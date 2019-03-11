@@ -1,28 +1,28 @@
 "idst";"tens";"impf";"dsty";"fmod";"endurance";"tcond";"comments"
-"ROCK";  "15"; "210";"3000";   "1";     "0.42";   "10";
-"CUPR"; "210"; "770";"8960";   "2";     "1.00";  "401";"copper"
-"EGLS";  "33";"1000";"2325";   "4";     "0.82";   "10";"elven glass/moldavite"
-"IRON"; "350";"1085";"7874";   "5";     "1.42";   "10";
-"ARGN"; "170"; "595";"10490";  "9";     "0.91";   "10";"argentum/silver"
-"STAL"; "531";"2520";"7874";  "14";     "1.73";   "10";"steel"
-"EAUR"; "768";   "0";"8192";  "21";     "1.36";   "10";"elven aurichalcum"
-"TIAL"; "900";   "0";"4420";  "33";     "2.16";   "10";"titanium alloy (Ti6Al4V)"
-"ADMT";"2000";"4090";"2700";  "71";     "3.42";   "10";"adamant"
-
-"OOZE";   "0";"genetic ooze"
+"ROCK";  "15"; "210";"3000";   "1";     "0.42";  "1.0";
+"CUPR"; "210"; "770";"8960";   "2";     "1.00";"401.0";"copper"
+"EGLS";  "33";"1000";"2325";   "4";     "0.82";  "1.0";"elven glass/moldavite"
+"IRON"; "350";"1085";"7874";   "5";     "1.42";  "1.0";
+"ARGN"; "170"; "595";"10490";  "9";     "0.91";  "1.0";"argentum/silver"
+"STAL"; "531";"2520";"7874";  "14";     "1.73";  "1.0";"steel"
+"EAUR"; "768";   "0";"8192";  "21";     "1.36";  "1.0";"elven aurichalcum"
+"TIAL"; "900";   "0";"4420";  "33";     "2.16";  "1.0";"titanium alloy (Ti6Al4V)"
+"ADMT";"2000";"4090";"2700";  "71";     "3.42";  "1.0";"adamant"
+"OOZE";  "20";   "0";"1000";   "1";      "N/A";  "0.5";"genetic ooze; data is about human skin"
+"BONE"; "130";   "0";"2000";   "1";     "0.23"; "0.55";"data was bovine bone"
 
 # idst: ID_STRING, ALL CAPS
 
 # tens: tensile strength (= ultimate stringth)
-        ultimate stringth is technically a tensile strength, but I'm using it anyway because it's easiest to get the value from
-								that, or DF's tensile fracture divided by 1000 (I think Toady and I are both using values posted on Wikipedia, e.g. Silver)
+#       not all 'impact' is not tensile stress, but I'm using it anyway because it's easiest to get the value from.
+#							that, or DF's tensile fracture divided by 1000 (I think Toady and I are both using values posted on Wikipedia, e.g. Silver)
 
 # impf: Dwarf Fortress impact fracture divided by 1000 (likely not being used)
 
 # dsty: density (grams per litre)
 
 # fmod: forcemod -- related to attack points
-#   Attack points = `4 * forcemod.sqrt()` for each strike
+#       Attack points = `4 * forcemod.sqrt()` for each strike
 
 # endurance: multiplier, using copper as reference; determines durability of tools/weapons/armours/etc.
              the base value for endurance differes to tool to tool. When integer is used, resulting value must be ROUNDED.
