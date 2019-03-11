@@ -77,7 +77,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
 
         // If we already have the item, increment the amount
         // If not, add item with specified amount
-        val existingItem = getByDynamicID(item.dynamicID)
+        val existingItem = invSearchByDynamicID(item.dynamicID)
 
         // if the item already exists
         if (existingItem != null) {
@@ -106,7 +106,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
 
 
 
-        val existingItem = getByDynamicID(item.dynamicID)
+        val existingItem = invSearchByDynamicID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
             val newCount = existingItem.amount - count
 
@@ -133,7 +133,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         quickSlot[slot] = dynamicID
     }
 
-    fun getQuickslot(slot: Int): InventoryPair? = getByDynamicID(quickSlot[slot])
+    fun getQuickslot(slot: Int): InventoryPair? = invSearchByDynamicID(quickSlot[slot])
 
     /**
      * HashMap<GameItem, Amounts>
@@ -198,7 +198,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
 
                 newItem.stackable = false
                 add(newItem)
-                itemEquipped[newItem.equipPosition] = getByDynamicID(newItem.dynamicID)!!.item // will test if some sketchy code is written. Test fail: kotlinNullpointerException
+                itemEquipped[newItem.equipPosition] = newItem.dynamicID //invSearchByDynamicID(newItem.dynamicID)!!.item // will test if some sketchy code is written. Test fail: kotlinNullpointerException
 
                 // FIXME now damage meter (vital) is broken
             }
@@ -236,7 +236,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
                 false
             else
                 itemList.binarySearch(id, DYNAMIC_ID) >= 0
-    fun getByDynamicID(id: ItemID?): InventoryPair? {
+    fun invSearchByDynamicID(id: ItemID?): InventoryPair? {
         if (itemList.size == 0 || id == null)
             return null
 
@@ -246,8 +246,8 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         else
             return itemList[index]
     }
-    private fun getByStaticID(id: ItemID): InventoryPair? {
-        if (itemList.size == 0)
+    private fun invSearchByStaticID(id: ItemID?): InventoryPair? {
+        if (itemList.size == 0 || id == null)
             return null
 
         val index = itemList.binarySearch(id, STATIC_ID)
@@ -269,7 +269,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
     }
     @Transient private val STATIC_ID = 41324534
     @Transient private val DYNAMIC_ID = 181643953
-    private fun ArrayList<InventoryPair>.binarySearch(ID: ItemID, searchBy: Int): Int {
+    private fun ArrayList<InventoryPair>.binarySearch(ID: ItemID, searchMode: Int): Int {
         // code from collections/Collections.kt
         var low = 0
         var high = this.size - 1
@@ -277,7 +277,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
 
-            val midVal = if (searchBy == STATIC_ID)
+            val midVal = if (searchMode == STATIC_ID)
                 ItemCodex[this[mid].item]!!.originalID
             else
                 ItemCodex[this[mid].item]!!.dynamicID

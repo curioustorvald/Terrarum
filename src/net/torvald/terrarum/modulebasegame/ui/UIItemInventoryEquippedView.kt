@@ -132,7 +132,7 @@ class UIItemInventoryEquippedView(
                 itemGrid[k].equippedSlot = null
             }
             else {
-                val itemRecord = inventory.getByDynamicID(item)!!
+                val itemRecord = inventory.invSearchByDynamicID(item)!!
 
                 itemGrid[k].item = ItemCodex[item]
                 itemGrid[k].amount = itemRecord.amount

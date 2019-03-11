@@ -22,6 +22,7 @@ object ItemCodex {
      */
     val itemCodex = HashMap<ItemID, GameItem>()
     val dynamicItemDescription = HashMap<ItemID, GameItem>()
+    val dynamicToStaticTable = HashMap<ItemID, ItemID>()
 
     val ITEM_TILES = 0..GameWorld.TILES_SUPPORTED - 1
     val ITEM_WALLS = GameWorld.TILES_SUPPORTED..GameWorld.TILES_SUPPORTED * 2 - 1
@@ -242,6 +243,7 @@ object ItemCodex {
             printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
         }
         dynamicItemDescription[dynamicID] = item
+        dynamicToStaticTable[dynamicID] = item.originalID
     }
 
     /**
@@ -265,6 +267,8 @@ object ItemCodex {
         }
     }
 
+    fun dynamicToStaticID(dynamicID: ItemID) = dynamicToStaticTable[dynamicID]!!
+
     /**
      * Mainly used by GameItemLoader
      */
@@ -279,8 +283,12 @@ object ItemCodex {
     }
 
     fun getItemImage(itemOriginalID: Int): TextureRegion {
+        // dynamic item
+        if (itemOriginalID in ITEM_DYNAMIC) {
+            return getItemImage(dynamicToStaticID(itemOriginalID))
+        }
         // terrain
-        if (itemOriginalID in ITEM_TILES) {
+        else if (itemOriginalID in ITEM_TILES) {
             return BlocksDrawer.tileItemTerrain.get(
                     itemOriginalID % 16,
                      itemOriginalID / 16
