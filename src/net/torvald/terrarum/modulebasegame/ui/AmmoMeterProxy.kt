@@ -19,7 +19,7 @@ object AmmoMeterProxy {
         else {
             meter.vitalGetterVal = {
                 if (currentItem.stackable && currentItem.maxDurability == GameItem.DURABILITY_NA) {
-                    actor.inventory.getByDynamicID(currentItem.dynamicID)!!.amount.toFloat()
+                    actor.inventory.invSearchByDynamicID(currentItem.dynamicID)!!.amount.toFloat()
                 }
                 else
                     currentItem.durability
