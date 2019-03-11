@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /***
@@ -45,8 +45,6 @@ class UIItemInventoryElem(
         val height = 48
         val UNIQUE_ITEM_HAS_NO_AMOUNT = -1
 
-        internal val durabilityCol = Color(0x22ff11_ff)
-        internal val durabilityBack: Color; get() = durabilityCol.darkerLab(0.4f)
         internal val durabilityBarThickness = 3f
     }
 
@@ -126,11 +124,14 @@ class UIItemInventoryElem(
             // durability metre
             val barFullLen = (width - 8f) - textOffsetX
             val barOffset = posX + textOffsetX
+            val percentage = if (item!!.maxDurability < 0.00001f) 0f else item!!.durability / item!!.maxDurability
+            val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
+            val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
             if (item!!.maxDurability > 0.0) {
                 batch.color = durabilityBack
                 batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, durabilityBarThickness, false)
                 batch.color = durabilityCol
-                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), durabilityBarThickness, false)
+                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * percentage, durabilityBarThickness, false)
             }
 
 

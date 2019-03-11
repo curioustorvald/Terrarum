@@ -10,6 +10,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /**
@@ -94,11 +95,14 @@ class UIItemInventoryElemSimple(
                 val barFullLen = width
                 val barOffset = posX.toFloat()
                 val thickness = UIItemInventoryElem.durabilityBarThickness
+                val percentage = item!!.durability / item!!.maxDurability
+                val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
+                val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
                 if (item!!.maxDurability > 0.0) {
-                    batch.color = UIItemInventoryElem.durabilityBack
+                    batch.color = durabilityBack
                     batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen, thickness, false)
-                    batch.color = UIItemInventoryElem.durabilityCol
-                    batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), thickness, false)
+                    batch.color = durabilityCol
+                    batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen * percentage, thickness, false)
                 }
             }
             // draw item count when applicable
