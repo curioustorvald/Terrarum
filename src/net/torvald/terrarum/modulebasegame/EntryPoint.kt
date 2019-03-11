@@ -64,7 +64,7 @@ class EntryPoint : ModuleEntryPoint() {
                     override var stackable = true
                     override var inventoryCategory = if (i in ItemCodex.ITEM_TILES) Category.BLOCK else Category.WALL
                     override var isDynamic = false
-                    override val material = MaterialCodex[blockProp.material]
+                    override val material = MaterialCodex.getOrDefault(blockProp.material)
 
                     init {
                         equipPosition = EquipPosition.HAND_GRIP

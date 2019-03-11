@@ -81,7 +81,7 @@ class PickaxeCopper(override val originalID: ItemID) : GameItem() {
     override var inventoryCategory = Category.TOOL
     override val isUnique = false
     override val isDynamic = true
-    override var material = MaterialCodex["CUPR"]
+    override val material = MaterialCodex["CUPR"]
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion?
         get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(0,0)
@@ -109,7 +109,7 @@ class PickaxeIron(override val originalID: ItemID) : GameItem() {
     override var inventoryCategory = Category.TOOL
     override val isUnique = false
     override val isDynamic = true
-    override var material = MaterialCodex["IRON"]
+    override val material = MaterialCodex["IRON"]
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion?
         get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(1,0)
@@ -137,7 +137,7 @@ class PickaxeSteel(override val originalID: ItemID) : GameItem() {
     override var inventoryCategory = Category.TOOL
     override val isUnique = false
     override val isDynamic = true
-    override var material = MaterialCodex["STAL"]
+    override val material = MaterialCodex["STAL"]
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion?
         get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(2,0)
