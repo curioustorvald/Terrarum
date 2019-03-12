@@ -4,7 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.dataclass.HistoryArray
+import net.torvald.util.HistoryArray
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.AppLoader

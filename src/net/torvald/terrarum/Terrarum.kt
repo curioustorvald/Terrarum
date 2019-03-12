@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
-import net.torvald.dataclass.CircularArray
+import net.torvald.util.CircularArray
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.gameactors.Actor

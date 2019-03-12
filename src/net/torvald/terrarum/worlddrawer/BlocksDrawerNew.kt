@@ -3,6 +3,7 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
@@ -184,7 +185,7 @@ internal object BlocksDrawer {
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
-    internal fun renderData() {
+    internal fun renderData(wireBit: Int) {
 
         try {
             drawTIME_T = (world as GameWorldExtension).time.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
@@ -197,7 +198,7 @@ internal object BlocksDrawer {
 
         drawTiles(WALL)
         drawTiles(TERRAIN) // regular tiles
-        drawTiles(WIRE)
+        drawTiles(WIRE, wireBit)
         drawTiles(FLUID)
     }
 
@@ -214,7 +215,7 @@ internal object BlocksDrawer {
         renderUsingBuffer(FLUID, projectionMatrix)
     }
 
-    internal fun drawFront(projectionMatrix: Matrix4, drawWires: Boolean) {
+    internal fun drawFront(projectionMatrix: Matrix4, drawWires: Int) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -227,7 +228,8 @@ internal object BlocksDrawer {
 
         gdxSetBlendNormal()
 
-        if (drawWires) {
+        if (drawWires != 0) {
+            //println("drawing wires")
             renderUsingBuffer(WIRE, projectionMatrix)
         }
     }
@@ -258,11 +260,23 @@ internal object BlocksDrawer {
     private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
 
     /**
+     * Turns bitmask-with-single-bit-set into its bit index. The LSB is counted as 1, and thus the index starts at one.
+     * @return 0 -> null, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, ...
+     */
+    private fun Int.toBitOrd(): Int? =
+            if (this > 0 && !FastMath.isPowerOfTwo(this)) throw IllegalArgumentException("value must be power of two: $this")
+            else {
+                val k = FastMath.intLog2(this, -1)
+                if (k == -1) null else k
+            }
+
+    /**
      * Writes to buffer. Actual draw code must be called after this operation.
      *
      * @param drawModeTilesBlendMul If current drawing mode is MULTIPLY. Doesn't matter if mode is FLUID.
+     * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.
      */
-    private fun drawTiles(mode: Int) {
+    private fun drawTiles(mode: Int, wireBit: Int = 0) {
         // can't be "WorldCamera.y / TILE_SIZE":
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
@@ -291,7 +305,7 @@ internal object BlocksDrawer {
                 val thisTile = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> world.getWires(x, y)
+                    WIRE -> world.getWires(x, y).and(wireBit).toBitOrd()
                     FLUID -> world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }

@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
-import net.torvald.dataclass.HistoryArray
+import net.torvald.util.HistoryArray
 import net.torvald.terrarum.langpack.Lang
 
 /**

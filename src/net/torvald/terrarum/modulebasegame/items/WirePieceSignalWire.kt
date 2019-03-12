@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.items
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.blockproperties.Wire
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.itemproperties.Material
@@ -35,6 +36,7 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
     }
 
     override fun effectWhenEquipped(delta: Float) {
-        IngameRenderer.drawWires = true
+        IngameRenderer.selectedWireBitToDraw = Wire.BIT_SIGNAL_RED
+        //println("wires!")
     }
 }

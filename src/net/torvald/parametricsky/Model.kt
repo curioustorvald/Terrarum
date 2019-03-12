@@ -1,6 +1,6 @@
 package net.torvald.parametricsky
 
-import net.torvald.dataclass.Matrix
+import net.torvald.util.Matrix
 import kotlin.math.pow
 
 /**

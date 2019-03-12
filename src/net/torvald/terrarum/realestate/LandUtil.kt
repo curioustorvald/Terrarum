@@ -11,7 +11,7 @@ import net.torvald.terrarum.gameworld.fmod
  */
 object LandUtil {
     fun getBlockAddr(world: GameWorld, x: Int, y: Int): BlockAddress =
-            // coercing and fmod-ing follows ROUNDWORLD rule
+            // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
             (world.width * y.coerceIn(0, world.height - 1)).toLong() + x.fmod(world.width)
 
     fun resolveBlockAddr(world: GameWorld, t: BlockAddress): Pair<Int, Int> =

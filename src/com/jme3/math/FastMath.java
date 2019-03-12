@@ -35,9 +35,6 @@
 
 package com.jme3.math;
 
-import java.util.Arrays;
-import java.util.Random;
-
 /**
  * <code>FastMath</code> provides 'fast' math approximations and float equivalents of Math
  * functions.  These are all used as static values and functions.
@@ -118,10 +115,24 @@ final public class FastMath {
      * Throws runtimeException for all numbers <= 1.
      *
      * @param number The number to obtain the POT for.
-     * @return The next power of two.
+     * @return The next power of two. (0 -> 0, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, etc.)
      */
     public static int intLog2(int number) {
-        if (number == 0) return 0;
+        return intLog2(number, 0);
+    }
+
+    /**
+     * Get the next binary log of the given number.
+     *
+     * E.g. for an input 100, this returns 6.
+     * Throws runtimeException for all numbers <= 1.
+     *
+     * @param number The number to obtain the POT for.
+     * @param zeroCase What to return if the input number is zero.
+     * @return The next power of two. (0 -> zeroCase, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, etc.)
+     */
+    public static int intLog2(int number, int zeroCase) { // zeroCase can't be null, for some reason...
+        if (number == 0) return zeroCase;
         int log = 0;
         if( ( number & 0xffff0000 ) != 0 ) { number >>>= 16; log = 16; }
         if( number >= 256 ) { number >>>= 8; log += 8; }

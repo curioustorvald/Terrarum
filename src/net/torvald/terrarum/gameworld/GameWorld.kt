@@ -2,6 +2,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.util.SortedArrayList
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -10,8 +11,10 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
+import net.torvald.terrarum.toInt
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 typealias BlockAddress = Long
 
@@ -79,6 +82,8 @@ open class GameWorld {
         get() = conduitFills[0]
     val conduitFills1: HashMap<BlockAddress, Float> // size of gas packet on the block
         get() = conduitFills[1]
+
+    private val wiringNodes = SortedArrayList<WiringNode>()
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -183,7 +188,7 @@ open class GameWorld {
     //val wireArray: ByteArray
     //    get() = layerWire.data
 
-    private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceWorld())
+    private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
     fun getTileFromWall(x: Int, y: Int): Int? {
         val (x, y) = coerceXY(x, y)
@@ -205,12 +210,7 @@ open class GameWorld {
             terrain * PairedMapLayer.RANGE + terrainDamage
     }
 
-    /*fun getTileFromWire(x: Int, y: Int): Int? {
-        val (x, y) = coerceXY(x, y)
-        return layerWire.getTile(x, y)
-    }*/
-
-    fun getWires(x: Int, y: Int): Int? {
+    fun getWires(x: Int, y: Int): Int {
         return conduitTypes.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
     }
 
@@ -290,6 +290,28 @@ open class GameWorld {
         if (oldWire != null)
             Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
     }*/
+
+    /**
+     * Overrides entire bits with given value. DO NOT USE THIS if you don't know what this means, you'll want to use setWire().
+     * Besides, this function won't fire WireChangedEvent
+     */
+    fun setWires(x: Int, y: Int, wireBits: Int) {
+        val (x, y) = coerceXY(x, y)
+        conduitTypes[LandUtil.getBlockAddr(this, x, y)] = wireBits
+    }
+
+    /**
+     * Sets single bit for given tile. YOU'LL WANT TO USE THIS instead of setWires()
+     * @param selectedWire wire-bit to modify, must be power of two
+     */
+    fun setWire(x: Int, y: Int, selectedWire: Int, bitToSet: Boolean) {
+        val oldWireBits = getWires(x, y)
+        val oldStatus = getWires(x, y) or selectedWire != 0
+        if (oldStatus != bitToSet) {
+            setWires(x, y, (oldWireBits and selectedWire.inv()) or (selectedWire * oldStatus.toInt()))
+            Terrarum.ingame?.queueWireChangedEvent(selectedWire * oldStatus.toInt(), selectedWire * bitToSet.toInt(), LandUtil.getBlockAddr(this, x, y))
+        }
+    }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
         if (mode == TERRAIN) {
@@ -460,6 +482,17 @@ open class GameWorld {
         override fun toString() = "Fluid type: ${type.value}, amount: $amount"
     }
 
+    private data class WiringNode(
+            val position: BlockAddress,
+            /** One defined in WireCodex, always power of two */
+            val typeBitMask: Int,
+            var fills: Float = 0f,
+            var connectedNodes: ArrayList<WiringNode>
+    ) : Comparable<WiringNode> {
+        override fun compareTo(other: WiringNode): Int {
+            return (this.position - other.position).sign
+        }
+    }
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
         return null
@@ -470,8 +503,6 @@ open class GameWorld {
     }
 
 
-    private fun Int.coerceWorld() = this.coerceIn(0, height - 1)
-    
     companion object {
         @Transient val WALL = 0
         @Transient val TERRAIN = 1

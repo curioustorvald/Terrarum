@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.ScreenUtils
-import net.torvald.dataclass.CircularArray
+import net.torvald.util.CircularArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -94,7 +94,7 @@ object IngameRenderer {
             LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
             prepLightmapRGBA()
-            BlocksDrawer.renderData()
+            BlocksDrawer.renderData(selectedWireBitToDraw)
             drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
             drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
             drawOverlayActors(actorsRenderOverlay)
@@ -216,7 +216,7 @@ object IngameRenderer {
         batch.color = Color.WHITE
 
 
-        drawWires = false
+        selectedWireBitToDraw = 0
     }
 
 
@@ -235,7 +235,19 @@ object IngameRenderer {
 
     internal var fboRGBexportRequested = false
 
-    var drawWires = false
+    /**
+     * Which wires should be drawn. Normally this value is set by the wiring item (e.g. wire pieces, wirecutters)
+     * This number is directly related with the World's wire bits:
+     *
+     * ```
+     * world.getWires(x, y) -> 0000101 (for example)
+     *     value of 3 selects this ^ ^
+     *       value of 1 selects this |
+     *
+     * The wire piece gets rendered when selected bit is set.
+     * ```
+     */
+    var selectedWireBitToDraw = 0
 
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,
@@ -279,7 +291,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawFront(batch.projectionMatrix, drawWires) // blue coloured filter of water, etc.
+            BlocksDrawer.drawFront(batch.projectionMatrix, selectedWireBitToDraw) // blue coloured filter of water, etc.
 
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)

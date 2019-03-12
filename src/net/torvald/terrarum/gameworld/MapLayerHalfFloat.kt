@@ -1,13 +1,14 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.dataclass.Float16
-import net.torvald.dataclass.Float16Bits
+import net.torvald.util.Float16
+import net.torvald.util.Float16Bits
 
 /**
  * MapLayer that contains raw Float16 values
  *
  * Created by minjaesong on 2017-04-21.
  */
+@Deprecated("Don't need this anymore")
 open class MapLayerHalfFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
 
     constructor(width: Int, height: Int, init: Float) : this(width, height) {
