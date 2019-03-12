@@ -588,13 +588,16 @@ open class ActorHumanoid(
     }
 
     override fun onActorValueChange(key: String, value: Any?) {
-        // quickslot implementation
+        // make quickslot work
         if (key == AVKey.__PLAYER_QUICKSLOTSEL && value != null) {
             // ONLY FOR HAND_GRIPs!!
             val quickBarItem = ItemCodex[inventory.getQuickslot(actorValue.getAsInt(key)!!)?.item]
 
             if (quickBarItem != null && quickBarItem.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
                 equipItem(quickBarItem)
+            }
+            else {
+                unequipSlot(GameItem.EquipPosition.HAND_GRIP)
             }
 
             // force update inventory UI

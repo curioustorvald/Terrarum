@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.dataclass.CircularArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -34,6 +33,7 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.util.CircularArray
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
@@ -795,7 +795,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             printStackTrace()
 
             actorContainerActive.add(actor)
-            insertionSortLastElem(actorContainerActive) // we can do this as we are only adding single actor
 
             if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
@@ -829,7 +828,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         else {
             actorContainerInactive.remove(actor)
             actorContainerActive.add(actor)
-            insertionSortLastElem(actorContainerActive) // we can do this as we are only adding single actor
 
             if (actor is ActorWithBody) {
                 when (actor.renderOrder) {

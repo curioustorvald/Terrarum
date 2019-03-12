@@ -1,4 +1,4 @@
-import net.torvald.dataclass.CircularArray
+import net.torvald.util.CircularArray
 
 /**
  * Created by minjaesong on 2019-01-09.

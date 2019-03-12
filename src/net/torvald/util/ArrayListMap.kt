@@ -1,4 +1,4 @@
-package net.torvald.dataclass
+package net.torvald.util
 
 import java.util.function.BiConsumer
 import java.util.function.BiFunction

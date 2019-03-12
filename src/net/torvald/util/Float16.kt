@@ -1,4 +1,4 @@
-package net.torvald.dataclass
+package net.torvald.util
 
 import kotlin.experimental.or
 

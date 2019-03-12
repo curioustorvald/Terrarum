@@ -1,18 +1,17 @@
 package net.torvald.terrarum.debuggerapp
 
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.util.SortedArrayList
 import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.GridLayout
-import java.util.*
 import javax.swing.*
 
 /**
  * Created by minjaesong on 2016-12-29.
  */
 class ActorsLister(
-        val actorContainer: ArrayList<Actor>,
-        val actorContainerInactive:  ArrayList<Actor>) : JFrame() {
+        val actorContainer: SortedArrayList<Actor>,
+        val actorContainerInactive: SortedArrayList<Actor>) : JFrame() {
 
     private val activeActorArea = JTextArea()
     private val activeActorScroller = JScrollPane(activeActorArea)

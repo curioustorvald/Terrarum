@@ -18,7 +18,7 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.torvald.dataclass.ArrayListMap;
+import net.torvald.util.ArrayListMap;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.blockstats.MinimapComposer;
 import net.torvald.terrarum.controller.GdxControllerAdapter;

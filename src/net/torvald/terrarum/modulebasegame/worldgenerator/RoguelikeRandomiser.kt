@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.badlogic.gdx.graphics.Color
-import net.torvald.dataclass.IntArrayStack
+import net.torvald.util.IntArrayStack
 import net.torvald.colourutil.Col4096
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.modulebasegame.RNGConsumer

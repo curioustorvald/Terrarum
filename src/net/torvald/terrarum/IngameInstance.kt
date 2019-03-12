@@ -8,9 +8,9 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.ConsoleWindow
+import net.torvald.util.SortedArrayList
 import java.util.*
 import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
@@ -48,8 +48,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         internal set
 
     val ACTORCONTAINER_INITIAL_SIZE = 64
-    val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
-    val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
     protected val terrainChangeQueue = Queue<BlockChangeQueueItem>()
     protected val wallChangeQueue = Queue<BlockChangeQueueItem>()
@@ -184,6 +184,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         return -(low + 1)  // key not found
     }
 
+    fun SortedArrayList<*>.binarySearch(actor: Actor) = this.toArrayList().binarySearch(actor.referenceID!!)
+    fun SortedArrayList<*>.binarySearch(ID: Int) = this.toArrayList().binarySearch(ID)
+
     open fun removeActor(ID: Int) = removeActor(getActorByID(ID))
     /**
      * get index of the actor and delete by the index.
@@ -213,7 +216,6 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         }
         else {
             actorContainerActive.add(actor)
-            insertionSortLastElem(actorContainerActive) // we can do this as we are only adding single actor
         }
     }
 
@@ -238,19 +240,6 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             isActive(ID) || isInactive(ID)
 
 
-
-
-    fun insertionSortLastElem(arr: ArrayList<Actor>) {
-        ReentrantLock().lock {
-            var j = arr.lastIndex - 1
-            val x = arr.last()
-            while (j >= 0 && arr[j] > x) {
-                arr[j + 1] = arr[j]
-                j -= 1
-            }
-            arr[j + 1] = x
-        }
-    }
 
 
     data class BlockChangeQueueItem(val old: Int, val new: Int, val posX: Int, val posY: Int)

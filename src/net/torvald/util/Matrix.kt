@@ -1,4 +1,4 @@
-package net.torvald.dataclass
+package net.torvald.util
 
 /**
  * Taken and improved from https://introcs.cs.princeton.edu/java/95linear/Matrix.java.html

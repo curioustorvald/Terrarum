@@ -80,10 +80,12 @@ class EntryPoint : ModuleEntryPoint() {
 
                         // check for collision with actors (BLOCK only)
                         if (this.inventoryCategory == Category.BLOCK) {
+                            var ret1 = true
                             ingame.actorContainerActive.forEach {
                                 if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
-                                    return false
+                                    ret1 = false // return is not allowed here
                             }
+                            if (!ret1) return ret1
                         }
 
                         // return false if the tile is already there
