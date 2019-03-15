@@ -600,11 +600,15 @@ open class ActorHumanoid(
                 unequipSlot(GameItem.EquipPosition.HAND_GRIP)
             }
 
-            // force update inventory UI
+            // force update inventory UI, but when the pie menu is not open (pie menu constantly writes to the actorvalue, which will rebuildList()
             try {
-                ((Terrarum.ingame!! as Ingame).uiInventoryPlayer as UIInventoryFull).rebuildList()
+                if (!(Terrarum.ingame!! as Ingame).uiPieMenu.isVisible) {
+                    ((Terrarum.ingame!! as Ingame).uiInventoryPlayer as UIInventoryFull).rebuildList()
+                }
             }
-            catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) { }
+            catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) {
+            }
+
         }
     }
 
