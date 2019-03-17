@@ -118,9 +118,11 @@ object ModMgr {
             }
             catch (noSuchModule: FileNotFoundException) {
                 printdbgerr(this, "No such module: $moduleName, skipping...")
+                moduleInfo.remove(moduleName)
             }
             catch (e: ClassNotFoundException) {
                 printdbgerr(this, "$moduleName has nonexisting entry point, skipping...")
+                moduleInfo.remove(moduleName)
             }
         }
 
