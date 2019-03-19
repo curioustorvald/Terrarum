@@ -48,7 +48,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
 
     var nameColour = Color.WHITE
 
-    /** In kg */
+    /** In kg. Weapon with different material must have different mass. In this case, you MUST use IRON as a reference (or default) material. */
     abstract var baseMass: Double
 
     /** In kg */

@@ -1,6 +1,6 @@
 package net.torvald.random
 
-import java.util.Random
+import java.util.*
 
 /**
  * Created by minjaesong on 2016-02-03.
@@ -20,7 +20,7 @@ open class FudgeDice
      */
     fun roll(): Int {
         var diceResult = 0
-        for (c in 0..diceCount - 1) {
+        for (c in 0 until diceCount) {
             diceResult += rollSingleDie()
         }
 
@@ -29,11 +29,17 @@ open class FudgeDice
 
     /**
      * Roll dice and get result, for array index
-     * @return Normally distributed integer [0 , N] for N = 2 × DiceCounts + 1. 0 is the most frequent return.
+     * @return Normally distributed integer [0 , N] for N = 2 × DiceCounts + 1. (diceCount) is the most frequent return.
      */
     fun rollForArray(): Int {
         return roll() + diceCount
     }
+
+    fun <T> rollForArray(array: Array<T>): T = array[rollForArray()]
+    fun rollForArray(intArray: IntArray): Int = intArray[rollForArray()]
+    fun rollForArray(longArray: LongArray): Long = longArray[rollForArray()]
+    fun rollForArray(floatArray: FloatArray): Float = floatArray[rollForArray()]
+    fun rollForArray(doubleArray: DoubleArray): Double = doubleArray[rollForArray()]
 
     val sizeOfProbabilityRange: Int
         get() = 2 * diceCount + 1

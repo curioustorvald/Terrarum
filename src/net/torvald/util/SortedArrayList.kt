@@ -16,6 +16,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
      */
     fun add(elem: T) {
         // don't append-at-tail-and-sort; just insert at right index
+        // this is a modified binary search to search the right "spot" where the insert elem fits
         ReentrantLock().lock {
             var low = 0
             var high = arrayList.size

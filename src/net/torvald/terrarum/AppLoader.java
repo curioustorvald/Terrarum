@@ -58,7 +58,7 @@ public class AppLoader implements ApplicationListener {
      * <p>
      * e.g. 0x02010034 will be translated as 2.1.52
      */
-    public static final int VERSION_RAW = 0x00_02_04B1;
+    public static final int VERSION_RAW = 0x00_02_0590;
 
     public static final String getVERSION_STRING() {
         return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
@@ -596,7 +596,13 @@ public class AppLoader implements ApplicationListener {
         );
         fontSmallNumbers = TinyAlphNum.INSTANCE;
 
-        audioDevice = Gdx.audio.newAudioDevice(48000, false);
+        try {
+            audioDevice = Gdx.audio.newAudioDevice(48000, false);
+        }
+        catch (NullPointerException deviceInUse) {
+            deviceInUse.printStackTrace();
+            System.err.println("[AppLoader] failed to create audio device: Audio device occupied by Exclusive Mode Device? (e.g. ASIO4all)");
+        }
 
         // if there is a predefined screen, open that screen after my init process
         if (injectScreen != null) {
