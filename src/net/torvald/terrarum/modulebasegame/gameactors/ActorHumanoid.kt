@@ -273,11 +273,6 @@ open class ActorHumanoid(
         /**
          * U-D stop
          */
-        if (hasController) {
-            if (axisY == 0f) {
-                walkVStop()
-            }
-        }
         // ↑E
         // ↑D
         if (isNoClip && !isUpDown && !isDownDown && axisY == 0f) {
@@ -319,7 +314,7 @@ open class ActorHumanoid(
         if (isNoClip || COLLISION_TEST_MODE) {
             if (hasController) {
                 if (axisY != 0f) {
-                    walkVertical(axisY < 0, axisY.abs())
+                    walkVertical(axisY > 0, axisY.abs())
                 }
             }
             // ↑E, ↓D
