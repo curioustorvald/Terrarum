@@ -103,7 +103,7 @@ open class UIItemTextButton(
         else inactiveCol
 
         font.draw(batch,
-                label,
+                label, //"$label/H:${highlighted.toInt()}, M:${mouseUp.toInt()}",
                 when (alignment) {
                     Alignment.CENTRE -> posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2)
                     Alignment.LEFT -> posX.toFloat() + preGapX
