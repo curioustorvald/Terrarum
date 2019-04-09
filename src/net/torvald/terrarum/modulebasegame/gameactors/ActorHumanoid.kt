@@ -233,12 +233,6 @@ open class ActorHumanoid(
                 axisRX = gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisrx"))
                 axisRY = gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisry"))
 
-                // deadzonning
-                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxislx"))) axisX = 0f
-                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxisly"))) axisY = 0f
-                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxisrx"))) axisRX = 0f
-                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxisry"))) axisRY = 0f
-
                 isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
                              gamepad.getButton(AppLoader.getConfigInt("gamepadltrigger"))
             }

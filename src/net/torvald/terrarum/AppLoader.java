@@ -183,12 +183,6 @@ public class AppLoader implements ApplicationListener {
     public static TerrarumController gamepad = null;
     public static float gamepadDeadzone = 0.2f;
 
-    public static boolean inDeadzone(TerrarumController controller, int axis) {
-        float ax = controller.getAxis(axis);
-        float zero = (axis < 4) ? getConfigFloatArray("gamepadaxiszeropoints")[axis] : 0f;
-
-        return Math.abs(ax - zero) < gamepadDeadzone;
-    }
 
     /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
@@ -360,13 +354,17 @@ public class AppLoader implements ApplicationListener {
             environment = RunningEnvironment.CONSOLE;
 
             // calibrate the sticks
-            /*float[] axesZeroPoints = new float[]{
-                    gamepad.getAxis(0),
-                    gamepad.getAxis(1),
-                    gamepad.getAxis(2),
-                    gamepad.getAxis(3)
+            printdbg(this, "Calibrating the gamepad...");
+            float[] axesZeroPoints = new float[]{
+                    gamepad.getAxisRaw(0),
+                    gamepad.getAxisRaw(1),
+                    gamepad.getAxisRaw(2),
+                    gamepad.getAxisRaw(3)
             };
-            setConfig("gamepadaxiszeropoints", axesZeroPoints);*/
+            setConfig("gamepadaxiszeropoints", axesZeroPoints);
+            for (int i = 0; i < 4; i++) {
+                printdbg(this, "Axis " + i + ": " + axesZeroPoints[i]);
+            }
 
         }
         else {
