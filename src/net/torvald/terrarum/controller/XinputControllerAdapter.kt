@@ -36,7 +36,7 @@ class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
         return false
     }
 
-    override fun getAxis(index: Int): Float {
+    override fun getAxisRaw(index: Int): Float {
         if (c.poll()) {
             val axes = c.components.axes
 

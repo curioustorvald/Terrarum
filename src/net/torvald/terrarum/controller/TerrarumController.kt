@@ -1,5 +1,8 @@
 package net.torvald.terrarum.controller
 
+import net.torvald.terrarum.AppLoader.gamepadDeadzone
+import net.torvald.terrarum.AppLoader.getConfigFloatArray
+
 /**
  * Created by minjaesong on 2019-02-09.
  */
@@ -40,7 +43,24 @@ interface TerrarumController {
      *
      * @return 0f..1f for the axis
      */
-    fun getAxis(index: Int): Float
+    fun getAxisRaw(index: Int): Float
+    /**
+     * Returns deadzone-applied axis value. Deadzone must be stored in the app's config database as the IntArray gamepadaxiszeropoints
+     */
+    fun getAxis(index:Int): Float {
+        val raw = getAxisRaw(index)
+        val zero = if (index < 4) getConfigFloatArray("gamepadaxiszeropoints")[index] else 0f
+        val inDeadzone = Math.abs(raw - zero) < gamepadDeadzone
+
+        return if (inDeadzone) 0f else raw
+    }
+
+    fun inDeadzone(axis: Int): Boolean {
+        val ax = getAxisRaw(axis)
+        val zero = if (axis < 4) getConfigFloatArray("gamepadaxiszeropoints")[axis] else 0f
+
+        return Math.abs(ax - zero) < gamepadDeadzone
+    }
 
     /**
      * ```

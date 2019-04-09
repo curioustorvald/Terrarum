@@ -12,7 +12,7 @@ class GdxControllerAdapter(val c: Controller): TerrarumController {
         return c.getButton(index)
     }
 
-    override fun getAxis(index: Int): Float {
+    override fun getAxisRaw(index: Int): Float {
         return c.getAxis(index)
     }
 
