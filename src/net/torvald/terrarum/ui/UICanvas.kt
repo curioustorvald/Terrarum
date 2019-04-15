@@ -213,8 +213,9 @@ abstract class UICanvas(
     }
     /** Called by the screen's InputProcessor */
     open fun keyTyped(character: Char): Boolean {
+        // TODO process key typing from the virtual keyboard?
+
         return false
-        //uiItems.forEach { it.keyT }
     }
 
     open fun resize(width: Int, height: Int) {

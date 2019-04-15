@@ -50,9 +50,10 @@ interface TerrarumController {
     fun getAxis(index:Int): Float {
         val raw = getAxisRaw(index)
         val zero = if (index < 4) getConfigFloatArray("gamepadaxiszeropoints")[index] else 0f
-        val inDeadzone = Math.abs(raw - zero) < gamepadDeadzone
+        val compensatedRaw = raw - zero
+        val inDeadzone = Math.abs(compensatedRaw) < gamepadDeadzone
 
-        return if (inDeadzone) 0f else raw
+        return if (inDeadzone) 0f else raw//compensatedRaw // returning raw makes more sense
     }
 
     fun inDeadzone(axis: Int): Boolean {
