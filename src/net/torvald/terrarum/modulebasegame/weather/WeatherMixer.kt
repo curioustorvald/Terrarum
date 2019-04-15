@@ -13,6 +13,7 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gdxSetBlendNormal
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
@@ -154,12 +155,13 @@ internal object WeatherMixer : RNGConsumer {
         val bottomCol = getGradientColour(skyboxColourMap, 1, timeNow)
 
         //Terrarum.textureWhiteSquare.bind(0)
+        gdxSetBlendNormal()
 
         Terrarum.shaderSkyboxFill.begin()
         Terrarum.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
         Terrarum.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
         Terrarum.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
-        Terrarum.shaderSkyboxFill.setUniformf("parallax", parallax)
+        Terrarum.shaderSkyboxFill.setUniformf("parallax", parallax.coerceIn(-1f, 1f))
         Terrarum.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
         Terrarum.fullscreenQuad.render(Terrarum.shaderSkyboxFill, GL20.GL_TRIANGLES)
         Terrarum.shaderSkyboxFill.end()

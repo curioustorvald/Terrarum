@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.ScreenUtils
-import net.torvald.util.CircularArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -16,6 +15,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.*
+import net.torvald.util.CircularArray
 import javax.swing.JFileChooser
 
 /**
