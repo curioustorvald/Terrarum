@@ -17,7 +17,7 @@ import net.torvald.terrarum.sqr
  * Remarks:
  * - NOT using the fullCodePage with 2x2 mode makes it slower... skewed tree generation?
  */
-class KDHeapifiedTree() {
+class KDHeapifiedTree(actors: List<ActorWBMovable>) {
 
     private val dimension = 2
     private val initialSize = 128
@@ -25,8 +25,8 @@ class KDHeapifiedTree() {
 
     private val root: Int = 0
 
-    fun findNearest(query: Point2d) =
-                getNearest(root, query, 0).get()!!
+    fun findNearestActor(query: Point2d): ActorWBMovable =
+                getNearest(root, query, 0).getActor()!!
 
     private fun Int.get() = nodes[this]?.feetPosPoint
     private fun Int.getActor() = nodes[this]
@@ -37,6 +37,10 @@ class KDHeapifiedTree() {
     private fun Int.setRightChild(value: ActorWBMovable?) { nodes[this.getRight()] = value }
 
     private val zeroPoint = Point2d(0.0, 0.0)
+
+    init {
+        create(actors, 0, 0)
+    }
 
     private fun create(points: List<ActorWBMovable?>, depth: Int, index: Int): ActorWBMovable? {
         if (points.isEmpty()) {
@@ -100,39 +104,4 @@ class KDHeapifiedTree() {
             other[dimension].minus(this[dimension]).sqr()
 
     private operator fun Point2d.get(index: Int) = if (index == 0) this.x else this.y
-}
-
-fun intLog2(number: Int): Int {
-    var number = number
-    if (number == 0) return 0
-    var log = 0
-    if (number and 0xffff0000.toInt() != 0) {
-        number = number ushr 16
-        log = 16
-    }
-    if (number >= 256) {
-        number = number ushr 8
-        log += 8
-    }
-    if (number >= 16) {
-        number = number ushr 4
-        log += 4
-    }
-    if (number >= 4) {
-        number = number ushr 2
-        log += 2
-    }
-    return log + number.ushr(1)
-}
-
-fun nextPowerOfTwo(number: Int): Int {
-    var number = number - 1
-    number = number or (number shr 1)
-    number = number or (number shr 2)
-    number = number or (number shr 4)
-    number = number or (number shr 8)
-    number = number or (number shr 16)
-    number++
-    number += if (number == 0) 1 else 0
-    return number
 }

@@ -481,6 +481,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (!paused) {
 
+            WorldSimulator.resetForThisFrame()
+
             ///////////////////////////
             // world-related updates //
             ///////////////////////////

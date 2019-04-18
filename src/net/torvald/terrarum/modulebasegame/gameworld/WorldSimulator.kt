@@ -1,10 +1,12 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.aa.KDHeapifiedTree
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.roundInt
@@ -47,16 +49,25 @@ object WorldSimulator {
     val colourNone = Color(0x808080FF.toInt())
     val colourWater = Color(0x66BBFFFF.toInt())
 
-    private val world = (Terrarum.ingame!!.world)
+    private val ingame = Terrarum.ingame!!
+    private val world = ingame.world
 
+    private var actorsKDTree: KDHeapifiedTree? = null
 
+    fun resetForThisFrame() {
+        actorsKDTree = null
+    }
 
-    operator fun invoke(p: ActorHumanoid?, delta: Float) {
+    operator fun invoke(player: ActorHumanoid?, delta: Float) {
+        // build the kdtree that will be used during a single frame of updating
+        if (actorsKDTree == null)
+            actorsKDTree = KDHeapifiedTree(ingame.actorContainerActive.filter { it is ActorWBMovable })
+
         //printdbg(this, "============================")
 
-        if (p != null) {
-            updateXFrom = p.hitbox.centeredX.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
-            updateYFrom = p.hitbox.centeredY.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+        if (player != null) {
+            updateXFrom = player.hitbox.centeredX.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+            updateYFrom = player.hitbox.centeredY.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }
