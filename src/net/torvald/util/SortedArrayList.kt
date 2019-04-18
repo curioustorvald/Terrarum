@@ -46,7 +46,15 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
     fun iterator() = arrayList.iterator()
     fun forEach(action: (T) -> Unit) = arrayList.forEach(action)
     fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
-    //fun <R> map(transformation: (T) -> R) = arrayList.map(transformation)
+
+
+    fun <R> map(transformation: (T) -> R) = arrayList.map(transformation)
+
+    fun <R> filter(function: (T) -> Boolean): List<R> {
+        val retList = ArrayList<R>() // sorted-ness is preserved
+        this.arrayList.forEach { if (function(it)) retList.add(it as R) }
+        return retList
+    }
 
     /**
      * Select one unsorted element from the array and put it onto the sorted spot.
