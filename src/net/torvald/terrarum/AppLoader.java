@@ -1,12 +1,11 @@
 package net.torvald.terrarum;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.AudioDevice;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,7 +17,6 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.torvald.util.ArrayListMap;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.blockstats.MinimapComposer;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
@@ -34,6 +32,7 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer;
 import net.torvald.terrarum.worlddrawer.LightmapRenderer;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
+import net.torvald.util.ArrayListMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,9 +85,11 @@ public class AppLoader implements ApplicationListener {
      * @param appConfig    LWJGL(2) Application Configuration
      * @param injectScreen GDX Screen you want to run
      */
-    public AppLoader(LwjglApplicationConfiguration appConfig, Screen injectScreen) {
+    public AppLoader(Lwjgl3ApplicationConfiguration appConfig, Screen injectScreen, int width, int height) {
         AppLoader.injectScreen = injectScreen;
         AppLoader.appConfig = appConfig;
+        setWindowWidth = width;
+        setWindowHeight = height;
     }
 
     /**
@@ -96,7 +97,7 @@ public class AppLoader implements ApplicationListener {
      *
      * @param appConfig LWJGL(2) Application Configuration
      */
-    public AppLoader(LwjglApplicationConfiguration appConfig) {
+    public AppLoader(Lwjgl3ApplicationConfiguration appConfig) {
         AppLoader.appConfig = appConfig;
     }
 
@@ -175,7 +176,7 @@ public class AppLoader implements ApplicationListener {
     private static boolean resizeRequested = false;
     private static Point2i resizeReqSize;
 
-    public static LwjglApplicationConfiguration appConfig;
+    public static Lwjgl3ApplicationConfiguration appConfig;
     public static GameFontBase fontGame;
     public static TinyAlphNum fontSmallNumbers;
 
@@ -197,6 +198,9 @@ public class AppLoader implements ApplicationListener {
     public static final int minimumW = 1080;
     public static final int minimumH = 720;
 
+    public static int setWindowWidth;
+    public static int setWindowHeight;
+    
     public static void main(String[] args) {
         // load configs
         getDefaultDirectory();
@@ -212,27 +216,30 @@ public class AppLoader implements ApplicationListener {
 
         ShaderProgram.pedantic = false;
 
-        LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-        appConfig.useGL30 = true; // utilising some GL trickeries, need this to be TRUE
-        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
-        appConfig.resizable = false;//true;
-        //appConfig.width = 1110; // photographic ratio (1.5:1)
-        //appConfig.height = 740; // photographic ratio (1.5:1)
-        appConfig.width = getConfigInt("screenwidth");
-        appConfig.height = getConfigInt("screenheight");
-        appConfig.backgroundFPS = getConfigInt("displayfps");
-        appConfig.foregroundFPS = getConfigInt("displayfps");
-        appConfig.title = GAME_NAME;
-        appConfig.forceExit = false;
+        Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
+        appConfig.useOpenGL3(true, 3, 0);// utilising some GL trickeries, need this to be TRUE
+        appConfig.setResizable(false);
+        appConfig.useVsync(getConfigBoolean("usevsync"));
+        //setWindowWidth = 1110; // photographic ratio (1.5:1)
+        //setWindowHeight = 740; // photographic ratio (1.5:1)
+        setWindowWidth = getConfigInt("screenwidth");
+        setWindowHeight = getConfigInt("screenheight");
+        appConfig.setWindowedMode(setWindowWidth, setWindowHeight);
+        appConfig.setIdleFPS(getConfigInt("displayfps"));
+        appConfig.setTitle(GAME_NAME);
+        //appConfig.forceExit = false;
+        if (IS_DEVELOPMENT_BUILD) {
+            appConfig.enableGLDebugOutput(true, System.err);
+        }
 
         // load app icon
-        int[] appIconSizes = new int[]{256,128,64,32,16};
-        for (int size : appIconSizes) {
-            String name = "assets/appicon" + size + ".png";
-            if (new File("./" + name).exists()) {
-                appConfig.addIcon(name, Files.FileType.Internal);
-            }
-        }
+        appConfig.setWindowIcon(
+                "assets/appicon256.png",
+                "assets/appicon128.png",
+                "assets/appicon64.png",
+                "assets/appicon32.png",
+                "assets/appicon16.png"
+        );
 
         if (args.length == 1 && args[0].equals("isdev=true")) {
             IS_DEVELOPMENT_BUILD = true;
@@ -240,7 +247,7 @@ public class AppLoader implements ApplicationListener {
             //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
         }
 
-        new LwjglApplication(new AppLoader(appConfig), appConfig);
+        new Lwjgl3Application(new AppLoader(appConfig), appConfig);
     }
 
 
@@ -292,9 +299,10 @@ public class AppLoader implements ApplicationListener {
 
         // set basis of draw
         logoBatch = new SpriteBatch();
-        camera = new OrthographicCamera(((float) appConfig.width), ((float) appConfig.height));
 
-        initViewPort(appConfig.width, appConfig.height);
+        camera = new OrthographicCamera(((float) setWindowWidth), ((float) setWindowHeight));
+
+        initViewPort(setWindowWidth, setWindowHeight);
 
         // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
@@ -312,7 +320,7 @@ public class AppLoader implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-        updateFullscreenQuad(appConfig.width, appConfig.height);
+        updateFullscreenQuad(setWindowWidth, setWindowHeight);
 
 
         // set up renderer info variables
@@ -415,8 +423,8 @@ public class AppLoader implements ApplicationListener {
 
 
             setCameraPosition(0f, 0f);
-            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
-                    (appConfig.height - logo.getRegionHeight()) / 2f
+            logoBatch.draw(logo, (setWindowWidth - logo.getRegionWidth()) / 2f,
+                    (setWindowHeight - logo.getRegionHeight()) / 2f
             );
             logoBatch.end();
 
@@ -454,7 +462,7 @@ public class AppLoader implements ApplicationListener {
             screenshotRequested = false;
 
             try {
-                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, appConfig.width, appConfig.height);
+                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, setWindowWidth, setWindowHeight);
                 PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir + "/Screenshot.tga"), p, true);
                 p.dispose();
             }
@@ -497,8 +505,8 @@ public class AppLoader implements ApplicationListener {
             );
         }
 
-        appConfig.width = screenW;
-        appConfig.height = screenH;
+        setWindowWidth = screenW;
+        setWindowHeight = screenH;
 
         updateFullscreenQuad(screenW, screenH);
 
@@ -622,7 +630,7 @@ public class AppLoader implements ApplicationListener {
 
 
     private void setCameraPosition(float newX, float newY) {
-        camera.position.set((-newX + appConfig.width / 2), (-newY + appConfig.height / 2), 0f);
+        camera.position.set((-newX + setWindowWidth / 2), (-newY + setWindowHeight / 2), 0f);
         camera.update();
         logoBatch.setProjectionMatrix(camera.combined);
     }

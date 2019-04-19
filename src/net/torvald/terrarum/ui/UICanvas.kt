@@ -142,7 +142,7 @@ abstract class UICanvas(
         uiItems.add(uiItem)
     }
 
-    fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.appConfig.width && y in 0 until AppLoader.appConfig.height
+    fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.setWindowWidth && y in 0 until AppLoader.setWindowHeight
 
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         if (this.isVisible) {

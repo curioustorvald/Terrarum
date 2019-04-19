@@ -3,8 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.ScreenAdapter
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -67,13 +67,13 @@ class UITestPad1 : ScreenAdapter() {
                 Yaml(treeStr)
         )
         batch = SpriteBatch()
-        camera = OrthographicCamera(AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+        camera = OrthographicCamera(AppLoader.setWindowWidth.toFloat(), AppLoader.setWindowHeight.toFloat())
 
-        camera.setToOrtho(true, AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+        camera.setToOrtho(true, AppLoader.setWindowWidth.toFloat(), AppLoader.setWindowHeight.toFloat())
         camera.update()
-        Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
+        Gdx.gl20.glViewport(0, 0, AppLoader.setWindowWidth, AppLoader.setWindowHeight)
 
-        resize(AppLoader.appConfig.width, AppLoader.appConfig.height)
+        resize(AppLoader.setWindowWidth, AppLoader.setWindowHeight)
 
         nsMenu.setPosition(0, 0)
         nsMenu.setAsAlwaysVisible()
@@ -148,16 +148,8 @@ class UITestPad1Controller(val host: UITestPad1) : InputAdapter() {
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
 
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false//true;
-    //appConfig.width = 1072; // IMAX ratio
-    //appConfig.height = 742; // IMAX ratio
-    appConfig.width = 1110 // photographic ratio (1.5:1)
-    appConfig.height = 740 // photographic ratio (1.5:1)
-    appConfig.backgroundFPS = 9999
-    appConfig.foregroundFPS = 9999
-    appConfig.forceExit = false
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.setWindowedMode(1110, 740)
 
-    LwjglApplication(AppLoader(appConfig, UITestPad1()), appConfig)
+    Lwjgl3Application(AppLoader(appConfig, UITestPad1(), 1110, 740), appConfig)
 }

@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.ScreenAdapter
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -15,22 +15,16 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.ModuleBasisFunction
 import com.sudoplay.joise.module.ModuleFractal
-import com.sudoplay.joise.module.ModuleScaleDomain
 import com.sudoplay.joise.module.ModuleScaleOffset
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.BlockingThreadPool
-import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
-import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.roundInt
 import kotlin.math.absoluteValue
-import kotlin.system.measureNanoTime
-import kotlin.system.measureTimeMillis
 
 /**
  * Created by minjaesong on 2018-12-14.
@@ -50,11 +44,11 @@ class NoiseGenerator : ScreenAdapter() {
         Gdx.input.inputProcessor = NoiseGeneratorController(this)
 
         batch = SpriteBatch()
-        camera = OrthographicCamera(AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+        camera = OrthographicCamera(AppLoader.setWindowWidth.toFloat(), AppLoader.setWindowHeight.toFloat())
 
-        camera.setToOrtho(true, AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+        camera.setToOrtho(true, AppLoader.setWindowWidth.toFloat(), AppLoader.setWindowHeight.toFloat())
         camera.update()
-        Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
+        Gdx.gl20.glViewport(0, 0, AppLoader.setWindowWidth, AppLoader.setWindowHeight)
 
         pixmap = Pixmap(IMAGE_SIZE, IMAGE_SIZE, Pixmap.Format.RGBA8888)
         texture = Texture(1, 1, Pixmap.Format.RGBA8888)
@@ -255,14 +249,10 @@ class NoiseGeneratorController(val host: NoiseGenerator) : InputAdapter() {
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
 
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false//true;
-    appConfig.width = 1024
-    appConfig.height = 1024
-    appConfig.backgroundFPS = 9999
-    appConfig.foregroundFPS = 9999
-    appConfig.forceExit = false
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.useVsync(false)
+    appConfig.setResizable(false)
+    appConfig.setWindowedMode(1024, 1024)
 
-    LwjglApplication(AppLoader(appConfig, NoiseGenerator()), appConfig)
+    Lwjgl3Application(AppLoader(appConfig, NoiseGenerator(), 1024, 1024), appConfig)
 }

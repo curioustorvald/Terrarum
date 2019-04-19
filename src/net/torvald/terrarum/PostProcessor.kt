@@ -61,7 +61,7 @@ object PostProcessor {
             batch.projectionMatrix = camera.combined
 
             shapeRenderer = ShapeRenderer()
-            Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
+            Gdx.gl20.glViewport(0, 0, AppLoader.setWindowWidth, AppLoader.setWindowHeight)
         }
 
 
