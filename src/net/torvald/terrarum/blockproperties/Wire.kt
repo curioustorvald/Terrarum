@@ -8,11 +8,11 @@ object Wire {
     /* A mapping for World's conduitTypes bits */
     const val BIT_NONE = 0
     const val BIT_SIGNAL_RED = 1
-    const val BIT_UTILITY_PROTOTYPE = 2
+    const val BIT_UTILITY_PROTOTYPE = 2 // logic gates/PCLs/Diodes/Caps/etc.
     const val BIT_POWER_LOW = 4
     const val BIT_POWER_HIGHT = 8
     const val BIT_PARALLEL_8B = 16 // uses bit-to-mantissa encoding
-    const val BIT_PARALLEL_16B = 32 // uses bit-to-mantissa encoding
+    const val BIT_PARALLEL_16B = 32 // uses bit-to-mantissa encoding. 16 bit half duplex OR 8 bit full duplex
     const val BIT_ETHERNET = 64 // the actual datagramme should be represented by another means than the ConduitFills
 
     /* A mapping for World's WiringNode.fills[] index */
@@ -28,7 +28,17 @@ object Wire {
 
     /**
      * Encodes a byte to Float's mantissa. Normal value range is 1.0..1.99609375. When decoding, the sign and exponent bits
-     * must be ignored. (e.g. the encoded float might have non-one-point-something value after "bitwise" add/subtraction.
+     * must be ignored. (e.g. the encoded float might have not-one-point-something value after "bitwise" add/subtraction.
+     *
+     * ```
+     *   exponent ,------- mantissa ------,
+     * s eeeeeeee bbbbbbbb cccccccc xxxxxxx
+     * s: sign (ignored)
+     * e: binary32 exponent (non-zero and non-255)
+     * b: upper byte
+     * c: lower byte (zero for Byte representation)
+     * x: not used, all zero
+     * ```
      *
      * MSB of the byte is also the highest bit in the mantissa. Therefore ```0x80``` will be encoded as ```1.5```
      */
