@@ -181,7 +181,7 @@ public class AppLoader implements ApplicationListener {
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
     public static TerrarumController gamepad = null;
-    public static float gamepadDeadzone = 0.2f;
+    public static float gamepadDeadzone = 0.3f;
 
 
     /**
@@ -688,6 +688,7 @@ public class AppLoader implements ApplicationListener {
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));
         System.out.println(String.format("default directory: %s", defaultDir));
+        System.out.println(String.format("java version = %s", System.getProperty("java.version")));
     }
 
     private static void createDirs() {

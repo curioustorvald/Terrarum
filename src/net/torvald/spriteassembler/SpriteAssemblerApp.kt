@@ -95,6 +95,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         }
 
         panelCode.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
+        panelCode.text = "Enter your descriptor code here…"
 
         panelAnimationsList.model = DefaultListModel()
         panelBodypartsList.model = DefaultListModel()
@@ -278,7 +279,7 @@ class SpriteAssemblerPreview: Game() {
         }
 
 
-        gdxClearAndSetBlend(.62f,.79f,1f,1f)
+        gdxClearAndSetBlend(bgCol)
 
 
         batch.inUse {
