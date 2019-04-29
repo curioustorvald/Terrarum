@@ -9,7 +9,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
-import java.util.*
 import java.util.concurrent.locks.Lock
 
 /**
@@ -143,11 +142,11 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         if (actorContainerActive.size == 0 && actorContainerInactive.size == 0)
             throw IllegalArgumentException("Actor with ID $ID does not exist.")
 
-        var index = actorContainerActive.binarySearch(ID)
-        if (index < 0) {
-            index = actorContainerInactive.binarySearch(ID)
+        var actor = actorContainerActive.searchFor(ID) { it.referenceID!! }
+        if (actor == null) {
+            actor = actorContainerInactive.searchFor(ID) { it.referenceID!! }
 
-            if (index < 0) {
+            if (actor == null) {
                 /*JOptionPane.showMessageDialog(
                         null,
                         "Actor with ID $ID does not exist.",
@@ -156,36 +155,14 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
                 throw IllegalArgumentException("Actor with ID $ID does not exist.")
             }
             else
-                return actorContainerInactive[index]
+                return actor
         }
         else
-            return actorContainerActive[index]
+            return actor
     }
 
-    fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID!!)
-
-    fun ArrayList<*>.binarySearch(ID: Int): Int {
-        // code from collections/Collections.kt
-        var low = 0
-        var high = this.size - 1
-
-        while (low <= high) {
-            val mid = (low + high).ushr(1) // safe from overflows
-
-            val midVal = get(mid)!!
-
-            if (ID > midVal.hashCode())
-                low = mid + 1
-            else if (ID < midVal.hashCode())
-                high = mid - 1
-            else
-                return mid // key found
-        }
-        return -(low + 1)  // key not found
-    }
-
-    fun SortedArrayList<*>.binarySearch(actor: Actor) = this.toArrayList().binarySearch(actor.referenceID!!)
-    fun SortedArrayList<*>.binarySearch(ID: Int) = this.toArrayList().binarySearch(ID)
+    //fun SortedArrayList<*>.binarySearch(actor: Actor) = this.toArrayList().binarySearch(actor.referenceID!!)
+    //fun SortedArrayList<*>.binarySearch(ID: Int) = this.toArrayList().binarySearch(ID)
 
     open fun removeActor(ID: Int) = removeActor(getActorByID(ID))
     /**
@@ -199,9 +176,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open fun removeActor(actor: Actor?) {
         if (actor == null) return
 
-        val indexToDelete = actorContainerActive.binarySearch(actor.referenceID!!)
-        if (indexToDelete >= 0) {
-            actorContainerActive.removeAt(indexToDelete)
+        val indexToDelete = actorContainerActive.searchFor(actor.referenceID!!) { it.referenceID!! }
+        if (indexToDelete != null) {
+            actorContainerActive.remove(indexToDelete)
         }
     }
 
@@ -223,13 +200,13 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             if (actorContainerActive.size == 0)
                 false
             else
-                actorContainerActive.binarySearch(ID) >= 0
+                actorContainerActive.searchFor(ID) { it.referenceID!! } != null
 
     fun isInactive(ID: Int): Boolean =
             if (actorContainerInactive.size == 0)
                 false
             else
-                actorContainerInactive.binarySearch(ID) >= 0
+                actorContainerInactive.searchFor(ID) { it.referenceID!! } != null
 
     /**
      * actorContainerActive extensions

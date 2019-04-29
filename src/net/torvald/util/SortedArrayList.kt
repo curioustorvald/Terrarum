@@ -39,9 +39,58 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
 
     fun removeAt(index: Int) = arrayList.removeAt(index)
     fun remove(element: T) = arrayList.remove(element)
-    fun removeLast() = arrayList.removeAt(arrayList.size)
+    fun removeLast() = arrayList.removeAt(arrayList.size - 1)
 
     operator fun get(index: Int) = arrayList[index]
+    fun getOrNull(index: Int?) = if (index == null) null else get(index)
+    /**
+     * Searches for the element. Null if the element was not found
+     */
+    fun contains(element: T): Boolean {
+        // code from collections/Collections.kt
+        var low = 0
+        var high = this.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1) // safe from overflows
+
+            val midVal = get(mid)
+
+            if (element > midVal)
+                low = mid + 1
+            else if (element < midVal)
+                high = mid - 1
+            else
+                return true // key found
+        }
+        return false // key not found
+    }
+
+    /** Searches the element using given predicate instead of the element itself. Returns index in the array where desired
+     * element is stored.
+     * (e.g. search the Actor by its ID rather than the actor instance) */
+    fun <R: Comparable<R>> searchForIndex(key: R, predicate: (T) -> R): Int? {
+        var low = 0
+        var high = this.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1) // safe from overflows
+
+            val midVal = predicate(get(mid))
+
+            if (key > midVal)
+                low = mid + 1
+            else if (key < midVal)
+                high = mid - 1
+            else
+                return mid // key found
+        }
+        return null // key not found
+    }
+
+    /** Searches the element using given predicate instead of the element itself. Returns the element desired.
+     * (e.g. search the Actor by its ID rather than the actor instance) */
+    fun <R: Comparable<R>> searchFor(key: R, predicate: (T) -> R): T? = getOrNull(searchForIndex(key, predicate))
 
     fun iterator() = arrayList.iterator()
     fun forEach(action: (T) -> Unit) = arrayList.forEach(action)

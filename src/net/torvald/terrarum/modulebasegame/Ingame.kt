@@ -747,8 +747,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
-        val indexToDelete = actorContainerActive.binarySearch(actor.referenceID!!)
-        if (indexToDelete >= 0) {
+        val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID!!) { it.referenceID!! }
+        if (indexToDelete != null) {
             printdbg(this, "Removing actor $actor")
             printStackTrace()
 
@@ -781,6 +781,28 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 }
             }
         }
+    }
+
+    private fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID!!)
+
+    private fun ArrayList<*>.binarySearch(ID: Int): Int {
+        // code from collections/Collections.kt
+        var low = 0
+        var high = this.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1) // safe from overflows
+
+            val midVal = get(mid)!!
+
+            if (ID > midVal.hashCode())
+                low = mid + 1
+            else if (ID < midVal.hashCode())
+                high = mid - 1
+            else
+                return mid // key found
+        }
+        return -(low + 1)  // key not found
     }
 
     /**

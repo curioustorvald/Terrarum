@@ -1,12 +1,11 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
 
 object ResizeScreen: ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 3) {
-            Terrarum.resize(args[1].toInt(), args[2].toInt())
+            AppLoader.resizeScreen(args[1].toInt(), args[2].toInt())
         }
         else if (args.size == 2) {
             when (args[1]) {

@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
-import net.torvald.util.CircularArray
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.gameactors.Actor
@@ -23,6 +22,7 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.util.CircularArray
 import org.lwjgl.BufferUtils
 import java.io.File
 import kotlin.math.absoluteValue
@@ -196,7 +196,6 @@ object Terrarum : Screen {
 
     init {
         println("$NAME version ${AppLoader.getVERSION_STRING()}")
-        println("Java Runtime version ${System.getProperty("java.version")}")
         println("LibGDX version ${com.badlogic.gdx.Version.VERSION}")
 
 
@@ -611,6 +610,10 @@ fun blendNormal(batch: SpriteBatch) {
     // helpful links:
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
+}
+
+fun gdxClearAndSetBlend(color: Color) {
+    gdxClearAndSetBlend(color.r, color.g, color.b, color.a)
 }
 
 fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {

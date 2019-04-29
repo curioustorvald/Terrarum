@@ -2,7 +2,6 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
-import net.torvald.util.SortedArrayList
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -12,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
 import net.torvald.terrarum.toInt
+import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
 import kotlin.math.sign
@@ -74,6 +74,9 @@ open class GameWorld {
     val fluidTypes: HashMap<BlockAddress, FluidType>
     @TEMzPayload("FlFL", TEMzPayload.INT48_FLOAT_PAIR)
     val fluidFills: HashMap<BlockAddress, Float>
+
+    // Actually stores the wiring data; used by renderers //
+
     @TEMzPayload("CtYP", TEMzPayload.INT48_INT_PAIR)
     val conduitTypes: HashMap<BlockAddress, Int> // 1 bit = 1 conduit (pipe/wire) type
     @TEMzPayload("CfL", TEMzPayload.INT48_FLOAT_PAIR)
@@ -82,6 +85,8 @@ open class GameWorld {
         get() = conduitFills[0]
     val conduitFills1: HashMap<BlockAddress, Float> // size of gas packet on the block
         get() = conduitFills[1]
+
+    // Built from the above data; used by hypothetical updater //
 
     private val wiringNodes = SortedArrayList<WiringNode>()
 
