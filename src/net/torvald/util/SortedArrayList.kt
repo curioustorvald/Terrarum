@@ -66,21 +66,25 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
         return false // key not found
     }
 
-    /** Searches the element using given predicate instead of the element itself. Returns index in the array where desired
+    /** Searches the element using given predicate instead of the element itself. Returns index in the array where desired, null when there is no such element.
      * element is stored.
-     * (e.g. search the Actor by its ID rather than the actor instance) */
-    fun <R: Comparable<R>> searchForIndex(key: R, predicate: (T) -> R): Int? {
+     * (e.g. search the Actor by its ID rather than the actor instance)
+     *
+     * @param searchQuery what exactly are we looking for?
+     * @param searchHow and where or how can it be found?
+     */
+    fun <R: Comparable<R>> searchForIndex(searchQuery: R, searchHow: (T) -> R): Int? {
         var low = 0
         var high = this.size - 1
 
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
 
-            val midVal = predicate(get(mid))
+            val midVal = searchHow(get(mid))
 
-            if (key > midVal)
+            if (searchQuery > midVal)
                 low = mid + 1
-            else if (key < midVal)
+            else if (searchQuery < midVal)
                 high = mid - 1
             else
                 return mid // key found
@@ -88,9 +92,13 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
         return null // key not found
     }
 
-    /** Searches the element using given predicate instead of the element itself. Returns the element desired.
-     * (e.g. search the Actor by its ID rather than the actor instance) */
-    fun <R: Comparable<R>> searchFor(key: R, predicate: (T) -> R): T? = getOrNull(searchForIndex(key, predicate))
+    /** Searches the element using given predicate instead of the element itself. Returns the element desired, null when there is no such element.
+     * (e.g. search the Actor by its ID rather than the actor instance)
+     *
+     * @param searchQuery what exactly are we looking for?
+     * @param searchHow and where or how can it be found?
+     */
+    fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 
     fun iterator() = arrayList.iterator()
     fun forEach(action: (T) -> Unit) = arrayList.forEach(action)

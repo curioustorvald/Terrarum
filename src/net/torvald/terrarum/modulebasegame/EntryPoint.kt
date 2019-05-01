@@ -94,7 +94,7 @@ class EntryPoint : ModuleEntryPoint() {
                             this.inventoryCategory == Category.WALL &&
                             this.dynamicID - ItemCodex.ITEM_WALLS.start == ingame.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
                             this.inventoryCategory == Category.WIRE &&
-                            1.shl(this.dynamicID - ItemCodex.ITEM_WIRES.start) and (ingame.world.getWires(Terrarum.mouseTileX, Terrarum.mouseTileY) ?: 0) != 0
+                            1.shl(this.dynamicID - ItemCodex.ITEM_WIRES.start) and (ingame.world.getWiringBlocks(Terrarum.mouseTileX, Terrarum.mouseTileY) ?: 0) != 0
                         )
                             return false
 

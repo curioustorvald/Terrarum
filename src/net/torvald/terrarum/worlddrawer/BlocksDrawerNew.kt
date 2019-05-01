@@ -263,12 +263,13 @@ internal object BlocksDrawer {
      * Turns bitmask-with-single-bit-set into its bit index. The LSB is counted as 1, and thus the index starts at one.
      * @return 0 -> null, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, ...
      */
-    private fun Int.toBitOrd(): Int? =
-            if (this > 0 && !FastMath.isPowerOfTwo(this)) throw IllegalArgumentException("value must be power of two: $this")
-            else {
-                val k = FastMath.intLog2(this, -1)
-                if (k == -1) null else k
-            }
+    private fun Int.toBitOrd(): Int? {
+        //if (this > 0 && !FastMath.isPowerOfTwo(this)) throw IllegalArgumentException("value must be power of two: $this")
+        //else {
+            val k = FastMath.intLog2(this, -1)
+            return if (k == -1) null else k
+        //}
+    }
 
     /**
      * Writes to buffer. Actual draw code must be called after this operation.
@@ -305,7 +306,7 @@ internal object BlocksDrawer {
                 val thisTile = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> world.getWires(x, y).and(wireBit).toBitOrd()
+                    WIRE -> world.getWiringBlocks(x, y).and(wireBit).toBitOrd()
                     FLUID -> world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }

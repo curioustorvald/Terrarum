@@ -32,7 +32,9 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        return super.startPrimaryUse(delta)
+        println("Wire!")
+
+        return true
     }
 
     override fun effectWhenEquipped(delta: Float) {

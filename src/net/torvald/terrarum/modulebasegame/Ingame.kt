@@ -394,7 +394,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun worldPrimaryClickStart(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        ItemCodex[itemOnGrip]?.startPrimaryUse(delta)
+        val consumptionSuccessful = ItemCodex[itemOnGrip]?.startPrimaryUse(delta) ?: false
+        if (consumptionSuccessful)
+            actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!)
     }
 
     override fun worldPrimaryClickEnd(delta: Float) {
@@ -404,7 +406,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun worldSecondaryClickStart(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        ItemCodex[itemOnGrip]?.startSecondaryUse(delta)
+        val consumptionSuccessful = ItemCodex[itemOnGrip]?.startSecondaryUse(delta) ?: false
+        if (consumptionSuccessful)
+            actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!)
     }
 
     override fun worldSecondaryClickEnd(delta: Float) {

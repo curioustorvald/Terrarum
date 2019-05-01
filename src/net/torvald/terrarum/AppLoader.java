@@ -205,9 +205,9 @@ public class AppLoader implements ApplicationListener {
 
 
         try { processor = GetCpuName.getModelName(); }
-        catch (IOException e1) { processor = "Unknown"; }
+        catch (IOException e1) { processor = "Unknown CPU"; }
         try { processorVendor = GetCpuName.getCPUID(); }
-        catch (IOException e2) { processorVendor = "Unknown"; }
+        catch (IOException e2) { processorVendor = "Unknown CPU"; }
 
 
         ShaderProgram.pedantic = false;

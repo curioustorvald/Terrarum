@@ -6,24 +6,25 @@ package net.torvald.terrarum.blockproperties
 object Wire {
 
     /* A mapping for World's conduitTypes bits */
+    /*  Must be aligned with the sprite sheet  */
     const val BIT_NONE = 0
     const val BIT_SIGNAL_RED = 1
     const val BIT_UTILITY_PROTOTYPE = 2 // logic gates/PCLs/Diodes/Caps/etc.
     const val BIT_POWER_LOW = 4
     const val BIT_POWER_HIGHT = 8
-    const val BIT_PARALLEL_8B = 16 // uses bit-to-mantissa encoding
-    const val BIT_PARALLEL_16B = 32 // uses bit-to-mantissa encoding. 16 bit half duplex OR 8 bit full duplex
-    const val BIT_ETHERNET = 64 // the actual datagramme should be represented by another means than the ConduitFills
+    const val BIT_THICKNET = 16 // the actual datagramme should be represented by another means than the ConduitFills
+    const val BIT_PARALLEL_8B = 32 // uses bit-to-mantissa encoding
+    const val BIT_PARALLEL_16B = 64 // uses bit-to-mantissa encoding. 16 bit half duplex OR 8 bit full duplex
 
     /* A mapping for World's WiringNode.fills[] index */
-    const val FILL_ID_SIGNAL_RED = 0
+    /*const val FILL_ID_SIGNAL_RED = 0
     const val FILL_ID_UTILITY_PROTOTYPE = 1
 
     fun bitToConduitFillID(bit: Int) = when(bit) {
         BIT_SIGNAL_RED -> FILL_ID_SIGNAL_RED
         BIT_UTILITY_PROTOTYPE -> FILL_ID_UTILITY_PROTOTYPE
         else -> null
-    }
+    }*/
 
 
     /**
@@ -35,8 +36,8 @@ object Wire {
      * s eeeeeeee bbbbbbbb cccccccc xxxxxxx
      * s: sign (ignored)
      * e: binary32 exponent (non-zero and non-255)
-     * b: upper byte
-     * c: lower byte (zero for Byte representation)
+     * b: upper octet
+     * c: lower octet (zero for Byte representation)
      * x: not used, all zero
      * ```
      *
