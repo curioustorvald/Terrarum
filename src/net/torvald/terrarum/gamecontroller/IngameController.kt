@@ -6,16 +6,12 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.itemproperties.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
@@ -57,22 +53,16 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         ///////////////////
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
+        // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (ingame.canPlayerControl) {
-            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) ||
-                Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+            // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
+            if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
-                if (player == null) return
-
-                val itemOnGrip = player.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
-
-                itemOnGrip?.let {
-                    if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
-                        player.consumePrimary(ItemCodex[it]!!)
-                    }
-                    if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
-                        player.consumeSecondary(ItemCodex[it]!!)
-                    }
+                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+                    ingame.worldPrimaryClickStart(AppLoader.UPDATE_RATE.toFloat())
+                }
+                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+                    ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE.toFloat())
                 }
             }
         }
@@ -192,21 +182,6 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (ingame.canPlayerControl) {
-            // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
-            if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
-
-                if (button == AppLoader.getConfigInt("mouseprimary")) {
-                    ingame.worldPrimaryClickStart(AppLoader.UPDATE_RATE.toFloat())
-                }
-                if (button == AppLoader.getConfigInt("mousesecondary")) {
-                    ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE.toFloat())
-                }
-            }
-        }
-
-
         ingame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
         return true
     }

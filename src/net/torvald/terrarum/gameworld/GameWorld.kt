@@ -10,7 +10,6 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
-import net.torvald.terrarum.toInt
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
@@ -75,20 +74,16 @@ open class GameWorld {
     @TEMzPayload("FlFL", TEMzPayload.INT48_FLOAT_PAIR)
     val fluidFills: HashMap<BlockAddress, Float>
 
-    // Actually stores the wiring data; used by renderers //
+    /**
+     * Single block can have multiple conduits, different types of conduits are stored separately.
+     */
+    @TEMzPayload("WiNt", TEMzPayload.EXTERNAL_JSON)
+    private val wirings: HashMap<BlockAddress, SortedArrayList<WiringNode>>
 
-    @TEMzPayload("CtYP", TEMzPayload.INT48_INT_PAIR)
-    val conduitTypes: HashMap<BlockAddress, Int> // 1 bit = 1 conduit (pipe/wire) type
-    @TEMzPayload("CfL", TEMzPayload.INT48_FLOAT_PAIR)
-    val conduitFills: Array<HashMap<BlockAddress, Float>>
-    val conduitFills0: HashMap<BlockAddress, Float> // size of liquid packet on the block
-        get() = conduitFills[0]
-    val conduitFills1: HashMap<BlockAddress, Float> // size of gas packet on the block
-        get() = conduitFills[1]
-
-    // Built from the above data; used by hypothetical updater //
-
-    private val wiringNodes = SortedArrayList<WiringNode>()
+    /**
+     * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
+     */
+    private val wiringBlocks: HashMap<BlockAddress, Int>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -119,13 +114,13 @@ open class GameWorld {
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
 
-        wallDamages = HashMap<BlockAddress, Float>()
-        terrainDamages = HashMap<BlockAddress, Float>()
-        fluidTypes = HashMap<BlockAddress, FluidType>()
-        fluidFills = HashMap<BlockAddress, Float>()
+        wallDamages = HashMap()
+        terrainDamages = HashMap()
+        fluidTypes = HashMap()
+        fluidFills = HashMap()
 
-        conduitTypes = HashMap<BlockAddress, Int>()
-        conduitFills = Array(16) { HashMap<BlockAddress, Float>() }
+        wiringBlocks = HashMap()
+        wirings = HashMap()
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -153,8 +148,8 @@ open class GameWorld {
         fluidTypes = layerData.fluidTypes
         fluidFills = layerData.fluidFills
 
-        conduitTypes = HashMap<BlockAddress, Int>()
-        conduitFills = Array(16) { HashMap<BlockAddress, Float>() }
+        wiringBlocks = HashMap()
+        wirings = HashMap()
 
         spawnX = layerData.spawnX
         spawnY = layerData.spawnY
@@ -215,8 +210,8 @@ open class GameWorld {
             terrain * PairedMapLayer.RANGE + terrainDamage
     }
 
-    fun getWires(x: Int, y: Int): Int {
-        return conduitTypes.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
+    fun getWiringBlocks(x: Int, y: Int): Int {
+        return wiringBlocks.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
     }
 
     fun getWallLowBits(x: Int, y: Int): Int? {
@@ -296,25 +291,31 @@ open class GameWorld {
             Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
     }*/
 
-    /**
-     * Overrides entire bits with given value. DO NOT USE THIS if you don't know what this means, you'll want to use setWire().
-     * Besides, this function won't fire WireChangedEvent
-     */
-    fun setWires(x: Int, y: Int, wireBits: Int) {
-        val (x, y) = coerceXY(x, y)
-        conduitTypes[LandUtil.getBlockAddr(this, x, y)] = wireBits
+    fun getAllConduitsFrom(x: Int, y: Int): SortedArrayList<WiringNode>? {
+        return wirings.get(LandUtil.getBlockAddr(this, x, y))
     }
 
     /**
-     * Sets single bit for given tile. YOU'LL WANT TO USE THIS instead of setWires()
-     * @param selectedWire wire-bit to modify, must be power of two
+     * @param conduitTypeBit defined in net.torvald.terrarum.blockproperties.Wire, always power-of-two
      */
-    fun setWire(x: Int, y: Int, selectedWire: Int, bitToSet: Boolean) {
-        val oldWireBits = getWires(x, y)
-        val oldStatus = getWires(x, y) or selectedWire != 0
-        if (oldStatus != bitToSet) {
-            setWires(x, y, (oldWireBits and selectedWire.inv()) or (selectedWire * oldStatus.toInt()))
-            Terrarum.ingame?.queueWireChangedEvent(selectedWire * oldStatus.toInt(), selectedWire * bitToSet.toInt(), LandUtil.getBlockAddr(this, x, y))
+    fun getConduitByTypeFrom(x: Int, y: Int, conduitTypeBit: Int): WiringNode? {
+        val conduits = getAllConduitsFrom(x, y)
+        return conduits?.searchFor(conduitTypeBit) { it.typeBitMask }
+    }
+
+    fun addNewConduitTo(x: Int, y: Int, node: WiringNode) {
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+
+        // check for existing type of conduit
+        // if there's no duplicate...
+        if (getWiringBlocks(x, y) and node.typeBitMask == 0) {
+            // store as-is
+            wirings.getOrPut(blockAddr) { SortedArrayList() }.add(node)
+            // synchronise wiringBlocks
+            wiringBlocks[blockAddr] = (wiringBlocks[blockAddr] ?: 0) or node.typeBitMask
+        }
+        else {
+            TODO("need overwriting policy for existing conduit node")
         }
     }
 
@@ -326,7 +327,7 @@ open class GameWorld {
             return getTileFromWall(x, y)
         }
         else if (mode == WIRE) {
-            return getWires(x, y)
+            return getWiringBlocks(x, y)
         }
         else
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
@@ -487,7 +488,7 @@ open class GameWorld {
         override fun toString() = "Fluid type: ${type.value}, amount: $amount"
     }
 
-    private data class WiringNode(
+    data class WiringNode(
             val position: BlockAddress,
             /** One defined in WireCodex, always power of two */
             val typeBitMask: Int,
@@ -540,6 +541,9 @@ inline class FluidType(val value: Int) {
  */
 annotation class TEMzPayload(val payloadName: String, val arg: Int) {
     companion object {
+        const val EXTERNAL_JAVAPROPERTIES = -3
+        const val EXTERNAL_CSV = -2
+        const val EXTERNAL_JSON = -1
         const val EIGHT_MSB = 0
         const val FOUR_LSB = 1
         const val INT48_FLOAT_PAIR = 2

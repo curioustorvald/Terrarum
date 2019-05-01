@@ -177,7 +177,9 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
             false
 
 
-    fun consumeItem(actor: Actor, item: GameItem) {
+    fun consumeItem(item: GameItem) {
+        val actor = this.actor as Actor
+
         if (item.stackable && !item.isDynamic) {
             remove(item, 1)
         }

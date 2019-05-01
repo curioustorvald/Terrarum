@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemID
@@ -79,15 +78,4 @@ interface Pocketed {
     fun hasItem(item: GameItem) = inventory.contains(item.dynamicID)
     fun hasItem(id: Int) = inventory.contains(id)
 
-
-    fun consumePrimary(item: GameItem) {
-        if (item.startPrimaryUse(AppLoader.UPDATE_RATE.toFloat())) {
-            inventory.consumeItem(this as Actor, item) // consume on successful
-        }
-    }
-
-    fun consumeSecondary(item: GameItem) {
-        if (item.startSecondaryUse(AppLoader.UPDATE_RATE.toFloat()))
-            inventory.consumeItem(this as Actor, item) // consume on successful
-    }
 }

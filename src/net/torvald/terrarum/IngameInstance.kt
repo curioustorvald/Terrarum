@@ -126,6 +126,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     /**
      * Wire version of terrainChanged() event
+     *
+     * @param old previous settings of conduits in bit set format.
+     * @param new current settings of conduits in bit set format.
      */
     open fun queueWireChangedEvent(old: Int, new: Int, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
