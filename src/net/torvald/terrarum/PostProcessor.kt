@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
 
 /**
  * Must be called by the App Loader
@@ -36,6 +37,8 @@ object PostProcessor {
     private val safeAreaCol2 = Color(0xffffff44.toInt())
 
     private val debugUI = BasicDebugInfoWindow()
+
+    private var functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
     fun dispose() {
         batch.dispose()
@@ -76,6 +79,25 @@ object PostProcessor {
 
             if (AppLoader.IS_DEVELOPMENT_BUILD && KeyToggler.isOn(Input.Keys.F11)) {
                 drawSafeArea()
+            }
+
+            if (KeyToggler.isOn(Input.Keys.F1)) {
+                batch.color = Color.WHITE
+                batch.inUse {
+                    it.draw(functionRowHelper,
+                            (AppLoader.screenW - functionRowHelper.width) / 2f,
+                            functionRowHelper.height.toFloat(),
+                            functionRowHelper.width.toFloat(),
+                            functionRowHelper.height * -1f
+                    )
+                }
+            }
+
+            if (KeyToggler.isOn(Input.Keys.F10)) {
+                batch.color = Color.WHITE
+                batch.inUse {
+                    AppLoader.fontSmallNumbers.draw(it, "Wire draw bits: ${BlocksDrawer.drawWires.toString(2)}", 2f, 2f)
+                }
             }
 
             if (KeyToggler.isOn(Input.Keys.F3)) {

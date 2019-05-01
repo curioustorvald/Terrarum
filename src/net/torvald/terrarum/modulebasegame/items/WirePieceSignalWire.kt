@@ -39,6 +39,5 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
 
     override fun effectWhenEquipped(delta: Float) {
         IngameRenderer.selectedWireBitToDraw = Wire.BIT_SIGNAL_RED
-        //println("wires!")
     }
 }
