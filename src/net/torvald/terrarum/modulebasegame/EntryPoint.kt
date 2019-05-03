@@ -1,14 +1,16 @@
 package net.torvald.terrarum.modulebasegame
 
-import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.ModuleEntryPoint
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
+import net.torvald.terrarum.modulebasegame.items.BlockBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -74,48 +76,11 @@ class EntryPoint : ModuleEntryPoint() {
                     }
 
                     override fun startPrimaryUse(delta: Float): Boolean {
-                        val ingame = Terrarum.ingame!! as Ingame
+                        return BlockBase.blockStartPrimaryUse(this, i, delta)
+                    }
 
-                        val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
-
-                        // check for collision with actors (BLOCK only)
-                        if (this.inventoryCategory == Category.BLOCK) {
-                            var ret1 = true
-                            ingame.actorContainerActive.forEach {
-                                if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
-                                    ret1 = false // return is not allowed here
-                            }
-                            if (!ret1) return ret1
-                        }
-
-                        // return false if the tile is already there
-                        if (this.inventoryCategory == Category.BLOCK &&
-                            this.dynamicID == ingame.world.getTileFromTerrain(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
-                            this.inventoryCategory == Category.WALL &&
-                            this.dynamicID - ItemCodex.ITEM_WALLS.start == ingame.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
-                            this.inventoryCategory == Category.WIRE &&
-                            1.shl(this.dynamicID - ItemCodex.ITEM_WIRES.start) and (ingame.world.getWiringBlocks(Terrarum.mouseTileX, Terrarum.mouseTileY) ?: 0) != 0
-                        )
-                            return false
-
-                        // filter passed, do the job
-                        // FIXME this is only useful for Player
-                        if (i in ItemCodex.ITEM_TILES) {
-                            ingame.world.setTileTerrain(
-                                    Terrarum.mouseTileX,
-                                    Terrarum.mouseTileY,
-                                    i
-                            )
-                        }
-                        else {
-                            ingame.world.setTileWall(
-                                    Terrarum.mouseTileX,
-                                    Terrarum.mouseTileY,
-                                    i
-                            )
-                        }
-
-                        return true
+                    override fun effectWhenEquipped(delta: Float) {
+                        BlockBase.blockEffectWhenEquipped(delta)
                     }
                 }
             }

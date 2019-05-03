@@ -94,7 +94,7 @@ object IngameRenderer {
             LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
             prepLightmapRGBA()
-            BlocksDrawer.renderData(selectedWireBitToDraw)
+            BlocksDrawer.renderData()
             drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
             drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
             drawOverlayActors(actorsRenderOverlay)
@@ -214,9 +214,6 @@ object IngameRenderer {
         // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
         blendNormal(batch)
         batch.color = Color.WHITE
-
-
-        selectedWireBitToDraw = 0
     }
 
 

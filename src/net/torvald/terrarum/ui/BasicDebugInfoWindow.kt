@@ -150,11 +150,13 @@ class BasicDebugInfoWindow : UICanvas() {
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
         if (ingame != null) {
+            val wallNum = ingame!!.world.getTileFromWall(mouseTileX, mouseTileY) ?: -1
             val tileNum = ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+            val wireNum = ingame!!.world.getWiringBlocks(mouseTileX, mouseTileY)
             val fluid = ingame!!.world.getFluid(mouseTileX, mouseTileY)
 
-            printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
-            printLine(batch, 10, "fluid@cursor ${ccY}Type $ccM${fluid.type.value} ${ccY}Fill $ccG${fluid.amount}f")
+            printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG${wireNum.toString(2)} $ccY($mtX, $mtY)")
+            printLine(batch, 10, "fluid@cursor ${ccO}Type $ccG${fluid.type.value} ${ccO}Fill $ccG${fluid.amount}f")
 
         }
 

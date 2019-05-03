@@ -6,7 +6,6 @@ import net.torvald.terrarum.blockproperties.Wire
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -32,12 +31,10 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        println("Wire!")
-
-        return true
+        return BlockBase.wireStartPrimaryUse(this, Wire.BIT_SIGNAL_RED, delta)
     }
 
     override fun effectWhenEquipped(delta: Float) {
-        IngameRenderer.selectedWireBitToDraw = Wire.BIT_SIGNAL_RED
+        BlockBase.wireEffectWhenEquipped(Wire.BIT_SIGNAL_RED, delta)
     }
 }
