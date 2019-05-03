@@ -210,10 +210,6 @@ open class GameWorld {
             terrain * PairedMapLayer.RANGE + terrainDamage
     }
 
-    fun getWiringBlocks(x: Int, y: Int): Int {
-        return wiringBlocks.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
-    }
-
     fun getWallLowBits(x: Int, y: Int): Int? {
         val (x, y) = coerceXY(x, y)
         return layerWallLowBits.getData(x, y)
@@ -230,10 +226,11 @@ open class GameWorld {
      * *
      * @param y
      * *
-     * @param combinedTilenum (tilenum * 16) + damage
+     * @param combinedTilenum Item id of the wall block. Less-than-4096-value is permitted.
      */
     fun setTileWall(x: Int, y: Int, combinedTilenum: Int) {
         val (x, y) = coerceXY(x, y)
+        val combinedTilenum = combinedTilenum % GameWorld.TILES_SUPPORTED // does work without this, but to be safe...
         setTileWall(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
@@ -243,7 +240,7 @@ open class GameWorld {
      * *
      * @param y
      * *
-     * @param combinedTilenum (tilenum * 16) + damage
+     * @param combinedTilenum Item id of the terrain block, <4096
      */
     fun setTileTerrain(x: Int, y: Int, combinedTilenum: Int) {
         val (x, y) = coerceXY(x, y)
@@ -290,6 +287,10 @@ open class GameWorld {
         if (oldWire != null)
             Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
     }*/
+
+    fun getWiringBlocks(x: Int, y: Int): Int {
+        return wiringBlocks.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
+    }
 
     fun getAllConduitsFrom(x: Int, y: Int): SortedArrayList<WiringNode>? {
         return wirings.get(LandUtil.getBlockAddr(this, x, y))
@@ -488,12 +489,17 @@ open class GameWorld {
         override fun toString() = "Fluid type: ${type.value}, amount: $amount"
     }
 
+    /**
+     * Connection rules: connect to all nearby, except:
+     *
+     * If the wire allows 3- or 4-way connection, make such connection.
+     * If the wire does not allow them (e.g. wire bridge, thicknet), connect top-bottom and left-right nodes.
+     */
     data class WiringNode(
             val position: BlockAddress,
             /** One defined in WireCodex, always power of two */
             val typeBitMask: Int,
-            var fills: Float = 0f,
-            var connectedNodes: ArrayList<WiringNode>
+            var fills: Float = 0f
     ) : Comparable<WiringNode> {
         override fun compareTo(other: WiringNode): Int {
             return (this.position - other.position).sign

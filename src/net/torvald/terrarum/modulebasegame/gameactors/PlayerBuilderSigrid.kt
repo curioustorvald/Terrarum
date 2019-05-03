@@ -85,7 +85,7 @@ object PlayerBuilderSigrid {
         inventory.add(8448) // copper pick
         inventory.add(8449) // iron pick
         inventory.add(8450) // steel pick
-        inventory.add(8466) // wire piece
+        inventory.add(8466, 9995) // wire piece
         inventory.add(9000) // TEST water bucket
         inventory.add(9001) // TEST lava bucket
     }

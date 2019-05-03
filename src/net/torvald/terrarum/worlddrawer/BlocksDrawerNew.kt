@@ -27,6 +27,8 @@ import kotlin.math.roundToInt
  * in the shader (tiling.frag). This will not be a problem in the base game, but if you are modifying
  * this engine for your project, you must edit the shader program accordingly.
  *
+ * To render and draw images, modify the ```selectedWireBitToDraw``` (bitset) property from the IngameRenderer.
+ *
  * Created by minjaesong on 2016-01-19.
  */
 internal object BlocksDrawer {
@@ -185,7 +187,7 @@ internal object BlocksDrawer {
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
-    internal fun renderData(wireBit: Int) {
+    internal fun renderData() {
 
         try {
             drawTIME_T = (world as GameWorldExtension).time.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
@@ -198,7 +200,7 @@ internal object BlocksDrawer {
 
         drawTiles(WALL)
         drawTiles(TERRAIN) // regular tiles
-        drawTiles(WIRE, wireBit)
+        drawTiles(WIRE)
         drawTiles(FLUID)
     }
 
@@ -281,7 +283,7 @@ internal object BlocksDrawer {
      * @param drawModeTilesBlendMul If current drawing mode is MULTIPLY. Doesn't matter if mode is FLUID.
      * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.
      */
-    private fun drawTiles(mode: Int, wireBit: Int = 0) {
+    private fun drawTiles(mode: Int) {
         // can't be "WorldCamera.y / TILE_SIZE":
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
@@ -310,7 +312,7 @@ internal object BlocksDrawer {
                 val thisTile = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> world.getWiringBlocks(x, y).and(wireBit).toBitOrd()
+                    WIRE -> world.getWiringBlocks(x, y).and(drawWires).toBitOrd()
                     FLUID -> world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }
