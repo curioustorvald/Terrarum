@@ -40,6 +40,8 @@ uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
 uniform ivec2 cameraTranslation = ivec2(0, 0);
 
+uniform float drawBreakage = 1f;
+
 
 ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
@@ -108,7 +110,13 @@ void main() {
 
     vec4 finalTile = mix(tileCol, tileAltCol, tilesBlend);
 
-    vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
+    vec4 finalBreakage;
+    if (drawBreakage == 0f) {
+        finalBreakage = vec4(0f);
+    }
+    else {
+        finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
+    }
 
     vec4 finalColor = vec4(mix(finalTile.rgb, finalBreakage.rgb, finalBreakage.a), finalTile.a);
 

@@ -123,10 +123,8 @@ internal object BlocksDrawer {
                 TextureRegionPack(Texture(CreateTileAtlas.atlasWinter), TILE_SIZE, TILE_SIZE)
         )
 
-        // unzip tga.gz for tilesWire and tilesFluid
-
-        //TODO
-        tilesWire = TextureRegionPack(Texture(8, 8, Pixmap.Format.RGBA8888), 1, 1)
+        //TODO make wire work with the TileAtlas system
+        tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "blocks/wire.tga"), TILE_SIZE, TILE_SIZE)
         tilesFluid = TextureRegionPack(Texture(CreateTileAtlas.atlasFluid), TILE_SIZE, TILE_SIZE)
 
 
@@ -267,14 +265,11 @@ internal object BlocksDrawer {
 
     /**
      * Turns bitmask-with-single-bit-set into its bit index. The LSB is counted as 1, and thus the index starts at one.
-     * @return 0 -> null, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, ...
+     * @return 0 -> -1, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, ...
      */
-    private fun Int.toBitOrd(): Int? {
-        //if (this > 0 && !FastMath.isPowerOfTwo(this)) throw IllegalArgumentException("value must be power of two: $this")
-        //else {
-            val k = FastMath.intLog2(this, -1)
-            return if (k == -1) null else k
-        //}
+    private fun Int.toBitOrd(): Int {
+        val k = FastMath.intLog2(this, -1)
+        return k
     }
 
     /**
@@ -312,7 +307,7 @@ internal object BlocksDrawer {
                 val thisTile = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> world.getWiringBlocks(x, y).and(drawWires).toBitOrd()
+                    WIRE -> world.getWiringBlocks(x, y).and(drawWires).toBitOrd() * 16
                     FLUID -> world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }
@@ -322,6 +317,9 @@ internal object BlocksDrawer {
                 if (thisTile != null) try {
                     val nearbyTilesInfo = if (mode == FLUID) {
                         getNearbyTilesInfoFluids(x, y)
+                    }
+                    else if (mode == WIRE) {
+                        getNearbyWiringInfo(x, y, thisTile)
                     }
                     else if (isPlatform(thisTile)) {
                         getNearbyTilesInfoPlatform(x, y)
@@ -343,10 +341,16 @@ internal object BlocksDrawer {
                     val tileNumberBase =
                             if (mode == FLUID)
                                 CreateTileAtlas.fluidToTileNumber(world.getFluid(x, y))
+                            else if (mode == WIRE)
+                                thisTile
                             else
                                 renderTag.tileNumber
-                    val tileNumber = if (thisTile == 0) 0
+                    val tileNumber = if (mode != WIRE && thisTile == 0) 0
+                    // special case: fluids
                     else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
+                    // special case: wires
+                    else if (mode == WIRE) tileNumberBase + connectLut16[nearbyTilesInfo]
+                    // rest of the cases: terrain and walls
                     else tileNumberBase + when (renderTag.maskType) {
                             CreateTileAtlas.RenderTag.MASK_NA -> 0
                             CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
@@ -370,7 +374,11 @@ internal object BlocksDrawer {
 
                     // draw a tile
 
-                    if (mode == FLUID) {
+                    if (mode == WIRE && thisTile < 0) {
+                        // no wire here, draw block id 255 (bottom right)
+                        writeToBuffer(mode, bufferX, bufferY, 15, 15, 0)
+                    }
+                    else if (mode == FLUID || mode == WIRE) {
                         writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
                     }
                     else {
@@ -402,6 +410,25 @@ internal object BlocksDrawer {
         var ret = 0
         for (i in 0 until nearbyTiles.size) {
             if (nearbyTiles[i] == mark) {
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+            }
+        }
+
+        return ret
+    }
+
+    /**
+     * @param wire -1 for none, 0 for signal red, 1 for untility prototype, 2 for low power, 3 for high power;
+     * log of bits defined in [net.torvald.terrarum.blockproperties.Wire]
+     *
+     * @return offset from the spritesheet's "base" tile number, 0..15.
+     */
+    private fun getNearbyWiringInfo(x: Int, y: Int, wire: Int): Int {
+        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getWiringBlocks(it.x, it.y).and(drawWires).toBitOrd() * 16 }
+
+        var ret = 0
+        for (i in 0 until nearbyTiles.size) {
+            if (nearbyTiles[i] == wire) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
@@ -608,6 +635,7 @@ internal object BlocksDrawer {
         else
             0f
         )
+        shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
 
