@@ -18,7 +18,6 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.torvald.util.ArrayListMap;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.blockstats.MinimapComposer;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
@@ -34,10 +33,12 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer;
 import net.torvald.terrarum.worlddrawer.LightmapRenderer;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
+import net.torvald.util.ArrayListMap;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
 
 import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
@@ -284,10 +285,13 @@ public class AppLoader implements ApplicationListener {
     private FrameBuffer renderFBO;
 
     public static CommonResourcePool resourcePool;
+    public static HashSet<File> tempFilePool = new HashSet();
 
     @Override
     public void create() {
         resourcePool = CommonResourcePool.INSTANCE;
+
+        newTempFile("wenquanyi.tga"); // temp file required by the font
 
 
         // set basis of draw
@@ -374,13 +378,6 @@ public class AppLoader implements ApplicationListener {
         // make loading list
 
 
-    }
-
-    /**
-     * @link http://bilgin.esme.org/BitsAndBytes/KalmanFilterforDummies
-     */
-    private void updateKalmanRenderDelta() {
-        // moved to LwjglGraphics
     }
 
     @Override
@@ -544,8 +541,7 @@ public class AppLoader implements ApplicationListener {
 
         ModMgr.INSTANCE.disposeMods();
 
-        // delete temp files
-        new File("./tmp_wenquanyi.tga").delete(); // FIXME this is pretty much ad-hoc
+        deleteTempfiles();
     }
 
     @Override
@@ -702,6 +698,17 @@ public class AppLoader implements ApplicationListener {
         //dirs.forEach { if (!it.exists()) it.mkdirs() }
     }
 
+    public static File newTempFile(String filename) {
+        File tempfile = new File("./tmp_" + filename);
+        tempFilePool.add(tempfile);
+        return tempfile;
+    }
+
+    private static void deleteTempfiles() {
+        for (File file : tempFilePool) {
+            file.delete();
+        }
+    }
 
     // CONFIG //
 
