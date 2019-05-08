@@ -83,7 +83,12 @@ object LightmapRenderer {
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+
+    /**
+     * Sstores both the block light sources and actor light sources.
+     */
+    private val lightSourcesMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val shadesMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     init {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
@@ -201,8 +206,13 @@ object LightmapRenderer {
 
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
-        AppLoader.measureDebugTime("Renderer.Lanterns") {
-            buildLanternmap(actorContainers)
+        AppLoader.measureDebugTime("Renderer.Preload") {
+            // this is to recycle pre-calculated lights and shades for all 4 rounds.
+            // the old code always re-calculates them (calls 'getLightsAndShades()') for every blocks for every round.
+            // the light source information can also be used to create no-op mask? I'm sceptical about that, there must
+            //     exist some edge cases like the other time...
+            buildLightSourcesMap(actorContainers)
+            buildShadesMap()
         } // usually takes 3000 ns
 
         /*
@@ -244,6 +254,7 @@ object LightmapRenderer {
 
             // The skipping is dependent on how you get ambient light,
             // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
+
 
             AppLoader.measureDebugTime("Renderer.LightTotal") {
                 // Round 2
@@ -331,8 +342,9 @@ object LightmapRenderer {
     internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
 
 
-    private fun buildLanternmap(actorContainers: Array<out List<ActorWithBody>?>) {
-        lanternMap.clear()
+    private fun buildLightSourcesMap(actorContainers: Array<out List<ActorWithBody>?>) {
+        lightSourcesMap.clear()
+        // lanterns from actors
         actorContainers.forEach { actorContainer ->
             actorContainer?.forEach {
                 if (it is Luminous && it is ActorWBMovable) {
@@ -349,17 +361,46 @@ object LightmapRenderer {
 
                                 val normalisedColor = it.color//.cpy().mul(DIV_FLOAT)
 
-                                lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
-                                //lanternMap[Point2i(x, y)] = normalisedColor
+                                lightSourcesMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
+                                //lightSourcesMap[Point2i(x, y)] = normalisedColor
                                 // Q&D fix for Roundworld anomaly
-                                //lanternMap[Point2i(x + world.width, y)] = normalisedColor
-                                //lanternMap[Point2i(x - world.width, y)] = normalisedColor
+                                //lightSourcesMap[Point2i(x + world.width, y)] = normalisedColor
+                                //lightSourcesMap[Point2i(x - world.width, y)] = normalisedColor
                             }
                         }
                     }
                 }
             }
         }
+
+        // light sources from blocks
+        for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
+                val block = BlockCodex[world.getTileFromTerrain(x, y)]
+                val wall = world.getTileFromWall(x, y)
+                val blockLum = block.internalLumCol
+                val fluid = world.getFluid(x, y)
+                val tileAddr = LandUtil.getBlockAddr(world, x, y)
+
+                // mix with the existing value
+                lightSourcesMap[tileAddr]?.maxAndAssign(blockLum)
+
+                // see if sunlight is applicable. If it does, mix with the existing value
+                if (!block.isSolid && wall == Block.AIR) {
+                    lightSourcesMap[tileAddr]?.maxAndAssign(sunLight)
+                }
+
+                // mix the lava light
+                if (fluid.type != Fluid.NULL) {
+                    TODO("getLightsAndShades()")
+                }
+            }
+        }
+    }
+
+    private fun buildShadesMap() {
+        shadesMap.clear()
+        TODO("getLightsAndShades()")
     }
 
     private fun buildNoopMask() {
@@ -416,6 +457,9 @@ object LightmapRenderer {
      * - sunlight
      */
     private fun getLightsAndShades(x: Int, y: Int) {
+        // TODO lanternmap now also holds light sources (incl. sunlight)
+
+
         lightLevelThis.set(colourNull)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisFluid = world.getFluid(x, y)
@@ -444,7 +488,7 @@ object LightmapRenderer {
         }
 
         // blend lantern
-        lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
+        lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lightSourcesMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
 
     }
 
@@ -516,6 +560,7 @@ object LightmapRenderer {
          */
 
         // will "overwrite" what's there in the lightmap if it's the first pass
+        // using "map"s actually makes it slower. Guess I'll keep it dirty...
         // takes about 2 ms on 6700K
         /* + */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, thisTileOpacity2))
         /* + */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, thisTileOpacity2))
