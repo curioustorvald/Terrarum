@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.items
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.blockproperties.Wire
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.itemproperties.Material
@@ -30,10 +31,10 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        return BlockBase.wireStartPrimaryUse(this, 64, delta)
+        return BlockBase.wireStartPrimaryUse(this, Wire.BIT_SIGNAL_RED, delta)
     }
 
     override fun effectWhenEquipped(delta: Float) {
-        BlockBase.wireEffectWhenEquipped(64, delta)
+        BlockBase.wireEffectWhenEquipped(Wire.BIT_SIGNAL_RED, delta)
     }
 }

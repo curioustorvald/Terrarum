@@ -40,7 +40,7 @@ uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
 uniform ivec2 cameraTranslation = ivec2(0, 0);
 
-uniform float drawBreakage = 1f;
+uniform float drawBreakage = 1f; // set it to 0f to not draw breakage; non-zero value to draw it
 
 
 ivec2 getTileXY(int tileNumber) {
