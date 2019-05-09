@@ -213,7 +213,7 @@ object LightmapRenderer {
         // set sunlight
         sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
-        AppLoader.measureDebugTime("Renderer.Preload") {
+        AppLoader.measureDebugTime("Renderer.LightPreload") {
             // this is to recycle pre-calculated lights and shades for all 4 rounds.
             // the old code always re-calculates them (calls 'getLightsAndShades()') for every blocks for every round.
             // the light source information can also be used to create no-op mask? I'm sceptical about that, there must

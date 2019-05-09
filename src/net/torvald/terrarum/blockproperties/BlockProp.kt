@@ -16,8 +16,7 @@ class BlockProp {
     var shadeColG = 0f
     var shadeColB = 0f
     var shadeColA = 0f
-
-    lateinit var opacity: Color
+    var opacity: Color = Color(0)
 
     var strength: Int = 0
     var density: Int = 0
@@ -36,7 +35,7 @@ class BlockProp {
     var lumColG = 0f
     var lumColB = 0f
     var lumColA = 0f
-    lateinit var internalLumCol: Color
+    var internalLumCol: Color = Color(0)
 
     /**
      * @param luminosity
