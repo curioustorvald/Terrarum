@@ -34,6 +34,7 @@ import net.torvald.terrarum.realestate.LandUtil
  */
 object LightmapRenderer {
     private const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
+    private const val SQRT2 = 1.41421356f
 
     private var world: GameWorld = GameWorld.makeNullWorld()
     private lateinit var lightCalcShader: ShaderProgram
@@ -88,7 +89,10 @@ object LightmapRenderer {
      * Sstores both the block light sources and actor light sources.
      */
     private val lightSourcesMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
-    private val shadesMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    /**
+     * Pair of: Regular shade, the former shade times 1.4142
+     */
+    private val shadesMap = HashMap<BlockAddress, Pair<Color, Color>>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     init {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
@@ -206,13 +210,15 @@ object LightmapRenderer {
 
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
+        // set sunlight
+        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
+
         AppLoader.measureDebugTime("Renderer.Preload") {
             // this is to recycle pre-calculated lights and shades for all 4 rounds.
             // the old code always re-calculates them (calls 'getLightsAndShades()') for every blocks for every round.
             // the light source information can also be used to create no-op mask? I'm sceptical about that, there must
             //     exist some edge cases like the other time...
             buildLightSourcesMap(actorContainers)
-            buildShadesMap()
         } // usually takes 3000 ns
 
         /*
@@ -228,9 +234,6 @@ object LightmapRenderer {
          * for all lightmap[y][x], run in this order: 2-3-4-1
          *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
          */
-
-        // set sunlight
-        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
         // set no-op mask from solidity of the block
         AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
@@ -342,8 +345,20 @@ object LightmapRenderer {
     internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
 
 
+    private var _block = BlockCodex[0]
+    private var _wall = 0
+    private var _blockLum = Color(0)
+    private var _fluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
+    private var _fluidProp = BlockCodex[_fluid.type]
+    private var _tileAddr = 0L
+    private var _fluidAmountToCol = Color(0)
+
     private fun buildLightSourcesMap(actorContainers: Array<out List<ActorWithBody>?>) {
         lightSourcesMap.clear()
+        shadesMap.clear()
+
+        // TODO make all local vars class-level global
+
         // lanterns from actors
         actorContainers.forEach { actorContainer ->
             actorContainer?.forEach {
@@ -373,34 +388,48 @@ object LightmapRenderer {
             }
         }
 
-        // light sources from blocks
+        // light sources and shades from a block
         for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
             for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
-                val block = BlockCodex[world.getTileFromTerrain(x, y)]
-                val wall = world.getTileFromWall(x, y)
-                val blockLum = block.internalLumCol
-                val fluid = world.getFluid(x, y)
-                val tileAddr = LandUtil.getBlockAddr(world, x, y)
+                _block = BlockCodex[world.getTileFromTerrain(x, y)]
+                _wall = world.getTileFromWall(x, y) ?: Block.STONE
+                _blockLum = _block.luminosity
+                _fluid = world.getFluid(x, y)
+                _fluidProp = BlockCodex[_fluid.type]
+                _tileAddr = LandUtil.getBlockAddr(world, x, y)
+                _fluidAmountToCol = Color(_fluid.amount.coerceIn(0f, 1f))
+
+                // light sources from blocks //
 
                 // mix with the existing value
-                lightSourcesMap[tileAddr]?.maxAndAssign(blockLum)
+                if (lightSourcesMap[_tileAddr] == null)
+                    lightSourcesMap[_tileAddr] = _blockLum
+                else
+                    lightSourcesMap[_tileAddr]!!.maxAndAssign(_blockLum)
 
                 // see if sunlight is applicable. If it does, mix with the existing value
-                if (!block.isSolid && wall == Block.AIR) {
-                    lightSourcesMap[tileAddr]?.maxAndAssign(sunLight)
+                if (!_block.isSolid && _wall == Block.AIR) {
+                    lightSourcesMap[_tileAddr]!!.maxAndAssign(sunLight)
                 }
 
                 // mix the lava light
-                if (fluid.type != Fluid.NULL) {
-                    TODO("getLightsAndShades()")
+                if (_fluid.type != Fluid.NULL) {
+                    lightSourcesMap[_tileAddr]!!.maxAndAssign(
+                            _fluidProp.luminosity mul _fluidAmountToCol
+                    )
                 }
+
+                // deal with the shades //
+
+                // shade from the block
+                val shade = _block.opacity
+                // shade from the fluid
+                shade.maxAndAssign(_fluidProp.opacity mul _fluidAmountToCol)
+
+                // actually store the shade value
+                shadesMap[_tileAddr] = shade to shade.cpy().mul(SQRT2)
             }
         }
-    }
-
-    private fun buildShadesMap() {
-        shadesMap.clear()
-        TODO("getLightsAndShades()")
     }
 
     private fun buildNoopMask() {
@@ -435,14 +464,14 @@ object LightmapRenderer {
 
 
     //private val ambientAccumulator = Color(0f,0f,0f,0f)
-    private val lightLevelThis = Color(0)
-    private var thisTerrain = 0
-    private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
-    private val fluidAmountToCol = Color(0)
-    private var thisWall = 0
-    private val thisTileLuminosity = Color(0)
-    private val thisTileOpacity = Color(0)
-    private val thisTileOpacity2 = Color(0) // thisTileOpacity * sqrt(2)
+    //private val lightLevelThis = Color(0)
+    //private var thisTerrain = 0
+    //private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
+    //private val fluidAmountToCol = Color(0)
+    //private var thisWall = 0
+    //private val thisTileLuminosity = Color(0)
+    //private val thisTileOpacity = Color(0)
+    //private val thisTileOpacity2 = Color(0) // thisTileOpacity * sqrt(2)
     private val sunLight = Color(0)
 
     /**
@@ -456,7 +485,7 @@ object LightmapRenderer {
      * - thisTileOpacity2
      * - sunlight
      */
-    private fun getLightsAndShades(x: Int, y: Int) {
+    /*private fun getLightsAndShades(x: Int, y: Int) {
         // TODO lanternmap now also holds light sources (incl. sunlight)
 
 
@@ -490,7 +519,7 @@ object LightmapRenderer {
         // blend lantern
         lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lightSourcesMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
 
-    }
+    }*/
 
     private val inNoopMaskp = Point2i(0,0)
 
@@ -549,7 +578,10 @@ object LightmapRenderer {
 
         // O(9n) == O(n) where n is a size of the map
 
-        getLightsAndShades(x, y)
+        //getLightsAndShades(x, y)
+        val tileAddr = LandUtil.getBlockAddr(world, x, y)
+        val lightLevelThis = lightSourcesMap[tileAddr]!!.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
+        val (thisTileOpacity, thisTileOpacity2) = shadesMap[tileAddr]!!
 
         // calculate ambient
         /*  + * +  0 4 1
@@ -573,7 +605,7 @@ object LightmapRenderer {
 
 
         //return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
-        setLightOf(lightmap, x, y, lightLevelThis.cpy())
+        setLightOf(lightmap, x, y, lightLevelThis)
     }
 
     private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
@@ -932,4 +964,4 @@ object LightmapRenderer {
 }
 
 fun Color.toRGBA() = (255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt()
-
+//fun Color(c: Float) = Color(c, c, c, c)

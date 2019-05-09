@@ -93,6 +93,13 @@ public class Color {
         this.a = a;
     }
 
+    public Color (float c) {
+        this.r = c;
+        this.g = c;
+        this.b = c;
+        this.a = c;
+    }
+
     /** Constructs a new color using the given color
      *
      * @param color the color */
