@@ -14,7 +14,6 @@ import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.realestate.LandUtil
@@ -88,11 +87,47 @@ object LightmapRenderer {
     /**
      * Sstores both the block light sources and actor light sources.
      */
-    private val lightSourcesMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    //private val lightSourcesMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val lightSourcesMap = Array<Color>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0) }
+    private fun toLightOffset(y: Int, x: Int): Int {
+        val xpos = x - for_x_start + overscan_open
+        val ypos = y - for_y_start + overscan_open
+        val index = ypos * LIGHTMAP_WIDTH + xpos
+
+        if (index >= lightSourcesMap.size)
+            println("$x, $y | $xpos, $ypos | $for_x_start, $for_y_start | $index")
+
+        return index
+    }
+    private fun getLightSourceMap(worldX: Int, worldY: Int) =
+            lightSourcesMap[toLightOffset(worldX, worldY)]
+    private fun setLightSourcesMap(worldX: Int, worldY: Int, value: Color) {
+        lightSourcesMap[toLightOffset(worldX, worldY)] = value
+    }
+    private fun mixLightSourcesMap(worldX: Int, worldY: Int, value: Color) {
+        lightSourcesMap[toLightOffset(worldX, worldY)].maxAndAssign(value)
+    }
+    private fun clearLightSourcesOffset() {
+        for (i in 0 until lightSourcesMap.size) { lightSourcesMap[i] = Color(0) }
+    }
     /**
      * Pair of: Regular shade, the former shade times 1.4142
      */
-    private val shadesMap = HashMap<BlockAddress, Pair<Color, Color>>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    //private val shadesMap = HashMap<BlockAddress, Pair<Color, Color>>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val shadesMap = Array<Pair<Color, Color>>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0) to Color(0) }
+    private fun getShadesMap(worldX: Int, worldY: Int) =
+            shadesMap[toLightOffset(worldX, worldY)]
+    private fun setShadesMap(worldX: Int, worldY: Int, value: Color) {
+        shadesMap[toLightOffset(worldX, worldY)] = value to (value.cpy().mul(SQRT2))
+    }
+    private fun mixShadesMap(worldX: Int, worldY: Int, value: Color) {
+        val field = shadesMap[toLightOffset(worldX, worldY)]
+        val baseval = field.first.maxAndAssign(value)
+        field.second.set(baseval); field.second.mul(SQRT2)
+    }
+    private fun clearShadesMap() {
+        for (i in 0 until shadesMap.size) { shadesMap[i] = Color(0) to Color(0) }
+    }
 
     init {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
@@ -345,7 +380,8 @@ object LightmapRenderer {
     internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
 
 
-    private var _block = BlockCodex[0]
+    private var _block = 0
+    private var _blockProp = BlockCodex[0]
     private var _wall = 0
     private var _blockLum = Color(0)
     private var _fluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
@@ -354,10 +390,10 @@ object LightmapRenderer {
     private var _fluidAmountToCol = Color(0)
 
     private fun buildLightSourcesMap(actorContainers: Array<out List<ActorWithBody>?>) {
-        lightSourcesMap.clear()
-        shadesMap.clear()
+        clearLightSourcesOffset()
+        clearShadesMap()
 
-        // TODO make all local vars class-level global
+        //lightSourcesMapOffset.set(for_x_start - overscan_open, for_y_start + overscan_open)
 
         // lanterns from actors
         actorContainers.forEach { actorContainer ->
@@ -376,7 +412,9 @@ object LightmapRenderer {
 
                                 val normalisedColor = it.color//.cpy().mul(DIV_FLOAT)
 
-                                lightSourcesMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
+                                //lightSourcesMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
+                                setLightSourcesMap(x, y, normalisedColor)
+
                                 //lightSourcesMap[Point2i(x, y)] = normalisedColor
                                 // Q&D fix for Roundworld anomaly
                                 //lightSourcesMap[Point2i(x + world.width, y)] = normalisedColor
@@ -389,11 +427,12 @@ object LightmapRenderer {
         }
 
         // light sources and shades from a block
-        for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
-            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
-                _block = BlockCodex[world.getTileFromTerrain(x, y)]
+        for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
+            for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+                _block = world.getTileFromTerrain(x, y) ?: Block.STONE
+                _blockProp = BlockCodex[_block]
                 _wall = world.getTileFromWall(x, y) ?: Block.STONE
-                _blockLum = _block.luminosity
+                _blockLum = _blockProp.luminosity
                 _fluid = world.getFluid(x, y)
                 _fluidProp = BlockCodex[_fluid.type]
                 _tileAddr = LandUtil.getBlockAddr(world, x, y)
@@ -402,32 +441,24 @@ object LightmapRenderer {
                 // light sources from blocks //
 
                 // mix with the existing value
-                if (lightSourcesMap[_tileAddr] == null)
-                    lightSourcesMap[_tileAddr] = _blockLum
-                else
-                    lightSourcesMap[_tileAddr]!!.maxAndAssign(_blockLum)
+                mixLightSourcesMap(x, y, _blockLum)
 
                 // see if sunlight is applicable. If it does, mix with the existing value
-                if (!_block.isSolid && _wall == Block.AIR) {
-                    lightSourcesMap[_tileAddr]!!.maxAndAssign(sunLight)
+                if ((_block == AIR && _wall == AIR) || (_blockLum.nonZero() && _wall == AIR)) {
+                    mixLightSourcesMap(x, y, sunLight)
                 }
 
                 // mix the lava light
                 if (_fluid.type != Fluid.NULL) {
-                    lightSourcesMap[_tileAddr]!!.maxAndAssign(
-                            _fluidProp.luminosity mul _fluidAmountToCol
-                    )
+                    mixLightSourcesMap(x, y, _fluidProp.luminosity mul _fluidAmountToCol)
                 }
 
                 // deal with the shades //
 
                 // shade from the block
-                val shade = _block.opacity
+                setShadesMap(x, y, _blockProp.opacity)
                 // shade from the fluid
-                shade.maxAndAssign(_fluidProp.opacity mul _fluidAmountToCol)
-
-                // actually store the shade value
-                shadesMap[_tileAddr] = shade to shade.cpy().mul(SQRT2)
+                mixShadesMap(x, y, _fluidProp.opacity mul _fluidAmountToCol)
             }
         }
     }
@@ -579,9 +610,8 @@ object LightmapRenderer {
         // O(9n) == O(n) where n is a size of the map
 
         //getLightsAndShades(x, y)
-        val tileAddr = LandUtil.getBlockAddr(world, x, y)
-        val lightLevelThis = lightSourcesMap[tileAddr]!!.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
-        val (thisTileOpacity, thisTileOpacity2) = shadesMap[tileAddr]!!
+        val lightLevelThis = getLightSourceMap(x, y) // it HAS to be a cpy()...?, otherwise all cells gets the same instance
+        val (thisTileOpacity, thisTileOpacity2) = getShadesMap(x, y)
 
         // calculate ambient
         /*  + * +  0 4 1
