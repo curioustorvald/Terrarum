@@ -56,8 +56,9 @@ task gamedebug(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.terrarum.AppLoader'
     group = "Application"
-    description = "Launches the game with debuy key."
+    description = "Launches the game with the debug key."
     args = ["isdev=true"]
+    jvmArgs = ["-ea"]
 }
 
 task spriteassembler(type: JavaExec) {

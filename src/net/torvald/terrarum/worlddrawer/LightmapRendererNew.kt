@@ -72,8 +72,8 @@ object LightmapRenderer {
 
     // TODO resize(int, int) -aware
 
-    val LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
-    val LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+    var LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+    var LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
@@ -82,7 +82,7 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private var lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     init {
@@ -713,6 +713,9 @@ object LightmapRenderer {
         val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
         val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
 
+        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+
         if (_init) {
             lightBuffer.dispose()
         }
@@ -720,6 +723,7 @@ object LightmapRenderer {
             _init = true
         }
         lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+        lightmap = Array<Color>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0) }
 
 
         printdbg(this, "Resize event")
