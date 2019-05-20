@@ -1,10 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.worlddrawer.Cvec
 
 /**
  * Created by minjaesong on 2016-04-26.
@@ -21,7 +20,7 @@ class WeaponSwung(val itemID: Int) : ActorWBMovable(RenderOrder.MIDTOP), Luminou
     actorValue[AVKey.LUMINOSITY] = value
     }
      */
-    override var color: Color
+    override var color: Cvec
         get() = throw UnsupportedOperationException()
         set(value) {
         }

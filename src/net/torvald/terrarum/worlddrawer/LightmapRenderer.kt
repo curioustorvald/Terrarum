@@ -1,19 +1,5 @@
 package net.torvald.terrarum.worlddrawer
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.jme3.math.FastMath
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.floorInt
-import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.IngameRenderer
-import java.util.*
-
 /**
  * Warning: you are not going to store float value to the lightmap -- see RGB_HDR_LUT (beziér)
  *
@@ -24,7 +10,7 @@ import java.util.*
 
 // NOTE: no Float16 on this thing: 67 kB of memory footage is totally acceptable
 
-object LightmapRendererOld {
+/*object LightmapRendererOld {
     lateinit var world: GameWorld
 
 
@@ -771,4 +757,4 @@ object LightmapRendererOld {
         }
         return (1f - scale) * startValue + scale * endValue
     }
-}
+}*/

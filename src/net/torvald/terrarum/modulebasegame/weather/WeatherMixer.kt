@@ -22,6 +22,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import net.torvald.terrarum.worlddrawer.Cvec
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.util.*
@@ -51,7 +52,7 @@ internal object WeatherMixer : RNGConsumer {
 
     lateinit var mixedWeather: BaseModularWeather
 
-    val globalLightNow = Color(0)
+    val globalLightNow = Cvec()
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -133,7 +134,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // calculate global light
         val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
-        globalLightNow.set(globalLight)
+        globalLightNow.setTo(floatArrayOf(globalLight.r, globalLight.g, globalLight.b, globalLight.a))
 
 
         /* (copied from the shader source)
@@ -178,8 +179,10 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Get a GL of specific time
      */
-    fun getGlobalLightOfTime(timeInSec: Int): Color =
-            getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
+    fun getGlobalLightOfTime(timeInSec: Int): Cvec {
+        val c = getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
+        return Cvec(floatArrayOf(c.r, c.g, c.b, c.a))
+    }
 
     fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Color {
         val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width

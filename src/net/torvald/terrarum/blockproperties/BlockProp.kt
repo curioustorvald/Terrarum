@@ -1,6 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
-import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.worlddrawer.Cvec
 
 /**
  * Created by minjaesong on 2016-02-16.
@@ -17,7 +17,7 @@ class BlockProp {
     var shadeColB = 0f
     var shadeColA = 0f
 
-    lateinit var opacity: Color
+    lateinit var opacity: Cvec
 
     var strength: Int = 0
     var density: Int = 0
@@ -36,12 +36,12 @@ class BlockProp {
     var lumColG = 0f
     var lumColB = 0f
     var lumColA = 0f
-    lateinit var internalLumCol: Color
+    lateinit var internalLumCol: Cvec
 
     /**
      * @param luminosity
      */
-    inline val luminosity: Color
+    inline val luminosity: Cvec
         get() = BlockPropUtil.getDynamicLumFunc(internalLumCol, dynamicLuminosityFunction)
 
     var drop: Int = 0

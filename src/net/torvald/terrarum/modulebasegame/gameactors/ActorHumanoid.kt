@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
@@ -15,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.time_t
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.worlddrawer.Cvec
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -68,18 +68,18 @@ open class ActorHumanoid(
         if (houseDesignation != null) houseDesignation!!.clear()
     }
 
-    override var color: Color
-        get() = Color(
+    override var color: Cvec
+        get() = Cvec(floatArrayOf(
                 (actorValue.getAsFloat(AVKey.LUMR) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMG) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMB) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMA) ?: 0f) / LightmapRenderer.MUL_FLOAT
-        )
+        ))
         set(value) {
-            actorValue[AVKey.LUMR] = value.r * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMG] = value.g * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMB] = value.b * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMA] = value.a * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMR] = value.vec[0] * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMG] = value.vec[1] * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMB] = value.vec[2] * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMA] = value.vec[3] * LightmapRenderer.MUL_FLOAT
         }
 
     /**

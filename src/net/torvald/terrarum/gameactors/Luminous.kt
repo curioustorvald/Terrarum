@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.worlddrawer.Cvec
 
 /**
  * Created by minjaesong on 2016-02-19.
@@ -26,7 +26,7 @@ interface Luminous {
             actorValue[AVKey.LUMA] = value.a * LightmapRenderer.MUL_FLOAT
         }
      */
-    var color: Color
+    var color: Cvec
 
     /**
      * Arguments:

@@ -9,6 +9,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.worlddrawer.Cvec
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -31,8 +32,8 @@ open class ProjectileSimple(
     val speed: Int
 
 
-    override var color: Color
-        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Color).cpy()
+    override var color: Cvec
+        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Cvec).cpy()
         set(value) {
         }
     /**
@@ -118,8 +119,8 @@ open class ProjectileSimple(
         val OFFSET_LUMINOSITY = 4
         val bulletDatabase = arrayOf(
                 // damage, display colour, no gravity, speed
-                arrayOf(7, Color(0xFF5429_FF.toInt()), true, 40, 32),
-                arrayOf(8, Color(0xFF5429_FF.toInt()), true, 20, 0)
+                arrayOf(7, Cvec(1f, .329f, .161f, 1f), true, 40, 32),
+                arrayOf(8, Cvec(1f, .329f, .161f, 1f), true, 20, 0)
                 // ...
         )
     }

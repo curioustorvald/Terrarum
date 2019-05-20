@@ -27,6 +27,7 @@ import net.torvald.terrarum.serialise.toULittle48
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
+import net.torvald.terrarum.worlddrawer.Cvec
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -279,7 +280,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     init {
         gameWorld.time.setTimeOfToday(WorldTime.HOUR_SEC * 10)
-        gameWorld.globalLight = Color(.8f,.8f,.8f,.8f)
+        gameWorld.globalLight = Cvec(.8f)
 
         essentialOverlays.add(blockPointingCursor)
 

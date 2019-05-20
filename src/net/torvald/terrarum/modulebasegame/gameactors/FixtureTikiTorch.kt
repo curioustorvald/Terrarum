@@ -1,12 +1,12 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.worlddrawer.Cvec
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
@@ -17,7 +17,7 @@ internal class FixtureTikiTorch : FixtureBase(
         BlockBox(BlockBox.NO_COLLISION, 1, 2)
 ), Luminous {
 
-    override var color: Color
+    override var color: Cvec
         get() = BlockCodex[Block.TORCH].luminosity
         set(value) {
             throw UnsupportedOperationException()

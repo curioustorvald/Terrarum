@@ -1,13 +1,13 @@
 package net.torvald.terrarum.blockproperties
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
+import net.torvald.terrarum.worlddrawer.Cvec
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 
 /**
@@ -37,7 +37,7 @@ object BlockPropUtil {
 
     }
 
-    private fun getTorchFlicker(baseLum: Color): Color {
+    private fun getTorchFlicker(baseLum: Cvec): Cvec {
         val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX / flickerFuncDomain,
                 flickerP0, flickerP1, flickerP2, flickerP3
         )
@@ -45,13 +45,13 @@ object BlockPropUtil {
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
-    private fun getSlowBreath(baseLum: Color): Color {
+    private fun getSlowBreath(baseLum: Cvec): Cvec {
         val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
-    private fun getPulsate(baseLum: Color): Color {
+    private fun getPulsate(baseLum: Cvec): Cvec {
         val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
@@ -91,7 +91,7 @@ object BlockPropUtil {
 
     private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x
 
-    fun getDynamicLumFunc(baseLum: Color, type: Int): Color {
+    fun getDynamicLumFunc(baseLum: Cvec, type: Int): Cvec {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
