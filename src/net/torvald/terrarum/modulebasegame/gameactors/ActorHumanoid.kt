@@ -7,8 +7,8 @@ import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -154,9 +154,7 @@ open class ActorHumanoid(
         get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.actorNowPlaying
 
 
-    @Transient private val nullItem = object : GameItem() {
-        override var dynamicID: Int = 0
-        override val originalID = dynamicID
+    @Transient private val nullItem = object : GameItem(0) {
         override val isUnique: Boolean = false
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null

@@ -5,6 +5,8 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
@@ -174,9 +176,7 @@ object ItemCodex {
 
 
         // test water bucket
-        itemCodex[9000] = object : GameItem() {
-            override var dynamicID: ItemID = 9000
-            override val originalID: ItemID = 9000
+        itemCodex[9000] = object : GameItem(9000) {
 
             override val isUnique: Boolean = true
             override val originalName: String = "Infinite Water Bucket"
@@ -203,9 +203,7 @@ object ItemCodex {
 
 
         // test lava bucket
-        itemCodex[9001] = object : GameItem() {
-            override var dynamicID: ItemID = 9001
-            override val originalID: ItemID = 9001
+        itemCodex[9001] = object : GameItem(9001) {
 
             override val isUnique: Boolean = true
             override val originalName: String = "Infinite Lava Bucket"

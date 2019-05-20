@@ -11,12 +11,17 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 interface HasAssembledSprite {
 
+    /** ADL path for main sprite. Necessary. */
     var animDescPath: String
+    /** ADL path for glow sprite. Optional. */
+    var animDescPathGlow: String?
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)
 
-    fun reassembleSprite(sprite: SpriteAnimation) {
+    fun reassembleSprite(sprite: SpriteAnimation, spriteGlow: SpriteAnimation? = null) {
         _rebuild(ADProperties(Gdx.files.internal(animDescPath).read()), sprite)
+        if (spriteGlow != null)
+            _rebuild(ADProperties(Gdx.files.internal(animDescPathGlow).read()), spriteGlow)
     }
 
     /*fun rebuild(animDescPath: String, spriteAnimation: SpriteAnimation) {

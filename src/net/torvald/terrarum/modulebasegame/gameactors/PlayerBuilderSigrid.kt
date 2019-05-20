@@ -14,7 +14,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 object PlayerBuilderSigrid {
 
     operator fun invoke(): IngamePlayer {
-        val p = IngamePlayer("lol",  - 9223372036854775807L) // XD
+        val p = IngamePlayer("lol", "lol_glow", - 9223372036854775807L) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
@@ -82,10 +82,13 @@ object PlayerBuilderSigrid {
             }
         }
 
+        // item ids are defined in <module>/items/itemid.csv
+
         inventory.add(8448) // copper pick
         inventory.add(8449) // iron pick
         inventory.add(8450) // steel pick
         inventory.add(8466, 9995) // wire piece
+        inventory.add(8467, 9995) // test tiki torch
         inventory.add(9000) // TEST water bucket
         inventory.add(9001) // TEST lava bucket
     }

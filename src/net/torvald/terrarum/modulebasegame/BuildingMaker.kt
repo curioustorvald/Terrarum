@@ -10,7 +10,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime

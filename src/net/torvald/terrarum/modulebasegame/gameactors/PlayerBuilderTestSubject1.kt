@@ -4,14 +4,17 @@ import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 
 /**
  * Created by minjaesong on 2017-02-10.
  */
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): IngamePlayer {
-        val p: IngamePlayer = IngamePlayer(ModMgr.getPath("basegame", "sprites/test_sprite.properties"), -589141658L) // random value thrown
+        val p: IngamePlayer = IngamePlayer(
+                ModMgr.getPath("basegame", "sprites/furry_sprite.properties"),
+                ModMgr.getPath("basegame", "sprites/furry_sprite_glow.properties"),
+                -589141658L // random value thrown
+        )
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 
@@ -26,7 +29,8 @@ object PlayerBuilderTestSubject1 {
         p.sprite!!.setRowsAndFrames(2, 4)*/
 
         p.sprite = SpriteAnimation(p)
-        p.reassembleSprite(p.sprite!!)
+        p.spriteGlow = SpriteAnimation(p)
+        p.reassembleSprite(p.sprite!!, p.spriteGlow)
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 
         p.setPosition(3.0 * CreateTileAtlas.TILE_SIZE, 3.0 * CreateTileAtlas.TILE_SIZE)
@@ -34,10 +38,10 @@ object PlayerBuilderTestSubject1 {
 
         PlayerBuilderSigrid.fillTestInventory(p.inventory)
 
-        p.actorValue[AVKey.LUMR] = 0.84
-        p.actorValue[AVKey.LUMG] = 0.93
-        p.actorValue[AVKey.LUMB] = 1.37
-        p.actorValue[AVKey.LUMA] = 1.93
+        //p.actorValue[AVKey.LUMR] = 0.84
+        //p.actorValue[AVKey.LUMG] = 0.93
+        //p.actorValue[AVKey.LUMB] = 1.37
+        //p.actorValue[AVKey.LUMA] = 1.93
 
         return p
     }

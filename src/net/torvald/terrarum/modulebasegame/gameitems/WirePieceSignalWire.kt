@@ -1,17 +1,16 @@
-package net.torvald.terrarum.modulebasegame.items
+package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blockproperties.Wire
-import net.torvald.terrarum.itemproperties.GameItem
-import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2019-03-10.
  */
-class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
+class WirePieceSignalWire(originalID: ItemID) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_WIRE"
@@ -23,7 +22,7 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion?
-        get() = (AppLoader.resourcePool["basegame.items16"] as TextureRegionPack).get(1,9)
+        get() = AppLoader.resourcePool.getAsTextureRegionPack("basegame.items16").get(1,9)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP

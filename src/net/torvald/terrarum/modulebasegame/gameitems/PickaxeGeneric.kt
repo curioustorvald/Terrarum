@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame.items
+package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
@@ -7,13 +7,13 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Calculate
-import net.torvald.terrarum.itemproperties.GameItem
-import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.items.PickaxeCore.BASE_MASS_AND_SIZE
-import net.torvald.terrarum.modulebasegame.items.PickaxeCore.TOOL_DURABILITY_BASE
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -74,9 +74,8 @@ object PickaxeCore {
 /**
  * Created by minjaesong on 2017-07-17.
  */
-class PickaxeCopper(override val originalID: ItemID) : GameItem() {
+class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
 
-    override var dynamicID: ItemID = originalID
     override val originalName = "PACKAGED_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var stackable = true
@@ -102,9 +101,8 @@ class PickaxeCopper(override val originalID: ItemID) : GameItem() {
 /**
  * Created by minjaesong on 2019-03-10.
  */
-class PickaxeIron(override val originalID: ItemID) : GameItem() {
+class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
 
-    override var dynamicID: ItemID = originalID
     override val originalName = "PACKAGED_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var stackable = true
@@ -130,9 +128,8 @@ class PickaxeIron(override val originalID: ItemID) : GameItem() {
 /**
  * Created by minjaesong on 2019-03-10.
  */
-class PickaxeSteel(override val originalID: ItemID) : GameItem() {
+class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
 
-    override var dynamicID: ItemID = originalID
     override val originalName = "PACKAGED_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var stackable = true

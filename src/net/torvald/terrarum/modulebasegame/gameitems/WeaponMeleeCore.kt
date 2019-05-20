@@ -1,8 +1,9 @@
-package net.torvald.terrarum.modulebasegame.items
+package net.torvald.terrarum.modulebasegame.gameitems
 
 import net.torvald.random.Fudge3
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import kotlin.math.pow
 
@@ -24,6 +25,6 @@ object WeaponMeleeCore {
 
 }
 
-abstract class WeaponMeleeBase : GameItem() {
+abstract class WeaponMeleeBase(originalID: ItemID) : GameItem(originalID) {
     abstract val velocityMod: Double
 }
