@@ -5,7 +5,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import net.torvald.terrarum.roundInt

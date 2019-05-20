@@ -1,10 +1,12 @@
-package net.torvald.terrarum.itemproperties
+package net.torvald.terrarum.gameitem
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
+import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
@@ -12,15 +14,18 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 typealias ItemID = Int
 
 /**
+ * Instances of the GameItem (e.g. net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper) are preferably referenced
+ * from the ```<module>/items/itemid.csv``` file only, and not from the actual game code.
+ *
  * Created by minjaesong on 2016-01-16.
  */
-abstract class GameItem : Comparable<GameItem>, Cloneable {
+abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneable {
 
-    abstract var dynamicID: ItemID
+    open var dynamicID: ItemID = originalID
     /**
      * if the ID is a Actor range, it's an actor contained in a pocket.
      */
-    abstract val originalID: ItemID // WUT?! using init does not work!!
+    //abstract val originalID: ItemID // WUT?! using init does not work!!
 
 
     /**
@@ -268,6 +273,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
         @JvmStatic val BLOCK = "block"
         @JvmStatic val WALL = "wall"
         @JvmStatic val WIRE = "wire"
+        @JvmStatic val FIXTURE = "fixture"
         @JvmStatic val MISC = "misc"
     }
 
@@ -281,7 +287,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
 
 
     fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
-        dynamicID = GameItem.generateUniqueDynamicID(inventory)
+        dynamicID = Companion.generateUniqueDynamicID(inventory)
         ItemCodex.registerNewDynamicItem(dynamicID, this)
         return this
     }

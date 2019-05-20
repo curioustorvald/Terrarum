@@ -6,11 +6,11 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
+import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
-import net.torvald.terrarum.modulebasegame.items.BlockBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -56,9 +56,7 @@ class EntryPoint : ModuleEntryPoint() {
             val blockProp = BlockCodex.getOrNull(i % ItemCodex.ITEM_WALLS.first)
 
             if (blockProp != null) {
-                ItemCodex.itemCodex[i] = object : GameItem() {
-                    override val originalID = i
-                    override var dynamicID = i
+                ItemCodex.itemCodex[i] = object : GameItem(i) {
                     override val isUnique: Boolean = false
                     override var baseMass: Double = blockProp.density / 1000.0
                     override var baseToolSize: Double? = null

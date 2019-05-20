@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 
 /**
  * Created by minjaesong on 2016-01-31.

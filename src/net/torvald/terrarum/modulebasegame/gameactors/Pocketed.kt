@@ -1,9 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.gameitem.ItemID
 
 /**
  * Created by minjaesong on 2016-01-15.

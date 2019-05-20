@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**

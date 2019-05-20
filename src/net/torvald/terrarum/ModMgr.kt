@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.utils.CSVFetcher

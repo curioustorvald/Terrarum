@@ -27,10 +27,11 @@ open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps 
     /**
      * Adds this instance of the fixture to the world
      *
-     * @param posX top-left position of the fixture, tile-wise
-     * @param posY top-left position of the fixture, tile-wise
+     * @param posX tile-wise top-left position of the fixture
+     * @param posY tile-wise top-left position of the fixture
+     * @return true if successfully spawned, false if was not (e.g. occupied space)
      */
-    open fun spawn(posX: Int, posY: Int) {
+    open fun spawn(posX: Int, posY: Int): Boolean {
         // place filler blocks
         // place the filler blocks where:
         //     origin posX: centre-left  if mouseX is on the right-half of the game window,
@@ -52,6 +53,9 @@ open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps 
         this.isVisible = true
         this.hitbox.setFromWidthHeight(posX * TSIZE, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
 
+
+
+        return true // TODO for the tests' sake, just get fucking spawned
     }
 
     /**

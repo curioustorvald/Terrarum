@@ -1,11 +1,11 @@
-package net.torvald.terrarum.modulebasegame.items
+package net.torvald.terrarum.modulebasegame.gameitems
 
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer

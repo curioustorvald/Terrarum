@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ai.ActorAI
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.gameworld.time_t
 
@@ -16,8 +16,8 @@ import net.torvald.terrarum.modulebasegame.gameworld.time_t
 open class HumanoidNPC(
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
         born: time_t,
-        usePhysics: Boolean = true,
-        forceAssignRefID: Int? = null
+        usePhysics: Boolean = true
+        //forceAssignRefID: Int? = null
 ) : ActorHumanoid(born, usePhysics = usePhysics), AIControlled, CanBeAnItem {
 
     companion object {
@@ -29,9 +29,7 @@ open class HumanoidNPC(
     }
 
     // we're having GameItem data so that this class could be somewhat universal
-    override var itemData: GameItem = object : GameItem() {
-        override var dynamicID = referenceID ?: forceAssignRefID!!
-        override val originalID = dynamicID
+    override var itemData: GameItem = object : GameItem(referenceID) {//GameItem(referenceID ?: forceAssignRefID!!) {
         override val isUnique = true
         override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!

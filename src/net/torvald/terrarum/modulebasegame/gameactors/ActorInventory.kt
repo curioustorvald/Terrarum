@@ -5,11 +5,11 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
-import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar

@@ -1,4 +1,4 @@
-import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable

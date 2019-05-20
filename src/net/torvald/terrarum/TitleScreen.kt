@@ -145,7 +145,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         }
 
 
-        cameraPlayer = object : HumanoidNPC(cameraAI, born = 0, usePhysics = false, forceAssignRefID = Terrarum.PLAYER_REF_ID) {
+        cameraPlayer = object : HumanoidNPC(cameraAI, born = 0, usePhysics = false) {
             init {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
