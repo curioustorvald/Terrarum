@@ -11,11 +11,22 @@ import kotlin.math.roundToInt
  * NOTE: Panama's new vectors are all immutable.
  * NOTE2: Class inlining vastly improves the performance
  *
- * -XX:TypeProfileLevel=121 -XX:+UseVectorApiIntrinsics --add-modules=jdk.incubator.vector
- *
  * Created by minjaesong on 2019-05-20.
  */
 inline class Cvec constructor(val vec: FloatVector) {
+
+    /*
+Test log
+
+I ran with following jvm args:
+    -XX:TypeProfileLevel=121 -XX:+UseVectorApiIntrinsics --add-modules=jdk.incubator.vector
+and it's slower than the legacy.
+
+This time I removed the TypeProfileLevel part. It now runs slightly faster than the legacy?
+    -XX:+UseVectorApiIntrinsics --add-modules=jdk.incubator.vector
+    
+<<append from here>>
+     */
 
     //constructor(floatArray: FloatArray) : this(FloatVector.fromArray(SPECIES, floatArray, 0))
     constructor(r: Float, g: Float, b: Float, a: Float) : this(FloatVector.scalars(SPECIES, r, g, b, a))
@@ -24,7 +35,7 @@ inline class Cvec constructor(val vec: FloatVector) {
 
     companion object {
         private val EPSILON = 1f / 512f
-        private val SPECIES = FloatVector.SPECIES_256
+        private val SPECIES = FloatVector.SPECIES_128
     }
 
     //fun cpy(): Cvec = Cvec(this.vec)
