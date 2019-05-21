@@ -52,7 +52,8 @@ internal object WeatherMixer : RNGConsumer {
 
     lateinit var mixedWeather: BaseModularWeather
 
-    val globalLightNow = Cvec()
+    var globalLightNow = Cvec()
+        private set
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -134,7 +135,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // calculate global light
         val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
-        globalLightNow.setTo(floatArrayOf(globalLight.r, globalLight.g, globalLight.b, globalLight.a))
+        globalLightNow = Cvec(globalLight.r, globalLight.g, globalLight.b, globalLight.a)
 
 
         /* (copied from the shader source)
@@ -181,7 +182,7 @@ internal object WeatherMixer : RNGConsumer {
      */
     fun getGlobalLightOfTime(timeInSec: Int): Cvec {
         val c = getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
-        return Cvec(floatArrayOf(c.r, c.g, c.b, c.a))
+        return Cvec(c.r, c.g, c.b, c.a)
     }
 
     fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Color {

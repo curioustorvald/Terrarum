@@ -2,10 +2,10 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
-      <configuration version="3" platform="JVM 1.8">
+      <configuration version="3" platform="JVM 9">
         <compilerSettings />
         <compilerArguments>
-          <option name="jvmTarget" value="1.8" />
+          <option name="jvmTarget" value="10" />
         </compilerArguments>
       </configuration>
     </facet>
@@ -16,7 +16,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/net/torvald/terrarum/tests" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="11" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="lib" level="project" />

@@ -110,7 +110,7 @@ object BlockCodex {
         prop.shadeColG = floatVal(record, "shdg") / LightmapRenderer.MUL_FLOAT
         prop.shadeColB = floatVal(record, "shdb") / LightmapRenderer.MUL_FLOAT
         prop.shadeColA = floatVal(record, "shduv") / LightmapRenderer.MUL_FLOAT
-        prop.opacity = Cvec(floatArrayOf(prop.shadeColR, prop.shadeColG, prop.shadeColB, prop.shadeColA))
+        prop.opacity = Cvec(prop.shadeColR, prop.shadeColG, prop.shadeColB, prop.shadeColA)
 
         prop.strength = intVal(record, "str")
         prop.density = intVal(record, "dsty")
@@ -119,7 +119,7 @@ object BlockCodex {
         prop.lumColG = floatVal(record, "lumg") / LightmapRenderer.MUL_FLOAT
         prop.lumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
         prop.lumColA = floatVal(record, "lumuv") / LightmapRenderer.MUL_FLOAT
-        prop.internalLumCol = Cvec(floatArrayOf(prop.lumColR, prop.lumColG, prop.lumColB, prop.lumColA))
+        prop.internalLumCol = Cvec(prop.lumColR, prop.lumColG, prop.lumColB, prop.lumColA)
 
         prop.friction = intVal(record, "fr")
         prop.viscosity = intVal(record, "vscs")

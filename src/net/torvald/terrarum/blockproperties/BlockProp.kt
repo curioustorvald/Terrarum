@@ -17,7 +17,7 @@ class BlockProp {
     var shadeColB = 0f
     var shadeColA = 0f
 
-    lateinit var opacity: Cvec
+    var opacity: Cvec = Cvec()
 
     var strength: Int = 0
     var density: Int = 0
@@ -36,7 +36,7 @@ class BlockProp {
     var lumColG = 0f
     var lumColB = 0f
     var lumColA = 0f
-    lateinit var internalLumCol: Cvec
+    var internalLumCol: Cvec = Cvec()
 
     /**
      * @param luminosity

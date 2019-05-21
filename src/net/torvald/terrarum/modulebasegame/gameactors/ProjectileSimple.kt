@@ -33,7 +33,7 @@ open class ProjectileSimple(
 
 
     override var color: Cvec
-        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Cvec).cpy()
+        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Cvec)
         set(value) {
         }
     /**

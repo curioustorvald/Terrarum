@@ -13,11 +13,12 @@ internal object SetGlobalLightOverride : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 5) {
             try {
-                //val r = args[1].toFloat()
-                //val g = args[2].toFloat()
-                //val b = args[3].toFloat()
-                //val a = args[4].toFloat()
-                val GL = Cvec(args.sliceArray(1..4).map { it.toFloat() }.toFloatArray())
+                val GL = Cvec(
+                        args[1].toFloat(),
+                        args[2].toFloat(),
+                        args[3].toFloat(),
+                        args[4].toFloat()
+                )
 
                 WeatherMixer.globalLightOverridden = true
                 (Terrarum.ingame!!.world).globalLight = GL

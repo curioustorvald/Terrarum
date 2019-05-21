@@ -94,8 +94,8 @@ object BlockPropUtil {
     fun getDynamicLumFunc(baseLum: Cvec, type: Int): Cvec {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
-            2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
-            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
+            2    -> (Terrarum.ingame!!.world).globalLight * LightmapRenderer.DIV_FLOAT // current global light
+            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2) * LightmapRenderer.DIV_FLOAT // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum
