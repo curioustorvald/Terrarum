@@ -19,9 +19,10 @@ class GdxColorMap {
         height = pixmap.height
         is2D = pixmap.height > 1
 
-        data = kotlin.IntArray(pixmap.width * pixmap.height) {
+        dataRaw = kotlin.IntArray(pixmap.width * pixmap.height) {
             pixmap.getPixel(it % pixmap.width, it / pixmap.width)
         }
+        dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
 
         pixmap.dispose()
     }
@@ -31,39 +32,46 @@ class GdxColorMap {
         height = pixmap.height
         is2D = pixmap.height > 1
 
-        data = kotlin.IntArray(pixmap.width * pixmap.height) {
+        dataRaw = kotlin.IntArray(pixmap.width * pixmap.height) {
             pixmap.getPixel(it % pixmap.width, it / pixmap.width)
         }
+        dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
 
         if (disposePixmap) pixmap.dispose()
     }
 
     constructor(color: Color) {
-        data = intArrayOf(color.toIntBits())
+        dataRaw = intArrayOf(color.toIntBits())
+        dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
         width = 1
         height = 1
         is2D = false
     }
 
     constructor(gradStart: Color, gradEnd: Color) {
-        data = intArrayOf(gradStart.toIntBits(), gradEnd.toIntBits())
+        dataRaw = intArrayOf(gradStart.toIntBits(), gradEnd.toIntBits())
+        dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
         width = 1
         height = 2
         is2D = true
     }
 
-    private val data: IntArray
+    private val dataRaw: IntArray
+    private val dataGdxColor: Array<Color>
+    //private val dataCvec: Array<Cvec>
     val width: Int
     val height: Int
     val is2D: Boolean
 
 
 
-    fun get(x: Int, y: Int): Color = Color(data[y * width + x])
-    operator fun get(x: Int): Color = if (is2D) throw OperationNotSupportedException("This is 2D color map") else Color(data[x])
+    fun get(x: Int, y: Int): Color = dataGdxColor[y * width + x]
+    operator fun get(x: Int): Color = if (is2D) throw OperationNotSupportedException("This is 2D color map") else dataGdxColor[x]
 
-    fun getRaw(x: Int, y: Int): RGBA8888 = data[y * width + x]
-    fun getRaw(x: Int): RGBA8888 = if (is2D) throw OperationNotSupportedException("This is 2D color map") else data[x]
+    fun getRaw(x: Int, y: Int): RGBA8888 = dataRaw[y * width + x]
+    fun getRaw(x: Int): RGBA8888 = if (is2D) throw OperationNotSupportedException("This is 2D color map") else dataRaw[x]
+
+    //fun getAsCvec(x: Int, y: Int): Cvec = dataCvec[y * width + x]
 
     override fun toString(): String {
         val sb = StringBuilder()
