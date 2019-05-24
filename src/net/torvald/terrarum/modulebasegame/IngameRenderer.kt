@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ScreenUtils
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -23,7 +24,7 @@ import javax.swing.JFileChooser
  *
  * For the entire render path, see AppLoader.
  */
-object IngameRenderer {
+object IngameRenderer : Disposable {
     /** for non-private use, use with care! */
     lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
@@ -60,6 +61,10 @@ object IngameRenderer {
     const val lightmapDownsample = 4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
 
     private var debugMode = 0
+
+    init {
+        AppLoader.disposableSingletonsPool.add(this)
+    }
 
     operator fun invoke(
             gamePaused: Boolean,
@@ -604,7 +609,7 @@ object IngameRenderer {
 
     private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
-    fun dispose() {
+    override fun dispose() {
         fboRGB.dispose()
         fboA.dispose()
         fboRGB_lightMixed.dispose()

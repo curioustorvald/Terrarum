@@ -2,6 +2,7 @@ package net.torvald.terrarum.blockstats
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader
@@ -12,7 +13,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
-object MinimapComposer {
+object MinimapComposer : Disposable {
 
     // strategy: mosaic the textures, maximum texture size is 4 096.
 
@@ -66,6 +67,8 @@ object MinimapComposer {
     init {
         totalWidth = minimap.width
         totalHeight = minimap.height
+
+        AppLoader.disposableSingletonsPool.add(this)
     }
 
     fun update() {
@@ -147,7 +150,7 @@ object MinimapComposer {
         }
     }
 
-    fun dispose() {
+    override fun dispose() {
         liveTiles.forEach { it.dispose() }
         minimap.dispose()
         try {
