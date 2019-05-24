@@ -777,12 +777,8 @@ object LightmapRenderer {
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
     internal fun Cvec.normaliseToHDR(): Cvec {
         // equation: hdr(this.coerceIn)
-        return Cvec(
-                hdr(this.vec.lane(0).coerceIn(0f, 1f)),
-                hdr(this.vec.lane(1).coerceIn(0f, 1f)),
-                hdr(this.vec.lane(2).coerceIn(0f, 1f)),
-                hdr(this.vec.lane(3).coerceIn(0f, 1f))
-        )
+        val arr = this.vec.toArray().map { hdr(it.coerceIn(0f, 1f)) }
+        return Cvec(arr.toFloatArray())
     }
 
     val histogram: Histogram

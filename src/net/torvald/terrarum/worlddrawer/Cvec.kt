@@ -28,7 +28,7 @@ This time I removed the TypeProfileLevel part. It now runs slightly faster than 
 <<append from here>>
      */
 
-    //constructor(floatArray: FloatArray) : this(FloatVector.fromArray(SPECIES, floatArray, 0))
+    constructor(floatArray: FloatArray) : this(FloatVector.fromArray(SPECIES, floatArray, 0))
     constructor(r: Float, g: Float, b: Float, a: Float) : this(FloatVector.scalars(SPECIES, r, g, b, a))
     constructor(scalar: Float) : this(FloatVector.scalars(SPECIES, scalar, scalar, scalar, scalar))
     constructor() : this(FloatVector.zero(SPECIES))
