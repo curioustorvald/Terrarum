@@ -8,14 +8,11 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2016-01-23.
  */
 class Notification : UICanvas() {
-
-    private val segment = SEGMENT_BLACK
 
     private var fontCol: Color = Color.WHITE // assuming alpha of 1.0
 
@@ -28,14 +25,14 @@ class Notification : UICanvas() {
 
     override var width: Int = 500
 
-    override var height: Int = segment.tileH
+    override var height: Int = 0
     private val visibleTime = Math.min(
             AppLoader.getConfigInt("notificationshowuptime"),
             SHOWUP_MAX
     ) / 1000f
     private var displayTimer = 0f
 
-    internal var message: Array<String> = Array(MESSAGES_DISPLAY) { "" }
+    internal var message: List<String> = listOf("")
 
 
     init {
@@ -51,9 +48,6 @@ class Notification : UICanvas() {
         }
     }
 
-    private val textAreaHeight = 48f
-    private val imageToTextAreaDelta = (segment.tileH - textAreaHeight) / 2
-
     private val drawColor = Color(1f,1f,1f,1f)
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -64,26 +58,22 @@ class Notification : UICanvas() {
         val realTextWidth = 12 + if (message.size == 1)
             Terrarum.fontGame.getWidth(message[0])
         else
-            maxOf(Terrarum.fontGame.getWidth(message[0]), Terrarum.fontGame.getWidth(message[1]))
+            message.map { Terrarum.fontGame.getWidth(it) }.sorted().last()
         val displayedTextWidth = maxOf(240, realTextWidth)
 
         // force the UI to the centre of the screen
         this.posX = (Terrarum.WIDTH - displayedTextWidth) / 2
 
+        val textHeight = message.size * Terrarum.fontGame.lineHeight
 
         batch.color = drawColor
 
-        batch.draw(segment.get(0, 0), -segment.tileW.toFloat(), 0f)
-        batch.draw(segment.get(1, 0), 0f, 0f, displayedTextWidth.toFloat(), segment.tileH.toFloat())
-        batch.draw(segment.get(2, 0), displayedTextWidth.toFloat(), 0f)
+        FloatDrawer(batch, 0f, -textHeight, displayedTextWidth.toFloat(), textHeight)
 
         batch.color = fontCol
         message.forEachIndexed { index, s ->
             val xoff = 6 + (displayedTextWidth - realTextWidth) / 2
-            val y = if (message.size == 1)
-                -2 + imageToTextAreaDelta + 0.5f * (textAreaHeight / 2) + (textAreaHeight / 2 - Terrarum.fontGame.lineHeight) / 2
-            else
-                -1 + imageToTextAreaDelta + index * (textAreaHeight / 2) + (textAreaHeight / 2 - Terrarum.fontGame.lineHeight) / 2
+            val y = -textHeight + Terrarum.fontGame.lineHeight * index
             Terrarum.fontGame.draw(batch, s, LRmargin + xoff, y)
         }
 
@@ -109,7 +99,7 @@ class Notification : UICanvas() {
         endClosingFade(this)
     }
     
-    fun sendNotification(message: Array<String>) {
+    fun sendNotification(message: List<String>) {
         this.message = message
         handler.openCloseCounter = 0f
         handler.opacity = 0f
@@ -121,12 +111,6 @@ class Notification : UICanvas() {
 
     companion object {
         // private int messagesShowingIndex = 0;
-        val MESSAGES_DISPLAY = 2
         val OPEN_CLOSE_TIME = 0.16f
-
-
-        // will be disposed by Terrarum (application main instance)
-        val SEGMENT_BLACK = TextureRegionPack("assets/graphics/gui/message_black.tga", 8, 56)
-        val SEGMENT_WHITE = TextureRegionPack("assets/graphics/gui/message_white.tga", 8, 56)
     }
 }

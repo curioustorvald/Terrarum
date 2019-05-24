@@ -602,9 +602,15 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     /** Send message to notifier UI and toggle the UI as opened. */
-    fun sendNotification(msg1: String, msg2: String? = null) {
-        (notifier as Notification).sendNotification(if (msg2 != null) arrayOf(msg1, msg2) else arrayOf(msg1))
+    fun sendNotification(messages: Array<String>) {
+        (notifier as Notification).sendNotification(messages.toList())
     }
+
+    fun sendNotification(messages: List<String>) {
+        (notifier as Notification).sendNotification(messages)
+    }
+
+    fun sendNotification(singleMessage: String) = sendNotification(listOf(singleMessage))
 
     fun wakeDormantActors() {
         var actorContainerSize = actorContainerInactive.size

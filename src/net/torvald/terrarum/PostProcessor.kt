@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -18,7 +19,7 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 /**
  * Must be called by the App Loader
  */
-object PostProcessor {
+object PostProcessor : Disposable {
 
     private lateinit var batch: SpriteBatch // not nulling to save some lines of code
     private lateinit var shapeRenderer: ShapeRenderer
@@ -40,7 +41,11 @@ object PostProcessor {
 
     private var functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
-    fun dispose() {
+    init {
+        AppLoader.disposableSingletonsPool.add(this)
+    }
+
+    override fun dispose() {
         batch.dispose()
         shapeRenderer.dispose()
         try {

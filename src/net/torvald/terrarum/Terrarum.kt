@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
@@ -37,7 +38,7 @@ typealias RGBA8888 = Int
  *
  * LibGDX Version Created by minjaesong on 2017-06-15.
  */
-object Terrarum : Screen {
+object Terrarum : Screen, Disposable {
 
     /**
      * All singleplayer "Player" must have this exact reference ID.
@@ -211,6 +212,9 @@ object Terrarum : Screen {
 
 
         setGamepadButtonLabels()
+
+
+        AppLoader.disposableSingletonsPool.add(this)
 
     }
 

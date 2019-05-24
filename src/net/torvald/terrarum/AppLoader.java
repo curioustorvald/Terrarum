@@ -13,20 +13,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.getcpuname.GetCpuName;
-import net.torvald.terrarum.blockstats.MinimapComposer;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.Ingame;
-import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarum.worlddrawer.BlocksDrawer;
@@ -286,6 +285,7 @@ public class AppLoader implements ApplicationListener {
 
     public static CommonResourcePool resourcePool;
     public static HashSet<File> tempFilePool = new HashSet();
+    public static HashSet<Disposable> disposableSingletonsPool = new HashSet();
 
     @Override
     public void create() {
@@ -517,11 +517,12 @@ public class AppLoader implements ApplicationListener {
             screen.dispose();
         }
 
-        IngameRenderer.INSTANCE.dispose();
-        PostProcessor.INSTANCE.dispose();
-        MinimapComposer.INSTANCE.dispose();
+        //IngameRenderer.INSTANCE.dispose();
+        //PostProcessor.INSTANCE.dispose();
+        //MinimapComposer.INSTANCE.dispose();
+        //FloatDrawer.INSTANCE.dispose();
 
-        Terrarum.INSTANCE.dispose();
+        //Terrarum.INSTANCE.dispose();
 
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
@@ -538,6 +539,8 @@ public class AppLoader implements ApplicationListener {
         textureWhiteSquare.dispose();
         textureWhiteCircle.dispose();
         logo.getTexture().dispose();
+
+        disposableSingletonsPool.forEach(Disposable::dispose);
 
         ModMgr.INSTANCE.disposeMods();
 
