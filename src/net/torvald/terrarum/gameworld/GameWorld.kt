@@ -210,12 +210,12 @@ open class GameWorld {
             terrain * PairedMapLayer.RANGE + terrainDamage
     }
 
-    fun getWallLowBits(x: Int, y: Int): Int? {
+    private fun getWallLowBits(x: Int, y: Int): Int? {
         val (x, y) = coerceXY(x, y)
         return layerWallLowBits.getData(x, y)
     }
 
-    fun getTerrainLowBits(x: Int, y: Int): Int? {
+    private fun getTerrainLowBits(x: Int, y: Int): Int? {
         val (x, y) = coerceXY(x, y)
         return layerTerrainLowBits.getData(x, y)
     }
@@ -226,57 +226,49 @@ open class GameWorld {
      * *
      * @param y
      * *
-     * @param combinedTilenum Item id of the wall block. Less-than-4096-value is permitted.
+     * @param tilenum Item id of the wall block. Less-than-4096-value is permitted.
      */
-    fun setTileWall(x: Int, y: Int, combinedTilenum: Int) {
+    fun setTileWall(x: Int, y: Int, tilenum: Int) {
         val (x, y) = coerceXY(x, y)
-        val combinedTilenum = combinedTilenum % GameWorld.TILES_SUPPORTED // does work without this, but to be safe...
-        setTileWall(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        val tilenum = tilenum % TILES_SUPPORTED // does work without this, but to be safe...
+
+        val oldWall = getTileFromWall(x, y)
+        layerWall.setTile(x, y, (tilenum / PairedMapLayer.RANGE).toByte())
+        layerWallLowBits.setData(x, y, tilenum % PairedMapLayer.RANGE)
+        wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
+
+        if (oldWall != null)
+            Terrarum.ingame?.queueWallChangedEvent(oldWall, tilenum, LandUtil.getBlockAddr(this, x, y))
     }
 
     /**
      * Set the tile of wall as specified, with damage value of zero.
+     *
+     * Warning: this function alters fluid lists: be wary of call order!
+     *
      * @param x
      * *
      * @param y
      * *
-     * @param combinedTilenum Item id of the terrain block, <4096
+     * @param tilenum Item id of the terrain block, <4096
      */
-    fun setTileTerrain(x: Int, y: Int, combinedTilenum: Int) {
+    fun setTileTerrain(x: Int, y: Int, tilenum: Int) {
         val (x, y) = coerceXY(x, y)
-        setTileTerrain(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
-    }
 
-    fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
-        val (x, y) = coerceXY(x, y)
-        val oldWall = getTileFromWall(x, y)
-        layerWall.setTile(x, y, tile)
-        layerWallLowBits.setData(x, y, damage)
-        wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
-
-        if (oldWall != null)
-            Terrarum.ingame?.queueWallChangedEvent(oldWall, tile.toUint() * PairedMapLayer.RANGE + damage, LandUtil.getBlockAddr(this, x, y))
-    }
-
-    /**
-     * Warning: this function alters fluid lists: be wary of call order!
-     */
-    fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
-        val (x, y) = coerceXY(x, y)
         val oldTerrain = getTileFromTerrain(x, y)
-        layerTerrain.setTile(x, y, tile)
-        layerTerrainLowBits.setData(x, y, damage)
+        layerTerrain.setTile(x, y, (tilenum / PairedMapLayer.RANGE).toByte())
+        layerTerrainLowBits.setData(x, y, tilenum % PairedMapLayer.RANGE)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         terrainDamages.remove(blockAddr)
 
-        if (BlockCodex[tile * PairedMapLayer.RANGE + damage].isSolid) {
+        if (BlockCodex[tilenum].isSolid) {
             fluidFills.remove(blockAddr)
             fluidTypes.remove(blockAddr)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
         if (oldTerrain != null)
-            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tile.toUint() * PairedMapLayer.RANGE + damage, LandUtil.getBlockAddr(this, x, y))
+            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tilenum, LandUtil.getBlockAddr(this, x, y))
     }
 
     /*fun setTileWire(x: Int, y: Int, tile: Byte) {

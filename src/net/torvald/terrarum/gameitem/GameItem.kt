@@ -82,7 +82,13 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     /**
      * Where to equip the item.
      *
-     * Can't use 'open val' as GSON don't like that
+     * Can't use 'open val' as GSON doesn't like that. Initialise this property like:
+     *
+     * ```
+     * init {
+     *     equipPosition = EquipPosition.HAND_GRIP
+     * }
+     * ```
      */
     var equipPosition: Int = EquipPosition.NULL
 
@@ -165,6 +171,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     open fun startPrimaryUse(delta: Float): Boolean = false
 
     /**
+     * I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
+     *
      * Apply effects (continuously or not) while secondary button is down
      * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
      *
@@ -174,7 +182,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      *
      * note: DO NOT super() this!
      */
-    open fun startSecondaryUse(delta: Float): Boolean = false
+    //open fun startSecondaryUse(delta: Float): Boolean = false
 
     open fun endPrimaryUse(delta: Float): Boolean = false
     open fun endSecondaryUse(delta: Float): Boolean = false

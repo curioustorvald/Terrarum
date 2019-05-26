@@ -188,7 +188,7 @@ class UIItemInventoryElem(
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
             if (itemEquipSlot == GameItem.EquipPosition.NULL) {
-                TODO("Equip position is NULL, does this mean it's single-consume items like a potion?")
+                TODO("Equip position is NULL, does this mean it's single-consume items like a potion? (from item: \"$item\" with itemID: ${item?.originalID}/${item?.dynamicID})")
             }
 
             val player = (Terrarum.ingame!! as Ingame).actorNowPlaying

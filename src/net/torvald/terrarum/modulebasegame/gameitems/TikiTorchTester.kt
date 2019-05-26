@@ -25,10 +25,17 @@ class TikiTorchTester(originalID: ItemID) : GameItem(originalID) {
         get() = AppLoader.resourcePool.getAsTextureRegion("itemplaceholder_48")
     override var baseToolSize: Double? = baseMass
 
+    init {
+        equipPosition = EquipPosition.HAND_GRIP
+    }
+
     override fun startPrimaryUse(delta: Float): Boolean {
         val torch = FixtureTikiTorch()
+
+        //println("aroisetn")
 
         return torch.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - torch.blockBox.height + 1)
         // return true when placed, false when cannot be placed
     }
+
 }

@@ -42,20 +42,27 @@ open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps 
         //     posY: bottom of the blockBox
         // using the actor's hitbox
 
+        // TODO: obviously check for collision
+
         for (x in posX until posX + blockBox.width) {
             for (y in posY until posY + blockBox.height) {
                 world.setTileTerrain(x, y, blockBox.collisionType)
             }
         }
 
+        // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
 
         this.isVisible = true
         this.hitbox.setFromWidthHeight(posX * TSIZE, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
 
+        // actually add this actor into the world
+        Terrarum.ingame!!.addNewActor(this)
 
 
         return true // TODO for the tests' sake, just get fucking spawned
+
+        // TODO TESTING RESULTS SO FAR: tiki torch does emit lights, but its body cannot be seen
     }
 
     /**

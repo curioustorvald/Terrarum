@@ -32,7 +32,17 @@ class KDHeapifiedTree(actors: List<ActorWBMovable>) {
     private fun Int.getActor() = nodes[this]
     private fun Int.getLeft() = this * 2 + 1
     private fun Int.getRight() = this * 2 + 2
-    private fun Int.set(value: ActorWBMovable?) { nodes[this] = value }
+    private fun Int.set(value: ActorWBMovable?) {
+        try {
+            nodes[this] = value
+        }
+        catch (_: ArrayIndexOutOfBoundsException) {
+            // modification of the private fun expandArray()
+            val prevNodes = nodes.copyOf() + value
+            Array<ActorWBMovable?>(prevNodes.size * 2, { null })
+            create(prevNodes.toList(), 0, 0)
+        }
+    }
     private fun Int.setLeftChild(value: ActorWBMovable?) { nodes[this.getLeft()] = value }
     private fun Int.setRightChild(value: ActorWBMovable?) { nodes[this.getRight()] = value }
 
