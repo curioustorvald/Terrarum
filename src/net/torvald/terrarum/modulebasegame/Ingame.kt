@@ -404,7 +404,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         ItemCodex[itemOnGrip]?.endPrimaryUse(delta)
     }
 
-    override fun worldSecondaryClickStart(delta: Float) {
+    // I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
+    /*override fun worldSecondaryClickStart(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
         val consumptionSuccessful = ItemCodex[itemOnGrip]?.startSecondaryUse(delta) ?: false
         if (consumptionSuccessful)
@@ -414,7 +415,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun worldSecondaryClickEnd(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
         ItemCodex[itemOnGrip]?.endSecondaryUse(delta)
-    }
+    }*/
 
 
 

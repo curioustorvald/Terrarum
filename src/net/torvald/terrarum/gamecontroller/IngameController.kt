@@ -58,12 +58,14 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+                if (
+                        Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) ||
+                        Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
                     ingame.worldPrimaryClickStart(AppLoader.UPDATE_RATE.toFloat())
                 }
-                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+                /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary")) {
                     ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE.toFloat())
-                }
+                }*/
             }
         }
 
@@ -146,12 +148,14 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (button == AppLoader.getConfigInt("mouseprimary")) {
+                if (
+                        button == AppLoader.getConfigInt("mouseprimary") ||
+                        button == AppLoader.getConfigInt("mousesecondary")) {
                     ingame.worldPrimaryClickEnd(AppLoader.UPDATE_RATE.toFloat())
                 }
-                if (button == AppLoader.getConfigInt("mousesecondary")) {
+                /*if (button == AppLoader.getConfigInt("mousesecondary")) {
                     ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE.toFloat())
-                }
+                }*/
             }
         }
 

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.graphics.Color
-import net.torvald.aa.KDHeapifiedTree
+import net.torvald.aa.KDTree
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -52,7 +52,7 @@ object WorldSimulator {
     private val ingame = Terrarum.ingame!!
     private val world = ingame.world
 
-    private var actorsKDTree: KDHeapifiedTree? = null
+    private var actorsKDTree: KDTree? = null
 
     fun resetForThisFrame() {
         actorsKDTree = null
@@ -61,7 +61,7 @@ object WorldSimulator {
     operator fun invoke(player: ActorHumanoid?, delta: Float) {
         // build the kdtree that will be used during a single frame of updating
         if (actorsKDTree == null)
-            actorsKDTree = KDHeapifiedTree(ingame.actorContainerActive.filter { it is ActorWBMovable })
+            actorsKDTree = KDTree(ingame.actorContainerActive.filter { it is ActorWBMovable })
 
         //printdbg(this, "============================")
 

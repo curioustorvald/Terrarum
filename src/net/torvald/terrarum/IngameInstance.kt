@@ -94,16 +94,18 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     }
 
     /**
+     * I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
+     *
      * Event for triggering held item's `startSecondaryUse(Float)`
      */
-    open fun worldSecondaryClickStart(delta: Float) {
-    }
+    //open fun worldSecondaryClickStart(delta: Float) { }
 
     /**
+     * I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
+     *
      * Event for triggering held item's `endSecondaryUse(Float)`
      */
-    open fun worldSecondaryClickEnd(delta: Float) {
-    }
+    //open fun worldSecondaryClickEnd(delta: Float) { }
 
     /**
      * Event for triggering fixture update when something is placed/removed on the world.
