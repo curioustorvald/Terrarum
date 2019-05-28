@@ -62,7 +62,7 @@ open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps 
 
         return true // TODO for the tests' sake, just get fucking spawned
 
-        // TODO TESTING RESULTS SO FAR: tiki torch does emit lights, but its body cannot be seen
+        // TODO TESTING RESULTS SO FAR: tiki torch spawns but is not centred
     }
 
     /**
