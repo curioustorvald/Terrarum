@@ -160,13 +160,17 @@ inline class BlockBoxProps(val flags: Int) {
 }
 
 /**
+ * To not define the blockbox, simply use BlockBox.NULL
+ *
+ * Null blockbox means the fixture won't bar any block placement. Fixtures like paintings will want to have such feature.
+ * 
  * @param collisionType Collision type defined in BlockBox.Companion
  * @param width Width of the block box, tile-wise
  * @param height Height of the block box, tile-wise
  */
-data class BlockBox(var collisionType: Int, var width: Int, var height: Int) {
+data class BlockBox(val collisionType: Int, val width: Int, val height: Int) {
 
-    fun redefine(collisionType: Int, width: Int, height: Int) {
+    /*fun redefine(collisionType: Int, width: Int, height: Int) {
         redefine(collisionType)
         redefine(width, height)
     }
@@ -178,7 +182,7 @@ data class BlockBox(var collisionType: Int, var width: Int, var height: Int) {
 
     fun redefine(collisionType: Int) {
         this.collisionType = collisionType
-    }
+    }*/
 
     companion object {
         const val NO_COLLISION = Block.ACTORBLOCK_NO_COLLISION
@@ -186,5 +190,7 @@ data class BlockBox(var collisionType: Int, var width: Int, var height: Int) {
         const val ALLOW_MOVE_DOWN = Block.ACTORBLOCK_ALLOW_MOVE_DOWN
         const val NO_PASS_RIGHT = Block.ACTORBLOCK_NO_PASS_RIGHT
         const val NO_PASS_LEFT = Block.ACTORBLOCK_NO_PASS_LEFT
+
+        val NULL = BlockBox(NO_COLLISION, 0, 0)
     }
 }
