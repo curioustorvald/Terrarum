@@ -11,7 +11,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-01-07.
  */
 class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String) :
-        FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1)) // placeholder blockbox
+        FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1), renderOrder = RenderOrder.BEHIND) // placeholder blockbox
 {
 
     // physics = false only speeds up for ~2 frames with 50 tapestries
@@ -28,7 +28,7 @@ class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String)
         // you CAN'T destroy the image
 
         // redefine blockbox
-        blockBox.redefine(texture.width.div(TILE_SIZEF).ceilInt(), texture.height.div(TILE_SIZEF).ceilInt())
+        blockBox = BlockBox(BlockBox.NO_COLLISION, texture.width.div(TILE_SIZEF).ceilInt(), texture.height.div(TILE_SIZEF).ceilInt())
     }
 
     override fun update(delta: Float) {

@@ -13,9 +13,7 @@ import java.util.*
 /**
  * Created by minjaesong on 2016-06-17.
  */
-internal class FixtureTikiTorch : FixtureBase(
-        BlockBox(BlockBox.NO_COLLISION, 1, 2)
-), Luminous {
+internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 2)), Luminous {
 
     override var color: Color
         get() = BlockCodex[Block.TORCH].luminosity

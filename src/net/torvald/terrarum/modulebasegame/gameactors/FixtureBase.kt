@@ -10,9 +10,12 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-06-17.
  */
-open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps = BlockBoxProps(0)) :
+open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = BlockBoxProps(0), renderOrder: RenderOrder = RenderOrder.MIDDLE) :
 // disabling physics (not allowing the fixture to move) WILL make things easier in many ways
-        ActorWBMovable(RenderOrder.BEHIND, immobileBody = true, usePhysics = false), CuedByTerrainChange {
+        ActorWBMovable(renderOrder, immobileBody = true, usePhysics = false), CuedByTerrainChange {
+
+    var blockBox: BlockBox = blockBox0
+        protected set // something like TapestryObject will want to redefine this
 
     private val world: GameWorld
         get() = Terrarum.ingame!!.world
@@ -53,16 +56,16 @@ open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps 
         // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
 
+        val posXoff = (TSIZE % (this.sprite?.cellWidth ?: 0)) / 2
+
         this.isVisible = true
-        this.hitbox.setFromWidthHeight(posX * TSIZE, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
+        this.hitbox.setFromWidthHeight(posX * TSIZE + posXoff, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
 
         // actually add this actor into the world
         Terrarum.ingame!!.addNewActor(this)
 
 
         return true // TODO for the tests' sake, just get fucking spawned
-
-        // TODO TESTING RESULTS SO FAR: tiki torch spawns but is not centred
     }
 
     /**
@@ -162,8 +165,8 @@ inline class BlockBoxProps(val flags: Int) {
 /**
  * To not define the blockbox, simply use BlockBox.NULL
  *
- * Null blockbox means the fixture won't bar any block placement. Fixtures like paintings will want to have such feature.
- * 
+ * Null blockbox means the fixture won't bar any block placement. Fixtures like paintings will want to have such feature. (e.g. torch placed on top; buried)
+ *
  * @param collisionType Collision type defined in BlockBox.Companion
  * @param width Width of the block box, tile-wise
  * @param height Height of the block box, tile-wise
