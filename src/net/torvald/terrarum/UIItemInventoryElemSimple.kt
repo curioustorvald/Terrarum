@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /**
@@ -107,7 +108,7 @@ class UIItemInventoryElemSimple(
             }
             // draw item count when applicable
             else if (item!!.stackable) {
-                val amountString = amount.toString()
+                val amountString = amount.toItemCountText()
 
                 // highlight item count (blocks/walls) if the item is equipped
                 if (equippedSlot != null) {

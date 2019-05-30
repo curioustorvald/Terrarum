@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.GdxColorMap
+import net.torvald.terrarum.abs
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.ui.UIItem
 import kotlin.math.roundToInt
@@ -45,6 +46,17 @@ object UIItemInventoryCellCommonRes {
             meterColourMap[scale.times(meterColourMap.width - 1).roundToInt()]
         }
     }
-
+    
     fun getHealthMeterColour(value: Int, start: Int, end: Int) = getHealthMeterColour(value.toFloat(), start.toFloat(), end.toFloat())
+
+    fun Int.toItemCountText() = (if (this < 0) "-" else "") + when (this.abs()) {
+        in 0..999999 -> "$this"
+        in 1_000_000..999_999_999 -> "${this / 1_000_000}.${this.rem(1_000_000) / 10_000}M"
+        else -> "${this / 1_000_000_000}.${this.rem(1_000_000_000) / 10_000_000}B"
+        
+        // 1 000 000 000
+        // 2 147 483 647
+        
+        // -2.14B
+    }
 }

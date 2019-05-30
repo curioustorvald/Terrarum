@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /***
@@ -90,6 +91,8 @@ class UIItemInventoryElem(
 
 
         if (item != null && itemImage != null) {
+            val amountString = amount.toItemCountText()
+
             blendNormal(batch)
             
             // item image
@@ -103,7 +106,7 @@ class UIItemInventoryElem(
             if (AppLoader.IS_DEVELOPMENT_BUILD) {
                 Terrarum.fontGame.draw(batch,
                         // print static id, dynamic id, and count
-                        "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else ""),
+                        "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
                         posX + textOffsetX,
                         posY + textOffsetY
                 )
@@ -111,7 +114,7 @@ class UIItemInventoryElem(
             else {
                 Terrarum.fontGame.draw(batch,
                         // print name and amount in parens
-                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
+                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else "") +
                         // TEMPORARY print eqipped slot info as well
                         (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
 

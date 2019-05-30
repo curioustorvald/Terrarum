@@ -66,6 +66,8 @@ open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = B
 
 
         return true // TODO for the tests' sake, just get fucking spawned
+
+        // FIXME has "roundworld anomaly"
     }
 
     /**
