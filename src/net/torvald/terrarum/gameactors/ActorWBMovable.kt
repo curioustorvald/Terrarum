@@ -1389,31 +1389,28 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
         // FIXME test me: this extra IF statement is supposed to not draw actors that's outside of the camera.
         //                basic code without offsetX/Y DOES work, but obviously offsets are not tested.
-        if (hitbox.startX - offsetX in WorldCamera.x - hitbox.width - offsetX..WorldCamera.x + WorldCamera.width + offsetX &&
-                hitbox.endY + offsetY in WorldCamera.y - hitbox.height - offsetY..WorldCamera.y + WorldCamera.height + offsetY) {
-            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                // camera center neg, actor center pos
-                sprite.render(batch,
-                        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                // camera center pos, actor center neg
-                sprite.render(batch,
-                        (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else {
-                sprite.render(batch,
-                        (hitbox.startX - offsetX).toFloat(),
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
+        if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+            // camera center neg, actor center pos
+            sprite.render(batch,
+                    (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZE,
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
+        }
+        else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+            // camera center pos, actor center neg
+            sprite.render(batch,
+                    (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZE,
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
+        }
+        else {
+            sprite.render(batch,
+                    (hitbox.startX - offsetX).toFloat(),
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
         }
     }
 

@@ -17,6 +17,10 @@ object WorldCamera {
         private set
     var y: Int = 0 // top position
         private set
+    var xEnd: Int = 0 // right position
+        private set
+    var yEnd: Int = 0 // bottom position
+        private set
     inline val gdxCamX: Float // centre position
         get() = xCentre.toFloat()
     inline val gdxCamY: Float// centre position
@@ -53,6 +57,8 @@ object WorldCamera {
                 world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
         )).floorInt().clampCameraY(world)
 
+        xEnd = x + width
+        yEnd = y + height
     }
 
     private fun Int.clampCameraY(world: GameWorld): Int {

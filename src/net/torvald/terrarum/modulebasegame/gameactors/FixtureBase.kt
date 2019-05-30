@@ -49,7 +49,14 @@ open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = B
 
         for (x in posX until posX + blockBox.width) {
             for (y in posY until posY + blockBox.height) {
-                world.setTileTerrain(x, y, blockBox.collisionType)
+                if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
+                    // if the collision type is allow_move_down, only the top surface tile should be "the platform"
+                    // lower part must not have such property (think of the table!)
+                    // TODO does this ACTUALLY work ?!
+                    world.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION)
+                }
+                else
+                    world.setTileTerrain(x, y, blockBox.collisionType)
             }
         }
 
@@ -67,7 +74,6 @@ open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = B
 
         return true // TODO for the tests' sake, just get fucking spawned
 
-        // FIXME has "roundworld anomaly"; check 'ActorWithBody.inScreen()'
     }
 
     /**

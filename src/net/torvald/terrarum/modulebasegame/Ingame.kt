@@ -30,6 +30,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -475,8 +476,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     }
 
+    private var worldWidth: Double = 0.0
+
+
     protected fun updateGame(delta: Float) {
         val world = this.world as GameWorldExtension
+        worldWidth = world.width.toDouble() * TILE_SIZE
 
         particlesActive = 0
 
@@ -570,6 +575,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
         visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
         visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
+
+        //printdbg(this, "total visible actors: ${visibleActorsRenderMiddle.size}")
     }
 
     private fun repossessActor() {
@@ -716,31 +723,40 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody) =
             min(// take min of normal position and wrapped (x < 0) position
                     (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
-                    (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    (a.hitbox.centeredX - p.hitbox.centeredX + world.width * CreateTileAtlas.TILE_SIZE).sqr() +
-                    (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    (a.hitbox.centeredX - p.hitbox.centeredX - world.width * CreateTileAtlas.TILE_SIZE).sqr() +
-                    (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                    ((a.hitbox.centeredX + world.width * CreateTileAtlas.TILE_SIZE) - p.hitbox.centeredX).sqr() +
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                    ((a.hitbox.centeredX - world.width * CreateTileAtlas.TILE_SIZE) - p.hitbox.centeredX).sqr() +
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
             )
     private fun distToCameraSqr(a: ActorWithBody) =
             min(
-                    (a.hitbox.startX - WorldCamera.x).sqr() +
-                    (a.hitbox.startY - WorldCamera.y).sqr(),
-                    (a.hitbox.startX - WorldCamera.x + world.width * CreateTileAtlas.TILE_SIZE).sqr() +
-                    (a.hitbox.startY - WorldCamera.y).sqr(),
-                    (a.hitbox.startX - WorldCamera.x - world.width * CreateTileAtlas.TILE_SIZE).sqr() +
-                    (a.hitbox.startY - WorldCamera.y).sqr()
+                    (a.hitbox.centeredX - WorldCamera.xCentre).sqr() +
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
+                    ((a.hitbox.centeredX + world.width * CreateTileAtlas.TILE_SIZE) - WorldCamera.xCentre).sqr() +
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
+                    ((a.hitbox.centeredX - world.width * CreateTileAtlas.TILE_SIZE) - WorldCamera.xCentre).sqr() +
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr()
             )
 
     /** whether the actor is within screen */
-    // FIXME "roundworld anomaly"
     private fun ActorWithBody.inScreen() =
-            distToCameraSqr(this) <=
-            (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).
-                    times(1 / screenZoom).sqr() +
-             Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).
-                     times(1 / screenZoom).sqr())
 
+            // y
+            this.hitbox.endY >= WorldCamera.y && this.hitbox.startY <= WorldCamera.yEnd
+
+            &&
+
+            // x: camera is on the right side of the seam
+            ((this.hitbox.endX - worldWidth >= WorldCamera.x && this.hitbox.startX - worldWidth <= WorldCamera.xEnd) ||
+            // x: camera in on the left side of the seam
+            (this.hitbox.endX + worldWidth >= WorldCamera.x && this.hitbox.startX + worldWidth <= WorldCamera.xEnd) ||
+            // x: neither
+            (this.hitbox.endX >= WorldCamera.x && this.hitbox.startX <= WorldCamera.xEnd))
+
+
+    private val cameraWindowX = WorldCamera.x.toDouble()..WorldCamera.xEnd.toDouble()
+    private val cameraWindowY = WorldCamera.y.toDouble()..WorldCamera.yEnd.toDouble()
 
     /** whether the actor is within update range */
     private fun ActorWithBody.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
