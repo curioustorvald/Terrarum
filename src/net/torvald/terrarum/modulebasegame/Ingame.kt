@@ -733,6 +733,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             )
 
     /** whether the actor is within screen */
+    // FIXME "roundworld anomaly"
     private fun ActorWithBody.inScreen() =
             distToCameraSqr(this) <=
             (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).
