@@ -1,12 +1,12 @@
 package net.torvald.colourutil
 
+import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.colourutil.CIELabUtil.toLab
 import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.colourutil.CIEXYZUtil.toRGB
 import net.torvald.colourutil.CIEXYZUtil.toXYZ
 import net.torvald.colourutil.CIELabUtil.toXYZ
-import com.badlogic.gdx.graphics.Color
 
 /**
  * A modification of CIEXYZ that is useful for surface colours

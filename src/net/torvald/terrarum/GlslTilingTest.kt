@@ -7,7 +7,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.jme3.math.FastMath
+import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**

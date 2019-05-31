@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -279,7 +280,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     init {
         gameWorld.time.setTimeOfToday(WorldTime.HOUR_SEC * 10)
-        gameWorld.globalLight = Color(.8f,.8f,.8f,.8f)
+        gameWorld.globalLight = Cvec(.8f, .8f, .8f, .8f)
 
         essentialOverlays.add(blockPointingCursor)
 

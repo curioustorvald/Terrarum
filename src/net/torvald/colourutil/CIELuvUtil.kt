@@ -2,7 +2,6 @@ package net.torvald.colourutil
 
 import com.jme3.math.FastMath
 import com.badlogic.gdx.graphics.Color
-import net.torvald.colourutil.CIELabUtil.toXYZ
 import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.colourutil.CIEXYZUtil.toRGB
 import net.torvald.colourutil.CIEXYZUtil.toXYZ

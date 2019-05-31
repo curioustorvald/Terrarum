@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 
 /**

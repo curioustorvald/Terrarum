@@ -61,7 +61,7 @@ class UIHandler(//var UI: UICanvas,
         }
     var scale = 1f
 
-    val opacityColour = Color(1f,1f,1f,opacity)
+    val opacityColour = Color(1f, 1f, 1f, opacity)
 
     var openCloseCounter = 0f
 

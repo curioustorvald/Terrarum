@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
+import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
@@ -55,7 +56,7 @@ internal object BlocksDrawer {
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
 
-    val wallOverlayColour = Color(5f/9f,5f/9f,5f/9f,1f)
+    val wallOverlayColour = Color(5f / 9f, 5f / 9f, 5f / 9f, 1f)
 
     const val BREAKAGE_STEPS = 10
     const val TILES_PER_BLOCK = PairedMapLayer.RANGE

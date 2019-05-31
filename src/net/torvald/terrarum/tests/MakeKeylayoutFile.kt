@@ -1,3 +1,4 @@
+package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.Input.Keys.*

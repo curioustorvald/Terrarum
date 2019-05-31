@@ -5,23 +5,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Affine2
-import com.jme3.math.FastMath
-import net.torvald.colourutil.CIEYXY
-import net.torvald.colourutil.CIEXYZUtil.toXYZ
 import net.torvald.colourutil.CIEXYZUtil.toColorRaw
-import net.torvald.colourutil.CIEXYZUtil.toColor
-import net.torvald.colourutil.RGB
-import net.torvald.terrarum.gameworld.fmod
+import net.torvald.colourutil.CIEXYZUtil.toXYZ
+import net.torvald.colourutil.CIEYXY
 import net.torvald.terrarum.inUse
-import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*
-import kotlin.math.pow
 
 
 const val WIDTH = 1200

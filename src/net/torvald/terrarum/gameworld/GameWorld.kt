@@ -1,7 +1,7 @@
 
 package net.torvald.terrarum.gameworld
 
-import com.badlogic.gdx.graphics.Color
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -90,7 +90,7 @@ open class GameWorld {
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
     var gravitation: Vector2 = Vector2(0.0, 9.80665)
     /** 0.0..1.0+ */
-    var globalLight = Color(0f,0f,0f,0f)
+    var globalLight = Cvec(0f, 0f, 0f, 0f)
     var averageTemperature = 288f // 15 deg celsius; simulates global warming
 
 

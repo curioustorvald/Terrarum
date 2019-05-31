@@ -1,16 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.random.HQRNG
-import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.LoadScreen
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.BuildingMaker
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextButtonList
-
 /*class UITitleRemoConRoot : UICanvas() {
 
     companion object {

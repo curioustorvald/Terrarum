@@ -30,7 +30,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
     private var moonDial = TextureRegionPack(ModMgr.getPath("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
     private var moonDialCount = moonDial.horizontalCount
 
-    private val drawCol = Color(1f,1f,1f,UIQuickslotBar.DISPLAY_OPACITY)
+    private val drawCol = Color(1f, 1f, 1f, UIQuickslotBar.DISPLAY_OPACITY)
     private val lcdLitColELoff = Color(0xc0c0c0ff.toInt()) mul drawCol
     private val lcdLitColELon = Color(0x404040ff) mul drawCol
 

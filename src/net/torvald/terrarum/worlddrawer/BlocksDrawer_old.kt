@@ -1,7 +1,7 @@
 /*package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
+import Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch

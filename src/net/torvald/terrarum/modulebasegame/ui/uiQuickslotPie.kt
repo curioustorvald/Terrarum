@@ -58,7 +58,7 @@ class uiQuickslotPie : UICanvas() {
         }
     }
 
-    private val drawColor = Color(1f,1f,1f,1f)
+    private val drawColor = Color(1f, 1f, 1f, 1f)
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies

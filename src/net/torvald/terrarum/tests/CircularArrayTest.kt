@@ -1,3 +1,5 @@
+package net.torvald.terrarum.tests
+
 import net.torvald.util.CircularArray
 
 /**

@@ -19,6 +19,7 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
@@ -255,8 +256,8 @@ public class AppLoader implements ApplicationListener {
     public static TextureRegion logo;
     public static AudioDevice audioDevice;
 
-    private Color gradWhiteTop = new Color(0xf8f8f8ff);
-    private Color gradWhiteBottom = new Color(0xd8d8d8ff);
+    private com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
+    private com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
 
     public Screen screen;
     public static int screenW = 0;

@@ -24,7 +24,7 @@ class UINSMenu(
 ) : UICanvas() {
 
     companion object {
-        val DEFAULT_TITLEBACKCOL = Color(0f,0f,0f,.77f)
+        val DEFAULT_TITLEBACKCOL = Color(0f, 0f, 0f, .77f)
         val DEFAULT_TITLETEXTCOL = Color.WHITE
     }
 
@@ -104,7 +104,7 @@ class UINSMenu(
                 uiWidth, listHeight,
                 textAreaWidth = listWidth,
                 alignment = UIItemTextButton.Companion.Alignment.LEFT,
-                inactiveCol = Color(.94f,.94f,.94f,1f),
+                inactiveCol = Color(.94f, .94f, .94f, 1f),
                 itemHitboxSize = LINE_HEIGHT
 
         )

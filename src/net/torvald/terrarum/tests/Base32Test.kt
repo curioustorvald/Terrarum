@@ -1,3 +1,5 @@
+package net.torvald.terrarum.tests
+
 import net.torvald.terrarum.utils.PasswordBase32
 import java.nio.charset.Charset
 
