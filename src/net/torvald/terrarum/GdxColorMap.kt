@@ -3,7 +3,6 @@ package net.torvald.terrarum
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import javax.naming.OperationNotSupportedException
 
 /**
  * Created by minjaesong on 2017-06-17.
@@ -66,10 +65,10 @@ class GdxColorMap {
 
 
     fun get(x: Int, y: Int): Color = dataGdxColor[y * width + x]
-    operator fun get(x: Int): Color = if (is2D) throw OperationNotSupportedException("This is 2D color map") else dataGdxColor[x]
+    operator fun get(x: Int): Color = if (is2D) throw UnsupportedOperationException("This is 2D color map") else dataGdxColor[x]
 
     fun getRaw(x: Int, y: Int): RGBA8888 = dataRaw[y * width + x]
-    fun getRaw(x: Int): RGBA8888 = if (is2D) throw OperationNotSupportedException("This is 2D color map") else dataRaw[x]
+    fun getRaw(x: Int): RGBA8888 = if (is2D) throw UnsupportedOperationException("This is 2D color map") else dataRaw[x]
 
     //fun getAsCvec(x: Int, y: Int): Cvec = dataCvec[y * width + x]
 
