@@ -568,15 +568,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         )
     }
 
-
     private fun filterVisibleActors() {
         visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen() }
         visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen() }
         visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
         visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
         visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
-
-        //printdbg(this, "total visible actors: ${visibleActorsRenderMiddle.size}")
     }
 
     private fun repossessActor() {

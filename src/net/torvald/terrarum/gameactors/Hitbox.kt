@@ -10,7 +10,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2016-01-15.
  */
-class Hitbox(x1: Double, y1: Double, width: Double, height: Double, var suppressWarning: Boolean = false) {
+class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppressWarning: Boolean = true) {
 
     @Volatile var hitboxStart: Point2d
         private set

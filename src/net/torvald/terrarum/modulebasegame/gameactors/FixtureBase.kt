@@ -4,6 +4,7 @@ import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameworld.GameWorld
 
@@ -45,10 +46,26 @@ open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = B
         //     posY: bottom of the blockBox
         // using the actor's hitbox
 
-        // TODO: obviously check for collision
 
-        for (x in posX until posX + blockBox.width) {
-            for (y in posY until posY + blockBox.height) {
+        // check for existing blocks (and fixtures)
+        var hasCollision = false
+        checkForCollision@
+        for (y in posY until posY + blockBox.height) {
+            for (x in posX until posX + blockBox.width) {
+                val tile = world.getTileFromTerrain(x, y)
+                if (BlockCodex[tile].isSolid || tile in Block.actorblocks) {
+                    hasCollision = true
+                    break@checkForCollision
+                }
+            }
+        }
+
+        if (hasCollision) return false
+
+
+        // fill the area with the filler blocks
+        for (y in posY until posY + blockBox.height) {
+            for (x in posX until posX + blockBox.width) {
                 if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
                     // if the collision type is allow_move_down, only the top surface tile should be "the platform"
                     // lower part must not have such property (think of the table!)
@@ -72,7 +89,7 @@ open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = B
         Terrarum.ingame!!.addNewActor(this)
 
 
-        return true // TODO for the tests' sake, just get fucking spawned
+        return true
 
     }
 
