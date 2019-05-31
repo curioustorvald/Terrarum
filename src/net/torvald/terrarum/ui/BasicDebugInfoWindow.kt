@@ -241,10 +241,12 @@ class BasicDebugInfoWindow : UICanvas() {
                 Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as Ingame).particlesActive}",
                         (2 + 41 * 8).toFloat(), Terrarum.HEIGHT - 10f)
             }
-
-            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
-                    2f, Terrarum.HEIGHT - 18f)
         }
+
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
+                2f, Terrarum.HEIGHT - 18f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}UIs rendering $ccG${IngameRenderer.renderingUIsCount}",
+                2f + (21 * 8), Terrarum.HEIGHT - 18f)
 
         /**
          * Bottom right
