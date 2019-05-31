@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
@@ -81,9 +82,9 @@ object LightmapRenderer {
      * Float value, 1.0 for 1023
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
-    //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private var lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    //private val lightmap: Array<Array<Cvec>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Cvec(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     init {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
@@ -120,13 +121,13 @@ object LightmapRenderer {
      * @param x world tile coord
      * @param y world tile coord
      */
-    internal fun getLight(x: Int, y: Int): Color? {
+    internal fun getLight(x: Int, y: Int): Cvec? {
         val col = getLightInternal(x, y)
         if (col == null) {
             return null
         }
         else {
-            return Color(col.r * MUL_FLOAT, col.g * MUL_FLOAT, col.b * MUL_FLOAT, col.a * MUL_FLOAT)
+            return Cvec(col.r * MUL_FLOAT, col.g * MUL_FLOAT, col.b * MUL_FLOAT, col.a * MUL_FLOAT)
         }
     }
 
@@ -137,7 +138,7 @@ object LightmapRenderer {
      * @param y world tile coord
      */
     // TODO in regard of "colour math against integers", return Int?
-    private fun getLightInternal(x: Int, y: Int): Color? {
+    private fun getLightInternal(x: Int, y: Int): Cvec? {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
@@ -161,10 +162,10 @@ object LightmapRenderer {
      * @param list The lightmap
      * @param x World X coordinate
      * @param y World Y coordinate
-     * @param colour Color to write
+     * @param colour Cvec to write
      * @param applyFun A function ```foo(old_colour, given_colour)```
      */
-    private fun setLightOf(list: Array<Color>, x: Int, y: Int, colour: Color, applyFun: (Color, Color) -> Color = { _, c -> c }) {
+    private fun setLightOf(list: Array<Cvec>, x: Int, y: Int, colour: Cvec, applyFun: (Cvec, Cvec) -> Cvec = { _, c -> c }) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
@@ -347,13 +348,13 @@ object LightmapRenderer {
                             for (x in lightBoxX.div(TILE_SIZE).floorInt()
                                     ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                                val normalisedColor = it.color//.cpy().mul(DIV_FLOAT)
+                                val normalisedCvec = it.color//.cpy().mul(DIV_FLOAT)
 
-                                lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
-                                //lanternMap[Point2i(x, y)] = normalisedColor
+                                lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedCvec
+                                //lanternMap[Point2i(x, y)] = normalisedCvec
                                 // Q&D fix for Roundworld anomaly
-                                //lanternMap[Point2i(x + world.width, y)] = normalisedColor
-                                //lanternMap[Point2i(x - world.width, y)] = normalisedColor
+                                //lanternMap[Point2i(x + world.width, y)] = normalisedCvec
+                                //lanternMap[Point2i(x - world.width, y)] = normalisedCvec
                             }
                         }
                     }
@@ -393,16 +394,16 @@ object LightmapRenderer {
     }
 
 
-    //private val ambientAccumulator = Color(0f,0f,0f,0f)
-    private val lightLevelThis = Color(0)
+    //private val ambientAccumulator = Cvec(0f,0f,0f,0f)
+    private val lightLevelThis = Cvec(0)
     private var thisTerrain = 0
     private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
-    private val fluidAmountToCol = Color(0)
+    private val fluidAmountToCol = Cvec(0)
     private var thisWall = 0
-    private val thisTileLuminosity = Color(0)
-    private val thisTileOpacity = Color(0)
-    private val thisTileOpacity2 = Color(0) // thisTileOpacity * sqrt(2)
-    private val sunLight = Color(0)
+    private val thisTileLuminosity = Cvec(0)
+    private val thisTileOpacity = Cvec(0)
+    private val thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
+    private val sunLight = Cvec(0)
 
     /**
      * This function will alter following variables:
@@ -425,9 +426,9 @@ object LightmapRenderer {
             fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
 
             thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
-            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].luminosity mul fluidAmountToCol) // already been div by four
+            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].luminosity.mul(fluidAmountToCol)) // already been div by four
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
-            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity mul fluidAmountToCol) // already been div by four
+            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity.mul(fluidAmountToCol)) // already been div by four
         }
         else {
             thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
@@ -499,7 +500,7 @@ object LightmapRenderer {
     /**
      * Calculates the light simulation, using main lightmap as one of the input.
      */
-    private fun calculateAndAssign(lightmap: Array<Color>, x: Int, y: Int) {
+    private fun calculateAndAssign(lightmap: Array<Cvec>, x: Int, y: Int) {
 
         if (inNoopMask(x, y)) return
 
@@ -531,13 +532,13 @@ object LightmapRenderer {
         setLightOf(lightmap, x, y, lightLevelThis.cpy())
     }
 
-    private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
+    private fun getLightForOpaque(x: Int, y: Int): Cvec? { // ...so that they wouldn't appear too dark
         val l = getLightInternal(x, y)
         if (l == null) return null
 
         // brighten if solid
         if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
-            return Color(
+            return Cvec(
                     (l.r * 1.2f),
                     (l.g * 1.2f),
                     (l.b * 1.2f),
@@ -551,7 +552,7 @@ object LightmapRenderer {
 
     var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
-    private val colourNull = Color(0)
+    private val colourNull = Cvec(0)
     private val epsilon = 1f/1024f
 
     private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
@@ -568,7 +569,7 @@ object LightmapRenderer {
 
             // wipe out beforehand. You DO need this
             lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
-            lightBuffer.setColor(colourNull)
+            lightBuffer.setColor(0)
             lightBuffer.fill()
 
 
@@ -581,7 +582,7 @@ object LightmapRenderer {
 
                 for (x in this_x_start..this_x_end) {
 
-                    val color = (getLightForOpaque(x, y) ?: Color(0f, 0f, 0f, 0f)).normaliseToHDR()
+                    val color = (getLightForOpaque(x, y) ?: Cvec(0f, 0f, 0f, 0f)).normaliseToHDR()
 
                     lightBuffer.setColor(color)
 
@@ -620,11 +621,11 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    fun darkenColoured(data: Color, darken: Color): Color {
+    fun darkenColoured(data: Cvec, darken: Cvec): Cvec {
         // use equation with magic number 8.0
         // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 
-        return Color(
+        return Cvec(
                 data.r * (1f - darken.r * lightScalingMagic),//.clampZero(),
                 data.g * (1f - darken.g * lightScalingMagic),//.clampZero(),
                 data.b * (1f - darken.b * lightScalingMagic),//.clampZero(),
@@ -638,11 +639,11 @@ object LightmapRenderer {
      * @param darken (0-255)
      * @return
      */
-    fun darkenUniformInt(data: Color, darken: Float): Color {
+    fun darkenUniformInt(data: Cvec, darken: Float): Cvec {
         if (darken < 0 || darken > CHANNEL_MAX)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        val darkenColoured = Color(darken, darken, darken, darken)
+        val darkenColoured = Cvec(darken, darken, darken, darken)
         return darkenColoured(data, darkenColoured)
     }
 
@@ -653,8 +654,8 @@ object LightmapRenderer {
      * @param brighten (-1.0 - 1.0) negative means darkening
      * @return processed colour
      */
-    fun alterBrightnessUniform(data: Color, brighten: Float): Color {
-        return Color(
+    fun alterBrightnessUniform(data: Cvec, brighten: Float): Cvec {
+        return Cvec(
                 data.r + brighten,
                 data.g + brighten,
                 data.b + brighten,
@@ -663,7 +664,7 @@ object LightmapRenderer {
     }
 
     /** infix is removed to clarify the association direction */
-    fun Color.maxAndAssign(other: Color): Color {
+    fun Cvec.maxAndAssign(other: Cvec): Cvec {
         this.set(
                 if (this.r > other.r) this.r else other.r,
                 if (this.g > other.g) this.g else other.g,
@@ -723,7 +724,7 @@ object LightmapRenderer {
             _init = true
         }
         lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
-        lightmap = Array<Color>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0) }
+        lightmap = Array<Cvec>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) }
 
 
         printdbg(this, "Resize event")
@@ -797,14 +798,14 @@ object LightmapRenderer {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    internal fun Color.normaliseToHDR() = Color(
-            hdr(this.r.coerceIn(0f,1f)),
-            hdr(this.g.coerceIn(0f,1f)),
-            hdr(this.b.coerceIn(0f,1f)),
-            hdr(this.a.coerceIn(0f,1f))
+    internal fun Cvec.normaliseToHDR() = Color(
+            hdr(this.r.coerceIn(0f, 1f)),
+            hdr(this.g.coerceIn(0f, 1f)),
+            hdr(this.b.coerceIn(0f, 1f)),
+            hdr(this.a.coerceIn(0f, 1f))
     )
 
-    private fun Color.nonZero() = this.r + this.g + this.b + this.a > epsilon
+    private fun Cvec.nonZero() = this.r + this.g + this.b + this.a > epsilon
 
     val histogram: Histogram
         get() {
@@ -890,5 +891,6 @@ object LightmapRenderer {
     }
 }
 
+fun Cvec.toRGBA() = (255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt()
 fun Color.toRGBA() = (255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt()
 

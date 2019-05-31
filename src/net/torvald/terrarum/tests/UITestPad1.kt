@@ -80,7 +80,7 @@ class UITestPad1 : ScreenAdapter() {
 
     }
 
-    val bgCol = Color(.62f,.79f,1f,1f)
+    val bgCol = Color(.62f, .79f, 1f, 1f)
 
     var _dct = 0f
 

@@ -15,22 +15,16 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.ModuleBasisFunction
 import com.sudoplay.joise.module.ModuleFractal
-import com.sudoplay.joise.module.ModuleScaleDomain
 import com.sudoplay.joise.module.ModuleScaleOffset
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.BlockingThreadPool
-import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
-import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.roundInt
 import kotlin.math.absoluteValue
-import kotlin.system.measureNanoTime
-import kotlin.system.measureTimeMillis
 
 /**
  * Created by minjaesong on 2018-12-14.

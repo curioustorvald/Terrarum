@@ -6,9 +6,9 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.PixmapIO2
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.gdxClearAndSetBlend
 import net.torvald.terrarum.inUse
 import java.awt.BorderLayout
@@ -258,7 +258,7 @@ class SpriteAssemblerPreview: Game() {
         renderTexture = Texture(1, 1, Pixmap.Format.RGBA8888)
     }
 
-    private val bgCol = Color(.62f,.79f,1f,1f)
+    private val bgCol = Color(.62f, .79f, 1f, 1f)
 
     private var doAssemble = false
     private lateinit var assembleProp: ADProperties

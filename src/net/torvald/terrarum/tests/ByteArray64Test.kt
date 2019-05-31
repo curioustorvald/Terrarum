@@ -1,3 +1,5 @@
+package net.torvald.terrarum.tests
+
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.serialise.WriteLayerDataZip
 import net.torvald.terrarum.serialise.toLittle

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.colourutil.CIELuvUtil
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.GdxColorMap
 import net.torvald.terrarum.ModMgr
@@ -51,7 +52,7 @@ internal object WeatherMixer : RNGConsumer {
 
     lateinit var mixedWeather: BaseModularWeather
 
-    val globalLightNow = Color(0)
+    val globalLightNow = Cvec(0)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -178,10 +179,10 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Get a GL of specific time
      */
-    fun getGlobalLightOfTime(timeInSec: Int): Color =
+    fun getGlobalLightOfTime(timeInSec: Int): Cvec =
             getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
 
-    fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Color {
+    fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Cvec {
         val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width
 
         val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
@@ -203,7 +204,7 @@ internal object WeatherMixer : RNGConsumer {
                     " | ${colourThis.toStringRGB()} -[${scale.times(100).toInt()}%]-> ${colourNext.toStringRGB()}" +
                     " | * `$r`$g`$b`")*/
 
-        return newCol
+        return Cvec(newCol)
     }
 
     fun getWeatherList(classification: String) = weatherList[classification]!!

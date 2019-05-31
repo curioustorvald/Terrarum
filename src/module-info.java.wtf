@@ -1,0 +1,16 @@
+module terrarum {
+    requires gdx;
+    requires gdx.backend.lwjgl;
+    requires gdx.controllers;
+    requires jxinput;
+    requires gson;
+    requires GetCpuName;
+    requires TerrarumSansBitmap;
+    requires kotlin.stdlib;
+    requires java.desktop;
+    requires java.logging;
+    requires TerranVirtualDisk;
+    requires commons.codec;
+    requires commons.csv;
+    requires Terrarum.Joise;
+}

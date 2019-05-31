@@ -1,8 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.*
@@ -68,8 +68,8 @@ open class ActorHumanoid(
         if (houseDesignation != null) houseDesignation!!.clear()
     }
 
-    override var color: Color
-        get() = Color(
+    override var color: Cvec
+        get() = Cvec(
                 (actorValue.getAsFloat(AVKey.LUMR) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMG) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMB) ?: 0f) / LightmapRenderer.MUL_FLOAT,

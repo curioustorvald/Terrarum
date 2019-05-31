@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -31,8 +32,8 @@ open class ProjectileSimple(
     val speed: Int
 
 
-    override var color: Color
-        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Color).cpy()
+    override var color: Cvec
+        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Cvec).cpy()
         set(value) {
         }
     /**
@@ -118,8 +119,8 @@ open class ProjectileSimple(
         val OFFSET_LUMINOSITY = 4
         val bulletDatabase = arrayOf(
                 // damage, display colour, no gravity, speed
-                arrayOf(7, Color(0xFF5429_FF.toInt()), true, 40, 32),
-                arrayOf(8, Color(0xFF5429_FF.toInt()), true, 20, 0)
+                arrayOf(7, Cvec(0xFF5429_FF.toInt()), true, 40, 32),
+                arrayOf(8, Cvec(0xFF5429_FF.toInt()), true, 20, 0)
                 // ...
         )
     }

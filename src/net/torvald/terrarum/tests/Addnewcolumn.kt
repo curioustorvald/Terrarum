@@ -1,3 +1,4 @@
+package net.torvald.terrarum.tests
 
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter

@@ -2,9 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.toUint
-import net.torvald.terrarum.modulebasegame.Ingame
 import java.io.File
 import java.nio.charset.Charset
 import java.util.*
@@ -99,9 +97,9 @@ object DecodeTapestry {
 
     private fun Int.fourBitCol() = Color(
             this.and(0xF00).shl(20) or this.and(0xF00).shl(16) or
-            this.and(0x0F0).shl(16) or this.and(0x0F0).shl(12) or
-            this.and(0x00F).shl(12) or this.and(0x00F).shl(8)  or
-            0xFF
+                    this.and(0x0F0).shl(16) or this.and(0x0F0).shl(12) or
+                    this.and(0x00F).shl(12) or this.and(0x00F).shl(8) or
+                    0xFF
     )
 
     val MAGIC = "TEAF".toByteArray(charset = Charset.forName("US-ASCII"))

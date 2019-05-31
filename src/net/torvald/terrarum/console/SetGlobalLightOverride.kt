@@ -1,10 +1,9 @@
 package net.torvald.terrarum.console
 
-import com.badlogic.gdx.graphics.Color
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 
 /**
  * Created by minjaesong on 2016-02-17.
@@ -18,7 +17,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 val g = args[2].toFloat()
                 val b = args[3].toFloat()
                 val a = args[4].toFloat()
-                val GL = Color(r, g, b, a)
+                val GL = Cvec(r, g, b, a)
 
                 WeatherMixer.globalLightOverridden = true
                 (Terrarum.ingame!!.world).globalLight = GL
