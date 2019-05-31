@@ -66,6 +66,13 @@ object IngameRenderer : Disposable {
         AppLoader.disposableSingletonsPool.add(this)
     }
 
+    var renderingActorsCount = 0
+        private set
+    var renderingUIsCount = 0
+        private set
+    /*var renderingParticleCount = 0
+        private set*/
+
     operator fun invoke(
             gamePaused: Boolean,
             world: GameWorldExtension,
@@ -78,6 +85,14 @@ object IngameRenderer : Disposable {
             player: ActorWithBody? = null,
             uisToDraw: ArrayList<UICanvas>? = null
     ) {
+        renderingActorsCount = (actorsRenderBehind?.size ?: 0) +
+                               (actorsRenderMiddle?.size ?: 0) +
+                               (actorsRenderMidTop?.size ?: 0) +
+                               (actorsRenderFront?.size ?: 0) +
+                               (actorsRenderOverlay?.size ?: 0)
+        //renderingParticleCount = particlesContainer?.size ?: 0
+        renderingUIsCount = uisToDraw?.size ?: 0
+
 
         if (uisToDraw != null) {
             uiListToDraw = uisToDraw

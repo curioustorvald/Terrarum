@@ -10,6 +10,7 @@ import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -240,6 +241,9 @@ class BasicDebugInfoWindow : UICanvas() {
                 Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as Ingame).particlesActive}",
                         (2 + 41 * 8).toFloat(), Terrarum.HEIGHT - 10f)
             }
+
+            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
+                    2f, Terrarum.HEIGHT - 18f)
         }
 
         /**

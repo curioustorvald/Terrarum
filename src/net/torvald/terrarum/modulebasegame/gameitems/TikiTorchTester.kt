@@ -32,8 +32,6 @@ class TikiTorchTester(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(delta: Float): Boolean {
         val torch = FixtureTikiTorch()
 
-        //println("aroisetn")
-
         return torch.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - torch.blockBox.height + 1)
         // return true when placed, false when cannot be placed
     }

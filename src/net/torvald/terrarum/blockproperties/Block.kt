@@ -127,4 +127,12 @@ object Block {
     const val WATER = 4095
 
     const val NULL = -1
+
+    val actorblocks = listOf(
+            ACTORBLOCK_NO_COLLISION,
+            ACTORBLOCK_FULL_COLLISION,
+            ACTORBLOCK_ALLOW_MOVE_DOWN,
+            ACTORBLOCK_NO_PASS_RIGHT,
+            ACTORBLOCK_NO_PASS_LEFT
+    )
 }
