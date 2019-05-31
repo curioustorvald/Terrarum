@@ -46,15 +46,15 @@ object LightmapRenderer {
             if (this.world != world) {
                 printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
 
-                /*for (y in 0 until LIGHTMAP_HEIGHT) {
+                for (y in 0 until LIGHTMAP_HEIGHT) {
                     for (x in 0 until LIGHTMAP_WIDTH) {
                         lightmap[y][x] = colourNull
                     }
-                }*/
-
-                for (i in 0 until lightmap.size) {
-                    lightmap[i] = colourNull
                 }
+
+                /*for (i in 0 until lightmap.size) {
+                    lightmap[i] = colourNull
+                }*/
 
                 makeUpdateTaskList()
             }
@@ -82,8 +82,9 @@ object LightmapRenderer {
      * Float value, 1.0 for 1023
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
-    //private val lightmap: Array<Array<Cvec>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Cvec(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    // will use array of array from now on because fuck it; debug-ability > slight framerate drop. 2019-06-01
+    private var lightmap: Array<Array<Cvec>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH) { Cvec(0) } } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    //private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     init {
@@ -145,8 +146,8 @@ object LightmapRenderer {
             val ypos = y - for_y_start + overscan_open
             val xpos = x - for_x_start + overscan_open
 
-            //return lightmap[ypos][xpos]
-            return lightmap[ypos * LIGHTMAP_WIDTH + xpos]
+            return lightmap[ypos][xpos]
+            //return lightmap[ypos * LIGHTMAP_WIDTH + xpos]
         }
 
         return null
@@ -165,15 +166,15 @@ object LightmapRenderer {
      * @param colour Cvec to write
      * @param applyFun A function ```foo(old_colour, given_colour)```
      */
-    private fun setLightOf(list: Array<Cvec>, x: Int, y: Int, colour: Cvec, applyFun: (Cvec, Cvec) -> Cvec = { _, c -> c }) {
+    private fun setLightOf(list: Array<Array<Cvec>>, x: Int, y: Int, colour: Cvec, applyFun: (Cvec, Cvec) -> Cvec = { _, c -> c }) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
             val ypos = y - for_y_start + overscan_open
             val xpos = x - for_x_start + overscan_open
 
-            //lightmap[ypos][xpos] = applyFun.invoke(list[ypos][xpos], colour)
-            list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
+            lightmap[ypos][xpos] = applyFun.invoke(list[ypos][xpos], colour)
+            //list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
         }
     }
 
@@ -231,7 +232,8 @@ object LightmapRenderer {
 
         // wipe out lightmap
         AppLoader.measureDebugTime("Renderer.Light0") {
-            for (k in 0 until lightmap.size) lightmap[k] = colourNull
+            //for (k in 0 until lightmap.size) lightmap[k] = colourNull
+            for (y in 0 until lightmap.size) for (x in 0 until lightmap[0].size) lightmap[y][x] = colourNull
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
         }
@@ -500,7 +502,7 @@ object LightmapRenderer {
     /**
      * Calculates the light simulation, using main lightmap as one of the input.
      */
-    private fun calculateAndAssign(lightmap: Array<Cvec>, x: Int, y: Int) {
+    private fun calculateAndAssign(lightmap: Array<Array<Cvec>>, x: Int, y: Int) {
 
         if (inNoopMask(x, y)) return
 
@@ -724,7 +726,8 @@ object LightmapRenderer {
             _init = true
         }
         lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
-        lightmap = Array<Cvec>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) }
+        lightmap = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH) { Cvec(0) } }
+        //lightmap = Array<Cvec>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) }
 
 
         printdbg(this, "Resize event")
@@ -819,8 +822,8 @@ object LightmapRenderer {
             for (y in overscan_open..render_height + overscan_open + 1) {
                 for (x in overscan_open..render_width + overscan_open + 1) {
                     try {
-                        //val colour = lightmap[y][x]
-                        val colour = lightmap[y * LIGHTMAP_WIDTH + x]
+                        val colour = lightmap[y][x]
+                        //val colour = lightmap[y * LIGHTMAP_WIDTH + x]
                         reds[minOf(CHANNEL_MAX, colour.r.times(MUL).floorInt())] += 1
                         greens[minOf(CHANNEL_MAX, colour.g.times(MUL).floorInt())] += 1
                         blues[minOf(CHANNEL_MAX, colour.b.times(MUL).floorInt())] += 1
