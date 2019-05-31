@@ -71,8 +71,8 @@ object IngameRenderer : Disposable {
         private set
     var renderingUIsCount = 0
         private set
-    /*var renderingParticleCount = 0
-        private set*/
+    //var renderingParticleCount = 0
+    //    private set
 
     operator fun invoke(
             gamePaused: Boolean,
@@ -92,7 +92,8 @@ object IngameRenderer : Disposable {
                                (actorsRenderFront?.size ?: 0) +
                                (actorsRenderOverlay?.size ?: 0)
         //renderingParticleCount = particlesContainer?.size ?: 0
-        renderingUIsCount = uisToDraw?.size ?: 0
+        //renderingParticleCount = (particlesContainer?.buffer?.map { (!it.flagDespawn).toInt() } ?: listOf(0)).sum()
+        renderingUIsCount = ((uisToDraw?.map { it.isVisible.toInt() }) ?: listOf(0)).sum()
 
 
         if (uisToDraw != null) {
