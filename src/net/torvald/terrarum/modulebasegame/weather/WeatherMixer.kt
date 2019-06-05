@@ -194,7 +194,7 @@ internal object WeatherMixer : RNGConsumer {
         // interpolate R, G, B and A
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
 
-        val newCol = CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newCol = colourThis.cpy().lerp(colourNext, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
 
         /* // very nice monitor code
         // 65 -> 66 | 300 | 19623 | RGB8(255, 0, 255) -[41%]-> RGB8(193, 97, 23) | * `230`40`160`

@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import net.torvald.gdx.graphics.Cvec
 
 /**
  * Created by minjaesong on 2017-06-17.
@@ -22,6 +23,7 @@ class GdxColorMap {
             pixmap.getPixel(it % pixmap.width, it / pixmap.width)
         }
         dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
+        dataCvec = dataRaw.map { Cvec(it) }.toTypedArray()
 
         pixmap.dispose()
     }
@@ -35,6 +37,7 @@ class GdxColorMap {
             pixmap.getPixel(it % pixmap.width, it / pixmap.width)
         }
         dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
+        dataCvec = dataRaw.map { Cvec(it) }.toTypedArray()
 
         if (disposePixmap) pixmap.dispose()
     }
@@ -42,6 +45,7 @@ class GdxColorMap {
     constructor(color: Color) {
         dataRaw = intArrayOf(color.toIntBits())
         dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
+        dataCvec = dataRaw.map { Cvec(it) }.toTypedArray()
         width = 1
         height = 1
         is2D = false
@@ -50,6 +54,7 @@ class GdxColorMap {
     constructor(gradStart: Color, gradEnd: Color) {
         dataRaw = intArrayOf(gradStart.toIntBits(), gradEnd.toIntBits())
         dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
+        dataCvec = dataRaw.map { Cvec(it) }.toTypedArray()
         width = 1
         height = 2
         is2D = true
@@ -57,7 +62,7 @@ class GdxColorMap {
 
     private val dataRaw: IntArray
     private val dataGdxColor: Array<Color>
-    //private val dataCvec: Array<Cvec>
+    private val dataCvec: Array<Cvec>
     val width: Int
     val height: Int
     val is2D: Boolean
