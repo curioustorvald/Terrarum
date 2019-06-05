@@ -12,6 +12,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
@@ -186,6 +187,8 @@ object LightmapRenderer {
             return // quit prematurely
         }
 
+        if (world.worldIndex == -1) return
+
 
         for_x_start = WorldCamera.x / TILE_SIZE // fix for premature lightmap rendering
         for_y_start = WorldCamera.y / TILE_SIZE // on topmost/leftmost side
@@ -251,38 +254,67 @@ object LightmapRenderer {
             AppLoader.measureDebugTime("Renderer.LightTotal") {
                 // Round 2
                 for (y in for_y_end + overscan_open downTo for_y_start) {
+                    // TODO multithread the following for loop duh
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 3
                 for (y in for_y_end + overscan_open downTo for_y_start) {
+                    // TODO multithread the following for loop duh
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 4
                 for (y in for_y_start - overscan_open..for_y_end) {
+                    // TODO multithread the following for loop duh
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 1
                 for (y in for_y_start - overscan_open..for_y_end) {
+                    // TODO multithread the following for loop duh
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
-                // Round 2 again
-                /*for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }*/
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
-            TODO()
+            val roundsY = arrayOf(
+                    (for_y_end + overscan_open downTo for_y_start).sliceEvenly(ThreadParallel.threadCount),
+                    (for_y_end + overscan_open downTo for_y_start).sliceEvenly(ThreadParallel.threadCount),
+                    (for_y_start - overscan_open..for_y_end).sliceEvenly(ThreadParallel.threadCount),
+                    (for_y_start - overscan_open..for_y_end).sliceEvenly(ThreadParallel.threadCount)
+            )
+            val roundsX = arrayOf(
+                    (for_x_start - overscan_open..for_x_end),
+                    (for_x_end + overscan_open downTo for_x_start),
+                    (for_x_end + overscan_open downTo for_x_start),
+                    (for_x_start - overscan_open..for_x_end)
+            )
+
+            AppLoader.measureDebugTime("Renderer.LightParallelPre") {
+                for (round in 0..roundsY.lastIndex) {
+                    roundsY[round].forEachIndexed { index, yRange ->
+                        ThreadParallel.map(index, "lightrender-round${round + 1}") {
+                            for (y in yRange) {
+                                for (x in roundsX[round]) {
+                                    calculateAndAssign(lightmap, x, y)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            AppLoader.measureDebugTime("Renderer.LightParallelRun") {
+                ThreadParallel.startAllWaitForDie()
+            }
+
+
         }
     }
 

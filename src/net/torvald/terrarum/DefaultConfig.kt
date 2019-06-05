@@ -25,7 +25,7 @@ object DefaultConfig {
         jsonObject.addProperty("language", AppLoader.getSysLang())
         jsonObject.addProperty("notificationshowuptime", 4000)
         jsonObject.addProperty("multithread", true) // experimental!
-        jsonObject.addProperty("multithreadedlight", false) // experimental!
+        jsonObject.addProperty("multithreadedlight", true) // experimental!
 
 
 
