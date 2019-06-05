@@ -1,6 +1,7 @@
 package net.torvald.terrarum.concurrent
 
 import net.torvald.terrarum.Terrarum
+import kotlin.math.absoluteValue
 
 typealias RunnableFun = () -> Unit
 /** Int: index of the processing core */
@@ -12,7 +13,7 @@ typealias ThreadableFun = (Int) -> Unit
 object ThreadParallel {
     val threadCount = Terrarum.THREADS // modify this to your taste
 
-    private val pool: Array<Thread?> = Array(threadCount, { null })
+    private val pool: Array<Thread?> = Array(threadCount) { null }
 
     /**
      * Map Runnable object to certain index of the thread pool.
@@ -189,13 +190,19 @@ object ParallelUtils {
         }
     }
 
-    fun IntRange.sliceEvenly(slices: Int): List<IntRange> {
-        if (this.step != 1) throw UnsupportedOperationException("Sorry, step != 1")
-        val size = this.last - this.first + 1f
+    fun IntProgression.sliceEvenly(slices: Int): List<IntProgression> {
+        if (this.step.absoluteValue != 1) throw UnsupportedOperationException("Sorry, step != +1/-1")
+        val size = (this.last - this.first).absoluteValue + (this.step.toFloat()).absoluteValue
 
-        return (0 until slices).map {
-            size.div(slices).times(it).roundInt() until
-                    size.div(slices).times(it + 1).roundInt()
+        // println(size)
+
+        return if (this.first < this.last) (0 until slices).map {
+            this.first + size.div(slices).times(it).roundInt() ..
+                    this.first + size.div(slices).times(it + 1).roundInt() - 1
+        }
+        else (0 until slices).map {
+            this.first - size.div(slices).times(it).roundInt() downTo
+                    this.first - size.div(slices).times(it + 1).roundInt() + 1
         }
     }
 

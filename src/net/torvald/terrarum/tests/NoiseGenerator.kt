@@ -65,7 +65,7 @@ class NoiseGenerator : ScreenAdapter() {
 
     private val jobsCount: Int
         get() = (IMAGE_SIZE * IMAGE_SIZE) / pixelsInSingleJob
-    private val rawPixelsList: List<IntRange>
+    private val rawPixelsList: List<IntProgression>
         get() = (0 until IMAGE_SIZE * IMAGE_SIZE).sliceEvenly(jobsCount)
     private fun makeGenFun(seed: Long, index: Int) = { //i: Int ->
         val module = ModuleFractal()
