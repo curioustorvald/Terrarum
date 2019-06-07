@@ -147,6 +147,7 @@ object LightmapRenderer {
             val ypos = y - for_y_start + overscan_open
             val xpos = x - for_x_start + overscan_open
 
+            // TODO as you can see above, we're already doing a boundary check; try using unsafe here?
             return lightmap[ypos][xpos]
             //return lightmap[ypos * LIGHTMAP_WIDTH + xpos]
         }
@@ -174,6 +175,7 @@ object LightmapRenderer {
             val ypos = y - for_y_start + overscan_open
             val xpos = x - for_x_start + overscan_open
 
+            // TODO as you can see above, we're already doing a boundary check; try using unsafe here?
             lightmap[ypos][xpos] = applyFun.invoke(list[ypos][xpos], colour)
             //list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
         }
