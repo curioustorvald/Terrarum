@@ -425,9 +425,9 @@ object LightmapRenderer {
             fluidAmountToCol = Cvec(thisFluid.amount)
 
             thisTileLuminosity = BlockCodex[thisTerrain].luminosity
-            thisTileLuminosity.max(BlockCodex[thisFluid.type].luminosity * fluidAmountToCol) // already been div by four
+            thisTileLuminosity = thisTileLuminosity.max(BlockCodex[thisFluid.type].luminosity * fluidAmountToCol) // already been div by four
             thisTileOpacity = BlockCodex[thisTerrain].opacity
-            thisTileOpacity.max(BlockCodex[thisFluid.type].opacity * fluidAmountToCol) // already been div by four
+            thisTileOpacity = thisTileOpacity.max(BlockCodex[thisFluid.type].opacity * fluidAmountToCol) // already been div by four
         }
         else {
             thisTileLuminosity = BlockCodex[thisTerrain].luminosity
@@ -444,7 +444,7 @@ object LightmapRenderer {
         }
 
         // blend lantern
-        lightLevelThis.max(thisTileLuminosity).max(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
+        lightLevelThis = lightLevelThis.max(thisTileLuminosity).max(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
 
     }
 
@@ -517,14 +517,14 @@ object LightmapRenderer {
 
         // will "overwrite" what's there in the lightmap if it's the first pass
         // takes about 2 ms on 6700K
-        /* + */lightLevelThis.max(darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, thisTileOpacity2))
-        /* + */lightLevelThis.max(darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, thisTileOpacity2))
-        /* + */lightLevelThis.max(darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, thisTileOpacity2))
-        /* + */lightLevelThis.max(darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, thisTileOpacity2))
-        /* * */lightLevelThis.max(darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity))
-        /* * */lightLevelThis.max(darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity))
-        /* * */lightLevelThis.max(darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity))
-        /* * */lightLevelThis.max(darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
+        /* + */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, thisTileOpacity2))
+        /* + */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, thisTileOpacity2))
+        /* + */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, thisTileOpacity2))
+        /* + */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, thisTileOpacity2))
+        /* * */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity))
+        /* * */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity))
+        /* * */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity))
+        /* * */lightLevelThis = lightLevelThis.max(darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
 
 
         //return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
