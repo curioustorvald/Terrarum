@@ -699,12 +699,12 @@ object LightmapRenderer {
 
     /** infix is removed to clarify the association direction */
     fun Cvec.maxAndAssign(other: Cvec): Cvec {
-        this.set( // TODO investigate: if I use assignment instead of set(), it blackens like the vector branch
-                if (this.r > other.r) this.r else other.r,
-                if (this.g > other.g) this.g else other.g,
-                if (this.b > other.b) this.b else other.b,
-                if (this.a > other.a) this.a else other.a
-        )
+        // TODO investigate: if I use assignment instead of set(), it blackens like the vector branch.  --Torvald, 2019-06-07
+        //                   that was because you forgot 'this.r/g/b/a = ' part, bitch. --Torvald, 2019-06-07
+        this.r = if (this.r > other.r) this.r else other.r
+        this.g = if (this.g > other.g) this.g else other.g
+        this.b = if (this.b > other.b) this.b else other.b
+        this.a = if (this.a > other.a) this.a else other.a
 
         return this
     }
