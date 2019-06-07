@@ -4,8 +4,8 @@ import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -26,6 +26,7 @@ object BlockBase {
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
         // check for collision with actors (BLOCK only)
+        // FIXME properly fix the collision detection: it OVERRIDES the tiki-torches which should not happen AT ALL
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
             var ret1 = true
             ingame.actorContainerActive.forEach {
