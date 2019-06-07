@@ -5,7 +5,10 @@ import net.torvald.terrarum.AppLoader.printdbg
 import sun.misc.Unsafe
 
 /**
- * Created by minjaesong on 2016-01-17.
+ * Original version Created by minjaesong on 2016-01-17.
+ * Unsafe version Created by minjaesong on 2019-06-08.
+ *
+ * Note to self: refrain from using shorts--just do away with two bytes: different system have different endianness
  */
 open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
