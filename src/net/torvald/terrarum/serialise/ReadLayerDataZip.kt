@@ -2,9 +2,8 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.BlockAddress
+import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.FluidType
-import net.torvald.terrarum.gameworld.MapLayer
-import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
 import net.torvald.terrarum.realestate.LandUtil
 import java.io.File
@@ -144,14 +143,7 @@ internal object ReadLayerDataZip {
             if (uncompLen.toLong() != u.uncompressedSize)
                 throw InternalError("Payload $t DEFLATE size mismatch -- expected ${u.uncompressedSize}, got $uncompLen")
 
-            // deal with (MSB ++ LSB)
-            if (t == "TERR" || t == "WALL") {
-                payloadBytes["${t}_MSB"] = inflatedFile.sliceArray(0 until worldSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
-                payloadBytes["${t}_LSB"] = inflatedFile.sliceArray(worldSize.toInt() until uncompLen) // FIXME deflated stream cannot be larger than 2 GB
-            }
-            else {
-                payloadBytes[t] = inflatedFile
-            }
+            payloadBytes[t] = inflatedFile
         }
 
         val spawnPoint = LandUtil.resolveBlockAddr(width, spawnAddress)
@@ -187,11 +179,8 @@ internal object ReadLayerDataZip {
 
         
         return LayerData(
-                MapLayer(width, height, payloadBytes["WALL_MSB"]!!),
-                MapLayer(width, height, payloadBytes["TERR_MSB"]!!),
-                MapLayer(width, height, payloadBytes["WIRE"]!!),
-                PairedMapLayer(width, height, payloadBytes["WALL_LSB"]!!),
-                PairedMapLayer(width, height, payloadBytes["TERR_LSB"]!!),
+                BlockLayer(width, height, payloadBytes["WALL"]!!),
+                BlockLayer(width, height, payloadBytes["TERR"]!!),
 
                 spawnPoint.first, spawnPoint.second,
 
@@ -203,16 +192,15 @@ internal object ReadLayerDataZip {
      * Immediately deployable, a part of the gameworld
      */
     internal data class LayerData(
-            val layerWall: MapLayer,
-            val layerTerrain: MapLayer,
-            val layerWire: MapLayer,
-            val layerWallLowBits: PairedMapLayer,
-            val layerTerrainLowBits: PairedMapLayer,
+            val layerWall: BlockLayer,
+            val layerTerrain: BlockLayer,
             //val layerThermal: MapLayerHalfFloat, // in Kelvins
             //val layerAirPressure: MapLayerHalfFloat, // (milibar - 1000)
 
             val spawnX: Int,
             val spawnY: Int,
+
+            //val wirings: HashMap<BlockAddress, SortedArrayList<GameWorld.WiringNode>>,
             val wallDamages: HashMap<BlockAddress, Float>,
             val terrainDamages: HashMap<BlockAddress, Float>,
             val fluidTypes: HashMap<BlockAddress, FluidType>,

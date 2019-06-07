@@ -1,16 +1,16 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import net.torvald.random.HQRNG
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.blockproperties.Block
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.random.HQRNG
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.modulebasegame.RNGConsumer
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.roundInt
 import java.util.*
 
@@ -105,7 +105,7 @@ object WorldGenerator {
      */
     fun generateMap() {
         random = HQRNG(SEED)
-        println("[mapgenerator] Seed: " + SEED)
+        printdbg(this, "Seed: " + SEED)
 
         worldOceanPosition = if (random.nextBoolean()) TYPE_OCEAN_LEFT else TYPE_OCEAN_RIGHT
 
@@ -491,7 +491,7 @@ object WorldGenerator {
         val joise = Joise(ground_select)
 
         // fill the area as Joise map
-        println("[mapgenerator] Raising and eroding terrain...")
+        printdbg(this, "Raising and eroding terrain...")
         LoadScreen.addMessage("Raising and eroding terrain...")
         for (y in 0..(TERRAIN_UNDULATION - 1)) {
             for (x in 0..WIDTH) {
@@ -549,7 +549,7 @@ object WorldGenerator {
     }
 
     private fun placeGlacierMount(heightMap: IntArray) {
-        println("[mapgenerator] Putting glacier...")
+        printdbg(this, "Putting glacier...")
 
         // raise
         for (i in heightMap.indices) {
@@ -579,7 +579,7 @@ object WorldGenerator {
     }
 
     private fun heightMapToObjectMap(fs: IntArray) {
-        println("[mapgenerator] Shaping world as processed...")
+        printdbg(this, "Shaping world as processed...")
 
         // iterate for heightmap
         for (x in 0..WIDTH - 1) {
@@ -602,7 +602,7 @@ object WorldGenerator {
     }
 
     private fun fillMapByNoiseMap() {
-        println("[mapgenerator] Shaping world...")
+        printdbg(this, "Shaping world...")
         LoadScreen.addMessage("Reticulating splines...") // RETICULATING SPLINES
         // generate dirt-stone transition line
         // use catmull spline
@@ -686,7 +686,7 @@ object WorldGenerator {
                            filter: NoiseFilter = NoiseFilterQuadratic,
                            filterStart: Double = NOISE_GRAD_START,
                            filterEnd: Double = NOISE_GRAD_END) {
-        println("[mapgenerator] " + message)
+        printdbg(this, "" + message)
 
         for (y in 0..HEIGHT - 1) {
             for (x in 0..WIDTH - 1) {
@@ -716,7 +716,7 @@ object WorldGenerator {
                           filter: NoiseFilter = NoiseFilterQuadratic,
                           filterStart: Double = NOISE_GRAD_START,
                           filterEnd: Double = NOISE_GRAD_END) {
-        println("[mapgenerator] " + message)
+        printdbg(this, "" + message)
 
         for (y in 0..HEIGHT - 1) {
             for (x in 0..WIDTH - 1) {
@@ -747,7 +747,7 @@ object WorldGenerator {
                           filter: NoiseFilter = NoiseFilterQuadratic,
                           filterStart: Double = NOISE_GRAD_START,
                           filterEnd: Double = NOISE_GRAD_END) {
-        println("[mapgenerator] " + message)
+        printdbg(this, "" + message)
 
         for (y in 0..HEIGHT - 1) {
             for (x in 0..WIDTH - 1) {
@@ -797,7 +797,7 @@ object WorldGenerator {
     private val islandSpacing = 1024
 
     private fun generateFloatingIslands() {
-        println("[mapgenerator] Placing floating islands...")
+        printdbg(this, "Placing floating islands...")
         LoadScreen.addMessage("Placing floating islands...")
 
         val nIslandsMax = Math.round(world.width * 6f / 8192f)
@@ -830,7 +830,7 @@ object WorldGenerator {
     /* Flood */
 
     private fun floodBottomLava() {
-        /*println("[mapgenerator] Flooding with lava...")
+        /*printdbg(this, "Flooding with lava...")
         LoadScreen.addMessage("Flooding with lava...")
         for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
@@ -844,7 +844,7 @@ object WorldGenerator {
     /* Plant */
 
     private fun plantGrass() {
-        println("[mapgenerator] Planting grass...")
+        printdbg(this, "Planting grass...")
         LoadScreen.addMessage("Planting grass...")
 
         /* TODO composing dirt and stone
@@ -910,7 +910,7 @@ object WorldGenerator {
             "yellow"
         else
             "white"
-        println("[mapgenerator] Beach sand type: $thisSandStr")
+        printdbg(this, "Beach sand type: $thisSandStr")
 
         var ix = 0
         while (ix < OCEAN_WIDTH * 1.5) {

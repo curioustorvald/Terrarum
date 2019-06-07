@@ -113,8 +113,7 @@ internal object WriteLayerDataZip {
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
         deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
-        deflater.write(world.terrainArray)
-        deflater.write(world.layerTerrainLowBits.data)
+        world.layerTerrain.bytesIterator().forEach { deflater.write(it.toInt()) }
         deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
@@ -122,8 +121,7 @@ internal object WriteLayerDataZip {
         wb(PAYLOAD_HEADER); wb("WALL".toByteArray())
         wi48(world.width * world.height * 3L / 2)
         deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
-        deflater.write(world.wallArray)
-        deflater.write(world.layerWallLowBits.data)
+        world.layerWall.bytesIterator().forEach { deflater.write(it.toInt()) }
         deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 

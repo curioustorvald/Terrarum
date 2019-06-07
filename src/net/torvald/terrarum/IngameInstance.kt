@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Queue
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -74,7 +75,15 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     override fun resize(width: Int, height: Int) {
     }
 
+    /**
+     * You ABSOLUTELY must call this in your child classes (```super.dispose()```) and the AppLoader to properly
+     * dispose of the world, which uses unsafe memory allocation.
+     * Failing to do this will result to a memory leak!
+     */
     override fun dispose() {
+        printdbg(this, "Thank you for properly disposing the world!")
+
+        world.dispose()
     }
 
     ////////////

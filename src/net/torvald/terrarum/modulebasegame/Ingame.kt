@@ -1010,6 +1010,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             it.handler.dispose()
             it.dispose()
         }
+
+        super.dispose()
     }
 
 

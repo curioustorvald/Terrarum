@@ -4,13 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
-import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
@@ -59,7 +57,6 @@ internal object BlocksDrawer {
     val wallOverlayColour = Color(5f / 9f, 5f / 9f, 5f / 9f, 1f)
 
     const val BREAKAGE_STEPS = 10
-    const val TILES_PER_BLOCK = PairedMapLayer.RANGE
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
@@ -257,7 +254,7 @@ internal object BlocksDrawer {
         val fluidNum = this.type.abs()
 
         if (this.amount >= WorldSimulator.FLUID_MIN_MASS) {
-            val fluidLevel = this.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
+            val fluidLevel = this.amount.coerceIn(0f,1f).times(15).roundToInt()
 
             return fluidLevel * 16 + fluidNum
         }

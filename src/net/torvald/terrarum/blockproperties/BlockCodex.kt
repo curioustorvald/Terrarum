@@ -5,8 +5,6 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printmsg
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.MapLayer
-import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.apache.commons.csv.CSVRecord
@@ -20,7 +18,7 @@ object BlockCodex {
     private var blockProps = HashMap<Int, BlockProp>()
 
     /** 4096 */
-    const val MAX_TERRAIN_TILES = MapLayer.RANGE * PairedMapLayer.RANGE
+    const val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
 
     private val nullProp = BlockProp()
 

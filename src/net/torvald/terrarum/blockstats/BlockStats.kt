@@ -3,7 +3,6 @@ package net.torvald.terrarum.blockstats
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -71,11 +70,5 @@ object BlockStats {
         return sum
     }
 
-    /**
-
-     * @return copy of the stat data
-     */
-    val statCopy: ShortArray
-        get() = Arrays.copyOf(tilestat, MapLayer.RANGE)
 
 }
