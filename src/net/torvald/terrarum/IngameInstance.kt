@@ -82,6 +82,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      */
     override fun dispose() {
         printdbg(this, "Thank you for properly disposing the world!")
+        printdbg(this, "dispose called by")
+        Thread.currentThread().stackTrace.forEach {
+            printdbg(this, "--> $it")
+        }
 
         world.dispose()
     }
