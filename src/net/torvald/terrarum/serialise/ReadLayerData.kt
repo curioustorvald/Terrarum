@@ -1,10 +1,5 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import java.io.IOException
-import java.io.InputStream
-import java.util.*
-
 /**
  * Only being used by the title screen and the demoworld. This object may get deleted at any update
  *
@@ -14,8 +9,11 @@ import java.util.*
 @Deprecated("TEMD is deprecated format; use TEMz which does compression")
 internal object ReadLayerData {
 
+    init {
+        throw Error("TEMD is old and removed format; use TEMz which does compression")
+    }
 
-    internal operator fun invoke(inputStream: InputStream, inWorld: GameWorldExtension? = null): GameWorldExtension {
+    /*internal operator fun invoke(inputStream: InputStream, inWorld: GameWorldExtension? = null): GameWorldExtension {
         val magicBytes = ByteArray(4)
         val layerSizeBytes = ByteArray(1)
         val layerCountBytes = ByteArray(1)
@@ -109,7 +107,7 @@ internal object ReadLayerData {
         }
 
         return i
-    }
+    }*/
 }
 
 fun Int.toLittle() = byteArrayOf(

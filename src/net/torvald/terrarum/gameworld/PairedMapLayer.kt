@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameworld
 /**
  * Created by minjaesong on 2016-02-15.
  */
-open class PairedMapLayer : Iterable<Byte> {
+/*open class PairedMapLayer : Iterable<Byte> {
 
     val width: Int; val height: Int
 
@@ -87,4 +87,4 @@ open class PairedMapLayer : Iterable<Byte> {
         @Transient const val RANGE = 16
         @Transient const val SIZEOF: Byte = 1 // 1 for 8-bit, 2 for 16-bit, ...
     }
-}
+}*/

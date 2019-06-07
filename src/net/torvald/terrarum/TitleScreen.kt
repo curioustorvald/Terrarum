@@ -27,12 +27,10 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import java.io.FileInputStream
 
 /**
  * Created by minjaesong on 2017-09-02.
@@ -129,7 +127,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         printdbg(this, "Intro pre-load")
 
 
-        demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
+        demoWorld = GameWorldExtension(1, 64, 64, 0L, 0L, 0)
+
+        printdbg(this, "Demo world gen complete")
+
         // set time to summer
         demoWorld.time.addTime(WorldTime.DAY_LENGTH * 32)
 
@@ -138,7 +139,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         cameraNodes = kotlin.FloatArray(nodeCount) { it ->
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
-            while (!BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
+            while (travelDownCounter < demoWorld.height && !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
                 travelDownCounter += 4
             }
             travelDownCounter * CreateTileAtlas.TILE_SIZE.toFloat()

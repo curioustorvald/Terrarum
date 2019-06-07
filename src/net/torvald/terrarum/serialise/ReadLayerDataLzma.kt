@@ -3,9 +3,8 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.BlockAddress
+import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.FluidType
-import net.torvald.terrarum.gameworld.MapLayer
-import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
 import net.torvald.terrarum.realestate.LandUtil
 import java.io.*
@@ -143,14 +142,7 @@ internal object ReadLayerDataLzma {
 
             val inflatedFile = inflatedOS.toByteArray()
 
-            // deal with (MSB ++ LSB)
-            if (t == "TERR" || t == "WALL") {
-                payloadBytes["${t}_MSB"] = inflatedFile.sliceArray(0 until worldSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
-                payloadBytes["${t}_LSB"] = inflatedFile.sliceArray(worldSize.toInt() until u.uncompressedSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
-            }
-            else {
-                payloadBytes[t] = inflatedFile
-            }
+            payloadBytes[t] = inflatedFile
         }
 
         val spawnPoint = LandUtil.resolveBlockAddr(width, spawnAddress)
@@ -184,13 +176,10 @@ internal object ReadLayerDataLzma {
 
         // TODO parse fluid(Types|Fills)
 
-        
+
         return ReadLayerDataZip.LayerData(
-                MapLayer(width, height, payloadBytes["WALL_MSB"]!!),
-                MapLayer(width, height, payloadBytes["TERR_MSB"]!!),
-                MapLayer(width, height, payloadBytes["WIRE"]!!),
-                PairedMapLayer(width, height, payloadBytes["WALL_LSB"]!!),
-                PairedMapLayer(width, height, payloadBytes["TERR_LSB"]!!),
+                BlockLayer(width, height, payloadBytes["WALL"]!!),
+                BlockLayer(width, height, payloadBytes["TERR"]!!),
 
                 spawnPoint.first, spawnPoint.second,
 

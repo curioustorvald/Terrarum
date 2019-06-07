@@ -1,6 +1,7 @@
 
 package net.torvald.terrarum.gameworld
 
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
@@ -17,14 +18,14 @@ import kotlin.math.sign
 
 typealias BlockAddress = Long
 
-open class GameWorld {
+open class GameWorld : Disposable {
 
     var worldName: String = "New World"
     /** Index start at 1 */
     var worldIndex: Int
         set(value) {
             if (value <= 0)
-                throw Error("World index start at 1; you entered $value")
+                throw Error("World index start at 1; you've entered $value")
 
             printdbg(this, "Creation of new world with index $value, called by:")
             Thread.currentThread().stackTrace.forEach {
@@ -46,16 +47,11 @@ open class GameWorld {
     val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
-    @TEMzPayload("WALL", TEMzPayload.EIGHT_MSB)
-    val layerWall: MapLayer
+    @TEMzPayload("WALL", TEMzPayload.TWELVE_BITS_LITTLE)
+    val layerWall: BlockLayer
     @TEMzPayload("TERR", TEMzPayload.EIGHT_MSB)
-    val layerTerrain: MapLayer
+    val layerTerrain: BlockLayer
     //val layerWire: MapLayer
-
-    @TEMzPayload("WALL", TEMzPayload.FOUR_LSB)
-    val layerWallLowBits: PairedMapLayer
-    @TEMzPayload("TERR", TEMzPayload.FOUR_LSB)
-    val layerTerrainLowBits: PairedMapLayer
 
     //val layerThermal: MapLayerHalfFloat // in Kelvins
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
@@ -108,11 +104,9 @@ open class GameWorld {
         this.spawnX = width / 2
         this.spawnY = 200
 
-        layerTerrain = MapLayer(width, height)
-        layerWall = MapLayer(width, height)
+        layerTerrain = BlockLayer(width, height)
+        layerWall = BlockLayer(width, height)
         //layerWire = MapLayer(width, height)
-        layerTerrainLowBits = PairedMapLayer(width, height)
-        layerWallLowBits = PairedMapLayer(width, height)
 
         wallDamages = HashMap()
         terrainDamages = HashMap()
@@ -140,8 +134,6 @@ open class GameWorld {
         layerTerrain = layerData.layerTerrain
         layerWall = layerData.layerWall
         //layerWire = layerData.layerWire
-        layerTerrainLowBits = layerData.layerTerrainLowBits
-        layerWallLowBits = layerData.layerWallLowBits
 
         wallDamages = layerData.wallDamages
         terrainDamages = layerData.terrainDamages
@@ -163,23 +155,6 @@ open class GameWorld {
         this.totalPlayTime = totalPlayTime
     }
 
-
-    /**
-     * Get 2d array data of terrain
-
-     * @return byte[][] terrain layer
-     */
-    val terrainArray: ByteArray
-        get() = layerTerrain.data
-
-    /**
-     * Get 2d array data of wall
-
-     * @return byte[][] wall layer
-     */
-    val wallArray: ByteArray
-        get() = layerWall.data
-
     /**
      * Get 2d array data of wire
 
@@ -190,34 +165,18 @@ open class GameWorld {
 
     private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
-    fun getTileFromWall(x: Int, y: Int): Int? {
+    fun getTileFromWall(x: Int, y: Int): Int {
         val (x, y) = coerceXY(x, y)
-        val wall: Int? = layerWall.getTile(x, y)
-        val wallDamage: Int? = getWallLowBits(x, y)
-        return if (wall == null || wallDamage == null)
-            null
-        else
-            wall * PairedMapLayer.RANGE + wallDamage
+        if (y !in 0 until height) throw Error("Y coord out of world boundary: $y")
+
+        return layerWall.unsafeGetTile(x, y)
     }
 
-    fun getTileFromTerrain(x: Int, y: Int): Int? {
+    fun getTileFromTerrain(x: Int, y: Int): Int {
         val (x, y) = coerceXY(x, y)
-        val terrain: Int? = layerTerrain.getTile(x, y)
-        val terrainDamage: Int? = getTerrainLowBits(x, y)
-        return if (terrain == null || terrainDamage == null)
-            null
-        else
-            terrain * PairedMapLayer.RANGE + terrainDamage
-    }
+        if (y !in 0 until height) throw Error("Y coord out of world boundary: $y")
 
-    private fun getWallLowBits(x: Int, y: Int): Int? {
-        val (x, y) = coerceXY(x, y)
-        return layerWallLowBits.getData(x, y)
-    }
-
-    private fun getTerrainLowBits(x: Int, y: Int): Int? {
-        val (x, y) = coerceXY(x, y)
-        return layerTerrainLowBits.getData(x, y)
+        return layerTerrain.unsafeGetTile(x, y)
     }
 
     /**
@@ -233,12 +192,10 @@ open class GameWorld {
         val tilenum = tilenum % TILES_SUPPORTED // does work without this, but to be safe...
 
         val oldWall = getTileFromWall(x, y)
-        layerWall.setTile(x, y, (tilenum / PairedMapLayer.RANGE).toByte())
-        layerWallLowBits.setData(x, y, tilenum % PairedMapLayer.RANGE)
+        layerWall.unsafeSetTile(x, y, tilenum)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
 
-        if (oldWall != null)
-            Terrarum.ingame?.queueWallChangedEvent(oldWall, tilenum, LandUtil.getBlockAddr(this, x, y))
+        Terrarum.ingame?.queueWallChangedEvent(oldWall, tilenum, LandUtil.getBlockAddr(this, x, y))
     }
 
     /**
@@ -256,8 +213,7 @@ open class GameWorld {
         val (x, y) = coerceXY(x, y)
 
         val oldTerrain = getTileFromTerrain(x, y)
-        layerTerrain.setTile(x, y, (tilenum / PairedMapLayer.RANGE).toByte())
-        layerTerrainLowBits.setData(x, y, tilenum % PairedMapLayer.RANGE)
+        layerTerrain.unsafeSetTile(x, y, tilenum)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         terrainDamages.remove(blockAddr)
 
@@ -267,8 +223,7 @@ open class GameWorld {
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
-        if (oldTerrain != null)
-            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tilenum, LandUtil.getBlockAddr(this, x, y))
+        Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tilenum, LandUtil.getBlockAddr(this, x, y))
     }
 
     /*fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -506,16 +461,19 @@ open class GameWorld {
         return null
     }
 
+    override fun dispose() {
+        layerWall.dispose()
+        layerTerrain.dispose()
+    }
 
     companion object {
-        @Transient val WALL = 0
-        @Transient val TERRAIN = 1
-        @Transient val WIRE = 2
+        @Transient const val WALL = 0
+        @Transient const val TERRAIN = 1
+        @Transient const val WIRE = 2
 
-        /** 4096 */
-        @Transient val TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE
-        @Transient val SIZEOF: Byte = MapLayer.SIZEOF
-        @Transient val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
+        @Transient const val TILES_SUPPORTED = 4096
+        //@Transient val SIZEOF: Byte = 2
+        @Transient const val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
 
         fun makeNullWorld() = GameWorld(1, 1, 1, 0, 0, 0)
     }
@@ -547,5 +505,6 @@ annotation class TEMzPayload(val payloadName: String, val arg: Int) {
         const val INT48_FLOAT_PAIR = 2
         const val INT48_SHORT_PAIR = 3
         const val INT48_INT_PAIR = 4
+        const val TWELVE_BITS_LITTLE = 5
     }
 }

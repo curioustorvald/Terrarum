@@ -101,15 +101,23 @@ internal object WriteLayerDataLzma {
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        Lzma.compress(ByteArrayInputStream(world.terrainArray), outputStream)
-        Lzma.compress(ByteArrayInputStream(world.layerTerrainLowBits.data), outputStream)
+        world.layerTerrain.bytesIterator().forEach {
+            val tempByteArray = ByteArray(1)
+            tempByteArray[0] = it
+            val tempByteArrayStream = ByteArrayInputStream(tempByteArray)
+            Lzma.compress(tempByteArrayStream, outputStream)
+        }
         wb(PAYLOAD_FOOTER)
 
         // WALL payload
         wb(PAYLOAD_HEADER); wb("WALL".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        Lzma.compress(ByteArrayInputStream(world.wallArray), outputStream)
-        Lzma.compress(ByteArrayInputStream(world.layerWallLowBits.data), outputStream)
+        world.layerWall.bytesIterator().forEach {
+            val tempByteArray = ByteArray(1)
+            tempByteArray[0] = it
+            val tempByteArrayStream = ByteArrayInputStream(tempByteArray)
+            Lzma.compress(tempByteArrayStream, outputStream)
+        }
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload

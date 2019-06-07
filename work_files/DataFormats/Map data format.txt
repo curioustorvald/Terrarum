@@ -50,14 +50,11 @@ Ord  Hex  Description
 #   "EndPYLd\xFF"  Payload footer  [45, 6E, 64, 50, 59, 4C, 64, FF]
 
 
-Payload "TERR" -- world terrain data, concatenation of MSB and LSB arrays. In Haskell style: Deflate(MSB ++ LSB)
-                  Uncompressed size will be 1.5x of (width * height)
+Payload "TERR" -- world terrain data in Uint16
+                  Uncompressed size will be 2x of (width * height)
 
-Payload "WALL" -- world walls data, concatenation of MSB and LSB arrays. In Haskell style: Deflate(MSB ++ LSB)
-                  Uncompressed size will be 1.5x of (width * height)
-
-Payload "WIRE" -- world wires data
-                  Uncompressed size will be as same as (width * height)
+Payload "WALL" -- world walls data in Unit16
+                  Uncompressed size will be 2x of (width * height)
 
 Payload "TdMG" -- world terrain damage data, array of: (Int48 tileAddress, Float32 damage)
                   Uncompressed size will be arbitrary (multiple of tens)
@@ -71,8 +68,12 @@ Payload "FlTP" -- world fluid types, array of: (Int48 tileAddress, Signed Int16 
 Payload "FlFL" -- world fluid fills, array of: (Int48 tileAddress, Float32 amount)
                   Uncompressed size will be arbitrary (multiple of tens)
                   If the 'amount' < 0.0001f (WorldSimulator.FLUID_MIN_MASS), the entry must be discarded
+
+Payload "WiNt" -- wiring nodes, in JSON format
+
 Payload "CtYP" -- conduit types, array of: (Int48 tileAddress, Uint32 bitarray)
                   can hold 32 different wires simultaneously
+
 Payload "CfL0" -- conduit fills, aka size of liquid/gas packet, array of: (Int48 tileAddress, Float32 fill)
                   CfL0..CfL9, CfLa..CfLf are available to store values for 16 different things.
 

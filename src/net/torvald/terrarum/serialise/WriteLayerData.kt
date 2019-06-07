@@ -1,27 +1,21 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.gameworld.GameWorld
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.charset.Charset
-import java.util.zip.GZIPOutputStream
-
 /**
  * TODO this one does not use TerranVirtualDisk
  *
  * Created by minjaesong on 2016-03-18.
  */
 // internal for everything: prevent malicious module from messing up the savedata
-@Deprecated("TEMD is deprecated format; use TEMz which does compression")
+@Deprecated("TEMD is old and removed format; use TEMz which does compression")
 internal object WriteLayerData {
+
+    init {
+        throw Error("TEMD is old and removed format; use TEMz which does compression")
+    }
 
     val LAYERS_FILENAME = "worldinfo1"
 
-    val MAGIC = "TEMD".toByteArray(charset = Charset.forName("US-ASCII"))
+    /*val MAGIC = "TEMD".toByteArray(charset = Charset.forName("US-ASCII"))
 
     val BYTE_NULL: Byte = 0
 
@@ -83,7 +77,7 @@ internal object WriteLayerData {
         }
 
         return false
-    }
+    }*/
 
 
 }
