@@ -16,6 +16,7 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         unsafe = unsafeConstructor.newInstance()
     }
     private var unsafeArrayInitialised = false
+    private var unsafeArrayDestroyed = false
 
     private var layerPtr = unsafe.allocateMemory(width * height * BYTES_PER_BLOCK.toLong())
 
@@ -135,8 +136,11 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
 
     override fun dispose() {
-        unsafe.freeMemory(layerPtr)
-        printdbg(this, "BlockLayer successfully freed")
+        if (!unsafeArrayDestroyed) {
+            unsafe.freeMemory(layerPtr)
+            unsafeArrayDestroyed = true
+            printdbg(this, "BlockLayer successfully freed")
+        }
     }
 
     companion object {
