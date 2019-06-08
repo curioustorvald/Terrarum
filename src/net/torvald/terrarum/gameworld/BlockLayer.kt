@@ -38,7 +38,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
      * TL;DR: LITTLE ENDIAN PLEASE
      */
     constructor(width: Int, height: Int, data: ByteArray) : this(width, height) {
-        unsafe.allocateMemory(width * height * BYTES_PER_BLOCK.toLong())
         data.forEachIndexed { index, byte -> unsafe.putByte(layerPtr + index, byte) }
         unsafeArrayInitialised = true
     }

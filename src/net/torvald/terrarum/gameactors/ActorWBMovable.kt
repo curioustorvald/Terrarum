@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
@@ -7,6 +9,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -1354,25 +1357,33 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
-            //if (!KeyToggler.isOn(Input.Keys.F12)) {
-                BlendMode.resolve(drawMode, batch)
-                drawSpriteInGoodPosition(sprite!!, batch)
-            /*}
-            // ye olde tilewiseposition debugger, we don't use it anymore.
-            else {
-                batch.color = Color.NAVY
-                val hb = intTilewiseHitbox
+            BlendMode.resolve(drawMode, batch)
+            drawSpriteInGoodPosition(sprite!!, batch)
+        }
 
-                batch.fillRect(
-                        hb.startX.toFloat() * TILE_SIZE,
-                        hb.startY.toFloat() * TILE_SIZE,
-                        hb.width.toFloat() * TILE_SIZE,
-                        hb.height.toFloat() * TILE_SIZE
-                )
+        // debug display of hIntTilewiseHitbox
+        if (KeyToggler.isOn(Input.Keys.F9)) {
+            val blockMark = AppLoader.resourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
-                batch.color = Color.VIOLET
-                batch.fillRect(hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
-            }*/
+            batch.color = Color.MAGENTA
+            for (y in 0 until intTilewiseHitbox.height.toInt()) {
+                for (x in 0 until intTilewiseHitbox.width.toInt()) {
+                    batch.draw(blockMark,
+                            (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
+                            (intTilewiseHitbox.startY.toFloat() * y) * TILE_SIZEF
+                    )
+                }
+            }
+
+            batch.color = Color.YELLOW
+            for (y in 0 until hIntTilewiseHitbox.height.toInt()) {
+                for (x in 0 until hIntTilewiseHitbox.width.toInt()) {
+                    batch.draw(blockMark,
+                            (hIntTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
+                            (hIntTilewiseHitbox.startY.toFloat() * y) * TILE_SIZEF
+                    )
+                }
+            }
         }
     }
 
