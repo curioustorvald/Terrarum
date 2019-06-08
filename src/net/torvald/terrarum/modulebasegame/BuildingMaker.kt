@@ -30,7 +30,6 @@ import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.File
 import java.io.FileOutputStream
 
@@ -134,7 +133,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val selection = ArrayList<Point2i>()
 
-    val blockMarkings = TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16)
+    val blockMarkings = AppLoader.resourcePool.getAsTextureRegionPack("blockmarkings_common")
     internal var showSelection = true
     val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 

@@ -291,6 +291,7 @@ public class AppLoader implements ApplicationListener {
     @Override
     public void create() {
         resourcePool = CommonResourcePool.INSTANCE;
+        resourcePool.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
 
         newTempFile("wenquanyi.tga"); // temp file required by the font
 
@@ -622,7 +623,7 @@ public class AppLoader implements ApplicationListener {
 
 
     private void setCameraPosition(float newX, float newY) {
-        camera.position.set((-newX + appConfig.width / 2), (-newY + appConfig.height / 2), 0f);
+        camera.position.set((-newX + appConfig.width / 2), (-newY + appConfig.height / 2), 0f); // deliberate integer division
         camera.update();
         logoBatch.setProjectionMatrix(camera.combined);
     }
