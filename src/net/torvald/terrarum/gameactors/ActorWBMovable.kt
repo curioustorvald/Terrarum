@@ -1365,25 +1365,17 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         if (KeyToggler.isOn(Input.Keys.F9)) {
             val blockMark = AppLoader.resourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
-            batch.color = Color.MAGENTA
-            for (y in 0 until intTilewiseHitbox.height.toInt()) {
-                for (x in 0 until intTilewiseHitbox.width.toInt()) {
+            batch.color = HITBOX_COLOURS[0]
+            for (y in 0..intTilewiseHitbox.height.toInt()) {
+                for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
                             (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
-                            (intTilewiseHitbox.startY.toFloat() * y) * TILE_SIZEF
+                            (intTilewiseHitbox.startY.toFloat() + y) * TILE_SIZEF
                     )
                 }
             }
 
-            batch.color = Color.YELLOW
-            for (y in 0 until hIntTilewiseHitbox.height.toInt()) {
-                for (x in 0 until hIntTilewiseHitbox.width.toInt()) {
-                    batch.draw(blockMark,
-                            (hIntTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
-                            (hIntTilewiseHitbox.startY.toFloat() * y) * TILE_SIZEF
-                    )
-                }
-            }
+            //println(intTilewiseHitbox)
         }
     }
 
@@ -1653,6 +1645,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         private fun clampCeil(x: Double, ceil: Double): Double {
             return if (Math.abs(x) > ceil) ceil else x
         }
+
+        @Transient private val HITBOX_COLOURS = arrayOf(Color(0xFF00FF88.toInt()), Color(0xFFFF0088.toInt()))
     }
 
     // gameplay-related actorvalue macros
