@@ -28,6 +28,7 @@ object BlockBase {
         // check for collision with actors (BLOCK only)
         // FIXME properly fix the collision detection: it OVERRIDES the tiki-torches which should not happen AT ALL
         // FIXME (h)IntTilewiseHitbox is badly defined
+        // FIXME    actually it's this code: not recognising hitbox's starting point correctly. Use F9 for visualisation
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
             var ret1 = true
             ingame.actorContainerActive.forEach {
