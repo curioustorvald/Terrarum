@@ -18,10 +18,12 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         unsafeConstructor.isAccessible = true
         unsafe = unsafeConstructor.newInstance()
     }
-    private var unsafeArrayInitialised = false
     private var unsafeArrayDestroyed = false
 
     private var layerPtr = unsafe.allocateMemory(width * height * BYTES_PER_BLOCK.toLong())
+    init {
+        unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0) // sometimes does not work?!
+    }
 
     /**
      * @param data Byte array representation of the layer, where:
@@ -39,18 +41,8 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
      */
     constructor(width: Int, height: Int, data: ByteArray) : this(width, height) {
         data.forEachIndexed { index, byte -> unsafe.putByte(layerPtr + index, byte) }
-        unsafeArrayInitialised = true
     }
 
-    init {
-        if (!unsafeArrayInitialised) {
-            //unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0) // sometimes does not work?!
-            for (i in 0 until width * height * BYTES_PER_BLOCK.toLong()) {
-                unsafe.putByte(layerPtr + i, 0)
-            }
-            unsafeArrayInitialised = true
-        }
-    }
 
     /**
      * Returns an iterator over blocks of type `Int`.
