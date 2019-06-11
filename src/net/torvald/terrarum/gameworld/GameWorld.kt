@@ -475,7 +475,14 @@ open class GameWorld : Disposable {
         //@Transient val SIZEOF: Byte = 2
         @Transient const val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
 
-        fun makeNullWorld() = GameWorld(1, 1, 1, 0, 0, 0)
+        @Transient private var nullWorldInstance: GameWorld? = null
+
+        fun makeNullWorld(): GameWorld {
+            if (nullWorldInstance == null)
+                nullWorldInstance = GameWorld(1, 1, 1, 0, 0, 0)
+
+            return nullWorldInstance!!
+        }
     }
 }
 

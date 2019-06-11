@@ -25,6 +25,7 @@ import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
+import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.Ingame;
 import net.torvald.terrarum.utils.JsonFetcher;
@@ -545,6 +546,8 @@ public class AppLoader implements ApplicationListener {
         disposableSingletonsPool.forEach(Disposable::dispose);
 
         ModMgr.INSTANCE.disposeMods();
+
+        GameWorld.Companion.makeNullWorld().dispose();
 
         deleteTempfiles();
     }
