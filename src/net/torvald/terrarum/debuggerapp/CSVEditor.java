@@ -28,7 +28,7 @@ import java.util.Properties;
 public class CSVEditor extends JFrame {
 
     /** Default columns. When you open existing csv, it should overwrite this. */
-    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "fall", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs"};
+    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs"};
     private final int FOUR_DIGIT = 42;
     private final int SIX_DIGIT = 50;
     private final int TWO_DIGIT = 30;
@@ -496,7 +496,7 @@ public class CSVEditor extends JFrame {
                     "solid=Whether the file has full collision\n" +
                     "plat=Whether the block should behave like a platform\n" +
                     "wall=Whether the block can be used as a wall\n" +
-                    "fall=Whether the block should fall through the empty space\n" +
+                    "grav=Whether the block should fall through the empty space. N/A to not make it fall; 0 to fall immediately (e.g. Sand), nonzero to indicate that number of floating blocks can be supported (e.g. Scaffolding)\n" +
                     "dlfn=Dynamic Light Function. 0=Static. Please see <strong>notes</strong>\n" +
                     "fv=Vertical friction when player slide on the cliff. 0 means not slide-able\n" +
                     "fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky\n" +

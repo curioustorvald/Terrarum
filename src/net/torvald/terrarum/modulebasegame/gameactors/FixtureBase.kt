@@ -80,10 +80,8 @@ open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = B
         // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
 
-        val posXoff = (TSIZE % (this.sprite?.cellWidth ?: 0)) / 2
-
         this.isVisible = true
-        this.hitbox.setFromWidthHeight(posX * TSIZE + posXoff, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
+        this.hitbox.setFromWidthHeight(posX * TSIZE, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
 
         // actually add this actor into the world
         Terrarum.ingame!!.addNewActor(this)

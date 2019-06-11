@@ -46,7 +46,7 @@ class BlockProp {
 
     var drop: Int = 0
 
-    var isFallable: Boolean = false
+    var maxSupport: Int? = null
 
     var friction: Int = 0
 

@@ -44,7 +44,10 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
     init {
         if (!unsafeArrayInitialised) {
-            unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0)
+            //unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0) // sometimes does not work?!
+            for (i in 0 until width * height * BYTES_PER_BLOCK.toLong()) {
+                unsafe.putByte(layerPtr + i, 0)
+            }
             unsafeArrayInitialised = true
         }
     }

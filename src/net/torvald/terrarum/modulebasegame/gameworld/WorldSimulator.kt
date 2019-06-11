@@ -254,7 +254,7 @@ object WorldSimulator {
                 val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
                 val tileBelow = world.getTileFromTerrain(x, y + 1) ?: Block.STONE
 
-                if (tile.isFallable()) {
+                if (tile.maxSupport()) {
                     // displace fluid. This statement must precede isSolid()
                     if (tileBelow.isFluid()) {
                         // remove tileThis to create air pocket
@@ -316,7 +316,7 @@ object WorldSimulator {
     }
 
 
-    fun Int.isFallable() = BlockCodex[this].isFallable
+    fun Int.isFallable() = BlockCodex[this].maxSupport
 
 
 

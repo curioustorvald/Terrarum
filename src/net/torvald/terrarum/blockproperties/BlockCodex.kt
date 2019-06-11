@@ -128,7 +128,7 @@ object BlockCodex {
         //prop.isClear = boolVal(record, "clear")
         prop.isPlatform = boolVal(record, "plat")
         prop.isWallable = boolVal(record, "wall")
-        prop.isFallable = boolVal(record, "fall")
+        prop.maxSupport = intVal(record, "grav")
         prop.isVertFriction = boolVal(record, "fv")
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
