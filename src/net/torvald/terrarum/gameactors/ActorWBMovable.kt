@@ -67,30 +67,30 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // Hitbox is implemented using Double;
 
     /** half integer tilewise hitbox.
-     * May hold width/height of zero; the end point should be inclusive!
+     * Used by physics-related shits.
      *
      * e.g. USE `for (x in hitbox.startX..hitbox.endX)`, NOT `for (x in hitbox.startX until hitbox.endX)`
      */ // got the idea from gl_FragCoord
     val hIntTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.startY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.startX.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
+                hitbox.startY.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
+                hitbox.endX.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
+                hitbox.endY.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
                 true
         )
 
 
-    /** May hold width/height of zero; the end point should be inclusive!
+    /** Used by non-physics shits. (e.g. BlockBase determining "occupied" blocks)
      *
      * e.g. USE `for (x in hitbox.startX..hitbox.endX)`, NOT `for (x in hitbox.startX until hitbox.endX)`
      */
     val intTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.plus(0.00001f).div(TILE_SIZE).floor(),
-                hitbox.startY.plus(0.00001f).div(TILE_SIZE).floor(),
-                hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor(),
-                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor(),
+                hitbox.startX.div(TILE_SIZE).floor(),
+                hitbox.startY.div(TILE_SIZE).floor(),
+                hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
+                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
                 true
         )
 
@@ -1365,7 +1365,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         if (KeyToggler.isOn(Input.Keys.F9)) {
             val blockMark = AppLoader.resourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
-            batch.color = HITBOX_COLOURS[0]
+            batch.color = HITBOX_COLOURS0
             for (y in 0..intTilewiseHitbox.height.toInt()) {
                 for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
@@ -1646,7 +1646,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             return if (Math.abs(x) > ceil) ceil else x
         }
 
-        @Transient private val HITBOX_COLOURS = arrayOf(Color(0xFF00FF88.toInt()), Color(0xFFFF0088.toInt()))
+        @Transient private val HITBOX_COLOURS0 = Color(0xFF00FF88.toInt())
+        @Transient private val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
     }
 
     // gameplay-related actorvalue macros

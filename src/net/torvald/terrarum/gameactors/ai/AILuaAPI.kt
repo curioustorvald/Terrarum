@@ -226,7 +226,7 @@ import org.luaj.vm2.LuaValue
                         val tile = BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(x, y) ?: Block.NULL]
                         val solidity = tile.isSolid.toInt()
                         val liquidity = tile.isFluid.toInt()
-                        val gravity = tile.isFallable.toInt()
+                        val gravity = tile.maxSupport.toInt()
                         val tileFlag: Int = gravity.shl(2) + liquidity.shl(1) + solidity
 
                         luatable[y - feetTilePos[1]][x - feetTilePos[0]] = tileFlag.toLua()

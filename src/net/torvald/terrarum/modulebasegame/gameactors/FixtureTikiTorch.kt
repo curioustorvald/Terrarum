@@ -26,10 +26,10 @@ internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1,
     init {
         density = 1200.0
 
-        setHitboxDimension(10, 24, 0, 0)
+        setHitboxDimension(16, 32, 0, 0)
 
         lightBoxList = ArrayList(1)
-        lightBoxList.add(Hitbox(3.0, 0.0, 4.0, 3.0))
+        lightBoxList.add(Hitbox(6.0, 5.0, 4.0, 3.0))
 
         makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 10, 27))
         sprite!!.setRowsAndFrames(1, 1)
