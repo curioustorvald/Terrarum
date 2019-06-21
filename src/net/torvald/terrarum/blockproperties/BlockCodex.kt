@@ -93,7 +93,7 @@ object BlockCodex {
         }
     }
 
-    fun getOrNull(rawIndex: Int?): BlockProp? {
+    fun getOrNull(rawIndex: Int?): BlockProp? {//<O>
         return blockProps[rawIndex]
     }
 

@@ -464,6 +464,7 @@ open class GameWorld : Disposable {
     override fun dispose() {
         layerWall.dispose()
         layerTerrain.dispose()
+        //nullWorldInstance?.dispose() // must be called ONLY ONCE; preferably when the app exits
     }
 
     companion object {

@@ -13,7 +13,6 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
-import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILES_IN_X
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
@@ -98,7 +97,7 @@ internal object BlocksDrawer {
         printdbg(this, "Making terrain textures...")
 
         CreateTileAtlas()
-        JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
+        //JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
         // each takes about 60 seconds
         //printdbg(this, "Writing pixmap as tga: atlas.tga")
         //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), CreateTileAtlas.atlas, false)

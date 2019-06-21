@@ -1,6 +1,5 @@
 package net.torvald.terrarum.concurrent
 
-import net.torvald.terrarum.Terrarum
 import kotlin.math.absoluteValue
 
 typealias RunnableFun = () -> Unit
@@ -11,7 +10,7 @@ typealias ThreadableFun = (Int) -> Unit
  * Created by minjaesong on 2016-05-25.
  */
 object ThreadParallel {
-    val threadCount = Terrarum.THREADS // modify this to your taste
+    val threadCount = Runtime.getRuntime().availableProcessors() + 1 // modify this to your taste
 
     private val pool: Array<Thread?> = Array(threadCount) { null }
 
@@ -49,6 +48,7 @@ object ThreadParallel {
      * Start all thread in the pool and wait for them to all die. If the thread in the pool is NULL, it will simply ignored.
      */
     fun startAllWaitForDie() {
+        // ThreadParallelTester says this function actually works as intended...
         pool.forEach { it?.start() }
         pool.forEach { it?.join() }
     }
@@ -69,7 +69,7 @@ object ThreadParallel {
  */
 @Deprecated("Experimental.", ReplaceWith("ThreadParallel", "net.torvald.terrarum.concurrent.ThreadParallel"))
 object BlockingThreadPool {
-    val threadCount = Terrarum.THREADS // modify this to your taste
+    val threadCount = Runtime.getRuntime().availableProcessors() + 1 // modify this to your taste
     private val pool: Array<Thread?> = Array(threadCount, { null })
     private var tasks: List<RunnableFun> = ArrayList<RunnableFun>()
     @Volatile private var dispatchedTasks = 0
@@ -127,85 +127,84 @@ object BlockingThreadPool {
     }
 }
 
-object ParallelUtils {
-    fun <T, R> Iterable<T>.parallelMap(transform: (T) -> R): List<R> {
-        val tasks = this.sliceEvenly(ThreadParallel.threadCount)
-        val destination = Array(ThreadParallel.threadCount) { ArrayList<R>() }
-        tasks.forEachIndexed { index, list ->
-            ThreadParallel.map(index, "ParallelUtils.parallelMap@${this.javaClass.canonicalName}") {
-                for (item in list)
-                    destination[index].add(transform(item as T))
-            }
-        }
 
-        ThreadParallel.startAllWaitForDie()
-
-        return destination.flatten()
-    }
-
-    /**
-     * Shallow flat of the array
-     */
-    fun <T> Array<out Iterable<T>>.flatten(): List<T> {
-        val al = ArrayList<T>()
-        this.forEach { it.forEach { al.add(it) } }
-        return al
-    }
-
-    /**
-     * Shallow flat of the iterable
-     */
-    fun <T> Iterable<out Iterable<T>>.flatten(): List<T> {
-        val al = ArrayList<T>()
-        this.forEach { it.forEach { al.add(it) } }
-        return al
-    }
-
-    /**
-     * Shallow flat of the array
-     */
-    fun <T> Array<out Array<T>>.flatten(): List<T> {
-        val al = ArrayList<T>()
-        this.forEach { it.forEach { al.add(it) } }
-        return al
-    }
-
-    fun <T> Iterable<T>.sliceEvenly(slices: Int): List<List<T>> = this.toList().sliceEvenly(slices)
-
-    fun <T> List<T>.sliceEvenly(slices: Int): List<List<T>> {
-        return (0 until slices).map {
-            this.subList(
-                    this.size.toFloat().div(slices).times(it).roundInt(),
-                    this.size.toFloat().div(slices).times(it + 1).roundInt()
-            )
+fun <T, R> Iterable<T>.parallelMap(transform: (T) -> R): List<R> {
+    val tasks = this.sliceEvenly(ThreadParallel.threadCount)
+    val destination = Array(ThreadParallel.threadCount) { ArrayList<R>() }
+    tasks.forEachIndexed { index, list ->
+        ThreadParallel.map(index, "ParallelUtils.parallelMap@${this.javaClass.canonicalName}") {
+            for (item in list)
+                destination[index].add(transform(item as T))
         }
     }
 
-    fun <T> Array<T>.sliceEvenly(slices: Int): List<Array<T>> {
-        return (0 until slices).map {
-            this.sliceArray(
-                    this.size.toFloat().div(slices).times(it).roundInt() until
-                            this.size.toFloat().div(slices).times(it + 1).roundInt()
-            )
-        }
-    }
+    ThreadParallel.startAllWaitForDie()
 
-    fun IntProgression.sliceEvenly(slices: Int): List<IntProgression> {
-        if (this.step.absoluteValue != 1) throw UnsupportedOperationException("Sorry, step != +1/-1")
-        val size = (this.last - this.first).absoluteValue + (this.step.toFloat()).absoluteValue
-
-        // println(size)
-
-        return if (this.first < this.last) (0 until slices).map {
-            this.first + size.div(slices).times(it).roundInt() ..
-                    this.first + size.div(slices).times(it + 1).roundInt() - 1
-        }
-        else (0 until slices).map {
-            this.first - size.div(slices).times(it).roundInt() downTo
-                    this.first - size.div(slices).times(it + 1).roundInt() + 1
-        }
-    }
-
-
-    private inline fun Float.roundInt(): Int = Math.round(this)
+    return destination.flatten()
 }
+
+/**
+ * Shallow flat of the array
+ */
+fun <T> Array<out Iterable<T>>.flatten(): List<T> {
+    val al = ArrayList<T>()
+    this.forEach { it.forEach { al.add(it) } }
+    return al
+}
+
+/**
+ * Shallow flat of the iterable
+ */
+fun <T> Iterable<out Iterable<T>>.flatten(): List<T> {
+    val al = ArrayList<T>()
+    this.forEach { it.forEach { al.add(it) } }
+    return al
+}
+
+/**
+ * Shallow flat of the array
+ */
+fun <T> Array<out Array<T>>.flatten(): List<T> {
+    val al = ArrayList<T>()
+    this.forEach { it.forEach { al.add(it) } }
+    return al
+}
+
+fun <T> Iterable<T>.sliceEvenly(slices: Int): List<List<T>> = this.toList().sliceEvenly(slices)
+
+fun <T> List<T>.sliceEvenly(slices: Int): List<List<T>> {
+    return (0 until slices).map {
+        this.subList(
+                this.size.toFloat().div(slices).times(it).roundInt(),
+                this.size.toFloat().div(slices).times(it + 1).roundInt()
+        )
+    }
+}
+
+fun <T> Array<T>.sliceEvenly(slices: Int): List<Array<T>> {
+    return (0 until slices).map {
+        this.sliceArray(
+                this.size.toFloat().div(slices).times(it).roundInt() until
+                        this.size.toFloat().div(slices).times(it + 1).roundInt()
+        )
+    }
+}
+
+fun IntProgression.sliceEvenly(slices: Int): List<IntProgression> {
+    if (this.step.absoluteValue != 1) throw UnsupportedOperationException("Sorry, step != +1/-1")
+    val size = (this.last - this.first).absoluteValue + (this.step.toFloat()).absoluteValue
+
+    // println(size)
+
+    return if (this.first < this.last) (0 until slices).map {
+        this.first + size.div(slices).times(it).roundInt() ..
+                this.first + size.div(slices).times(it + 1).roundInt() - 1
+    }
+    else (0 until slices).map {
+        this.first - size.div(slices).times(it).roundInt() downTo
+                this.first - size.div(slices).times(it + 1).roundInt() + 1
+    }
+}
+
+
+private inline fun Float.roundInt(): Int = Math.round(this)

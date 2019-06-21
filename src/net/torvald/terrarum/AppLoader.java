@@ -125,10 +125,10 @@ public class AppLoader implements ApplicationListener {
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
     public static final String systemArch = System.getProperty("os.arch");
-    public static String processor;
-    public static String processorVendor;
-    public static String renderer;
-    public static String rendererVendor;
+    public static String processor = "(a super-duper virtual processor)";
+    public static String processorVendor = "(andromeda software development)"; // definitely not taken from "that" demogroup
+    public static String renderer = "(a super-fancy virtual photoradiator)";
+    public static String rendererVendor = "(radiosity)";
 
     public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
 
@@ -610,15 +610,14 @@ public class AppLoader implements ApplicationListener {
         if (injectScreen != null) {
             setScreen(injectScreen);
         }
+        else {
+            ModMgr.INSTANCE.invoke(); // invoke Module Manager
+            AppLoader.resourcePool.loadAll();
+            printdbg(this, "all modules loaded successfully");
 
-
-        ModMgr.INSTANCE.invoke(); // invoke Module Manager
-        AppLoader.resourcePool.loadAll();
-        printdbg(this, "all modules loaded successfully");
-
-
-        BlocksDrawer.INSTANCE.getWorld(); // will initialize the BlocksDrawer by calling dummy method
-        LightmapRenderer.INSTANCE.hdr(0f);
+            BlocksDrawer.INSTANCE.getWorld(); // will initialize the BlocksDrawer by calling dummy method
+            LightmapRenderer.INSTANCE.hdr(0f);
+        }
 
 
         printdbg(this, "PostInit done");
