@@ -11,7 +11,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
+import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -400,7 +400,15 @@ object LightmapRenderer {
     }
 
     private fun buildNoopMask() {
-        fun isShaded(x: Int, y: Int) = BlockCodex[world.getTileFromTerrain(x, y) ?: Block.STONE].isSolid
+        fun isShaded(x: Int, y: Int) = try {
+            BlockCodex[world.getTileFromTerrain(x, y)].isSolid
+        }
+        catch (e: NullPointerException) {
+            System.err.println("Invalid block id ${world.getTileFromTerrain(x, y)} from coord ($x, $y)")
+            e.printStackTrace()
+
+            false
+        }
 
         /*
         update ordering: clockwise snake

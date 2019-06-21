@@ -20,33 +20,33 @@ class UITestPad1 : ScreenAdapter() {
 
     val treeStr = """
 - File
- - New : Ctrl-N
- - Open : Ctrl-O
+ - New
+ - Open
  - Open Recent
   - yaml_example.yaml
   - Yaml.kt
- - Close : Ctrl-W
+ - Close
  - Settings
  - Line Separators
   - CRLF
   - CR
   - LF
 - Edit
- - Undo : Ctrl-Z
- - Redo : Shift-Ctrl-Z
- - Cut : Ctrl-X
- - Copy : Ctrl-C
- - Paste : Ctrl-V
+ - Undo
+ - Redo
+ - Cut
+ - Copy
+ - Paste
  - Find
-  - Find : Ctrl-F
-  - Replace : Shift-Ctrl-F
+  - Find
+  - Replace
  - Convert Indents
   - To Spaces
    - Set Project Indentation
   - To Tabs
 - Refactor
  - Refactor This
- - Rename : Shift-Ctrl-R
+ - Rename
  - Extract
   - Variable
   - Property

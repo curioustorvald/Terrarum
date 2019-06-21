@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -166,7 +167,7 @@ object Terrarum : Screen, Disposable {
     val STATE_ID_TOOL_RUMBLE_DIAGNOSIS = 0x201
 
     /** Available CPU threads */
-    val THREADS = Runtime.getRuntime().availableProcessors() + 1
+    val THREADS = ThreadParallel.threadCount //Runtime.getRuntime().availableProcessors() + 1
 
     /**
      * If the game is multithreading.
@@ -196,19 +197,22 @@ object Terrarum : Screen, Disposable {
 
 
     init {
-        println("$NAME version ${AppLoader.getVERSION_STRING()}")
-        println("LibGDX version ${com.badlogic.gdx.Version.VERSION}")
+        println("[Terrarum] init called by:")
+        Thread.currentThread().stackTrace.forEach { println("... $it") }
+
+        println("[Terrarum] $NAME version ${AppLoader.getVERSION_STRING()}")
+        println("[Terrarum] LibGDX version ${com.badlogic.gdx.Version.VERSION}")
 
 
-        println("os.arch = $systemArch") // debug info
+        println("[Terrarum] os.arch = $systemArch") // debug info
 
         if (is32BitJVM) {
             printdbgerr(this, "32 Bit JVM detected")
         }
 
 
-        println("processor = $processor")
-        println("vendor = $processorVendor")
+        println("[Terrarum] processor = $processor")
+        println("[Terrarum] vendor = $processorVendor")
 
 
         setGamepadButtonLabels()
@@ -216,6 +220,9 @@ object Terrarum : Screen, Disposable {
 
         AppLoader.disposableSingletonsPool.add(this)
 
+
+
+        println("[Terrarum] init complete")
     }
 
     private fun setGamepadButtonLabels() {

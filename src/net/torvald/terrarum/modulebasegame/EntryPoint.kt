@@ -86,7 +86,7 @@ class EntryPoint : ModuleEntryPoint() {
 
 
 
-        println("Welcome back!")
+        println("[Basegame.EntryPoint] Welcome back!")
     }
 
     override fun dispose() {

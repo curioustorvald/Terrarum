@@ -52,6 +52,7 @@ object WorldSimulator {
     private val ingame = Terrarum.ingame!!
     private val world = ingame.world
 
+    // TODO use R-Tree instead?  https://stackoverflow.com/questions/10269179/find-rectangles-that-contain-point-efficient-algorithm#10269695
     private var actorsKDTree: KDTree? = null
 
     fun resetForThisFrame() {

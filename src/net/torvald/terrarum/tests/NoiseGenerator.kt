@@ -20,7 +20,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.BlockingThreadPool
-import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
+import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.roundInt
