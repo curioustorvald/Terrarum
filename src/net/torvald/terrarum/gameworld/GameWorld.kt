@@ -165,17 +165,13 @@ open class GameWorld : Disposable {
 
     private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
-    fun getTileFromWall(x: Int, y: Int): Int {
-        val (x, y) = coerceXY(x, y)
-        if (y !in 0 until height) throw Error("Y coord out of world boundary: $y")
-
+    fun getTileFromWall(rawX: Int, rawY: Int): Int {
+        val (x, y) = coerceXY(rawX, rawY)
         return layerWall.unsafeGetTile(x, y)
     }
 
-    fun getTileFromTerrain(x: Int, y: Int): Int {
-        val (x, y) = coerceXY(x, y)
-        if (y !in 0 until height) throw Error("Y coord out of world boundary: $y")
-
+    fun getTileFromTerrain(rawX: Int, rawY: Int): Int {
+        val (x, y) = coerceXY(rawX, rawY)
         return layerTerrain.unsafeGetTile(x, y)
     }
 
