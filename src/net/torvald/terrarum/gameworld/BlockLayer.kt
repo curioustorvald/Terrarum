@@ -22,7 +22,7 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
     private var layerPtr = unsafe.allocateMemory(width * height * BYTES_PER_BLOCK.toLong())
     init {
-        unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0) // sometimes does not work?!
+        unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0) // does reliably fill the memory with zeroes
     }
 
     /**
@@ -89,12 +89,9 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
             }
 
             override fun next(): Byte {
-                val y = iteratorCount / width
-                val x = iteratorCount % width
-                // advance counter
                 iteratorCount += 1
 
-                return unsafe.getByte(layerPtr + 1)
+                return unsafe.getByte(layerPtr + iteratorCount)
             }
         }
     }
