@@ -1,8 +1,8 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.UnsafeHelper
 import net.torvald.terrarum.AppLoader.printdbg
-import java.nio.ByteBuffer
 
 /**
  * Original version Created by minjaesong on 2016-01-17.
@@ -12,23 +12,14 @@ import java.nio.ByteBuffer
  */
 open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
-    private var unsafeArrayDestroyed = false
+    private val ptr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
 
-    /*private val unsafe: Unsafe
-    init {
-        val unsafeConstructor = Unsafe::class.java.getDeclaredConstructor()
-        unsafeConstructor.isAccessible = true
-        unsafe = unsafeConstructor.newInstance()
-    }
-
-    private val layerPtr = unsafe.allocateMemory(width * height * BYTES_PER_BLOCK.toLong())*/
-
-    private val directByteBuffer: ByteBuffer
+    //private val directByteBuffer: ByteBuffer
 
     init {
-        //unsafe.setMemory(layerPtr, width * height * BYTES_PER_BLOCK.toLong(), 0) // does reliably fill the memory with zeroes
+        ptr.fillWith(0)
 
-        directByteBuffer = ByteBuffer.allocateDirect(width * height * BYTES_PER_BLOCK)
+        //directByteBuffer = ByteBuffer.allocateDirect(width * height * BYTES_PER_BLOCK)
     }
 
     /**
@@ -71,13 +62,13 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
                 // advance counter
                 iteratorCount += 2
 
-                val offset = 2 * (y * width + x)
-                //val lsb = unsafe.getByte(layerPtr + offset)
-                val lsb = directByteBuffer[offset]
-                //val msb = unsafe.getByte(layerPtr + offset + 1)
-                val msb = directByteBuffer[offset + 1]
+                val offset = 2L * (y * width + x)
+                val lsb = ptr[offset]
+                //val lsb = directByteBuffer[offset]
+                val msb = ptr[offset + 1]
+                //val msb = directByteBuffer[offset + 1]
 
-                //return data[y * width + x]
+
                 return lsb.toUint() + msb.toUint().shl(8)
             }
         }
@@ -91,7 +82,7 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
     fun bytesIterator(): Iterator<Byte> {
         return object : Iterator<Byte> {
 
-            private var iteratorCount = 0
+            private var iteratorCount = 0L
 
             override fun hasNext(): Boolean {
                 return iteratorCount < width * height
@@ -100,18 +91,18 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
             override fun next(): Byte {
                 iteratorCount += 1
 
-                //return unsafe.getByte(layerPtr + iteratorCount)
-                return directByteBuffer[iteratorCount]
+                return ptr[iteratorCount]
+                //return directByteBuffer[iteratorCount]
             }
         }
     }
 
     internal fun unsafeGetTile(x: Int, y: Int): Int {
         val offset = BYTES_PER_BLOCK * (y * width + x)
-        //val lsb = unsafe.getByte(layerPtr + offset)
-        //val msb = unsafe.getByte(layerPtr + offset + 1)
-        val lsb = directByteBuffer[offset]
-        val msb = directByteBuffer[offset + 1]
+        val lsb = ptr[offset]
+        val msb = ptr[offset + 1]
+        //val lsb = directByteBuffer[offset]
+        //val msb = directByteBuffer[offset + 1]
 
         return lsb.toUint() + msb.toUint().shl(8)
     }
@@ -123,10 +114,10 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         val msb = tile.ushr(8).and(0xff).toByte()
 
 
-        directByteBuffer.put(offset, lsb)
-        directByteBuffer.put(offset + 1, msb)
-        //unsafe.putByte(layerPtr + offset, lsb)
-        //unsafe.putByte(layerPtr + offset + 1, msb)
+        ptr[offset] = lsb
+        ptr[offset + 1] = msb
+        //directByteBuffer.put(offset, lsb)
+        //directByteBuffer.put(offset + 1, msb)
     }
 
     /**
@@ -145,16 +136,15 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
 
     override fun dispose() {
-        if (!unsafeArrayDestroyed) {
-            //unsafe.freeMemory(layerPtr)
-            directByteBuffer.clear()
-            unsafeArrayDestroyed = true
-            printdbg(this, "BlockLayer successfully freed")
-        }
+        ptr.destroy()
+        //directByteBuffer.clear()
+        printdbg(this, "BlockLayer successfully freed")
     }
 
+    internal fun getPtr() = ptr.ptr
+
     companion object {
-        @Transient val BYTES_PER_BLOCK = 2
+        @Transient val BYTES_PER_BLOCK = 2L
     }
 }
 
