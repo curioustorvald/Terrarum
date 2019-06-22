@@ -13,7 +13,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     private inline fun toAddr(x: Int, y: Int) = 16L * (y * width + x)
 
-    fun zerofill() = UnsafeHelper.unsafe.setMemory(this.array.ptr, TOTAL_SIZE_IN_BYTES, 0)
+    fun zerofill() = array.fillWith(0)
 
     init {
         zerofill()

@@ -37,10 +37,10 @@ class UnsafePtr(val ptr: Long, val allocSize: Long) {
     }
 
     private inline fun checkNullPtr(index: Long) {
-        if (destroyed) throw NullPointerException()
+        if (destroyed) throw NullPointerException("The pointer is already destroyed (0x${ptr.toString(16)})")
 
         // OOB Check: debugging purposes only -- comment out for the production
-        //if (index !in 0 until allocSize) throw NullPointerException("Out of bounds: $index; alloc size: $allocSize")
+        //if (index !in 0 until allocSize) throw IndexOutOfBoundsException("Index: $index; alloc size: $allocSize")
     }
 
     operator fun get(index: Long): Byte {
@@ -61,6 +61,10 @@ class UnsafePtr(val ptr: Long, val allocSize: Long) {
     fun setFloat(index: Long, value: Float) {
         checkNullPtr(index)
         UnsafeHelper.unsafe.putFloat(ptr + index, value)
+    }
+
+    fun fillWith(byte: Byte) {
+        UnsafeHelper.unsafe.setMemory(ptr, allocSize, byte)
     }
 
 }

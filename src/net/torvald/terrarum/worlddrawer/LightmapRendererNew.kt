@@ -211,6 +211,12 @@ object LightmapRenderer {
         catch (e: UninitializedPropertyAccessException) {
             return // quit prematurely
         }
+        catch (e: NullPointerException) {
+            System.err.println("[LightmapRendererNew.fireRecalculateEvent] Attempted to refer destroyed unsafe array " +
+                               "(world size: ${world.layerTerrain.width} x ${world.layerTerrain.height}; " +
+                               "ptr: 0x${world.layerTerrain.getPtr().toString(16)})")
+            return
+        }
 
         if (world.worldIndex == -1) return
 
