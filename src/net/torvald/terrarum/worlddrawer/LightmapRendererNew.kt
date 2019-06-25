@@ -39,11 +39,12 @@ object LightmapRenderer {
     private const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
     private var world: GameWorld = GameWorld.makeNullWorld()
+
     private lateinit var lightCalcShader: ShaderProgram
     //private val SHADER_LIGHTING = AppLoader.getConfigBoolean("gpulightcalc")
 
     /** do not call this yourself! Let your game renderer handle this! */
-    fun setWorld(world: GameWorld) {
+    internal fun internalSetWorld(world: GameWorld) {
         try {
             if (this.world != world) {
                 printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
@@ -213,9 +214,9 @@ object LightmapRenderer {
         }
         catch (e: NullPointerException) {
             System.err.println("[LightmapRendererNew.fireRecalculateEvent] Attempted to refer destroyed unsafe array " +
-                               "(world size: ${world.layerTerrain.width} x ${world.layerTerrain.height}; " +
-                               "ptr: 0x${world.layerTerrain.getPtr().toString(16)})")
-            return
+                               "(${world.layerTerrain.getPtr()})")
+            e.printStackTrace()
+            return // something's wrong but we'll ignore it like a trustful AK
         }
 
         if (world.worldIndex == -1) return

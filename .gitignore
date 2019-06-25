@@ -6,6 +6,7 @@ build/*
 
 # Java native errors
 hs_err_pid*
+replay_pid*
 
 # OS files
 Thumbs.db

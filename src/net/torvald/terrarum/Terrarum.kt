@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
@@ -180,14 +179,6 @@ object Terrarum : Screen, Disposable {
 
     const val NAME = AppLoader.GAME_NAME
 
-
-    lateinit var shaderBlur: ShaderProgram
-    lateinit var shaderBayer: ShaderProgram
-    lateinit var shaderSkyboxFill: ShaderProgram
-    lateinit var shaderBlendGlow: ShaderProgram
-    lateinit var shaderRGBOnly: ShaderProgram
-    lateinit var shaderAtoGrey: ShaderProgram
-
     lateinit var testTexture: Texture
 
 
@@ -334,59 +325,6 @@ object Terrarum : Screen, Disposable {
         shapeRender = ShapeRenderer()
 
 
-
-        shaderBlur = AppLoader.loadShader("assets/blur.vert", "assets/blur.frag")
-
-
-        if (getConfigBoolean("fxdither")) {
-            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer.frag")
-            shaderBayer.begin()
-            shaderBayer.setUniformf("rcount", 64f)
-            shaderBayer.setUniformf("gcount", 64f)
-            shaderBayer.setUniformf("bcount", 64f)
-            shaderBayer.end()
-
-            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag")
-            shaderSkyboxFill.begin()
-            shaderSkyboxFill.setUniformf("rcount", 64f)
-            shaderSkyboxFill.setUniformf("gcount", 64f)
-            shaderSkyboxFill.setUniformf("bcount", 64f)
-            shaderSkyboxFill.end()
-        }
-        else {
-            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthrurgb.frag")
-            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/skyboxfill.frag")
-        }
-
-
-        shaderBlendGlow = AppLoader.loadShader("assets/blendGlow.vert", "assets/blendGlow.frag")
-
-        shaderRGBOnly = AppLoader.loadShader("assets/4096.vert", "assets/rgbonly.frag")
-        shaderAtoGrey = AppLoader.loadShader("assets/4096.vert", "assets/aonly.frag")
-
-
-        if (!shaderBlendGlow.isCompiled) {
-            Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
-            System.exit(1)
-        }
-
-
-        if (getConfigBoolean("fxdither")) {
-            if (!shaderBayer.isCompiled) {
-                Gdx.app.log("shaderBayer", shaderBayer.log)
-                System.exit(1)
-            }
-
-            if (!shaderSkyboxFill.isCompiled) {
-                Gdx.app.log("shaderSkyboxFill", shaderSkyboxFill.log)
-                System.exit(1)
-            }
-        }
-
-
-
-
-
         AppLoader.GAME_LOCALE = getConfigString("language")
         printdbg(this, "locale = ${AppLoader.GAME_LOCALE}")
 
@@ -428,11 +366,6 @@ object Terrarum : Screen, Disposable {
     /** Don't call this! Call AppLoader.dispose() */
     override fun dispose() {
         //dispose any other resources used in this level
-        shaderBayer.dispose()
-        shaderSkyboxFill.dispose()
-        shaderBlur.dispose()
-        shaderBlendGlow.dispose()
-
         ingame?.dispose()
     }
 

@@ -5,15 +5,17 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ScreenUtils
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleBase
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.*
@@ -41,12 +43,13 @@ object IngameRenderer : Disposable {
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
-    private val shaderBlur = Terrarum.shaderBlur
-    private val shaderSkyboxFill = Terrarum.shaderSkyboxFill
-    private val shaderBlendGlow = Terrarum.shaderBlendGlow
-    private val shaderRGBOnly = Terrarum.shaderRGBOnly
-    private val shaderAtoGrey = Terrarum.shaderAtoGrey
-    private val shaderPassthru = SpriteBatch.createDefaultShader()
+    val shaderBlur: ShaderProgram
+    val shaderBayer: ShaderProgram
+    val shaderSkyboxFill: ShaderProgram
+    val shaderBlendGlow: ShaderProgram
+    val shaderRGBOnly: ShaderProgram
+    val shaderAtoGrey: ShaderProgram
+    val shaderPassthru = SpriteBatch.createDefaultShader()
 
     private val width = Terrarum.WIDTH
     private val height = Terrarum.HEIGHT
@@ -63,10 +66,6 @@ object IngameRenderer : Disposable {
 
     private var debugMode = 0
 
-    init {
-        AppLoader.disposableSingletonsPool.add(this)
-    }
-
     var renderingActorsCount = 0
         private set
     var renderingUIsCount = 0
@@ -74,9 +73,112 @@ object IngameRenderer : Disposable {
     //var renderingParticleCount = 0
     //    private set
 
+    var world: GameWorld = GameWorld.makeNullWorld()
+        private set // the grammar "IngameRenderer.world = gameWorld" seemes mundane and this function needs special care!
+
+
+    // these codes will run regardless of the invocation of the "initialise()" function
+    // the "initialise()" function will also be called
+    init {
+        shaderBlur = AppLoader.loadShader("assets/blur.vert", "assets/blur.frag")
+
+
+        if (AppLoader.getConfigBoolean("fxdither")) {
+            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer.frag")
+            shaderBayer.begin()
+            shaderBayer.setUniformf("rcount", 64f)
+            shaderBayer.setUniformf("gcount", 64f)
+            shaderBayer.setUniformf("bcount", 64f)
+            shaderBayer.end()
+
+            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag")
+            shaderSkyboxFill.begin()
+            shaderSkyboxFill.setUniformf("rcount", 64f)
+            shaderSkyboxFill.setUniformf("gcount", 64f)
+            shaderSkyboxFill.setUniformf("bcount", 64f)
+            shaderSkyboxFill.end()
+        }
+        else {
+            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthrurgb.frag")
+            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/skyboxfill.frag")
+        }
+
+
+        shaderBlendGlow = AppLoader.loadShader("assets/blendGlow.vert", "assets/blendGlow.frag")
+
+        shaderRGBOnly = AppLoader.loadShader("assets/4096.vert", "assets/rgbonly.frag")
+        shaderAtoGrey = AppLoader.loadShader("assets/4096.vert", "assets/aonly.frag")
+
+
+        if (!shaderBlendGlow.isCompiled) {
+            Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
+            System.exit(1)
+        }
+
+
+        if (AppLoader.getConfigBoolean("fxdither")) {
+            if (!shaderBayer.isCompiled) {
+                Gdx.app.log("shaderBayer", shaderBayer.log)
+                System.exit(1)
+            }
+
+            if (!shaderSkyboxFill.isCompiled) {
+                Gdx.app.log("shaderSkyboxFill", shaderSkyboxFill.log)
+                System.exit(1)
+            }
+        }
+
+        initialise()
+    }
+
+    /** Whether or not "initialise()" method had been called */
+    private var initialisedExternally = false
+
+    /** To make it more convenient to be initialised by the Java code, and for the times when the order of the call
+     * actually matter */
+    @JvmStatic fun initialise() {
+        if (!initialisedExternally) {
+            AppLoader.disposableSingletonsPool.add(this)
+
+            // also initialise these sinigletons
+            BlocksDrawer
+            LightmapRenderer
+
+
+            initialisedExternally = true
+        }
+    }
+
+    /**
+     * Your game/a scene that renders the world must call this method at least once!
+     *
+     * For example:
+     * - When the main scene that renders the world is first created
+     * - When the game make transition to the new world (advancing to the next level/entering or exiting the room)
+     */
+    fun setWorld(world: GameWorld) {
+            try {
+                if (this.world != world) {
+                    printdbg(this, "World change detected -- " +
+                                   "old world: ${this.world.hashCode()}, " +
+                                   "new world: ${world.hashCode()}")
+
+                    // change worlds from internal methods
+                    LightmapRenderer.internalSetWorld(world)
+                    BlocksDrawer.world = world
+                    FeaturesDrawer.world = world
+                }
+            }
+            catch (e: UninitializedPropertyAccessException) {
+                // new init, do nothing
+            }
+            finally {
+                this.world = world
+            }
+        }
+
     operator fun invoke(
             gamePaused: Boolean,
-            world: GameWorldExtension,
             actorsRenderBehind : List<ActorWithBody>? = null,
             actorsRenderMiddle : List<ActorWithBody>? = null,
             actorsRenderMidTop : List<ActorWithBody>? = null,
@@ -100,14 +202,10 @@ object IngameRenderer : Disposable {
             uiListToDraw = uisToDraw
         }
 
-        init()
+        invokeInit()
 
         batch.color = Color.WHITE
 
-
-        BlocksDrawer.world = world
-        LightmapRenderer.setWorld(world)
-        FeaturesDrawer.world = world
 
         this.player = player
 
@@ -480,7 +578,7 @@ object IngameRenderer : Disposable {
     }
 
 
-    private fun init() {
+    private fun invokeInit() {
         if (!initDone) {
             batch = SpriteBatch()
             camera = OrthographicCamera(widthf, heightf)
@@ -639,6 +737,14 @@ object IngameRenderer : Disposable {
         WeatherMixer.dispose()
 
         batch.dispose()
+
+        shaderBlur.dispose()
+        shaderBayer.dispose()
+        shaderSkyboxFill.dispose()
+        shaderBlendGlow.dispose()
+        shaderRGBOnly.dispose()
+        shaderAtoGrey.dispose()
+        shaderPassthru.dispose()
     }
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {

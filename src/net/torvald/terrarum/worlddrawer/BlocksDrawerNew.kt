@@ -31,7 +31,7 @@ import kotlin.math.roundToInt
  */
 internal object BlocksDrawer {
 
-    var world: GameWorld = GameWorld.makeNullWorld()
+    internal var world: GameWorld = GameWorld.makeNullWorld()
 
     private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
     private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
@@ -189,7 +189,7 @@ internal object BlocksDrawer {
     internal fun renderData() {
 
         try {
-            drawTIME_T = (world as GameWorldExtension).time.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
+            drawTIME_T = (world as GameWorldExtension).worldTime.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
             val seasonalMonth = (drawTIME_T.div(WorldTime.DAY_LENGTH) fmod WorldTime.YEAR_DAYS.toLong()).toInt() / WorldTime.MONTH_LENGTH + 1
 
             tilesTerrain = weatherTerrains[seasonalMonth - 1]

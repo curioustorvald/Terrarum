@@ -101,7 +101,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         // set time to summer
-        gameWorld.time.addTime(WorldTime.DAY_LENGTH * 32)
+        gameWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         world = gameWorld
     }
@@ -278,7 +278,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     private val essentialOverlays = ArrayList<ActorWithBody>()
 
     init {
-        gameWorld.time.setTimeOfToday(WorldTime.HOUR_SEC * 10)
+        gameWorld.worldTime.setTimeOfToday(WorldTime.HOUR_SEC * 10)
         gameWorld.globalLight = Cvec(.8f, .8f, .8f, .8f)
 
         essentialOverlays.add(blockPointingCursor)
@@ -308,6 +308,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiPalette.setPosition(200, 100)
 
 
+        IngameRenderer.setWorld(gameWorld)
         LightmapRenderer.fireRecalculateEvent()
     }
 
@@ -392,7 +393,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         _testMarkerDrawCalls = 0L
 
-        IngameRenderer.invoke(false, world as GameWorldExtension, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
+        IngameRenderer.invoke(false, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
 
         AppLoader.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
     }
@@ -597,25 +598,25 @@ class YamlCommandExit : YamlInvokable {
 
 class YamlCommandSetTimeMorning : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("7h00"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("7h00"))
     }
 }
 
 class YamlCommandSetTimeNoon : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("12h30"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("12h30"))
     }
 }
 
 class YamlCommandSetTimeDusk : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("18h40"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("18h40"))
     }
 }
 
 class YamlCommandSetTimeNight : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("0h30"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("0h30"))
     }
 }
 

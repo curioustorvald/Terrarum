@@ -6,20 +6,17 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
-import net.torvald.colourutil.CIELuvUtil
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.GdxColorMap
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gdxSetBlendNormal
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -124,16 +121,16 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
-    internal fun render(camera: Camera, world: GameWorldExtension) {
+    internal fun render(camera: Camera, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3) * 0.75f // just an arb multiplier (266.66666 -> 200)
 
 
         // we will not care for nextSkybox for now
-        val timeNow = world.time.todaySeconds
+        val timeNow = world.TIME_T.toInt() % world.dayLength
         val skyboxColourMap = currentWeather.skyboxGradColourMap
 
         // calculate global light
-        val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
+        val globalLight = getGradientColour(world, skyboxColourMap, 2, timeNow)
         globalLightNow.set(globalLight)
 
 
@@ -152,20 +149,20 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // draw skybox to provided graphics instance
-        val topCol = getGradientColour(skyboxColourMap, 0, timeNow)
-        val bottomCol = getGradientColour(skyboxColourMap, 1, timeNow)
+        val topCol = getGradientColour(world, skyboxColourMap, 0, timeNow)
+        val bottomCol = getGradientColour(world, skyboxColourMap, 1, timeNow)
 
         //Terrarum.textureWhiteSquare.bind(0)
         gdxSetBlendNormal()
 
-        Terrarum.shaderSkyboxFill.begin()
-        Terrarum.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
-        Terrarum.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
-        Terrarum.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
-        Terrarum.shaderSkyboxFill.setUniformf("parallax", parallax.coerceIn(-1f, 1f))
-        Terrarum.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
-        Terrarum.fullscreenQuad.render(Terrarum.shaderSkyboxFill, GL20.GL_TRIANGLES)
-        Terrarum.shaderSkyboxFill.end()
+        IngameRenderer.shaderSkyboxFill.begin()
+        IngameRenderer.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
+        IngameRenderer.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
+        IngameRenderer.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
+        IngameRenderer.shaderSkyboxFill.setUniformf("parallax", parallax.coerceIn(-1f, 1f))
+        IngameRenderer.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
+        AppLoader.fullscreenQuad.render(IngameRenderer.shaderSkyboxFill, GL20.GL_TRIANGLES)
+        IngameRenderer.shaderSkyboxFill.end()
 
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
@@ -179,11 +176,11 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Get a GL of specific time
      */
-    fun getGlobalLightOfTime(timeInSec: Int): Cvec =
-            getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
+    fun getGlobalLightOfTime(world: GameWorld, timeInSec: Int): Cvec =
+            getGradientColour(world, currentWeather.skyboxGradColourMap, 2, timeInSec)
 
-    fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Cvec {
-        val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width
+    fun getGradientColour(world: GameWorld, colorMap: GdxColorMap, row: Int, timeInSec: Int): Cvec {
+        val dataPointDistance = world.dayLength / colorMap.width
 
         val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
         val phaseNext: Int = (phaseThis + 1) % colorMap.width

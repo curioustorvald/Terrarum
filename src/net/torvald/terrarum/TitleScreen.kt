@@ -14,9 +14,9 @@ import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -107,7 +107,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             //println("${actor.hitbox.canonicalX}, ${actor.hitbox.canonicalY}")
         }
     }
-    private lateinit var cameraPlayer: HumanoidNPC
+    private lateinit var cameraPlayer: ActorWithBody
 
     private val gradWhiteTop = Color(0xf8f8f8ff.toInt())
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
@@ -132,7 +132,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         printdbg(this, "Demo world gen complete")
 
         // set time to summer
-        demoWorld.time.addTime(WorldTime.DAY_LENGTH * 32)
+        demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         // construct camera nodes
         val nodeCount = 100
@@ -146,23 +146,12 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         }
 
 
-        cameraPlayer = object : HumanoidNPC(cameraAI, born = 0, usePhysics = false) {
-            init {
-                setHitboxDimension(2, 2, 0, 0)
-                hitbox.setPosition(
-                        HQRNG().nextInt(demoWorld.width) * CreateTileAtlas.TILE_SIZE.toDouble(),
-                        0.0 // Y pos: placeholder; camera AI will take it over
-                )
-                isNoClip = true
-            }
-        }
+        cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
-        demoWorld.time.timeDelta = 150
+        demoWorld.worldTime.timeDelta = 150
 
 
-        //LightmapRenderer.setWorld(demoWorld)
-        //BlocksDrawer.world = demoWorld
-        //FeaturesDrawer.world = demoWorld
+        IngameRenderer.setWorld(demoWorld)
 
 
         uiMenu = UIRemoCon(UITitleRemoConYaml())//UITitleRemoConRoot()
@@ -254,7 +243,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         if (!demoWorld.disposed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
-            IngameRenderer.invoke(gamePaused = false, world = demoWorld, uisToDraw = uiContainer)
+            IngameRenderer.invoke(gamePaused = false, uisToDraw = uiContainer)
+        }
+        else {
+            System.err.println("[TitleScreen] demoworld is already destroyed")
         }
 
 
@@ -373,6 +365,58 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             screen.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
             return true
+        }
+    }
+
+    private class CameraPlayer(val demoWorld: GameWorld, override val ai: ActorAI) : ActorWithBody(RenderOrder.FRONT), AIControlled {
+
+        override val hitbox = Hitbox(0.0, 0.0, 2.0, 2.0)
+
+        init {
+            hitbox.setPosition(
+                    HQRNG().nextInt(demoWorld.width) * CreateTileAtlas.TILE_SIZE.toDouble(),
+                    0.0 // Y pos: placeholder; camera AI will take it over
+            )
+        }
+
+        override fun drawBody(batch: SpriteBatch) { }
+        override fun drawGlow(batch: SpriteBatch) { }
+
+        override fun update(delta: Float) {
+
+        }
+
+        override fun onActorValueChange(key: String, value: Any?) { }
+        override fun dispose() { }
+
+        override fun run() { TODO("not implemented") }
+
+        override fun moveLeft(amount: Float) {
+            TODO("not implemented")
+        }
+
+        override fun moveRight(amount: Float) {
+            TODO("not implemented")
+        }
+
+        override fun moveUp(amount: Float) {
+            TODO("not implemented")
+        }
+
+        override fun moveDown(amount: Float) {
+            TODO("not implemented")
+        }
+
+        override fun moveJump(amount: Float) {
+            TODO("not implemented")
+        }
+
+        override fun moveTo(bearing: Double) {
+            TODO("not implemented")
+        }
+
+        override fun moveTo(toX: Double, toY: Double) {
+            TODO("not implemented")
         }
     }
 }

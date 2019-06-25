@@ -3,8 +3,6 @@ package net.torvald.terrarum.modulebasegame.gameworld
 import net.torvald.terrarum.gameworld.fmod
 
 
-typealias time_t = Long
-
 /**
  * Please also see:
  *      https://en.wikipedia.org/wiki/World_Calendar
@@ -56,8 +54,9 @@ typealias time_t = Long
  * Created by minjaesong on 2016-01-24.
  */
 class WorldTime(initTime: Long = 0L) {
+
+    /** It is not recommended to directly modify the TIME_T. Use provided methods instead. */
     var TIME_T = 0L // Epoch: Year 125 Spring 1st, 0h00:00 (Mondag) // 125-01-01
-        private set
 
     init {
         TIME_T = initTime

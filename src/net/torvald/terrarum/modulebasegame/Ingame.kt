@@ -174,9 +174,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             GameLoadMode.LOAD_FROM  -> enter(gameLoadInfoPayload as GameSaveData)
         }
 
-        //LightmapRenderer.world = this.world
-        //BlocksDrawer.world = this.world
-        FeaturesDrawer.world = this.world
+        IngameRenderer.setWorld(gameworld)
 
 
         super.show() // gameInitialised = true
@@ -556,7 +554,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.invoke(
                 paused,
-                world as GameWorldExtension,
                 visibleActorsRenderBehind,
                 visibleActorsRenderMiddle,
                 visibleActorsRenderMidTop,

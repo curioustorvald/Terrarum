@@ -17,11 +17,11 @@ internal object SetTimeDelta : ConsoleCommand {
         
         
         if (args.size == 2) {
-            world.time.timeDelta = args[1].toInt()
-            if (world.time.timeDelta == 0)
+            world.worldTime.timeDelta = args[1].toInt()
+            if (world.worldTime.timeDelta == 0)
                 Echo("時間よ止まれ！ザ・ワルド！！")
             else
-                Echo("Set time delta to ${world.time.timeDelta}")
+                Echo("Set time delta to ${world.worldTime.timeDelta}")
         }
         else {
             printUsage()

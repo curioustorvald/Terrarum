@@ -17,10 +17,10 @@ internal object SetTime : ConsoleCommand {
         if (args.size == 2) {
             val timeToSet = WorldTime.parseTime(args[1])
 
-            world.time.setTimeOfToday(timeToSet)
+            world.worldTime.setTimeOfToday(timeToSet)
 
-            Echo("Set time to ${world.time.todaySeconds} " +
-                                              "(${world.time.hours}h${formatMin(world.time.minutes)})")
+            Echo("Set time to ${world.worldTime.todaySeconds} " +
+                 "(${world.worldTime.hours}h${formatMin(world.worldTime.minutes)})")
         }
         else {
             printUsage()
