@@ -28,10 +28,9 @@ import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.Ingame;
+import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
-import net.torvald.terrarum.worlddrawer.BlocksDrawer;
-import net.torvald.terrarum.worlddrawer.LightmapRenderer;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.ArrayListMap;
@@ -614,9 +613,7 @@ public class AppLoader implements ApplicationListener {
             ModMgr.INSTANCE.invoke(); // invoke Module Manager
             AppLoader.resourcePool.loadAll();
             printdbg(this, "all modules loaded successfully");
-
-            BlocksDrawer.INSTANCE.getWorld(); // will initialize the BlocksDrawer by calling dummy method
-            LightmapRenderer.INSTANCE.hdr(0f);
+            IngameRenderer.initialise();
         }
 
 

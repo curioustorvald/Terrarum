@@ -38,7 +38,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         //get() = if (ELon) lcdLitColELon else lcdLitColELoff
 
     private val worldTime: WorldTime
-        get() = (Terrarum.ingame!!.world as GameWorldExtension).time
+        get() = (Terrarum.ingame!!.world as GameWorldExtension).worldTime
 
 
     override fun updateUI(delta: Float) {

@@ -15,7 +15,9 @@ object UnsafeHelper {
         unsafe = unsafeConstructor.newInstance()
     }
 
-
+    /**
+     * A factory method to allocate a memory of given size and return its starting address as a pointer.
+     */
     fun allocate(size: Long): UnsafePtr {
         val ptr = unsafe.allocateMemory(size)
         return UnsafePtr(ptr, size)
@@ -34,7 +36,7 @@ class UnsafePtr(val ptr: Long, val allocSize: Long) {
             UnsafeHelper.unsafe.freeMemory(ptr)
 
             println("[UnsafePtr] Destroying pointer $this; called from:")
-            Thread.currentThread().stackTrace.forEach { println("[UnsafePtr] $it") }
+            Thread.currentThread().stackTrace.forEach { println(it) }
 
             destroyed = true
         }

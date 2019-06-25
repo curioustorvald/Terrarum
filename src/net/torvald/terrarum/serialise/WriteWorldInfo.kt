@@ -101,7 +101,7 @@ object WriteWorldInfo {
         metaOut.write(Terrarum.PLAYER_REF_ID.toLittle())
 
         // ingame time_t
-        metaOut.write((world as GameWorldExtension).time.TIME_T.toLittle())
+        metaOut.write((world as GameWorldExtension).worldTime.TIME_T.toLittle())
 
         // creation time (real world time)
         metaOut.write(world.creationTime.toULittle48())

@@ -37,14 +37,14 @@ open class GameWorld : Disposable {
     val width: Int
     val height: Int
 
-    val creationTime: Long
-    var lastPlayTime: Long
+    open val creationTime: Long
+    open var lastPlayTime: Long
         internal set // there's a case of save-and-continue-playing
-    var totalPlayTime: Int
+    open var totalPlayTime: Int
         internal set
 
     /** Used to calculate play time */
-    val loadTime: Long = System.currentTimeMillis() / 1000L
+    open val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
     @TEMzPayload("WALL", TEMzPayload.TWELVE_BITS_LITTLE)
@@ -57,9 +57,9 @@ open class GameWorld : Disposable {
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
 
     /** Tilewise spawn point */
-    var spawnX: Int
+    open var spawnX: Int
     /** Tilewise spawn point */
-    var spawnY: Int
+    open var spawnY: Int
 
     @TEMzPayload("WdMG", TEMzPayload.INT48_FLOAT_PAIR)
     val wallDamages: HashMap<BlockAddress, Float>
@@ -84,17 +84,21 @@ open class GameWorld : Disposable {
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
-    var gravitation: Vector2 = Vector2(0.0, 9.80665)
+    open var gravitation: Vector2 = Vector2(0.0, 9.80665)
     /** 0.0..1.0+ */
-    var globalLight = Cvec(0f, 0f, 0f, 0f)
-    var averageTemperature = 288f // 15 deg celsius; simulates global warming
+    open var globalLight = Cvec(0f, 0f, 0f, 0f)
+    open var averageTemperature = 288f // 15 deg celsius; simulates global warming
 
 
-    var generatorSeed: Long = 0
+    open var generatorSeed: Long = 0
         internal set
 
     var disposed = false
         private set
+
+    /** time in (preferably) seconds */
+    open var TIME_T: Long = 0L
+    open var dayLength: Int = 86400
 
 
     constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {

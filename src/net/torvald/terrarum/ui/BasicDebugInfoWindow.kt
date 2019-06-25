@@ -178,8 +178,8 @@ class BasicDebugInfoWindow : UICanvas() {
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
 
         if (world != null) {
-            printLineColumn(batch, 2, 5, "Time $ccG${world2!!.time.todaySeconds.toString().padStart(5, '0')}" +
-                                         " (${world2!!.time.getFormattedTime()})")
+            printLineColumn(batch, 2, 5, "Time $ccG${world2!!.worldTime.todaySeconds.toString().padStart(5, '0')}" +
+                                         " (${world2!!.worldTime.getFormattedTime()})")
         }
 
         if (player != null) {

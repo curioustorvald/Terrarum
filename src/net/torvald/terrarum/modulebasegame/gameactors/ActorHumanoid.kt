@@ -12,7 +12,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameworld.time_t
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -31,8 +30,8 @@ import java.util.*
  * Created by minjaesong on 2016-10-24.
  */
 open class ActorHumanoid(
-        birth: time_t,
-        death: time_t? = null,
+        birth: Long,
+        death: Long? = null,
         usePhysics: Boolean = true
 ) : ActorWBMovable(RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 

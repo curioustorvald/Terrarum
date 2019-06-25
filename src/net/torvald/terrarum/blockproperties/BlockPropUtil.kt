@@ -95,7 +95,7 @@ object BlockPropUtil {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
-            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
+            3    -> WeatherMixer.getGlobalLightOfTime(Terrarum.ingame!!.world, WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum

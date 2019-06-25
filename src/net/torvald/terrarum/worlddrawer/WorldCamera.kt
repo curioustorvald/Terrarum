@@ -3,7 +3,7 @@ package net.torvald.terrarum.worlddrawer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floorInt
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import org.dyn4j.geometry.Vector2
 
@@ -36,7 +36,7 @@ object WorldCamera {
 
     private val nullVec = Vector2(0.0, 0.0)
 
-    fun update(world: GameWorld, player: ActorWBMovable?) {
+    fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
         width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
@@ -46,7 +46,7 @@ object WorldCamera {
 
         // some hacky equation to position player at the dead centre
         // implementing the "lag behind" camera the right way
-        val pVecSum = player.externalV + (player.controllerV ?: nullVec)
+        val pVecSum = Vector2(0.0, 0.0)//player.externalV + (player.controllerV ?: nullVec)
 
         x = ((player.hitbox.centeredX - pVecSum.x).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
 

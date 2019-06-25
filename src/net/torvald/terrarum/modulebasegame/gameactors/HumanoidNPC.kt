@@ -6,7 +6,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.modulebasegame.gameworld.time_t
 
 /**
  * @param ai AI class. Use LuaAIWrapper for Lua script
@@ -15,7 +14,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.time_t
  */
 open class HumanoidNPC(
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
-        born: time_t,
+        born: Long,
         usePhysics: Boolean = true
         //forceAssignRefID: Int? = null
 ) : ActorHumanoid(born, usePhysics = usePhysics), AIControlled, CanBeAnItem {

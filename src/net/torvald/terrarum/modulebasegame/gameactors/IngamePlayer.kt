@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameworld.time_t
 
 
 /**
@@ -14,7 +13,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.time_t
 class IngamePlayer(
         override var animDescPath: String,
         override var animDescPathGlow: String? = null,
-        born: time_t
+        born: Long
 ) : ActorHumanoid(born), HasAssembledSprite {
 
     /**
