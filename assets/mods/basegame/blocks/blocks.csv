@@ -141,6 +141,9 @@
 # fv: vertical friction (boolean)
 # fr: horizontal friction. 0: frictionless, <16: slippery, 16: regular, >16: sticky
 #
+# grav: Whether the block should fall through the empty space. N/A to not make it fall;
+#       0 to fall immediately (e.g. Sand), nonzero to indicate that number of floating blocks can be supported (e.g. Scaffolding)
+#
 #
 ## Illuminators ##
 #
