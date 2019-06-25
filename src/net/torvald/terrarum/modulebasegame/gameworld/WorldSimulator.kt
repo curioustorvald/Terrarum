@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import net.torvald.aa.KDTree
 import net.torvald.terrarum.AppLoader
@@ -8,6 +9,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.roundInt
@@ -17,6 +19,8 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas
  * Created by minjaesong on 2016-08-03.
  */
 object WorldSimulator {
+
+    private val DEBUG_STEPPING_MODE = false // use period key
 
     // FLUID-RELATED STUFFS //
 
@@ -250,6 +254,8 @@ object WorldSimulator {
 
     }
 
+    private val FALLABLE_MAX_FALL_SPEED = 2
+
     /**
      * displace fallable tiles. It is scanned bottom-left first. To achieve the sens ofreal
      * falling, each tiles are displaced by ONLY ONE TILE below.
@@ -281,30 +287,48 @@ object WorldSimulator {
         // displace fallables (TODO implement blocks with fallable supports e.g. scaffolding)
         // only displace SINGLE BOTTOMMOST block on single X-coord (this doesn't mean they must fall only one block)
         // so that the "falling" should be visible to the end user
-        for (x in updateXFrom..updateXTo) {
-            var fallDownCounter = 0
-            for (y in updateYTo downTo  updateYFrom) {
-                val currentTile = world.getTileFromTerrain(x, y)
-                val prop = BlockCodex[currentTile]
-                val isSolid = prop.isSolid
-                val support = prop.maxSupport
-                val isFallable = support != -1
+        if (!DEBUG_STEPPING_MODE || DEBUG_STEPPING_MODE && KeyToggler.isOn (Input.Keys.PERIOD)) {
+            for (x in updateXFrom..updateXTo) {
+                var fallDownCounter = 0
+                var fallableStackProcessed = false
+                // one "stack" is a contiguous fallable blocks, regardless of the actual block number
+                // when you are simulating the gradual falling, it is natural to process all the "stacks" at the same run,
+                // otherwise you'll get an artefact.
+                for (y in updateYTo downTo updateYFrom) {
+                    val currentTile = world.getTileFromTerrain(x, y)
+                    val prop = BlockCodex[currentTile]
+                    val isSolid = prop.isSolid
+                    val support = prop.maxSupport
+                    val isFallable = support != -1
 
-                if (fallDownCounter != 0 && isFallable) {
-                    // replace blocks
-                    world.setTileTerrain(x, y, Block.AIR)
-                    world.setTileTerrain(x, y + fallDownCounter, currentTile)
+                    // mark the beginnig of the new "stack"
+                    if (fallableStackProcessed && !isFallable) {
+                        fallableStackProcessed = false
+                    } // do not chain with "else if"
 
-                    break
-                }
-                else if (isSolid) {
-                    fallDownCounter = 0
-                }
-                else if (!isSolid && !isFallable) {
-                    fallDownCounter += 1
+                    // process the gradual falling of the selected "stack"
+                    if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
+                        // replace blocks
+                        world.setTileTerrain(x, y, Block.AIR)
+                        world.setTileTerrain(x, y + fallDownCounter, currentTile)
+
+                        fallableStackProcessed = true
+                    }
+                    else if (isSolid) {
+                        fallDownCounter = 0
+                    }
+                    else if (!isSolid && !isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
+                        fallDownCounter += 1
+                    }
                 }
             }
+
+            if (DEBUG_STEPPING_MODE) {
+                KeyToggler.forceSet(Input.Keys.PERIOD, false)
+            }
         }
+
+
     }
 
 
