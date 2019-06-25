@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
@@ -29,7 +30,6 @@ import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
@@ -226,10 +226,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         // update UIs //
         uiContainer.forEach { it.update(delta) }
-
-
-
-        LightmapRenderer.fireRecalculateEvent() // don't half-frame update; it will jitter!
     }
 
     fun renderScreen() {
@@ -242,11 +238,11 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
 
 
-        if (!demoWorld.disposed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
+        if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
             IngameRenderer.invoke(gamePaused = false, uisToDraw = uiContainer)
         }
         else {
-            System.err.println("[TitleScreen] demoworld is already destroyed")
+            printdbgerr(this, "Demoworld is already been destroyed")
         }
 
 
