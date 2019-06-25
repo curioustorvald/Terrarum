@@ -93,6 +93,9 @@ open class GameWorld : Disposable {
     var generatorSeed: Long = 0
         internal set
 
+    var disposed = false
+        private set
+
 
     constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
@@ -461,6 +464,8 @@ open class GameWorld : Disposable {
         layerWall.dispose()
         layerTerrain.dispose()
         //nullWorldInstance?.dispose() // must be called ONLY ONCE; preferably when the app exits
+
+        disposed = true
     }
 
     companion object {

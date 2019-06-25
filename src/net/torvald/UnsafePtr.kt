@@ -32,12 +32,16 @@ class UnsafePtr(val ptr: Long, val allocSize: Long) {
     fun destroy() {
         if (!destroyed) {
             UnsafeHelper.unsafe.freeMemory(ptr)
+
+            println("[UnsafePtr] Destroying pointer $this; called from:")
+            Thread.currentThread().stackTrace.forEach { println("[UnsafePtr] $it") }
+
             destroyed = true
         }
     }
 
     private inline fun checkNullPtr(index: Long) {
-        if (destroyed) throw NullPointerException("The pointer is already destroyed (0x${ptr.toString(16)})")
+        if (destroyed) throw NullPointerException("The pointer is already destroyed ($this)")
 
         // OOB Check: debugging purposes only -- comment out for the production
         //if (index !in 0 until allocSize) throw IndexOutOfBoundsException("Index: $index; alloc size: $allocSize")
@@ -67,4 +71,5 @@ class UnsafePtr(val ptr: Long, val allocSize: Long) {
         UnsafeHelper.unsafe.setMemory(ptr, allocSize, byte)
     }
 
+    override fun toString() = "0x${ptr.toString(16)} with size $allocSize"
 }
