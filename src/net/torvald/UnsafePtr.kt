@@ -74,4 +74,5 @@ class UnsafePtr(val ptr: Long, val allocSize: Long) {
     }
 
     override fun toString() = "0x${ptr.toString(16)} with size $allocSize"
+    override fun equals(other: Any?) = this.ptr == (other as UnsafePtr).ptr
 }

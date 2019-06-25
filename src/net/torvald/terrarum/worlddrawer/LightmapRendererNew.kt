@@ -69,6 +69,8 @@ object LightmapRenderer {
         }
         finally {
             this.world = world
+
+            // fireRecalculateEvent()
         }
     }
 
@@ -214,7 +216,7 @@ object LightmapRenderer {
         }
         catch (e: NullPointerException) {
             System.err.println("[LightmapRendererNew.fireRecalculateEvent] Attempted to refer destroyed unsafe array " +
-                               "(${world.layerTerrain.getPtr()})")
+                               "(${world.layerTerrain.ptr})")
             e.printStackTrace()
             return // something's wrong but we'll ignore it like a trustful AK
         }

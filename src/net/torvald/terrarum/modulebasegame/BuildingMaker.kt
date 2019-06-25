@@ -28,7 +28,6 @@ import net.torvald.terrarum.serialise.toULittle48
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.FileOutputStream
@@ -309,7 +308,6 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         IngameRenderer.setWorld(gameWorld)
-        LightmapRenderer.fireRecalculateEvent()
     }
 
     override fun show() {

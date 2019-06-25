@@ -472,6 +472,8 @@ open class GameWorld : Disposable {
         disposed = true
     }
 
+    override fun equals(other: Any?) = layerTerrain.ptr == (other as GameWorld).layerTerrain.ptr
+
     companion object {
         @Transient const val WALL = 0
         @Transient const val TERRAIN = 1

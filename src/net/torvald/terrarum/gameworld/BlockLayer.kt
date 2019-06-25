@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.UnsafeHelper
+import net.torvald.UnsafePtr
 import net.torvald.terrarum.AppLoader.printdbg
 
 /**
@@ -13,7 +14,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
     // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
-    private val ptr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
+    internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
 
     //private val directByteBuffer: ByteBuffer
 
@@ -141,8 +142,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         //directByteBuffer.clear()
         printdbg(this, "BlockLayer successfully freed")
     }
-
-    internal fun getPtr() = ptr
 
     companion object {
         @Transient val BYTES_PER_BLOCK = 2L

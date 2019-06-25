@@ -32,7 +32,6 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import java.util.*
@@ -377,13 +376,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // these need to appear on top of any others
         uiContainer.add(notifier)
 
-
-        LightmapRenderer.fireRecalculateEvent()
-
-
         AppLoader.setDebugTime("Ingame.updateCounter", 0)
-
-
 
         // some sketchy test code here
 
@@ -963,7 +956,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         if (gameInitialised) {
-            LightmapRenderer.fireRecalculateEvent()
+            //LightmapRenderer.fireRecalculateEvent()
         }
 
 
