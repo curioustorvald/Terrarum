@@ -253,7 +253,9 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
 
 
-        IngameRenderer.invoke(gamePaused = false, world = demoWorld, uisToDraw = uiContainer)
+        if (!demoWorld.disposed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
+            IngameRenderer.invoke(gamePaused = false, world = demoWorld, uisToDraw = uiContainer)
+        }
 
 
         batch.inUse {

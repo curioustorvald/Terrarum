@@ -12,6 +12,7 @@ import net.torvald.terrarum.AppLoader.printdbg
  */
 open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
+    // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
     private val ptr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
 
     //private val directByteBuffer: ByteBuffer
