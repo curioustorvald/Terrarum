@@ -46,7 +46,7 @@ class BlockProp {
 
     var drop: Int = 0
 
-    var maxSupport: Int? = null
+    var maxSupport: Int = -1 // couldn't use NULL at all...
 
     var friction: Int = 0
 

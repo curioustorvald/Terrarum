@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.aa.KDTree
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWBMovable
@@ -41,9 +42,13 @@ object WorldSimulator {
 
     // END OF FLUID-RELATED STUFFS
 
+    /** Top-left point */
     var updateXFrom = 0
+    /** Bottom-right point */
     var updateXTo = 0
+    /** Top-left point */
     var updateYFrom = 0
+    /** Bottom-right point */
     var updateYTo = 0
 
     val colourNone = Color(0x808080FF.toInt())
@@ -272,6 +277,34 @@ object WorldSimulator {
                 }
             }
         }*/
+
+        // displace fallables (TODO implement blocks with fallable supports e.g. scaffolding)
+        // only displace SINGLE BOTTOMMOST block on single X-coord (this doesn't mean they must fall only one block)
+        // so that the "falling" should be visible to the end user
+        for (x in updateXFrom..updateXTo) {
+            var fallDownCounter = 0
+            for (y in updateYTo downTo  updateYFrom) {
+                val currentTile = world.getTileFromTerrain(x, y)
+                val prop = BlockCodex[currentTile]
+                val isSolid = prop.isSolid
+                val support = prop.maxSupport
+                val isFallable = support != -1
+
+                if (fallDownCounter != 0 && isFallable) {
+                    // replace blocks
+                    world.setTileTerrain(x, y, Block.AIR)
+                    world.setTileTerrain(x, y + fallDownCounter, currentTile)
+
+                    break
+                }
+                else if (isSolid) {
+                    fallDownCounter = 0
+                }
+                else if (!isSolid && !isFallable) {
+                    fallDownCounter += 1
+                }
+            }
+        }
     }
 
 
