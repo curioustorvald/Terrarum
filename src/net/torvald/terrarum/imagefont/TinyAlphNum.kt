@@ -12,10 +12,10 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object TinyAlphNum : BitmapFont() {
 
-    internal val W = 8
-    internal val H = 8
+    internal val W = 7
+    internal val H = 13
 
-    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/milky.tga", W, H)
+    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/7x13_Tamzen7x14b.tga", W, H)
 
 
     init {

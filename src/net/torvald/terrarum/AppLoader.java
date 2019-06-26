@@ -198,51 +198,6 @@ public class AppLoader implements ApplicationListener {
     public static final int minimumW = 1080;
     public static final int minimumH = 720;
 
-    public static void main(String[] args) {
-        // load configs
-        getDefaultDirectory();
-        createDirs();
-        readConfigJson();
-
-
-        try { processor = GetCpuName.getModelName(); }
-        catch (IOException e1) { processor = "Unknown CPU"; }
-        try { processorVendor = GetCpuName.getCPUID(); }
-        catch (IOException e2) { processorVendor = "Unknown CPU"; }
-
-
-        ShaderProgram.pedantic = false;
-
-        LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-        appConfig.useGL30 = true; // utilising some GL trickeries, need this to be TRUE
-        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
-        appConfig.resizable = false;//true;
-        //appConfig.width = 1110; // photographic ratio (1.5:1)
-        //appConfig.height = 740; // photographic ratio (1.5:1)
-        appConfig.width = getConfigInt("screenwidth");
-        appConfig.height = getConfigInt("screenheight");
-        appConfig.backgroundFPS = getConfigInt("displayfps");
-        appConfig.foregroundFPS = getConfigInt("displayfps");
-        appConfig.title = GAME_NAME;
-        appConfig.forceExit = false;
-
-        // load app icon
-        int[] appIconSizes = new int[]{256,128,64,32,16};
-        for (int size : appIconSizes) {
-            String name = "assets/appicon" + size + ".png";
-            if (new File("./" + name).exists()) {
-                appConfig.addIcon(name, Files.FileType.Internal);
-            }
-        }
-
-        if (args.length == 1 && args[0].equals("isdev=true")) {
-            IS_DEVELOPMENT_BUILD = true;
-            // safe area box
-            //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
-        }
-
-        new LwjglApplication(new AppLoader(appConfig), appConfig);
-    }
 
 
     private static ShaderProgram shaderBayerSkyboxFill;
@@ -288,6 +243,76 @@ public class AppLoader implements ApplicationListener {
     public static HashSet<File> tempFilePool = new HashSet();
     public static HashSet<Disposable> disposableSingletonsPool = new HashSet();
 
+    public static char gamepadLabelStart = 0xE000; // lateinit
+    public static char gamepadLabelSelect = 0xE000; // lateinit
+    public static char gamepadLabelEast = 0xE000; // lateinit
+    public static char gamepadLabelSouth = 0xE000; // lateinit
+    public static char gamepadLabelNorth = 0xE000; // lateinit
+    public static char gamepadLabelWest = 0xE000; // lateinit
+    public static char gamepadLabelLB = 0xE000; // lateinit
+    public static char gamepadLabelRB = 0xE000; // lateinit
+    public static char gamepadLabelLT = 0xE000; // lateinit
+    public static char gamepadLabelRT = 0xE000; // lateinit
+    public static char gamepadLabelLEFT = 0xE068;
+    public static char gamepadLabelDOWN = 0xE069;
+    public static char gamepadLabelUP = 0xE06A;
+    public static char gamepadLabelRIGHT = 0xE06B;
+    public static char gamepadLabelUPDOWN = 0xE072;
+    public static char gamepadLabelLEFTRIGHT = 0xE071;
+    public static char gamepadLabelDPAD = 0xE070;
+    public static char gamepadLabelLStick = 0xE044;
+    public static char gamepadLabelRStick = 0xE045;
+    public static char gamepadLabelLStickPush = 0xE046;
+    public static char gamepadLabelRStickPush = 0xE047;
+    
+    public static void main(String[] args) {
+        // load configs
+        getDefaultDirectory();
+        createDirs();
+        readConfigJson();
+
+        setGamepadButtonLabels();
+
+
+        try { processor = GetCpuName.getModelName(); }
+        catch (IOException e1) { processor = "Unknown CPU"; }
+        try { processorVendor = GetCpuName.getCPUID(); }
+        catch (IOException e2) { processorVendor = "Unknown CPU"; }
+
+
+        ShaderProgram.pedantic = false;
+
+        LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
+        appConfig.useGL30 = true; // utilising some GL trickeries, need this to be TRUE
+        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
+        appConfig.resizable = false;//true;
+        //appConfig.width = 1110; // photographic ratio (1.5:1)
+        //appConfig.height = 740; // photographic ratio (1.5:1)
+        appConfig.width = getConfigInt("screenwidth");
+        appConfig.height = getConfigInt("screenheight");
+        appConfig.backgroundFPS = getConfigInt("displayfps");
+        appConfig.foregroundFPS = getConfigInt("displayfps");
+        appConfig.title = GAME_NAME;
+        appConfig.forceExit = false;
+
+        // load app icon
+        int[] appIconSizes = new int[]{256,128,64,32,16};
+        for (int size : appIconSizes) {
+            String name = "assets/appicon" + size + ".png";
+            if (new File("./" + name).exists()) {
+                appConfig.addIcon(name, Files.FileType.Internal);
+            }
+        }
+
+        if (args.length == 1 && args[0].equals("isdev=true")) {
+            IS_DEVELOPMENT_BUILD = true;
+            // safe area box
+            //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
+        }
+
+        new LwjglApplication(new AppLoader(appConfig), appConfig);
+    }
+    
     @Override
     public void create() {
         resourcePool = CommonResourcePool.INSTANCE;
@@ -635,6 +660,72 @@ public class AppLoader implements ApplicationListener {
                 0f, HEIGHT, 0f, 1f, 1f, 1f, 1f, 0f, 0f
         });
         fullscreenQuad.setIndices(new short[]{0, 1, 2, 2, 3, 0});
+    }
+
+    public static void setGamepadButtonLabels() {
+        switch (getConfigString("gamepadlabelstyle")) {
+            case "nwii"     : gamepadLabelStart = 0xE04B; break; // + mark
+            case "logitech" : gamepadLabelStart = 0xE05A; break; // number 10
+            case "msxbone"  : gamepadLabelStart = 0xE049; break; // trifold equal sign?
+            default         : gamepadLabelStart = 0xE042; break; // |> mark (sonyps, msxb360, generic)
+        }
+
+        switch (getConfigString("gamepadlabelstyle")) {
+            case "nwii"     : gamepadLabelSelect = 0xE04D; break; // - mark
+            case "logitech" : gamepadLabelSelect = 0xE059; break; // number 9
+            case "sonyps"   : gamepadLabelSelect = 0xE043; break; // solid rectangle
+            case "msxb360"  : gamepadLabelSelect = 0xE041; break; // <| mark
+            case "msxbone"  : gamepadLabelSelect = 0xE048; break; // multitask button?
+            default         : gamepadLabelSelect = 0xE043; break; // solid rectangle
+        }
+
+
+        switch (getConfigString("gamepadlabelstyle")) {
+            case "msxb360": case "msxbone" : {
+                gamepadLabelSouth = 0xE061;
+                gamepadLabelEast = 0xE062;
+                gamepadLabelWest = 0xE078;
+                gamepadLabelNorth = 0xE079;
+                gamepadLabelLB = 0xE06D;
+                gamepadLabelRB = 0xE06E;
+                gamepadLabelLT = 0xE06C;
+                gamepadLabelRT = 0xE06F;
+                break;
+            }
+            case "nwii": {
+                gamepadLabelSouth = 0xE062;
+                gamepadLabelEast = 0xE061;
+                gamepadLabelWest = 0xE079;
+                gamepadLabelNorth = 0xE078;
+                gamepadLabelLB = 0xE065;
+                gamepadLabelRB = 0xE066;
+                gamepadLabelLT = 0xE064;
+                gamepadLabelRT = 0xE067;
+                break;
+            }
+            case "sonyps": {
+                gamepadLabelSouth = 0xE063;
+                gamepadLabelEast = 0xE050;
+                gamepadLabelWest = 0xE073;
+                gamepadLabelNorth = 0xE074;
+                gamepadLabelLB = 0xE07B;
+                gamepadLabelRB = 0xE07C;
+                gamepadLabelLT = 0xE07A;
+                gamepadLabelRT = 0xE07D;
+                break;
+            }
+            case "logitech": {
+                gamepadLabelSouth = 0xE052;
+                gamepadLabelEast = 0xE053;
+                gamepadLabelWest = 0xE051;
+                gamepadLabelNorth = 0xE054;
+                gamepadLabelLB = 0xE055;
+                gamepadLabelRB = 0xE056;
+                gamepadLabelLT = 0xE057;
+                gamepadLabelRT = 0xE058;
+                break;
+            }
+        }
     }
 
     public static void requestScreenshot() {
