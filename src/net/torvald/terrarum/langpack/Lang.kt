@@ -1,10 +1,9 @@
 package net.torvald.terrarum.langpack
 
-import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
-import java.io.*
+import net.torvald.terrarum.utils.JsonFetcher
+import java.io.File
 import java.util.*
 
 /**
@@ -118,7 +117,7 @@ object Lang {
 
         // special treatment
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
-            return ret2.replace('>', Terrarum.gamepadLabelStart).capitalize()
+            return ret2.replace('>', AppLoader.gamepadLabelStart).capitalize()
 
         return if (key.getEndTag().contains("bg"))
             "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideDefault}"

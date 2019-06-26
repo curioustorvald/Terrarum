@@ -9,6 +9,7 @@ import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -151,8 +152,8 @@ class BasicDebugInfoWindow : UICanvas() {
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
         if (ingame != null) {
-            val wallNum = ingame!!.world.getTileFromWall(mouseTileX, mouseTileY) ?: -1
-            val tileNum = ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+            val wallNum = ingame!!.world.getTileFromWall(mouseTileX, mouseTileY)
+            val tileNum = ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY)
             val wireNum = ingame!!.world.getWiringBlocks(mouseTileX, mouseTileY)
             val fluid = ingame!!.world.getFluid(mouseTileX, mouseTileY)
 
@@ -189,8 +190,8 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         drawHistogram(batch, LightmapRenderer.histogram,
-                Terrarum.WIDTH - histogramW - 30,
-                Terrarum.HEIGHT - histogramH - 30
+                Terrarum.WIDTH - histogramW - TinyAlphNum.W * 2,
+                Terrarum.HEIGHT - histogramH - TinyAlphNum.H * 4
         )
 
         batch.color = Color.WHITE
@@ -200,8 +201,8 @@ class BasicDebugInfoWindow : UICanvas() {
             drawGamepadAxis(gamepad, batch,
                     gamepad.getAxis(AppLoader.getConfigInt("gamepadaxislx")),
                     gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisly")),
-                    Terrarum.WIDTH - 135,
-                    40
+                    Terrarum.WIDTH - 128 - TinyAlphNum.W * 2,
+                    line(3).toInt()
             )
         }
 
@@ -210,21 +211,21 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         // memory pressure
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}MEM ", (Terrarum.WIDTH - 21 * 8 - 2).toFloat(), 2f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}MEM ", (Terrarum.WIDTH - 23 * TinyAlphNum.W - 2).toFloat(), line(1))
         // thread count
         Terrarum.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.THREADS.toString().padStart(2, ' ')}",
-                (Terrarum.WIDTH - 2 - 6 * 8).toFloat(), 10f)
+                (Terrarum.WIDTH - 2 - 8 * TinyAlphNum.W).toFloat(), line(2))
 
         // memory texts
         Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
-                (Terrarum.WIDTH - 17 * 8 - 2).toFloat(), 2f)
+                (Terrarum.WIDTH - 19 * TinyAlphNum.W - 2).toFloat(), line(1))
         Terrarum.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
-                (Terrarum.WIDTH - 12 * 8 - 2).toFloat(), 2f)
+                (Terrarum.WIDTH - 14 * TinyAlphNum.W - 2).toFloat(), line(1))
         Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
-                (Terrarum.WIDTH - 5 * 8 - 2).toFloat(), 2f)
+                (Terrarum.WIDTH - 7 * TinyAlphNum.W - 2).toFloat(), line(1))
         // FPS count
         Terrarum.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
-                (Terrarum.WIDTH - 2 - 13 * 8).toFloat(), 10F)
+                (Terrarum.WIDTH - 3 - 15 * TinyAlphNum.W).toFloat(), line(2))
 
         /**
          * Bottom left
@@ -232,21 +233,21 @@ class BasicDebugInfoWindow : UICanvas() {
 
         if (ingame != null) {
             Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
-                    2f, Terrarum.HEIGHT - 10f)
+                    TinyAlphNum.W * 2f, Terrarum.HEIGHT - TinyAlphNum.H * 2f)
             Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
-                    (2 + 17 * 8).toFloat(), Terrarum.HEIGHT - 10f)
+                    (TinyAlphNum.W * 2 + 17 * 8).toFloat(), Terrarum.HEIGHT - TinyAlphNum.H * 2f)
             Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
-                    (2 + 28 * 8).toFloat(), Terrarum.HEIGHT - 10f)
+                    (TinyAlphNum.W * 2 + 28 * 8).toFloat(), Terrarum.HEIGHT - TinyAlphNum.H * 2f)
             if (ingame is Ingame) {
                 Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as Ingame).particlesActive}",
-                        (2 + 41 * 8).toFloat(), Terrarum.HEIGHT - 10f)
+                        (TinyAlphNum.W * 2 + 41 * 8).toFloat(), Terrarum.HEIGHT - TinyAlphNum.H * 2f)
             }
         }
 
         Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
-                2f, Terrarum.HEIGHT - 18f)
+                TinyAlphNum.W * 2f, Terrarum.HEIGHT - TinyAlphNum.H * 3f)
         Terrarum.fontSmallNumbers.draw(batch, "${ccY}UIs rendering $ccG${IngameRenderer.renderingUIsCount}",
-                2f + (21 * 8), Terrarum.HEIGHT - 18f)
+                TinyAlphNum.W * 2f + (21 * 8), Terrarum.HEIGHT - TinyAlphNum.H * 3f)
 
         /**
          * Bottom right
@@ -254,7 +255,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // processor and renderer
         Terrarum.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
-                (Terrarum.WIDTH - 2 - totalHardwareName.length * 8).toFloat(), Terrarum.HEIGHT - 10f)
+                (Terrarum.WIDTH - (totalHardwareName.length + 2) * TinyAlphNum.W).toFloat(), Terrarum.HEIGHT - TinyAlphNum.H * 2f)
     }
 
     private val processorName = AppLoader.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (AppLoader.is32BitJVM) " (32-bit)" else ""
@@ -263,13 +264,13 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun printLine(batch: SpriteBatch, l: Int, s: String) {
         Terrarum.fontSmallNumbers.draw(batch,
-                s, 10f, line(l)
+                s, TinyAlphNum.W * 2f, line(l)
         )
     }
 
     private fun printLineColumn(batch: SpriteBatch, col: Int, row: Int, s: String) {
         Terrarum.fontSmallNumbers.draw(batch,
-                s, (10 + column(col)), line(row)
+                s, (TinyAlphNum.W * 2f + column(col)), line(row)
         )
     }
 
@@ -341,11 +342,11 @@ class BasicDebugInfoWindow : UICanvas() {
         }
         batch.begin()
 
-        Terrarum.fontSmallNumbers.draw(batch, gamepad.getName(), Terrarum.WIDTH - (gamepad.getName().length) * 8f, uiY.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, gamepad.getName(), Terrarum.WIDTH - (gamepad.getName().length + 2f) * TinyAlphNum.W, uiY.toFloat() + h + 2)
 
     }
 
-    private fun line(i: Int): Float = i * 10f
+    private fun line(i: Int): Float = i * TinyAlphNum.H.toFloat()
 
     private fun column(i: Int): Float = 300f * (i - 1)
 
