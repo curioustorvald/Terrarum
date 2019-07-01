@@ -307,13 +307,13 @@ abstract class UICanvas(
                 ).roundInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        Terrarum.WIDTH.toFloat(),
-                        Terrarum.WIDTH - ui.width.toFloat()
+                        AppLoader.screenW.toFloat(),
+                        AppLoader.screenW - ui.width.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        Terrarum.HEIGHT.toFloat(),
-                        Terrarum.HEIGHT - ui.height.toFloat()
+                        AppLoader.screenH.toFloat(),
+                        AppLoader.screenH - ui.height.toFloat()
                 ).roundInt()
             }
         }
@@ -331,13 +331,13 @@ abstract class UICanvas(
                 ).roundInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        Terrarum.WIDTH - ui.width.toFloat(),
-                        Terrarum.WIDTH.toFloat()
+                        AppLoader.screenW - ui.width.toFloat(),
+                        AppLoader.screenW.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        Terrarum.HEIGHT - ui.height.toFloat(),
-                        Terrarum.HEIGHT.toFloat()
+                        AppLoader.screenH - ui.height.toFloat(),
+                        AppLoader.screenH.toFloat()
                 ).roundInt()
             }
         }
@@ -345,16 +345,16 @@ abstract class UICanvas(
             when (position) {
                 Position.LEFT -> ui.handler.posX = 0
                 Position.TOP -> ui.handler.posY = 0
-                Position.RIGHT -> ui.handler.posX = Terrarum.WIDTH - ui.width
-                Position.BOTTOM -> ui.handler.posY = Terrarum.HEIGHT - ui.height
+                Position.RIGHT -> ui.handler.posX = AppLoader.screenW - ui.width
+                Position.BOTTOM -> ui.handler.posY = AppLoader.screenH - ui.height
             }
         }
         fun endClosingPopOut(ui: UICanvas, position: Position) {
             when (position) {
                 Position.LEFT -> ui.handler.posX = -ui.width
                 Position.TOP -> ui.handler.posY = -ui.height
-                Position.RIGHT -> ui.handler.posX = Terrarum.WIDTH
-                Position.BOTTOM -> ui.handler.posY = Terrarum.HEIGHT
+                Position.RIGHT -> ui.handler.posX = AppLoader.screenW
+                Position.BOTTOM -> ui.handler.posY = AppLoader.screenH
             }
         }
 

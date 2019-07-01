@@ -62,7 +62,7 @@ class Notification : UICanvas() {
         val displayedTextWidth = maxOf(240, realTextWidth)
 
         // force the UI to the centre of the screen
-        this.posX = (Terrarum.WIDTH - displayedTextWidth) / 2
+        this.posX = (AppLoader.screenW - displayedTextWidth) / 2
 
         val textHeight = message.size * AppLoader.fontGame.lineHeight
 

@@ -3,12 +3,9 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendMul
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.BlockStats
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 
@@ -46,7 +43,7 @@ object FeaturesDrawer {
      * usually targeted for the environmental temperature (desert/winterland), hence the name.
      */
     fun drawEnvOverlay(batch: SpriteBatch) {
-        val onscreen_tiles_max = FastMath.ceil(Terrarum.HEIGHT * Terrarum.WIDTH / FastMath.sqr (TILE_SIZE.toFloat())) * 2
+        val onscreen_tiles_max = FastMath.ceil(AppLoader.screenH * AppLoader.screenW / FastMath.sqr (TILE_SIZE.toFloat())) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f
         val onscreen_cold_tiles = BlockStats.getCount(*TILES_COLD).toFloat()
         val onscreen_warm_tiles = BlockStats.getCount(*TILES_WARM).toFloat()
@@ -60,8 +57,8 @@ object FeaturesDrawer {
 
         batch.color = ColourTemp(colTemp)
         batch.fillRect(0f, 0f,
-                Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom,
-                Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom
+                AppLoader.screenW * if (zoom < 1) 1f / zoom else zoom,
+                AppLoader.screenH * if (zoom < 1) 1f / zoom else zoom
         )
 
         blendNormal(batch)

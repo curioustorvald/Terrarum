@@ -51,8 +51,8 @@ object IngameRenderer : Disposable {
     val shaderAtoGrey: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
 
-    private val width = Terrarum.WIDTH
-    private val height = Terrarum.HEIGHT
+    private val width = AppLoader.screenW
+    private val height = AppLoader.screenH
     private val widthf = width.toFloat()
     private val heightf = height.toFloat()
 
@@ -608,7 +608,7 @@ object IngameRenderer : Disposable {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     private fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + Terrarum.HALFW).round(), (-newY + Terrarum.HALFH).round(), 0f)
+        camera.position.set((-newX + AppLoader.halfScreenW).round(), (-newY + AppLoader.halfScreenH).round(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

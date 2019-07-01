@@ -44,7 +44,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
 
     fun enter() {
         // init view port
-        camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+        camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
 
 
         img = Texture("assets/test_texture.tga")
@@ -56,14 +56,14 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         blurFboA = FrameBuffer(Pixmap.Format.RGBA8888, img.width, img.height, false)
         blurFboB = FrameBuffer(Pixmap.Format.RGBA8888, img.width, img.height, false)
 
-        worldFbo = FrameBuffer(Pixmap.Format.RGBA8888, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldFbo = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenW, AppLoader.screenH, false)
 
         //blurShader.begin()
         //blurShader.setUniformf("iResolution", img.width.toFloat(), img.height.toFloat(), 0f)
         //blurShader.end()
 
 
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
     }
 
     override fun render(delta: Float) {
@@ -134,7 +134,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
             batch.inUse {
                 batch.shader = null
 
-                camera.position.set(Terrarum.WIDTH / 2f - 50f, Terrarum.HEIGHT / 2f - 50f, 0f)
+                camera.position.set(AppLoader.screenW / 2f - 50f, AppLoader.screenH / 2f - 50f, 0f)
                 camera.update()
                 batch.projectionMatrix = camera.combined
 
@@ -146,11 +146,11 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         }
 
 
-        camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+        camera.setToOrtho(true, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
         batch.projectionMatrix = camera.combined
         batch.inUse {
 
-            camera.position.set(Terrarum.WIDTH / 2f, Terrarum.HEIGHT / 2f, 0f)
+            camera.position.set(AppLoader.screenW / 2f, AppLoader.screenH / 2f, 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
 
@@ -167,7 +167,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
     }
 
     override fun pause() {

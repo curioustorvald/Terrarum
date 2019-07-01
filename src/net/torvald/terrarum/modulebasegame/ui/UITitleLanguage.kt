@@ -21,13 +21,13 @@ class UITitleLanguage : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = (Terrarum.WIDTH * 0.75).toInt()
-    override var height = Terrarum.HEIGHT - textAreaHMargin * 2
+    override var width = (AppLoader.screenW * 0.75).toInt()
+    override var height = AppLoader.screenH - textAreaHMargin * 2
 
     private val localeList = Lang.languageList.toList().sorted()
     private val textArea = UIItemTextButtonList(this,
             localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
-            Terrarum.WIDTH - width, textAreaHMargin,
+            AppLoader.screenW - width, textAreaHMargin,
             width, height,
             textAreaWidth = width,
             readFromLang = false,

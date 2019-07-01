@@ -236,6 +236,8 @@ public class AppLoader implements ApplicationListener {
     private static Screen currenScreen;
     public static int screenW = 0;
     public static int screenH = 0;
+    public static int halfScreenW = 0;
+    public static int halfScreenH = 0;
 
     public static Texture textureWhiteSquare;
     public static Texture textureWhiteCircle;
@@ -581,6 +583,9 @@ public class AppLoader implements ApplicationListener {
 
         appConfig.width = screenW;
         appConfig.height = screenH;
+
+        halfScreenW = screenW / 2;
+        halfScreenH = screenH / 2;
 
         updateFullscreenQuad(screenW, screenH);
 

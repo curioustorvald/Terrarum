@@ -32,7 +32,7 @@ class UIProxyNewBuildingMaker : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
-        val ingame = BuildingMaker(Terrarum.batch)
+        val ingame = BuildingMaker(AppLoader.batch)
 
         Terrarum.setCurrentIngameInstance(ingame)
         LoadScreen.screenToLoad = ingame

@@ -294,11 +294,11 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiToolbox.isVisible = true
         uiToolbox.invocationArgument = arrayOf(this)
 
-        uiPaletteSelector.setPosition(Terrarum.WIDTH - uiPaletteSelector.width, 0)
+        uiPaletteSelector.setPosition(AppLoader.screenW - uiPaletteSelector.width, 0)
         uiPaletteSelector.isVisible = true
 
         notifier.setPosition(
-                (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+                (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
 
 
         actorNowPlaying?.setPosition(512 * 16.0, 149 * 16.0)
@@ -378,8 +378,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             // position the menu to where the cursor is
             uiPenMenu.posX = Terrarum.mouseScreenX - uiPenMenu.width / 2
             uiPenMenu.posY = Terrarum.mouseScreenY - uiPenMenu.height / 2
-            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, Terrarum.WIDTH - uiPenMenu.width)
-            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, Terrarum.HEIGHT - uiPenMenu.height)
+            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, AppLoader.screenW - uiPenMenu.width)
+            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, AppLoader.screenH - uiPenMenu.height)
 
             // actually open
             uiPenMenu.setAsOpen()
@@ -397,10 +397,10 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun resize(width: Int, height: Int) {
-        IngameRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        IngameRenderer.resize(AppLoader.screenW, AppLoader.screenH)
         uiToolbox.setPosition(0, 0)
         notifier.setPosition(
-                (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+                (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
 
         println("[BuildingMaker] Resize event")
     }
@@ -562,12 +562,12 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, usePhysic
 
     // TODO resize-aware
     private var coerceInStart = Point2d(
-            (Terrarum.WIDTH - hitbox.width) / 2.0,
-            (Terrarum.HEIGHT - hitbox.height) / 2.0
+            (AppLoader.screenW - hitbox.width) / 2.0,
+            (AppLoader.screenH - hitbox.height) / 2.0
     )
     private var coerceInEnd = Point2d(
-            parent.world.width * TILE_SIZE - (Terrarum.WIDTH - hitbox.width) / 2.0,
-            parent.world.height * TILE_SIZE - (Terrarum.HEIGHT - hitbox.height) / 2.0
+            parent.world.width * TILE_SIZE - (AppLoader.screenW - hitbox.width) / 2.0,
+            parent.world.height * TILE_SIZE - (AppLoader.screenH - hitbox.height) / 2.0
     )
 
     override fun update(delta: Float) {
@@ -590,7 +590,7 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, usePhysic
 
 class YamlCommandExit : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        AppLoader.setScreen(TitleScreen(Terrarum.batch))
+        AppLoader.setScreen(TitleScreen(AppLoader.batch))
     }
 }
 

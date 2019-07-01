@@ -91,7 +91,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
         fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
-            camera.position.set((-newX + Terrarum.HALFW).round(), (-newY + Terrarum.HALFH).round(), 0f)
+            camera.position.set((-newX + AppLoader.halfScreenW).round(), (-newY + AppLoader.halfScreenH).round(), 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
         }
@@ -131,9 +131,9 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGB888
 
-    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
-    var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
-    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, AppLoader.screenW, AppLoader.screenH, false)
+    var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, AppLoader.screenW, AppLoader.screenH, false)
+    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, AppLoader.screenW, AppLoader.screenH, false)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     private lateinit var lightmapFboA: FrameBuffer
     private lateinit var lightmapFboB: FrameBuffer
@@ -228,7 +228,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun show() {
-        //initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        //initViewPort(AppLoader.screenW, AppLoader.screenH)
 
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
 
@@ -336,7 +336,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.input.inputProcessor = ingameController
 
 
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
 
 
         // init console window
@@ -351,7 +351,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // init notifier
         notifier = Notification()
         notifier.setPosition(
-                (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+                (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
 
 
 
@@ -360,7 +360,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // inventory
         /*uiInventoryPlayer = UIInventory(player,
                 width = 900,
-                height = Terrarum.HEIGHT - 160,
+                height = AppLoader.screenH - 160,
                 categoryWidth = 210,
                 toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
         )*/
@@ -377,11 +377,11 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // quick bar
         uiQuickBar = UIQuickBar()
         uiQuickBar.isVisible = true
-        uiQuickBar.setPosition((Terrarum.WIDTH - uiQuickBar.width) / 2 + 12, -10)
+        uiQuickBar.setPosition((AppLoader.screenW - uiQuickBar.width) / 2 + 12, -10)
 
         // pie menu
         uiPieMenu = UIPieMenu()
-        uiPieMenu.setPosition(Terrarum.HALFW, Terrarum.HALFH)
+        uiPieMenu.setPosition(AppLoader.halfScreenW, AppLoader.halfScreenH)
 
         // vital metre
         // fill in getter functions by
@@ -396,11 +396,11 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // basic watch-style notification bar (temperature, new mail)
         uiWatchBasic = UIBasicNotifier(player)
         uiWatchBasic.setAsAlwaysVisible()
-        uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
+        uiWatchBasic.setPosition(AppLoader.screenW - uiWatchBasic.width, 0)
 
         uiWatchTierOne = UITierOneWatch(player)
         uiWatchTierOne.setAsAlwaysVisible()
-        uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
+        uiWatchTierOne.setPosition(AppLoader.screenW - uiWatchTierOne.width, uiWatchBasic.height - 2)
 
 
         uiTooltip = UITooltip()
@@ -865,7 +865,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         /////////////////////////
         // draw to main screen //
         /////////////////////////
-        camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+        camera.setToOrtho(true, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
         batch.projectionMatrix = camera.combined
         batch.inUse {
 
@@ -1232,9 +1232,9 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     /** whether the actor is within screen */
     private fun ActorWithBody.inScreen() =
             distToCameraSqr(this) <=
-            (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).
+            (AppLoader.screenW.plus(this.hitbox.width.div(2)).
                     times(1 / screenZoom).sqr() +
-             Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).
+             AppLoader.screenH.plus(this.hitbox.height.div(2)).
                      times(1 / screenZoom).sqr())
 
 
@@ -1398,22 +1398,22 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private var lightmapInitialised = false // to avoid nullability of lightmapFBO
 
     /**
-     * @param width same as Terrarum.WIDTH
-     * @param height same as Terrarum.HEIGHT
+     * @param width same as AppLoader.screenW
+     * @param height same as AppLoader.screenH
      * @see net.torvald.terrarum.Terrarum
      */
     override fun resize(width: Int, height: Int) {
 
-        BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-        LightmapRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        BlocksDrawer.resize(AppLoader.screenW, AppLoader.screenH)
+        LightmapRenderer.resize(AppLoader.screenW, AppLoader.screenH)
         MegaRainGovernor.resize()
 
         worldDrawFrameBuffer.dispose()
-        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, AppLoader.screenW, AppLoader.screenH, false)
         worldGlowFrameBuffer.dispose()
-        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, AppLoader.screenW, AppLoader.screenH, false)
         worldBlendFrameBuffer.dispose()
-        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, AppLoader.screenW, AppLoader.screenH, false)
 
         if (lightmapInitialised) {
             lightmapFboA.dispose()
@@ -1435,7 +1435,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // Set up viewport when window is resized
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
 
 
 
@@ -1448,20 +1448,20 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // resize UIs
 
             notifier.setPosition(
-                    (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+                    (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
 
             // inventory
             /*uiInventoryPlayer =
                     UIInventory(player,
                             width = 840,
-                            height = Terrarum.HEIGHT - 160,
+                            height = AppLoader.screenH - 160,
                             categoryWidth = 210
                     )*/
 
 
             // basic watch-style notification bar (temperature, new mail)
-            uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
-            uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
+            uiWatchBasic.setPosition(AppLoader.screenW - uiWatchBasic.width, 0)
+            uiWatchTierOne.setPosition(AppLoader.screenW - uiWatchTierOne.width, uiWatchBasic.height - 2)
         }
 
 

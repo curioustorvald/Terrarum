@@ -38,7 +38,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     // todo register titlescreen as the ingame, similar in a way that the buildingmaker did
 
-    var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+    var camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
 
 
     // invert Y
@@ -172,7 +172,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     override fun show() {
         printdbg(this, "show() called")
 
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
 
         logo = TextureRegion(Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")))
         logo.flip(false, true)
@@ -181,7 +181,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.input.inputProcessor = TitleScreenController(this)
 
 
-        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenW, AppLoader.screenH, false)
 
         loadThingsWhileIntroIsVisible()
 
@@ -233,7 +233,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
-        //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+        //camera.setToOrtho(true, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
 
         // render world
         gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
@@ -270,14 +270,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         COPYTING.forEachIndexed { index, s ->
             val textWidth = AppLoader.fontGame.getWidth(s)
             AppLoader.fontGame.draw(batch, s,
-                    (Terrarum.WIDTH - textWidth - 1f).toInt().toFloat(),
-                    (Terrarum.HEIGHT - AppLoader.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
+                    (AppLoader.screenW - textWidth - 1f).toInt().toFloat(),
+                    (AppLoader.screenH - AppLoader.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
             )
         }
 
         AppLoader.fontGame.draw(batch, "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}",
                 1f.toInt().toFloat(),
-                (Terrarum.HEIGHT - AppLoader.fontGame.lineHeight - 1f).toInt().toFloat()
+                (AppLoader.screenH - AppLoader.fontGame.lineHeight - 1f).toInt().toFloat()
         )
 
     }
@@ -292,11 +292,11 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         printdbg(this, "resize() called")
 
         // Set up viewport when window is resized
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
 
 
         // resize UI by re-creating it (!!)
-        uiMenu.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        uiMenu.resize(AppLoader.screenW, AppLoader.screenH)
         // TODO I forgot what the fuck kind of hack I was talking about
         //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         uiMenu.setPosition(0, 0) // shitty hack. Could be:
@@ -304,7 +304,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         // 2: The UI is coded shit
 
 
-        IngameRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        IngameRenderer.resize(AppLoader.screenW, AppLoader.screenH)
 
         printdbg(this, "resize() exit")
     }

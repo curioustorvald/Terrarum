@@ -1328,7 +1328,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
 
         // wrap around for X-axis
-        //val actorMinimumX = Terrarum.HALFW // to make camera's X stay positive
+        //val actorMinimumX = AppLoader.halfScreenW // to make camera's X stay positive
         //val actorMaximumX = worldsizePxl + actorMinimumX // to make camera's X stay positive
 
         hitbox.setPositionFromPointed(

@@ -31,7 +31,7 @@ object LoadScreen : ScreenAdapter() {
     private var arrowObjPos = 0f // 0 means at starting position, regardless of screen position
     private var arrowObjGlideOffsetX = 0f
     private var arrowObjGlideSize = 0f
-    private val arrowGlideSpeed: Float; get() = Terrarum.WIDTH * 2f // pixels per sec
+    private val arrowGlideSpeed: Float; get() = AppLoader.screenW * 2f // pixels per sec
     private lateinit var arrowObjTex: Texture
     private var glideTimer = 0f
     private var glideDispY = 0f
@@ -47,7 +47,7 @@ object LoadScreen : ScreenAdapter() {
     private val ghostMaxZoomX = 1.25f
     private val ghostAlphaMax = 1f
 
-    var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+    var camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
 
     fun initViewPort(width: Int, height: Int) {
         // Set Y to point downwards
@@ -92,7 +92,7 @@ object LoadScreen : ScreenAdapter() {
         }
 
 
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
 
         textFbo = FrameBuffer(
                 Pixmap.Format.RGBA4444,
@@ -111,7 +111,7 @@ object LoadScreen : ScreenAdapter() {
     }
 
 
-    val textX: Float; get() = (Terrarum.WIDTH * 0.72f).floor()
+    val textX: Float; get() = (AppLoader.screenW * 0.72f).floor()
 
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
     private var doContextChange = false
@@ -122,8 +122,8 @@ object LoadScreen : ScreenAdapter() {
     override fun render(delta: Float) {
         val delta = Gdx.graphics.rawDeltaTime
 
-        glideDispY = Terrarum.HEIGHT - 100f - AppLoader.fontGame.lineHeight
-        arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
+        glideDispY = AppLoader.screenH - 100f - AppLoader.fontGame.lineHeight
+        arrowObjGlideSize = arrowObjTex.width + 2f * AppLoader.screenW
 
 
 
@@ -159,11 +159,11 @@ object LoadScreen : ScreenAdapter() {
 
         if (!doContextChange) {
             // draw text to FBO
-            textFbo.inAction(camera, Terrarum.batch) {
-                Terrarum.batch.inUse {
+            textFbo.inAction(camera, AppLoader.batch) {
+                AppLoader.batch.inUse {
 
 
-                    blendNormal(Terrarum.batch)
+                    blendNormal(AppLoader.batch)
                     AppLoader.fontGame
                     it.color = Color.WHITE
 
@@ -171,7 +171,7 @@ object LoadScreen : ScreenAdapter() {
                     AppLoader.fontGame.draw(it, textToPrint, ((textFbo.width - textWidth) / 2).toInt().toFloat(), 0f)
 
 
-                    blendMul(Terrarum.batch)
+                    blendMul(AppLoader.batch)
                     // draw colour overlay, flipped
                     it.draw(textOverlayTex,
                             (textFbo.width - textWidth) / 2f,
@@ -183,15 +183,15 @@ object LoadScreen : ScreenAdapter() {
             }
 
 
-            Terrarum.batch.inUse {
-                initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
+            AppLoader.batch.inUse {
+                initViewPort(AppLoader.screenW, AppLoader.screenH) // dunno, no render without this
                 it.projectionMatrix = camera.combined
-                blendNormal(Terrarum.batch)
+                blendNormal(AppLoader.batch)
 
 
                 // almost black background
                 it.color = Color(0x181818ff)
-                it.fillRect(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+                it.fillRect(0f, 0f, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
 
 
                 it.color = Color.WHITE
@@ -234,7 +234,7 @@ object LoadScreen : ScreenAdapter() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
+                it.fillRect(0f, 60f, AppLoader.screenW.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
@@ -248,18 +248,18 @@ object LoadScreen : ScreenAdapter() {
             }
         }
         else {
-            Terrarum.batch.inUse {
+            AppLoader.batch.inUse {
                 // recycling part of the draw code //
 
-                initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
+                initViewPort(AppLoader.screenW, AppLoader.screenH) // dunno, no render without this
                 it.projectionMatrix = camera.combined
-                blendNormal(Terrarum.batch)
+                blendNormal(AppLoader.batch)
 
 
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
+                it.fillRect(0f, 60f, AppLoader.screenW.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
@@ -272,7 +272,7 @@ object LoadScreen : ScreenAdapter() {
                 }
             }
 
-            Terrarum.batch.flush()
+            AppLoader.batch.flush()
 
             Thread.sleep(80)
 
@@ -318,6 +318,6 @@ object LoadScreen : ScreenAdapter() {
     }
 
     override fun resize(width: Int, height: Int) {
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        initViewPort(AppLoader.screenW, AppLoader.screenH)
     }
 }

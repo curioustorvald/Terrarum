@@ -80,8 +80,8 @@ object LightmapRenderer {
 
     // TODO resize(int, int) -aware
 
-    var LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
-    var LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+    var LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+    var LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
@@ -754,8 +754,8 @@ object LightmapRenderer {
         val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
         val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
 
-        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
-        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
 
         if (_init) {
             lightBuffer.dispose()

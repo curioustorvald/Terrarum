@@ -300,6 +300,6 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         val remoConWidth = 304
         fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
-        val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
+        val menubarOffY: Int; get() = AppLoader.screenH / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
     }
 }

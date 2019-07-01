@@ -101,8 +101,8 @@ internal object WeatherMixer : RNGConsumer {
             val playerPosY = player.hitbox.centeredY
             kotlin.repeat(7) {
                 val rainParticle = ParticleMegaRain(
-                        playerPosX + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                        playerPosY - Terrarum.HEIGHT
+                        playerPosX + HQRNG().nextInt(AppLoader.screenW) - AppLoader.halfScreenW,
+                        playerPosY - AppLoader.screenH
                 )
                 (Terrarum.ingame!! as TerrarumIngame).addParticle(rainParticle)
             }
