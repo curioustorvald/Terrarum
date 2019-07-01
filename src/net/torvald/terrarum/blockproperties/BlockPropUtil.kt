@@ -15,7 +15,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
  */
 object BlockPropUtil {
     var flickerFuncX: Second = 0f // saves current status (time) of func
-    val flickerFuncDomain: Second = 0.1f // time between two noise sample
+    val flickerFuncDomain: Second = 0.08f // time between two noise sample
     val flickerFuncRange = 0.012f // intensity [0, 1]
 
     var breathFuncX = 0f
@@ -30,31 +30,27 @@ object BlockPropUtil {
 
     var flickerP0 = getNewRandom()
     var flickerP1 = getNewRandom()
-    var flickerP2 = getNewRandom()
-    var flickerP3 = getNewRandom()
 
     init {
 
     }
 
     private fun getTorchFlicker(baseLum: Cvec): Cvec {
-        val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX / flickerFuncDomain,
-                flickerP0, flickerP1, flickerP2, flickerP3
-        )
+        val funcY = FastMath.interpolateLinear(flickerFuncX / flickerFuncDomain, flickerP0, flickerP1)
 
-        return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
+        return alterBrightnessUniform(baseLum, funcY)
     }
 
     private fun getSlowBreath(baseLum: Cvec): Cvec {
         val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
 
-        return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
+        return alterBrightnessUniform(baseLum, funcY)
     }
 
     private fun getPulsate(baseLum: Cvec): Cvec {
         val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
 
-        return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
+        return alterBrightnessUniform(baseLum, funcY)
     }
 
     /**
@@ -63,21 +59,17 @@ object BlockPropUtil {
     internal fun dynamicLumFuncTickClock() {
         // FPS-time compensation
         if (Gdx.graphics.framesPerSecond > 0) {
-            flickerFuncX += Gdx.graphics.rawDeltaTime * 1000f
-            breathFuncX  += Gdx.graphics.rawDeltaTime * 1000f
-            pulsateFuncX += Gdx.graphics.rawDeltaTime * 1000f
+            flickerFuncX += Gdx.graphics.rawDeltaTime
+            breathFuncX  += Gdx.graphics.rawDeltaTime
+            pulsateFuncX += Gdx.graphics.rawDeltaTime
         }
 
         // flicker-related vars
         if (flickerFuncX > flickerFuncDomain) {
             flickerFuncX -= flickerFuncDomain
 
-            //flickerPatternThis = flickerPatternNext
-            //flickerPatternNext = getNewRandom()
             flickerP0 = flickerP1
-            flickerP1 = flickerP2
-            flickerP2 = flickerP3
-            flickerP3 = getNewRandom()
+            flickerP1 = getNewRandom()
         }
 
         // breath-related vars
@@ -100,5 +92,21 @@ object BlockPropUtil {
             5    -> getPulsate(baseLum)
             else -> baseLum
         }
+    }
+
+    /**
+     * Darken or brighten colour by 'brighten' argument
+     *
+     * @param data Raw channel value (0-255) per channel
+     * @param brighten (-1.0 - 1.0) negative means darkening
+     * @return processed colour
+     */
+    private fun alterBrightnessUniform(data: Cvec, brighten: Float): Cvec {
+        return Cvec(
+                data.r + brighten,
+                data.g + brighten,
+                data.b + brighten,
+                data.a + brighten
+        )
     }
 }

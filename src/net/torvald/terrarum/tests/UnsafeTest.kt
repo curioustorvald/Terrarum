@@ -1,5 +1,6 @@
 package net.torvald.terrarum.tests
 
+import net.torvald.UnsafeHelper
 import net.torvald.terrarum.gameworld.toUint
 import sun.misc.Unsafe
 
@@ -15,20 +16,32 @@ class UnsafeTest {
         unsafe = unsafeConstructor.newInstance()
     }
 
-    private val memsize = 2048L // must be big enough value so that your OS won't always return zero-filled pieces
+    private val memsize = 512L // must be big enough value so that your OS won't always return zero-filled pieces
 
     fun main() {
-        val ptr = unsafe.allocateMemory(memsize)
+        var ptr = unsafe.allocateMemory(memsize)
         printDump(ptr)
 
         unsafe.setMemory(ptr, memsize, 0x00.toByte())
         printDump(ptr)
 
-        for (k in 0 until memsize step 4) {
-            unsafe.putInt(ptr + k, 0xcafebabe.toInt())
+        for (k in 0 until 13) {
+            unsafe.putByte(ptr + k, (-1 - k).toByte())
         }
         printDump(ptr)
 
+        // test shingled memory copy -- how would it work out?
+        UnsafeHelper.memcpy(ptr, ptr + 3L, 13L)
+
+        printDump(ptr)
+
+
+        println(ptr)
+        ptr = unsafe.reallocateMemory(ptr, 256L)
+        println(ptr)
+
+
+        // that's all for today!
         unsafe.freeMemory(ptr)
     }
 

@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.debuggerapp.ActorsLister
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import java.util.*
 
 /**
@@ -15,8 +15,8 @@ internal object ActorsList : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         jPanelInstances.add(ActorsLister(
-                (Terrarum.ingame!! as Ingame).actorContainerActive,
-                (Terrarum.ingame!! as Ingame).actorContainerInactive)
+                (Terrarum.ingame!! as TerrarumIngame).actorContainerActive,
+                (Terrarum.ingame!! as TerrarumIngame).actorContainerInactive)
         )
     }
 

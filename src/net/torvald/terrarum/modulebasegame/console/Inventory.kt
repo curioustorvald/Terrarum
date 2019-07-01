@@ -5,7 +5,7 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 /**
@@ -13,7 +13,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: Pocketed? = (Terrarum.ingame!! as Ingame).actorNowPlaying
+    private var target: Pocketed? = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {

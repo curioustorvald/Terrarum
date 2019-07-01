@@ -3,12 +3,13 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UICanvas
 
 /**
@@ -21,15 +22,15 @@ class UIQuickslotBar : UICanvas() {
 
     private val gutter = 10 - 6 // do -6 to get a gutter size of not-enlarged cells
     override var width: Int = cellSize * SLOT_COUNT + gutter * (SLOT_COUNT - 1) // 452
-    override var height: Int = ItemSlotImageFactory.slotImage.tileH + 4 + Terrarum.fontGame.lineHeight.toInt()
+    override var height: Int = ItemSlotImageFactory.slotImage.tileH + 4 + AppLoader.fontGame.lineHeight.toInt()
     /**
      * In milliseconds
      */
     override var openCloseTime: Second = COMMON_OPEN_CLOSE
 
     private var selection: Int
-        get() = (Terrarum.ingame!! as Ingame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
-        set(value) { (Terrarum.ingame!! as Ingame).actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
+        get() = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        set(value) { (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
 
 
     companion object {
@@ -47,7 +48,7 @@ class UIQuickslotBar : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         for (i in 0..SLOT_COUNT - 1) {
-            val item = ItemCodex[(Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
+            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
 
             val image = if (i == selection)
                 ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)

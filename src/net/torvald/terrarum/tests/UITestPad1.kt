@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.terrarum.*
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UINSMenu
 
 /**
@@ -85,7 +85,7 @@ class UITestPad1 : ScreenAdapter() {
     var _dct = 0f
 
     override fun render(delta: Float) {
-        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+        Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
         // UPDATE

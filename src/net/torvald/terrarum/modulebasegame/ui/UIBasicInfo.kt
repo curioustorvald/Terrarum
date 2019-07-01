@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegSmall
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
@@ -52,7 +52,7 @@ class UIBasicInfo(private val player: ActorHumanoid?) : UICanvas() {
         get() {
             if (player != null) {
                 val playerTilePos = player.hIntTilewiseHitbox
-                val tempCelsius = -273f + ((Terrarum.ingame as? Ingame)?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
+                val tempCelsius = -273f + ((Terrarum.ingame as? TerrarumIngame)?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
 
                 return if (tempCelsius < -10)
                     0

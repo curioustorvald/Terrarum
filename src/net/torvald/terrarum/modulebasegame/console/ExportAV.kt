@@ -5,7 +5,7 @@ import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 import java.io.IOException
 
@@ -16,7 +16,7 @@ internal object ExportAV : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
-                val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+                val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                 if (player == null) return
 
                 JsonWriter.writeToFile(

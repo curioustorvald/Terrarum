@@ -39,10 +39,12 @@ import java.util.concurrent.locks.ReentrantLock
 
 
 /**
+ * Ingame instance for the game Terrarum.
+ *
  * Created by minjaesong on 2017-06-16.
  */
 
-open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
+open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val ACTOR_UPDATE_RANGE = 4096
 
@@ -240,7 +242,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            LoadScreen.addMessage("${Terrarum.NAME} version ${AppLoader.getVERSION_STRING()}")
+            LoadScreen.addMessage("${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
             LoadScreen.addMessage("Creating new world")
 
 
@@ -416,7 +418,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     ///////////////
     // prod code //
     ///////////////
-    private class ThreadIngameUpdate(val ingame: Ingame): Runnable {
+    private class ThreadIngameUpdate(val terrarumIngame: TerrarumIngame): Runnable {
         override fun run() {
             TODO()
         }
@@ -425,6 +427,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private var updateAkku = 0.0
 
     override fun render(delta: Float) {
+        println("Vitun Perkeleen TerrarumIngame")
+
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
         // there's still things to load which needs GL context to be present
         if (!gameFullyLoaded) {
@@ -660,12 +664,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainerActive.size > Terrarum.THREADS) {
             val actors = actorContainerActive.size.toFloat()
             // set up indices
-            for (i in 0..Terrarum.THREADS - 1) {
+            for (i in 0..AppLoader.THREADS - 1) {
                 ThreadParallel.map(
                         i, "ActorUpdate",
                         ThreadActorUpdate(
-                                actors.div(Terrarum.THREADS).times(i).roundInt(),
-                                actors.div(Terrarum.THREADS).times(i + 1).roundInt() - 1
+                                actors.div(AppLoader.THREADS).times(i).roundInt(),
+                                actors.div(AppLoader.THREADS).times(i + 1).roundInt() - 1
                         )
                 )
             }

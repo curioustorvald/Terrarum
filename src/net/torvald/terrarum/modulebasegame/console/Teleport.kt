@@ -5,7 +5,7 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
 /**
@@ -27,7 +27,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            (Terrarum.ingame!! as Ingame).actorNowPlaying?.setPosition(x.toDouble(), y.toDouble())
+            (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.setPosition(x.toDouble(), y.toDouble())
         }
         else if (args.size == 4) {
             if (args[2].toLowerCase() != "to") {
@@ -39,7 +39,7 @@ internal object Teleport : ConsoleCommand {
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player") {
-                    val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+                    val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                     if (player == null) {
                         EchoError("Player does not exist")
                         return

@@ -12,7 +12,7 @@ package net.torvald.terrarum.modulebasegame.ui
     override var height: Int = 0
 
     private var fontCol: Color = if (!isBlackVariant) Color.BLACK else Color.WHITE
-    private val GLYPH_HEIGHT = Terrarum.fontGame.lineHeight
+    private val GLYPH_HEIGHT = AppLoader.fontGame.lineHeight
 
     override var openCloseTime: Second = OPEN_CLOSE_TIME
 
@@ -29,7 +29,7 @@ package net.torvald.terrarum.modulebasegame.ui
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
 
-        val textWidth = messagesList.map { Terrarum.fontGame.getWidth(it) }.sorted()[1]
+        val textWidth = messagesList.map { AppLoader.fontGame.getWidth(it) }.sorted()[1]
 
         batch.color = Color.WHITE
 
@@ -38,7 +38,7 @@ package net.torvald.terrarum.modulebasegame.ui
         batch.draw(segment.get(2, 0), 2 * LRmargin + textWidth, 0f)
 
         messagesList.forEachIndexed { index, s ->
-            Terrarum.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - Terrarum.fontGame.lineHeight) / 2f)
+            AppLoader.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - AppLoader.fontGame.lineHeight) / 2f)
         }
 
         AppLoader.printdbg(this, "render")

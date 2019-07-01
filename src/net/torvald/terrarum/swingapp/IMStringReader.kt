@@ -1,10 +1,13 @@
 package net.torvald.terrarum.swingapp
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.langpack.Lang
 import java.awt.BorderLayout
 import java.awt.FlowLayout
-import java.awt.event.*
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import javax.swing.*
 
 
@@ -42,7 +45,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
         this.title = labelTitle
         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
 
-        Terrarum.pause()
+        AppLoader.getINSTANCE().pause()
 
         buttonOkay.addMouseListener(object : MouseListener {
             override fun mouseEntered(e: MouseEvent?) { }
@@ -52,7 +55,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
             override fun mousePressed(e: MouseEvent?) {
                 userInput = inputArea.text
                 isVisible = false
-                Terrarum.resume()
+                AppLoader.getINSTANCE().resume()
 
                 feedInput(userInput)
 
@@ -68,7 +71,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
             override fun mousePressed(e: MouseEvent?) {
                 userInput = ""//null
                 isVisible = false
-                Terrarum.resume()
+                AppLoader.getINSTANCE().resume()
 
                 dispose()
             }
@@ -80,7 +83,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
             override fun keyPressed(e: KeyEvent?) {
                 userInput = inputArea.text
                 isVisible = false
-                Terrarum.resume()
+                AppLoader.getINSTANCE().resume()
 
                 feedInput(userInput)
 

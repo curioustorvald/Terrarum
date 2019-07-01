@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
@@ -104,7 +104,7 @@ class UIItemInventoryElem(
             batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             // draw name of the item
             if (AppLoader.IS_DEVELOPMENT_BUILD) {
-                Terrarum.fontGame.draw(batch,
+                AppLoader.fontGame.draw(batch,
                         // print static id, dynamic id, and count
                         "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
                         posX + textOffsetX,
@@ -112,7 +112,7 @@ class UIItemInventoryElem(
                 )
             }
             else {
-                Terrarum.fontGame.draw(batch,
+                AppLoader.fontGame.draw(batch,
                         // print name and amount in parens
                         item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else "") +
                         // TEMPORARY print eqipped slot info as well
@@ -143,8 +143,8 @@ class UIItemInventoryElem(
 
             if (quickslot != null) {
                 val label = quickslot!!.plus(0xE010).toChar()
-                val labelW = Terrarum.fontGame.getWidth("$label")
-                Terrarum.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+                val labelW = AppLoader.fontGame.getWidth("$label")
+                AppLoader.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
             }
 
         }
@@ -156,7 +156,7 @@ class UIItemInventoryElem(
 
     override fun keyDown(keycode: Int): Boolean {
         if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
 
             if (player == null) return false
 
@@ -194,7 +194,7 @@ class UIItemInventoryElem(
                 TODO("Equip position is NULL, does this mean it's single-consume items like a potion? (from item: \"$item\" with itemID: ${item?.originalID}/${item?.dynamicID})")
             }
 
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
 
             if (player == null) return false
 

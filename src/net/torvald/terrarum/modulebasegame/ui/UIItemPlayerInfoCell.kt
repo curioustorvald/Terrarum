@@ -2,10 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.blendScreen
-import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.serialise.ReadWorldInfo
@@ -45,7 +42,7 @@ class UIItemPlayerInfoCell(
     private val backColInactive = ItemSlotImageFactory.CELLCOLOUR_BLACK
     private val backColActive = ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 
-    private val textRow1 = (((height / 2) - Terrarum.fontGame.lineHeight) / 2).toFloat()
+    private val textRow1 = (((height / 2) - AppLoader.fontGame.lineHeight) / 2).toFloat()
     private val textRow2 = textRow1 + (height / 2)
 
     private val creationTimeStr: String
@@ -69,7 +66,7 @@ class UIItemPlayerInfoCell(
 
 
         worldCountStr = Lang["CONTEXT_WORLD_COUNT"] + saveInfo.worldCount
-        worldCountStrWidth = Terrarum.fontGame.getWidth(worldCountStr)
+        worldCountStrWidth = AppLoader.fontGame.getWidth(worldCountStr)
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -109,15 +106,15 @@ class UIItemPlayerInfoCell(
 
         // name
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, saveInfo.playerName, spriteAreaWidth + spriteToNameAreaGap.toFloat(), textRow1)
+        AppLoader.fontGame.draw(batch, saveInfo.playerName, spriteAreaWidth + spriteToNameAreaGap.toFloat(), textRow1)
         // creation and modification time
-        Terrarum.fontGame.draw(batch, "$creationTimeStr/$modificationTimeStr", spriteAreaWidth + spriteToNameAreaGap.toFloat(), textRow2)
+        AppLoader.fontGame.draw(batch, "$creationTimeStr/$modificationTimeStr", spriteAreaWidth + spriteToNameAreaGap.toFloat(), textRow2)
         // world count
-        Terrarum.fontGame.draw(batch, worldCountStr, width - (edgeGap + worldCountStrWidth).toFloat(), textRow1)
+        AppLoader.fontGame.draw(batch, worldCountStr, width - (edgeGap + worldCountStrWidth).toFloat(), textRow1)
         // wallet
         val walletStr = "¤ " + (ingamePlayer?.inventory?.wallet ?: saveInfo.playerWallet)
-        val walletStrWidth = Terrarum.fontGame.getWidth(walletStr)
-        Terrarum.fontGame.draw(batch, walletStr, width - (edgeGap + walletStrWidth).toFloat(), textRow2)
+        val walletStrWidth = AppLoader.fontGame.getWidth(walletStr)
+        AppLoader.fontGame.draw(batch, walletStr, width - (edgeGap + walletStrWidth).toFloat(), textRow2)
         */
     }
 

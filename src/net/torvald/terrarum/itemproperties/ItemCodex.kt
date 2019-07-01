@@ -8,7 +8,7 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import java.util.*
@@ -195,7 +195,7 @@ object ItemCodex {
             }
 
             override fun startPrimaryUse(delta: Float): Boolean {
-                val ingame = Terrarum.ingame!! as Ingame // must be in here
+                val ingame = Terrarum.ingame!! as TerrarumIngame // must be in here
                 ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.WATER, 4f)
                 return true
             }
@@ -222,7 +222,7 @@ object ItemCodex {
             }
 
             override fun startPrimaryUse(delta: Float): Boolean {
-                val ingame = Terrarum.ingame!! as Ingame // must be in here
+                val ingame = Terrarum.ingame!! as TerrarumIngame // must be in here
                 ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.LAVA, 4f)
                 return true
             }
@@ -257,7 +257,7 @@ object ItemCodex {
             return dynamicItemDescription[code]!!
         }
         else {
-            val a = (Terrarum.ingame!! as Ingame).getActorByID(code) // actor item
+            val a = (Terrarum.ingame!! as TerrarumIngame).getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
             return null

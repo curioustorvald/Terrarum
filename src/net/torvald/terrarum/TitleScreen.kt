@@ -2,7 +2,6 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -20,8 +19,8 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
@@ -35,7 +34,9 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 /**
  * Created by minjaesong on 2017-09-02.
  */
-class TitleScreen(val batch: SpriteBatch) : Screen {
+class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
+
+    // todo register titlescreen as the ingame, similar in a way that the buildingmaker did
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
@@ -229,7 +230,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun renderScreen() {
-        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+        Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
@@ -267,16 +268,16 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         )
 
         COPYTING.forEachIndexed { index, s ->
-            val textWidth = Terrarum.fontGame.getWidth(s)
-            Terrarum.fontGame.draw(batch, s,
+            val textWidth = AppLoader.fontGame.getWidth(s)
+            AppLoader.fontGame.draw(batch, s,
                     (Terrarum.WIDTH - textWidth - 1f).toInt().toFloat(),
-                    (Terrarum.HEIGHT - Terrarum.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
+                    (Terrarum.HEIGHT - AppLoader.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
             )
         }
 
-        Terrarum.fontGame.draw(batch, "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}",
+        AppLoader.fontGame.draw(batch, "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}",
                 1f.toInt().toFloat(),
-                (Terrarum.HEIGHT - Terrarum.fontGame.lineHeight - 1f).toInt().toFloat()
+                (Terrarum.HEIGHT - AppLoader.fontGame.lineHeight - 1f).toInt().toFloat()
         )
 
     }
@@ -317,7 +318,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
     fun setCameraPosition(newX: Float, newY: Float) {
-        Ingame.setCameraPosition(batch, camera, newX, newY)
+        TerrarumIngame.setCameraPosition(batch, camera, newX, newY)
     }
 
 
@@ -415,4 +416,5 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             TODO("not implemented")
         }
     }
+
 }

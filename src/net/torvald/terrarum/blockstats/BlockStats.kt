@@ -3,7 +3,7 @@ package net.torvald.terrarum.blockstats
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import java.util.*
@@ -26,7 +26,7 @@ object BlockStats {
         // Get stats on no-zoomed screen area. In other words, will behave as if screen zoom were 1.0
         // no matter how the screen is zoomed.
         val map = (Terrarum.ingame!!.world)
-        val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return
 
         val renderWidth = FastMath.ceil(Terrarum.WIDTH.toFloat())

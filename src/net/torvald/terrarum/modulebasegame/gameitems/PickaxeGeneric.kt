@@ -11,7 +11,7 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -22,7 +22,7 @@ import kotlin.math.roundToInt
  */
 object PickaxeCore {
     fun startPrimaryUse(delta: Float, item: GameItem): Boolean {
-        val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return false
 
         val mouseTileX = Terrarum.mouseTileX
@@ -58,7 +58,7 @@ object PickaxeCore {
     }
 
     fun endPrimaryUse(delta: Float, item: GameItem): Boolean {
-        val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return false
 
         item.using = false

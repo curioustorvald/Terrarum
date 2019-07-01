@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -60,7 +59,7 @@ object MinimapComposer : Disposable {
     private val liveTilesMeta = Array(TILES_IN_X * TILES_IN_Y) { LiveTileMeta(revalidate = true) }
 
     private val updaterQueue = Queue<Runnable>(TILES_IN_X * TILES_IN_Y * 2)
-    private var currentThreads = Array(maxOf(1, Terrarum.THREADS.times(2).div(3))) {
+    private var currentThreads = Array(maxOf(1, AppLoader.THREADS.times(2).div(3))) {
         Thread()
     }
 

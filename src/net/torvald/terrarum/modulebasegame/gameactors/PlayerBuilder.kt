@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * Created by minjaesong on 2016-02-03.
@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 object PlayerBuilder {
 
     operator fun invoke(): Actor {
-        val world = (Terrarum.ingame!! as Ingame).gameworld
+        val world = (Terrarum.ingame!! as TerrarumIngame).gameworld
 
         val p: Actor = IngamePlayer("lol", "lol_glow", world.worldTime.TIME_T)
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")

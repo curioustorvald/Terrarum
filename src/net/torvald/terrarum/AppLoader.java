@@ -1,9 +1,6 @@
 package net.torvald.terrarum;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
@@ -13,7 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
@@ -21,14 +20,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
+import net.torvald.terrarum.concurrent.ThreadParallel;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
-import net.torvald.terrarum.modulebasegame.Ingame;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
+import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
@@ -51,13 +51,23 @@ import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
  */
 public class AppLoader implements ApplicationListener {
 
+    public static final String GAME_NAME = "Terrarum";
+    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
+
     /**
-     * 0xAA_BB_XXXX
-     * AA: Major version
-     * BB: Minor version
-     * XXXX: Revision (Repository commits, or something arbitrary)
+     * <p>
+     * Version numbering that follows Semantic Versioning 2.0.0 (https://semver.org/)
+     * </p>
+     *
+     * <p>
+     * 0xAA_BB_XXXX, where:
+     * </p>
+     * <li>AA: Major version</li>
+     * <li>BB: Minor version</li>
+     * <li>XXXX: Patch version</li>
      * <p>
      * e.g. 0x02010034 will be translated as 2.1.52
+     * </p>
      */
     public static final int VERSION_RAW = 0x00_02_0590;
 
@@ -110,6 +120,9 @@ public class AppLoader implements ApplicationListener {
     /**
      * Singleton pattern implementation in Java.
      *
+     * This function exists because the limitation in the Java language and the design of the GDX itself, where
+     * not everything (more like not every method) can be static.
+     *
      * @return
      */
     public static AppLoader getINSTANCE() {
@@ -119,8 +132,6 @@ public class AppLoader implements ApplicationListener {
         return INSTANCE;
     }
 
-    public static final String GAME_NAME = "Terrarum";
-    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
     public static final String systemArch = System.getProperty("os.arch");
@@ -129,8 +140,13 @@ public class AppLoader implements ApplicationListener {
     public static String renderer = "(a super-fancy virtual photoradiator)";
     public static String rendererVendor = "(radiosity)";
 
+    public static int THREADS = ThreadParallel.INSTANCE.getThreadCount();
+    public static boolean MULTITHREAD;
+
     public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
 
+    public static int GL_VERSION;
+    public static final int MINIMAL_GL_VERSION = 320;
 
     public static final float TV_SAFE_GRAPHICS = 0.05f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
     public static final float TV_SAFE_ACTION = 0.035f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
@@ -206,15 +222,18 @@ public class AppLoader implements ApplicationListener {
     public static ShaderProgram shaderColLUT;
 
     public static Mesh fullscreenQuad;
-    private OrthographicCamera camera;
-    private SpriteBatch logoBatch;
+    private static OrthographicCamera camera;
+    private static SpriteBatch logoBatch;
     public static TextureRegion logo;
     public static AudioDevice audioDevice;
 
-    private com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
-    private com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
+    public static SpriteBatch batch;
+    public static ShapeRenderer shapeRender;
 
-    public Screen screen;
+    private static com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
+    private static com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
+
+    private static Screen currenScreen;
     public static int screenW = 0;
     public static int screenH = 0;
 
@@ -234,10 +253,10 @@ public class AppLoader implements ApplicationListener {
 
     public static final double UPDATE_RATE = 1.0 / 60.0; // TODO set it like 1/100, because apparent framerate is limited by update rate
 
-    private float loadTimer = 0f;
-    private final float showupTime = 100f / 1000f;
+    private static float loadTimer = 0f;
+    private static final float showupTime = 100f / 1000f;
 
-    private FrameBuffer renderFBO;
+    private static FrameBuffer renderFBO;
 
     public static CommonResourcePool resourcePool;
     public static HashSet<File> tempFilePool = new HashSet();
@@ -294,6 +313,7 @@ public class AppLoader implements ApplicationListener {
         appConfig.foregroundFPS = getConfigInt("displayfps");
         appConfig.title = GAME_NAME;
         appConfig.forceExit = false;
+        appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
 
         // load app icon
         int[] appIconSizes = new int[]{256,128,64,32,16};
@@ -310,11 +330,36 @@ public class AppLoader implements ApplicationListener {
             //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
         }
 
+        // set some more configuration vars
+        MULTITHREAD = ThreadParallel.INSTANCE.getThreadCount() >= 3 && getConfigBoolean("multithread");
+
         new LwjglApplication(new AppLoader(appConfig), appConfig);
     }
     
     @Override
     public void create() {
+        Gdx.graphics.setContinuousRendering(true);
+
+        GAME_LOCALE = getConfigString("language");
+        printdbg(this, "locale = " + GAME_LOCALE);
+
+        String glInfo = Gdx.graphics.getGLVersion().getDebugVersionString();
+
+        GL_VERSION = Gdx.graphics.getGLVersion().getMajorVersion() * 100 +
+                     Gdx.graphics.getGLVersion().getMinorVersion() * 10 +
+                     Gdx.graphics.getGLVersion().getReleaseVersion();
+
+        System.out.println("GL_VERSION = " + GL_VERSION);
+        System.out.println("GL info:\n" + glInfo); // debug info
+
+
+        if (GL_VERSION < MINIMAL_GL_VERSION) {
+            // TODO notify properly
+            throw new GdxRuntimeException("Graphics device not capable -- device's GL_VERSION: " + GL_VERSION +
+                    ", required: " + MINIMAL_GL_VERSION);
+        }
+
+
         resourcePool = CommonResourcePool.INSTANCE;
         resourcePool.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
 
@@ -324,6 +369,9 @@ public class AppLoader implements ApplicationListener {
         // set basis of draw
         logoBatch = new SpriteBatch();
         camera = new OrthographicCamera(((float) appConfig.width), ((float) appConfig.height));
+
+        batch = new SpriteBatch();
+        shapeRender = new ShapeRenderer();
 
         initViewPort(appConfig.width, appConfig.height);
 
@@ -416,6 +464,10 @@ public class AppLoader implements ApplicationListener {
             postInit();
         }
 
+        AppLoader.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getRawDeltaTime() * 1000_000_000f));
+        AppLoader.setDebugTime("GDX.smtDelta", (long) (Gdx.graphics.getDeltaTime() * 1000_000_000f));
+
+
         FrameBufferManager.begin(renderFBO);
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f);
         setCameraPosition(0, 0);
@@ -423,7 +475,7 @@ public class AppLoader implements ApplicationListener {
         // draw splash screen when predefined screen is null
         // because in normal operation, the only time screen == null is when the app is cold-launched
         // you can't have a text drawn here :v
-        if (screen == null) {
+        if (currenScreen == null) {
             shaderBayerSkyboxFill.begin();
             shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
             shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
@@ -450,15 +502,20 @@ public class AppLoader implements ApplicationListener {
             if (loadTimer >= showupTime) {
                 // hand over the scene control to this single class; Terrarum must call
                 // 'AppLoader.getINSTANCE().screen.render(delta)', this is not redundant at all!
-                setScreen(Terrarum.INSTANCE);
+
+                printdbg(this, "!! Force set current screen and ingame instance to TitleScreen !!");
+
+                IngameInstance title = new TitleScreen(batch);
+                Terrarum.INSTANCE.setCurrentIngameInstance(title);
+                setScreen(title);
             }
         }
         // draw the screen
         else {
-            screen.render((float) UPDATE_RATE);
+            currenScreen.render((float) UPDATE_RATE);
         }
 
-        KeyToggler.INSTANCE.update(screen instanceof Ingame);
+        KeyToggler.INSTANCE.update(currenScreen instanceof TerrarumIngame);
 
         // nested FBOs are just not a thing in GL!
         net.torvald.terrarum.FrameBufferManager.end();
@@ -489,6 +546,7 @@ public class AppLoader implements ApplicationListener {
 
         splashDisplayed = true;
         GLOBAL_RENDER_TIMER += 1;
+
     }
 
     @Override
@@ -506,7 +564,7 @@ public class AppLoader implements ApplicationListener {
         if (screenW % 2 == 1) screenW -= 1;
         if (screenH % 2 == 1) screenH -= 1;
 
-        if (screen != null) screen.resize(screenW, screenH);
+        if (currenScreen != null) currenScreen.resize(screenW, screenH);
 
 
         if (renderFBO == null ||
@@ -539,9 +597,9 @@ public class AppLoader implements ApplicationListener {
         System.out.println("Goodbye !");
 
 
-        if (screen != null) {
-            screen.hide();
-            screen.dispose();
+        if (currenScreen != null) {
+            currenScreen.hide();
+            currenScreen.dispose();
         }
 
         //IngameRenderer.INSTANCE.dispose();
@@ -549,7 +607,6 @@ public class AppLoader implements ApplicationListener {
         //MinimapComposer.INSTANCE.dispose();
         //FloatDrawer.INSTANCE.dispose();
 
-        //Terrarum.INSTANCE.dispose();
 
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
@@ -573,43 +630,55 @@ public class AppLoader implements ApplicationListener {
 
         GameWorld.Companion.makeNullWorld().dispose();
 
+        Terrarum.INSTANCE.dispose();
+
         deleteTempfiles();
     }
 
     @Override
     public void pause() {
-        if (screen != null) screen.pause();
+        if (currenScreen != null) currenScreen.pause();
     }
 
     @Override
     public void resume() {
-        if (screen != null) screen.resume();
+        if (currenScreen != null) currenScreen.resume();
     }
 
-    public void setScreen(Screen screen) {
-        printdbg(this, "Changing screen to " + screen.getClass().getCanonicalName());
+    public static void setScreen(Screen screen) {
+        printdbg("[AppLoader-Static]", "Changing screen to " + screen.getClass().getCanonicalName());
 
         // this whole thing is directtly copied from com.badlogic.gdx.Game
 
-        if (this.screen != null) {
-            this.screen.hide();
-            this.screen.dispose();
+        if (currenScreen != null) {
+            printdbg("[AppLoader-Static]", "Screen before change: " + currenScreen.getClass().getCanonicalName());
+
+            currenScreen.hide();
+            currenScreen.dispose();
         }
-        this.screen = screen;
-        if (this.screen != null) {
-            this.screen.show();
-            this.screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        else {
+            printdbg("[AppLoader-Static]", "Screen before change: null");
         }
+
+
+        currenScreen = screen;
+
+        currenScreen.show();
+        currenScreen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
 
         System.gc();
 
-        printdbg(this, "Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
+        printdbg("[AppLoader-Static]", "Screen transition complete: " + currenScreen.getClass().getCanonicalName());
     }
-
+    
     /**
      * Init stuffs which needs GL context
      */
     private void postInit() {
+        Terrarum.initialise();
+
+
         textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 

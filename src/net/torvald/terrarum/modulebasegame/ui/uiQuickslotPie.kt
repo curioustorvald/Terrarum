@@ -8,7 +8,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
 import net.torvald.terrarum.ui.UICanvas
@@ -40,8 +40,8 @@ class uiQuickslotPie : UICanvas() {
     var selection: Int = -1
 
     override fun updateUI(delta: Float) {
-        if (selection >= 0 && (Terrarum.ingame!! as Ingame).actorNowPlaying != null)
-            (Terrarum.ingame!! as Ingame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+        if (selection >= 0 && (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying != null)
+            (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                     selection % slotCount
 
 
@@ -63,7 +63,7 @@ class uiQuickslotPie : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
-            val item = ItemCodex[(Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
+            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
 
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise

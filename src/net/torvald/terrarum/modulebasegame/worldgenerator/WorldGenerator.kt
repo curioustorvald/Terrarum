@@ -4,9 +4,9 @@ import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.LoadScreen
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel
@@ -774,14 +774,14 @@ object WorldGenerator {
     }
 
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
-        if (Terrarum.MULTITHREAD) {
+        if (AppLoader.MULTITHREAD) {
             // set up indices
-            for (i in 0 until Terrarum.THREADS) {
+            for (i in 0 until AppLoader.THREADS) {
                 ThreadParallel.map(
                         i, "SampleJoiseMap",
                         ThreadProcessNoiseLayers(
-                                HEIGHT.toFloat().div(Terrarum.THREADS).times(i).roundInt(),
-                                HEIGHT.toFloat().div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1,
+                                HEIGHT.toFloat().div(AppLoader.THREADS).times(i).roundInt(),
+                                HEIGHT.toFloat().div(AppLoader.THREADS).times(i.plus(1)).roundInt() - 1,
                                 noiseRecords
                         )
                 )

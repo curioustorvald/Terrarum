@@ -6,7 +6,7 @@ package net.torvald.terrarum.modulebasegame.ui
         val remoConWidth = 240
         fun getRemoConHeight(menu: ArrayList<String>) = 36 * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = 36 * menu.size.plus(1)
-        val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (Terrarum.fontGame.lineHeight * 1.5).toInt()
+        val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
     }
 
 
@@ -83,7 +83,7 @@ package net.torvald.terrarum.modulebasegame.ui
             (Terrarum.ingame!! as Ingame).gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
             (Terrarum.ingame!! as Ingame).gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
             LoadScreen.screenToLoad = (Terrarum.ingame!! as Ingame)
-            Terrarum.setScreen(LoadScreen)
+            AppLoader.setScreen(LoadScreen)
         }
 
 
@@ -114,7 +114,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
                 val maker = BuildingMaker(Terrarum.batch)
                 Terrarum.ingame = maker
-                Terrarum.setScreen(maker)
+                AppLoader.setScreen(maker)
             }
         }
     }

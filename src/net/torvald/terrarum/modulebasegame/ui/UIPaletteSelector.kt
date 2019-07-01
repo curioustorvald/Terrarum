@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
@@ -26,7 +26,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
     val LINE_HEIGHT = 24
     val TEXT_OFFSETX = 3f
-    val TEXT_OFFSETY = (LINE_HEIGHT - Terrarum.fontGame.lineHeight) / 2f
+    val TEXT_OFFSETY = (LINE_HEIGHT - AppLoader.fontGame.lineHeight) / 2f
 
     fun mouseOnTitleBar() =
             relativeMouseX in 0 until width && relativeMouseY in 0 until LINE_HEIGHT
@@ -78,7 +78,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
         // draw "Pal."
         batch.color = UINSMenu.DEFAULT_TITLETEXTCOL
-        Terrarum.fontGame.draw(batch, titleText, TEXT_OFFSETX, TEXT_OFFSETY)
+        AppLoader.fontGame.draw(batch, titleText, TEXT_OFFSETX, TEXT_OFFSETY)
 
         // draw background
         batch.color = CELLCOLOUR_BLACK
@@ -89,7 +89,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
         // TODO carve the overlap
         batch.draw(ItemCodex.getItemImage(back), 14f, 41f)
         batch.draw(ItemCodex.getItemImage(fore), 6f, 33f)
-        Terrarum.fontSmallNumbers.draw(batch, fore.toString(), 3f, 61f)
+        AppLoader.fontSmallNumbers.draw(batch, fore.toString(), 3f, 61f)
 
         // draw swap icon
         batch.color = Color.WHITE

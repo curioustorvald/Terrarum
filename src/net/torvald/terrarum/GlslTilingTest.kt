@@ -60,7 +60,7 @@ object GlslTilingTest : ApplicationAdapter() {
 
             //ErrorDisp.title = "Error in shader ${shader.vertexShaderSource}"
             //ErrorDisp.text = shader.log.split('\n')
-            //AppLoader.getINSTANCE().setScreen(ErrorDisp)
+            //AppLoader.setScreen(ErrorDisp)
             System.exit(1)
         }
 

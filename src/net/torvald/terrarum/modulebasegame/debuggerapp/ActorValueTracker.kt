@@ -8,7 +8,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.console.SetAV
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import java.awt.BorderLayout
@@ -86,7 +86,7 @@ class ActorValueTracker constructor() : JFrame() {
         buttonChangeActor.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorIDField.text.toLowerCase() == "player") {
-                    actor = (Terrarum.ingame!! as Ingame).actorNowPlaying
+                    actor = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {

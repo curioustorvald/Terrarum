@@ -3,8 +3,8 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.langpack.Lang
@@ -53,7 +53,7 @@ open class UIItemTextButton(
     override var oldPosY = posY
 
     companion object {
-        val font = Terrarum.fontGame
+        val font = AppLoader.fontGame
         val height = font.lineHeight.toInt()
         val defaultInactiveCol = Color.WHITE
         val defaultHighlightCol = Color(0x00f8ff_ff)

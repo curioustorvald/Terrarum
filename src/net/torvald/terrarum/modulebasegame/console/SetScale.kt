@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.gameactors.ActorWBMovable
 
 /**
@@ -14,7 +14,7 @@ internal object SetScale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2 || args.size == 3) {
             try {
-                val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+                val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                 if (player == null) return
 
 

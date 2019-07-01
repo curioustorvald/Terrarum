@@ -140,7 +140,7 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
     override fun dispose() {
         ptr.destroy()
         //directByteBuffer.clear()
-        printdbg(this, "BlockLayer successfully freed")
+        printdbg(this, "BlockLayer with ptr ($ptr) successfully freed")
     }
 
     companion object {

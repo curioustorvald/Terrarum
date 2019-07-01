@@ -22,7 +22,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.BlockingThreadPool
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.roundInt
 import kotlin.math.absoluteValue
 
@@ -100,7 +100,7 @@ class NoiseGenerator : ScreenAdapter() {
     private var timerFired = false
 
     override fun render(delta: Float) {
-        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+        Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
         updateTestGovernor(delta)
@@ -138,7 +138,7 @@ class NoiseGenerator : ScreenAdapter() {
             batch.draw(texture, 0f, 0f)
 
             batch.color = Color.CYAN
-            Terrarum.fontGame.draw(batch, "Tests: $totalTestsDone / ${testSets.size * samplingCount}", 10f, 10f)
+            AppLoader.fontGame.draw(batch, "Tests: $totalTestsDone / ${testSets.size * samplingCount}", 10f, 10f)
         }
 
     }

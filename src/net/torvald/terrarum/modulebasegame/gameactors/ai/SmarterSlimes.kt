@@ -5,7 +5,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ai.ActorAI
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * Slime's stupid AI but can adjust his jump power to smack you as fast as possible
@@ -35,7 +35,7 @@ class SmarterSlimes : ActorAI {
 
 
         // TEST: just target player
-        val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return
 
         val playerXPos = player.centrePosPoint.x

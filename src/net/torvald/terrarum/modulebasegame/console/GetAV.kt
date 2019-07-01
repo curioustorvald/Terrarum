@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * Created by minjaesong on 2016-01-19.
@@ -14,8 +14,8 @@ internal object GetAV : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         try {
-            val ingame = Terrarum.ingame!! as Ingame
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            val ingame = Terrarum.ingame!! as TerrarumIngame
+            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
             if (player == null) return
             
             
