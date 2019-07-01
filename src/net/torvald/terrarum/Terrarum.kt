@@ -10,21 +10,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
-import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
-import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
-import org.lwjgl.BufferUtils
 import java.io.File
 import kotlin.math.absoluteValue
 
@@ -38,15 +34,15 @@ typealias RGBA8888 = Int
  *
  * LibGDX Version Created by minjaesong on 2017-06-15.
  */
-object Terrarum : Screen, Disposable {
+object Terrarum : Disposable {
 
     /**
      * All singleplayer "Player" must have this exact reference ID.
      */
     const val PLAYER_REF_ID: Int = 0x91A7E2
 
-    lateinit var batch: SpriteBatch
-    lateinit var shapeRender: ShapeRenderer // DO NOT USE!! for very limited applications e.g. WeatherMixer
+    var batch: SpriteBatch = AppLoader.batch
+    var shapeRender: ShapeRenderer = AppLoader.shapeRender // DO NOT USE!! for very limited applications e.g. WeatherMixer
     inline fun inShapeRenderer(shapeRendererType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, action: (ShapeRenderer) -> Unit) {
         shapeRender.begin(shapeRendererType)
         action(shapeRender)
@@ -85,6 +81,7 @@ object Terrarum : Screen, Disposable {
 
     /** Current ingame instance the game is holding */
     var ingame: IngameInstance? = null
+        private set
 
     private val javaHeapCircularArray = CircularArray<Int>(64)
     private val nativeHeapCircularArray = CircularArray<Int>(64)
@@ -118,11 +115,6 @@ object Terrarum : Screen, Disposable {
         }
 
 
-
-
-    val fontGame: GameFontBase = AppLoader.fontGame
-    val fontSmallNumbers: TinyAlphNum = AppLoader.fontSmallNumbers
-
     // 0x0 - 0xF: Game-related
     // 0x10 - 0x1F: Config
     // 0x100 and onward: unit tests for dev
@@ -144,20 +136,6 @@ object Terrarum : Screen, Disposable {
     val STATE_ID_TOOL_NOISEGEN = 0x200
     val STATE_ID_TOOL_RUMBLE_DIAGNOSIS = 0x201
 
-    /** Available CPU threads */
-    val THREADS = ThreadParallel.threadCount //Runtime.getRuntime().availableProcessors() + 1
-
-    /**
-     * If the game is multithreading.
-     * True if:
-     *
-     *     THREADS >= 2 and config "multithread" is true
-     */
-    val MULTITHREAD: Boolean
-        get() = THREADS >= 3 && getConfigBoolean("multithread")
-
-    const val NAME = AppLoader.GAME_NAME
-
     lateinit var testTexture: Texture
 
 
@@ -170,7 +148,7 @@ object Terrarum : Screen, Disposable {
         println("[Terrarum] init called by:")
         Thread.currentThread().stackTrace.forEach { println("... $it") }
 
-        println("[Terrarum] $NAME version ${AppLoader.getVERSION_STRING()}")
+        println("[Terrarum] ${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
         println("[Terrarum] LibGDX version ${com.badlogic.gdx.Version.VERSION}")
 
 
@@ -193,6 +171,11 @@ object Terrarum : Screen, Disposable {
     }
 
 
+    @JvmStatic fun initialise() {
+        // dummy init method
+    }
+
+
     val RENDER_FPS = getConfigInt("displayfps")
     val USE_VSYNC = getConfigBoolean("usevsync")
     var VSYNC = USE_VSYNC
@@ -202,7 +185,7 @@ object Terrarum : Screen, Disposable {
                 Gdx.graphics.glVersion.minorVersion * 10 +
                 Gdx.graphics.glVersion.releaseVersion
     val MINIMAL_GL_VERSION = 210
-    val GL_MAX_TEXTURE_SIZE: Int
+    /*val GL_MAX_TEXTURE_SIZE: Int
         get() {
             val intBuffer = BufferUtils.createIntBuffer(16) // size must be at least 16, or else LWJGL complains
             Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer)
@@ -211,24 +194,19 @@ object Terrarum : Screen, Disposable {
 
             return intBuffer.get()
         }
-    val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096
+    val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096*/
 
-    override fun show() {
+    fun setCurrentIngameInstance(ingame: IngameInstance) {
+        this.ingame = ingame
+
+        printdbg(this, "Accepting new ingame instance '${ingame.javaClass.canonicalName}', called by:")
+        Thread.currentThread().stackTrace.forEach { printdbg(this, it) }
+    }
+
+    private fun showxxx() {
 
         testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
 
-
-        val glInfo = Gdx.graphics.glVersion.debugVersionString
-
-        println("GL_VERSION = $GL_VERSION")
-        println("GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
-        println("GL info:\n$glInfo") // debug info
-
-
-        if (GL_VERSION < MINIMAL_GL_VERSION || GL_MAX_TEXTURE_SIZE < MINIMAL_GL_MAX_TEXTURE_SIZE) {
-            // TODO notify properly
-            throw GdxRuntimeException("Graphics device not capable -- device's GL_VERSION: $GL_VERSION, required: $MINIMAL_GL_VERSION; GL_MAX_TEXTURE_SIZE: $GL_MAX_TEXTURE_SIZE, required: $MINIMAL_GL_MAX_TEXTURE_SIZE")
-        }
 
         // resize fullscreen quad?
 
@@ -236,8 +214,8 @@ object Terrarum : Screen, Disposable {
         TextureRegionPack.globalFlipY = true // !! TO MAKE LEGACY CODE RENDER ON ITS POSITION !!
         Gdx.graphics.isContinuousRendering = true
 
-        batch = SpriteBatch()
-        shapeRender = ShapeRenderer()
+        //batch = SpriteBatch()
+        //shapeRender = ShapeRenderer()
 
 
         AppLoader.GAME_LOCALE = getConfigString("language")
@@ -257,25 +235,7 @@ object Terrarum : Screen, Disposable {
 
 
         // title screen
-        AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
-    }
-
-    fun setScreen(screen: Screen) {
-        AppLoader.getINSTANCE().setScreen(screen)
-    }
-
-    override fun render(delta: Float) {
-        AppLoader.setDebugTime("GDX.rawDelta", Gdx.graphics.rawDeltaTime.times(1000_000_000f).toLong())
-        AppLoader.setDebugTime("GDX.smtDelta", Gdx.graphics.deltaTime.times(1000_000_000f).toLong())
-        AppLoader.getINSTANCE().screen.render(delta)
-    }
-
-    override fun pause() {
-        AppLoader.getINSTANCE().screen.pause()
-    }
-
-    override fun resume() {
-        AppLoader.getINSTANCE().screen.resume()
+        AppLoader.setScreen(TitleScreen(batch))
     }
 
     /** Don't call this! Call AppLoader.dispose() */
@@ -284,16 +244,13 @@ object Terrarum : Screen, Disposable {
         ingame?.dispose()
     }
 
-    override fun hide() {
-        AppLoader.getINSTANCE().screen.hide()
-    }
 
     /** For the actual resize, call AppLoader.resize() */
-    override fun resize(width: Int, height: Int) {
+    /*fun resize(width: Int, height: Int) {
         ingame?.resize(width, height)
 
         printdbg(this, "newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
-    }
+    }*/
 
 
 

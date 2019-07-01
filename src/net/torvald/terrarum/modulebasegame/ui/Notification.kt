@@ -56,15 +56,15 @@ class Notification : UICanvas() {
         fontCol.a = handler.opacity
 
         val realTextWidth = 12 + if (message.size == 1)
-            Terrarum.fontGame.getWidth(message[0])
+            AppLoader.fontGame.getWidth(message[0])
         else
-            message.map { Terrarum.fontGame.getWidth(it) }.sorted().last()
+            message.map { AppLoader.fontGame.getWidth(it) }.sorted().last()
         val displayedTextWidth = maxOf(240, realTextWidth)
 
         // force the UI to the centre of the screen
         this.posX = (Terrarum.WIDTH - displayedTextWidth) / 2
 
-        val textHeight = message.size * Terrarum.fontGame.lineHeight
+        val textHeight = message.size * AppLoader.fontGame.lineHeight
 
         batch.color = drawColor
 
@@ -73,8 +73,8 @@ class Notification : UICanvas() {
         batch.color = fontCol
         message.forEachIndexed { index, s ->
             val xoff = 6 + (displayedTextWidth - realTextWidth) / 2
-            val y = -textHeight + Terrarum.fontGame.lineHeight * index
-            Terrarum.fontGame.draw(batch, s, LRmargin + xoff, y)
+            val y = -textHeight + AppLoader.fontGame.lineHeight * index
+            AppLoader.fontGame.draw(batch, s, LRmargin + xoff, y)
         }
 
 

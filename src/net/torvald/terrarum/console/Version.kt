@@ -11,7 +11,7 @@ import net.torvald.terrarum.langpack.Lang
 internal object Version : ConsoleCommand {
     override fun execute(args: Array<String>) {
 
-        Echo("${Terrarum.NAME} ${AppLoader.getVERSION_STRING()}")
+        Echo("${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}")
         Echo("Polyglot language pack version ${Lang.POLYGLOT_VERSION}")
         Echo("GL_VERSION: ${Terrarum.GL_VERSION}")
         Echo("Renderer: ${Gdx.graphics.glVersion.rendererString}, ${Gdx.graphics.glVersion.vendorString}")

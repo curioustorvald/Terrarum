@@ -12,7 +12,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
@@ -96,7 +96,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // test rain toggled by F2
-        if (KeyToggler.isOn(Input.Keys.F2) && Terrarum.ingame is Ingame) {
+        if (KeyToggler.isOn(Input.Keys.F2) && Terrarum.ingame is TerrarumIngame) {
             val playerPosX = player.hitbox.centeredX
             val playerPosY = player.hitbox.centeredY
             kotlin.repeat(7) {
@@ -104,7 +104,7 @@ internal object WeatherMixer : RNGConsumer {
                         playerPosX + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
                         playerPosY - Terrarum.HEIGHT
                 )
-                (Terrarum.ingame!! as Ingame).addParticle(rainParticle)
+                (Terrarum.ingame!! as TerrarumIngame).addParticle(rainParticle)
             }
             //globalLightNow.set(getGlobalLightOfTime((Terrarum.ingame!!.world).time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
         }

@@ -2,12 +2,11 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.random.HQRNG
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.BuildingMaker
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.ui.UICanvas
 
 /**
@@ -35,9 +34,9 @@ class UIProxyNewBuildingMaker : UICanvas() {
     override fun endOpening(delta: Float) {
         val ingame = BuildingMaker(Terrarum.batch)
 
-        Terrarum.ingame = ingame
+        Terrarum.setCurrentIngameInstance(ingame)
         LoadScreen.screenToLoad = ingame
-        Terrarum.setScreen(LoadScreen)
+        AppLoader.setScreen(LoadScreen)
     }
 
     override fun endClosing(delta: Float) {

@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -63,7 +63,7 @@ internal object SetAV : ConsoleCommand {
                 return
             }
 
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
             if (player == null) {
                 EchoError("Player does not exist")
                 println("[SetAV] Player does not exist")

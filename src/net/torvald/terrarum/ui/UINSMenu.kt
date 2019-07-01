@@ -31,14 +31,14 @@ class UINSMenu(
     override var openCloseTime: Second = 0f
     val LINE_HEIGHT = 24
     val TEXT_OFFSETX = 3f
-    val TEXT_OFFSETY = (LINE_HEIGHT - Terrarum.fontGame.lineHeight) / 2f
+    val TEXT_OFFSETY = (LINE_HEIGHT - AppLoader.fontGame.lineHeight) / 2f
     val CHILD_ARROW = "${0x2023.toChar()}"
 
 
     val tree = treeRepresentation.parseAsYamlInvokable()
     override var width = 0
     override var height = 0
-    //override var width = maxOf(minimumWidth, tree.getLevelData(1).map { Terrarum.fontGame.getWidth(it ?: "") }.max() ?: 0)
+    //override var width = maxOf(minimumWidth, tree.getLevelData(1).map { AppLoader.fontGame.getWidth(it ?: "") }.max() ?: 0)
     //override var height = LINE_HEIGHT * (tree.children.size + 1)
 
 
@@ -91,8 +91,8 @@ class UINSMenu(
         }
 
         val listWidth = maxOf(
-                Terrarum.fontGame.getWidth(menuTitle), minimumWidth,
-                stringsFromTree.map { Terrarum.fontGame.getWidth(it) }.max() ?: 0
+                AppLoader.fontGame.getWidth(menuTitle), minimumWidth,
+                stringsFromTree.map { AppLoader.fontGame.getWidth(it) }.max() ?: 0
         )
         val uiWidth = listWidth + (2 * TEXT_OFFSETX.toInt())
         val listHeight = stringsFromTree.size * LINE_HEIGHT
@@ -176,7 +176,7 @@ class UINSMenu(
 
             batch.color = titleTextCol
             blendNormal(batch)
-            Terrarum.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.ui.posX, TEXT_OFFSETY + it.ui.posY - LINE_HEIGHT)
+            AppLoader.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.ui.posX, TEXT_OFFSETY + it.ui.posY - LINE_HEIGHT)
 
             // draw the list
             batch.color = Color.WHITE

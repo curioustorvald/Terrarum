@@ -925,7 +925,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 actorContainer.forEachIndexed { i, actor ->
                     if (actor is ActorWithBody) {
                         batch.color = Color.WHITE
-                        Terrarum.fontSmallNumbers.draw(batch,
+                        AppLoader.fontSmallNumbers.draw(batch,
                                 actor.referenceID.toString(),
                                 actor.hitbox.startX.toFloat(),
                                 actor.hitbox.canonicalY.toFloat() + 4
@@ -950,12 +950,12 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
                         // velocity
                         batch.color = Color.CHARTREUSE//GameFontBase.codeToCol["g"]
-                        Terrarum.fontSmallNumbers.draw(batch,
+                        AppLoader.fontSmallNumbers.draw(batch,
                                 "${0x7F.toChar()}X ${actor.externalForce.x}",
                                 actor.hitbox.startX.toFloat(),
                                 actor.hitbox.canonicalY.toFloat() + 4 + 8
                         )
-                        Terrarum.fontSmallNumbers.draw(batch,
+                        AppLoader.fontSmallNumbers.draw(batch,
                                 "${0x7F.toChar()}Y ${actor.externalForce.y}",
                                 actor.hitbox.startX.toFloat(),
                                 actor.hitbox.canonicalY.toFloat() + 4 + 8 * 2

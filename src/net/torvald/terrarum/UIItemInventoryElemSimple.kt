@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
@@ -116,10 +116,10 @@ class UIItemInventoryElemSimple(
                 }
 
 
-                Terrarum.fontSmallNumbers.draw(batch,
+                AppLoader.fontSmallNumbers.draw(batch,
                         amountString,
-                        posX + (width - Terrarum.fontSmallNumbers.getWidth(amountString)).toFloat(),
-                        posY + (height - Terrarum.fontSmallNumbers.H).toFloat()
+                        posX + (width - AppLoader.fontSmallNumbers.getWidth(amountString)).toFloat(),
+                        posY + (height - AppLoader.fontSmallNumbers.H).toFloat()
                 )
             }
 
@@ -133,7 +133,7 @@ class UIItemInventoryElemSimple(
     override fun keyDown(keycode: Int): Boolean {
         if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
 
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
             if (player == null) return false
 
             val inventory = player.inventory
@@ -168,7 +168,7 @@ class UIItemInventoryElemSimple(
 
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
             if (player == null) return false
 
             if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it

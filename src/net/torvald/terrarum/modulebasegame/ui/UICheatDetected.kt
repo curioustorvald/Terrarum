@@ -3,9 +3,10 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 
@@ -37,10 +38,10 @@ class UICheatDetected : UICanvas() {
 
         batch.color = Color.WHITE
         val txt = Lang["ERROR_GENERIC_CHEATING"]
-        val txtW = Terrarum.fontGame.getWidth(txt)
-        val txtH = Terrarum.fontGame.lineHeight.toInt()
+        val txtW = AppLoader.fontGame.getWidth(txt)
+        val txtH = AppLoader.fontGame.lineHeight.toInt()
 
-        Terrarum.fontGame.draw(batch, txt, width.minus(txtW).ushr(1).toFloat(), height.minus(txtH).ushr(1).toFloat())
+        AppLoader.fontGame.draw(batch, txt, width.minus(txtW).ushr(1).toFloat(), height.minus(txtH).ushr(1).toFloat())
     }
 
     override fun updateUI(delta: Float) {

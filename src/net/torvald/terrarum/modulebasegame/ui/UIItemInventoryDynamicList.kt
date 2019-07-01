@@ -7,7 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
@@ -287,7 +287,7 @@ class UIItemInventoryDynamicList(
 
             // set tooltip accordingly
             if (isCompactMode && it.mouseUp && !tooltipSet) {
-                (Terrarum.ingame as? Ingame)?.setTooltipMessage(
+                (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(
                         if (AppLoader.IS_DEVELOPMENT_BUILD) {
                             it.item?.name + "/Mat: ${it.item?.material?.identifier}"
                         }
@@ -300,7 +300,7 @@ class UIItemInventoryDynamicList(
         }
 
         if (!tooltipSet) {
-            (Terrarum.ingame as? Ingame)?.setTooltipMessage(null)
+            (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
         }
 
 

@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.debuggerapp.ActorValueTracker
 import java.util.*
 
@@ -16,7 +16,7 @@ internal object AVTracker : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         if (args.size < 2) {
-            jPanelInstances.add(ActorValueTracker((Terrarum.ingame!! as Ingame).actorNowPlaying))
+            jPanelInstances.add(ActorValueTracker((Terrarum.ingame!! as TerrarumIngame).actorNowPlaying))
         }
         else {
             try {

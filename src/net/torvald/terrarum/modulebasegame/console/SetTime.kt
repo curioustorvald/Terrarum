@@ -4,14 +4,14 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * Created by minjaesong on 2016-03-20.
  */
 internal object SetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val world = (Terrarum.ingame!! as Ingame).gameworld
+        val world = (Terrarum.ingame!! as TerrarumIngame).gameworld
         
         
         if (args.size == 2) {

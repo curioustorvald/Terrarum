@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
-import net.torvald.util.HistoryArray
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.util.HistoryArray
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -97,10 +97,10 @@ object LoadScreen : ScreenAdapter() {
         textFbo = FrameBuffer(
                 Pixmap.Format.RGBA4444,
                 maxOf(
-                        Terrarum.fontGame.getWidth(Lang["MENU_IO_LOADING"]),
-                        Terrarum.fontGame.getWidth(Lang["ERROR_GENERIC_TEXT"])
+                        AppLoader.fontGame.getWidth(Lang["MENU_IO_LOADING"]),
+                        AppLoader.fontGame.getWidth(Lang["ERROR_GENERIC_TEXT"])
                 ),
-                Terrarum.fontGame.lineHeight.toInt(),
+                AppLoader.fontGame.lineHeight.toInt(),
                 true
         )
 
@@ -122,7 +122,7 @@ object LoadScreen : ScreenAdapter() {
     override fun render(delta: Float) {
         val delta = Gdx.graphics.rawDeltaTime
 
-        glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
+        glideDispY = Terrarum.HEIGHT - 100f - AppLoader.fontGame.lineHeight
         arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
 
 
@@ -155,7 +155,7 @@ object LoadScreen : ScreenAdapter() {
 
 
         val textToPrint = if (errorTrapped) Lang["ERROR_GENERIC_TEXT"] else Lang["MENU_IO_LOADING"]
-        val textWidth = Terrarum.fontGame.getWidth(textToPrint).toFloat()
+        val textWidth = AppLoader.fontGame.getWidth(textToPrint).toFloat()
 
         if (!doContextChange) {
             // draw text to FBO
@@ -164,20 +164,20 @@ object LoadScreen : ScreenAdapter() {
 
 
                     blendNormal(Terrarum.batch)
-                    Terrarum.fontGame
+                    AppLoader.fontGame
                     it.color = Color.WHITE
 
 
-                    Terrarum.fontGame.draw(it, textToPrint, ((textFbo.width - textWidth) / 2).toInt().toFloat(), 0f)
+                    AppLoader.fontGame.draw(it, textToPrint, ((textFbo.width - textWidth) / 2).toInt().toFloat(), 0f)
 
 
                     blendMul(Terrarum.batch)
                     // draw colour overlay, flipped
                     it.draw(textOverlayTex,
                             (textFbo.width - textWidth) / 2f,
-                            Terrarum.fontGame.lineHeight,
+                            AppLoader.fontGame.lineHeight,
                             textWidth,
-                            -Terrarum.fontGame.lineHeight
+                            -AppLoader.fontGame.lineHeight
                     )
                 }
             }
@@ -234,15 +234,15 @@ object LoadScreen : ScreenAdapter() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * Terrarum.fontGame.lineHeight)
+                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
                 for (i in 0 until messages.elemCount) {
-                    Terrarum.fontGame.draw(it,
+                    AppLoader.fontGame.draw(it,
                             messages[i] ?: "",
                             AppLoader.getTvSafeGraphicsWidth() + 16f,
-                            80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
+                            80f + (messages.size - i - 1) * AppLoader.fontGame.lineHeight
                     )
                 }
             }
@@ -259,15 +259,15 @@ object LoadScreen : ScreenAdapter() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * Terrarum.fontGame.lineHeight)
+                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
                 for (i in 0 until messages.elemCount) {
-                    Terrarum.fontGame.draw(it,
+                    AppLoader.fontGame.draw(it,
                             messages[i] ?: "",
                             AppLoader.getTvSafeGraphicsWidth() + 16f,
-                            80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
+                            80f + (messages.size - i - 1) * AppLoader.fontGame.lineHeight
                     )
                 }
             }
@@ -276,7 +276,7 @@ object LoadScreen : ScreenAdapter() {
 
             Thread.sleep(80)
 
-            Terrarum.setScreen(screenToLoad!!)
+            AppLoader.setScreen(screenToLoad!!)
         }
     }
 

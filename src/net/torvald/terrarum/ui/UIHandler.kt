@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * UIHandler is a handler for UICanvas. It opens/closes the attached UI, moves the "window" (or "canvas")
@@ -279,7 +279,7 @@ class UIHandler(//var UI: UICanvas,
         }
 
     fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
-        Ingame.setCameraPosition(batch, camera, newX, newY)
+        TerrarumIngame.setCameraPosition(batch, camera, newX, newY)
     }
 
     fun mouseMoved(uiItems: List<UIItem>, screenX: Int, screenY: Int): Boolean {

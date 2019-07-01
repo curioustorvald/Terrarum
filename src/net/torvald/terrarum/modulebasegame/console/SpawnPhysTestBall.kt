@@ -4,7 +4,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.PhysTestBall
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
 import org.dyn4j.geometry.Vector2
 
 /**

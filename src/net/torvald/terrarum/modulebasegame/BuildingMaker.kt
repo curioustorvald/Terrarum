@@ -318,7 +318,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     private var updateAkku = 0.0
 
     override fun render(delta: Float) {
-        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+        Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
         // ASYNCHRONOUS UPDATE AND RENDER //
@@ -590,7 +590,7 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, usePhysic
 
 class YamlCommandExit : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        Terrarum.setScreen(TitleScreen(Terrarum.batch))
+        AppLoader.setScreen(TitleScreen(Terrarum.batch))
     }
 }
 

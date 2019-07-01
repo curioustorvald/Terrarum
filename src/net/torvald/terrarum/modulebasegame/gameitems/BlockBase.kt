@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.realestate.LandUtil
 
@@ -21,7 +21,7 @@ object BlockBase {
      * for wire items, otherwise you want it to be true.
      */
     fun blockStartPrimaryUse(gameItem: GameItem, itemID: Int, delta: Float): Boolean {
-        val ingame = Terrarum.ingame!! as Ingame
+        val ingame = Terrarum.ingame!! as TerrarumIngame
         val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
@@ -74,7 +74,7 @@ object BlockBase {
     }
 
     fun wireStartPrimaryUse(gameItem: GameItem, wireTypeBit: Int, delta: Float): Boolean {
-        val ingame = Terrarum.ingame!! as Ingame
+        val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
         // return false if the tile is already there

@@ -3,10 +3,12 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UICanvas
 
 /**
@@ -32,14 +34,17 @@ class UIProxyNewRandomGame : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
-        val ingame = Ingame(Terrarum.batch)
-        ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-        //ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, 0x51621DL)
-        ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+        printdbg(this, "endOpening")
 
-        Terrarum.ingame = ingame
+
+        val ingame = TerrarumIngame(AppLoader.batch)
+        ingame.gameLoadInfoPayload = TerrarumIngame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+        //ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, 0x51621DL)
+        ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
+
+        Terrarum.setCurrentIngameInstance(ingame)
         LoadScreen.screenToLoad = ingame
-        Terrarum.setScreen(LoadScreen)
+        AppLoader.setScreen(LoadScreen)
     }
 
     override fun endClosing(delta: Float) {

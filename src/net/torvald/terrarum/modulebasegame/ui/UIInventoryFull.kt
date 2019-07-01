@@ -6,22 +6,12 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.gamepadLabelEast
-import net.torvald.terrarum.AppLoader.gamepadLabelLStick
-import net.torvald.terrarum.AppLoader.gamepadLabelLT
-import net.torvald.terrarum.AppLoader.gamepadLabelNorth
-import net.torvald.terrarum.AppLoader.gamepadLabelRStick
-import net.torvald.terrarum.AppLoader.gamepadLabelRT
-import net.torvald.terrarum.AppLoader.gamepadLabelStart
-import net.torvald.terrarum.AppLoader.gamepadLabelWest
+import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.ui.UICanvas
@@ -87,7 +77,7 @@ class UIInventoryFull(
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"
-    val controlHelpHeight = Terrarum.fontGame.lineHeight
+    val controlHelpHeight = AppLoader.fontGame.lineHeight
 
     private var encumbrancePerc = 0f
     private var isEncumbered = false
@@ -194,7 +184,7 @@ class UIInventoryFull(
         // make gameMenuButtons work
         gameMenuButtons.selectionChangeListener = { old, new ->
             if (new == 0) {
-                Terrarum.setScreen(TitleScreen(Terrarum.batch))
+                AppLoader.setScreen(TitleScreen(Terrarum.batch))
             }
             else if (new == 1) {
                 Gdx.app.exit()
@@ -441,7 +431,7 @@ class UIInventoryFull(
         batch.begin()
 
 
-        Terrarum.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -10f + itemList.posY)
+        AppLoader.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -10f + itemList.posY)
 
 
         batch.projectionMatrix = camera.combined
@@ -451,7 +441,7 @@ class UIInventoryFull(
 
         // control hints
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, minimapControlHelp, offsetX + minimapScrOffX, yEnd - 20)
+        AppLoader.fontGame.draw(batch, minimapControlHelp, offsetX + minimapScrOffX, yEnd - 20)
 
         // the minimap
         batch.draw(minimapFBO.colorBufferTexture, minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, itemList.posY.toFloat())
@@ -461,7 +451,7 @@ class UIInventoryFull(
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, gameMenuControlHelp, offsetX + menuScrOffX, yEnd - 20)
+        AppLoader.fontGame.draw(batch, gameMenuControlHelp, offsetX + menuScrOffX, yEnd - 20)
 
         // text buttons
         gameMenuButtons.render(batch, camera)
@@ -475,15 +465,15 @@ class UIInventoryFull(
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, listControlHelp, offsetX + inventoryScrOffX, yEnd - 20)
+        AppLoader.fontGame.draw(batch, listControlHelp, offsetX + inventoryScrOffX, yEnd - 20)
 
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
 
-        Terrarum.fontGame.draw(batch,
+        AppLoader.fontGame.draw(batch,
                 encumbranceText,
-                xEnd - 6 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
+                xEnd - 6 - AppLoader.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
                 yEnd-20
         )
 
@@ -514,7 +504,7 @@ class UIInventoryFull(
         if (IS_DEVELOPMENT_BUILD) {
             AppLoader.fontSmallNumbers.draw(batch,
                     "${actor.inventory.capacity}/${actor.inventory.maxCapacity}",
-                    xEnd - 6 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
+                    xEnd - 6 - AppLoader.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
                     yEnd-20 + 3f + controlHelpHeight - 4f
             )
         }
@@ -554,18 +544,18 @@ class UIInventoryFull(
 
 
     override fun doOpening(delta: Float) {
-        (Terrarum.ingame as? Ingame)?.setTooltipMessage(null)
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
-        (Terrarum.ingame as? Ingame)?.setTooltipMessage(null)
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
     }
 
     override fun endClosing(delta: Float) {
-        (Terrarum.ingame as? Ingame)?.setTooltipMessage(null) // required!
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null) // required!
 
         MinimapComposer.revalidateAll()
     }

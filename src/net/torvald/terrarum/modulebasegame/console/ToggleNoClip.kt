@@ -3,14 +3,14 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
  * Created by minjaesong on 2016-01-19.
  */
 internal object ToggleNoClip : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return
 
 

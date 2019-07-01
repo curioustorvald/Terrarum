@@ -74,8 +74,8 @@ object LightmapRenderer {
         }
     }
 
-    val overscan_open: Int = 40
-    val overscan_opaque: Int = 10
+    private const val overscan_open: Int = 40
+    private const val overscan_opaque: Int = 10
 
 
     // TODO resize(int, int) -aware
@@ -83,7 +83,7 @@ object LightmapRenderer {
     var LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
     var LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
 
-    val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
+    private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
     /**
      * Float value, 1.0 for 1023
@@ -99,9 +99,9 @@ object LightmapRenderer {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
     }
 
-    private val AIR = Block.AIR
+    private const val AIR = Block.AIR
 
-    val DRAW_TILE_SIZE: Float = CreateTileAtlas.TILE_SIZE / IngameRenderer.lightmapDownsample
+    const val DRAW_TILE_SIZE: Float = CreateTileAtlas.TILE_SIZE / IngameRenderer.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -120,9 +120,17 @@ object LightmapRenderer {
     internal var for_x = 0
     internal var for_y = 0
 
-
-    //inline fun getLightRawPos(x: Int, y: Int) = lightmap[y][x]
-
+    /**
+     * @param x world coord
+     * @param y world coord
+     */
+    private fun inBounds(x: Int, y: Int) =
+            (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
+             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH)
+    /** World coord to array coord */
+    private inline fun Int.convX() = this - for_x_start + overscan_open
+    /** World coord to array coord */
+    private inline fun Int.convY() = this - for_y_start + overscan_open
 
     /**
      * Conventional level (multiplied by four)
@@ -146,66 +154,6 @@ object LightmapRenderer {
             )
         }
     }
-
-    /**
-     * @param x world coord
-     * @param y world coord
-     */
-    private fun inBounds(x: Int, y: Int) =
-            (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
-             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH)
-    /** World coord to array coord */
-    private inline fun Int.convX() = this - for_x_start + overscan_open
-    /** World coord to array coord */
-    private inline fun Int.convY() = this - for_y_start + overscan_open
-
-    /**
-     * Internal level (0..1)
-     *
-     * @param x world tile coord
-     * @param y world tile coord
-     */
-    // TODO in regard of "colour math against integers", return Int?
-    /*private fun getLightInternal(x: Int, y: Int): Cvec? {
-        if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
-            x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
-
-            val ypos = y - for_y_start + overscan_open
-            val xpos = x - for_x_start + overscan_open
-
-            // TODO as you can see above, we're already doing a boundary check; try using unsafe here?
-            return lightmap[ypos][xpos]
-            //return lightmap[ypos * LIGHTMAP_WIDTH + xpos]
-        }
-
-        return null
-    }*/
-
-
-    /**
-     * Converts world coord (x,y) into the lightmap index, and stores the input colour into the given list
-     * with given applyFun applied.
-     *
-     * Default 'applyFun' is simply storing given colour into the array.
-     *
-     * @param list The lightmap
-     * @param x World X coordinate
-     * @param y World Y coordinate
-     * @param colour Cvec to write
-     * @param applyFun A function ```foo(old_colour, given_colour)```
-     */
-    /*private fun setLightOf(list: Array<Array<Cvec>>, x: Int, y: Int, colour: Cvec, applyFun: (Cvec, Cvec) -> Cvec = { _, c -> c }) {
-        if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
-            x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
-
-            val ypos = y - for_y_start + overscan_open
-            val xpos = x - for_x_start + overscan_open
-
-            // TODO as you can see above, we're already doing a boundary check; try using unsafe here?
-            lightmap[ypos][xpos] = applyFun.invoke(list[ypos][xpos], colour)
-            //list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
-        }
-    }*/
 
     internal fun fireRecalculateEvent(vararg actorContainers: List<ActorWithBody>?) {
         try {
@@ -395,7 +343,7 @@ object LightmapRenderer {
             }
         }
 
-        updateMessages = lightTaskArr.toTypedArray().sliceEvenly(Terrarum.THREADS)
+        updateMessages = lightTaskArr.toTypedArray().sliceEvenly(AppLoader.THREADS)
     }
 
     internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
@@ -650,7 +598,7 @@ object LightmapRenderer {
 
     private val colourNull = Cvec(0)
     private val gdxColorNull = Color(0)
-    private val epsilon = 1f/1024f
+    private const val epsilon = 1f/1024f
 
     private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
@@ -719,10 +667,12 @@ object LightmapRenderer {
     }
 
     fun dispose() {
-
+        _lightBufferAsTex.dispose()
+        lightBuffer.dispose()
+        lightmap.destroy()
     }
 
-    val lightScalingMagic = 8f
+    private const val lightScalingMagic = 8f
 
     /**
      * Subtract each channel's RGB value.
@@ -732,7 +682,7 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    fun darkenColoured(x: Int, y: Int, darken: Cvec): Cvec {
+    private fun darkenColoured(x: Int, y: Int, darken: Cvec): Cvec {
         // use equation with magic number 8.0
         // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 
@@ -753,24 +703,8 @@ object LightmapRenderer {
 
     }
 
-    /**
-     * Darken or brighten colour by 'brighten' argument
-     *
-     * @param data Raw channel value (0-255) per channel
-     * @param brighten (-1.0 - 1.0) negative means darkening
-     * @return processed colour
-     */
-    fun alterBrightnessUniform(data: Cvec, brighten: Float): Cvec {
-        return Cvec(
-                data.r + brighten,
-                data.g + brighten,
-                data.b + brighten,
-                data.a + brighten
-        )
-    }
-
     /** infix is removed to clarify the association direction */
-    fun Cvec.maxAndAssign(other: Cvec): Cvec {
+    private fun Cvec.maxAndAssign(other: Cvec): Cvec {
         // TODO investigate: if I use assignment instead of set(), it blackens like the vector branch.  --Torvald, 2019-06-07
         //                   that was because you forgot 'this.r/g/b/a = ' part, bitch. --Torvald, 2019-06-07
         this.r = if (this.r > other.r) this.r else other.r
@@ -793,7 +727,7 @@ object LightmapRenderer {
     // TODO: float LUT lookup using linear interpolation
 
     // input: 0..1 for int 0..1023
-    fun hdr(intensity: Float): Float {
+    private fun hdr(intensity: Float): Float {
         val intervalStart = (intensity * CHANNEL_MAX).floorInt()
         val intervalEnd = minOf(rgbHDRLookupTable.lastIndex, (intensity * CHANNEL_MAX).floorInt() + 1)
 
@@ -839,7 +773,7 @@ object LightmapRenderer {
     }
 
 
-    val rgbHDRLookupTable = floatArrayOf( // polynomial of 6.0   please refer to work_files/HDRcurveBezierLinIntp.kts
+    private val rgbHDRLookupTable = floatArrayOf( // polynomial of 6.0   please refer to work_files/HDRcurveBezierLinIntp.kts
             0.0000f,0.0004f,0.0020f,0.0060f,0.0100f,0.0139f,0.0179f,0.0219f,0.0259f,0.0299f,0.0338f,0.0378f,0.0418f,0.0458f,0.0497f,0.0537f,
             0.0577f,0.0617f,0.0656f,0.0696f,0.0736f,0.0776f,0.0816f,0.0855f,0.0895f,0.0935f,0.0975f,0.1014f,0.1054f,0.1094f,0.1134f,0.1173f,
             0.1213f,0.1253f,0.1293f,0.1332f,0.1372f,0.1412f,0.1451f,0.1491f,0.1531f,0.1571f,0.1610f,0.1650f,0.1690f,0.1730f,0.1769f,0.1809f,
@@ -906,7 +840,7 @@ object LightmapRenderer {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    internal fun Color.normaliseToHDR() = Color(
+    fun Color.normaliseToHDR() = Color(
             hdr(this.r.coerceIn(0f, 1f)),
             hdr(this.g.coerceIn(0f, 1f)),
             hdr(this.b.coerceIn(0f, 1f)),
@@ -927,14 +861,7 @@ object LightmapRenderer {
             for (y in overscan_open..render_height + overscan_open + 1) {
                 for (x in overscan_open..render_width + overscan_open + 1) {
                     try {
-                        //val colour = lightmap[y][x]
-                        //val colour = lightmap[y * LIGHTMAP_WIDTH + x]
-                        val x = x.convX()
-                        val y = y.convY()
-                        //reds[minOf(CHANNEL_MAX, lightmap.getR(x, y).times(MUL).floorInt())] += 1
-                        //greens[minOf(CHANNEL_MAX, lightmap.getG(x, y).times(MUL).floorInt())] += 1
-                        //blues[minOf(CHANNEL_MAX, lightmap.getB(x, y).floorInt())] += 1
-                        //uvs[minOf(CHANNEL_MAX, lightmap.getA(x, y).floorInt())] += 1
+                        // TODO
                     }
                     catch (e: ArrayIndexOutOfBoundsException) { }
                 }

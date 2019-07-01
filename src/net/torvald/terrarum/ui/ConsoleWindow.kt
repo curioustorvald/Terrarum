@@ -4,13 +4,13 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.util.HistoryArray
-import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.langpack.Lang
+import net.torvald.util.HistoryArray
 
 
 /**
@@ -58,12 +58,12 @@ class ConsoleWindow : UICanvas() {
         batch.fillRect(drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
 
         val input = commandInputPool!!.toString()
-        val inputDrawWidth = Terrarum.fontGame.getWidth(input)
-        val inputDrawHeight = Terrarum.fontGame.lineHeight
+        val inputDrawWidth = AppLoader.fontGame.getWidth(input)
+        val inputDrawHeight = AppLoader.fontGame.lineHeight
 
         // text and cursor
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
+        AppLoader.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
 
         batch.color = Color(0x7f7f7f_ff)
         batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight)
@@ -74,7 +74,7 @@ class ConsoleWindow : UICanvas() {
         // messages
         for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {
             val message = messages[messageDisplayPos + i]
-            Terrarum.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
+            AppLoader.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
         }
     }
 
@@ -181,7 +181,7 @@ class ConsoleWindow : UICanvas() {
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {
-            sendMessage("${Terrarum.NAME} ${AppLoader.getVERSION_STRING()}")
+            sendMessage("${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }
     }

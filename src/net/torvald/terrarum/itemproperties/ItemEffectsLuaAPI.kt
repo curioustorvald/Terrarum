@@ -2,7 +2,6 @@ package net.torvald.terrarum.itemproperties
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ai.toLua
-import net.torvald.terrarum.modulebasegame.Ingame
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue

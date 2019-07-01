@@ -4,7 +4,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
  * Created by minjaesong on 2016-06-16.

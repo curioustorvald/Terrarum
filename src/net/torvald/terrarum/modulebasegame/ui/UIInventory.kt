@@ -47,7 +47,7 @@ package net.torvald.terrarum.modulebasegame.ui
     val itemStripGutterH = 8
     val itemInterColGutter = 8
 
-    val controlHelpHeight = Terrarum.fontGame.lineHeight.toInt()
+    val controlHelpHeight = AppLoader.fontGame.lineHeight.toInt()
 
     val pageButtonExtraGap = 32
 
@@ -239,16 +239,16 @@ package net.torvald.terrarum.modulebasegame.ui
         blendNormal()
         batch.color = defaultTextColour
         // W - close
-        Terrarum.fontGame.draw(batch, listControlClose, 4f, height - controlHelpHeight.toFloat())
+        AppLoader.fontGame.draw(batch, listControlClose, 4f, height - controlHelpHeight.toFloat())
         // MouseL - Use ; 1.9 - Register ; T - Drop
-        Terrarum.fontGame.draw(batch, listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
+        AppLoader.fontGame.draw(batch, listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
         // encumbrance
         if (inventory != null) {
             val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
 
-            Terrarum.fontGame.draw(batch,
+            AppLoader.fontGame.draw(batch,
                     encumbranceText,
-                    width - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth,
+                    width - 9 - AppLoader.fontGame.getWidth(encumbranceText) - weightBarWidth,
                     height - controlHelpHeight.toFloat()
             )
 

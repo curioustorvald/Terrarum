@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 
 /**

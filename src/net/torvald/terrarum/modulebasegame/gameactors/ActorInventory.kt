@@ -11,7 +11,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.lock
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -67,8 +67,8 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
         if (item.originalID == Terrarum.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
-        if (((Terrarum.ingame as? Ingame)?.gameFullyLoaded ?: false) &&
-            (item.originalID == (Terrarum.ingame as? Ingame)?.actorNowPlaying?.referenceID))
+        if (((Terrarum.ingame as? TerrarumIngame)?.gameFullyLoaded ?: false) &&
+            (item.originalID == (Terrarum.ingame as? TerrarumIngame)?.actorNowPlaying?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
         if ((!item.stackable || item.dynamicID in ITEM_DYNAMIC) && count > 1)
             throw IllegalArgumentException("Attempting to adding stack of item but the item is not stackable; item: $item, count: $count")
