@@ -1,6 +1,7 @@
 package net.torvald.terrarum.blockstats
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -29,13 +30,13 @@ object BlockStats {
         val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return
 
-        val renderWidth = FastMath.ceil(Terrarum.WIDTH.toFloat())
-        val renderHeight = FastMath.ceil(Terrarum.HEIGHT.toFloat())
+        val renderWidth = FastMath.ceil(AppLoader.screenW.toFloat())
+        val renderHeight = FastMath.ceil(AppLoader.screenH.toFloat())
 
         val noZoomCameraX = Math.round(FastMath.clamp(
-                (player.hitbox?.centeredX?.toFloat() ?: 0f) - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
+                player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
         val noZoomCameraY = Math.round(FastMath.clamp(
-                (player.hitbox?.centeredY?.toFloat() ?: 0f) - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
 
         val for_x_start = noZoomCameraX / TSIZE
         val for_y_start = noZoomCameraY / TSIZE

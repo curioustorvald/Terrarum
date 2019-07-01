@@ -41,8 +41,6 @@ object Terrarum : Disposable {
      */
     const val PLAYER_REF_ID: Int = 0x91A7E2
 
-    var batch: SpriteBatch = AppLoader.batch
-    var shapeRender: ShapeRenderer = AppLoader.shapeRender // DO NOT USE!! for very limited applications e.g. WeatherMixer
     inline fun inShapeRenderer(shapeRendererType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, action: (ShapeRenderer) -> Unit) {
         shapeRender.begin(shapeRendererType)
         action(shapeRender)
@@ -53,19 +51,6 @@ object Terrarum : Disposable {
     //////////////////////////////
     // GLOBAL IMMUTABLE CONFIGS //
     //////////////////////////////
-
-    val WIDTH: Int
-        get() = AppLoader.screenW
-    val HEIGHT: Int
-        get() = AppLoader.screenH
-
-    //val WIDTH_MIN = 800
-    //val HEIGHT_MIN = 600
-
-    inline val HALFW: Int
-        get() = WIDTH.ushr(1)
-    inline val HALFH: Int
-        get() = HEIGHT.ushr(1)
 
     /**
      * To be used with physics simulator. This is a magic number.
@@ -114,35 +99,7 @@ object Terrarum : Disposable {
             return String.format("%.2f", acc)
         }
 
-
-    // 0x0 - 0xF: Game-related
-    // 0x10 - 0x1F: Config
-    // 0x100 and onward: unit tests for dev
-    val STATE_ID_SPLASH = 0x0
-    val STATE_ID_HOME = 0x1
-    val STATE_ID_GAME = 0x3
-    val STATE_ID_CONFIG_CALIBRATE = 0x11
-
-    val STATE_ID_TEST_FONT = 0x100
-    val STATE_ID_TEST_GFX = 0x101
-    val STATE_ID_TEST_TTY = 0x102
-    val STATE_ID_TEST_BLUR = 0x103
-    val STATE_ID_TEST_SHADER = 0x104
-    val STATE_ID_TEST_REFRESHRATE = 0x105
-    val STATE_ID_TEST_INPUT = 0x106
-
-    val STATE_ID_TEST_UI1 = 0x110
-
-    val STATE_ID_TOOL_NOISEGEN = 0x200
-    val STATE_ID_TOOL_RUMBLE_DIAGNOSIS = 0x201
-
     lateinit var testTexture: Texture
-
-
-    /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
-    val fullscreenQuad = AppLoader.fullscreenQuad
-
-
 
     init {
         println("[Terrarum] init called by:")
@@ -356,7 +313,7 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     //this.end()
     FrameBufferManager.end()
 
-    camera?.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+    camera?.setToOrtho(true, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 }

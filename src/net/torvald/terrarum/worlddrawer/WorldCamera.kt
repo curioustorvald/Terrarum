@@ -1,6 +1,7 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -39,8 +40,8 @@ object WorldCamera {
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
-        width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
-        height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
+        width = FastMath.ceil(AppLoader.screenW / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
+        height = FastMath.ceil(AppLoader.screenH / (Terrarum.ingame?.screenZoom ?: 1f))
 
         // TOP-LEFT position of camera border
 
@@ -64,8 +65,8 @@ object WorldCamera {
     private fun Int.clampCameraY(world: GameWorld): Int {
         return if (this < 0)
             0
-        else if (this > world.height.times(TILE_SIZE) - Terrarum.HEIGHT)
-            world.height.times(TILE_SIZE) - Terrarum.HEIGHT
+        else if (this > world.height.times(TILE_SIZE) - AppLoader.screenH)
+            world.height.times(TILE_SIZE) - AppLoader.screenH
         else
             this
     }

@@ -6,7 +6,7 @@ package net.torvald.terrarum.modulebasegame.ui
         val remoConWidth = 240
         fun getRemoConHeight(menu: ArrayList<String>) = 36 * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = 36 * menu.size.plus(1)
-        val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
+        val menubarOffY: Int; get() = AppLoader.screenH / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
     }
 
 

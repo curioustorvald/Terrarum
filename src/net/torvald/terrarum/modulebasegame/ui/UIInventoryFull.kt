@@ -35,8 +35,8 @@ class UIInventoryFull(
 
     private val debugvals = false
     
-    override var width: Int = Terrarum.WIDTH
-    override var height: Int = Terrarum.HEIGHT
+    override var width: Int = AppLoader.screenW
+    override var height: Int = AppLoader.screenH
 
     private val itemListToEquipViewGap = 24
 
@@ -86,8 +86,8 @@ class UIInventoryFull(
     val catBarWidth = 330
     val categoryBar = UIItemInventoryCatBar(
             this,
-            (Terrarum.WIDTH - catBarWidth) / 2,
-            42 + (Terrarum.HEIGHT - internalHeight) / 2,
+            (AppLoader.screenW - catBarWidth) / 2,
+            42 + (AppLoader.screenH - internalHeight) / 2,
             catBarWidth
     )
     val catSelection: Int
@@ -102,8 +102,8 @@ class UIInventoryFull(
             UIItemInventoryDynamicList(
                     this,
                     actor.inventory,
-                    0 + (Terrarum.WIDTH - internalWidth) / 2,
-                    109 + (Terrarum.HEIGHT - internalHeight) / 2
+                    0 + (AppLoader.screenW - internalWidth) / 2,
+                    109 + (AppLoader.screenH - internalHeight) / 2
             )
 
 
@@ -112,15 +112,15 @@ class UIInventoryFull(
                     this,
                     actor.inventory,
                     actor as ActorWBMovable,
-                    internalWidth - UIItemInventoryEquippedView.WIDTH + (Terrarum.WIDTH - internalWidth) / 2,
-                    109 + (Terrarum.HEIGHT - internalHeight) / 2
+                    internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
+                    109 + (AppLoader.screenH - internalHeight) / 2
             )
     private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
     private val gameMenuButtons = UIItemTextButtonList(
             this, gameMenu,
-            Terrarum.WIDTH + (Terrarum.WIDTH - gameMenuListWidth) / 2,
+            AppLoader.screenW + (AppLoader.screenW - gameMenuListWidth) / 2,
             (itemList.height - gameMenuListHeight) / 2 + itemList.posY,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
@@ -184,7 +184,7 @@ class UIInventoryFull(
         // make gameMenuButtons work
         gameMenuButtons.selectionChangeListener = { old, new ->
             if (new == 0) {
-                AppLoader.setScreen(TitleScreen(Terrarum.batch))
+                AppLoader.setScreen(TitleScreen(AppLoader.batch))
             }
             else if (new == 1) {
                 Gdx.app.exit()
@@ -193,8 +193,8 @@ class UIInventoryFull(
 
     }
 
-    private var offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
-    private var offsetY = ((Terrarum.HEIGHT - internalHeight) / 2).toFloat()
+    private var offsetX = ((AppLoader.screenW - internalWidth)   / 2).toFloat()
+    private var offsetY = ((AppLoader.screenH - internalHeight) / 2).toFloat()
 
 
 
@@ -223,8 +223,8 @@ class UIInventoryFull(
 
     private val weightBarWidth = 64f
 
-    private var xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
-    private var yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
+    private var xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
+    private var yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
 
     private var minimapRerenderTimer = 0f
     private val minimapRerenderInterval = .5f
@@ -272,17 +272,17 @@ class UIInventoryFull(
         gdxSetBlendNormal()
 
 
-        val gradTopStart = (Terrarum.HEIGHT - internalHeight).div(2).toFloat()
-        val gradBottomEnd = Terrarum.HEIGHT - gradTopStart
+        val gradTopStart = (AppLoader.screenH - internalHeight).div(2).toFloat()
+        val gradBottomEnd = AppLoader.screenH - gradTopStart
 
         shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, Terrarum.WIDTH.toFloat(), gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, Terrarum.WIDTH.toFloat(), -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenW.toFloat(), gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenW.toFloat(), -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, Terrarum.WIDTH.toFloat(), internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenW.toFloat(), internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, 0f, Terrarum.WIDTH.toFloat(), gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, Terrarum.HEIGHT.toFloat(), Terrarum.WIDTH.toFloat(), -(Terrarum.HEIGHT.toFloat() - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, 0f, AppLoader.screenW.toFloat(), gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, AppLoader.screenH.toFloat(), AppLoader.screenW.toFloat(), -(AppLoader.screenH.toFloat() - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
         }
 
 
@@ -330,16 +330,16 @@ class UIInventoryFull(
     private val epsilon = 0.001f
 
     private val minimapScrOffX: Float
-        get() = (currentScreen - 2f) * Terrarum.WIDTH
+        get() = (currentScreen - 2f) * AppLoader.screenW
     /**
      * - 0 on inventory screen
      * - +WIDTH on minimap screen
      * - -WIDTH on gamemenu screen
      */
     private val inventoryScrOffX: Float
-        get() = (currentScreen - 1f) * Terrarum.WIDTH
+        get() = (currentScreen - 1f) * AppLoader.screenW
     private val menuScrOffX: Float
-        get() = (currentScreen) * Terrarum.WIDTH
+        get() = (currentScreen) * AppLoader.screenW
 
     private val MINIMAP_WIDTH = 800f
     private val MINIMAP_HEIGHT = UIItemInventoryDynamicList.HEIGHT.toFloat()
@@ -431,20 +431,20 @@ class UIInventoryFull(
         batch.begin()
 
 
-        AppLoader.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -10f + itemList.posY)
+        AppLoader.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", minimapScrOffX + (AppLoader.screenW - MINIMAP_WIDTH) / 2, -10f + itemList.posY)
 
 
         batch.projectionMatrix = camera.combined
         // 1px stroke
         batch.color = Color.WHITE
-        batch.fillRect(-1 + minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -1 + itemList.posY.toFloat(), 2 + MINIMAP_WIDTH, 2 + MINIMAP_HEIGHT)
+        batch.fillRect(-1 + minimapScrOffX + (AppLoader.screenW - MINIMAP_WIDTH) / 2, -1 + itemList.posY.toFloat(), 2 + MINIMAP_WIDTH, 2 + MINIMAP_HEIGHT)
 
         // control hints
         batch.color = Color.WHITE
         AppLoader.fontGame.draw(batch, minimapControlHelp, offsetX + minimapScrOffX, yEnd - 20)
 
         // the minimap
-        batch.draw(minimapFBO.colorBufferTexture, minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, itemList.posY.toFloat())
+        batch.draw(minimapFBO.colorBufferTexture, minimapScrOffX + (AppLoader.screenW - MINIMAP_WIDTH) / 2, itemList.posY.toFloat())
     }
 
     private fun renderScreenGamemenu(batch: SpriteBatch, camera: Camera) {
@@ -565,11 +565,11 @@ class UIInventoryFull(
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
 
-        offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
-        offsetY = ((Terrarum.HEIGHT - internalHeight) / 2).toFloat()
+        offsetX = ((AppLoader.screenW - internalWidth)   / 2).toFloat()
+        offsetY = ((AppLoader.screenH - internalHeight) / 2).toFloat()
 
-        xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
-        yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
+        xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
+        yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
     }
 
 

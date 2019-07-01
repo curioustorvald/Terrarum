@@ -33,7 +33,7 @@ class ConsoleWindow : UICanvas() {
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 11
 
-    override var width: Int = Terrarum.WIDTH
+    override var width: Int = AppLoader.screenW
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime = 0f
