@@ -65,10 +65,13 @@ class UnsafePtr(pointer: Long, allocSize: Long) {
     }
 
     private inline fun checkNullPtr(index: Long) { // ignore what IDEA says and do inline this
+        // commenting out because of the suspected (or minor?) performance impact.
+        // You may break the glass and use this tool when some fucking incomprehensible bugs ("vittujen vitun bugit")
+        // appear (e.g. getting garbage values when it fucking shouldn't)
         if (destroyed) throw NullPointerException("The pointer is already destroyed ($this)")
 
         // OOB Check: debugging purposes only -- comment out for the production
-        //if (index !in 0 until allocSize) throw IndexOutOfBoundsException("Index: $index; alloc size: $allocSize")
+        //if (index !in 0 until size) throw IndexOutOfBoundsException("Index: $index; alloc size: $size")
     }
 
     operator fun get(index: Long): Byte {
