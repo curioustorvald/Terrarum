@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
+import static net.torvald.terrarum.TerrarumKt.printStackTrace;
 
 /**
  * The framework's Application Loader
@@ -253,7 +254,7 @@ public class AppLoader implements ApplicationListener {
         Gdx.gl20.glViewport(0, 0, width, height);
     }
 
-    public static final double UPDATE_RATE = 1.0 / 60.0; // TODO set it like 1/100, because apparent framerate is limited by update rate
+    public static final float UPDATE_RATE = 1f / 64f; // TODO set it like 1/100, because apparent framerate is limited by update rate
 
     private static float loadTimer = 0f;
     private static final float showupTime = 100f / 1000f;
@@ -261,8 +262,8 @@ public class AppLoader implements ApplicationListener {
     private static FrameBuffer renderFBO;
 
     public static CommonResourcePool resourcePool;
-    public static HashSet<File> tempFilePool = new HashSet();
-    public static HashSet<Disposable> disposableSingletonsPool = new HashSet();
+    public static HashSet<File> tempFilePool = new HashSet<>();
+    public static HashSet<Disposable> disposableSingletonsPool = new HashSet<>();
 
     public static char gamepadLabelStart = 0xE000; // lateinit
     public static char gamepadLabelSelect = 0xE000; // lateinit
@@ -514,7 +515,7 @@ public class AppLoader implements ApplicationListener {
         }
         // draw the screen
         else {
-            currenScreen.render((float) UPDATE_RATE);
+            currenScreen.render(UPDATE_RATE);
         }
 
         KeyToggler.INSTANCE.update(currenScreen instanceof TerrarumIngame);
@@ -554,9 +555,7 @@ public class AppLoader implements ApplicationListener {
     @Override
     public void resize(int width, int height) {
         printdbg(this, "Resize called");
-        for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
-            printdbg(this, stackTraceElement);
-        }
+        printStackTrace(this);
 
         //initViewPort(width, height);
 

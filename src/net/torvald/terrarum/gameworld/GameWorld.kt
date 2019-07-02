@@ -9,6 +9,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
+import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
 import net.torvald.util.SortedArrayList
@@ -28,9 +29,7 @@ open class GameWorld : Disposable {
                 throw Error("World index start at 1; you've entered $value")
 
             printdbg(this, "Creation of new world with index $value, called by:")
-            Thread.currentThread().stackTrace.forEach {
-                printdbg(this, "--> $it")
-            }
+            printStackTrace(this)
 
             field = value
         }

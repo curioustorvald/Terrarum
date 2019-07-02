@@ -145,9 +145,7 @@ class UINSMenu(
     private fun popSubMenu() {
         if (listStack.size == 1) {
             System.err.println("[UINSMenu] Tried to pop root menu")
-            Thread.currentThread().getStackTrace().forEach {
-                System.err.println(it)
-            }
+            printStackTrace(this, System.err)
             return
         }
 

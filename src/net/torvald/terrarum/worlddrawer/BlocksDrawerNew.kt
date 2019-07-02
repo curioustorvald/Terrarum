@@ -31,6 +31,7 @@ import kotlin.math.roundToInt
  */
 internal object BlocksDrawer {
 
+    /** World change is managed by IngameRenderer.setWorld() */
     internal var world: GameWorld = GameWorld.makeNullWorld()
 
     private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
@@ -724,9 +725,7 @@ internal object BlocksDrawer {
 
     fun dispose() {
         printdbg(this, "dispose called by")
-        Thread.currentThread().stackTrace.forEach {
-            printdbg(this, "--> $it")
-        }
+        printStackTrace(this)
 
         weatherTerrains.forEach { it.dispose() }
         tilesWire.dispose()

@@ -13,7 +13,7 @@ class ActorValue(@Transient val actor: Actor) : KVHashMap() {
 
     override fun set(key: String, value: Any) {
         /*if (key == AVKey.__PLAYER_QUICKSLOTSEL) {
-            Thread.currentThread().stackTrace.forEach { println(it) }
+            printStackTrace(this)
         }*/
 
         super.set(key, value)

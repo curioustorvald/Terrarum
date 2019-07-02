@@ -23,7 +23,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
 
-    override fun run() = update(AppLoader.UPDATE_RATE.toFloat())
+    override fun run() = update(AppLoader.UPDATE_RATE)
 
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0

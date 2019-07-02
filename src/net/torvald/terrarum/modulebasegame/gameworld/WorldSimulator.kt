@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import net.torvald.aa.KDTree
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -11,6 +12,7 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.FluidType
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -58,8 +60,10 @@ object WorldSimulator {
     val colourNone = Color(0x808080FF.toInt())
     val colourWater = Color(0x66BBFFFF.toInt())
 
-    private val ingame = Terrarum.ingame!!
-    private val world = ingame.world
+    private val ingame: IngameInstance
+            get() = Terrarum.ingame!!
+    private val world: GameWorld
+            get() = ingame.world
 
     // TODO use R-Tree instead?  https://stackoverflow.com/questions/10269179/find-rectangles-that-contain-point-efficient-algorithm#10269695
     private var actorsKDTree: KDTree? = null
@@ -81,7 +85,6 @@ object WorldSimulator {
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }
-
         moveFluids(delta)
         displaceFallables(delta)
 

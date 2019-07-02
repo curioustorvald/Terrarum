@@ -22,6 +22,7 @@ import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
 import java.io.File
+import java.io.PrintStream
 import kotlin.math.absoluteValue
 
 
@@ -64,7 +65,21 @@ object Terrarum : Disposable {
     var previousScreen: Screen? = null // to be used with temporary states like StateMonitorCheck
 
 
-    /** Current ingame instance the game is holding */
+    /** Current ingame instance the game is holding.
+     *
+     *  The ingame instance this variable is subject to change.
+     *
+     *  Don't do:
+     *  ```
+     *  private val ingame = Terrarum.ingame
+     *  ```
+     *
+     *  Do instead:
+     *  ```
+     *  private val ingame: IngameInstance
+     *          get() = Terrarum.ingame
+     *  ```
+     */
     var ingame: IngameInstance? = null
         private set
 
@@ -103,7 +118,7 @@ object Terrarum : Disposable {
 
     init {
         println("[Terrarum] init called by:")
-        Thread.currentThread().stackTrace.forEach { println("... $it") }
+        printStackTrace(this)
 
         println("[Terrarum] ${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
         println("[Terrarum] LibGDX version ${com.badlogic.gdx.Version.VERSION}")
@@ -157,7 +172,7 @@ object Terrarum : Disposable {
         this.ingame = ingame
 
         printdbg(this, "Accepting new ingame instance '${ingame.javaClass.canonicalName}', called by:")
-        Thread.currentThread().stackTrace.forEach { printdbg(this, it) }
+        printStackTrace(this)
     }
 
     private fun showxxx() {
@@ -550,4 +565,14 @@ fun <T> List<T>.linearSearchBy(selector: (T) -> Boolean): T? {
     }
 
     return null
+}
+
+inline fun printStackTrace(obj: Any) = printStackTrace(obj, System.out) // because of Java
+
+fun printStackTrace(obj: Any, out: PrintStream = System.out) {
+    if (AppLoader.IS_DEVELOPMENT_BUILD) {
+        Thread.currentThread().stackTrace.forEach {
+            out.println("[${obj.javaClass.simpleName}] ... $it")
+        }
+    }
 }

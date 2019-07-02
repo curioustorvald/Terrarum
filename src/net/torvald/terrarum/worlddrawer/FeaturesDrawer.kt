@@ -13,6 +13,8 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
  * Created by minjaesong on 2015-12-31.
  */
 object FeaturesDrawer {
+
+    /** World change is managed by IngameRenderer.setWorld() */
     internal var world: GameWorld = GameWorld.makeNullWorld()
 
     //const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
