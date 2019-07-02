@@ -22,9 +22,22 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val ZOOM_MAXIMUM = 4.0f
     val ZOOM_MINIMUM = 0.5f
 
-    open lateinit var consoleHandler: ConsoleWindow
+    open var consoleHandler: ConsoleWindow = ConsoleWindow()
+
+    init {
+        consoleHandler.setPosition(0, 0)
+
+        printdbg(this, "New ingame instance ${this.hashCode()}, called from")
+        printStackTrace(this)
+    }
 
     open var world: GameWorld = GameWorld.makeNullWorld()
+        set(value) {
+            printdbg(this, "Ingame instance ${this.hashCode()}, accepting new world ${value.layerTerrain}; called from")
+            printStackTrace(this)
+
+            field = value
+        }
     /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
     var gameworldCount = 0
     /** The actor the game is currently allowing you to control.
@@ -63,7 +76,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         gameInitialised = true
     }
 
-    override fun render(delta: Float) {
+    override fun render(updateRate: Float) {
     }
 
     override fun pause() {
@@ -83,9 +96,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     override fun dispose() {
         printdbg(this, "Thank you for properly disposing the world!")
         printdbg(this, "dispose called by")
-        Thread.currentThread().stackTrace.forEach {
-            printdbg(this, "--> $it")
-        }
+        printStackTrace(this)
 
         world.dispose()
     }

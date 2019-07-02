@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Point2d
+import net.torvald.terrarum.printStackTrace
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -28,7 +29,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
 
         if (!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
-            Thread.currentThread().stackTrace.forEach { println(it) }
+            printStackTrace(this)
         }
     }
 
@@ -67,7 +68,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
 
         if (!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
-            Thread.currentThread().stackTrace.forEach { println(it) }
+            printStackTrace(this)
         }
 
         return this
@@ -85,7 +86,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
 
         if (!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
-            Thread.currentThread().stackTrace.forEach { println(it) }
+            printStackTrace(this)
         }
 
         return this

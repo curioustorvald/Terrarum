@@ -36,8 +36,6 @@ object ItemCodex {
     private val itemImagePlaceholder: TextureRegion
         get() = AppLoader.resourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
 
-    //private val ingame = Terrarum.ingame!! as Ingame // WARNING you can't put this here, ExceptionInInitializerError
-
 
     // TODO: when generalised, there's no guarantee that blocks will be used as an item. Write customised item prop loader and init it on the Ingame
 

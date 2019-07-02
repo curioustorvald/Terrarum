@@ -1,5 +1,6 @@
 package net.torvald
 
+import net.torvald.terrarum.printStackTrace
 import sun.misc.Unsafe
 
 /**
@@ -57,7 +58,7 @@ class UnsafePtr(pointer: Long, allocSize: Long) {
             UnsafeHelper.unsafe.freeMemory(ptr)
 
             println("[UnsafePtr] Destroying pointer $this; called from:")
-            Thread.currentThread().stackTrace.forEach { println(it) }
+            printStackTrace(this)
 
             destroyed = true
         }

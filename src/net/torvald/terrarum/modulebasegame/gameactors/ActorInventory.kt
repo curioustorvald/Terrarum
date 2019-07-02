@@ -215,7 +215,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
                 actor.avStrength / 1000.0
             else
                 1.0 // TODO variable: scale, strength
-            val swingDmgToFrameDmg = AppLoader.UPDATE_RATE.toFloat().toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val swingDmgToFrameDmg = AppLoader.UPDATE_RATE.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
             // damage the item
             newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()

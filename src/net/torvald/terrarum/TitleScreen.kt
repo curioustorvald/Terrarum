@@ -193,16 +193,16 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private var introUncoverDeltaCounter = 0f
     private var updateAkku = 0.0
 
-    override fun render(delta: Float) {
+    override fun render(updateRate: Float) {
         // async update and render
 
         val dt = Gdx.graphics.rawDeltaTime
         updateAkku += dt
 
         var i = 0L
-        while (updateAkku >= delta) {
-            AppLoader.measureDebugTime("Ingame.update") { updateScreen(delta) }
-            updateAkku -= delta
+        while (updateAkku >= updateRate) {
+            AppLoader.measureDebugTime("Ingame.update") { updateScreen(updateRate) }
+            updateAkku -= updateRate
             i += 1
         }
         AppLoader.setDebugTime("Ingame.updateCounter", i)

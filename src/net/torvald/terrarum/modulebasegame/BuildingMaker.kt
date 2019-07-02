@@ -317,7 +317,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private var updateAkku = 0.0
 
-    override fun render(delta: Float) {
+    override fun render(updateRate: Float) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
@@ -327,9 +327,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         updateAkku += dt
 
         var i = 0L
-        while (updateAkku >= delta) {
-            AppLoader.measureDebugTime("Ingame.update") { updateGame(delta) }
-            updateAkku -= delta
+        while (updateAkku >= updateRate) {
+            AppLoader.measureDebugTime("Ingame.update") { updateGame(updateRate) }
+            updateAkku -= updateRate
             i += 1
         }
         AppLoader.setDebugTime("Ingame.updateCounter", i)

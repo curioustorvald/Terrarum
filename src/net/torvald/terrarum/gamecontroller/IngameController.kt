@@ -61,10 +61,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 if (
                         Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) ||
                         Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
-                    terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE.toFloat())
+                    terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
                 }
                 /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary")) {
-                    ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE.toFloat())
+                    ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
                 }*/
             }
         }
@@ -151,10 +151,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 if (
                         button == AppLoader.getConfigInt("mouseprimary") ||
                         button == AppLoader.getConfigInt("mousesecondary")) {
-                    terrarumIngame.worldPrimaryClickEnd(AppLoader.UPDATE_RATE.toFloat())
+                    terrarumIngame.worldPrimaryClickEnd(AppLoader.UPDATE_RATE)
                 }
                 /*if (button == AppLoader.getConfigInt("mousesecondary")) {
-                    ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE.toFloat())
+                    ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE)
                 }*/
             }
         }

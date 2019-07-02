@@ -38,6 +38,7 @@ import net.torvald.terrarum.realestate.LandUtil
 object LightmapRenderer {
     private const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
+    /** World change is managed by IngameRenderer.setWorld() */
     private var world: GameWorld = GameWorld.makeNullWorld()
 
     private lateinit var lightCalcShader: ShaderProgram

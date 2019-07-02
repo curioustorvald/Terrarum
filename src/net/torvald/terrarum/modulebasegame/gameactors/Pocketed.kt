@@ -28,7 +28,7 @@ interface Pocketed {
         }
 
         inventory.itemEquipped[item.equipPosition] = null
-        item.effectOnUnequip(AppLoader.UPDATE_RATE.toFloat())
+        item.effectOnUnequip(AppLoader.UPDATE_RATE)
     }
 
     fun unequipItem(itemID: ItemID?) {
@@ -56,7 +56,7 @@ interface Pocketed {
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item.dynamicID
-            item.effectWhenEquipped(AppLoader.UPDATE_RATE.toFloat())
+            item.effectWhenEquipped(AppLoader.UPDATE_RATE)
         }
         // else do nothing
     }

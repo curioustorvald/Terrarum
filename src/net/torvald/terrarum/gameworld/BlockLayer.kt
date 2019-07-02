@@ -143,6 +143,8 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         printdbg(this, "BlockLayer with ptr ($ptr) successfully freed")
     }
 
+    override fun toString(): String = ptr.toString()
+
     companion object {
         @Transient val BYTES_PER_BLOCK = 2L
     }

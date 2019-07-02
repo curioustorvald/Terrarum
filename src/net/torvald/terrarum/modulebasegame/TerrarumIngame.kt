@@ -27,7 +27,6 @@ import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
-import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
@@ -236,7 +235,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     private fun enter(worldParams: NewWorldParameters) {
         printdbg(this, "Ingame called")
-        printStackTrace()
+        printStackTrace(this)
 
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
@@ -285,8 +284,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         // init console window
-        consoleHandler = ConsoleWindow()
-        consoleHandler.setPosition(0, 0)
+        // TODO test put it on the IngameInstance.(init)
+        //consoleHandler = ConsoleWindow()
+        //consoleHandler.setPosition(0, 0)
 
 
         // init notifier
@@ -426,9 +426,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private var updateAkku = 0.0
 
-    override fun render(delta: Float) {
-        println("Vitun Perkeleen TerrarumIngame")
-
+    override fun render(`_`: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
         // there's still things to load which needs GL context to be present
         if (!gameFullyLoaded) {
@@ -447,6 +445,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             gameFullyLoaded = true
         }
 
+        // define custom update rate
+        val updateRate = if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else AppLoader.UPDATE_RATE
+
         // ASYNCHRONOUS UPDATE AND RENDER //
 
         /** UPDATE CODE GOES HERE */
@@ -454,9 +455,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         updateAkku += dt
 
         var i = 0L
-        while (updateAkku >= delta) {
-            AppLoader.measureDebugTime("Ingame.update") { updateGame(delta) }
-            updateAkku -= delta
+        while (updateAkku >= updateRate) {
+            AppLoader.measureDebugTime("Ingame.update") { updateGame(updateRate) }
+            updateAkku -= updateRate
             i += 1
         }
         AppLoader.setDebugTime("Ingame.updateCounter", i)
@@ -473,7 +474,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private var worldWidth: Double = 0.0
 
-
+    /**
+     * Ingame (world) related updates; UI update must go to renderGame()
+     */
     protected fun updateGame(delta: Float) {
         val world = this.world as GameWorldExtension
         worldWidth = world.width.toDouble() * TILE_SIZE
@@ -532,7 +535,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         ////////////////////////
         // ui-related updates //
         ////////////////////////
-        uiContainer.forEach { it.update(delta) }
+        //uiContainer.forEach { it.update(delta) }
         //debugWindow.update(delta)
         //notifier.update(delta)
 
@@ -548,6 +551,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
         filterVisibleActors()
+        uiContainer.forEach { it.update(Gdx.graphics.rawDeltaTime) }
 
         IngameRenderer.invoke(
                 paused,
@@ -769,7 +773,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID!!) { it.referenceID!! }
         if (indexToDelete != null) {
             printdbg(this, "Removing actor $actor")
-            printStackTrace()
+            printStackTrace(this)
 
             actorContainerActive.removeAt(indexToDelete)
 
@@ -835,7 +839,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         else {
             printdbg(this, "Adding actor $actor")
-            printStackTrace()
+            printStackTrace(this)
 
             actorContainerActive.add(actor)
 
@@ -1006,13 +1010,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         super.dispose()
-    }
-
-
-    private fun printStackTrace() {
-        Thread.currentThread().getStackTrace().forEach {
-            printdbg(this, "--> $it")
-        }
     }
 
 }

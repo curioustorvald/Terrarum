@@ -345,7 +345,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     val feetPosTile: Point2i = Point2i(0,0)
         //get() = Point2i(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
-    override fun run() = update(AppLoader.UPDATE_RATE.toFloat())
+    override fun run() = update(AppLoader.UPDATE_RATE)
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.
