@@ -316,79 +316,76 @@ internal object BlocksDrawer {
 
 
                 // draw a tile
-                if (thisTile != null) try {
-                    val nearbyTilesInfo = if (mode == FLUID) {
-                        getNearbyTilesInfoFluids(x, y)
-                    }
-                    else if (mode == WIRE) {
-                        getNearbyWiringInfo(x, y, thisTile)
-                    }
-                    else if (isPlatform(thisTile)) {
-                        getNearbyTilesInfoPlatform(x, y)
-                    }
-                    else if (isWallSticker(thisTile)) {
-                        getNearbyTilesInfoWallSticker(x, y)
-                    }
-                    else if (isConnectMutual(thisTile)) {
-                        getNearbyTilesInfoConMutual(x, y, mode)
-                    }
-                    else if (isConnectSelf(thisTile)) {
-                        getNearbyTilesInfoConSelf(x, y, mode, thisTile)
-                    }
-                    else {
-                        0
-                    }
-
-                    val renderTag = CreateTileAtlas.getRenderTag(thisTile)
-                    val tileNumberBase =
-                            if (mode == FLUID)
-                                CreateTileAtlas.fluidToTileNumber(world.getFluid(x, y))
-                            else if (mode == WIRE)
-                                thisTile
-                            else
-                                renderTag.tileNumber
-                    val tileNumber = if (mode != WIRE && thisTile == 0) 0
-                    // special case: fluids
-                    else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
-                    // special case: wires
-                    else if (mode == WIRE) tileNumberBase + connectLut16[nearbyTilesInfo]
-                    // rest of the cases: terrain and walls
-                    else tileNumberBase + when (renderTag.maskType) {
-                            CreateTileAtlas.RenderTag.MASK_NA -> 0
-                            CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
-                            CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
-                            CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
-                            else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
-                        }
-
-                    var thisTileX = tileNumber % TILES_IN_X
-                    var thisTileY = tileNumber / TILES_IN_X
-
-                    if (mode == FLUID && thisTileX == 22 && thisTileY == 3) {
-                        //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
-                    }
-
-                    val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
-                    val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                    val breakingStage = (breakage / maxHealth).times(BREAKAGE_STEPS).roundInt()
-
-
-
-                    // draw a tile
-
-                    if (mode == WIRE && thisTile < 0) {
-                        // no wire here, draw block id 255 (bottom right)
-                        writeToBuffer(mode, bufferX, bufferY, 15, 15, 0)
-                    }
-                    else if (mode == FLUID || mode == WIRE) {
-                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
-                    }
-                    else {
-                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
-                    }
-                } catch (e: NullPointerException) {
-                    // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
+                val nearbyTilesInfo = if (mode == FLUID) {
+                    getNearbyTilesInfoFluids(x, y)
                 }
+                else if (mode == WIRE) {
+                    getNearbyWiringInfo(x, y, thisTile)
+                }
+                else if (isPlatform(thisTile)) {
+                    getNearbyTilesInfoPlatform(x, y)
+                }
+                else if (isWallSticker(thisTile)) {
+                    getNearbyTilesInfoWallSticker(x, y)
+                }
+                else if (isConnectMutual(thisTile)) {
+                    getNearbyTilesInfoConMutual(x, y, mode)
+                }
+                else if (isConnectSelf(thisTile)) {
+                    getNearbyTilesInfoConSelf(x, y, mode, thisTile)
+                }
+                else {
+                    0
+                }
+
+                val renderTag = CreateTileAtlas.getRenderTag(thisTile)
+                val tileNumberBase =
+                        if (mode == FLUID)
+                            CreateTileAtlas.fluidToTileNumber(world.getFluid(x, y))
+                        else if (mode == WIRE)
+                            thisTile
+                        else
+                            renderTag.tileNumber
+                val tileNumber = if (mode != WIRE && thisTile == 0) 0
+                // special case: fluids
+                else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
+                // special case: wires
+                else if (mode == WIRE) tileNumberBase + connectLut16[nearbyTilesInfo]
+                // rest of the cases: terrain and walls
+                else tileNumberBase + when (renderTag.maskType) {
+                        CreateTileAtlas.RenderTag.MASK_NA -> 0
+                        CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
+                        CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
+                        CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
+                        else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
+                    }
+
+                var thisTileX = tileNumber % TILES_IN_X
+                var thisTileY = tileNumber / TILES_IN_X
+
+                if (mode == FLUID && thisTileX == 22 && thisTileY == 3) {
+                    //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
+                }
+
+                val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
+                val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
+                val breakingStage = (breakage / maxHealth).times(BREAKAGE_STEPS).roundInt()
+
+
+
+                // draw a tile
+
+                if (mode == WIRE && thisTile < 0) {
+                    // no wire here, draw block id 255 (bottom right)
+                    writeToBuffer(mode, bufferX, bufferY, 15, 15, 0)
+                }
+                else if (mode == FLUID || mode == WIRE) {
+                    writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
+                }
+                else {
+                    writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
+                }
+
             }
         }
     }
