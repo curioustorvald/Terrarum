@@ -115,8 +115,8 @@ open class ActorHumanoid(
     var axisRY = 0f; protected set
 
     /** empirical value. */
-    @Transient private val JUMP_ACCELERATION_MOD = 51.0 / 10000.0 // (170 * (17/MAX_JUMP_LENGTH)^2) / 10000.0
-    @Transient private val WALK_FRAMES_TO_MAX_ACCEL = 6
+    @Transient private val JUMP_ACCELERATION_MOD =  51.0 / 10000.0 // (170 * (17/MAX_JUMP_LENGTH)^2) / 10000.0 // bigger value = higher jump
+    @Transient private val WALK_FRAMES_TO_MAX_ACCEL = 5 // how many frames it takes to reach maximum walking speed
 
     @Transient private val LEFT = 1
     @Transient private val RIGHT = 2
@@ -247,6 +247,9 @@ open class ActorHumanoid(
                 else true
     
     private fun processInput(delta: Float) {
+
+        // Good control is simple: it move as the player meant: if I push the stick forward, it goes forward, rather than
+        //                         the way your character is looking. Think of the SM64
 
         /**
          * L-R stop
