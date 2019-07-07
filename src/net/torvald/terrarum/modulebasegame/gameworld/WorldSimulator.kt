@@ -1,21 +1,18 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
-import net.torvald.aa.KDTree
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
+import org.khelekore.prtree.*
 
 /**
  * Created by minjaesong on 2016-08-03.
@@ -57,25 +54,25 @@ object WorldSimulator {
     /** Bottom-right point */
     var updateYTo = 0
 
-    val colourNone = Color(0x808080FF.toInt())
-    val colourWater = Color(0x66BBFFFF.toInt())
-
     private val ingame: IngameInstance
             get() = Terrarum.ingame!!
     private val world: GameWorld
             get() = ingame.world
 
-    // TODO use R-Tree instead?  https://stackoverflow.com/questions/10269179/find-rectangles-that-contain-point-efficient-algorithm#10269695
-    private var actorsKDTree: KDTree? = null
+
+    private lateinit var actorsRTree: PRTree<ActorWithBody>
 
     fun resetForThisFrame() {
-        actorsKDTree = null
+
     }
 
+    /** Must be called BEFORE the actors update -- actors depend on the R-Tree for various things */
     operator fun invoke(player: ActorHumanoid?, delta: Float) {
-        // build the kdtree that will be used during a single frame of updating
-        if (actorsKDTree == null)
-            actorsKDTree = KDTree(ingame.actorContainerActive.filter { it is ActorWBMovable })
+        // build the r-tree that will be used during a single frame of updating
+        actorsRTree = PRTree(actorMBRConverter, 24)
+        actorsRTree.load(ingame.actorContainerActive.filter { it is ActorWithBody })
+
+
 
         //printdbg(this, "============================")
 
@@ -85,10 +82,47 @@ object WorldSimulator {
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }
-        moveFluids(delta)
+        //moveFluids(delta)
         displaceFallables(delta)
 
         //printdbg(this, "============================")
+    }
+
+    /**
+     * @return list of actors under the bounding box given, list may be empty if no actor is under the point.
+     */
+    fun getActorsAt(startPoint: Point2d, endPoint: Point2d): List<ActorWithBody> {
+        val outList = ArrayList<ActorWithBody>()
+        actorsRTree.find(startPoint.x, startPoint.y, endPoint.x, endPoint.y, outList)
+        return outList
+    }
+
+    fun getActorsAt(worldX: Double, worldY: Double): List<ActorWithBody> {
+        val outList = ArrayList<ActorWithBody>()
+        actorsRTree.find(worldX, worldY, worldX + 1.0, worldY + 1.0, outList)
+        return outList
+    }
+
+    /** Will use centre point of the actors
+     * @return List of DistanceResult, list may be empty */
+    fun findKNearestActors(from: ActorWithBody, maxHits: Int): List<DistanceResult<ActorWithBody>> {
+        return actorsRTree.nearestNeighbour(actorDistanceCalculator, null, maxHits, object : PointND {
+            override fun getDimensions(): Int = 2
+            override fun getOrd(axis: Int): Double = when(axis) {
+                0 -> from.hitbox.centeredX
+                1 -> from.hitbox.centeredY
+                else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
+            }
+        })
+    }
+    /** Will use centre point of the actors
+     * @return Pair of: the actor, distance from the actor; null if none found */
+    fun findNearestActors(from: ActorWithBody): DistanceResult<ActorWithBody>? {
+        val t = findKNearestActors(from, 1)
+        return if (t.isNotEmpty())
+            t[0]
+        else
+            null
     }
 
     /**
@@ -118,6 +152,90 @@ object WorldSimulator {
         // true if target's type is the same as mine, or it's NULL (air)
         return ((fluid.type sameAs type || fluid.type sameAs Fluid.NULL) && !BlockCodex[tile].isSolid)
     }
+
+    /**
+     * displace fallable tiles. It is scanned bottom-left first. To achieve the sens ofreal
+     * falling, each tiles are displaced by ONLY ONE TILE below.
+     */
+    fun displaceFallables(delta: Float) {
+        /*for (y in updateYFrom..updateYTo) {
+            for (x in updateXFrom..updateXTo) {
+                val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
+                val tileBelow = world.getTileFromTerrain(x, y + 1) ?: Block.STONE
+
+                if (tile.maxSupport()) {
+                    // displace fluid. This statement must precede isSolid()
+                    if (tileBelow.isFluid()) {
+                        // remove tileThis to create air pocket
+                        world.setTileTerrain(x, y, Block.AIR)
+
+                        pour(x, y, drain(x, y, tileBelow.fluidLevel().toInt()))
+                        // place our tile
+                        world.setTileTerrain(x, y + 1, tile)
+                    }
+                    else if (!tileBelow.isSolid()) {
+                        world.setTileTerrain(x, y, Block.AIR)
+                        world.setTileTerrain(x, y + 1, tile)
+                    }
+                }
+            }
+        }*/
+
+        // displace fallables (TODO implement blocks with fallable supports e.g. scaffolding)
+        // only displace SINGLE BOTTOMMOST block on single X-coord (this doesn't mean they must fall only one block)
+        // so that the "falling" should be visible to the end user
+        if (!DEBUG_STEPPING_MODE || DEBUG_STEPPING_MODE && KeyToggler.isOn (Input.Keys.PERIOD)) {
+            for (x in updateXFrom..updateXTo) {
+                var fallDownCounter = 0
+                var fallableStackProcessed = false
+                // one "stack" is a contiguous fallable blocks, regardless of the actual block number
+                // when you are simulating the gradual falling, it is natural to process all the "stacks" at the same run,
+                // otherwise you'll get an artefact.
+                for (y in updateYTo downTo updateYFrom) {
+                    val currentTile = world.getTileFromTerrain(x, y)
+                    val prop = BlockCodex[currentTile]
+                    val isSolid = prop.isSolid
+                    val support = prop.maxSupport
+                    val isFallable = support != -1
+
+                    // mark the beginnig of the new "stack"
+                    if (fallableStackProcessed && !isFallable) {
+                        fallableStackProcessed = false
+                    } // do not chain with "else if"
+
+                    // process the gradual falling of the selected "stack"
+                    if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
+                        // replace blocks
+                        world.setTileTerrain(x, y, Block.AIR)
+                        world.setTileTerrain(x, y + fallDownCounter, currentTile)
+
+                        fallableStackProcessed = true
+                    }
+                    else if (isSolid) {
+                        fallDownCounter = 0
+                    }
+                    else if (!isSolid && !isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
+                        fallDownCounter += 1
+                    }
+                }
+            }
+
+            if (DEBUG_STEPPING_MODE) {
+                KeyToggler.forceSet(Input.Keys.PERIOD, false)
+            }
+        }
+
+
+    }
+
+
+    fun disperseHeat(delta: Float) {
+
+    }
+
+
+
+
 
     /*
     Explanation of get_stable_state_b (well, kind-of) :
@@ -259,86 +377,6 @@ object WorldSimulator {
 
     private val FALLABLE_MAX_FALL_SPEED = 2
 
-    /**
-     * displace fallable tiles. It is scanned bottom-left first. To achieve the sens ofreal
-     * falling, each tiles are displaced by ONLY ONE TILE below.
-     */
-    fun displaceFallables(delta: Float) {
-        /*for (y in updateYFrom..updateYTo) {
-            for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
-                val tileBelow = world.getTileFromTerrain(x, y + 1) ?: Block.STONE
-
-                if (tile.maxSupport()) {
-                    // displace fluid. This statement must precede isSolid()
-                    if (tileBelow.isFluid()) {
-                        // remove tileThis to create air pocket
-                        world.setTileTerrain(x, y, Block.AIR)
-
-                        pour(x, y, drain(x, y, tileBelow.fluidLevel().toInt()))
-                        // place our tile
-                        world.setTileTerrain(x, y + 1, tile)
-                    }
-                    else if (!tileBelow.isSolid()) {
-                        world.setTileTerrain(x, y, Block.AIR)
-                        world.setTileTerrain(x, y + 1, tile)
-                    }
-                }
-            }
-        }*/
-
-        // displace fallables (TODO implement blocks with fallable supports e.g. scaffolding)
-        // only displace SINGLE BOTTOMMOST block on single X-coord (this doesn't mean they must fall only one block)
-        // so that the "falling" should be visible to the end user
-        if (!DEBUG_STEPPING_MODE || DEBUG_STEPPING_MODE && KeyToggler.isOn (Input.Keys.PERIOD)) {
-            for (x in updateXFrom..updateXTo) {
-                var fallDownCounter = 0
-                var fallableStackProcessed = false
-                // one "stack" is a contiguous fallable blocks, regardless of the actual block number
-                // when you are simulating the gradual falling, it is natural to process all the "stacks" at the same run,
-                // otherwise you'll get an artefact.
-                for (y in updateYTo downTo updateYFrom) {
-                    val currentTile = world.getTileFromTerrain(x, y)
-                    val prop = BlockCodex[currentTile]
-                    val isSolid = prop.isSolid
-                    val support = prop.maxSupport
-                    val isFallable = support != -1
-
-                    // mark the beginnig of the new "stack"
-                    if (fallableStackProcessed && !isFallable) {
-                        fallableStackProcessed = false
-                    } // do not chain with "else if"
-
-                    // process the gradual falling of the selected "stack"
-                    if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
-                        // replace blocks
-                        world.setTileTerrain(x, y, Block.AIR)
-                        world.setTileTerrain(x, y + fallDownCounter, currentTile)
-
-                        fallableStackProcessed = true
-                    }
-                    else if (isSolid) {
-                        fallDownCounter = 0
-                    }
-                    else if (!isSolid && !isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
-                        fallDownCounter += 1
-                    }
-                }
-            }
-
-            if (DEBUG_STEPPING_MODE) {
-                KeyToggler.forceSet(Input.Keys.PERIOD, false)
-            }
-        }
-
-
-    }
-
-
-    fun disperseHeat(delta: Float) {
-
-    }
-
     private fun monitorIllegalFluidSetup() {
         for (y in 0 until fluidMap.size) {
             for (x in 0 until fluidMap[0].size) {
@@ -380,5 +418,32 @@ object WorldSimulator {
     fun Int.isFallable() = BlockCodex[this].maxSupport
 
 
+    private val actorMBRConverter = object : MBRConverter<ActorWithBody> {
+        override fun getDimensions(): Int = 2
+        override fun getMin(axis: Int, t: ActorWithBody): Double =
+                when (axis) {
+                    0 -> t.hitbox.startX
+                    1 -> t.hitbox.startY
+                    else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
+                }
 
+        override fun getMax(axis: Int, t: ActorWithBody): Double =
+                when (axis) {
+                    0 -> t.hitbox.endX
+                    1 -> t.hitbox.endY
+                    else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
+                }
+    }
+
+    // simple euclidean norm, squared
+    private val actorDistanceCalculator = object : DistanceCalculator<ActorWithBody> {
+        override fun distanceTo(t: ActorWithBody, p: PointND): Double {
+            val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+            // ROUNDWORLD implementation
+            val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+            val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+
+            return minOf(dist1, minOf(dist2, dist3))
+        }
+    }
 }

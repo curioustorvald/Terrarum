@@ -73,10 +73,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      */ // got the idea from gl_FragCoord
     val hIntTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
-                hitbox.startY.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
-                hitbox.endX.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
-                hitbox.endY.plus(0.00001).div(TILE_SIZE).floor() + 0.5,
+                hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+                hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+                hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+                hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
                 true
         )
 
@@ -89,8 +89,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
+                hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+                hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
                 true
         )
 
@@ -641,8 +641,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 val newTilewiseHitbox = Hitbox.fromTwoPoints(
                         hitbox.startX.div(TILE_SIZE).floor(),
                         hitbox.startY.div(TILE_SIZE).floor(),
-                        hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                        hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
+                        hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+                        hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
                         true
                 )
 
@@ -690,7 +690,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 }*/
 
                 // trying to use same function as the others, in an effort to eliminate the "contradiction" mentioned below
-                if (isColliding(stepBox)) {
+                if (isColliding(stepBox, vectorSum.y > PHYS_EPSILON_VELO)) {
                     collidingStep = step
                 }
 
@@ -773,13 +773,13 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
                     // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                     val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
-                        newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
+                        newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE - PHYS_EPSILON_DIST
                     else
                         newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
 
                     // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                     val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
-                        newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
+                        newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE - PHYS_EPSILON_DIST
                     else
                         newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
 
@@ -962,7 +962,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg
      */
-    private fun isColliding(hitbox: Hitbox): Boolean {
+    private fun isColliding(hitbox: Hitbox, feet: Boolean = false): Boolean {
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
@@ -978,7 +978,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
         val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
 
-        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
+        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd, feet)
     }
 
     /**
@@ -1604,8 +1604,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         val newTilewiseHitbox = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
+                hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+                hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
                 true
         ) // NOT the same as intTilewiseHitbox !!
 
@@ -1659,20 +1659,23 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
          * Constants
          */
 
-        @Transient val METER = 24.0
+        @Transient const val METER = 24.0
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */
-        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME)
+        @Transient const val SI_TO_GAME_ACC = METER / (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME)
         /**
          * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
          */
-        @Transient val SI_TO_GAME_VEL = METER / Terrarum.PHYS_TIME_FRAME
+        @Transient const val SI_TO_GAME_VEL = METER / Terrarum.PHYS_TIME_FRAME
 
         /**
          * [px / InternalFrame^2] * GAME_TO_SI_ACC -> [m / s^2]
          */
-        @Transient val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
+        @Transient const val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
+
+        @Transient const val PHYS_EPSILON_DIST = 0.00001
+        @Transient const val PHYS_EPSILON_VELO = 0.0001
 
 
         /**

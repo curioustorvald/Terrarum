@@ -56,7 +56,7 @@ object Terrarum : Disposable {
     /**
      * To be used with physics simulator. This is a magic number.
      */
-    val PHYS_TIME_FRAME: Double = 26.0 + (2.0 / 3.0)
+    const val PHYS_TIME_FRAME: Double = 26.0 + (2.0 / 3.0)
     // 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
     // protip: using METER, game unit and SI unit will have same number
 
