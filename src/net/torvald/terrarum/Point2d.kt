@@ -57,6 +57,8 @@ data class Point2d(var x: Double, var y: Double) : Cloneable {
     fun length(other: Point2d) = distSqr(other).sqrt()
     fun distSqr(other: Point2d) = ((this.x - other.x).sqr() + (this.y - other.y).sqr())
 
+    fun toDoubleArray() = doubleArrayOf(x, y)
+
 }
 
 data class Point2i(var x: Int, var y: Int) {

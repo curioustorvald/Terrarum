@@ -27,7 +27,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         this.width = width
         this.height = height
 
-        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
+        assert(!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             printStackTrace(this)
         }
@@ -66,7 +66,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         this.width = width
         this.height = height
 
-        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
+        assert(!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             printStackTrace(this)
         }
@@ -84,7 +84,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
     fun setPosition(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
 
-        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
+        assert(!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             printStackTrace(this)
         }
@@ -116,6 +116,9 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         height = h
         return this
     }
+
+    fun containsPoint(x: Double, y: Double) = (hitboxStart.x - x) in 0.0..width && (hitboxStart.y - y) in 0.0..height
+    fun containsPoint(p: Point2d) = containsPoint(p.x, p.y)
 
     /**
      * Returns x value of start point
@@ -155,6 +158,8 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
     }
 
     override fun equals(other: Any?): Boolean {
-        return this.hitboxStart == (other as Hitbox).hitboxStart && this.hitboxEnd == (other as Hitbox).hitboxEnd
+        return this.hitboxStart == (other as Hitbox).hitboxStart &&
+               this.width == other.width &&
+               this.height == other.height
     }
 }

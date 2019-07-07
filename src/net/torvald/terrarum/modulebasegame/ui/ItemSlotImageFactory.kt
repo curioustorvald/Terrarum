@@ -27,7 +27,7 @@ object ItemSlotImageFactory {
     /** Blend mode: screen */
     val CELLCOLOUR_BLACK_ACTIVE = Color(0x282828ff)
 
-    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas.tga"), 38, 38) // must have same w/h as slotLarge
+    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas2.tga"), 38, 38) // must have same w/h as slotLarge
 
     fun produce(isBlack: Boolean, number: Int = 10, item: GameItem?): ItemSlotImage {
         return ItemSlotImage(slotImage.get(number, 0 or isBlack.toInt().shl(1)), ItemCodex.getItemImage(item))
