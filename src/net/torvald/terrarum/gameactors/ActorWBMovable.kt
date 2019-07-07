@@ -361,6 +361,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private val bounceDampenVelThreshold = 0.5
 
     override fun update(delta: Float) {
+
+        val oldHitbox = hitbox.clone()
+
         if (isUpdate && !flagDespawn) {
             if (!assertPrinted) assertInit()
 
@@ -411,7 +414,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox(delta.toDouble())
+                    displaceHitbox()
+                    //collisionInterpolatorRun()
                 }
                 else {
                     val vecSum = externalV + (controllerV ?: Vector2(0.0, 0.0))
@@ -464,6 +468,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             feetPosTile.y = hIntTilewiseHitbox.endY.floorInt()
 
         }
+
+        hasMoved = (oldHitbox != hitbox)
     }
 
     /**
@@ -583,7 +589,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }*/
 
-    private fun displaceHitbox(delta: Double) {
+    private fun displaceHitbox() {
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -612,7 +618,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
             fun debug1(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (true) printdbg(this, wut)
+                if (false) printdbg(this, wut)
             }
 
             fun debug2(wut: Any?) {
@@ -674,13 +680,18 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
                 val stepBox = sixteenStep[step]
 
-                forEachOccupyingTilePos(stepBox) {
+                /*forEachOccupyingTilePos(stepBox) {
                     val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
                     val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
 
                     if (shouldICollideWithThis(tile) || (it.isFeetTile(stepBox) && shouldICollideWithThisFeet(tile))) {
                         collidingStep = step
                     }
+                }*/
+
+                // trying to use same function as the others, in an effort to eliminate the "contradiction" mentioned below
+                if (isColliding(stepBox)) {
+                    collidingStep = step
                 }
 
                 if (collidingStep != null) break
@@ -891,6 +902,62 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }
 
+    fun collisionInterpolatorRun() {
+
+        fun isWalled2(hitbox: Hitbox, option: Int): Boolean {
+            val newHB = Hitbox.fromTwoPoints(
+                    hitbox.startX + A_PIXEL, hitbox.startY + A_PIXEL,
+                    hitbox.endX - A_PIXEL, hitbox.endY - A_PIXEL
+            )
+
+            return isWalled(newHB, option)
+        }
+
+        // kinda works but the jump is inconsistent because of the nondeterministic nature of the values (doesn't get fixed to the integer value when collided)
+
+        if (world != null) {
+            val intpStep = 64.0
+
+            // make interpolation even if the "next" position is clear of collision
+            var clearOfCollision = true
+            val testHitbox = hitbox.clone()
+
+            // divide the vectors by the constant
+            externalV /= intpStep
+            controllerV?.let { controllerV!! /= intpStep }
+
+            repeat(intpStep.toInt()) { // basically we don't care if we're already been encased (e.g. entrapped by falling sand)
+
+                // change the order and the player gets stuck in the vertical wall
+                // so leave as-is
+
+                testHitbox.translate(externalV + controllerV)
+
+                // vertical collision
+                if (isWalled2(testHitbox, COLLIDING_UD)) {
+                    externalV.y *= elasticity // TODO also multiply the friction value
+                    controllerV?.let { controllerV!!.y *= elasticity } // TODO also multiply the friction value
+                    clearOfCollision = false
+                }
+                // horizontal collision
+                if (isWalled2(testHitbox, COLLIDING_LR)) {
+                    externalV.x *= elasticity // TODO also multiply the friction value
+                    controllerV?.let { controllerV!!.x *= elasticity } // TODO also multiply the friction value
+                    clearOfCollision = false
+                }
+
+            }
+
+            hitbox.reassign(testHitbox)
+
+            // revert the division because the Acceleration depends on being able to integrate onto the velo values
+            // don't want to mess up with the value they're expecting
+            externalV *= intpStep
+            controllerV?.let { controllerV!! *= intpStep }
+
+            // TODO collision damage
+        }
+    }
 
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg

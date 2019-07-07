@@ -20,7 +20,7 @@ interface HasAssembledSprite {
 
     fun reassembleSprite(sprite: SpriteAnimation, spriteGlow: SpriteAnimation? = null) {
         _rebuild(ADProperties(Gdx.files.internal(animDescPath).read()), sprite)
-        if (spriteGlow != null)
+        if (animDescPathGlow != null && spriteGlow != null)
             _rebuild(ADProperties(Gdx.files.internal(animDescPathGlow).read()), spriteGlow)
     }
 
