@@ -484,9 +484,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesActive = 0
 
 
-        ingameController.update(delta)
-
-
         if (!paused) {
 
             WorldSimulator.resetForThisFrame()
@@ -496,9 +493,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             ///////////////////////////
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
-            WorldSimulator.invoke(actorNowPlaying, delta)
-            WeatherMixer.update(delta, actorNowPlaying, world)
-            BlockStats.update()
+            AppLoader.measureDebugTime("WorldSimulator.update") {
+                WorldSimulator.invoke(actorNowPlaying, delta)
+            }
+            AppLoader.measureDebugTime("WeatherMixer.update") {
+                WeatherMixer.update(delta, actorNowPlaying, world)
+            }
+            AppLoader.measureDebugTime("BlockStats.update") {
+                BlockStats.update()
+            }
 
 
 
@@ -524,6 +527,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             WorldCamera.update(gameworld, actorNowPlaying)
 
+        }
+
+        // world click events (e.g. opening the UI that a fixture has) must go here
+        ingameController.update(delta)
+
+        if (!paused) {
 
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
