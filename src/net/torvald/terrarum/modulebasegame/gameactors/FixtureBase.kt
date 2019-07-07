@@ -7,13 +7,19 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.ui.UICanvas
 
 /**
  * Created by minjaesong on 2016-06-17.
  */
-open class FixtureBase(blockBox0: BlockBox, val blockBoxProps: BlockBoxProps = BlockBoxProps(0), renderOrder: RenderOrder = RenderOrder.MIDDLE) :
+open class FixtureBase(
+        blockBox0: BlockBox,
+        val blockBoxProps: BlockBoxProps = BlockBoxProps(0),
+        renderOrder: RenderOrder = RenderOrder.MIDDLE,
+        val mainUI: UICanvas? = null
+
 // disabling physics (not allowing the fixture to move) WILL make things easier in many ways
-        ActorWBMovable(renderOrder, immobileBody = true, usePhysics = false), CuedByTerrainChange {
+) : ActorWBMovable(renderOrder, immobileBody = true, usePhysics = false), CuedByTerrainChange {
 
     var blockBox: BlockBox = blockBox0
         protected set // something like TapestryObject will want to redefine this

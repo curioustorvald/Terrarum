@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock
  */
 class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
 
-    private val arrayList = ArrayList<T>(initialSize)
+    val arrayList = ArrayList<T>(initialSize)
 
     /**
      */
@@ -37,9 +37,9 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
     val size: Int
         get() = arrayList.size
 
-    fun removeAt(index: Int) = arrayList.removeAt(index)
-    fun remove(element: T) = arrayList.remove(element)
-    fun removeLast() = arrayList.removeAt(arrayList.size - 1)
+    inline fun removeAt(index: Int) = arrayList.removeAt(index)
+    inline fun remove(element: T) = arrayList.remove(element)
+    inline fun removeLast() = arrayList.removeAt(arrayList.size - 1)
 
     operator fun get(index: Int) = arrayList[index]
     fun getOrNull(index: Int?) = if (index == null) null else get(index)
@@ -100,18 +100,21 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
      */
     fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 
-    fun iterator() = arrayList.iterator()
-    fun forEach(action: (T) -> Unit) = arrayList.forEach(action)
-    fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
+    inline fun iterator() = arrayList.iterator()
+    inline fun forEach(action: (T) -> Unit) = arrayList.forEach(action)
+    inline fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
 
 
-    fun <R> map(transformation: (T) -> R) = arrayList.map(transformation)
+    inline fun <reified R> map(transformation: (T) -> R) = arrayList.map(transformation)
 
-    fun <R> filter(function: (T) -> Boolean): List<R> {
+    /*fun <R> filter(function: (T) -> Boolean): List<R> {
         val retList = ArrayList<R>() // sorted-ness is preserved
         this.arrayList.forEach { if (function(it)) retList.add(it as R) }
         return retList
-    }
+    }*/
+    inline fun filter(function: (T) -> Boolean) = arrayList.filter(function)
+
+    inline fun <reified R> filterIsInstance() = arrayList.filterIsInstance<R>()
 
     /**
      * Select one unsorted element from the array and put it onto the sorted spot.

@@ -48,6 +48,7 @@ class UICheatDetected : UICanvas() {
     }
 
     override fun doOpening(delta: Float) {
+        Terrarum.ingame?.paused = true
     }
 
     override fun doClosing(delta: Float) {

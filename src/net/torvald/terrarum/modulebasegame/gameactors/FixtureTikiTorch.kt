@@ -34,6 +34,10 @@ internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1,
         makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32))
         sprite!!.setRowsAndFrames(1, 1)
 
-        actorValue[AVKey.BASEMASS] = 1.0
+        actorValue[AVKey.BASEMASS] = MASS
+    }
+
+    companion object {
+        const val MASS = 1.0
     }
 }

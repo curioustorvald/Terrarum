@@ -544,10 +544,12 @@ class UIInventoryFull(
 
 
     override fun doOpening(delta: Float) {
+        Terrarum.ingame?.paused = true
         (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
+        Terrarum.ingame?.paused = false
         (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
     }
 

@@ -70,7 +70,7 @@ object WorldSimulator {
     operator fun invoke(player: ActorHumanoid?, delta: Float) {
         // build the r-tree that will be used during a single frame of updating
         actorsRTree = PRTree(actorMBRConverter, 24)
-        actorsRTree.load(ingame.actorContainerActive.filter { it is ActorWithBody })
+        actorsRTree.load(ingame.actorContainerActive.filterIsInstance<ActorWithBody>())
 
 
 

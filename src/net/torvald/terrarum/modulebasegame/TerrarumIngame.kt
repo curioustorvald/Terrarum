@@ -58,7 +58,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     //val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
-    val uiContainer = ArrayList<UICanvas>()
+    val uiContainer = ArrayList<UICanvas?>()
 
     private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
@@ -105,10 +105,21 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var uiPieMenu: UICanvas
     lateinit var uiQuickBar: UICanvas
     lateinit var uiInventoryPlayer: UICanvas
+    // this will not allow multiple fixture UIs from popping up (does not prevent them actually being open)
+    // because UI updating and rendering is whitelist-operated
+    var uiFixture: UICanvas? = null
+        set(value) {
+            printdbg(this, "uiFixture change: $uiFixture -> $value")
+            field?.let { it.setAsClose() }
+            value?.let { uiFixturesHistory.add(it) }
+            field = value
+        }
     lateinit var uiInventoryContainer: UICanvas
     lateinit var uiVitalPrimary: UICanvas
     lateinit var uiVitalSecondary: UICanvas
     lateinit var uiVitalItem: UICanvas // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
+
+    private val uiFixturesHistory = HashSet<UICanvas>()
 
     private lateinit var uiBasicInfo: UICanvas
     private lateinit var uiWatchTierOne: UICanvas
@@ -118,13 +129,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
 
     // UI aliases
-    lateinit var uiAliases: ArrayList<UICanvas>
+    lateinit var uiAliases: ArrayList<UICanvas?>
         private set
-    lateinit var uiAliasesPausing: ArrayList<UICanvas>
+    lateinit var uiAliasesPausing: ArrayList<UICanvas?>
         private set
 
-    inline val paused: Boolean
-        get() = uiAliasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmpty is always false, which we want
+    //var paused: Boolean = false
+        //get() = uiAliasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmpty is always false, which we want
     /**
      * Set to false if UI is opened; set to true  if UI is closed.
      */
@@ -313,7 +324,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiQuickBar.setPosition((AppLoader.screenW - uiQuickBar.width) / 2, AppLoader.getTvSafeGraphicsHeight())
 
         // pie menu
-        uiPieMenu = uiQuickslotPie()
+        uiPieMenu = UIQuickslotPie()
         uiPieMenu.setPosition(AppLoader.halfScreenW, AppLoader.halfScreenH)
 
         // vital metre
@@ -362,6 +373,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiAliasesPausing = arrayListOf(
                 uiInventoryPlayer,
                 //uiInventoryContainer,
+                uiFixture,
                 consoleHandler,
                 uiCheatMotherfuckerNootNoot
         )
@@ -387,10 +399,38 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }// END enter
 
     override fun worldPrimaryClickStart(delta: Float) {
-        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        val consumptionSuccessful = ItemCodex[itemOnGrip]?.startPrimaryUse(delta) ?: false
-        if (consumptionSuccessful)
-            actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!)
+        // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
+        var uiOpened = false
+        val actorsUnderMouse: List<FixtureBase> = WorldSimulator.getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
+        if (actorsUnderMouse.size > 1) {
+            AppLoader.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
+        }
+        // scan for the one with non-null UI.
+        // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
+        for (kk in 0 until actorsUnderMouse.size) {
+            actorsUnderMouse[kk].mainUI?.let {
+                uiOpened = true
+
+                println("ui = $it")
+
+                // whitelist the UI
+                // unlisting is done when renderGame() is called, in which, if the UI is 'isClosed', it'll be unlisted
+                uiFixture = it
+
+                it.setPosition(0, 0)
+                it.setAsOpen()
+            }
+            break
+        }
+
+
+        // don't want to open the UI and use the item at the same time, would ya?
+        if (!uiOpened) {
+            val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
+            val consumptionSuccessful = ItemCodex[itemOnGrip]?.startPrimaryUse(delta) ?: false
+            if (consumptionSuccessful)
+                actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!)
+        }
     }
 
     override fun worldPrimaryClickEnd(delta: Float) {
@@ -553,6 +593,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             AVTracker.update()
             ActorsList.update()
         }
+
+        //println("paused = $paused")
     }
 
 
@@ -560,7 +602,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
         filterVisibleActors()
-        uiContainer.forEach { it.update(Gdx.graphics.rawDeltaTime) }
+        uiContainer.forEach { it?.update(Gdx.graphics.rawDeltaTime) }
+        // deal with the uiFixture being closed
+        if (uiFixture?.isClosed == true) {
+            uiFixture = null
+        }
 
         IngameRenderer.invoke(
                 paused,
@@ -911,11 +957,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesContainer.add(particle)
     }
 
-    fun addUI(ui: UICanvas) {
+    fun addUI(ui: UICanvas?) {
         // check for exact duplicates
         if (uiContainer.contains(ui)) {
             throw IllegalArgumentException(
-                    "Exact copy of the UI already exists: The instance of ${ui.javaClass.simpleName}"
+                    "Exact copy of the UI already exists: The instance of ${ui?.javaClass?.simpleName}"
             )
         }
 
@@ -954,7 +1000,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun hide() {
-        uiContainer.forEach { it.handler.dispose() }
+        uiContainer.forEach { it?.handler?.dispose() }
     }
 
 
@@ -1014,6 +1060,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderOverlay.forEach { it.dispose() }
 
         uiContainer.forEach {
+            it?.handler?.dispose()
+            it?.dispose()
+        }
+        uiFixturesHistory.forEach {
             it.handler.dispose()
             it.dispose()
         }

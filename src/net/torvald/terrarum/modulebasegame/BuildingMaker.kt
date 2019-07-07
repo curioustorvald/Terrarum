@@ -115,7 +115,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     val uiPenMenu = UIBuildingMakerPenMenu(this)
 
 
-    val uiContainer = ArrayList<UICanvas>()
+    val uiContainer = ArrayList<UICanvas?>()
 
     private val pensMustShowSelection = arrayOf(
             PENMODE_MARQUEE, PENMODE_MARQUEE_ERASE
@@ -353,8 +353,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         actorNowPlaying?.update(delta)
         var overwriteMouseOnUI = false
         uiContainer.forEach {
-            it.update(delta)
-            if (it.isVisible && it.mouseUp) {
+            it?.update(delta)
+            if (it?.isVisible == true && it?.mouseUp == true) {
                 overwriteMouseOnUI = true
             }
         }
@@ -502,43 +502,43 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
 class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        screen.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        screen.uiContainer.forEach { it?.touchUp(screenX, screenY, pointer, button) }
         screen.tappedOnUI = false
         return true
     }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        screen.uiContainer.forEach { it.mouseMoved(screenX, screenY) }
+        screen.uiContainer.forEach { it?.mouseMoved(screenX, screenY) }
         return true
     }
 
     override fun keyTyped(character: Char): Boolean {
-        screen.uiContainer.forEach { it.keyTyped(character) }
+        screen.uiContainer.forEach { it?.keyTyped(character) }
         return true
     }
 
     override fun scrolled(amount: Int): Boolean {
-        screen.uiContainer.forEach { it.scrolled(amount) }
+        screen.uiContainer.forEach { it?.scrolled(amount) }
         return true
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        screen.uiContainer.forEach { it.keyUp(keycode) }
+        screen.uiContainer.forEach { it?.keyUp(keycode) }
         return true
     }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        screen.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
+        screen.uiContainer.forEach { it?.touchDragged(screenX, screenY, pointer) }
         return true
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        screen.uiContainer.forEach { it.keyDown(keycode) }
+        screen.uiContainer.forEach { it?.keyDown(keycode) }
         return true
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        screen.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        screen.uiContainer.forEach { it?.touchDown(screenX, screenY, pointer, button) }
         return true
     }
 }

@@ -1,3 +1,4 @@
+import sun.misc.Unsafe
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -26,6 +27,13 @@ class BFVM(
         val stdin: InputStream = System.`in`
 ) {
     annotation class Unsigned
+
+    private val unsafe: Unsafe
+    init {
+        val unsafeConstructor = Unsafe::class.java.getDeclaredConstructor()
+        unsafeConstructor.isAccessible = true
+        unsafe = unsafeConstructor.newInstance()
+    }
 
     private val DEBUG = true
 
@@ -77,8 +85,11 @@ class BFVM(
     private var pc = 0 // Program Counter
     private var ir = 0 // Instruction Register; does lookahead ahd lookbehind
 
-    private val mem = ByteArray(memSize)
+    private val mem = UnsafePtr(unsafe.allocateMemory(memSize.toLong()), memSize.toLong(), unsafe)
 
+    init {
+        mem.fillWith(0.toByte())
+    }
 
     /*
     Input program is loaded into the memory from index zero.
@@ -188,6 +199,10 @@ class BFVM(
     }
     // END OF NOTE (INC_PC is implied)
 
+
+    fun quit() {
+        mem.destroy()
+    }
 
     fun execute() {
         dbgp("Now run...")
@@ -324,6 +339,55 @@ class BFVM(
     Optimise level
     1   RLE, Set cell to zero
      */
+
+    private class UnsafePtr(pointer: Long, allocSize: Long, val unsafe: sun.misc.Unsafe) {
+        var destroyed = false
+            private set
+
+        var ptr: Long = pointer
+            private set
+
+        var size: Long = allocSize
+            private set
+
+        fun realloc(newSize: Long) {
+            ptr = unsafe.reallocateMemory(ptr, newSize)
+        }
+
+        fun destroy() {
+            if (!destroyed) {
+                unsafe.freeMemory(ptr)
+                destroyed = true
+            }
+        }
+
+        private inline fun checkNullPtr(index: Int) { // ignore what IDEA says and do inline this
+            // commenting out because of the suspected (or minor?) performance impact.
+            // You may break the glass and use this tool when some fucking incomprehensible bugs ("vittujen vitun bugit")
+            // appear (e.g. getting garbage values when it fucking shouldn't)
+            assert(destroyed) { throw NullPointerException("The pointer is already destroyed ($this)") }
+
+            // OOB Check: debugging purposes only -- comment out for the production
+            //if (index !in 0 until size) throw IndexOutOfBoundsException("Index: $index; alloc size: $size")
+        }
+
+        operator fun get(index: Int): Byte {
+            checkNullPtr(index)
+            return unsafe.getByte(ptr + index)
+        }
+
+        operator fun set(index: Int, value: Byte) {
+            checkNullPtr(index)
+            unsafe.putByte(ptr + index, value)
+        }
+
+        fun fillWith(byte: Byte) {
+            unsafe.setMemory(ptr, size, byte)
+        }
+
+        override fun toString() = "0x${ptr.toString(16)} with size $size"
+        override fun equals(other: Any?) = this.ptr == (other as UnsafePtr).ptr
+    }
 }
 
 
@@ -343,6 +407,8 @@ val factorials = """
 [-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]
 """
 
+// expected output: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
+
 vm.loadProgram(factorials, optimizeLevel = 1)
 vm.execute()
-
+vm.quit()
