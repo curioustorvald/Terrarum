@@ -60,7 +60,7 @@ object IngameRenderer : Disposable {
 
     private var player: ActorWithBody? = null
 
-    var uiListToDraw = ArrayList<UICanvas>()
+    var uiListToDraw = ArrayList<UICanvas?>()
 
     const val lightmapDownsample = 4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
 
@@ -186,7 +186,7 @@ object IngameRenderer : Disposable {
             actorsRenderOverlay: List<ActorWithBody>? = null,
             particlesContainer : CircularArray<ParticleBase>? = null,
             player: ActorWithBody? = null,
-            uisToDraw: ArrayList<UICanvas>? = null
+            uisToDraw: ArrayList<UICanvas?>? = null
     ) {
         renderingActorsCount = (actorsRenderBehind?.size ?: 0) +
                                (actorsRenderMiddle?.size ?: 0) +
@@ -195,7 +195,7 @@ object IngameRenderer : Disposable {
                                (actorsRenderOverlay?.size ?: 0)
         //renderingParticleCount = particlesContainer?.size ?: 0
         //renderingParticleCount = (particlesContainer?.buffer?.map { (!it.flagDespawn).toInt() } ?: listOf(0)).sum()
-        renderingUIsCount = ((uisToDraw?.map { it.isVisible.toInt() }) ?: listOf(0)).sum()
+        renderingUIsCount = ((uisToDraw?.map { (it?.isVisible ?: false).toInt() }) ?: listOf(0)).sum()
 
 
         if (uisToDraw != null) {
@@ -327,7 +327,7 @@ object IngameRenderer : Disposable {
             batch.color = Color.WHITE
 
             uiListToDraw.forEach {
-                it.render(batch, camera)
+                it?.render(batch, camera)
             }
         }
 

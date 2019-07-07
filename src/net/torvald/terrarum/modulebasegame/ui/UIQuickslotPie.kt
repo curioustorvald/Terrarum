@@ -20,7 +20,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2016-07-20.
  */
-class uiQuickslotPie : UICanvas() {
+class UIQuickslotPie : UICanvas() {
     private val cellSize = ItemSlotImageFactory.slotImage.tileW
 
     private val slotCount = UIQuickslotBar.SLOT_COUNT

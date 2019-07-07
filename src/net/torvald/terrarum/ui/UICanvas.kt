@@ -365,4 +365,5 @@ abstract class UICanvas(
         }
     }
 
+    override fun toString(): String = "${this.javaClass.simpleName}@${this.hashCode().toString(16)}"
 }

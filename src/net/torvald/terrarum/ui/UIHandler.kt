@@ -88,7 +88,7 @@ class UIHandler(//var UI: UICanvas,
     fun addSubUI(ui: UICanvas) {
         if (subUIs.contains(ui))
             throw IllegalArgumentException(
-                    "Exact copy of the UI already exists: The instance of ${ui.javaClass.simpleName}"
+                    "Exact copy of the UI already exists: The instance of $ui"
             )
 
         subUIs.add(ui)
@@ -136,6 +136,7 @@ class UIHandler(//var UI: UICanvas,
                 // println("UIHandler.opening ${UI.javaClass.simpleName}")
             }
             else {
+                ui.doOpening(0f)
                 ui.endOpening(delta)
                 isOpening = false
                 isClosing = false
@@ -156,6 +157,7 @@ class UIHandler(//var UI: UICanvas,
                 // println("UIHandler.closing ${UI.javaClass.simpleName}")
             }
             else {
+                ui.doClosing(0f)
                 ui.endClosing(delta)
                 isClosing = false
                 isOpening = false
@@ -218,7 +220,7 @@ class UIHandler(//var UI: UICanvas,
     }
 
     /**
-     * Send OPEN signal to the attached UI.
+     * Send OPEN signal to the attached UI. The actual job is done when the handler is being updated.
      */
     fun setAsOpen() {
         if (alwaysVisible && !doNotWarnConstant) {
@@ -235,7 +237,7 @@ class UIHandler(//var UI: UICanvas,
     }
 
     /**
-     * Send CLOSE signal to the attached UI.
+     * Send CLOSE signal to the attached UI. The actual job is done when the handler is being updated.
      */
     fun setAsClose() {
         if (alwaysVisible && !doNotWarnConstant) {

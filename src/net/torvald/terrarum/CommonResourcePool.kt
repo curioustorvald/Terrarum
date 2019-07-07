@@ -19,13 +19,28 @@ object CommonResourcePool {
         get() = loadCounter == 0
 
     init {
+        addToLoadingList("itemplaceholder_16") {
+            val t = TextureRegion(Texture("assets/item_kari_16.tga"))
+            t.flip(false, true)
+            /*return*/t
+        }
         addToLoadingList("itemplaceholder_24") {
             val t = TextureRegion(Texture("assets/item_kari_24.tga"))
             t.flip(false, true)
             /*return*/t
         }
+        addToLoadingList("itemplaceholder_32") {
+            val t = TextureRegion(Texture("assets/item_kari_32.tga"))
+            t.flip(false, true)
+            /*return*/t
+        }
         addToLoadingList("itemplaceholder_48") {
             val t = TextureRegion(Texture("assets/item_kari_48.tga"))
+            t.flip(false, true)
+            /*return*/t
+        }
+        addToLoadingList("test_texture") {
+            val t = TextureRegion(Texture("assets/test_texture.tga"))
             t.flip(false, true)
             /*return*/t
         }
@@ -64,9 +79,10 @@ object CommonResourcePool {
         return pool[identifier]!!
     }
 
-    fun getAsTextureRegionPack(identifier: String) = get(identifier) as TextureRegionPack
-    fun getAsTextureRegion(identifier: String) = get(identifier) as TextureRegion
-    fun getAsTexture(identifier: String) = get(identifier) as Texture
+    inline fun <reified T> getAs(identifier: String) = get(identifier) as T
+    fun getAsTextureRegionPack(identifier: String) = getAs<TextureRegionPack>(identifier)
+    fun getAsTextureRegion(identifier: String) = getAs<TextureRegion>(identifier)
+    fun getAsTexture(identifier: String) = getAs<Texture>(identifier)
 
     fun dispose() {
         pool.forEach { _, u ->

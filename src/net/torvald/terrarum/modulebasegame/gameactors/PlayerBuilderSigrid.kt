@@ -89,6 +89,7 @@ object PlayerBuilderSigrid {
         inventory.add(8450) // steel pick
         inventory.add(8466, 9995) // wire piece
         inventory.add(8467, 385930603) // test tiki torch
+        inventory.add(8468, 95) // crafting table
         inventory.add(9000) // TEST water bucket
         inventory.add(9001) // TEST lava bucket
     }
