@@ -1,5 +1,7 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -17,10 +19,12 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
  * Created by minjaesong on 2015-12-31.
  */
 class UIHandler(//var UI: UICanvas,
-                var toggleKeyLiteral: Int? = null, var toggleButtonLiteral: Int? = null,
+                var toggleKeyLiteral: Int? = null,
+                var toggleButtonLiteral: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
                 var customPositioning: Boolean = false, // mainly used by vital meter
-                var doNotWarnConstant: Boolean = false
+                var doNotWarnConstant: Boolean = false,
+                internal var allowESCtoClose: Boolean = false
 ): Disposable {
 
     // X/Y Position relative to the game window.
@@ -101,16 +105,21 @@ class UIHandler(//var UI: UICanvas,
 
     fun update(ui: UICanvas, delta: Float) {
         // open/close UI by key pressed
-        if (toggleKey != null) {
-            if (KeyToggler.isOn(toggleKey!!)) {
+        if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!)) {
+            if (isClosed)
                 setAsOpen()
-            }
-            else {
+            else if (isOpened)
                 setAsClose()
-            }
+
+            // for the case of intermediate states, do nothing.
         }
         if (toggleButton != null) {
             /* */
+        }
+
+        // ESC is a master key for closing
+        if (allowESCtoClose && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && isOpened) {
+            setAsClose()
         }
 
 
