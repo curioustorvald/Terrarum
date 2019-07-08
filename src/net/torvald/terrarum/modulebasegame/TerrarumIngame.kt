@@ -58,7 +58,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     //val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
-    val uiContainer = ArrayList<UICanvas?>()
+    val uiContainer = ArrayList<UICanvas>()
 
     private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
@@ -105,8 +105,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var uiPieMenu: UICanvas
     lateinit var uiQuickBar: UICanvas
     lateinit var uiInventoryPlayer: UICanvas
-    // this will not allow multiple fixture UIs from popping up (does not prevent them actually being open)
-    // because UI updating and rendering is whitelist-operated
+    /**
+     * This is a dedicated property for the fixtures' UI.
+     *
+     * When it's not null, the UI will be updated and rendered;
+     * when the UI is closed, it'll be replaced with a null value.
+     *
+     * This will not allow multiple fixture UIs from popping up (does not prevent them actually being open)
+     * because UI updating and rendering is whitelist-operated
+     */
     var uiFixture: UICanvas? = null
         set(value) {
             printdbg(this, "uiFixture change: $uiFixture -> $value")
@@ -129,9 +136,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
 
     // UI aliases
-    lateinit var uiAliases: ArrayList<UICanvas?>
+    lateinit var uiAliases: ArrayList<UICanvas>
         private set
-    lateinit var uiAliasesPausing: ArrayList<UICanvas?>
+    lateinit var uiAliasesPausing: ArrayList<UICanvas>
         private set
 
     //var paused: Boolean = false
@@ -373,7 +380,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiAliasesPausing = arrayListOf(
                 uiInventoryPlayer,
                 //uiInventoryContainer,
-                uiFixture,
                 consoleHandler,
                 uiCheatMotherfuckerNootNoot
         )
@@ -401,6 +407,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun worldPrimaryClickStart(delta: Float) {
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
         var uiOpened = false
+
+        // TODO actorsUnderMouse: support ROUNDWORLD
         val actorsUnderMouse: List<FixtureBase> = WorldSimulator.getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
         if (actorsUnderMouse.size > 1) {
             AppLoader.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
@@ -411,10 +419,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             actorsUnderMouse[kk].mainUI?.let {
                 uiOpened = true
 
-                println("ui = $it")
-
-                // whitelist the UI
-                // unlisting is done when renderGame() is called, in which, if the UI is 'isClosed', it'll be unlisted
+                // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                // when it's not null, the UI will be updated and rendered
+                // when the UI is closed, it'll be replaced with a null value
                 uiFixture = it
 
                 it.setPosition(0, 0)
@@ -559,7 +566,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // determine whether the inactive actor should be activated
             wakeDormantActors()
             // determine whether the actor should keep being activated or be dormant
-            KillOrKnockdownActors()
+            killOrKnockdownActors()
             updateActors(delta)
             particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
             // TODO thread pool(?)
@@ -602,11 +609,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
         filterVisibleActors()
-        uiContainer.forEach { it?.update(Gdx.graphics.rawDeltaTime) }
+        uiContainer.forEach { it.update(Gdx.graphics.rawDeltaTime) }
+        uiFixture?.update(Gdx.graphics.rawDeltaTime)
         // deal with the uiFixture being closed
-        if (uiFixture?.isClosed == true) {
-            uiFixture = null
-        }
+        if (uiFixture?.isClosed == true) { uiFixture = null }
 
         IngameRenderer.invoke(
                 paused,
@@ -617,7 +623,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 visibleActorsRenderOverlay,
                 particlesContainer,
                 actorNowPlaying,
-                uiContainer
+                uiContainer + uiFixture
         )
     }
 
@@ -689,7 +695,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      * If the actor must be dormant, the target actor will be put to the list specifically for them.
      * if the actor is not to be dormant, it will be just ignored.
      */
-    fun KillOrKnockdownActors() {
+    fun killOrKnockdownActors() {
         var actorContainerSize = actorContainerActive.size
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainerActive
@@ -957,11 +963,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesContainer.add(particle)
     }
 
-    fun addUI(ui: UICanvas?) {
+    fun addUI(ui: UICanvas) {
         // check for exact duplicates
         if (uiContainer.contains(ui)) {
             throw IllegalArgumentException(
-                    "Exact copy of the UI already exists: The instance of ${ui?.javaClass?.simpleName}"
+                    "Exact copy of the UI already exists: The instance of ${ui.javaClass.simpleName}"
             )
         }
 
@@ -1000,7 +1006,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun hide() {
-        uiContainer.forEach { it?.handler?.dispose() }
+        uiContainer.forEach { it.handler.dispose() }
     }
 
 
@@ -1060,8 +1066,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderOverlay.forEach { it.dispose() }
 
         uiContainer.forEach {
-            it?.handler?.dispose()
-            it?.dispose()
+            it.handler.dispose()
+            it.dispose()
         }
         uiFixturesHistory.forEach {
             it.handler.dispose()

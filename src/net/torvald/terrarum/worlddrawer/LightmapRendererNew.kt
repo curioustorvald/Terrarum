@@ -21,6 +21,7 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.realestate.LandUtil
+import kotlin.system.exitProcess
 
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
@@ -467,7 +468,7 @@ object LightmapRenderer {
             }
             System.err.println("\nMINIMINIDUMP END")
 
-            System.exit(1)
+            exitProcess(1)
         }
 
         if (thisFluid.type != Fluid.NULL) {

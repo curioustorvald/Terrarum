@@ -3,6 +3,7 @@ out/*
 bin/*
 build/*
 .gradle/*
+TerrarumBuild.jar
 
 # Java native errors
 hs_err_pid*
