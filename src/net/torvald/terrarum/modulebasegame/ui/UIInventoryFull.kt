@@ -43,7 +43,9 @@ class UIInventoryFull(
     val internalWidth: Int = UIItemInventoryDynamicList.WIDTH + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
     val internalHeight: Int = 166 + UIItemInventoryDynamicList.HEIGHT // grad_begin..grad_end..contents..grad_begin..grad_end
 
-
+    init {
+        handler.allowESCtoClose = true
+    }
 
     internal val catIcons: TextureRegionPack = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
     internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)

@@ -1,7 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -38,7 +36,11 @@ internal class FixtureCraftingTable : FixtureBase(
 internal object UICraftingTable : UICanvas() {
     override var width = 512
     override var height = 512
-    override var openCloseTime: Second = 0.05f
+    override var openCloseTime: Second = 0.0f
+
+    init {
+        handler.allowESCtoClose = true
+    }
 
     override fun updateUI(delta: Float) {
 
@@ -49,10 +51,6 @@ internal object UICraftingTable : UICanvas() {
         batch.color = Color.WHITE
         batch.draw(AppLoader.resourcePool.getAsTextureRegion("test_texture"), 0f, 0f)
 
-
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            handler.setAsClose()
-        }
     }
 
     override fun doOpening(delta: Float) {
