@@ -45,7 +45,6 @@ internal object UICraftingTable : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        println("TurdTurdTurdTurd")
 
         batch.color = Color.WHITE
         batch.draw(AppLoader.resourcePool.getAsTextureRegion("test_texture"), 0f, 0f)
@@ -58,7 +57,6 @@ internal object UICraftingTable : UICanvas() {
 
     override fun doOpening(delta: Float) {
         Terrarum.ingame?.paused = true
-        println("You hit me!")
     }
 
     override fun doClosing(delta: Float) {

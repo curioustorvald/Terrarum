@@ -21,6 +21,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.*
 import net.torvald.util.CircularArray
 import javax.swing.JFileChooser
+import kotlin.system.exitProcess
 
 /**
  * This will be rendered to a postprocessor FBO.
@@ -60,7 +61,7 @@ object IngameRenderer : Disposable {
 
     private var player: ActorWithBody? = null
 
-    var uiListToDraw = ArrayList<UICanvas?>()
+    var uiListToDraw: List<UICanvas?> = arrayListOf()
 
     const val lightmapDownsample = 4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
 
@@ -112,19 +113,19 @@ object IngameRenderer : Disposable {
 
         if (!shaderBlendGlow.isCompiled) {
             Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
-            System.exit(1)
+            exitProcess(1)
         }
 
 
         if (AppLoader.getConfigBoolean("fxdither")) {
             if (!shaderBayer.isCompiled) {
                 Gdx.app.log("shaderBayer", shaderBayer.log)
-                System.exit(1)
+                exitProcess(1)
             }
 
             if (!shaderSkyboxFill.isCompiled) {
                 Gdx.app.log("shaderSkyboxFill", shaderSkyboxFill.log)
-                System.exit(1)
+                exitProcess(1)
             }
         }
 
@@ -186,7 +187,7 @@ object IngameRenderer : Disposable {
             actorsRenderOverlay: List<ActorWithBody>? = null,
             particlesContainer : CircularArray<ParticleBase>? = null,
             player: ActorWithBody? = null,
-            uisToDraw: ArrayList<UICanvas?>? = null
+            uisToDraw: List<UICanvas?>? = null
     ) {
         renderingActorsCount = (actorsRenderBehind?.size ?: 0) +
                                (actorsRenderMiddle?.size ?: 0) +

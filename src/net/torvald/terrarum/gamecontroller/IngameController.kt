@@ -56,7 +56,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (terrarumIngame.canPlayerControl) {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
-            if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it?.mouseUp == true) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
+            if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) ||
                     Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
@@ -97,7 +97,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
         }
 
-        terrarumIngame.uiContainer.forEach { it?.keyDown(keycode) } // for KeyboardControlled UIcanvases
+        terrarumIngame.uiContainer.forEach { it.keyDown(keycode) } // for KeyboardControlled UIcanvases
 
         // Debug UIs
         if (keycode == Input.Keys.GRAVE) {
@@ -123,7 +123,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.uiQuickBar.setAsOpen()
         }
 
-        terrarumIngame.uiContainer.forEach { it?.keyUp(keycode) } // for KeyboardControlled UIcanvases
+        terrarumIngame.uiContainer.forEach { it.keyUp(keycode) } // for KeyboardControlled UIcanvases
 
 
         // screenshot key
@@ -134,12 +134,12 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     override fun keyTyped(character: Char): Boolean {
-        terrarumIngame.uiContainer.forEach { if (it?.isVisible == true) it.keyTyped(character) }
+        terrarumIngame.uiContainer.forEach { if (it.isVisible) it.keyTyped(character) }
         return true
     }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        terrarumIngame.uiContainer.forEach { it?.mouseMoved(screenX, screenY) }
+        terrarumIngame.uiContainer.forEach { it.mouseMoved(screenX, screenY) }
         return true
     }
 
@@ -147,7 +147,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (terrarumIngame.canPlayerControl) {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
-            if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it?.mouseUp == true) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
+            if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (
                         button == AppLoader.getConfigInt("mouseprimary") ||
@@ -161,7 +161,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
 
-        terrarumIngame.uiContainer.forEach { it?.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
+        terrarumIngame.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
 
         return true
     }
@@ -177,17 +177,17 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
         }
 
-        terrarumIngame.uiContainer.forEach { it?.scrolled(amount) }
+        terrarumIngame.uiContainer.forEach { it.scrolled(amount) }
         return true
     }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        terrarumIngame.uiContainer.forEach { it?.touchDragged(screenX, screenY, pointer) }
+        terrarumIngame.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
         return true
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        terrarumIngame.uiContainer.forEach { it?.touchDown(screenX, screenY, pointer, button) }
+        terrarumIngame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
         return true
     }
 
