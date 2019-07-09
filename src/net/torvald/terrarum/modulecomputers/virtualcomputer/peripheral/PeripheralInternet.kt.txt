@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulecomputers.virtualcomputer.peripheral
 
 import org.luaj.vm2.Globals
-import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer
+import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -14,7 +14,7 @@ import java.net.URL
  *
  * Created by minjaesong on 2016-09-24.
  */
-internal class PeripheralInternet(val host: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer)
+internal class PeripheralInternet(val host: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld)
 : net.torvald.terrarum.modulecomputers.virtualcomputer.peripheral.Peripheral("internet"){
 
     override val memSize = 1024

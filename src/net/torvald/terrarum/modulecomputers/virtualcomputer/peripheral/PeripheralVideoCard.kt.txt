@@ -8,7 +8,7 @@ import org.luaj.vm2.lib.*
  *
  * Created by minjaesong on 2017-02-08.
  */
-/*class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val termH: Int = 25) :
+/*class PeripheralVideoCard(val host: TerrarumComputerOld, val termW: Int = 80, val termH: Int = 25) :
         Peripheral("ppu") {
     companion object {
         val blockW = 8 // MUST BE 8

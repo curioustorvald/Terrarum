@@ -6,7 +6,7 @@ package net.torvald.terrarum.modulecomputers.virtualcomputer.terminal
  *
  * Created by minjaesong on 2017-02-08.
  */
-/*class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
+/*class GraphicsTerminal(private val host: TerrarumComputerOld) : Terminal {
     lateinit var videoCard: PeripheralVideoCard
 
     override val width: Int; get() = videoCard.termW
