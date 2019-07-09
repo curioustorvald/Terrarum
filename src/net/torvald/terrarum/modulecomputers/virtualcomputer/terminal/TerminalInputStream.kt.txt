@@ -1,12 +1,12 @@
 package net.torvald.terrarum.modulecomputers.virtualcomputer.terminal
 
-import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer
+import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld
 import java.io.InputStream
 
 /**
  * Created by minjaesong on 2016-09-10.
  */
-class TerminalInputStream(val host: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : InputStream() {
+class TerminalInputStream(val host: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : InputStream() {
 
     override fun read(): Int {
         //System.err.println(Thread.currentThread().name)

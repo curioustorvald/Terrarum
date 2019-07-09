@@ -1,5 +1,12 @@
 package net.torvald.terrarum.modulecomputers.virtualcomputer.computer
 
+import net.torvald.terrarum.KVHashMap
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.modulecomputers.virtualcomputer.worldobject.ComputerPartsCodex
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -7,13 +14,6 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
-import net.torvald.terrarum.KVHashMap
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.ceilInt
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
-import net.torvald.terrarum.modulecomputers.virtualcomputer.worldobject.ComputerPartsCodex
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL10
 import java.io.*
@@ -30,7 +30,7 @@ import kotlin.collections.HashMap
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
  * Created by minjaesong on 2016-09-10.
  */
-class TerrarumComputer(peripheralSlots: Int) {
+class TerrarumComputerOldOld(peripheralSlots: Int) {
 
     val DEBUG_UNLIMITED_MEM = false
     val DEBUG = true
@@ -161,7 +161,7 @@ class TerrarumComputer(peripheralSlots: Int) {
         if (peripheralTable[slot] == null) {
             peripheralTable[slot] = peri
             peri.loadLib(luaJ_globals)
-            println("[TerrarumComputer] loading peripheral $peri")
+            println("[TerrarumComputerOld] loading peripheral $peri")
         }
         else {
             throw RuntimeException("Peripheral slot is already taken by: ${peripheralTable[slot]?.tableName}")
@@ -179,7 +179,7 @@ class TerrarumComputer(peripheralSlots: Int) {
         }
         if (found >= 0) {
             peripheralTable[found] = null
-            println("[TerrarumComputer] unloading peripheral $peri")
+            println("[TerrarumComputerOld] unloading peripheral $peri")
         }
         else {
             throw IllegalArgumentException("Peripheral not exists: $peri")
@@ -383,13 +383,13 @@ class TerrarumComputer(peripheralSlots: Int) {
         }
     }
 
-    class LuaFunGetTotalMem(val computer: TerrarumComputer) : ZeroArgFunction() {
+    class LuaFunGetTotalMem(val computer: TerrarumComputerOldOld) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(computer.memSize)
         }
     }
 
-    class ComputerEmitTone(val computer: TerrarumComputer) : TwoArgFunction() {
+    class ComputerEmitTone(val computer: TerrarumComputerOldOld) : TwoArgFunction() {
         override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
             computer.playTone(millisec.checkdouble().toFloat(), freq.checkdouble())
             return LuaValue.NONE
@@ -447,7 +447,7 @@ class TerrarumComputer(peripheralSlots: Int) {
 
         //AL.destroy()
 
-        if (DEBUG) println("[TerrarumComputer] !! Beep queue clear")
+        if (DEBUG) println("[TerrarumComputerOld] !! Beep queue clear")
     }
 
     fun enqueueBeep(duration: Double, freq: Double) {

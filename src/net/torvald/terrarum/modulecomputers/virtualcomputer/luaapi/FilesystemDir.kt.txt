@@ -5,7 +5,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer
+import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld
 import net.torvald.terrarum.modulecomputers.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import java.io.*
 import java.nio.file.Files
@@ -27,7 +27,7 @@ import java.util.*
  *      Use .absoluteFile whenever possible; there's fuckin oddity! (http://bugs.java.com/bugdatabase/view_bug.do;:YfiG?bug_id=4483097)
  */
 @Deprecated("Fuck permission and shit, we go virtual. Use FilesystemTar")
-internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) {
+internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) {
 
     init {
         // load things. WARNING: THIS IS MANUAL!
@@ -102,7 +102,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
         /** actual directory: <appdata>/Saves/<savename>/computers/<drivename>/
          * directs media/ directory to /<uuid> directory
          */
-        fun net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer.getRealPath(luapath: LuaValue) : String {
+        fun net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld.getRealPath(luapath: LuaValue) : String {
             // direct mounted paths to real path
             val computerDir = Terrarum.currentSaveDir.absolutePath + "/computers/"
             /* if not begins with "(/?)media/", direct to boot
@@ -147,7 +147,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
      *
      * actual directory: <appdata>/Saves/<savename>/computers/<drivename>/
      */
-    class ListFiles(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class ListFiles(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -164,7 +164,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
     }
 
     /** Don't use this. Use isFile */
-    class FileExists(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class FileExists(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -172,7 +172,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
         }
     }
 
-    class IsDirectory(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class IsDirectory(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -183,7 +183,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
         }
     }
 
-    class IsFile(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class IsFile(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -207,7 +207,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
         }
     }
 
-    class IsReadOnly(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class IsReadOnly(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -216,7 +216,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
     }
 
     /** we have 4GB file size limit */
-    class GetSize(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class GetSize(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -229,7 +229,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
     /**
      * difference with ComputerCraft: it returns boolean, true on successful.
      */
-    class Mkdir(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class Mkdir(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -240,7 +240,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
     /**
      * moves a directory, overwrites the target
      */
-    class Mv(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : TwoArgFunction() {
+    class Mv(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : TwoArgFunction() {
         override fun call(from: LuaValue, to: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(from)
             FilesystemDir.ensurePathSanity(to)
@@ -259,7 +259,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
      * copies a directory, overwrites the target
      * difference with ComputerCraft: it returns boolean, true on successful.
      */
-    class Cp(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : TwoArgFunction() {
+    class Cp(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : TwoArgFunction() {
         override fun call(from: LuaValue, to: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(from)
             FilesystemDir.ensurePathSanity(to)
@@ -275,7 +275,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
     /**
      * difference with ComputerCraft: it returns boolean, true on successful.
      */
-    class Rm(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class Rm(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -285,7 +285,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
         }
     }
 
-    class ConcatPath(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : TwoArgFunction() {
+    class ConcatPath(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : TwoArgFunction() {
         override fun call(base: LuaValue, local: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(base)
             FilesystemDir.ensurePathSanity(local)
@@ -321,7 +321,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
      *      writeBytes = function(string as bytearray)
      * }
      */
-    class OpenFile(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : TwoArgFunction() {
+    class OpenFile(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : TwoArgFunction() {
         override fun call(path: LuaValue, mode: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 
@@ -401,7 +401,7 @@ internal class FilesystemDir(globals: Globals, computer: net.torvald.terrarum.mo
         }
     }
 
-    class GetParentDir(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class GetParentDir(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             FilesystemDir.ensurePathSanity(path)
 

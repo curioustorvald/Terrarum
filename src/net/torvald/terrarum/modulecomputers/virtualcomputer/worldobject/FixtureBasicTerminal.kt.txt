@@ -9,7 +9,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
  */
 class FixtureBasicTerminal(phosphor: Color) : FixtureBase(BlockBox(BlockBox.ALLOW_MOVE_DOWN, 1, 1)) {
 
-    /*val computer = TerrarumComputer(8)
+    /*val computer = TerrarumComputerOld(8)
     val vt: Terminal = SimpleTextTerminal(phosphor, 80, 25, computer)
     val ui = UITextTerminal(vt)
 

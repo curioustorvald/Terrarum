@@ -11,7 +11,7 @@ open class FixtureComputerBase : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 
     /** Connected terminal */
     var terminal: FixtureBasicTerminal? = null
 
-    var computerInside: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer? = null
+    var computerInside: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld? = null
 
     init {
         // UUID of the "brain"
@@ -26,7 +26,7 @@ open class FixtureComputerBase : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 
 
     fun attachTerminal(uuid: String) {
         val fetchedTerminal = getTerminalByUUID(uuid)
-        computerInside = net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer(8)
+        computerInside = net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld(8)
         computerInside!!.attachTerminal(fetchedTerminal!!)
         actorValue["computerid"] = computerInside!!.UUID
     }

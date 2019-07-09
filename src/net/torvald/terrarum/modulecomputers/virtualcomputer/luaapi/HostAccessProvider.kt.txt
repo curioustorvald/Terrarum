@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulecomputers.virtualcomputer.luaapi
 import net.torvald.terrarum.gameactors.ai.toLua
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
-import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer
+import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld
 import net.torvald.terrarum.modulecomputers.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import net.torvald.terrarum.modulecomputers.virtualcomputer.terminal.Teletype
 import org.luaj.vm2.*
@@ -15,7 +15,7 @@ import org.luaj.vm2.*
  *
  * Created by minjaesong on 2016-09-19.
  */
-internal class HostAccessProvider(globals: Globals, computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) {
+internal class HostAccessProvider(globals: Globals, computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) {
 
     init {
         globals["machine"] = LuaTable()
@@ -42,19 +42,19 @@ internal class HostAccessProvider(globals: Globals, computer: net.torvald.terrar
         }
     }
 
-    class IsHalted(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer): ZeroArgFunction() {
+    class IsHalted(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld): ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(computer.isHalted)
         }
     }
 
-    class NativeReadStdin(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : ZeroArgFunction() {
+    class NativeReadStdin(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return computer.stdin!!.read().toLua()
         }
     }
 
-    class HaltComputer(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : ZeroArgFunction() {
+    class HaltComputer(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : ZeroArgFunction() {
         override fun call() : LuaValue {
             computer.isHalted = true
             computer.luaJ_globals.load("""print(DC4.."system halted")""").call()
@@ -63,13 +63,13 @@ internal class HostAccessProvider(globals: Globals, computer: net.torvald.terrar
     }
 
     /** Time elapsed since the power is on. */
-    class NativeGetMilliTime(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : ZeroArgFunction() {
+    class NativeGetMilliTime(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(computer.milliTime)
         }
     }
 
-    class NativeThreadSleep(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) : OneArgFunction() {
+    class NativeThreadSleep(val computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputerOld) : OneArgFunction() {
         override fun call(mills: LuaValue): LuaValue {
             computer.currentExecutionThread.join(mills.checklong())
             return LuaValue.NONE

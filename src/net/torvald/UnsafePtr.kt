@@ -30,6 +30,8 @@ object UnsafeHelper {
     }
 
     fun memcpy(srcAddress: Long, destAddress: Long, copyLength: Long) = unsafe.copyMemory(srcAddress, destAddress, copyLength)
+
+    fun memcpyRaw(srcObj: Any?, srcPos: Long, destObj: Any?, destPos: Long, len: Long) = unsafe.copyMemory(srcObj, srcPos, destObj, destPos, len)
 }
 
 /**
