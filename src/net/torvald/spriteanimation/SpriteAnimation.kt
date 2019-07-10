@@ -122,8 +122,8 @@ class SpriteAnimation(@Transient val parentActor: ActorWBMovable) {
      * @param scale
      */
     fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f) {
-        assert(cellWidth == 0 || cellHeight == 0) {
-            throw Error("Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor")
+        assert(cellWidth > 0 || cellHeight > 0) {
+            "Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor"
         }
 
         if (visible) {

@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.LuaComputerVM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.MDA
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -26,6 +27,7 @@ class StandaloneApp : Game() {
     lateinit var vmThread: Thread
 
     val display = MDA(80, 25)
+    val vm = LuaComputerVM(display)
 
     override fun create() {
         font = TextureRegionPack(Gdx.files.internal("assets/mods/dwarventech/gui/lcd.tga"), 12, 16)
@@ -50,16 +52,18 @@ class StandaloneApp : Game() {
     private val lcdOffY = 56f
 
     private val lcdCol = arrayOf(
-            Color(0x14141400),
-            Color(0x141414AA),
-            Color(0x14141455),
-            Color(0x141414FF)
+            Color(0x10101000),
+            Color(0x101010AA),
+            Color(0x10101055),
+            Color(0x101010FF)
     )
 
     private var textCursorDrawTimer = 0f // 0f..0.5f: not draw
 
     override fun render() {
         Gdx.graphics.setTitle("Terrarum Lua Computer Standalone — F: ${Gdx.graphics.framesPerSecond}")
+
+        //display.print(ByteArray(1){ (Math.random() * 255).toByte() })
 
         batch.inUse {
             batch.color = Color.WHITE
@@ -69,8 +73,6 @@ class StandaloneApp : Game() {
             // draw the screen
             textCursorDrawTimer += Gdx.graphics.rawDeltaTime
             if (textCursorDrawTimer > 1f) textCursorDrawTimer -= 1f
-            val cursorX = display.cursor % display.width
-            val cursorY = display.cursor / display.height
 
             for (i in 0 until display.width * display.height) {
                 val drawX = ((i % display.width) * font.tileW).toFloat()
@@ -78,7 +80,7 @@ class StandaloneApp : Game() {
                 val (g, a) = display.rawGet(i)
                 val glyph = g.toUint()
                 val glyphBack = glyph + 256
-                val back = (a.toUint() ushr 0x3) % lcdCol.size
+                val back = (a.toUint() ushr 4) % lcdCol.size
                 val fore = a.toUint() % lcdCol.size
 
                 if (display.blink && i == display.cursor && textCursorDrawTimer >= 0.5f) {
