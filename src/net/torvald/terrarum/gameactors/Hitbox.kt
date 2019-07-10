@@ -27,7 +27,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         this.width = width
         this.height = height
 
-        assert(!suppressWarning && (width == 0.0 || height == 0.0)) {
+        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             printStackTrace(this)
         }
@@ -66,7 +66,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         this.width = width
         this.height = height
 
-        assert(!suppressWarning && (width == 0.0 || height == 0.0)) {
+        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             printStackTrace(this)
         }
@@ -84,7 +84,7 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
     fun setPosition(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
 
-        assert(!suppressWarning && (width == 0.0 || height == 0.0)) {
+        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
             println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             printStackTrace(this)
         }
