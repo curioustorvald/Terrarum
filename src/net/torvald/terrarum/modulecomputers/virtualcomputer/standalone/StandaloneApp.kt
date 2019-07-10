@@ -64,6 +64,7 @@ class StandaloneApp : Game() {
         Gdx.graphics.setTitle("Terrarum Lua Computer Standalone — F: ${Gdx.graphics.framesPerSecond}")
 
         //display.print(ByteArray(1){ (Math.random() * 255).toByte() })
+        //display.print("@")
 
         batch.inUse {
             batch.color = Color.WHITE
