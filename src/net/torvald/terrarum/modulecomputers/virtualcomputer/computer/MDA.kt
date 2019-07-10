@@ -27,8 +27,8 @@ class MDA(val width: Int, val height: Int) {
 
     private val arrayElemOffset = 8L * if (AppLoader.is32BitJVM) 1 else 2 // 8 for 32-bit, 16 for 64-bit
 
-    private val glyphs = UnsafeHelper.allocate(width.toLong() * height)
-    private val attributes = UnsafeHelper.allocate(width.toLong() * height)
+    private val glyphs = UnsafeHelper.allocate(width.toLong() * height + 1) // extra one byte is absolutely needed
+    private val attributes = UnsafeHelper.allocate(width.toLong() * height + 1)
 
     var cursor = 0
         private set
@@ -37,8 +37,8 @@ class MDA(val width: Int, val height: Int) {
     var blink = true
 
     init {
-        glyphs.fillWith(0)
-        attributes.fillWith(1)
+        //glyphs.fillWith(0)
+        //attributes.fillWith(1)
     }
 
     /*
@@ -116,8 +116,14 @@ class MDA(val width: Int, val height: Int) {
 
     /** Bulk write method. Any control characers will be represented as a glyph, rather than an actual control sequence.
      * E.g. '\n' will print a symbol. */
-    fun setText(x: Int, y: Int, text: ByteArray) {
+    inline fun setText(x: Int, y: Int, text: ByteArray) {
         setText(x, y, text, toAttribute(background, foreground))
+    }
+
+    fun setOneText(x: Int, y: Int, text: Byte, attribute: Byte = toAttribute(background, foreground)) {
+        val o = wrapAround(x, y).toAddress()
+        glyphs[o] = text
+        attributes[o] = attribute
     }
 
     private fun setOneText(offset: Int, text: Byte, attribute: Byte = toAttribute(background, foreground)) {
@@ -131,7 +137,7 @@ class MDA(val width: Int, val height: Int) {
         print(text)
         write(0x0A)
     }
-    fun print(text: String) {
+    inline fun print(text: String) {
         print(text.toByteArray(charset))
     }
 
@@ -144,12 +150,11 @@ class MDA(val width: Int, val height: Int) {
     }
 
     fun write(text: Byte) {
-
         when (text) {
-            // CR
-            0x0D.toByte() -> { /* do nothing */ }
             // LF
             0x0A.toByte() -> newline()
+            // all others (e.g. CR)
+            in 0x00.toByte()..0x0D.toByte() -> { /* do nothing */ }
 
             else -> {
                 setOneText(cursor, text)
@@ -161,6 +166,30 @@ class MDA(val width: Int, val height: Int) {
             }
         }
 
+    }
+
+    fun clear() {
+        glyphs.fillWith(0)
+        attributes.fillWith(toAttribute(background, foreground))
+        cursor = 0
+    }
+
+    fun clearCurrentLine() {
+        clearLine(cursor / width)
+    }
+
+    fun clearLine(line: Int) {
+        val lineOffset = line * width
+        for (i in 0L until width) {
+            glyphs[lineOffset + i] = 0
+        }
+    }
+
+    fun clearLineAfterCursor() {
+        val lineOffset = (cursor / width) * width
+        for (i in (cursor % width).toLong() until width) {
+            glyphs[lineOffset + i] = 0
+        }
     }
 
     /**
@@ -175,6 +204,8 @@ class MDA(val width: Int, val height: Int) {
 
         cursor -= offset.toInt()
         if (cursor < 0) cursor = 0
+
+        clearLineAfterCursor()
     }
 
     /**
@@ -188,6 +219,7 @@ class MDA(val width: Int, val height: Int) {
         }
 
         cursor = (cursor / width) * width // set cursorX to 0
+        clearLineAfterCursor()
     }
 
     fun dispose() {

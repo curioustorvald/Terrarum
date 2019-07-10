@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors.ai
 
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 
 /**
@@ -385,6 +386,13 @@ import org.luaj.vm2.LuaValue
 fun Double.toLua() = LuaValue.valueOf(this)
 fun Int.toLua() = LuaValue.valueOf(this)
 fun String.toLua() = LuaValue.valueOf(this)
+fun Boolean.toLua() = LuaValue.valueOf(this)
 fun Double?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
 fun Int?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
 fun String?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
+fun Boolean?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
+fun luaTableOf(vararg luaValues: LuaValue): LuaTable {
+    val t = LuaTable.tableOf()
+    luaValues.forEachIndexed { index, luaValue -> t[index + 1] = luaValue }
+    return t
+}
