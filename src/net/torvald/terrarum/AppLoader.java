@@ -55,6 +55,14 @@ public class AppLoader implements ApplicationListener {
     public static final String GAME_NAME = "Terrarum";
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
 
+    // is this jvm good?
+    static {
+        if (System.getProperty("sun.arch.data.model") == null || System.getProperty("sun.arch.data.model").equals("unknown")) {
+            System.err.println("Error: Your JVM is not supported by the application.\nPlease install the desired version.");
+            System.exit(1);
+        }
+    }
+
     /**
      * <p>
      * Version numbering that follows Semantic Versioning 2.0.0 (https://semver.org/)
@@ -139,12 +147,13 @@ public class AppLoader implements ApplicationListener {
     public static String processor = "(a super-duper virtual processor)";
     public static String processorVendor = "(andromeda software development)"; // definitely not taken from "that" demogroup
     public static String renderer = "(a super-fancy virtual photoradiator)";
-    public static String rendererVendor = "(radiosity)";
+    public static String rendererVendor = "(aperture science psychovisualcomputation laboratory)";
 
     public static int THREADS = ThreadParallel.INSTANCE.getThreadCount();
     public static boolean MULTITHREAD;
 
     public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
+    // some JVMs don't have this property, but they probably don't have "sun.misc.Unsafe" either, so it's no big issue \_(ツ)_/
 
     public static int GL_VERSION;
     public static final int MINIMAL_GL_VERSION = 320;
@@ -169,7 +178,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     public static void setGAME_LOCALE(String value) {
-        if (value.isEmpty() || value.equals("")) {
+        if (value.isEmpty()) {
             GAME_LOCALE = getSysLang();
         }
         else {
