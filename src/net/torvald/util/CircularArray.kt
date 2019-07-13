@@ -1,5 +1,7 @@
 package net.torvald.util
 
+import java.util.*
+
 
 /**
  * buffer[head] contains the most recent item, whereas buffer[tail] contains the oldest one.
@@ -11,13 +13,25 @@ package net.torvald.util
  *
  * Created by minjaesong on 2017-01-22.
  */
-class CircularArray<T>(val size: Int) {
+class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterable<T> {
+
+    /**
+     * What to do when old element is being overridden by the new element (only makes sense when ```overwriteOnOverflow = true```)
+     *
+     * This function will not be called when ```removeHead()``` or ```removeTail()``` is called.
+     */
+    var overwritingPolicy: (T) -> Unit = {
+        // do nothing
+    }
 
     val buffer: Array<T> = arrayOfNulls<Any>(size) as Array<T>
-    var tail: Int = 0; private set
-    var head: Int = -1; private set
 
-    private var unreliableAddCount = 0
+    /** Tail stands for the oldest element. The tail index points AT the tail element */
+    var tail: Int = 0; private set
+    /** Head stands for the youngest element. The head index points AFTER the head element */
+    var head: Int = 0; private set
+
+    private var overflow = false
 
     val lastIndex = size - 1
 
@@ -25,58 +39,143 @@ class CircularArray<T>(val size: Int) {
      * Number of elements that forEach() or fold() would iterate.
      */
     val elemCount: Int
-        get() = minOf(unreliableAddCount, size)
+        get() = if (overflow) size else head - tail
+    val isEmpty: Boolean
+        get() = !overflow && head == tail
 
-    fun add(item: T) {
-        if (unreliableAddCount <= size) unreliableAddCount += 1
-
-        head = (head + 1) % size
-        if (unreliableAddCount > size) {
-            tail = (tail + 1) % size
-        }
-
-        buffer[head] = item // overwrites oldest item when eligible
-
-
-        //println("$this $unreliableAddCount")
-    }
-
-    fun getHeadElem(): T = buffer[head]
-    fun getTailElem(): T = buffer[tail]
+    private inline fun incHead() { head = (head + 1).wrap() }
+    private inline fun decHead() { head = (head - 1).wrap() }
+    private inline fun incTail() { tail = (tail + 1).wrap() }
+    private inline fun decTail() { tail = (tail - 1).wrap() }
 
     /**
-     * Iterates the array with oldest element first.
+     * When the overflowing is enabled, tail element (ultimate element) will be changed into the penultimate element.
      */
-    fun forEach(action: (T) -> Unit) {
-        // has slightly better iteration performance than lambda
-        if (unreliableAddCount <= size) {
-            for (i in 0..head)
-                action(buffer[i])
+    fun appendHead(item: T) {
+        if (overflow && !overwriteOnOverflow) {
+            throw StackOverflowError()
         }
         else {
-            for (i in 0..size - 1)
-                action(buffer[(i + tail) % size])
+            if (overflow) {
+                overwritingPolicy.invoke(buffer[head])
+            }
+
+            buffer[head] = item
+            incHead()
         }
+
+        if (overflow) {
+            incTail()
+        }
+
+        // must be checked AFTER the actual head increment; otherwise this condition doesn't make sense
+        if (tail == head) {
+            overflow = true
+        }
+    }
+
+    fun appendTail(item: T) {
+        // even if overflowing is enabled, appending at tail causes head element to be altered, therefore such action
+        // must be blocked by throwing overflow error
+
+        if (overflow) {
+            throw StackOverflowError()
+        }
+        else {
+            decTail()
+            buffer[tail] = item
+        }
+
+        // must be checked AFTER the actual head increment; otherwise this condition doesn't make sense
+        if (tail == head) {
+            overflow = true
+        }
+    }
+
+    fun removeHead(): T {
+        if (isEmpty) throw EmptyStackException()
+
+        decHead()
+        overflow = false
+
+        return buffer[head]
+    }
+
+    fun removeTail(): T {
+        if (isEmpty) throw EmptyStackException()
+
+        val ret = buffer[tail]
+        incTail()
+        overflow = false
+
+        return ret
+    }
+
+    /** Returns the youngest (last of the array) element */
+    fun getHeadElem(): T = if (isEmpty) throw EmptyStackException() else buffer[(head - 1).wrap()]
+    /** Returns the oldest (first of the array) element */
+    fun getTailElem(): T = buffer[tail]
+
+    private fun getAbsoluteRange() =  0 until when {
+        head == tail -> buffer.size
+        tail >  head -> buffer.size - (((head - 1).wrap()) - tail)
+        else         -> head - tail
+    }
+
+    override fun iterator(): Iterator<T> {
+        if (isEmpty) {
+            return object : Iterator<T> {
+                override fun next(): T = throw EmptyStackException()
+                override fun hasNext() = false
+            }
+        }
+
+        val rangeMax = getAbsoluteRange().last
+        var counter = 0
+        return object : Iterator<T> {
+            override fun next(): T {
+                val ret = buffer[(counter + tail).wrap()]
+                counter += 1
+                return ret
+            }
+
+            override fun hasNext() = (counter <= rangeMax)
+        }
+    }
+
+    /**
+     * Iterates the array with oldest element (tail) first.
+     */
+    fun forEach(action: (T) -> Unit) {
+        // for (element in buffer) action(element)
+        // return nothing
+
+        iterator().forEach(action)
     }
 
     fun <R> fold(initial: R, operation: (R, T) -> R): R {
+        // accumulator = initial
+        // for (element in buffer) accumulator = operation(accumulator, element)
+        // return accumulator
+
         var accumulator = initial
-        //for (element in buffer) accumulator = operation(accumulator, element)
-        if (unreliableAddCount <= size) {
-            for (i in 0..head)
-                accumulator = operation(accumulator, buffer[i])
-        }
+
+        if (isEmpty)
+            return initial
         else {
-            for (i in 0..size - 1)
-                accumulator = operation(accumulator, buffer[(i + tail) % size])
+            iterator().forEach {
+                accumulator = operation(accumulator, it)
+            }
         }
 
         return accumulator
     }
 
-
+    private fun Int.wrap() = this fmod size
 
     override fun toString(): String {
-        return "CircularArray(size=" + buffer.size + ", head=" + head + ", tail=" + tail + ")"
+        return "CircularArray(size=${buffer.size}, head=$head, tail=$tail, overflow=$overflow)"
     }
+
+    private infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
 }
