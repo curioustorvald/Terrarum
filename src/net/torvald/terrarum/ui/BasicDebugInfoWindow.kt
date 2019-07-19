@@ -321,6 +321,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun drawGamepadAxis(gamepad: TerrarumController, batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
         val uiColour = ItemSlotImageFactory.CELLCOLOUR_BLACK
+        val deadzoneColour = Color(0xaa0000aa.toInt())
         val w = 128f
         val h = 128f
         val halfW = w / 2f
@@ -329,6 +330,8 @@ class BasicDebugInfoWindow : UICanvas() {
         val pointDX = axisX * halfW
         val pointDY = -axisY * halfH
 
+        val deadzone = AppLoader.gamepadDeadzone
+
         blendNormal(batch)
 
         batch.end()
@@ -336,6 +339,8 @@ class BasicDebugInfoWindow : UICanvas() {
         Terrarum.inShapeRenderer {
             it.color = uiColour
             it.rect(uiX.toFloat(), AppLoader.screenH - uiY.toFloat(), w, -h)
+            it.color = deadzoneColour
+            it.rect(uiX + halfW - (halfW * deadzone), AppLoader.screenH - (uiY + halfH - halfH * deadzone), w * deadzone, -h * deadzone)
             it.color = Color.WHITE
             it.line(uiX + halfW, AppLoader.screenH - (uiY + halfH), uiX + halfW + pointDX, AppLoader.screenH - (uiY + halfH + pointDY))
             it.color = Color.GRAY

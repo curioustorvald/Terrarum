@@ -208,7 +208,7 @@ public class AppLoader implements ApplicationListener {
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
     public static TerrarumController gamepad = null;
-    public static float gamepadDeadzone = 0.3f;
+    public static float gamepadDeadzone = 0.2f;
 
 
     /**
@@ -295,7 +295,11 @@ public class AppLoader implements ApplicationListener {
     public static char gamepadLabelRStick = 0xE045;
     public static char gamepadLabelLStickPush = 0xE046;
     public static char gamepadLabelRStickPush = 0xE047;
-    
+
+    public static String[] gamepadWhitelist = {
+            "xinput", "xbox", "game", "joy", "pad"
+    };
+
     public static void main(String[] args) {
         // load configs
         getDefaultDirectory();
@@ -441,7 +445,19 @@ public class AppLoader implements ApplicationListener {
 
         }
 
+        // tell the game that we have a gamepad
+        environment = RunningEnvironment.PC;
+
         if (gamepad != null) {
+            String name = gamepad.getName().toLowerCase();
+            for (String allowedName : gamepadWhitelist) {
+                if (name.contains(allowedName)) {
+                    environment = RunningEnvironment.CONSOLE;
+                    break;
+                }
+            }
+        }
+        /*if (gamepad != null) {
             environment = RunningEnvironment.CONSOLE;
 
             // calibrate the sticks
@@ -460,7 +476,7 @@ public class AppLoader implements ApplicationListener {
         }
         else {
             environment = RunningEnvironment.PC;
-        }
+        }*/
 
         // make loading list
 

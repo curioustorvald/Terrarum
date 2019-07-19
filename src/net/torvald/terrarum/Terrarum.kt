@@ -83,13 +83,13 @@ object Terrarum : Disposable {
     var ingame: IngameInstance? = null
         private set
 
-    private val javaHeapCircularArray = CircularArray<Int>(64)
-    private val nativeHeapCircularArray = CircularArray<Int>(64)
-    private val updateRateCircularArray = CircularArray<Double>(16)
+    private val javaHeapCircularArray = CircularArray<Int>(64, true)
+    private val nativeHeapCircularArray = CircularArray<Int>(64, true)
+    private val updateRateCircularArray = CircularArray<Double>(16, true)
 
     val memJavaHeap: Int
         get() {
-            javaHeapCircularArray.add((Gdx.app.javaHeap shr 20).toInt())
+            javaHeapCircularArray.appendHead((Gdx.app.javaHeap shr 20).toInt())
 
             var acc = 0
             javaHeapCircularArray.forEach { acc = maxOf(acc, it) }
@@ -97,7 +97,7 @@ object Terrarum : Disposable {
         }
     val memNativeHeap: Int
         get() {
-            nativeHeapCircularArray.add((Gdx.app.javaHeap shr 20).toInt())
+            nativeHeapCircularArray.appendHead((Gdx.app.javaHeap shr 20).toInt())
 
             var acc = 0
             nativeHeapCircularArray.forEach { acc = maxOf(acc, it) }
@@ -107,7 +107,7 @@ object Terrarum : Disposable {
         get() = (Runtime.getRuntime().maxMemory() shr 20).toInt()
     val updateRateStr: String
         get() {
-            updateRateCircularArray.add(updateRate)
+            updateRateCircularArray.appendHead(updateRate)
 
             var acc = 0.0
             updateRateCircularArray.forEach { acc = maxOf(acc, it) }

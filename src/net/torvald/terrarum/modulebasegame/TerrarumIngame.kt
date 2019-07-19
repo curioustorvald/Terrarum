@@ -57,7 +57,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     val PARTICLES_MAX = AppLoader.getConfigInt("maxparticles")
     //val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
-    val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
+    val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
     val uiContainer = ArrayList<UICanvas>()
 
     private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
@@ -960,7 +960,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     fun addParticle(particle: ParticleBase) {
-        particlesContainer.add(particle)
+        particlesContainer.appendHead(particle)
     }
 
     fun addUI(ui: UICanvas) {
