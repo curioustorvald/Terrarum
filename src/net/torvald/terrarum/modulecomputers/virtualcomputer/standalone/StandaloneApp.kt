@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulecomputers.virtualcomputer.standalone
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -24,26 +25,19 @@ class StandaloneApp : Game() {
 
     lateinit var batch: SpriteBatch
 
-    lateinit var vmThread: Thread
-
-    val display = MDA(80, 25)
+    val display = MDA(64, 40)
     val vm = LuaComputerVM(display)
 
     override fun create() {
         font = TextureRegionPack(Gdx.files.internal("assets/mods/dwarventech/gui/lcd.tga"), 12, 16)
 
-        background = Texture(Gdx.files.internal("assets/mods/dwarventech/gui/8025_textonly.png"))
+        background = Texture(Gdx.files.internal("assets/mods/dwarventech/gui/6440_textonly.png"))
         execLed = Texture(Gdx.files.internal("assets/mods/dwarventech/gui/led_green.tga"))
         waitLed = Texture(Gdx.files.internal("assets/mods/dwarventech/gui/led_orange.tga"))
 
         batch = SpriteBatch()
 
-        //Gdx.input.inputProcessor = TVMInputProcessor()
-
-
-        //vmThread = Thread(vm)
-        //vmThread.start()
-
+        Gdx.input.inputProcessor = StandaloneAppInputProcessor(vm)
     }
 
     private val height: Int; get() = Gdx.graphics.height
@@ -59,6 +53,26 @@ class StandaloneApp : Game() {
     )
 
     private var textCursorDrawTimer = 0f // 0f..0.5f: not draw
+
+    init {
+        vm.runCommand("""
+            print("Hello, world!")
+            while true do
+                local s = io.read()
+                print(s)
+            end
+        """.trimIndent(), "")
+
+        /*vm.runCommand("""
+            a = 0
+            while true do
+                print(a)
+                a = a + 1
+            end
+        """.trimIndent(), "")*/
+    }
+
+
 
     override fun render() {
         Gdx.graphics.setTitle("Terrarum Lua Computer Standalone — F: ${Gdx.graphics.framesPerSecond}")
@@ -130,51 +144,48 @@ class StandaloneApp : Game() {
         this.end()
     }
 
-
-    /*class TVMInputProcessor(val vm: TerranVM) : InputProcessor {
-        override fun touchUp(p0: Int, p1: Int, p2: Int, p3: Int): Boolean {
+    private class StandaloneAppInputProcessor(private val vm: LuaComputerVM) : InputProcessor {
+        override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             return false
         }
 
-        override fun mouseMoved(p0: Int, p1: Int): Boolean {
+        override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
             return false
         }
 
-        override fun keyTyped(p0: Char): Boolean {
-
-
-            return true
-        }
-
-        override fun scrolled(p0: Int): Boolean {
+        override fun keyTyped(character: Char): Boolean {
             return false
         }
 
-        override fun keyUp(p0: Int): Boolean {
+        override fun scrolled(amount: Int): Boolean {
             return false
         }
 
-        override fun touchDragged(p0: Int, p1: Int, p2: Int): Boolean {
+        override fun keyUp(keycode: Int): Boolean {
             return false
         }
 
-        override fun keyDown(p0: Int): Boolean {
+        override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
             return false
         }
 
-        override fun touchDown(p0: Int, p1: Int, p2: Int, p3: Int): Boolean {
+        override fun keyDown(keycode: Int): Boolean {
+            vm.keyPressed(keycode)
             return false
         }
-    }*/
 
+        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            return false
+        }
+    }
 
     private fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)
 }
 
 fun main(args: Array<String>) {
     val config = LwjglApplicationConfiguration()
-    config.width = 1106
-    config.height = 556
+    config.width = 914
+    config.height = 796
     config.foregroundFPS = 100
     config.vSyncEnabled = false
     config.resizable = false

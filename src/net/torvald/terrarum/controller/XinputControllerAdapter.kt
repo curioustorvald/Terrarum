@@ -74,7 +74,7 @@ class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
     }
 
     override fun getName(): String {
-        return "(XB360 Compatible)"
+        return "(XINPUT Compatible)"
     }
 
     override fun setRumble(left: Float, right: Float) {

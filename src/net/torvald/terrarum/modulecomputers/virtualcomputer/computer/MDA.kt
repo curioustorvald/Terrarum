@@ -37,8 +37,8 @@ class MDA(val width: Int, val height: Int) {
     var blink = true
 
     init {
-        //glyphs.fillWith(0)
-        //attributes.fillWith(1)
+        glyphs.fillWith(0)
+        attributes.fillWith(1)
     }
 
     /*

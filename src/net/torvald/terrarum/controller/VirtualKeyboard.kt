@@ -7,12 +7,12 @@ import net.torvald.util.CircularArray
  */
 abstract class VirtualKeyboard(val BUFFER_SIZE: Int = DEFAULT_BUFFER_SIZE) {
 
-    val inputBuffer = CircularArray<Char>(BUFFER_SIZE)
+    val inputBuffer = CircularArray<Char>(BUFFER_SIZE, false)
 
     abstract fun takeFromInputBuffer()
 
     fun addToBuffer(char: Char) {
-        inputBuffer.add(char)
+        inputBuffer.appendHead(char)
     }
 
     companion object {
