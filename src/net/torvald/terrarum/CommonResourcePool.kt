@@ -89,9 +89,9 @@ object CommonResourcePool {
             try {
                 if (u is Disposable)
                     u.dispose()
-                if (u is Texture)
+                else if (u is Texture)
                     u.dispose()
-                if (u is TextureRegion)
+                else if (u is TextureRegion)
                     u.texture.dispose()
                 // TODO
             }
