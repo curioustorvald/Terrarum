@@ -16,12 +16,8 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
     // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
     internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
 
-    //private val directByteBuffer: ByteBuffer
-
     init {
         ptr.fillWith(0)
-
-        //directByteBuffer = ByteBuffer.allocateDirect(width * height * BYTES_PER_BLOCK)
     }
 
     /**
@@ -40,7 +36,7 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
      */
     constructor(width: Int, height: Int, data: ByteArray) : this(width, height) {
         TODO()
-        //data.forEachIndexed { index, byte -> unsafe.putByte(layerPtr + index, byte) }
+        data.forEachIndexed { index, byte -> UnsafeHelper.unsafe.putByte(ptr.ptr + index, byte) }
     }
 
 
@@ -62,13 +58,11 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
                 val y = iteratorCount / width
                 val x = iteratorCount % width
                 // advance counter
-                iteratorCount += 2
+                iteratorCount += 1
 
-                val offset = 2L * (y * width + x)
+                val offset = BYTES_PER_BLOCK * (y * width + x)
                 val lsb = ptr[offset]
-                //val lsb = directByteBuffer[offset]
                 val msb = ptr[offset + 1]
-                //val msb = directByteBuffer[offset + 1]
 
 
                 return lsb.toUint() + msb.toUint().shl(8)
@@ -94,7 +88,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
                 iteratorCount += 1
 
                 return ptr[iteratorCount]
-                //return directByteBuffer[iteratorCount]
             }
         }
     }
@@ -103,8 +96,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         val offset = BYTES_PER_BLOCK * (y * width + x)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
-        //val lsb = directByteBuffer[offset]
-        //val msb = directByteBuffer[offset + 1]
 
         return lsb.toUint() + msb.toUint().shl(8)
     }
@@ -118,8 +109,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
         ptr[offset] = lsb
         ptr[offset + 1] = msb
-        //directByteBuffer.put(offset, lsb)
-        //directByteBuffer.put(offset + 1, msb)
     }
 
     /**
@@ -139,7 +128,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
 
     override fun dispose() {
         ptr.destroy()
-        //directByteBuffer.clear()
         printdbg(this, "BlockLayer with ptr ($ptr) successfully freed")
     }
 
