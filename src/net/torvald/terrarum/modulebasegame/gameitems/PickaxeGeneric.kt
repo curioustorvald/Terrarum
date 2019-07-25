@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -14,7 +14,6 @@ import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
 /**
@@ -85,7 +84,7 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
     override val material = MaterialCodex["CUPR"]
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion?
-        get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(0,0)
+        get() = CommonResourcePool.getAsTextureRegionPack("basegame.items24").get(0,0)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -112,7 +111,7 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
     override val material = MaterialCodex["IRON"]
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion?
-        get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(1,0)
+        get() = CommonResourcePool.getAsTextureRegionPack("basegame.items24").get(1,0)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -139,7 +138,7 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
     override val material = MaterialCodex["STAL"]
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
     override val itemImage: TextureRegion?
-        get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(2,0)
+        get() = CommonResourcePool.getAsTextureRegionPack("basegame.items24").get(2,0)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP

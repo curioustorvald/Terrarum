@@ -146,6 +146,7 @@ class UIItemInventoryEquippedView(
     
     override fun dispose() {
         itemGrid.forEach { it.dispose() }
+        equipPosIcon.dispose()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

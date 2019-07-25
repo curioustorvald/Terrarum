@@ -1430,7 +1430,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
         // debug display of hIntTilewiseHitbox
         if (KeyToggler.isOn(Input.Keys.F9)) {
-            val blockMark = AppLoader.resourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
+            val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
             batch.color = HITBOX_COLOURS0
             for (y in 0..intTilewiseHitbox.height.toInt()) {

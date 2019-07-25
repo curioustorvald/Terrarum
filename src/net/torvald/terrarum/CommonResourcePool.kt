@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
+import net.torvald.UnsafePtr
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -11,8 +12,9 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object CommonResourcePool {
 
-    private val loadingList = Queue<Pair<String, () -> Any>>()
+    private val loadingList = Queue<ResourceLoadingDescriptor>()
     private val pool = HashMap<String, Any>()
+    private val poolKillFun = HashMap<String, (() -> Unit)?>()
     //private val typesMap = HashMap<String, Class<*>>()
     private var loadCounter = -1 // using counters so that the loading can be done on separate thread (gg if the asset requires GL context to be loaded)
     val loaded: Boolean
@@ -46,8 +48,26 @@ object CommonResourcePool {
         }
     }
 
+    /**
+     * Following objects doesn't need destroy function:
+     * - com.badlogic.gdx.utils.Disposable
+     * - com.badlogic.gdx.graphics.Texture
+     * - com.badlogic.gdx.graphics.g2d.TextureRegion
+     * - net.torvald.UnsafePtr
+     */
     fun addToLoadingList(identifier: String, loadFunction: () -> Any) {
-        loadingList.addFirst(identifier to loadFunction)
+        CommonResourcePool.addToLoadingList(identifier, loadFunction, null)
+    }
+
+    /**
+     * Following objects doesn't need destroy function:
+     * - com.badlogic.gdx.utils.Disposable
+     * - com.badlogic.gdx.graphics.Texture
+     * - com.badlogic.gdx.graphics.g2d.TextureRegion
+     * - net.torvald.UnsafePtr
+     */
+    fun addToLoadingList(identifier: String, loadFunction: () -> Any, destroyFunction: (() -> Unit)?) {
+        loadingList.addFirst(ResourceLoadingDescriptor(identifier, loadFunction, destroyFunction))
 
         if (loadCounter == -1)
             loadCounter = 1
@@ -56,13 +76,13 @@ object CommonResourcePool {
     }
 
     /**
-     * You are supposed to call this function only once.
+     * Consumes the loading list. After the load, the list will be empty
      */
     fun loadAll() {
         if (loaded) throw IllegalStateException("Assets are already loaded and shipped out :p")
 
         while (!loadingList.isEmpty) {
-            val (name, loadfun) = loadingList.removeFirst()
+            val (name, loadfun, killfun) = loadingList.removeFirst()
 
             if (pool.containsKey(name)) {
                 throw IllegalArgumentException("Assets with identifier '$name' already exists.")
@@ -70,6 +90,7 @@ object CommonResourcePool {
 
             //typesMap[name] = type
             pool[name] = loadfun.invoke()
+            poolKillFun[name] = killfun
 
             loadCounter -= 1
         }
@@ -85,19 +106,25 @@ object CommonResourcePool {
     fun getAsTexture(identifier: String) = getAs<Texture>(identifier)
 
     fun dispose() {
-        pool.forEach { _, u ->
+        pool.forEach { name, u ->
             try {
-                if (u is Disposable)
-                    u.dispose()
-                else if (u is Texture)
-                    u.dispose()
-                else if (u is TextureRegion)
-                    u.texture.dispose()
-                // TODO
+                when {
+                    u is Disposable -> u.dispose()
+                    u is Texture -> u.dispose()
+                    u is TextureRegion -> u.texture.dispose()
+                    u is UnsafePtr -> u.destroy()
+                    else -> poolKillFun[name]?.invoke()
+                }
             }
             catch (e: Throwable) {
                 e.printStackTrace()
             }
         }
     }
+
+    private data class ResourceLoadingDescriptor(
+            val name: String,
+            val loadfun: () -> Any,
+            val killfun: (() -> Unit)? = null
+    )
 }
