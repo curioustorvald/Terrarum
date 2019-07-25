@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
@@ -22,7 +22,7 @@ class TikiTorchTester(originalID: ItemID) : GameItem(originalID) {
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion?
-        get() = AppLoader.resourcePool.getAsTextureRegion("itemplaceholder_48")
+        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_48")
     override var baseToolSize: Double? = baseMass
 
     init {

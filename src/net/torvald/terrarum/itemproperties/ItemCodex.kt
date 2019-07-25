@@ -3,6 +3,7 @@ package net.torvald.terrarum.itemproperties
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.GameItem
@@ -34,7 +35,7 @@ object ItemCodex {
     val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
     private val itemImagePlaceholder: TextureRegion
-        get() = AppLoader.resourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
+        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
 
 
     // TODO: when generalised, there's no guarantee that blocks will be used as an item. Write customised item prop loader and init it on the Ingame

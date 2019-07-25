@@ -6,12 +6,19 @@ import net.torvald.UnsafePtr
 import net.torvald.terrarum.AppLoader.printdbg
 
 /**
+ * Memory layout:
+ * ```
+ *  a7 a6 a5 a4 a3 a2 a1 a0 | xx xx xx xx aB aA a9 a8 ||
+ * ```
+ * where a_n is a tile number
+ *
  * Original version Created by minjaesong on 2016-01-17.
  * Unsafe version Created by minjaesong on 2019-06-08.
  *
  * Note to self: refrain from using shorts--just do away with two bytes: different system have different endianness
  */
 open class BlockLayer(val width: Int, val height: Int) : Disposable {
+    // for some reason, all the efforts of saving the memory space were futile.
 
     // using unsafe pointer gets you 100 fps, whereas using directbytebuffer gets you 90
     internal val ptr: UnsafePtr = UnsafeHelper.allocate(width * height * BYTES_PER_BLOCK)
@@ -21,18 +28,7 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
     }
 
     /**
-     * @param data Byte array representation of the layer, where:
-     * - every 2n-th byte is lowermost 8 bits of the tile number
-     * - every (2n+1)th byte is uppermost 4 (4096 blocks) or 8 (65536 blocks) bits of the tile number.
-     *
-     * When 4096-block mode is being used, every (2n+1)th byte is filled in this format:
-     * ```
-     * (MSB) 0 0 0 0 a b c d (LSB)
-     * ```
-     *
-     * In other words, the valid range for the every (2n+1)th byte is 0..15.
-     *
-     * TL;DR: LITTLE ENDIAN PLEASE
+     * @param data Byte array representation of the layer
      */
     constructor(width: Int, height: Int, data: ByteArray) : this(width, height) {
         TODO()

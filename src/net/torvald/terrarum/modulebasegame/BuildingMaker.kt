@@ -132,7 +132,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val selection = ArrayList<Point2i>()
 
-    val blockMarkings = AppLoader.resourcePool.getAsTextureRegionPack("blockmarkings_common")
+    val blockMarkings = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common")
     internal var showSelection = true
     val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 

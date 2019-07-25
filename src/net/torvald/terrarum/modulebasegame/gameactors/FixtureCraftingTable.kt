@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
@@ -21,7 +21,7 @@ internal class FixtureCraftingTable : FixtureBase(
     init {
         setHitboxDimension(16, 16, 0, 0)
 
-        makeNewSprite(TextureRegionPack(AppLoader.resourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16))
+        makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16))
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = MASS
@@ -49,7 +49,7 @@ internal object UICraftingTable : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         batch.color = Color.WHITE
-        batch.draw(AppLoader.resourcePool.getAsTextureRegion("test_texture"), 0f, 0f)
+        batch.draw(CommonResourcePool.getAsTextureRegion("test_texture"), 0f, 0f)
 
     }
 

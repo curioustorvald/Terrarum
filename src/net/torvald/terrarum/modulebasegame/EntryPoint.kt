@@ -1,8 +1,8 @@
 package net.torvald.terrarum.modulebasegame
 
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -33,13 +33,13 @@ class EntryPoint : ModuleEntryPoint() {
 
 
         // load common resources to the AssetsManager
-        AppLoader.resourcePool.addToLoadingList("$moduleName.items16") {
+        CommonResourcePool.addToLoadingList("$moduleName.items16") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16)
         }
-        AppLoader.resourcePool.addToLoadingList("$moduleName.items24") {
+        CommonResourcePool.addToLoadingList("$moduleName.items24") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items24.tga"), 24, 24)
         }
-        AppLoader.resourcePool.addToLoadingList("$moduleName.items48") {
+        CommonResourcePool.addToLoadingList("$moduleName.items48") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48)
         }
 

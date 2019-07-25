@@ -45,9 +45,13 @@ class UIInventoryFull(
 
     init {
         handler.allowESCtoClose = true
+        CommonResourcePool.addToLoadingList("inventory_caticons") {
+            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
+        }
+        CommonResourcePool.loadAll()
     }
 
-    internal val catIcons: TextureRegionPack = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
+    internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
     internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
 
 

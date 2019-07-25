@@ -29,6 +29,7 @@ import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
@@ -254,7 +255,7 @@ public class AppLoader implements ApplicationListener {
 
     private void initViewPort(int width, int height) {
         // Set Y to point downwards
-        camera.setToOrtho(true, width, height);
+        camera.setToOrtho(true, width, height); // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
 
         // Update camera matrix
         camera.update();
@@ -648,6 +649,7 @@ public class AppLoader implements ApplicationListener {
 
         fontGame.dispose();
         fontSmallNumbers.dispose();
+        ItemSlotImageFactory.INSTANCE.dispose();
 
         textureWhiteSquare.dispose();
         textureWhiteCircle.dispose();
@@ -734,7 +736,7 @@ public class AppLoader implements ApplicationListener {
         }
         else {
             ModMgr.INSTANCE.invoke(); // invoke Module Manager
-            AppLoader.resourcePool.loadAll();
+            CommonResourcePool.INSTANCE.loadAll();
             printdbg(this, "all modules loaded successfully");
             IngameRenderer.initialise();
         }
