@@ -1,11 +1,5 @@
 /*
 
-Texture binding:
-
-0 <- Tiles atlas
-1 <- Tiles buffer that holds tiles to be drawn
-2 <- Fluid tiles atlas
-
 */
 
 #version 120
@@ -23,24 +17,26 @@ uniform sampler2D u_texture;
 
 
 uniform vec2 screenDimension;
-uniform vec2 tilesInAxes; // vec2(tiles_in_horizontal, tiles_in_vertical)
+uniform vec2 tilesInAxes; // basically a screen dimension; vec2(tiles_in_horizontal, tiles_in_vertical)
 
 uniform ivec2 tilemapDimension;
 uniform sampler2D tilemap; // RGBA8888
 
 uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
-uniform sampler2D tilesBlendAtlas; // weather mix (e.g. yellowed grass)
+uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e.g. yellowed grass)
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
 uniform ivec2 tilesInAtlas = ivec2(256, 256);
 uniform ivec2 atlasTexSize = ivec2(4096, 4096);
-ivec2 tileSizeInPx = atlasTexSize / tilesInAtlas;
+ivec2 tileSizeInPx = atlasTexSize / tilesInAtlas; // should be like ivec2(16, 16)
 
 uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
-uniform ivec2 cameraTranslation = ivec2(0, 0);
+uniform ivec2 cameraTranslation = ivec2(0, 0); // used to offset the drawing
 
-uniform float drawBreakage = 1f; // set it to 0f to not draw breakage; non-zero value to draw it
+uniform float drawBreakage = 1f; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
+
+uniform float zoom = 1f;
 
 
 ivec2 getTileXY(int tileNumber) {
@@ -74,22 +70,22 @@ void main() {
 
     // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
     // This one, however, takes exact integer by rounding down. //
-    vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // one used by the tileFromMap
+    vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap
     vec2 flippedFragCoord = vec2(gl_FragCoord.x, screenDimension.y - gl_FragCoord.y) + cameraTranslation; // NO IVEC2!!; this flips Y
+    //vec2 pxCoord = flippedFragCoord.xy; // TODO do I actually need 'pxCoord'?
 
-    vec2 pxCoord = flippedFragCoord.xy;
+    // get required tile numbers //
 
-    // TODO do I really need mediump for this thing ? (default to smapler2D is lowp)
-    vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // <- THE CULPRIT
+    vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // raw tile number
     int tile = getTileFromColor(tileFromMap);
     int breakage = getBreakageFromColor(tileFromMap);
-
-
     ivec2 tileXY = getTileXY(tile);
     ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the atlas
 
+    // cauculate the UV coord value for texture sampling //
 
-    vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
+    //vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas  // TODO do I actually need 'pxCoord'?
+    vec2 coordInTile = mod(flippedFragCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
     // don't really need highp here; read the GLES spec
     vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625 for unmodified default uniforms
@@ -99,24 +95,19 @@ void main() {
     vec2 uvCoordOffsetTile = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
     vec2 uvCoordOffsetBreakage = breakageXY * singleTileSizeInUV;
 
+    // get final UV coord for the actual sampling //
+
     vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
     vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
 
-
-    // blending a breakage tex with main tex
+    // blending a breakage tex with main tex //
 
     vec4 tileCol = texture2D(tilesAtlas, finalUVCoordForTile);
     vec4 tileAltCol = texture2D(tilesBlendAtlas, finalUVCoordForTile);
 
     vec4 finalTile = mix(tileCol, tileAltCol, tilesBlend);
 
-    vec4 finalBreakage;
-    if (drawBreakage == 0f) {
-        finalBreakage = vec4(0f);
-    }
-    else {
-        finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
-    }
+    vec4 finalBreakage = drawBreakage * texture2D(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
 
     vec4 finalColor = vec4(mix(finalTile.rgb, finalBreakage.rgb, finalBreakage.a), finalTile.a);
 
