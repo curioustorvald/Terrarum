@@ -201,7 +201,7 @@ object WorldGenerator {
         ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         ridged.setNumOctaves(4)
         ridged.setFrequency(1.0)
-        ridged.seed = SEED xor random.nextLong()
+        ridged.seed = SEED shake random.nextLong()
 
         val ridged_autocorrect = ModuleAutoCorrect()
         ridged_autocorrect.setRange(0.0, 1.0)
@@ -228,7 +228,7 @@ object WorldGenerator {
         cave_shape.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         cave_shape.setNumOctaves(1)
         cave_shape.setFrequency(4.0)
-        cave_shape.seed = SEED xor caveMagic
+        cave_shape.seed = SEED shake caveMagic
 
         val cave_select = ModuleSelect()
         cave_select.setLowSource(1.0)
@@ -243,7 +243,7 @@ object WorldGenerator {
         cave_perturb_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         cave_perturb_fractal.setNumOctaves(6)
         cave_perturb_fractal.setFrequency(3.0)
-        cave_perturb_fractal.seed = SEED xor cavePerturbMagic
+        cave_perturb_fractal.seed = SEED shake cavePerturbMagic
 
         val cave_perturb_scale = ModuleScaleOffset()
         cave_perturb_scale.setSource(cave_perturb_fractal)
@@ -271,7 +271,7 @@ object WorldGenerator {
         ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         ridged.setNumOctaves(2)
         ridged.setFrequency(frequency)
-        ridged.seed = SEED xor ridgedMagic
+        ridged.seed = SEED shake ridgedMagic
 
         val brownian_select = ModuleSelect()
         brownian_select.setControlSource(ridged)
@@ -370,7 +370,7 @@ object WorldGenerator {
         lowland_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         lowland_shape_fractal.setNumOctaves(2)
         lowland_shape_fractal.setFrequency(1.0)
-        lowland_shape_fractal.seed = SEED xor lowlandMagic
+        lowland_shape_fractal.seed = SEED shake lowlandMagic
 
         val lowland_autocorrect = ModuleAutoCorrect()
         lowland_autocorrect.setSource(lowland_shape_fractal)
@@ -399,7 +399,7 @@ object WorldGenerator {
         highland_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         highland_shape_fractal.setNumOctaves(2)
         highland_shape_fractal.setFrequency(2.0)
-        highland_shape_fractal.seed = SEED xor highlandMagic
+        highland_shape_fractal.seed = SEED shake highlandMagic
 
         val highland_autocorrect = ModuleAutoCorrect()
         highland_autocorrect.setSource(highland_shape_fractal)
@@ -428,7 +428,7 @@ object WorldGenerator {
         mountain_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         mountain_shape_fractal.setNumOctaves(4)
         mountain_shape_fractal.setFrequency(1.0)
-        mountain_shape_fractal.seed = SEED xor mountainMagic
+        mountain_shape_fractal.seed = SEED shake mountainMagic
 
         val mountain_autocorrect = ModuleAutoCorrect()
         mountain_autocorrect.setSource(mountain_shape_fractal)
@@ -457,7 +457,7 @@ object WorldGenerator {
         terrain_type_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         terrain_type_fractal.setNumOctaves(3)
         terrain_type_fractal.setFrequency(0.5)
-        terrain_type_fractal.seed = SEED xor selectionMagic
+        terrain_type_fractal.seed = SEED shake selectionMagic
 
         val terrain_autocorrect = ModuleAutoCorrect()
         terrain_autocorrect.setSource(terrain_type_fractal)
@@ -898,7 +898,7 @@ object WorldGenerator {
                 Block.SAND_WHITE, Block.SAND_WHITE, Block.SAND_WHITE,
                 Block.SAND_BLACK, Block.SAND_BLACK, Block.SAND_GREEN
                 )
-        val thisRand = HQRNG(SEED xor random.nextLong())
+        val thisRand = HQRNG(SEED shake random.nextLong())
         val thisSand = thisSandList[thisRand.nextInt(thisSandList.size)]
         // val thisSand = Block.SAND_GREEN
 
@@ -1030,4 +1030,16 @@ object WorldGenerator {
                            var filter: NoiseFilter = NoiseFilterQuadratic,
                            var filterArg1: Double = NOISE_GRAD_START,
                            var filterArg2: Double = NOISE_GRAD_END)
+
+    // identical to te HQRNG's implementation
+    private infix fun Long.shake(other: Long): Long {
+        var s0 = this
+        var s1 = other
+
+        s1 = s1 xor s0
+        s0 = s0 shl 55 or s0.ushr(9) xor s1 xor (s1 shl 14)
+        s1 = s1 shl 36 or s1.ushr(28)
+
+        return s0 + s1
+    }
 }

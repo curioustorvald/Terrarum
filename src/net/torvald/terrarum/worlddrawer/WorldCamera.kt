@@ -4,6 +4,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import org.dyn4j.geometry.Vector2
@@ -47,7 +48,10 @@ object WorldCamera {
 
         // some hacky equation to position player at the dead centre
         // implementing the "lag behind" camera the right way
-        val pVecSum = Vector2(0.0, 0.0)//player.externalV + (player.controllerV ?: nullVec)
+        val pVecSum = if (player is ActorWBMovable)
+            player.externalV + (player.controllerV ?: nullVec)
+        else
+            nullVec
 
         x = ((player.hitbox.centeredX - pVecSum.x).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
 
