@@ -39,7 +39,7 @@ object PostProcessor : Disposable {
 
     private val debugUI = BasicDebugInfoWindow()
 
-    private var functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
+    private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
     init {
         AppLoader.disposableSingletonsPool.add(this)
@@ -48,6 +48,7 @@ object PostProcessor : Disposable {
     override fun dispose() {
         batch.dispose()
         shapeRenderer.dispose()
+        functionRowHelper.dispose()
         try {
             lutTex.dispose()
         }
@@ -117,7 +118,7 @@ object PostProcessor : Disposable {
 
     private fun postShader(projMat: Matrix4, fbo: FrameBuffer) {
         val shader: ShaderProgram? =
-                if (AppLoader.getConfigBoolean("fxdither"))
+                if (AppLoader.getConfigBoolean("fxretro"))
                     AppLoader.shaderHicolour
                 else
                     AppLoader.shaderPassthruRGB

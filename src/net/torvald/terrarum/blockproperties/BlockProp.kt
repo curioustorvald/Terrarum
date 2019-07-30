@@ -24,6 +24,10 @@ class BlockProp {
     var viscosity: Int = 0
     var colour: Int = 0
 
+    /** isSolid is NOT SAME AS !isOpaqueis
+     * Like, don't ever use this vars to tell this block should be removed by water or something,
+     * because PLANTS ARE ACTORS, TREES ARE BLOCKS, stupid myself!
+     */
     var isSolid: Boolean = false
     //var isClear: Boolean = false
     var isPlatform: Boolean = false
