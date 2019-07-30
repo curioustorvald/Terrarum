@@ -194,7 +194,7 @@ object WorldSimulator {
                 for (y in updateYTo downTo updateYFrom) {
                     val currentTile = world.getTileFromTerrain(x, y)
                     val prop = BlockCodex[currentTile]
-                    val isSolid = prop.isSolid
+                    val isAir = currentTile == Block.AIR
                     val support = prop.maxSupport
                     val isFallable = support != -1
 
@@ -211,10 +211,10 @@ object WorldSimulator {
 
                         fallableStackProcessed = true
                     }
-                    else if (isSolid) {
+                    else if (!isAir) {
                         fallDownCounter = 0
                     }
-                    else if (!isSolid && !isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
+                    else if (!isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
                         fallDownCounter += 1
                     }
                 }
