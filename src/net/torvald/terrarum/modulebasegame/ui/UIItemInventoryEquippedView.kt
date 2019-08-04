@@ -24,12 +24,13 @@ class UIItemInventoryEquippedView(
         override var posY: Int
 ) : UIItem(parentUI) {
 
+
     override val width  = WIDTH
-    override val height = HEIGHT
+    override val height = parentUI.itemList.height
 
     companion object {
         val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap
-        val HEIGHT = UIItemInventoryDynamicList.HEIGHT
+        //val HEIGHT = UIItemInventoryDynamicList.HEIGHT
         val SPRITE_DRAW_COL = Color(0xddddddff.toInt())
     }
 
