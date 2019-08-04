@@ -34,6 +34,8 @@ class UIItemInventoryDynamicList(
         val inventory: ActorInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
         override var posX: Int,
         override var posY: Int,
+        val horizontalCells: Int,
+        val verticalCells: Int,
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true
 ) : UIItem(parentUI) {
@@ -42,9 +44,10 @@ class UIItemInventoryDynamicList(
     override var oldPosX = posX
     override var oldPosY = posY
 
-    override val width  = WIDTH
-    override val height = HEIGHT
+    override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
+    override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
+    val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
     val backColour = CELLCOLOUR_BLACK
 
     private val catArrangement = parentUI.catArrangement
@@ -98,13 +101,16 @@ class UIItemInventoryDynamicList(
 
     companion object {
         const val listGap = 8
-        const val horizontalCells = 11
-        const val verticalCells = 8
+        //const val horizontalCells = 11
+        //const val verticalCells = 8
         const val LIST_TO_CONTROL_GAP = 12
-        val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
 
-        val WIDTH = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
-        val HEIGHT = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
+        //val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
+        //val WIDTH = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
+        //val HEIGHT = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
+
+        fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
+        fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
     }
 
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -123,6 +129,7 @@ class UIItemInventoryDynamicList(
                 inactiveTextCol = defaultTextColour
         )
     }
+    // TODO automatically determine how much columns are needed. Minimum width = 5 grids
     private val itemList = Array<UIItemInventoryCellBase>(verticalCells * 2) {
         UIItemInventoryElem(
                 parentUI = inventoryUI,

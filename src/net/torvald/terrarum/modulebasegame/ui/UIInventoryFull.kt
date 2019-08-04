@@ -39,10 +39,13 @@ class UIInventoryFull(
     override var width: Int = AppLoader.screenW
     override var height: Int = AppLoader.screenH
 
+    private val CELLS_HOR = 10
+    private val CELLS_VRT = 8
+
     private val itemListToEquipViewGap = UIItemInventoryDynamicList.listGap // used to be 24; figured out that the extra gap does nothig
 
-    val internalWidth: Int = UIItemInventoryDynamicList.WIDTH + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
-    val internalHeight: Int = 166 + UIItemInventoryDynamicList.HEIGHT // grad_begin..grad_end..contents..grad_begin..grad_end
+    val internalWidth: Int = UIItemInventoryDynamicList.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
+    val internalHeight: Int = 166 + UIItemInventoryDynamicList.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
 
     init {
         handler.allowESCtoClose = true
@@ -105,12 +108,13 @@ class UIInventoryFull(
     override var openCloseTime: Second = 0.0f
 
 
-    private val itemList: UIItemInventoryDynamicList =
+    internal val itemList: UIItemInventoryDynamicList =
             UIItemInventoryDynamicList(
                     this,
                     actor.inventory,
                     0 + (AppLoader.screenW - internalWidth) / 2,
-                    107 + (AppLoader.screenH - internalHeight) / 2
+                    107 + (AppLoader.screenH - internalHeight) / 2,
+                    CELLS_HOR, CELLS_VRT
             )
 
 
@@ -349,7 +353,7 @@ class UIInventoryFull(
         get() = (currentScreen) * AppLoader.screenW
 
     private val MINIMAP_WIDTH = 800f
-    private val MINIMAP_HEIGHT = UIItemInventoryDynamicList.HEIGHT.toFloat()
+    private val MINIMAP_HEIGHT = itemList.height.toFloat()
     private val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
     private var minimapZoom = 1f
     private var minimapPanX = -MinimapComposer.totalWidth / 2f
