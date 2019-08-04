@@ -46,6 +46,17 @@ object CommonResourcePool {
             t.flip(false, true)
             /*return*/t
         }
+        loadAll()
+    }
+
+    fun resourceExists(name: String): Boolean {
+        loadingList.forEach {
+            if (it.name == name) return true
+        }
+        pool.forEach {
+            if (it.key == name) return true
+        }
+        return false
     }
 
     /**
@@ -67,26 +78,30 @@ object CommonResourcePool {
      * - net.torvald.UnsafePtr
      */
     fun addToLoadingList(identifier: String, loadFunction: () -> Any, destroyFunction: (() -> Unit)?) {
-        loadingList.addFirst(ResourceLoadingDescriptor(identifier, loadFunction, destroyFunction))
+        // check if resource is already there
+        if (!resourceExists(identifier)) {
+            loadingList.addFirst(ResourceLoadingDescriptor(identifier, loadFunction, destroyFunction))
 
-        if (loadCounter == -1)
-            loadCounter = 1
-        else
-            loadCounter += 1
+            if (loadCounter == -1)
+                loadCounter = 1
+            else
+                loadCounter += 1
+        }
     }
 
     /**
      * Consumes the loading list. After the load, the list will be empty
      */
     fun loadAll() {
-        if (loaded) throw IllegalStateException("Assets are already loaded and shipped out :p")
+        if (loaded) return //throw IllegalStateException("Assets are already loaded and shipped out :p")
 
         while (!loadingList.isEmpty) {
             val (name, loadfun, killfun) = loadingList.removeFirst()
 
-            if (pool.containsKey(name)) {
+            // no need for the collision checking; quarantine is done when the loading list is being appended
+            /*if (pool.containsKey(name)) {
                 throw IllegalArgumentException("Assets with identifier '$name' already exists.")
-            }
+            }*/
 
             //typesMap[name] = type
             pool[name] = loadfun.invoke()

@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
@@ -31,9 +31,11 @@ import java.util.*
  */
 class UIItemInventoryDynamicList(
         parentUI: UIInventoryFull,
-        val inventory: ActorInventory,
+        val inventory: ActorInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
         override var posX: Int,
-        override var posY: Int
+        override var posY: Int,
+        val drawScrollOnRightside: Boolean = false,
+        val drawWallet: Boolean = true
 ) : UIItem(parentUI) {
 
     // deal with the moving position
@@ -47,7 +49,12 @@ class UIItemInventoryDynamicList(
 
     private val catArrangement = parentUI.catArrangement
 
-
+    init {
+        CommonResourcePool.addToLoadingList("inventory_walletnumberfont") {
+            TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
+        }
+        CommonResourcePool.loadAll()
+    }
 
     val catIconsMeaning = listOf( // sortedBy: catArrangement
             arrayOf(GameItem.Category.WEAPON),
@@ -87,10 +94,13 @@ class UIItemInventoryDynamicList(
     private val walletFont = TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
     private var walletText = ""
 
+
+
     companion object {
         const val listGap = 8
         const val horizontalCells = 11
         const val verticalCells = 8
+        const val LIST_TO_CONTROL_GAP = 12
         val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
 
         val WIDTH = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
@@ -140,8 +150,11 @@ class UIItemInventoryDynamicList(
             field = value
         }
 
+    private val iconPosX = if (drawScrollOnRightside)
+        posX + width + LIST_TO_CONTROL_GAP
+    else
+        posX - LIST_TO_CONTROL_GAP - parentUI.catIcons.tileW + 2
 
-    private val iconPosX = posX - 12 - parentUI.catIcons.tileW + 2
     private fun getIconPosY(index: Int) =
             posY - 2 + (4 + UIItemInventoryElem.height - (parentUI as UIInventoryFull).catIcons.tileH) * index
 
@@ -233,8 +246,8 @@ class UIItemInventoryDynamicList(
         scrollDownButton.posX += posXDelta
 
 
-
         fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 10 + upDownButtonGapToDots + 10 * i
+
 
         scrollDownButton.posY = getScrollDotYHeight(itemPageCount) + upDownButtonGapToDots
 
@@ -252,20 +265,22 @@ class UIItemInventoryDynamicList(
 
             batch.color = colour
             batch.draw(
-                    (parentUI as UIInventoryFull).catIcons.get(if (i == itemPage) 20 else 21,0),
+                    (parentUI as UIInventoryFull).catIcons.get(if (i == itemPage) 20 else 21, 0),
                     scrollUpButton.posX.toFloat(),
                     getScrollDotYHeight(i).toFloat()
             )
         }
 
         // draw wallet text
-        batch.color = Color.WHITE
-        walletText.forEachIndexed { index, it ->
-            batch.draw(
-                    walletFont.get(0, it - '0'),
-                    gridModeButtons[0].posX.toFloat(), // scroll button size: 20px, font width: 20 px
-                    gridModeButtons[0].posY + height - index * walletFont.tileH.toFloat()
-            )
+        if (drawWallet) {
+            batch.color = Color.WHITE
+            walletText.forEachIndexed { index, it ->
+                batch.draw(
+                        walletFont.get(0, it - '0'),
+                        gridModeButtons[0].posX.toFloat(), // scroll button size: 20px, font width: 20 px
+                        gridModeButtons[0].posY + height - index * walletFont.tileH.toFloat()
+                )
+            }
         }
 
         super.render(batch, camera)
@@ -389,10 +404,11 @@ class UIItemInventoryDynamicList(
     override fun dispose() {
         itemList.forEach { it.dispose() }
         itemGrid.forEach { it.dispose() }
-        gridModeButtons.forEach { it.dispose() }
-        scrollUpButton.dispose()
-        scrollDownButton.dispose()
-        walletFont.dispose()
+        // the icons are using common resources that are disposed when the app quits
+        //gridModeButtons.forEach { it.dispose() }
+        //scrollUpButton.dispose()
+        //scrollDownButton.dispose()
+        //walletFont.dispose()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
