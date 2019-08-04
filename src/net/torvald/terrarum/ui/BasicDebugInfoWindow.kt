@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
@@ -147,7 +148,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)
         val rawA = valRaw?.a?.times(100f)?.round()?.div(100f)
 
-        lightVal = if (valRaw == null) "—"
+        lightVal = if (valRaw == null) "$EMDASH"
                    else "$rawR $rawG $rawB $rawA"
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 

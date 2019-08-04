@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.EMDASH
 import net.torvald.terrarum.gdxClearAndSetBlend
 import net.torvald.terrarum.inUse
 
@@ -98,7 +99,7 @@ class GetKeycode : Game() {
     }
 
     override fun render() {
-        Gdx.graphics.setTitle("Get Keycode — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("Get Keycode $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         gdxClearAndSetBlend(.1f,.1f,.1f,1f)
 

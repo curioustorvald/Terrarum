@@ -503,8 +503,8 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         Gdx.graphics.setTitle(AppLoader.GAME_NAME +
-                              " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                              " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
+                              " $EMDASH F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                              " $EMDASH M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
         )
 
         // ASYNCHRONOUS UPDATE AND RENDER //

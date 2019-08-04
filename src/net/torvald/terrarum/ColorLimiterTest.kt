@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import net.torvald.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
@@ -78,7 +79,7 @@ object ColorLimiterTest : ApplicationAdapter() {
                 dither = ditherStart
         }
 
-        Gdx.graphics.setTitle("TestTestTest — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("TestTestTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)

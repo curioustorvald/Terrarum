@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.EMDASH
 import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.LuaComputerVM
 import net.torvald.terrarum.modulecomputers.virtualcomputer.computer.MDA
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -75,7 +76,7 @@ class StandaloneApp : Game() {
 
 
     override fun render() {
-        Gdx.graphics.setTitle("Terrarum Lua Computer Standalone — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("Terrarum Lua Computer Standalone $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         //display.print(ByteArray(1){ (Math.random() * 255).toByte() })
         //display.print("@")

@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.EMDASH
 import net.torvald.colourutil.CIEXYZUtil.toColorRaw
 import net.torvald.colourutil.CIEXYZUtil.toXYZ
 import net.torvald.colourutil.CIEYXY
@@ -60,7 +61,7 @@ class Application : Game() {
     }
 
     override fun render() {
-        Gdx.graphics.setTitle("Daylight Model — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("Daylight Model $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         genTexLoop(turbidity)
 

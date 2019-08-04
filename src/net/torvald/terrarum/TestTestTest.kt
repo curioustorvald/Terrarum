@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.Color
+import net.torvald.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 
@@ -67,7 +68,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
     }
 
     override fun render(delta: Float) {
-        Gdx.graphics.setTitle("TestTestTest — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("TestTestTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
 
         val iterations = 16 // ideally, 4 * radius; must be even number -- odd number will flip the image

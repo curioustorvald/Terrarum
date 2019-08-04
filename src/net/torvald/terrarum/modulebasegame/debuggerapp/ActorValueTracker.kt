@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.debuggerapp
 
+import net.torvald.EMDASH
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ccM
 import net.torvald.terrarum.ccW
@@ -152,7 +153,7 @@ class ActorValueTracker constructor() : JFrame() {
     fun setTrackingActor(actor: Actor?) {
         this.actorValue = actor?.actorValue
 
-        this.title = "AVTracker — $actor"
+        this.title = "AVTracker $EMDASH $actor"
 
         if (actor is ActorWBMovable) {
             this.actor = actor
