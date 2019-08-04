@@ -109,7 +109,7 @@ class UIInventoryFull(
                     this,
                     actor.inventory,
                     0 + (AppLoader.screenW - internalWidth) / 2,
-                    109 + (AppLoader.screenH - internalHeight) / 2
+                    107 + (AppLoader.screenH - internalHeight) / 2
             )
 
 
@@ -119,7 +119,7 @@ class UIInventoryFull(
                     actor.inventory,
                     actor as ActorWBMovable,
                     internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
-                    109 + (AppLoader.screenH - internalHeight) / 2
+                    107 + (AppLoader.screenH - internalHeight) / 2
             )
     private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
