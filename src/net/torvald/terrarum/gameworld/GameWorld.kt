@@ -46,9 +46,9 @@ open class GameWorld : Disposable {
     open val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
-    @TEMzPayload("WALL", TEMzPayload.TWELVE_BITS_LITTLE)
+    @TEMzPayload("WALL", TEMzPayload.INT16_LITTLE)
     val layerWall: BlockLayer
-    @TEMzPayload("TERR", TEMzPayload.EIGHT_MSB)
+    @TEMzPayload("TERR", TEMzPayload.INT16_LITTLE)
     val layerTerrain: BlockLayer
     //val layerWire: MapLayer
 
@@ -514,11 +514,9 @@ annotation class TEMzPayload(val payloadName: String, val arg: Int) {
         const val EXTERNAL_JAVAPROPERTIES = -3
         const val EXTERNAL_CSV = -2
         const val EXTERNAL_JSON = -1
-        const val EIGHT_MSB = 0
-        const val FOUR_LSB = 1
+        const val INT16_LITTLE = 1
         const val INT48_FLOAT_PAIR = 2
         const val INT48_SHORT_PAIR = 3
         const val INT48_INT_PAIR = 4
-        const val TWELVE_BITS_LITTLE = 5
     }
 }

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import net.torvald.EMDASH
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
@@ -15,6 +16,6 @@ object MoneyDisp : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo("Usage: money [amount] — Prints given or random amount of money")
+        Echo("Usage: money [amount] $EMDASH Prints given or random amount of money")
     }
 }

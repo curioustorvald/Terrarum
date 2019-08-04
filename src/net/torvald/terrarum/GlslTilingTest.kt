@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.Color
+import net.torvald.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
@@ -108,7 +109,7 @@ object GlslTilingTest : ApplicationAdapter() {
     var cameraY = 0f
 
     override fun render() {
-        Gdx.graphics.setTitle("GlslTilingTest — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("GlslTilingTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
 
         // 0brrrrrrrr_gggggggg_bbbbbbbb_aaaaaaaa

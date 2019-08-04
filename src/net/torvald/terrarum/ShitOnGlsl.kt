@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import net.torvald.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
@@ -83,7 +84,7 @@ object ShitOnGlsl : ApplicationAdapter() {
 
 
     override fun render() {
-        Gdx.graphics.setTitle("ShitOnGlsl — F: ${Gdx.graphics.framesPerSecond}")
+        Gdx.graphics.setTitle("ShitOnGlsl $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
