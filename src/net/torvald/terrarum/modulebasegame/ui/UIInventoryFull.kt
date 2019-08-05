@@ -11,10 +11,12 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.CAT_ALL
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -57,6 +59,18 @@ class UIInventoryFull(
 
     internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
     internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
+    internal val catIconsMeaning = listOf( // sortedBy: catArrangement
+            arrayOf(GameItem.Category.WEAPON),
+            arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
+            arrayOf(GameItem.Category.ARMOUR),
+            arrayOf(GameItem.Category.GENERIC),
+            arrayOf(GameItem.Category.POTION),
+            arrayOf(GameItem.Category.MAGIC),
+            arrayOf(GameItem.Category.BLOCK),
+            arrayOf(GameItem.Category.WALL),
+            arrayOf(GameItem.Category.MISC),
+            arrayOf(CAT_ALL)
+    )
 
 
     private val SP = "${0x3000.toChar()} "
@@ -100,10 +114,7 @@ class UIInventoryFull(
             42 + (AppLoader.screenH - internalHeight) / 2,
             catBarWidth
     )
-    val catSelection: Int
-        get() = categoryBar.selectedIndex
-    val catSelectedIcon: Int
-        get() = categoryBar.selectedIcon
+
 
     override var openCloseTime: Second = 0.0f
 
@@ -181,7 +192,7 @@ class UIInventoryFull(
         categoryBar.selectionChangeListener = { old, new  ->
             rebuildList()
             itemList.itemPage = 0 // set scroll to zero
-            itemList.rebuild() // have to manually rebuild, too!
+            itemList.rebuild(catIconsMeaning[catArrangement[new]]) // have to manually rebuild, too!
         }
 
 
@@ -525,7 +536,7 @@ class UIInventoryFull(
     fun rebuildList() {
         printdbg(this, "rebuilding list")
 
-        itemList.rebuild()
+        itemList.rebuild(catIconsMeaning[categoryBar.selectedIcon])
         equipped.rebuild()
 
         encumbrancePerc = actor.inventory.capacity.toFloat() / actor.inventory.maxCapacity

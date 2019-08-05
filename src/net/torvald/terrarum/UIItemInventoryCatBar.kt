@@ -36,8 +36,10 @@ class UIItemInventoryCatBar(
 
     private val mainButtons: Array<UIItemImageButton>
     private val buttonGapSize = (width.toFloat() - (catArrangement.size * catIcons.tileW)) / (catArrangement.size)
-    var selectedIndex = 0 // default to ALL
+    /** raw order */
+    private var selectedIndex = 0 // default to ALL
         private set
+    /** re-arranged order */
     val selectedIcon: Int
         get() = catArrangement[selectedIndex]
 
@@ -141,7 +143,8 @@ class UIItemInventoryCatBar(
     }
 
 
-    /** (oldIndex: Int?, newIndex: Int) -> Unit */
+    /** (oldIndex: Int?, newIndex: Int) -> Unit
+     * Indices are raw index. That is, not re-arranged. */
     var selectionChangeListener: ((Int?, Int) -> Unit)? = null
 
     override fun update(delta: Float) {

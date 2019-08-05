@@ -11,8 +11,6 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.dyn4j.geometry.Vector2
@@ -590,14 +588,14 @@ open class ActorHumanoid(
             }
 
             // force update inventory UI, but when the pie menu is not open (pie menu constantly writes to the actorvalue, which will rebuildList()
-            try {
+            /*try {
                 if (!(Terrarum.ingame!! as TerrarumIngame).uiPieMenu.isVisible) {
                     ((Terrarum.ingame!! as TerrarumIngame).uiInventoryPlayer as UIInventoryFull).rebuildList()
                 }
             }
             catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) {
-            }
-
+            }*/
+            // commented; works without it
         }
     }
 
