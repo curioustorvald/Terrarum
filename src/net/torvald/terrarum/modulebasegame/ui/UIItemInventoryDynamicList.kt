@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -59,7 +58,8 @@ class UIItemInventoryDynamicList(
         CommonResourcePool.loadAll()
     }
 
-    val catIconsMeaning = listOf( // sortedBy: catArrangement
+    // info regarding cat icon should not be here, move it to the parent call (e.g. UIInventoryFull, CraftingUI)
+    /*val catIconsMeaning = listOf( // sortedBy: catArrangement
             arrayOf(GameItem.Category.WEAPON),
             arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
             arrayOf(GameItem.Category.ARMOUR),
@@ -69,22 +69,19 @@ class UIItemInventoryDynamicList(
             arrayOf(GameItem.Category.BLOCK),
             arrayOf(GameItem.Category.WALL),
             arrayOf(GameItem.Category.MISC),
-            arrayOf("__all__")
-    )
+            arrayOf(CAT_ALL)
+    )*/
+    private var currentFilter = arrayOf(CAT_ALL)
 
     private val inventoryUI = parentUI
 
-    private val selection: Int
-        get() = inventoryUI.catSelection
-    private val selectedIcon: Int
-        get() = inventoryUI.catSelectedIcon
-
-    private val compactViewCat = setOf(3, 4, 6, 7, 9) // ingredients, potions, blocks, walls, all (spritesheet order)
+    //private val selectedIcon: Int
+    //    get() = inventoryUI.catSelectedIcon
 
     var itemPage = 0
         set(value) {
             field = if (itemPageCount == 0) 0 else (value).fmod(itemPageCount)
-            rebuild()
+            rebuild(currentFilter)
         }
     var itemPageCount = 1 // TODO total size of current category / items.size
         private set
@@ -111,6 +108,8 @@ class UIItemInventoryDynamicList(
 
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
+
+        const val CAT_ALL = "__all__"
     }
 
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -129,7 +128,7 @@ class UIItemInventoryDynamicList(
                 inactiveTextCol = defaultTextColour
         )
     }
-    // TODO automatically determine how much columns are needed. Minimum width = 5 grids
+    // TODO automatically determine how much columns are needed. Minimum Width = 5 grids
     private val itemList = Array<UIItemInventoryCellBase>(verticalCells * 2) {
         UIItemInventoryElem(
                 parentUI = inventoryUI,
@@ -153,7 +152,7 @@ class UIItemInventoryDynamicList(
     var isCompactMode = false // this is INIT code
         set(value) {
             items = if (value) itemGrid else itemList
-            rebuild()
+            rebuild(currentFilter)
             field = value
         }
 
@@ -219,14 +218,14 @@ class UIItemInventoryDynamicList(
             gridModeButtons[0].highlighted = true
             gridModeButtons[1].highlighted = false
             itemPage = 0
-            rebuild()
+            rebuild(currentFilter)
         }
         gridModeButtons[1].touchDownListener = { _, _, _, _ ->
             isCompactMode = true
             gridModeButtons[0].highlighted = false
             gridModeButtons[1].highlighted = true
             itemPage = 0
-            rebuild()
+            rebuild(currentFilter)
         }
 
         scrollUpButton.clickOnceListener = { _, _, _ ->
@@ -333,19 +332,19 @@ class UIItemInventoryDynamicList(
     }
 
 
-
-    internal fun rebuild() {
+    internal fun rebuild(filter: Array<String>) {
         //println("Rebuilt inventory")
         //println("rebuild: actual itempage: $itemPage")
 
 
-        val filter = catIconsMeaning[selectedIcon]
+        //val filter = catIconsMeaning[selectedIcon]
+        currentFilter = filter
 
         inventorySortList = ArrayList<InventoryPair>()
 
         // filter items
         inventory.forEach {
-            if ((filter.contains(ItemCodex[it.item]!!.inventoryCategory) || filter[0] == "__all__"))
+            if ((filter.contains(ItemCodex[it.item]!!.inventoryCategory) || filter[0] == CAT_ALL))
                 inventorySortList.add(it)
         }
 
@@ -440,7 +439,7 @@ class UIItemInventoryDynamicList(
         super.keyDown(keycode)
 
         items.forEach { if (it.mouseUp) it.keyDown(keycode) }
-        rebuild()
+        rebuild(currentFilter)
 
         return true
     }
@@ -449,7 +448,7 @@ class UIItemInventoryDynamicList(
         super.keyUp(keycode)
 
         items.forEach { if (it.mouseUp) it.keyUp(keycode) }
-        rebuild()
+        rebuild(currentFilter)
 
         return true
     }
