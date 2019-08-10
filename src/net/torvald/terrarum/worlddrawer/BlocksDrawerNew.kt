@@ -635,7 +635,8 @@ internal object BlocksDrawer {
         else
             0f
         )
-        shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
+        //shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
+        shader.setUniformf("zoom", Terrarum.ingame?.screenZoom ?: 1f)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
 

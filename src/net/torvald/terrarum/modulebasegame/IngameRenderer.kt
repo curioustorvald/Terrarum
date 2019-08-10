@@ -198,6 +198,8 @@ object IngameRenderer : Disposable {
         //renderingParticleCount = (particlesContainer?.buffer?.map { (!it.flagDespawn).toInt() } ?: listOf(0)).sum()
         renderingUIsCount = ((uisToDraw?.map { (it?.isVisible ?: false).toInt() }) ?: listOf(0)).sum()
 
+        val zoom = Terrarum.ingame?.screenZoom ?: 1f
+
 
         if (uisToDraw != null) {
             uiListToDraw = uisToDraw
@@ -236,6 +238,8 @@ object IngameRenderer : Disposable {
 
         val rgbTex = fboRGB_lightMixed.colorBufferTexture
         val aTex = fboA_lightMixed.colorBufferTexture
+        rgbTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        aTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // normal behaviour
         if (!KeyToggler.isOn(Input.Keys.F6) &&
@@ -250,11 +254,11 @@ object IngameRenderer : Disposable {
                 blendNormal(batch)
                 batch.shader = shaderBlendGlow
                 shaderBlendGlow.setUniformi("tex1", 1)
-                batch.draw(rgbTex, 0f, 0f)
+                batch.draw(rgbTex, 0f, 0f, rgbTex.width * zoom, rgbTex.height * zoom)
             }
 
 
-            // definitely something is not blended correctly
+            // blending is correct... somewhat. Alpha must be premultiplied
         }
         // something about RGB
         else if (KeyToggler.isOn(Input.Keys.F6) &&
@@ -264,7 +268,7 @@ object IngameRenderer : Disposable {
             batch.inUse {
                 blendNormal(batch)
                 batch.shader = null
-                batch.draw(rgbTex, 0f, 0f)
+                batch.draw(rgbTex, 0f, 0f, rgbTex.width * zoom, rgbTex.height * zoom)
 
 
                 // indicator
@@ -287,7 +291,7 @@ object IngameRenderer : Disposable {
             batch.inUse {
                 blendNormal(batch)
                 batch.shader = null
-                batch.draw(aTex, 0f, 0f)
+                batch.draw(aTex, 0f, 0f, aTex.width * zoom, aTex.height * zoom)
 
 
                 // indicator

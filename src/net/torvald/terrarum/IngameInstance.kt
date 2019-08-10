@@ -20,7 +20,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     var screenZoom = 1.0f
     val ZOOM_MAXIMUM = 4.0f
-    val ZOOM_MINIMUM = 0.5f
+    val ZOOM_MINIMUM = 1.0f
 
     open var consoleHandler: ConsoleWindow = ConsoleWindow()
 

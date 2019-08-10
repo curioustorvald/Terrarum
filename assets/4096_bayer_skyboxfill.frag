@@ -20,6 +20,8 @@ uniform float rcount = 64.0; // it even works on 256.0!
 uniform float gcount = 64.0; // using 64: has less banding and most monitors are internally 6-bit
 uniform float bcount = 64.0;
 
+// inverted zoom; this value must set to (1f/zoom)
+uniform float zoomInv = 1f;
 
 /*int bayer[7 * 7] = int[](
 32,42,10,27,37,5,15,
@@ -72,12 +74,13 @@ void main(void) {
 
     float scale = v_texCoords.y * (1.0 - parallax_size) + (parallax_size / 2.0) + (parallax * parallax_size / 2.0);
 
+    float zoomSamplePoint = (1f - zoomInv) / 2f; // will never quite exceed 0.5
 
-    float inR = mix(bottomColor.r, topColor.r, scale);
-    float inG = mix(bottomColor.g, topColor.g, scale);
-    float inB = mix(bottomColor.b, topColor.b, scale);
+    // I don't even know if it works, and also not sure if I actually want it
+    vec3 newBottom = mix(bottomColor, topColor, zoomSamplePoint);
+    vec3 newTop = mix(topColor, bottomColor, zoomSamplePoint);
 
-    vec4 inColor = vec4(inR, inG, inB, 1.0);
+    vec4 inColor = vec4(mix(newBottom, newTop, scale), 1.0);
 
     vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
 

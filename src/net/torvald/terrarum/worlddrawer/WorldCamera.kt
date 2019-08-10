@@ -15,6 +15,9 @@ import org.dyn4j.geometry.Vector2
 object WorldCamera {
     private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
+    val zoom: Float
+        get() = Terrarum.ingame?.screenZoom ?: 1f
+
     var x: Int = 0 // left position
         private set
     var y: Int = 0 // top position
@@ -24,9 +27,9 @@ object WorldCamera {
     var yEnd: Int = 0 // bottom position
         private set
     inline val gdxCamX: Float // centre position
-        get() = xCentre.toFloat()
+        get() = (x + width / 2f * zoom).toInt().toFloat()
     inline val gdxCamY: Float// centre position
-        get() = yCentre.toFloat()
+        get() = (y + height / 2f * zoom).toInt().toFloat()
     var width: Int = 0
         private set
     var height: Int = 0
@@ -41,8 +44,8 @@ object WorldCamera {
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
-        width = FastMath.ceil(AppLoader.screenW / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
-        height = FastMath.ceil(AppLoader.screenH / (Terrarum.ingame?.screenZoom ?: 1f))
+        width = FastMath.ceil(AppLoader.screenW / zoom) // div, not mul
+        height = FastMath.ceil(AppLoader.screenH / zoom)
 
         // TOP-LEFT position of camera border
 

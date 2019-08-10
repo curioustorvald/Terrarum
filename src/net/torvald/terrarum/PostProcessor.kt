@@ -83,6 +83,7 @@ object PostProcessor : Disposable {
 
             postShader(projMat, fbo)
 
+            // draw things when F keys are on
             if (AppLoader.IS_DEVELOPMENT_BUILD && KeyToggler.isOn(Input.Keys.F11)) {
                 drawSafeArea()
             }
@@ -112,6 +113,14 @@ object PostProcessor : Disposable {
             }
             else {
                 if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()
+            }
+
+            // draw dev build notifiers
+            if (AppLoader.IS_DEVELOPMENT_BUILD && Terrarum.ingame != null) {
+                batch.inUse {
+                    batch.color = safeAreaCol
+                    AppLoader.fontGame.draw(it, thisIsDebugStr, 5f, AppLoader.screenH - 24f)
+                }
             }
         }
     }
@@ -143,16 +152,25 @@ object PostProcessor : Disposable {
         val tvSafeArea2H = AppLoader.getTvSafeActionHeight().toFloat()
 
         shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
+
+            // centre ind
+            shapeRenderer.color = safeAreaCol2
+            shapeRenderer.line(0f, 0f, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+            shapeRenderer.line(0f, AppLoader.screenH.toFloat(), AppLoader.screenW.toFloat(), 0f)
+
+            // safe action area
             shapeRenderer.color = safeAreaCol2
             shapeRenderer.rect(
                     tvSafeArea2W, tvSafeArea2H, AppLoader.screenW - 2 * tvSafeArea2W, AppLoader.screenH - 2 * tvSafeArea2H
             )
 
+            // safe graphics area
             shapeRenderer.color = safeAreaCol
             shapeRenderer.rect(
                     tvSafeAreaW, tvSafeAreaH, AppLoader.screenW - 2 * tvSafeAreaW, AppLoader.screenH - 2 * tvSafeAreaH
             )
 
+            // default res ind
             shapeRenderer.color = defaultResCol
             shapeRenderer.rect(
                     (AppLoader.screenW - AppLoader.minimumW).div(2).toFloat(),
@@ -189,6 +207,8 @@ object PostProcessor : Disposable {
 
     private val defaultResStr = "${AppLoader.minimumW}x${AppLoader.minimumH}"
     private val safeAreaStr = "TV Safe Area"
+    private val versionStr = "Version ${AppLoader.getVERSION_STRING()}"
+    private val thisIsDebugStr = "${AppLoader.GAME_NAME} Develoment Build $versionStr"
 
     /**
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
