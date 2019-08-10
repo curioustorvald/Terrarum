@@ -72,6 +72,7 @@ object DefaultConfig {
         jsonObject.addProperty("keyinventory", Input.Keys.Q)
         jsonObject.addProperty("keyinteract", Input.Keys.R)
         jsonObject.addProperty("keyclose", Input.Keys.C) // this or hard-coded ESC
+        jsonObject.addProperty("keyzoom", Input.Keys.Z)
 
         jsonObject.addProperty("keygamemenu", Input.Keys.TAB)
         jsonObject.addProperty("keyquicksel", Input.Keys.SHIFT_LEFT) // pie menu is now LShift because GDX does not read CapsLock

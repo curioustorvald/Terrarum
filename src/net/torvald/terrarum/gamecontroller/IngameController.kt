@@ -11,6 +11,7 @@ import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.toInt
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
@@ -74,6 +75,15 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         /////////////////////
         // GAMEPAD CONTROL //
         /////////////////////
+
+
+        //////////////////////
+        // KEYBOARD CONTROL //
+        //////////////////////
+
+        // FIXME temporarily make zoom work with 'Z' key
+        terrarumIngame.screenZoom = 1f + KeyToggler.isOn(AppLoader.getConfigInt("keyzoom")).toInt()
+
     }
 
     private var f12Down = false

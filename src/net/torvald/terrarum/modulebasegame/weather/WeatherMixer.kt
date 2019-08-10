@@ -12,9 +12,9 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
@@ -161,6 +161,7 @@ internal object WeatherMixer : RNGConsumer {
         IngameRenderer.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
         IngameRenderer.shaderSkyboxFill.setUniformf("parallax", parallax.coerceIn(-1f, 1f))
         IngameRenderer.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
+        IngameRenderer.shaderSkyboxFill.setUniformf("zoomInv", 1f / (Terrarum.ingame?.screenZoom ?: 1f))
         AppLoader.fullscreenQuad.render(IngameRenderer.shaderSkyboxFill, GL20.GL_TRIANGLES)
         IngameRenderer.shaderSkyboxFill.end()
 

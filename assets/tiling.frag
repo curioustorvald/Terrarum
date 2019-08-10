@@ -73,6 +73,7 @@ void main() {
     vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // how many tiles will fit into a screen; one used by the tileFromMap
     vec2 flippedFragCoord = vec2(gl_FragCoord.x, screenDimension.y - gl_FragCoord.y) + cameraTranslation; // NO IVEC2!!; this flips Y
     //vec2 pxCoord = flippedFragCoord.xy; // TODO do I actually need 'pxCoord'?
+    vec2 zoomVec = vec2(zoom);
 
     // get required tile numbers //
 
@@ -97,8 +98,8 @@ void main() {
 
     // get final UV coord for the actual sampling //
 
-    vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
-    vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
+    vec2 finalUVCoordForTile = (uvCoordForTile + uvCoordOffsetTile);// where we should be actually looking for in atlas, using UV coord (0..1)
+    vec2 finalUVCoordForBreakage = (uvCoordForTile + uvCoordOffsetBreakage);
 
     // blending a breakage tex with main tex //
 
