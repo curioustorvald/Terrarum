@@ -250,11 +250,17 @@ object IngameRenderer : Disposable {
             aTex.bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
+
             batch.inUse {
                 blendNormal(batch)
                 batch.shader = shaderBlendGlow
                 shaderBlendGlow.setUniformi("tex1", 1)
-                batch.draw(rgbTex, 0f, 0f, rgbTex.width * zoom, rgbTex.height * zoom)
+                batch.draw(rgbTex,
+                        -0.5f * rgbTex.width * zoom + 0.5f * rgbTex.width,
+                        -0.5f * rgbTex.height * zoom + 0.5f * rgbTex.height,
+                        rgbTex.width * zoom,
+                        rgbTex.height * zoom
+                )
             }
 
 
@@ -268,8 +274,12 @@ object IngameRenderer : Disposable {
             batch.inUse {
                 blendNormal(batch)
                 batch.shader = null
-                batch.draw(rgbTex, 0f, 0f, rgbTex.width * zoom, rgbTex.height * zoom)
-
+                batch.draw(rgbTex,
+                        -0.5f * rgbTex.width * zoom + 0.5f * rgbTex.width,
+                        -0.5f * rgbTex.height * zoom + 0.5f * rgbTex.height,
+                        rgbTex.width * zoom,
+                        rgbTex.height * zoom
+                )
 
                 // indicator
                 batch.color = Color.RED
@@ -291,8 +301,12 @@ object IngameRenderer : Disposable {
             batch.inUse {
                 blendNormal(batch)
                 batch.shader = null
-                batch.draw(aTex, 0f, 0f, aTex.width * zoom, aTex.height * zoom)
-
+                batch.draw(aTex,
+                        -0.5f * aTex.width * zoom + 0.5f * aTex.width,
+                        -0.5f * aTex.height * zoom + 0.5f * aTex.height,
+                        aTex.width * zoom,
+                        aTex.height * zoom
+                )
 
                 // indicator
                 batch.color = Color.WHITE
