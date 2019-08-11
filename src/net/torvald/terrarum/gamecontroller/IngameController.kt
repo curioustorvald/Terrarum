@@ -11,7 +11,6 @@ import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.toInt
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
@@ -55,7 +54,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (terrarumIngame.canPlayerControl) {
+        if (!terrarumIngame.paused) {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
@@ -81,8 +80,11 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         // KEYBOARD CONTROL //
         //////////////////////
 
+        //KeyToggler.update(terrarumIngame.canPlayerControl)
+        //printdbg(this, terrarumIngame.canPlayerControl)
+
         // FIXME temporarily make zoom work with 'Z' key
-        terrarumIngame.screenZoom = 1f + KeyToggler.isOn(AppLoader.getConfigInt("keyzoom")).toInt()
+        //terrarumIngame.screenZoom = 1f + KeyToggler.isOn(AppLoader.getConfigInt("keyzoom")).toInt()
 
     }
 
@@ -90,7 +92,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
     override fun keyDown(keycode: Int): Boolean {
 
-        if (terrarumIngame.canPlayerControl) {
+        if (!terrarumIngame.paused) {
             terrarumIngame.actorNowPlaying?.keyDown(keycode)
 
             // quickslot by number keys
@@ -155,7 +157,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-        if (terrarumIngame.canPlayerControl) {
+        if (!terrarumIngame.paused) {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
@@ -177,7 +179,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     override fun scrolled(amount: Int): Boolean {
-        if (terrarumIngame.canPlayerControl) {
+        if (!terrarumIngame.paused) {
             // quickslot by wheel
             if (terrarumIngame.actorNowPlaying != null) {
                 terrarumIngame.actorNowPlaying!!.actorValue.set(

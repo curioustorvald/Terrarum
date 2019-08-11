@@ -1,7 +1,9 @@
 package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
-import net.torvald.terrarum.Terrarum
+import com.badlogic.gdx.Input
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.util.sortedArrayListOf
 import java.util.*
 
 object KeyToggler {
@@ -13,7 +15,13 @@ object KeyToggler {
     /**
      * Keys that won't be updated when console is opened
      */
-    private val gameKeys = (16..27) + (30..40) + (43..53)
+    private val gameKeys = sortedArrayListOf(
+            Input.Keys.NUM_1, Input.Keys.NUM_2, Input.Keys.NUM_3, Input.Keys.NUM_4, Input.Keys.NUM_5, Input.Keys.NUM_6, Input.Keys.NUM_7, Input.Keys.NUM_8, Input.Keys.NUM_9, Input.Keys.NUM_0, Input.Keys.MINUS, Input.Keys.EQUALS,
+            Input.Keys.Q, Input.Keys.W, Input.Keys.E, Input.Keys.R, Input.Keys.T, Input.Keys.Y, Input.Keys.U, Input.Keys.I, Input.Keys.O, Input.Keys.P, Input.Keys.LEFT_BRACKET, Input.Keys.RIGHT_BRACKET,
+            Input.Keys.A, Input.Keys.S, Input.Keys.D, Input.Keys.F, Input.Keys.G, Input.Keys.H, Input.Keys.J, Input.Keys.K, Input.Keys.L, Input.Keys.SEMICOLON, Input.Keys.APOSTROPHE,
+            Input.Keys.Z, Input.Keys.X, Input.Keys.C, Input.Keys.V, Input.Keys.B, Input.Keys.N, Input.Keys.M, Input.Keys.COMMA, Input.Keys.PERIOD, Input.Keys.SLASH,
+            Input.Keys.NUMPAD_0, Input.Keys.NUMPAD_1, Input.Keys.NUMPAD_2, Input.Keys.NUMPAD_3, Input.Keys.NUMPAD_4, Input.Keys.NUMPAD_5, Input.Keys.NUMPAD_6, Input.Keys.NUMPAD_7, Input.Keys.NUMPAD_8, Input.Keys.NUMPAD_9
+    )
 
 
     fun isOn(key: Int): Boolean {
@@ -22,11 +30,15 @@ object KeyToggler {
 
     /**
      * Put this into the each scene's update/render method.
+     *
+     * Set ```toggleGameKeys = true``` to make toggling work for keys like Q, W, E, ...; otherwise only F1-F12 keys will be toggled
      */
-    fun update(gameMode: Boolean = true) {
+    fun update(toggleGameKeys: Boolean) {
         for (it in 0..255) {
-            if (gameMode && it in gameKeys &&
-                (Terrarum.ingame!!.consoleHandler.isOpening || Terrarum.ingame!!.consoleHandler.isOpened)) {
+            if (!toggleGameKeys && gameKeys.contains(it)) {
+                if (Gdx.input.isKeyPressed(it))
+                    printdbg(this, "Disallowed key: $it")
+
                 continue
             }
 

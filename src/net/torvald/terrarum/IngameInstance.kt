@@ -25,6 +25,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open var consoleHandler: ConsoleWindow = ConsoleWindow()
 
     var paused: Boolean = false
+    val consoleOpened: Boolean
+        get() = consoleHandler.isOpened || consoleHandler.isOpening
 
     init {
         consoleHandler.setPosition(0, 0)

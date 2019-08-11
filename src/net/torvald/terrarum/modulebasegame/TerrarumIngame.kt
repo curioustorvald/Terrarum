@@ -144,11 +144,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     //var paused: Boolean = false
         //get() = uiAliasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmpty is always false, which we want
-    /**
-     * Set to false if UI is opened; set to true  if UI is closed.
-     */
-    inline val canPlayerControl: Boolean
-        get() = !paused // FIXME temporary behab (block movement if the game is paused or paused by UIs)
 
     var particlesActive = 0
         private set

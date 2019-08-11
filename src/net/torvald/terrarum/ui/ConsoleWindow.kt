@@ -14,6 +14,8 @@ import net.torvald.util.HistoryArray
 
 
 /**
+ * Don't let the debug console have the ```toggleKeyLiteral```, this must open even when the game is paused
+ *
  * Created by minjaesong on 2015-12-31.
  */
 class ConsoleWindow : UICanvas() {
@@ -203,11 +205,13 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
+        Terrarum.ingame?.paused = true
         drawOffY = 0f
         openingTimeCounter = 0f
     }
 
     override fun endClosing(delta: Float) {
+        Terrarum.ingame?.paused = false
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
     }
