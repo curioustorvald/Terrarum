@@ -119,8 +119,12 @@ object LightmapRenderer {
     internal var for_y_start = 0
     internal var for_x_end = 0
     internal var for_y_end = 0
-    internal var for_x = 0
-    internal var for_y = 0
+    internal var for_draw_x_start = 0
+    internal var for_draw_y_start = 0
+    internal var for_draw_x_end = 0
+    internal var for_draw_y_end = 0
+    //internal var for_x = 0
+    //internal var for_y = 0
 
     /**
      * @param x world coord
@@ -174,19 +178,23 @@ object LightmapRenderer {
         if (world.worldIndex == -1) return
 
 
-        for_x_start = WorldCamera.x / TILE_SIZE // fix for premature lightmap rendering
-        for_y_start = WorldCamera.y / TILE_SIZE // on topmost/leftmost side
+        for_x_start = WorldCamera.zoomedX / TILE_SIZE // fix for premature lightmap rendering
+        for_y_start = WorldCamera.zoomedY / TILE_SIZE // on topmost/leftmost side
+        for_draw_x_start = WorldCamera.x / TILE_SIZE
+        for_draw_y_start = WorldCamera.y / TILE_SIZE
 
         if (for_x_start < 0) for_x_start -= 1 // to fix that the light shifts 1 tile to the left when WorldCamera < 0
         //if (for_y_start < 0) for_y_start -= 1 // not needed when we only wrap at x axis
 
         if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_x_start -= 1 // another edge-case fix
 
-        for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
-        for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 3 // same fix as above
+        for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 3
+        for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 3 // same fix as above
+        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3
+        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3
 
-        for_x = for_x_start + (for_x_end - for_x_start) / 2
-        for_y = for_y_start + (for_y_end - for_y_start) / 2
+        //for_x = for_x_start + (for_x_end - for_x_start) / 2
+        //for_y = for_y_start + (for_y_end - for_y_start) / 2
 
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
@@ -609,10 +617,10 @@ object LightmapRenderer {
         // when shader is not used: 0.5 ms on 6700K
         AppLoader.measureDebugTime("Renderer.LightToScreen") {
 
-            val this_x_start = for_x_start// + overscan_open
-            val this_x_end = for_x_end// + overscan_open
-            val this_y_start = for_y_start// + overscan_open
-            val this_y_end = for_y_end// + overscan_open
+            val this_x_start = for_draw_x_start
+            val this_y_start = for_draw_y_start
+            val this_x_end = for_draw_x_end
+            val this_y_end = for_draw_y_end
 
             // wipe out beforehand. You DO need this
             lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
