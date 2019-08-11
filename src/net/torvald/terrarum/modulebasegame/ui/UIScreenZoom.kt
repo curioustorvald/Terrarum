@@ -21,7 +21,7 @@ class UIScreenZoom : UICanvas(
     override var width = AppLoader.fontGame.getWidth(zoomText)
     override var height = AppLoader.fontGame.lineHeight.toInt()
 
-    override var openCloseTime = 0.3f
+    override var openCloseTime = 0.2f
 
     override val mouseUp = false
 

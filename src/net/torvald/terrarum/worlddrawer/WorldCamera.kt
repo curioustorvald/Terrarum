@@ -2,7 +2,6 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -15,8 +14,8 @@ import org.dyn4j.geometry.Vector2
 object WorldCamera {
     private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
-    val zoom: Float
-        get() = Terrarum.ingame?.screenZoom ?: 1f
+    //val zoom: Float
+    //    get() = Terrarum.ingame?.screenZoom ?: 1f
 
     var x: Int = 0 // left position
         private set
@@ -27,9 +26,9 @@ object WorldCamera {
     var yEnd: Int = 0 // bottom position
         private set
     inline val gdxCamX: Float // centre position
-        get() = (x + width / 2f * zoom).toInt().toFloat()
+        get() = xCentre.toFloat()
     inline val gdxCamY: Float// centre position
-        get() = (y + height / 2f * zoom).toInt().toFloat()
+        get() = yCentre.toFloat()
     var width: Int = 0
         private set
     var height: Int = 0
@@ -44,8 +43,8 @@ object WorldCamera {
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
-        width = FastMath.ceil(AppLoader.screenW / zoom) // div, not mul
-        height = FastMath.ceil(AppLoader.screenH / zoom)
+        width = AppLoader.screenW//FastMath.ceil(AppLoader.screenW / zoom) // div, not mul
+        height = AppLoader.screenH//FastMath.ceil(AppLoader.screenH / zoom)
 
         // TOP-LEFT position of camera border
 
