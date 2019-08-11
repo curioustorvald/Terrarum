@@ -2,6 +2,8 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -21,18 +23,37 @@ object WorldCamera {
         private set
     var y: Int = 0 // top position
         private set
-    var xEnd: Int = 0 // right position
-        private set
-    var yEnd: Int = 0 // bottom position
-        private set
-    inline val gdxCamX: Float // centre position
-        get() = xCentre.toFloat()
-    inline val gdxCamY: Float// centre position
-        get() = yCentre.toFloat()
+
     var width: Int = 0
         private set
     var height: Int = 0
         private set
+
+    private var zoom = 1f
+    private var zoomSamplePoint = 0f
+
+    // zoomed coords. Currently only being used by the lightmaprenderer.
+    // What about others? We just waste 3/4 of the framebuffer
+    val zoomedX: Int
+        get() = x + (width * zoomSamplePoint).toInt()
+    val zoomedY: Int
+        get() = y + (height * zoomSamplePoint).toInt()
+
+    val zoomedWidth: Int
+        get() = (width / zoom).ceilInt()
+    val zoomedHeight: Int
+        get() = (height / zoom).ceilInt()
+
+    var xEnd: Int = 0 // right position
+        private set
+    var yEnd: Int = 0 // bottom position
+        private set
+
+    inline val gdxCamX: Float // centre position
+        get() = xCentre.toFloat()
+    inline val gdxCamY: Float// centre position
+        get() = yCentre.toFloat()
+
     inline val xCentre: Int
         get() = x + width.ushr(1)
     inline val yCentre: Int
@@ -45,6 +66,8 @@ object WorldCamera {
 
         width = AppLoader.screenW//FastMath.ceil(AppLoader.screenW / zoom) // div, not mul
         height = AppLoader.screenH//FastMath.ceil(AppLoader.screenH / zoom)
+        zoom = Terrarum.ingame?.screenZoom ?: 1f
+        zoomSamplePoint = (1f - 1f / zoom) / 2f // will never quite exceed 0.5
 
         // TOP-LEFT position of camera border
 

@@ -238,16 +238,16 @@ object Terrarum : Disposable {
 
     /** Position of the cursor in the world */
     val mouseX: Double
-        get() = WorldCamera.x + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
     val mouseY: Double
-        get() = WorldCamera.y + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
     val oldMouseX: Double
-        get() = WorldCamera.x + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
     val oldMouseY: Double
-        get() = WorldCamera.y + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileX: Int
         get() = (mouseX / CreateTileAtlas.TILE_SIZE).floorInt()
