@@ -21,7 +21,7 @@ object CommandDict {
             "togglenoclip" to ToggleNoClip,
             "nc" to ToggleNoClip,
             "setlocale" to SetLocale,
-            "zoom" to Zoom,
+            //"zoom" to Zoom,
             "teleport" to Teleport,
             "tp" to Teleport,
             "cat" to CatStdout,
