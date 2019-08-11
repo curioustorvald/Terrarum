@@ -132,6 +132,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private lateinit var uiBasicInfo: UICanvas
     private lateinit var uiWatchTierOne: UICanvas
 
+    /** For in-world text overlays? e.g. cursor on the ore block and tooltip will say "Malachite" or something */
     private lateinit var uiTooltip: UITooltip
 
     lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
@@ -370,6 +371,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 uiQuickBar,
                 uiBasicInfo,
                 uiWatchTierOne,
+                UIScreenZoom(),
                 uiTooltip
                 // drawn last
         )
