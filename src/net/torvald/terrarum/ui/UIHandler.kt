@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
@@ -105,23 +106,25 @@ class UIHandler(//var UI: UICanvas,
 
     fun update(ui: UICanvas, delta: Float) {
         // open/close UI by key pressed
-        if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!)) {
-            if (isClosed)
-                setAsOpen()
-            else if (isOpened)
+        // some UIs will pause the game, and they still need to be closed
+        if (Terrarum.ingame?.consoleOpened == false && (Terrarum.ingame?.paused == false || isOpened)) {
+            if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!)) {
+                if (isClosed)
+                    setAsOpen()
+                else if (isOpened)
+                    setAsClose()
+
+                // for the case of intermediate states, do nothing.
+            }
+            if (toggleButton != null) {
+                /* */
+            }
+
+            // ESC is a master key for closing
+            if (allowESCtoClose && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && isOpened) {
                 setAsClose()
-
-            // for the case of intermediate states, do nothing.
+            }
         }
-        if (toggleButton != null) {
-            /* */
-        }
-
-        // ESC is a master key for closing
-        if (allowESCtoClose && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && isOpened) {
-            setAsClose()
-        }
-
 
         //if (openFired && openCloseCounter > 9) openFired = false
         //if (closeFired && openCloseCounter > 9) closeFired = false

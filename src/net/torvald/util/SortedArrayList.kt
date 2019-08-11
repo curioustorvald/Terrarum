@@ -153,3 +153,12 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
      */
     fun toArrayList() = arrayList
 }
+
+fun <T: Comparable<T>> sortedArrayListOf(vararg elements: T): SortedArrayList<T> {
+    val a = SortedArrayList<T>(elements.size + 1)
+    ReentrantLock().lock {
+        a.arrayList.addAll(elements)
+        a.arrayList.sort()
+    }
+    return a
+}
