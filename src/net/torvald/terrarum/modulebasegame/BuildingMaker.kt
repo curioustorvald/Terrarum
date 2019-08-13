@@ -307,7 +307,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiPalette.setPosition(200, 100)
 
 
-        IngameRenderer.setWorld(gameWorld)
+        IngameRenderer.setRenderedWorld(gameWorld)
     }
 
     override fun show() {

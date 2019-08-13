@@ -189,7 +189,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             GameLoadMode.LOAD_FROM  -> enter(gameLoadInfoPayload as GameSaveData)
         }
 
-        IngameRenderer.setWorld(gameworld)
+        IngameRenderer.setRenderedWorld(gameworld)
 
 
         super.show() // gameInitialised = true
