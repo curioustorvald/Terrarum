@@ -27,6 +27,7 @@ import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
+import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
@@ -479,6 +480,12 @@ public class AppLoader implements ApplicationListener {
             environment = RunningEnvironment.PC;
         }*/
 
+
+        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
+                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
+        );
+        Lang.invoke();
+
         // make loading list
 
 
@@ -494,7 +501,6 @@ public class AppLoader implements ApplicationListener {
         }
 
         AppLoader.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getRawDeltaTime() * 1000_000_000f));
-        AppLoader.setDebugTime("GDX.smtDelta", (long) (Gdx.graphics.getDeltaTime() * 1000_000_000f));
 
 
         FrameBufferManager.begin(renderFBO);
@@ -505,26 +511,7 @@ public class AppLoader implements ApplicationListener {
         // because in normal operation, the only time screen == null is when the app is cold-launched
         // you can't have a text drawn here :v
         if (currenScreen == null) {
-            shaderBayerSkyboxFill.begin();
-            shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
-            shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
-            shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b);
-            shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b);
-            fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
-            shaderBayerSkyboxFill.end();
-
-            logoBatch.begin();
-            logoBatch.setColor(Color.WHITE);
-            //blendNormal();
-            logoBatch.setShader(null);
-
-
-            setCameraPosition(0f, 0f);
-            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
-                    (appConfig.height - logo.getRegionHeight()) / 2f
-            );
-            logoBatch.end();
-
+            drawSplash();
 
             loadTimer += Gdx.graphics.getRawDeltaTime();
 
@@ -576,6 +563,60 @@ public class AppLoader implements ApplicationListener {
         splashDisplayed = true;
         GLOBAL_RENDER_TIMER += 1;
 
+    }
+
+    private void drawSplash() {
+        shaderBayerSkyboxFill.begin();
+        shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
+        shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
+        shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b);
+        shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b);
+        fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
+        shaderBayerSkyboxFill.end();
+
+        logoBatch.begin();
+        logoBatch.setColor(Color.WHITE);
+        //blendNormal();
+        logoBatch.setShader(null);
+
+        setCameraPosition(0f, 0f);
+
+        if (getConfigBoolean("showhealthmessageonstartup")) {
+            int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
+            int logoPosX = (appConfig.width - logo.getRegionWidth() - safetyTextLen) >>> 1;
+            int logoPosY = Math.round(appConfig.height / 15f);
+
+
+            logoBatch.draw(logo, logoPosX, logoPosY);
+            logoBatch.setColor(new Color(0x666666FF));
+            fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"),
+                    logoPosX + logo.getRegionWidth(),
+                    logoPosY + (logo.getRegionHeight() >>> 1) - 16
+            );
+
+            // some chinese stuff
+            if (GAME_LOCALE.contentEquals("zhCN")) {
+                for (int i = 1; i <= 4; i++) {
+                    String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i);
+
+                    fontGame.draw(logoBatch, s,
+                            (appConfig.width - fontGame.getWidth(s)) >>> 1,
+                            Math.round(appConfig.height * 12f / 15f + fontGame.getLineHeight() * (i - 1))
+                    );
+                }
+            }
+            else {
+
+            }
+
+        }
+        else {
+            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
+                    (appConfig.height - logo.getRegionHeight()) / 2f
+            );
+        }
+
+        logoBatch.end();
     }
 
     @Override
@@ -717,9 +758,6 @@ public class AppLoader implements ApplicationListener {
         textureWhiteCircle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
-        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
-                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
-        );
         fontSmallNumbers = TinyAlphNum.INSTANCE;
 
         try {

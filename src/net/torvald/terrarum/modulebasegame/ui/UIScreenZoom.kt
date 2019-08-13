@@ -10,6 +10,8 @@ import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
 
 /**
+ * Screen zooms in when the UI is opened; zooms out when being closed.
+ *
  * Created by minjaesong on 2019-08-11.
  */
 class UIScreenZoom : UICanvas(

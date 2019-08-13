@@ -21,12 +21,13 @@ object DefaultConfig {
         jsonObject.addProperty("screenheight", AppLoader.defaultH)
 
 
-        jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
+        //jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
         jsonObject.addProperty("language", AppLoader.getSysLang())
         jsonObject.addProperty("notificationshowuptime", 4000)
         jsonObject.addProperty("multithread", true) // experimental!
         jsonObject.addProperty("multithreadedlight", false) // experimental!
 
+        jsonObject.addProperty("showhealthmessageonstartup", true)
 
 
         // control-gamepad

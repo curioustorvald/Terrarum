@@ -1,3 +1,11 @@
 {
+  "COPYRIGHT_ALL_RIGHTS_RESERVED": "版权所有",
+  "COPYRIGHT_GNU_GPL_3": "分布在GNU GPL 3下",
+  "APP_WARNING_HEALTH_AND_SAFETY": "健康游戏忠告",
+  "APP_CHINESE_HEALTHY_GAME_MSG_1": "抵制不良游戏　拒绝盗版游戏",
+  "APP_CHINESE_HEALTHY_GAME_MSG_2": "注意自我保护　谨防受骗上当",
+  "APP_CHINESE_HEALTHY_GAME_MSG_3": "适度游戏益脑　过度游戏伤身",
+  "APP_CHINESE_HEALTHY_GAME_MSG_4": "合理安排时间　享受健康生活",
+  "MENU_LABEL_PRESS_START_SYMBOL": "按下 >",
   "MENU_MODULES" : "模块"
 }
