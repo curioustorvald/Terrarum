@@ -43,6 +43,8 @@ object Lang {
         load("./assets/locales/")
     }
 
+    @JvmStatic operator fun invoke() { /* dummy method for manual initialisation */ }
+
     fun load(localesDir: String) {
         printdbg(this, "Loading languages from $localesDir")
 
