@@ -123,8 +123,6 @@ object LightmapRenderer {
     internal var for_draw_y_start = 0
     internal var for_draw_x_end = 0
     internal var for_draw_y_end = 0
-    //internal var for_x = 0
-    //internal var for_y = 0
 
     /**
      * @param x world coord
@@ -183,18 +181,13 @@ object LightmapRenderer {
         for_draw_x_start = WorldCamera.x / TILE_SIZE
         for_draw_y_start = WorldCamera.y / TILE_SIZE
 
-        if (for_x_start < 0) for_x_start -= 1 // to fix that the light shifts 1 tile to the left when WorldCamera < 0
-        //if (for_y_start < 0) for_y_start -= 1 // not needed when we only wrap at x axis
-
-        if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_x_start -= 1 // another edge-case fix
+        if (WorldCamera.x < 0) for_draw_x_start -= 1 // edge case fix that light shift 1 tile to the left when WorldCamera.x < 0
+        //if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_draw_x_start -= 1 // another edge-case fix; we don't need this anymore?
 
         for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 3 // same fix as above
         for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3
         for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3
-
-        //for_x = for_x_start + (for_x_end - for_x_start) / 2
-        //for_y = for_y_start + (for_y_end - for_y_start) / 2
 
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
