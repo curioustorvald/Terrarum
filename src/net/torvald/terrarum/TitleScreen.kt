@@ -152,7 +152,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         demoWorld.worldTime.timeDelta = 150
 
 
-        IngameRenderer.setWorld(demoWorld)
+        IngameRenderer.setRenderedWorld(demoWorld)
 
 
         uiMenu = UIRemoCon(UITitleRemoConYaml())//UITitleRemoConRoot()

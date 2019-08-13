@@ -157,7 +157,7 @@ object IngameRenderer : Disposable {
      * - When the main scene that renders the world is first created
      * - When the game make transition to the new world (advancing to the next level/entering or exiting the room)
      */
-    fun setWorld(world: GameWorld) {
+    fun setRenderedWorld(world: GameWorld) {
             try {
                 if (this.world != world) {
                     printdbg(this, "World change detected -- " +
