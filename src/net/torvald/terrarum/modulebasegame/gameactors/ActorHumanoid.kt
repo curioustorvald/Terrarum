@@ -5,6 +5,7 @@ import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitem.GameItem
@@ -133,7 +134,21 @@ open class ActorHumanoid(
     private var readonly_totalY = 0.0
 
     internal var jumping = false
-    internal var airJumpingAllowed = false
+
+    /** Make air-jumping (sometimes referred as "double jumping) work
+     * Valid values: 0 or 2; 1 is same as 0, and because of the "failed" implementation, any value greater than
+     * 2 will allow tremendous jump height if you control it right, so it's not recommended to use those values.
+     */
+    internal var airJumpingPoint: Int
+        get() = actorValue.getAsInt(AVKey.AIRJUMPPOINT) ?: 0
+        set(value) {
+            actorValue[AVKey.AIRJUMPPOINT] = value
+        }
+    internal var airJumpingCount: Int
+        get() = actorValue.getAsInt(AVKey.AIRJUMPCOUNT) ?: 0
+        set(value) {
+            actorValue[AVKey.AIRJUMPCOUNT] = value
+        }
 
     internal var walkHeading: Int = 0
 
@@ -243,7 +258,9 @@ open class ActorHumanoid(
     private inline val hasController: Boolean
         get() = if (isGamer) AppLoader.gamepad != null
                 else true
-    
+
+    private var playerJumpKeyHeldDown = false
+
     private fun processInput(delta: Float) {
 
         // Good control is simple: it move as the player meant: if I push the stick forward, it goes forward, rather than
@@ -334,20 +351,38 @@ open class ActorHumanoid(
          */
         if (isJumpDown) {
             if (!isNoClip) {
-                if (airJumpingAllowed ||
-                    (!airJumpingAllowed && walledBottom)) {
+                if (!playerJumpKeyHeldDown && (walledBottom || airJumpingCount < airJumpingPoint)) {
                     jumping = true
+
+                    // make airjumping work
+                    if (airJumpingCount < airJumpingPoint) {
+                        printdbg(this, "airjump!")
+                        // reset jumping-related variables
+                        jumpCounter = 0
+                        airJumpingCount += 1
+                        // also reset the velocity because otherwise the jump is not truly reset
+                        jumpAcc = 0.0
+                        //controllerV?.y = 0.0
+                    }
                 }
                 jump()
             }
             else {
                 walkVertical(true, AXIS_KEYBOARD)
             }
+
+            playerJumpKeyHeldDown = true
         }
         else {
             jumping = false
             jumpCounter = 0
             jumpAcc = 0.0
+            playerJumpKeyHeldDown = false
+
+            // reset airjump counter
+            if (walledBottom) {
+                airJumpingCount = 0
+            }
         }
 
     }
@@ -565,8 +600,12 @@ open class ActorHumanoid(
             grounded = false // just in case...
         }*/
 
-        // release "jump key" of AIs
-        if (jumpCounter >= MAX_JUMP_LENGTH && !isGamer) {
+        // release "jump key" (of AIs?)
+        if (jumpCounter >= MAX_JUMP_LENGTH) {
+            if (isGamer) {
+                playerJumpKeyHeldDown = false
+            }
+
             isJumpDown = false
             jumping = false
             jumpCounter = 0

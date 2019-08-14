@@ -29,6 +29,15 @@ object AVKey {
     const val JUMPPOWER = "jumppower"
     const val JUMPPOWERBUFF = "$JUMPPOWER$BUFF"
 
+    /** How much air jumping you can perform. INT */
+    const val AIRJUMPPOINT = "airjumppoint"
+    /** How much air jumping you have performed before you run out of the point. INT */
+    const val AIRJUMPCOUNT = "_airjumpcount"
+    /** How long you can fly. DOUBLE */
+    const val FLIGHTPOINT = "flightpoint"
+    /** How long you have been flying before you reach your maximum flight time */
+    const val FLIGHTTIMER = "_flighttimer"
+
     /** NOT meant for living creatures. Also, only effective when noclip=true. E.g. camera actor */
     const val FRICTIONMULT = "frictionmult"
 
