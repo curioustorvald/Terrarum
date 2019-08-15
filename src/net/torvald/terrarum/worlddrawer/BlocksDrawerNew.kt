@@ -50,6 +50,7 @@ internal object BlocksDrawer {
     val tileItemTerrain: TextureRegionPack
     val tileItemWall: TextureRegionPack
     val tilesFluid: TextureRegionPack
+    val tilesGlow: TextureRegionPack
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
@@ -124,6 +125,7 @@ internal object BlocksDrawer {
         //TODO make wire work with the TileAtlas system
         tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "blocks/wire.tga"), TILE_SIZE, TILE_SIZE)
         tilesFluid = TextureRegionPack(Texture(CreateTileAtlas.atlasFluid), TILE_SIZE, TILE_SIZE)
+        tilesGlow = TextureRegionPack(Texture(CreateTileAtlas.atlasGlow), TILE_SIZE, TILE_SIZE)
 
 
         printdbg(this, "Making terrain and wall item textures...")
@@ -205,17 +207,17 @@ internal object BlocksDrawer {
         drawTiles(FLUID)
     }
 
-    internal fun drawWall(projectionMatrix: Matrix4) {
+    internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean) {
         gdxSetBlendNormal()
 
-        renderUsingBuffer(WALL, projectionMatrix)
+        renderUsingBuffer(WALL, projectionMatrix, drawGlow)
     }
 
-    internal fun drawTerrain(projectionMatrix: Matrix4) {
+    internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean) {
         gdxSetBlendNormal()
 
-        renderUsingBuffer(TERRAIN, projectionMatrix)
-        renderUsingBuffer(FLUID, projectionMatrix)
+        renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow)
+        renderUsingBuffer(FLUID, projectionMatrix, drawGlow)
     }
 
     var drawWires = 0
@@ -228,7 +230,7 @@ internal object BlocksDrawer {
         Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         // let's just not MUL on terrain, make it FLUID only...
-        renderUsingBuffer(FLUID, projectionMatrix)
+        renderUsingBuffer(FLUID, projectionMatrix, false)
 
 
 
@@ -237,7 +239,7 @@ internal object BlocksDrawer {
         this.drawWires = drawWires
         if (drawWires != 0) {
             //println("Wires! draw: $drawWires") // use F10 instead
-            renderUsingBuffer(WIRE, projectionMatrix)
+            renderUsingBuffer(WIRE, projectionMatrix, false)
         }
     }
 
@@ -570,7 +572,7 @@ internal object BlocksDrawer {
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
-    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4) {
+    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -613,9 +615,17 @@ internal object BlocksDrawer {
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex = Texture(tilesBuffer)
         _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        tilesTerrainBlend.texture.bind(2)
-        _tilesBufferAsTex.bind(1) // trying 1 and 0...
-        tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
+
+        if (drawGlow) {
+            tilesGlow.texture.bind(2)
+            _tilesBufferAsTex.bind(1) // trying 1 and 0...
+            tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
+        }
+        else {
+            tilesTerrainBlend.texture.bind(2)
+            _tilesBufferAsTex.bind(1) // trying 1 and 0...
+            tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
+        }
 
         shader.begin()
         shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
@@ -727,6 +737,7 @@ internal object BlocksDrawer {
         printStackTrace(this)
 
         weatherTerrains.forEach { it.dispose() }
+        tilesGlow.dispose()
         tilesWire.dispose()
         tileItemTerrain.dispose()
         tileItemWall.dispose()

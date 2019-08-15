@@ -403,7 +403,7 @@ object IngameRenderer : Disposable {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawWall(batch.projectionMatrix)
+            BlocksDrawer.drawWall(batch.projectionMatrix, false)
 
             batch.inUse {
                 moveCameraToWorldCoord()
@@ -412,7 +412,7 @@ object IngameRenderer : Disposable {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawTerrain(batch.projectionMatrix)
+            BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
 
             batch.inUse {
                 /////////////////
@@ -515,7 +515,7 @@ object IngameRenderer : Disposable {
             }
 
             setCameraPosition(0f, 0f)
-            // BlocksDrawer.renderWhateverGlow_WALL
+            BlocksDrawer.drawWall(batch.projectionMatrix, true)
 
             batch.inUse {
                 moveCameraToWorldCoord()
@@ -524,7 +524,7 @@ object IngameRenderer : Disposable {
             }
 
             setCameraPosition(0f, 0f)
-            // BlocksDrawer.renderWhateverGlow_TERRAIN
+            BlocksDrawer.drawTerrain(batch.projectionMatrix, true)
 
             batch.inUse {
                 /////////////////
