@@ -54,8 +54,8 @@ import static net.torvald.terrarum.TerrarumKt.printStackTrace;
  */
 public class AppLoader implements ApplicationListener {
 
-    public static final String GAME_NAME = "Terrarum";
-    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
+    public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
+    public static final String COPYRIGHT_DATE_NAME = TerrarumAppConfiguration.COPYRIGHT_DATE_NAME;
 
     // is this jvm good?
     static {
@@ -65,22 +65,7 @@ public class AppLoader implements ApplicationListener {
         }
     }
 
-    /**
-     * <p>
-     * Version numbering that follows Semantic Versioning 2.0.0 (https://semver.org/)
-     * </p>
-     *
-     * <p>
-     * 0xAA_BB_XXXX, where:
-     * </p>
-     * <li>AA: Major version</li>
-     * <li>BB: Minor version</li>
-     * <li>XXXX: Patch version</li>
-     * <p>
-     * e.g. 0x02010034 will be translated as 2.1.52
-     * </p>
-     */
-    public static final int VERSION_RAW = 0x00_02_0590;
+    public static final int VERSION_RAW = TerrarumAppConfiguration.VERSION_RAW;
 
     public static final String getVERSION_STRING() {
         return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);

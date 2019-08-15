@@ -6,13 +6,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.GdxColorMap
-import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.mulAndAssign
-import net.torvald.terrarum.toInt
 import kotlin.math.roundToInt
 
 /**
@@ -27,8 +24,8 @@ import kotlin.math.roundToInt
  */
 object CreateTileAtlas {
 
-    const val MAX_TEX_SIZE = 4096
-    const val TILE_SIZE = 16
+    const val MAX_TEX_SIZE = TerrarumAppConfiguration.MAX_TEX_SIZE
+    const val TILE_SIZE = TerrarumAppConfiguration.TILE_SIZE
     const val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
 
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
@@ -38,6 +35,7 @@ object CreateTileAtlas {
     lateinit var atlasWinter: Pixmap
     lateinit var atlasSpring: Pixmap
     lateinit var atlasFluid: Pixmap
+    lateinit var atlasGlow: Pixmap // glowing won't be affected by the season... for now
     lateinit var itemTerrainTexture: Texture
     lateinit var itemWallTexture: Texture
     lateinit var terrainTileColourMap: GdxColorMap
@@ -49,12 +47,14 @@ object CreateTileAtlas {
 
     /** 0000.tga, 1.tga.gz, 3242423.tga, 000033.tga.gz */
     // for right now, TGA file only, no gzip
-    private val validTerrainTilesFilename = Regex("""[0-9]+\.tga""")//Regex("""[0-9]+\.tga(.gz)?""")
     private val validFluidTilesFilename = Regex("""fluid_[0-9]+\.tga""")
+    private val tileNameRegex = Regex("""[0-9]+\.tga""")
+    private val tileGlowNameRegex = Regex("""[0-9]+_glow\.tga""")
 
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
     private var atlasCursor = 0
+    private var atlasCursorGlow = 0
     private val atlasInit = "./assets/graphics/blocks/init.tga"
 
     /**
@@ -70,15 +70,17 @@ object CreateTileAtlas {
         atlasWinter = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        atlasGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         atlas.blending = Pixmap.Blending.None
         atlasAutumn.blending = Pixmap.Blending.None
         atlasWinter.blending = Pixmap.Blending.None
         atlasSpring.blending = Pixmap.Blending.None
         atlasFluid.blending = Pixmap.Blending.None
+        atlasGlow.blending = Pixmap.Blending.None
 
         val initMap = Pixmap(Gdx.files.internal(atlasInit))
-        drawToAtlantes(initMap, 16)
+        drawToAtlantes(initMap, nullTile, 16)
         initMap.dispose()
 
 
@@ -91,19 +93,29 @@ object CreateTileAtlas {
             }
 
             it.list().forEach { tgaFile ->
-                if (!tgaFile.isDirectory) tgaList.add(tgaFile)
+                if (!tgaFile.isDirectory && (tgaFile.name().matches(tileNameRegex))) {
+                    tgaList.add(tgaFile)
+                }
             }
         }
 
         // Sift through the file list for blocks, but TGA format first
-        tgaList.filter { it.name().matches(validTerrainTilesFilename) && it.extension().toUpperCase() == "TGA" }.forEach {
+        tgaList.forEach {
             try {
-                fileToAtlantes(it)
+                val glowFile = Gdx.files.internal(it.path().dropLast(4) + "_glow.tga") // assuming strict ".tga" file
+                fileToAtlantes(it, if (glowFile.exists()) glowFile else null)
             }
             catch (e: GdxRuntimeException) {
                 System.err.println("Couldn't load file $it, skipping...")
             }
         }
+
+
+        // test print
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), atlas, false)
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
+
+
 
         // Sift throuth the file list, second TGA.GZ
         /*tgaList.filter { it.name().toUpperCase().endsWith(".TGA.GZ") }.forEach {
@@ -259,25 +271,28 @@ object CreateTileAtlas {
             16 + (376 * (fluid.type.abs() - 1)) + (47 * (fluidLevel - 1))
     }
 
-    private fun fileToAtlantes(it: FileHandle) {
-        val tilesPixmap = Pixmap(it)
-        val blockID = it.nameWithoutExtension().toInt()
+    private val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
+
+    private fun fileToAtlantes(matte: FileHandle, glow: FileHandle?) {
+        val tilesPixmap = Pixmap(matte)
+        val tilesGlowPixmap = if (glow != null) Pixmap(glow) else nullTile
+        val blockID = matte.nameWithoutExtension().toInt()
 
         // determine the type of the block (populate tags list)
         // predefined by the image dimension: 16x16 for (1,0)
         if (tilesPixmap.width == TILE_SIZE && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_SELF, RenderTag.MASK_NA)
-            drawToAtlantes(tilesPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_NA))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_NA))
         }
         // predefined by the image dimension: 64x16 for (2,3)
         else if (tilesPixmap.width == TILE_SIZE * 4 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_WALL_STICKER, RenderTag.MASK_TORCH)
-            drawToAtlantes(tilesPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_TORCH))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_TORCH))
         }
         // predefined by the image dimension: 128x16 for (3,4)
         else if (tilesPixmap.width == TILE_SIZE * 8 && tilesPixmap.height == TILE_SIZE) {
             addTag(blockID, RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF, RenderTag.MASK_PLATFORM)
-            drawToAtlantes(tilesPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_PLATFORM))
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, RenderTag.maskTypeToTileCount(RenderTag.MASK_PLATFORM))
         }
         // 112x112 or 224x224
         else {
@@ -298,7 +313,8 @@ object CreateTileAtlas {
             }
 
             addTag(blockID, connectionType, maskType)
-            drawToAtlantes(tilesPixmap, RenderTag.maskTypeToTileCount(maskType))
+            val tileCount = RenderTag.maskTypeToTileCount(maskType)
+            drawToAtlantes(tilesPixmap, tilesGlowPixmap, tileCount)
         }
 
         tilesPixmap.dispose()
@@ -316,13 +332,14 @@ object CreateTileAtlas {
         tags[id] = RenderTag(atlasCursor, connectionType, maskType)
     }
 
-    private fun drawToAtlantes(pixmap: Pixmap, tilesCount: Int) {
+    private fun drawToAtlantes(pixmap: Pixmap, glow: Pixmap, tilesCount: Int) {
         if (atlasCursor >= TOTAL_TILES) {
             throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
         }
 
         val seasonal = pixmap.width == pixmap.height && pixmap.width == 14 * TILE_SIZE
         val txOfPixmap = pixmap.width / TILE_SIZE
+        val txOfPixmapGlow = glow.width / TILE_SIZE
         for (i in 0 until tilesCount) {
             //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
 
@@ -333,11 +350,13 @@ object CreateTileAtlas {
                 _drawToAtlantes(pixmap, atlasCursor, i % 7 + 7, i / 7, 2)
                 _drawToAtlantes(pixmap, atlasCursor, i % 7 + 7, i / 7 + 7, 3)
                 _drawToAtlantes(pixmap, atlasCursor, i % 7, i / 7 + 7, 4)
+                _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, 6)
                 atlasCursor += 1
             }
             else {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
                 _drawToAtlantes(pixmap, atlasCursor, i % txOfPixmap, i / txOfPixmap, 0)
+                _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, 6)
                 atlasCursor += 1
             }
         }
@@ -367,6 +386,7 @@ object CreateTileAtlas {
                 3 -> atlasWinter.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 4 -> atlasSpring.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 5 -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                6 -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
             }
         }
     }
@@ -401,5 +421,8 @@ object CreateTileAtlas {
         atlasWinter.dispose()
         atlasSpring.dispose()
         atlasFluid.dispose()
+        atlasGlow.dispose()
+
+        nullTile.dispose()
     }
 }
