@@ -257,7 +257,6 @@ public class AppLoader implements ApplicationListener {
 
     private static FrameBuffer renderFBO;
 
-    public static CommonResourcePool resourcePool;
     public static HashSet<File> tempFilePool = new HashSet<>();
     public static HashSet<Disposable> disposableSingletonsPool = new HashSet<>();
 
@@ -363,8 +362,7 @@ public class AppLoader implements ApplicationListener {
         }
 
 
-        resourcePool = CommonResourcePool.INSTANCE;
-        resourcePool.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
 
         newTempFile("wenquanyi.tga"); // temp file required by the font
 
@@ -381,6 +379,9 @@ public class AppLoader implements ApplicationListener {
         // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
         logo.flip(false, true);
+
+        CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
+        CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
         // set GL graphics constants
         shaderBayerSkyboxFill = loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
@@ -474,6 +475,7 @@ public class AppLoader implements ApplicationListener {
         // make loading list
 
 
+        CommonResourcePool.INSTANCE.loadAll();
     }
 
     @Override
@@ -570,13 +572,13 @@ public class AppLoader implements ApplicationListener {
             int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
             int logoPosX = (appConfig.width - logo.getRegionWidth() - safetyTextLen) >>> 1;
             int logoPosY = Math.round(appConfig.height / 15f);
-
+            int textY = logoPosY + (logo.getRegionHeight() >>> 1) - 16;
 
             logoBatch.draw(logo, logoPosX, logoPosY);
-            logoBatch.setColor(new Color(0x666666FF));
+            logoBatch.setColor(new Color(0x666666ff));
             fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"),
                     logoPosX + logo.getRegionWidth(),
-                    logoPosY + (logo.getRegionHeight() >>> 1) - 16
+                    textY
             );
 
             // some chinese stuff
@@ -590,10 +592,14 @@ public class AppLoader implements ApplicationListener {
                     );
                 }
             }
-            else {
 
-            }
-
+            logoBatch.setColor(new Color(0x282828ff));
+            Texture tex1 = CommonResourcePool.INSTANCE.getAsTexture("title_health1");
+            Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
+            int virtualHeight = appConfig.height - logoPosY - logo.getRegionHeight() / 4;
+            int virtualHeightOffset = appConfig.height - virtualHeight;
+            logoBatch.draw(tex1, (appConfig.width - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
+            logoBatch.draw(tex2, (appConfig.width - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
         }
         else {
             logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
@@ -669,7 +675,7 @@ public class AppLoader implements ApplicationListener {
         shaderPassthruRGB.dispose();
         shaderColLUT.dispose();
 
-        resourcePool.dispose();
+        CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
         logoBatch.dispose();
 
@@ -1101,7 +1107,8 @@ public class AppLoader implements ApplicationListener {
 
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
-            System.out.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
+            String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+            System.out.println("[" + out + "] " + message.toString());
         }
     }
 
