@@ -2,7 +2,6 @@ package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.util.sortedArrayListOf
 import java.util.*
 
@@ -36,9 +35,6 @@ object KeyToggler {
     fun update(toggleGameKeys: Boolean) {
         for (it in 0..255) {
             if (!toggleGameKeys && gameKeys.contains(it)) {
-                if (Gdx.input.isKeyPressed(it))
-                    printdbg(this, "Disallowed key: $it")
-
                 continue
             }
 

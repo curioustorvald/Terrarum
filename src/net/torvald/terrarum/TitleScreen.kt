@@ -193,7 +193,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private var introUncoverDeltaCounter = 0f
     private var updateAkku = 0.0
 
+    private var fucklatch = false
+
     override fun render(updateRate: Float) {
+        if (!fucklatch) {
+            printdbg(this, "render start")
+            fucklatch = true
+        }
+
         // async update and render
 
         val dt = Gdx.graphics.rawDeltaTime
