@@ -307,7 +307,7 @@ class UIItemInventoryDynamicList(
 
 
             // set tooltip accordingly
-            if (isCompactMode && it.mouseUp && !tooltipSet) {
+            if (isCompactMode && it.item != null && it.mouseUp && !tooltipSet) {
                 (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(
                         if (AppLoader.IS_DEVELOPMENT_BUILD) {
                             it.item?.name + "/Mat: ${it.item?.material?.identifier}"

@@ -41,13 +41,16 @@ class UIInventoryFull(
     override var width: Int = AppLoader.screenW
     override var height: Int = AppLoader.screenH
 
+    private val REQUIRED_MARGIN = 166 // hard-coded value. Don't know the details
+
     private val CELLS_HOR = 10
-    private val CELLS_VRT = 8
+    private val CELLS_VRT = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryDynamicList.listGap) / // 134 is another magic number
+                            (UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap)
 
     private val itemListToEquipViewGap = UIItemInventoryDynamicList.listGap // used to be 24; figured out that the extra gap does nothig
 
     val internalWidth: Int = UIItemInventoryDynamicList.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
-    val internalHeight: Int = 166 + UIItemInventoryDynamicList.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
+    val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryDynamicList.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
 
     init {
         handler.allowESCtoClose = true
@@ -243,7 +246,7 @@ class UIInventoryFull(
     private val shapeRenderer = ShapeRenderer()
     private val gradHeight = 48f
 
-    private val weightBarWidth = 64f
+    private val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryDynamicList.listGap
 
     private var xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
     private var yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
@@ -485,18 +488,28 @@ class UIInventoryFull(
 
 
         // control hints
+        val controlHintXPos = offsetX + inventoryScrOffX
         blendNormal(batch)
         batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, listControlHelp, offsetX + inventoryScrOffX, yEnd - 20)
+        AppLoader.fontGame.draw(batch, listControlHelp, controlHintXPos, yEnd - 20)
 
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+        // encumbrance bar will go one row down if control help message is too long
+        val encumbBarXPos = xEnd - weightBarWidth + inventoryScrOffX
+        val encumbBarTextXPos = encumbBarXPos - 6 - AppLoader.fontGame.getWidth(encumbranceText)
+        val encumbBarYPos = yEnd-20 + 3f +
+                            if (AppLoader.fontGame.getWidth(listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
+                                AppLoader.fontGame.lineHeight
+                            else 0f
+
+        printdbg(this, "${AppLoader.fontGame.getWidth(listControlHelp) + 2 + controlHintXPos}; ${encumbBarTextXPos}")
 
         AppLoader.fontGame.draw(batch,
                 encumbranceText,
-                xEnd - 6 - AppLoader.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
-                yEnd-20
+                encumbBarTextXPos,
+                encumbBarYPos - 3f
         )
 
         // encumbrance bar background
@@ -505,16 +518,13 @@ class UIInventoryFull(
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
         batch.color = encumbBack
         batch.fillRect(
-                xEnd - weightBarWidth + inventoryScrOffX,
-                yEnd-20 + 3f,
-                weightBarWidth,
-                controlHelpHeight - 6f
+                encumbBarXPos, encumbBarYPos,
+                weightBarWidth, controlHelpHeight - 6f
         )
         // encumbrance bar
         batch.color = encumbCol
         batch.fillRect(
-                xEnd - weightBarWidth + inventoryScrOffX,
-                yEnd-20 + 3f,
+                encumbBarXPos, encumbBarYPos,
                 if (actor.inventory.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
                     1f
                 else // make sure 1px is always be seen
@@ -526,8 +536,8 @@ class UIInventoryFull(
         if (IS_DEVELOPMENT_BUILD) {
             AppLoader.fontSmallNumbers.draw(batch,
                     "${actor.inventory.capacity}/${actor.inventory.maxCapacity}",
-                    xEnd - 6 - AppLoader.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
-                    yEnd-20 + 3f + controlHelpHeight - 4f
+                    encumbBarTextXPos,
+                    encumbBarYPos + controlHelpHeight - 4f
             )
         }
     }
