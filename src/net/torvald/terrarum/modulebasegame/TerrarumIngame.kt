@@ -137,14 +137,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
 
-    // UI aliases
-    lateinit var uiAliases: ArrayList<UICanvas>
-        private set
-    lateinit var uiAliasesPausing: ArrayList<UICanvas>
-        private set
-
-    //var paused: Boolean = false
-        //get() = uiAliasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmpty is always false, which we want
 
     var particlesActive = 0
         private set
@@ -361,7 +353,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // batch-process uiAliases
-        uiAliases = arrayListOf(
+        // NOTE: UIs that should pause the game (e.g. Inventory) must have relevant codes ON THEIR SIDE
+        arrayListOf(
                 // drawn first
                 //uiVitalPrimary,
                 //uiVitalSecondary,
@@ -372,19 +365,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 uiBasicInfo,
                 uiWatchTierOne,
                 UIScreenZoom(),
-                uiTooltip
-                // drawn last
-        )
-        uiAliasesPausing = arrayListOf(
                 uiInventoryPlayer,
                 //uiInventoryContainer,
+                uiTooltip,
                 consoleHandler,
                 uiCheatMotherfuckerNootNoot
-        )
-        // UIFixture is handled "dirtily" (calling directly from the render/update code) because it's dynamic
-        // Therefore, console window will be drawn behind of the thing
-        uiAliases.forEach { addUI(it) } // put them all to the UIContainer
-        uiAliasesPausing.forEach { addUI(it) } // put them all to the UIContainer
+                // drawn last
+        ).forEach { addUI(it) }
 
 
 
