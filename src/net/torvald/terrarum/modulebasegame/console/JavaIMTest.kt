@@ -25,7 +25,7 @@ internal object JavaIMTest : ConsoleCommand {
                 Echo("[TextInputText] (input canceled)")
             }
         }
-        Gdx.input.getTextInput(inputListener, "TextInputTest", "Testing the text input", "type anything!")
+        Gdx.input.getTextInput(inputListener, "TextInputTest", "", "type anything!")
     }
 
     override fun printUsage() {

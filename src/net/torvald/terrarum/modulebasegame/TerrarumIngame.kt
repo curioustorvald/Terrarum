@@ -381,8 +381,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 consoleHandler,
                 uiCheatMotherfuckerNootNoot
         )
-        uiAliasesPausing.forEach { addUI(it) } // put them all to the UIContainer
+        // UIFixture is handled "dirtily" (calling directly from the render/update code) because it's dynamic
+        // Therefore, console window will be drawn behind of the thing
         uiAliases.forEach { addUI(it) } // put them all to the UIContainer
+        uiAliasesPausing.forEach { addUI(it) } // put them all to the UIContainer
 
 
 

@@ -1114,12 +1114,14 @@ public class AppLoader implements ApplicationListener {
 
     public static void printdbgerr(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
-            System.err.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
+            String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+            System.err.println("[" + out + "] " + message.toString());
         }
     }
 
     public static void printmsg(Object obj, Object message) {
-        System.out.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
+        String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+        System.out.println("[" + out + "] " + message.toString());
     }
 
     public static ShaderProgram loadShader(String vert, String frag) {
