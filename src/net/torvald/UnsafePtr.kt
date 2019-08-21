@@ -40,6 +40,8 @@ object UnsafeHelper {
  * All the getFloat/Int/whatever methods will follow the endianness of your system,
  * e.g. it'll be Little Endian on x86, Big Endian on PPC, User-defined on ARM; therefore these functions should not be
  * used when the portability matters (e.g. Savefile). In such situations, do byte-wise operations will be needed.
+ *
+ * Use of hashCode() is forbidden, use the pointer instead.
  */
 class UnsafePtr(pointer: Long, allocSize: Long) {
     var destroyed = false
@@ -53,6 +55,7 @@ class UnsafePtr(pointer: Long, allocSize: Long) {
 
     fun realloc(newSize: Long) {
         ptr = UnsafeHelper.unsafe.reallocateMemory(ptr, newSize)
+        size = newSize
     }
 
     fun destroy() {
@@ -111,5 +114,5 @@ class UnsafePtr(pointer: Long, allocSize: Long) {
     }
 
     override fun toString() = "0x${ptr.toString(16)} with size $size"
-    override fun equals(other: Any?) = this.ptr == (other as UnsafePtr).ptr
+    override fun equals(other: Any?) = this.ptr == (other as UnsafePtr).ptr && this.size == other.size
 }
