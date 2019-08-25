@@ -243,11 +243,11 @@ object AccidentalCave : NoiseMaker {
 
         val lowlandScale = ModuleScaleOffset()
         lowlandScale.setScale(0.125)
-        lowlandScale.setOffset(-0.45)
+        lowlandScale.setOffset(-0.65) // TODO linearly alters the height
 
         val lowlandYScale = ModuleScaleDomain()
         lowlandYScale.setSource(lowlandScale)
-        lowlandYScale.setScaleY(0.0)
+        lowlandYScale.setScaleY(0.02) // greater = more distortion, overhangs
 
         val lowlandTerrain = ModuleTranslateDomain()
         lowlandTerrain.setSource(groundGradient)
@@ -271,11 +271,11 @@ object AccidentalCave : NoiseMaker {
         val highlandScale = ModuleScaleOffset()
         highlandScale.setSource(highlandAutocorrect)
         highlandScale.setScale(0.25)
-        highlandScale.setOffset(0.0)
+        highlandScale.setOffset(-0.2) // TODO linearly alters the height
 
         val highlandYScale = ModuleScaleDomain()
         highlandYScale.setSource(highlandScale)
-        highlandYScale.setScaleY(0.0)
+        highlandYScale.setScaleY(0.2) // greater = more distortion, overhangs
 
         val highlandTerrain = ModuleTranslateDomain()
         highlandTerrain.setSource(groundGradient)
@@ -298,11 +298,11 @@ object AccidentalCave : NoiseMaker {
         val mountainScale = ModuleScaleOffset()
         mountainScale.setSource(mountainAutocorrect)
         mountainScale.setScale(0.45)
-        mountainScale.setOffset(0.15)
+        mountainScale.setOffset(-0.1) // TODO linearly alters the height
 
         val mountainYScale = ModuleScaleDomain()
         mountainYScale.setSource(mountainScale)
-        mountainYScale.setScaleY(0.25)
+        mountainYScale.setScaleY(0.74) // greater = more distortion, overhangs
 
         val mountainTerrain = ModuleTranslateDomain()
         mountainTerrain.setSource(groundGradient)
