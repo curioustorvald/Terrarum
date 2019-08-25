@@ -2,8 +2,10 @@ package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -12,13 +14,15 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.concurrent.ThreadParallel
+import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.inUse
 import kotlin.math.cos
 import kotlin.math.sin
 
 const val WIDTH = 1536
-const val HEIGHT = 512
+const val HEIGHT = 1024
 const val TWO_PI = Math.PI * 2
 
 /**
@@ -35,7 +39,10 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private lateinit var joise: Joise
 
     private val RNG = HQRNG()
-    private val seed = 10000L //RNG.nextLong()
+    private var seed = 10000L
+
+    private var generationDone = false
+    private var generateKeyLatched = false
 
     override fun create() {
         batch = SpriteBatch()
@@ -46,44 +53,72 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         Gdx.gl20.glViewport(0, 0, WIDTH, HEIGHT)
 
         testTex = Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888)
+        testTex.blending = Pixmap.Blending.None
         tempTex = Texture(1, 1, Pixmap.Format.RGBA8888)
-
-        joise = generateNoise()
-        renderNoise()
 
         println("Init done")
     }
 
     override fun render() {
+        if (!generationDone) {
+            joise = getNoiseGenerator(seed)
+            renderNoise()
+        }
+
         // draw using pixmap
         batch.inUse {
             tempTex.dispose()
             tempTex = Texture(testTex)
             batch.draw(tempTex, 0f, 0f)
         }
+
+        // read key input
+        if (!generateKeyLatched && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            generateKeyLatched = true
+            seed = RNG.nextLong()
+            joise = getNoiseGenerator(seed)
+            renderNoise()
+        }
+
+        // check if generation is done
+        if (ThreadParallel.allFinished()) {
+            generateKeyLatched = false
+        }
     }
 
     private val NOISE_MAKER = AccidentalCave
 
-    private fun generateNoise(): Joise {
-        return NOISE_MAKER.generate(seed)
+    private fun getNoiseGenerator(SEED: Long): Joise {
+        return NOISE_MAKER.getGenerator(SEED)
     }
 
-    private fun renderNoise() {
-        // render noisemap to pixmap
-        for (y in 0 until HEIGHT) {
-            for (x in 0 until WIDTH) {
-                val sampleDensity = NOISE_MAKER.sampleDensity
-                val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                val sampleOffset = (WIDTH / sampleDensity) / 8.0
-                val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                val sampleY = y / sampleDensity
-                val noise = joise.get(sampleX, sampleY, sampleZ)
+    val colourNull = Color(0x1b3281ff)
 
-                NOISE_MAKER.draw(x, y, noise, testTex)
+    private fun renderNoise() {
+        // erase first
+        testTex.setColor(colourNull)
+        testTex.fill()
+
+        // render noisemap to pixmap
+        (0 until WIDTH).mapToThreadPoolDirectly("NoiseGen") { range ->
+            for (y in 0 until HEIGHT) {
+                for (x in range) {
+                    val sampleDensity = NOISE_MAKER.sampleDensity
+                    val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                    val sampleOffset = (WIDTH / sampleDensity) / 8.0
+                    val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                    val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                    val sampleY = y / sampleDensity
+                    val noise = joise.get(sampleX, sampleY, sampleZ)
+
+                    NOISE_MAKER.draw(x, y, noise, testTex)
+                }
             }
         }
+
+        ThreadParallel.startAll()
+
+        generationDone = true
     }
 }
 
@@ -95,8 +130,8 @@ fun main(args: Array<String>) {
     appConfig.resizable = false
     appConfig.width = WIDTH
     appConfig.height = HEIGHT
-    appConfig.backgroundFPS = 10
-    appConfig.foregroundFPS = 10
+    appConfig.backgroundFPS = 60
+    appConfig.foregroundFPS = 60
     appConfig.forceExit = false
 
     LwjglApplication(WorldgenNoiseSandbox(), appConfig)
@@ -104,7 +139,7 @@ fun main(args: Array<String>) {
 
 interface NoiseMaker {
     fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap)
-    fun generate(seed: Long): Joise
+    fun getGenerator(seed: Long): Joise
     val sampleDensity: Double // bigger: larger features. IT IS RECOMMENDED TO SET THIS VALUE SAME AS THE CANVAS SIZE
                               //         so that the whole world can have noise coord of 0.0 to 1.0 on Y-axis
                               //         attempting to adjust the feature size with this is a dirty hack and may not be
@@ -124,7 +159,7 @@ object BiomeMaker : NoiseMaker {
         outTex.drawPixel(x, y)
     }
 
-    override fun generate(seed: Long): Joise {
+    override fun getGenerator(seed: Long): Joise {
         //val biome = ModuleBasisFunction()
         //biome.setType(ModuleBasisFunction.BasisType.SIMPLEX)
 
@@ -164,7 +199,7 @@ object BiomeMaker : NoiseMaker {
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
 object AccidentalCave : NoiseMaker {
 
-    override val sampleDensity = HEIGHT / 2.0
+    override val sampleDensity = 333.0 // fixed value for fixed size of features
 
     override fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap) {
         val c = noiseValue.toFloat()
@@ -177,7 +212,7 @@ object AccidentalCave : NoiseMaker {
         outTex.drawPixel(x, y)
     }
 
-    override fun generate(seed: Long): Joise {
+    override fun getGenerator(seed: Long): Joise {
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
         val highlandMagic: Long = 0x0114E091      // Olive Oyl
         val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
@@ -318,7 +353,6 @@ object AccidentalCave : NoiseMaker {
         groundSelect.setControlSource(highlandLowlandSelectCache)
 
         /* caves */
-        // FIXME cave gradient is too steep? the terrain itself is good
 
         val caveShape = ModuleFractal()
         caveShape.setType(ModuleFractal.FractalType.RIDGEMULTI)
@@ -326,12 +360,12 @@ object AccidentalCave : NoiseMaker {
         caveShape.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         caveShape.setNumOctaves(1)
         //caveShape.setFrequency(4.0)
-        caveShape.setFrequency(8.0)
+        caveShape.setFrequency(8.0) // TODO adjust this to change the "density" of the caves
         caveShape.seed = seed shake caveMagic
 
         val caveAttenuateBias = ModuleBias()
         caveAttenuateBias.setSource(highlandLowlandSelectCache)
-        caveAttenuateBias.setBias(0.8) // adjust this to adjust the "concentration" of the cave gen?
+        caveAttenuateBias.setBias(0.94) // TODO adjust this (0.5..0.9999999) to adjust the "concentration" of the cave gen?
 
         val caveShapeAttenuate = ModuleCombiner()
         caveShapeAttenuate.setType(ModuleCombiner.CombinerType.MULT)
@@ -360,7 +394,7 @@ object AccidentalCave : NoiseMaker {
         caveSelect.setLowSource(1.0)
         caveSelect.setHighSource(0.0)
         caveSelect.setControlSource(cavePerturb)
-        caveSelect.setThreshold(1.0) // it does make sense, trust me
+        caveSelect.setThreshold(0.96) // TODO also adjust this if you've touched the bias value. Number can be greater than 1.0
         caveSelect.setFalloff(0.0)
 
         // note: gradient-multiply DOESN'T generate "naturally cramped" cave entrance
