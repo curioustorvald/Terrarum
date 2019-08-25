@@ -220,6 +220,7 @@ object AccidentalCave : NoiseMaker {
 
         val caveMagic: Long = 0x00215741CDF // Urist McDF
         val cavePerturbMagic: Long = 0xA2410C // Armok
+        val caveBlockageMagic: Long = 0xD15A57E5 // Disaster
 
 
         val groundGradient = ModuleGradient()
@@ -360,12 +361,12 @@ object AccidentalCave : NoiseMaker {
         caveShape.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         caveShape.setNumOctaves(1)
         //caveShape.setFrequency(4.0)
-        caveShape.setFrequency(8.0) // TODO adjust this to change the "density" of the caves
+        caveShape.setFrequency(7.4) // TODO adjust this to change the "density" of the caves
         caveShape.seed = seed shake caveMagic
 
         val caveAttenuateBias = ModuleBias()
         caveAttenuateBias.setSource(highlandLowlandSelectCache)
-        caveAttenuateBias.setBias(0.94) // TODO adjust this (0.5..0.9999999) to adjust the "concentration" of the cave gen?
+        caveAttenuateBias.setBias(0.91) // TODO adjust this (0.5..0.9999999) to adjust the "concentration" of the cave gen?
 
         val caveShapeAttenuate = ModuleCombiner()
         caveShapeAttenuate.setType(ModuleCombiner.CombinerType.MULT)
@@ -394,18 +395,46 @@ object AccidentalCave : NoiseMaker {
         caveSelect.setLowSource(1.0)
         caveSelect.setHighSource(0.0)
         caveSelect.setControlSource(cavePerturb)
-        caveSelect.setThreshold(0.96) // TODO also adjust this if you've touched the bias value. Number can be greater than 1.0
+        caveSelect.setThreshold(0.94) // TODO also adjust this if you've touched the bias value. Number can be greater than 1.0
         caveSelect.setFalloff(0.0)
+
+        val caveBlockageFractal = ModuleFractal()
+        caveBlockageFractal.setType(ModuleFractal.FractalType.RIDGEMULTI)
+        caveBlockageFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        caveBlockageFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        caveBlockageFractal.setNumOctaves(2)
+        caveBlockageFractal.setFrequency(7.4) // TODO same as caveShape frequency?
+        caveBlockageFractal.seed = seed shake caveBlockageMagic
+
+        val caveBlockageSelect = ModuleSelect()
+        caveBlockageSelect.setLowSource(1.0)
+        caveBlockageSelect.setHighSource(0.0)
+        caveBlockageSelect.setControlSource(caveBlockageFractal)
+        caveBlockageSelect.setThreshold(1.33) // TODO size of cave-in. For some reason, [0.7, 2.0?]
+        caveBlockageSelect.setFalloff(0.0)
 
         // note: gradient-multiply DOESN'T generate "naturally cramped" cave entrance
 
+        val caveInMix = ModuleCombiner()
+        caveInMix.setType(ModuleCombiner.CombinerType.ADD)
+        caveInMix.setSource(0, caveSelect)
+        caveInMix.setSource(1, caveBlockageSelect)
+
         val groundCaveMult = ModuleCombiner()
         groundCaveMult.setType(ModuleCombiner.CombinerType.MULT)
-        groundCaveMult.setSource(0, caveSelect)
+        groundCaveMult.setSource(0, caveInMix)
         groundCaveMult.setSource(1, groundSelect)
 
+        // this noise tree WILL generate noise value greater than 1.0
+        // they should be treated properly when you actually generate the world out of the noisemap
+        // for the visualisation, no treatment will be done in this demo app.
 
-        return Joise(groundCaveMult)
+        val finalClamp = ModuleClamp()
+        finalClamp.setRange(0.0, 1.0)
+        finalClamp.setSource(groundCaveMult)
+
+        //return Joise(groundCaveMult)
+        return Joise(finalClamp)
     }
 }
 
