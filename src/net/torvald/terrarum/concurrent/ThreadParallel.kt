@@ -10,7 +10,7 @@ typealias ThreadableFun = (Int) -> Unit
  * Created by minjaesong on 2016-05-25.
  */
 object ThreadParallel {
-    val threadCount = Runtime.getRuntime().availableProcessors() + 1 // modify this to your taste
+    val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
 
     private val pool: Array<Thread?> = Array(threadCount) { null }
 
@@ -203,6 +203,15 @@ fun IntProgression.sliceEvenly(slices: Int): List<IntProgression> {
     else (0 until slices).map {
         this.first - size.div(slices).times(it).roundInt() downTo
                 this.first - size.div(slices).times(it + 1).roundInt() + 1
+    }
+}
+
+fun IntProgression.mapToThreadPoolDirectly(prefix: String, worker: (IntProgression) -> Unit) {
+    this.sliceEvenly(ThreadParallel.threadCount).forEachIndexed { index, intProgression ->
+        val workerFun: ThreadableFun = {
+            worker(intProgression)
+        }
+        ThreadParallel.map(index, prefix, workerFun)
     }
 }
 
