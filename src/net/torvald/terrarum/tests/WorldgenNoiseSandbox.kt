@@ -16,6 +16,7 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
+import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.inUse
 import kotlin.math.cos
@@ -43,6 +44,9 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private var generationDone = false
     private var generateKeyLatched = false
+
+    private var generationTimeInMeasure = false
+    private var generationStartTime = 0L
 
     override fun create() {
         batch = SpriteBatch()
@@ -84,6 +88,13 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         if (ThreadParallel.allFinished()) {
             generateKeyLatched = false
         }
+
+        // finish time measurement
+        if (ThreadParallel.allFinished() && generationTimeInMeasure) {
+            generationTimeInMeasure = false
+            val time = System.nanoTime() - generationStartTime
+            println("Generation time in sec: ${time / 1000000000f}")
+        }
     }
 
     private val NOISE_MAKER = AccidentalCave
@@ -95,6 +106,9 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     val colourNull = Color(0x1b3281ff)
 
     private fun renderNoise() {
+        generationStartTime = System.nanoTime()
+        generationTimeInMeasure = true
+
         // erase first
         testTex.setColor(colourNull)
         testTex.fill()
@@ -201,14 +215,25 @@ object AccidentalCave : NoiseMaker {
 
     override val sampleDensity = 333.0 // fixed value for fixed size of features
 
+    private val notationColours = arrayOf(
+            Color.WHITE,
+            Color.MAGENTA,
+            Color(0f, 186f/255f, 1f, 1f),
+            Color(.5f, 1f, .5f, 1f),
+            Color(1f, 0.93f, 0.07f, 1f),
+            Color(0.97f, 0.6f, 0.56f, 1f)
+    )
+
     override fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap) {
         val c = noiseValue.toFloat()
-        if (c > 1f)
-            outTex.setColor(0f, c, c, 1f)
-        else if (c >= 0f)
-            outTex.setColor(c, c, c, 1f)
-        else
+        val selector = c.minus(0.0001).floorInt() fmod notationColours.size
+        val selecteeColour = Color(c - selector, c - selector, c - selector, 1f)
+        if (noiseValue < 0) {
             outTex.setColor(-c, 0f, 0f, 1f)
+        }
+        else {
+            outTex.setColor(selecteeColour.mul(notationColours[selector]))
+        }
         outTex.drawPixel(x, y)
     }
 
@@ -275,7 +300,7 @@ object AccidentalCave : NoiseMaker {
 
         val highlandYScale = ModuleScaleDomain()
         highlandYScale.setSource(highlandScale)
-        highlandYScale.setScaleY(0.2) // greater = more distortion, overhangs
+        highlandYScale.setScaleY(0.14) // greater = more distortion, overhangs
 
         val highlandTerrain = ModuleTranslateDomain()
         highlandTerrain.setSource(groundGradient)
@@ -302,7 +327,7 @@ object AccidentalCave : NoiseMaker {
 
         val mountainYScale = ModuleScaleDomain()
         mountainYScale.setSource(mountainScale)
-        mountainYScale.setScaleY(0.74) // greater = more distortion, overhangs
+        mountainYScale.setScaleY(0.7) // greater = more distortion, overhangs
 
         val mountainTerrain = ModuleTranslateDomain()
         mountainTerrain.setSource(groundGradient)
@@ -360,13 +385,12 @@ object AccidentalCave : NoiseMaker {
         caveShape.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         caveShape.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         caveShape.setNumOctaves(1)
-        //caveShape.setFrequency(4.0)
-        caveShape.setFrequency(7.4) // TODO adjust this to change the "density" of the caves
+        caveShape.setFrequency(7.4) // TODO adjust the "density" of the caves
         caveShape.seed = seed shake caveMagic
 
         val caveAttenuateBias = ModuleBias()
         caveAttenuateBias.setSource(highlandLowlandSelectCache)
-        caveAttenuateBias.setBias(0.91) // TODO adjust this (0.5..0.9999999) to adjust the "concentration" of the cave gen?
+        caveAttenuateBias.setBias(0.90) // TODO (0.5+) adjust the "concentration" of the cave gen. Lower = larger voids
 
         val caveShapeAttenuate = ModuleCombiner()
         caveShapeAttenuate.setType(ModuleCombiner.CombinerType.MULT)
@@ -378,7 +402,6 @@ object AccidentalCave : NoiseMaker {
         cavePerturbFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         cavePerturbFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         cavePerturbFractal.setNumOctaves(6)
-        //cavePerturbFractal.setFrequency(3.0)
         cavePerturbFractal.setFrequency(3.0)
         cavePerturbFractal.seed = seed shake cavePerturbMagic
 
@@ -395,7 +418,7 @@ object AccidentalCave : NoiseMaker {
         caveSelect.setLowSource(1.0)
         caveSelect.setHighSource(0.0)
         caveSelect.setControlSource(cavePerturb)
-        caveSelect.setThreshold(0.94) // TODO also adjust this if you've touched the bias value. Number can be greater than 1.0
+        caveSelect.setThreshold(0.89) // TODO also adjust this if you've touched the bias value. Number can be greater than 1.0
         caveSelect.setFalloff(0.0)
 
         val caveBlockageFractal = ModuleFractal()
@@ -403,14 +426,20 @@ object AccidentalCave : NoiseMaker {
         caveBlockageFractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         caveBlockageFractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         caveBlockageFractal.setNumOctaves(2)
-        caveBlockageFractal.setFrequency(7.4) // TODO same as caveShape frequency?
+        caveBlockageFractal.setFrequency(8.88) // TODO same as caveShape frequency?
         caveBlockageFractal.seed = seed shake caveBlockageMagic
 
+        // will only close-up deeper caves. Shallow caves will be less likely to be closed up
+        val caveBlockageAttenuate = ModuleCombiner()
+        caveBlockageAttenuate.setType(ModuleCombiner.CombinerType.MULT)
+        caveBlockageAttenuate.setSource(0, caveBlockageFractal)
+        caveBlockageAttenuate.setSource(1, caveAttenuateBias)
+
         val caveBlockageSelect = ModuleSelect()
-        caveBlockageSelect.setLowSource(1.0)
-        caveBlockageSelect.setHighSource(0.0)
-        caveBlockageSelect.setControlSource(caveBlockageFractal)
-        caveBlockageSelect.setThreshold(1.33) // TODO size of cave-in. For some reason, [0.7, 2.0?]
+        caveBlockageSelect.setLowSource(0.0)
+        caveBlockageSelect.setHighSource(1.0)
+        caveBlockageSelect.setControlSource(caveBlockageAttenuate)
+        caveBlockageSelect.setThreshold(1.40) // TODO adjust cave cloing-up strength. Larger = more closing
         caveBlockageSelect.setFalloff(0.0)
 
         // note: gradient-multiply DOESN'T generate "naturally cramped" cave entrance
@@ -423,6 +452,7 @@ object AccidentalCave : NoiseMaker {
         val groundCaveMult = ModuleCombiner()
         groundCaveMult.setType(ModuleCombiner.CombinerType.MULT)
         groundCaveMult.setSource(0, caveInMix)
+        //groundCaveMult.setSource(0, caveSelect) // disables the cave-in for quick cavegen testing
         groundCaveMult.setSource(1, groundSelect)
 
         // this noise tree WILL generate noise value greater than 1.0
@@ -433,7 +463,7 @@ object AccidentalCave : NoiseMaker {
         finalClamp.setRange(0.0, 1.0)
         finalClamp.setSource(groundCaveMult)
 
-        //return Joise(groundCaveMult)
+        //return Joise(caveInMix)
         return Joise(finalClamp)
     }
 }
