@@ -162,7 +162,7 @@ interface NoiseMaker {
 
 object BiomeMaker : NoiseMaker {
 
-    override val sampleDensity = HEIGHT.toDouble() // 24: magic number from old code
+    override val sampleDensity = 24.0 // 24: magic number from old code
 
     override fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap) {
         val colPal = biomeColors

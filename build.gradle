@@ -49,28 +49,28 @@ task game(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.terrarum.AppLoader'
     group = "Application"
-    description = "Launches the game. Should be the same as 'gradlew run'."
+    description = "Launches the game. Should be the same as 'gradlew run'"
 }
 
 task gamedebug(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.terrarum.AppLoader'
     group = "Application"
-    description = "Launches the game with the debug key."
+    description = "Launches the game with the debug key"
     args = ["isdev=true"]
-    jvmArgs = ["-ea"]
+    jvmArgs = ["-ea"] // make assert functions work
 }
 
 task spriteassembler(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.spriteassembler.SpriteAssemblerAppKt'
     group = "Application"
-    description = "Launches the Sprite Assembler."
+    description = "Launches the Sprite Assembler"
 }
 
 task csveditor(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.terrarum.debuggerapp.CSVEditor'
     group = "Application"
-    description = "Launches the CSV Editor. (for Blocks?)"
+    description = "Launches the CSV Editor for in-game Blocks"
 }
