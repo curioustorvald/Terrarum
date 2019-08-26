@@ -117,12 +117,11 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         (0 until WIDTH).mapToThreadPoolDirectly("NoiseGen") { range ->
             for (y in 0 until HEIGHT) {
                 for (x in range) {
-                    val sampleDensity = NOISE_MAKER.sampleDensity
                     val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                    val sampleOffset = (WIDTH / sampleDensity) / 8.0
+                    val sampleOffset = WIDTH / 8.0
                     val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                     val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                    val sampleY = y / sampleDensity
+                    val sampleY = y.toDouble()
                     val noise = joise.get(sampleX, sampleY, sampleZ)
 
                     NOISE_MAKER.draw(x, y, noise, testTex)
@@ -154,15 +153,9 @@ fun main(args: Array<String>) {
 interface NoiseMaker {
     fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap)
     fun getGenerator(seed: Long): Joise
-    val sampleDensity: Double // bigger: larger features. IT IS RECOMMENDED TO SET THIS VALUE SAME AS THE CANVAS SIZE
-                              //         so that the whole world can have noise coord of 0.0 to 1.0 on Y-axis
-                              //         attempting to adjust the feature size with this is a dirty hack and may not be
-                              //         supported by the world generator.
 }
 
 object BiomeMaker : NoiseMaker {
-
-    override val sampleDensity = 24.0 // 24: magic number from old code
 
     override fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap) {
         val colPal = biomeColors
@@ -191,9 +184,9 @@ object BiomeMaker : NoiseMaker {
 
         val scale = ModuleScaleDomain()
         scale.setSource(autocorrect)
-        scale.setScaleX(0.3)
-        scale.setScaleY(0.3)
-        scale.setScaleZ(0.3)
+        scale.setScaleX(1.0 / 80.0) // adjust this value to change features size
+        scale.setScaleY(1.0 / 80.0)
+        scale.setScaleZ(1.0 / 80.0)
 
         val last = scale
 
@@ -212,8 +205,6 @@ object BiomeMaker : NoiseMaker {
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
 object AccidentalCave : NoiseMaker {
-
-    override val sampleDensity = 333.0 // fixed value for fixed size of features
 
     private val notationColours = arrayOf(
             Color.WHITE,
@@ -463,8 +454,14 @@ object AccidentalCave : NoiseMaker {
         finalClamp.setRange(0.0, 1.0)
         finalClamp.setSource(groundCaveMult)
 
+        val finalScaling = ModuleScaleDomain()
+        finalScaling.setScaleX(1.0 / 333.0) // adjust this value to change features size
+        finalScaling.setScaleY(1.0 / 333.0)
+        finalScaling.setScaleZ(1.0 / 333.0)
+        finalScaling.setSource(finalClamp)
+
         //return Joise(caveInMix)
-        return Joise(finalClamp)
+        return Joise(finalScaling)
     }
 }
 
