@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
@@ -33,6 +34,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
+    private lateinit var font: BitmapFont
 
     private lateinit var testTex: Pixmap
     private lateinit var tempTex: Texture
@@ -49,6 +51,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var generationStartTime = 0L
 
     override fun create() {
+        font = BitmapFont() // use default because fuck it
+
         batch = SpriteBatch()
         camera = OrthographicCamera(WIDTH.toFloat(), HEIGHT.toFloat())
         camera.setToOrtho(false) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
@@ -62,6 +66,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
         println("Init done")
     }
+
+    private var generationTime = 0f
 
     override fun render() {
         if (!generationDone) {
@@ -93,7 +99,17 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         if (ThreadParallel.allFinished() && generationTimeInMeasure) {
             generationTimeInMeasure = false
             val time = System.nanoTime() - generationStartTime
-            println("Generation time in sec: ${time / 1000000000f}")
+            generationTime = time / 1000000000f
+        }
+
+        // draw timer
+        batch.inUse {
+            if (!generationTimeInMeasure) {
+                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, HEIGHT - 8f)
+            }
+            else {
+                font.draw(batch, "Generating...", 8f, HEIGHT - 8f)
+            }
         }
     }
 
