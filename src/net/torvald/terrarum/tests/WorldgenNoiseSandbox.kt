@@ -17,7 +17,6 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
-import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.inUse
 import kotlin.math.cos
@@ -39,7 +38,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private lateinit var testTex: Pixmap
     private lateinit var tempTex: Texture
 
-    private lateinit var joise: Joise
+    private lateinit var joise: List<Joise>
 
     private val RNG = HQRNG()
     private var seed = 10000L
@@ -115,7 +114,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private val NOISE_MAKER = AccidentalCave
 
-    private fun getNoiseGenerator(SEED: Long): Joise {
+    private fun getNoiseGenerator(SEED: Long): List<Joise> {
         return NOISE_MAKER.getGenerator(SEED)
     }
 
@@ -138,7 +137,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                     val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                     val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                     val sampleY = y.toDouble()
-                    val noise = joise.get(sampleX, sampleY, sampleZ)
+                    val noise = joise.map { it.get(sampleX, sampleY, sampleZ) }
 
                     NOISE_MAKER.draw(x, y, noise, testTex)
                 }
@@ -167,22 +166,22 @@ fun main(args: Array<String>) {
 }
 
 interface NoiseMaker {
-    fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap)
-    fun getGenerator(seed: Long): Joise
+    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap)
+    fun getGenerator(seed: Long): List<Joise>
 }
 
 object BiomeMaker : NoiseMaker {
 
-    override fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap) {
+    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val colPal = biomeColors
-        val control = noiseValue.times(colPal.size).minus(0.00001f).toInt().fmod(colPal.size)
+        val control = noiseValue[0].times(colPal.size).minus(0.00001f).toInt().fmod(colPal.size)
 
         outTex.setColor(colPal[control])
         //testTex.setColor(RNG.nextFloat(), RNG.nextFloat(), RNG.nextFloat(), 1f)
         outTex.drawPixel(x, y)
     }
 
-    override fun getGenerator(seed: Long): Joise {
+    override fun getGenerator(seed: Long): List<Joise> {
         //val biome = ModuleBasisFunction()
         //biome.setType(ModuleBasisFunction.BasisType.SIMPLEX)
 
@@ -206,7 +205,7 @@ object BiomeMaker : NoiseMaker {
 
         val last = scale
 
-        return Joise(last)
+        return listOf(Joise(last))
     }
 
     // with this method, only TWO distinct (not bland) biomes are possible. CLUT order is important here.
@@ -222,6 +221,8 @@ object BiomeMaker : NoiseMaker {
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
 object AccidentalCave : NoiseMaker {
 
+    private infix fun Color.mul(other: Color) = this.mul(other)
+
     private val notationColours = arrayOf(
             Color.WHITE,
             Color.MAGENTA,
@@ -231,20 +232,32 @@ object AccidentalCave : NoiseMaker {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    override fun draw(x: Int, y: Int, noiseValue: Double, outTex: Pixmap) {
-        val c = noiseValue.toFloat()
+    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+        // simple one-source draw
+        /*val c = noiseValue[0].toFloat()
         val selector = c.minus(0.0001).floorInt() fmod notationColours.size
         val selecteeColour = Color(c - selector, c - selector, c - selector, 1f)
-        if (noiseValue < 0) {
+        if (c < 0) {
             outTex.setColor(-c, 0f, 0f, 1f)
         }
         else {
             outTex.setColor(selecteeColour.mul(notationColours[selector]))
         }
+        outTex.drawPixel(x, y)*/
+
+
+        val n1 = noiseValue[0].toFloat()
+        var n2 = noiseValue[1].toFloat()
+        if (n2 != 1f) n2 = 0.5f
+        val c1 = Color(.55f * n1, .4f * n1, .24f * n1, 1f)
+        val c2 = Color(n2, n2, n2, 1f)
+        val cout = c1 mul c2
+
+        outTex.setColor(cout)
         outTex.drawPixel(x, y)
     }
 
-    override fun getGenerator(seed: Long): Joise {
+    override fun getGenerator(seed: Long): List<Joise> {
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
         val highlandMagic: Long = 0x0114E091      // Olive Oyl
         val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
@@ -456,28 +469,43 @@ object AccidentalCave : NoiseMaker {
         caveInMix.setSource(0, caveSelect)
         caveInMix.setSource(1, caveBlockageSelect)
 
-        val groundCaveMult = ModuleCombiner()
+        /*val groundCaveMult = ModuleCombiner()
         groundCaveMult.setType(ModuleCombiner.CombinerType.MULT)
         groundCaveMult.setSource(0, caveInMix)
         //groundCaveMult.setSource(0, caveSelect) // disables the cave-in for quick cavegen testing
-        groundCaveMult.setSource(1, groundSelect)
+        groundCaveMult.setSource(1, groundSelect)*/
 
         // this noise tree WILL generate noise value greater than 1.0
         // they should be treated properly when you actually generate the world out of the noisemap
         // for the visualisation, no treatment will be done in this demo app.
 
-        val finalClamp = ModuleClamp()
-        finalClamp.setRange(0.0, 1.0)
-        finalClamp.setSource(groundCaveMult)
 
-        val finalScaling = ModuleScaleDomain()
-        finalScaling.setScaleX(1.0 / 333.0) // adjust this value to change features size
-        finalScaling.setScaleY(1.0 / 333.0)
-        finalScaling.setScaleZ(1.0 / 333.0)
-        finalScaling.setSource(finalClamp)
+        val groundClamp = ModuleClamp()
+        groundClamp.setRange(0.0, 1.0)
+        groundClamp.setSource(groundSelect)
+
+        val groundScaling = ModuleScaleDomain()
+        groundScaling.setScaleX(1.0 / 333.0) // adjust this value to change features size
+        groundScaling.setScaleY(1.0 / 333.0)
+        groundScaling.setScaleZ(1.0 / 333.0)
+        groundScaling.setSource(groundClamp)
+
+
+        val caveClamp = ModuleClamp()
+        caveClamp.setRange(0.0, 1.0)
+        caveClamp.setSource(caveInMix)
+
+        val caveScaling = ModuleScaleDomain()
+        caveScaling.setScaleX(1.0 / 333.0) // adjust this value to change features size
+        caveScaling.setScaleY(1.0 / 333.0)
+        caveScaling.setScaleZ(1.0 / 333.0)
+        caveScaling.setSource(caveClamp)
 
         //return Joise(caveInMix)
-        return Joise(finalScaling)
+        return listOf(
+                Joise(groundScaling),
+                Joise(caveScaling)
+        )
     }
 }
 
