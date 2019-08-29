@@ -246,10 +246,22 @@ object AccidentalCave : NoiseMaker {
         outTex.drawPixel(x, y)*/
 
 
-        val n1 = noiseValue[0].toFloat()
+        fun Double.tiered(vararg tiers: Double): Int {
+            tiers.reversed().forEachIndexed { index, it ->
+                if (this >= it) return (tiers.lastIndex - index) // why??
+            }
+            return tiers.lastIndex
+        }
+
+        val groundDepthCol = listOf(
+                Color(0f, 0f, 0f, 1f),
+                Color(0.55f, 0.4f, 0.24f, 1f),
+                Color(.6f, .6f, .6f, 1f)
+        )
+        val n1 = noiseValue[0].tiered(.0, .5, .88)
         var n2 = noiseValue[1].toFloat()
         if (n2 != 1f) n2 = 0.5f
-        val c1 = Color(.55f * n1, .4f * n1, .24f * n1, 1f)
+        val c1 = groundDepthCol[n1]
         val c2 = Color(n2, n2, n2, 1f)
         val cout = c1 mul c2
 
@@ -398,6 +410,12 @@ object AccidentalCave : NoiseMaker {
         groundSelect.setThreshold(0.5)
         groundSelect.setControlSource(highlandLowlandSelectCache)
 
+        val groundSelect2 = ModuleSelect()
+        groundSelect2.setLowSource(0.0)
+        groundSelect2.setHighSource(1.0)
+        groundSelect2.setThreshold(0.8)
+        groundSelect2.setControlSource(highlandLowlandSelectCache)
+
         /* caves */
 
         val caveShape = ModuleFractal()
@@ -479,10 +497,9 @@ object AccidentalCave : NoiseMaker {
         // they should be treated properly when you actually generate the world out of the noisemap
         // for the visualisation, no treatment will be done in this demo app.
 
-
         val groundClamp = ModuleClamp()
-        groundClamp.setRange(0.0, 1.0)
-        groundClamp.setSource(groundSelect)
+        groundClamp.setRange(0.0, 100.0)
+        groundClamp.setSource(highlandLowlandSelectCache)
 
         val groundScaling = ModuleScaleDomain()
         groundScaling.setScaleX(1.0 / 333.0) // adjust this value to change features size
