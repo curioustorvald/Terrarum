@@ -1,255 +1,52 @@
-package net.torvald.terrarum.tests
+package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import com.badlogic.gdx.ApplicationAdapter
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.random.HQRNG
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
-import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.inUse
-import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
-import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
-import net.torvald.terrarum.modulebasegame.worldgenerator.shake
+import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.cos
 import kotlin.math.sin
-
-const val WIDTH = 1536
-const val HEIGHT = 1024
-const val TWO_PI = Math.PI * 2
 
 /**
  * Created by minjaesong on 2019-07-23.
  */
-class WorldgenNoiseSandbox : ApplicationAdapter() {
+object Terragen : Gen {
 
-    private lateinit var batch: SpriteBatch
-    private lateinit var camera: OrthographicCamera
-    private lateinit var font: BitmapFont
+    override var generationStarted: Boolean = false
+    override val generationDone: Boolean
+        get() = generationStarted && ThreadParallel.allFinished()
 
-    private lateinit var testTex: Pixmap
-    private lateinit var tempTex: Texture
+    override fun invoke(world: GameWorld, seed: Long, params: Any) {
+        val joise = getGenerator(seed, params as TerragenParams)
 
-    private lateinit var joise: List<Joise>
-
-    private val RNG = HQRNG()
-    private var seed = 10000L
-
-    private var generationDone = false
-    private var generateKeyLatched = false
-
-    private var generationTimeInMeasure = false
-    private var generationStartTime = 0L
-
-    override fun create() {
-        font = BitmapFont() // use default because fuck it
-
-        batch = SpriteBatch()
-        camera = OrthographicCamera(WIDTH.toFloat(), HEIGHT.toFloat())
-        camera.setToOrtho(false) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
-        camera.update()
-        batch.projectionMatrix = camera.combined
-        Gdx.gl20.glViewport(0, 0, WIDTH, HEIGHT)
-
-        testTex = Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888)
-        testTex.blending = Pixmap.Blending.None
-        tempTex = Texture(1, 1, Pixmap.Format.RGBA8888)
-
-        println("Init done")
-    }
-
-    private var generationTime = 0f
-
-    override fun render() {
-        if (!generationDone) {
-            joise = getNoiseGenerator(seed)
-            renderNoise()
-        }
-
-        // draw using pixmap
-        batch.inUse {
-            tempTex.dispose()
-            tempTex = Texture(testTex)
-            batch.draw(tempTex, 0f, 0f)
-        }
-
-        // read key input
-        if (!generateKeyLatched && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            generateKeyLatched = true
-            seed = RNG.nextLong()
-            joise = getNoiseGenerator(seed)
-            renderNoise()
-        }
-
-        // check if generation is done
-        if (ThreadParallel.allFinished()) {
-            generateKeyLatched = false
-        }
-
-        // finish time measurement
-        if (ThreadParallel.allFinished() && generationTimeInMeasure) {
-            generationTimeInMeasure = false
-            val time = System.nanoTime() - generationStartTime
-            generationTime = time / 1000000000f
-        }
-
-        // draw timer
-        batch.inUse {
-            if (!generationTimeInMeasure) {
-                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, HEIGHT - 8f)
-            }
-            else {
-                font.draw(batch, "Generating...", 8f, HEIGHT - 8f)
-            }
-        }
-    }
-
-    private val NOISE_MAKER = AccidentalCave
-
-    private fun getNoiseGenerator(SEED: Long): List<Joise> {
-        return NOISE_MAKER.getGenerator(SEED, TerragenParams())
-    }
-
-    val colourNull = Color(0x1b3281ff)
-
-    private fun renderNoise() {
-        generationStartTime = System.nanoTime()
-        generationTimeInMeasure = true
-
-        // erase first
-        testTex.setColor(colourNull)
-        testTex.fill()
-
-        // render noisemap to pixmap
-        (0 until WIDTH).mapToThreadPoolDirectly("NoiseGen") { range ->
-            for (y in 0 until HEIGHT) {
+        (0 until world.width).mapToThreadPoolDirectly(this.javaClass.simpleName) { range ->
+            for (y in 0 until world.height) {
                 for (x in range) {
-                    val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                    val sampleOffset = WIDTH / 8.0
+                    val sampleTheta = (x.toDouble() / world.width) * TWO_PI
+                    val sampleOffset = world.width / 8.0
                     val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                     val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                     val sampleY = y.toDouble()
                     val noise = joise.map { it.get(sampleX, sampleY, sampleZ) }
 
-                    NOISE_MAKER.draw(x, y, noise, testTex)
+                    draw(x, y, noise, world)
                 }
             }
         }
 
         ThreadParallel.startAll()
+        generationStarted = true
 
-        generationDone = true
-    }
-}
-
-fun main(args: Array<String>) {
-    ShaderProgram.pedantic = false
-
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false
-    appConfig.width = WIDTH
-    appConfig.height = HEIGHT
-    appConfig.backgroundFPS = 60
-    appConfig.foregroundFPS = 60
-    appConfig.forceExit = false
-
-    LwjglApplication(WorldgenNoiseSandbox(), appConfig)
-}
-
-interface NoiseMaker {
-    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap)
-    fun getGenerator(seed: Long, params: Any): List<Joise>
-}
-
-object BiomeMaker : NoiseMaker {
-
-    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
-        val colPal = biomeColors
-        val control = noiseValue[0].times(colPal.size).minus(0.00001f).toInt().fmod(colPal.size)
-
-        outTex.setColor(colPal[control])
-        //testTex.setColor(RNG.nextFloat(), RNG.nextFloat(), RNG.nextFloat(), 1f)
-        outTex.drawPixel(x, y)
     }
 
-    override fun getGenerator(seed: Long, params: Any): List<Joise> {
-        val params = params as BiomegenParams
-        //val biome = ModuleBasisFunction()
-        //biome.setType(ModuleBasisFunction.BasisType.SIMPLEX)
 
-        // simplex AND fractal for more noisy edges, mmmm..!
-        val fractal = ModuleFractal()
-        fractal.setType(ModuleFractal.FractalType.MULTI)
-        fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
-        fractal.setNumOctaves(4)
-        fractal.setFrequency(1.0)
-        fractal.seed = seed shake 0x7E22A
-
-        val autocorrect = ModuleAutoCorrect()
-        autocorrect.setSource(fractal)
-        autocorrect.setRange(0.0, 1.0)
-
-        val scale = ModuleScaleDomain()
-        scale.setSource(autocorrect)
-        scale.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-        scale.setScaleY(1.0 / params.featureSize)
-        scale.setScaleZ(1.0 / params.featureSize)
-
-        val last = scale
-
-        return listOf(Joise(last))
-    }
-
-    // with this method, only TWO distinct (not bland) biomes are possible. CLUT order is important here.
-    val biomeColors = intArrayOf(
-            //0x2288ccff.toInt(), // ísland
-            0x229944ff.toInt(), // woodlands
-            0x77bb77ff.toInt(), // shrubland
-            0x88bb66ff.toInt(), // plains
-            0x888888ff.toInt() // rockyland
-    )
-}
-
-// http://accidentalnoise.sourceforge.net/minecraftworlds.html
-object AccidentalCave : NoiseMaker {
-
-    private infix fun Color.mul(other: Color) = this.mul(other)
-
-    private val notationColours = arrayOf(
-            Color.WHITE,
-            Color.MAGENTA,
-            Color(0f, 186f/255f, 1f, 1f),
-            Color(.5f, 1f, .5f, 1f),
-            Color(1f, 0.93f, 0.07f, 1f),
-            Color(0.97f, 0.6f, 0.56f, 1f)
+    private val groundDepthBlock = listOf(
+            Block.AIR, Block.DIRT, Block.STONE
     )
 
-    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
-        // simple one-source draw
-        /*val c = noiseValue[0].toFloat()
-        val selector = c.minus(0.0001).floorInt() fmod notationColours.size
-        val selecteeColour = Color(c - selector, c - selector, c - selector, 1f)
-        if (c < 0) {
-            outTex.setColor(-c, 0f, 0f, 1f)
-        }
-        else {
-            outTex.setColor(selecteeColour.mul(notationColours[selector]))
-        }
-        outTex.drawPixel(x, y)*/
-
-
+    fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
         fun Double.tiered(vararg tiers: Double): Int {
             tiers.reversed().forEachIndexed { index, it ->
                 if (this >= it) return (tiers.lastIndex - index) // why??
@@ -257,25 +54,18 @@ object AccidentalCave : NoiseMaker {
             return tiers.lastIndex
         }
 
-        val groundDepthCol = listOf(
-                Color(0f, 0f, 0f, 1f),
-                Color(0.55f, 0.4f, 0.24f, 1f),
-                Color(.6f, .6f, .6f, 1f)
-        )
-        val n1 = noiseValue[0].tiered(.0, .5, .88)
-        var n2 = noiseValue[1].toFloat()
-        if (n2 != 1f) n2 = 0.5f
-        val c1 = groundDepthCol[n1]
-        val c2 = Color(n2, n2, n2, 1f)
-        val cout = c1 mul c2
+        val terr = noiseValue[0].tiered(.0, .5, .88)
+        val cave = if (noiseValue[1] < 0.5) 0 else 1
 
-        outTex.setColor(cout)
-        outTex.drawPixel(x, y)
+        val wallBlock = groundDepthBlock[terr]
+        val terrBlock = wallBlock * cave // AIR is always zero, this is the standard
+
+        world.setTileTerrain(x, y, terrBlock)
+        world.setTileWall(x, y, wallBlock)
     }
 
-    override fun getGenerator(seed: Long, params: Any): List<Joise> {
-        val params = params as TerragenParams
 
+    private fun getGenerator(seed: Long, params: TerragenParams): List<Joise> {
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
         val highlandMagic: Long = 0x0114E091      // Olive Oyl
         val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
@@ -532,15 +322,15 @@ object AccidentalCave : NoiseMaker {
     }
 }
 
-
-
-/*infix fun Long.shake(other: Long): Long {
-    var s0 = this
-    var s1 = other
-
-    s1 = s1 xor s0
-    s0 = s0 shl 55 or s0.ushr(9) xor s1 xor (s1 shl 14)
-    s1 = s1 shl 36 or s1.ushr(28)
-
-    return s0 + s1
-}*/
+data class TerragenParams(
+        val featureSize: Double = 333.0,
+        val lowlandScaleOffset: Double = -0.65, // linearly alters the height
+        val highlandScaleOffset: Double = -0.2, // linearly alters the height
+        val mountainScaleOffset: Double = -0.1, // linearly alters the height
+        val mountainDisturbance: Double = 0.7, // greater = more distortion, overhangs
+        val caveShapeFreq: Double = 7.4, //adjust the "density" of the caves
+        val caveAttenuateBias: Double = 0.90, // adjust the "concentration" of the cave gen. Lower = larger voids
+        val caveSelectThre: Double = 0.89, // also adjust this if you've touched the bias value. Number can be greater than 1.0
+        val caveBlockageFractalFreq: Double = 8.88,
+        val caveBlockageSelectThre: Double = 1.40 // adjust cave cloing-up strength. Larger = more closing
+)

@@ -12,9 +12,11 @@ replay_pid*
 # OS files
 Thumbs.db
 .DS_Store
+desktop.ini
 
 # Resources that should not be tracked
 assets/mods/basegame/demoworld
+external_resource_packs
 #assets/mods/basegame/demoworld.gz
 external_resource_packs.zip
 
@@ -33,4 +35,3 @@ tmp_*
 *.index
 *.threads
 *_Leak_Suspects.zip
-desktop.ini
