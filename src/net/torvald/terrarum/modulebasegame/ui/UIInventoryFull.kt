@@ -503,9 +503,7 @@ class UIInventoryFull(
                             if (AppLoader.fontGame.getWidth(listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
                                 AppLoader.fontGame.lineHeight
                             else 0f
-
-        printdbg(this, "${AppLoader.fontGame.getWidth(listControlHelp) + 2 + controlHintXPos}; ${encumbBarTextXPos}")
-
+        
         AppLoader.fontGame.draw(batch,
                 encumbranceText,
                 encumbBarTextXPos,
