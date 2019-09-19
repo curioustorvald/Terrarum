@@ -1159,4 +1159,8 @@ public class AppLoader implements ApplicationListener {
             debugTimers.put(target, l);
         }
     }
+
+    public static long getTIME_T() {
+        return System.currentTimeMillis() / 1000L;
+    }
 }

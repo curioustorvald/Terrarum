@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
@@ -10,24 +12,39 @@ import net.torvald.terrarum.gameworld.GameWorld
 object Worldgen {
 
     operator fun invoke(worldIndex: Int, params: WorldgenParams) {
-
-        val world = GameWorld(worldIndex, params.width, params.height, System.currentTimeMillis() / 1000, System.currentTimeMillis() / 1000, 0)
+        val genTime = AppLoader.getTIME_T()
+        val world = GameWorld(worldIndex, params.width, params.height, genTime, genTime, 0)
 
         val jobs = listOf(
-                Work("Reticulating Splines") { Terragen(world, params.seed, params.terragenParams) },
-                Work("Adding Vegetations") { Biomegen(world, params.seed, params.biomegenParams) }
+                Work("Reticulating Splines", Terragen(world, params.seed, params.terragenParams))
+                //Work("Adding Vegetations") { Biomegen(world, params.seed, params.biomegenParams) }
         )
+
+
+        for (i in 0 until jobs.size) {
+            val it = jobs[i]
+
+            LoadScreen.addMessage(it.loadingScreenName)
+            it.theWork.run()
+
+            // busy wait
+            while (!it.theWork.generationDone) { }
+        }
 
     }
 
-    private data class Work(val loadingScreenName: String, val theWork: () -> Unit)
+    private data class Work(val loadingScreenName: String, val theWork: Gen)
 
 }
 
-interface Gen {
-    var generationStarted: Boolean
-    val generationDone: Boolean
-    operator fun invoke(world: GameWorld, seed: Long, params: Any)
+abstract class Gen(val world: GameWorld, val seed: Long, val params: Any) {
+    abstract var generationStarted: Boolean
+    abstract val generationDone: Boolean
+    open fun run() {
+        if (generationDone) {
+            // worldgen.wake()
+        }
+    }
 }
 
 data class WorldgenParams(

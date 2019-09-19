@@ -22,7 +22,7 @@ external_resource_packs.zip
 
 # IntelliJ
 workspace.xml
-*/workspace.xml
+.idea/*
 
 # Temporary files
 .tmp*

@@ -12,13 +12,13 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2019-07-23.
  */
-object Terragen : Gen {
+class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
     override var generationStarted: Boolean = false
     override val generationDone: Boolean
         get() = generationStarted && ThreadParallel.allFinished()
 
-    override fun invoke(world: GameWorld, seed: Long, params: Any) {
+    override fun run() {
         val joise = getGenerator(seed, params as TerragenParams)
 
         (0 until world.width).mapToThreadPoolDirectly(this.javaClass.simpleName) { range ->
@@ -38,7 +38,7 @@ object Terragen : Gen {
 
         ThreadParallel.startAll()
         generationStarted = true
-
+        super.run()
     }
 
 
