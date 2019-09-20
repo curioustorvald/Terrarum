@@ -34,9 +34,9 @@ uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
 uniform ivec2 cameraTranslation = ivec2(0, 0); // used to offset the drawing
 
-uniform float drawBreakage = 1f; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
+uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
 
-uniform float zoom = 1f;
+uniform float zoom = 1.0;
 
 
 ivec2 getTileXY(int tileNumber) {
