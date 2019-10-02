@@ -162,6 +162,7 @@ open class ActorHumanoid(
     var isLeftDown = false; protected set
     var isRightDown = false; protected set
     var isJumpDown = false; protected set
+    var isJumpJustDown = false; protected set // TODO if jump key is held in current update frame
     protected inline val isGamer: Boolean
         get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.actorNowPlaying
 
@@ -246,6 +247,8 @@ open class ActorHumanoid(
                 isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
                              gamepad.getButton(AppLoader.getConfigInt("gamepadltrigger"))
             }
+
+            TODO("isJumpJustDown")
         }
         else {
             isUpDown = axisY < 0f
@@ -347,16 +350,26 @@ open class ActorHumanoid(
         }
 
         /**
-         * Jump control
+         * Jump-key control
          */
         if (isJumpDown) {
             if (!isNoClip) {
+
+                // wall-kick jumps // (think of Mario DS!)
+
+                if (isJumpJustDown && !jumping && (walledLeft || walledRight)) {
+                    printdbg(this, "Wallkicking detection test print")
+                }
+
+                // perpendicular jumps //
+
+                // make airjumping work by resetting some jump-related variables
                 if (!playerJumpKeyHeldDown && (walledBottom || airJumpingCount < airJumpingPoint)) {
                     jumping = true
 
                     // make airjumping work
                     if (airJumpingCount < airJumpingPoint) {
-                        printdbg(this, "airjump!")
+                        //printdbg(this, "airjump!")
                         // reset jumping-related variables
                         jumpCounter = 0
                         airJumpingCount += 1
@@ -365,6 +378,8 @@ open class ActorHumanoid(
                         //controllerV?.y = 0.0
                     }
                 }
+
+                // acutally launch the player in the air
                 jump()
             }
             else {
@@ -434,7 +449,7 @@ open class ActorHumanoid(
         else
             controllerV?.x?.let { controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
-        if (walkCounterX < 1000000) {
+        if (walkCounterX <= WALK_FRAMES_TO_MAX_ACCEL) {
           walkCounterX += 1
         }
 

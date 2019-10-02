@@ -29,7 +29,7 @@ object AVKey {
     const val JUMPPOWER = "jumppower"
     const val JUMPPOWERBUFF = "$JUMPPOWER$BUFF"
 
-    /** How much air jumping you can perform. INT */
+    /** How much air jumping you can perform. 0 is same as 1. INT */
     const val AIRJUMPPOINT = "airjumppoint"
     /** How much air jumping you have performed before you run out of the point. INT */
     const val AIRJUMPCOUNT = "_airjumpcount"

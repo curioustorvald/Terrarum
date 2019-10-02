@@ -83,7 +83,7 @@ open class GameWorld : Disposable {
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
-    open var gravitation: Vector2 = Vector2(0.0, 9.80665)
+    open var gravitation: Vector2 = DEFAULT_GRAVITATION
     /** 0.0..1.0+ */
     open var globalLight = Cvec(0f, 0f, 0f, 0f)
     open var averageTemperature = 288f // 15 deg celsius; simulates global warming
@@ -490,6 +490,8 @@ open class GameWorld : Disposable {
 
             return nullWorldInstance!!
         }
+
+        val DEFAULT_GRAVITATION = Vector2(0.0, 9.8)
     }
 }
 
