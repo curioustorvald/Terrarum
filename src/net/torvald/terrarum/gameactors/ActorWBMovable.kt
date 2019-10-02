@@ -222,9 +222,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * [m / s^2]
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
      * meter to pixel : 24/FPS
+     *
+     * NOTE: this property is "var" so that future coder can implement the "reverse gravity potion"
      */
-    private val gravitation: Vector2
-        get() = world?.gravitation ?: Vector2(0.0, 9.8)
+    var gravitation: Vector2 = world?.gravitation ?: GameWorld.DEFAULT_GRAVITATION
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
     var dragCoefficient: Double
