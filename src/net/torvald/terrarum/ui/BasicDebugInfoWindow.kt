@@ -133,7 +133,8 @@ class BasicDebugInfoWindow : UICanvas() {
                     "${if (player.walledRight) "$ccR" else "$ccG"}R" +
                     "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}  " +
                     "${if (player.jumping) "$ccG" else "$ccK"}JMP" +
-                    "${if (player.isJumpDown) "$ccG" else "$ccK"}KEY"
+                    "${if (player.isJumpDown) "$ccG" else "$ccK"}KEY" +
+                    "${if (player.isJumpJustDown) "$ccO" else "$ccK"}${0x0F.toChar()}"
             )
         }
 

@@ -166,6 +166,7 @@ open class ActorHumanoid(
     protected inline val isGamer: Boolean
         get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.actorNowPlaying
 
+    private var jumpJustPressedLatched = false
 
     @Transient private val nullItem = object : GameItem(0) {
         override val isUnique: Boolean = false
@@ -248,7 +249,17 @@ open class ActorHumanoid(
                              gamepad.getButton(AppLoader.getConfigInt("gamepadltrigger"))
             }
 
-            TODO("isJumpJustDown")
+            if (isJumpJustDown && jumpJustPressedLatched) {
+                isJumpJustDown = false
+            }
+            else if (isJumpDown && !jumpJustPressedLatched) {
+                isJumpJustDown = true
+                jumpJustPressedLatched = true
+            }
+            else if (!isJumpDown) {
+                jumpJustPressedLatched = false
+            }
+
         }
         else {
             isUpDown = axisY < 0f
