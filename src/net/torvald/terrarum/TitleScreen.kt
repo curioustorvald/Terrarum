@@ -114,8 +114,6 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
 
 
-    lateinit var logo: TextureRegion
-
     val uiContainer = ArrayList<UICanvas?>()
     private lateinit var uiMenu: UICanvas
 
@@ -173,9 +171,6 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         printdbg(this, "show() called")
 
         initViewPort(AppLoader.screenW, AppLoader.screenH)
-
-        logo = TextureRegion(Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")))
-        logo.flip(false, true)
 
 
         Gdx.input.inputProcessor = TitleScreenController(this)
@@ -317,7 +312,6 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        logo.texture.dispose()
         uiMenu.dispose()
         demoWorld.dispose()
     }
