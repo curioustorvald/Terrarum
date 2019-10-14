@@ -44,7 +44,7 @@ class UIItemInventoryEquippedView(
     
     val spriteViewBackCol: Color = CELLCOLOUR_BLACK
 
-    private val equipPosIcon = TextureRegionPack("./assets/graphics/gui/inventory/equip_position.tga", 18, 18)
+    private val equipPosIcon = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
     private val cellToIcon = intArrayOf(0,1,2,3,4,5,6,7,6,7,6,7)
     private val equipPosIconCol = Color(0xdddddd7f.toInt())
 
@@ -107,7 +107,7 @@ class UIItemInventoryEquippedView(
             cell.render(batch, camera)
             if (cell.item == null) {
                 batch.color = equipPosIconCol
-                batch.draw(equipPosIcon.get(cellToIcon[index], 0), 15f + cell.posX, 15f + cell.posY)
+                batch.draw(equipPosIcon.get(cellToIcon[index], 1), 15f + cell.posX, 15f + cell.posY)
             }
         }
 

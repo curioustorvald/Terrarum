@@ -217,6 +217,7 @@ public class AppLoader implements ApplicationListener {
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderPassthruRGB;
     public static ShaderProgram shaderColLUT;
+    public static ShaderProgram shaderReflect;
 
     public static Mesh fullscreenQuad;
     private static OrthographicCamera camera;
@@ -388,6 +389,7 @@ public class AppLoader implements ApplicationListener {
         shaderHicolour = loadShader("assets/4096.vert", "assets/hicolour.frag");
         shaderPassthruRGB = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
         shaderColLUT = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
+        shaderReflect = loadShader("assets/4096.vert", "assets/reflect.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -561,18 +563,35 @@ public class AppLoader implements ApplicationListener {
         fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
         shaderBayerSkyboxFill.end();
 
-        logoBatch.begin();
-        logoBatch.setColor(Color.WHITE);
-        //blendNormal();
-        logoBatch.setShader(null);
 
         setCameraPosition(0f, 0f);
 
+        int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
+        int logoPosX = (appConfig.width - logo.getRegionWidth() - safetyTextLen) >>> 1;
+        int logoPosY = Math.round(appConfig.height / 15f);
+        int textY = logoPosY + logo.getRegionHeight() - 16;
+
+        // draw logo reflection
+        logoBatch.setShader(shaderReflect);
+        logoBatch.setColor(Color.WHITE);
+        logoBatch.begin();
+
         if (getConfigBoolean("showhealthmessageonstartup")) {
-            int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
-            int logoPosX = (appConfig.width - logo.getRegionWidth() - safetyTextLen) >>> 1;
-            int logoPosY = Math.round(appConfig.height / 15f);
-            int textY = logoPosY + (logo.getRegionHeight() >>> 1) - 16;
+            logoBatch.draw(logo, logoPosX, logoPosY + logo.getRegionHeight());
+        }
+        else {
+            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
+                    (appConfig.height - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
+            );
+        }
+
+        logoBatch.end();
+
+        // draw health messages
+        logoBatch.setShader(null);
+        logoBatch.begin();
+
+        if (getConfigBoolean("showhealthmessageonstartup")) {
 
             logoBatch.draw(logo, logoPosX, logoPosY);
             logoBatch.setColor(new Color(0x666666ff));
@@ -600,10 +619,11 @@ public class AppLoader implements ApplicationListener {
             int virtualHeightOffset = appConfig.height - virtualHeight;
             logoBatch.draw(tex1, (appConfig.width - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
             logoBatch.draw(tex2, (appConfig.width - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
+
         }
         else {
             logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
-                    (appConfig.height - logo.getRegionHeight()) / 2f
+                    (appConfig.height - logo.getRegionHeight() * 2) / 2f
             );
         }
 
