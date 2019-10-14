@@ -58,8 +58,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) ||
-                    Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
 
                     terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
                 }
@@ -172,6 +171,11 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
         }
 
+        // pie menu
+        if (button == AppLoader.getConfigInt("mousesecondary")) {
+            terrarumIngame.uiPieMenu.setAsClose()
+            terrarumIngame.uiQuickBar.setAsOpen()
+        }
 
         terrarumIngame.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
 
@@ -200,7 +204,15 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         terrarumIngame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
+
+        // pie menu
+        if (button == AppLoader.getConfigInt("mousesecondary")) {
+            terrarumIngame.uiPieMenu.setAsOpen()
+            terrarumIngame.uiQuickBar.setAsClose()
+        }
+
         return true
     }
+
 
 }
