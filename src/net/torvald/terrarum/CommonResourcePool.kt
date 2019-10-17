@@ -17,7 +17,7 @@ object CommonResourcePool {
     private val poolKillFun = HashMap<String, (() -> Unit)?>()
     //private val typesMap = HashMap<String, Class<*>>()
     private var loadCounter = -1 // using counters so that the loading can be done on separate thread (gg if the asset requires GL context to be loaded)
-    val loaded: Boolean
+    val loaded: Boolean // see if there's a thing to load
         get() = loadCounter == 0
 
     init {
@@ -93,7 +93,7 @@ object CommonResourcePool {
      * Consumes the loading list. After the load, the list will be empty
      */
     fun loadAll() {
-        if (loaded) return //throw IllegalStateException("Assets are already loaded and shipped out :p")
+        if (loaded) return
 
         while (!loadingList.isEmpty) {
             val (name, loadfun, killfun) = loadingList.removeFirst()
