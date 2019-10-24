@@ -2,6 +2,7 @@ package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Camera
@@ -13,10 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemTextButton
-import net.torvald.terrarum.ui.UIItemToggleButton
+import net.torvald.terrarum.ui.*
 import kotlin.math.roundToInt
 
 /**
@@ -53,7 +51,12 @@ class UIElemTest : ApplicationAdapter() {
 }
 
 class DummyTogglePane : UICanvas() {
-    private val button1 = UIItemToggleButton(this, 10, 10)
+    private val button1 = UIItemToggleButton(this, 0, 0)
+
+    private val key1 = UIItemConfigKeycap(this, 0, 20, 4, Input.Keys.A)
+    private val key2 = UIItemConfigKeycap(this, 36, 20, 4, Input.Keys.S)
+    private val key3 = UIItemConfigKeycap(this, 36*2, 20, 4, Input.Keys.D)
+    private val key4 = UIItemConfigKeycap(this, 36*3, 20, 4, Input.Keys.F)
 
     override var width = 100
     override var height = 25
@@ -62,21 +65,29 @@ class DummyTogglePane : UICanvas() {
 
     private var timer = 0f
 
+    init {
+        uiItems.add(button1)
+        uiItems.add(key1)
+        uiItems.add(key2)
+        uiItems.add(key3)
+        uiItems.add(key4)
+    }
+
     override fun updateUI(delta: Float) {
         timer += delta
 
-        if (timer >= 1.5f) {
-            timer -= 1.5f
+        if (timer >= 1f) {
+            timer -= 1f
             button1.toggle()
         }
 
-        button1.update(delta)
+        uiItems.forEach { it.update(delta) }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.inUse {
-            batch.color = Color(0x404040ff)
-            button1.render(batch, camera)
+
+            uiItems.forEach { it.render(batch, camera) }
         }
     }
 

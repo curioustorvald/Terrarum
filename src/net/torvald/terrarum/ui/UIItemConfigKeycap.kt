@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -18,14 +19,14 @@ class UIItemConfigKeycap(
         private val keySize: Int,
 
         private val keycode: Int, // also used to draw key label
-        private var keyItem: Int  // internal index for the key's behaviour, also used to choose appropriate icon
+        private var keyItem: Int? = null  // internal index for the key's behaviour, also used to choose appropriate icon
 ) : UIItem(parent) {
 
     init {
         if (keySize < 3) throw IllegalArgumentException("Key size must be greater than 2 (got $keySize)")
 
         CommonResourcePool.addToLoadingList("ui_item_keymap_keycap") {
-            TextureRegionPack("./assets/graphics/gui/ui_config_keymap_keycap.tga", 4, 32)
+            TextureRegionPack("./assets/graphics/gui/ui_config_keymap_keycap.tga", 8, 32)
         }
         CommonResourcePool.loadAll()
     }
@@ -51,12 +52,16 @@ class UIItemConfigKeycap(
         batch.draw(capTex.get(2, 0), (posX + (keySize - 1) * capTex.tileW).toFloat(), posY.toFloat())
 
         // draw label
-        AppLoader.fontSmallNumbers.draw(batch, KeyDict.keycodeToLabel[keycode]!!, posX + 2f, posY + 2f)
+        TinyAlphNum.draw(batch, KeyDict.keycodeToLabel[keycode]!!, posX + 2f, posY + 2f)
 
         // draw icon
         
 
         super.render(batch, camera)
+    }
+
+    override fun dispose() {
+
     }
 }
 
@@ -201,7 +206,7 @@ object KeyDict {
 
     init {
         keyDict.forEach {
-            keycodeToLabel[it[1]] = it[2]
+            keycodeToLabel[it[1] as Int] = it[2] as String
         }
     }
 
