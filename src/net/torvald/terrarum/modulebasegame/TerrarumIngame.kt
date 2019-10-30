@@ -28,6 +28,8 @@ import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
+import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
@@ -259,9 +261,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             world = gameworld
 
             // generate terrain for the map
-            WorldGenerator.attachMap(world)
-            WorldGenerator.SEED = worldParams.worldGenSeed
-            WorldGenerator.generateMap()
+            //WorldGenerator.attachMap(world)
+            //WorldGenerator.SEED = worldParams.worldGenSeed
+            //WorldGenerator.generateMap()
+            Worldgen.attachMap(world, WorldgenParams(worldParams.worldGenSeed))
+            Worldgen.generateMap()
 
 
             historicalFigureIDBucket = ArrayList<Int>()

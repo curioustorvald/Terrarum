@@ -2,6 +2,8 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
@@ -23,6 +25,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
         (0 until world.width).mapToThreadPoolDirectly(this.javaClass.simpleName) { range ->
             for (y in 0 until world.height) {
+                printdbg(this, "Tile draw for y=$y")
                 for (x in range) {
                     val sampleTheta = (x.toDouble() / world.width) * TWO_PI
                     val sampleOffset = world.width / 8.0
@@ -36,9 +39,10 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             }
         }
 
-        ThreadParallel.startAll()
         generationStarted = true
-        super.run()
+        ThreadParallel.startAllWaitForDie()
+        printdbg(this, "Waking up Worldgen")
+        //Worldgen.wake()
     }
 
 
