@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.gameworld.GameWorld
 
@@ -11,10 +12,17 @@ import net.torvald.terrarum.gameworld.GameWorld
  */
 object Worldgen {
 
-    operator fun invoke(worldIndex: Int, params: WorldgenParams) {
-        val genTime = AppLoader.getTIME_T()
-        val world = GameWorld(worldIndex, params.width, params.height, genTime, genTime, 0)
+    private lateinit var world: GameWorld
+    private lateinit var params: WorldgenParams
 
+    private val threadLock = java.lang.Object()
+
+    fun attachMap(world: GameWorld, genParams: WorldgenParams) {
+        this.world = world
+        params = genParams
+    }
+
+    fun generateMap() {
         val jobs = listOf(
                 Work("Reticulating Splines", Terragen(world, params.seed, params.terragenParams))
                 //Work("Adding Vegetations") { Biomegen(world, params.seed, params.biomegenParams) }
@@ -22,15 +30,28 @@ object Worldgen {
 
 
         for (i in 0 until jobs.size) {
+            printdbg(this, "Worldgen: job #$i")
+
             val it = jobs[i]
 
             LoadScreen.addMessage(it.loadingScreenName)
             it.theWork.run()
 
-            // busy wait
-            while (!it.theWork.generationDone) { }
+            // wait
+            //while (!it.theWork.generationDone) { } // busy wait
+            //synchronized(threadLock) {
+            //    threadLock.wait()
+            //}
         }
 
+        printdbg(this, "Generation job finished")
+
+    }
+
+    fun wake() {
+        synchronized(threadLock) {
+            threadLock.notifyAll()
+        }
     }
 
     private data class Work(val loadingScreenName: String, val theWork: Gen)
@@ -41,15 +62,14 @@ abstract class Gen(val world: GameWorld, val seed: Long, val params: Any) {
     abstract var generationStarted: Boolean
     abstract val generationDone: Boolean
     open fun run() {
-        if (generationDone) {
+        /*if (generationDone) {
             // worldgen.wake()
-        }
+            Worldgen.threadLock.notifyAll()
+        }*/
     }
 }
 
 data class WorldgenParams(
-        val width: Int,
-        val height: Int,
         val seed: Long,
         // optional parametres
         val terragenParams: TerragenParams = TerragenParams(),
