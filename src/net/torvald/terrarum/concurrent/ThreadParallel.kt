@@ -1,14 +1,32 @@
 package net.torvald.terrarum.concurrent
 
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
 typealias RunnableFun = () -> Unit
 /** Int: index of the processing core */
 typealias ThreadableFun = (Int) -> Unit
 
+
+object ThreadExecutor {
+    val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
+    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+
+    fun submit(t: Runnable) = executor.submit(t)
+    fun submit(f: RunnableFun) = executor.submit { f() }
+
+    fun join() {
+        executor.awaitTermination(24L, TimeUnit.HOURS)
+    }
+
+}
+
+
 /**
  * Created by minjaesong on 2016-05-25.
  */
+@Deprecated("Hooey implementation", ReplaceWith("ThreadExecutor", "net.torvald.terrarum.concurrent.ThreadExecutor"))
 object ThreadParallel {
     val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
 
