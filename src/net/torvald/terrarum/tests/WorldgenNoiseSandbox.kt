@@ -15,13 +15,13 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
+import net.torvald.terrarum.concurrent.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
+import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -93,12 +93,12 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
 
         // check if generation is done
-        if (ThreadParallel.allFinished()) {
+        if (threadExecFinished) {
             generateKeyLatched = false
         }
 
         // finish time measurement
-        if (ThreadParallel.allFinished() && generationTimeInMeasure) {
+        if (threadExecFinished && generationTimeInMeasure) {
             generationTimeInMeasure = false
             val time = System.nanoTime() - generationStartTime
             generationTime = time / 1000000000f
@@ -123,6 +123,12 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     val colourNull = Color(0x1b3281ff)
 
+    private val sampleOffset = WIDTH / 8.0
+
+    private val threadExecFuture = Array<Future<*>?>(ThreadExecutor.threadCount) { null }
+    private val threadExecFinished: Boolean
+        get() = threadExecFuture.fold(true) { acc, future -> acc && (future?.isDone ?: true) }
+
     private fun renderNoise() {
         generationStartTime = System.nanoTime()
         generationTimeInMeasure = true
@@ -132,22 +138,26 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testTex.fill()
 
         // render noisemap to pixmap
-        (0 until WIDTH).mapToThreadPoolDirectly("NoiseGen") { range ->
-            for (y in 0 until HEIGHT) {
-                for (x in range) {
-                    val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                    val sampleOffset = WIDTH / 8.0
-                    val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                    val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                    val sampleY = y.toDouble()
-                    val noise = joise.map { it.get(sampleX, sampleY, sampleZ) }
+        val runnables: List<RunnableFun> = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount).map { range ->
+            {
+                for (y in 0 until HEIGHT) {
+                    for (x in range) {
+                        val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                        val sampleY = y.toDouble()
 
-                    NOISE_MAKER.draw(x, y, noise, testTex)
+                        //synchronized(testTex) {
+                            NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+                        //}
+                    }
                 }
             }
         }
 
-        ThreadParallel.startAll()
+        runnables.forEachIndexed { index, function ->
+            threadExecFuture[index] = ThreadExecutor.submit(function)
+        }
 
         generationDone = true
     }
