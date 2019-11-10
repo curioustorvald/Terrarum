@@ -14,6 +14,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.UnsafeHelper
+import net.torvald.UnsafePtr
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.concurrent.*
 import net.torvald.terrarum.gameworld.fmod
@@ -21,12 +23,14 @@ import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
+import net.torvald.terrarum.worlddrawer.toRGBA
 import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 
-const val WIDTH = 1536
-const val HEIGHT = 1024
+const val WIDTH = 768
+const val HEIGHT = 512
 const val TWO_PI = Math.PI * 2
 
 /**
@@ -104,6 +108,19 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             generationTime = time / 1000000000f
         }
 
+        //if (threadExecFinished) {
+            threadingBuffer.forEachIndexed { index, ptr ->
+                val xs = xSlices[index]
+                for (x in xs) {
+                    for (y in 0 until HEIGHT) {
+                        val n = ptr[(y * (xs.last - xs.first + 1)) + (x - xs.first).toLong()]
+
+                        testTex.drawPixel(x, y, if (n == 0.toByte()) 0xff else -1)
+                    }
+                }
+            }
+        //}
+
         // draw timer
         batch.inUse {
             if (!generationTimeInMeasure) {
@@ -129,6 +146,41 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private val threadExecFinished: Boolean
         get() = threadExecFuture.fold(true) { acc, future -> acc && (future?.isDone ?: true) }
 
+    private val testColSet = arrayOf(
+            Color(0xff0000ff.toInt()),
+            Color(0xffff00ff.toInt()),
+            Color(0x00ff00ff.toInt()),
+            Color(0x00ffffff.toInt()),
+            Color(0x0000ffff.toInt()),
+            Color(0xff00ffff.toInt()),
+            Color(0xffffffff.toInt()),
+            Color(0xff)
+    )
+    private val testColSet2 = arrayOf(
+            0xff0000ff.toInt(),
+            0xffff00ff.toInt(),
+            0x00ff00ff.toInt(),
+            0x00ffffff.toInt(),
+            0x0000ffff.toInt(),
+            0xff00ffff.toInt(),
+            0xffffffff.toInt(),
+            0xff
+    )
+
+    fun <T> Array<T>.shuffle() {
+        val rng = Random(System.nanoTime())
+        for (k in this.size - 1 downTo 1) {
+            val r = rng.nextInt(k + 1)
+
+            val t = this[r]
+            this[r] = this[k]
+            this[k] = t
+        }
+    }
+
+    private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
+    private val threadingBuffer = xSlices.map { UnsafeHelper.allocate(1L * HEIGHT * (it.last - it.first + 1) ) }
+
     private fun renderNoise() {
         generationStartTime = System.nanoTime()
         generationTimeInMeasure = true
@@ -137,19 +189,30 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testTex.setColor(colourNull)
         testTex.fill()
 
-        // render noisemap to pixmap
-        val runnables: List<RunnableFun> = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount).map { range ->
-            {
-                for (y in 0 until HEIGHT) {
-                    for (x in range) {
-                        val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                        val sampleY = y.toDouble()
+        testColSet.shuffle()
+        testColSet2.shuffle()
 
-                        //synchronized(testTex) {
-                            NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
-                        //}
+        // render noisemap to pixmap
+        val runnables: List<RunnableFun> = xSlices.mapIndexed { index, range ->
+            {
+                for (x in range) {
+                    for (y in 0 until HEIGHT) {
+                        synchronized(threadingBuffer[index]) {
+                            val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                            val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                            val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                            val sampleY = y.toDouble()
+
+
+                            //NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+                            NOISE_MAKER.draw(range, x, y, listOf(joise[0].get(sampleX, sampleY, sampleZ)), threadingBuffer[index])
+
+                            //joise.map { it.get(sampleX, sampleY, sampleZ) }
+                            //testTex.drawPixel(x, y, testColSet2[index])
+
+                            //testTex.setColor(testColSet2[index])
+                            //testTex.drawPixel(x, y)
+                        }
                     }
                 }
             }
@@ -160,6 +223,12 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
 
         generationDone = true
+    }
+
+    override fun dispose() {
+        testTex.dispose()
+        tempTex.dispose()
+        threadingBuffer.forEach { it.destroy() }
     }
 }
 
@@ -179,19 +248,20 @@ fun main(args: Array<String>) {
 }
 
 interface NoiseMaker {
-    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap)
+    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr)
     fun getGenerator(seed: Long, params: Any): List<Joise>
 }
 
+val locklock = java.lang.Object()
+
 object BiomeMaker : NoiseMaker {
 
-    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr) {
         val colPal = biomeColors
         val control = noiseValue[0].times(colPal.size).minus(0.00001f).toInt().fmod(colPal.size)
 
-        outTex.setColor(colPal[control])
-        //testTex.setColor(RNG.nextFloat(), RNG.nextFloat(), RNG.nextFloat(), 1f)
-        outTex.drawPixel(x, y)
+        //outTex.setColor(colPal[control])
+        //outTex.drawPixel(x, y)
     }
 
     override fun getGenerator(seed: Long, params: Any): List<Joise> {
@@ -233,7 +303,7 @@ object BiomeMaker : NoiseMaker {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-object AccidentalCave : NoiseMaker {
+object AccidentalCave {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
@@ -246,7 +316,7 @@ object AccidentalCave : NoiseMaker {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+    fun draw(xs: IntProgression, x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr) {
         // simple one-source draw
         /*val c = noiseValue[0].toFloat()
         val selector = c.minus(0.0001).floorInt() fmod notationColours.size
@@ -273,17 +343,19 @@ object AccidentalCave : NoiseMaker {
                 Color(.6f, .6f, .6f, 1f)
         )
         val n1 = noiseValue[0].tiered(.0, .5, .88)
-        var n2 = noiseValue[1].toFloat()
-        if (n2 != 1f) n2 = 0.5f
+        //var n2 = noiseValue[1].toFloat()
+        //if (n2 != 1f) n2 = 0.5f
         val c1 = groundDepthCol[n1]
-        val c2 = Color(n2, n2, n2, 1f)
-        val cout = c1 mul c2
+        //val c2 = Color(n2, n2, n2, 1f)
+        //val cout = c1 mul c23
+        val cout = c1
 
-        outTex.setColor(cout)
-        outTex.drawPixel(x, y)
+        //outTex.drawPixel(x, y, cout.toRGBA())
+
+        outTex[(y * (xs.last - xs.first + 1)) + (x - xs.first).toLong()] = n1.toByte()
     }
 
-    override fun getGenerator(seed: Long, params: Any): List<Joise> {
+    fun getGenerator(seed: Long, params: Any): List<Joise> {
         val params = params as TerragenParams
 
         val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
