@@ -5,9 +5,11 @@ import com.sudoplay.joise.module.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.mapToThreadPoolDirectly
 import net.torvald.terrarum.gameworld.GameWorld
+import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -16,17 +18,21 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
+    private var genFuture: Future<*>? = null
     override var generationStarted: Boolean = false
     override val generationDone: Boolean
-        get() = generationStarted && ThreadParallel.allFinished()
+        get() = generationStarted && genFuture?.isDone ?: false
 
     override fun run() {
         val joise = getGenerator(seed, params as TerragenParams)
 
-        (0 until world.width).mapToThreadPoolDirectly(this.javaClass.simpleName) { range ->
-            for (y in 0 until world.height) {
-                printdbg(this, "Tile draw for y=$y")
-                for (x in range) {
+        generationStarted = true
+
+        // single-threaded impl because I couldn't resolve multithread memory corruption issue...
+        genFuture = ThreadExecutor.submit {
+            for (x in 0 until world.width) {
+                //printdbg(this, "Tile draw for y=$y")
+                for (y in 0 until world.height) {
                     val sampleTheta = (x.toDouble() / world.width) * TWO_PI
                     val sampleOffset = world.width / 8.0
                     val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
@@ -39,8 +45,6 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             }
         }
 
-        generationStarted = true
-        ThreadParallel.startAllWaitForDie()
         printdbg(this, "Waking up Worldgen")
         //Worldgen.wake()
     }
