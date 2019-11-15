@@ -1,10 +1,12 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.ScreenAdapter
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.util.HistoryArray
+import net.torvald.util.CircularArray
 import kotlin.math.roundToInt
 
 /**
@@ -25,7 +27,25 @@ class WorldgenLoadScreen(private var world: GameWorld, private var screenToLoad:
 
     private lateinit var screenLoadingThread: Thread
 
+    private lateinit var previewPixmap: Pixmap
+    private lateinit var previewTexture: Texture
 
-    private val messages = HistoryArray<String>(20)
+    private val messages = CircularArray<String>(20, true) // this many texts will be shown at once
 
+    override fun show() {
+        previewPixmap = Pixmap(previewWidth, previewHeight, Pixmap.Format.RGBA8888)
+        previewTexture = Texture(1, 1, Pixmap.Format.RGBA8888)
+    }
+
+    override fun render(delta: Float) {
+        previewTexture.dispose()
+        previewTexture = Texture(previewPixmap)
+
+        //
+    }
+
+    override fun dispose() {
+        previewPixmap.dispose()
+        previewTexture.dispose()
+    }
 }

@@ -16,7 +16,7 @@ import java.util.*
 class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterable<T> {
 
     /**
-     * What to do when old element is being overridden by the new element (only makes sense when ```overwriteOnOverflow = true```)
+     * What to do RIGHT BEFORE old element is being overridden by the new element (only makes sense when ```overwriteOnOverflow = true```)
      *
      * This function will not be called when ```removeHead()``` or ```removeTail()``` is called.
      */
@@ -47,6 +47,12 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
     private inline fun decHead() { head = (head - 1).wrap() }
     private inline fun incTail() { tail = (tail + 1).wrap() }
     private inline fun decTail() { tail = (tail - 1).wrap() }
+
+    fun clear() {
+        tail = 0
+        head = 0
+        overflow = false
+    }
 
     /**
      * When the overflowing is enabled, tail element (ultimate element) will be changed into the penultimate element.
@@ -116,6 +122,11 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
     /** Returns the oldest (first of the array) element */
     fun getTailElem(): T = buffer[tail]
 
+    /**
+     * Relative-indexed get. Index of zero will return the head element.
+     */
+    operator fun get(index: Int) = buffer[(head - 1 - index).wrap()]
+
     private fun getAbsoluteRange() =  0 until when {
         head == tail -> buffer.size
         tail >  head -> buffer.size - (((head - 1).wrap()) - tail)
@@ -171,11 +182,11 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
         return accumulator
     }
 
-    private fun Int.wrap() = this fmod size
+    private inline fun Int.wrap() = this fmod size
 
     override fun toString(): String {
         return "CircularArray(size=${buffer.size}, head=$head, tail=$tail, overflow=$overflow)"
     }
 
-    private infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
+    private inline infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
 }
