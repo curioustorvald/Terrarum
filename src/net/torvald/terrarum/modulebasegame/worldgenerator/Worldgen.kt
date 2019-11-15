@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.gameworld.GameWorld

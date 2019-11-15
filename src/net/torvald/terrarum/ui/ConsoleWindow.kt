@@ -10,7 +10,7 @@ import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.util.HistoryArray
+import net.torvald.util.CircularArray
 
 
 /**
@@ -30,7 +30,7 @@ class ConsoleWindow : UICanvas() {
     private var messagesCount: Int = 0
 
     private var commandInputPool: StringBuilder? = null
-    private var commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
+    private var commandHistory = CircularArray<String>(COMMAND_HISTORY_MAX, true)
 
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 11
@@ -83,7 +83,7 @@ class ConsoleWindow : UICanvas() {
 
     override fun keyDown(key: Int): Boolean {
         // history
-        if (key == Input.Keys.UP && historyIndex < commandHistory.history.size)
+        if (key == Input.Keys.UP && historyIndex < commandHistory.elemCount)
             historyIndex++
         else if (key == Input.Keys.DOWN && historyIndex >= 0)
             historyIndex--
@@ -92,7 +92,7 @@ class ConsoleWindow : UICanvas() {
 
         // execute
         if (key == Input.Keys.ENTER && commandInputPool!!.isNotEmpty()) {
-            commandHistory.add(commandInputPool!!.toString())
+            commandHistory.appendHead(commandInputPool!!.toString())
             executeCommand()
             commandInputPool = StringBuilder()
         }
@@ -105,7 +105,7 @@ class ConsoleWindow : UICanvas() {
             // create new stringbuilder
             commandInputPool = StringBuilder()
             if (historyIndex >= 0) // just leave blank if index is -1
-                commandInputPool!!.append(commandHistory[historyIndex] ?: "")
+                commandInputPool!!.append(commandHistory[historyIndex])
         }
         // delete input
         else if (key == Input.Keys.BACKSPACE) {
@@ -179,7 +179,7 @@ class ConsoleWindow : UICanvas() {
         messageDisplayPos = 0
         messagesCount = 0
         inputCursorPos = 0
-        commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
+        commandHistory = CircularArray<String>(COMMAND_HISTORY_MAX, true)
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {

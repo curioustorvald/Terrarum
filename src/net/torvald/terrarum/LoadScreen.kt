@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.util.HistoryArray
+import net.torvald.util.CircularArray
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -20,10 +20,10 @@ object LoadScreen : ScreenAdapter() {
     private lateinit var screenLoadingThread: Thread
 
 
-    private val messages = HistoryArray<String>(20)
+    private val messages = CircularArray<String>(20, true)
 
     fun addMessage(msg: String) {
-        messages.add(msg)
+        messages.appendHead(msg)
     }
 
 
@@ -238,9 +238,9 @@ object LoadScreen : ScreenAdapter() {
 
                 // log messages
                 it.color = messageForegroundColour
-                for (i in 0 until messages.elemCount) {
+                messages.forEachIndexed { i, s ->
                     AppLoader.fontGame.draw(it,
-                            messages[i] ?: "",
+                            s,
                             AppLoader.getTvSafeGraphicsWidth() + 16f,
                             80f + (messages.size - i - 1) * AppLoader.fontGame.lineHeight
                     )
@@ -263,9 +263,9 @@ object LoadScreen : ScreenAdapter() {
 
                 // log messages
                 it.color = messageForegroundColour
-                for (i in 0 until messages.elemCount) {
+                messages.forEachIndexed { i, s ->
                     AppLoader.fontGame.draw(it,
-                            messages[i] ?: "",
+                            s,
                             AppLoader.getTvSafeGraphicsWidth() + 16f,
                             80f + (messages.size - i - 1) * AppLoader.fontGame.lineHeight
                     )

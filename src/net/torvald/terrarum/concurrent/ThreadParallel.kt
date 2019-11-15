@@ -1,6 +1,7 @@
 package net.torvald.terrarum.concurrent
 
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
@@ -11,12 +12,27 @@ typealias ThreadableFun = (Int) -> Unit
 
 object ThreadExecutor {
     val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
-    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    private var executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
 
-    fun submit(t: Runnable) = executor.submit(t)
-    fun submit(f: RunnableFun) = executor.submit { f() }
+    private fun checkShutdown() {
+        if (!executor.isShutdown) return
+        if (executor.isShutdown&& !executor.isTerminated)
+            throw IllegalStateException("Thread pool is still running")
+
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    }
+
+    fun submit(t: Runnable): Future<*> {
+        checkShutdown()
+        return executor.submit(t)
+    }
+    fun submit(f: RunnableFun): Future<*> {
+        checkShutdown()
+        return executor.submit { f() }
+    }
 
     fun join() {
+        executor.shutdown() // thread status of completed ones will be WAIT instead of TERMINATED without this line...
         executor.awaitTermination(24L, TimeUnit.HOURS)
     }
 
