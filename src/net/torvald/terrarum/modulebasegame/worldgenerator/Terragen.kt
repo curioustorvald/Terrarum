@@ -2,7 +2,9 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameworld.GameWorld
@@ -28,7 +30,10 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         // single-threaded impl because I couldn't resolve multithread memory corruption issue...
         genFuture = ThreadExecutor.submit {
             for (x in 0 until world.width) {
-                printdbg(this, "Tile draw for x=$x")
+
+                if (AppLoader.IS_DEVELOPMENT_BUILD)
+                    LoadScreen.addMessage("Tile draw for x=$x")
+
                 for (y in 0 until world.height) {
                     val sampleTheta = (x.toDouble() / world.width) * TWO_PI
                     val sampleOffset = world.width / 8.0

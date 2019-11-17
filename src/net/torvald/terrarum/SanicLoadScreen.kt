@@ -14,19 +14,7 @@ import net.torvald.util.CircularArray
 /**
  * Created by minjaesong on 2017-07-13.
  */
-object LoadScreen : ScreenAdapter() {
-
-    var screenToLoad: IngameInstance? = null
-    private lateinit var screenLoadingThread: Thread
-
-
-    private val messages = CircularArray<String>(20, true)
-
-    fun addMessage(msg: String) {
-        messages.appendHead(msg)
-    }
-
-
+object LoadScreen : LoadScreenBase() {
 
     private var arrowObjPos = 0f // 0 means at starting position, regardless of screen position
     private var arrowObjGlideOffsetX = 0f
@@ -47,52 +35,11 @@ object LoadScreen : ScreenAdapter() {
     private val ghostMaxZoomX = 1.25f
     private val ghostAlphaMax = 1f
 
-    var camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
-
-    fun initViewPort(width: Int, height: Int) {
-        // Set Y to point downwards
-        camera.setToOrtho(true, width.toFloat(), height.toFloat())
-
-        // Update camera matrix
-        camera.update()
-
-        // Set viewport to restrict drawing
-        Gdx.gl20.glViewport(0, 0, width, height)
-    }
-
-
-    private var errorTrapped = false
-
 
     override fun show() {
-        messages.clear()
-        doContextChange = false
         glideTimer = 0f
 
-
-        if (screenToLoad == null) {
-            println("[LoadScreen] Screen to load is not set. Are you testing the UI?")
-        }
-        else {
-            val runnable = {
-                try {
-                    screenToLoad!!.show()
-                }
-                catch (e: Exception) {
-                    addMessage("$ccR$e")
-                    errorTrapped = true
-
-                    System.err.println("Error while loading:")
-                    e.printStackTrace()
-                }
-            }
-            screenLoadingThread = Thread(runnable, "LoadScreen GameLoader")
-
-            screenLoadingThread.start()
-        }
-
-
-        initViewPort(AppLoader.screenW, AppLoader.screenH)
+        super.show()
 
         textFbo = FrameBuffer(
                 Pixmap.Format.RGBA4444,
@@ -114,7 +61,6 @@ object LoadScreen : ScreenAdapter() {
     val textX: Float; get() = (AppLoader.screenW * 0.72f).floor()
 
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
-    private var doContextChange = false
 
     private var messageBackgroundColour = Color(0x404040ff)
     private var messageForegroundColour = Color.WHITE
@@ -315,9 +261,5 @@ object LoadScreen : ScreenAdapter() {
     }
 
     override fun hide() {
-    }
-
-    override fun resize(width: Int, height: Int) {
-        initViewPort(AppLoader.screenW, AppLoader.screenH)
     }
 }
