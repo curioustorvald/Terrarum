@@ -169,6 +169,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var theRealGamer: IngamePlayer
         // get() = actorGamer as IngamePlayer
 
+
+
     enum class GameLoadMode {
         CREATE_NEW, LOAD_FROM
     }
