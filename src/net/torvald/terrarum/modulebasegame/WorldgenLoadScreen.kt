@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.ScreenAdapter
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
@@ -22,6 +23,10 @@ class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameI
     companion object {
         private const val WIDTH_RATIO = 0.6
         private const val PREVIEW_UPDATE_RATE = 1/8f
+
+        private val COL_WALL = Color.WHITE
+        private val COL_TERR = Color(.5f,.5f,.5f,1f)
+        private val COL_AIR = Color.BLACK
     }
 
     private val previewWidth = (AppLoader.screenW * WIDTH_RATIO).roundToInt()
@@ -45,6 +50,21 @@ class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameI
                     (AppLoader.screenW - previewWidth).div(2f).round(),
                     (AppLoader.screenH - previewHeight.times(1.25f)).div(2f).round()
             )
+        }
+    }
+
+    private fun renderToPreview() {
+        for (y in 0 until previewWidth) {
+            for (x in 0 until previewHeight) {
+                val wx = (world.width / previewWidth * x).toInt()
+                val wy = (world.height / previewHeight * y).toInt()
+                val colT = if (world.getTileFromTerrain(wx, wy) != 0) COL_WALL else COL_TERR
+                val colW = if (world.getTileFromWall(wx, wy) != 0) COL_WALL else COL_AIR
+                val outCol = colW mul colT
+
+                previewPixmap.setColor(outCol)
+                previewPixmap.drawPixel(x, y)
+            }
         }
     }
 
