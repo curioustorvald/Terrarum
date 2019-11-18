@@ -17,7 +17,7 @@ object ThreadExecutor {
     private fun checkShutdown() {
         if (!executor.isShutdown) return
         if (executor.isShutdown&& !executor.isTerminated)
-            throw IllegalStateException("Thread pool is still running")
+            throw IllegalStateException("Pool is closed, come back when all the threads are terminated.")
 
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     }

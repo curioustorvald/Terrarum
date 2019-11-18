@@ -21,6 +21,7 @@ class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameI
 
     companion object {
         private const val WIDTH_RATIO = 0.6
+        private const val PREVIEW_UPDATE_RATE = 1/8f
     }
 
     private val previewWidth = (AppLoader.screenW * WIDTH_RATIO).roundToInt()
