@@ -219,11 +219,9 @@ object LoadScreen : LoadScreenBase() {
             }
 
             AppLoader.batch.flush()
-
-            Thread.sleep(80)
-
-            AppLoader.setScreen(screenToLoad!!)
         }
+
+        super.render(delta)
     }
 
     private fun getPulseEffCol(): Color {
