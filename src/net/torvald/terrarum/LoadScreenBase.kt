@@ -12,7 +12,7 @@ open class LoadScreenBase : ScreenAdapter() {
 
     internal val messages = CircularArray<String>(20, true)
 
-    fun addMessage(msg: String) {
+    open fun addMessage(msg: String) {
         messages.appendHead(msg)
     }
 
@@ -59,6 +59,13 @@ open class LoadScreenBase : ScreenAdapter() {
 
         // Set viewport to restrict drawing
         Gdx.gl20.glViewport(0, 0, width, height)
+    }
+
+    override fun render(delta: Float) {
+        if (doContextChange) {
+            Thread.sleep(80)
+            AppLoader.setScreen(LoadScreen.screenToLoad!!)
+        }
     }
 
     override fun resize(width: Int, height: Int) {

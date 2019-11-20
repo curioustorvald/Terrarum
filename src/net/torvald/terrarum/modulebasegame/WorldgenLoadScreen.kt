@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.util.CircularArray
 import kotlin.math.roundToInt
@@ -14,14 +15,19 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2019-11-09.
  */
-class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameInstance) : LoadScreenBase() {
+class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worldheight: Int) : LoadScreenBase() {
 
     // a Class impl is chosen to make resize-handling easier, there's not much benefit making this a singleton anyway
 
+    init {
+        screenToBeLoaded.world
+    }
+
+    private val world = screenToBeLoaded.world
     override var screenToLoad: IngameInstance? = screenToBeLoaded
 
     companion object {
-        private const val WIDTH_RATIO = 0.6
+        private const val WIDTH_RATIO = 0.7
         private const val PREVIEW_UPDATE_RATE = 1/8f
 
         private val COL_WALL = Color.WHITE
@@ -30,14 +36,21 @@ class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameI
     }
 
     private val previewWidth = (AppLoader.screenW * WIDTH_RATIO).roundToInt()
-    private val previewHeight = (AppLoader.screenW * WIDTH_RATIO * world.height / world.width).roundToInt()
+    private val previewHeight = (AppLoader.screenW * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
 
     private lateinit var previewPixmap: Pixmap
     private lateinit var previewTexture: Texture
 
+    private var previewRenderCounter = 0f
+
     override fun show() {
+        super.show()
+
         previewPixmap = Pixmap(previewWidth, previewHeight, Pixmap.Format.RGBA8888)
         previewTexture = Texture(1, 1, Pixmap.Format.RGBA8888)
+
+        previewPixmap.setColor(Color.BLACK)
+        previewPixmap.fill()
     }
 
     override fun render(delta: Float) {
@@ -45,12 +58,21 @@ class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameI
         previewTexture = Texture(previewPixmap)
 
         //
+
+        previewRenderCounter += delta
+        if (previewRenderCounter >= PREVIEW_UPDATE_RATE) {
+            previewRenderCounter -= PREVIEW_UPDATE_RATE
+            renderToPreview()
+        }
+
         AppLoader.batch.inUse {
             it.draw(previewTexture,
                     (AppLoader.screenW - previewWidth).div(2f).round(),
-                    (AppLoader.screenH - previewHeight.times(1.25f)).div(2f).round()
+                    (AppLoader.screenH - previewHeight.times(1.5f)).div(2f).round()
             )
         }
+
+        super.render(delta)
     }
 
     private fun renderToPreview() {
@@ -66,6 +88,11 @@ class WorldgenLoadScreen(private val world: GameWorld, screenToBeLoaded: IngameI
                 previewPixmap.drawPixel(x, y)
             }
         }
+    }
+
+    override fun addMessage(msg: String) {
+        super.addMessage(msg)
+        println("[WorldgenLoadScreen] $msg")
     }
 
     override fun dispose() {
