@@ -232,6 +232,7 @@ public class AppLoader implements ApplicationListener {
     private static com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
 
     private static Screen currenScreen;
+    private static LoadScreenBase currentSetLoadScreen;
     public static int screenW = 0;
     public static int screenH = 0;
     public static int halfScreenW = 0;
@@ -728,19 +729,38 @@ public class AppLoader implements ApplicationListener {
         if (currenScreen != null) currenScreen.resume();
     }
 
+    public static LoadScreenBase getLoadScreen() {
+        return currentSetLoadScreen;
+    }
+
+    public static void setLoadScreen(LoadScreenBase screen) {
+        currentSetLoadScreen = screen;
+        _setScr(screen);
+    }
+
     public static void setScreen(Screen screen) {
-        printdbg("[AppLoader-Static]", "Changing screen to " + screen.getClass().getCanonicalName());
+        if (screen instanceof LoadScreenBase) {
+            throw new RuntimeException(
+                    "Loadscreen '" + screen.getClass().getSimpleName() + "' must be set with 'setLoadScreen()' method");
+        }
+
+        _setScr(screen);
+    }
+
+    private static void _setScr(Screen screen) {
+
+        printdbg("AppLoader-Static", "Changing screen to " + screen.getClass().getCanonicalName());
 
         // this whole thing is directtly copied from com.badlogic.gdx.Game
 
         if (currenScreen != null) {
-            printdbg("[AppLoader-Static]", "Screen before change: " + currenScreen.getClass().getCanonicalName());
+            printdbg("AppLoader-Static", "Screen before change: " + currenScreen.getClass().getCanonicalName());
 
             currenScreen.hide();
             currenScreen.dispose();
         }
         else {
-            printdbg("[AppLoader-Static]", "Screen before change: null");
+            printdbg("AppLoader-Static", "Screen before change: null");
         }
 
 
@@ -752,9 +772,9 @@ public class AppLoader implements ApplicationListener {
 
         System.gc();
 
-        printdbg("[AppLoader-Static]", "Screen transition complete: " + currenScreen.getClass().getCanonicalName());
+        printdbg("AppLoader-Static", "Screen transition complete: " + currenScreen.getClass().getCanonicalName());
     }
-    
+
     /**
      * Init stuffs which needs GL context
      */

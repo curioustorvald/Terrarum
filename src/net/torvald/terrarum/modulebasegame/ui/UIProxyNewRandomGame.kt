@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -48,7 +47,7 @@ class UIProxyNewRandomGame : UICanvas() {
         //LoadScreen.screenToLoad = ingame
         //AppLoader.setScreen(LoadScreen)
         val loadScreen = WorldgenLoadScreen(ingame, worldParam.width, worldParam.height)
-        AppLoader.setScreen(loadScreen)
+        AppLoader.setLoadScreen(loadScreen)
     }
 
     override fun endClosing(delta: Float) {

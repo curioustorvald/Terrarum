@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
@@ -33,7 +33,7 @@ object Worldgen {
 
             val it = jobs[i]
 
-            LoadScreen.addMessage(it.loadingScreenName)
+            AppLoader.getLoadScreen().addMessage(it.loadingScreenName)
             it.theWork.run()
 
             // wait
