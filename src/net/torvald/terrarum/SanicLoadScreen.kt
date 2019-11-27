@@ -225,7 +225,12 @@ object SanicLoadScreen : LoadScreenBase() {
             AppLoader.batch.flush()
         }
 
-        super.render(delta)
+
+        // replaces super.render()
+        if (doContextChange) {
+            Thread.sleep(80)
+            AppLoader.setScreen(screenToLoad!!)
+        }
     }
 
     private fun getPulseEffCol(): Color {

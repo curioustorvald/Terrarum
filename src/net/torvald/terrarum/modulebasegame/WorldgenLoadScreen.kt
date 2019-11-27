@@ -110,7 +110,9 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
     }
 
     override fun dispose() {
-        previewPixmap.dispose()
+        if (!previewPixmap.isDisposed)
+            previewPixmap.dispose()
+
         previewTexture.dispose()
     }
 }
