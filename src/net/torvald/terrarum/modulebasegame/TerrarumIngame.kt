@@ -180,8 +180,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
 
         when (gameLoadMode) {
-            GameLoadMode.CREATE_NEW -> enter(gameLoadInfoPayload as NewWorldParameters)
-            GameLoadMode.LOAD_FROM  -> enter(gameLoadInfoPayload as GameSaveData)
+            GameLoadMode.CREATE_NEW -> enterCreateNewWorld(gameLoadInfoPayload as NewWorldParameters)
+            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as GameSaveData)
         }
 
         IngameRenderer.setRenderedWorld(gameworld)
@@ -220,7 +220,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Init instance by loading saved world
      */
-    private fun enter(gameSaveData: GameSaveData) {
+    private fun enterLoadFromSave(gameSaveData: GameSaveData) {
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
         }
@@ -243,7 +243,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Init instance by creating new world
      */
-    private fun enter(worldParams: NewWorldParameters) {
+    private fun enterCreateNewWorld(worldParams: NewWorldParameters) {
         printdbg(this, "Ingame called")
         printStackTrace(this)
 
