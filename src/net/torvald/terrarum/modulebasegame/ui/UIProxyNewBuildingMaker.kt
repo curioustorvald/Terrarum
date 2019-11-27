@@ -36,7 +36,7 @@ class UIProxyNewBuildingMaker : UICanvas() {
 
         Terrarum.setCurrentIngameInstance(ingame)
         SanicLoadScreen.screenToLoad = ingame
-        AppLoader.setScreen(SanicLoadScreen)
+        AppLoader.setLoadScreen(SanicLoadScreen)
     }
 
     override fun endClosing(delta: Float) {

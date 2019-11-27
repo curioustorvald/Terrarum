@@ -63,6 +63,10 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
     }
 
     override fun render(delta: Float) {
+        if (screenToLoad?.gameInitialised ?: false) {
+            doContextChange = true
+        }
+
         if (doContextChange) {
             Thread.sleep(80)
             AppLoader.setScreen(screenToLoad!!)
