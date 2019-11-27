@@ -14,7 +14,11 @@ import net.torvald.util.CircularArray
 /**
  * Created by minjaesong on 2017-07-13.
  */
-object LoadScreen : LoadScreenBase() {
+object SanicLoadScreen : LoadScreenBase() {
+
+    init {
+        AppLoader.disposableSingletonsPool.add(this)
+    }
 
     private var arrowObjPos = 0f // 0 means at starting position, regardless of screen position
     private var arrowObjGlideOffsetX = 0f

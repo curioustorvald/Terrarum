@@ -20,7 +20,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
     // a Class impl is chosen to make resize-handling easier, there's not much benefit making this a singleton anyway
 
     init {
-        screenToBeLoaded.world
+        AppLoader.disposableSingletonsPool.add(this)
     }
 
     private val world = screenToBeLoaded.world
@@ -28,10 +28,10 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
 
     companion object {
         private const val WIDTH_RATIO = 0.7
-        private const val PREVIEW_UPDATE_RATE = 1/8f
+        private const val PREVIEW_UPDATE_RATE = 1 / 8f
 
         private val COL_WALL = Color.WHITE
-        private val COL_TERR = Color(.5f,.5f,.5f,1f)
+        private val COL_TERR = Color(.5f, .5f, .5f, 1f)
         private val COL_AIR = Color.BLACK
     }
 
@@ -54,23 +54,33 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
     }
 
     override fun render(delta: Float) {
-        previewTexture.dispose()
-        previewTexture = Texture(previewPixmap)
+        //println("WorldgenLoadScreenRender")
 
-        //
+        gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
         previewRenderCounter += delta
         if (previewRenderCounter >= PREVIEW_UPDATE_RATE) {
             previewRenderCounter -= PREVIEW_UPDATE_RATE
             renderToPreview()
+            previewTexture.dispose()
+            previewTexture = Texture(previewPixmap)
         }
 
+
         AppLoader.batch.inUse {
+            it.color = Color.WHITE
             it.draw(previewTexture,
                     (AppLoader.screenW - previewWidth).div(2f).round(),
                     (AppLoader.screenH - previewHeight.times(1.5f)).div(2f).round()
             )
+            val text = messages.getHeadElem() ?: ""
+            AppLoader.fontGame.draw(it,
+                    text,
+                    (AppLoader.screenW - AppLoader.fontGame.getWidth(text)).div(2f).round(),
+                    (AppLoader.screenH + previewHeight.times(1.5f)).div(2f).round() - AppLoader.fontGame.lineHeight
+            )
         }
+
 
         super.render(delta)
     }
@@ -92,7 +102,6 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
 
     override fun addMessage(msg: String) {
         super.addMessage(msg)
-        println("[WorldgenLoadScreen] $msg")
     }
 
     override fun dispose() {

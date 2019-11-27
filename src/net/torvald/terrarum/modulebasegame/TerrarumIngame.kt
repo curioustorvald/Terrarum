@@ -27,7 +27,6 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
@@ -226,7 +225,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            LoadScreen.addMessage("Loading world from save")
+            AppLoader.getLoadScreen().addMessage("Loading world from save")
 
 
             gameworld = gameSaveData.world
@@ -252,8 +251,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            LoadScreen.addMessage("${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
-            LoadScreen.addMessage("Creating new world")
+            AppLoader.getLoadScreen().addMessage("${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
+            AppLoader.getLoadScreen().addMessage("Creating new world")
 
 
             // init map as chosen size

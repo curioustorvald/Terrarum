@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import net.torvald.terrarum.LoadScreen
+import net.torvald.terrarum.AppLoader
 
 /**
  * Created by minjaesong on 2016-06-13.
@@ -12,7 +12,7 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
     override fun run() {
         for (record in noiseRecords) {
             println("[mapgenerator] ${record.message}...")
-            LoadScreen.addMessage("${record.message}...")
+            AppLoader.getLoadScreen().addMessage("${record.message}...")
 
             for (y in startIndex..endIndex) {
                 for (x in 0..WorldGenerator.WIDTH - 1) {

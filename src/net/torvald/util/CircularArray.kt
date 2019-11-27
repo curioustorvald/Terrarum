@@ -118,9 +118,9 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
     }
 
     /** Returns the youngest (last of the array) element */
-    fun getHeadElem(): T = if (isEmpty) throw EmptyStackException() else buffer[(head - 1).wrap()]
+    fun getHeadElem(): T? = if (isEmpty) null else buffer[(head - 1).wrap()]
     /** Returns the oldest (first of the array) element */
-    fun getTailElem(): T = buffer[tail]
+    fun getTailElem(): T? = if (isEmpty) null else buffer[tail]
 
     /**
      * Relative-indexed get. Index of zero will return the head element.

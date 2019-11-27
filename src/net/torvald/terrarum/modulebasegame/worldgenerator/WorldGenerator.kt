@@ -6,7 +6,6 @@ import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel
@@ -492,7 +491,7 @@ object WorldGenerator {
 
         // fill the area as Joise map
         printdbg(this, "Raising and eroding terrain...")
-        LoadScreen.addMessage("Raising and eroding terrain...")
+        AppLoader.getLoadScreen().addMessage("Raising and eroding terrain...")
         for (y in 0..(TERRAIN_UNDULATION - 1)) {
             for (x in 0..WIDTH) {
                 // straight-line sampling
@@ -603,7 +602,7 @@ object WorldGenerator {
 
     private fun fillMapByNoiseMap() {
         printdbg(this, "Shaping world...")
-        LoadScreen.addMessage("Reticulating splines...") // RETICULATING SPLINES
+        AppLoader.getLoadScreen().addMessage("Reticulating splines...") // RETICULATING SPLINES
         // generate dirt-stone transition line
         // use catmull spline
         val dirtStoneLine = IntArray(WIDTH)
@@ -798,7 +797,7 @@ object WorldGenerator {
 
     private fun generateFloatingIslands() {
         printdbg(this, "Placing floating islands...")
-        LoadScreen.addMessage("Placing floating islands...")
+        AppLoader.getLoadScreen().addMessage("Placing floating islands...")
 
         val nIslandsMax = Math.round(world.width * 6f / 8192f)
         val nIslandsMin = Math.max(2, Math.round(world.width * 4f / 8192f))
@@ -845,7 +844,7 @@ object WorldGenerator {
 
     private fun plantGrass() {
         printdbg(this, "Planting grass...")
-        LoadScreen.addMessage("Planting grass...")
+        AppLoader.getLoadScreen().addMessage("Planting grass...")
 
         /* TODO composing dirt and stone
 		 * over certain level, use background dirt with stone 'peckles'

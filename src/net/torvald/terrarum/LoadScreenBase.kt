@@ -3,9 +3,10 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.util.CircularArray
 
-open class LoadScreenBase : ScreenAdapter() {
+open class LoadScreenBase : ScreenAdapter(), Disposable {
 
     open var screenToLoad: IngameInstance? = null
     open lateinit var screenLoadingThread: Thread
@@ -64,7 +65,7 @@ open class LoadScreenBase : ScreenAdapter() {
     override fun render(delta: Float) {
         if (doContextChange) {
             Thread.sleep(80)
-            AppLoader.setScreen(LoadScreen.screenToLoad!!)
+            AppLoader.setScreen(screenToLoad!!)
         }
     }
 
