@@ -15,7 +15,7 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2019-11-09.
  */
-class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worldheight: Int) : LoadScreenBase() {
+class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidth: Int, private val worldheight: Int) : LoadScreenBase() {
 
     // a Class impl is chosen to make resize-handling easier, there's not much benefit making this a singleton anyway
 
@@ -23,8 +23,9 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
         AppLoader.disposableSingletonsPool.add(this)
     }
 
-    private val world = screenToBeLoaded.world
     override var screenToLoad: IngameInstance? = screenToBeLoaded
+    private val world: GameWorld // must use Getter, as the field WILL BE redefined by the TerrarumIngame.enterCreateNewWorld() !
+        get() = screenToLoad!!.world
 
     companion object {
         private const val WIDTH_RATIO = 0.7
@@ -42,6 +43,8 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
     private lateinit var previewTexture: Texture
 
     private var previewRenderCounter = 0f
+
+    // NOTE: actual world init and terragen is called by TerrarumIngame.enterLoadFromSave()
 
     override fun show() {
         super.show()
@@ -86,18 +89,20 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, worldwidth: Int, worl
     }
 
     private fun renderToPreview() {
-        for (y in 0 until previewWidth) {
-            for (x in 0 until previewHeight) {
-                val wx = (world.width / previewWidth * x).toInt()
-                val wy = (world.height / previewHeight * y).toInt()
+        for (y in 0 until previewHeight) {
+            for (x in 0 until previewWidth) {
+                val wx = (world.width.toFloat() / previewWidth * x).roundToInt()
+                val wy = (world.height.toFloat() / previewHeight * y).roundToInt()
+
                 val colT = if (world.getTileFromTerrain(wx, wy) != 0) COL_WALL else COL_TERR
                 val colW = if (world.getTileFromWall(wx, wy) != 0) COL_WALL else COL_AIR
                 val outCol = colW mul colT
 
                 previewPixmap.setColor(outCol)
-                previewPixmap.drawPixel(x, y)
+                previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y
             }
         }
+
     }
 
     override fun addMessage(msg: String) {
