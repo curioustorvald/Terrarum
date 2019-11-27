@@ -6,7 +6,9 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.toInt
 import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
@@ -16,10 +18,10 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private var genFuture: Future<*>? = null
+    private var genFutures: Array<Future<*>?> = arrayOfNulls(ThreadExecutor.threadCount)
     override var generationStarted: Boolean = false
     override val generationDone: Boolean
-        get() = generationStarted && genFuture?.isDone ?: false
+        get() = generationStarted && genFutures.fold(1) { acc, f -> acc * (f?.isDone ?: true).toInt() } == 1
 
     override fun run() {
         val joise = getGenerator(seed, params as TerragenParams)
@@ -27,23 +29,26 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         generationStarted = true
 
         // single-threaded impl because I couldn't resolve multithread memory corruption issue...
-        genFuture = ThreadExecutor.submit {
-            for (x in 0 until world.width) {
+        val slices = 1 // ThreadExecutor.threadCount
+        (0 until world.width).sliceEvenly(slices).mapIndexed { i, xs ->
+            genFutures[i] = ThreadExecutor.submit {
+                for (x in xs) {
 
-                if (AppLoader.IS_DEVELOPMENT_BUILD) {
-                    AppLoader.getLoadScreen().addMessage("Tile draw for x=$x")
-                    //println("Tile draw for x=$x")
-                }
+                    if (AppLoader.IS_DEVELOPMENT_BUILD) {
+                        AppLoader.getLoadScreen().addMessage("Tile draw for x=$x")
+                        //println("Tile draw for x=$x")
+                    }
 
-                for (y in 0 until world.height) {
-                    val sampleTheta = (x.toDouble() / world.width) * TWO_PI
-                    val sampleOffset = world.width / 8.0
-                    val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                    val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                    val sampleY = y.toDouble()
-                    val noise = joise.map { it.get(sampleX, sampleY, sampleZ) }
+                    for (y in 0 until world.height) {
+                        val sampleTheta = (x.toDouble() / world.width) * TWO_PI
+                        val sampleOffset = world.width / 8.0
+                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                        val sampleY = y.toDouble()
+                        val noise = joise.map { it.get(sampleX, sampleY, sampleZ) }
 
-                    draw(x, y, noise, world)
+                        draw(x, y, noise, world)
+                    }
                 }
             }
         }
