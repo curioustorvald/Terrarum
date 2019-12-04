@@ -18,7 +18,9 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private var genFutures: Array<Future<*>?> = arrayOfNulls(ThreadExecutor.threadCount)
+    private val genSlices = 1 // world.width / 64
+
+    private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
     override var generationStarted: Boolean = false
     override val generationDone: Boolean
         get() = generationStarted && genFutures.fold(1) { acc, f -> acc * (f?.isDone ?: true).toInt() } == 1
@@ -29,16 +31,9 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         generationStarted = true
 
         // single-threaded impl because I couldn't resolve multithread memory corruption issue...
-        val slices = 1 // ThreadExecutor.threadCount
-        (0 until world.width).sliceEvenly(slices).mapIndexed { i, xs ->
+        (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             genFutures[i] = ThreadExecutor.submit {
                 for (x in xs) {
-
-                    if (AppLoader.IS_DEVELOPMENT_BUILD) {
-                        AppLoader.getLoadScreen().addMessage("Tile draw for x=$x")
-                        //println("Tile draw for x=$x")
-                    }
-
                     for (y in 0 until world.height) {
                         val sampleTheta = (x.toDouble() / world.width) * TWO_PI
                         val sampleOffset = world.width / 8.0
