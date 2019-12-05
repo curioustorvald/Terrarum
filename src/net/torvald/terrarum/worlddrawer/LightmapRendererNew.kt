@@ -734,7 +734,7 @@ object LightmapRenderer {
     // input: 0..1 for int 0..1023
     private fun hdr(intensity: Float): Float {
         val intervalStart = (intensity * CHANNEL_MAX).floorInt()
-        val intervalEnd = minOf(LightmapHDRMap.lastIndex, (intensity * CHANNEL_MAX).floorInt() + 1)
+        val intervalEnd = (intensity * CHANNEL_MAX).floorInt() + 1
 
         if (intervalStart == intervalEnd) return LightmapHDRMap[intervalStart]
 
