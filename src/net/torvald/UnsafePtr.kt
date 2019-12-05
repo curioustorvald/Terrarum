@@ -84,6 +84,13 @@ class UnsafePtr(pointer: Long, allocSize: Long) {
         return UnsafeHelper.unsafe.getByte(ptr + index)
     }
 
+    operator fun set(index: Long, value: Byte) {
+        checkNullPtr(index)
+        UnsafeHelper.unsafe.putByte(ptr + index, value)
+    }
+
+    // NOTE: get/set multibyte values are NOT BYTE-ALIGNED!
+
     fun getFloat(index: Long): Float {
         checkNullPtr(index)
         return UnsafeHelper.unsafe.getFloat(ptr + index)
@@ -92,11 +99,6 @@ class UnsafePtr(pointer: Long, allocSize: Long) {
     fun getInt(index: Long): Int {
         checkNullPtr(index)
         return UnsafeHelper.unsafe.getInt(ptr + index)
-    }
-
-    operator fun set(index: Long, value: Byte) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putByte(ptr + index, value)
     }
 
     fun setFloat(index: Long, value: Float) {
