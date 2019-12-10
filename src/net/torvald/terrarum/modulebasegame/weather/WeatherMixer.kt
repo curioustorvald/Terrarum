@@ -140,20 +140,22 @@ internal object WeatherMixer : RNGConsumer {
          UV mapping coord.y
 
          -+ <- 1.0  =
-         D|         = // parallax of +1
+         D|         = // parallax of -1
          i|  =      =
          s|  = // parallax of 0
          p|  =      =
-         .|         = // parallax of -1
+         .|         = // parallax of +1
          -+ <- 0.0  =
          */
-        val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize).coerceIn(-1f, 1f)
+        val parallax = -((parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize).coerceIn(-1f, 1f)
         val parallaxSize = 1f / 3f
 
         // draw skybox to provided graphics instance
         val colTopmost = getGradientColour(world, skyboxColourMap, 0, timeNow).toGdxColor()
         val colBottommost = getGradientColour(world, skyboxColourMap, 1, timeNow).toGdxColor()
         val colMid = colorMix(colTopmost, colBottommost, 0.5f)
+
+        //println(parallax) // parallax value works as intended.
 
         val colTop = colorMix(colTopmost, colBottommost, (parallax + parallaxSize / 2f) * 2f - 1f)
         val colBottom = colorMix(colTopmost, colBottommost, (parallax - parallaxSize / 2f) * 2f - 1f)
@@ -169,11 +171,11 @@ internal object WeatherMixer : RNGConsumer {
         skyboxPixmap.setColor(colBottom)
         skyboxPixmap.drawPixel(0, 1); skyboxPixmap.drawPixel(1, 1)
         skyboxTexture.dispose()
-        skyboxTexture = Texture(skyboxPixmap)
+        skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
         batch.shader = IngameRenderer.shaderBayer
         batch.inUse {
-            it.draw(skyboxTexture, 0f, 0f, AppLoader.screenWf, AppLoader.screenHf)
+            it.draw(skyboxTexture, 0f, -AppLoader.halfScreenHf, AppLoader.screenWf, AppLoader.screenHf * 2f) // because of how the linear filter works, we extend the image by two
         }
 
         // don't use shader to just fill the whole screen... frag shader will be called a million times and it's best to not burden it
