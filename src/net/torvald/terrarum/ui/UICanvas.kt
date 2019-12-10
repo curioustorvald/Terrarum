@@ -307,12 +307,12 @@ abstract class UICanvas(
                 ).roundInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenW.toFloat(),
+                        AppLoader.screenWf,
                         AppLoader.screenW - ui.width.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenH.toFloat(),
+                        AppLoader.screenHf,
                         AppLoader.screenH - ui.height.toFloat()
                 ).roundInt()
             }
@@ -332,12 +332,12 @@ abstract class UICanvas(
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         AppLoader.screenW - ui.width.toFloat(),
-                        AppLoader.screenW.toFloat()
+                        AppLoader.screenWf
                 ).roundInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         AppLoader.screenH - ui.height.toFloat(),
-                        AppLoader.screenH.toFloat()
+                        AppLoader.screenHf
                 ).roundInt()
             }
         }

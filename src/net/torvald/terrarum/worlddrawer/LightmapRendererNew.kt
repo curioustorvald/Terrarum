@@ -756,8 +756,8 @@ object LightmapRenderer {
 
         // copied from BlocksDrawer, duh!
         // FIXME 'lightBuffer' is not zoomable in this way
-        val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
-        val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
+        val tilesInHorizontal = (AppLoader.screenWf / TILE_SIZE).ceilInt() + 1
+        val tilesInVertical = (AppLoader.screenHf / TILE_SIZE).ceilInt() + 1
 
         LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
         LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3

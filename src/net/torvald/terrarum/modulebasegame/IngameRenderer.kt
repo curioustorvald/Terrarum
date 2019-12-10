@@ -46,7 +46,6 @@ object IngameRenderer : Disposable {
 
     val shaderBlur: ShaderProgram
     val shaderBayer: ShaderProgram
-    val shaderSkyboxFill: ShaderProgram
     val shaderBlendGlow: ShaderProgram
     val shaderRGBOnly: ShaderProgram
     val shaderAtoGrey: ShaderProgram
@@ -91,17 +90,9 @@ object IngameRenderer : Disposable {
             shaderBayer.setUniformf("gcount", 64f)
             shaderBayer.setUniformf("bcount", 64f)
             shaderBayer.end()
-
-            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag")
-            shaderSkyboxFill.begin()
-            shaderSkyboxFill.setUniformf("rcount", 64f)
-            shaderSkyboxFill.setUniformf("gcount", 64f)
-            shaderSkyboxFill.setUniformf("bcount", 64f)
-            shaderSkyboxFill.end()
         }
         else {
             shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthrurgb.frag")
-            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/skyboxfill.frag")
         }
 
 
@@ -120,11 +111,6 @@ object IngameRenderer : Disposable {
         if (AppLoader.getConfigBoolean("fxdither")) {
             if (!shaderBayer.isCompiled) {
                 Gdx.app.log("shaderBayer", shaderBayer.log)
-                exitProcess(1)
-            }
-
-            if (!shaderSkyboxFill.isCompiled) {
-                Gdx.app.log("shaderSkyboxFill", shaderSkyboxFill.log)
                 exitProcess(1)
             }
         }
@@ -229,7 +215,7 @@ object IngameRenderer : Disposable {
         ///////////////////////////////////////////////////////////////////////
 
         // draw sky
-        WeatherMixer.render(camera, world)
+        WeatherMixer.render(camera, batch, world)
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -759,7 +745,6 @@ object IngameRenderer : Disposable {
 
         shaderBlur.dispose()
         shaderBayer.dispose()
-        shaderSkyboxFill.dispose()
         shaderBlendGlow.dispose()
         shaderRGBOnly.dispose()
         shaderAtoGrey.dispose()

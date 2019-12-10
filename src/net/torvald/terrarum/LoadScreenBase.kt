@@ -20,7 +20,7 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
     internal var errorTrapped = false
     internal var doContextChange = false
 
-    var camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+    var camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
 
     override fun show() {
         messages.clear()

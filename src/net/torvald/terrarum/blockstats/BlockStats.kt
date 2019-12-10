@@ -30,8 +30,8 @@ object BlockStats {
         val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return
 
-        val renderWidth = FastMath.ceil(AppLoader.screenW.toFloat())
-        val renderHeight = FastMath.ceil(AppLoader.screenH.toFloat())
+        val renderWidth = FastMath.ceil(AppLoader.screenWf)
+        val renderHeight = FastMath.ceil(AppLoader.screenHf)
 
         val noZoomCameraX = Math.round(FastMath.clamp(
                 player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))

@@ -64,7 +64,7 @@ object PostProcessor : Disposable {
             debugUI.setPosition(0, 0)
 
             batch = SpriteBatch()
-            camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+            camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
             camera.setToOrtho(true)
 
             batch.projectionMatrix = camera.combined
@@ -155,8 +155,8 @@ object PostProcessor : Disposable {
 
             // centre ind
             shapeRenderer.color = safeAreaCol2
-            shapeRenderer.line(0f, 0f, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
-            shapeRenderer.line(0f, AppLoader.screenH.toFloat(), AppLoader.screenW.toFloat(), 0f)
+            shapeRenderer.line(0f, 0f, AppLoader.screenWf, AppLoader.screenHf)
+            shapeRenderer.line(0f, AppLoader.screenHf, AppLoader.screenWf, 0f)
 
             // safe action area
             shapeRenderer.color = safeAreaCol2

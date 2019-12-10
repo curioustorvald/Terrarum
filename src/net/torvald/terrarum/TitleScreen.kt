@@ -38,7 +38,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     // todo register titlescreen as the ingame, similar in a way that the buildingmaker did
 
-    var camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+    var camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
 
 
     // invert Y
@@ -235,7 +235,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
-        //camera.setToOrtho(true, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+        //camera.setToOrtho(true, AppLoader.screenWf, AppLoader.screenHf)
 
         // render world
         gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
