@@ -213,7 +213,7 @@ public class AppLoader implements ApplicationListener {
 
 
 
-    private static ShaderProgram shaderBayerSkyboxFill;
+    private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderPassthruRGB;
     public static ShaderProgram shaderColLUT;
@@ -235,8 +235,12 @@ public class AppLoader implements ApplicationListener {
     private static LoadScreenBase currentSetLoadScreen;
     public static int screenW = 0;
     public static int screenH = 0;
+    public static float screenWf = 0f;
+    public static float screenHf = 0f;
     public static int halfScreenW = 0;
     public static int halfScreenH = 0;
+    public static float halfScreenWf = 0f;
+    public static float halfScreenHf = 0f;
 
     public static Texture textureWhiteSquare;
     public static Texture textureWhiteCircle;
@@ -664,6 +668,11 @@ public class AppLoader implements ApplicationListener {
 
         halfScreenW = screenW / 2;
         halfScreenH = screenH / 2;
+
+        screenWf = (float) screenW;
+        screenHf = (float) screenH;
+        halfScreenWf = (float) halfScreenW;
+        halfScreenHf = (float) halfScreenH;
 
         updateFullscreenQuad(screenW, screenH);
 

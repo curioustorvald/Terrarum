@@ -45,7 +45,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
 
     fun enter() {
         // init view port
-        camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+        camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
 
 
         img = Texture("assets/test_texture.tga")
@@ -147,7 +147,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         }
 
 
-        camera.setToOrtho(true, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+        camera.setToOrtho(true, AppLoader.screenWf, AppLoader.screenHf)
         batch.projectionMatrix = camera.combined
         batch.inUse {
 

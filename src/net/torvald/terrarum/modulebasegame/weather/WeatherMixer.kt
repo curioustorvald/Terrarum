@@ -2,10 +2,9 @@ package net.torvald.terrarum.modulebasegame.weather
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
@@ -118,10 +117,13 @@ internal object WeatherMixer : RNGConsumer {
     //private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT * 0.75f // just an arb multiplier (266.66666 -> 200)
     private val parallaxDomainSize = WorldGenerator.TERRAIN_UNDULATION / 2f
 
+    private val skyboxPixmap = Pixmap(2, 2, Pixmap.Format.RGBA8888)
+    private var skyboxTexture = Texture(skyboxPixmap)
+
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
-    internal fun render(camera: Camera, world: GameWorld) {
+    internal fun render(camera: Camera, batch: SpriteBatch, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3) * 0.75f // just an arb multiplier (266.66666 -> 200)
 
 
@@ -145,16 +147,37 @@ internal object WeatherMixer : RNGConsumer {
          .|         = // parallax of -1
          -+ <- 0.0  =
          */
-        val parallax: Float = (parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize
-
+        val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize).coerceIn(-1f, 1f)
+        val parallaxSize = 1f / 3f
 
         // draw skybox to provided graphics instance
-        val topCol = getGradientColour(world, skyboxColourMap, 0, timeNow)
-        val bottomCol = getGradientColour(world, skyboxColourMap, 1, timeNow)
+        val colTopmost = getGradientColour(world, skyboxColourMap, 0, timeNow).toGdxColor()
+        val colBottommost = getGradientColour(world, skyboxColourMap, 1, timeNow).toGdxColor()
+        val colMid = colorMix(colTopmost, colBottommost, 0.5f)
+
+        val colTop = colorMix(colTopmost, colBottommost, (parallax + parallaxSize / 2f) * 2f - 1f)
+        val colBottom = colorMix(colTopmost, colBottommost, (parallax - parallaxSize / 2f) * 2f - 1f)
+
+        // draw using shaperenderer or whatever
 
         //Terrarum.textureWhiteSquare.bind(0)
         gdxSetBlendNormal()
 
+        // draw to skybox texture
+        skyboxPixmap.setColor(colTop)
+        skyboxPixmap.drawPixel(0, 0); skyboxPixmap.drawPixel(1, 0)
+        skyboxPixmap.setColor(colBottom)
+        skyboxPixmap.drawPixel(0, 1); skyboxPixmap.drawPixel(1, 1)
+        skyboxTexture.dispose()
+        skyboxTexture = Texture(skyboxPixmap)
+
+        batch.shader = IngameRenderer.shaderBayer
+        batch.inUse {
+            it.draw(skyboxTexture, 0f, 0f, AppLoader.screenWf, AppLoader.screenHf)
+        }
+
+        // don't use shader to just fill the whole screen... frag shader will be called a million times and it's best to not burden it
+        /*
         IngameRenderer.shaderSkyboxFill.begin()
         IngameRenderer.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
         IngameRenderer.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
@@ -164,6 +187,7 @@ internal object WeatherMixer : RNGConsumer {
         IngameRenderer.shaderSkyboxFill.setUniformf("zoomInv", 1f / (Terrarum.ingame?.screenZoom ?: 1f))
         AppLoader.fullscreenQuad.render(IngameRenderer.shaderSkyboxFill, GL20.GL_TRIANGLES)
         IngameRenderer.shaderSkyboxFill.end()
+        */
 
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
@@ -173,6 +197,15 @@ internal object WeatherMixer : RNGConsumer {
     fun Float.clampOne() = if (this > 1) 1f else this
 
     private operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
+
+    fun colorMix(one: Color, two: Color, scale: Float): Color {
+        return Color(
+                FastMath.interpolateLinear(scale, one.r, two.r),
+                FastMath.interpolateLinear(scale, one.g, two.g),
+                FastMath.interpolateLinear(scale, one.b, two.b),
+                FastMath.interpolateLinear(scale, one.a, two.a)
+        )
+    }
 
     /**
      * Get a GL of specific time
@@ -270,6 +303,11 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     fun dispose() {
+        try {
+            skyboxTexture.dispose()
+        }
+        catch (e: Throwable) {}
 
+        skyboxPixmap.dispose()
     }
 }

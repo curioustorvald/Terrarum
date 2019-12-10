@@ -141,7 +141,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // almost black background
                 it.color = Color(0x181818ff)
-                it.fillRect(0f, 0f, AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+                it.fillRect(0f, 0f, AppLoader.screenWf, AppLoader.screenHf)
 
 
                 it.color = Color.WHITE
@@ -184,7 +184,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, AppLoader.screenW.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
+                it.fillRect(0f, 60f, AppLoader.screenWf, 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
@@ -209,7 +209,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, AppLoader.screenW.toFloat(), 40f + (messages.size) * AppLoader.fontGame.lineHeight)
+                it.fillRect(0f, 60f, AppLoader.screenWf, 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
