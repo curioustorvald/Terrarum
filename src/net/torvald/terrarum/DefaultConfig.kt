@@ -103,6 +103,7 @@ object DefaultConfig {
 
 
         // "fancy" graphics settings
+        jsonObject.addProperty("fxdither", true)
         jsonObject.addProperty("fxretro", false)
         //jsonObject.addProperty("fx3dlut", false)
 

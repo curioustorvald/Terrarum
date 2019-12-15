@@ -173,7 +173,15 @@ internal object WeatherMixer : RNGConsumer {
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
-        batch.shader = IngameRenderer.shaderBayer
+        if (AppLoader.getConfigBoolean("fxdither")) {
+            batch.shader = IngameRenderer.shaderBayer
+            batch.shader.setUniformf("rcount", 64f)
+            batch.shader.setUniformf("gcount", 64f)
+            batch.shader.setUniformf("bcount", 64f)
+        }
+        else {
+            batch.shader = null
+        }
         batch.inUse {
             it.draw(skyboxTexture, 0f, -AppLoader.halfScreenHf, AppLoader.screenWf, AppLoader.screenHf * 2f) // because of how the linear filter works, we extend the image by two
         }
