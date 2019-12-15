@@ -392,7 +392,7 @@ public class AppLoader implements ApplicationListener {
         // set GL graphics constants
         shaderBayerSkyboxFill = loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShader("assets/4096.vert", "assets/hicolour.frag");
-        shaderPassthruRGB = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
+        shaderPassthruRGB = SpriteBatch.createDefaultShader();
         shaderColLUT = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
         shaderReflect = loadShader("assets/4096.vert", "assets/reflect.frag");
 
