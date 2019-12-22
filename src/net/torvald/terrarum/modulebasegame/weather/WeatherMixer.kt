@@ -153,7 +153,7 @@ internal object WeatherMixer : RNGConsumer {
         val parallaxTop = (parallaxMidpt - (parallaxSize / 2f)).coerceIn(0f, 1f)
         val parallaxBottom = (parallaxMidpt + (parallaxSize / 2f)).coerceIn(0f, 1f)
 
-        println("$parallaxZeroPos, $parallax | $parallaxTop - $parallaxMidpt - $parallaxBottom | $parallaxDomainSize")
+        //println("$parallaxZeroPos, $parallax | $parallaxTop - $parallaxMidpt - $parallaxBottom | $parallaxDomainSize")
 
         // draw skybox to provided graphics instance
         val colTopmost = getGradientColour(world, skyboxColourMap, 0, timeNow).toGdxColor()
