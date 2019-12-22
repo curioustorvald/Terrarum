@@ -320,7 +320,8 @@ public class AppLoader implements ApplicationListener {
         appConfig.backgroundFPS = getConfigInt("displayfps");
         appConfig.foregroundFPS = getConfigInt("displayfps");
         appConfig.title = GAME_NAME;
-        appConfig.forceExit = false;
+        appConfig.forceExit = true; // it seems KDE 5 likes this one better...
+        // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
         appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
 
         // load app icon
