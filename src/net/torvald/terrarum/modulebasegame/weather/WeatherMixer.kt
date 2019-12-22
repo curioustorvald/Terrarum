@@ -115,7 +115,6 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     //private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT * 0.75f // just an arb multiplier (266.66666 -> 200)
-    private val parallaxDomainSize = WorldGenerator.TERRAIN_UNDULATION / 2f
 
     private val skyboxPixmap = Pixmap(2, 2, Pixmap.Format.RGBA8888)
     private var skyboxTexture = Texture(skyboxPixmap)
@@ -124,7 +123,8 @@ internal object WeatherMixer : RNGConsumer {
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
     internal fun render(camera: Camera, batch: SpriteBatch, world: GameWorld) {
-        val parallaxZeroPos = (world.height / 3) * 0.75f // just an arb multiplier (266.66666 -> 200)
+        val parallaxZeroPos = (world.height / 3f) * 0.8888f
+        val parallaxDomainSize = world.height / 4f
 
 
         // we will not care for nextSkybox for now
@@ -147,8 +147,13 @@ internal object WeatherMixer : RNGConsumer {
          .|         = // parallax of +1
          -+ <- 0.0  =
          */
-        val parallax = -((parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize).coerceIn(-1f, 1f)
+        val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
         val parallaxSize = 1f / 3f
+        val parallaxMidpt = (parallax + 1f) / 2f
+        val parallaxTop = (parallaxMidpt - (parallaxSize / 2f)).coerceIn(0f, 1f)
+        val parallaxBottom = (parallaxMidpt + (parallaxSize / 2f)).coerceIn(0f, 1f)
+
+        println("$parallaxZeroPos, $parallax | $parallaxTop - $parallaxMidpt - $parallaxBottom | $parallaxDomainSize")
 
         // draw skybox to provided graphics instance
         val colTopmost = getGradientColour(world, skyboxColourMap, 0, timeNow).toGdxColor()
@@ -157,8 +162,8 @@ internal object WeatherMixer : RNGConsumer {
 
         //println(parallax) // parallax value works as intended.
 
-        val colTop = colorMix(colTopmost, colBottommost, (parallax + parallaxSize / 2f) * 2f - 1f)
-        val colBottom = colorMix(colTopmost, colBottommost, (parallax - parallaxSize / 2f) * 2f - 1f)
+        val colTop = colorMix(colTopmost, colBottommost, parallaxTop)
+        val colBottom = colorMix(colTopmost, colBottommost, parallaxBottom)
 
         // draw using shaperenderer or whatever
 
@@ -166,9 +171,9 @@ internal object WeatherMixer : RNGConsumer {
         gdxSetBlendNormal()
 
         // draw to skybox texture
-        skyboxPixmap.setColor(colTop)
-        skyboxPixmap.drawPixel(0, 0); skyboxPixmap.drawPixel(1, 0)
         skyboxPixmap.setColor(colBottom)
+        skyboxPixmap.drawPixel(0, 0); skyboxPixmap.drawPixel(1, 0)
+        skyboxPixmap.setColor(colTop)
         skyboxPixmap.drawPixel(0, 1); skyboxPixmap.drawPixel(1, 1)
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
