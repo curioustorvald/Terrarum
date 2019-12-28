@@ -12,6 +12,8 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
+import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /***
@@ -86,8 +88,11 @@ class UIItemInventoryElem(
                 BlendMode.resolve(backBlendMode, batch)
                 batch.color = backCol
             }
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX, posY, width, height)
         }
+        batch.color = DEFAULT_BOX_BORDER_COL
+        //blendNormal(batch)
+        Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 
 
         if (item != null && itemImage != null) {

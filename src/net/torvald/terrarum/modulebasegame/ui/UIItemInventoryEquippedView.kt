@@ -10,6 +10,8 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
+import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -82,10 +84,10 @@ class UIItemInventoryEquippedView(
         // sprite background
         blendNormal(batch)
         batch.color = spriteViewBackCol
-        batch.fillRect(
-                posX.toFloat(), posY.toFloat(),
-                width.toFloat(), width.toFloat()
-        )
+        Toolkit.fillArea(batch, posX, posY, width, width)
+        batch.color = DEFAULT_BOX_BORDER_COL
+        Toolkit.drawBoxBorder(batch, posX, posY, width, width)
+
 
         // sprite
         val sprite = theActor.sprite
@@ -101,8 +103,7 @@ class UIItemInventoryEquippedView(
 
         }
 
-        // TODO inscribe slot image on each cells HERE
-
+        // slot image on each cells
         itemGrid.forEachIndexed { index, cell ->
             cell.render(batch, camera)
             if (cell.item == null) {
