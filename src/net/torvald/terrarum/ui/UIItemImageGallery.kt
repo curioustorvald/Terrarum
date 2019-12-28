@@ -39,7 +39,7 @@ class UIItemImageGallery(
         }
 
         imageList.forEachIndexed { i, image ->
-            DrawUtil.drawCentered(batch, image,
+            Toolkit.drawCentered(batch, image,
                     imagePosY(i),
                     width.toFloat().div(column).times(column(i).plus(1)).roundInt(),
                     posX, posY
