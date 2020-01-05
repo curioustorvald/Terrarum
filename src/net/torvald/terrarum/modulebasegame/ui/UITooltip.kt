@@ -15,6 +15,9 @@ class UITooltip : UICanvas() {
 
     override var openCloseTime: Second = 0f
 
+    private val tooltipBackCol = Color(0xd5d4d3ff.toInt())
+    private val tooltipForeCol = Color(0x404040ff)
+
     var message: String = ""
         set(value) {
             field = value
@@ -37,16 +40,17 @@ class UITooltip : UICanvas() {
         val mouseX = 4f
         val mouseY = 6f
 
-        val tooltipY = mouseY - height
+        val tooltipYoff = 12
+        val tooltipY = mouseY - height + tooltipYoff
 
         val txtW = msgWidth + 2f * textMarginX
 
-        batch.color = Color.WHITE
-
+        batch.color = tooltipBackCol
         FloatDrawer(batch, mouseX - textMarginX, tooltipY, txtW, font.lineHeight)
+        batch.color = tooltipForeCol
         font.draw(batch, message,
                 mouseX,
-                mouseY - height
+                mouseY - height + tooltipYoff
         )
     }
 
