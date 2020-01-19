@@ -1,0 +1,57 @@
+digraph EnergyFlow {
+
+    subgraph power_source { // remove cluster_ to not visualize
+        node [shape=box];
+        label = Source;
+
+        Light;
+        Fuel;
+        Steam;
+        Radioisotope;
+        Geothermal;
+        Water;
+    }
+
+    subgraph power {
+        node [style=filled];
+        label = Power;
+
+        Electric -> Kinetic [label=Motor];
+        Electric -> Heat [label=Heater];
+        Kinetic -> Electric [label=Generator];
+        Heat -> Electric [label=Thermoelectric];
+        Heat -> Kinetic [label=Engine, weight = 0.1];
+    }
+
+    subgraph power_storage {
+        node [style=filled, shape=box3d];
+        label = Storage;
+
+        Battery;
+        "Compressed Air";
+    }
+
+    Radioisotope -> Heat [label=Heating, color="#00aa00"];
+    Radioisotope -> Heat [label=RTG];
+    Radioisotope -> Electric [label=Betavoltaic];
+    
+    Fuel -> Heat [label=Combustion];
+    Fuel -> Electric [label="Fuel Cell"];
+    Light -> Electric [label=Photovoltaic];
+    //Light -> Heat [label="Thermal Energy", color="#00aa00"];
+    Heat -> Steam [label=Boiling, weight = 2.0];
+    Water -> Steam [color="#00aa00"];
+    Steam -> Kinetic [label="Turbine thru Pipe", color="#00aa00", weight = 2.2];
+    Geothermal -> Heat [color="#00aa00"];
+
+    Electric -> Battery [dir=both, weight = 16.0];
+    Kinetic -> "Compressed Air" [dir=both];
+    
+    
+    labelfloat = true;
+    ranksep = 0.6;
+    nodesep = 0.4;
+    sep = 1.0;
+    overlap = voronoi;
+    splines = true;
+}
