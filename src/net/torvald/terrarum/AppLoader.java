@@ -145,6 +145,8 @@ public class AppLoader implements ApplicationListener {
     public static int GL_VERSION;
     public static final int MINIMAL_GL_VERSION = 320;
 
+    public static final int GLOBAL_FRAMERATE_LIMIT = 300;
+
     public static final float TV_SAFE_GRAPHICS = 0.05f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
     public static final float TV_SAFE_ACTION = 0.035f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
 
@@ -317,12 +319,15 @@ public class AppLoader implements ApplicationListener {
         //appConfig.height = 740; // photographic ratio (1.5:1)
         appConfig.width = getConfigInt("screenwidth");
         appConfig.height = getConfigInt("screenheight");
-        appConfig.backgroundFPS = getConfigInt("displayfps");
-        appConfig.foregroundFPS = getConfigInt("displayfps");
+        appConfig.backgroundFPS = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
+        appConfig.foregroundFPS = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
         appConfig.title = GAME_NAME;
         appConfig.forceExit = true; // it seems KDE 5 likes this one better...
         // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
         appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
+
+        if (appConfig.backgroundFPS <= 0) appConfig.backgroundFPS = GLOBAL_FRAMERATE_LIMIT;
+        if (appConfig.foregroundFPS <= 0) appConfig.foregroundFPS = GLOBAL_FRAMERATE_LIMIT;
 
         // load app icon
         int[] appIconSizes = new int[]{256,128,64,32,16};
@@ -705,10 +710,13 @@ public class AppLoader implements ApplicationListener {
         shaderHicolour.dispose();
         shaderPassthruRGB.dispose();
         shaderColLUT.dispose();
+        shaderReflect.dispose();
 
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
         logoBatch.dispose();
+        batch.dispose();
+        shapeRender.dispose();
 
         fontGame.dispose();
         fontSmallNumbers.dispose();
