@@ -1,0 +1,71 @@
+digraph EnergyFlow {
+
+    graph [compound = true];
+
+    subgraph cluster_resources {
+        hilt1;
+        hilt2;
+        hilt3;
+        grip1;
+        grip2;
+        grip3;
+        
+    }
+    
+    subgraph cluster_genicon {
+        Size;
+        Accessories;
+        Colour;
+        Type;
+        Straightness;
+        Roughness;
+    }
+    
+    subgraph cluster_mesh {
+        "Left Perturb Mesh";
+        "Right Perturb Mesh";
+        "Curve Mesh";
+    }
+    
+    subgraph gens {
+        node [style=filled,shape=rect];
+        Curvegen;
+        Jagg;
+        "Accessory\nSelector";
+        Rasterizer;
+        "Base Shape";
+        "Final Mesh";
+    }
+    
+    grip1 -> "Accessory\nSelector";
+    grip2 -> "Accessory\nSelector";
+    grip3 -> "Accessory\nSelector";
+    hilt1 -> "Accessory\nSelector";
+    hilt2 -> "Accessory\nSelector";
+    hilt3 -> "Accessory\nSelector";
+    Type -> "Base Shape";
+
+    
+    Straightness -> Curvegen -> "Curve Mesh";
+    Roughness -> Jagg;
+    Jagg -> "Left Perturb Mesh";
+    Jagg -> "Right Perturb Mesh";
+    
+    
+    "Accessory\nSelector" -> Accessories;
+    
+    Accessories -> Rasterizer;
+    Size -> Rasterizer;
+    Colour -> Rasterizer;
+    "Base Shape" -> Add;
+    "Curve Mesh" -> Add;
+    Add -> "Final Mesh";
+    "Left Perturb Mesh" -> Mul;
+    "Right Perturb Mesh" -> Mul;
+    "Base Shape" -> Mul;
+    Mul -> "Final Mesh";
+    
+    "Final Mesh" -> Rasterizer;
+    
+    
+}

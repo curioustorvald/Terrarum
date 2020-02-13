@@ -84,7 +84,7 @@ object PlayerBuilderSigrid {
 
         // item ids are defined in <module>/items/itemid.csv
 
-        inventory.add(8448) // copper pick
+        inventory.add(8448, 16) // copper pick
         inventory.add(8449) // iron pick
         inventory.add(8450) // steel pick
         inventory.add(8466, 9995) // wire piece

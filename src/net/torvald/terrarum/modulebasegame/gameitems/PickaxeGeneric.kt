@@ -34,12 +34,13 @@ object PickaxeCore {
 
         // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
         // return false if hitting actors
-        var ret1 = true
+        // ** below is commented out -- don't make actors obstruct the way of digging **
+        /*var ret1 = true
         Terrarum.ingame!!.actorContainerActive.forEach {
             if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                 ret1 =  false // return is not allowed here
         }
-        if (!ret1) return ret1
+        if (!ret1) return ret1*/
 
         // return false if here's no tile
         if (Block.AIR == (Terrarum.ingame!!.world).getTileFromTerrain(mouseTileX, mouseTileY))
