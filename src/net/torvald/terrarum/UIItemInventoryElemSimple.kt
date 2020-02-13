@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -178,9 +179,19 @@ class UIItemInventoryElemSimple(
 
             if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
                 player.equipItem(item!!)
+
+                // also equip on the quickslot
+                player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                    player.inventory.setQuickBar(it, item!!.dynamicID)
+                }
             }
             else { // if not, unequip it
                 player.unequipItem(item!!)
+
+                // also unequip on the quickslot
+                player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                    player.inventory.setQuickBar(it, null)
+                }
             }
         }
 

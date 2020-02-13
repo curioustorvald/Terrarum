@@ -202,6 +202,10 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
                 add(newItem)
                 itemEquipped[newItem.equipPosition] = newItem.dynamicID //invSearchByDynamicID(newItem.dynamicID)!!.item // will test if some sketchy code is written. Test fail: kotlinNullpointerException
 
+                actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                    setQuickBar(it, newItem.dynamicID)
+                }
+
                 // FIXME now damage meter (vital) is broken
             }
             else {

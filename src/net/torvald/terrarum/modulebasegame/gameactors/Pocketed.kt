@@ -28,6 +28,14 @@ interface Pocketed {
         }
 
         inventory.itemEquipped[item.equipPosition] = null
+
+        // remove it from the quickslot
+        inventory.quickSlot.forEachIndexed { index, itemID ->
+            if (itemID == item.dynamicID) {
+                inventory.setQuickBar(index, null)
+            }
+        }
+
         item.effectOnUnequip(AppLoader.UPDATE_RATE)
     }
 
