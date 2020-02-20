@@ -316,7 +316,7 @@ object LightmapRenderer {
                             val hash = (x.toLong() shl 32) or y.toLong()
                             if (visitedCells.contains(hash)) continue
 
-                            var thisLightValue = lightmap.channelGet(lx, ly, rgbaOffset)
+                            var thisLightValue = 0f
 
 
                             // nearby tiles, namely a b c d e f g h
@@ -340,7 +340,7 @@ object LightmapRenderer {
                             thisLightValue = maxOf(thisLightValue, BlockCodex[tilef].getLum(rgbaOffset) * 0.70710678f)
                             thisLightValue = maxOf(thisLightValue, BlockCodex[tileh].getLum(rgbaOffset) * 0.70710678f)
 
-                            lightmap.channelSet(lx, ly, rgbaOffset, thisLightValue)
+                            lightmap.channelSet(lx, ly, rgbaOffset, lightmap.channelGet(lx, ly, rgbaOffset) + thisLightValue)
 
                             // recurse condition
                             if (lightmap.channelGet(lx - 1, ly - 1, rgbaOffset) < thisLightValue)
@@ -425,7 +425,7 @@ object LightmapRenderer {
         if (y !in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1) return
         if (recurseCount > 128) return
 
-        var thisLightValue = lightmap.channelGet(lx, ly, rgbaOffset)
+        var thisLightValue = 0f
 
         // nearby tiles, namely a b c d e f g h
         val tilea = world.getTileFromTerrain(x - 1, y - 1)
@@ -448,7 +448,7 @@ object LightmapRenderer {
         thisLightValue = maxOf(thisLightValue, BlockCodex[tilef].getLum(rgbaOffset) * 0.70710678f)
         thisLightValue = maxOf(thisLightValue, BlockCodex[tileh].getLum(rgbaOffset) * 0.70710678f)
 
-        lightmap.channelSet(lx, ly, rgbaOffset, thisLightValue)
+        lightmap.channelSet(lx, ly, rgbaOffset, lightmap.channelGet(lx, ly, rgbaOffset) + thisLightValue)
 
         // recurse condition
         if (lightmap.channelGet(lx - 1, ly - 1, rgbaOffset) < thisLightValue)
