@@ -37,20 +37,29 @@ object BlockPropUtil {
 
     private fun getTorchFlicker(baseLum: Cvec): Cvec {
         val funcY = FastMath.interpolateLinear(flickerFuncX / flickerFuncDomain, flickerP0, flickerP1)
-
         return alterBrightnessUniform(baseLum, funcY)
+    }
+
+    private fun getTorchFlicker(baseLum: Float): Float {
+        return baseLum + FastMath.interpolateLinear(flickerFuncX / flickerFuncDomain, flickerP0, flickerP1)
     }
 
     private fun getSlowBreath(baseLum: Cvec): Cvec {
         val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
-
         return alterBrightnessUniform(baseLum, funcY)
+    }
+
+    private fun getSlowBreath(baseLum: Float): Float {
+        return baseLum + FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
     }
 
     private fun getPulsate(baseLum: Cvec): Cvec {
         val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
-
         return alterBrightnessUniform(baseLum, funcY)
+    }
+
+    private fun getPulsate(baseLum: Float): Float {
+        return baseLum + FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
     }
 
     /**
@@ -88,6 +97,20 @@ object BlockPropUtil {
             1    -> getTorchFlicker(baseLum)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
             3    -> WeatherMixer.getGlobalLightOfTime(Terrarum.ingame!!.world, WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
+            4    -> getSlowBreath(baseLum)
+            5    -> getPulsate(baseLum)
+            else -> baseLum
+        }
+    }
+
+    /**
+     * @param chan 0 for R, 1 for G, 2 for B, 3 for A
+     */
+    fun getDynamicLumFuncByChan(baseLum: Float, type: Int, chan: Int): Float {
+        return when (type) {
+            1    -> getTorchFlicker(baseLum)
+            2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT).getElem(chan) // current global light
+            3    -> WeatherMixer.getGlobalLightOfTime(Terrarum.ingame!!.world, WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT).getElem(chan) // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum

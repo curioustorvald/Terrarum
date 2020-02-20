@@ -70,6 +70,21 @@ class Cvec {
         set(color)
     }
 
+    /**
+     * Get RGBA Element using index, of which:
+     * - 0: R
+     * - 1: G
+     * - 2: B
+     * - 3: A
+     */
+    fun getElem(index: Int) = when(index) {
+        0 -> r
+        1 -> g
+        2 -> b
+        3 -> a
+        else -> throw IndexOutOfBoundsException("Invalid index $index")
+    }
+
     /** Sets this color to the given color.
      *
      * @param color the Cvec
