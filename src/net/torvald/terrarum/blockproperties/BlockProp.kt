@@ -19,6 +19,14 @@ class BlockProp {
 
     lateinit var opacity: Cvec
 
+    fun getOpacity(channel: Int) = when (channel) {
+        0 -> shadeColR
+        1 -> shadeColG
+        2 -> shadeColB
+        3 -> shadeColA
+        else -> throw IllegalArgumentException("Invalid channel $channel")
+    }
+
     var strength: Int = 0
     var density: Int = 0
     var viscosity: Int = 0
@@ -47,6 +55,16 @@ class BlockProp {
      */
     inline val luminosity: Cvec
         get() = BlockPropUtil.getDynamicLumFunc(internalLumCol, dynamicLuminosityFunction)
+
+    fun getLum(channel: Int) = BlockPropUtil.getDynamicLumFuncByChan(
+            when (channel) {
+                0 -> lumColR
+                1 -> lumColG
+                2 -> lumColB
+                3 -> lumColA
+                else -> throw IllegalArgumentException("Invalid channel $channel")
+            }, dynamicLuminosityFunction, channel
+    )
 
     var drop: Int = 0
 

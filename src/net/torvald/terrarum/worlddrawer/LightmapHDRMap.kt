@@ -4,6 +4,9 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.UnsafeHelper
 
 /**
+ * As the fast access to this LUT is critical for the performance because of the way light calculation work,
+ * even the IO can be a bottleneck so I use UnsafePointer.
+ *
  * Created by Torvald on 2019-12-05.
  */
 internal object LightmapHDRMap : Disposable {
