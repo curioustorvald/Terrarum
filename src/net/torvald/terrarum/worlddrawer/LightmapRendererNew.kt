@@ -278,40 +278,68 @@ object LightmapRenderer {
             AppLoader.measureDebugTime("Renderer.LightTotal") {
                 // Round 1
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    // TODO multithread the following for loop duh
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 2
                 for (y in for_y_end + overscan_open downTo for_y_start) {
-                    // TODO multithread the following for loop duh
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 3
                 for (y in for_y_end + overscan_open downTo for_y_start) {
-                    // TODO multithread the following for loop duh
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 4
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    // TODO multithread the following for loop duh
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
                 // Round 1
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    // TODO multithread the following for loop duh
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
                     }
                 }
 
+                // per-channel version is slower...
+                /*repeat(4) { channel ->
+                    // Round 1
+                    for (y in for_y_start - overscan_open..for_y_end) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            calculateAndAssign(lightmap, x, y, channel)
+                        }
+                    }
+                    // Round 2
+                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            calculateAndAssign(lightmap, x, y, channel)
+                        }
+                    }
+                    // Round 3
+                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                        for (x in for_x_end + overscan_open downTo for_x_start) {
+                            calculateAndAssign(lightmap, x, y, channel)
+                        }
+                    }
+                    // Round 4
+                    for (y in for_y_start - overscan_open..for_y_end) {
+                        for (x in for_x_end + overscan_open downTo for_x_start) {
+                            calculateAndAssign(lightmap, x, y, channel)
+                        }
+                    }
+                    // Round 1
+                    for (y in for_y_start - overscan_open..for_y_end) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            calculateAndAssign(lightmap, x, y, channel)
+                        }
+                    }
+                }*/
 
                 // per-channel operation for bit more aggressive optimisation
                 /*for (lightsource in lightsourceMap) {
@@ -538,16 +566,23 @@ object LightmapRenderer {
     }
 
 
-    //private val ambientAccumulator = Cvec(0f,0f,0f,0f)
+    private val ambientAccumulator = Cvec(0f,0f,0f,0f)
     private val lightLevelThis = Cvec(0)
-    private var thisTerrain = 0
-    private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
     private val fluidAmountToCol = Cvec(0)
-    private var thisWall = 0
     private val thisTileLuminosity = Cvec(0)
     private val thisTileOpacity = Cvec(0)
     private val thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
     private val sunLight = Cvec(0)
+    private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
+    private var thisTerrain = 0
+    private var thisWall = 0
+
+    // per-channel variants
+    private var lightLevelThisCh = 0f
+    private var fluidAmountToColCh = 0f
+    private var thisTileLuminosityCh = 0f
+    private var thisTileOpacityCh = 0f
+    private var thisTileOpacity2Ch = 0f
 
     /**
      * This function will alter following variables:
@@ -612,7 +647,61 @@ object LightmapRenderer {
 
         // blend lantern
         lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
+    }
 
+    private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
+        lightLevelThisCh = 0f
+        thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
+        thisFluid = world.getFluid(x, y)
+        thisWall = world.getTileFromWall(x, y) ?: Block.STONE
+
+        // regarding the issue #26
+        try {
+            val fuck = BlockCodex[thisTerrain].luminosity
+        }
+        catch (e: NullPointerException) {
+            System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
+            e.printStackTrace()
+            // create shitty minidump
+            System.err.println("MINIMINIDUMP START")
+            for (xx in x - 16 until x + 16) {
+                val raw = world.getTileFromTerrain(xx, y)
+                val lsb = raw.and(0xff).toString(16).padStart(2, '0')
+                val msb = raw.ushr(8).and(0xff).toString(16).padStart(2, '0')
+                System.err.print(lsb)
+                System.err.print(msb)
+                System.err.print(" ")
+            }
+            System.err.println("\nMINIMINIDUMP END")
+
+            exitProcess(1)
+        }
+
+        if (thisFluid.type != Fluid.NULL) {
+            fluidAmountToColCh = thisFluid.amount
+
+            thisTileLuminosityCh = BlockCodex[thisTerrain].getLum(channel)
+            thisTileLuminosityCh = maxOf(BlockCodex[thisFluid.type].getLum(channel) * fluidAmountToColCh, thisTileLuminosityCh) // already been div by four
+            thisTileOpacityCh = BlockCodex[thisTerrain].getOpacity(channel)
+            thisTileOpacityCh = maxOf(BlockCodex[thisFluid.type].getOpacity(channel) * fluidAmountToColCh, thisTileOpacityCh) // already been div by four
+        }
+        else {
+            thisTileLuminosityCh = BlockCodex[thisTerrain].getLum(channel)
+            thisTileOpacityCh = BlockCodex[thisTerrain].getOpacity(channel)
+        }
+
+        thisTileOpacity2Ch = thisTileOpacityCh * 1.41421356f
+        //sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT) // moved to fireRecalculateEvent()
+
+
+        // open air || luminous tile backed by sunlight
+        if ((thisTerrain == AIR && thisWall == AIR) || (thisTileLuminosityCh > epsilon && thisWall == AIR)) {
+            lightLevelThisCh = sunLight.getElem(channel)
+        }
+
+        // blend lantern
+        lightLevelThisCh = maxOf(thisTileLuminosityCh, lightLevelThisCh)
+        lightLevelThisCh = maxOf(lanternMap[LandUtil.getBlockAddr(world, x, y)]?.getElem(channel) ?: 0f, lightLevelThisCh)
     }
 
     private val inNoopMaskp = Point2i(0,0)
@@ -705,6 +794,41 @@ object LightmapRenderer {
         lightmap.setB(x, y, lightLevelThis.b)
         lightmap.setA(x, y, lightLevelThis.a)
     }
+
+    // per-channel version is slower...
+    /*private fun calculateAndAssign(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, channel: Int) {
+
+        if (inNoopMask(worldX, worldY)) return
+
+        // O(9n) == O(n) where n is a size of the map
+
+        getLightsAndShadesCh(worldX, worldY, channel)
+
+        val x = worldX.convX()
+        val y = worldY.convY()
+
+        // calculate ambient
+        /*  + * +  0 4 1
+         *  * @ *  6 @ 7
+         *  + * +  2 5 3
+         *  sample ambient for eight points and apply attenuation for those
+         *  maxblend eight values and use it
+         */
+
+        // will "overwrite" what's there in the lightmap if it's the first pass
+        // takes about 2 ms on 6700K
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
+
+        lightLevelThisCh = maxOf(darken(x, y - 1, thisTileOpacityCh, channel), lightLevelThisCh)
+        lightLevelThisCh = maxOf(darken(x, y + 1, thisTileOpacityCh, channel), lightLevelThisCh)
+        lightLevelThisCh = maxOf(darken(x - 1, y, thisTileOpacityCh, channel), lightLevelThisCh)
+        lightLevelThisCh = maxOf(darken(x + 1, y, thisTileOpacityCh, channel), lightLevelThisCh)
+
+        lightmap.channelSet(x, y, channel, lightLevelThisCh)
+    }*/
 
     private fun isSolid(x: Int, y: Int): Float? { // ...so that they wouldn't appear too dark
         if (!inBounds(x, y)) return null
@@ -821,6 +945,11 @@ object LightmapRenderer {
                 lightmap.getA(x, y) * (1f - darken.a * lightScalingMagic)
         )
 
+    }
+
+    private fun darken(x: Int, y: Int, darken: Float, channel: Int): Float {
+        if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return 0f
+        return lightmap.channelGet(x, y, channel) * (1f - darken * lightScalingMagic)
     }
 
     /** infix is removed to clarify the association direction */
