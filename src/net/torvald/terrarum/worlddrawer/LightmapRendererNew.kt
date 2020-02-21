@@ -235,8 +235,8 @@ object LightmapRenderer {
 
 
             // pre-seed the lightmap with known value
-            for (x in for_x_start - overscan_open + 1..for_x_end + overscan_open - 1) {
-                for (y in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1) {
+            for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+                for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
                     val tile = world.getTileFromTerrain(x, y)
                     val wall = world.getTileFromWall(x, y)
 
@@ -267,6 +267,39 @@ object LightmapRenderer {
         // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
 
+        fun r1() {
+            // Round 1
+            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
+                for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+                    calculateAndAssign(lightmap, x, y)
+                }
+            }
+        }
+        fun r2() {
+            // Round 2
+            for (y in for_y_end + overscan_open downTo for_y_start - overscan_open) {
+                for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+                    calculateAndAssign(lightmap, x, y)
+                }
+            }
+        }
+        fun r3() {
+            // Round 3
+            for (y in for_y_end + overscan_open downTo for_y_start - overscan_open) {
+                for (x in for_x_end + overscan_open downTo for_x_start - overscan_open) {
+                    calculateAndAssign(lightmap, x, y)
+                }
+            }
+        }
+        fun r4() {
+            // Round 4
+            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
+                for (x in for_x_end + overscan_open downTo for_x_start - overscan_open) {
+                    calculateAndAssign(lightmap, x, y)
+                }
+            }
+        }
+
 
         // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
@@ -276,80 +309,25 @@ object LightmapRenderer {
             // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
 
             AppLoader.measureDebugTime("Renderer.LightTotal") {
-                // Round 1
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 2
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 3
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 4
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 1
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
 
-                // per-channel version is slower...
-                /*repeat(4) { channel ->
-                    // Round 1
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y, channel)
-                        }
-                    }
-                    // Round 2
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y, channel)
-                        }
-                    }
-                    // Round 3
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_end + overscan_open downTo for_x_start) {
-                            calculateAndAssign(lightmap, x, y, channel)
-                        }
-                    }
-                    // Round 4
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_end + overscan_open downTo for_x_start) {
-                            calculateAndAssign(lightmap, x, y, channel)
-                        }
-                    }
-                    // Round 1
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y, channel)
-                        }
-                    }
-                }*/
+
+                //r1();r2();r3();r4()
+
+
+                // ANECDOTES
+                // * Radiate-from-light-source idea is doomed because skippable cells are completely random
+                // * Spread-every-cell idea might work as skippable cells are predictable, and they're related
+                //   to the pos of lightsources
+                // * No-op masks cause some ambient ray to disappear when they're on the screen edge
+
 
                 // per-channel operation for bit more aggressive optimisation
-                /*for (lightsource in lightsourceMap) {
+                for (lightsource in lightsourceMap) {
                     val (lsx, lsy) = LandUtil.resolveBlockAddr(world, lightsource.key)
 
-                    if (lsx !in for_x_start - overscan_open + 1..for_x_end + overscan_open - 1 || lsy !in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1)
-                        continue
-
+                    // lightmap MUST BE PRE-SEEDED from known lightsources!
                     repeat(4) { rgbaOffset ->
-                        for (genus in 1..6) { // use of overscan_open for loop limit is completely arbitrary
+                        for (genus in 1..12) { // use of overscan_open for loop limit is completely arbitrary
                             val rimSize = 1 + 2 * genus
 
                             var skip = true
@@ -378,7 +356,7 @@ object LightmapRenderer {
                             if (skip) break
                         }
                     }
-                }*/
+                }
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
@@ -426,7 +404,7 @@ object LightmapRenderer {
     private fun radiate(channel: Int, wx: Int, wy: Int, lightsource: Cvec, distSqr: Int): Boolean {
         val lx = wx.convX(); val ly = wy.convY()
 
-        if (lx !in 1..lightmap.width - 1 || ly !in 1..lightmap.height - 1)
+        if (lx !in 0 until LIGHTMAP_WIDTH || ly !in 0 until LIGHTMAP_HEIGHT)
             return true
 
         val currentLightLevel = lightmap.channelGet(lx, ly, channel)
@@ -441,11 +419,38 @@ object LightmapRenderer {
         //brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx + 1, ly - 1, channel) * 0.70710678f)
         //brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx + 1, ly + 1, channel) * 0.70710678f)
 
-        val newLight = brightestNeighbour - attenuate
+        val newLight = brightestNeighbour * (1f - attenuate * lightScalingMagic)
 
-        if (newLight <= currentLightLevel) return true
+        if (newLight <= currentLightLevel || newLight < epsilon) return true
 
         lightmap.channelSet(lx, ly, channel, newLight)
+
+        return false
+    }
+
+    private fun radiate2(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, lightsource: Cvec): Boolean {
+        if (inNoopMask(worldX, worldY)) return false
+
+        // just quick snippets to make test work
+        lightLevelThis.set(colourNull)
+        thisTileOpacity.set(BlockCodex[world.getTileFromTerrain(worldX, worldY)].opacity)
+
+        val x = worldX.convX()
+        val y = worldY.convY()
+
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y - 1, thisTileOpacity))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y + 1, thisTileOpacity))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y, thisTileOpacity))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y, thisTileOpacity))
+
+        lightmap.setR(x, y, lightLevelThis.r)
+        lightmap.setG(x, y, lightLevelThis.g)
+        lightmap.setB(x, y, lightLevelThis.b)
+        lightmap.setA(x, y, lightLevelThis.a)
 
         return false
     }
@@ -597,9 +602,9 @@ object LightmapRenderer {
      */
     private fun getLightsAndShades(x: Int, y: Int) {
         lightLevelThis.set(colourNull)
-        thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
+        thisTerrain = world.getTileFromTerrain(x, y)
         thisFluid = world.getFluid(x, y)
-        thisWall = world.getTileFromWall(x, y) ?: Block.STONE
+        thisWall = world.getTileFromWall(x, y)
 
         // regarding the issue #26
         try {
@@ -757,7 +762,7 @@ object LightmapRenderer {
      */
     private fun calculateAndAssign(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int) {
 
-        if (inNoopMask(worldX, worldY)) return
+        //if (inNoopMask(worldX, worldY)) return
 
         // O(9n) == O(n) where n is a size of the map
 
