@@ -100,6 +100,8 @@ object LightmapRenderer {
     //private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
+    private val lightsourceMap = HashMap<BlockAddress, Cvec>(256)
+
     init {
         LightmapHDRMap.invoke()
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
@@ -229,6 +231,7 @@ object LightmapRenderer {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
             lightmap.zerofill()
+            lightsourceMap.clear()
 
 
             // pre-seed the lightmap with known value
@@ -242,15 +245,13 @@ object LightmapRenderer {
                     else
                         colourNull.cpy()
                     // are you a light source?
-                    lightlevel.add(BlockCodex[tile].luminosity)
+                    lightlevel.maxAndAssign(BlockCodex[tile].luminosity)
+                    // there will be a way to slightly optimise this following line but hey, let's make everything working right first...
+                    lightlevel.maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
 
-                    // TODO: add lanterns
-
-                    // subtract attenuation value
                     if (!lightlevel.nonZero()) {
-                        lightlevel.sub(
-                                BlockCodex[tile].opacity
-                        )
+                        // mark the tile as a light source
+                        lightsourceMap[LandUtil.getBlockAddr(world, x, y)] = lightlevel
                     }
 
                     val lx = x.convX(); val ly = y.convY()
@@ -261,6 +262,7 @@ object LightmapRenderer {
                     lightmap.setA(lx, ly, lightlevel.a)
                 }
             }
+
         }
         // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
@@ -274,8 +276,15 @@ object LightmapRenderer {
             // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
 
             AppLoader.measureDebugTime("Renderer.LightTotal") {
+                // Round 1
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    // TODO multithread the following for loop duh
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
                 // Round 2
-                /*for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (y in for_y_end + overscan_open downTo for_y_start) {
                     // TODO multithread the following for loop duh
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
@@ -301,70 +310,47 @@ object LightmapRenderer {
                     for (x in for_x_start - overscan_open..for_x_end) {
                         calculateAndAssign(lightmap, x, y)
                     }
-                }*/
+                }
 
 
                 // per-channel operation for bit more aggressive optimisation
-                repeat(4) { rgbaOffset ->
-                    val visitedCells = setOf(-1L) // (x shl 32) or y
+                /*for (lightsource in lightsourceMap) {
+                    val (lsx, lsy) = LandUtil.resolveBlockAddr(world, lightsource.key)
 
-                    for (x in for_x_start - overscan_open + 1..for_x_end + overscan_open - 1) {
-                        for (y in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1) {
-                            val lx = x.convX()
-                            val ly = y.convY()
+                    if (lsx !in for_x_start - overscan_open + 1..for_x_end + overscan_open - 1 || lsy !in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1)
+                        continue
 
-                            val hash = (x.toLong() shl 32) or y.toLong()
-                            if (visitedCells.contains(hash)) continue
+                    repeat(4) { rgbaOffset ->
+                        for (genus in 1..6) { // use of overscan_open for loop limit is completely arbitrary
+                            val rimSize = 1 + 2 * genus
 
-                            var thisLightValue = 0f
+                            var skip = true
+                            // left side, counterclockwise
+                            for (k in 0 until rimSize) {
+                                val wx = lsx - genus; val wy = lsy - genus + k
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                                // whenever radiate() returns false (not-skip), skip is permanently fixated as false
+                            }
+                            // bottom side, counterclockwise
+                            for (k in 1 until rimSize) {
+                                val wx = lsx - genus + k; val wy = lsy + genus
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                            }
+                            // right side, counterclockwise
+                            for (k in 1 until rimSize) {
+                                val wx = lsx + genus; val wy = lsy + genus - k
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                            }
+                            // top side, counterclockwise
+                            for (k in 1 until rimSize - 1) {
+                                val wx = lsx + genus - k; val wy = lsy - genus
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                            }
 
-
-                            // nearby tiles, namely a b c d e f g h
-                            val tilea = world.getTileFromTerrain(x - 1, y - 1)
-                            val tileb = world.getTileFromTerrain(x, y - 1)
-                            val tilec = world.getTileFromTerrain(x + 1, y - 1)
-                            val tiled = world.getTileFromTerrain(x - 1, y)
-                            val tilee = world.getTileFromTerrain(x + 1, y)
-                            val tilef = world.getTileFromTerrain(x - 1, y + 1)
-                            val tileg = world.getTileFromTerrain(x, y + 1)
-                            val tileh = world.getTileFromTerrain(x + 1, y + 1)
-
-                            // max value from plus-shaped neighbouring tiles
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tileb].getLum(rgbaOffset))
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tiled].getLum(rgbaOffset))
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tilee].getLum(rgbaOffset))
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tileg].getLum(rgbaOffset))
-                            // max vaule from x-shaped neighbouring tiles
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tilea].getLum(rgbaOffset) * 0.70710678f)
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tilec].getLum(rgbaOffset) * 0.70710678f)
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tilef].getLum(rgbaOffset) * 0.70710678f)
-                            thisLightValue = maxOf(thisLightValue, BlockCodex[tileh].getLum(rgbaOffset) * 0.70710678f)
-
-                            lightmap.channelSet(lx, ly, rgbaOffset, lightmap.channelGet(lx, ly, rgbaOffset) + thisLightValue)
-
-                            // recurse condition
-                            if (lightmap.channelGet(lx - 1, ly - 1, rgbaOffset) < thisLightValue)
-                                spread(x - 1, y - 1, rgbaOffset, visitedCells, 0)
-                            if (lightmap.channelGet(lx, ly - 1, rgbaOffset) < thisLightValue)
-                                spread(x, y - 1, rgbaOffset, visitedCells, 0)
-                            if (lightmap.channelGet(lx + 1, ly - 1, rgbaOffset) < thisLightValue)
-                                spread(x + 1, y - 1, rgbaOffset, visitedCells, 0)
-
-                            if (lightmap.channelGet(lx - 1, ly, rgbaOffset) < thisLightValue)
-                                spread(x - 1, y, rgbaOffset, visitedCells, 0)
-                            if (lightmap.channelGet(lx + 1, ly, rgbaOffset) < thisLightValue)
-                                spread(x + 1, y, rgbaOffset, visitedCells, 0)
-
-                            if (lightmap.channelGet(lx - 1, ly + 1, rgbaOffset) < thisLightValue)
-                                spread(x - 1, y + 1, rgbaOffset, visitedCells, 0)
-                            if (lightmap.channelGet(lx, ly + 1, rgbaOffset) < thisLightValue)
-                                spread(x, y + 1, rgbaOffset, visitedCells, 0)
-                            if (lightmap.channelGet(lx + 1, ly + 1, rgbaOffset) < thisLightValue)
-                                spread(x + 1, y + 1, rgbaOffset, visitedCells, 0)
-
+                            if (skip) break
                         }
                     }
-                }
+                }*/
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
@@ -404,73 +390,41 @@ object LightmapRenderer {
     }
 
 
+    /**
+     * the lightmap is already been seeded with lightsource.
+     *
+     * @return true if skip
+     */
+    private fun radiate(channel: Int, wx: Int, wy: Int, lightsource: Cvec, distSqr: Int): Boolean {
+        val lx = wx.convX(); val ly = wy.convY()
+
+        if (lx !in 1..lightmap.width - 1 || ly !in 1..lightmap.height - 1)
+            return true
+
+        val currentLightLevel = lightmap.channelGet(lx, ly, channel)
+        val attenuate = BlockCodex[world.getTileFromTerrain(wx, wy)].getOpacity(channel)
+
+        var brightestNeighbour = lightmap.channelGet(lx, ly - 1, channel)
+        brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx, ly + 1, channel))
+        brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx - 1, ly, channel))
+        brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx + 1, ly, channel))
+        //brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx - 1, ly - 1, channel) * 0.70710678f)
+        //brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx - 1, ly + 1, channel) * 0.70710678f)
+        //brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx + 1, ly - 1, channel) * 0.70710678f)
+        //brightestNeighbour = maxOf(brightestNeighbour, lightmap.channelGet(lx + 1, ly + 1, channel) * 0.70710678f)
+
+        val newLight = brightestNeighbour - attenuate
+
+        if (newLight <= currentLightLevel) return true
+
+        lightmap.channelSet(lx, ly, channel, newLight)
+
+        return false
+    }
 
 
     // TODO re-init at every resize
     private lateinit var updateMessages: List<Array<ThreadedLightmapUpdateMessage>>
-
-    /**
-     * @param x x position in the world
-     * @param y y position in the world
-     */
-    private fun spread(x: Int, y: Int, rgbaOffset: Int, visitedCells: Set<Long>, recurseCount: Int) {
-        val lx = x.convX()
-        val ly = y.convY()
-
-        val hash = (x.toLong() shl 32) or y.toLong()
-
-        // stop condition
-        if (visitedCells.contains(hash)) return
-        if (x !in for_x_start - overscan_open + 1..for_x_end + overscan_open - 1) return
-        if (y !in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1) return
-        if (recurseCount > 128) return
-
-        var thisLightValue = 0f
-
-        // nearby tiles, namely a b c d e f g h
-        val tilea = world.getTileFromTerrain(x - 1, y - 1)
-        val tileb = world.getTileFromTerrain(x, y - 1)
-        val tilec = world.getTileFromTerrain(x + 1, y - 1)
-        val tiled = world.getTileFromTerrain(x - 1, y)
-        val tilee = world.getTileFromTerrain(x + 1, y)
-        val tilef = world.getTileFromTerrain(x - 1, y + 1)
-        val tileg = world.getTileFromTerrain(x, y + 1)
-        val tileh = world.getTileFromTerrain(x + 1, y + 1)
-
-        // max value from plus-shaped neighbouring tiles
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tileb].getLum(rgbaOffset))
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tiled].getLum(rgbaOffset))
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tilee].getLum(rgbaOffset))
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tileg].getLum(rgbaOffset))
-        // max vaule from x-shaped neighbouring tiles
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tilea].getLum(rgbaOffset) * 0.70710678f)
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tilec].getLum(rgbaOffset) * 0.70710678f)
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tilef].getLum(rgbaOffset) * 0.70710678f)
-        thisLightValue = maxOf(thisLightValue, BlockCodex[tileh].getLum(rgbaOffset) * 0.70710678f)
-
-        lightmap.channelSet(lx, ly, rgbaOffset, lightmap.channelGet(lx, ly, rgbaOffset) + thisLightValue)
-
-        // recurse condition
-        if (lightmap.channelGet(lx - 1, ly - 1, rgbaOffset) < thisLightValue)
-            spread(x - 1, y - 1, rgbaOffset, visitedCells, recurseCount + 1)
-        if (lightmap.channelGet(lx, ly - 1, rgbaOffset) < thisLightValue)
-            spread(x, y - 1, rgbaOffset, visitedCells, recurseCount + 1)
-        if (lightmap.channelGet(lx + 1, ly - 1, rgbaOffset) < thisLightValue)
-            spread(x + 1, y - 1, rgbaOffset, visitedCells, recurseCount + 1)
-
-        if (lightmap.channelGet(lx - 1, ly, rgbaOffset) < thisLightValue)
-            spread(x - 1, y, rgbaOffset, visitedCells, recurseCount + 1)
-        if (lightmap.channelGet(lx + 1, ly, rgbaOffset) < thisLightValue)
-            spread(x + 1, y, rgbaOffset, visitedCells, recurseCount + 1)
-
-        if (lightmap.channelGet(lx - 1, ly + 1, rgbaOffset) < thisLightValue)
-            spread(x - 1, y + 1, rgbaOffset, visitedCells, recurseCount + 1)
-        if (lightmap.channelGet(lx, ly + 1, rgbaOffset) < thisLightValue)
-            spread(x, y + 1, rgbaOffset, visitedCells, recurseCount + 1)
-        if (lightmap.channelGet(lx + 1, ly + 1, rgbaOffset) < thisLightValue)
-            spread(x + 1, y + 1, rgbaOffset, visitedCells, recurseCount + 1)
-
-    }
 
     private fun makeUpdateTaskList() {
         val lightTaskArr = ArrayList<ThreadedLightmapUpdateMessage>()
@@ -733,10 +687,10 @@ object LightmapRenderer {
 
         // will "overwrite" what's there in the lightmap if it's the first pass
         // takes about 2 ms on 6700K
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
+        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
         /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y - 1, thisTileOpacity))
         /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y + 1, thisTileOpacity))
         /* * */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y, thisTileOpacity))
