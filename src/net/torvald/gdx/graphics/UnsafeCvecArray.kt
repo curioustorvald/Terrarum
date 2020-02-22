@@ -29,6 +29,8 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 8, value) }
     fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 12, value) }
 
+    fun addA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 12, getA(x, y) + value) }
+
     /**
      * @param channel 0 for R, 1 for G, 2 for B, 3 for A
      */
