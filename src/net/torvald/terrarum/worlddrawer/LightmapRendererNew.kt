@@ -256,12 +256,11 @@ object LightmapRenderer {
                         lightsourceMap.add(LandUtil.getBlockAddr(world, x, y) to lightlevel)
                     }
 
-                    val lx = x.convX(); val ly = y.convY()
-
-                    lightmap.setR(lx, ly, lightlevel.r)
-                    lightmap.setG(lx, ly, lightlevel.g)
-                    lightmap.setB(lx, ly, lightlevel.b)
-                    lightmap.setA(lx, ly, lightlevel.a)
+                    //val lx = x.convX(); val ly = y.convY()
+                    //lightmap.setR(lx, ly, lightlevel.r)
+                    //lightmap.setG(lx, ly, lightlevel.g)
+                    //lightmap.setB(lx, ly, lightlevel.b)
+                    //lightmap.setA(lx, ly, lightlevel.a)
                 }
             }
 
@@ -321,6 +320,8 @@ object LightmapRenderer {
                 // * Spread-every-cell idea might work as skippable cells are predictable, and they're related
                 //   to the pos of lightsources
                 // * No-op masks cause some ambient ray to disappear when they're on the screen edge
+                // * Naive optimisation (mark-and-iterate) attempt was a disaster
+
 
 
                 // per-channel operation for bit more aggressive optimisation
