@@ -251,7 +251,7 @@ object LightmapRenderer {
                     // there will be a way to slightly optimise this following line but hey, let's make everything working right first...
                     lightlevel.maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
 
-                    if (!lightlevel.nonZero()) {
+                    if (lightlevel.nonZero()) {
                         // mark the tile as a light source
                         lightsourceMap.add(LandUtil.getBlockAddr(world, x, y) to lightlevel)
                     }
@@ -325,34 +325,34 @@ object LightmapRenderer {
 
                 // per-channel operation for bit more aggressive optimisation
                 /*for (lightsource in lightsourceMap) {
-                    val (lsx, lsy) = LandUtil.resolveBlockAddr(world, lightsource.key)
+                    val (lsx, lsy) = LandUtil.resolveBlockAddr(world, lightsource.first)
 
                     // lightmap MUST BE PRE-SEEDED from known lightsources!
                     repeat(4) { rgbaOffset ->
-                        for (genus in 1..12) { // use of overscan_open for loop limit is completely arbitrary
+                        for (genus in 1..6) { // use of overscan_open for loop limit is completely arbitrary
                             val rimSize = 1 + 2 * genus
 
                             var skip = true
                             // left side, counterclockwise
                             for (k in 0 until rimSize) {
                                 val wx = lsx - genus; val wy = lsy - genus + k
-                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.second,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
                                 // whenever radiate() returns false (not-skip), skip is permanently fixated as false
                             }
                             // bottom side, counterclockwise
                             for (k in 1 until rimSize) {
                                 val wx = lsx - genus + k; val wy = lsy + genus
-                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.second,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
                             }
                             // right side, counterclockwise
                             for (k in 1 until rimSize) {
                                 val wx = lsx + genus; val wy = lsy + genus - k
-                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.second,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
                             }
                             // top side, counterclockwise
                             for (k in 1 until rimSize - 1) {
                                 val wx = lsx + genus - k; val wy = lsy - genus
-                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.value,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
+                                skip = skip and radiate(rgbaOffset, wx, wy, lightsource.second,(lsx - wx)*(lsx - wx) + (lsy - wy)*(lsy - wy))
                             }
 
                             if (skip) break
@@ -423,7 +423,7 @@ object LightmapRenderer {
 
         val newLight = brightestNeighbour * (1f - attenuate * lightScalingMagic)
 
-        if (newLight <= currentLightLevel || newLight < epsilon) return true
+        if (newLight <= currentLightLevel || newLight < 0.125f) return true
 
         lightmap.channelSet(lx, ly, channel, newLight)
 
@@ -1037,9 +1037,9 @@ object LightmapRenderer {
             hdr(this.a.coerceIn(0f, 1f))
     )
 
-    private fun Cvec.nonZero() = this.r.abs() > epsilon &&
-                                 this.g.abs() > epsilon &&
-                                 this.b.abs() > epsilon &&
+    private fun Cvec.nonZero() = this.r.abs() > epsilon ||
+                                 this.g.abs() > epsilon ||
+                                 this.b.abs() > epsilon ||
                                  this.a.abs() > epsilon
 
     val histogram: Histogram
