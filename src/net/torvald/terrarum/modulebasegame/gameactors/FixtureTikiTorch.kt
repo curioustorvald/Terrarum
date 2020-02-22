@@ -16,7 +16,7 @@ import java.util.*
 internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 2)), Luminous {
 
     override var color: Cvec
-        get() = BlockCodex[Block.TORCH].luminosity
+        get() = BlockCodex[Block.TORCH].lumCol
         set(value) {
             throw UnsupportedOperationException()
         }

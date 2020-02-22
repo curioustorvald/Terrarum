@@ -7,6 +7,7 @@ import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.util.SortedArrayList
 import org.apache.commons.csv.CSVRecord
 import java.io.IOException
 
@@ -16,6 +17,8 @@ import java.io.IOException
 object BlockCodex {
 
     private var blockProps = HashMap<Int, BlockProp>()
+
+    val dynamicLights = SortedArrayList<Int>()
 
     /** 4096 */
     const val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
@@ -44,6 +47,10 @@ object BlockCodex {
 
                 val id = intVal(it, "id")
                 setProp(id, it)
+
+                if ((blockProps[id]?.dynamicLuminosityFunction ?: 0) != 0) {
+                    dynamicLights.add(id)
+                }
 
                 if (id > highestNumber)
                     highestNumber = id
@@ -113,11 +120,11 @@ object BlockCodex {
         prop.strength = intVal(record, "str")
         prop.density = intVal(record, "dsty")
 
-        prop.lumColR = floatVal(record, "lumr") / LightmapRenderer.MUL_FLOAT
-        prop.lumColG = floatVal(record, "lumg") / LightmapRenderer.MUL_FLOAT
-        prop.lumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
-        prop.lumColA = floatVal(record, "lumuv") / LightmapRenderer.MUL_FLOAT
-        prop.internalLumCol = Cvec(prop.lumColR, prop.lumColG, prop.lumColB, prop.lumColA)
+        prop.baseLumColR = floatVal(record, "lumr") / LightmapRenderer.MUL_FLOAT
+        prop.baseLumColG = floatVal(record, "lumg") / LightmapRenderer.MUL_FLOAT
+        prop.baseLumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
+        prop.baseLumColA = floatVal(record, "lumuv") / LightmapRenderer.MUL_FLOAT
+        prop.baseLumCol.set(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
 
         prop.friction = intVal(record, "fr")
         prop.viscosity = intVal(record, "vscs")

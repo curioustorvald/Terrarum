@@ -86,13 +86,28 @@ object BlockPropUtil {
 
         // pulsate-related vars
         if (pulsateFuncX > pulsateCycleDuration) pulsateFuncX -= pulsateCycleDuration
+
+        // update the memoised values in props
+        for (key in BlockCodex.dynamicLights) {
+            try {
+                val prop = BlockCodex[key]
+                if (prop.dynamicLuminosityFunction != 0) {
+                    prop.lumCol.set(getDynamicLumFunc(prop.baseLumCol, prop.dynamicLuminosityFunction))
+                    prop.lumColR = prop.lumCol.r
+                    prop.lumColG = prop.lumCol.g
+                    prop.lumColB = prop.lumCol.b
+                    prop.lumColA = prop.lumCol.a
+                }
+            }
+            catch (skip: NullPointerException) {}
+        }
     }
 
     private fun getNewRandom() = random.nextFloat().times(2).minus(1f) * flickerFuncRange
 
     private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x
 
-    fun getDynamicLumFunc(baseLum: Cvec, type: Int): Cvec {
+    private fun getDynamicLumFunc(baseLum: Cvec, type: Int): Cvec {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
@@ -106,7 +121,7 @@ object BlockPropUtil {
     /**
      * @param chan 0 for R, 1 for G, 2 for B, 3 for A
      */
-    fun getDynamicLumFuncByChan(baseLum: Float, type: Int, chan: Int): Float {
+    private fun getDynamicLumFuncByChan(baseLum: Float, type: Int, chan: Int): Float {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT).getElem(chan) // current global light
