@@ -44,27 +44,24 @@ class BlockProp {
 
 
     /** 1.0f for 1023, 0.25f for 255 */
-    var lumColR = 0f
-    var lumColG = 0f
-    var lumColB = 0f
-    var lumColA = 0f
-    lateinit var internalLumCol: Cvec
+    internal var baseLumColR = 0f // base value used to calculate dynamic luminosity
+    internal var baseLumColG = 0f // base value used to calculate dynamic luminosity
+    internal var baseLumColB = 0f // base value used to calculate dynamic luminosity
+    internal var baseLumColA = 0f // base value used to calculate dynamic luminosity
+    internal val baseLumCol = Cvec(0)
+    var lumColR = 0f // memoised value of dynamic luminosity
+    var lumColG = 0f // memoised value of dynamic luminosity
+    var lumColB = 0f // memoised value of dynamic luminosity
+    var lumColA = 0f // memoised value of dynamic luminosity
+    var lumCol = Cvec(0)
 
     /**
      * @param luminosity
      */
-    inline val luminosity: Cvec
-        get() = BlockPropUtil.getDynamicLumFunc(internalLumCol, dynamicLuminosityFunction)
+    //inline val luminosity: Cvec
+    //    get() = BlockPropUtil.getDynamicLumFunc(internalLumCol, dynamicLuminosityFunction)
 
-    fun getLum(channel: Int) = BlockPropUtil.getDynamicLumFuncByChan(
-            when (channel) {
-                0 -> lumColR
-                1 -> lumColG
-                2 -> lumColB
-                3 -> lumColA
-                else -> throw IllegalArgumentException("Invalid channel $channel")
-            }, dynamicLuminosityFunction, channel
-    )
+    fun getLum(channel: Int) = lumCol.getElem(channel)
 
     var drop: Int = 0
 

@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock
  *
  * Created by minjaesong on 2019-03-12.
  */
-class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
+class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
 
     val arrayList = ArrayList<T>(initialSize)
 
@@ -24,7 +24,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
             while (low < high) {
                 val mid = (low + high).ushr(1)
 
-                if (arrayList[mid] > elem)
+                if ((arrayList[mid] as Comparable<T>).compareTo(elem) > 0)
                     high = mid
                 else
                     low = mid + 1
@@ -56,7 +56,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
 
             val midVal = get(mid)
 
-            if (element > midVal)
+            if ((element as Comparable<T>).compareTo(midVal) > 0)
                 low = mid + 1
             else if (element < midVal)
                 high = mid - 1
@@ -100,7 +100,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
      */
     fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 
-    inline fun iterator() = arrayList.iterator()
+    override fun iterator() = arrayList.iterator()
     inline fun forEach(action: (T) -> Unit) = arrayList.forEach(action)
     inline fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
 
@@ -117,41 +117,11 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) {
     inline fun <reified R> filterIsInstance() = arrayList.filterIsInstance<R>()
 
     /**
-     * Select one unsorted element from the array and put it onto the sorted spot.
-     *
-     * The list must be fully sorted except for that one "renegade", otherwise the operation is undefined behaviour.
-     */
-    private fun sortThisRenegade(index: Int) {
-        if (
-                (index == arrayList.lastIndex && arrayList[index - 1] <= arrayList[index]) ||
-                (index == 0 && arrayList[index] <= arrayList[index + 1]) ||
-                (arrayList[index - 1] <= arrayList[index] && arrayList[index] <= arrayList[index + 1])
-        ) return
-
-        // modified binary search
-        ReentrantLock().lock {
-            val renegade = arrayList.removeAt(index)
-
-            var low = 0
-            var high = arrayList.size
-
-            while (low < high) {
-                val mid = (low + high).ushr(1)
-
-                if (arrayList[mid] > renegade)
-                    high = mid
-                else
-                    low = mid + 1
-            }
-
-            arrayList.add(low, renegade)
-        }
-    }
-
-    /**
      * Does NOT create copies!
      */
     fun toArrayList() = arrayList
+
+    fun clear() = arrayList.clear()
 }
 
 fun <T: Comparable<T>> sortedArrayListOf(vararg elements: T): SortedArrayList<T> {

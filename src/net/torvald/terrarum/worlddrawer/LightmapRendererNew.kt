@@ -24,6 +24,8 @@ import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer.convX
 import net.torvald.terrarum.worlddrawer.LightmapRenderer.convY
+import net.torvald.util.SortedArrayList
+import kotlin.math.sign
 import kotlin.system.exitProcess
 
 /**
@@ -100,7 +102,7 @@ object LightmapRenderer {
     //private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
-    private val lightsourceMap = HashMap<BlockAddress, Cvec>(256)
+    private val lightsourceMap = ArrayList<Pair<BlockAddress, Cvec>>(256)
 
     init {
         LightmapHDRMap.invoke()
@@ -245,13 +247,13 @@ object LightmapRenderer {
                     else
                         colourNull.cpy()
                     // are you a light source?
-                    lightlevel.maxAndAssign(BlockCodex[tile].luminosity)
+                    lightlevel.maxAndAssign(BlockCodex[tile].lumCol)
                     // there will be a way to slightly optimise this following line but hey, let's make everything working right first...
                     lightlevel.maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
 
                     if (!lightlevel.nonZero()) {
                         // mark the tile as a light source
-                        lightsourceMap[LandUtil.getBlockAddr(world, x, y)] = lightlevel
+                        lightsourceMap.add(LandUtil.getBlockAddr(world, x, y) to lightlevel)
                     }
 
                     val lx = x.convX(); val ly = y.convY()
@@ -269,32 +271,32 @@ object LightmapRenderer {
 
         fun r1() {
             // Round 1
-            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
-                for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+            for (y in for_y_start - overscan_open..for_y_end) {
+                for (x in for_x_start - overscan_open..for_x_end) {
                     calculateAndAssign(lightmap, x, y)
                 }
             }
         }
         fun r2() {
             // Round 2
-            for (y in for_y_end + overscan_open downTo for_y_start - overscan_open) {
-                for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+            for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (x in for_x_start - overscan_open..for_x_end) {
                     calculateAndAssign(lightmap, x, y)
                 }
             }
         }
         fun r3() {
             // Round 3
-            for (y in for_y_end + overscan_open downTo for_y_start - overscan_open) {
-                for (x in for_x_end + overscan_open downTo for_x_start - overscan_open) {
+            for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (x in for_x_end + overscan_open downTo for_x_start) {
                     calculateAndAssign(lightmap, x, y)
                 }
             }
         }
         fun r4() {
             // Round 4
-            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
-                for (x in for_x_end + overscan_open downTo for_x_start - overscan_open) {
+            for (y in for_y_start - overscan_open..for_y_end) {
+                for (x in for_x_end + overscan_open downTo for_x_start) {
                     calculateAndAssign(lightmap, x, y)
                 }
             }
@@ -311,7 +313,7 @@ object LightmapRenderer {
             AppLoader.measureDebugTime("Renderer.LightTotal") {
 
 
-                //r1();r2();r3();r4()
+                r3();r4();r1();r2();
 
 
                 // ANECDOTES
@@ -322,7 +324,7 @@ object LightmapRenderer {
 
 
                 // per-channel operation for bit more aggressive optimisation
-                for (lightsource in lightsourceMap) {
+                /*for (lightsource in lightsourceMap) {
                     val (lsx, lsy) = LandUtil.resolveBlockAddr(world, lightsource.key)
 
                     // lightmap MUST BE PRE-SEEDED from known lightsources!
@@ -356,7 +358,7 @@ object LightmapRenderer {
                             if (skip) break
                         }
                     }
-                }
+                }*/
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
@@ -608,7 +610,7 @@ object LightmapRenderer {
 
         // regarding the issue #26
         try {
-            val fuck = BlockCodex[thisTerrain].luminosity
+            val fuck = BlockCodex[thisTerrain].lumCol
         }
         catch (e: NullPointerException) {
             System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
@@ -631,13 +633,13 @@ object LightmapRenderer {
         if (thisFluid.type != Fluid.NULL) {
             fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
 
-            thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
-            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].luminosity.mul(fluidAmountToCol)) // already been div by four
+            thisTileLuminosity.set(BlockCodex[thisTerrain].lumCol)
+            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].lumCol.mul(fluidAmountToCol)) // already been div by four
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
             thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity.mul(fluidAmountToCol)) // already been div by four
         }
         else {
-            thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
+            thisTileLuminosity.set(BlockCodex[thisTerrain].lumCol)
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
         }
 
@@ -662,7 +664,7 @@ object LightmapRenderer {
 
         // regarding the issue #26
         try {
-            val fuck = BlockCodex[thisTerrain].luminosity
+            val fuck = BlockCodex[thisTerrain].lumCol
         }
         catch (e: NullPointerException) {
             System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
