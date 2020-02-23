@@ -14,81 +14,50 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
  * Created by minjaesong on 2016-06-16.
  */
 object BlockPropUtil {
-    var flickerFuncX: Second = 0f // saves current status (time) of func
+    //var flickerFuncX: Second = 0f // saves current status (time) of func
     val flickerFuncDomain: Second = 0.08f // time between two noise sample
     val flickerFuncRange = 0.012f // intensity [0, 1]
 
-    var breathFuncX = 0f
+    //var breathFuncX = 0f
     val breathRange = 0.02f
     val breathCycleDuration: Second = 2f
 
-    var pulsateFuncX = 0f
+    //var pulsateFuncX = 0f
     val pulsateRange = 0.034f
     val pulsateCycleDuration: Second = 0.5f
 
     val random = HQRNG()
 
-    var flickerP0 = getNewRandom()
-    var flickerP1 = getNewRandom()
+    //var flickerP0 = getNewRandom()
+    //var flickerP1 = getNewRandom()
 
     init {
 
     }
 
-    private fun getTorchFlicker(baseLum: Cvec): Cvec {
-        val funcY = FastMath.interpolateLinear(flickerFuncX / flickerFuncDomain, flickerP0, flickerP1)
-        return alterBrightnessUniform(baseLum, funcY)
+    private fun getTorchFlicker(prop: BlockProp): Cvec {
+        val funcY = FastMath.interpolateLinear(prop.rngBase0 / flickerFuncDomain, prop.rngBase1, prop.rngBase2)
+        return alterBrightnessUniform(prop.baseLumCol, funcY)
     }
 
-    private fun getTorchFlicker(baseLum: Float): Float {
-        return baseLum + FastMath.interpolateLinear(flickerFuncX / flickerFuncDomain, flickerP0, flickerP1)
+    private fun getSlowBreath(prop: BlockProp): Cvec {
+        val funcY = FastMath.sin(FastMath.PI * prop.rngBase0 / breathCycleDuration) * breathRange
+        return alterBrightnessUniform(prop.baseLumCol, funcY)
     }
 
-    private fun getSlowBreath(baseLum: Cvec): Cvec {
-        val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
-        return alterBrightnessUniform(baseLum, funcY)
+    private fun getPulsate(prop: BlockProp): Cvec {
+        val funcY = FastMath.sin(FastMath.PI * prop.rngBase0 / pulsateCycleDuration) * pulsateRange
+        return alterBrightnessUniform(prop.baseLumCol, funcY)
     }
 
-    private fun getSlowBreath(baseLum: Float): Float {
-        return baseLum + FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
-    }
-
-    private fun getPulsate(baseLum: Cvec): Cvec {
-        val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
-        return alterBrightnessUniform(baseLum, funcY)
-    }
-
-    private fun getPulsate(baseLum: Float): Float {
-        return baseLum + FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
-    }
 
     /**
      * Using our own timer so that they flickers for same duration regardless of game's FPS
      */
     internal fun dynamicLumFuncTickClock() {
-        // FPS-time compensation
-        if (Gdx.graphics.framesPerSecond > 0) {
-            flickerFuncX += Gdx.graphics.rawDeltaTime
-            breathFuncX  += Gdx.graphics.rawDeltaTime
-            pulsateFuncX += Gdx.graphics.rawDeltaTime
-        }
-
-        // flicker-related vars
-        if (flickerFuncX > flickerFuncDomain) {
-            flickerFuncX -= flickerFuncDomain
-
-            flickerP0 = flickerP1
-            flickerP1 = getNewRandom()
-        }
-
-        // breath-related vars
-        if (breathFuncX > breathCycleDuration) breathFuncX -= breathCycleDuration
-
-        // pulsate-related vars
-        if (pulsateFuncX > pulsateCycleDuration) pulsateFuncX -= pulsateCycleDuration
 
         // update the memoised values in props
-        for (key in BlockCodex.dynamicLights) {
+        /*for (key in BlockCodex.dynamicLights) {
             try {
                 val prop = BlockCodex[key]
                 if (prop.dynamicLuminosityFunction != 0) {
@@ -100,6 +69,38 @@ object BlockPropUtil {
                 }
             }
             catch (skip: NullPointerException) {}
+        }*/
+        // update randomised virtual props instead
+        for (keyMax in BlockCodex.dynamicToVirtualPropMapping) {
+            repeat(BlockCodex.DYNAMIC_RANDOM_CASES) {
+                val prop = BlockCodex[keyMax.second - it]
+                val domain = when (prop.dynamicLuminosityFunction) {
+                    1 -> flickerFuncDomain
+                    4 -> breathCycleDuration
+                    5 -> pulsateCycleDuration
+                    else -> 0f
+                }
+
+                // FPS-time compensation
+                if (Gdx.graphics.framesPerSecond > 0) {
+                    prop.rngBase0 += Gdx.graphics.rawDeltaTime
+                }
+
+                // reset timer
+                if (prop.rngBase0 > domain) {
+                    prop.rngBase0 -= domain
+
+                    // flicker related
+                    prop.rngBase1 = prop.rngBase2
+                    prop.rngBase2 = getNewRandom()
+                }
+
+                prop._lumCol.set(getDynamicLumFunc(prop))
+                //prop.lumColR = prop.lumCol.r
+                //prop.lumColG = prop.lumCol.g
+                //prop.lumColB = prop.lumCol.b
+                //prop.lumColA = prop.lumCol.a
+            }
         }
     }
 
@@ -107,21 +108,21 @@ object BlockPropUtil {
 
     private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x
 
-    private fun getDynamicLumFunc(baseLum: Cvec, type: Int): Cvec {
-        return when (type) {
-            1    -> getTorchFlicker(baseLum)
+    private fun getDynamicLumFunc(prop: BlockProp): Cvec {
+        return when (prop.dynamicLuminosityFunction) {
+            1    -> getTorchFlicker(prop)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
             3    -> WeatherMixer.getGlobalLightOfTime(Terrarum.ingame!!.world, WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
-            4    -> getSlowBreath(baseLum)
-            5    -> getPulsate(baseLum)
-            else -> baseLum
+            4    -> getSlowBreath(prop)
+            5    -> getPulsate(prop)
+            else -> prop.baseLumCol
         }
     }
 
     /**
      * @param chan 0 for R, 1 for G, 2 for B, 3 for A
      */
-    private fun getDynamicLumFuncByChan(baseLum: Float, type: Int, chan: Int): Float {
+    /*private fun getDynamicLumFuncByChan(baseLum: Float, type: Int, chan: Int): Float {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
             2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT).getElem(chan) // current global light
@@ -130,7 +131,7 @@ object BlockPropUtil {
             5    -> getPulsate(baseLum)
             else -> baseLum
         }
-    }
+    }*/
 
     /**
      * Darken or brighten colour by 'brighten' argument
