@@ -3,6 +3,7 @@ package net.torvald.terrarum.blockproperties
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printmsg
+import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.CSVFetcher
@@ -18,15 +19,24 @@ object BlockCodex {
 
     private var blockProps = HashMap<Int, BlockProp>()
 
-    val dynamicLights = SortedArrayList<Int>()
+    val dynamicLights = SortedArrayList<Int>() // does not include virtual ones
 
     /** 4096 */
-    const val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
+    val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
 
     private val nullProp = BlockProp()
 
-    var highestNumber = -1
+    var highestNumber = -1 // does not include virtual ones
         private set
+
+    // fake props for "randomised" dynamic lights
+    const val DYNAMIC_RANDOM_CASES = 64
+    var virtualPropsCount = 0
+        private set
+    /** always points to the HIGHEST prop ID. <Original ID, Virtual ID> */
+    val dynamicToVirtualPropMapping = ArrayList<Pair<Int, Int>>()
+    /** for random access dont iterate over this */
+    val dynamicToVirtualMap = hashMapOf<Int, Int>()
 
     /**
      * Later entry (possible from other modules) will replace older ones
@@ -48,8 +58,18 @@ object BlockCodex {
                 val id = intVal(it, "id")
                 setProp(id, it)
 
+                // register tiles with dynamic light
                 if ((blockProps[id]?.dynamicLuminosityFunction ?: 0) != 0) {
                     dynamicLights.add(id)
+
+                    // add virtual props for dynamic lights
+                    val virtualIDMax = ReferencingRanges.VIRTUAL_TILES.first - virtualPropsCount
+                    dynamicToVirtualPropMapping.add(id to virtualIDMax)
+                    dynamicToVirtualMap[id] = virtualIDMax
+                    repeat(DYNAMIC_RANDOM_CASES) { i ->
+                        setProp(virtualIDMax - i, it)
+                        virtualPropsCount += 1
+                    }
                 }
 
                 if (id > highestNumber)

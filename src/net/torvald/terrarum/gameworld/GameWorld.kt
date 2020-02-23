@@ -4,6 +4,7 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -478,7 +479,7 @@ open class GameWorld : Disposable {
         @Transient const val TERRAIN = 1
         @Transient const val WIRE = 2
 
-        @Transient const val TILES_SUPPORTED = 4096
+        @Transient val TILES_SUPPORTED = ReferencingRanges.TILES.last + 1
         //@Transient val SIZEOF: Byte = 2
         @Transient const val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
 

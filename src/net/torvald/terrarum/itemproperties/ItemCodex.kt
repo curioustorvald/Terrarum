@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.GameItem
@@ -27,12 +28,12 @@ object ItemCodex {
     val dynamicItemDescription = HashMap<ItemID, GameItem>()
     val dynamicToStaticTable = HashMap<ItemID, ItemID>()
 
-    val ITEM_TILES = 0..GameWorld.TILES_SUPPORTED - 1
-    val ITEM_WALLS = GameWorld.TILES_SUPPORTED..GameWorld.TILES_SUPPORTED * 2 - 1
-    val ITEM_WIRES = GameWorld.TILES_SUPPORTED * 2..GameWorld.TILES_SUPPORTED * 2 + 255
-    val ITEM_STATIC = ITEM_WIRES.endInclusive + 1..0x0F_FFFF
-    val ITEM_DYNAMIC = 0x10_0000..0x0FFF_FFFF
-    val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
+    val ITEM_TILES = ReferencingRanges.TILES
+    val ITEM_WALLS = ReferencingRanges.WALLS
+    val ITEM_WIRES = ReferencingRanges.WIRES
+    val ITEM_STATIC = ReferencingRanges.ITEMS_STATIC
+    val ITEM_DYNAMIC = ReferencingRanges.ITEMS_DYNAMIC
+    val ACTORID_MIN = ReferencingRanges.ACTORS.first
 
     private val itemImagePlaceholder: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -15,8 +16,11 @@ import java.util.*
  */
 internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 2)), Luminous {
 
+    private val rndHash1: Int
+    private val rndHash2: Int
+
     override var color: Cvec
-        get() = BlockCodex[Block.TORCH].lumCol
+        get() = BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)
         set(value) {
             throw UnsupportedOperationException()
         }
@@ -35,6 +39,10 @@ internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1,
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = MASS
+
+        val rng = HQRNG()
+        rndHash1 = rng.nextInt()
+        rndHash2 = rng.nextInt()
     }
 
     companion object {

@@ -239,7 +239,7 @@ object LightmapRenderer {
 
 
             // pre-seed the lightmap with known value
-            for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+            /*for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
                 for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
                     val tile = world.getTileFromTerrain(x, y)
                     val wall = world.getTileFromWall(x, y)
@@ -264,7 +264,7 @@ object LightmapRenderer {
                     //lightmap.setB(lx, ly, lightlevel.b)
                     //lightmap.setA(lx, ly, lightlevel.a)
                 }
-            }
+            }*/
 
         }
         // O((5*9)n) == O(n) where n is a size of the map.
@@ -681,7 +681,7 @@ object LightmapRenderer {
 
         // regarding the issue #26
         try {
-            val fuck = BlockCodex[thisTerrain].lumCol
+            val fuck = BlockCodex[thisTerrain].getLumCol(x, y)
         }
         catch (e: NullPointerException) {
             System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
@@ -704,13 +704,13 @@ object LightmapRenderer {
         if (thisFluid.type != Fluid.NULL) {
             fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
 
-            thisTileLuminosity.set(BlockCodex[thisTerrain].lumCol)
-            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].lumCol.mul(fluidAmountToCol)) // already been div by four
+            thisTileLuminosity.set(BlockCodex[thisTerrain].getLumCol(x, y))
+            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].getLumCol(x, y).mul(fluidAmountToCol)) // already been div by four
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
             thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity.mul(fluidAmountToCol)) // already been div by four
         }
         else {
-            thisTileLuminosity.set(BlockCodex[thisTerrain].lumCol)
+            thisTileLuminosity.set(BlockCodex[thisTerrain].getLumCol(x, y))
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
         }
 
@@ -727,7 +727,7 @@ object LightmapRenderer {
         lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
     }
 
-    private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
+    /*private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
         lightLevelThisCh = 0f
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisFluid = world.getFluid(x, y)
@@ -735,7 +735,7 @@ object LightmapRenderer {
 
         // regarding the issue #26
         try {
-            val fuck = BlockCodex[thisTerrain].lumCol
+            val fuck = BlockCodex[thisTerrain].getLumCol(x, y)
         }
         catch (e: NullPointerException) {
             System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
@@ -780,7 +780,7 @@ object LightmapRenderer {
         // blend lantern
         lightLevelThisCh = maxOf(thisTileLuminosityCh, lightLevelThisCh)
         lightLevelThisCh = maxOf(lanternMap[LandUtil.getBlockAddr(world, x, y)]?.getElem(channel) ?: 0f, lightLevelThisCh)
-    }
+    }*/
 
     private val inNoopMaskp = Point2i(0,0)
 

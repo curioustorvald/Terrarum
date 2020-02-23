@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemCodex.ACTORID_MIN
 
@@ -22,11 +23,11 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
     }
 
     companion object {
-        val RANGE_BEHIND = ACTORID_MIN..0x1FFF_FFFF // 1
-        val RANGE_MIDDLE = 0x2000_0000..0x4FFF_FFFF // 3
-        val RANGE_MIDTOP = 0x5000_0000..0x5FFF_FFFF // 1
-        val RANGE_FRONT  = 0x6000_0000..0x6FFF_FFFF // 1
-        val RANDE_OVERLAY= 0x7000_0000..0x7FFF_FFFF // 1
+        val RANGE_BEHIND = ReferencingRanges.ACTORS_BEHIND  // 1
+        val RANGE_MIDDLE = ReferencingRanges.ACTORS_MIDDLE  // 3
+        val RANGE_MIDTOP = ReferencingRanges.ACTORS_MIDTOP  // 1
+        val RANGE_FRONT  = ReferencingRanges.ACTORS_FRONT   // 1
+        val RANDE_OVERLAY= ReferencingRanges.ACTORS_OVERLAY // 1
     }
 
     abstract fun update(delta: Float)
