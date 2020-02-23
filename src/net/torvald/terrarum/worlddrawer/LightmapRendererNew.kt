@@ -167,6 +167,8 @@ object LightmapRenderer {
         }
     }
 
+    private val cellsToUpdate = ArrayList<Long>()
+
     internal fun fireRecalculateEvent(vararg actorContainers: List<ActorWithBody>?) {
         try {
             world.getTileFromTerrain(0, 0) // test inquiry
@@ -322,6 +324,74 @@ object LightmapRenderer {
                 // * No-op masks cause some ambient ray to disappear when they're on the screen edge
                 // * Naive optimisation (mark-and-iterate) attempt was a disaster
 
+                //mark cells to update
+                // Round 1
+                /*cellsToUpdate.clear()
+                lightsourceMap.forEach { (addr, light) ->
+                    val (wx, wy) = LandUtil.resolveBlockAddr(world, addr)
+                    // mark cells to update
+                    for (y in 0 until overscan_open) {
+                        for (x in 0 until overscan_open - y) {
+                            val lx = (wx + x).convX(); val ly = (wy + y).convY()
+                            if (lx in 0 until LIGHTMAP_WIDTH && ly in 0 until LIGHTMAP_HEIGHT)
+                                cellsToUpdate.add((ly.toLong() shl 32) or lx.toLong())
+                        }
+                    }
+                }
+                cellsToUpdate.forEach {
+                    calculateAndAssign(lightmap, it.toInt(), (it shr 32).toInt())
+                }
+                // Round 2
+                cellsToUpdate.clear()
+                lightsourceMap.forEach { (addr, light) ->
+                    val (wx, wy) = LandUtil.resolveBlockAddr(world, addr)
+
+                    // mark cells to update
+                    for (y in 0 downTo -overscan_open + 1) {
+                        for (x in 0 until overscan_open + y) {
+                            val lx = (wx + x).convX(); val ly = (wy + y).convY()
+                            if (lx in 0 until LIGHTMAP_WIDTH && ly in 0 until LIGHTMAP_HEIGHT)
+                                cellsToUpdate.add((ly.toLong() shl 32) or lx.toLong())
+                        }
+                    }
+                }
+                cellsToUpdate.forEach {
+                    calculateAndAssign(lightmap, it.toInt(), (it shr 32).toInt())
+                }
+                // Round 3
+                cellsToUpdate.clear()
+                lightsourceMap.forEach { (addr, light) ->
+                    val (wx, wy) = LandUtil.resolveBlockAddr(world, addr)
+
+                    // mark cells to update
+                    for (y in 0 downTo -overscan_open + 1) {
+                        for (x in 0 downTo -overscan_open + 1 - y) {
+                            val lx = (wx + x).convX(); val ly = (wy + y).convY()
+                            if (lx in 0 until LIGHTMAP_WIDTH && ly in 0 until LIGHTMAP_HEIGHT)
+                                cellsToUpdate.add((ly.toLong() shl 32) or lx.toLong())
+                        }
+                    }
+                }
+                cellsToUpdate.forEach {
+                    calculateAndAssign(lightmap, it.toInt(), (it shr 32).toInt())
+                }
+                // Round 4
+                cellsToUpdate.clear()
+                lightsourceMap.forEach { (addr, light) ->
+                    val (wx, wy) = LandUtil.resolveBlockAddr(world, addr)
+
+                    // mark cells to update
+                    for (y in 0 until overscan_open) {
+                        for (x in 0 downTo -overscan_open + 1 + y) {
+                            val lx = (wx + x).convX(); val ly = (wy + y).convY()
+                            if (lx in 0 until LIGHTMAP_WIDTH && ly in 0 until LIGHTMAP_HEIGHT)
+                                cellsToUpdate.add((ly.toLong() shl 32) or lx.toLong())
+                        }
+                    }
+                }
+                cellsToUpdate.forEach {
+                    calculateAndAssign(lightmap, it.toInt(), (it shr 32).toInt())
+                }*/
 
 
                 // per-channel operation for bit more aggressive optimisation
