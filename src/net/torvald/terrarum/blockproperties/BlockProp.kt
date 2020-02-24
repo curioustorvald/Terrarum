@@ -57,11 +57,12 @@ class BlockProp {
     //var lumColB = 0f // memoised value of dynamic luminosity
     //var lumColA = 0f // memoised value of dynamic luminosity
     internal val _lumCol = Cvec(0)
+    // X- and Y-value must be treated properly beforehand! (use GameWorld.coerceXY())
     fun getLumCol(x: Int, y: Int) = if (dynamicLuminosityFunction == 0) {
         baseLumCol
     } else {
-        val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000)
-        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset.fmod(BlockCodex.DYNAMIC_RANDOM_CASES)]._lumCol
+        val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
+        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol
     }
 
     /**
