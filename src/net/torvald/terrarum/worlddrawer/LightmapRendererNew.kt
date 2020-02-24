@@ -674,10 +674,12 @@ object LightmapRenderer {
      * - sunlight
      */
     private fun getLightsAndShades(x: Int, y: Int) {
+        val (x, y) = world.coerceXY(x, y)
+
         lightLevelThis.set(colourNull)
-        thisTerrain = world.getTileFromTerrain(x, y)
+        thisTerrain = world.getTileFromTerrainRaw(x, y)
         thisFluid = world.getFluid(x, y)
-        thisWall = world.getTileFromWall(x, y)
+        thisWall = world.getTileFromWallRaw(x, y)
 
         // regarding the issue #26
         try {

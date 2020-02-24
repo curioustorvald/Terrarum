@@ -170,7 +170,7 @@ open class GameWorld : Disposable {
     //val wireArray: ByteArray
     //    get() = layerWire.data
 
-    private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
+    fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
     fun getTileFromWall(rawX: Int, rawY: Int): Int {
         val (x, y) = coerceXY(rawX, rawY)
@@ -181,6 +181,9 @@ open class GameWorld : Disposable {
         val (x, y) = coerceXY(rawX, rawY)
         return layerTerrain.unsafeGetTile(x, y)
     }
+
+    fun getTileFromWallRaw(coercedX: Int, coercedY: Int) = layerWall.unsafeGetTile(coercedX, coercedY)
+    fun getTileFromTerrainRaw(coercedX: Int, coercedY: Int) = layerTerrain.unsafeGetTile(coercedX, coercedY)
 
     /**
      * Set the tile of wall as specified, with damage value of zero.
