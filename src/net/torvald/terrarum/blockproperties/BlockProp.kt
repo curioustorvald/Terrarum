@@ -1,7 +1,9 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.random.XXHash32
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.serialise.toLittle
 
 /**
  * Created by minjaesong on 2016-02-16.
@@ -58,8 +60,8 @@ class BlockProp {
     fun getLumCol(x: Int, y: Int) = if (dynamicLuminosityFunction == 0) {
         baseLumCol
     } else {
-        val offset = (x * 214013 + 2531011).ushr(16).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
-        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol
+        val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000)
+        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset.fmod(BlockCodex.DYNAMIC_RANDOM_CASES)]._lumCol
     }
 
     /**
