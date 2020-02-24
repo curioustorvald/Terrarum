@@ -8,7 +8,7 @@ import sun.misc.Unsafe
  */
 
 object UnsafeHelper {
-    internal val unsafe: Unsafe
+    val unsafe: Unsafe
 
     init {
         val unsafeConstructor = Unsafe::class.java.getDeclaredConstructor()
