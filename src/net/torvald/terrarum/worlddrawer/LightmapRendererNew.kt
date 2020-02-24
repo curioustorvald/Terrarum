@@ -314,7 +314,61 @@ object LightmapRenderer {
             AppLoader.measureDebugTime("Renderer.LightTotal") {
 
 
-                r3();r4();r1();r2();
+                r3();r4();r1();r2();r3();
+                val for_x_middle = (for_x_start + for_x_end) / 2
+                //val for_y_middle = (for_y_start + for_y_end) / 2
+
+
+                // Round 1
+                /*for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_start - overscan_open..for_x_middle) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 2
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_start - overscan_open..for_x_middle) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 3
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_middle + overscan_open downTo for_x_start) { // for_x_middle + overscan_open
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 4
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_middle + overscan_open downTo for_x_start) { // for_x_middle + overscan_open
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+
+
+                // Round 3
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_end + overscan_open downTo for_x_middle) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 4
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_end + overscan_open downTo for_x_middle) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 1
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_middle - overscan_open..for_x_end) { // for_x_middle - overscan_open
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 2
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_middle - overscan_open..for_x_end) { // for_x_middle - overscan_open
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }*/
 
 
                 // ANECDOTES
