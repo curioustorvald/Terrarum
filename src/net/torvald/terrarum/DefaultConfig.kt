@@ -82,6 +82,7 @@ object DefaultConfig {
         // so these keys are treated as the same.
         // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
         jsonObject.add("keyquickselalt", keyquickselalt)
+        jsonObject.addProperty("mousequicksel", Input.Buttons.MIDDLE) // middle click to open pie menu
 
         jsonObject.addProperty("keyjump", Input.Keys.SPACE)
 
