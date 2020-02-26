@@ -172,7 +172,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
         // pie menu
-        if (button == AppLoader.getConfigInt("mousesecondary")) {
+        if (button == AppLoader.getConfigInt("mousequicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -206,7 +206,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         terrarumIngame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
 
         // pie menu
-        if (button == AppLoader.getConfigInt("mousesecondary")) {
+        if (button == AppLoader.getConfigInt("mousequicksel")) {
             terrarumIngame.uiPieMenu.setAsOpen()
             terrarumIngame.uiQuickBar.setAsClose()
         }

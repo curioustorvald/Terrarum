@@ -7,7 +7,7 @@ import sun.misc.Unsafe
  * Created by minjaesong on 2019-06-21.
  */
 
-object UnsafeHelper {
+internal object UnsafeHelper {
     val unsafe: Unsafe
 
     init {
@@ -43,7 +43,7 @@ object UnsafeHelper {
  *
  * Use of hashCode() is forbidden, use the pointer instead.
  */
-class UnsafePtr(pointer: Long, allocSize: Long) {
+internal class UnsafePtr(pointer: Long, allocSize: Long) {
     var destroyed = false
         private set
 

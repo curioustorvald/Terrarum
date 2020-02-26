@@ -315,7 +315,7 @@ object LightmapRenderer {
 
 
                 r3();r4();r1();r2();r3();
-                val for_x_middle = (for_x_start + for_x_end) / 2
+                //val for_x_middle = (for_x_start + for_x_end) / 2
                 //val for_y_middle = (for_y_start + for_y_end) / 2
 
 

@@ -247,14 +247,14 @@ fun main(args: Array<String>) {
     LwjglApplication(WorldgenNoiseSandbox(), appConfig)
 }
 
-interface NoiseMaker {
+internal interface NoiseMaker {
     fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr)
     fun getGenerator(seed: Long, params: Any): List<Joise>
 }
 
 val locklock = java.lang.Object()
 
-object BiomeMaker : NoiseMaker {
+internal object BiomeMaker : NoiseMaker {
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr) {
         val colPal = biomeColors
@@ -303,7 +303,7 @@ object BiomeMaker : NoiseMaker {
 }
 
 // http://accidentalnoise.sourceforge.net/minecraftworlds.html
-object AccidentalCave {
+internal object AccidentalCave {
 
     private infix fun Color.mul(other: Color) = this.mul(other)
 
