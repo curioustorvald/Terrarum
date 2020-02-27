@@ -19,30 +19,11 @@ class UnsafeTest {
     private val memsize = 512L // must be big enough value so that your OS won't always return zero-filled pieces
 
     fun main() {
-        var ptr = unsafe.allocateMemory(memsize)
-        printDump(ptr)
+        val intarray = intArrayOf(5,4,3,2,1)
 
-        unsafe.setMemory(ptr, memsize, 0x00.toByte())
-        printDump(ptr)
+        val arrayBaseOffset = UnsafeHelper.getArrayOffset(intarray) // should be 16 or 12 on 64-bit JVM
 
-        for (k in 0 until 13) {
-            unsafe.putByte(ptr + k, (-1 - k).toByte())
-        }
-        printDump(ptr)
-
-        // test shingled memory copy -- how would it work out?
-        UnsafeHelper.memcpy(ptr, ptr + 3L, 13L)
-
-        printDump(ptr)
-
-
-        println(ptr)
-        ptr = unsafe.reallocateMemory(ptr, 256L)
-        println(ptr)
-
-
-        // that's all for today!
-        unsafe.freeMemory(ptr)
+        println(arrayBaseOffset)
     }
 
 

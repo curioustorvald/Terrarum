@@ -35,7 +35,7 @@ class BLIT {
             val writeAddr = toAddr(x, y)
 
             UnsafeHelper.memcpyRaw(
-                    bytes, (if (AppLoader.is32BitJVM) 8 else 16) + yy * width,
+                    bytes, UnsafeHelper.getArrayOffset(bytes) + yy * width,
                     null, framebuffer.ptr + writeAddr,
                     width.toLong()
             )

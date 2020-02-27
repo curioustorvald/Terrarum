@@ -39,6 +39,8 @@ fun main(args: Array<String>) {
 
 
 
+    val rangeSize = 64
+    val textLen = (rangeSize - 1).toString().length
     for (tries in 0 until 16) {
         repeat(BlockCodex.DYNAMIC_RANDOM_CASES + 12) { repeats ->
             val x = 349 + repeats
@@ -48,7 +50,7 @@ fun main(args: Array<String>) {
             val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000)
 
             //print("${offset.toString().padStart(2, '0')} ")
-            print("${offset.fmod(BlockCodex.DYNAMIC_RANDOM_CASES).toString().padStart(2, '0')} ")
+            print("${offset.fmod(rangeSize).toString().padStart(textLen, '0')} ")
         }
         println()
         println()

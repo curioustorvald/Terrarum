@@ -24,14 +24,24 @@ internal object UnsafeHelper {
         return UnsafePtr(ptr, size)
     }
 
-    fun memcpy(src: UnsafePtr, fromIndex: Long, dest: UnsafePtr, toIndex: Long, copyLength: Long) {
-        // unsafe.copyMemory(srcAddress, destAddress, bytes); in case no src for the sun.misc.Unsafe is available :D
-        unsafe.copyMemory(src.ptr + fromIndex, dest.ptr + toIndex, copyLength)
-    }
+    fun memcpy(src: UnsafePtr, fromIndex: Long, dest: UnsafePtr, toIndex: Long, copyLength: Long) =
+            unsafe.copyMemory(src.ptr + fromIndex, dest.ptr + toIndex, copyLength)
+    fun memcpy(srcAddress: Long, destAddress: Long, copyLength: Long) =
+            unsafe.copyMemory(srcAddress, destAddress, copyLength)
+    fun memcpyRaw(srcObj: Any?, srcPos: Long, destObj: Any?, destPos: Long, len: Long) =
+            unsafe.copyMemory(srcObj, srcPos, destObj, destPos, len)
 
-    fun memcpy(srcAddress: Long, destAddress: Long, copyLength: Long) = unsafe.copyMemory(srcAddress, destAddress, copyLength)
-
-    fun memcpyRaw(srcObj: Any?, srcPos: Long, destObj: Any?, destPos: Long, len: Long) = unsafe.copyMemory(srcObj, srcPos, destObj, destPos, len)
+    /**
+     * The array object in JVM is stored in this memory map:
+     *
+     * 0                 w                  2w                    *
+     * | Some identifier | Other identifier | the actual data ... |
+     *
+     * (where w = 4 for 32-bit JVM and 8 for 64-bit JVM. If Compressed-OOP is involved, things may get complicated)
+     *
+     * @return offset from the array's base memory address (aka pointer) that the actual data begins.
+     */
+    fun getArrayOffset(obj: Any) = unsafe.arrayBaseOffset(obj.javaClass)
 }
 
 /**
