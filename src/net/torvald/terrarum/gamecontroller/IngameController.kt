@@ -82,9 +82,6 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         //KeyToggler.update(terrarumIngame.canPlayerControl)
         //printdbg(this, terrarumIngame.canPlayerControl)
 
-        // FIXME temporarily make zoom work with 'Z' key
-        //terrarumIngame.screenZoom = 1f + KeyToggler.isOn(AppLoader.getConfigInt("keyzoom")).toInt()
-
     }
 
     private var f12Down = false
