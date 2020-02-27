@@ -65,6 +65,13 @@ class BlockProp {
         BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol
     }
 
+    fun getLumCol(x: Int, y: Int, channel: Int): Float = if (dynamicLuminosityFunction == 0) {
+        baseLumCol.getElem(channel)
+    } else {
+        val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
+        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol.getElem(channel)
+    }
+
     /**
      * @param luminosity
      */

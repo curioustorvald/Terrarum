@@ -12,6 +12,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameactors.ActorWBMovable
@@ -315,60 +316,37 @@ object LightmapRenderer {
 
 
                 r3();r4();r1();r2();r3();
-                //val for_x_middle = (for_x_start + for_x_end) / 2
-                //val for_y_middle = (for_y_start + for_y_end) / 2
 
-
-                // Round 1
-                /*for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_start - overscan_open..for_x_middle) {
-                        calculateAndAssign(lightmap, x, y)
+                // multithread per channel: slower AND that cursed noisy output
+                /*for (channel in 0..3) {
+                    ThreadExecutor.submit {
+                        // Round 1
+                        for (y in for_y_start - overscan_open..for_y_end) {
+                            for (x in for_x_start - overscan_open..for_x_end) {
+                                calculateAndAssignCh(lightmap, x, y, channel)
+                            }
+                        }
+                        // Round 2
+                        for (y in for_y_end + overscan_open downTo for_y_start) {
+                            for (x in for_x_start - overscan_open..for_x_end) {
+                                calculateAndAssignCh(lightmap, x, y, channel)
+                            }
+                        }
+                        // Round 3
+                        for (y in for_y_end + overscan_open downTo for_y_start) {
+                            for (x in for_x_end + overscan_open downTo for_x_start) {
+                                calculateAndAssignCh(lightmap, x, y, channel)
+                            }
+                        }
+                        // Round 4
+                        for (y in for_y_start - overscan_open..for_y_end) {
+                            for (x in for_x_end + overscan_open downTo for_x_start) {
+                                calculateAndAssignCh(lightmap, x, y, channel)
+                            }
+                        }
                     }
                 }
-                // Round 2
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_middle) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 3
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_middle + overscan_open downTo for_x_start) { // for_x_middle + overscan_open
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 4
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_middle + overscan_open downTo for_x_start) { // for_x_middle + overscan_open
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-
-
-                // Round 3
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_end + overscan_open downTo for_x_middle) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 4
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_end + overscan_open downTo for_x_middle) {
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 1
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_middle - overscan_open..for_x_end) { // for_x_middle - overscan_open
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }
-                // Round 2
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_middle - overscan_open..for_x_end) { // for_x_middle - overscan_open
-                        calculateAndAssign(lightmap, x, y)
-                    }
-                }*/
+                ThreadExecutor.join()*/
 
 
                 // ANECDOTES
@@ -783,7 +761,7 @@ object LightmapRenderer {
         lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
     }
 
-    /*private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
+    private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
         lightLevelThisCh = 0f
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisFluid = world.getFluid(x, y)
@@ -814,13 +792,13 @@ object LightmapRenderer {
         if (thisFluid.type != Fluid.NULL) {
             fluidAmountToColCh = thisFluid.amount
 
-            thisTileLuminosityCh = BlockCodex[thisTerrain].getLum(channel)
-            thisTileLuminosityCh = maxOf(BlockCodex[thisFluid.type].getLum(channel) * fluidAmountToColCh, thisTileLuminosityCh) // already been div by four
+            thisTileLuminosityCh = BlockCodex[thisTerrain].getLumCol(x, y, channel)
+            thisTileLuminosityCh = maxOf(BlockCodex[thisFluid.type].getLumCol(x, y, channel) * fluidAmountToColCh, thisTileLuminosityCh) // already been div by four
             thisTileOpacityCh = BlockCodex[thisTerrain].getOpacity(channel)
             thisTileOpacityCh = maxOf(BlockCodex[thisFluid.type].getOpacity(channel) * fluidAmountToColCh, thisTileOpacityCh) // already been div by four
         }
         else {
-            thisTileLuminosityCh = BlockCodex[thisTerrain].getLum(channel)
+            thisTileLuminosityCh = BlockCodex[thisTerrain].getLumCol(x, y, channel)
             thisTileOpacityCh = BlockCodex[thisTerrain].getOpacity(channel)
         }
 
@@ -836,7 +814,7 @@ object LightmapRenderer {
         // blend lantern
         lightLevelThisCh = maxOf(thisTileLuminosityCh, lightLevelThisCh)
         lightLevelThisCh = maxOf(lanternMap[LandUtil.getBlockAddr(world, x, y)]?.getElem(channel) ?: 0f, lightLevelThisCh)
-    }*/
+    }
 
     private val inNoopMaskp = Point2i(0,0)
 
@@ -910,10 +888,10 @@ object LightmapRenderer {
 
         // will "overwrite" what's there in the lightmap if it's the first pass
         // takes about 2 ms on 6700K
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
         /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y - 1, thisTileOpacity))
         /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y + 1, thisTileOpacity))
         /* * */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y, thisTileOpacity))
@@ -930,7 +908,7 @@ object LightmapRenderer {
     }
 
     // per-channel version is slower...
-    /*private fun calculateAndAssign(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, channel: Int) {
+    private fun calculateAndAssignCh(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, channel: Int) {
 
         if (inNoopMask(worldX, worldY)) return
 
@@ -962,7 +940,7 @@ object LightmapRenderer {
         lightLevelThisCh = maxOf(darken(x + 1, y, thisTileOpacityCh, channel), lightLevelThisCh)
 
         lightmap.channelSet(x, y, channel, lightLevelThisCh)
-    }*/
+    }
 
     private fun isSolid(x: Int, y: Int): Float? { // ...so that they wouldn't appear too dark
         if (!inBounds(x, y)) return null
