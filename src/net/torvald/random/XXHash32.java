@@ -17,8 +17,6 @@ public class XXHash32 {
     static final int PRIME4 = 0x27D4EB2F;
     static final int PRIME5 = 0x165667B1;
 
-    static final int ARRAY_ELEM_OFFSET = (AppLoader.is32BitJVM) ? 8 : 16;
-
     public static int hash(byte[] data, int seed) {
         int end = data.length;
         int offset = 0;
@@ -74,6 +72,6 @@ public class XXHash32 {
     }
 
     protected static int getInt(byte[] data, int offset) {
-        return UnsafeHelper.INSTANCE.getUnsafe().getInt(data, offset + ARRAY_ELEM_OFFSET);
+        return UnsafeHelper.INSTANCE.getUnsafe().getInt(data, offset + UnsafeHelper.INSTANCE.getArrayOffset(data));
     }
 }
