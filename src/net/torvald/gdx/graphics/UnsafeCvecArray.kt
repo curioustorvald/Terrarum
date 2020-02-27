@@ -3,6 +3,11 @@ package net.torvald.gdx.graphics
 import net.torvald.UnsafeHelper
 
 /**
+ * Basically just a FloatArray. You may need to re-write the entire code to actually store the Vectors,
+ * maybe in the form of array of objects.
+ */
+
+/**
  * Created by minjaesong on 2019-06-21.
  */
 internal class UnsafeCvecArray(val width: Int, val height: Int) {
