@@ -12,14 +12,14 @@ typealias ThreadableFun = (Int) -> Unit
 
 object ThreadExecutor {
     val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
-    private var executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    private var executor = Executors.newFixedThreadPool(threadCount)
 
     private fun checkShutdown() {
         if (!executor.isShutdown) return
         if (executor.isShutdown&& !executor.isTerminated)
             throw IllegalStateException("Pool is closed, come back when all the threads are terminated.")
 
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+        executor = Executors.newFixedThreadPool(threadCount)
     }
 
     fun submit(t: Runnable): Future<*> {
