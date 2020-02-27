@@ -102,7 +102,7 @@ object LightmapRenderer {
     //private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
-    private val lightsourceMap = ArrayList<Pair<BlockAddress, Cvec>>(256)
+    //private val lightsourceMap = ArrayList<Pair<BlockAddress, Cvec>>(256)
 
     init {
         LightmapHDRMap.invoke()
@@ -235,7 +235,7 @@ object LightmapRenderer {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
             lightmap.zerofill()
-            lightsourceMap.clear()
+            //lightsourceMap.clear()
 
 
             // pre-seed the lightmap with known value

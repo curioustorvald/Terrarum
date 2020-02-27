@@ -4,6 +4,9 @@ import net.torvald.terrarum.printStackTrace
 import sun.misc.Unsafe
 
 /**
+ * Further read:
+ * - http://www.docjar.com/docs/api/sun/misc/Unsafe.html
+ *
  * Created by minjaesong on 2019-06-21.
  */
 

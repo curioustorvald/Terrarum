@@ -19,6 +19,13 @@ package net.torvald.gdx.graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.NumberUtils
 
+/**
+ * A Cvec is kind of a Vector4f made compatible with LibGdx's Color class, with the intention of actually utilising
+ * the JEP 338 VectorInstrinsics later, when the damned thing finally releases.
+ *
+ * Before then, the code will be identical to LibGdx's.
+ */
+
 /** A color class, holding the r, g, b and alpha component as floats in the range [0,1]. All methods perform clamping on the
  * internal values after execution.
  *
