@@ -22,12 +22,17 @@ external_resource_packs.zip
 
 # IntelliJ
 workspace.xml
-.idea/*
 
 # Temporary files
 .tmp*
 tmp_*
+## Microsoft Office
 ~$*
+## Generic temp files in Linux
+*~
+## Vim temp files
+*.swp
+*.swo
 
 # Eclipse MAT heap files
 *.hprof
