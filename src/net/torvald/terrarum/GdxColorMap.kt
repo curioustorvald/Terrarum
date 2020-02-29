@@ -75,7 +75,7 @@ class GdxColorMap {
     fun getRaw(x: Int, y: Int): RGBA8888 = dataRaw[y * width + x]
     fun getRaw(x: Int): RGBA8888 = if (is2D) throw UnsupportedOperationException("This is 2D color map") else dataRaw[x]
 
-    //fun getAsCvec(x: Int, y: Int): Cvec = dataCvec[y * width + x]
+    //fun getAsCvec(x: Int, y: Int): Cvec = dataCvec[y * width + x] // for some reason it just returns zero
 
     override fun toString(): String {
         val sb = StringBuilder()

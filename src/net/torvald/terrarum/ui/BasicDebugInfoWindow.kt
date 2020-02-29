@@ -146,10 +146,10 @@ class BasicDebugInfoWindow : UICanvas() {
         val mtX = mouseTileX.toString()
         val mtY = mouseTileY.toString()
         val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
-        val rawR = valRaw?.r?.times(100f)?.round()?.div(100f)
-        val rawG = valRaw?.g?.times(100f)?.round()?.div(100f)
-        val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)
-        val rawA = valRaw?.a?.times(100f)?.round()?.div(100f)
+        val rawR = valRaw?.vec?.lane(0)?.times(100f)?.round()?.div(100f)
+        val rawG = valRaw?.vec?.lane(1)?.times(100f)?.round()?.div(100f)
+        val rawB = valRaw?.vec?.lane(2)?.times(100f)?.round()?.div(100f)
+        val rawA = valRaw?.vec?.lane(3)?.times(100f)?.round()?.div(100f)
 
         lightVal = if (valRaw == null) "$EMDASH"
                    else "$rawR $rawG $rawB $rawA"

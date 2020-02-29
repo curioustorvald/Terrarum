@@ -12,11 +12,13 @@ import net.torvald.UnsafeHelper
  */
 internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
-    val TOTAL_SIZE_IN_BYTES = 16L * width * height
+    val sizeof = 16L
+
+    val TOTAL_SIZE_IN_BYTES = sizeof * width * height
 
     val array = UnsafeHelper.allocate(TOTAL_SIZE_IN_BYTES)
 
-    private inline fun toAddr(x: Int, y: Int) = 16L * (y * width + x)
+    private inline fun toAddr(x: Int, y: Int) = sizeof * (y * width + x)
 
     fun zerofill() = array.fillWith(0)
 
@@ -24,35 +26,21 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
         zerofill()
     }
 
-    fun getR(x: Int, y: Int) = array.getFloat(toAddr(x, y))
-    fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 4)
-    fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 8)
-    fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 12)
-
-    fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
-    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 4, value) }
-    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 8, value) }
-    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 12, value) }
-
-    fun addA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 12, getA(x, y) + value) }
-
-    /**
-     * @param channel 0 for R, 1 for G, 2 for B, 3 for A
-     */
-    inline fun channelSet(x: Int, y: Int, channel: Int, value: Float) {
-        array.setFloat(toAddr(x, y) + 4L * channel, value)
+    fun getVec(x: Int, y: Int): Cvec {
+        val addr = toAddr(x, y)
+        return Cvec(
+                array.getFloat(addr),
+                array.getFloat(addr + 4),
+                array.getFloat(addr + 8),
+                array.getFloat(addr + 12)
+        )
     }
-
-    /**
-     * @param channel 0 for R, 1 for G, 2 for B, 3 for A
-     */
-    inline fun channelGet(x: Int, y: Int, channel: Int) = array.getFloat(toAddr(x, y) + 4L * channel)
-
-    fun max(x: Int, y: Int, other: Cvec) {
-        setR(x, y, maxOf(getR(x, y), other.r))
-        setG(x, y, maxOf(getG(x, y), other.g))
-        setB(x, y, maxOf(getB(x, y), other.b))
-        setA(x, y, maxOf(getA(x, y), other.a))
+    fun setVec(x: Int, y: Int, value: Cvec) {
+        val addr = toAddr(x, y)
+        array.setFloat(addr, value.vec.lane(0))
+        array.setFloat(addr + 4, value.vec.lane(1))
+        array.setFloat(addr + 8, value.vec.lane(2))
+        array.setFloat(addr + 12, value.vec.lane(3))
     }
 
     fun destroy() = this.array.destroy()

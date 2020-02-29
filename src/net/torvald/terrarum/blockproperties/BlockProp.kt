@@ -20,7 +20,7 @@ class BlockProp {
     var shadeColB = 0f
     var shadeColA = 0f
 
-    lateinit var opacity: Cvec
+    var opacity: Cvec = Cvec(0f)
 
     fun getOpacity(channel: Int) = when (channel) {
         0 -> shadeColR
@@ -51,12 +51,12 @@ class BlockProp {
     internal var baseLumColG = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColB = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColA = 0f // base value used to calculate dynamic luminosity
-    internal val baseLumCol = Cvec(0)
+    internal var baseLumCol = Cvec(0f)
     //var lumColR = 0f // memoised value of dynamic luminosity
     //var lumColG = 0f // memoised value of dynamic luminosity
     //var lumColB = 0f // memoised value of dynamic luminosity
     //var lumColA = 0f // memoised value of dynamic luminosity
-    internal val _lumCol = Cvec(0)
+    internal var _lumCol = Cvec(0f)
     // X- and Y-value must be treated properly beforehand! (use GameWorld.coerceXY())
     fun getLumCol(x: Int, y: Int) = if (dynamicLuminosityFunction == 0) {
         baseLumCol
@@ -65,12 +65,6 @@ class BlockProp {
         BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol
     }
 
-    fun getLumCol(x: Int, y: Int, channel: Int): Float = if (dynamicLuminosityFunction == 0) {
-        baseLumCol.getElem(channel)
-    } else {
-        val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
-        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol.getElem(channel)
-    }
 
     /**
      * @param luminosity

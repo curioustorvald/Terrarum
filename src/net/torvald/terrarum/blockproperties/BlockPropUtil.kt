@@ -95,7 +95,7 @@ object BlockPropUtil {
                     prop.rngBase2 = getNewRandom()
                 }
 
-                prop._lumCol.set(getDynamicLumFunc(prop))
+                prop._lumCol = getDynamicLumFunc(prop)
                 //prop.lumColR = prop.lumCol.r
                 //prop.lumColG = prop.lumCol.g
                 //prop.lumColB = prop.lumCol.b
@@ -111,8 +111,8 @@ object BlockPropUtil {
     private fun getDynamicLumFunc(prop: BlockProp): Cvec {
         return when (prop.dynamicLuminosityFunction) {
             1    -> getTorchFlicker(prop)
-            2    -> (Terrarum.ingame!!.world).globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
-            3    -> WeatherMixer.getGlobalLightOfTime(Terrarum.ingame!!.world, WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
+            2    -> (Terrarum.ingame!!.world).globalLight * LightmapRenderer.DIV_FLOAT_VEC // current global light
+            3    -> WeatherMixer.getGlobalLightOfTime(Terrarum.ingame!!.world, WorldTime.DAY_LENGTH / 2) * LightmapRenderer.DIV_FLOAT_VEC // daylight at noon
             4    -> getSlowBreath(prop)
             5    -> getPulsate(prop)
             else -> prop.baseLumCol
@@ -141,11 +141,6 @@ object BlockPropUtil {
      * @return processed colour
      */
     private fun alterBrightnessUniform(data: Cvec, brighten: Float): Cvec {
-        return Cvec(
-                data.r + brighten,
-                data.g + brighten,
-                data.b + brighten,
-                data.a + brighten
-        )
+        return data + Cvec(brighten)
     }
 }

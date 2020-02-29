@@ -147,7 +147,7 @@ object BlockCodex {
         prop.baseLumColG = floatVal(record, "lumg") / LightmapRenderer.MUL_FLOAT
         prop.baseLumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
         prop.baseLumColA = floatVal(record, "lumuv") / LightmapRenderer.MUL_FLOAT
-        prop.baseLumCol.set(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
+        prop.baseLumCol = Cvec(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
 
         prop.friction = intVal(record, "fr")
         prop.viscosity = intVal(record, "vscs")

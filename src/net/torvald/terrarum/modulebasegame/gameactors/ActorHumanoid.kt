@@ -74,10 +74,10 @@ open class ActorHumanoid(
                 (actorValue.getAsFloat(AVKey.LUMA) ?: 0f) / LightmapRenderer.MUL_FLOAT
         )
         set(value) {
-            actorValue[AVKey.LUMR] = value.r * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMG] = value.g * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMB] = value.b * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMA] = value.a * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMR] = value.vec.lane(0) * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMG] = value.vec.lane(1) * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMB] = value.vec.lane(2) * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMA] = value.vec.lane(3) * LightmapRenderer.MUL_FLOAT
         }
 
     /**

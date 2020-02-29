@@ -48,7 +48,7 @@ internal object WeatherMixer : RNGConsumer {
 
     lateinit var mixedWeather: BaseModularWeather
 
-    val globalLightNow = Cvec(0)
+    var globalLightNow = Cvec(0f)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -133,7 +133,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // calculate global light
         val globalLight = getGradientColour(world, skyboxColourMap, 2, timeNow)
-        globalLightNow.set(globalLight)
+        globalLightNow = globalLight
 
 
         /* (copied from the shader source)
@@ -250,7 +250,7 @@ internal object WeatherMixer : RNGConsumer {
                     " | ${colourThis.toStringRGB()} -[${scale.times(100).toInt()}%]-> ${colourNext.toStringRGB()}" +
                     " | * `$r`$g`$b`")*/
 
-        return Cvec(newCol)
+        return Cvec(newCol.r, newCol.g, newCol.b, newCol.a)
     }
 
     fun getWeatherList(classification: String) = weatherList[classification]!!

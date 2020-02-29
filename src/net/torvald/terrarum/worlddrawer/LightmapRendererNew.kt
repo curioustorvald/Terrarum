@@ -122,7 +122,9 @@ object LightmapRenderer {
     const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
     const val COLOUR_RANGE_SIZE = MUL * MUL_2
     const val MUL_FLOAT = MUL / 256f
+    val MUL_FLOAT_VEC = Cvec(MUL_FLOAT)
     const val DIV_FLOAT = 256f / MUL
+    val DIV_FLOAT_VEC = Cvec(DIV_FLOAT)
 
     internal var for_x_start = 0
     internal var for_y_start = 0
@@ -159,12 +161,7 @@ object LightmapRenderer {
             val x = x.convX()
             val y = y.convY()
 
-            return Cvec(
-                    lightmap.getR(x, y) * MUL_FLOAT,
-                    lightmap.getG(x, y) * MUL_FLOAT,
-                    lightmap.getB(x, y) * MUL_FLOAT,
-                    lightmap.getA(x, y) * MUL_FLOAT
-            )
+            return lightmap.getVec(x, y) * MUL_FLOAT_VEC
         }
     }
 
@@ -221,7 +218,7 @@ object LightmapRenderer {
          */
 
         // set sunlight
-        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
+        sunLight = world.globalLight * DIV_FLOAT_VEC
 
         // set no-op mask from solidity of the block
         AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
@@ -506,7 +503,7 @@ object LightmapRenderer {
      *
      * @return true if skip
      */
-    private fun radiate(channel: Int, wx: Int, wy: Int, lightsource: Cvec, distSqr: Int): Boolean {
+    /*private fun radiate(channel: Int, wx: Int, wy: Int, lightsource: Cvec, distSqr: Int): Boolean {
         val lx = wx.convX(); val ly = wy.convY()
 
         if (lx !in 0 until LIGHTMAP_WIDTH || ly !in 0 until LIGHTMAP_HEIGHT)
@@ -537,28 +534,25 @@ object LightmapRenderer {
         if (inNoopMask(worldX, worldY)) return false
 
         // just quick snippets to make test work
-        lightLevelThis.set(colourNull)
-        thisTileOpacity.set(BlockCodex[world.getTileFromTerrain(worldX, worldY)].opacity)
+        thisTileOpacity = BlockCodex[world.getTileFromTerrain(worldX, worldY)].opacity
 
         val x = worldX.convX()
         val y = worldY.convY()
 
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y - 1, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y + 1, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y, thisTileOpacity))
+        lightLevelThis = lightLevelThis max
+        /* + *///darkenColoured(x - 1, y - 1, thisTileOpacity2) max
+        /* + *///darkenColoured(x + 1, y - 1, thisTileOpacity2) max
+        /* + *///darkenColoured(x - 1, y + 1, thisTileOpacity2) max
+        /* + *///darkenColoured(x + 1, y + 1, thisTileOpacity2) max
+        /* * */darkenColoured(x, y - 1, thisTileOpacity) max
+        /* * */darkenColoured(x, y + 1, thisTileOpacity) max
+        /* * */darkenColoured(x - 1, y, thisTileOpacity) max
+        /* * */darkenColoured(x + 1, y, thisTileOpacity)
 
-        lightmap.setR(x, y, lightLevelThis.r)
-        lightmap.setG(x, y, lightLevelThis.g)
-        lightmap.setB(x, y, lightLevelThis.b)
-        lightmap.setA(x, y, lightLevelThis.a)
+        lightmap.setVec(x, y, lightLevelThis)
 
         return false
-    }
+    }*/
 
 
     // TODO re-init at every resize
@@ -677,12 +671,12 @@ object LightmapRenderer {
 
 
     private val ambientAccumulator = Cvec(0f,0f,0f,0f)
-    private val lightLevelThis = Cvec(0)
-    private val fluidAmountToCol = Cvec(0)
-    private val thisTileLuminosity = Cvec(0)
-    private val thisTileOpacity = Cvec(0)
-    private val thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
-    private val sunLight = Cvec(0)
+    private var lightLevelThis = Cvec(0f)
+    private var fluidAmountToCol = Cvec(0f)
+    private var thisTileLuminosity = Cvec(0f)
+    private var thisTileOpacity = Cvec(0f)
+    private var thisTileOpacity2 = Cvec(0f) // thisTileOpacity * sqrt(2)
+    private var sunLight = Cvec(0f)
     private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
     private var thisTerrain = 0
     private var thisWall = 0
@@ -693,6 +687,8 @@ object LightmapRenderer {
     private var thisTileLuminosityCh = 0f
     private var thisTileOpacityCh = 0f
     private var thisTileOpacity2Ch = 0f
+
+    private val SQRT2_VEC = Cvec(1.41421356f)
 
     /**
      * This function will alter following variables:
@@ -708,7 +704,7 @@ object LightmapRenderer {
     private fun getLightsAndShades(x: Int, y: Int) {
         val (x, y) = world.coerceXY(x, y)
 
-        lightLevelThis.set(colourNull)
+        lightLevelThis = colourNull
         thisTerrain = world.getTileFromTerrainRaw(x, y)
         thisFluid = world.getFluid(x, y)
         thisWall = world.getTileFromWallRaw(x, y)
@@ -736,84 +732,29 @@ object LightmapRenderer {
         }
 
         if (thisFluid.type != Fluid.NULL) {
-            fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
+            fluidAmountToCol = Cvec(thisFluid.amount)
 
-            thisTileLuminosity.set(BlockCodex[thisTerrain].getLumCol(x, y))
-            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].getLumCol(x, y).mul(fluidAmountToCol)) // already been div by four
-            thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
-            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity.mul(fluidAmountToCol)) // already been div by four
+            thisTileLuminosity = BlockCodex[thisTerrain].getLumCol(x, y) max
+                    (BlockCodex[thisFluid.type].getLumCol(x, y) * fluidAmountToCol) // already been div by four
+            thisTileOpacity = BlockCodex[thisTerrain].opacity max
+                    (BlockCodex[thisFluid.type].opacity * fluidAmountToCol) // already been div by four
         }
         else {
-            thisTileLuminosity.set(BlockCodex[thisTerrain].getLumCol(x, y))
-            thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
+            thisTileLuminosity = BlockCodex[thisTerrain].getLumCol(x, y)
+            thisTileOpacity = BlockCodex[thisTerrain].opacity
         }
 
-        thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
+        thisTileOpacity2 = thisTileOpacity * SQRT2_VEC
         //sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT) // moved to fireRecalculateEvent()
 
 
         // open air || luminous tile backed by sunlight
         if ((thisTerrain == AIR && thisWall == AIR) || (thisTileLuminosity.nonZero() && thisWall == AIR)) {
-            lightLevelThis.set(sunLight)
+            lightLevelThis = sunLight
         }
 
         // blend lantern
-        lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
-    }
-
-    private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
-        lightLevelThisCh = 0f
-        thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
-        thisFluid = world.getFluid(x, y)
-        thisWall = world.getTileFromWall(x, y) ?: Block.STONE
-
-        // regarding the issue #26
-        try {
-            val fuck = BlockCodex[thisTerrain].getLumCol(x, y)
-        }
-        catch (e: NullPointerException) {
-            System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
-            e.printStackTrace()
-            // create shitty minidump
-            System.err.println("MINIMINIDUMP START")
-            for (xx in x - 16 until x + 16) {
-                val raw = world.getTileFromTerrain(xx, y)
-                val lsb = raw.and(0xff).toString(16).padStart(2, '0')
-                val msb = raw.ushr(8).and(0xff).toString(16).padStart(2, '0')
-                System.err.print(lsb)
-                System.err.print(msb)
-                System.err.print(" ")
-            }
-            System.err.println("\nMINIMINIDUMP END")
-
-            exitProcess(1)
-        }
-
-        if (thisFluid.type != Fluid.NULL) {
-            fluidAmountToColCh = thisFluid.amount
-
-            thisTileLuminosityCh = BlockCodex[thisTerrain].getLumCol(x, y, channel)
-            thisTileLuminosityCh = maxOf(BlockCodex[thisFluid.type].getLumCol(x, y, channel) * fluidAmountToColCh, thisTileLuminosityCh) // already been div by four
-            thisTileOpacityCh = BlockCodex[thisTerrain].getOpacity(channel)
-            thisTileOpacityCh = maxOf(BlockCodex[thisFluid.type].getOpacity(channel) * fluidAmountToColCh, thisTileOpacityCh) // already been div by four
-        }
-        else {
-            thisTileLuminosityCh = BlockCodex[thisTerrain].getLumCol(x, y, channel)
-            thisTileOpacityCh = BlockCodex[thisTerrain].getOpacity(channel)
-        }
-
-        thisTileOpacity2Ch = thisTileOpacityCh * 1.41421356f
-        //sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT) // moved to fireRecalculateEvent()
-
-
-        // open air || luminous tile backed by sunlight
-        if ((thisTerrain == AIR && thisWall == AIR) || (thisTileLuminosityCh > epsilon && thisWall == AIR)) {
-            lightLevelThisCh = sunLight.getElem(channel)
-        }
-
-        // blend lantern
-        lightLevelThisCh = maxOf(thisTileLuminosityCh, lightLevelThisCh)
-        lightLevelThisCh = maxOf(lanternMap[LandUtil.getBlockAddr(world, x, y)]?.getElem(channel) ?: 0f, lightLevelThisCh)
+        lightLevelThis = lightLevelThis max thisTileLuminosity max (lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
     }
 
     private val inNoopMaskp = Point2i(0,0)
@@ -888,70 +829,35 @@ object LightmapRenderer {
 
         // will "overwrite" what's there in the lightmap if it's the first pass
         // takes about 2 ms on 6700K
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y - 1, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y + 1, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y, thisTileOpacity))
+        lightLevelThis = lightLevelThis max
+        /* + */darkenColoured(x - 1, y - 1, thisTileOpacity2) max
+        /* + */darkenColoured(x + 1, y - 1, thisTileOpacity2) max
+        /* + */darkenColoured(x - 1, y + 1, thisTileOpacity2) max
+        /* + */darkenColoured(x + 1, y + 1, thisTileOpacity2) max
+        /* * */darkenColoured(x, y - 1, thisTileOpacity) max
+        /* * */darkenColoured(x, y + 1, thisTileOpacity) max
+        /* * */darkenColoured(x - 1, y, thisTileOpacity) max
+        /* * */darkenColoured(x + 1, y, thisTileOpacity)
 
 
         //return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
         //setLightOf(lightmap, x, y, lightLevelThis.cpy())
 
-        lightmap.setR(x, y, lightLevelThis.r)
-        lightmap.setG(x, y, lightLevelThis.g)
-        lightmap.setB(x, y, lightLevelThis.b)
-        lightmap.setA(x, y, lightLevelThis.a)
+        lightmap.setVec(x, y, lightLevelThis)
     }
 
-    // per-channel version is slower...
-    private fun calculateAndAssignCh(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, channel: Int) {
-
-        if (inNoopMask(worldX, worldY)) return
-
-        // O(9n) == O(n) where n is a size of the map
-
-        getLightsAndShadesCh(worldX, worldY, channel)
-
-        val x = worldX.convX()
-        val y = worldY.convY()
-
-        // calculate ambient
-        /*  + * +  0 4 1
-         *  * @ *  6 @ 7
-         *  + * +  2 5 3
-         *  sample ambient for eight points and apply attenuation for those
-         *  maxblend eight values and use it
-         */
-
-        // will "overwrite" what's there in the lightmap if it's the first pass
-        // takes about 2 ms on 6700K
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
-        /* + *///lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
-
-        lightLevelThisCh = maxOf(darken(x, y - 1, thisTileOpacityCh, channel), lightLevelThisCh)
-        lightLevelThisCh = maxOf(darken(x, y + 1, thisTileOpacityCh, channel), lightLevelThisCh)
-        lightLevelThisCh = maxOf(darken(x - 1, y, thisTileOpacityCh, channel), lightLevelThisCh)
-        lightLevelThisCh = maxOf(darken(x + 1, y, thisTileOpacityCh, channel), lightLevelThisCh)
-
-        lightmap.channelSet(x, y, channel, lightLevelThisCh)
-    }
-
-    private fun isSolid(x: Int, y: Int): Float? { // ...so that they wouldn't appear too dark
+    private val SOLIDMULTMAGIC_FALSE = Cvec(1f)
+    private val SOLIDMULTMAGIC_TRUE = Cvec(1.2f)
+    private fun isSolid(x: Int, y: Int): Cvec? { // ...so that they wouldn't appear too dark
         if (!inBounds(x, y)) return null
 
         // brighten if solid
-        return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) 1.2f else 1f
+        return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) SOLIDMULTMAGIC_TRUE else SOLIDMULTMAGIC_FALSE
     }
 
     var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
-    private val colourNull = Cvec(0)
+    private val colourNull = Cvec(0f)
     private val gdxColorNull = Color(0)
     private const val epsilon = 1f/1024f
 
@@ -990,12 +896,7 @@ object LightmapRenderer {
                     val color = if (solidMultMagic == null)
                         gdxColorNull
                     else
-                        Color(
-                                lightmap.getR(arrayX, arrayY) * solidMultMagic,
-                                lightmap.getG(arrayX, arrayY) * solidMultMagic,
-                                lightmap.getB(arrayX, arrayY) * solidMultMagic,
-                                lightmap.getA(arrayX, arrayY) * solidMultMagic
-                        ).normaliseToHDR()
+                        lightmap.getVec(arrayX, arrayY).times(solidMultMagic).toGdxColor().normaliseToHDR()
 
                     lightBuffer.setColor(color)
 
@@ -1028,7 +929,8 @@ object LightmapRenderer {
         lightmap.destroy()
     }
 
-    private const val lightScalingMagic = 8f
+    private val lightScalingMagic = Cvec(8f)
+    private val CVEC_ONE = Cvec(1f)
 
     /**
      * Subtract each channel's RGB value.
@@ -1050,30 +952,7 @@ object LightmapRenderer {
 
         if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return colourNull
 
-        return Cvec(
-                lightmap.getR(x, y) * (1f - darken.r * lightScalingMagic),
-                lightmap.getG(x, y) * (1f - darken.g * lightScalingMagic),
-                lightmap.getB(x, y) * (1f - darken.b * lightScalingMagic),
-                lightmap.getA(x, y) * (1f - darken.a * lightScalingMagic)
-        )
-
-    }
-
-    private fun darken(x: Int, y: Int, darken: Float, channel: Int): Float {
-        if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return 0f
-        return lightmap.channelGet(x, y, channel) * (1f - darken * lightScalingMagic)
-    }
-
-    /** infix is removed to clarify the association direction */
-    private fun Cvec.maxAndAssign(other: Cvec): Cvec {
-        // TODO investigate: if I use assignment instead of set(), it blackens like the vector branch.  --Torvald, 2019-06-07
-        //                   that was because you forgot 'this.r/g/b/a = ' part, bitch. --Torvald, 2019-06-07
-        this.r = if (this.r > other.r) this.r else other.r
-        this.g = if (this.g > other.g) this.g else other.g
-        this.b = if (this.b > other.b) this.b else other.b
-        this.a = if (this.a > other.a) this.a else other.a
-
-        return this
+        return lightmap.getVec(x, y) * (CVEC_ONE - darken * lightScalingMagic)
     }
 
     private fun Float.inv() = 1f / this
@@ -1141,11 +1020,6 @@ object LightmapRenderer {
             hdr(this.b.coerceIn(0f, 1f)),
             hdr(this.a.coerceIn(0f, 1f))
     )
-
-    private fun Cvec.nonZero() = this.r.abs() > epsilon ||
-                                 this.g.abs() > epsilon ||
-                                 this.b.abs() > epsilon ||
-                                 this.a.abs() > epsilon
 
     val histogram: Histogram
         get() {
@@ -1226,6 +1100,5 @@ object LightmapRenderer {
     }
 }
 
-fun Cvec.toRGBA() = (255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt()
 fun Color.toRGBA() = (255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt()
 
