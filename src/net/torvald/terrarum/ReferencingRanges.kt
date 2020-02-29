@@ -19,6 +19,6 @@ object ReferencingRanges {
     val ACTORS_FRONT   = 0x6000_0000..0x6FFF_FFFF // Rendered front (e.g. fake tile)
     val ACTORS_OVERLAY = 0x7000_0000..0x7FFF_FFFF // Rendered as screen overlay, not affected by light nor environment overlays
 
-    val VIRTUAL_TILES = -1 downTo -65536
+    val VIRTUAL_TILES = -2 downTo -65536 // index of -1 breaks things for some reason :(
 
 }
