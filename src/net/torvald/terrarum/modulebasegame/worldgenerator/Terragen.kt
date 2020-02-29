@@ -341,9 +341,9 @@ data class TerragenParams(
         val highlandScaleOffset: Double = -0.2, // linearly alters the height
         val mountainScaleOffset: Double = -0.1, // linearly alters the height
         val mountainDisturbance: Double = 0.7, // greater = more distortion, overhangs
-        val caveShapeFreq: Double = 7.4, //adjust the "density" of the caves
+        val caveShapeFreq: Double = 4.0, //adjust the "density" of the caves
         val caveAttenuateBias: Double = 0.90, // adjust the "concentration" of the cave gen. Lower = larger voids
-        val caveSelectThre: Double = 0.89, // also adjust this if you've touched the bias value. Number can be greater than 1.0
+        val caveSelectThre: Double = 0.918, // also adjust this if you've touched the bias value. Number can be greater than 1.0
         val caveBlockageFractalFreq: Double = 8.88,
         val caveBlockageSelectThre: Double = 1.40 // adjust cave cloing-up strength. Larger = more closing
 )
