@@ -74,8 +74,8 @@ class UIItemInventoryCatBar(
         val iconIndex = arrayOf(12, 16, 17, 13)
 
 
-        println("[UIItemInventoryCatBar] relativeStartX: $relativeStartX")
-        println("[UIItemInventoryCatBar] posX: $posX")
+        //println("[UIItemInventoryCatBar] relativeStartX: $relativeStartX")
+        //println("[UIItemInventoryCatBar] posX: $posX")
 
         sideButtons = Array(iconIndex.size) { index ->
             val iconPosX = if (index < 2)

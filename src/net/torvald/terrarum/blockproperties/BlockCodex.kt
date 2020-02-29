@@ -2,6 +2,7 @@ package net.torvald.terrarum.blockproperties
 
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printmsg
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameworld.FluidType
@@ -68,6 +69,8 @@ object BlockCodex {
                     dynamicToVirtualMap[id] = virtualIDMax
                     repeat(DYNAMIC_RANDOM_CASES) { i ->
                         setProp(virtualIDMax - i, it)
+                        printdbg(this, "Block ID $id -> Virtual ID ${virtualIDMax - i}, baseLum: ${blockProps[virtualIDMax - i]?.baseLumCol}")
+
                         virtualPropsCount += 1
                     }
                 }
