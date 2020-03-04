@@ -12,7 +12,7 @@ public class TerrarumAppConfiguration {
     //////////////////////////////////////
 
     public static final String GAME_NAME = "Terrarum";
-    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
+    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2020 Torvald (minjaesong)";
 
     /**
      * <p>
