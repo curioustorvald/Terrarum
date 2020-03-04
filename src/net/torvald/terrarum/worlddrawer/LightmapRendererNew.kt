@@ -82,8 +82,8 @@ object LightmapRenderer {
         }
     }
 
-    private const val overscan_open: Int = 40
-    private const val overscan_opaque: Int = 10
+    const val overscan_open: Int = 40
+    const val overscan_opaque: Int = 10
 
 
     // TODO resize(int, int) -aware
@@ -132,6 +132,40 @@ object LightmapRenderer {
     internal var for_draw_y_start = 0
     internal var for_draw_x_end = 0
     internal var for_draw_y_end = 0
+
+    private val executor0 = LightCalculatorContext(world, lightmap, lanternMap)
+    private val executor1 = LightCalculatorContext(world, lightmap, lanternMap)
+    private val executor2 = LightCalculatorContext(world, lightmap, lanternMap)
+    private val executor3 = LightCalculatorContext(world, lightmap, lanternMap)
+
+    private val exec0 = {
+        for (y in for_y_start - overscan_open..for_y_end) {
+            for (x in for_x_start - overscan_open..for_x_end) {
+                executor0.calculateAndAssign(x, y)
+            }
+        }
+    }
+    private val exec1 = {
+        for (y in for_y_end + overscan_open downTo for_y_start) {
+            for (x in for_x_start - overscan_open..for_x_end) {
+                executor1.calculateAndAssign(x, y)
+            }
+        }
+    }
+    private val exec2 = {
+        for (y in for_y_end + overscan_open downTo for_y_start) {
+            for (x in for_x_end + overscan_open downTo for_x_start) {
+                executor2.calculateAndAssign(x, y)
+            }
+        }
+    }
+    private val exec3 = {
+        for (y in for_y_start - overscan_open..for_y_end) {
+            for (x in for_x_end + overscan_open downTo for_x_start) {
+                executor3.calculateAndAssign(x, y)
+            }
+        }
+    }
 
     /**
      * @param x world coord
@@ -317,6 +351,14 @@ object LightmapRenderer {
 
                 r3();r4();r1();r2();r3();
 
+                /*ThreadExecutor.submit(exec0)
+                ThreadExecutor.submit(exec1)
+                ThreadExecutor.submit(exec2)
+                ThreadExecutor.submit(exec3)
+                ThreadExecutor.join()*/
+
+
+                // FIXME right now parallel execution share single static variables
                 // multithread per channel: slower AND that cursed noisy output
                 /*for (channel in 0..3) {
                     ThreadExecutor.submit {
@@ -953,7 +995,7 @@ object LightmapRenderer {
 
     private val colourNull = Cvec(0)
     private val gdxColorNull = Color(0)
-    private const val epsilon = 1f/1024f
+    const val epsilon = 1f/1024f
 
     private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
@@ -1038,7 +1080,7 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    private fun darkenColoured(x: Int, y: Int, darken: Cvec): Cvec {
+    fun darkenColoured(x: Int, y: Int, darken: Cvec): Cvec {
         // use equation with magic number 8.0
         // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 
