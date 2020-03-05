@@ -43,7 +43,8 @@ internal class LightCalculatorContext(
         thisWall = world.getTileFromWallRaw(x, y)
 
         // regarding the issue #26
-        try {
+        // uncomment this if you're facing diabolically indescribable bugs
+        /*try {
             val fuck = BlockCodex[thisTerrain].getLumCol(x, y)
         }
         catch (e: NullPointerException) {
@@ -62,7 +63,7 @@ internal class LightCalculatorContext(
             System.err.println("\nMINIMINIDUMP END")
 
             exitProcess(1)
-        }
+        }*/
 
         if (thisFluid.type != Fluid.NULL) {
             fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
