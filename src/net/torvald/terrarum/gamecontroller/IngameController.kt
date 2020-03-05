@@ -56,16 +56,17 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (!terrarumIngame.paused) {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
-            if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+            // DON'T DO UI-FILTERING HERE; they're already done on ingame.worldPrimaryClickStart
+            // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
+            // the very job.
 
-                    terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
-                }
-                /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary")) {
-                    ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
-                }*/
+            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+                terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
             }
+            /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary")) {
+                ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
+            }*/
 
         }
 
