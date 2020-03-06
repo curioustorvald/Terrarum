@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
+import net.torvald.gdx.graphics.TestCvecArr
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
@@ -23,10 +24,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.worlddrawer.LightmapRenderer.convX
-import net.torvald.terrarum.worlddrawer.LightmapRenderer.convY
-import net.torvald.util.SortedArrayList
-import kotlin.math.sign
 import kotlin.system.exitProcess
 
 /**
@@ -761,7 +758,7 @@ object LightmapRenderer {
 
     fun precalculate(rawx: Int, rawy: Int) {
         val lx = rawx.convX(); val ly = rawy.convY()
-        val (x, y) = world.coerceXY(rawx, rawy)
+        val (worldX, worldY) = world.coerceXY(rawx, rawy)
 
         //printdbg(this, "precalculate ($rawx, $rawy) -> ($lx, $ly) | ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
 
@@ -771,23 +768,23 @@ object LightmapRenderer {
         }
 
 
-        _thisTerrain = world.getTileFromTerrainRaw(x, y)
-        _thisFluid = world.getFluid(x, y)
-        _thisWall = world.getTileFromWallRaw(x, y)
+        _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
+        _thisFluid = world.getFluid(worldX, worldY)
+        _thisWall = world.getTileFromWallRaw(worldX, worldY)
 
 
         // regarding the issue #26
         // uncomment this and/or run JVM with -ea if you're facing diabolically indescribable bugs
         try {
-            val fuck = BlockCodex[_thisTerrain].getLumCol(x, y)
+            val fuck = BlockCodex[_thisTerrain].getLumCol(worldX, worldY)
         }
         catch (e: NullPointerException) {
-            System.err.println("## NPE -- x: $x, y: $y, value: $_thisTerrain")
+            System.err.println("## NPE -- x: $worldX, y: $worldY, value: $_thisTerrain")
             e.printStackTrace()
             // create shitty minidump
             System.err.println("MINIMINIDUMP START")
-            for (xx in x - 16 until x + 16) {
-                val raw = world.getTileFromTerrain(xx, y)
+            for (xx in worldX - 16 until worldX + 16) {
+                val raw = world.getTileFromTerrain(xx, worldY)
                 val lsb = raw.and(0xff).toString(16).padStart(2, '0')
                 val msb = raw.ushr(8).and(0xff).toString(16).padStart(2, '0')
                 System.err.print(lsb)
@@ -803,14 +800,14 @@ object LightmapRenderer {
         if (_thisFluid.type != Fluid.NULL) {
             _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
 
-            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(x, y))
-            _thisTileLuminosity.maxAndAssign(BlockCodex[_thisFluid.type].getLumCol(x, y).mul(_fluidAmountToCol)) // already been div by four
+            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(worldX, worldY))
+            _thisTileLuminosity.maxAndAssign(BlockCodex[_thisFluid.type].getLumCol(worldX, worldY).mul(_fluidAmountToCol)) // already been div by four
             _mapThisTileOpacity.setVec(lx, ly, BlockCodex[_thisTerrain].opacity)
             _mapThisTileOpacity.max(lx, ly, BlockCodex[_thisFluid.type].opacity.mul(_fluidAmountToCol))// already been div by four
         }
         else {
-            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(x, y))
-            _mapThisTileOpacity.setVec(x, y, BlockCodex[_thisTerrain].opacity)
+            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(worldX, worldY))
+            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[_thisTerrain].opacity)
         }
 
         _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
@@ -827,7 +824,7 @@ object LightmapRenderer {
 
         // blend lantern
         _mapLightLevelThis.max(lx, ly, _thisTileLuminosity.maxAndAssign(
-                lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull
+                lanternMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull
         ))
     }
 
