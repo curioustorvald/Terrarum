@@ -68,6 +68,9 @@ object LightmapRenderer {
                 }*/
 
                 lightmap.zerofill()
+                _mapLightLevelThis.zerofill()
+                _mapThisTileOpacity.zerofill()
+                _mapThisTileOpacity2.zerofill()
 
                 makeUpdateTaskList()
             }
@@ -98,10 +101,15 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     // will use array of array from now on because fuck it; debug-ability > slight framerate drop. 2019-06-01
-    private var lightmap: UnsafeCvecArray = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+    private var lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     //private var lightmap: Array<Array<Cvec>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH) { Cvec(0) } } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     //private var lightmap: Array<Cvec> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private var _mapLightLevelThis = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+    //private var _mapFluidAmountToCol = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+    //private var _mapThisTileLuminosity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+    private var _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+    private var _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
 
     //private val lightsourceMap = ArrayList<Pair<BlockAddress, Cvec>>(256)
 
@@ -270,6 +278,7 @@ object LightmapRenderer {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
             lightmap.zerofill()
+            _mapLightLevelThis.zerofill()
             //lightsourceMap.clear()
 
 
@@ -301,6 +310,11 @@ object LightmapRenderer {
                 }
             }*/
 
+            for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
+                for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
+                    precalculate(x, y)
+                }
+            }
         }
         // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
@@ -548,7 +562,7 @@ object LightmapRenderer {
      *
      * @return true if skip
      */
-    private fun radiate(channel: Int, wx: Int, wy: Int, lightsource: Cvec, distSqr: Int): Boolean {
+    /*private fun radiate(channel: Int, wx: Int, wy: Int, lightsource: Cvec, distSqr: Int): Boolean {
         val lx = wx.convX(); val ly = wy.convY()
 
         if (lx !in 0 until LIGHTMAP_WIDTH || ly !in 0 until LIGHTMAP_HEIGHT)
@@ -600,7 +614,7 @@ object LightmapRenderer {
         lightmap.setA(x, y, lightLevelThis.a)
 
         return false
-    }
+    }*/
 
 
     // TODO re-init at every resize
@@ -718,49 +732,57 @@ object LightmapRenderer {
     }
 
 
-    private val ambientAccumulator = Cvec(0f,0f,0f,0f)
-    private val lightLevelThis = Cvec(0)
-    private val fluidAmountToCol = Cvec(0)
-    private val thisTileLuminosity = Cvec(0)
-    private val thisTileOpacity = Cvec(0)
-    private val thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
+
+    //private val ambientAccumulator = Cvec(0f,0f,0f,0f)
+    //private val lightLevelThis = Cvec(0)
+    //private val fluidAmountToCol = Cvec(0)
+    //private val thisTileLuminosity = Cvec(0)
+    //private val thisTileOpacity = Cvec(0)
+    //private val thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
+
+    // local variables that are made static
     private val sunLight = Cvec(0)
-    private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
-    private var thisTerrain = 0
-    private var thisWall = 0
+    private var _thisTerrain = 0
+    private var _thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
+    private var _thisWall = 0
+    private val _ambientAccumulator = Cvec(0)
+    private val _thisTileOpacity = Cvec(0)
+    private val _thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
+    private val _fluidAmountToCol = Cvec(0)
+    private val _thisTileLuminosity = Cvec(0)
 
     // per-channel variants
-    private var lightLevelThisCh = 0f
+    /*private var lightLevelThisCh = 0f
     private var fluidAmountToColCh = 0f
     private var thisTileLuminosityCh = 0f
     private var thisTileOpacityCh = 0f
-    private var thisTileOpacity2Ch = 0f
+    private var thisTileOpacity2Ch = 0f*/
 
-    /**
-     * This function will alter following variables:
-     * - lightLevelThis
-     * - thisTerrain
-     * - thisFluid
-     * - thisWall
-     * - thisTileLuminosity
-     * - thisTileOpacity
-     * - thisTileOpacity2
-     * - sunlight
-     */
-    private fun getLightsAndShades(x: Int, y: Int) {
-        val (x, y) = world.coerceXY(x, y)
 
-        lightLevelThis.set(colourNull)
-        thisTerrain = world.getTileFromTerrainRaw(x, y)
-        thisFluid = world.getFluid(x, y)
-        thisWall = world.getTileFromWallRaw(x, y)
+    fun precalculate(rawx: Int, rawy: Int) {
+        val lx = rawx.convX(); val ly = rawy.convY()
+        val (x, y) = world.coerceXY(rawx, rawy)
+
+        //printdbg(this, "precalculate ($rawx, $rawy) -> ($lx, $ly) | ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
+
+        if (lx !in 0..LIGHTMAP_WIDTH || ly !in 0..LIGHTMAP_HEIGHT) {
+            println("[LightmapRendererNew.precalculate] Out of range: ($lx, $ly) for size ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
+            exitProcess(1)
+        }
+
+
+        _thisTerrain = world.getTileFromTerrainRaw(x, y)
+        _thisFluid = world.getFluid(x, y)
+        _thisWall = world.getTileFromWallRaw(x, y)
+
 
         // regarding the issue #26
+        // uncomment this and/or run JVM with -ea if you're facing diabolically indescribable bugs
         try {
-            val fuck = BlockCodex[thisTerrain].getLumCol(x, y)
+            val fuck = BlockCodex[_thisTerrain].getLumCol(x, y)
         }
         catch (e: NullPointerException) {
-            System.err.println("## NPE -- x: $x, y: $y, value: $thisTerrain")
+            System.err.println("## NPE -- x: $x, y: $y, value: $_thisTerrain")
             e.printStackTrace()
             // create shitty minidump
             System.err.println("MINIMINIDUMP START")
@@ -777,17 +799,91 @@ object LightmapRenderer {
             exitProcess(1)
         }
 
-        if (thisFluid.type != Fluid.NULL) {
-            fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
 
-            thisTileLuminosity.set(BlockCodex[thisTerrain].getLumCol(x, y))
-            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].getLumCol(x, y).mul(fluidAmountToCol)) // already been div by four
-            thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
-            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity.mul(fluidAmountToCol)) // already been div by four
+        if (_thisFluid.type != Fluid.NULL) {
+            _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
+
+            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(x, y))
+            _thisTileLuminosity.maxAndAssign(BlockCodex[_thisFluid.type].getLumCol(x, y).mul(_fluidAmountToCol)) // already been div by four
+            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[_thisTerrain].opacity)
+            _mapThisTileOpacity.max(lx, ly, BlockCodex[_thisFluid.type].opacity.mul(_fluidAmountToCol))// already been div by four
         }
         else {
-            thisTileLuminosity.set(BlockCodex[thisTerrain].getLumCol(x, y))
-            thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
+            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(x, y))
+            _mapThisTileOpacity.setVec(x, y, BlockCodex[_thisTerrain].opacity)
+        }
+
+        _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
+        _mapThisTileOpacity2.setG(lx, ly, _mapThisTileOpacity.getG(lx, ly) * 1.41421356f)
+        _mapThisTileOpacity2.setB(lx, ly, _mapThisTileOpacity.getB(lx, ly) * 1.41421356f)
+        _mapThisTileOpacity2.setA(lx, ly, _mapThisTileOpacity.getA(lx, ly) * 1.41421356f)
+        //sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT) // moved to fireRecalculateEvent()
+
+
+        // open air || luminous tile backed by sunlight
+        if ((_thisTerrain == AIR && _thisWall == AIR) || (_thisTileLuminosity.nonZero() && _thisWall == AIR)) {
+            _mapLightLevelThis.setVec(lx, ly, sunLight)
+        }
+
+        // blend lantern
+        _mapLightLevelThis.max(lx, ly, _thisTileLuminosity.maxAndAssign(
+                lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull
+        ))
+    }
+
+    /**
+     * This function will alter following variables:
+     * - lightLevelThis
+     * - thisTerrain
+     * - thisFluid
+     * - thisWall
+     * - thisTileLuminosity
+     * - thisTileOpacity
+     * - thisTileOpacity2
+     * - sunlight
+     */
+    /*private fun getLightsAndShades(x: Int, y: Int) {
+        val (x, y) = world.coerceXY(x, y)
+
+        lightLevelThis.set(colourNull)
+        _thisTerrain = world.getTileFromTerrainRaw(x, y)
+        _thisFluid = world.getFluid(x, y)
+        _thisWall = world.getTileFromWallRaw(x, y)
+
+        // regarding the issue #26
+        // uncomment this and/or run JVM with -ea if you're facing diabolically indescribable bugs
+        /*try {
+            val fuck = BlockCodex[_thisTerrain].getLumCol(x, y)
+        }
+        catch (e: NullPointerException) {
+            System.err.println("## NPE -- x: $x, y: $y, value: $_thisTerrain")
+            e.printStackTrace()
+            // create shitty minidump
+            System.err.println("MINIMINIDUMP START")
+            for (xx in x - 16 until x + 16) {
+                val raw = world.getTileFromTerrain(xx, y)
+                val lsb = raw.and(0xff).toString(16).padStart(2, '0')
+                val msb = raw.ushr(8).and(0xff).toString(16).padStart(2, '0')
+                System.err.print(lsb)
+                System.err.print(msb)
+                System.err.print(" ")
+            }
+            System.err.println("\nMINIMINIDUMP END")
+
+            exitProcess(1)
+        }*/
+
+        if (_thisFluid.type != Fluid.NULL) {
+            fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
+
+            thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(x, y))
+            thisTileLuminosity.maxAndAssign(BlockCodex[_thisFluid.type].getLumCol(x, y).mul(fluidAmountToCol)) // already been div by four
+            thisTileOpacity.set(BlockCodex[_thisTerrain].opacity)
+            thisTileOpacity.maxAndAssign(BlockCodex[_thisFluid.type].opacity.mul(fluidAmountToCol)) // already been div by four
+        }
+        else {
+            thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(x, y))
+            thisTileOpacity.set(BlockCodex[_thisTerrain].opacity)
         }
 
         thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
@@ -795,15 +891,15 @@ object LightmapRenderer {
 
 
         // open air || luminous tile backed by sunlight
-        if ((thisTerrain == AIR && thisWall == AIR) || (thisTileLuminosity.nonZero() && thisWall == AIR)) {
+        if ((_thisTerrain == AIR && _thisWall == AIR) || (thisTileLuminosity.nonZero() && _thisWall == AIR)) {
             lightLevelThis.set(sunLight)
         }
 
         // blend lantern
         lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
-    }
+    }*/
 
-    private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
+    /*private fun getLightsAndShadesCh(x: Int, y: Int, channel: Int) {
         lightLevelThisCh = 0f
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisFluid = world.getFluid(x, y)
@@ -856,7 +952,7 @@ object LightmapRenderer {
         // blend lantern
         lightLevelThisCh = maxOf(thisTileLuminosityCh, lightLevelThisCh)
         lightLevelThisCh = maxOf(lanternMap[LandUtil.getBlockAddr(world, x, y)]?.getElem(channel) ?: 0f, lightLevelThisCh)
-    }
+    }*/
 
     private val inNoopMaskp = Point2i(0,0)
 
@@ -915,7 +1011,7 @@ object LightmapRenderer {
 
         // O(9n) == O(n) where n is a size of the map
 
-        getLightsAndShades(worldX, worldY)
+        //getLightsAndShades(worldX, worldY)
 
         val x = worldX.convX()
         val y = worldY.convY()
@@ -928,29 +1024,43 @@ object LightmapRenderer {
          *  maxblend eight values and use it
          */
 
+
+        // TODO getLightsAndShades is replaced with precalculate; change following codes accordingly!
+        _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
+        _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
+        _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
+        _ambientAccumulator.a = _mapLightLevelThis.getA(x, y)
+
+        _thisTileOpacity.r = _mapThisTileOpacity.getR(x, y)
+        _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
+        _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
+        _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
+
+        _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
+        _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
+        _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
+        _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
+
         // will "overwrite" what's there in the lightmap if it's the first pass
         // takes about 2 ms on 6700K
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y - 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y - 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y + 1, thisTileOpacity2))
-        /* + */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y + 1, thisTileOpacity2))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y - 1, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x, y + 1, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x - 1, y, thisTileOpacity))
-        /* * */lightLevelThis.maxAndAssign(darkenColoured(x + 1, y, thisTileOpacity))
+        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x - 1, y - 1, _thisTileOpacity2))
+        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y - 1, _thisTileOpacity2))
+        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x - 1, y + 1, _thisTileOpacity2))
+        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y + 1, _thisTileOpacity2))
+        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x, y - 1, _thisTileOpacity))
+        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x, y + 1, _thisTileOpacity))
+        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x - 1, y, _thisTileOpacity))
+        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y, _thisTileOpacity))
 
 
         //return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
         //setLightOf(lightmap, x, y, lightLevelThis.cpy())
 
-        lightmap.setR(x, y, lightLevelThis.r)
-        lightmap.setG(x, y, lightLevelThis.g)
-        lightmap.setB(x, y, lightLevelThis.b)
-        lightmap.setA(x, y, lightLevelThis.a)
+        lightmap.setVec(x, y, _ambientAccumulator)
     }
 
     // per-channel version is slower...
-    private fun calculateAndAssignCh(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, channel: Int) {
+    /*private fun calculateAndAssignCh(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int, channel: Int) {
 
         if (inNoopMask(worldX, worldY)) return
 
@@ -982,7 +1092,7 @@ object LightmapRenderer {
         lightLevelThisCh = maxOf(darken(x + 1, y, thisTileOpacityCh, channel), lightLevelThisCh)
 
         lightmap.channelSet(x, y, channel, lightLevelThisCh)
-    }
+    }*/
 
     private fun isSolid(x: Int, y: Int): Float? { // ...so that they wouldn't appear too dark
         if (!inBounds(x, y)) return null
@@ -1067,7 +1177,13 @@ object LightmapRenderer {
         LightmapHDRMap.dispose()
         _lightBufferAsTex.dispose()
         lightBuffer.dispose()
+
         lightmap.destroy()
+        _mapLightLevelThis.destroy()
+        //_mapFluidAmountToCol.destroy()
+        //_mapThisTileLuminosity.destroy()
+        _mapThisTileOpacity.destroy()
+        _mapThisTileOpacity2.destroy()
     }
 
     private const val lightScalingMagic = 8f
@@ -1167,10 +1283,19 @@ object LightmapRenderer {
             _init = true
         }
         lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
-        lightmap.destroy()
-        lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
-        //lightmap = Array<Cvec>(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Cvec(0) }
 
+        lightmap.destroy()
+        _mapLightLevelThis.destroy()
+        //_mapFluidAmountToCol.destroy()
+        //_mapThisTileLuminosity.destroy()
+        _mapThisTileOpacity.destroy()
+        _mapThisTileOpacity2.destroy()
+        lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        _mapLightLevelThis = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        //_mapFluidAmountToCol = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        //_mapThisTileLuminosity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
 
         printdbg(this, "Resize event")
     }
