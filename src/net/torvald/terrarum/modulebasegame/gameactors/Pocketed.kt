@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.gameitem.ItemID
@@ -11,6 +12,7 @@ import net.torvald.terrarum.gameitem.ItemID
 interface Pocketed {
 
     var inventory: ActorInventory
+    val actorValue: ActorValue
 
     /**
      * Equips an item. If the item is not in the inventory, an error will be thrown.
@@ -29,12 +31,9 @@ interface Pocketed {
 
         inventory.itemEquipped[item.equipPosition] = null
 
-        // remove it from the quickslot
-        inventory.quickSlot.forEachIndexed { index, itemID ->
-            if (itemID == item.dynamicID) {
-                inventory.setQuickBar(index, null)
-            }
-        }
+        // NOTE: DON'T TOUCH QUICKSLOT HERE
+        // Relevant Actorvalue is NOT being updated on time
+        // They're being safely handled by UIItemInventoryElem*.touchDown() and ActorInventory.remove
 
         item.effectOnUnequip(AppLoader.UPDATE_RATE)
     }
