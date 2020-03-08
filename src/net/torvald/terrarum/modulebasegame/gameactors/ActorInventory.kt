@@ -122,6 +122,11 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
                 actor.unequipItem(existingItem.item)
                 // depleted item; remove entry from inventory
                 itemList.remove(existingItem)
+
+                // also unequip on the quickslot
+                actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                    actor.inventory.setQuickBar(it, null)
+                }
             }
         }
         else {
@@ -202,6 +207,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
                 add(newItem)
                 itemEquipped[newItem.equipPosition] = newItem.dynamicID //invSearchByDynamicID(newItem.dynamicID)!!.item // will test if some sketchy code is written. Test fail: kotlinNullpointerException
 
+                // update quickslot designation as the item is being unpacked (e.g. using fresh new pickaxe)
                 actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
                     setQuickBar(it, newItem.dynamicID)
                 }
