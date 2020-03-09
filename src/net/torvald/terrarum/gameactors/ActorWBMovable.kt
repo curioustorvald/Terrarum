@@ -132,15 +132,15 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * Physical properties.
      */
     /** Apparent scale. Use "avBaseScale" for base scale */
-    var scale: Double
+    val scale: Double
         inline get() = (actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) *
                        (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
-        set(value) {
+        /*set(value) {
             val scaleDelta = value - scale
             actorValue[AVKey.SCALE] = value / (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
             // reposition
             translatePosition(-baseHitboxW * scaleDelta / 2, -baseHitboxH * scaleDelta)
-        }
+        }*/
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
     val mass: Double
@@ -298,6 +298,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     }
 
     /**
+     * ONLY FOR INITIAL SETUP
+     *
      * @param w
      * @param h
      * @param tx positive: translate sprite to LEFT.
@@ -318,6 +320,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
 
     /**
+     * ONLY FOR INITIAL SETUP
+     *
      * Set hitbox position from bottom-center point
      * @param x
      * @param y
@@ -328,10 +332,6 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 y - (baseHitboxH - hitboxTranslateY) * scale,
                 baseHitboxW * scale,
                 baseHitboxH * scale)
-    }
-
-    private fun translatePosition(dx: Double, dy: Double) {
-        hitbox.translate(dx, dy)
     }
 
     // get() methods are moved to update(), too much stray object being created is definitely not good
@@ -362,6 +362,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private val bounceDampenVelThreshold = 0.5
 
     override fun update(delta: Float) {
+
+        // re-scale hitbox
+        // it's just much better to poll them than use perfectly-timed setter because latter simply cannot exist
+        hitbox.canonicalResize(baseHitboxW * scale, baseHitboxH * scale)
+
 
         val oldHitbox = hitbox.clone()
 

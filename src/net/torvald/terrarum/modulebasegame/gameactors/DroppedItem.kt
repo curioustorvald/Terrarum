@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -22,7 +23,7 @@ open class DroppedItem(private val item: GameItem) : ActorWBMovable(RenderOrder.
         else
             ItemCodex[item.dynamicID]!!.mass
 
-        scale = ItemCodex[item.dynamicID]!!.scale
+        actorValue[AVKey.SCALE] = ItemCodex[item.dynamicID]!!.scale
     }
 
     override fun update(delta: Float) {
