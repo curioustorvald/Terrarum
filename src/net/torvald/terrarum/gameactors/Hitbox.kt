@@ -33,9 +33,21 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         }
     }
 
-    override fun toString(): String {
-        return "[$hitboxStart - $hitboxEnd]"
-    }
+
+    val startX: Double
+        get() = hitboxStart.x
+    val startY: Double
+        get() = hitboxStart.y
+
+    val endX: Double
+        get() = hitboxStart.x + width
+    val endY: Double
+        get() = hitboxStart.y + height
+
+    val centeredX: Double
+        get() = hitboxStart.x + width * 0.5
+    val centeredY: Double
+        get() = hitboxStart.y + height * 0.5
 
     /**
      * @return bottom-centered point of hitbox.
@@ -48,11 +60,6 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
      */
     inline val canonicalY: Double
         get() = endY
-
-    val endX: Double
-        get() = hitboxStart.x + width
-    val endY: Double
-        get() = hitboxStart.y + height
 
     /**
      * Set to the point top left
@@ -111,7 +118,23 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         return this
     }
 
+    /**
+     * For initial setup only. Use CanonicalResize for graceful resizing
+     */
     fun setDimension(w: Double, h: Double): Hitbox {
+        width = w
+        height = h
+        return this
+    }
+
+    fun canonicalResize(w: Double, h: Double): Hitbox {
+        // sx_1 + 0.5w_1 = sx_2 + 0.5w_2 // equals because the final point must not move. sx_1: old start-x, sx_2: new start-x which is what we want
+        // sx_2 = sx_1 + 0.5w_1 - 0.5w_2 // move variables to right-hand side to derive final value sx_2
+
+        hitboxStart.set(
+                startX + 0.5 * width - 0.5 * w,
+                startY + height - h
+        )
         width = w
         height = h
         return this
@@ -120,25 +143,6 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
     fun containsPoint(x: Double, y: Double) = (hitboxStart.x - x) in 0.0..width && (hitboxStart.y - y) in 0.0..height
     fun containsPoint(p: Point2d) = containsPoint(p.x, p.y)
 
-    /**
-     * Returns x value of start point
-     * @return top-left point startX
-     */
-    val startX: Double
-        get() = hitboxStart.x
-
-    /**
-     * Returns y value of start point
-     * @return top-left point startY
-     */
-    val startY: Double
-        get() = hitboxStart.y
-
-    val centeredX: Double
-        get() = hitboxStart.x + width * 0.5
-
-    val centeredY: Double
-        get() = hitboxStart.y + height * 0.5
 
     infix fun intersects(position: Point2d) =
             (position.x >= startX && position.x <= startX + width) &&
@@ -161,5 +165,9 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
         return this.hitboxStart == (other as Hitbox).hitboxStart &&
                this.width == other.width &&
                this.height == other.height
+    }
+
+    override fun toString(): String {
+        return "[$hitboxStart - $hitboxEnd]"
     }
 }

@@ -130,17 +130,19 @@ class SpriteAnimation(@Transient val parentActor: ActorWBMovable) {
             val region = textureRegion.get(currentFrame, currentRow)
             batch.color = colorFilter
 
+            val scale = parentActor.scale.toFloat()
+
             if (flipHorizontal && flipVertical) {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
-                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * parentActor.scale.toFloat() + parentActor.hitbox.height.toFloat()),
+                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * scale + parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * scale + parentActor.hitbox.height.toFloat()),
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         -FastMath.floor(cellHeight * scale).toFloat()
                 )
             }
             else if (flipHorizontal) {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * scale + scale * parentActor.hitbox.width.toFloat()),
                         FastMath.floor(posY).toFloat(),
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         FastMath.floor(cellHeight * scale).toFloat()
@@ -149,7 +151,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWBMovable) {
             else if (flipVertical) {
                 batch.draw(region,
                         FastMath.floor(posX).toFloat(),
-                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * parentActor.scale.toFloat() + parentActor.hitbox.height.toFloat()),
+                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * scale + parentActor.hitbox.height.toFloat()),
                         FastMath.floor(cellWidth * scale).toFloat(),
                         -FastMath.floor(cellHeight * scale).toFloat()
                 )

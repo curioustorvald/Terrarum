@@ -4,6 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.gameactors.ActorWBMovable
 
@@ -27,7 +28,8 @@ internal object SetScale : ConsoleCommand {
                     EchoError("Target is not ActorWBMovable")
                 }
                 else {
-                    target.scale = scale
+                    target.actorValue[AVKey.SCALE] = scale
+                    //target.scale = scale
                 }
             }
             catch (e: NumberFormatException) {
