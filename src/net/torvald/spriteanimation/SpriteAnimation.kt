@@ -142,7 +142,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWBMovable) {
             }
             else if (flipHorizontal) {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * scale + scale * parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * scale + parentActor.hitbox.width.toFloat()),
                         FastMath.floor(posY).toFloat(),
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         FastMath.floor(cellHeight * scale).toFloat()
