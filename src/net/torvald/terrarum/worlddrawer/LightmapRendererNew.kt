@@ -13,7 +13,6 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.sliceEvenly
-import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
@@ -334,7 +333,7 @@ object LightmapRenderer {
         lanternMap.clear()
         actorContainers.forEach { actorContainer ->
             actorContainer?.forEach {
-                if (it is Luminous && it is ActorWBMovable) {
+                if (it is Luminous && it is ActorWithBody) {
                     // put lanterns to the area the luminantBox is occupying
                     for (lightBox in it.lightBoxList) {
                         val lightBoxX = it.hitbox.startX + lightBox.startX

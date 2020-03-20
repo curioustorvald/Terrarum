@@ -3,14 +3,14 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
  * Created by minjaesong on 2016-03-15.
  */
-open class DroppedItem(private val item: GameItem) : ActorWBMovable(RenderOrder.MIDTOP) {
+open class DroppedItem(private val item: GameItem) : ActorWithBody(RenderOrder.MIDTOP) {
 
     init {
         if (item.dynamicID >= ItemCodex.ACTORID_MIN)

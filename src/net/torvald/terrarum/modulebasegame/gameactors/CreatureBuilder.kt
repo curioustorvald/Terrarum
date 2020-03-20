@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 
 
@@ -15,8 +15,8 @@ object CreatureBuilder {
     /**
      * @Param jsonFileName with extension
      */
-    operator fun invoke(module: String, jsonFileName: String): ActorWBMovable {
-        val actor = ActorWBMovable(Actor.RenderOrder.MIDDLE)
+    operator fun invoke(module: String, jsonFileName: String): ActorWithBody {
+        val actor = ActorWithBody(Actor.RenderOrder.MIDDLE)
         InjectCreatureRaw(actor.actorValue, module, jsonFileName)
 
 

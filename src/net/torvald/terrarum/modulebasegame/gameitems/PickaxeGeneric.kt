@@ -6,7 +6,6 @@ import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Calculate

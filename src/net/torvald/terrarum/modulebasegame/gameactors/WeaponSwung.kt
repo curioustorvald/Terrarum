@@ -1,14 +1,14 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 
 /**
  * Created by minjaesong on 2016-04-26.
  */
-class WeaponSwung(val itemID: Int) : ActorWBMovable(RenderOrder.MIDTOP), Luminous {
+class WeaponSwung(val itemID: Int) : ActorWithBody(RenderOrder.MIDTOP), Luminous {
     // just let the solver use AABB; it's cheap but works just enough
 
     /**

@@ -32,7 +32,7 @@ open class ActorHumanoid(
         birth: Long,
         death: Long? = null,
         usePhysics: Boolean = true
-) : ActorWBMovable(RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+) : ActorWithBody(RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
     private val world: GameWorld?
         get() = Terrarum.ingame?.world
