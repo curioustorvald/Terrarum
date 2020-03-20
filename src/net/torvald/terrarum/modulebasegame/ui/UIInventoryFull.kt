@@ -10,7 +10,7 @@ import net.torvald.ENDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockstats.MinimapComposer
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -136,7 +136,7 @@ class UIInventoryFull(
             UIItemInventoryEquippedView(
                     this,
                     actor.inventory,
-                    actor as ActorWBMovable,
+                    actor as ActorWithBody,
                     internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
                     107 + (AppLoader.screenH - internalHeight) / 2
             )

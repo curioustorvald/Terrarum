@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -35,7 +35,7 @@ object BlockBase {
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
             var ret1 = true
             ingame.actorContainerActive.forEach {
-                if (it is ActorWBMovable && it.intTilewiseHitbox.intersects(mousePoint))
+                if (it is ActorWithBody && it.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
                     ret1 = false // return is not allowed here
             }
             if (!ret1) return ret1

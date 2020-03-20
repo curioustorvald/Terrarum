@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
@@ -21,7 +21,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIItemInventoryEquippedView(
         parentUI: UIInventoryFull,
         val inventory: ActorInventory,
-        val theActor: ActorWBMovable,
+        val theActor: ActorWithBody,
         override var posX: Int,
         override var posY: Int
 ) : UIItem(parentUI) {

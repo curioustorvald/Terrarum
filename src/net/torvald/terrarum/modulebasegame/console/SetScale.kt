@@ -6,7 +6,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 
 /**
  * Created by minjaesong on 2017-01-20.
@@ -24,7 +24,7 @@ internal object SetScale : ConsoleCommand {
 
                 val target = Terrarum.ingame!!.getActorByID(targetID!!)
 
-                if (target !is ActorWBMovable) {
+                if (target !is ActorWithBody) {
                     EchoError("Target is not ActorWBMovable")
                 }
                 else {

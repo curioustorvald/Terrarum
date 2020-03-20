@@ -8,7 +8,7 @@ import net.torvald.terrarum.ccY
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorValue
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.console.SetAV
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -32,7 +32,7 @@ class ActorValueTracker constructor() : JFrame() {
     private val avPosArea = JTextArea()
     private val avPosScroller = JScrollPane(avPosArea)
 
-    private var actor: ActorWBMovable? = null
+    private var actor: ActorWithBody? = null
     private var actorValue: ActorValue? = null
 
     private val modavInputKey = JTextField()
@@ -91,7 +91,7 @@ class ActorValueTracker constructor() : JFrame() {
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {
-                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWBMovable
+                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithBody
                     actorValue = actor!!.actorValue
                 }
             }
@@ -155,7 +155,7 @@ class ActorValueTracker constructor() : JFrame() {
 
         this.title = "AVTracker $EMDASH $actor"
 
-        if (actor is ActorWBMovable) {
+        if (actor is ActorWithBody) {
             this.actor = actor
         }
 

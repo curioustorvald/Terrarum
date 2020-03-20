@@ -134,7 +134,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val blockMarkings = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common")
     internal var showSelection = true
-    val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
+    val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY, usePhysics = false) {
 
         override var referenceID: ActorID = 1048575 // custom refID
         override val hitbox = Hitbox(0.0, 0.0, 16.0, 16.0)
@@ -175,7 +175,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private var _testMarkerDrawCalls = 0L
 
-    private fun generateNewBlockMarkerVisible(x: Int, y: Int) = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
+    private fun generateNewBlockMarkerVisible(x: Int, y: Int) = object : ActorWithBody(Actor.RenderOrder.OVERLAY, usePhysics = false) {
         override var referenceID: ActorID = blockPosToRefID(x, y) // custom refID
         override val hitbox = Hitbox(x * 16.0, y * 16.0, 16.0, 16.0)
 

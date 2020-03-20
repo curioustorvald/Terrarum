@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
@@ -34,8 +34,8 @@ internal object Teleport : ConsoleCommand {
                 EchoError("missing 'to' on teleport command")
                 return
             }
-            val fromActor: ActorWBMovable
-            val targetActor: ActorWBMovable
+            val fromActor: ActorWithBody
+            val targetActor: ActorWithBody
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player") {
@@ -53,13 +53,13 @@ internal object Teleport : ConsoleCommand {
                 // if from == target, ignore the action
                 if (fromActorID == targetActorID) return
 
-                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWBMovable ||
-                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWBMovable) {
+                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWithBody ||
+                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWithBody) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWBMovable
-                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWBMovable
+                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWithBody
+                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWithBody
                 }
             }
             catch (e: NumberFormatException) {
@@ -82,7 +82,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            val actor: ActorWBMovable
+            val actor: ActorWithBody
             val x: Int
             val y: Int
             try {
@@ -90,11 +90,11 @@ internal object Teleport : ConsoleCommand {
                 y = args[4].toInt() * CreateTileAtlas.TILE_SIZE + CreateTileAtlas.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWBMovable) {
+                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWithBody) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWBMovable
+                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWithBody
                 }
             }
             catch (e: NumberFormatException) {
