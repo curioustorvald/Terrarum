@@ -396,11 +396,11 @@ public class AppLoader implements ApplicationListener {
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
         // set GL graphics constants
-        shaderBayerSkyboxFill = loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
-        shaderHicolour = loadShader("assets/4096.vert", "assets/hicolour.frag");
+        shaderBayerSkyboxFill = loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
+        shaderHicolour = loadShaderFromFile("assets/4096.vert", "assets/hicolour.frag");
         shaderPassthruRGB = SpriteBatch.createDefaultShader();
-        shaderColLUT = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
-        shaderReflect = loadShader("assets/4096.vert", "assets/reflect.frag");
+        shaderColLUT = loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag");
+        shaderReflect = loadShaderFromFile("assets/4096.vert", "assets/reflect.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -1182,8 +1182,18 @@ public class AppLoader implements ApplicationListener {
         System.out.println("[" + out + "] " + message.toString());
     }
 
-    public static ShaderProgram loadShader(String vert, String frag) {
+    public static ShaderProgram loadShaderFromFile(String vert, String frag) {
         ShaderProgram s = new ShaderProgram(Gdx.files.internal(vert), Gdx.files.internal(frag));
+
+        if (s.getLog().toLowerCase().contains("error")) {
+            throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
+        }
+
+        return s;
+    }
+
+    public static ShaderProgram loadShaderInline(String vert, String frag) {
+        ShaderProgram s = new ShaderProgram(vert, frag);
 
         if (s.getLog().toLowerCase().contains("error")) {
             throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
