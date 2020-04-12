@@ -13,6 +13,8 @@ replay_pid*
 Thumbs.db
 .DS_Store
 desktop.ini
+.directory
+*/.directory
 
 # Resources that should not be tracked
 assets/mods/basegame/demoworld

@@ -80,11 +80,11 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-        shaderBlur = AppLoader.loadShader("assets/blur.vert", "assets/blur.frag")
+        shaderBlur = AppLoader.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
 
 
         if (AppLoader.getConfigBoolean("fxdither")) {
-            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer.frag")
+            shaderBayer = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
             shaderBayer.begin()
             shaderBayer.setUniformf("rcount", 64f)
             shaderBayer.setUniformf("gcount", 64f)
@@ -92,14 +92,14 @@ object IngameRenderer : Disposable {
             shaderBayer.end()
         }
         else {
-            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthrurgb.frag")
+            shaderBayer = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
         }
 
 
-        shaderBlendGlow = AppLoader.loadShader("assets/blendGlow.vert", "assets/blendGlow.frag")
+        shaderBlendGlow = AppLoader.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
 
-        shaderRGBOnly = AppLoader.loadShader("assets/4096.vert", "assets/rgbonly.frag")
-        shaderAtoGrey = AppLoader.loadShader("assets/4096.vert", "assets/aonly.frag")
+        shaderRGBOnly = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
+        shaderAtoGrey = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
 
 
         if (!shaderBlendGlow.isCompiled) {

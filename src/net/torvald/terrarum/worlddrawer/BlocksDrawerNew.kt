@@ -86,7 +86,7 @@ internal object BlocksDrawer {
 
 
     private lateinit var tilesQuad: Mesh
-    private val shader = AppLoader.loadShader("assets/4096.vert", "assets/tiling.frag")
+    private val shader = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/tiling.frag")
 
     init {
 
@@ -637,8 +637,8 @@ internal object BlocksDrawer {
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
-        /*shader hard-code*/shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
-        /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
+        shader.setUniformf("tilesInAtlas", tileAtlas.horizontalCount.toFloat(), tileAtlas.verticalCount.toFloat()) //depends on the tile atlas
+        shader.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
         shader.setUniformf("tilesBlend", if (world is GameWorldExtension && (mode == TERRAIN || mode == WALL))
             drawTIME_T.fmod(SECONDS_IN_MONTH) / SECONDS_IN_MONTH.toFloat()
@@ -646,7 +646,6 @@ internal object BlocksDrawer {
             0f
         )
         //shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
-        shader.setUniformf("zoom", Terrarum.ingame?.screenZoom ?: 1f)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
 
