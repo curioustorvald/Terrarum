@@ -17,7 +17,7 @@ uniform sampler2D u_texture;
 
 
 uniform vec2 screenDimension;
-uniform vec2 tilesInAxes; // basically a screen dimension; vec2(tiles_in_horizontal, tiles_in_vertical)
+uniform vec2 tilesInAxes; // size of the tilemap texture; vec2(tiles_in_horizontal, tiles_in_vertical)
 
 uniform sampler2D tilemap; // RGBA8888
 
