@@ -104,6 +104,16 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
 
     // NOTE: get/set multibyte values are NOT BYTE-ALIGNED!
 
+    fun getDouble(index: Long): Double {
+        checkNullPtr(index)
+        return UnsafeHelper.unsafe.getDouble(ptr + index)
+    }
+
+    fun getLong(index: Long): Long {
+        checkNullPtr(index)
+        return UnsafeHelper.unsafe.getLong(ptr + index)
+    }
+
     fun getFloat(index: Long): Float {
         checkNullPtr(index)
         return UnsafeHelper.unsafe.getFloat(ptr + index)
@@ -112,6 +122,28 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
     fun getInt(index: Long): Int {
         checkNullPtr(index)
         return UnsafeHelper.unsafe.getInt(ptr + index)
+    }
+
+    fun getShort(index: Long): Short {
+        checkNullPtr(index)
+        return UnsafeHelper.unsafe.getShort(ptr + index)
+    }
+
+    fun getChar(index: Long): Char {
+        checkNullPtr(index)
+        return UnsafeHelper.unsafe.getChar(ptr + index)
+    }
+
+
+
+    fun setDouble(index: Long, value: Double) {
+        checkNullPtr(index)
+        UnsafeHelper.unsafe.putDouble(ptr + index, value)
+    }
+
+    fun setLong(index: Long, value: Long) {
+        checkNullPtr(index)
+        UnsafeHelper.unsafe.putLong(ptr + index, value)
     }
 
     fun setFloat(index: Long, value: Float) {
@@ -123,6 +155,18 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
         checkNullPtr(index)
         UnsafeHelper.unsafe.putInt(ptr + index, value)
     }
+
+    fun setShort(index: Long, value: Short) {
+        checkNullPtr(index)
+        UnsafeHelper.unsafe.putShort(ptr + index, value)
+    }
+
+    fun setChar(index: Long, value: Char) {
+        checkNullPtr(index)
+        UnsafeHelper.unsafe.putChar(ptr + index, value)
+    }
+
+
 
     fun fillWith(byte: Byte) {
         UnsafeHelper.unsafe.setMemory(ptr, size, byte)
