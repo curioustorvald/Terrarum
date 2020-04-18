@@ -44,7 +44,7 @@ object PlayerBuilderTestSubject1 {
         //p.actorValue[AVKey.LUMA] = 1.93
 
         p.actorValue[AVKey.AIRJUMPPOINT] = 0
-        p.actorValue[AVKey.SCALE] = 2.0
+        p.actorValue[AVKey.SCALE] = 1.0
 
         return p
     }
