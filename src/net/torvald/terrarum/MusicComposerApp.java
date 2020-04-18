@@ -49,7 +49,7 @@ public class MusicComposerApp extends ApplicationAdapter {
 
     @Override
     public void create() {
-        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
+        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true, false,
                 Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
         );
     }

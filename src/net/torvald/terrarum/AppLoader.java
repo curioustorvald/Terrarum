@@ -481,7 +481,7 @@ public class AppLoader implements ApplicationListener {
 
 
         fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
-                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
+                false, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
         );
         Lang.invoke();
 
