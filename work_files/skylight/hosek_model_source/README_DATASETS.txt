@@ -1,0 +1,1 @@
+all dataset bins contain double-precision floating point numbers, in LITTLE-ENDIAN.

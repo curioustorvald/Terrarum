@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
-import net.torvald.colourutil.CIEXYZUtil.toColorRaw
-import net.torvald.colourutil.CIEXYZUtil.toXYZ
-import net.torvald.colourutil.CIEYXY
+import net.torvald.parametricsky.datasets.DatasetCIEXYZ
+import net.torvald.parametricsky.datasets.DatasetRGB
+import net.torvald.parametricsky.datasets.DatasetSpectral
 import net.torvald.terrarum.inUse
 import java.awt.Dimension
 import javax.swing.*
@@ -50,7 +50,8 @@ class Application : Game() {
     private lateinit var testTex: Texture
 
     var turbidity = 5.0
-    //var thetaOfSun = 0.0
+    var albedo = 0.0
+    var elevation = 0.0
 
     override fun getScreen(): Screen {
         return super.getScreen()
@@ -63,7 +64,8 @@ class Application : Game() {
     override fun render() {
         Gdx.graphics.setTitle("Daylight Model $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
-        genTexLoop(turbidity)
+
+        genTexLoop(ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation))
 
 
         val tex = Texture(oneScreen)
@@ -99,7 +101,7 @@ class Application : Game() {
      * Generated texture is as if you took the panorama picture of sky: up 70deg to horizon, east-south-west;
      * with sun not moving (sun is at exact south, sun's height is adjustable)
      */
-    private fun genTexLoop(T: Double) {
+    private fun genTexLoop(state: ArHosekSkyModelState) {
 
         fun normaliseY(y: Double): Float {
             var v = y.coerceAtLeast(0.0)
@@ -109,62 +111,7 @@ class Application : Game() {
             return v.toFloat()
         }
 
-        val theta = Math.toRadians(45.0) // of observer
 
-        // loop DAY
-        for (x in 0 until outTexWidth) { // theta_s (time of day)
-            for (y in 0 until outTexHeight) { // gamma
-                val theta_s = Math.toRadians(x * (90.0 / outTexWidth.toDouble()))
-                val gamma = Math.toRadians((outTexHeight - y) * (90.0 / outTexHeight.toDouble())) // of observer
-
-                val Y_z = Model.getAbsoluteZenithLuminance(T, theta_s).coerceAtLeast(0.0) / 88.0
-                val x_z = Model.getZenithChromaX(T, theta_s)
-                val y_z = Model.getZenithChromaY(T, theta_s)
-
-                val Y_p = Y_z * Model.getFforLuma(theta, gamma, T) / Model.getFforLuma(0.0, theta_s, T)
-                val Y_oc = Y_z * (1.0 + 2.0 * Math.cos(theta)) / 3.0
-                val x_p = (x_z * Model.getFforChromaX(theta, gamma, T) / Model.getFforChromaX(0.0, theta_s, T)).coerceIn(0.0, 1.0)
-                val y_p = (y_z * Model.getFforChromaY(theta, gamma, T) / Model.getFforChromaY(0.0, theta_s, T)).coerceIn(0.0, 1.0)
-
-                val normalisedY = normaliseY(Y_p)
-
-                //println("$Y_p -> $normalisedY, $x_p, $y_p")
-
-                val rgbColour = CIEYXY(normalisedY, x_p.toFloat(), y_p.toFloat()).toXYZ().toColorRaw()
-
-                oneScreen.setColor(rgbColour)
-                oneScreen.drawPixel(x, y)
-            }
-        }
-        // end loop DAY
-
-        // loop NIGHT
-        for (x in outTexWidth until outTexWidth * 2) {
-            for (y in 0 until outTexHeight) {
-                val theta_s = Math.toRadians(90.0 - (x - outTexWidth) * (90.0 / outTexWidth.toDouble())) // 90 downTo 0
-                val theta_sReal = Math.toRadians(120.0)
-                val gamma = Math.toRadians((outTexHeight - y) * (90.0 / outTexHeight.toDouble())) // of observer
-
-                val Y_z = Model.getAbsoluteZenithLuminance(T, theta_sReal)
-                val x_z = Model.getZenithChromaX(T, theta_s)
-                val y_z = Model.getZenithChromaY(T, theta_s)
-
-                val Y_p = Y_z * Model.getFforLuma(theta, gamma, T) / Model.getFforLuma(0.0, theta_sReal, T)
-                val Y_oc = Y_z * (1.0 + 2.0 * Math.cos(theta)) / 3.0
-                val x_p = (x_z * Model.getFforChromaX(theta, gamma, T) / Model.getFforChromaX(0.0, theta_s, T)).coerceIn(0.0, 1.0)
-                val y_p = (y_z * Model.getFforChromaY(theta, gamma, T) / Model.getFforChromaY(0.0, theta_s, T)).coerceIn(0.0, 1.0)
-
-                val normalisedY = normaliseY(Y_p)
-
-                //println("$Y_p -> $normalisedY, $x_p, $y_p")
-
-                val rgbColour = CIEYXY(normalisedY, x_p.toFloat(), y_p.toFloat()).toXYZ().toColorRaw()
-
-                oneScreen.setColor(rgbColour)
-                oneScreen.drawPixel(x, y)
-            }
-        }
-        // end loop NIGHT
     }
 
     /**
@@ -230,6 +177,9 @@ class Application : Game() {
 
         oneScreen = Pixmap(outTexWidth * 2, outTexHeight, Pixmap.Format.RGBA8888)
 
+        DatasetSpectral
+        DatasetCIEXYZ
+        DatasetRGB
 
         ApplicationController(this)
     }
@@ -240,32 +190,27 @@ class Application : Game() {
 
         val mainPanel = JPanel()
 
-        val turbidityControl = JSlider(2, 64, 5)
-        //val theta_sControl = JSlider(0, 15, 0)
-
-        val turbidityValueDisp = JLabel()
-        //val theta_sValueDisp = JLabel()
-
-        //val theta_sValue: Double
-        //    get() = theta_sControl.value * (90.0 / theta_sControl.maximum)
+        val turbidityControl = JSpinner(SpinnerNumberModel(5, 1, 10, 1))
+        val albedoControl = JSpinner(SpinnerNumberModel(0.3, 0.0, 1.0, 0.05))
+        val elevationControl = JSpinner(SpinnerNumberModel(45, 0, 90, 5))
 
         init {
             val turbidityPanel = JPanel()
-            val theta_sPanel = JPanel()
+            val albedoPanel = JPanel()
+            val elevationPanel = JPanel()
 
             turbidityPanel.add(JLabel("Turbidity"))
             turbidityPanel.add(turbidityControl)
-            turbidityPanel.add(turbidityValueDisp)
 
-            turbidityValueDisp.text = turbidityControl.value.toString()
-            //theta_sValueDisp.text = theta_sValue.toString()
+            albedoPanel.add(JLabel("Albedo"))
+            albedoPanel.add(albedoControl)
 
-            //theta_sPanel.add(JLabel("Theta_s"))
-            //theta_sPanel.add(theta_sControl)
-            //theta_sPanel.add(theta_sValueDisp)
+            elevationPanel.add(JLabel("Elevation"))
+            elevationPanel.add(elevationControl)
 
             mainPanel.add(turbidityPanel)
-            mainPanel.add(theta_sPanel)
+            mainPanel.add(albedoPanel)
+            mainPanel.add(elevationPanel)
 
             this.isVisible = true
             this.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -275,14 +220,16 @@ class Application : Game() {
 
 
             turbidityControl.addChangeListener {
-                turbidityValueDisp.text = turbidityControl.value.toString()
-                app.turbidity = turbidityControl.value.toDouble()
+                app.turbidity = turbidityControl.value as Double
             }
 
-            //theta_sControl.addChangeListener {
-            //    theta_sValueDisp.text = theta_sValue.toString()
-            //    app.thetaOfSun = Math.toRadians(theta_sValue)
-            //}
+            albedoControl.addChangeListener {
+                app.albedo = albedoControl.value as Double
+            }
+
+            elevationControl.addChangeListener {
+                app.elevation = Math.toRadians((elevationControl.value as Int).toDouble())
+            }
 
         }
 
