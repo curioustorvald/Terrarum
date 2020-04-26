@@ -108,19 +108,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             generationTime = time / 1000000000f
         }
 
-        //if (threadExecFinished) {
-            threadingBuffer.forEachIndexed { index, ptr ->
-                val xs = xSlices[index]
-                for (x in xs) {
-                    for (y in 0 until HEIGHT) {
-                        val n = ptr[(y * (xs.last - xs.first + 1)) + (x - xs.first).toLong()]
-
-                        testTex.drawPixel(x, y, if (n == 0.toByte()) 0xff else -1)
-                    }
-                }
-            }
-        //}
-
         // draw timer
         batch.inUse {
             if (!generationTimeInMeasure) {
@@ -179,7 +166,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     }
 
     private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
-    private val threadingBuffer = xSlices.map { UnsafeHelper.allocate(1L * HEIGHT * (it.last - it.first + 1) ) }
 
     private fun renderNoise() {
         generationStartTime = System.nanoTime()
@@ -197,22 +183,19 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             {
                 for (x in range) {
                     for (y in 0 until HEIGHT) {
-                        synchronized(threadingBuffer[index]) {
-                            val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
-                            val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                            val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                            val sampleY = y.toDouble()
+                        val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                        val sampleY = y.toDouble()
 
 
-                            //NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
-                            NOISE_MAKER.draw(range, x, y, listOf(joise[0].get(sampleX, sampleY, sampleZ)), threadingBuffer[index])
+                        NOISE_MAKER.draw(range, x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
 
-                            //joise.map { it.get(sampleX, sampleY, sampleZ) }
-                            //testTex.drawPixel(x, y, testColSet2[index])
+                        //joise.map { it.get(sampleX, sampleY, sampleZ) }
+                        //testTex.drawPixel(x, y, testColSet2[index])
 
-                            //testTex.setColor(testColSet2[index])
-                            //testTex.drawPixel(x, y)
-                        }
+                        //testTex.setColor(testColSet2[index])
+                        //testTex.drawPixel(x, y)
                     }
                 }
             }
@@ -228,7 +211,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     override fun dispose() {
         testTex.dispose()
         tempTex.dispose()
-        threadingBuffer.forEach { it.destroy() }
     }
 }
 
@@ -316,7 +298,7 @@ internal object AccidentalCave {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    fun draw(xs: IntProgression, x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr) {
+    fun draw(xs: IntProgression, x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         // simple one-source draw
         /*val c = noiseValue[0].toFloat()
         val selector = c.minus(0.0001).floorInt() fmod notationColours.size
@@ -350,9 +332,7 @@ internal object AccidentalCave {
         //val cout = c1 mul c23
         val cout = c1
 
-        //outTex.drawPixel(x, y, cout.toRGBA())
-
-        outTex[(y * (xs.last - xs.first + 1)) + (x - xs.first).toLong()] = n1.toByte()
+        outTex.drawPixel(x, y, cout.toRGBA())
     }
 
     fun getGenerator(seed: Long, params: Any): List<Joise> {
