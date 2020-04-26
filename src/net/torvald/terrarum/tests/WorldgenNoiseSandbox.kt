@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.UnsafeHelper
 import net.torvald.UnsafePtr
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.concurrent.*
@@ -24,10 +23,10 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
 import net.torvald.terrarum.worlddrawer.toRGBA
-import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
+import kotlinx.coroutines.*
 
 const val WIDTH = 768
 const val HEIGHT = 512
@@ -50,7 +49,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private val RNG = HQRNG()
     private var seed = 10000L
 
-    private var generationDone = false
+    private var initialGenDone = false
     private var generateKeyLatched = false
 
     private var generationTimeInMeasure = false
@@ -76,7 +75,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private var generationTime = 0f
 
     override fun render() {
-        if (!generationDone) {
+        if (!initialGenDone) {
             joise = getNoiseGenerator(seed)
             renderNoise()
         }
@@ -96,13 +95,14 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             renderNoise()
         }
 
+        val coroutineExecFinished = (coroutineJobs.fold(true) { acc, it -> acc and it.isCompleted })
         // check if generation is done
-        if (threadExecFinished) {
+        if (coroutineExecFinished) {
             generateKeyLatched = false
         }
 
         // finish time measurement
-        if (threadExecFinished && generationTimeInMeasure) {
+        if (coroutineExecFinished && generationTimeInMeasure) {
             generationTimeInMeasure = false
             val time = System.nanoTime() - generationStartTime
             generationTime = time / 1000000000f
@@ -128,10 +128,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     val colourNull = Color(0x1b3281ff)
 
     private val sampleOffset = WIDTH / 8.0
-
-    private val threadExecFuture = Array<Future<*>?>(ThreadExecutor.threadCount) { null }
-    private val threadExecFinished: Boolean
-        get() = threadExecFuture.fold(true) { acc, future -> acc && (future?.isDone ?: true) }
 
     private val testColSet = arrayOf(
             Color(0xff0000ff.toInt()),
@@ -165,7 +161,10 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
-    private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
+    //private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
+    private val xSlices = (0 until WIDTH).sliceEvenly(WIDTH / 8)
+
+    private lateinit var coroutineJobs: List<Job>
 
     private fun renderNoise() {
         generationStartTime = System.nanoTime()
@@ -201,11 +200,13 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             }
         }
 
-        runnables.forEachIndexed { index, function ->
+        /*runnables.forEachIndexed { index, function ->
             threadExecFuture[index] = ThreadExecutor.submit(function)
-        }
+        }*/
 
-        generationDone = true
+        coroutineJobs = runnables.map { r -> GlobalScope.launch { r() } }
+
+        initialGenDone = true
     }
 
     override fun dispose() {
