@@ -44,8 +44,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     private lateinit var testTex: Pixmap
     private lateinit var tempTex: Texture
 
-    private lateinit var joise: List<Joise>
-
     private val RNG = HQRNG()
     private var seed = 10000L
 
@@ -76,7 +74,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     override fun render() {
         if (!initialGenDone) {
-            joise = getNoiseGenerator(seed)
             renderNoise()
         }
 
@@ -91,7 +88,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         if (!generateKeyLatched && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             generateKeyLatched = true
             seed = RNG.nextLong()
-            joise = getNoiseGenerator(seed)
             renderNoise()
         }
 
@@ -161,8 +157,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
-    //private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
-    private val xSlices = (0 until WIDTH).sliceEvenly(WIDTH / 8)
+    private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
+    //private val xSlices = (0 until WIDTH).sliceEvenly(WIDTH / 8)
 
     private val runs = (0 until WIDTH).map { x -> (x until WIDTH * HEIGHT step WIDTH) }.flatten()
 
@@ -179,6 +175,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testColSet.shuffle()
         testColSet2.shuffle()
 
+        // render noisemap to pixmap
+
         /*
         I've got two ideas to resolve noisy artefact when noise generation runs concurrently:
 
@@ -186,13 +184,13 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         2) 1 thread has its own copy of Joise (threads have different INSTANCEs of Joise with same params)
 
         Method 1) seemingly works but may break if the operation is more complex
-        Method 2) needs testing
+        Method 2) also works
 
         --CuriousTorvald, 2020-04-29
          */
 
-        // render noisemap to pixmap
-        // 0. naive coucurrent approach
+        // 0. naive concurrent approach
+        // CULPRIT: one global instance of Joise that all the threads try to access (and modify local variables) at the same time
         /*val runnables: List<RunnableFun> = xSlices.map { range ->
             {
                 for (x in range) {
@@ -209,6 +207,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }*/
 
         // 1. stupid one-block-is-one-coroutine approach (seemingly works?)
+        /*val joise = getNoiseGenerator(seed)
         val runnables: List<RunnableFun> = runs.map { i -> {
             val (x, y) = (i % WIDTH) to (i / WIDTH)
             val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
@@ -217,6 +216,21 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             val sampleY = y.toDouble()
 
             NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+        } }*/
+
+        // 2. each runner gets their own copy of Joise
+        val runnables: List<RunnableFun> = xSlices.map { range -> {
+                val localJoise = getNoiseGenerator(seed)
+                for (x in range) {
+                    for (y in 0 until HEIGHT) {
+                        val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                        val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                        val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                        val sampleY = y.toDouble()
+
+                        NOISE_MAKER.draw(x, y, localJoise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+                    }
+                }
         } }
 
 
