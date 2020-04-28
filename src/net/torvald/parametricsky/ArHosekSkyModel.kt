@@ -160,8 +160,10 @@ object ArHosekSkyModel {
 // internal definitions
 
     private class DoubleArrayPtr(val arr: DoubleArray, var ptrOffset: Int) {
+        init {
+            if (ptrOffset < 0) throw IllegalArgumentException("Negative ptrOffset: $ptrOffset")
+        }
         operator fun get(i: Int) = arr[ptrOffset + i]
-
     }
 
     private class DoubleArrayArrayPtr(var arr: Array<DoubleArray>, var ptrOffset: Int) {
@@ -185,6 +187,8 @@ object ArHosekSkyModel {
             albedo: Double,
             solar_elevation: Double
     ) {
+        if (turbidity < 1) throw IllegalArgumentException("Turbidity must be equal to or greater than 1 (got $turbidity)")
+
         var elev_matrix: DoubleArrayPtr
 
         val int_turbidity = turbidity.toInt()
@@ -193,7 +197,6 @@ object ArHosekSkyModel {
         val solar_elevation = pow(solar_elevation / (MATH_PI / 2.0), (1.0 / 3.0))
 
         // alb 0 low turb
-
         elev_matrix = DoubleArrayPtr(dataset, 9 * 6 * (int_turbidity - 1))
 
 
@@ -672,13 +675,13 @@ object ArHosekSkyModel {
                 state.configs[channel],
                 theta,
                 gamma
-        ) * state.radiances[channel];
+        ) * state.radiances[channel]
     }
 
     private const val pieces = 45
     private const val order = 4
 
-    fun arhosekskymodel_sr_internal(
+    private fun arhosekskymodel_sr_internal(
             state: ArHosekSkyModelState,
             turbidity: Int,
             wl: Int,
@@ -686,7 +689,7 @@ object ArHosekSkyModel {
     ): Double {
         var pos = (pow(2.0 * elevation / MATH_PI, 1.0 / 3.0) * pieces).toInt() // floor
 
-        if (pos > 44) pos = 44;
+        if (pos > 44) pos = 44
 
         val break_x = pow((pos.toDouble() / pieces.toDouble()), 3.0) * (MATH_PI * 0.5)
 
@@ -773,7 +776,7 @@ object ArHosekSkyModel {
         val singamma = sin(gamma)
         var sc2 = 1.0 - ar2 * singamma * singamma
         if (sc2 < 0.0) sc2 = 0.0
-        var sampleCosine = sqrt (sc2);
+        var sampleCosine = sqrt(sc2)
 
         //   The following will be improved in future versions of the model:
         //   here, we directly use fitted 5th order polynomials provided by the
@@ -791,9 +794,9 @@ object ArHosekSkyModel {
                 ldCoefficient[4] * pow(sampleCosine, 4.0) +
                 ldCoefficient[5] * pow(sampleCosine, 5.0)
 
-        direct_radiance *= darkeningFactor;
+        direct_radiance *= darkeningFactor
 
-        return direct_radiance;
+        return direct_radiance
     }
 
     fun arhosekskymodel_solar_radiance(
@@ -816,7 +819,7 @@ object ArHosekSkyModel {
                 wavelength
         )
 
-        return direct_radiance + inscattered_radiance;
+        return direct_radiance + inscattered_radiance
     }
 }
 

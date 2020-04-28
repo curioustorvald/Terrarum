@@ -87,3 +87,4 @@ infix fun Long.shake(other: Long): Long {
 }
 
 val TWO_PI = Math.PI * 2.0
+val HALF_PI = Math.PI / 2.0

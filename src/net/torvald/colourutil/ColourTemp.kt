@@ -1,7 +1,6 @@
 package net.torvald.colourutil
 
 import com.badlogic.gdx.graphics.Color
-import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.terrarum.GdxColorMap
 import net.torvald.terrarum.ModMgr
 
@@ -24,5 +23,5 @@ object ColourTemp {
     /** returns CIExyY-based colour converted to slick.color
      * @param CIE_Y 0.0 - 1.0+ */
     operator fun invoke(temp: Float, CIE_Y: Float): Color =
-            CIEXYZUtil.colourTempToXYZ(temp, CIE_Y).toColor()
+            colourTempToXYZ(temp, CIE_Y).toColor()
 }
