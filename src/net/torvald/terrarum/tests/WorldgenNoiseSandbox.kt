@@ -164,6 +164,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     //private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
     private val xSlices = (0 until WIDTH).sliceEvenly(WIDTH / 8)
 
+    private val runs = (0 until WIDTH).map { x -> (x until WIDTH * HEIGHT step WIDTH) }.flatten()
+
     private lateinit var coroutineJobs: List<Job>
 
     private fun renderNoise() {
@@ -177,8 +179,21 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testColSet.shuffle()
         testColSet2.shuffle()
 
+        /*
+        I've got two ideas to resolve noisy artefact when noise generation runs concurrently:
+
+        1) 1 block = 1 coroutine
+        2) 1 thread has its own copy of Joise (threads have different INSTANCEs of Joise with same params)
+
+        Method 1) seemingly works but may break if the operation is more complex
+        Method 2) needs testing
+
+        --CuriousTorvald, 2020-04-29
+         */
+
         // render noisemap to pixmap
-        val runnables: List<RunnableFun> = xSlices.mapIndexed { index, range ->
+        // 0. naive coucurrent approach
+        /*val runnables: List<RunnableFun> = xSlices.map { range ->
             {
                 for (x in range) {
                     for (y in 0 until HEIGHT) {
@@ -187,22 +202,23 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                         val sampleY = y.toDouble()
 
-
-                        NOISE_MAKER.draw(range, x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
-
-                        //joise.map { it.get(sampleX, sampleY, sampleZ) }
-                        //testTex.drawPixel(x, y, testColSet2[index])
-
-                        //testTex.setColor(testColSet2[index])
-                        //testTex.drawPixel(x, y)
+                        NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
                     }
                 }
             }
-        }
-
-        /*runnables.forEachIndexed { index, function ->
-            threadExecFuture[index] = ThreadExecutor.submit(function)
         }*/
+
+        // 1. stupid one-block-is-one-coroutine approach (seemingly works?)
+        val runnables: List<RunnableFun> = runs.map { i -> {
+            val (x, y) = (i % WIDTH) to (i / WIDTH)
+            val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+            val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+            val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+            val sampleY = y.toDouble()
+
+            NOISE_MAKER.draw(x, y, joise.map { it.get(sampleX, sampleY, sampleZ) }, testTex)
+        } }
+
 
         coroutineJobs = runnables.map { r -> GlobalScope.launch { r() } }
 
@@ -299,7 +315,7 @@ internal object AccidentalCave {
             Color(0.97f, 0.6f, 0.56f, 1f)
     )
 
-    fun draw(xs: IntProgression, x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
+    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         // simple one-source draw
         /*val c = noiseValue[0].toFloat()
         val selector = c.minus(0.0001).floorInt() fmod notationColours.size
