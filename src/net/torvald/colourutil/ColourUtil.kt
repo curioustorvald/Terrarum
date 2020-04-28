@@ -2,7 +2,6 @@ package net.torvald.colourutil
 
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
-import net.torvald.colourutil.CIEXYZUtil.linearise
 
 /**
  * Created by minjaesong on 2016-07-26.

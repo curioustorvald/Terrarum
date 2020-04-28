@@ -5,16 +5,22 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
+import net.torvald.colourutil.*
 import net.torvald.parametricsky.datasets.DatasetCIEXYZ
 import net.torvald.parametricsky.datasets.DatasetRGB
 import net.torvald.parametricsky.datasets.DatasetSpectral
 import net.torvald.terrarum.inUse
+import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
+import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import java.awt.Dimension
 import javax.swing.*
+import kotlin.math.PI
+import kotlin.math.pow
 
 
 const val WIDTH = 1200
@@ -50,8 +56,9 @@ class Application : Game() {
     private lateinit var testTex: Texture
 
     var turbidity = 5.0
-    var albedo = 0.0
+    var albedo = 0.1
     var elevation = 0.0
+    var scalefactor = 1f
 
     override fun getScreen(): Screen {
         return super.getScreen()
@@ -64,12 +71,14 @@ class Application : Game() {
     override fun render() {
         Gdx.graphics.setTitle("Daylight Model $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
+        if (turbidity <= 0) throw IllegalStateException()
 
+        // we need to use different modelstate to accomodate different albedo for each spectral band but oh well...
         genTexLoop(ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation))
 
 
         val tex = Texture(oneScreen)
-        tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         batch.inUse {
             batch.draw(tex, 0f, 0f, WIDTH.toFloat(), HEIGHT.toFloat())
@@ -94,8 +103,8 @@ class Application : Game() {
         oneScreen.dispose()
     }
 
-    val outTexWidth = 32
-    val outTexHeight = 16
+    val outTexWidth = 256
+    val outTexHeight = 256
 
     /**
      * Generated texture is as if you took the panorama picture of sky: up 70deg to horizon, east-south-west;
@@ -112,6 +121,28 @@ class Application : Game() {
         }
 
 
+        for (y in 0 until oneScreen.height) {
+            for (x in 0 until oneScreen.width) {
+                val gamma = (x / oneScreen.width.toDouble()) * TWO_PI // 0deg..360deg
+                val theta = (1.0 - (y / oneScreen.height.toDouble())) * HALF_PI // 90deg..0deg
+
+                val xyz = CIEXYZ(
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat().times(scalefactor / 10f),
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 1).toFloat().times(scalefactor / 10f),
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat().times(scalefactor / 10f)
+                )
+                val rgb = xyz.toRGB().toColor()
+                rgb.a = 1f
+
+                oneScreen.setColor(rgb)
+                oneScreen.drawPixel(x, y)
+
+                //println("x: ${xyz.X}, y: ${xyz.Y}, z: ${xyz.Z}")
+            }
+
+        }
+
+        //System.exit(0)
     }
 
     /**
@@ -190,14 +221,21 @@ class Application : Game() {
 
         val mainPanel = JPanel()
 
-        val turbidityControl = JSpinner(SpinnerNumberModel(5, 1, 10, 1))
-        val albedoControl = JSpinner(SpinnerNumberModel(0.3, 0.0, 1.0, 0.05))
-        val elevationControl = JSpinner(SpinnerNumberModel(45, 0, 90, 5))
+        val turbidityControl = JSpinner(SpinnerNumberModel(5.0, 1.0, 10.0, 0.1))
+        val albedoControl = JSpinner(SpinnerNumberModel(0.1, 0.0, 1.0, 0.05))
+        val elevationControl = JSpinner(SpinnerNumberModel(0.0, 0.0, 90.0, 0.5))
+        val scalefactorControl = JSpinner(SpinnerNumberModel(1.0, 0.0, 2.0, 0.01))
 
         init {
             val turbidityPanel = JPanel()
             val albedoPanel = JPanel()
             val elevationPanel = JPanel()
+            val scalefactorPanel = JPanel()
+
+            turbidityControl.preferredSize = Dimension(45, 18)
+            albedoControl.preferredSize = Dimension(45, 18)
+            elevationControl.preferredSize = Dimension(45, 18)
+            scalefactorControl.preferredSize = Dimension(45, 18)
 
             turbidityPanel.add(JLabel("Turbidity"))
             turbidityPanel.add(turbidityControl)
@@ -208,9 +246,13 @@ class Application : Game() {
             elevationPanel.add(JLabel("Elevation"))
             elevationPanel.add(elevationControl)
 
+            scalefactorPanel.add(JLabel("Scaling Factor"))
+            scalefactorPanel.add(scalefactorControl)
+
             mainPanel.add(turbidityPanel)
             mainPanel.add(albedoPanel)
             mainPanel.add(elevationPanel)
+            mainPanel.add(scalefactorPanel)
 
             this.isVisible = true
             this.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -228,7 +270,11 @@ class Application : Game() {
             }
 
             elevationControl.addChangeListener {
-                app.elevation = Math.toRadians((elevationControl.value as Int).toDouble())
+                app.elevation = Math.toRadians(elevationControl.value as Double)
+            }
+
+            scalefactorControl.addChangeListener {
+                app.scalefactor = (scalefactorControl.value as Double).toFloat()
             }
 
         }

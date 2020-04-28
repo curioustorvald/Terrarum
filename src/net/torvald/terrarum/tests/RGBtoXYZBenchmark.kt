@@ -1,10 +1,10 @@
 package net.torvald.terrarum.tests
 
-import net.torvald.colourutil.CIEXYZUtil.linearise
-import net.torvald.colourutil.CIEXYZUtil.unLinearise
 import net.torvald.colourutil.ColourUtil.getLuminosity
 import net.torvald.colourutil.ColourUtil.getLuminosityQuick
 import net.torvald.colourutil.RGB
+import net.torvald.colourutil.linearise
+import net.torvald.colourutil.unLinearise
 import net.torvald.random.HQRNG
 import kotlin.system.measureNanoTime
 

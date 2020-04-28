@@ -194,6 +194,8 @@ object DatasetSpectral {
             solarDataset720
     )
 
+    val waves = floatArrayOf(320f, 360f, 400f, 440f, 480f, 520f, 560f, 600f, 640f, 680f, 720f)
+
     val limbDarkeningDataset320 = doubleArrayOf(0.087657, 0.767174, 0.658123, -1.02953, 0.703297, -0.186735)
 
     val limbDarkeningDataset360 = doubleArrayOf(0.122953, 1.01278, 0.238687, -1.12208, 1.17087, -0.424947)
