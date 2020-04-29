@@ -13,6 +13,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.roundInt
 import java.util.*
 
+@Deprecated("Old non-thread-safe version", ReplaceWith("Terragen", "net.torvald.terrarum.modulebasegame.worldgenerator"))
 object WorldGenerator {
 
     internal lateinit var world: GameWorld

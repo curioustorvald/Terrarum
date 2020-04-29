@@ -18,21 +18,21 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private val genSlices = 1 // world.width / 64
+    private val genSlices = world.width / 8
 
     private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
     override var generationStarted: Boolean = false
     override val generationDone: Boolean
-        get() = generationStarted && genFutures.fold(1) { acc, f -> acc * (f?.isDone ?: true).toInt() } == 1
+        get() = generationStarted && genFutures.fold(true) { acc, f -> acc and (f?.isDone ?: true) }
 
     override fun run() {
-        val joise = getGenerator(seed, params as TerragenParams)
 
         generationStarted = true
 
         // single-threaded impl because I couldn't resolve multithread memory corruption issue...
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             genFutures[i] = ThreadExecutor.submit {
+                val localJoise = getGenerator(seed, params as TerragenParams)
                 for (x in xs) {
                     for (y in 0 until world.height) {
                         val sampleTheta = (x.toDouble() / world.width) * TWO_PI
@@ -40,7 +40,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                         val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                         val sampleY = y.toDouble()
-                        val noise = joise.map { it.get(sampleX, sampleY, sampleZ) }
+                        val noise = localJoise.map { it.get(sampleX, sampleY, sampleZ) }
 
                         draw(x, y, noise, world)
                     }
