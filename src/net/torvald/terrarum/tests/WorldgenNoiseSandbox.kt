@@ -91,7 +91,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             renderNoise()
         }
 
-        val coroutineExecFinished = (coroutineJobs.fold(true) { acc, it -> acc and it.isCompleted })
+        val coroutineExecFinished = coroutineJobs.fold(true) { acc, it -> acc and it.isCompleted }
         // check if generation is done
         if (coroutineExecFinished) {
             generateKeyLatched = false
