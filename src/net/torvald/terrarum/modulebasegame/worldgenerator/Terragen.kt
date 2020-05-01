@@ -29,7 +29,6 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
         generationStarted = true
 
-        // single-threaded impl because I couldn't resolve multithread memory corruption issue...
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             genFutures[i] = ThreadExecutor.submit {
                 val localJoise = getGenerator(seed, params as TerragenParams)
