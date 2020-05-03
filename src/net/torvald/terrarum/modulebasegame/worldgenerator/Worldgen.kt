@@ -28,29 +28,17 @@ object Worldgen {
         )
 
 
-        for (i in 0 until jobs.size) {
+        for (i in jobs.indices) {
             printdbg(this, "Worldgen: job #$i")
 
             val it = jobs[i]
 
             AppLoader.getLoadScreen().addMessage(it.loadingScreenName)
             it.theWork.run()
-
-            // wait
-            //while (!it.theWork.generationDone) { } // busy wait
-            //synchronized(threadLock) {
-            //    threadLock.wait()
-            //}
         }
 
         printdbg(this, "Generation job finished")
 
-    }
-
-    fun wake() {
-        synchronized(threadLock) {
-            threadLock.notifyAll()
-        }
     }
 
     private data class Work(val loadingScreenName: String, val theWork: Gen)
@@ -60,12 +48,7 @@ object Worldgen {
 abstract class Gen(val world: GameWorld, val seed: Long, val params: Any) {
     abstract var generationStarted: Boolean
     abstract val generationDone: Boolean
-    open fun run() {
-        /*if (generationDone) {
-            // worldgen.wake()
-            Worldgen.threadLock.notifyAll()
-        }*/
-    }
+    open fun run() { }
 }
 
 data class WorldgenParams(

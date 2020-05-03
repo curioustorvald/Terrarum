@@ -18,12 +18,15 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private val genSlices = world.width / 8
+    private val genSlices = maxOf(world.width, ThreadExecutor.threadCount, world.width / 8)
 
     private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
     override var generationStarted: Boolean = false
     override val generationDone: Boolean
         get() = generationStarted && genFutures.fold(true) { acc, f -> acc and (f?.isDone ?: true) }
+
+    private val YHEIGHT_MAGIC = 2800.0 / 3.0
+    private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
     override fun run() {
 
@@ -38,7 +41,8 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                         val sampleOffset = world.width / 8.0
                         val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                        val sampleY = y.toDouble()
+                        val sampleY = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+                        // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
                         val noise = localJoise.map { it.get(sampleX, sampleY, sampleZ) }
 
                         draw(x, y, noise, world)
@@ -50,7 +54,6 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         ThreadExecutor.join()
 
         printdbg(this, "Waking up Worldgen")
-        //Worldgen.wake()
     }
 
 
