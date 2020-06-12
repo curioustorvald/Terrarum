@@ -23,8 +23,8 @@ object Worldgen {
 
     fun generateMap() {
         val jobs = listOf(
-                Work("Reticulating Splines", Terragen(world, params.seed, params.terragenParams))
-                //Work("Adding Vegetations") { Biomegen(world, params.seed, params.biomegenParams) }
+                Work("Reticulating Splines", Terragen(world, params.seed, params.terragenParams)),
+                Work("Adding Vegetations", Biomegen(world, params.seed, params.biomegenParams))
         )
 
 

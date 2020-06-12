@@ -115,10 +115,11 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
-    private val NOISE_MAKER = AccidentalCave
+    private val NOISE_MAKER = BiomeMaker
 
     private fun getNoiseGenerator(SEED: Long): List<Joise> {
-        return NOISE_MAKER.getGenerator(SEED, TerragenParams())
+        //return NOISE_MAKER.getGenerator(SEED, TerragenParams())
+        return NOISE_MAKER.getGenerator(SEED, BiomegenParams())
     }
 
     val colourNull = Color(0x1b3281ff)
@@ -157,8 +158,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
-    private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
-    //private val xSlices = (0 until WIDTH).sliceEvenly(WIDTH / 8)
+    //private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
+    private val xSlices = (0 until WIDTH).sliceEvenly(maxOf(WIDTH, ThreadExecutor.threadCount, WIDTH / 8))
 
     private val runs = (0 until WIDTH).map { x -> (x until WIDTH * HEIGHT step WIDTH) }.flatten()
 
@@ -261,7 +262,7 @@ fun main(args: Array<String>) {
 }
 
 internal interface NoiseMaker {
-    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr)
+    fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap)
     fun getGenerator(seed: Long, params: Any): List<Joise>
 }
 
@@ -269,12 +270,12 @@ val locklock = java.lang.Object()
 
 internal object BiomeMaker : NoiseMaker {
 
-    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: UnsafePtr) {
+    override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val colPal = biomeColors
         val control = noiseValue[0].times(colPal.size).minus(0.00001f).toInt().fmod(colPal.size)
 
-        //outTex.setColor(colPal[control])
-        //outTex.drawPixel(x, y)
+        outTex.setColor(colPal[control])
+        outTex.drawPixel(x, y)
     }
 
     override fun getGenerator(seed: Long, params: Any): List<Joise> {

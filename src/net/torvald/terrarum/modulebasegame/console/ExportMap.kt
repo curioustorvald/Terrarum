@@ -72,9 +72,9 @@ internal object ExportMap : ConsoleCommand {
      * R-G-B-A order for RGBA input value
      */
     private fun Int.toByteArray() = byteArrayOf(
-            this.shl(24).and(0xff).toByte(),
-            this.shl(16).and(0xff).toByte(),
-            this.shl(8).and(0xff).toByte(),
+            this.shr(24).and(0xff).toByte(),
+            this.shr(16).and(0xff).toByte(),
+            this.shr(8).and(0xff).toByte(),
             this.and(0xff).toByte()
     )
 

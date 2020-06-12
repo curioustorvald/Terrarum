@@ -1,5 +1,6 @@
 package net.torvald.terrarum.concurrent
 
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -12,13 +13,19 @@ typealias ThreadableFun = (Int) -> Unit
 
 object ThreadExecutor {
     val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
-    private var executor = Executors.newFixedThreadPool(threadCount)
+    private lateinit var executor: ExecutorService// = Executors.newFixedThreadPool(threadCount)
 
     private fun checkShutdown() {
-        if (!executor.isShutdown) return
-        if (executor.isShutdown&& !executor.isTerminated)
-            throw IllegalStateException("Pool is closed, come back when all the threads are terminated.")
+        try {
+            if (executor.isTerminated)
+                throw IllegalStateException("Executor terminated, renew the executor service.")
+            if (executor.isShutdown)
+                throw IllegalStateException("Pool is closed, come back when all the threads are terminated.")
+        }
+        catch (e: UninitializedPropertyAccessException) {}
+    }
 
+    fun renew() {
         executor = Executors.newFixedThreadPool(threadCount)
     }
 
@@ -32,6 +39,7 @@ object ThreadExecutor {
     }
 
     fun join() {
+        println("ThreadExecutor.join")
         executor.shutdown() // thread status of completed ones will be WAIT instead of TERMINATED without this line...
         executor.awaitTermination(24L, TimeUnit.HOURS)
     }

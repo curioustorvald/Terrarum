@@ -84,6 +84,7 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
         // even if overflowing is enabled, appending at tail causes head element to be altered, therefore such action
         // must be blocked by throwing overflow error
 
+        // if you think this behaviour is wrong, you're confusing appendHead() with appendTail(). Use appendHead() and removeTail()
         if (overflow) {
             throw StackOverflowError()
         }
@@ -98,8 +99,8 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
         }
     }
 
-    fun removeHead(): T {
-        if (isEmpty) throw EmptyStackException()
+    fun removeHead(): T? {
+        if (isEmpty) return null
 
         decHead()
         overflow = false
@@ -107,8 +108,8 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
         return buffer[head]
     }
 
-    fun removeTail(): T {
-        if (isEmpty) throw EmptyStackException()
+    fun removeTail(): T? {
+        if (isEmpty) return null
 
         val ret = buffer[tail]
         incTail()
@@ -125,7 +126,7 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
     /**
      * Relative-indexed get. Index of zero will return the head element.
      */
-    operator fun get(index: Int) = buffer[(head - 1 - index).wrap()]
+    operator fun get(index: Int): T? = buffer[(head - 1 - index).wrap()]
 
     private fun getAbsoluteRange() =  0 until when {
         head == tail -> buffer.size
