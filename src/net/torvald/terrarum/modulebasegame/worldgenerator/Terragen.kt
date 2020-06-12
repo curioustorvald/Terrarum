@@ -18,7 +18,7 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private val genSlices = maxOf(world.width, ThreadExecutor.threadCount, world.width / 8)
+    private val genSlices = maxOf(ThreadExecutor.threadCount, world.width / 8)
 
     private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
     override var generationStarted: Boolean = false
@@ -32,6 +32,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
         generationStarted = true
 
+        ThreadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             genFutures[i] = ThreadExecutor.submit {
                 val localJoise = getGenerator(seed, params as TerragenParams)
@@ -61,7 +62,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             Block.AIR, Block.DIRT, Block.STONE
     )
 
-    fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
+    private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
         fun Double.tiered(vararg tiers: Double): Int {
             tiers.reversed().forEachIndexed { index, it ->
                 if (this >= it) return (tiers.lastIndex - index) // why??
@@ -297,12 +298,6 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         caveInMix.setType(ModuleCombiner.CombinerType.ADD)
         caveInMix.setSource(0, caveSelect)
         caveInMix.setSource(1, caveBlockageSelect)
-
-        /*val groundCaveMult = ModuleCombiner()
-        groundCaveMult.setType(ModuleCombiner.CombinerType.MULT)
-        groundCaveMult.setSource(0, caveInMix)
-        //groundCaveMult.setSource(0, caveSelect) // disables the cave-in for quick cavegen testing
-        groundCaveMult.setSource(1, groundSelect)*/
 
         // this noise tree WILL generate noise value greater than 1.0
         // they should be treated properly when you actually generate the world out of the noisemap
