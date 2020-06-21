@@ -60,21 +60,30 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         AppLoader.printdbg(this, "Waking up Worldgen")
     }
 
-    val nearbyArr = arrayOf(
-            (-1 to -1), // tileTL
-            (+1 to -1), // tileTR
-            (-1 to +1), // tileBL
-            (+1 to +1), // tileBR
-            (0 to -1), // tileT
-            (0 to +1), // tileB
-            (-1 to 0), // tileL
-            (+1 to 0) // tileR
-    )
+    companion object {
+        private const val slices = 5
+        private val nearbyArr = arrayOf(
+        (-1 to -1), // tileTL
+        (+1 to -1), // tileTR
+        (-1 to +1), // tileBL
+        (+1 to +1), // tileBR
+        (0 to -1), // tileT
+        (0 to +1), // tileB
+        (-1 to 0), // tileL
+        (+1 to 0) // tileR
+        )
+        private const val TL = 0
+        private const val TR = 1
+        private const val BL = 2
+        private const val BR = 3
+        private const val TP = 4
+        private const val BT = 5
+        private const val LF = 6
+        private const val RH = 7
+    }
 
     private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
-        val control = noiseValue[0].times(4).minus(0.00001f).toInt().fmod(4)
-
-
+        val control = noiseValue[0].times(slices).minus(0.00001f).toInt().fmod(slices)
 
         if (y > 0) {
             val tileThis = world.getTileFromTerrain(x, y)
@@ -84,22 +93,30 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
             when (control) {
                 0 -> { // woodlands
-                    if (world.getTileFromTerrain(x, y) == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
+                    if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
                         world.setTileTerrain(x, y, Block.GRASS)
                     }
                 }
                 1 -> { // shrublands
-                    if (world.getTileFromTerrain(x, y) == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
+                    if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
                         world.setTileTerrain(x, y, Block.GRASS)
                     }
                 }
-                2 -> { // plains
-                    if (world.getTileFromTerrain(x, y) == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
+                2, 3 -> { // plains
+                    if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
                         world.setTileTerrain(x, y, Block.GRASS)
                     }
                 }
-                3 -> { // rockylands
-                    if (world.getTileFromTerrain(x, y) == Block.DIRT) {
+                /*3 -> { // sands
+                    if (tileThis == Block.DIRT && (nearbyTerr[BT] == Block.STONE || nearbyTerr[BT] == Block.AIR)) {
+                        world.setTileTerrain(x, y, Block.SANDSTONE)
+                    }
+                    else if (tileThis == Block.DIRT) {
+                        world.setTileTerrain(x, y, Block.SAND)
+                    }
+                }*/
+                4 -> { // rockylands
+                    if (tileThis == Block.DIRT) {
                         world.setTileTerrain(x, y, Block.STONE)
                         world.setTileWall(x, y, Block.STONE)
                     }

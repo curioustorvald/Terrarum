@@ -7,7 +7,7 @@
 |0x10_0000..0x0FFF_FFFF|Items (dynamic\*) (267M possible)|
 |0x1000_0000..0x7FFF_FFFF|Actors (1879M possible)|
 |-1..-65536|Virtual Tiles|
-|-2147483648..-1 (all negative numbers)|Faction (2147M possible)|
+|-2147483648..-65537 (all negative numbers)|Faction (2147M possible)|
 
 * dynamic items have own properties that will persist through savegame.
 
@@ -20,3 +20,5 @@ Actors range in-depth
 |0x5000_0000..0x5FFF_FFFF|Special (e.g. weapon swung, bullets, dropped item, particles)|
 |0x6000_0000..0x6FFF_FFFF|Rendered front (e.g. fake tile)|
 |0x7000_0000..0x7FFF_FFFF|Rendered as screen overlay, not affected by light nor environment overlays|
+
+Actor IDs are assigned in 256 groups, single actor can have 256 sub-actors

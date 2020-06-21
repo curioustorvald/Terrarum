@@ -243,6 +243,7 @@ public class AppLoader implements ApplicationListener {
     public static int halfScreenH = 0;
     public static float halfScreenWf = 0f;
     public static float halfScreenHf = 0f;
+    public static float aspectRatio = 0f;
 
     public static Texture textureWhiteSquare;
     public static Texture textureWhiteCircle;
@@ -679,6 +680,8 @@ public class AppLoader implements ApplicationListener {
         screenHf = (float) screenH;
         halfScreenWf = (float) halfScreenW;
         halfScreenHf = (float) halfScreenH;
+
+        aspectRatio = screenWf / screenHf;
 
         updateFullscreenQuad(screenW, screenH);
 

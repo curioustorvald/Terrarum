@@ -312,6 +312,7 @@ internal object BiomeMaker : NoiseMaker {
             0x229944ff.toInt(), // woodlands
             0x77bb77ff.toInt(), // shrubland
             0x88bb66ff.toInt(), // plains
+            0xeeddbbff.toInt(), // sands
             0x888888ff.toInt() // rockyland
     )
 }
