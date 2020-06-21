@@ -31,8 +31,8 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
         private const val WIDTH_RATIO = 0.7
         private const val PREVIEW_UPDATE_RATE = 1 / 5f
 
-        private val COL_WALL = Color.WHITE
-        private val COL_TERR = Color(.5f, .5f, .5f, 1f)
+        private val COL_TERR = Color.WHITE
+        private val COL_WALLED = Color(.5f, .5f, .5f, 1f)
         private val COL_AIR = Color.BLACK
     }
 
@@ -94,9 +94,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
                 val wx = (world.width.toFloat() / previewWidth * x).roundToInt()
                 val wy = (world.height.toFloat() / previewHeight * y).roundToInt()
 
-                val colT = if (world.getTileFromTerrain(wx, wy) != 0) COL_WALL else COL_TERR
-                val colW = if (world.getTileFromWall(wx, wy) != 0) COL_WALL else COL_AIR
-                val outCol = colW mul colT
+                val outCol = if (world.getTileFromTerrain(wx, wy) > 15) COL_TERR else if (world.getTileFromWall(wx, wy) > 15) COL_WALLED else COL_AIR
 
                 previewPixmap.setColor(outCol)
                 previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y

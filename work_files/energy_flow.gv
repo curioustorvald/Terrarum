@@ -1,4 +1,11 @@
 digraph EnergyFlow {
+    labelfloat = true;
+    ranksep = 0.6;
+    nodesep = 0.4;
+    sep = 1.0;
+    overlap = voronoi;
+    splines = true;
+    newrank=true;
 
     subgraph power_source { // remove cluster_ to not visualize
         node [shape=box];
@@ -12,7 +19,7 @@ digraph EnergyFlow {
         Water;
     }
 
-    subgraph power {
+    subgraph cluster_power {
         node [style=filled];
         label = Power;
 
@@ -46,12 +53,4 @@ digraph EnergyFlow {
 
     Electric -> Battery [dir=both, weight = 16.0];
     Kinetic -> "Compressed Air" [dir=both];
-    
-    
-    labelfloat = true;
-    ranksep = 0.6;
-    nodesep = 0.4;
-    sep = 1.0;
-    overlap = voronoi;
-    splines = true;
 }

@@ -295,7 +295,7 @@ object Terrarum : Disposable {
 
         var ret: Int
         do {
-            ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
+            ret = HQRNG().nextInt().and(0x7FFFFF00) // set new ID
         } while (hasCollision(ret)) // check for collision
         return ret
     }
