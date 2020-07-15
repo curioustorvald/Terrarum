@@ -11,7 +11,7 @@ import net.torvald.terrarum.gameactors.*
 /**
  * Created by minjaesong on 2018-01-17.
  */
-class PhysTestLuarLander : ActorWithBody(RenderOrder.MIDTOP), Controllable {
+class PhysTestLuarLander : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT), Controllable {
 
     private val texture = Texture(ModMgr.getGdxFile("basegame", "sprites/phystest_lunarlander.tga"))
 

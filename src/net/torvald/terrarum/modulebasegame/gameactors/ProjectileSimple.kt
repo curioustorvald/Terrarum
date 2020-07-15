@@ -10,6 +10,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameactors.PhysProperties
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -24,7 +25,7 @@ open class ProjectileSimple(
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-) : ActorWithBody(RenderOrder.MIDTOP), Luminous, Projectile {
+) : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color

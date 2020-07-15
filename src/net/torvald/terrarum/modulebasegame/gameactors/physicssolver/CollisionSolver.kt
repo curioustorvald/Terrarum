@@ -40,7 +40,7 @@ object CollisionSolver {
 
         // mark list x
         (Terrarum.ingame!! as TerrarumIngame).actorContainerActive.forEach { it ->
-            if (it is ActorWithBody && it.usePhysics) {
+            if (it is ActorWithBody && it.physProp.usePhysics) {
                 collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it))
                 collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it))
             }
@@ -73,7 +73,7 @@ object CollisionSolver {
 
         // mark list y
         (Terrarum.ingame!! as TerrarumIngame).actorContainerActive.forEach { it ->
-            if (it is ActorWithBody && it.usePhysics) {
+            if (it is ActorWithBody && it.physProp.usePhysics) {
                 collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it))
                 collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it))
             }

@@ -31,8 +31,8 @@ import java.util.*
 open class ActorHumanoid(
         birth: Long,
         death: Long? = null,
-        usePhysics: Boolean = true
-) : ActorWithBody(RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+        physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT
+) : ActorWithBody(RenderOrder.MIDDLE, physProp = physProp), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
     private val world: GameWorld?
         get() = Terrarum.ingame?.world
