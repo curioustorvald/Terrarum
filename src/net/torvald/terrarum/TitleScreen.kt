@@ -366,7 +366,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private class CameraPlayer(val demoWorld: GameWorld, override val ai: ActorAI) : ActorWithBody(RenderOrder.FRONT, usePhysics = false), AIControlled {
+    private class CameraPlayer(val demoWorld: GameWorld, override val ai: ActorAI) : ActorWithBody(RenderOrder.FRONT, physProp = PhysProperties.MOBILE_OBJECT), AIControlled {
 
         override val hitbox = Hitbox(0.0, 0.0, 2.0, 2.0)
 

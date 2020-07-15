@@ -35,7 +35,7 @@ object BlockBase {
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
             var ret1 = true
             ingame.actorContainerActive.forEach {
-                if (it is ActorWithBody && it.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
+                if (it is ActorWithBody && it.physProp.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
                     ret1 = false // return is not allowed here
             }
             if (!ret1) return ret1

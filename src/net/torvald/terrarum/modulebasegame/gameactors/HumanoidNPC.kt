@@ -14,10 +14,9 @@ import net.torvald.terrarum.itemproperties.Material
  */
 open class HumanoidNPC(
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
-        born: Long,
-        usePhysics: Boolean = true
+        born: Long
         //forceAssignRefID: Int? = null
-) : ActorHumanoid(born, usePhysics = usePhysics), AIControlled, CanBeAnItem {
+) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
     companion object {
         val DEFAULT_COLLISION_TYPE = COLLISION_DYNAMIC

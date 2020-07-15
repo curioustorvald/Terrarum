@@ -31,7 +31,7 @@ import java.util.*
  *
  * Created by minjaesong on 2016-01-13.
  */
-open class ActorWithBody(renderOrder: RenderOrder, val immobileBody: Boolean = false, var usePhysics: Boolean = true) :
+open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties) :
         Actor(renderOrder) {
 
 
@@ -389,7 +389,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val immobileBody: Boolean = f
                 isNoSubjectToFluidResistance = isNoClip
             }
 
-            if (!usePhysics) {
+            if (!physProp.usePhysics) {
                 isNoCollideWorld = true
                 isNoSubjectToFluidResistance = true
                 isNoSubjectToGrav = true
@@ -1154,7 +1154,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val immobileBody: Boolean = f
     }
 
     private fun getTileFriction(tile: Int) =
-            if (immobileBody && tile == Block.AIR)
+            if (physProp.immobileBody && tile == Block.AIR)
                 BlockCodex[Block.AIR].friction.frictionToMult().div(500)
                         .times(if (!grounded) elasticity else 1.0)
             else

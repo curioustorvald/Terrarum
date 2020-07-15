@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
 
@@ -19,7 +20,7 @@ open class FixtureBase(
         val mainUI: UICanvas? = null
 
 // disabling physics (not allowing the fixture to move) WILL make things easier in many ways
-) : ActorWithBody(renderOrder, immobileBody = true, usePhysics = false), CuedByTerrainChange {
+) : ActorWithBody(renderOrder, PhysProperties.IMMOBILE), CuedByTerrainChange {
 
     var blockBox: BlockBox = blockBox0
         protected set // something like TapestryObject will want to redefine this
