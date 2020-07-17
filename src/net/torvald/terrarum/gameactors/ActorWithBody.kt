@@ -263,10 +263,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     // just some trivial magic numbers
     @Transient private val A_PIXEL = 1.0
     @Transient private val HALF_PIXEL = 0.5
-    @Transient private val COLLIDING_TOP = 0
-    @Transient private val COLLIDING_RIGHT = 1
-    @Transient private val COLLIDING_BOTTOM = 2
-    @Transient private val COLLIDING_LEFT = 3
+
+    @Transient private val COLLIDING_LEFT = 0
+    @Transient private val COLLIDING_BOTTOM = 1
+    @Transient private val COLLIDING_RIGHT = 2
+    @Transient private val COLLIDING_TOP = 3
+
     @Transient private val COLLIDING_UD = 4
     @Transient private val COLLIDING_LR = 5
     @Transient private val COLLIDING_ALLSIDE = 6
@@ -732,10 +734,13 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 val newHitbox = hitbox.reassign(sixteenStep[collidingStep!!])
 
                 var selfCollisionStatus = 0
+
+                var collisionStatus = (0..3).map { isWalledStairs(newHitbox, it) }
+
                 if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
+                if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
                 if (isWalled(newHitbox, COLLIDING_RIGHT)) selfCollisionStatus += COLL_RIGHTSIDE  // 4
                 if (isWalled(newHitbox, COLLIDING_TOP)) selfCollisionStatus += COLL_TOPSIDE    // 8
-                if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
 
                 // fixme UP and RIGHT && LEFT and DOWN bug
 
@@ -1060,6 +1065,73 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM)
     }
 
+    /**
+     * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
+     */
+    private fun isWalledStairs(hitbox: Hitbox, option: Int): Int {
+        val x1: Double
+        val x2: Double
+        val y1: Double
+        val y2: Double
+
+        /*
+        The structure:
+
+             #######  // TOP
+            =+-----+=
+            =|     |=
+            =+-----+=
+             #######  // BOTTOM
+
+        IMPORTANT AF NOTE: things are ASYMMETRIC!
+         */
+
+        // AT LEAST THESE ARE CONFIRMED
+        if (option == COLLIDING_TOP) {
+            x1 = hitbox.startX
+            x2 = hitbox.endX - A_PIXEL
+            y1 = hitbox.startY - A_PIXEL
+            y2 = y1
+        }
+        else if (option == COLLIDING_BOTTOM) {
+            x1 = hitbox.startX
+            x2 = hitbox.endX - A_PIXEL
+            y1 = hitbox.endY + A_PIXEL
+            y2 = y1
+        }
+        else if (option == COLLIDING_LEFT) {
+            x1 = hitbox.startX - A_PIXEL
+            x2 = x1
+            y1 = hitbox.startY
+            y2 = hitbox.endY - A_PIXEL
+        }
+        else if (option == COLLIDING_RIGHT) {
+            x1 = hitbox.endX + A_PIXEL
+            x2 = x1
+            y1 = hitbox.startY
+            y2 = hitbox.endY - A_PIXEL
+        }
+        else if (option == COLLIDING_ALLSIDE) {
+            return maxOf(maxOf(isWalledStairs(hitbox, COLLIDING_LEFT), isWalledStairs(hitbox, COLLIDING_RIGHT)),
+                    maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM), isWalledStairs(hitbox, COLLIDING_TOP)))
+
+        }
+        else if (option == COLLIDING_LR) {
+            return maxOf(isWalledStairs(hitbox, COLLIDING_LEFT),isWalledStairs(hitbox, COLLIDING_RIGHT))
+        }
+        else if (option == COLLIDING_UD) {
+            return maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM), isWalledStairs(hitbox, COLLIDING_TOP))
+        }
+        else throw IllegalArgumentException()
+
+        val txStart = x1.plus(0.5f).div(TILE_SIZE).floorInt()
+        val txEnd =   x2.plus(0.5f).div(TILE_SIZE).floorInt()
+        val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
+
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM)
+    }
+
     private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
         if (world == null) return false
 
@@ -1082,6 +1154,33 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         }
 
         return false
+    }
+
+    /**
+     * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
+     */
+    private fun isCollidingInternalStairs(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Int {
+        if (world == null) return 0
+
+        for (y in tyStart..tyEnd) {
+            for (x in txStart..txEnd) {
+                val tile = world!!.getTileFromTerrain(x, y) ?: Block.STONE
+
+                if (feet) {
+                    if (shouldICollideWithThisFeet(tile))
+                        return 2
+                }
+                else {
+                    if (shouldICollideWithThis(tile))
+                        return 2
+                }
+
+                // this weird statement means that if's the condition is TRUE, return TRUE;
+                // if the condition is FALSE, do nothing and let succeeding code handle it.
+            }
+        }
+
+        return 0
     }
 
     /**
