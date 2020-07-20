@@ -733,14 +733,20 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
                 val newHitbox = hitbox.reassign(sixteenStep[collidingStep!!])
 
-                var selfCollisionStatus = 0
+                //var selfCollisionStatus = 0
 
                 var collisionStatus = (0..3).map { isWalledStairs(newHitbox, it) }
 
-                if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
-                if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
-                if (isWalled(newHitbox, COLLIDING_RIGHT)) selfCollisionStatus += COLL_RIGHTSIDE  // 4
-                if (isWalled(newHitbox, COLLIDING_TOP)) selfCollisionStatus += COLL_TOPSIDE    // 8
+                // made compatible with old variable and its usage
+                var selfCollisionStatus = collisionStatus.foldIndexed(0) { index, acc, b -> acc or (b.shr(1) shl index) }
+
+                // TODO when player bonks to the ceiling, don't just reset veloY to zero -- add some head elasticity!
+
+                // superseded by isWalledStairs-related codes
+                //if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
+                //if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
+                //if (isWalled(newHitbox, COLLIDING_RIGHT)) selfCollisionStatus += COLL_RIGHTSIDE  // 4
+                //if (isWalled(newHitbox, COLLIDING_TOP)) selfCollisionStatus += COLL_TOPSIDE    // 8
 
                 // fixme UP and RIGHT && LEFT and DOWN bug
 
@@ -1155,6 +1161,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
         return false
     }
+
+    private val AUTO_CLIMB_STRIDE: Int
+        get() = (8 * scale).toInt() // number inspired by SM64
+    //private val AUTO_CLIMB_RATE: Int // we'll just climb stairs instantly to make things work wo worrying about the details
+    //    get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZE.toDouble()).toInt()
 
     /**
      * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
@@ -1642,9 +1653,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 controllerV?.zero()
             }
         }
-
-    private val AUTO_CLIMB_RATE: Int
-        get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZE.toDouble()).toInt()
 
     private fun assertInit() {
         // errors
