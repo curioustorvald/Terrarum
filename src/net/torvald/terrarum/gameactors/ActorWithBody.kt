@@ -740,8 +740,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 // made compatible with old variable and its usage
                 var selfCollisionStatus = collisionStatus.foldIndexed(0) { index, acc, b -> acc or (b.shr(1) shl index) }
 
-                // TODO when player bonks to the ceiling, don't just reset veloY to zero -- add some head elasticity!
-
                 // superseded by isWalledStairs-related codes
                 //if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
                 //if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
@@ -1185,6 +1183,8 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                     if (shouldICollideWithThis(tile))
                         return 2
                 }
+
+                // TODO add terms that returns 1, also checkout ./work_files/physics_staircasing.kra
 
                 // this weird statement means that if's the condition is TRUE, return TRUE;
                 // if the condition is FALSE, do nothing and let succeeding code handle it.
