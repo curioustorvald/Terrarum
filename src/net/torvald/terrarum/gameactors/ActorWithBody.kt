@@ -994,12 +994,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         val y2 = hitbox.endY - A_PIXEL
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENDED!
 
-        val txStart = x1.plus(0.5f).div(TILE_SIZE).floorInt()
-        val txEnd =   x2.plus(0.5f).div(TILE_SIZE).floorInt()
-        val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
+        val txStart = x1.plus(0.5f).floorInt()
+        val txEnd =   x2.plus(0.5f).floorInt()
+        val tyStart = y1.plus(0.5f).floorInt()
+        val tyEnd =   y2.plus(0.5f).floorInt()
 
-        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd, feet)
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, feet) == 2
     }
 
     /**
@@ -1061,12 +1061,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(0.5f).div(TILE_SIZE).floorInt()
-        val txEnd =   x2.plus(0.5f).div(TILE_SIZE).floorInt()
-        val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
+        val txStart = x1.plus(0.5f).floorInt()
+        val txEnd =   x2.plus(0.5f).floorInt()
+        val tyStart = y1.plus(0.5f).floorInt()
+        val tyEnd =   y2.plus(0.5f).floorInt()
 
-        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM)
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM) == 2
     }
 
     /**
@@ -1128,15 +1128,15 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(0.5f).div(TILE_SIZE).floorInt()
-        val txEnd =   x2.plus(0.5f).div(TILE_SIZE).floorInt()
-        val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
+        val pxStart = x1.plus(0.5f).floorInt()
+        val pxEnd =   x2.plus(0.5f).floorInt()
+        val pyStart = y1.plus(0.5f).floorInt()
+        val pyEnd =   y2.plus(0.5f).floorInt()
 
-        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM)
+        return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, option == COLLIDING_BOTTOM)
     }
 
-    private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
+    /*private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
         if (world == null) return false
 
         for (y in tyStart..tyEnd) {
@@ -1158,7 +1158,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         }
 
         return false
-    }
+    }*/
 
     private val AUTO_CLIMB_STRIDE: Int
         get() = (8 * scale).toInt() // number inspired by SM64
@@ -1168,12 +1168,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     /**
      * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
      */
-    private fun isCollidingInternalStairs(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Int {
+    private fun isCollidingInternalStairs(pxStart: Int, pyStart: Int, pxEnd: Int, pyEnd: Int, feet: Boolean = false): Int {
         if (world == null) return 0
 
-        for (y in tyStart..tyEnd) {
-            for (x in txStart..txEnd) {
-                val tile = world!!.getTileFromTerrain(x, y) ?: Block.STONE
+        for (y in pyEnd downTo pyStart) {
+            for (x in pxStart..pxEnd) {
+                val tile = world!!.getTileFromTerrain(x / TILE_SIZE, y / TILE_SIZE) ?: Block.STONE
 
                 if (feet) {
                     if (shouldICollideWithThisFeet(tile))
@@ -1184,10 +1184,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                         return 2
                 }
 
-                // TODO add terms that returns 1, also checkout ./work_files/physics_staircasing.kra
-
                 // this weird statement means that if's the condition is TRUE, return TRUE;
                 // if the condition is FALSE, do nothing and let succeeding code handle it.
+
+
+
+                // TODO add terms that returns 1, also checkout ./work_files/physics_staircasing.kra
             }
         }
 
