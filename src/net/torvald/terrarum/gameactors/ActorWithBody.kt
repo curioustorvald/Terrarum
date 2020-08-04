@@ -19,6 +19,8 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 
 /**
@@ -1171,29 +1173,56 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     private fun isCollidingInternalStairs(pxStart: Int, pyStart: Int, pxEnd: Int, pyEnd: Int, feet: Boolean = false): Int {
         if (world == null) return 0
 
-        for (y in pyEnd downTo pyStart) {
+        val ys = if (gravitation.y >= 0) pyEnd downTo pyStart else pyStart..pyEnd
+        val yheight = (ys.last - ys.first).absoluteValue
+        var stairHeight = 0
+        var countUpForStairHeight = true
+        var hitFloor = false
+
+        for (y in ys) {
+
+            var hasFloor = false
+
             for (x in pxStart..pxEnd) {
                 val tile = world!!.getTileFromTerrain(x / TILE_SIZE, y / TILE_SIZE) ?: Block.STONE
 
                 if (feet) {
-                    if (shouldICollideWithThisFeet(tile))
-                        return 2
+                    if (shouldICollideWithThisFeet(tile)) {
+                        hasFloor = true
+                        hitFloor = true
+                        //return 2
+                    }
                 }
                 else {
-                    if (shouldICollideWithThis(tile))
-                        return 2
+                    if (shouldICollideWithThis(tile)) {
+                        hasFloor = true
+                        hitFloor = true
+                        //return 2
+                    }
                 }
-
-                // this weird statement means that if's the condition is TRUE, return TRUE;
-                // if the condition is FALSE, do nothing and let succeeding code handle it.
-
-
-
-                // TODO add terms that returns 1, also checkout ./work_files/physics_staircasing.kra
             }
+
+            val distFromOriginY = if (gravitation.y >= 0) ys.first - y else y - ys.first
+            //print("$distFromOriginY ")
+
+            if (hasFloor)
+                stairHeight = distFromOriginY
+
+            if (stairHeight > AUTO_CLIMB_STRIDE) {
+                //println(" -> $stairHeight ending prematurely")
+                return 2
+            }
+
         }
 
-        return 0
+        //println("-> $stairHeight")
+
+               // edge-detect mode
+        return if (yheight == 0) hitFloor.toInt() * 2
+               // not an edge-detect && no collision
+               else if (stairHeight == 0) 0
+               // there was collision and stairHeight <= AUTO_CLIMB_STRIDE
+               else 2 // 1; your main code is not ready to handle return code 1 (try "setscale 2")
     }
 
     /**
