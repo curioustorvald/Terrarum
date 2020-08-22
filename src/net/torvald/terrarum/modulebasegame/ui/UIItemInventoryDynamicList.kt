@@ -31,13 +31,13 @@ import java.util.*
 class UIItemInventoryDynamicList(
         parentUI: UIInventoryFull,
         val inventory: ActorInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         val horizontalCells: Int,
         val verticalCells: Int,
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX
@@ -115,8 +115,8 @@ class UIItemInventoryDynamicList(
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
         UIItemInventoryElemSimple(
                 parentUI = inventoryUI,
-                posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
-                posY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
+                initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
+                initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
@@ -132,8 +132,8 @@ class UIItemInventoryDynamicList(
     private val itemList = Array<UIItemInventoryCellBase>(verticalCells * 2) {
         UIItemInventoryElem(
                 parentUI = inventoryUI,
-                posX = this.posX + (largeListWidth + listGap) * (it % 2),
-                posY = this.posY + (UIItemInventoryElem.height + listGap) * (it / 2),
+                initialX = this.posX + (largeListWidth + listGap) * (it % 2),
+                initialY = this.posY + (UIItemInventoryElem.height + listGap) * (it / 2),
                 width = largeListWidth,
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
@@ -174,8 +174,8 @@ class UIItemInventoryDynamicList(
                 highlightBackCol = Color(0),
                 activeBackBlendMode = BlendMode.NORMAL,
                 activeCol = defaultActiveCol,
-                posX = iconPosX,
-                posY = getIconPosY(index),
+                initialX = iconPosX,
+                initialY = getIconPosY(index),
                 highlightable = true
         )
     }
@@ -187,8 +187,8 @@ class UIItemInventoryDynamicList(
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
             activeCol = defaultActiveCol,
-            posX = iconPosX,
-            posY = getIconPosY(2),
+            initialX = iconPosX,
+            initialY = getIconPosY(2),
             highlightable = false
     )
 
@@ -199,8 +199,8 @@ class UIItemInventoryDynamicList(
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
             activeCol = defaultActiveCol,
-            posX = iconPosX,
-            posY = getIconPosY(3),
+            initialX = iconPosX,
+            initialY = getIconPosY(3),
             highlightable = false
     )
 

@@ -12,8 +12,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIItemTextButtonList(
         parentUI: UICanvas,
         labelsList: Array<String>,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override var width: Int,
         override var height: Int = DEFAULT_LINE_HEIGHT * labelsList.size,
         val readFromLang: Boolean = false,
@@ -48,7 +48,7 @@ class UIItemTextButtonList(
 
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
         val itemHitboxSize: Int = DEFAULT_LINE_HEIGHT
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     companion object {
         val DEFAULT_BACKGROUNDCOL = Color(0x242424_80)
@@ -83,8 +83,8 @@ class UIItemTextButtonList(
         if (!kinematic) {
             UIItemTextButton(
                     parentUI, s,
-                    posX = posX,
-                    posY = posY + vertOff,
+                    initialX = posX,
+                    initialY = posY + vertOff,
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -105,8 +105,8 @@ class UIItemTextButtonList(
         else {
             UIItemTextButton(
                     parentUI, s,
-                    posX = posX,
-                    posY = posY + vertOff,
+                    initialX = posX,
+                    initialY = posY + vertOff,
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -126,7 +126,7 @@ class UIItemTextButtonList(
     }
 
 
-    /*override var posX = 0
+    /*initialX = 0
         set(value) {
             buttons.forEach {
                 val oldPosX = field
@@ -135,7 +135,7 @@ class UIItemTextButtonList(
             }
             field = value
         }
-    override var posY = 0
+    initialY = 0
         set(value) {
             buttons.forEach {
                 val oldPosY = field

@@ -15,10 +15,10 @@ import net.torvald.terrarum.ui.UIUtils
  */
 class UIItemInventoryCatBar(
         parentUI: UIInventoryFull,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX
@@ -59,8 +59,8 @@ class UIItemInventoryCatBar(
                     backgroundCol = Color(0),
                     highlightBackCol = Color(0),
                     activeBackBlendMode = BlendMode.NORMAL,
-                    posX = posX + iconPosX,
-                    posY = posY + iconPosY,
+                    initialX = posX + iconPosX,
+                    initialY = posY + iconPosY,
                     highlightable = true
             )
         }
@@ -91,8 +91,8 @@ class UIItemInventoryCatBar(
                     backgroundCol = Color(0),
                     highlightBackCol = Color(0),
                     activeBackBlendMode = BlendMode.NORMAL,
-                    posX = iconPosX,
-                    posY = posY + iconPosY,
+                    initialX = iconPosX,
+                    initialY = posY + iconPosY,
                     inactiveCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),
                     activeCol = if (index == 0 || index == 3) Color(0xfff066_ff.toInt()) else Color(0xffffff7f.toInt()),
                     highlightable = (index == 0 || index == 3)

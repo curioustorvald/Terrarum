@@ -32,14 +32,14 @@ open class UIItemImageButton(
         val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
 
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int = image.regionWidth,
         override val height: Int = image.regionHeight,
 
         /** When clicked, toggle its "lit" status */
         var highlightable: Boolean
-) : UIItem(parent) {
+) : UIItem(parent, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX

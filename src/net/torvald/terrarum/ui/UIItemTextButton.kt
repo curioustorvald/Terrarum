@@ -18,8 +18,8 @@ open class UIItemTextButton(
         parentUI: UICanvas,
         /** Stored text (independent to the Langpack) */
         val labelText: String,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int,
         val readFromLang: Boolean = false,
 
@@ -46,7 +46,7 @@ open class UIItemTextButton(
 
         val alignment: Alignment = Alignment.CENTRE,
         val hitboxSize: Int = UIItemTextButton.height
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX

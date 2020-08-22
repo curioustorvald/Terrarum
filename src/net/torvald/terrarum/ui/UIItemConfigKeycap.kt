@@ -13,14 +13,14 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class UIItemConfigKeycap(
         parent: UICanvas,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
 
         private val keySize: Int,
 
         private val keycode: Int, // also used to draw key label
         private var keyItem: Int? = null  // internal index for the key's behaviour, also used to choose appropriate icon
-) : UIItem(parent) {
+) : UIItem(parent, initialX, initialY) {
 
     init {
         if (keySize < 3) throw IllegalArgumentException("Key size must be greater than 2 (got $keySize)")

@@ -57,8 +57,8 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
                 backgroundCol = Color(0),
                 highlightBackCol = Color(0),
                 activeBackCol = Color(0),
-                posX = newvec.x.roundInt(),
-                posY = newvec.y.roundInt(),
+                initialX = newvec.x.roundInt(),
+                initialY = newvec.y.roundInt(),
                 width = ICON_SIZE, height = ICON_SIZE,
                 highlightable = false
         )

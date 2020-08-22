@@ -14,8 +14,8 @@ import net.torvald.terrarum.fillRect
 class UIItemList<Item: UIItem>(
         parentUI: UICanvas,
         val itemList: ArrayList<Item>,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int,
         override val height: Int,
 
@@ -34,7 +34,7 @@ class UIItemList<Item: UIItem>(
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false,
         val border: Int = 0
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX

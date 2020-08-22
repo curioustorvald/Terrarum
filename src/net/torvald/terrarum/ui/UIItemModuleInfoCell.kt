@@ -12,9 +12,9 @@ class UIItemModuleInfoCell(
         parent: UICanvas,
         var moduleName: String,
         override val width: Int,
-        override var posX: Int,
-        override var posY: Int
-) : UIItem(parent) {
+        initialX: Int,
+        initialY: Int
+) : UIItem(parent, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX

@@ -24,8 +24,8 @@ import net.torvald.terrarum.ui.UIItemTextButton
  */
 class UIItemInventoryElem(
         parentUI: UIInventoryFull,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int,
         override var item: GameItem?,
         override var amount: Int,
@@ -39,7 +39,7 @@ class UIItemInventoryElem(
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true
-) : UIItemInventoryCellBase(parentUI, posX, posY, item, amount, itemImage, quickslot, equippedSlot) {
+) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot) {
 
     // deal with the moving position
     override var oldPosX = posX

@@ -8,14 +8,14 @@ import net.torvald.terrarum.ui.UIItemTextButton.Companion.Alignment
 
 class UIItemTextArea(
         parentUI: UICanvas,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int,
         override val height: Int,
         val lineGap: Int = 0,
         val lineCount: Int = ((height + lineGap) / AppLoader.fontGame.lineHeight).toInt(),
         val align: Alignment = Alignment.LEFT
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX
