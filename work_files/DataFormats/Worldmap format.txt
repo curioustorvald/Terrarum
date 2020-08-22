@@ -88,3 +88,5 @@ EOF  FE   Byte order mark
 
 
 * To read layers: you'll need to search for specific strings, namely ["TERR", "WALL", "WIRE"]
+* It is possible that compressed data happen to replicate any of the internal identifiers
+  (e.g. "\0pLdTERR", "EndTEM\xFF\xFE", "EndPYLd\xFF"), but such probability is very low (0.000000000000000005421 %)

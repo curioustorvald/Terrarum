@@ -27,6 +27,7 @@ object UITitleRemoConYaml {
           - MENU_LABEL_RETURN
          - MENU_OPTIONS_SOUND
          - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
+         - MENU_MODULES : net.torvald.terrarum.ModOptionsHost
          - MENU_LABEL_RETURN
         - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
          - MENU_LABEL_RETURN
