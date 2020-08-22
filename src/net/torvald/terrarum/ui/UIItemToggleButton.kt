@@ -15,10 +15,10 @@ import kotlin.math.roundToInt
  */
 class UIItemToggleButton(
         parent: UICanvas,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         private var status: Boolean = false
-) : UIItem(parent) {
+) : UIItem(parent, initialX, initialY) {
 
     init {
         CommonResourcePool.addToLoadingList("ui_item_toggler_base") {

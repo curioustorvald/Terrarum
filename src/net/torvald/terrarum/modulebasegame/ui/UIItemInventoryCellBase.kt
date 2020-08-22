@@ -18,14 +18,14 @@ import kotlin.math.roundToInt
  */
 abstract class UIItemInventoryCellBase(
         parentUI: UIInventoryFull,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         open var item: GameItem?,
         open var amount: Int,
         open var itemImage: TextureRegion?,
         open var quickslot: Int? = null,
         open var equippedSlot: Int? = null
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(batch: SpriteBatch, camera: Camera)
 }

@@ -19,11 +19,11 @@ class UIItemPlayerInfoCell(
         parent: UICanvas,
         val saveInfo: ReadWorldInfo.SaveMetaData,
         override val width: Int,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         var highlightable: Boolean,
         var ingamePlayer: IngamePlayer? = null
-) : UIItem(parent) {
+) : UIItem(parent, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX

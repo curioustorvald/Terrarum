@@ -45,13 +45,16 @@ import net.torvald.terrarum.Terrarum
  * As mentioned in [UICanvas], UIItems must be added to the Canvas to make listeners work without implementing
  * everything by yourself.
  *
+ * @param initialX initial position of the item. Useful for making transition that requires the item to be moved
+ * @param initialY initial position of the item. Useful for making transition that requires the item to be moved
+ *
  * Created by minjaesong on 2015-12-31.
  */
-abstract class UIItem(var parentUI: UICanvas): Disposable { // do not replace parentUI to UIHandler!
+abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: Int): Disposable { // do not replace parentUI to UIHandler!
 
     // X/Y Position relative to the containing canvas
-    abstract var posX: Int
-    abstract var posY: Int
+    var posX: Int = initialX
+    var posY: Int = initialY
     abstract val width: Int
     abstract val height: Int
 

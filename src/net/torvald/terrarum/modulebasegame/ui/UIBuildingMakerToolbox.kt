@@ -11,13 +11,12 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIBuildingMakerToolbox : UICanvas() {
 
     val toolsTexture = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/building_maker_toolbox.tga"), 16, 16)
-    val tools = Array(toolsTexture.verticalCount, { UIItemImageButton(
+    val tools = Array(toolsTexture.verticalCount) { UIItemImageButton(
             this, toolsTexture.get(0, it),
-            posX = 0,
-            posY = 20 * it,
+            initialX = 0,
+            initialY = 20 * it,
             highlightable = true
-
-    ) })
+    ) }
 
     override var width = 16
     override var height = 20 * tools.size - 4

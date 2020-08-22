@@ -13,8 +13,12 @@ import java.awt.Color
 class UIItemIntSlider(
         parent: UICanvas,
         initValue: Int,
+        initialX: Int,
+        initialY: Int,
+
         override val width: Int,
         override val height: Int,
+
         val minValue: Int,
         val maxValue: Int,
         val step: Int,
@@ -38,11 +42,13 @@ class UIItemIntSlider(
 
         val sliderUseColourMap: GdxColorMap? = null,
         val sliderUseTexture: Texture? = null
-) : UIItem(parent) {
+) : UIItem(parent, initialX, initialY) {
 
     constructor(
             parent: UICanvas,
             initValue: Int,
+            initialX: Int,
+            initialY: Int,
             values: IntRange,
             width: Int,
             height: Int,
@@ -60,6 +66,8 @@ class UIItemIntSlider(
     ) : this(
             parent,
             initValue,
+            initialX,
+            initialY,
             values.first,
             values.last,
             values.step,
@@ -84,12 +92,6 @@ class UIItemIntSlider(
     // TODO unimplemented
 
 
-    override var posX: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
-    override var posY: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
     override val mouseUp: Boolean
         get() = super.mouseUp
     override val mousePushed: Boolean

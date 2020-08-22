@@ -12,13 +12,13 @@ import java.util.*
  */
 class UIItemImageGallery(
         parentUI: UICanvas,
-        override var posX: Int,
-        override var posY: Int,
+        initialX: Int,
+        initialY: Int,
         override val width: Int,
         override val height: Int,
         val imageList: ArrayList<Texture>,
         val column: Int = 1
-) : UIItem(parentUI) {
+) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
     override var oldPosX = posX

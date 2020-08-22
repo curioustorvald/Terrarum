@@ -40,8 +40,8 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         // initialise with terrain blocks
         UIItemImageButton(
                 this, ItemCodex.getItemImage(it),
-                posX = MENUBAR_SIZE + (it % 16) * TILESREGION_SIZE,
-                posY = (it / 16) * TILESREGION_SIZE,
+                initialX = MENUBAR_SIZE + (it % 16) * TILESREGION_SIZE,
+                initialY = (it / 16) * TILESREGION_SIZE,
                 highlightable = false,
                 width = TILESREGION_SIZE,
                 height = TILESREGION_SIZE,

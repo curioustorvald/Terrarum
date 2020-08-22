@@ -22,9 +22,9 @@ class UIItemInventoryEquippedView(
         parentUI: UIInventoryFull,
         val inventory: ActorInventory,
         val theActor: ActorWithBody,
-        override var posX: Int,
-        override var posY: Int
-) : UIItem(parentUI) {
+        initialX: Int,
+        initialY: Int
+) : UIItem(parentUI, initialX, initialY) {
 
 
     override val width  = WIDTH
@@ -53,8 +53,8 @@ class UIItemInventoryEquippedView(
     private val itemGrid = Array<UIItemInventoryCellBase>(2 * 6) {
         UIItemInventoryElemSimple(
                 parentUI = parentUI,
-                posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) % 2),
-                posY = this.posY + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) / 2),
+                initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) % 2),
+                initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) / 2),
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
