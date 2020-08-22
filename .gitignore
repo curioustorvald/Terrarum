@@ -28,6 +28,7 @@ workspace.xml
 # Temporary files
 .tmp*
 tmp_*
+*.bak
 ## Microsoft Office
 ~$*
 ## Generic temp files in Linux
