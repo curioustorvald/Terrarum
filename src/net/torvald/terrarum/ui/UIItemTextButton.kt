@@ -48,10 +48,6 @@ open class UIItemTextButton(
         val hitboxSize: Int = UIItemTextButton.height
 ) : UIItem(parentUI, initialX, initialY) {
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     companion object {
         val font = AppLoader.fontGame
         val height = font.lineHeight.toInt()

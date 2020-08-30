@@ -32,6 +32,9 @@ class UIHandler(//var UI: UICanvas,
     var posX: Int = 0
     var posY: Int = 0
 
+    var initialX = posX
+    var initialY = posY
+
     private var alwaysVisible = false
 
     var isOpening = false

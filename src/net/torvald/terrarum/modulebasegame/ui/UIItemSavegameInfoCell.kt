@@ -21,10 +21,6 @@ class UIItemSavegameInfoCell(
         initialY: Int
 ) : UIItem(parent, initialX, initialY) {
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     override val height: Int = AppLoader.fontGame.lineHeight.toInt() * 2
 
     override fun render(batch: SpriteBatch, camera: Camera) {

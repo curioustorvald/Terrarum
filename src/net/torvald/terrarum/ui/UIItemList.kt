@@ -36,10 +36,6 @@ class UIItemList<Item: UIItem>(
         val border: Int = 0
 ) : UIItem(parentUI, initialX, initialY) {
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     init {
         itemList.forEachIndexed { index, item ->
             item.posX = this.posX + border

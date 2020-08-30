@@ -8,7 +8,7 @@
 "EAUR"; "768";   "0";"8192";  "21";     "1.36";  "1.0";"elven aurichalcum"
 "TIAL"; "900";   "0";"4420";  "33";     "2.16";  "1.0";"titanium alloy (Ti6Al4V)"
 "ADMT";"2000";"4090";"2700";  "71";     "3.42";  "1.0";"adamant"
-"OOZE";  "20";   "0";"1000";   "1";      "N/A";  "0.5";"genetic ooze; data is about human skin"
+"OOZE";  "20";   "0";"1000";   "1";     "0.08";  "0.5";"genetic ooze; data is about human skin"
 "BONE"; "130";   "0";"2000";   "1";     "0.23"; "0.55";"data is that of bovine bone"
 
 # idst: ID_STRING, ALL CAPS
