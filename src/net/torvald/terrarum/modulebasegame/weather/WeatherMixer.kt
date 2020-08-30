@@ -300,13 +300,13 @@ internal object WeatherMixer : RNGConsumer {
 
         var mixFrom: String?
         try { mixFrom = JSON.get("mixFrom").asJsonPrimitive.asString }
-        catch (e: IllegalStateException) { mixFrom = null }
+        catch (e: NullPointerException) { mixFrom = null }
 
 
 
         var mixPercentage: Double?
         try { mixPercentage = JSON.get("mixPercentage").asJsonPrimitive.asDouble }
-        catch (e: IllegalStateException) { mixPercentage = null }
+        catch (e: NullPointerException) { mixPercentage = null }
 
 
 

@@ -178,6 +178,8 @@ fun str16ToInt(rec: CSVRecord, s: String): Int {
     }
     catch (e1: IllegalStateException) {
     }
+    catch (e2: NullPointerException) {
+    }
 
     return ret
 }
@@ -191,6 +193,8 @@ fun intVal(rec: CSVRecord, s: String): Int {
     }
     catch (e1: IllegalStateException) {
     }
+    catch (e2: NullPointerException) {
+    }
 
     return ret
 }
@@ -203,6 +207,8 @@ fun floatVal(rec: CSVRecord, s: String): Float {
     catch (e: NumberFormatException) {
     }
     catch (e1: IllegalStateException) {
+    }
+    catch (e2: NullPointerException) {
     }
 
     return ret

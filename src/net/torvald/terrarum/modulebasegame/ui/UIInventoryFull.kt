@@ -1,29 +1,21 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.ENDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockstats.MinimapComposer
-import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.CAT_ALL
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemTextButtonList
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
-import net.torvald.terrarum.ui.UIUtils
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-10-21.
@@ -41,17 +33,20 @@ class UIInventoryFull(
     
     override var width: Int = AppLoader.screenW
     override var height: Int = AppLoader.screenH
+    override var openCloseTime: Second = 0.0f
 
-    private val REQUIRED_MARGIN = 166 // hard-coded value. Don't know the details
+    val REQUIRED_MARGIN = 166 // hard-coded value. Don't know the details
 
-    private val CELLS_HOR = 10
-    private val CELLS_VRT = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryDynamicList.listGap) / // 134 is another magic number
+    val CELLS_HOR = 10
+    val CELLS_VRT = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryDynamicList.listGap) / // 134 is another magic number
                             (UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap)
 
     private val itemListToEquipViewGap = UIItemInventoryDynamicList.listGap // used to be 24; figured out that the extra gap does nothig
 
     val internalWidth: Int = UIItemInventoryDynamicList.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
     val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryDynamicList.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
+
+    val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.listGap
 
     init {
         handler.allowESCtoClose = true
@@ -107,10 +102,6 @@ class UIInventoryFull(
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"
     val controlHelpHeight = AppLoader.fontGame.lineHeight
 
-    private var encumbrancePerc = 0f
-    private var isEncumbered = false
-
-
     val catBarWidth = 330
     val categoryBar = UIItemInventoryCatBar(
             this,
@@ -120,34 +111,27 @@ class UIInventoryFull(
     )
 
 
-    override var openCloseTime: Second = 0.0f
+    private val transitionalMinimap = UIInventoryCells(this) // PLACEHOLDER
+    private val transitionalItemCells = UIInventoryCells(this)
+    private val transitionalEscMenu = UIInventoryCells(this) // PLACEHOLDER
+    private val transitionPanel = UIItemHorizontalFadeSlide(
+            this,
+            (AppLoader.screenW - internalWidth) / 2,
+            107 + (AppLoader.screenH - internalHeight) / 2,
+            AppLoader.screenW,
+            AppLoader.screenH,
+            1f,
+            transitionalMinimap, transitionalItemCells, transitionalEscMenu
+    )
 
 
-    internal val itemList: UIItemInventoryDynamicList =
-            UIItemInventoryDynamicList(
-                    this,
-                    actor.inventory,
-                    0 + (AppLoader.screenW - internalWidth) / 2,
-                    107 + (AppLoader.screenH - internalHeight) / 2,
-                    CELLS_HOR, CELLS_VRT
-            )
-
-
-    private val equipped: UIItemInventoryEquippedView =
-            UIItemInventoryEquippedView(
-                    this,
-                    actor.inventory,
-                    actor as ActorWithBody,
-                    internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
-                    107 + (AppLoader.screenH - internalHeight) / 2
-            )
     private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
     private val gameMenuButtons = UIItemTextButtonList(
             this, gameMenu,
             (AppLoader.screenW - gameMenuListWidth) / 2,
-            (itemList.height - gameMenuListHeight) / 2 + itemList.posY,
+            (transitionalItemCells.itemList.height - gameMenuListHeight) / 2 + transitionalItemCells.itemList.posY,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
             textAreaWidth = gameMenuListWidth,
@@ -162,31 +146,19 @@ class UIInventoryFull(
     private val SCREEN_INVENTORY = 1f
     private val SCREEN_MENU = 2f
 
-    /** 0..2 where 0 is minimap, 1 is inventory, 2 is menu. Non-integer value means transition is on-going */
-    private var currentScreenTransition = SCREEN_INVENTORY
-    private var transitionRequested = false
-    private var transitionOngoing = false
-    private var transitionReqSource = SCREEN_INVENTORY
-    private var transitionReqTarget = SCREEN_INVENTORY
-    private var transitionTimer = 0f
-    private val transitionLength = 0.212f
-
-
-    private val transitionalUpdateUIs = ArrayList<UIItem>()
-    private val transitionalUpdateUIoriginalPosX = ArrayList<Int>()
 
 
 
     init {
-        addItem(categoryBar)
-        itemList.let { addItem(it) }
-        equipped.let { addItem(it) }
+        addUIitem(categoryBar)
+        addUIitem(transitionPanel)
+        //itemList.let { addUIitem(it) }
+        //equipped.let { addUIitem(it) }
 
 
         categoryBar.selectionChangeListener = { old, new  ->
             rebuildList()
-            itemList.itemPage = 0 // set scroll to zero
-            itemList.rebuild(catIconsMeaning[catArrangement[new]]) // have to manually rebuild, too!
+            transitionalItemCells.resetStatusAsCatChanges(old, new)
         }
 
 
@@ -204,10 +176,12 @@ class UIInventoryFull(
 
     }
 
-    private var offsetX = ((AppLoader.screenW - internalWidth)  / 2).toFloat()
-    private var offsetY = ((AppLoader.screenH - internalHeight) / 2).toFloat()
+    internal var offsetX = ((AppLoader.screenW - internalWidth)  / 2).toFloat()
+        private set
+    internal var offsetY = ((AppLoader.screenH - internalHeight) / 2).toFloat()
+        private set
 
-
+    fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
 
     override fun updateUI(delta: Float) {
         if (handler.openFired) {
@@ -216,25 +190,25 @@ class UIInventoryFull(
 
 
         categoryBar.update(delta)
+        transitionPanel.update(delta)
 
-        transitionalUpdateUIs.forEach { it.update(delta) }
 
         // update map while visible
-        if (currentScreenTransition > 1f + epsilon) {
+        /*if (currentScreenTransition > 1f + epsilon) {
             MinimapComposer.setWorld(Terrarum.ingame!!.world)
             MinimapComposer.update()
-        }
+        }*/
 
         // update inventory while visible
-        if (currentScreenTransition in epsilon..2f - epsilon) {
+        /*if (currentScreenTransition in epsilon..2f - epsilon) {
             itemList.update(delta)
             equipped.update(delta)
-        }
+        }*/
 
         // update menu while visible
-        if (currentScreenTransition < 1f - epsilon) {
+        /*if (currentScreenTransition < 1f - epsilon) {
             gameMenuButtons.update(delta)
-        }
+        }*/
 
         minimapRerenderTimer += Gdx.graphics.rawDeltaTime
     }
@@ -244,49 +218,24 @@ class UIInventoryFull(
     private val shapeRenderer = ShapeRenderer()
     private val gradHeight = 48f
 
-    private val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryDynamicList.listGap
-
-    private var xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
-    private var yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
+    internal var xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
+        private set
+    internal var yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
+        private set
 
     private var minimapRerenderTimer = 0f
     private val minimapRerenderInterval = .5f
 
-    fun requestTransition(target: Int) {
+    // TODO implemented on UIItemTransitionContainer
+    /*fun requestTransition(target: Int) {
         if (!transitionOngoing) {
             transitionRequested = true
             transitionReqSource = currentScreenTransition.round()
             transitionReqTarget = target.toFloat()
         }
-    }
+    }*/
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-
-        if (transitionRequested && !transitionOngoing) {
-            transitionRequested = false
-            transitionOngoing = true
-            transitionTimer = 0f
-        }
-
-        if (transitionOngoing) {
-            transitionTimer += Gdx.graphics.rawDeltaTime
-
-            currentScreenTransition = UIUtils.moveLinear(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
-
-            if (transitionTimer > transitionLength) {
-                transitionOngoing = false
-                currentScreenTransition = transitionReqTarget
-            }
-        }
-
-
-
-        // update at render time
-        if (debugvals) {
-            batch.color = Color.WHITE
-            AppLoader.fontSmallNumbers.draw(batch, "screen:$currentScreenTransition", 500f, 30f)
-        }
-
 
 
         // background fill
@@ -314,41 +263,41 @@ class UIInventoryFull(
         categoryBar.render(batch, camera)
 
         // render map while visible
-        if (currentScreenTransition > 1f + epsilon) {
+        /*if (currentScreenTransition > 1f + epsilon) {
             renderScreenMinimap(batch, camera)
 
             if (debugvals) {
                 batch.color = Color.CORAL
                 AppLoader.fontSmallNumbers.draw(batch, "Map", 300f, 10f)
             }
-        }
+        }*/
 
         // render inventory while visible
-        if (currentScreenTransition in epsilon..2f - epsilon) {
+        /*if (currentScreenTransition in epsilon..2f - epsilon) {
             renderScreenInventory(batch, camera)
 
             if (debugvals) {
                 batch.color = Color.CHARTREUSE
                 AppLoader.fontSmallNumbers.draw(batch, "Inv", 350f, 10f)
             }
-        }
+        }*/
 
         // render menu while visible
-        if (currentScreenTransition < 1f - epsilon) {
+        /*if (currentScreenTransition < 1f - epsilon) {
             renderScreenGamemenu(batch, camera)
 
             if (debugvals) {
                 batch.color = Color.SKY
                 AppLoader.fontSmallNumbers.draw(batch, "Men", 400f, 10f)
             }
-        }
+        }*/
 
-        if (debugvals) {
+        /*if (debugvals) {
             batch.color = Color.WHITE
             AppLoader.fontSmallNumbers.draw(batch, "minimap:$minimapScrOffX", 500f, 0f)
             AppLoader.fontSmallNumbers.draw(batch, "inven:$inventoryScrOffX", 500f, 10f)
             AppLoader.fontSmallNumbers.draw(batch, "menu:$menuScrOffX", 500f, 20f)
-        }
+        }*/
 
 
     }
@@ -360,7 +309,7 @@ class UIInventoryFull(
      * - +WIDTH on minimap screen
      * - -WIDTH on gamemenu screen
      */
-    private val minimapScrOffX: Float
+    /*private val minimapScrOffX: Float
         get() = (currentScreenTransition - 2f) * AppLoader.screenW / 2f
     private val inventoryScrOffX: Float
         get() = (currentScreenTransition - 1f) * AppLoader.screenW / 2f
@@ -372,24 +321,24 @@ class UIInventoryFull(
     private val inventoryScrOpacity: Float
         get() = (currentScreenTransition - 1f).coerceIn(0f, 1f)
     private val menuScrOpacity: Float
-        get() = (currentScreenTransition - 0f).coerceIn(0f, 1f)
+        get() = (currentScreenTransition - 0f).coerceIn(0f, 1f)*/
 
-    private val MINIMAP_WIDTH = 800f
-    private val MINIMAP_HEIGHT = itemList.height.toFloat()
-    private val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
-    private var minimapZoom = 1f
-    private var minimapPanX = -MinimapComposer.totalWidth / 2f
-    private var minimapPanY = -MinimapComposer.totalHeight / 2f
-    private val MINIMAP_ZOOM_MIN = 0.5f
-    private val MINIMAP_ZOOM_MAX = 8f
-    private val minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, MINIMAP_WIDTH.toInt(), MINIMAP_HEIGHT.toInt(), false)
-    private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
+    //private val MINIMAP_WIDTH = 800f
+    //private val MINIMAP_HEIGHT = itemList.height.toFloat()
+    //private val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
+    //private var minimapZoom = 1f
+    //private var minimapPanX = -MinimapComposer.totalWidth / 2f
+    //private var minimapPanY = -MinimapComposer.totalHeight / 2f
+    //private val MINIMAP_ZOOM_MIN = 0.5f
+    //private val MINIMAP_ZOOM_MAX = 8f
+    //private val minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, MINIMAP_WIDTH.toInt(), MINIMAP_HEIGHT.toInt(), false)
+    //private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
 
     // TODO put 3 bare sub-UIs into proper UIcanvas to handle the motherfucking opacity
 
-
-    private fun renderScreenMinimap(batch: SpriteBatch, camera: Camera) {
+    // TODO not yet refactored
+    /*private fun renderScreenMinimap(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
 
         // update map panning
@@ -482,9 +431,10 @@ class UIInventoryFull(
 
         // the minimap
         batch.draw(minimapFBO.colorBufferTexture, minimapScrOffX + (AppLoader.screenW - MINIMAP_WIDTH) / 2, itemList.posY.toFloat())
-    }
+    }*/
 
-    private fun renderScreenGamemenu(batch: SpriteBatch, camera: Camera) {
+    // TODO not yet refactored
+    /*private fun renderScreenGamemenu(batch: SpriteBatch, camera: Camera) {
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
@@ -493,9 +443,10 @@ class UIInventoryFull(
         // text buttons
         gameMenuButtons.posX = gameMenuButtons.initialX + menuScrOffX.roundToInt()
         gameMenuButtons.render(batch, camera)
-    }
+    }*/
 
-    private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
+    // TODO refactoring wip
+    /*private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
         itemList.posX = itemList.initialX + inventoryScrOffX.roundToInt()
         itemList.render(batch, camera)
         equipped.posX = equipped.initialX + inventoryScrOffX.roundToInt()
@@ -553,17 +504,11 @@ class UIInventoryFull(
                     encumbBarYPos + controlHelpHeight - 4f
             )
         }
-    }
+    }*/
 
 
     fun rebuildList() {
-        printdbg(this, "rebuilding list")
-
-        itemList.rebuild(catIconsMeaning[categoryBar.selectedIcon])
-        equipped.rebuild()
-
-        encumbrancePerc = actor.inventory.capacity.toFloat() / actor.inventory.maxCapacity
-        isEncumbered = actor.inventory.isEncumbered
+        transitionalItemCells.rebuildList()
     }
 
     private fun Int.fastLen(): Int {
@@ -582,8 +527,8 @@ class UIInventoryFull(
 
     override fun dispose() {
         categoryBar.dispose()
-        itemList.dispose()
-        equipped.dispose()
+        transitionPanel.dispose()
+
     }
 
 

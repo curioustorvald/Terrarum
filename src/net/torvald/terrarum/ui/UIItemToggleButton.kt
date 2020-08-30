@@ -34,8 +34,6 @@ class UIItemToggleButton(
         get() = togglerBase.width
     override val height: Int
         get() = togglerBase.height
-    override var oldPosX = posX
-    override var oldPosY = posY
 
     private var togglerBase = CommonResourcePool.getAsTexture("ui_item_toggler_base")
     private var togglerHandle = CommonResourcePool.getAsTexture("ui_item_toggler_handle")

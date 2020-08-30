@@ -28,7 +28,7 @@ class UIItemInventoryEquippedView(
 
 
     override val width  = WIDTH
-    override val height = parentUI.itemList.height
+    override val height = parentUI.itemListHeight
 
     companion object {
         val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap
@@ -70,10 +70,6 @@ class UIItemInventoryEquippedView(
     override fun update(delta: Float) {
         itemGrid.forEach { it.update(delta) }
     }
-
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         val posXDelta = posX - oldPosX

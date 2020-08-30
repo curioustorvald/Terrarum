@@ -66,7 +66,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
      * oldPosX = posX
      * ```
      */
-    protected abstract var oldPosX: Int
+    protected var oldPosX: Int = initialX
     /** This variable is NOT updated on its own.
      * ```
      * val posYDelta = posY - oldPosY
@@ -75,7 +75,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
      * oldPosY = posY
      * ```
      */
-    protected abstract var oldPosY: Int
+    protected var oldPosY: Int = initialY
 
     /** Position of mouse relative to this item */
     protected val relativeMouseX: Int

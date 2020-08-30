@@ -20,10 +20,6 @@ class UIItemInventoryCatBar(
         override val width: Int
 ) : UIItem(parentUI, initialX, initialY) {
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     private val parentInventory = parentUI
 
     private val catIcons = parentUI.catIcons
