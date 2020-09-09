@@ -261,6 +261,7 @@ class UIInventoryFull(
 
         // UI items
         categoryBar.render(batch, camera)
+        transitionPanel.render(batch, camera)
 
         // render map while visible
         /*if (currentScreenTransition > 1f + epsilon) {
