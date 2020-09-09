@@ -17,7 +17,7 @@ class UIItemHorizontalFadeSlide(
         vararg uis: UICanvas
 ) : UIItemTransitionContainer(parent, initialX, initialY, width, height, 0.212f, currentPosition, uis) {
 
-    fun getOffX(index: Int) = ((currentPosition - index) * width).roundToInt()
+    fun getOffX(index: Int) = ((currentPosition - index) * width / 2f).roundToInt()
     fun getOpacity(index: Int) = (currentPosition - index).coerceIn(0f, 1f)
 
     init {
