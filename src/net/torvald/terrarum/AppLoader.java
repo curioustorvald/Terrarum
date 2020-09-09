@@ -344,7 +344,9 @@ public class AppLoader implements ApplicationListener {
             // safe area box
             //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
         }
-
+        else {
+            System.err.println("Game not started using DEBUG MODE -- current build of the game will display black screen without debug mode");
+        }
         // set some more configuration vars
         MULTITHREAD = ThreadParallel.INSTANCE.getThreadCount() >= 3 && getConfigBoolean("multithread");
 
