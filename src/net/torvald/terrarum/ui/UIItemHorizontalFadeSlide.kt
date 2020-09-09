@@ -23,10 +23,10 @@ class UIItemHorizontalFadeSlide(
     init {
         // re-position the uis according to the initial choice of currentPosition
         uis.forEachIndexed { index, it ->
-            it.posX = posX + getOffX(index)
-            it.initialX = posX + getOffX(index)
-            it.posY = posY
-            it.initialY = posY
+            it.posX = 0 + getOffX(index)
+            it.initialX = 0 + getOffX(index)
+            it.posY = 0
+            it.initialY = 0
             it.opacity = getOpacity(index)
         }
     }
@@ -34,7 +34,7 @@ class UIItemHorizontalFadeSlide(
     override fun onTransition(currentPosition: Float, uis: Array<out UICanvas>) {
         uis.forEachIndexed { index, it ->
             it.posX = it.initialX + getOffX(index)
-            it.posY = posY
+            it.posY = it.initialY
             it.opacity = getOpacity(index)
         }
     }
