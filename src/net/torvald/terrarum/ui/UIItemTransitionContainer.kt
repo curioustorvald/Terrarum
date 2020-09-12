@@ -12,7 +12,7 @@ open class UIItemTransitionContainer(
         initialY: Int,
         override val width: Int,
         override val height: Int,
-        val transitionLength: Float = 0.212f,
+        val transitionLength: Float = 0.15f,
         var currentPosition: Float = 0f,
         val uis: Array<out UICanvas>
 ) : UIItem(parent, initialX, initialY) {

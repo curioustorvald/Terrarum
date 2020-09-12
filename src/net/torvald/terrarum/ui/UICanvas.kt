@@ -121,8 +121,8 @@ abstract class UICanvas(
      * Under normal circumstances, draws are automatically translated as per the handler's X/Y position.
      * This means, don't write like: ```draw(posX + 4, posY + 32)```, do instead: ```draw(4, 32)``` unless you have a good reason to do so.
      *
-     * The transparency of the handler is independent of the draw, you must specified the color yourself
-     * using handler.opacity or handler.opacityColour
+     * The transparency of the handler is independent of the draw, you must set the drawing color yourself
+     * (use handler.opacity or handler.opacityColour)
      */
     abstract fun renderUI(batch: SpriteBatch, camera: Camera)
 

@@ -15,10 +15,10 @@ class UIItemHorizontalFadeSlide(
         //transitionLength: Float,
         currentPosition: Float,
         vararg uis: UICanvas
-) : UIItemTransitionContainer(parent, initialX, initialY, width, height, 0.212f, currentPosition, uis) {
+) : UIItemTransitionContainer(parent, initialX, initialY, width, height, 0.15f, currentPosition, uis) {
 
     fun getOffX(index: Int) = ((currentPosition - index) * width / 2f).roundToInt()
-    fun getOpacity(index: Int) = (currentPosition - index).coerceIn(0f, 1f)
+    fun getOpacity(index: Int) = 1f - (currentPosition - index).coerceIn(0f, 1f) // fixme make it work for both direction
 
     init {
         // re-position the uis according to the initial choice of currentPosition
