@@ -213,6 +213,8 @@ public class AppLoader implements ApplicationListener {
     public static final int minimumW = 1080;
     public static final int minimumH = 720;
 
+    public static final String FONT_DIR = "assets/graphics/fonts/terrarum-sans-bitmap";
+
 
 
     private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
@@ -481,14 +483,12 @@ public class AppLoader implements ApplicationListener {
         }*/
 
 
-        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
+        fontGame = new GameFontBase(FONT_DIR, false, true,
                 false, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
         );
         Lang.invoke();
 
         // make loading list
-
-
         CommonResourcePool.INSTANCE.loadAll();
     }
 
