@@ -174,6 +174,7 @@ class UIItemInventoryCatBar(
                 selectedPanel = 1
             }
 
+            // move selection highlighter
             if (btn.mousePushed && index != selectedIndex) {
                 // normal stuffs
                 val oldIndex = selectedIndex
@@ -203,7 +204,6 @@ class UIItemInventoryCatBar(
             if (selectedPanel != 0) transitionFired = true
             mainButtons.forEach { it.highlighted = false }
             selectedPanel = 0
-            parentInventory.requestTransition(0)
 
             sideButtons[0].highlighted = true
             sideButtons[3].highlighted = false
@@ -212,7 +212,6 @@ class UIItemInventoryCatBar(
             if (selectedPanel != 2) transitionFired = true
             mainButtons.forEach { it.highlighted = false }
             selectedPanel = 2
-            parentInventory.requestTransition(2)
             transitionFired = true
 
             sideButtons[0].highlighted = false
@@ -222,7 +221,7 @@ class UIItemInventoryCatBar(
 
         if (transitionFired) {
             transitionFired = false
-            parentInventory.requestTransition(2 - selectedPanel)
+            parentInventory.requestTransition(selectedPanel)
         }
     }
 
