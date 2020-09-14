@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.jme3.math.FastMath
 import kotlin.math.roundToInt
 
 /**
@@ -18,7 +19,12 @@ class UIItemHorizontalFadeSlide(
 ) : UIItemTransitionContainer(parent, initialX, initialY, width, height, 0.15f, currentPosition, uis) {
 
     fun getOffX(index: Int) = ((currentPosition - index) * width / 2f).roundToInt()
-    fun getOpacity(index: Int) = 1f - (currentPosition - index).coerceIn(0f, 1f) // fixme make it work for both direction
+    fun getOpacity(index: Int) = 1f
+            /*if (currentPosition >= index)
+                1f - (currentPosition - index).coerceIn(0f, 1f)
+            else
+                (currentPosition - index).coerceIn(0f, 1f) - 1f*/
+
 
     init {
         // re-position the uis according to the initial choice of currentPosition
@@ -33,7 +39,7 @@ class UIItemHorizontalFadeSlide(
 
     override fun onTransition(currentPosition: Float, uis: Array<out UICanvas>) {
         uis.forEachIndexed { index, it ->
-            it.posX = it.initialX + getOffX(index)
+            it.posX = it.initialX - getOffX(index)
             it.posY = it.initialY
             it.opacity = getOpacity(index)
         }
