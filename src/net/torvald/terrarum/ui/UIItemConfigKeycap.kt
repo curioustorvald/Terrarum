@@ -36,9 +36,6 @@ class UIItemConfigKeycap(
     override val width = capTex.tileW * keySize
     override val height = capTex.tileH
 
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     override fun update(delta: Float) {
         super.update(delta)
     }

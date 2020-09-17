@@ -38,11 +38,7 @@ class UIItemInventoryElemSimple(
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot) {
-
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
+    
     companion object {
         val height = UIItemInventoryElem.height
     }

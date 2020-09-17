@@ -79,7 +79,7 @@ class UIQuickslotPie : UICanvas() {
             val slotX = slotCentrePoint.x.toInt()
             val slotY = slotCentrePoint.y.toInt()
 
-            drawColor.a = handler.opacity * UIQuickslotBar.DISPLAY_OPACITY
+            drawColor.a = UIQuickslotBar.DISPLAY_OPACITY
             batch.color = drawColor
             image.draw(batch, slotX, slotY)
 

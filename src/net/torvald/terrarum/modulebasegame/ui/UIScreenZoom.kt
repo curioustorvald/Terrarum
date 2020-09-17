@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.AppLoader
@@ -34,7 +35,7 @@ class UIScreenZoom : UICanvas(
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        batch.color = handler.opacityColour
+        batch.color = Color.WHITE
 
         AppLoader.fontGame.draw(
                 batch, zoomText,

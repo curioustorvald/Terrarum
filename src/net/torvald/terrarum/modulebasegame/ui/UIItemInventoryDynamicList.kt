@@ -40,8 +40,8 @@ class UIItemInventoryDynamicList(
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
+    //override var oldPosX = posX
+    //override var oldPosY = posY
 
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
     override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap

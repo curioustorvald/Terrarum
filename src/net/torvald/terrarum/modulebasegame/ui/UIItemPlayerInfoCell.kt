@@ -25,10 +25,6 @@ class UIItemPlayerInfoCell(
         var ingamePlayer: IngamePlayer? = null
 ) : UIItem(parent, initialX, initialY) {
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     override val height = HEIGHT
 
     companion object {
