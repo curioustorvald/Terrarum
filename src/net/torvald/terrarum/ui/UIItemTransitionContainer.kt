@@ -27,6 +27,8 @@ open class UIItemTransitionContainer(
 
     private val epsilon = 0.001f
 
+    private fun timeToUpdate(index: Int) = true//(currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon)
+
     fun requestTransition(target: Int) {
         if (!transitionOngoing) {
             transitionRequested = true
@@ -37,12 +39,7 @@ open class UIItemTransitionContainer(
 
     override fun update(delta: Float) {
         super.update(delta)
-
-        uis.forEachIndexed { index, ui ->
-            if (currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon) {
-                ui.update(delta)
-            }
-        }
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.update(delta) }
     }
 
     open fun onTransition(currentPosition: Float, uis: Array<out UICanvas>) {}
@@ -87,6 +84,41 @@ open class UIItemTransitionContainer(
             batch.color = Color.WHITE
             AppLoader.fontSmallNumbers.draw(batch, "position:$currentPosition", 500f, 10f)
         }
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.keyDown(keycode) }
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.keyUp(keycode) }
+        return true
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.mouseMoved(screenX, screenY) }
+        return true
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.touchDragged(screenX, screenY, pointer) }
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.touchUp(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun scrolled(amount: Int): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.scrolled(amount) }
+        return true
     }
 
     override fun dispose() {
