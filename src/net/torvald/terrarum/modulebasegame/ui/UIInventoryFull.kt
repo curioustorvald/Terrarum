@@ -48,6 +48,9 @@ class UIInventoryFull(
 
     val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.listGap
 
+    val INVENTORY_CELLS_UI_HEIGHT = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryDynamicList.listGap
+    val INVENTORY_CELLS_OFFSET_Y = 107 + (AppLoader.screenH - internalHeight) / 2
+
     init {
         handler.allowESCtoClose = true
         CommonResourcePool.addToLoadingList("inventory_caticons") {
@@ -113,33 +116,15 @@ class UIInventoryFull(
 
     private val transitionalMinimap = UIInventoryCells(this) // PLACEHOLDER
     private val transitionalItemCells = UIInventoryCells(this)
-    private val transitionalEscMenu = UIInventoryCells(this) // PLACEHOLDER
+    private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
             this,
             (AppLoader.screenW - internalWidth) / 2,
-            107 + (AppLoader.screenH - internalHeight) / 2,
+            INVENTORY_CELLS_OFFSET_Y,
             AppLoader.screenW,
             AppLoader.screenH,
             1f,
             transitionalMinimap, transitionalItemCells, transitionalEscMenu
-    )
-
-
-    private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
-    private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
-    private val gameMenuListWidth = 400
-    private val gameMenuButtons = UIItemTextButtonList(
-            this, gameMenu,
-            (AppLoader.screenW - gameMenuListWidth) / 2,
-            (transitionalItemCells.itemList.height - gameMenuListHeight) / 2 + transitionalItemCells.itemList.posY,
-            gameMenuListWidth, gameMenuListHeight,
-            readFromLang = true,
-            textAreaWidth = gameMenuListWidth,
-            activeBackCol = Color(0),
-            highlightBackCol = Color(0),
-            backgroundCol = Color(0),
-            inactiveCol = Color.WHITE,
-            defaultSelection = null
     )
 
     private val SCREEN_MINIMAP = 0f
@@ -164,15 +149,6 @@ class UIInventoryFull(
 
         rebuildList()
 
-        // make gameMenuButtons work
-        gameMenuButtons.selectionChangeListener = { old, new ->
-            if (new == 0) {
-                AppLoader.setScreen(TitleScreen(AppLoader.batch))
-            }
-            else if (new == 1) {
-                Gdx.app.exit()
-            }
-        }
 
     }
 
@@ -433,80 +409,6 @@ class UIInventoryFull(
         // the minimap
         batch.draw(minimapFBO.colorBufferTexture, minimapScrOffX + (AppLoader.screenW - MINIMAP_WIDTH) / 2, itemList.posY.toFloat())
     }*/
-
-    // TODO not yet refactored
-    /*private fun renderScreenGamemenu(batch: SpriteBatch, camera: Camera) {
-        // control hints
-        blendNormal(batch)
-        batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, gameMenuControlHelp, offsetX + menuScrOffX, yEnd - 20)
-
-        // text buttons
-        gameMenuButtons.posX = gameMenuButtons.initialX + menuScrOffX.roundToInt()
-        gameMenuButtons.render(batch, camera)
-    }*/
-
-    // TODO refactoring wip
-    /*private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
-        itemList.posX = itemList.initialX + inventoryScrOffX.roundToInt()
-        itemList.render(batch, camera)
-        equipped.posX = equipped.initialX + inventoryScrOffX.roundToInt()
-        equipped.render(batch, camera)
-
-
-        // control hints
-        val controlHintXPos = offsetX + inventoryScrOffX
-        blendNormal(batch)
-        batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, listControlHelp, controlHintXPos, yEnd - 20)
-
-
-        // encumbrance meter
-        val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
-        // encumbrance bar will go one row down if control help message is too long
-        val encumbBarXPos = xEnd - weightBarWidth + inventoryScrOffX
-        val encumbBarTextXPos = encumbBarXPos - 6 - AppLoader.fontGame.getWidth(encumbranceText)
-        val encumbBarYPos = yEnd-20 + 3f +
-                            if (AppLoader.fontGame.getWidth(listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
-                                AppLoader.fontGame.lineHeight
-                            else 0f
-        
-        AppLoader.fontGame.draw(batch,
-                encumbranceText,
-                encumbBarTextXPos,
-                encumbBarYPos - 3f
-        )
-
-        // encumbrance bar background
-        blendNormal(batch)
-        val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
-        val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-        batch.color = encumbBack
-        batch.fillRect(
-                encumbBarXPos, encumbBarYPos,
-                weightBarWidth, controlHelpHeight - 6f
-        )
-        // encumbrance bar
-        batch.color = encumbCol
-        batch.fillRect(
-                encumbBarXPos, encumbBarYPos,
-                if (actor.inventory.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
-                    1f
-                else // make sure 1px is always be seen
-                    minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
-                controlHelpHeight - 6f
-        )
-        // debug text
-        batch.color = Color.LIGHT_GRAY
-        if (IS_DEVELOPMENT_BUILD) {
-            AppLoader.fontSmallNumbers.draw(batch,
-                    "${actor.inventory.capacity}/${actor.inventory.maxCapacity}",
-                    encumbBarTextXPos,
-                    encumbBarYPos + controlHelpHeight - 4f
-            )
-        }
-    }*/
-
 
     fun rebuildList() {
         transitionalItemCells.rebuildList()
