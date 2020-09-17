@@ -46,6 +46,11 @@ internal class UIInventoryCells(
                     107 + (AppLoader.screenH - full.internalHeight) / 2
             )
 
+    init {
+        uiItems.add(itemList)
+        uiItems.add(equipped)
+    }
+
     fun rebuildList() {
         AppLoader.printdbg(this, "rebuilding list")
 
