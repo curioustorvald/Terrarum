@@ -16,10 +16,6 @@ class UIItemModuleInfoCell(
         initialY: Int
 ) : UIItem(parent, initialX, initialY) {
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     override val height: Int = AppLoader.fontGame.lineHeight.toInt() * 2
 
     private val numberAreaWidth = AppLoader.fontSmallNumbers.W * 3 + 4

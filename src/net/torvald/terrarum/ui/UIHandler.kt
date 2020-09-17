@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -14,6 +15,9 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
  * UIHandler is a handler for UICanvas. It opens/closes the attached UI, moves the "window" (or "canvas")
  * to the coordinate of displayed cartesian coords, and update and render the UI.
  * It also process game inputs and send control events to the UI so that the UI can handle them.
+ *
+ * The UI is *non-compositing* and thus has no underlying framebuffers, meaning that some of the effects (opacity, scaling)
+ * must be separately implemented onto the UICanvas (which may cause some artefacts when UI elements are overlapping and they are both semi-transparent)
  *
  * New UIs are NORMALLY HIDDEN; set it visible as you need!
  *
@@ -28,9 +32,50 @@ class UIHandler(//var UI: UICanvas,
                 internal var allowESCtoClose: Boolean = false
 ): Disposable {
 
+    companion object {
+        private val SHADER_PROG_FRAG = """
+#version 130
+#ifdef GL_ES
+    precision mediump float;
+#endif
+
+varying vec4 v_color;
+varying vec2 v_texCoords;
+uniform sampler2D u_texture;
+
+uniform float opacity;
+
+void main(void) {
+    vec4 color = texture2D(u_texture, v_texCoords).rgba;
+    
+    gl_FragColor = v_color * vec4(color.rgb, color.a * opacity);
+}
+""".trimIndent()
+
+        private val SHADER_PROG_VERT = """
+attribute vec4 a_position;
+attribute vec4 a_color;
+attribute vec2 a_texCoord0;
+
+uniform mat4 u_projTrans;
+
+varying vec4 v_color;
+varying vec2 v_texCoords;
+
+void main() {
+    v_color = a_color;
+    v_texCoords = a_texCoord0;
+    gl_Position = u_projTrans * a_position;
+}
+        """.trimIndent()
+    }
+
     // X/Y Position relative to the game window.
     var posX: Int = 0
     var posY: Int = 0
+
+    var initialX = posX
+    var initialY = posY
 
     private var alwaysVisible = false
 
@@ -60,15 +105,17 @@ class UIHandler(//var UI: UICanvas,
     var closeFired = false
 
     var opacity = 1f
-        set(value) {
+        /*set(value) {
             field = value
-            opacityColour.set(1f,1f,1f,opacity)
-        }
+            opacityColour.a = value
+        }*/
     var scale = 1f
 
-    val opacityColour = Color(1f, 1f, 1f, opacity)
+    //val opacityColour = Color(1f, 1f, 1f, opacity)
 
     var openCloseCounter = 0f
+
+    private val shader = AppLoader.loadShaderInline(SHADER_PROG_VERT, SHADER_PROG_FRAG)
 
     init {
         //UI.handler = this
@@ -201,9 +248,12 @@ class UIHandler(//var UI: UICanvas,
             }
             batch.color = Color.WHITE
 
-
+            batch.shader = shader
+            shader.setUniformf("opacity", opacity)
             ui.renderUI(batch, camera)
             //ingameGraphics.flush()
+
+            batch.shader = null
             batch.color = Color.WHITE
 
 
@@ -381,5 +431,6 @@ class UIHandler(//var UI: UICanvas,
     override fun dispose() {
         toggleKey?.let { KeyToggler.forceSet(it, false) }
         toggleButton?.let { /* ButtonToggler.forceSet(it, false) */ }
+        shader.dispose()
     }
 }

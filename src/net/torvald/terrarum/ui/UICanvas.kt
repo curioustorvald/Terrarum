@@ -53,6 +53,13 @@ abstract class UICanvas(
         get() = handler.posY
         set(value) { handler.posY = value }
 
+    inline var initialX: Int
+        get() = handler.initialX
+        set(value) { handler.initialX = value }
+    inline var initialY: Int
+        get() = handler.initialY
+        set(value) { handler.initialY = value }
+
     /**
      * Usage: (in StateInGame:) uiHandlerField.ui.handler = uiHandlerField
      */
@@ -103,16 +110,19 @@ abstract class UICanvas(
     }
 
 
-    /** Override this for the actual update. Note that you must update uiItems by yourself. */
+    /** **DO NOT CALL THIS FUNCTION FOR THE ACTUAL UPDATING OF THE UI — USE update() INSTEAD**
+     *
+     * Override this for the actual update. Note that you must update uiItems by yourself. */
     abstract fun updateUI(delta: Float)
-    /**
+    /** **DO NOT CALL THIS FUNCTION FOR THE ACTUAL RENDERING OF THE UI — USE render() INSTEAD**
+     *
      * Override this for the actual render. Note that you must render uiItems by yourself.
      *
      * Under normal circumstances, draws are automatically translated as per the handler's X/Y position.
      * This means, don't write like: ```draw(posX + 4, posY + 32)```, do instead: ```draw(4, 32)``` unless you have a good reason to do so.
      *
-     * The transparency of the handler is independent of the draw, you must specified the color yourself
-     * using handler.opacity or handler.opacityColour
+     * The transparency of the handler is independent of the draw, you must set the drawing color yourself
+     * (use handler.opacity or handler.opacityColour)
      */
     abstract fun renderUI(batch: SpriteBatch, camera: Camera)
 
@@ -138,7 +148,7 @@ abstract class UICanvas(
 
     abstract override fun dispose()
 
-    fun addItem(uiItem: UIItem) {
+    fun addUIitem(uiItem: UIItem) {
         uiItems.add(uiItem)
     }
 

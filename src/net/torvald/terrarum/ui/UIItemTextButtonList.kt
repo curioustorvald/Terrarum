@@ -57,10 +57,6 @@ class UIItemTextButtonList(
         val DEFAULT_LINE_HEIGHT = 36
     }
 
-    // deal with the moving position
-    override var oldPosX = posX
-    override var oldPosY = posY
-
     val iconToTextGap = 20
     val iconCellWidth = (iconSpriteSheet?.tileW ?: -iconToTextGap) / (iconSpriteSheet?.horizontalCount ?: 1)
     val iconCellHeight = (iconSpriteSheet?.tileH ?: 0) / (iconSpriteSheet?.verticalCount ?: 1)

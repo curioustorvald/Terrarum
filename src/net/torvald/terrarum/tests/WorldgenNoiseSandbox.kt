@@ -23,10 +23,11 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.BiomegenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.TerragenParams
 import net.torvald.terrarum.modulebasegame.worldgenerator.shake
 import net.torvald.terrarum.worlddrawer.toRGBA
+import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
-import kotlinx.coroutines.*
+import kotlin.coroutines.*
 
 const val WIDTH = 768
 const val HEIGHT = 512
@@ -52,6 +53,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     private var generationTimeInMeasure = false
     private var generationStartTime = 0L
+    private var genSlices: Int = 0
+    private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
 
     override fun create() {
         font = BitmapFont() // use default because fuck it
@@ -66,6 +69,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testTex = Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888)
         testTex.blending = Pixmap.Blending.None
         tempTex = Texture(1, 1, Pixmap.Format.RGBA8888)
+
+        genSlices = maxOf(ThreadExecutor.threadCount, testTex.width / 8)
 
         println("Init done")
     }
@@ -91,7 +96,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
             renderNoise()
         }
 
-        val coroutineExecFinished = coroutineJobs.fold(true) { acc, it -> acc and it.isCompleted }
+        val coroutineExecFinished = genFutures.fold(true) { acc, it -> acc and (it?.isDone ?: true) }
         // check if generation is done
         if (coroutineExecFinished) {
             generateKeyLatched = false
@@ -158,12 +163,6 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         }
     }
 
-    //private val xSlices = (0 until WIDTH).sliceEvenly(ThreadExecutor.threadCount)
-    private val xSlices = (0 until WIDTH).sliceEvenly(maxOf(WIDTH, ThreadExecutor.threadCount, WIDTH / 8))
-
-    private val runs = (0 until WIDTH).map { x -> (x until WIDTH * HEIGHT step WIDTH) }.flatten()
-
-    private lateinit var coroutineJobs: List<Job>
 
     private fun renderNoise() {
         generationStartTime = System.nanoTime()
@@ -220,7 +219,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         } }*/
 
         // 2. each runner gets their own copy of Joise
-        val runnables: List<RunnableFun> = xSlices.map { range -> {
+        val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range -> {
                 val localJoise = getNoiseGenerator(seed)
                 for (x in range) {
                     for (y in 0 until HEIGHT) {
@@ -235,7 +234,12 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         } }
 
 
-        coroutineJobs = runnables.map { r -> GlobalScope.launch { r() } }
+        ThreadExecutor.renew()
+        runnables.forEach {
+            ThreadExecutor.submit(it)
+        }
+
+        ThreadExecutor.join()
 
         initialGenDone = true
     }
