@@ -31,8 +31,8 @@ internal class UIInventoryCells(
             UIItemInventoryDynamicList(
                     full,
                     full.actor.inventory,
-                    0 + (AppLoader.screenW - full.internalWidth) / 2,
-                    107 + (AppLoader.screenH - full.internalHeight) / 2,
+                    full.INVENTORY_CELLS_OFFSET_X,
+                    full.INVENTORY_CELLS_OFFSET_Y,
                     full.CELLS_HOR, full.CELLS_VRT
             )
 
@@ -43,7 +43,7 @@ internal class UIInventoryCells(
                     full.actor.inventory,
                     full.actor as ActorWithBody,
                     full.internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - full.internalWidth) / 2,
-                    107 + (AppLoader.screenH - full.internalHeight) / 2
+                    full.INVENTORY_CELLS_OFFSET_Y
             )
 
     init {
