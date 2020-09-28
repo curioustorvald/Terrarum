@@ -1,5 +1,6 @@
 package net.torvald.terrarum.blockstats
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
@@ -139,11 +140,11 @@ object MinimapComposer : Disposable {
                 val colTerr = CreateTileAtlas.terrainTileColourMap.get(tileTerr % 16, tileTerr / 16)
                 val colWall = CreateTileAtlas.terrainTileColourMap.get(wallTerr % 16, wallTerr / 16).mul(BlocksDrawer.wallOverlayColour)
 
-                if (colTerr.a < 1f) {
-                    pixmap.setColor(colWall)
-                    pixmap.drawPixel(x - topLeftX, y - topLeftY)
-                }
-                pixmap.setColor(colTerr)
+                val outCol = if (colTerr.a > 0.1f) colTerr else colWall
+
+                pixmap.blending = Pixmap.Blending.None
+                pixmap.setColor(outCol)
+                //pixmap.setColor(Color.CORAL)
                 pixmap.drawPixel(x - topLeftX, y - topLeftY)
             }
         }
