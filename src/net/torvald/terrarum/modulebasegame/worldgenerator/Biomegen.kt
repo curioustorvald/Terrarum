@@ -23,21 +23,13 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
     private val genSlices = maxOf(ThreadExecutor.threadCount, world.width / 8)
 
-    private var genFutures: Array<Future<*>?> = arrayOfNulls(genSlices)
-    override var generationStarted: Boolean = false
-    override val generationDone: Boolean
-        get() = generationStarted && genFutures.fold(true) { acc, f -> acc and (f?.isDone ?: true) }
-
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
-    override fun run() {
-
-        generationStarted = true
-
+    override fun getDone() {
         ThreadExecutor.renew()
-        (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
-            genFutures[i] = ThreadExecutor.submit {
+        (0 until world.width).sliceEvenly(genSlices).map { xs ->
+            ThreadExecutor.submit {
                 val localJoise = getGenerator(seed, params as BiomegenParams)
                 for (x in xs) {
                     for (y in 0 until world.height) {
