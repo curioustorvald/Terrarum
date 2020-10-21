@@ -154,7 +154,7 @@ internal object ReadLayerDataZip {
         val fluidFills = HashMap<BlockAddress, Float>()
 
         // parse terrain damages
-        for (c in 0 until payloadBytes["TdMG"]!!.size step 10) {
+        for (c in payloadBytes["TdMG"]!!.indices step 10) {
             val bytes = payloadBytes["TdMG"]!!
 
             val tileAddr = bytes.sliceArray(c..c+5)
@@ -165,7 +165,7 @@ internal object ReadLayerDataZip {
 
 
         // parse wall damages
-        for (c in 0 until payloadBytes["WdMG"]!!.size step 10) {
+        for (c in payloadBytes["WdMG"]!!.indices step 10) {
             val bytes = payloadBytes["WdMG"]!!
 
             val tileAddr = bytes.sliceArray(c..c+5)

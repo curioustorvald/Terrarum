@@ -307,7 +307,7 @@ package net.torvald.terrarum.modulebasegame.ui
             inventorySortList.sortBy { it.item.name }
 
             // map sortList to item list
-            for (k in 0 until items.size) {
+            for (k in items.indices) {
                 // we have an item
                 try {
                     val sortListItem = inventorySortList[k + itemPage * items.size]

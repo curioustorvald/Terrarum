@@ -53,7 +53,7 @@ class RGBtoXYZBenchmark {
 
         // print out captured data
         println("with LUT\tno LUT\tmult")
-        for (i in 0 until timer1.size) {
+        for (i in timer1.indices) {
             println("${timer1[i]}\t${timer2[i]}\t${timer1[i].toFloat() / timer2[i]}")
         }
     }

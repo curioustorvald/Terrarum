@@ -410,7 +410,7 @@ internal object BlocksDrawer {
         val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
 
         var ret = 0
-        for (i in 0 until nearbyTiles.size) {
+        for (i in nearbyTiles.indices) {
             if (nearbyTiles[i] == mark) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
@@ -429,7 +429,7 @@ internal object BlocksDrawer {
         val nearbyTiles = getNearbyTilesPos(x, y).map { world.getWiringBlocks(it.x, it.y).and(drawWires).toBitOrd() * 16 }
 
         var ret = 0
-        for (i in 0 until nearbyTiles.size) {
+        for (i in nearbyTiles.indices) {
             if (nearbyTiles[i] == wire) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
@@ -442,7 +442,7 @@ internal object BlocksDrawer {
         val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
 
         var ret = 0
-        for (i in 0 until nearbyTiles.size) {
+        for (i in nearbyTiles.indices) {
             if (BlockCodex[nearbyTiles[i]].isSolid) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
@@ -459,7 +459,7 @@ internal object BlocksDrawer {
         val nearbyTiles = nearbyPos.map { world.getTileFromTerrain(it.x, it.y) ?: Block.NULL }
 
         var ret = 0
-        for (i in 0 until nearbyTiles.size) {
+        for (i in nearbyTiles.indices) {
             val fluid = world.getFluid(nearbyPos[i].x, nearbyPos[i].y)
             if (BlockCodex[nearbyTiles[i]].isSolid || (fluid.isFluid() && 0 < CreateTileAtlas.fluidFillToTileLevel(fluid.amount))) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3

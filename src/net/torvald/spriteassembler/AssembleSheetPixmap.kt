@@ -107,7 +107,7 @@ internal object AssembleFrameBase {
         transforms.forEach { transform ->
             if (transform.joint.name == ADProperties.ALL_JOINT_SELECT_KEY) {
                 // transform applies to all joints
-                for (c in 0 until out.size) {
+                for (c in out.indices) {
                     out[c] = out[c].first to (out[c].second + transform.translate)
                 }
             }

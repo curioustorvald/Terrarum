@@ -130,7 +130,7 @@ void main() {
 
     val mouseUp: Boolean
         get() {
-            for (k in 0 until subUIs.size) {
+            for (k in subUIs.indices) {
                 val ret2 = subUIs[k].mouseUp
                 if (ret2) return true
             }

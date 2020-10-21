@@ -407,7 +407,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         // scan for the one with non-null UI.
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-        for (kk in 0 until actorsUnderMouse.size) {
+        for (kk in actorsUnderMouse.indices) {
             actorsUnderMouse[kk].mainUI?.let {
                 uiOpened = true
 
