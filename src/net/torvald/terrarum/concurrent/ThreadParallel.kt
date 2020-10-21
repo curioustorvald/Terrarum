@@ -1,9 +1,6 @@
 package net.torvald.terrarum.concurrent
 
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import kotlin.math.absoluteValue
 
 typealias RunnableFun = () -> Unit
@@ -14,32 +11,58 @@ typealias ThreadableFun = (Int) -> Unit
 object ThreadExecutor {
     val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
     private lateinit var executor: ExecutorService// = Executors.newFixedThreadPool(threadCount)
+    val futures = ArrayList<Future<*>>()
+    private var isOpen = true
 
     private fun checkShutdown() {
         try {
             if (executor.isTerminated)
                 throw IllegalStateException("Executor terminated, renew the executor service.")
-            if (executor.isShutdown)
+            if (!isOpen || executor.isShutdown)
                 throw IllegalStateException("Pool is closed, come back when all the threads are terminated.")
         }
         catch (e: UninitializedPropertyAccessException) {}
     }
 
     fun renew() {
+        try {
+            if (!executor.isTerminated && !executor.isShutdown) throw IllegalStateException("Pool is still running")
+        }
+        catch (_: UninitializedPropertyAccessException) {}
+
         executor = Executors.newFixedThreadPool(threadCount)
+        futures.clear()
+        isOpen = true
     }
 
-    fun submit(t: Runnable): Future<*> {
+    /*fun invokeAll(ts: List<Callable<Unit>>) {
         checkShutdown()
-        return executor.submit(t)
-    }
-    fun submit(f: RunnableFun): Future<*> {
-        checkShutdown()
-        return executor.submit { f() }
-    }
+        executor.invokeAll(ts)
+    }*/
 
+    fun submit(t: Callable<Unit>) {
+        checkShutdown()
+        val fut = executor.submit(t)
+        futures.add(fut)
+    }
+    /*fun submit(f: RunnableFun) {
+        checkShutdown()
+        val fut = executor.submit { f() }
+        futures.add(fut)
+    }*/
+
+    // https://stackoverflow.com/questions/28818494/threads-stopping-prematurely-for-certain-values
     fun join() {
         println("ThreadExecutor.join")
+        isOpen = false
+        futures.forEach {
+            try {
+                it.get()
+            }
+            catch (e: ExecutionException) {
+                throw e
+            }
+        }
         executor.shutdown() // thread status of completed ones will be WAIT instead of TERMINATED without this line...
         executor.awaitTermination(24L, TimeUnit.HOURS)
     }

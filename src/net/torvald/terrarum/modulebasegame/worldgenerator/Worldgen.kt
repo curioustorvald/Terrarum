@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
+import java.util.concurrent.Callable
 
 /**
  * New world generator.
@@ -34,7 +35,7 @@ object Worldgen {
             val it = jobs[i]
 
             AppLoader.getLoadScreen().addMessage(it.loadingScreenName)
-            it.theWork.run()
+            it.theWork.getDone()
         }
 
         printdbg(this, "Generation job finished")
@@ -46,9 +47,7 @@ object Worldgen {
 }
 
 abstract class Gen(val world: GameWorld, val seed: Long, val params: Any) {
-    abstract var generationStarted: Boolean
-    abstract val generationDone: Boolean
-    open fun run() { }
+    open fun getDone() { } // trying to use different name so that it won't be confused with Runnable or Callable
 }
 
 data class WorldgenParams(
