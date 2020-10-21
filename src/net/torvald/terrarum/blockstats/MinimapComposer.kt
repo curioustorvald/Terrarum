@@ -74,8 +74,8 @@ object MinimapComposer : Disposable {
     fun update() {
         // make the queueing work
         // enqueue first
-        for (y in 0 until tilemap.size) {
-            for (x in 0 until tilemap[0].size) {
+        for (y in tilemap.indices) {
+            for (x in tilemap[0].indices) {
                 if (liveTilesMeta[tilemap[y][x]].revalidate) {
                     liveTilesMeta[tilemap[y][x]].revalidate = false
                     updaterQueue.addLast(createUpdater(x, y))
@@ -84,7 +84,7 @@ object MinimapComposer : Disposable {
             }
         }
         // consume the queue
-        for (k in 0 until currentThreads.size) {
+        for (k in currentThreads.indices) {
             if (currentThreads[k].state == Thread.State.TERMINATED && !updaterQueue.isEmpty) {
                 currentThreads[k] = Thread(updaterQueue.removeFirst(), "MinimapLivetilePainter")
                 printdbg(this, "Consuming from queue; queue size now: ${updaterQueue.size}")

@@ -378,8 +378,8 @@ object WorldSimulator {
     private val FALLABLE_MAX_FALL_SPEED = 2
 
     private fun monitorIllegalFluidSetup() {
-        for (y in 0 until fluidMap.size) {
-            for (x in 0 until fluidMap[0].size) {
+        for (y in fluidMap.indices) {
+            for (x in fluidMap[0].indices) {
                 val fluidData = world.getFluid(x + updateXFrom, y + updateYFrom)
                 if (fluidData.amount < 0f) {
                     throw InternalError("Negative amount of fluid at (${x + updateXFrom},${y + updateYFrom}): $fluidData")
@@ -391,8 +391,8 @@ object WorldSimulator {
     private fun makeFluidMapFromWorld() {
         //printdbg(this, "Scan area: ($updateXFrom,$updateYFrom)..(${updateXFrom + fluidMap[0].size},${updateYFrom + fluidMap.size})")
 
-        for (y in 0 until fluidMap.size) {
-            for (x in 0 until fluidMap[0].size) {
+        for (y in fluidMap.indices) {
+            for (x in fluidMap[0].indices) {
                 val fluidData = world.getFluid(x + updateXFrom, y + updateYFrom)
                 fluidMap[y][x] = fluidData.amount
                 fluidTypeMap[y][x] = fluidData.type
@@ -407,8 +407,8 @@ object WorldSimulator {
     }
 
     private fun fluidmapToWorld() {
-        for (y in 0 until fluidMap.size) {
-            for (x in 0 until fluidMap[0].size) {
+        for (y in fluidMap.indices) {
+            for (x in fluidMap[0].indices) {
                 world.setFluid(x + updateXFrom, y + updateYFrom, fluidNewTypeMap[y][x], fluidNewMap[y][x])
             }
         }

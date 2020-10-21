@@ -118,7 +118,7 @@ class UIItemInventoryEquippedView(
         // sort by equip position
 
         // fill the grid from fastest index, make no gap in-between of slots
-        for (k in 0 until itemGrid.size) {
+        for (k in itemGrid.indices) {
             val item = inventory.itemEquipped[k]
 
             if (item == null) {
