@@ -44,7 +44,7 @@ internal object UnsafeHelper {
      *
      * @return offset from the array's base memory address (aka pointer) that the actual data begins.
      */
-    fun getArrayOffset(obj: Any) = unsafe.arrayBaseOffset(obj.javaClass)
+    fun getArrayOffset(obj: Any) = unsafe.arrayBaseOffset(obj.javaClass).toLong()
 }
 
 /**
