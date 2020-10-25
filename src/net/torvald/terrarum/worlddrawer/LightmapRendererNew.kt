@@ -264,10 +264,10 @@ object LightmapRenderer {
         fun r1() {
             // TODO test non-parallel
             swipeDiag = false
-            for (line in for_y_start - overscan_open..for_y_end) {
+            for (line in 1 until LIGHTMAP_HEIGHT - 1) {
                 swipeLight(
-                        for_x_start - overscan_open + 1, line,
-                        for_x_end + overscan_open - 1, line,
+                        1, line,
+                        LIGHTMAP_WIDTH - 2, line,
                         1, 0
                 )
             }
@@ -275,12 +275,45 @@ object LightmapRenderer {
         fun r2() {
             // TODO test non-parallel
             swipeDiag = false
-            for (line in for_x_start - overscan_open..for_x_end) {
+            for (line in 1 until LIGHTMAP_WIDTH - 1) {
                 swipeLight(
-                        line, for_y_start - overscan_open + 1,
-                        line, for_y_end + overscan_open - 1,
+                        line, 1,
+                        line, LIGHTMAP_HEIGHT - 2,
                         0, 1
                 )
+            }
+        }
+        fun r3() {
+            // TODO test non-parallel
+            swipeDiag = true
+            for (linx in -LIGHTMAP_HEIGHT + 1 until LIGHTMAP_WIDTH - 1) {
+                /* construct indices such that:
+                      56789ABC
+                   4 1       w-2
+                   3 \---\---+
+                   2 \\···\··|
+                   1 \\\···\·|
+                   0 \\\\···\|
+                 h-2 \\\\\---\
+
+                 0   (1, h-2) -> (1, h-2)
+                 1   (1, h-2-1) -> (2, h-2)
+                 2   (1, h-2-2) -> (3, h-2)
+                 3   (1, h-2-3) -> (4, h-2)
+                 4   (1, 1) -> (5, h-2)
+                 5   (2, 1) -> (6, h-2)
+                 6   (3, 1) -> (7, h-2)
+                 7   (4, 1) -> (8, h-2)
+                 8   (5, 1) -> (w-2, h-2)
+                 9   (6, 1) -> (w-2, h-2-1)
+                 10  (7, 1) -> (w-2, h-2-2)
+                 11  (8, 1) -> (w-2, h-2-3)
+                 12  (w-2, 1) -> (w-2, 1)
+
+                 number of indices: internal_width + internal_height - 1
+                 */
+
+                TODO()
             }
         }
 
@@ -300,8 +333,7 @@ object LightmapRenderer {
 
                 //r3();r4();r1();r2();r3();
 
-                r1()
-                r2()
+                r1();r2();//r3()
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
@@ -550,10 +582,10 @@ object LightmapRenderer {
 
     private var swipeX = -1
     private var swipeY = -1
-    private var swipeTx = -1
-    private var swipeTy = -1
     private var swipeDiag = false
     private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int) {
+        if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
+
         _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
         _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
         _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
@@ -578,13 +610,12 @@ object LightmapRenderer {
         lightmap.setVec(x, y, _ambientAccumulator)
     }
     private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int) {
+
         swipeX = sx; swipeY = sy
         while (swipeX <= ex && swipeY <= ey) {
             // conduct the task #1
             // spread towards the end
-            swipeTx = swipeX.convX()
-            swipeTy = swipeY.convY()
-            _swipeTask(swipeTx, swipeTy, swipeTx-dx, swipeTy-dy)
+            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy)
 
             swipeX += dx
             swipeY += dy
@@ -594,9 +625,7 @@ object LightmapRenderer {
         while (swipeX >= sx && swipeY >= sy) {
             // conduct the task #2
             // spread towards the start
-            swipeTx = swipeX.convX()
-            swipeTy = swipeY.convY()
-            _swipeTask(swipeTx, swipeTy, swipeTx+dx, swipeTy+dy)
+            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy)
 
             swipeX -= dx
             swipeY -= dy
