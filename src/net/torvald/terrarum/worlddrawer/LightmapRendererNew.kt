@@ -211,7 +211,7 @@ object LightmapRenderer {
         }
 
         // wipe out lightmap
-        AppLoader.measureDebugTime("Renderer.Light0") {
+        AppLoader.measureDebugTime("Renderer.LightPrecalc") {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
             lightmap.zerofill()
@@ -227,7 +227,7 @@ object LightmapRenderer {
         // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
 
-        fun r1() {
+        /*fun r1() {
             // Round 1
             for (y in for_y_start - overscan_open..for_y_end) {
                 for (x in for_x_start - overscan_open..for_x_end) {
@@ -258,15 +258,38 @@ object LightmapRenderer {
                     calculateAndAssign(lightmap, x, y)
                 }
             }
-        }
+        }*/
 
+
+        fun r1() {
+            // TODO test non-parallel
+            swipeDiag = false
+            for (line in for_y_start - overscan_open..for_y_end) {
+                swipeLight(
+                        for_x_start - overscan_open + 1, line,
+                        for_x_end + overscan_open - 1, line,
+                        1, 0
+                )
+            }
+        }
+        fun r2() {
+            // TODO test non-parallel
+            swipeDiag = false
+            for (line in for_x_start - overscan_open..for_x_end) {
+                swipeLight(
+                        line, for_y_start - overscan_open + 1,
+                        line, for_y_end + overscan_open - 1,
+                        0, 1
+                )
+            }
+        }
 
         // each usually takes 8..12 ms total when not threaded
         // - with direct memory access of world array and pre-calculating things in the start of the frame,
         //      I was able to pull out 3.5..5.5 ms! With abhorrently many occurrences of segfaults I had to track down...
 
         if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-            AppLoader.measureDebugTime("Renderer.LightTotal") {
+            AppLoader.measureDebugTime("Renderer.LightRuns") {
 
                 // To save you from pains:
                 // - Per-channel light updating is actually slower
@@ -275,11 +298,14 @@ object LightmapRenderer {
                 // - Multithreading? I have absolutely no idea.
                 // - If you naively slice the screen (job area) to multithread, the seam will appear.
 
-                r3();r4();r1();r2();r3();
+                //r3();r4();r1();r2();r3();
+
+                r1()
+                r2()
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
-            AppLoader.measureDebugTime("Renderer.LightTotal") {
+            AppLoader.measureDebugTime("Renderer.LightRuns") {
             }
         }
     }
@@ -520,6 +546,61 @@ object LightmapRenderer {
 
         // if your IDE error out that you need return statement, AND it's "fixed" by removing 'else' before 'return false',
         // you're doing it wrong, the IF and return statements must be inclusive.
+    }
+
+    private var swipeX = -1
+    private var swipeY = -1
+    private var swipeTx = -1
+    private var swipeTy = -1
+    private var swipeDiag = false
+    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int) {
+        _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
+        _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
+        _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
+        _ambientAccumulator.a = _mapLightLevelThis.getA(x, y)
+
+        if (!swipeDiag) {
+            _thisTileOpacity.r = _mapThisTileOpacity.getR(x, y)
+            _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
+            _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
+            _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity))
+        }
+        else {
+            _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
+            _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
+            _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
+            _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2))
+        }
+
+        _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
+        lightmap.setVec(x, y, _ambientAccumulator)
+    }
+    private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int) {
+        swipeX = sx; swipeY = sy
+        while (swipeX <= ex && swipeY <= ey) {
+            // conduct the task #1
+            // spread towards the end
+            swipeTx = swipeX.convX()
+            swipeTy = swipeY.convY()
+            _swipeTask(swipeTx, swipeTy, swipeTx-dx, swipeTy-dy)
+
+            swipeX += dx
+            swipeY += dy
+        }
+
+        swipeX = ex; swipeY = ey
+        while (swipeX >= sx && swipeY >= sy) {
+            // conduct the task #2
+            // spread towards the start
+            swipeTx = swipeX.convX()
+            swipeTy = swipeY.convY()
+            _swipeTask(swipeTx, swipeTy, swipeTx+dx, swipeTy+dy)
+
+            swipeX -= dx
+            swipeY -= dy
+        }
     }
 
     /**

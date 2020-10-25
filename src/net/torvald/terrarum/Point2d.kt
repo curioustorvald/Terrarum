@@ -59,6 +59,13 @@ data class Point2d(var x: Double, var y: Double) : Cloneable {
 
     fun toDoubleArray() = doubleArrayOf(x, y)
 
+    fun apply(transformation: (Double, Double) -> Pair<Double, Double>): Point2d {
+        val translation = transformation(x, y)
+        this.x = translation.first
+        this.y = translation.second
+
+        return this
+    }
 }
 
 data class Point2i(var x: Int, var y: Int) {
@@ -78,5 +85,13 @@ data class Point2i(var x: Int, var y: Int) {
 
     operator fun minus(other: Point2i): Point2i {
         return Point2i(other.x - this.x, other.y - this.y)
+    }
+
+    fun apply(transformation: (Int, Int) -> Pair<Int, Int>): Point2i {
+        val translation = transformation(x, y)
+        this.x = translation.first
+        this.y = translation.second
+
+        return this
     }
 }
