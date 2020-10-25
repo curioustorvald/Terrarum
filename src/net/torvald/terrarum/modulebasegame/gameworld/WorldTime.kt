@@ -96,20 +96,20 @@ class WorldTime(initTime: Long = 0L) {
 
 
     // these functions won't need inlining for performance
-    val yearlyDays: Int // 0 - 119
+    val ordinalDay: Int // 0 - 119
         get() = (TIME_T.div(DAY_LENGTH) fmod YEAR_DAYS.toLong()).toInt()
-    val days: Int // 1 - 30 fixed
-        get() = (yearlyDays % MONTH_LENGTH) + 1
-    val months: Int // 1 - 4
-        get() = (yearlyDays / MONTH_LENGTH) + 1
+    val calendarDay: Int // 1 - 30 fixed
+        get() = (ordinalDay % MONTH_LENGTH) + 1
+    val calendarMonth: Int // 1 - 4
+        get() = (ordinalDay / MONTH_LENGTH) + 1
     val years: Int
         get() = TIME_T.div(YEAR_DAYS * DAY_LENGTH).abs().toInt() + EPOCH_YEAR
 
-    val quarter = months - 1 // 0 - 3
+    val quarter = calendarMonth - 1 // 0 - 3
 
 
     val dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
-        get() = if (yearlyDays == YEAR_DAYS - 1) 7 else yearlyDays % 7
+        get() = if (ordinalDay == YEAR_DAYS - 1) 7 else ordinalDay % 7
 
     var timeDelta: Int = 1
         set(value) {
@@ -206,17 +206,17 @@ class WorldTime(initTime: Long = 0L) {
     fun getFormattedTime() = "${getDayNameShort()}, " +
                              "$years " +
                              "${getMonthNameFull()} " +
-                             "$days " +
+                             "$calendarDay " +
                              "${String.format("%02d", hours)}:" +
                              "${String.format("%02d", minutes)}:" +
                              "${String.format("%02d", seconds)}"
-    fun getShortTime() = "${years.toString().padStart(4, '0')}-${getMonthNameShort()}-${days.toString().padStart(2, '0')}"
-    fun getFilenameTime() = "${years.toString().padStart(4, '0')}${months.toString().padStart(2, '0')}${days.toString().padStart(2, '0')}"
+    fun getShortTime() = "${years.toString().padStart(4, '0')}-${getMonthNameShort()}-${calendarDay.toString().padStart(2, '0')}"
+    fun getFilenameTime() = "${years.toString().padStart(4, '0')}${calendarMonth.toString().padStart(2, '0')}${calendarDay.toString().padStart(2, '0')}"
 
     fun getDayNameFull() = DAY_NAMES[dayOfWeek]
     fun getDayNameShort() = DAY_NAMES_SHORT[dayOfWeek]
-    fun getMonthNameFull() = MONTH_NAMES[months - 1]
-    fun getMonthNameShort() = MONTH_NAMES_SHORT[months - 1]
+    fun getMonthNameFull() = MONTH_NAMES[calendarMonth - 1]
+    fun getMonthNameShort() = MONTH_NAMES_SHORT[calendarMonth - 1]
 
     override fun toString() = getFormattedTime()
 }
