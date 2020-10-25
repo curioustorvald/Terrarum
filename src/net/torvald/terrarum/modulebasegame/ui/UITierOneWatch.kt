@@ -76,7 +76,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         watchFont.draw(batch, worldTime.getDayNameShort().toUpperCase(), 73f, 7f)
 
         // day
-        watchFont.draw(batch, worldTime.days.toString().padStart(2, '@'), 107f, 7f)
+        watchFont.draw(batch, worldTime.calendarDay.toString().padStart(2, '@'), 107f, 7f)
 
         // hour
         watchFont.draw(batch, worldTime.hours.toString().padStart(2, '@'), 27f, 7f)
@@ -84,7 +84,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         watchFont.draw(batch, worldTime.minutes.toString().padStart(2, '0'), 49f, 7f)
 
         // season marker
-        batch.draw(atlas.get(1, worldTime.months - 1), 0f, 0f)
+        batch.draw(atlas.get(1, worldTime.calendarMonth - 1), 0f, 0f)
 
 
         // moon dial
