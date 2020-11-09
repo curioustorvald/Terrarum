@@ -286,34 +286,39 @@ object LightmapRenderer {
         fun r3() {
             // TODO test non-parallel
             swipeDiag = true
-            for (linx in -LIGHTMAP_HEIGHT + 1 until LIGHTMAP_WIDTH - 1) {
-                /* construct indices such that:
-                      56789ABC
-                   4 1       w-2
-                   3 \---\---+
-                   2 \\···\··|
-                   1 \\\···\·|
-                   0 \\\\···\|
-                 h-2 \\\\\---\
+            /* construct indices such that:
+                  56789ABC
+               4 1       w-2
+               3 \---\---+
+               2 \\···\··|
+               1 \\\···\·|
+               0 \\\\···\|
+            h-2 \\\\\---\
 
-                 0   (1, h-2) -> (1, h-2)
-                 1   (1, h-2-1) -> (2, h-2)
-                 2   (1, h-2-2) -> (3, h-2)
-                 3   (1, h-2-3) -> (4, h-2)
-                 4   (1, 1) -> (5, h-2)
-                 5   (2, 1) -> (6, h-2)
-                 6   (3, 1) -> (7, h-2)
-                 7   (4, 1) -> (8, h-2)
-                 8   (5, 1) -> (w-2, h-2)
-                 9   (6, 1) -> (w-2, h-2-1)
-                 10  (7, 1) -> (w-2, h-2-2)
-                 11  (8, 1) -> (w-2, h-2-3)
-                 12  (w-2, 1) -> (w-2, 1)
+             0   (1, h-2) -> (1, h-2)
+             1   (1, h-2-1) -> (2, h-2)
+             2   (1, h-2-2) -> (3, h-2)
+             3   (1, h-2-3) -> (4, h-2)
+             4   (1, 1) -> (5, h-2)
 
-                 number of indices: internal_width + internal_height - 1
-                 */
+             5   (2, 1) -> (6, h-2)
+             6   (3, 1) -> (7, h-2)
+             7   (4, 1) -> (8, h-2)
+             8   (5, 1) -> (w-2, h-2)
 
-                TODO()
+             9   (6, 1) -> (w-2, h-2-1)
+             10  (7, 1) -> (w-2, h-2-2)
+             11  (8, 1) -> (w-2, h-2-3)
+             12  (w-2, 1) -> (w-2, 1)
+
+             number of indices: internal_width + internal_height - 1
+             */
+            for (i in 0 until LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) {
+                swipeLight(
+                        maxOf(1, i - LIGHTMAP_HEIGHT - 2 + 2), maxOf(1, LIGHTMAP_HEIGHT - 2 - i),
+                        minOf(LIGHTMAP_WIDTH - 2, i + 1), minOf(LIGHTMAP_HEIGHT - 2, (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) - i),
+                        1, 1
+                )
             }
         }
 
@@ -333,7 +338,7 @@ object LightmapRenderer {
 
                 //r3();r4();r1();r2();r3();
 
-                r1();r2();//r3()
+                r1();r2();r3()
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
