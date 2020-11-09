@@ -34,10 +34,10 @@ import com.badlogic.gdx.utils.NumberUtils
 class Cvec {
 
     /** the red, green, blue and alpha components  */
-    var r: Float = 0.toFloat()
-    var g: Float = 0.toFloat()
-    var b: Float = 0.toFloat()
-    var a: Float = 0.toFloat()
+    var r: Float = 0f
+    var g: Float = 0f
+    var b: Float = 0f
+    var a: Float = 0f
 
     /** Constructs a new Cvec with all components set to 0.  */
     constructor() {}
