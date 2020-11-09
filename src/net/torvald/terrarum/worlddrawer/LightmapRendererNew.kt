@@ -293,7 +293,7 @@ object LightmapRenderer {
                2 \\···\··|
                1 \\\···\·|
                0 \\\\···\|
-            h-2 \\\\\---\
+             h-2 \\\\\---\
 
              0   (1, h-2) -> (1, h-2)
              1   (1, h-2-1) -> (2, h-2)
@@ -321,6 +321,41 @@ object LightmapRenderer {
                 )
             }
         }
+        fun r4() {
+            // TODO test non-parallel
+            swipeDiag = true
+            /*
+                1       w-2
+                /////---/
+                ////···/|
+                ///···/·|
+                //···/··|
+            h-2 /---/---+
+            d:(1,-1)
+
+             0  (1, 1) -> (1, 1)
+             1  (1, 2) -> (2, 1)
+             2  (1, 3) -> (3, 1)
+             3  (1, 4) -> (4, 1)
+             4  (1, h-2) -> (5, 1)
+             5  (2, h-2) -> (6, 1)
+             6  (3, h-2) -> (7, 1)
+             7  (4, h-2) -> (8, 1)
+             8  (5, h-2) -> (w-2, 1)
+             9  (6, h-2) -> (w-2, 2)
+            10  (7, h-2) -> (w-2, 3)
+            11  (8, h-2) -> (w-2, 4)
+            12  (w-2, h-2) -> (w-2, h-2)
+             */
+            for (i in 0 until LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) {
+                swipeLight(
+                        maxOf(1, i - 3), minOf(LIGHTMAP_HEIGHT - 2, i + 1),
+                        minOf(LIGHTMAP_WIDTH - 2, i + 1), maxOf(1, (LIGHTMAP_HEIGHT - 2) + i - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6)),
+                        1, -1
+                )
+            }
+        }
+
 
         // each usually takes 8..12 ms total when not threaded
         // - with direct memory access of world array and pre-calculating things in the start of the frame,
@@ -338,7 +373,7 @@ object LightmapRenderer {
 
                 //r3();r4();r1();r2();r3();
 
-                r1();r2();r3()
+                r4()
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
