@@ -224,10 +224,10 @@ object LightmapRenderer {
                 }
             }
         }
-        // O((5*9)n) == O(n) where n is a size of the map.
+        // O((5*9)n where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
 
-        /*fun r1() {
+        /*fun or1() {
             // Round 1
             for (y in for_y_start - overscan_open..for_y_end) {
                 for (x in for_x_start - overscan_open..for_x_end) {
@@ -235,7 +235,7 @@ object LightmapRenderer {
                 }
             }
         }
-        fun r2() {
+        fun or2() {
             // Round 2
             for (y in for_y_end + overscan_open downTo for_y_start) {
                 for (x in for_x_start - overscan_open..for_x_end) {
@@ -243,7 +243,7 @@ object LightmapRenderer {
                 }
             }
         }
-        fun r3() {
+        fun or3() {
             // Round 3
             for (y in for_y_end + overscan_open downTo for_y_start) {
                 for (x in for_x_end + overscan_open downTo for_x_start) {
@@ -251,7 +251,7 @@ object LightmapRenderer {
                 }
             }
         }
-        fun r4() {
+        fun or4() {
             // Round 4
             for (y in for_y_start - overscan_open..for_y_end) {
                 for (x in for_x_end + overscan_open downTo for_x_start) {
@@ -260,7 +260,7 @@ object LightmapRenderer {
             }
         }*/
 
-
+        // O((8*2)n) where n is a size of the map.
         fun r1() {
             // TODO test non-parallel
             swipeDiag = false
@@ -373,7 +373,9 @@ object LightmapRenderer {
 
                 //r3();r4();r1();r2();r3();
 
-                r4()
+                r1();r2();r3();r4()
+                r1();r2();r3();r4()
+
             }
         }
         else if (world.worldIndex != -1) { // to avoid updating on the null world
@@ -651,7 +653,7 @@ object LightmapRenderer {
     }
     private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int) {
         swipeX = sx; swipeY = sy
-        while (swipeX <= ex && swipeY <= ey) {
+        while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
             // conduct the task #1
             // spread towards the end
             _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy)
@@ -661,7 +663,7 @@ object LightmapRenderer {
         }
 
         swipeX = ex; swipeY = ey
-        while (swipeX >= sx && swipeY >= sy) {
+        while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
             _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy)
