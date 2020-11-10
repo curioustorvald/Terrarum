@@ -315,7 +315,7 @@ object LightmapRenderer {
              */
             for (i in 0 until LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) {
                 swipeLight(
-                        maxOf(1, i - LIGHTMAP_HEIGHT - 2 + 2), maxOf(1, LIGHTMAP_HEIGHT - 2 - i),
+                        maxOf(1, i - LIGHTMAP_HEIGHT + 4), maxOf(1, LIGHTMAP_HEIGHT - 2 - i),
                         minOf(LIGHTMAP_WIDTH - 2, i + 1), minOf(LIGHTMAP_HEIGHT - 2, (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) - i),
                         1, 1
                 )
@@ -349,8 +349,8 @@ object LightmapRenderer {
              */
             for (i in 0 until LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) {
                 swipeLight(
-                        maxOf(1, i - 3), minOf(LIGHTMAP_HEIGHT - 2, i + 1),
-                        minOf(LIGHTMAP_WIDTH - 2, i + 1), maxOf(1, (LIGHTMAP_HEIGHT - 2) + i - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6)),
+                        maxOf(1, i - LIGHTMAP_HEIGHT + 4), minOf(LIGHTMAP_HEIGHT - 2, i + 1),
+                        minOf(LIGHTMAP_WIDTH - 2, i + 1), maxOf(1, (LIGHTMAP_HEIGHT - 2) - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6) + i),
                         1, -1
                 )
             }
@@ -650,7 +650,6 @@ object LightmapRenderer {
         lightmap.setVec(x, y, _ambientAccumulator)
     }
     private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int) {
-
         swipeX = sx; swipeY = sy
         while (swipeX <= ex && swipeY <= ey) {
             // conduct the task #1
