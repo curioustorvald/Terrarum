@@ -19,12 +19,13 @@ import com.sudoplay.joise.module.ModuleScaleOffset
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.concurrent.BlockingThreadPool
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.roundInt
+import java.util.concurrent.Callable
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2018-12-14.
@@ -67,32 +68,34 @@ class NoiseGenerator : ScreenAdapter() {
         get() = (IMAGE_SIZE * IMAGE_SIZE) / pixelsInSingleJob
     private val rawPixelsList: List<IntProgression>
         get() = (0 until IMAGE_SIZE * IMAGE_SIZE).sliceEvenly(jobsCount)
-    private fun makeGenFun(seed: Long, index: Int) = { //i: Int ->
-        val module = ModuleFractal()
-        module.setType(ModuleFractal.FractalType.BILLOW)
-        module.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
-        module.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        module.setNumOctaves(10)
-        module.setFrequency(8.0)
-        module.seed = seed
+    private fun makeGenFun(seed: Long, index: Int) = object : Callable<Unit> { //i: Int ->
+        override fun call() {
+            val module = ModuleFractal()
+            module.setType(ModuleFractal.FractalType.BILLOW)
+            module.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+            module.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+            module.setNumOctaves(10)
+            module.setFrequency(8.0)
+            module.seed = seed
 
-        val moduleScale = ModuleScaleOffset()
-        moduleScale.setSource(module)
-        moduleScale.setScale(0.5)
-        moduleScale.setOffset(0.0)
+            val moduleScale = ModuleScaleOffset()
+            moduleScale.setSource(module)
+            moduleScale.setScale(0.5)
+            moduleScale.setOffset(0.0)
 
-        val noiseModule = Joise(moduleScale)
+            val noiseModule = Joise(moduleScale)
 
-        for (c in rawPixelsList[index]) {
-            val x = c % IMAGE_SIZE
-            val y = c / IMAGE_SIZE
-            val uvX = x / IMAGE_SIZED
-            val uvY = y / IMAGE_SIZED
+            for (c in rawPixelsList[index]) {
+                val x = c % IMAGE_SIZE
+                val y = c / IMAGE_SIZE
+                val uvX = x / IMAGE_SIZED
+                val uvY = y / IMAGE_SIZED
 
-            val noiseValue = noiseModule.get(uvX, uvY).absoluteValue
-            val rgb = (noiseValue * 255.0).roundInt()
+                val noiseValue = noiseModule.get(uvX, uvY).absoluteValue
+                val rgb = (noiseValue * 255.0).roundToInt()
 
-            pixmap.drawPixel(x, y, (rgb shl 24) or (rgb shl 16) or (rgb shl 8) or 0xFF)
+                pixmap.drawPixel(x, y, (rgb shl 24) or (rgb shl 16) or (rgb shl 8) or 0xFF)
+            }
         }
     }
 
@@ -107,13 +110,13 @@ class NoiseGenerator : ScreenAdapter() {
 
 
         // regen
-        if (timerFired && BlockingThreadPool.allFinished()) {
+        if (timerFired && ThreadExecutor.allFinished) {
             timerFired = false
 
             totalTestsDone += 1
         }
 
-        if (regenerate && BlockingThreadPool.allFinished()) {
+        if (regenerate && ThreadExecutor.allFinished) {
             //printdbg(this, "Reticulating splines...")
 
             regenerate = false
@@ -124,8 +127,9 @@ class NoiseGenerator : ScreenAdapter() {
 
             val seed = RNG.nextLong()
             val jobs = List(jobsCount) { makeGenFun(seed, it) }
-            BlockingThreadPool.setTasks(jobs, "")
-            BlockingThreadPool.startAllWaitForDie()
+            ThreadExecutor.renew()
+            ThreadExecutor.submitAll(jobs)
+            ThreadExecutor.join()
         }
 
 
@@ -192,7 +196,7 @@ class NoiseGenerator : ScreenAdapter() {
             System.exit(0)
         }
         // time to construct a new test
-        if (totalTestsDone % samplingCount == 0 && BlockingThreadPool.allFinished()) {
+        if (totalTestsDone % samplingCount == 0 && ThreadExecutor.allFinished) {
             pixelsInSingleJob = (IMAGE_SIZE * IMAGE_SIZE) / testSets[totalTestsDone / samplingCount]
 
 
@@ -213,7 +217,7 @@ class NoiseGenerator : ScreenAdapter() {
         }
 
         // auto-press SPACE
-        if (BlockingThreadPool.allFinished()) {
+        if (ThreadExecutor.allFinished) {
             regenerate = true
             constructOnce = false
         }

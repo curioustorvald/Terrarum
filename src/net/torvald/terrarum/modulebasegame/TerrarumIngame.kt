@@ -10,7 +10,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
-import net.torvald.terrarum.concurrent.ThreadParallel
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -37,6 +37,7 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.math.roundToInt
 
 
 /**
@@ -719,19 +720,20 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     fun updateActors(delta: Float) {
         if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainerActive.size > Terrarum.THREADS) {
+            ThreadExecutor.renew()
+
             val actors = actorContainerActive.size.toFloat()
             // set up indices
-            for (i in 0..AppLoader.THREADS - 1) {
-                ThreadParallel.map(
-                        i, "ActorUpdate",
+            for (i in 0..AppLoader.THREAD_COUNT - 1) {
+                ThreadExecutor.submit(
                         ThreadActorUpdate(
-                                actors.div(AppLoader.THREADS).times(i).roundInt(),
-                                actors.div(AppLoader.THREADS).times(i + 1).roundInt() - 1
+                                actors.div(AppLoader.THREAD_COUNT).times(i).roundToInt(),
+                                actors.div(AppLoader.THREAD_COUNT).times(i + 1).roundToInt() - 1
                         )
                 )
             }
 
-            ThreadParallel.startAll()
+            ThreadExecutor.join()
 
             actorNowPlaying?.update(delta)
         }

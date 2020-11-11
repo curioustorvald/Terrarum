@@ -13,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import org.khelekore.prtree.*
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2016-08-03.
@@ -77,8 +78,8 @@ object WorldSimulator {
         //printdbg(this, "============================")
 
         if (player != null) {
-            updateXFrom = player.hitbox.centeredX.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
-            updateYFrom = player.hitbox.centeredY.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+            updateXFrom = player.hitbox.centeredX.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            updateYFrom = player.hitbox.centeredY.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }

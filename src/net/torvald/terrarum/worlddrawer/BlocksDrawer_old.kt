@@ -503,7 +503,7 @@ object BlocksDrawerOLD {
                             if (mode == TERRAIN || mode == WALL) {
                                 val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
                                 val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                                val stage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
+                                val stage = (breakage / maxHealth).times(breakAnimSteps).roundToInt()
                                 // actual drawing
                                 if (stage > 0) {
                                     batch.color = color

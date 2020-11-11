@@ -20,6 +20,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.math.sign
 
 
@@ -1257,28 +1258,28 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         if (world == null) return 0
 
         var contactAreaCounter = 0
-        for (i in 0..(if (side % 2 == 0) hitbox.width else hitbox.height).roundInt() - 1) {
+        for (i in 0..(if (side % 2 == 0) hitbox.width else hitbox.height).roundToInt() - 1) {
             // set tile positions
             val tileX: Int
             val tileY: Int
             if (side == COLLIDING_LEFT) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt()
+                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundToInt()
                                                 + i + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxEnd.y.roundInt() + translateY)
+                tileY = div16TruncateToMapHeight(hitbox.hitboxEnd.y.roundToInt() + translateY)
             }
             else if (side == COLLIDING_TOP) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt()
+                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundToInt()
                                                 + i + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt() + translateY)
+                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundToInt() + translateY)
             }
             else if (side == COLLIDING_RIGHT) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxEnd.x.roundInt() + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt()
+                tileX = div16TruncateToMapWidth(hitbox.hitboxEnd.x.roundToInt() + translateX)
+                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundToInt()
                                                  + i + translateY)
             }
             else if (side == COLLIDING_LEFT) {
-                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt() + translateX)
-                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt()
+                tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundToInt() + translateX)
+                tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundToInt()
                                                  + i + translateY)
             }
             else {

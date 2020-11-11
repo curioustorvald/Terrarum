@@ -372,7 +372,7 @@ internal object BlocksDrawer {
 
                 val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
                 val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                val breakingStage = (breakage / maxHealth).times(BREAKAGE_STEPS).roundInt()
+                val breakingStage = (breakage / maxHealth).times(BREAKAGE_STEPS).roundToInt()
 
 
 

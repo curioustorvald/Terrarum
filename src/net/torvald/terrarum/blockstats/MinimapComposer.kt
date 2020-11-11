@@ -1,6 +1,5 @@
 package net.torvald.terrarum.blockstats
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
@@ -60,7 +59,7 @@ object MinimapComposer : Disposable {
     private val liveTilesMeta = Array(TILES_IN_X * TILES_IN_Y) { LiveTileMeta(revalidate = true) }
 
     private val updaterQueue = Queue<Runnable>(TILES_IN_X * TILES_IN_Y * 2)
-    private var currentThreads = Array(maxOf(1, AppLoader.THREADS.times(2).div(3))) {
+    private var currentThreads = Array(maxOf(1, AppLoader.THREAD_COUNT.times(2).div(3))) {
         Thread()
     }
 

@@ -3,8 +3,6 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
@@ -12,7 +10,6 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
@@ -41,7 +38,7 @@ object LightmapRenderer {
     /** World change is managed by IngameRenderer.setWorld() */
     private var world: GameWorld = GameWorld.makeNullWorld()
 
-    private lateinit var lightCalcShader: ShaderProgram
+    //private lateinit var lightCalcShader: ShaderProgram
     //private val SHADER_LIGHTING = AppLoader.getConfigBoolean("gpulightcalc")
 
     /** do not call this yourself! Let your game renderer handle this! */
@@ -54,8 +51,6 @@ object LightmapRenderer {
                 _mapLightLevelThis.zerofill()
                 _mapThisTileOpacity.zerofill()
                 _mapThisTileOpacity2.zerofill()
-
-                makeUpdateTaskList()
             }
         }
         catch (e: UninitializedPropertyAccessException) {
@@ -71,10 +66,10 @@ object LightmapRenderer {
     const val overscan_open: Int = 40
     const val overscan_opaque: Int = 10
 
-    var LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
-    var LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+    private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+    private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
 
-    private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
+    //private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
     /**
@@ -135,14 +130,14 @@ object LightmapRenderer {
      * @param y world tile coord
      */
     internal fun getLight(x: Int, y: Int): Cvec? {
-        if (!inBounds(x, y)) {
-            return null
+        return if (!inBounds(x, y)) {
+            null
         }
         else {
             val x = x.convX()
             val y = y.convY()
 
-            return Cvec(
+            Cvec(
                     lightmap.getR(x, y) * MUL_FLOAT,
                     lightmap.getG(x, y) * MUL_FLOAT,
                     lightmap.getB(x, y) * MUL_FLOAT,
@@ -205,10 +200,10 @@ object LightmapRenderer {
         sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
         // set no-op mask from solidity of the block
-        AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
+        /*AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
             noopMask.clear()
             buildNoopMask()
-        }
+        }*/
 
         // wipe out lightmap
         AppLoader.measureDebugTime("Renderer.LightPrecalc") {
@@ -224,9 +219,10 @@ object LightmapRenderer {
                 }
             }
         }
+
+        // YE OLDE LIGHT UPDATER
         // O((5*9)n where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
-
         /*fun or1() {
             // Round 1
             for (y in for_y_start - overscan_open..for_y_end) {
@@ -260,6 +256,7 @@ object LightmapRenderer {
             }
         }*/
 
+        // 'NEWLIGHT2' LIGHT SWIPER
         // O((8*2)n) where n is a size of the map.
         fun r1() {
             // TODO test non-parallel
@@ -366,11 +363,11 @@ object LightmapRenderer {
 
                 // To save you from pains:
                 // - Per-channel light updating is actually slower
+                // BELOW NOTES DOES NOT APPLY TO 'NEWLIGHT2' LIGHT SWIPER
                 // - It seems 5-pass lighting is needed to resonably eliminate the dark spot (of which I have zero idea
                 //      why dark spots appear in the first place)
                 // - Multithreading? I have absolutely no idea.
                 // - If you naively slice the screen (job area) to multithread, the seam will appear.
-
                 //r3();r4();r1();r2();r3();
 
                 r1();r2();r3();r4()
@@ -384,56 +381,11 @@ object LightmapRenderer {
         }
     }
 
-    // TODO re-init at every resize
-    private lateinit var updateMessages: List<Array<ThreadedLightmapUpdateMessage>>
-
-    private fun makeUpdateTaskList() {
-        val lightTaskArr = ArrayList<ThreadedLightmapUpdateMessage>()
-
-        val for_x_start = overscan_open
-        val for_y_start = overscan_open
-        val for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
-        val for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 3 // same fix as above
-
-        // Round 2
-        for (y in for_y_end + overscan_open downTo for_y_start) {
-            for (x in for_x_start - overscan_open..for_x_end) {
-                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
-            }
-        }
-
-        // Round 3
-        for (y in for_y_end + overscan_open downTo for_y_start) {
-            for (x in for_x_end + overscan_open downTo for_x_start) {
-                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
-            }
-        }
-
-        // Round 4
-        for (y in for_y_start - overscan_open..for_y_end) {
-            for (x in for_x_end + overscan_open downTo for_x_start) {
-                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
-            }
-        }
-
-        // Round 1
-        for (y in for_y_start - overscan_open..for_y_end) {
-            for (x in for_x_start - overscan_open..for_x_end) {
-                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
-            }
-        }
-
-        updateMessages = lightTaskArr.toTypedArray().sliceEvenly(AppLoader.THREADS)
-    }
-
-    internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
-
-
     private fun buildLanternmap(actorContainers: Array<out List<ActorWithBody>?>) {
         lanternMap.clear()
         actorContainers.forEach { actorContainer ->
             actorContainer?.forEach {
-                if (it is Luminous && it is ActorWithBody) {
+                if (it is Luminous) {
                     // put lanterns to the area the luminantBox is occupying
                     for (lightBox in it.lightBoxList) {
                         val lightBoxX = it.hitbox.startX + lightBox.startX
@@ -456,7 +408,7 @@ object LightmapRenderer {
         }
     }
 
-    private fun buildNoopMask() {
+    /*private fun buildNoopMask() {
         fun isShaded(x: Int, y: Int) = try {
             BlockCodex[world.getTileFromTerrain(x, y)].isSolid
         }
@@ -491,8 +443,7 @@ object LightmapRenderer {
             if (isShaded(for_x_start, y)) noopMask.add(Point2i(for_x_start, y))
             if (isShaded(for_x_end, y)) noopMask.add(Point2i(for_x_end, y))
         }
-
-    }
+    }*/
 
     // local variables that are made static
     private val sunLight = Cvec(0)
@@ -576,7 +527,7 @@ object LightmapRenderer {
         ))
     }
 
-    private val inNoopMaskp = Point2i(0,0)
+    /*private val inNoopMaskp = Point2i(0,0)
 
     private fun inNoopMask(x: Int, y: Int): Boolean {
         if (x in for_x_start..for_x_end) {
@@ -620,7 +571,7 @@ object LightmapRenderer {
 
         // if your IDE error out that you need return statement, AND it's "fixed" by removing 'else' before 'return false',
         // you're doing it wrong, the IF and return statements must be inclusive.
-    }
+    }*/
 
     private var swipeX = -1
     private var swipeY = -1
@@ -673,10 +624,10 @@ object LightmapRenderer {
         }
     }
 
-    /**
+    /** Another YE OLDE light simulator
      * Calculates the light simulation, using main lightmap as one of the input.
      */
-    private fun calculateAndAssign(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int) {
+    /*private fun calculateAndAssign(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int) {
 
         //if (inNoopMask(worldX, worldY)) return
 
@@ -724,7 +675,7 @@ object LightmapRenderer {
         /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y, _thisTileOpacity))
 
         lightmap.setVec(x, y, _ambientAccumulator)
-    }
+    }*/
 
     private fun isSolid(x: Int, y: Int): Float? { // ...so that they wouldn't appear too dark
         if (!inBounds(x, y)) return null
@@ -760,9 +711,9 @@ object LightmapRenderer {
             // write to colour buffer
             for (y in this_y_start..this_y_end) {
                 //println("y: $y, this_y_start: $this_y_start")
-                if (y == this_y_start && this_y_start == 0) {
-                    //throw Error("Fuck hits again...")
-                }
+                //if (y == this_y_start && this_y_start == 0) {
+                //    throw Error("Fuck hits again...")
+                //}
 
                 for (x in this_x_start..this_x_end) {
 
@@ -854,11 +805,6 @@ object LightmapRenderer {
     }
 
     private fun Float.inv() = 1f / this
-    fun Float.floor() = FastMath.floor(this)
-    fun Double.floorInt() = Math.floor(this).toInt()
-    fun Float.round(): Int = Math.round(this)
-    fun Double.round(): Int = Math.round(this).toInt()
-    fun Float.ceil() = FastMath.ceil(this)
     fun Int.even(): Boolean = this and 1 == 0
     fun Int.odd(): Boolean = this and 1 == 1
 
@@ -892,8 +838,8 @@ object LightmapRenderer {
         val tilesInHorizontal = (AppLoader.screenWf / TILE_SIZE).ceilInt() + 1
         val tilesInVertical = (AppLoader.screenHf / TILE_SIZE).ceilInt() + 1
 
-        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
-        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
 
         if (_init) {
             lightBuffer.dispose()

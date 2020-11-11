@@ -24,6 +24,8 @@ import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
 import kotlin.math.absoluteValue
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 
 
@@ -333,10 +335,6 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     batch?.projectionMatrix = camera?.combined
 }
 
-fun Float.round(): Float {
-    return Math.round(this).toFloat()
-}
-
 
 // ShapeRenderer alternative for rects
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
@@ -506,11 +504,10 @@ fun Float.floor() = FastMath.floor(this).toFloat()
 fun Double.ceilInt() = Math.ceil(this).toInt()
 fun Float.ceil(): Float = FastMath.ceil(this).toFloat()
 fun Float.ceilInt() = FastMath.ceil(this)
+fun Float.round(): Float = round(this)
 fun Double.round() = Math.round(this).toDouble()
 fun Double.floor() = Math.floor(this)
 fun Double.ceil() = this.floor() + 1.0
-@Deprecated("Use kotlin.roundToInt") fun Double.roundInt(): Int = Math.round(this).toInt()
-@Deprecated("Use kotlin.roundToInt") fun Float.roundInt(): Int = Math.round(this)
 fun Double.abs() = Math.abs(this)
 fun Double.sqr() = this * this
 fun Float.sqr() = this * this

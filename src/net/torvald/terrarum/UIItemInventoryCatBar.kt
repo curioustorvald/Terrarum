@@ -9,6 +9,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIUtils
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-10-20.
@@ -45,7 +46,7 @@ class UIItemInventoryCatBar(
     init {
         // place sub UIs: Image Buttons
         mainButtons = Array(catArrangement.size) { index ->
-            val iconPosX = ((buttonGapSize / 2) + index * (catIcons.tileW + buttonGapSize)).roundInt()
+            val iconPosX = ((buttonGapSize / 2) + index * (catIcons.tileW + buttonGapSize)).roundToInt()
             val iconPosY = 0
 
             UIItemImageButton(
@@ -75,9 +76,9 @@ class UIItemInventoryCatBar(
 
         sideButtons = Array(iconIndex.size) { index ->
             val iconPosX = if (index < 2)
-                (relativeStartX + sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundInt()
+                (relativeStartX + sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundToInt()
             else
-                (relativeStartX + width + 2 * sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundInt()
+                (relativeStartX + width + 2 * sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundToInt()
             val iconPosY = 0
 
             UIItemImageButton(

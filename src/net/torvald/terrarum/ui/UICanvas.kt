@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.roundInt
+import kotlin.math.roundToInt
 
 
 /**
@@ -309,22 +309,22 @@ abstract class UICanvas(
                         ui.handler.openCloseCounter / openCloseTime,
                         -ui.width.toFloat(),
                         0f
-                ).roundInt()
+                ).roundToInt()
                 Position.TOP -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         -ui.height.toFloat(),
                         0f
-                ).roundInt()
+                ).roundToInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         AppLoader.screenWf,
                         AppLoader.screenW - ui.width.toFloat()
-                ).roundInt()
+                ).roundToInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         AppLoader.screenHf,
                         AppLoader.screenH - ui.height.toFloat()
-                ).roundInt()
+                ).roundToInt()
             }
         }
         fun doClosingPopOut(ui: UICanvas, openCloseTime: Second, position: Position) {
@@ -333,22 +333,22 @@ abstract class UICanvas(
                         ui.handler.openCloseCounter / openCloseTime,
                         0f,
                         -ui.width.toFloat()
-                ).roundInt()
+                ).roundToInt()
                 Position.TOP -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         0f,
                         -ui.height.toFloat()
-                ).roundInt()
+                ).roundToInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         AppLoader.screenW - ui.width.toFloat(),
                         AppLoader.screenWf
-                ).roundInt()
+                ).roundToInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
                         AppLoader.screenH - ui.height.toFloat(),
                         AppLoader.screenHf
-                ).roundInt()
+                ).roundToInt()
             }
         }
         fun endOpeningPopOut(ui: UICanvas, position: Position) {

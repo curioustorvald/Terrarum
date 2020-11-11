@@ -10,8 +10,8 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.roundInt
 import java.util.*
+import kotlin.math.roundToInt
 
 @Deprecated("Old non-thread-safe version", ReplaceWith("Terragen", "net.torvald.terrarum.modulebasegame.worldgenerator"))
 object WorldGenerator {
@@ -776,12 +776,12 @@ object WorldGenerator {
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
         if (AppLoader.MULTITHREAD) {
             // set up indices
-            for (i in 0 until AppLoader.THREADS) {
+            for (i in 0 until AppLoader.THREAD_COUNT) {
                 ThreadParallel.map(
                         i, "SampleJoiseMap",
                         ThreadProcessNoiseLayers(
-                                HEIGHT.toFloat().div(AppLoader.THREADS).times(i).roundInt(),
-                                HEIGHT.toFloat().div(AppLoader.THREADS).times(i.plus(1)).roundInt() - 1,
+                                HEIGHT.toFloat().div(AppLoader.THREAD_COUNT).times(i).roundToInt(),
+                                HEIGHT.toFloat().div(AppLoader.THREAD_COUNT).times(i.plus(1)).roundToInt() - 1,
                                 noiseRecords
                         )
                 )

@@ -3,8 +3,8 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.roundInt
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * Image gallery. Images will be equally spaced, counted from top-left to bottom-right.
@@ -31,13 +31,13 @@ class UIItemImageGallery(
             val gutter = (height - imageList[i].height.times(imageList.size)).toFloat().div(
                     imageList.size + 1f
             )
-            return row((gutter * i.plus(1) + imageList[i].height * i).roundInt())
+            return row((gutter * i.plus(1) + imageList[i].height * i).roundToInt())
         }
 
         imageList.forEachIndexed { i, image ->
             Toolkit.drawCentered(batch, image,
                     imagePosY(i),
-                    width.toFloat().div(column).times(column(i).plus(1)).roundInt(),
+                    width.toFloat().div(column).times(column(i).plus(1)).roundToInt(),
                     posX, posY
             )
         }

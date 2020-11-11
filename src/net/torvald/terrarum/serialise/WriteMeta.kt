@@ -1,8 +1,6 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
-import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import java.nio.charset.Charset
 
 /**
@@ -18,7 +16,7 @@ internal object WriteMeta {
 
     val BYTE_NULL: Byte = 0
 
-    val terraseed: Long = WorldGenerator.SEED
+    val terraseed: Long = Worldgen.params.seed
 
 
     /**

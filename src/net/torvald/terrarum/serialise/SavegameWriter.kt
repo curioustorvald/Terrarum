@@ -8,10 +8,10 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
-import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.utils.JsonWriter.getJsonBuilder
 import java.io.File
 import java.nio.charset.Charset
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2018-10-03.
@@ -26,7 +26,7 @@ object SavegameWriter {
 
     operator fun invoke(pnameOverride: String? = null): Boolean {
         playerName = pnameOverride ?: "${Terrarum.ingame!!.actorGamer!!.actorValue[AVKey.NAME]}"
-        if (playerName.isEmpty()) playerName = "Test subject ${Math.random().times(0x7FFFFFFF).roundInt()}"
+        if (playerName.isEmpty()) playerName = "Test subject ${Math.random().times(0x7FFFFFFF).roundToInt()}"
 
         try {
             val diskImage = generateNewDiskImage()

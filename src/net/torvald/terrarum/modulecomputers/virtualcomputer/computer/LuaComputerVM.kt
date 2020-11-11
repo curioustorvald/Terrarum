@@ -366,7 +366,7 @@ class LuaComputerVM(val display: MDA) {
                 if (sine > 0.79) sine = 0.79
                 else if (sine < -0.79) sine = -0.79
                 audioData.put(
-                        (0.5 + 0.5 * sine).times(0xFF).roundInt().toByte()
+                        (0.5 + 0.5 * sine).times(0xFF).roundToInt().toByte()
                 )
             }
         }
@@ -377,7 +377,7 @@ class LuaComputerVM(val display: MDA) {
                     sine += Math.sin(Math.PI * 2 * (2*k - 1) * chopSize * x) / (2*k - 1)
                 }
                 audioData.put(
-                        (0.5 + 0.5 * sine).times(0xFF).roundInt().toByte()
+                        (0.5 + 0.5 * sine).times(0xFF).roundToInt().toByte()
                 )
             }
         }*/

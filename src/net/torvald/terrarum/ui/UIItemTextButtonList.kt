@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-03-13.
@@ -74,7 +75,7 @@ class UIItemTextButtonList(
         val h = height.toFloat()
         val ss = labelsList.size.toFloat()
         val lh = itemHitboxSize
-        val vertOff = (h/ss * i + (h/ss - lh) / 2f).roundInt()
+        val vertOff = (h/ss * i + (h/ss - lh) / 2f).roundToInt()
 
         if (!kinematic) {
             UIItemTextButton(

@@ -1172,8 +1172,8 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 ThreadParallel.map(
                         i,
                         ThreadActorUpdate(
-                                actors.div(Terrarum.THREADS).times(i).roundInt(),
-                                actors.div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1
+                                actors.div(Terrarum.THREADS).times(i).roundToInt(),
+                                actors.div(Terrarum.THREADS).times(i.plus(1)).roundToInt() - 1
                         ),
                         "ActorUpdate"
                 )

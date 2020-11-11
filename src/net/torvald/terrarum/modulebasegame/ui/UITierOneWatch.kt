@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-06-11.
@@ -88,7 +89,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
 
 
         // moon dial
-        val moonPhase = (worldTime.moonPhase * moonDialCount).roundInt() % moonDialCount
+        val moonPhase = (worldTime.moonPhase * moonDialCount).roundToInt() % moonDialCount
         batch.color = lcdLitCol
         batch.draw(moonDial.get(moonPhase, 0), 6f, 3f)
     }

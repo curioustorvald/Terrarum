@@ -12,6 +12,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2019-02-16.
@@ -57,8 +58,8 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
                 backgroundCol = Color(0),
                 highlightBackCol = Color(0),
                 activeBackCol = Color(0),
-                initialX = newvec.x.roundInt(),
-                initialY = newvec.y.roundInt(),
+                initialX = newvec.x.roundToInt(),
+                initialY = newvec.y.roundToInt(),
                 width = ICON_SIZE, height = ICON_SIZE,
                 highlightable = false
         )
@@ -154,8 +155,8 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         batch.color = blockCellCol
         val slotConfig = AppLoader.getConfigIntArray("buildingmakerfavs")
         for (i in 0 until PALETTE_SIZE) {
-            val x = blockCellPos[i].x.roundInt().toFloat()
-            val y = blockCellPos[i].y.roundInt().toFloat()
+            val x = blockCellPos[i].x.roundToInt().toFloat()
+            val y = blockCellPos[i].y.roundToInt().toFloat()
             batch.color = blockCellCol
             repeat((i == mouseOnBlocksSlot).toInt() + 1) { batch.fillCircle(x - BLOCK_BACK_RADIUS, y - BLOCK_BACK_RADIUS, BLOCK_BACK_SIZE.toFloat(), BLOCK_BACK_SIZE.toFloat()) }
             batch.color = Color.WHITE

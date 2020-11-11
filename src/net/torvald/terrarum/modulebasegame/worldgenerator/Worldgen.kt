@@ -13,7 +13,8 @@ import java.util.concurrent.Callable
 object Worldgen {
 
     private lateinit var world: GameWorld
-    private lateinit var params: WorldgenParams
+    lateinit var params: WorldgenParams
+        private set
 
     private val threadLock = java.lang.Object()
 

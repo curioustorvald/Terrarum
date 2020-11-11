@@ -217,7 +217,7 @@ class BasicDebugInfoWindow : UICanvas() {
         // memory pressure
         AppLoader.fontSmallNumbers.draw(batch, "${ccY}MEM ", (AppLoader.screenW - 23 * TinyAlphNum.W - 2).toFloat(), line(1))
         // thread count
-        AppLoader.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (AppLoader.MULTITHREAD) ccG else ccR}${AppLoader.THREADS.toString().padStart(2, ' ')}",
+        AppLoader.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (AppLoader.MULTITHREAD) ccG else ccR}${AppLoader.THREAD_COUNT.toString().padStart(2, ' ')}",
                 (AppLoader.screenW - 2 - 8 * TinyAlphNum.W).toFloat(), line(2))
 
         // memory texts

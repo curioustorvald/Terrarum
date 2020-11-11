@@ -21,8 +21,8 @@ import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.concurrent.ThreadableFun
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
-import net.torvald.terrarum.roundInt
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlin.system.measureNanoTime
 
 /**
@@ -124,7 +124,7 @@ class ThreadParallelTester : ApplicationAdapter() {
                 val uvY = y / IMAGE_SIZED
 
                 val noiseValue = noiseModule.get(uvX, uvY).absoluteValue
-                val rgb = (noiseValue * 255.0).roundInt()
+                val rgb = (noiseValue * 255.0).roundToInt()
 
                 pixmap.drawPixel(x, y, (rgb shl 24) or (rgb shl 16) or (rgb shl 8) or 0xFF)
             }

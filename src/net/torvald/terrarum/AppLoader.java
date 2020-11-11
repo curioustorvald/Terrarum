@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
-import net.torvald.terrarum.concurrent.ThreadParallel;
+import net.torvald.terrarum.concurrent.ThreadExecutor;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
@@ -136,7 +136,7 @@ public class AppLoader implements ApplicationListener {
     public static String renderer = "(a super-fancy virtual photoradiator)";
     public static String rendererVendor = "(aperture science psychovisualcomputation laboratory)";
 
-    public static int THREADS = ThreadParallel.INSTANCE.getThreadCount();
+    public static int THREAD_COUNT = ThreadExecutor.INSTANCE.getThreadCount();
     public static boolean MULTITHREAD;
 
     public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
@@ -350,7 +350,7 @@ public class AppLoader implements ApplicationListener {
             System.err.println("Game not started using DEBUG MODE -- current build of the game will display black screen without debug mode");
         }
         // set some more configuration vars
-        MULTITHREAD = ThreadParallel.INSTANCE.getThreadCount() >= 3 && getConfigBoolean("multithread");
+        MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
 
         new LwjglApplication(new AppLoader(appConfig), appConfig);
     }
