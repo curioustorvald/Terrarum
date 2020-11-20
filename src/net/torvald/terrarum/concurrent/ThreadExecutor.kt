@@ -56,7 +56,7 @@ object ThreadExecutor {
 
     // https://stackoverflow.com/questions/28818494/threads-stopping-prematurely-for-certain-values
     fun join() {
-        println("ThreadExecutor.join")
+        //println("ThreadExecutor.join")
         isOpen = false
         futures.forEach {
             try {

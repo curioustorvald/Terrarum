@@ -10,6 +10,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
@@ -357,28 +358,23 @@ object LightmapRenderer {
         // each usually takes 8..12 ms total when not threaded
         // - with direct memory access of world array and pre-calculating things in the start of the frame,
         //      I was able to pull out 3.5..5.5 ms! With abhorrently many occurrences of segfaults I had to track down...
+        // - with 'NEWLIGHT2', I was able to pull ~2 ms!
+        //
+        // multithreading - forget about it; overhead is way too big and for some reason i was not able to
+        //      resolve the 'noisy shit' artefact
+        AppLoader.measureDebugTime("Renderer.LightRuns") {
 
-        if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-            AppLoader.measureDebugTime("Renderer.LightRuns") {
+            // To save you from pains:
+            // - Per-channel light updating is actually slower
+            // BELOW NOTES DOES NOT APPLY TO 'NEWLIGHT2' LIGHT SWIPER
+            // - It seems 5-pass lighting is needed to resonably eliminate the dark spot (of which I have zero idea
+            //      why dark spots appear in the first place)
+            // - Multithreading? I have absolutely no idea.
+            // - If you naively slice the screen (job area) to multithread, the seam will appear.
 
-                // To save you from pains:
-                // - Per-channel light updating is actually slower
-                // BELOW NOTES DOES NOT APPLY TO 'NEWLIGHT2' LIGHT SWIPER
-                // - It seems 5-pass lighting is needed to resonably eliminate the dark spot (of which I have zero idea
-                //      why dark spots appear in the first place)
-                // - Multithreading? I have absolutely no idea.
-                // - If you naively slice the screen (job area) to multithread, the seam will appear.
-                //r3();r4();r1();r2();r3();
-
-                r1();r2();r3();r4()
-                //r1();r2();r3();r4()
-
-            }
+            r1();r2();r3();r4()
         }
-        else if (world.worldIndex != -1) { // to avoid updating on the null world
-            AppLoader.measureDebugTime("Renderer.LightRuns") {
-            }
-        }
+
     }
 
     private fun buildLanternmap(actorContainers: Array<out List<ActorWithBody>?>) {
