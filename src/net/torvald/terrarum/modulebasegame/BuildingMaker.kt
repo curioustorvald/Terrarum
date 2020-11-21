@@ -16,6 +16,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
+import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
+import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.realestate.LandUtil
@@ -27,7 +29,6 @@ import net.torvald.terrarum.serialise.toLittleShort
 import net.torvald.terrarum.serialise.toULittle48
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.FileOutputStream

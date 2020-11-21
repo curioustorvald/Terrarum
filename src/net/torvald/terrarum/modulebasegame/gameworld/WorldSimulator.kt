@@ -437,14 +437,12 @@ object WorldSimulator {
     }
 
     // simple euclidean norm, squared
-    private val actorDistanceCalculator = object : DistanceCalculator<ActorWithBody> {
-        override fun distanceTo(t: ActorWithBody, p: PointND): Double {
-            val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
-            // ROUNDWORLD implementation
-            val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
-            val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+    private val actorDistanceCalculator = DistanceCalculator<ActorWithBody> { t: ActorWithBody, p: PointND ->
+        val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+        // ROUNDWORLD implementation
+        val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+        val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
 
-            return minOf(dist1, minOf(dist2, dist3))
-        }
+        minOf(dist1, minOf(dist2, dist3))
     }
 }

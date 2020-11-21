@@ -30,7 +30,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
     companion object {
         private const val WIDTH_RATIO = 0.7
-        private const val PREVIEW_UPDATE_RATE = 1 / 5f
+        private const val PREVIEW_UPDATE_RATE = AppLoader.UPDATE_RATE
 
         private val COL_TERR = Color.WHITE
         private val COL_WALLED = Color(.5f, .5f, .5f, 1f)

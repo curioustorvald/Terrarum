@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame
+package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
@@ -8,6 +8,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
@@ -28,8 +29,8 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         const val MENUBAR_SIZE = 72
         const val SCROLLBAR_SIZE = 24
 
-        const val WIDTH = TILES_X*TILESREGION_SIZE + SCROLLBAR_SIZE + MENUBAR_SIZE
-        const val HEIGHT = TILES_Y*TILESREGION_SIZE
+        const val WIDTH = TILES_X * TILESREGION_SIZE + SCROLLBAR_SIZE + MENUBAR_SIZE
+        const val HEIGHT = TILES_Y * TILESREGION_SIZE
     }
 
     override var width = WIDTH

@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame
+package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
+import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack

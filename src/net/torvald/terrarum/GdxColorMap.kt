@@ -13,6 +13,7 @@ class GdxColorMap {
 
     constructor(imageFile: FileHandle) {
         AppLoader.printdbg(this, "Loading colormap from ${imageFile.name()}")
+        printStackTrace(this)
 
         val pixmap = Pixmap(imageFile)
         width = pixmap.width

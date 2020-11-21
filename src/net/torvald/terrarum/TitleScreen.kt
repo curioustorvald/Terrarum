@@ -292,6 +292,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun resize(width: Int, height: Int) {
         printdbg(this, "resize() called")
+        printdbg(this, "called by:")
+        printStackTrace(this)
 
         // Set up viewport when window is resized
         initViewPort(AppLoader.screenW, AppLoader.screenH)

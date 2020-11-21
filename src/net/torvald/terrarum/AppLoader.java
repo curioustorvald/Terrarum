@@ -211,7 +211,7 @@ public class AppLoader implements ApplicationListener {
     public static final int defaultW = 1116;
     public static final int defaultH = 744;
     public static final int minimumW = 1080;
-    public static final int minimumH = 720;
+    public static final int minimumH = 722;
 
     public static final String FONT_DIR = "assets/graphics/fonts/terrarum-sans-bitmap";
 
@@ -318,10 +318,12 @@ public class AppLoader implements ApplicationListener {
         appConfig.useGL30 = true; // utilising some GL trickeries, need this to be TRUE
         appConfig.vSyncEnabled = getConfigBoolean("usevsync");
         appConfig.resizable = false;//true;
-        //appConfig.width = 1110; // photographic ratio (1.5:1)
-        //appConfig.height = 740; // photographic ratio (1.5:1)
         appConfig.width = getConfigInt("screenwidth");
+        if (appConfig.width % 2 == 1) appConfig.width -= 1;
+        if (appConfig.width < minimumW) appConfig.width = minimumW;
         appConfig.height = getConfigInt("screenheight");
+        if (appConfig.height % 2 == 1) appConfig.height -= 1;
+        if (appConfig.height < minimumH) appConfig.height = minimumH;
         appConfig.backgroundFPS = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
         appConfig.foregroundFPS = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
         appConfig.title = GAME_NAME;
@@ -654,9 +656,6 @@ public class AppLoader implements ApplicationListener {
         screenW = width;
         screenH = height;
 
-        if (screenW % 2 == 1) screenW -= 1;
-        if (screenH % 2 == 1) screenH -= 1;
-
         if (currenScreen != null) currenScreen.resize(screenW, screenH);
 
 
@@ -790,7 +789,7 @@ public class AppLoader implements ApplicationListener {
         currenScreen = screen;
 
         currenScreen.show();
-        currenScreen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        currenScreen.resize(appConfig.width, appConfig.height);
 
 
         System.gc();

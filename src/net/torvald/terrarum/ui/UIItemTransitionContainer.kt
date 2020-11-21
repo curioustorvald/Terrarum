@@ -17,7 +17,7 @@ open class UIItemTransitionContainer(
         val uis: Array<out UICanvas>
 ) : UIItem(parent, initialX, initialY) {
 
-    val debugvals = true
+    val debugvals = false
 
     private var transitionRequested = false
     private var transitionOngoing = false
