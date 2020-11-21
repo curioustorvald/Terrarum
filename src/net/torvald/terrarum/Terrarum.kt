@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
+import net.torvald.UnsafeHelper
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.gameactors.Actor
@@ -99,11 +100,15 @@ object Terrarum : Disposable {
         }
     val memNativeHeap: Int
         get() {
-            nativeHeapCircularArray.appendHead((Gdx.app.javaHeap shr 20).toInt())
+            nativeHeapCircularArray.appendHead((Gdx.app.nativeHeap shr 20).toInt())
 
             var acc = 0
             nativeHeapCircularArray.forEach { acc = maxOf(acc, it) }
             return acc
+        }
+    val memUnsafe: Int
+        get() {
+            return (UnsafeHelper.unsafeAllocatedSize shr 20).toInt()
         }
     val memXmx: Int
         get() = (Runtime.getRuntime().maxMemory() shr 20).toInt()

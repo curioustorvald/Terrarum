@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.CircularArray
 
 /**
@@ -70,6 +71,8 @@ object SanicLoadScreen : LoadScreenBase() {
     private var messageForegroundColour = Color.WHITE
 
     override fun render(delta: Float) {
+        Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
+
         val delta = Gdx.graphics.rawDeltaTime
 
         glideDispY = AppLoader.screenH - 100f - AppLoader.fontGame.lineHeight

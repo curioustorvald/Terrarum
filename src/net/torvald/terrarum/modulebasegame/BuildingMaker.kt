@@ -367,13 +367,13 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         // make pen work HERE
         // when LEFT mouse is down
-        if (!tappedOnUI && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) && !mouseOnUI) {
+        if (!tappedOnUI && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) && !mouseOnUI) {
 
             makePenWork(Terrarum.mouseTileX, Terrarum.mouseTileY)
             // TODO drag support using bresenham's algo
             //      for some reason it just doesn't work...
         }
-        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary"))) {
             // open pen menu
             // position the menu to where the cursor is
             uiPenMenu.posX = Terrarum.mouseScreenX - uiPenMenu.width / 2

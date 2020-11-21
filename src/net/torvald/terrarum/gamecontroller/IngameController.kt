@@ -61,10 +61,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
             // the very job.
 
-            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
                 terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
             }
-            /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary")) {
+            /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary")) {
                 ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
             }*/
 
@@ -93,14 +93,14 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.actorNowPlaying?.keyDown(keycode)
 
             // quickslot by number keys
-            val quickslotKeys = AppLoader.getConfigIntArray("keyquickslots")
+            val quickslotKeys = AppLoader.getConfigIntArray("config_keyquickslots")
             if (keycode in quickslotKeys) {
                 terrarumIngame.actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, quickslotKeys.indexOf(keycode))
             }
 
             // pie menu
-            if (AppLoader.getConfigIntArray("keyquickselalt").contains(keycode)
-                || keycode == AppLoader.getConfigInt("keyquicksel")) {
+            if (AppLoader.getConfigIntArray("config_keyquickselalt").contains(keycode)
+                || keycode == AppLoader.getConfigInt("config_keyquicksel")) {
                 terrarumIngame.uiPieMenu.setAsOpen()
                 terrarumIngame.uiQuickBar.setAsClose()
             }
@@ -126,8 +126,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        if (AppLoader.getConfigIntArray("keyquickselalt").contains(keycode)
-            || keycode == AppLoader.getConfigInt("keyquicksel")) {
+        if (AppLoader.getConfigIntArray("config_keyquickselalt").contains(keycode)
+            || keycode == AppLoader.getConfigInt("config_keyquicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -159,18 +159,18 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             if (terrarumIngame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (
-                        button == AppLoader.getConfigInt("mouseprimary") ||
-                        button == AppLoader.getConfigInt("mousesecondary")) {
+                        button == AppLoader.getConfigInt("config_mouseprimary") ||
+                        button == AppLoader.getConfigInt("config_mousesecondary")) {
                     terrarumIngame.worldPrimaryClickEnd(AppLoader.UPDATE_RATE)
                 }
-                /*if (button == AppLoader.getConfigInt("mousesecondary")) {
+                /*if (button == AppLoader.getConfigInt("config_mousesecondary")) {
                     ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE)
                 }*/
             }
         }
 
         // pie menu
-        if (button == AppLoader.getConfigInt("mousequicksel")) {
+        if (button == AppLoader.getConfigInt("config_mousequicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -204,7 +204,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         terrarumIngame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
 
         // pie menu
-        if (button == AppLoader.getConfigInt("mousequicksel")) {
+        if (button == AppLoader.getConfigInt("config_mousequicksel")) {
             terrarumIngame.uiPieMenu.setAsOpen()
             terrarumIngame.uiQuickBar.setAsClose()
         }

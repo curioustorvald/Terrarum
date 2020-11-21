@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
@@ -57,8 +58,6 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
     }
 
     override fun render(delta: Float) {
-        //println("WorldgenLoadScreenRender")
-
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
         previewRenderCounter += delta
@@ -103,9 +102,6 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
     }
 
-    override fun addMessage(msg: String) {
-        super.addMessage(msg)
-    }
 
     override fun dispose() {
         if (!previewPixmap.isDisposed)

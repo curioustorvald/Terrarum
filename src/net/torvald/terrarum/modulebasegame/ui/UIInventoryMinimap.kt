@@ -42,7 +42,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
         // update map panning
         // if left click is down and cursor is in the map area
-        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) &&
+        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) &&
             Terrarum.mouseScreenY in full.INVENTORY_CELLS_OFFSET_Y..full.INVENTORY_CELLS_OFFSET_Y + full.INVENTORY_CELLS_UI_HEIGHT) {
             minimapPanX += Terrarum.mouseDeltaX * 2f / minimapZoom
             minimapPanY += Terrarum.mouseDeltaY * 2f / minimapZoom

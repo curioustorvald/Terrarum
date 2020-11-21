@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.CircularArray
 
 open class LoadScreenBase : ScreenAdapter(), Disposable {
@@ -63,6 +64,8 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
     }
 
     override fun render(delta: Float) {
+        Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
+
         if (screenToLoad?.gameInitialised ?: false) {
             doContextChange = true
         }

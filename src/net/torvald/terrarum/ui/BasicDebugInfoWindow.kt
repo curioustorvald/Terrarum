@@ -203,8 +203,8 @@ class BasicDebugInfoWindow : UICanvas() {
         val gamepad = (Terrarum.ingame as? TerrarumIngame)?.ingameController?.gamepad
         if (gamepad != null) {
             drawGamepadAxis(gamepad, batch,
-                    gamepad.getAxis(AppLoader.getConfigInt("gamepadaxislx")),
-                    gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisly")),
+                    gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxislx")),
+                    gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxisly")),
                     AppLoader.screenW - 128 - TinyAlphNum.W * 2,
                     line(3).toInt()
             )

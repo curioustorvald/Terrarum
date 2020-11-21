@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
+import net.torvald.UnsafeHelper
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -91,7 +92,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                                   " $EMDASH F: ${Gdx.graphics.framesPerSecond}" +
                                   if (AppLoader.IS_DEVELOPMENT_BUILD)
                                       " (ΔF${Terrarum.updateRateStr})" +
-                                      " $EMDASH M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
+                                      " $EMDASH M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / U${Terrarum.memUnsafe}M / X${Terrarum.memXmx}M"
                                   else
                                       ""
     }
@@ -314,8 +315,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // >- queue up game UIs that should pause the world -<
         uiInventoryPlayer = UIInventoryFull(actorNowPlaying!!,
-                toggleKeyLiteral = AppLoader.getConfigInt("keyinventory"),
-                toggleButtonLiteral = AppLoader.getConfigInt("gamepadstart")
+                toggleKeyLiteral = AppLoader.getConfigInt("config_keyinventory"),
+                toggleButtonLiteral = AppLoader.getConfigInt("config_gamepadstart")
         )
         uiInventoryPlayer.setPosition(0, 0)
 

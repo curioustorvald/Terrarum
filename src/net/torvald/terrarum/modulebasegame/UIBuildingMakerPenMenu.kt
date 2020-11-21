@@ -99,7 +99,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             uiItems.add(button)
 
             button.clickOnceListener = { _, _, b ->
-                if (b == AppLoader.getConfigInt("mouseprimary")) {
+                if (b == AppLoader.getConfigInt("config_mouseprimary")) {
                     toolButtonsJob[index].invoke()
                     closeGracefully()
                 }
@@ -133,7 +133,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         }
 
         // primary click
-        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
             // close by clicking close button or out-of-boud
             if (mouseVec.distanceSquared(RADIUS, RADIUS) !in CLOSE_BUTTON_RADIUS.sqr()..RADIUSF.sqr()) {
                 closeGracefully()
@@ -163,7 +163,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             batch.draw(ItemCodex.getItemImage(slotConfig[i]), x - 16, y - 16, 32f, 32f)
 
             // update as well while looping
-            if (i == mouseOnBlocksSlot && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+            if (i == mouseOnBlocksSlot && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
                 parent.setPencilColour(slotConfig[i])
                 closeGracefully()
             }

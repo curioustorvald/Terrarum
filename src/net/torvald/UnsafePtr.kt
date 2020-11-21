@@ -11,6 +11,9 @@ import sun.misc.Unsafe
  */
 
 internal object UnsafeHelper {
+    var unsafeAllocatedSize = 0L
+        internal set
+
     val unsafe: Unsafe
 
     init {
@@ -57,6 +60,10 @@ internal object UnsafeHelper {
  * Use of hashCode() is forbidden, use the pointer instead.
  */
 internal class UnsafePtr(pointer: Long, allocSize: Long) {
+    init {
+        UnsafeHelper.unsafeAllocatedSize += allocSize
+    }
+
     var destroyed = false
         private set
 
@@ -67,8 +74,10 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
         private set
 
     fun realloc(newSize: Long) {
+        UnsafeHelper.unsafeAllocatedSize -= size
         ptr = UnsafeHelper.unsafe.reallocateMemory(ptr, newSize)
         size = newSize
+        UnsafeHelper.unsafeAllocatedSize += size
     }
 
     fun destroy() {
@@ -79,6 +88,8 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
             printStackTrace(this)
 
             destroyed = true
+
+            UnsafeHelper.unsafeAllocatedSize -= size
         }
     }
 

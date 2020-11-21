@@ -81,7 +81,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         }
 
         // respond to click
-        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
             // scroll bar
             if (relativeMouseX in width - SCROLLBAR_SIZE until width && relativeMouseY in 0 until height) {
                 mouseOnScroll = true

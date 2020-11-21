@@ -90,7 +90,7 @@ abstract class UICanvas(
         get() = _mouseUpThis || handler.mouseUp
     /** If mouse is hovering over it and mouse is down */
     val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))
+        get() = mouseUp && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))
 
     private val _mouseUpThis: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
