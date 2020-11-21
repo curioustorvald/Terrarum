@@ -12,9 +12,8 @@ import net.torvald.UnsafeHelper
  */
 internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
-    val TOTAL_SIZE_IN_BYTES = 16L * width * height
-
-    val array = UnsafeHelper.allocate(TOTAL_SIZE_IN_BYTES)
+    private val TOTAL_SIZE_IN_BYTES = 16L * (width + 1) * (height + 1)
+    private val array = UnsafeHelper.allocate(TOTAL_SIZE_IN_BYTES)
 
     private inline fun toAddr(x: Int, y: Int) = 16L * (y * width + x)
 

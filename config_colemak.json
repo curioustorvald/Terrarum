@@ -1,8 +1,8 @@
 {
   "displayfps": 0,
   "usevsync": false,
-  "screenwidth": 1110,
-  "screenheight": 740,
+  "screenwidth": 1280,
+  "screenheight": 720,
   "language": "enUS",
   "notificationshowuptime": 4000,
   "multithread": true,

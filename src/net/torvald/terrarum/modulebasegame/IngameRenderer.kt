@@ -51,10 +51,10 @@ object IngameRenderer : Disposable {
     val shaderAtoGrey: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
 
-    private val width = AppLoader.screenW
-    private val height = AppLoader.screenH
-    private val widthf = width.toFloat()
-    private val heightf = height.toFloat()
+    private val WIDTH = AppLoader.screenW
+    private val HEIGHT = AppLoader.screenH
+    private val WIDTHF = WIDTH.toFloat()
+    private val HEIGHTF = HEIGHT.toFloat()
 
     private var initDone = false
 
@@ -586,13 +586,13 @@ object IngameRenderer : Disposable {
     private fun invokeInit() {
         if (!initDone) {
             batch = SpriteBatch()
-            camera = OrthographicCamera(widthf, heightf)
+            camera = OrthographicCamera(WIDTHF, HEIGHTF)
 
-            camera.setToOrtho(true, widthf, heightf)
+            camera.setToOrtho(true, WIDTHF, HEIGHTF)
             camera.update()
-            Gdx.gl20.glViewport(0, 0, width, height)
+            Gdx.gl20.glViewport(0, 0, WIDTH, HEIGHT)
 
-            resize(width, height)
+            resize(WIDTH, HEIGHT)
 
             initDone = true
         }

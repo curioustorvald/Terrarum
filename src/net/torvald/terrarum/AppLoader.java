@@ -208,10 +208,10 @@ public class AppLoader implements ApplicationListener {
 
     public static ArrayListMap debugTimers = new ArrayListMap<String, Long>();
 
-    public static final int defaultW = 1116;
-    public static final int defaultH = 744;
-    public static final int minimumW = 1080;
-    public static final int minimumH = 722;
+    public static final int defaultW = 1280;
+    public static final int defaultH = 720;
+    public static final int minimumW = 800;
+    public static final int minimumH = 600;
 
     public static final String FONT_DIR = "assets/graphics/fonts/terrarum-sans-bitmap";
 
