@@ -36,6 +36,7 @@ object PostProcessor : Disposable {
     private val defaultResCol = Color(0x66ffff66)
     private val safeAreaCol = Color(0xffffff66.toInt())
     private val safeAreaCol2 = Color(0xffffff44.toInt())
+    private val currentResCol = Color(0xff00ff44.toInt())
 
     private val debugUI = BasicDebugInfoWindow()
 
@@ -192,7 +193,14 @@ object PostProcessor : Disposable {
                 AppLoader.fontSmallNumbers.draw(
                         batch, defaultResStr,
                         (AppLoader.screenW - AppLoader.minimumW).div(2).toFloat(),
-                        (AppLoader.screenH - AppLoader.minimumH).div(2).minus(10).toFloat()
+                        (AppLoader.screenH - AppLoader.minimumH).div(2).toFloat()
+                )
+
+                batch.color = currentResCol
+                AppLoader.fontSmallNumbers.draw(
+                        batch, currentResStr,
+                        AppLoader.screenW - 80f,
+                        0f
                 )
             }
         }
@@ -206,6 +214,7 @@ object PostProcessor : Disposable {
     }
 
     private val defaultResStr = "${AppLoader.minimumW}x${AppLoader.minimumH}"
+    private val currentResStr = "${AppLoader.screenW}x${AppLoader.screenH}"
     private val safeAreaStr = "TV Safe Area"
     private val versionStr = "Version ${AppLoader.getVERSION_STRING()}"
     private val thisIsDebugStr = "${AppLoader.GAME_NAME} Develoment Build $versionStr"
