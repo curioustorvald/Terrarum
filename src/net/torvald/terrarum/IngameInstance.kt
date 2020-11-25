@@ -253,6 +253,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
 
     data class BlockChangeQueueItem(val old: Int, val new: Int, val posX: Int, val posY: Int)
+
+    open fun sendNotification(messages: Array<String>) {}
+    open fun sendNotification(messages: List<String>) {}
+    open fun sendNotification(singleMessage: String) {}
 }
 
 inline fun Lock.lock(body: () -> Unit) {

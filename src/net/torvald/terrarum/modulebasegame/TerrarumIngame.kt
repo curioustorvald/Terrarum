@@ -660,15 +660,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     /** Send message to notifier UI and toggle the UI as opened. */
-    fun sendNotification(messages: Array<String>) {
+    override fun sendNotification(messages: Array<String>) {
         (notifier as Notification).sendNotification(messages.toList())
     }
 
-    fun sendNotification(messages: List<String>) {
+    override fun sendNotification(messages: List<String>) {
         (notifier as Notification).sendNotification(messages)
     }
 
-    fun sendNotification(singleMessage: String) = sendNotification(listOf(singleMessage))
+    override fun sendNotification(singleMessage: String) = sendNotification(listOf(singleMessage))
 
     fun wakeDormantActors() {
         var actorContainerSize = actorContainerInactive.size

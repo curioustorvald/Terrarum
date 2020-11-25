@@ -557,11 +557,14 @@ public class AppLoader implements ApplicationListener {
 
             try {
                 Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, appConfig.width, appConfig.height);
-                PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir + "/Screenshot.tga"), p, true);
+                PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".tga"), p, true);
                 p.dispose();
+
+                Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
             }
             catch (Throwable e) {
                 e.printStackTrace();
+                Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
             }
         }
 

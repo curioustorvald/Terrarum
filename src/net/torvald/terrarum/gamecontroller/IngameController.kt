@@ -117,7 +117,6 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         // screenshot key
         if (keycode == Input.Keys.F12 && !f12Down) {
             AppLoader.requestScreenshot()
-            terrarumIngame.sendNotification("Screenshot taken")
             f12Down = true
             println("Screenshot taken.")
         }
