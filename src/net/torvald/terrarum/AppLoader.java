@@ -315,7 +315,7 @@ public class AppLoader implements ApplicationListener {
         ShaderProgram.pedantic = false;
 
         LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-        appConfig.useGL30 = false; // utilising some GL trickeries, need this to be TRUE
+        appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
         appConfig.vSyncEnabled = getConfigBoolean("usevsync");
         appConfig.resizable = false;//true;
         appConfig.width = getConfigInt("screenwidth");
