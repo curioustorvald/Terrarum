@@ -18,6 +18,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
+import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
 /**
@@ -718,21 +719,40 @@ object LightmapRenderer {
                     val arrayX = x.convX()
                     val arrayY = y.convY()
 
+                    val red = lightmap.getR(arrayX, arrayY)
+                    val grn = lightmap.getG(arrayX, arrayY)
+                    val blu = lightmap.getB(arrayX, arrayY)
+                    val redw = (red - 1f) * (7f / 24f)
+                    val grnw = (grn - 1f)
+                    val bluw = (blu - 1f) * (7f / 72f)
+
                     val color = if (solidMultMagic == null)
-                        gdxColorNull
+                        lightBuffer.drawPixel(
+                            x - this_x_start,
+                            lightBuffer.height - 1 - y + this_y_start,
+                            0
+                        ) // flip Y
                     else
-                        Color(
-                                lightmap.getR(arrayX, arrayY) * solidMultMagic,
-                                lightmap.getG(arrayX, arrayY) * solidMultMagic,
-                                lightmap.getB(arrayX, arrayY) * solidMultMagic,
+                        lightBuffer.drawPixel(
+                            x - this_x_start,
+                            lightBuffer.height - 1 - y + this_y_start,
+                                (maxOf(red, grnw, bluw) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
+                                        (maxOf(redw, grn, bluw) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
+                                        (maxOf(redw, grnw, blu) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
+                                        (lightmap.getA(arrayX, arrayY) * solidMultMagic).hdnorm().times(255f).roundToInt()
+                        ) // flip Y
+
+
+                    /*Color(
+                                maxOf(red, grnw, bluw) * solidMultMagic,
+                                maxOf(redw, grn, bluw) * solidMultMagic,
+                                maxOf(redw, grnw, blu) * solidMultMagic,
                                 lightmap.getA(arrayX, arrayY) * solidMultMagic
                         ).normaliseToHDR()
 
-                    lightBuffer.setColor(color)
+                    lightBuffer.setColor(color)*/
 
-                    //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
 
-                    lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
                 }
             }
 
@@ -807,7 +827,7 @@ object LightmapRenderer {
     // TODO: float LUT lookup using linear interpolation
 
     // input: 0..1 for int 0..1023
-    private fun hdr(intensity: Float): Float {
+    fun hdr(intensity: Float): Float {
         val intervalStart = (intensity * CHANNEL_MAX).floorInt()
         val intervalEnd = (intensity * CHANNEL_MAX).floorInt() + 1
 
@@ -865,6 +885,8 @@ object LightmapRenderer {
             hdr(this.b.coerceIn(0f, 1f)),
             hdr(this.a.coerceIn(0f, 1f))
     )
+
+    inline fun Float.hdnorm() = hdr(this.coerceIn(0f, 1f))
 
     private fun Cvec.nonZero() = this.r.abs() > epsilon ||
                                  this.g.abs() > epsilon ||
