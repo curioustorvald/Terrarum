@@ -68,16 +68,16 @@ open class ActorHumanoid(
 
     override var color: Cvec
         get() = Cvec(
-                (actorValue.getAsFloat(AVKey.LUMR) ?: 0f) / LightmapRenderer.MUL_FLOAT,
-                (actorValue.getAsFloat(AVKey.LUMG) ?: 0f) / LightmapRenderer.MUL_FLOAT,
-                (actorValue.getAsFloat(AVKey.LUMB) ?: 0f) / LightmapRenderer.MUL_FLOAT,
-                (actorValue.getAsFloat(AVKey.LUMA) ?: 0f) / LightmapRenderer.MUL_FLOAT
+                (actorValue.getAsFloat(AVKey.LUMR) ?: 0f),
+                (actorValue.getAsFloat(AVKey.LUMG) ?: 0f),
+                (actorValue.getAsFloat(AVKey.LUMB) ?: 0f),
+                (actorValue.getAsFloat(AVKey.LUMA) ?: 0f)
         )
         set(value) {
-            actorValue[AVKey.LUMR] = value.r * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMG] = value.g * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMB] = value.b * LightmapRenderer.MUL_FLOAT
-            actorValue[AVKey.LUMA] = value.a * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMR] = value.r
+            actorValue[AVKey.LUMG] = value.g
+            actorValue[AVKey.LUMB] = value.b
+            actorValue[AVKey.LUMA] = value.a
         }
 
     /**

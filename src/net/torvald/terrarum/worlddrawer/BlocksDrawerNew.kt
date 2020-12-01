@@ -266,8 +266,6 @@ internal object BlocksDrawer {
         }
     }
 
-    private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
-
     /**
      * Turns bitmask-with-single-bit-set into its bit index. The LSB is counted as 1, and thus the index starts at one.
      * @return 0 -> -1, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, ...

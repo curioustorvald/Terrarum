@@ -134,19 +134,19 @@ object BlockCodex {
         prop.id = if (key == -1) 0 else intVal(record, "id")
         prop.drop = intVal(record, "drop")
 
-        prop.shadeColR = floatVal(record, "shdr") / LightmapRenderer.MUL_FLOAT
-        prop.shadeColG = floatVal(record, "shdg") / LightmapRenderer.MUL_FLOAT
-        prop.shadeColB = floatVal(record, "shdb") / LightmapRenderer.MUL_FLOAT
-        prop.shadeColA = floatVal(record, "shduv") / LightmapRenderer.MUL_FLOAT
+        prop.shadeColR = floatVal(record, "shdr")
+        prop.shadeColG = floatVal(record, "shdg")
+        prop.shadeColB = floatVal(record, "shdb")
+        prop.shadeColA = floatVal(record, "shduv")
         prop.opacity = Cvec(prop.shadeColR, prop.shadeColG, prop.shadeColB, prop.shadeColA)
 
         prop.strength = intVal(record, "str")
         prop.density = intVal(record, "dsty")
 
-        prop.baseLumColR = floatVal(record, "lumr") / LightmapRenderer.MUL_FLOAT
-        prop.baseLumColG = floatVal(record, "lumg") / LightmapRenderer.MUL_FLOAT
-        prop.baseLumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
-        prop.baseLumColA = floatVal(record, "lumuv") / LightmapRenderer.MUL_FLOAT
+        prop.baseLumColR = floatVal(record, "lumr")
+        prop.baseLumColG = floatVal(record, "lumg")
+        prop.baseLumColB = floatVal(record, "lumb")
+        prop.baseLumColA = floatVal(record, "lumuv")
         prop.baseLumCol.set(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
 
         prop.friction = intVal(record, "fr")

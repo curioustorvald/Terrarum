@@ -89,6 +89,7 @@ internal object LightmapHDRMap : Disposable {
     inline operator fun get(index: Int) = ptr.getFloat(4L * index)
 
     val lastIndex = THE_LUT.lastIndex
+    val size = lastIndex + 1
 
     override fun dispose() {
         ptr.destroy()

@@ -26,7 +26,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 Echo("Wrong number input.")
             }
             catch (e1: IllegalArgumentException) {
-                Echo("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel")
+                Echo("Range: 0.0-1.0+ per channel")
             }
 
         }

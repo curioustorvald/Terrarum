@@ -94,16 +94,6 @@ object LightmapRenderer {
 
     const val DRAW_TILE_SIZE: Float = CreateTileAtlas.TILE_SIZE / IngameRenderer.lightmapDownsample
 
-    // color model related constants
-    const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
-    const val CHANNEL_MAX_DECIMAL = 1f
-    const val MUL_2 = MUL * MUL
-    const val CHANNEL_MAX = MUL - 1
-    const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
-    const val COLOUR_RANGE_SIZE = MUL * MUL_2
-    const val MUL_FLOAT = MUL / 256f
-    const val DIV_FLOAT = 256f / MUL
-
     internal var for_x_start = 0
     internal var for_y_start = 0
     internal var for_x_end = 0
@@ -140,10 +130,10 @@ object LightmapRenderer {
             val y = y.convY()
 
             Cvec(
-                    lightmap.getR(x, y) * MUL_FLOAT,
-                    lightmap.getG(x, y) * MUL_FLOAT,
-                    lightmap.getB(x, y) * MUL_FLOAT,
-                    lightmap.getA(x, y) * MUL_FLOAT
+                    lightmap.getR(x, y),
+                    lightmap.getG(x, y),
+                    lightmap.getB(x, y),
+                    lightmap.getA(x, y)
             )
         }
     }
@@ -199,7 +189,7 @@ object LightmapRenderer {
          */
 
         // set sunlight
-        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
+        sunLight.set(world.globalLight)
 
         // set no-op mask from solidity of the block
         /*AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
@@ -722,37 +712,30 @@ object LightmapRenderer {
                     val red = lightmap.getR(arrayX, arrayY)
                     val grn = lightmap.getG(arrayX, arrayY)
                     val blu = lightmap.getB(arrayX, arrayY)
-                    val redw = (red - 1f) * (7f / 24f)
-                    val grnw = (grn - 1f)
-                    val bluw = (blu - 1f) * (7f / 72f)
+                    val uvl = lightmap.getA(arrayX, arrayY)
+                    val redw = (red.sqrt() - 1f) * (7f / 24f)
+                    val grnw = (grn.sqrt() - 1f)
+                    val bluw = (blu.sqrt() - 1f) * (7f / 72f)
+                    val bluwv = (blu.sqrt() - 1f) * (1f / 50f)
+                    val uvlwr = (uvl.sqrt() - 1f) * (1f / 13f)
+                    val uvlwg = (uvl.sqrt() - 1f) * (1f / 10f)
+                    val uvlwb = (uvl.sqrt() - 1f) * (1f / 8f)
 
                     val color = if (solidMultMagic == null)
                         lightBuffer.drawPixel(
                             x - this_x_start,
-                            lightBuffer.height - 1 - y + this_y_start,
+                            lightBuffer.height - 1 - y + this_y_start, // flip Y
                             0
-                        ) // flip Y
+                        )
                     else
                         lightBuffer.drawPixel(
                             x - this_x_start,
-                            lightBuffer.height - 1 - y + this_y_start,
-                                (maxOf(red, grnw, bluw) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
-                                        (maxOf(redw, grn, bluw) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
-                                        (maxOf(redw, grnw, blu) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
-                                        (lightmap.getA(arrayX, arrayY) * solidMultMagic).hdnorm().times(255f).roundToInt()
-                        ) // flip Y
-
-
-                    /*Color(
-                                maxOf(red, grnw, bluw) * solidMultMagic,
-                                maxOf(redw, grn, bluw) * solidMultMagic,
-                                maxOf(redw, grnw, blu) * solidMultMagic,
-                                lightmap.getA(arrayX, arrayY) * solidMultMagic
-                        ).normaliseToHDR()
-
-                    lightBuffer.setColor(color)*/
-
-
+                            lightBuffer.height - 1 - y + this_y_start, // flip Y
+                                (maxOf(red,grnw,bluw,uvlwr) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
+                                        (maxOf(redw,grn,bluw,uvlwg) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
+                                        (maxOf(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
+                                        (maxOf(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
+                        )
                 }
             }
 
@@ -783,7 +766,7 @@ object LightmapRenderer {
         _mapThisTileOpacity2.destroy()
     }
 
-    private const val lightScalingMagic = 8f
+    private const val lightScalingMagic = 2f
 
     /**
      * Subtract each channel's RGB value.
@@ -828,12 +811,12 @@ object LightmapRenderer {
 
     // input: 0..1 for int 0..1023
     fun hdr(intensity: Float): Float {
-        val intervalStart = (intensity * CHANNEL_MAX).floorInt()
-        val intervalEnd = (intensity * CHANNEL_MAX).floorInt() + 1
+        val intervalStart = (intensity / 4f * LightmapHDRMap.size).floorInt()
+        val intervalEnd = (intensity / 4f * LightmapHDRMap.size).floorInt() + 1
 
         if (intervalStart == intervalEnd) return LightmapHDRMap[intervalStart]
 
-        val intervalPos = (intensity * CHANNEL_MAX) - (intensity * CHANNEL_MAX).toInt()
+        val intervalPos = (intensity / 4f * LightmapHDRMap.size) - (intensity / 4f * LightmapHDRMap.size).toInt()
 
         val ret = interpolateLinear(
                 intervalPos,
@@ -895,10 +878,10 @@ object LightmapRenderer {
 
     val histogram: Histogram
         get() {
-            val reds = IntArray(MUL) // reds[intensity] ← counts
-            val greens = IntArray(MUL) // do.
-            val blues = IntArray(MUL) // do.
-            val uvs = IntArray(MUL)
+            val reds = IntArray(256) // reds[intensity] ← counts
+            val greens = IntArray(256) // do.
+            val blues = IntArray(256) // do.
+            val uvs = IntArray(256)
             val render_width = for_x_end - for_x_start
             val render_height = for_y_end - for_y_start
             // excluiding overscans; only reckon echo lights
@@ -924,7 +907,7 @@ object LightmapRenderer {
 
         val brightest: Int
             get() {
-                for (i in CHANNEL_MAX downTo 1) {
+                for (i in 255 downTo 1) {
                     if (reds[i] > 0 || greens[i] > 0 || blues[i] > 0)
                         return i
                 }
@@ -938,14 +921,14 @@ object LightmapRenderer {
 
         val dimmest: Int
             get() {
-                for (i in 0..CHANNEL_MAX) {
+                for (i in 0..255) {
                     if (reds[i] > 0 || greens[i] > 0 || blues[i] > 0)
                         return i
                 }
-                return CHANNEL_MAX
+                return 255
             }
 
-        val range: Int = CHANNEL_MAX
+        val range: Int = 255
 
         fun get(index: Int): IntArray {
             return when (index) {
