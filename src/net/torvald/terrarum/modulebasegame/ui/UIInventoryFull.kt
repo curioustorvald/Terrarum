@@ -33,10 +33,10 @@ class UIInventoryFull(
     override var height: Int = AppLoader.screenH
     override var openCloseTime: Second = 0.0f
 
-    val REQUIRED_MARGIN = 166 // hard-coded value. Don't know the details
+    val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
 
     val CELLS_HOR = 10
-    val CELLS_VRT = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryDynamicList.listGap) / // 134 is another magic number
+    val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryDynamicList.listGap) / // 134 is another magic number
                             (UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap)
 
     private val itemListToEquipViewGap = UIItemInventoryDynamicList.listGap // used to be 24; figured out that the extra gap does nothig
@@ -46,9 +46,9 @@ class UIInventoryFull(
 
     val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.listGap
 
-    val INVENTORY_CELLS_UI_HEIGHT = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryDynamicList.listGap
+    val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryDynamicList.listGap
     val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
-    val INVENTORY_CELLS_OFFSET_Y = 107 + (AppLoader.screenH - internalHeight) / 2
+    val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
 
     init {
         handler.allowESCtoClose = true
@@ -252,6 +252,10 @@ class UIInventoryFull(
 
         xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
         yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
+    }
+
+    companion object {
+        const val INVEN_DEBUG_MODE = false
     }
 }
 

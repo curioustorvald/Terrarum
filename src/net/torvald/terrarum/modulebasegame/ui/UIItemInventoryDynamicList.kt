@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
@@ -309,7 +310,7 @@ class UIItemInventoryDynamicList(
             // set tooltip accordingly
             if (isCompactMode && it.item != null && it.mouseUp && !tooltipSet) {
                 (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(
-                        if (AppLoader.IS_DEVELOPMENT_BUILD) {
+                        if (INVEN_DEBUG_MODE) {
                             it.item?.name + "/Mat: ${it.item?.material?.identifier}"
                         }
                         else {

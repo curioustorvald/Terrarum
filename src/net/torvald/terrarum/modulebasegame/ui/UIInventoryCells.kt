@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.ui.UICanvas
 import kotlin.math.roundToInt
 
@@ -122,7 +123,7 @@ internal class UIInventoryCells(
         )
         // debug text
         batch.color = Color.LIGHT_GRAY
-        if (AppLoader.IS_DEVELOPMENT_BUILD) {
+        if (INVEN_DEBUG_MODE) {
             AppLoader.fontSmallNumbers.draw(batch,
                     "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
                     encumbBarTextXPos,

@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
@@ -105,7 +106,7 @@ class UIItemInventoryElem(
             // this one-liner sets color
             batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             // draw name of the item
-            if (AppLoader.IS_DEVELOPMENT_BUILD) {
+            if (INVEN_DEBUG_MODE) {
                 AppLoader.fontGame.draw(batch,
                         // print static id, dynamic id, and count
                         "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
