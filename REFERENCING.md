@@ -6,8 +6,8 @@
 |8448..0x0F_FFFF|Items (static) (1M possible)|
 |0x10_0000..0x0FFF_FFFF|Items (dynamic\*) (267M possible)|
 |0x1000_0000..0x7FFF_FFFF|Actors (1879M possible)|
-|-1..-65536|Virtual Tiles|
-|-2147483648..-65537 (all negative numbers)|Faction (2147M possible)|
+|-2..-1048576|Virtual Tiles|
+|-2147483648..-1048577 (all negative numbers)|Faction (2147M possible)|
 
 * dynamic items have own properties that will persist through savegame.
 
