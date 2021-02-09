@@ -22,7 +22,7 @@ object BlockCodex {
 
     val dynamicLights = SortedArrayList<Int>() // does not include virtual ones
 
-    /** 4096 */
+    /** 65536 */
     val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
 
     private val nullProp = BlockProp()

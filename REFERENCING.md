@@ -1,9 +1,9 @@
 |Range|Description|
 |-----|-----------|
-|0..4095|Tiles (4096 possible)|
-|4096..8191|Walls (4096 possible)|
-|8192..8447|Wires (256 possible)|
-|8448..0x0F_FFFF|Items (static) (1M possible)|
+|0..65535|Tiles (65536 possible)|
+|65536..131071|Walls (65536 possible)|
+|131072..135167|Wires (4096 possible)|
+|135168..0x0F_FFFF|Items (static) (1M possible)|
 |0x10_0000..0x0FFF_FFFF|Items (dynamic\*) (267M possible)|
 |0x1000_0000..0x7FFF_FFFF|Actors (1879M possible)|
 |-2..-1048576|Virtual Tiles|

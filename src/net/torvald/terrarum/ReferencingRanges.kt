@@ -6,12 +6,12 @@ package net.torvald.terrarum
  */
 object ReferencingRanges {
 
-    val TILES = 0..4095
-    val WALLS = 4096..8191
-    val WIRES = 8192..8447
-    val ITEMS_STATIC = 8448..0x0F_FFFF
-    val ITEMS_DYNAMIC = 0x10_0000..0x0FFF_FFFF
-    val ACTORS = 0x1000_0000..0x7FFF_FFFF
+    val TILES = 0..65535 // 65 536 blocks
+    val WALLS = 65536..131071 // 65 536 walls
+    val WIRES = 131072..135167 // 4 096 wires
+    val ITEMS_STATIC = 135168..0x0F_FFFF // 913 408 items
+    val ITEMS_DYNAMIC = 0x10_0000..0x0FFF_FFFF // 267 386 880 pseudo-items
+    val ACTORS = 0x1000_0000..0x7FFF_FFFF // too much actors
 
     // Actor IDs are assigned in 256 groups, single actor can have 256 sub-actors
     val ACTORS_BEHIND  = 0x1000_0000..0x1FFF_FFFF // Rendered behind (e.g. tapestries)
