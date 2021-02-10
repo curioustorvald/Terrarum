@@ -178,16 +178,19 @@ object ModMgr {
     }
 
     /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
-     * contain the file, the mod will be skipped. */
-    fun getFilesFromEveryMod(path: String): List<File> {
+     * contain the file, the mod will be skipped.
+     *
+     * @return List of pairs<modname, file>
+     */
+    fun getFilesFromEveryMod(path: String): List<Pair<String, File>> {
         val path = path.sanitisePath()
         val moduleNames = moduleInfo.keys.toList()
 
-        val filesList = ArrayList<File>()
+        val filesList = ArrayList<Pair<String, File>>()
         moduleNames.forEach {
             val file = File(getPath(it, path))
 
-            if (file.exists()) filesList.add(file)
+            if (file.exists()) filesList.add(it to file)
         }
 
         return filesList.toList()
@@ -196,16 +199,18 @@ object ModMgr {
     /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
      * contain the file, the mod will be skipped.
      *
-     * Returning files are read-only. */
-    fun getGdxFilesFromEveryMod(path: String): List<FileHandle> {
+     * Returning files are read-only.
+     * @return List of pairs<modname, filehandle>
+     */
+    fun getGdxFilesFromEveryMod(path: String): List<Pair<String, FileHandle>> {
         val path = path.sanitisePath()
         val moduleNames = moduleInfo.keys.toList()
 
-        val filesList = ArrayList<FileHandle>()
+        val filesList = ArrayList<Pair<String, FileHandle>>()
         moduleNames.forEach {
             val file = Gdx.files.internal(getPath(it, path))
 
-            if (file.exists()) filesList.add(file)
+            if (file.exists()) filesList.add(it to file)
         }
 
         return filesList.toList()
@@ -231,15 +236,16 @@ object ModMgr {
             val csv = CSVFetcher.readFromModule(module, itemPath + "itemid.csv")
             csv.forEach {
                 val className = it["classname"].toString()
-                val itemID = it["id"].toInt()
+                val internalID = it["id"].toInt()
+                val itemName = "item@$module:$internalID"
 
-                printdbg(this, "Reading item #$itemID with className $className")
+                printdbg(this, "Reading item #$internalID with className $className")
 
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
-                val loadedClassInstance = loadedClassConstructor.newInstance(itemID)
+                val loadedClassInstance = loadedClassConstructor.newInstance(internalID)
 
-                ItemCodex[itemID] = loadedClassInstance as GameItem
+                ItemCodex[itemName] = loadedClassInstance as GameItem
             }
         }
     }

@@ -4,14 +4,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
+import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
-typealias ItemID = Int
+typealias ItemID = String
 
 /**
  * Instances of the GameItem (e.g. net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper) are preferably referenced
@@ -40,7 +40,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     abstract val originalName: String
 
 
-    var newName: String = "I AM VITTUN PLACEHOLDER"
+    var newName: String = "I AM VITUN PLACEHOLDER"
         private set
 
     var name: String
@@ -208,7 +208,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     }
 
     override fun hashCode(): Int {
-        return dynamicID
+        return dynamicID.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -222,7 +222,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         nameColour = Color.WHITE
     }
 
-    override fun compareTo(other: GameItem): Int = (this.dynamicID - other.dynamicID).sign()
+    override fun compareTo(other: GameItem): Int = (this.dynamicID.substring(4).toInt() - other.dynamicID.substring(4).toInt()).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 
@@ -295,7 +295,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
 
     fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
-        dynamicID = Companion.generateUniqueDynamicID(inventory)
+        dynamicID = "$PREFIX_DYNAMICITEM${Companion.generateUniqueDynamicID(inventory)}"
         ItemCodex.registerNewDynamicItem(dynamicID, this)
         return this
     }
@@ -307,8 +307,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         fun generateUniqueDynamicID(inventory: ActorInventory): Int {
             var ret: Int
             do {
-                ret = ITEM_DYNAMIC.pickRandom()
-            } while (inventory.contains(ret))
+                ret = (1..2147483647).pickRandom()
+            } while (inventory.contains("$PREFIX_DYNAMICITEM$ret"))
 
             return ret
         }

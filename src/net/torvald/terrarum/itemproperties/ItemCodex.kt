@@ -5,7 +5,11 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ReferencingRanges
+import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
+import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
@@ -13,6 +17,8 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.ITEM_ATLAS_TILES_X
 import java.util.*
 
 /**
@@ -24,96 +30,20 @@ object ItemCodex {
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
-    val itemCodex = HashMap<ItemID, GameItem>()
+    private val itemCodex = HashMap<ItemID, GameItem>()
     val dynamicItemDescription = HashMap<ItemID, GameItem>()
     val dynamicToStaticTable = HashMap<ItemID, ItemID>()
 
-    val ITEM_TILES = ReferencingRanges.TILES
-    val ITEM_WALLS = ReferencingRanges.WALLS
-    val ITEM_WIRES = ReferencingRanges.WIRES
-    val ITEM_STATIC = ReferencingRanges.ITEMS_STATIC
-    val ITEM_DYNAMIC = ReferencingRanges.ITEMS_DYNAMIC
     val ACTORID_MIN = ReferencingRanges.ACTORS.first
 
     private val itemImagePlaceholder: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
 
-
-    // TODO: when generalised, there's no guarantee that blocks will be used as an item. Write customised item prop loader and init it on the Ingame
-
     init {
         //val ingame = Terrarum.ingame!! as Ingame // WARNING you can't put this here, ExceptionInInitializerError
 
 
-        /*println("[ItemCodex] recording item ID ")
-
-        // blocks.csvs are loaded by ModMgr beforehand
-        // block items (blocks and walls are the same thing basically)
-        for (i in ITEM_TILES + ITEM_WALLS) {
-            itemCodex[i] = object : GameItem() {
-                override val originalID = i
-                override var dynamicID = i
-                override val isUnique: Boolean = false
-                override var baseMass: Double = BlockCodex[i].density / 1000.0
-                override var baseToolSize: Double? = null
-                override var equipPosition = EquipPosition.HAND_GRIP
-                override val originalName = BlockCodex[i % ITEM_WALLS.first].nameKey
-                override var stackable = true
-                override var inventoryCategory = if (i in ITEM_TILES) Category.BLOCK else Category.WALL
-                override var isDynamic = false
-                override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
-
-                init {
-                    print("$originalID ")
-                }
-
-                override fun startPrimaryUse(delta: Float): Boolean {
-                    return false
-                    // TODO base punch attack
-                }
-
-                override fun startSecondaryUse(delta: Float): Boolean {
-                    val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
-
-                    // check for collision with actors (BLOCK only)
-                    if (this.inventoryCategory == Category.BLOCK) {
-                        ingame.actorContainerActive.forEach {
-                            if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
-                                return false
-                        }
-                    }
-
-                    // return false if the tile is already there
-                    if (this.inventoryCategory == Category.BLOCK &&
-                        this.dynamicID == ingame.world.getTileFromTerrain(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
-                        this.inventoryCategory == Category.WALL &&
-                        this.dynamicID - ITEM_WALLS.start == ingame.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
-                        this.inventoryCategory == Category.WIRE &&
-                        this.dynamicID - ITEM_WIRES.start == ingame.world.getTileFromWire(Terrarum.mouseTileX, Terrarum.mouseTileY)
-                            )
-                        return false
-
-                    // filter passed, do the job
-                    // FIXME this is only useful for Player
-                    if (i in ITEM_TILES) {
-                        ingame.world.setTileTerrain(
-                                Terrarum.mouseTileX,
-                                Terrarum.mouseTileY,
-                                i
-                        )
-                    }
-                    else {
-                        ingame.world.setTileWall(
-                                Terrarum.mouseTileX,
-                                Terrarum.mouseTileY,
-                                i
-                        )
-                    }
-
-                    return true
-                }
-            }
-        }*/
+        println("[ItemCodex] recording item ID ")
 
         // test copper pickaxe
         /*itemCodex[ITEM_STATIC.first] = object : GameItem() {
@@ -176,7 +106,7 @@ object ItemCodex {
 
 
         // test water bucket
-        itemCodex[9000] = object : GameItem(9000) {
+        /*itemCodex[9000] = object : GameItem(9000) {
 
             override val isUnique: Boolean = true
             override val originalName: String = "Infinite Water Bucket"
@@ -226,7 +156,7 @@ object ItemCodex {
                 ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.LAVA, 4f)
                 return true
             }
-        }
+        }*/
 
 
         // read from save (if applicable) and fill dynamicItemDescription
@@ -236,7 +166,10 @@ object ItemCodex {
         println()
     }
 
-    fun registerNewDynamicItem(dynamicID: Int, item: GameItem) {
+    /**
+     * @param: dynamicID string of "dyn:<random id>"
+     */
+    fun registerNewDynamicItem(dynamicID: ItemID, item: GameItem) {
         if (AppLoader.IS_DEVELOPMENT_BUILD) {
             printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
         }
@@ -251,18 +184,17 @@ object ItemCodex {
     operator fun get(code: ItemID?): GameItem? {
         if (code == null) return null
 
-        if (code <= ITEM_STATIC.endInclusive) // generic item
-            return itemCodex[code]!!.clone() // from CSV
-        else if (code <= ITEM_DYNAMIC.endInclusive) {
+        if (code.startsWith(PREFIX_DYNAMICITEM))
             return dynamicItemDescription[code]!!
-        }
-        else {
-            val a = (Terrarum.ingame!! as TerrarumIngame).getActorByID(code) // actor item
+        else if (code.startsWith(PREFIX_ACTORITEM)) {
+            val a = (Terrarum.ingame!! as TerrarumIngame).getActorByID(code.substring(6).toInt()) // actor item
             if (a is CanBeAnItem) return a.itemData
 
             return null
             //throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
         }
+        else // generic item
+            return itemCodex[code]!!.clone() // from CSV
     }
 
     fun dynamicToStaticID(dynamicID: ItemID) = dynamicToStaticTable[dynamicID]!!
@@ -270,6 +202,10 @@ object ItemCodex {
     /**
      * Mainly used by GameItemLoader
      */
+    fun set(modname: String, code: Int, item: GameItem) {
+        itemCodex["$modname:$code"] = item
+    }
+
     operator fun set(code: ItemID, item: GameItem) {
         itemCodex[code] = item
     }
@@ -280,31 +216,35 @@ object ItemCodex {
         return getItemImage(item.originalID)
     }
 
-    fun getItemImage(itemOriginalID: Int): TextureRegion {
+    fun getItemImage(itemID: ItemID?): TextureRegion? {
+        if (itemID == null) return null
+
         // dynamic item
-        if (itemOriginalID in ITEM_DYNAMIC) {
-            return getItemImage(dynamicToStaticID(itemOriginalID))
+        if (itemID.startsWith(PREFIX_DYNAMICITEM)) {
+            return getItemImage(dynamicToStaticID(itemID))
+        }
+        // item
+        else if (itemID.startsWith("item@")) {
+            return getItemImage(itemID)
+        }
+        // TODO: wires
+        // wall
+        else if (itemID.startsWith("wall@")) {
+            val itemSheetNumber = CreateTileAtlas.tileIDtoItemSheetNumber(itemID.substring(5))
+            return BlocksDrawer.tileItemWall.get(
+                    itemSheetNumber % ITEM_ATLAS_TILES_X,
+                    itemSheetNumber / ITEM_ATLAS_TILES_X
+            )
         }
         // terrain
-        else if (itemOriginalID in ITEM_TILES) {
+        else {
+            val itemSheetNumber = CreateTileAtlas.tileIDtoItemSheetNumber(itemID)
             return BlocksDrawer.tileItemTerrain.get(
-                    itemOriginalID % 16,
-                     itemOriginalID / 16
+                    itemSheetNumber % ITEM_ATLAS_TILES_X,
+                    itemSheetNumber / ITEM_ATLAS_TILES_X
             )
         }
-        // wall
-        else if (itemOriginalID in ITEM_WALLS) {
-            return BlocksDrawer.tileItemWall.get(
-                    (itemOriginalID.minus(ITEM_WALLS.first) % 16),
-                    (itemOriginalID.minus(ITEM_WALLS.first) / 16)
-            )
-        }
-        // wire
-        /*else if (itemOriginalID in ITEM_WIRES) {
-            return BlocksDrawer.tilesWire.get((itemOriginalID % 16) * 16, itemOriginalID / 16)
-        }*/
-        else
-            return itemCodex[itemOriginalID]?.itemImage ?: itemImagePlaceholder
+
     }
 
     fun hasItem(itemID: Int): Boolean = dynamicItemDescription.containsKey(itemID)

@@ -22,3 +22,28 @@ Actors range in-depth
 |0x7000_0000..0x7FFF_FFFF|Rendered as screen overlay, not affected by light nor environment overlays|
 
 Actor IDs are assigned in 256 groups, single actor can have 256 sub-actors
+
+## Prefix-ID Referencing
+
+Every blocks and items have Prefix-ID Referencing scheme, which is defined as follows:
+
+```<prefix>@<modname>:<integer-id>```
+
+where prefix is predefined (see below), integer-id is arbitrarily chosen.
+
+### Prefixes
+|Name|Description|
+|----|-----------|
+|wall|Wall|
+|wire|Wire|
+|item|Item (Static)|
+
+Note: BlockCodex and ItemCodex will not store prefix part of the ID, as blocks and walls are identical in properties
+
+### Predefined Modname
+
+|Name|Description|
+|----|-----------|
+|dyn|Dynamic Item|
+|actor|Actor As an Item|
+|virt|Virtual Tile Number|

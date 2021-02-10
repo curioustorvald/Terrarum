@@ -71,11 +71,17 @@ Payload "FlFL" -- world fluid fills, array of: (Int48 tileAddress, Float32 amoun
 
 Payload "WiNt" -- wiring nodes, in JSON format
 
-Payload "CtYP" -- conduit types, array of: (Int48 tileAddress, Uint32 bitarray)
+Payload "TMaP" -- tile number to name map, array of: (Int32, tileNumber, String itemID)
+                  String is null-terminated byte array
+
+TODO need a format that can store arbitrary number of conduits, not just limited to 32
+
+/*Payload "CtYP" -- conduit types, array of: (Int48 tileAddress, Uint32 bitarray)
                   can hold 32 different wires simultaneously
 
 Payload "CfL0" -- conduit fills, aka size of liquid/gas packet, array of: (Int48 tileAddress, Float32 fill)
-                  CfL0..CfL9, CfLa..CfLf are available to store values for 16 different things.
+                  CfL0..CfL9, CfLa..CfLf are available to store values for 16 different things.*/
+
 
 EOF  45   E
 EOF  6E   n

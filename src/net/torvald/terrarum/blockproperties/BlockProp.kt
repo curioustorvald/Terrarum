@@ -2,6 +2,7 @@ package net.torvald.terrarum.blockproperties
 
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.XXHash32
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.serialise.toLittle
 
@@ -10,7 +11,7 @@ import net.torvald.terrarum.serialise.toLittle
  */
 class BlockProp {
 
-    var id: Int = 0
+    var id: ItemID = ""
 
     var nameKey: String = ""
 
@@ -62,14 +63,14 @@ class BlockProp {
         baseLumCol
     } else {
         val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
-        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol
+        BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol
     }
 
     fun getLumCol(x: Int, y: Int, channel: Int): Float = if (dynamicLuminosityFunction == 0) {
         baseLumCol.getElem(channel)
     } else {
         val offset = XXHash32.hash(((x and 0xFFFF).shl(16) or (y and 0xFFFF)).toLittle(), 10000).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
-        BlockCodex[BlockCodex.dynamicToVirtualMap[id]!! - offset]._lumCol.getElem(channel)
+        BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol.getElem(channel)
     }
 
     /**
@@ -80,7 +81,7 @@ class BlockProp {
 
     //fun getLum(channel: Int) = lumCol.getElem(channel)
 
-    var drop: Int = 0
+    var drop: ItemID = ""
 
     var maxSupport: Int = -1 // couldn't use NULL at all...
 

@@ -7,8 +7,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
-import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -54,8 +52,8 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
 
         // not wall-able walls
         if (item.inventoryCategory == GameItem.Category.WALL &&
-            !BlockCodex[item.dynamicID - ITEM_WALLS.start].isWallable) {
-            throw IllegalArgumentException("Wall ID ${item.dynamicID - ITEM_WALLS.start} is not wall-able.")
+            (!item.dynamicID.startsWith("wall@") || !BlockCodex[item.dynamicID.substring(5)].isWallable)) {
+            throw IllegalArgumentException("Wall ID ${item.dynamicID} is not wall-able.")
         }
 
 
@@ -65,12 +63,12 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         if (count < 0)
             throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()\n" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
-        if (item.originalID == Terrarum.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
+        if (item.originalID == "actor:${Terrarum.PLAYER_REF_ID}" || item.originalID == ("actor:${0x51621D}")) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (((Terrarum.ingame as? TerrarumIngame)?.gameFullyLoaded ?: false) &&
-            (item.originalID == (Terrarum.ingame as? TerrarumIngame)?.actorNowPlaying?.referenceID))
+            (item.originalID == "actor:${(Terrarum.ingame as? TerrarumIngame)?.actorNowPlaying?.referenceID}"))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
-        if ((!item.stackable || item.dynamicID in ITEM_DYNAMIC) && count > 1)
+        if ((!item.stackable || item.dynamicID.startsWith("dyn:")) && count > 1)
             throw IllegalArgumentException("Attempting to adding stack of item but the item is not stackable; item: $item, count: $count")
 
 

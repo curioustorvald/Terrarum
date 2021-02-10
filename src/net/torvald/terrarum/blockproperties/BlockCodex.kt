@@ -5,6 +5,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printmsg
 import net.torvald.terrarum.ReferencingRanges
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.CSVFetcher
@@ -18,12 +19,12 @@ import java.io.IOException
  */
 object BlockCodex {
 
-    private var blockProps = HashMap<Int, BlockProp>()
+    private var blockProps = HashMap<ItemID, BlockProp>()
 
-    val dynamicLights = SortedArrayList<Int>() // does not include virtual ones
+    val dynamicLights = SortedArrayList<ItemID>() // does not include virtual ones
 
     /** 65536 */
-    val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
+    //val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
 
     private val nullProp = BlockProp()
 
@@ -32,12 +33,9 @@ object BlockCodex {
 
     // fake props for "randomised" dynamic lights
     const val DYNAMIC_RANDOM_CASES = 64
-    var virtualPropsCount = 0
-        private set
-    /** always points to the HIGHEST prop ID. <Original ID, Virtual ID> */
-    val dynamicToVirtualPropMapping = ArrayList<Pair<Int, Int>>()
-    /** for random access dont iterate over this */
-    val dynamicToVirtualMap = hashMapOf<Int, Int>()
+    private var virtualTileCursor = 0
+    val tileToVirtual = HashMap<ItemID, List<ItemID>>()
+    val virtualToTile = HashMap<ItemID, ItemID>()
 
     /**
      * Later entry (possible from other modules) will replace older ones
@@ -56,33 +54,37 @@ object BlockCodex {
                     setProp(blockProps[intVal(it, "id")], it)
                 }*/
 
-                val id = intVal(it, "id")
-                setProp(id, it)
+                val numericID = intVal(it, "id")
+                setProp(module, numericID, it)
+                val tileId = "tile@$module:$numericID"
 
                 // register tiles with dynamic light
-                if ((blockProps[id]?.dynamicLuminosityFunction ?: 0) != 0) {
-                    dynamicLights.add(id)
+                if ((blockProps[tileId]?.dynamicLuminosityFunction ?: 0) != 0) {
+                    dynamicLights.add(tileId)
 
                     // add virtual props for dynamic lights
-                    val virtualIDMax = ReferencingRanges.VIRTUAL_TILES.first - virtualPropsCount
-                    dynamicToVirtualPropMapping.add(id to virtualIDMax)
-                    dynamicToVirtualMap[id] = virtualIDMax
-                    repeat(DYNAMIC_RANDOM_CASES) { i ->
-                        setProp(virtualIDMax - i, it)
-                        printdbg(this, "Block ID $id -> Virtual ID ${virtualIDMax - i}, baseLum: ${blockProps[virtualIDMax - i]?.baseLumCol}")
+                    val virtualChunk = ArrayList<ItemID>()
+                    repeat(DYNAMIC_RANDOM_CASES) { _ ->
+                        val virtualID = "virt:$virtualTileCursor"
 
-                        virtualPropsCount += 1
+                        virtualToTile[virtualID] = tileId
+                        virtualChunk.add(virtualID)
+
+                        setProp("virt", virtualTileCursor, it)
+
+                        printdbg(this, "Block ID $tileId -> Virtual ID $virtualID, baseLum: ${blockProps[virtualID]?.baseLumCol}")
+                        virtualTileCursor += 1
                     }
+                    tileToVirtual[tileId] = virtualChunk.sorted().toList()
                 }
-
-                if (id > highestNumber)
-                    highestNumber = id
             }
         }
         catch (e: IOException) {
             e.printStackTrace()
         }
     }
+
+    fun getAll() = blockProps.values
 
     /*fun get(index: Int): BlockProp {
         try {
@@ -97,7 +99,7 @@ object BlockCodex {
         }
     }*/
 
-    operator fun get(rawIndex: Int?): BlockProp {
+    /*operator fun get(rawIndex: Int?): BlockProp {
         if (rawIndex == null || rawIndex == Block.NULL) {
             return nullProp
         }
@@ -108,31 +110,45 @@ object BlockCodex {
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with raw id $rawIndex does not exist.")
         }
-    }
-
-    operator fun get(fluidType: FluidType?): BlockProp {
-        if (fluidType == null || fluidType.value == 0) {
-            return blockProps[Block.AIR]!!
+    }*/
+    operator fun get(blockID: ItemID?): BlockProp {
+        if (blockID == null || blockID == "basegame:"+Block.NULL) {
+            return nullProp
         }
 
         try {
-            return blockProps[fluidType.abs() + GameWorld.TILES_SUPPORTED - 1]!!
+            return blockProps[blockID]!!
         }
         catch (e: NullPointerException) {
-            throw NullPointerException("Blockprop with raw id $fluidType does not exist.")
+            throw NullPointerException("Blockprop with id $blockID does not exist.")
         }
     }
 
-    fun getOrNull(rawIndex: Int?): BlockProp? {//<O>
-        return blockProps[rawIndex]
+    operator fun get(fluidType: FluidType?): BlockProp {
+        // TODO fluid from other mods
+
+        if (fluidType == null || fluidType.value == 0) {
+            return blockProps["basegame:"+Block.AIR]!!
+        }
+
+        try {
+            return blockProps["basegame:${fluidType.abs() + GameWorld.TILES_SUPPORTED - 1}"]!!
+        }
+        catch (e: NullPointerException) {
+            throw NullPointerException("Blockprop with id $fluidType does not exist.")
+        }
     }
 
-    private fun setProp(key: Int, record: CSVRecord) {
+    fun getOrNull(blockID: ItemID?): BlockProp? {//<O>
+        return blockProps[blockID]
+    }
+
+    private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = BlockProp()
         prop.nameKey = record.get("name")
 
-        prop.id = if (key == -1) 0 else intVal(record, "id")
-        prop.drop = intVal(record, "drop")
+        prop.id = "$modname:${(if (key == -1) 0 else intVal(record, "id"))}"
+        prop.drop = "$modname:${intVal(record, "drop")}"
 
         prop.shadeColR = floatVal(record, "shdr")
         prop.shadeColG = floatVal(record, "shdg")
@@ -163,9 +179,9 @@ object BlockCodex {
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
 
-        blockProps[key] = prop
+        blockProps["$modname:$key"] = prop
 
-        printmsg(this, "${intVal(record, "id")}\t" + prop.nameKey)
+        printmsg(this, "$modname:${intVal(record, "id")}\t" + prop.nameKey)
     }
 }
 

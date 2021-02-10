@@ -487,14 +487,14 @@ object LightmapRenderer {
         if (_thisFluid.type != Fluid.NULL) {
             _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
 
-            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(worldX, worldY))
+            _thisTileLuminosity.set(BlockCodex[world.tileNumberToNameMap[_thisTerrain]].getLumCol(worldX, worldY))
             _thisTileLuminosity.maxAndAssign(BlockCodex[_thisFluid.type].getLumCol(worldX, worldY).mul(_fluidAmountToCol)) // already been div by four
-            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[_thisTerrain].opacity)
+            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[world.tileNumberToNameMap[_thisTerrain]].opacity)
             _mapThisTileOpacity.max(lx, ly, BlockCodex[_thisFluid.type].opacity.mul(_fluidAmountToCol))// already been div by four
         }
         else {
-            _thisTileLuminosity.set(BlockCodex[_thisTerrain].getLumCol(worldX, worldY))
-            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[_thisTerrain].opacity)
+            _thisTileLuminosity.set(BlockCodex[world.tileNumberToNameMap[_thisTerrain]].getLumCol(worldX, worldY))
+            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[world.tileNumberToNameMap[_thisTerrain]].opacity)
         }
 
         _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
@@ -504,7 +504,8 @@ object LightmapRenderer {
 
 
         // open air || luminous tile backed by sunlight
-        if ((_thisTerrain == AIR && _thisWall == AIR) || (_thisTileLuminosity.nonZero() && _thisWall == AIR)) {
+        if ((world.tileNumberToNameMap[_thisTerrain] == AIR && world.tileNumberToNameMap[_thisWall] == AIR) ||
+            (_thisTileLuminosity.nonZero() && world.tileNumberToNameMap[_thisWall] == AIR)) {
             _mapLightLevelThis.setVec(lx, ly, sunLight)
         }
 
