@@ -93,7 +93,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
                 val wx = (world.width.toFloat() / previewWidth * x).roundToInt()
                 val wy = (world.height.toFloat() / previewHeight * y).roundToInt()
 
-                val outCol = if (world.getTileFromTerrain(wx, wy) > 15) COL_TERR else if (world.getTileFromWall(wx, wy) > 15) COL_WALLED else COL_AIR
+                val outCol = if (world.getTileNumFromTerrain(wx, wy) > 0) COL_TERR else if (world.getTileNumFromWall(wx, wy) > 0) COL_WALLED else COL_AIR
 
                 previewPixmap.setColor(outCol)
                 previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
@@ -7,6 +8,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.utils.RasterWriter
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import net.torvald.terrarum.worlddrawer.toRGBA
 import java.io.File
 import java.io.IOException
 
@@ -31,7 +33,8 @@ internal object ExportMap : ConsoleCommand {
             var mapDataPointer = 0
 
             for (tile in world.terrainIterator()) {
-                val colArray = CreateTileAtlas.terrainTileColourMap.getRaw(tile % 16, tile / 16).toByteArray()
+                val tileNumber = CreateTileAtlas.tileIDtoItemSheetNumber(tile)
+                val colArray = CreateTileAtlas.terrainTileColourMap.get(tileNumber)!!.toByteArray()
 
                 for (i in 0..2) {
                     mapData[mapDataPointer + i] = colArray[i]
@@ -71,11 +74,13 @@ internal object ExportMap : ConsoleCommand {
     /***
      * R-G-B-A order for RGBA input value
      */
+    private fun Cvec.toByteArray() = this.toRGBA().toByteArray()
+
     private fun Int.toByteArray() = byteArrayOf(
-            this.shr(24).and(0xff).toByte(),
-            this.shr(16).and(0xff).toByte(),
-            this.shr(8).and(0xff).toByte(),
-            this.and(0xff).toByte()
+            this.ushr(24).and(255).toByte(),
+            this.ushr(16).and(255).toByte(),
+            this.ushr(8).and(255).toByte(),
+            this.and(255).toByte()
     )
 
     override fun printUsage() {

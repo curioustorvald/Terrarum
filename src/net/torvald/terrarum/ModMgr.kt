@@ -235,15 +235,15 @@ object ModMgr {
         @JvmStatic operator fun invoke(module: String) {
             val csv = CSVFetcher.readFromModule(module, itemPath + "itemid.csv")
             csv.forEach {
-                val className = it["classname"].toString()
-                val internalID = it["id"].toInt()
-                val itemName = "item@$module:$internalID"
+                val className: String = it["classname"].toString()
+                val internalID: Int = it["id"].toInt()
+                val itemName: String = "item@$module:$internalID"
 
                 printdbg(this, "Reading item #$internalID with className $className")
 
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
-                val loadedClassInstance = loadedClassConstructor.newInstance(internalID)
+                val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
 
                 ItemCodex[itemName] = loadedClassInstance as GameItem
             }

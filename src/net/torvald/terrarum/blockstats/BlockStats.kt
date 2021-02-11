@@ -3,6 +3,7 @@ package net.torvald.terrarum.blockstats
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -14,7 +15,7 @@ import java.util.*
  */
 object BlockStats {
 
-    private val tilestat = ShortArray(GameWorld.TILES_SUPPORTED)
+    private val tilestat = HashMap<ItemID, Int>()
 
     private val TSIZE = CreateTileAtlas.TILE_SIZE
 
@@ -22,7 +23,7 @@ object BlockStats {
      * Update tile stats from tiles on screen
      */
     fun update() {
-        Arrays.fill(tilestat, 0.toShort())
+        tilestat.clear()
 
         // Get stats on no-zoomed screen area. In other words, will behave as if screen zoom were 1.0
         // no matter how the screen is zoomed.
@@ -47,29 +48,14 @@ object BlockStats {
             for (x in for_x_start..for_x_end - 1) {
                 val tileWall = map.getTileFromWall(x, y)
                 val tileTerrain = map.getTileFromTerrain(x, y)
-                ++tilestat[tileWall ?: 0]
-                ++tilestat[tileTerrain ?: 0]
+                tilestat[tileWall] = 1 + (tilestat[tileWall] ?: 0)
+                tilestat[tileTerrain] = 1 + (tilestat[tileTerrain] ?: 0)
             }
         }
     }
 
-    fun getCount(vararg tile: Byte): Int {
-        var sum = 0
-        for (i in tile.indices) {
-            val newArgs = java.lang.Byte.toUnsignedInt(tile[i])
-            sum += java.lang.Short.toUnsignedInt(tilestat[newArgs])
-        }
-
-        return sum
+    fun getCount(vararg tiles: ItemID): Int {
+        return tiles.fold(0) { acc, key -> acc + (tilestat[key] ?: 0) }
     }
-
-    fun getCount(vararg tile: Int): Int {
-        var sum = 0
-        for (i in tile.indices) {
-            sum += java.lang.Short.toUnsignedInt(tilestat[tile[i]])
-        }
-        return sum
-    }
-
 
 }

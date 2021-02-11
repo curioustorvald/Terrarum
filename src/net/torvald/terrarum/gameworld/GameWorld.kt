@@ -107,7 +107,9 @@ open class GameWorld : Disposable {
     // does not go to the savefile
     val tileNameToNumberMap: HashMap<ItemID, Int>
 
-
+    /**
+     * Create new world
+     */
     constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
 
@@ -150,6 +152,9 @@ open class GameWorld : Disposable {
         }
     }
 
+    /**
+     * Load existing world
+     */
     internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         this.worldIndex = worldIndex
 
@@ -176,15 +181,23 @@ open class GameWorld : Disposable {
         lastPlayTime = lastPlayTIME_T
         this.totalPlayTime = totalPlayTime
 
-        tileNumberToNameMap = layerData.tileNumberToNameMap
-
-        // TODO perform renaming of tile layers
-
-        // after the renaming, update the name maps
+        // before the renaming, update the name maps
+        tileNumberToNameMap = HashMap<Int, ItemID>()
         tileNameToNumberMap = HashMap<ItemID, Int>()
         CreateTileAtlas.tags.forEach {
             tileNumberToNameMap[it.value.tileNumber] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
+        }
+
+        // perform renaming of tile layers
+        val oldTileNumberToNameMap = layerData.tileNumberToNameMap
+        for (y in 0 until layerTerrain.height) {
+            for (x in 0 until layerTerrain.width) {
+                layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]]!!)
+                layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y)]]!!)
+                // TODO rename fluid map
+                // TODO rename wire map
+            }
         }
     }
 
@@ -199,7 +212,7 @@ open class GameWorld : Disposable {
     fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
     /**
-     * @return ItemID
+     * @return ItemID, WITHOUT wall tag
      */
     fun getTileFromWall(rawX: Int, rawY: Int): ItemID {
         val (x, y) = coerceXY(rawX, rawY)
@@ -239,7 +252,7 @@ open class GameWorld : Disposable {
      * *
      * @param y
      * *
-     * @param itemID Tile as in ItemID
+     * @param itemID Tile as in ItemID, with tag removed!
      */
     fun setTileWall(x: Int, y: Int, itemID: ItemID) {
         val (x, y) = coerceXY(x, y)
@@ -261,7 +274,7 @@ open class GameWorld : Disposable {
      * *
      * @param y
      * *
-     * @param itemID Tile as in ItemID
+     * @param itemID Tile as in ItemID, with tag removed!
      */
     fun setTileTerrain(x: Int, y: Int, itemID: ItemID) {
         val (x, y) = coerceXY(x, y)

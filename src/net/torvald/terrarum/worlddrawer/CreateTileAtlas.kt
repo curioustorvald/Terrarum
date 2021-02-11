@@ -213,7 +213,7 @@ object CreateTileAtlas {
             16 + (376 * (fluid.type.abs() - 1)) + (47 * (fluidLevel - 1))
     }
 
-    private val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
+    val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
 
     private fun fileToAtlantes(modname: String, matte: FileHandle, glow: FileHandle?) {
         val tilesPixmap = Pixmap(matte)
@@ -374,6 +374,8 @@ object CreateTileAtlas {
         atlasSpring.dispose()
         atlasFluid.dispose()
         atlasGlow.dispose()
+        //itemTerrainTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
+        //itemWallTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemWall (TextureRegionPack)'
 
         nullTile.dispose()
     }

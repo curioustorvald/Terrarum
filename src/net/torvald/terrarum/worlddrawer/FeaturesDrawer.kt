@@ -27,13 +27,13 @@ object FeaturesDrawer {
     var colTemp: Int = 0
         private set
 
-    private val TILES_COLD = intArrayOf(
+    private val TILES_COLD = arrayOf(
               Block.ICE_MAGICAL
             , Block.ICE_FRAGILE
             , Block.ICE_NATURAL
             , Block.SNOW)
 
-    private val TILES_WARM = intArrayOf(
+    private val TILES_WARM = arrayOf(
               Block.SAND_DESERT
             , Block.SAND_RED)
 

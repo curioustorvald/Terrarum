@@ -27,7 +27,7 @@ open class HumanoidNPC(
     }
 
     // we're having GameItem data so that this class could be somewhat universal
-    override var itemData: GameItem = object : GameItem(referenceID) {//GameItem(referenceID ?: forceAssignRefID!!) {
+    override var itemData: GameItem = object : GameItem("actor:"+referenceID) {//GameItem(referenceID ?: forceAssignRefID!!) {
         override val isUnique = true
         override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!

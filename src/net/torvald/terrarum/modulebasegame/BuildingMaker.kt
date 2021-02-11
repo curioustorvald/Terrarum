@@ -424,10 +424,10 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         when (currentPenMode) {
             // test paint terrain layer
             PENMODE_PENCIL -> {
-                if (palSelection < BlockCodex.MAX_TERRAIN_TILES)
+                if (palSelection.startsWith("wall@"))
+                    world.setTileWall(x, y, palSelection.substring(5))
+                else
                     world.setTileTerrain(x, y, palSelection)
-                else if (palSelection < 2 * BlockCodex.MAX_TERRAIN_TILES)
-                    world.setTileWall(x, y, palSelection - BlockCodex.MAX_TERRAIN_TILES)
             }
             PENMODE_PENCIL_ERASE -> {
                 if (currentPenTarget and PENTARGET_WALL != 0)
@@ -437,9 +437,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             }
             PENMODE_EYEDROPPER -> {
                 uiPaletteSelector.fore = if (world.getTileFromTerrain(x, y) == Block.AIR)
-                    world.getTileFromWall(x, y)!! + BlockCodex.MAX_TERRAIN_TILES
+                    "wall@"+world.getTileFromWall(x, y)
                 else
-                    world.getTileFromTerrain(x, y)!!
+                    world.getTileFromTerrain(x, y)
             }
             PENMODE_MARQUEE -> {
                 addBlockMarker(x, y)
@@ -455,7 +455,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         return selection.last() - selection.first()
     }
 
-    private fun serialiseSelection(outfile: File) {
+    /*private fun serialiseSelection(outfile: File) {
         // save format: sparse list encoded in following binary format:
         /*
         Header: TEaT0bLD -- magic: Terrarum Attachment
@@ -498,7 +498,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         }
         fos.write(FILE_FOOTER)
         fos.close()
-    }
+    }*/
 }
 
 class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {

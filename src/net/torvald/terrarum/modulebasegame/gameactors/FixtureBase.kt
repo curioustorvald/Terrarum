@@ -7,6 +7,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
 
@@ -201,7 +202,7 @@ inline class BlockBoxProps(val flags: Int) {
  * @param width Width of the block box, tile-wise
  * @param height Height of the block box, tile-wise
  */
-data class BlockBox(val collisionType: Int, val width: Int, val height: Int) {
+data class BlockBox(val collisionType: ItemID, val width: Int, val height: Int) {
 
     /*fun redefine(collisionType: Int, width: Int, height: Int) {
         redefine(collisionType)

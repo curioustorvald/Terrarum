@@ -1123,6 +1123,21 @@ public class AppLoader implements ApplicationListener {
             return ((float[]) cfg);
     }
 
+    public static String[] getConfigStringArray(String key) {
+        Object cfg = getConfigMaster(key);
+        if (cfg instanceof JsonArray) {
+            JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
+            //return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
+            String[] intArray = new String[jsonArray.size()];
+            for (int i = 0; i < jsonArray.size(); i++) {
+                intArray[i] = jsonArray.get(i).getAsString();
+            }
+            return intArray;
+        }
+        else
+            return ((String[]) cfg);
+    }
+
     /**
      * Get config from config file. If the entry does not exist, get from defaults; if the entry is not in the default, NullPointerException will be thrown
      */

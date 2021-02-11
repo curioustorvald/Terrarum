@@ -168,7 +168,7 @@ open class ActorHumanoid(
 
     private var jumpJustPressedLatched = false
 
-    @Transient private val nullItem = object : GameItem(0) {
+    @Transient private val nullItem = object : GameItem("item@basegame:0") {
         override val isUnique: Boolean = false
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null

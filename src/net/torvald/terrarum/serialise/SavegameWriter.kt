@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.Gdx
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
@@ -9,9 +10,23 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import net.torvald.terrarum.utils.JsonWriter.getJsonBuilder
+import net.torvald.util.SortedArrayList
 import java.io.File
 import java.nio.charset.Charset
 import kotlin.math.roundToInt
+
+internal class RNGPool() {
+    private val RNG = HQRNG()
+    private val used = SortedArrayList<Int>()
+    fun next(): Int {
+        var n = RNG.nextLong().ushr(32).toInt()
+        while (used.contains(n)) {
+            n = RNG.nextLong().ushr(32).toInt()
+        }
+        used.add(n)
+        return n
+    }
+}
 
 /**
  * Created by minjaesong on 2018-10-03.
@@ -19,6 +34,8 @@ import kotlin.math.roundToInt
 object SavegameWriter {
 
     // TODO create temporary files (worldinfo), create JSON files on RAM, pack those into TEVd as per Savegame container.txt
+
+    private val rngPool = RNGPool()
 
     private val charset = Charset.forName("UTF-8")
 
@@ -99,16 +116,16 @@ object SavegameWriter {
         // actors
         ingame.actorContainerActive.forEach {
             VDUtil.registerFile(disk, DiskEntry(
-                    it.referenceID!!, ROOT,
-                    it.referenceID!!.toString(16).toUpperCase().toByteArray(charset),
+                    rngPool.next(), ROOT,
+                    it.referenceID.toString(16).toUpperCase().toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseActor(it))
             ))
         }
         ingame.actorContainerInactive.forEach {
             VDUtil.registerFile(disk, DiskEntry(
-                    it.referenceID!!, ROOT,
-                    it.referenceID!!.toString(16).toUpperCase().toByteArray(charset),
+                    rngPool.next(), ROOT,
+                    it.referenceID.toString(16).toUpperCase().toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseActor(it))
             ))
@@ -117,8 +134,8 @@ object SavegameWriter {
         // items
         ItemCodex.dynamicItemDescription.forEach { dynamicID, item ->
             VDUtil.registerFile(disk, DiskEntry(
-                    item.dynamicID, ROOT,
-                    dynamicID.toString(16).toUpperCase().toByteArray(charset),
+                    rngPool.next(), ROOT,
+                    dynamicID.toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseItem(item))
             ))
