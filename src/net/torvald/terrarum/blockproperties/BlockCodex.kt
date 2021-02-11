@@ -33,7 +33,7 @@ object BlockCodex {
 
     // fake props for "randomised" dynamic lights
     const val DYNAMIC_RANDOM_CASES = 64
-    private var virtualTileCursor = 0
+    private var virtualTileCursor = 1
     val tileToVirtual = HashMap<ItemID, List<ItemID>>()
     val virtualToTile = HashMap<ItemID, ItemID>()
 

@@ -1,17 +1,42 @@
+## Prefix-ID Referencing
+
+Every blocks and items have Prefix-ID Referencing scheme, which is defined as follows:
+
+```<Prefix>@<Modname>:<Integer ID>```
+
+where Prefix is predefined (see below), Integer ID is arbitrarily chosen within a domain.
+
+### Prefixes
+|Name|Description|
+|----|-----------|
+|wall|Wall, only used by the Inventory to differentiate walls from blocks (therefore wall shares same "ID Space" with blocks/fluids/wires)|
+|item|Item (Static), uses different "ID Space" with blocks/walls/fluids/wires|
+
+Notes: 
+- BlockCodex and ItemCodex will not store prefix part of the ID, as blocks and walls are identical in properties
+- Wires and Fluids use the same "ID Space" as the tiles; they just happened to exclusive to their own layers.
+  This simplifies many things e.g. only one TileID-to-AtlasTileNumber map is needed and the renderer will
+  greatly benefit from it.
+
+### Predefined Modnames
+
+|Name|Description|
+|----|-----------|
+|dyn|Dynamic Item|
+|actor|Actor As an Item. Integer ID is identical to the actor's Reference ID|
+|virt|Virtual Tile Number|
+
+### Integer ID Domains
+
 |Range|Description|
 |-----|-----------|
-|0..65535|Tiles (65536 possible)|
-|65536..131071|Walls (65536 possible)|
-|131072..135167|Wires (4096 possible)|
-|135168..0x0F_FFFF|Items (static) (1M possible)|
-|0x10_0000..0x0FFF_FFFF|Items (dynamic\*) (267M possible)|
-|0x1000_0000..0x7FFF_FFFF|Actors (1879M possible)|
-|-2..-1048576|Virtual Tiles|
-|-2147483648..-1048577 (all negative numbers)|Faction (2147M possible)|
+|1..2147483647|Integer ID for dynamic items|
+|0x1000_0000..0x7FFF_FFFF|Reference ID for Actors (1879M possible)|
+|1..2147483647|Integer ID for virtual tiles|
 
 * dynamic items have own properties that will persist through savegame.
 
-Actors range in-depth
+Actor range in-depth
 
 |Range|Description|
 |-----|-----------|
@@ -22,28 +47,3 @@ Actors range in-depth
 |0x7000_0000..0x7FFF_FFFF|Rendered as screen overlay, not affected by light nor environment overlays|
 
 Actor IDs are assigned in 256 groups, single actor can have 256 sub-actors
-
-## Prefix-ID Referencing
-
-Every blocks and items have Prefix-ID Referencing scheme, which is defined as follows:
-
-```<prefix>@<modname>:<integer-id>```
-
-where prefix is predefined (see below), integer-id is arbitrarily chosen.
-
-### Prefixes
-|Name|Description|
-|----|-----------|
-|wall|Wall|
-|wire|Wire|
-|item|Item (Static)|
-
-Note: BlockCodex and ItemCodex will not store prefix part of the ID, as blocks and walls are identical in properties
-
-### Predefined Modname
-
-|Name|Description|
-|----|-----------|
-|dyn|Dynamic Item|
-|actor|Actor As an Item|
-|virt|Virtual Tile Number|
