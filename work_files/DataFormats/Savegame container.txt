@@ -14,9 +14,9 @@ Files contained the TerranVirtualDisk is as follows:
                        Has fixed Entry ID of 32763
     world[n]        -- Layer Data (TEMD); [n] is a serial number of the world (starts at 1)
                        Has fixed Entry ID of [n]
-    (any random number in Hex ACTORID_MIN..FFFFFFFF)    -- Serialised Entity Information (including Player)
-    (PLAYER_REF_ID in Hex -- 91A7E2)    -- Player Character Information (Serialised--JSON'd--Entity Information)
-    (51621D)        -- The Debug Player (Serialised Entity Information)
+    (any random number in Hex ACTORID_MIN..FFFFFFFF)    -- Serialised Entity Information (including Player), Entry ID is random
+    (PLAYER_REF_ID in Hex -- 91A7E2)    -- Player Character Information (Serialised--JSON'd--Entity Information), Entry ID is random
+    (51621D)        -- The Debug Player (Serialised Entity Information), Entry ID is random
     load_order.txt  -- LoadOrder.csv (NOT zipped)
                        Has fixed Entry ID of 32767
 

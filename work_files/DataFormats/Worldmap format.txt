@@ -53,7 +53,7 @@ Ord  Hex  Description
 Payload "TERR" -- world terrain data in Uint16
                   Uncompressed size will be 2x of (width * height)
 
-Payload "WALL" -- world walls data in Unit16
+Payload "WALL" -- world walls data in Uint16
                   Uncompressed size will be 2x of (width * height)
 
 Payload "TdMG" -- world terrain damage data, array of: (Int48 tileAddress, Float32 damage)

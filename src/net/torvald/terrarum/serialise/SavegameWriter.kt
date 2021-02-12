@@ -18,6 +18,13 @@ import kotlin.math.roundToInt
 internal class RNGPool() {
     private val RNG = HQRNG()
     private val used = SortedArrayList<Int>()
+
+    init {
+        for (i in 0 until 32767) {
+            used.add(i)
+        }
+    }
+
     fun next(): Int {
         var n = RNG.nextLong().ushr(32).toInt()
         while (used.contains(n)) {
