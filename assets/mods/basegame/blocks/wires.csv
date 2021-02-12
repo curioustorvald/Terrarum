@@ -1,0 +1,12 @@
+"id";"drop";"name";"accept";"inputcount";"inputtype";"outputtype"
+"8192";"8192";"WIRE_RED";"digital_bit";"N/A";"N/A";"N/A"
+"8193";"8193";"WIRE_GREEN";"digital_bit";"N/A";"N/A";"N/A"
+"8194";"8194";"WIRE_BLUE";"digital_bit";"N/A";"N/A";"N/A"
+"8195";"8195";"WIRE_BUNDLE";"digital_3bits";"N/A";"N/A";"N/A"
+"bundlemaker";"bundlemaker";"WIRE_BUNDLEMAKER";"N/A";3;"digital_bit";"digital_3bits"
+
+
+# accept: which wiretype (defined elsewhere) the wires acceps. Use comma to separate multiple. N/A for electronic components (aka "not wires")
+# inputcount: how many sides are input (outputcount is deduced from the inputcount). N/A for wires
+# inputtype: which wiretype it accepts. N/A for wires
+# outputtype: which wiretype it emits. N/A for wires
