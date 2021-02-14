@@ -240,7 +240,7 @@ object CreateTileAtlas {
         // 112x112 or 224x224
         else {
             if (tilesPixmap.width != tilesPixmap.height && tilesPixmap.width % (7 * TILE_SIZE) >= 2) {
-                throw IllegalArgumentException("Unrecognized image dimension: ${tilesPixmap.width}x${tilesPixmap.height}")
+                throw IllegalArgumentException("Unrecognized image dimension ${tilesPixmap.width}x${tilesPixmap.height} from $modname:${matte.name()}")
             }
             // figure out the tags
             var connectionType = 0
@@ -266,8 +266,10 @@ object CreateTileAtlas {
         tilesPixmap.dispose()
     }
 
-    fun tileIDtoAtlasNumber(tileID: ItemID) = tags[tileID]!!.tileNumber
-    fun tileIDtoItemSheetNumber(tileID: ItemID) = itemSheetNumbers[tileID]!!
+    fun tileIDtoAtlasNumber(tileID: ItemID) = tags[tileID]?.tileNumber
+                                              ?: throw NullPointerException("AtlasNumbers mapping from $tileID does not exist")
+    fun tileIDtoItemSheetNumber(tileID: ItemID) = itemSheetNumbers[tileID]
+                                                  ?: throw NullPointerException("ItemSheetNumber mapping from $tileID does not exist")
 
     /**
      * This function must precede the drawToAtlantes() function, as the marking requires the variable

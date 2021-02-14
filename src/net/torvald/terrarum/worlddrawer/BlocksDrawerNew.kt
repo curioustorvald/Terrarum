@@ -97,23 +97,7 @@ internal object BlocksDrawer {
         // with TGA, you have a complete control over this, with the expense of added hassle on your side.
         // -- Torvald, 2018-12-19
 
-        printdbg(this, "Making terrain textures...")
-
-        CreateTileAtlas()
-        //JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
-        // each takes about 60 seconds
-        //printdbg(this, "Writing pixmap as tga: atlas.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), CreateTileAtlas.atlas, false)
-        //printdbg(this, "Writing pixmap as tga: atlasAutumn.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasAutumn.tga"), CreateTileAtlas.atlasAutumn, false)
-        //printdbg(this, "Writing pixmap as tga: atlasWinter.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasWinter.tga"), CreateTileAtlas.atlasWinter, false)
-        //printdbg(this, "Writing pixmap as tga: atlasSpring.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasSpring.tga"), CreateTileAtlas.atlasSpring, false)
-        //printdbg(this, "Writing pixmap as tga: atlasFluid.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasFluid.tga"), CreateTileAtlas.atlasFluid, false)
-
-
+        // CreateTileAtlas.invoke() has been moved to the AppLoader.create() //
 
         // create terrain texture from pixmaps
         weatherTerrains = arrayOf(

@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
+import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
@@ -39,7 +40,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
     val itemList = ArrayList<InventoryPair>()
     val quickSlot = Array<ItemID?>(UIQuickslotBar.SLOT_COUNT) { null } // 0: Slot 1, 9: Slot 10
 
-    var wallet = 0 // unified currency for whole civs; Dwarf Fortress approach seems too complicated
+    var wallet = BigInteger("0") // unified currency for whole civs; Dwarf Fortress approach seems too complicated
 
     init {
     }

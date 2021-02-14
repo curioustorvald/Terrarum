@@ -34,7 +34,15 @@ object BlockCodex {
     // fake props for "randomised" dynamic lights
     const val DYNAMIC_RANDOM_CASES = 64
     private var virtualTileCursor = 1
+
+    /**
+     * One-to-Many
+     */
     val tileToVirtual = HashMap<ItemID, List<ItemID>>()
+
+    /**
+     * Many-to-One
+     */
     val virtualToTile = HashMap<ItemID, ItemID>()
 
     /**
@@ -56,7 +64,7 @@ object BlockCodex {
 
                 val numericID = intVal(it, "id")
                 setProp(module, numericID, it)
-                val tileId = "tile@$module:$numericID"
+                val tileId = "$module:$numericID"
 
                 // register tiles with dynamic light
                 if ((blockProps[tileId]?.dynamicLuminosityFunction ?: 0) != 0) {
