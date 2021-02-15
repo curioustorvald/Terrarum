@@ -55,7 +55,9 @@ class EntryPoint : ModuleEntryPoint() {
         // block items (blocks and walls are the same thing basically)
         for (tile in BlockCodex.getAll()) {
             ItemCodex[tile.id] = makeNewItemObj(tile, false)
+            if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
             ItemCodex["wall@"+tile.id] = makeNewItemObj(tile, true)
+            if (IS_DEVELOPMENT_BUILD) print("wall@"+tile.id+" ")
         }
 
 
@@ -75,9 +77,6 @@ class EntryPoint : ModuleEntryPoint() {
 
         init {
             equipPosition = EquipPosition.HAND_GRIP
-
-            if (IS_DEVELOPMENT_BUILD)
-                print("$originalID ")
         }
 
         override fun startPrimaryUse(delta: Float): Boolean {
