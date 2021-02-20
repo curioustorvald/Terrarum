@@ -55,11 +55,8 @@ object CreateTileAtlas {
     var initialised = false
         private set
 
-    /** 0000.tga, 1.tga.gz, 3242423.tga, 000033.tga.gz */
-    // for right now, TGA file only, no gzip
-    private val validFluidTilesFilename = Regex("""fluid_[0-9]+\.tga""")
-    private val tileNameRegex = Regex("""[0-9]+\.tga""")
-    private val tileGlowNameRegex = Regex("""[0-9]+_glow\.tga""")
+    /** 0.tga, 1.tga.gz, 3242423.tga, 33.tga.gz */
+    private val tileNameRegex = Regex("""(0|[1-9][0-9]*)\.tga(\.gz)?""")
 
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
@@ -89,30 +86,27 @@ object CreateTileAtlas {
         atlasFluid.blending = Pixmap.Blending.None
         atlasGlow.blending = Pixmap.Blending.None
 
-        val initMap = Pixmap(Gdx.files.internal(atlasInit))
-        drawToAtlantes(initMap, nullTile, 16)
-        initMap.dispose()
-
-
         // get all the files applicable
         // first, get all the '/blocks' directory, and add all the files, regardless of their extension, to the list
         val tgaList = ArrayList<Pair<String, FileHandle>>() //Pair of <modname, filehandle>
-        ModMgr.getGdxFilesFromEveryMod("blocks").forEach { (modname, filehandle) ->
-            if (!filehandle.isDirectory) {
-                throw Error("Path '${filehandle.path()}' is not a directory")
+        ModMgr.getGdxFilesFromEveryMod("blocks").forEach { (modname, dir) ->
+            if (!dir.isDirectory) {
+                throw Error("Path '${dir.path()}' is not a directory")
             }
 
-            filehandle.list().forEach { tgaFile ->
-                if (!tgaFile.isDirectory && (tgaFile.name().matches(tileNameRegex))) {
-                    tgaList.add(modname to tgaFile)
-                }
-            }
+
+            dir.list().filter { tgaFile -> !tgaFile.isDirectory && (tgaFile.name().matches(tileNameRegex)) }
+                    .sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile -> // toInt() to sort by the number, not lexicographically
+                        tgaList.add(modname to tgaFile)
+                    }
         }
 
         // Sift through the file list for blocks, but TGA format first
         tgaList.forEach { (modname, filehandle) ->
+            printdbg(this, "processing $modname:${filehandle.name()}")
+
             try {
-                val glowFile = Gdx.files.internal(filehandle.path().dropLast(4) + "_glow.tga") // assuming strict ".tga" file
+                val glowFile = Gdx.files.internal(filehandle.path().dropLast(4) + "_glow.tga") // assuming strict ".tga" file for now...
                 fileToAtlantes(modname, filehandle, if (glowFile.exists()) glowFile else null)
             }
             catch (e: GdxRuntimeException) {

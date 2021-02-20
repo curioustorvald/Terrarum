@@ -77,20 +77,20 @@ object PlayerBuilderSigrid {
 
         CreateTileAtlas.tags.forEach { t, _ ->
             inventory.add(t, 9995)
-            if (BlockCodex[t].isWallable) {
+            try {
                 inventory.add("wall@"+t, 9995)
             }
+            catch (e: Throwable) {}
         }
 
         // item ids are defined in <module>/items/itemid.csv
-
+        /*
         inventory.add("item@basegame:0", 16) // copper pick
         inventory.add("item@basegame:1") // iron pick
         inventory.add("item@basegame:2") // steel pick
         inventory.add("item@basegame:3", 9995) // wire piece
         inventory.add("item@basegame:4", 385930603) // test tiki torch
         inventory.add("item@basegame:5", 95) // crafting table
-        //inventory.add(9000) // TEST water bucket
-        //inventory.add(9001) // TEST lava bucket
+        */
     }
 }

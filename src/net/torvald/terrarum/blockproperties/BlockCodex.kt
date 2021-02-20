@@ -62,7 +62,7 @@ object BlockCodex {
                     setProp(blockProps[intVal(it, "id")], it)
                 }*/
 
-                setProp(module, it)
+                setProp(module, intVal(it, "id"), it)
                 val tileId = "$module:${intVal(it, "id")}"
 
                 // register tiles with dynamic light
@@ -77,7 +77,7 @@ object BlockCodex {
                         virtualToTile[virtualID] = tileId
                         virtualChunk.add(virtualID)
 
-                        setProp("virt", it, virtualTileCursor)
+                        setProp("virt", virtualTileCursor, it)
 
                         printdbg(this, "Block ID $tileId -> Virtual ID $virtualID, baseLum: ${blockProps[virtualID]?.baseLumCol}")
                         virtualTileCursor += 1
@@ -150,11 +150,11 @@ object BlockCodex {
         return blockProps[blockID]
     }
 
-    private fun setProp(modname: String, record: CSVRecord, newKey: Int? = null) {
+    private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = BlockProp()
         prop.nameKey = record.get("name")
 
-        prop.id = if (newKey != null) "$modname:$newKey" else "$modname:${intVal(record, "id")}"
+        prop.id = "$modname:$key"
         prop.drop = "$modname:${intVal(record, "drop")}"
 
         prop.shadeColR = floatVal(record, "shdr")
@@ -186,9 +186,9 @@ object BlockCodex {
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
 
-        blockProps["$modname:${prop.id}"] = prop
+        blockProps[prop.id] = prop
 
-        printmsg(this, "Setting prop $modname:${prop.id}\t" + prop.nameKey)
+        printmsg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}\tsolid:${prop.isSolid}")
     }
 }
 
