@@ -147,6 +147,8 @@ open class GameWorld : Disposable {
         tileNumberToNameMap = HashMap<Int, ItemID>()
         tileNameToNumberMap = HashMap<ItemID, Int>()
         CreateTileAtlas.tags.forEach {
+            printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+
             tileNumberToNameMap[it.value.tileNumber] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }
@@ -224,7 +226,14 @@ open class GameWorld : Disposable {
      */
     fun getTileFromTerrain(rawX: Int, rawY: Int): ItemID {
         val (x, y) = coerceXY(rawX, rawY)
-        return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]!!
+
+        try {
+            return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]!!
+        }
+        catch (e: NullPointerException) {
+            System.err.println("NPE for tilenum ${layerTerrain.unsafeGetTile(x, y)}")
+            throw e
+        }
     }
 
     /**

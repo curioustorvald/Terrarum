@@ -137,7 +137,7 @@ object MinimapComposer : Disposable {
                 val tileTerr = world.getTileFromTerrain(x, y)
                 val wallTerr = world.getTileFromWall(x, y)
                 val colTerr = CreateTileAtlas.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
-                val colWall = CreateTileAtlas.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(BlocksDrawer.wallOverlayColour)
+                val colWall = CreateTileAtlas.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(CreateTileAtlas.wallOverlayColour)
 
                 val outCol = if (colTerr.a > 0.1f) colTerr else colWall
 

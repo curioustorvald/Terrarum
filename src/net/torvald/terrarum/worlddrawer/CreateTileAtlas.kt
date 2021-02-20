@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
@@ -35,6 +36,8 @@ object CreateTileAtlas {
 
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
+    val wallOverlayColour = Color(5f / 9f, 5f / 9f, 5f / 9f, 1f)
+
     lateinit var atlas: Pixmap
     lateinit var atlasAutumn: Pixmap
     lateinit var atlasWinter: Pixmap
@@ -61,7 +64,6 @@ object CreateTileAtlas {
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
     private var atlasCursor = 0
-    private var atlasCursorGlow = 0
     private val atlasInit = "./assets/graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
@@ -72,7 +74,6 @@ object CreateTileAtlas {
 
         tags = HashMap<ItemID, RenderTag>()
         itemSheetNumbers = HashMap<ItemID, Int>()
-        tags[Block.AIR] = RenderTag(0, RenderTag.CONNECT_SELF, RenderTag.MASK_NA)
 
         atlas = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasAutumn = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
@@ -160,7 +161,7 @@ object CreateTileAtlas {
         // darken things for the wall
         for (y in 0 until itemWallPixmap.height) {
             for (x in 0 until itemWallPixmap.width) {
-                val c = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(BlocksDrawer.wallOverlayColour).toRGBA()
+                val c = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
                 itemWallPixmap.drawPixel(x, y, c)
             }
         }
@@ -281,6 +282,8 @@ object CreateTileAtlas {
         }
 
         tags[id] = RenderTag(atlasCursor, connectionType, maskType)
+
+        printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }
 
     private fun drawToAtlantes(pixmap: Pixmap, glow: Pixmap, tilesCount: Int) {

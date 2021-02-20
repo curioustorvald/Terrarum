@@ -55,9 +55,6 @@ internal object BlocksDrawer {
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
-
-    val wallOverlayColour = Color(5f / 9f, 5f / 9f, 5f / 9f, 1f)
-
     const val BREAKAGE_STEPS = 10
 
     val WALL = GameWorld.WALL
@@ -582,7 +579,7 @@ internal object BlocksDrawer {
         }
         val vertexColour = when (mode) {
             TERRAIN, WIRE, FLUID -> Color.WHITE
-            WALL -> wallOverlayColour
+            WALL -> CreateTileAtlas.wallOverlayColour
             else -> throw IllegalArgumentException()
         }
 
