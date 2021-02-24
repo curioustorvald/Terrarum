@@ -60,7 +60,7 @@ object CreateTileAtlas {
 
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
-    private var atlasCursor = 0
+    private var atlasCursor = 64 // 64 predefined tiles. The normal blocks (e.g. Air) should start from this number
     private val atlasInit = "./assets/graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
@@ -85,6 +85,14 @@ object CreateTileAtlas {
         atlasSpring.blending = Pixmap.Blending.None
         atlasFluid.blending = Pixmap.Blending.None
         atlasGlow.blending = Pixmap.Blending.None
+
+        // populate the atlantes with atlasInit
+        // this just directly copies the image to the atlantes :p
+        val initPixmap = Pixmap(Gdx.files.internal(atlasInit))
+        atlas.drawPixmap(initPixmap, 0, 0)
+        atlasAutumn.drawPixmap(initPixmap, 0, 0)
+        atlasWinter.drawPixmap(initPixmap, 0, 0)
+        atlasSpring.drawPixmap(initPixmap, 0, 0)
 
         // get all the files applicable
         // first, get all the '/blocks' directory, and add all the files, regardless of their extension, to the list
@@ -192,6 +200,7 @@ object CreateTileAtlas {
         itemWallTexture = Texture(itemWallPixmap)
         itemTerrainPixmap.dispose()
         itemWallPixmap.dispose()
+        initPixmap.dispose()
 
         initialised = true
     } }

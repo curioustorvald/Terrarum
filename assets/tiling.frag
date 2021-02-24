@@ -76,7 +76,7 @@ void main() {
     int tile = getTileFromColor(tileFromMap);
     int breakage = getBreakageFromColor(tileFromMap);
     ivec2 tileXY = getTileXY(tile);
-    ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the atlas
+    ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the contents of the atlas
 
     // calculate the UV coord value for texture sampling //
 
