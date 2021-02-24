@@ -84,13 +84,13 @@ object PlayerBuilderSigrid {
         }
 
         // item ids are defined in <module>/items/itemid.csv
-        /*
-        inventory.add("item@basegame:0", 16) // copper pick
-        inventory.add("item@basegame:1") // iron pick
-        inventory.add("item@basegame:2") // steel pick
-        inventory.add("item@basegame:3", 9995) // wire piece
-        inventory.add("item@basegame:4", 385930603) // test tiki torch
-        inventory.add("item@basegame:5", 95) // crafting table
-        */
+
+        inventory.add("item@basegame:1", 16) // copper pick
+        inventory.add("item@basegame:2") // iron pick
+        inventory.add("item@basegame:3") // steel pick
+        inventory.add("item@basegame:4", 9995) // wire piece
+        inventory.add("item@basegame:5", 385930603) // test tiki torch
+        //inventory.add("item@basegame:6", 95) // crafting table
+
     }
 }

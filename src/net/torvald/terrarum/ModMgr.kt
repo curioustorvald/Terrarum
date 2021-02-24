@@ -239,7 +239,7 @@ object ModMgr {
                 val internalID: Int = it["id"].toInt()
                 val itemName: String = "item@$module:$internalID"
 
-                printdbg(this, "Reading item #$internalID with className $className")
+                printdbg(this, "Reading item  ${itemName} <<- internal #$internalID with className $className")
 
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
