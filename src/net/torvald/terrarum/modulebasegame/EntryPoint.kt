@@ -55,9 +55,13 @@ class EntryPoint : ModuleEntryPoint() {
         // block items (blocks and walls are the same thing basically)
         for (tile in BlockCodex.getAll()) {
             ItemCodex[tile.id] = makeNewItemObj(tile, false)
+
             if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
-            ItemCodex["wall@"+tile.id] = makeNewItemObj(tile, true)
-            if (IS_DEVELOPMENT_BUILD) print("wall@"+tile.id+" ")
+
+            if (BlockCodex[tile.id].isWallable) {
+                ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true)
+                if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
+            }
         }
 
 
@@ -65,7 +69,9 @@ class EntryPoint : ModuleEntryPoint() {
         println("[Basegame.EntryPoint] Welcome back!")
     }
 
-    private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(tile.id) {
+    private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
+            if (isWall) "wall@"+tile.id else tile.id
+    ) {
         override val isUnique: Boolean = false
         override var baseMass: Double = tile.density / 1000.0
         override var baseToolSize: Double? = null
@@ -80,7 +86,7 @@ class EntryPoint : ModuleEntryPoint() {
         }
 
         override fun startPrimaryUse(delta: Float): Boolean {
-            return BlockBase.blockStartPrimaryUse(this, tile.id, delta)
+            return BlockBase.blockStartPrimaryUse(this, dynamicID, delta)
         }
 
         override fun effectWhenEquipped(delta: Float) {

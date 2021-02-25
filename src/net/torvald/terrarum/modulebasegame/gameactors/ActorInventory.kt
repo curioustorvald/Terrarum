@@ -45,18 +45,15 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
     init {
     }
 
-    fun add(itemID: ItemID, count: Int = 1) = if (ItemCodex[itemID] == null) throw NullPointerException("Item not found: "+itemID) else add(ItemCodex[itemID]!!, count)
+    fun add(itemID: ItemID, count: Int = 1) {
+        if (ItemCodex[itemID] == null)
+            throw NullPointerException("Item not found: $itemID")
+        else
+            add(ItemCodex[itemID]!!, count)
+    }
     fun add(item: GameItem, count: Int = 1) {
 
-        println("[ActorInventory] add $item, $count")
-
-
-        // not wall-able walls
-        if (item.inventoryCategory == GameItem.Category.WALL &&
-            (!item.dynamicID.startsWith("wall@") || !BlockCodex[item.dynamicID.substring(5)].isWallable)) {
-            throw IllegalArgumentException("Wall ID ${item.dynamicID} is not wall-able.")
-        }
-
+        println("[ActorInventory] add-by-elem $item, $count")
 
         // other invalid values
         if (count == 0)
