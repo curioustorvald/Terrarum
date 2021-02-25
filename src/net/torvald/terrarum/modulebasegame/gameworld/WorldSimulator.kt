@@ -208,8 +208,8 @@ object WorldSimulator {
                     // process the gradual falling of the selected "stack"
                     if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
                         // replace blocks
-                        world.setTileTerrain(x, y, Block.AIR)
-                        world.setTileTerrain(x, y + fallDownCounter, currentTile)
+                        world.setTileTerrain(x, y, Block.AIR, true)
+                        world.setTileTerrain(x, y + fallDownCounter, currentTile, true)
 
                         fallableStackProcessed = true
                     }

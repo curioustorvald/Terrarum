@@ -144,7 +144,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      */
     open fun queueTerrainChangedEvent(old: ItemID, new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        terrainChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+        terrainChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
     }
 
     /**
@@ -152,7 +152,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      */
     open fun queueWallChangedEvent(old: ItemID, new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wallChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+        wallChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
     }
 
     /**
@@ -163,7 +163,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      */
     open fun queueWireChangedEvent(old: ItemID, new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wireChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+        wireChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
     }
 
 

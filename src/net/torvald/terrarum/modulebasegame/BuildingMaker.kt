@@ -84,19 +84,19 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         println("[BuildingMaker] Generating builder world...")
 
         for (y in 0 until gameWorld.height) {
-            gameWorld.setTileWall(0, y, Block.ILLUMINATOR_RED)
-            gameWorld.setTileWall(gameWorld.width - 1, y, Block.ILLUMINATOR_RED)
-            gameWorld.setTileTerrain(0, y, Block.ILLUMINATOR_RED_OFF)
-            gameWorld.setTileTerrain(gameWorld.width - 1, y, Block.ILLUMINATOR_RED_OFF)
+            gameWorld.setTileWall(0, y, Block.ILLUMINATOR_RED, true)
+            gameWorld.setTileWall(gameWorld.width - 1, y, Block.ILLUMINATOR_RED, true)
+            gameWorld.setTileTerrain(0, y, Block.ILLUMINATOR_RED_OFF, true)
+            gameWorld.setTileTerrain(gameWorld.width - 1, y, Block.ILLUMINATOR_RED_OFF, true)
         }
 
         for (y in 150 until gameWorld.height) {
             for (x in 1 until gameWorld.width - 1) {
                 // wall layer
-                gameWorld.setTileWall(x, y, Block.DIRT)
+                gameWorld.setTileWall(x, y, Block.DIRT, true)
 
                 // terrain layer
-                gameWorld.setTileTerrain(x, y, if (y == 150) Block.GRASS else Block.DIRT)
+                gameWorld.setTileTerrain(x, y, if (y == 150) Block.GRASS else Block.DIRT, true)
             }
         }
 
@@ -425,15 +425,15 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             // test paint terrain layer
             PENMODE_PENCIL -> {
                 if (palSelection.startsWith("wall@"))
-                    world.setTileWall(x, y, palSelection.substring(5))
+                    world.setTileWall(x, y, palSelection.substring(5), true)
                 else
-                    world.setTileTerrain(x, y, palSelection)
+                    world.setTileTerrain(x, y, palSelection, true)
             }
             PENMODE_PENCIL_ERASE -> {
                 if (currentPenTarget and PENTARGET_WALL != 0)
-                    world.setTileWall(x, y, Block.AIR)
+                    world.setTileWall(x, y, Block.AIR, true)
                 else
-                    world.setTileTerrain(x, y, Block.AIR)
+                    world.setTileTerrain(x, y, Block.AIR, true)
             }
             PENMODE_EYEDROPPER -> {
                 uiPaletteSelector.fore = if (world.getTileFromTerrain(x, y) == Block.AIR)

@@ -80,7 +80,9 @@ object PlayerBuilderSigrid {
             try {
                 inventory.add("wall@"+t, 9995)
             }
-            catch (e: Throwable) {}
+            catch (e: Throwable) {
+                System.err.println("[PlayerBuilder] $e")
+            }
         }
 
         // item ids are defined in <module>/items/itemid.csv

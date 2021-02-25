@@ -56,14 +56,16 @@ object BlockBase {
             ingame.world.setTileWall(
                     mouseTile.x,
                     mouseTile.y,
-                    itemID.substring(5)
+                    itemID.substring(5),
+                    false
             )
         }
         else {
             ingame.world.setTileTerrain(
                     mouseTile.x,
                     mouseTile.y,
-                    itemID
+                    itemID,
+                    false
             )
         }
 

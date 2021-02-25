@@ -269,7 +269,7 @@ open class GameWorld : Disposable {
      * *
      * @param itemID Tile as in ItemID, with tag removed!
      */
-    fun setTileWall(x: Int, y: Int, itemID: ItemID) {
+    fun setTileWall(x: Int, y: Int, itemID: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
         val tilenum = tileNameToNumberMap[itemID]!!
 
@@ -277,7 +277,8 @@ open class GameWorld : Disposable {
         layerWall.unsafeSetTile(x, y, tilenum)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
 
-        Terrarum.ingame?.queueWallChangedEvent(oldWall, itemID, LandUtil.getBlockAddr(this, x, y))
+        if (!bypassEvent)
+            Terrarum.ingame?.queueWallChangedEvent(oldWall, itemID, LandUtil.getBlockAddr(this, x, y))
     }
 
     /**
@@ -291,7 +292,7 @@ open class GameWorld : Disposable {
      * *
      * @param itemID Tile as in ItemID, with tag removed!
      */
-    fun setTileTerrain(x: Int, y: Int, itemID: ItemID) {
+    fun setTileTerrain(x: Int, y: Int, itemID: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
         val tilenum = tileNameToNumberMap[itemID]!!
 
@@ -306,7 +307,8 @@ open class GameWorld : Disposable {
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
-        Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, LandUtil.getBlockAddr(this, x, y))
+        if (!bypassEvent)
+            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, LandUtil.getBlockAddr(this, x, y))
     }
 
     /*fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -431,7 +433,7 @@ open class GameWorld : Disposable {
 
         // remove tile from the world
         if (terrainDamages[addr] ?: 0f >= BlockCodex[getTileFromTerrain(x, y)].strength) {
-            setTileTerrain(x, y, Block.AIR)
+            setTileTerrain(x, y, Block.AIR, false)
             terrainDamages.remove(addr)
             return true
         }
@@ -460,7 +462,7 @@ open class GameWorld : Disposable {
 
         // remove tile from the world
         if (wallDamages[addr]!! >= BlockCodex[getTileFromWall(x, y)].strength) {
-            setTileWall(x, y, Block.AIR)
+            setTileWall(x, y, Block.AIR, false)
             wallDamages.remove(addr)
             return true
         }

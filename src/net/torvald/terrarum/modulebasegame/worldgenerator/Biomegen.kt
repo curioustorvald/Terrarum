@@ -86,17 +86,17 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             when (control) {
                 0 -> { // woodlands
                     if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
-                        world.setTileTerrain(x, y, Block.GRASS)
+                        world.setTileTerrain(x, y, Block.GRASS, true)
                     }
                 }
                 1 -> { // shrublands
                     if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
-                        world.setTileTerrain(x, y, Block.GRASS)
+                        world.setTileTerrain(x, y, Block.GRASS, true)
                     }
                 }
                 2, 3 -> { // plains
                     if (tileThis == Block.DIRT && nearbyTerr.any { it == Block.AIR } && nearbyWall.any { it == Block.AIR }) {
-                        world.setTileTerrain(x, y, Block.GRASS)
+                        world.setTileTerrain(x, y, Block.GRASS, true)
                     }
                 }
                 /*3 -> { // sands
@@ -109,8 +109,8 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                 }*/
                 4 -> { // rockylands
                     if (tileThis == Block.DIRT) {
-                        world.setTileTerrain(x, y, Block.STONE)
-                        world.setTileWall(x, y, Block.STONE)
+                        world.setTileTerrain(x, y, Block.STONE, true)
+                        world.setTileWall(x, y, Block.STONE, true)
                     }
                 }
             }
