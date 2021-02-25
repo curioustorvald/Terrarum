@@ -92,7 +92,7 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:3") // steel pick
         inventory.add("item@basegame:4", 9995) // wire piece
         inventory.add("item@basegame:5", 385930603) // test tiki torch
-        //inventory.add("item@basegame:6", 95) // crafting table
+        inventory.add("item@basegame:6", 95) // crafting table
 
     }
 }

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.util.CircularArray
 import kotlin.math.roundToInt
@@ -93,7 +95,9 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
                 val wx = (world.width.toFloat() / previewWidth * x).roundToInt()
                 val wy = (world.height.toFloat() / previewHeight * y).roundToInt()
 
-                val outCol = if (world.getTileNumFromTerrain(wx, wy) > 0) COL_TERR else if (world.getTileNumFromWall(wx, wy) > 0) COL_WALLED else COL_AIR
+                val outCol = if (BlockCodex[world.getTileFromTerrain(wx, wy)].isSolid) COL_TERR
+                    else if (BlockCodex[world.getTileFromWall(wx, wy)].isSolid) COL_WALLED
+                    else COL_AIR
 
                 previewPixmap.setColor(outCol)
                 previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y
