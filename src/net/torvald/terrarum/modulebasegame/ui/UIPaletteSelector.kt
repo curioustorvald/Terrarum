@@ -9,6 +9,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
@@ -31,8 +32,8 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
     fun mouseOnTitleBar() =
             relativeMouseX in 0 until width && relativeMouseY in 0 until LINE_HEIGHT
 
-    var fore = Block.STONE_BRICKS
-    var back = Block.GLASS_CRUDE
+    var fore: ItemID = Block.STONE_BRICKS
+    var back: ItemID = Block.GLASS_CRUDE
 
     private val titleText = "Pal."
 
@@ -102,10 +103,9 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
     }
 
     fun swapForeAndBack() {
-        // xor used, because why not?
-        fore = fore xor back
-        back = back xor fore
-        fore = fore xor back
+        val t = fore
+        fore = back
+        back = t
     }
 
     override fun doOpening(delta: Float) {

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
@@ -141,17 +142,17 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      *
      * Queueing schema is used to make sure things are synchronised.
      */
-    open fun queueTerrainChangedEvent(old: Int, new: Int, position: Long) {
+    open fun queueTerrainChangedEvent(old: ItemID, new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        terrainChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+        terrainChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
     }
 
     /**
      * Wall version of terrainChanged() event
      */
-    open fun queueWallChangedEvent(old: Int, new: Int, position: Long) {
+    open fun queueWallChangedEvent(old: ItemID, new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wallChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+        wallChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
     }
 
     /**
@@ -160,9 +161,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * @param old previous settings of conduits in bit set format.
      * @param new current settings of conduits in bit set format.
      */
-    open fun queueWireChangedEvent(old: Int, new: Int, position: Long) {
+    open fun queueWireChangedEvent(old: ItemID, new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wireChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+        wireChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
     }
 
 
@@ -252,7 +253,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
 
 
-    data class BlockChangeQueueItem(val old: Int, val new: Int, val posX: Int, val posY: Int)
+    data class BlockChangeQueueItem(val old: ItemID, val new: ItemID, val posX: Int, val posY: Int)
 
     open fun sendNotification(messages: Array<String>) {}
     open fun sendNotification(messages: List<String>) {}

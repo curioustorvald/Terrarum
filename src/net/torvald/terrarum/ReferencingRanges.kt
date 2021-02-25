@@ -22,4 +22,6 @@ object ReferencingRanges {
 
     val VIRTUAL_TILES = -2 downTo -1048576 // index of -1 breaks things for some reason :(
 
+    val PREFIX_DYNAMICITEM = "dyn:"
+    val PREFIX_ACTORITEM = "actor:"
 }

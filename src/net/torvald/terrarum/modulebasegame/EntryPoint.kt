@@ -6,6 +6,7 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
@@ -52,35 +53,14 @@ class EntryPoint : ModuleEntryPoint() {
 
         // blocks.csvs are loaded by ModMgr beforehand
         // block items (blocks and walls are the same thing basically)
-        for (i in ItemCodex.ITEM_TILES + ItemCodex.ITEM_WALLS) {
-            val blockProp = BlockCodex.getOrNull(i % ItemCodex.ITEM_WALLS.first)
+        for (tile in BlockCodex.getAll()) {
+            ItemCodex[tile.id] = makeNewItemObj(tile, false)
 
-            if (blockProp != null) {
-                ItemCodex.itemCodex[i] = object : GameItem(i) {
-                    override val isUnique: Boolean = false
-                    override var baseMass: Double = blockProp.density / 1000.0
-                    override var baseToolSize: Double? = null
-                    override val originalName = blockProp.nameKey
-                    override var stackable = true
-                    override var inventoryCategory = if (i in ItemCodex.ITEM_TILES) Category.BLOCK else Category.WALL
-                    override var isDynamic = false
-                    override val material = MaterialCodex.getOrDefault(blockProp.material)
+            if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
 
-                    init {
-                        equipPosition = EquipPosition.HAND_GRIP
-
-                        if (IS_DEVELOPMENT_BUILD)
-                            print("$originalID ")
-                    }
-
-                    override fun startPrimaryUse(delta: Float): Boolean {
-                        return BlockBase.blockStartPrimaryUse(this, i, delta)
-                    }
-
-                    override fun effectWhenEquipped(delta: Float) {
-                        BlockBase.blockEffectWhenEquipped(delta)
-                    }
-                }
+            if (BlockCodex[tile.id].isWallable) {
+                ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true)
+                if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
             }
         }
 
@@ -88,6 +68,32 @@ class EntryPoint : ModuleEntryPoint() {
 
         println("[Basegame.EntryPoint] Welcome back!")
     }
+
+    private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
+            if (isWall) "wall@"+tile.id else tile.id
+    ) {
+        override val isUnique: Boolean = false
+        override var baseMass: Double = tile.density / 1000.0
+        override var baseToolSize: Double? = null
+        override val originalName = tile.nameKey
+        override var stackable = true
+        override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
+        override var isDynamic = false
+        override val material = MaterialCodex.getOrDefault(tile.material)
+
+        init {
+            equipPosition = EquipPosition.HAND_GRIP
+        }
+
+        override fun startPrimaryUse(delta: Float): Boolean {
+            return BlockBase.blockStartPrimaryUse(this, dynamicID, delta)
+        }
+
+        override fun effectWhenEquipped(delta: Float) {
+            BlockBase.blockEffectWhenEquipped(delta)
+        }
+    }
+
 
     override fun dispose() {
         WatchFont.dispose()

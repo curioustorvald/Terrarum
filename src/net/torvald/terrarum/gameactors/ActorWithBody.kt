@@ -10,6 +10,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -1231,7 +1232,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
      *
      * Very straightforward for the actual solid tiles, not so much for the platforms
      */
-    private fun shouldICollideWithThis(tile: Int) =
+    private fun shouldICollideWithThis(tile: ItemID) =
     // regular solid block
             (BlockCodex[tile].isSolid)
 
@@ -1240,7 +1241,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
      *
      * Just like "shouldICollideWithThis" but it's intended to work with feet tiles
      */
-    private fun shouldICollideWithThisFeet(tile: Int) =
+    private fun shouldICollideWithThisFeet(tile: ItemID) =
     // regular solid block
             (BlockCodex[tile].isSolid) ||
             // platforms, moving downward AND not "going down"
@@ -1295,7 +1296,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         return contactAreaCounter
     }
 
-    private fun getTileFriction(tile: Int) =
+    private fun getTileFriction(tile: ItemID) =
             if (physProp.immobileBody && tile == Block.AIR)
                 BlockCodex[Block.AIR].friction.frictionToMult().div(500)
                         .times(if (!grounded) elasticity else 1.0)
@@ -1705,11 +1706,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     }
 
 
-    private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
+    private fun forEachOccupyingTileNum(consumer: (ItemID?) -> Unit) {
         if (world == null) return
 
 
-        val tiles = ArrayList<Int?>()
+        val tiles = ArrayList<ItemID?>()
         for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
             for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
                 tiles.add(world!!.getTileFromTerrain(x, y))
@@ -1770,11 +1771,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         return tilePosList.forEach(consumer)
     }
 
-    private fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
+    private fun forEachFeetTileNum(consumer: (ItemID?) -> Unit) {
         if (world == null) return
 
 
-        val tiles = ArrayList<Int?>()
+        val tiles = ArrayList<ItemID?>()
 
         // offset 1 pixel to the down so that friction would work
         val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()

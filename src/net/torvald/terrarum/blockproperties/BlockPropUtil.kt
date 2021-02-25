@@ -71,36 +71,34 @@ object BlockPropUtil {
             catch (skip: NullPointerException) {}
         }*/
         // update randomised virtual props instead
-        for (keyMax in BlockCodex.dynamicToVirtualPropMapping) {
-            repeat(BlockCodex.DYNAMIC_RANDOM_CASES) {
-                val prop = BlockCodex[keyMax.second - it]
-                val domain = when (prop.dynamicLuminosityFunction) {
-                    1 -> flickerFuncDomain
-                    4 -> breathCycleDuration
-                    5 -> pulsateCycleDuration
-                    else -> 0f
-                }
-
-                // FPS-time compensation
-                if (Gdx.graphics.framesPerSecond > 0) {
-                    prop.rngBase0 += Gdx.graphics.rawDeltaTime
-                }
-
-                // reset timer
-                if (prop.rngBase0 > domain) {
-                    prop.rngBase0 -= domain
-
-                    // flicker related
-                    prop.rngBase1 = prop.rngBase2
-                    prop.rngBase2 = getNewRandom()
-                }
-
-                prop._lumCol.set(getDynamicLumFunc(prop))
-                //prop.lumColR = prop.lumCol.r
-                //prop.lumColG = prop.lumCol.g
-                //prop.lumColB = prop.lumCol.b
-                //prop.lumColA = prop.lumCol.a
+        for (key in BlockCodex.tileToVirtual.values.flatten()) {
+            val prop = BlockCodex[key]
+            val domain = when (prop.dynamicLuminosityFunction) {
+                1 -> flickerFuncDomain
+                4 -> breathCycleDuration
+                5 -> pulsateCycleDuration
+                else -> 0f
             }
+
+            // FPS-time compensation
+            if (Gdx.graphics.framesPerSecond > 0) {
+                prop.rngBase0 += Gdx.graphics.rawDeltaTime
+            }
+
+            // reset timer
+            if (prop.rngBase0 > domain) {
+                prop.rngBase0 -= domain
+
+                // flicker related
+                prop.rngBase1 = prop.rngBase2
+                prop.rngBase2 = getNewRandom()
+            }
+
+            prop._lumCol.set(getDynamicLumFunc(prop))
+            //prop.lumColR = prop.lumCol.r
+            //prop.lumColG = prop.lumCol.g
+            //prop.lumColB = prop.lumCol.b
+            //prop.lumColA = prop.lumCol.a
         }
     }
 

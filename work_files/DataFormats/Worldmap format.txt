@@ -43,17 +43,17 @@ Ord  Hex  Description
 # A payload is consisted as follows:
 #
 #   Literal        Description
-#   "\0pLd"        Payload header  [00, 70, 4C, 64]
+#   "\0pLd"       Payload header  [00, 70, 4C, 64]
 #   [4]            Identifier. 4 lettres ASCII string
 #   [6]            Uncompressed size of DEFLATEd binary (max size 256 TB)
+#   [6]            Length of the actual payload (max size 256 TB)
 #   [..]           DEFLATEd binary (begins with one of these: 0x789C, 0x78DA, 0x7801)
-#   "EndPYLd\xFF"  Payload footer  [45, 6E, 64, 50, 59, 4C, 64, FF]
 
 
 Payload "TERR" -- world terrain data in Uint16
                   Uncompressed size will be 2x of (width * height)
 
-Payload "WALL" -- world walls data in Unit16
+Payload "WALL" -- world walls data in Uint16
                   Uncompressed size will be 2x of (width * height)
 
 Payload "TdMG" -- world terrain damage data, array of: (Int48 tileAddress, Float32 damage)
@@ -71,11 +71,17 @@ Payload "FlFL" -- world fluid fills, array of: (Int48 tileAddress, Float32 amoun
 
 Payload "WiNt" -- wiring nodes, in JSON format
 
-Payload "CtYP" -- conduit types, array of: (Int48 tileAddress, Uint32 bitarray)
+Payload "TMaP" -- tile number to name map, array of: (Int32, tileNumber, String itemID)
+                  String is null-terminated byte array
+
+TODO need a format that can store arbitrary number of conduits, not just limited to 32
+
+/*Payload "CtYP" -- conduit types, array of: (Int48 tileAddress, Uint32 bitarray)
                   can hold 32 different wires simultaneously
 
 Payload "CfL0" -- conduit fills, aka size of liquid/gas packet, array of: (Int48 tileAddress, Float32 fill)
-                  CfL0..CfL9, CfLa..CfLf are available to store values for 16 different things.
+                  CfL0..CfL9, CfLa..CfLf are available to store values for 16 different things.*/
+
 
 EOF  45   E
 EOF  6E   n
@@ -86,7 +92,3 @@ EOF  4D   M
 EOF  FF   Byte order mark
 EOF  FE   Byte order mark
 
-
-* To read layers: you'll need to search for specific strings, namely ["TERR", "WALL", "WIRE"]
-* It is possible that compressed data happen to replicate any of the internal identifiers
-  (e.g. "\0pLdTERR", "EndTEM\xFF\xFE", "EndPYLd\xFF"), but such probability is very low (0.000000000000000005421 %)

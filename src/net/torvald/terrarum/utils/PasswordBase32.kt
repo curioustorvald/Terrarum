@@ -10,7 +10,7 @@ import kotlin.experimental.xor
  */
 object PasswordBase32 {
 
-    private val stringSet = "YBNDRFG8EJKMCPQXOT+VWIS2A345H769="
+    private val stringSet = "YBNDRFG8EJKMCPQXOTLVWIS2A345H769="
 
     private val substituteSet = hashMapOf(
             Pair('0', 'O'),

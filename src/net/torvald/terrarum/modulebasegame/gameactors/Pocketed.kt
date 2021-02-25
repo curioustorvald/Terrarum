@@ -77,12 +77,12 @@ interface Pocketed {
     }
     fun equipped(itemID: ItemID) = equipped(ItemCodex[itemID]!!)
 
-    fun addItem(itemID: Int, count: Int = 1) = inventory.add(ItemCodex[itemID]!!, count)
+    fun addItem(itemID: ItemID, count: Int = 1) = inventory.add(ItemCodex[itemID]!!, count)
     fun addItem(item: GameItem, count: Int = 1) = inventory.add(item, count)
-    fun removeItem(itemID: Int, count: Int = 1) = inventory.remove(ItemCodex[itemID]!!, count)
+    fun removeItem(itemID: ItemID, count: Int = 1) = inventory.remove(ItemCodex[itemID]!!, count)
     fun removeItem(item: GameItem, count: Int = 1) = inventory.remove(item, count)
 
     fun hasItem(item: GameItem) = inventory.contains(item.dynamicID)
-    fun hasItem(id: Int) = inventory.contains(id)
+    fun hasItem(id: ItemID) = inventory.contains(id)
 
 }

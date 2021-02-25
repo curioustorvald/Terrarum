@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -54,9 +55,6 @@ internal object BlocksDrawer {
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
-
-    val wallOverlayColour = Color(5f / 9f, 5f / 9f, 5f / 9f, 1f)
-
     const val BREAKAGE_STEPS = 10
 
     val WALL = GameWorld.WALL
@@ -96,23 +94,7 @@ internal object BlocksDrawer {
         // with TGA, you have a complete control over this, with the expense of added hassle on your side.
         // -- Torvald, 2018-12-19
 
-        printdbg(this, "Making terrain textures...")
-
-        CreateTileAtlas()
-        //JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
-        // each takes about 60 seconds
-        //printdbg(this, "Writing pixmap as tga: atlas.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), CreateTileAtlas.atlas, false)
-        //printdbg(this, "Writing pixmap as tga: atlasAutumn.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasAutumn.tga"), CreateTileAtlas.atlasAutumn, false)
-        //printdbg(this, "Writing pixmap as tga: atlasWinter.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasWinter.tga"), CreateTileAtlas.atlasWinter, false)
-        //printdbg(this, "Writing pixmap as tga: atlasSpring.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasSpring.tga"), CreateTileAtlas.atlasSpring, false)
-        //printdbg(this, "Writing pixmap as tga: atlasFluid.tga")
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasFluid.tga"), CreateTileAtlas.atlasFluid, false)
-
-
+        // CreateTileAtlas.invoke() has been moved to the AppLoader.create() //
 
         // create terrain texture from pixmaps
         weatherTerrains = arrayOf(
@@ -179,7 +161,7 @@ internal object BlocksDrawer {
     /**
      * To interact with external modules
      */
-    @JvmStatic fun addBlendMul(blockID: Int): Boolean {
+    @JvmStatic fun addBlendMul(blockID: ItemID): Boolean {
         return TILES_BLEND_MUL.add(blockID)
     }
 
@@ -307,11 +289,11 @@ internal object BlocksDrawer {
                 val bufferX = x - for_x_start
                 val bufferY = y - for_y_start
 
-                val thisTile = when (mode) {
+                val thisTile: ItemID = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> world.getWiringBlocks(x, y).and(drawWires).toBitOrd() * 16
-                    FLUID -> world.getFluid(x, y).type.abs()
+                    WIRE -> "basegame:-1" // TODO need new wire storing format //world.getWiringBlocks(x, y).and(drawWires).toBitOrd() * 16
+                    FLUID -> "basegame:-1" // TODO need new wire storing format //world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }
 
@@ -344,10 +326,10 @@ internal object BlocksDrawer {
                         if (mode == FLUID)
                             CreateTileAtlas.fluidToTileNumber(world.getFluid(x, y))
                         else if (mode == WIRE)
-                            thisTile
+                            0 // TODO need new wire storing format
                         else
                             renderTag.tileNumber
-                val tileNumber = if (mode != WIRE && thisTile == 0) 0
+                val tileNumber = if (mode != WIRE && thisTile == Block.AIR) 0
                 // special case: fluids
                 else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
                 // special case: wires
@@ -376,11 +358,11 @@ internal object BlocksDrawer {
 
                 // draw a tile
 
-                if (mode == WIRE && thisTile < 0) {
+                if (mode == WIRE) {
                     // no wire here, draw block id 255 (bottom right)
                     writeToBuffer(mode, bufferX, bufferY, 15, 15, 0)
                 }
-                else if (mode == FLUID || mode == WIRE) {
+                else if (mode == FLUID) {
                     writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
                 }
                 else {
@@ -404,7 +386,7 @@ internal object BlocksDrawer {
         )
     }
 
-    private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: Int?): Int {
+    private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: ItemID?): Int {
         val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
 
         var ret = 0
@@ -423,8 +405,9 @@ internal object BlocksDrawer {
      *
      * @return offset from the spritesheet's "base" tile number, 0..15.
      */
-    private fun getNearbyWiringInfo(x: Int, y: Int, wire: Int): Int {
-        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getWiringBlocks(it.x, it.y).and(drawWires).toBitOrd() * 16 }
+    private fun getNearbyWiringInfo(x: Int, y: Int, wire: ItemID): Int {
+        return 0 // TODO need new wire storing format
+        /*val nearbyTiles = getNearbyTilesPos(x, y).map { world.getWiringBlocks(it.x, it.y).and(drawWires).toBitOrd() * 16 }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
@@ -433,11 +416,11 @@ internal object BlocksDrawer {
             }
         }
 
-        return ret
+        return ret*/
     }
 
     private fun getNearbyTilesInfoConMutual(x: Int, y: Int, mode: Int): Int {
-        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
+        val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y)!! }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
@@ -454,7 +437,7 @@ internal object BlocksDrawer {
      */
     private fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
         val nearbyPos = getNearbyTilesPos(x, y)
-        val nearbyTiles = nearbyPos.map { world.getTileFromTerrain(it.x, it.y) ?: Block.NULL }
+        val nearbyTiles: List<ItemID> = nearbyPos.map { world.getTileFromTerrain(it.x, it.y) }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
@@ -468,12 +451,12 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
-        val nearbyTiles = IntArray(4)
+        val nearbyTiles = arrayOf(Block.NULL, Block.NULL, Block.NULL, Block.NULL)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  world.getTileFrom(TERRAIN, x    , y + 1) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_BACK] =  world.getTileFrom(WALL,    x    , y) ?: Block.NULL
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y)
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y)
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  world.getTileFrom(TERRAIN, x    , y + 1)
+        nearbyTiles[NEARBY_TILE_KEY_BACK] =  world.getTileFrom(WALL,    x    , y)
 
         try {
             if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
@@ -502,9 +485,11 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
-        val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: Block.NULL
+        val nearbyTiles = arrayOf(Block.NULL, Block.NULL, Block.NULL, Block.NULL)
+        val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y)
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y)
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y)
 
         if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
              BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid) ||
@@ -594,7 +579,7 @@ internal object BlocksDrawer {
         }
         val vertexColour = when (mode) {
             TERRAIN, WIRE, FLUID -> Color.WHITE
-            WALL -> wallOverlayColour
+            WALL -> CreateTileAtlas.wallOverlayColour
             else -> throw IllegalArgumentException()
         }
 
@@ -753,10 +738,10 @@ internal object BlocksDrawer {
     fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (WorldCamera.width / TILE_SIZE) + 2)
     fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (WorldCamera.height / TILE_SIZE) + 2)
 
-    fun isConnectSelf(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_SELF
-    fun isConnectMutual(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_MUTUAL
-    fun isWallSticker(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
-    fun isPlatform(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
+    fun isConnectSelf(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_SELF
+    fun isConnectMutual(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_MUTUAL
+    fun isWallSticker(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
+    fun isPlatform(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
     //fun isBlendMul(b: Int): Boolean = TILES_BLEND_MUL.contains(b)
 
     fun tileInCamera(x: Int, y: Int) =

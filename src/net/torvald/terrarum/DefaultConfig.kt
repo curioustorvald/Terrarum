@@ -111,7 +111,7 @@ object DefaultConfig {
 
         // settings regarding debugger
         val buildingMakerFavs = JsonArray()
-        intArrayOf(
+        arrayOf(
                 Block.GLASS_CRUDE,
                 Block.PLANK_NORMAL,
                 Block.PLANK_BIRCH,
@@ -120,9 +120,10 @@ object DefaultConfig {
 
                 Block.STONE_TILE_WHITE,
                 Block.TORCH,
-                Block.PLANK_NORMAL + BlockCodex.MAX_TERRAIN_TILES,
-                Block.PLANK_BIRCH + BlockCodex.MAX_TERRAIN_TILES,
-                Block.GLASS_CRUDE + BlockCodex.MAX_TERRAIN_TILES).forEach {
+                "wall@" + Block.PLANK_NORMAL,
+                "wall@" + Block.PLANK_BIRCH,
+                "wall@" + Block.GLASS_CRUDE
+        ).forEach {
             buildingMakerFavs.add(it)
         }
         jsonObject.add("buildingmakerfavs", buildingMakerFavs)

@@ -2,6 +2,7 @@ package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.FluidType
@@ -151,6 +152,7 @@ internal object ReadLayerDataLzma {
         val wallDamages = HashMap<BlockAddress, Float>()
         val fluidTypes = HashMap<BlockAddress, FluidType>()
         val fluidFills = HashMap<BlockAddress, Float>()
+        val tileNumToName = HashMap<Int, ItemID>()
 
         // parse terrain damages
         for (c in payloadBytes["TdMG"]!!.indices step 10) {
@@ -176,6 +178,8 @@ internal object ReadLayerDataLzma {
 
         // TODO parse fluid(Types|Fills)
 
+        // TODO parse tileNumToName
+
 
         return ReadLayerDataZip.LayerData(
                 BlockLayer(width, height, payloadBytes["WALL"]!!),
@@ -183,7 +187,7 @@ internal object ReadLayerDataLzma {
 
                 spawnPoint.first, spawnPoint.second,
 
-                wallDamages, terrainDamages, fluidTypes, fluidFills
+                wallDamages, terrainDamages, fluidTypes, fluidFills, tileNumToName
         )
     }
 

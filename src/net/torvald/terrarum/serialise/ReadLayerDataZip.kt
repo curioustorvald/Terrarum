@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.FluidType
@@ -152,6 +153,7 @@ internal object ReadLayerDataZip {
         val wallDamages = HashMap<BlockAddress, Float>()
         val fluidTypes = HashMap<BlockAddress, FluidType>()
         val fluidFills = HashMap<BlockAddress, Float>()
+        val tileNumberToNameMap = HashMap<Int, ItemID>()
 
         // parse terrain damages
         for (c in payloadBytes["TdMG"]!!.indices step 10) {
@@ -184,7 +186,7 @@ internal object ReadLayerDataZip {
 
                 spawnPoint.first, spawnPoint.second,
 
-                wallDamages, terrainDamages, fluidTypes, fluidFills
+                wallDamages, terrainDamages, fluidTypes, fluidFills, tileNumberToNameMap
         )
     }
 
@@ -204,7 +206,8 @@ internal object ReadLayerDataZip {
             val wallDamages: HashMap<BlockAddress, Float>,
             val terrainDamages: HashMap<BlockAddress, Float>,
             val fluidTypes: HashMap<BlockAddress, FluidType>,
-            val fluidFills: HashMap<BlockAddress, Float>
+            val fluidFills: HashMap<BlockAddress, Float>,
+            val tileNumberToNameMap: HashMap<Int, ItemID>
     )
 
 	internal fun InputStream.readRelative(b: ByteArray, off: Int, len: Int): Int {

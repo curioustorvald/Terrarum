@@ -9,10 +9,12 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
@@ -79,7 +81,7 @@ open class GameWorld : Disposable {
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
      */
-    private val wiringBlocks: HashMap<BlockAddress, Int>
+    private val wiringBlocks: HashMap<BlockAddress, ItemID>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -100,7 +102,14 @@ open class GameWorld : Disposable {
     open var TIME_T: Long = 0L
     open var dayLength: Int = 86400
 
+    @TEMzPayload("TMaP", TEMzPayload.EXTERNAL_JSON)
+    val tileNumberToNameMap: HashMap<Int, ItemID>
+    // does not go to the savefile
+    val tileNameToNumberMap: HashMap<ItemID, Int>
 
+    /**
+     * Create new world
+     */
     constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
 
@@ -133,8 +142,24 @@ open class GameWorld : Disposable {
         creationTime = creationTIME_T
         lastPlayTime = lastPlayTIME_T
         this.totalPlayTime = totalPlayTime
+
+
+        tileNumberToNameMap = HashMap<Int, ItemID>()
+        tileNameToNumberMap = HashMap<ItemID, Int>()
+        CreateTileAtlas.tags.forEach {
+            printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+
+            tileNumberToNameMap[it.value.tileNumber] = it.key
+            tileNameToNumberMap[it.key] = it.value.tileNumber
+        }
+
+        // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
+        tileNumberToNameMap[0] = Block.AIR
     }
 
+    /**
+     * Load existing world
+     */
     internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         this.worldIndex = worldIndex
 
@@ -160,6 +185,28 @@ open class GameWorld : Disposable {
         creationTime = creationTIME_T
         lastPlayTime = lastPlayTIME_T
         this.totalPlayTime = totalPlayTime
+
+        // before the renaming, update the name maps
+        tileNumberToNameMap = HashMap<Int, ItemID>()
+        tileNameToNumberMap = HashMap<ItemID, Int>()
+        CreateTileAtlas.tags.forEach {
+            tileNumberToNameMap[it.value.tileNumber] = it.key
+            tileNameToNumberMap[it.key] = it.value.tileNumber
+        }
+
+        // perform renaming of tile layers
+        val oldTileNumberToNameMap = layerData.tileNumberToNameMap
+        for (y in 0 until layerTerrain.height) {
+            for (x in 0 until layerTerrain.width) {
+                layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]]!!)
+                layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y)]]!!)
+                // TODO rename fluid map
+                // TODO rename wire map
+            }
+        }
+
+        // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
+        tileNumberToNameMap[0] = Block.AIR
     }
 
     /**
@@ -172,12 +219,41 @@ open class GameWorld : Disposable {
 
     fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
-    fun getTileFromWall(rawX: Int, rawY: Int): Int {
+    /**
+     * @return ItemID, WITHOUT wall tag
+     */
+    fun getTileFromWall(rawX: Int, rawY: Int): ItemID {
+        val (x, y) = coerceXY(rawX, rawY)
+        return tileNumberToNameMap[layerWall.unsafeGetTile(x, y)]!!
+    }
+
+    /**
+     * @return ItemID
+     */
+    fun getTileFromTerrain(rawX: Int, rawY: Int): ItemID {
+        val (x, y) = coerceXY(rawX, rawY)
+
+        try {
+            return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]!!
+        }
+        catch (e: NullPointerException) {
+            System.err.println("NPE for tilenum ${layerTerrain.unsafeGetTile(x, y)}")
+            throw e
+        }
+    }
+
+    /**
+     * @return Int
+     */
+    fun getTileNumFromWall(rawX: Int, rawY: Int): Int {
         val (x, y) = coerceXY(rawX, rawY)
         return layerWall.unsafeGetTile(x, y)
     }
 
-    fun getTileFromTerrain(rawX: Int, rawY: Int): Int {
+    /**
+     * @return Int
+     */
+    fun getTileNumFromTerrain(rawX: Int, rawY: Int): Int {
         val (x, y) = coerceXY(rawX, rawY)
         return layerTerrain.unsafeGetTile(x, y)
     }
@@ -191,17 +267,18 @@ open class GameWorld : Disposable {
      * *
      * @param y
      * *
-     * @param tilenum Item id of the wall block. Less-than-4096-value is permitted.
+     * @param itemID Tile as in ItemID, with tag removed!
      */
-    fun setTileWall(x: Int, y: Int, tilenum: Int) {
+    fun setTileWall(x: Int, y: Int, itemID: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
-        val tilenum = tilenum % TILES_SUPPORTED // does work without this, but to be safe...
+        val tilenum = tileNameToNumberMap[itemID]!!
 
         val oldWall = getTileFromWall(x, y)
         layerWall.unsafeSetTile(x, y, tilenum)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
 
-        Terrarum.ingame?.queueWallChangedEvent(oldWall, tilenum, LandUtil.getBlockAddr(this, x, y))
+        if (!bypassEvent)
+            Terrarum.ingame?.queueWallChangedEvent(oldWall, itemID, LandUtil.getBlockAddr(this, x, y))
     }
 
     /**
@@ -213,23 +290,25 @@ open class GameWorld : Disposable {
      * *
      * @param y
      * *
-     * @param tilenum Item id of the terrain block, <4096
+     * @param itemID Tile as in ItemID, with tag removed!
      */
-    fun setTileTerrain(x: Int, y: Int, tilenum: Int) {
+    fun setTileTerrain(x: Int, y: Int, itemID: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
+        val tilenum = tileNameToNumberMap[itemID]!!
 
         val oldTerrain = getTileFromTerrain(x, y)
         layerTerrain.unsafeSetTile(x, y, tilenum)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         terrainDamages.remove(blockAddr)
 
-        if (BlockCodex[tilenum].isSolid) {
+        if (BlockCodex[itemID].isSolid) {
             fluidFills.remove(blockAddr)
             fluidTypes.remove(blockAddr)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
-        Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tilenum, LandUtil.getBlockAddr(this, x, y))
+        if (!bypassEvent)
+            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, LandUtil.getBlockAddr(this, x, y))
     }
 
     /*fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -241,8 +320,9 @@ open class GameWorld : Disposable {
             Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
     }*/
 
-    fun getWiringBlocks(x: Int, y: Int): Int {
-        return wiringBlocks.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
+    fun getWiringBlocks(x: Int, y: Int): ItemID {
+        return Block.AIR // TODO
+        //return wiringBlocks.getOrDefault(LandUtil.getBlockAddr(this, x, y), Block.AIR)
     }
 
     fun getAllConduitsFrom(x: Int, y: Int): SortedArrayList<WiringNode>? {
@@ -258,7 +338,9 @@ open class GameWorld : Disposable {
     }
 
     fun addNewConduitTo(x: Int, y: Int, node: WiringNode) {
-        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        // TODO needs new conduit storage scheme
+
+        /*val blockAddr = LandUtil.getBlockAddr(this, x, y)
 
         // check for existing type of conduit
         // if there's no duplicate...
@@ -270,10 +352,10 @@ open class GameWorld : Disposable {
         }
         else {
             TODO("need overwriting policy for existing conduit node")
-        }
+        }*/
     }
 
-    fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
+    fun getTileFrom(mode: Int, x: Int, y: Int): ItemID {
         if (mode == TERRAIN) {
             return getTileFromTerrain(x, y)
         }
@@ -287,8 +369,8 @@ open class GameWorld : Disposable {
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
     }
 
-    fun terrainIterator(): Iterator<Int> {
-        return object : Iterator<Int> {
+    fun terrainIterator(): Iterator<ItemID> {
+        return object : Iterator<ItemID> {
 
             private var iteratorCount = 0
 
@@ -296,7 +378,7 @@ open class GameWorld : Disposable {
                 return iteratorCount < width * height
             }
 
-            override fun next(): Int {
+            override fun next(): ItemID {
                 val y = iteratorCount / width
                 val x = iteratorCount % width
                 // advance counter
@@ -308,15 +390,15 @@ open class GameWorld : Disposable {
         }
     }
 
-    fun wallIterator(): Iterator<Int> {
-        return object : Iterator<Int> {
+    fun wallIterator(): Iterator<ItemID> {
+        return object : Iterator<ItemID> {
 
             private var iteratorCount = 0
 
             override fun hasNext(): Boolean =
                     iteratorCount < width * height
 
-            override fun next(): Int {
+            override fun next(): ItemID {
                 val y = iteratorCount / width
                 val x = iteratorCount % width
                 // advance counter
@@ -351,7 +433,7 @@ open class GameWorld : Disposable {
 
         // remove tile from the world
         if (terrainDamages[addr] ?: 0f >= BlockCodex[getTileFromTerrain(x, y)].strength) {
-            setTileTerrain(x, y, 0)
+            setTileTerrain(x, y, Block.AIR, false)
             terrainDamages.remove(addr)
             return true
         }
@@ -380,7 +462,7 @@ open class GameWorld : Disposable {
 
         // remove tile from the world
         if (wallDamages[addr]!! >= BlockCodex[getTileFromWall(x, y)].strength) {
-            setTileWall(x, y, 0)
+            setTileWall(x, y, Block.AIR, false)
             wallDamages.remove(addr)
             return true
         }

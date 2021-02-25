@@ -7,6 +7,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
 
@@ -77,10 +78,10 @@ open class FixtureBase(
                     // if the collision type is allow_move_down, only the top surface tile should be "the platform"
                     // lower part must not have such property (think of the table!)
                     // TODO does this ACTUALLY work ?!
-                    world.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION)
+                    world.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, false)
                 }
                 else
-                    world.setTileTerrain(x, y, blockBox.collisionType)
+                    world.setTileTerrain(x, y, blockBox.collisionType, false)
             }
         }
 
@@ -115,7 +116,7 @@ open class FixtureBase(
         // remove filler block
         for (x in posX until posX + blockBox.width) {
             for (y in posY until posY + blockBox.height) {
-                world.setTileTerrain(x, y, Block.AIR)
+                world.setTileTerrain(x, y, Block.AIR, false)
             }
         }
 
@@ -156,7 +157,7 @@ open class FixtureBase(
             for (x in posX until posX + blockBox.width) {
                 for (y in posY until posY + blockBox.height) {
                     if (world.getTileFromTerrain(x, y) == blockBox.collisionType) {
-                        world.setTileTerrain(x, y, Block.AIR)
+                        world.setTileTerrain(x, y, Block.AIR, false)
                     }
                 }
             }
@@ -201,7 +202,7 @@ inline class BlockBoxProps(val flags: Int) {
  * @param width Width of the block box, tile-wise
  * @param height Height of the block box, tile-wise
  */
-data class BlockBox(val collisionType: Int, val width: Int, val height: Int) {
+data class BlockBox(val collisionType: ItemID, val width: Int, val height: Int) {
 
     /*fun redefine(collisionType: Int, width: Int, height: Int) {
         redefine(collisionType)

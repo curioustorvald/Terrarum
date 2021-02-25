@@ -153,7 +153,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
         // draw blocks slot
         batch.color = blockCellCol
-        val slotConfig = AppLoader.getConfigIntArray("buildingmakerfavs")
+        val slotConfig = AppLoader.getConfigStringArray("buildingmakerfavs")
         for (i in 0 until PALETTE_SIZE) {
             val x = blockCellPos[i].x.roundToInt().toFloat()
             val y = blockCellPos[i].y.roundToInt().toFloat()

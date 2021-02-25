@@ -14,15 +14,15 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 open class DroppedItem(private val item: GameItem) : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
 
     init {
-        if (item.dynamicID >= ItemCodex.ACTORID_MIN)
+        if (item.dynamicID.startsWith("actor@"))
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
 
         isVisible = true
 
-        avBaseMass = if (item.dynamicID < BlockCodex.MAX_TERRAIN_TILES)
-            BlockCodex[item.dynamicID].density / 1000.0
-        else
+        avBaseMass = if (item.dynamicID.startsWith("item@"))
             ItemCodex[item.dynamicID]!!.mass
+        else
+            BlockCodex[item.dynamicID].density / 1000.0 // block and wall
 
         actorValue[AVKey.SCALE] = ItemCodex[item.dynamicID]!!.scale
     }

@@ -52,8 +52,8 @@ object WriteWorldInfo {
             val infile = infileList[filenum - 1]
 
             infile.forEach {
-                outputStream.write("## from file: ${it.nameWithoutExtension()} ##############################\n".toByteArray())
-                val readBytes = it.readBytes()
+                outputStream.write("## from file: ${it.second.nameWithoutExtension()} ##############################\n".toByteArray())
+                val readBytes = it.second.readBytes()
                 outputStream.write(readBytes)
                 outputStream.write("\n".toByteArray())
             }

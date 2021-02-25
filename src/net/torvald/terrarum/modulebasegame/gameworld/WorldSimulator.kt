@@ -7,6 +7,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -207,8 +208,8 @@ object WorldSimulator {
                     // process the gradual falling of the selected "stack"
                     if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
                         // replace blocks
-                        world.setTileTerrain(x, y, Block.AIR)
-                        world.setTileTerrain(x, y + fallDownCounter, currentTile)
+                        world.setTileTerrain(x, y, Block.AIR, true)
+                        world.setTileTerrain(x, y + fallDownCounter, currentTile, true)
 
                         fallableStackProcessed = true
                     }
@@ -416,7 +417,7 @@ object WorldSimulator {
     }
 
 
-    fun Int.isFallable() = BlockCodex[this].maxSupport
+    fun ItemID.isFallable() = BlockCodex[this].maxSupport
 
 
     private val actorMBRConverter = object : MBRConverter<ActorWithBody> {

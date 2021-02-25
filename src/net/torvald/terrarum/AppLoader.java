@@ -33,6 +33,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.ArrayListMap;
@@ -494,6 +495,10 @@ public class AppLoader implements ApplicationListener {
 
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
+
+        // create tile atlas
+        printdbg(this, "Making terrain textures...");
+        CreateTileAtlas.INSTANCE.invoke(false);
     }
 
     @Override
@@ -1121,6 +1126,21 @@ public class AppLoader implements ApplicationListener {
         }
         else
             return ((float[]) cfg);
+    }
+
+    public static String[] getConfigStringArray(String key) {
+        Object cfg = getConfigMaster(key);
+        if (cfg instanceof JsonArray) {
+            JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
+            //return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
+            String[] intArray = new String[jsonArray.size()];
+            for (int i = 0; i < jsonArray.size(); i++) {
+                intArray[i] = jsonArray.get(i).getAsString();
+            }
+            return intArray;
+        }
+        else
+            return ((String[]) cfg);
     }
 
     /**

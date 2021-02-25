@@ -28,8 +28,8 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             ThreadExecutor.submit {
                 val localJoise = getGenerator(seed, params as TerragenParams)
-                val localLock = java.lang.Object() // in an attempt to fix the "premature exit" issue of a thread run
-                synchronized(localLock) {          // also see: https://stackoverflow.com/questions/28818494/threads-stopping-prematurely-for-certain-values
+                //val localLock = java.lang.Object() // in an attempt to fix the "premature exit" issue of a thread run
+                //synchronized(localLock) {          // also see: https://stackoverflow.com/questions/28818494/threads-stopping-prematurely-for-certain-values
                     for (x in xs) {
                         for (y in 0 until world.height) {
                             val sampleTheta = (x.toDouble() / world.width) * TWO_PI
@@ -43,7 +43,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                             draw(x, y, noise, world)
                         }
                     }
-                }
+                //}
             }
         }
 
@@ -69,10 +69,10 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         val cave = if (noiseValue[1] < 0.5) 0 else 1
 
         val wallBlock = groundDepthBlock[terr]
-        val terrBlock = wallBlock * cave // AIR is always zero, this is the standard
+        val terrBlock = if (cave == 0) Block.AIR else wallBlock //wallBlock * cave // AIR is always zero, this is the standard
 
-        world.setTileTerrain(x, y, terrBlock)
-        world.setTileWall(x, y, wallBlock)
+        world.setTileTerrain(x, y, terrBlock, true)
+        world.setTileWall(x, y, wallBlock, true)
     }
 
 

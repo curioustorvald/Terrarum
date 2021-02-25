@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.BlockCodex.MAX_TERRAIN_TILES
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -78,20 +77,22 @@ object PlayerBuilderSigrid {
 
         CreateTileAtlas.tags.forEach { t, _ ->
             inventory.add(t, 9995)
-            if (BlockCodex[t].isWallable) {
-                inventory.add(t + MAX_TERRAIN_TILES, 9995)
+            try {
+                inventory.add("wall@"+t, 9995) // this code will try to add nonexisting wall items, do not get surprised with NPEs
+            }
+            catch (e: Throwable) {
+                System.err.println("[PlayerBuilder] $e")
             }
         }
 
         // item ids are defined in <module>/items/itemid.csv
 
-        inventory.add(135168, 16) // copper pick
-        inventory.add(135169) // iron pick
-        inventory.add(135170) // steel pick
-        inventory.add(135171, 9995) // wire piece
-        inventory.add(135172, 385930603) // test tiki torch
-        inventory.add(135173, 95) // crafting table
-        //inventory.add(9000) // TEST water bucket
-        //inventory.add(9001) // TEST lava bucket
+        inventory.add("item@basegame:1", 16) // copper pick
+        inventory.add("item@basegame:2") // iron pick
+        inventory.add("item@basegame:3") // steel pick
+        inventory.add("item@basegame:4", 9995) // wire piece
+        inventory.add("item@basegame:5", 385930603) // test tiki torch
+        inventory.add("item@basegame:6", 95) // crafting table
+
     }
 }

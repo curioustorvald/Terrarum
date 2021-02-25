@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.BuildingMaker
@@ -14,6 +15,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_BACKGROUNDCOL
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import kotlin.math.roundToInt
 
 /**
@@ -37,19 +39,10 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     override var height = HEIGHT
     override var openCloseTime = 0f
 
-    private val palette = Array<UIItemImageButton>(TILES_X * TILES_Y) {
-        // initialise with terrain blocks
-        UIItemImageButton(
-                this, ItemCodex.getItemImage(it),
-                initialX = MENUBAR_SIZE + (it % 16) * TILESREGION_SIZE,
-                initialY = (it / 16) * TILESREGION_SIZE,
-                highlightable = false,
-                width = TILESREGION_SIZE,
-                height = TILESREGION_SIZE,
-                highlightCol = Color.WHITE,
-                activeCol = Color.WHITE
-        )
-    }
+    val palette = ArrayList<UIItemImageButton>()
+
+    // TODO scrolling of the palette, as the old method flat out won't work with The Flattening
+
     private val tabs = UIItemTextButtonList(
             this, arrayOf("Terrain", "Wall", "Wire"),
             0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
@@ -62,12 +55,25 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     )
 
     init {
-        palette.forEachIndexed { index, it ->
-            uiItems.add(it)
 
-            it.clickOnceListener = { _, _, _ ->
-                parent.setPencilColour(paletteScroll * 16 + index)
+        BlockCodex.getAll().forEachIndexed { index, prop ->
+            val paletteItem = UIItemImageButton(
+                this, ItemCodex.getItemImage(prop.id)!!,
+                initialX = MENUBAR_SIZE + (index % 16) * TILESREGION_SIZE,
+                initialY = (index / 16) * TILESREGION_SIZE,
+                highlightable = false,
+                width = TILESREGION_SIZE,
+                height = TILESREGION_SIZE,
+                highlightCol = Color.WHITE,
+                activeCol = Color.WHITE
+            )
+
+            paletteItem.clickOnceListener = { _, _, _ ->
+                parent.setPencilColour(prop.id)
             }
+
+            uiItems.add(paletteItem)
+            palette.add(paletteItem)
         }
     }
 
@@ -119,9 +125,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     }
 
     private fun rebuildPalette() {
-        palette.forEachIndexed { index, it ->
-            it.image = ItemCodex.getItemImage(paletteScroll * 16 + index)
-        }
+
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

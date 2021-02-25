@@ -399,6 +399,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }// END enter
 
     override fun worldPrimaryClickStart(delta: Float) {
+        //println("[Ingame] worldPrimaryClickStart $delta")
+
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
         var uiOpened = false
 

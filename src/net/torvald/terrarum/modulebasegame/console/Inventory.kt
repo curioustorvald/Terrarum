@@ -4,6 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
@@ -22,10 +23,10 @@ internal object Inventory : ConsoleCommand {
         else {
             when (args[1]) {
                 "list"   -> listInventory()
-                "add"    -> if (args.size > 3) addItem(args[2].toInt(), args[3].toInt())
-                            else addItem(args[2].toInt())
+                "add"    -> if (args.size > 3) addItem(args[2], args[3].toInt())
+                            else addItem(args[2])
                 "target" -> setTarget(args[2].toInt())
-                "equip"  -> equipItem(args[2].toInt())
+                "equip"  -> equipItem(args[2])
                 else     -> printUsage()
             }
         }
@@ -57,13 +58,13 @@ internal object Inventory : ConsoleCommand {
         }
     }
 
-    private fun addItem(refId: Int, amount: Int = 1) {
+    private fun addItem(refId: ItemID, amount: Int = 1) {
         if (target != null) {
             target!!.addItem(ItemCodex[refId]!!, amount)
         }
     }
 
-    private fun equipItem(refId: Int) {
+    private fun equipItem(refId: ItemID) {
         if (target != null) {
             val item = ItemCodex[refId]!!
             target!!.equipItem(item)

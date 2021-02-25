@@ -5,6 +5,7 @@ import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -20,7 +21,7 @@ object BlockBase {
      * @param dontEncaseActors when set to true, blocks won't be placed where Actors are. You will want to set it false
      * for wire items, otherwise you want it to be true.
      */
-    fun blockStartPrimaryUse(gameItem: GameItem, itemID: Int, delta: Float): Boolean {
+    fun blockStartPrimaryUse(gameItem: GameItem, itemID: ItemID, delta: Float): Boolean {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
@@ -45,24 +46,26 @@ object BlockBase {
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK &&
             gameItem.dynamicID == ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y) ||
             gameItem.inventoryCategory == GameItem.Category.WALL &&
-            gameItem.dynamicID - ItemCodex.ITEM_WALLS.start == ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
-            )
+            gameItem.dynamicID == ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
+        )
             return false
 
         // filter passed, do the job
         // FIXME this is only useful for Player
-        if (itemID in ItemCodex.ITEM_TILES) {
-            ingame.world.setTileTerrain(
-                    mouseTile.x,
-                    mouseTile.y,
-                    itemID
-            )
-        }
-        else {
+        if (itemID.startsWith("wall@")) {
             ingame.world.setTileWall(
                     mouseTile.x,
                     mouseTile.y,
-                    itemID
+                    itemID.substring(5),
+                    false
+            )
+        }
+        else {
+            ingame.world.setTileTerrain(
+                    mouseTile.x,
+                    mouseTile.y,
+                    itemID,
+                    false
             )
         }
 
@@ -74,7 +77,8 @@ object BlockBase {
     }
 
     fun wireStartPrimaryUse(gameItem: GameItem, wireTypeBit: Int, delta: Float): Boolean {
-        val ingame = Terrarum.ingame!! as TerrarumIngame
+        return false // TODO need new wire storing format
+        /*val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
         // return false if the tile is already there
@@ -93,7 +97,7 @@ object BlockBase {
                 )
         )
 
-        return true
+        return true*/
     }
 
     fun wireEffectWhenEquipped(typebit: Int, delta: Float) {
