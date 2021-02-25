@@ -46,6 +46,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
     }
 
+    private var worldPrimaryClickLatched = false
+
     fun update(delta: Float) {
 
         ///////////////////
@@ -61,12 +63,17 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
             // the very job.
 
-            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
+            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) && !worldPrimaryClickLatched) {
                 terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
+                worldPrimaryClickLatched = true
             }
             /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary")) {
                 ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
             }*/
+
+            if (!Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
+                worldPrimaryClickLatched = false
+            }
 
         }
 
