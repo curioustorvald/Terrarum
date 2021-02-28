@@ -28,22 +28,11 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
             ThreadExecutor.submit {
                 val localJoise = getGenerator(seed, params as TerragenParams)
-                //val localLock = java.lang.Object() // in an attempt to fix the "premature exit" issue of a thread run
-                //synchronized(localLock) {          // also see: https://stackoverflow.com/questions/28818494/threads-stopping-prematurely-for-certain-values
-                    for (x in xs) {
-                        for (y in 0 until world.height) {
-                            val sampleTheta = (x.toDouble() / world.width) * TWO_PI
-                            val sampleOffset = world.width / 8.0
-                            val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                            val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                            val sampleY = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
-                            // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
-                            val noise = localJoise.map { it.get(sampleX, sampleY, sampleZ) }
-
-                            draw(x, y, noise, world)
-                        }
-                    }
-                //}
+                for (x in xs) {
+                    val sampleTheta = (x.toDouble() / world.width) * TWO_PI
+                    val sampleOffset = world.width / 8.0
+                    draw(x, localJoise, sampleTheta, sampleOffset)
+                }
             }
         }
 
@@ -57,22 +46,31 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             Block.AIR, Block.DIRT, Block.STONE
     )
 
-    private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
-        fun Double.tiered(vararg tiers: Double): Int {
-            tiers.reversed().forEachIndexed { index, it ->
-                if (this >= it) return (tiers.lastIndex - index) // why??
-            }
-            return tiers.lastIndex
+    private fun Double.tiered(vararg tiers: Double): Int {
+        tiers.reversed().forEachIndexed { index, it ->
+            if (this >= it) return (tiers.lastIndex - index) // why??
         }
+        return tiers.lastIndex
+    }
 
-        val terr = noiseValue[0].tiered(.0, .5, .88)
-        val cave = if (noiseValue[1] < 0.5) 0 else 1
+    //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
+    private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
+        for (y in 0 until world.height) {
+            val sx = sin(st) * soff + soff // plus sampleOffset to make only
+            val sz = cos(st) * soff + soff // positive points are to be sampled
+            val sy = y - (world.height - YHEIGHT_MAGIC) * YHEIGHT_DIVISOR // Q&D offsetting to make ratio of sky:ground to be constant
+            // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
+            val noiseValue = noises.map { it.get(sx, sy, sz) }
 
-        val wallBlock = groundDepthBlock[terr]
-        val terrBlock = if (cave == 0) Block.AIR else wallBlock //wallBlock * cave // AIR is always zero, this is the standard
+            val terr = noiseValue[0].tiered(.0, .5, .88)
+            val cave = if (noiseValue[1] < 0.5) 0 else 1
 
-        world.setTileTerrain(x, y, terrBlock, true)
-        world.setTileWall(x, y, wallBlock, true)
+            val wallBlock = groundDepthBlock[terr]
+            val terrBlock = if (cave == 0) Block.AIR else wallBlock //wallBlock * cave // AIR is always zero, this is the standard
+
+            world.setTileTerrain(x, y, terrBlock, true)
+            world.setTileWall(x, y, wallBlock, true)
+        }
     }
 
 
