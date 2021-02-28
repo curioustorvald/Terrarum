@@ -12,9 +12,9 @@ object Ascii85 {
     private val INVERSE_TABLE = LongArray(127)
 
     /** Int of `-1` */
-    val PAD_BYTE = -1
+    const val PAD_BYTE = -1
     /** Null-character (`\0`) */
-    val PAD_CHAR = 0.toChar()
+    const val PAD_CHAR = 0.toChar()
 
     private val INTERNAL_PAD_BYTE = 0
     private val INTERNAL_PAD_CHAR = CHAR_TABLE.last()
@@ -51,13 +51,13 @@ object Ascii85 {
                 (b3.toLong().and(255) shl 8) or
                 b4.toLong().and(255)
         val c1 = (sum / 52200625L).toInt()
-        sum = sum - (c1 * 52200625L)
+        sum -= (c1 * 52200625L)
         val c2 = (sum / 614125L).toInt()
-        sum = sum - (c2 * 614125L)
+        sum -= (c2 * 614125L)
         val c3 = (sum / 7225L).toInt()
-        sum = sum - (c3 * 7225L)
+        sum -= (c3 * 7225L)
         val c4 = (sum / 85L).toInt()
-        sum = sum % 85L
+        sum %= 85L
 
         return ("${CHAR_TABLE[c1]}" +
                 "${CHAR_TABLE[c2]}" +

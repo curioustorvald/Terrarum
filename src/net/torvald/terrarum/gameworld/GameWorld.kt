@@ -384,7 +384,7 @@ open class GameWorld : Disposable {
                 // advance counter
                 iteratorCount += 1
 
-                return getTileFromTerrain(x, y)!!
+                return getTileFromTerrain(x, y)
             }
 
         }
@@ -404,7 +404,7 @@ open class GameWorld : Disposable {
                 // advance counter
                 iteratorCount += 1
 
-                return getTileFromWall(x, y)!!
+                return getTileFromWall(x, y)
             }
 
         }

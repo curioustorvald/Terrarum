@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.random.XXHash32
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
@@ -22,6 +23,8 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
+
+    private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
 
     override fun getDone() {
         ThreadExecutor.renew()
@@ -55,6 +58,8 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
     private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
+        var dirtStoneTransition = 0
+
         for (y in 0 until world.height) {
             val sx = sin(st) * soff + soff // plus sampleOffset to make only
             val sz = cos(st) * soff + soff // positive points are to be sampled
@@ -65,11 +70,41 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             val terr = noiseValue[0].tiered(.0, .5, .88)
             val cave = if (noiseValue[1] < 0.5) 0 else 1
 
+            // mark off the position where the transition occurred
+            if (dirtStoneTransition == 0 && terr == 2) {
+                dirtStoneTransition = y
+            }
+
             val wallBlock = groundDepthBlock[terr]
-            val terrBlock = if (cave == 0) Block.AIR else wallBlock //wallBlock * cave // AIR is always zero, this is the standard
+            val terrBlock = if (cave == 0) Block.AIR else wallBlock
 
             world.setTileTerrain(x, y, terrBlock, true)
             world.setTileWall(x, y, wallBlock, true)
+        }
+
+        // dither shits
+        /*
+        #
+        # - dirt-to-cobble transition, height = dirtStoneDitherSize
+        #
+        %
+        % - cobble-to-rock transition, height = dirtStoneDitherSize
+        %
+         */
+        for (pos in 0 until dirtStoneDitherSize * 2) {
+            val y = dirtStoneTransition - dirtStoneDitherSize + pos
+
+            val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+            val newTile = if (pos < dirtStoneDitherSize)
+                if (hash < pos.toDouble() / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.DIRT
+            else
+                if (hash >= (pos.toDouble() - dirtStoneDitherSize) / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.STONE
+
+            if (world.getTileFromTerrain(x, y) != Block.AIR) {
+                world.setTileTerrain(x, y, newTile, true)
+            }
+            // wall is dithered no mater what; do not put if-statement here
+            world.setTileWall(x, y, newTile, true)
         }
     }
 

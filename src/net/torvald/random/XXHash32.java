@@ -17,6 +17,11 @@ public class XXHash32 {
     static final int PRIME4 = 0x27D4EB2F;
     static final int PRIME5 = 0x165667B1;
 
+    public static int hashGeoCoord(int x, int y) {
+        int p = ((x & 65535) << 16) | (y & 65535);
+        return hash(new byte[]{(byte) p, (byte)(p >>> 8), (byte)(p >>> 16), (byte)(p >>> 24)}, 10000);
+    }
+
     public static int hash(byte[] data, int seed) {
         int end = data.length;
         int offset = 0;

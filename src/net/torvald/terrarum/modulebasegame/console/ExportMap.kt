@@ -33,8 +33,7 @@ internal object ExportMap : ConsoleCommand {
             var mapDataPointer = 0
 
             for (tile in world.terrainIterator()) {
-                val tileNumber = CreateTileAtlas.tileIDtoItemSheetNumber(tile)
-                val colArray = CreateTileAtlas.terrainTileColourMap.get(tileNumber)!!.toByteArray()
+                val colArray = CreateTileAtlas.terrainTileColourMap.get(tile)!!.toByteArray()
 
                 for (i in 0..2) {
                     mapData[mapDataPointer + i] = colArray[i]
