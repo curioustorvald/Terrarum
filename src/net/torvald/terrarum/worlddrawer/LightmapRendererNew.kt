@@ -364,6 +364,7 @@ object LightmapRenderer {
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
 
             r1();r2();r3();r4()
+            r1();r2();r3();r4() // two looks better than one
         }
 
     }

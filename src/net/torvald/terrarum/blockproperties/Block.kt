@@ -11,6 +11,8 @@ object Block {
     const val STONE_QUARRIED = "basegame:17"
     const val STONE_TILE_WHITE = "basegame:18"
     const val STONE_BRICKS = "basegame:19"
+    const val STONE_SLATE = "basegame:20"
+    const val STONE_MARBLE = "basegame:21"
 
     const val DIRT = "basegame:32"
     const val GRASS = "basegame:33"

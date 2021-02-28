@@ -25,6 +25,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
     private val dirtStoneDitherSize = 3 // actual dither size will be double of this value
+    private val stoneSlateDitherSize = 4
 
     override fun getDone() {
         ThreadExecutor.renew()
@@ -46,7 +47,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
 
     private val groundDepthBlock = listOf(
-            Block.AIR, Block.DIRT, Block.STONE
+            Block.AIR, Block.DIRT, Block.STONE, Block.STONE_SLATE
     )
 
     private fun Double.tiered(vararg tiers: Double): Int {
@@ -59,6 +60,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     //private fun draw(x: Int, y: Int, width: Int, height: Int, noiseValue: List<Double>, world: GameWorld) {
     private fun draw(x: Int, noises: List<Joise>, st: Double, soff: Double) {
         var dirtStoneTransition = 0
+        var stoneSlateTransition = 0
 
         for (y in 0 until world.height) {
             val sx = sin(st) * soff + soff // plus sampleOffset to make only
@@ -67,13 +69,14 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             // DEBUG NOTE: it is the OFFSET FROM THE IDEAL VALUE (observed land height - (HEIGHT * DIVISOR)) that must be constant
             val noiseValue = noises.map { it.get(sx, sy, sz) }
 
-            val terr = noiseValue[0].tiered(.0, .5, .88)
+            val terr = noiseValue[0].tiered(.0, .5, .88, 1.88)
             val cave = if (noiseValue[1] < 0.5) 0 else 1
 
             // mark off the position where the transition occurred
-            if (dirtStoneTransition == 0 && terr == 2) {
+            if (dirtStoneTransition == 0 && terr == 2)
                 dirtStoneTransition = y
-            }
+            if (stoneSlateTransition == 0 && terr == 3)
+                stoneSlateTransition = y
 
             val wallBlock = groundDepthBlock[terr]
             val terrBlock = if (cave == 0) Block.AIR else wallBlock
@@ -90,20 +93,41 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         %
         % - cobble-to-rock transition, height = dirtStoneDitherSize
         %
+        * - where the stone layer actually begins
          */
         for (pos in 0 until dirtStoneDitherSize * 2) {
-            val y = dirtStoneTransition - dirtStoneDitherSize + pos
-
+            val y = pos + dirtStoneTransition - (dirtStoneDitherSize * 2) + 1
+            if (y >= world.height) break
             val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+            val fore = world.getTileFromTerrain(x, y)
+            val back = world.getTileFromWall(x, y)
             val newTile = if (pos < dirtStoneDitherSize)
                 if (hash < pos.toDouble() / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.DIRT
-            else
+            else // don't +1 to pos.toDouble(); I've suffered
                 if (hash >= (pos.toDouble() - dirtStoneDitherSize) / dirtStoneDitherSize) Block.STONE_QUARRIED else Block.STONE
 
-            if (world.getTileFromTerrain(x, y) != Block.AIR) {
+            if (fore != Block.AIR)
                 world.setTileTerrain(x, y, newTile, true)
-            }
-            // wall is dithered no mater what; do not put if-statement here
+
+            world.setTileWall(x, y, newTile, true)
+        }
+
+        /*
+        #
+        # - stone-to-slate transition, height = stoneSlateDitherSize
+        #
+         */
+        for (pos in 0 until stoneSlateDitherSize) {
+            val y = pos + stoneSlateTransition - stoneSlateDitherSize + 1
+            if (y >= world.height) break
+            val hash = XXHash32.hashGeoCoord(x, y).and(0x7FFFFFFF) / 2147483647.0
+            val fore = world.getTileFromTerrain(x, y)
+            val back = world.getTileFromWall(x, y)
+            val newTile = if (hash < pos.toDouble() / stoneSlateDitherSize) Block.STONE_SLATE else Block.STONE
+
+            if (fore != Block.AIR)
+                world.setTileTerrain(x, y, newTile, true)
+
             world.setTileWall(x, y, newTile, true)
         }
     }

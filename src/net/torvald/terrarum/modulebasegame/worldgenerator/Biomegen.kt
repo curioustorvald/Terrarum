@@ -55,14 +55,14 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     companion object {
         private const val slices = 5
         private val nearbyArr = arrayOf(
-        (-1 to -1), // tileTL
-        (+1 to -1), // tileTR
-        (-1 to +1), // tileBL
-        (+1 to +1), // tileBR
-        (0 to -1), // tileT
-        (0 to +1), // tileB
-        (-1 to 0), // tileL
-        (+1 to 0) // tileR
+            (-1 to -1), // tileTL
+            (+1 to -1), // tileTR
+            (-1 to +1), // tileBL
+            (+1 to +1), // tileBR
+            (0 to -1), // tileT
+            (0 to +1), // tileB
+            (-1 to 0), // tileL
+            (+1 to 0) // tileR
         )
         private const val TL = 0
         private const val TR = 1
@@ -108,7 +108,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                     }
                 }*/
                 4 -> { // rockylands
-                    if (tileThis == Block.DIRT) {
+                    if (tileThis == Block.DIRT || tileThis == Block.STONE_QUARRIED) {
                         world.setTileTerrain(x, y, Block.STONE, true)
                         world.setTileWall(x, y, Block.STONE, true)
                     }
