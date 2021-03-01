@@ -73,15 +73,16 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
         AppLoader.batch.inUse {
             it.color = Color.WHITE
+            val previewY = (AppLoader.screenH - previewHeight.times(1.5f)).div(2f).round()
             it.draw(previewTexture,
                     (AppLoader.screenW - previewWidth).div(2f).round(),
-                    (AppLoader.screenH - previewHeight.times(1.5f)).div(2f).round()
+                    previewY
             )
             val text = messages.getHeadElem() ?: ""
             AppLoader.fontGame.draw(it,
                     text,
                     (AppLoader.screenW - AppLoader.fontGame.getWidth(text)).div(2f).round(),
-                    (AppLoader.screenH + previewHeight.times(1.5f)).div(2f).round() - AppLoader.fontGame.lineHeight
+                    previewY + previewHeight + 98 - AppLoader.fontGame.lineHeight
             )
         }
 
