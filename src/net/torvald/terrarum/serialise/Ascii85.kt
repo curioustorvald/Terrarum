@@ -1,3 +1,5 @@
+package net.torvald.terrarum.serialise
+
 /**
  * Standard Ascii85 implementation, except that the character sets used are as defined in
  * RFC 1924 for JSON-compatibility, and will NOT truncate '00000' into something else;
