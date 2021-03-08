@@ -1,0 +1,66 @@
+digraph techtree {
+	subgraph cluster_legend {
+		label=Legend
+		Item
+		Technolgy [shape=component,style=filled]
+		Material [shape=box3d]
+		"Energy Source" [style=filled]
+	}
+
+	rankdir=LR
+	{rank=source; Metallurgy}
+	{rank=source; Electricity}
+	{rank=source; Information}
+
+	Copper [shape=box3d]
+	Iron [shape=box3d]
+	
+	Heat [style=filled]
+	Kinetic [style=filled]
+	
+	Copper -> Iron
+	Copper -> Generator
+	Iron -> Generator
+	Iron -> Metallurgy
+	Furnace -> Heat
+	Heat -> Kinetic [label=Engine]
+		
+	"Metallurgy" [shape=component,style=filled]
+	Metallurgy -> Steel
+	Heat -> Metallurgy
+	Steel [shape=box3d]
+	Titanium [shape=box3d]
+	Uranium [shape=box3d]
+	Steel -> Titanium
+	Steel -> Uranium
+	Uranium -> Heat
+	
+	Kinetic -> Generator
+	Generator -> Electricity
+	
+	"Electricity" [shape=component,style=filled]
+	Electricity -> Computer
+	Electricity -> Machinery
+	Machinery -> Thermocouple
+	Heat -> Thermocouple -> Electricity
+	Electricity -> Drill
+	Steel -> Drill
+	
+	"Information" [shape=component,style=filled]
+	Information -> Entanglement
+
+	"Logic"	[shape=component,style=filled]
+	Information -> Logic
+	Electricity -> Logic
+	Logic -> Computer
+		
+	"Entanglement" [shape=component,style=filled]
+	Entanglement -> "Physical Warp"
+	Computer -> "Disk Oracle"
+	Entanglement -> "Disk Oracle"
+	
+	
+	"Physical Warp" [shape=component,style=filled]
+	"Physical Warp" -> "Multiworld Portal"
+	Titanium -> "Physical Warp"
+}
