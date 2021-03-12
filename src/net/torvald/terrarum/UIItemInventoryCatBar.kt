@@ -5,26 +5,48 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIUtils
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-10-20.
  */
 class UIItemInventoryCatBar(
-        parentUI: UIInventoryFull,
+        parentUI: UICanvas,
         initialX: Int,
         initialY: Int,
-        override val width: Int
+        uiInternalWidth: Int,
+        override val width: Int,
+        val transitionReqFun: (Int) -> Unit,
+        val showSideButtons: Boolean
 ) : UIItem(parentUI, initialX, initialY) {
 
-    private val parentInventory = parentUI
+    companion object {
+        const val CAT_ALL = "__all__"
+    }
 
-    private val catIcons = parentUI.catIcons
-    private val catArrangement = parentUI.catArrangement
+    //private val parentInventory = parentUI
+
+    internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
+    internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
+    internal val catIconsMeaning = listOf( // sortedBy: catArrangement
+            arrayOf(GameItem.Category.WEAPON),
+            arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
+            arrayOf(GameItem.Category.ARMOUR),
+            arrayOf(GameItem.Category.GENERIC),
+            arrayOf(GameItem.Category.POTION),
+            arrayOf(GameItem.Category.MAGIC),
+            arrayOf(GameItem.Category.BLOCK),
+            arrayOf(GameItem.Category.WALL),
+            arrayOf(GameItem.Category.MISC),
+            arrayOf(CAT_ALL)
+    )
 
 
     private val inventoryUI = parentUI
@@ -66,8 +88,8 @@ class UIItemInventoryCatBar(
         // side buttons
         // NOTE: < > arrows must "highlightable = false"; "true" otherwise
         //  determine gaps: hacky way exploiting that we already know the catbar is always at the c of the ui
-        val relativeStartX = posX - (parentUI.internalWidth - width) / 2
-        val sideButtonsGap = (((parentUI.internalWidth - width) / 2) - 2f * catIcons.tileW) / 3f
+        val relativeStartX = posX - (uiInternalWidth - width) / 2
+        val sideButtonsGap = (((uiInternalWidth - width) / 2) - 2f * catIcons.tileW) / 3f
         val iconIndex = arrayOf(12, 16, 17, 13)
 
 
@@ -196,33 +218,35 @@ class UIItemInventoryCatBar(
             }
         }
 
-        sideButtons[0].update(delta)
-        sideButtons[3].update(delta)
+        if (showSideButtons) {
+            sideButtons[0].update(delta)
+            sideButtons[3].update(delta)
+
+            // more transition stuffs
+            if (sideButtons[0].mousePushed) {
+                if (selectedPanel != 0) transitionFired = true
+                mainButtons.forEach { it.highlighted = false }
+                selectedPanel = 0
+
+                sideButtons[0].highlighted = true
+                sideButtons[3].highlighted = false
+            }
+            else if (sideButtons[3].mousePushed) {
+                if (selectedPanel != 2) transitionFired = true
+                mainButtons.forEach { it.highlighted = false }
+                selectedPanel = 2
+                transitionFired = true
+
+                sideButtons[0].highlighted = false
+                sideButtons[3].highlighted = true
+            }
 
 
-        // more transition stuffs
-        if (sideButtons[0].mousePushed) {
-            if (selectedPanel != 0) transitionFired = true
-            mainButtons.forEach { it.highlighted = false }
-            selectedPanel = 0
-
-            sideButtons[0].highlighted = true
-            sideButtons[3].highlighted = false
-        }
-        else if (sideButtons[3].mousePushed) {
-            if (selectedPanel != 2) transitionFired = true
-            mainButtons.forEach { it.highlighted = false }
-            selectedPanel = 2
-            transitionFired = true
-
-            sideButtons[0].highlighted = false
-            sideButtons[3].highlighted = true
-        }
-
-
-        if (transitionFired) {
-            transitionFired = false
-            parentInventory.requestTransition(selectedPanel)
+            if (transitionFired) {
+                transitionFired = false
+                //parentInventory.requestTransition(selectedPanel)
+                transitionReqFun(selectedPanel)
+            }
         }
     }
 
@@ -232,7 +256,7 @@ class UIItemInventoryCatBar(
         // button
         // colour determined by UI items themselves
         mainButtons.forEach { it.render(batch, camera) }
-        sideButtons.forEach { it.render(batch, camera) }
+        if (showSideButtons) sideButtons.forEach { it.render(batch, camera) }
 
 
         blendNormal(batch)

@@ -16,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /***
@@ -24,7 +25,7 @@ import net.torvald.terrarum.ui.UIItemTextButton
  * Created by minjaesong on 2017-03-16.
  */
 class UIItemInventoryElem(
-        parentUI: UIInventoryFull,
+        parentUI: UICanvas,
         initialX: Int,
         initialY: Int,
         override val width: Int,
@@ -39,7 +40,8 @@ class UIItemInventoryElem(
         val backBlendMode: String = BlendMode.NORMAL,
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
-        val drawBackOnNull: Boolean = true
+        val drawBackOnNull: Boolean = true,
+        val listRebuildFun: () -> Unit
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot) {
 
     companion object {
@@ -48,8 +50,6 @@ class UIItemInventoryElem(
 
         internal val durabilityBarThickness = 3f
     }
-
-    private val inventoryUI = parentUI
 
     override val height = UIItemInventoryElem.height
 
@@ -219,7 +219,7 @@ class UIItemInventoryElem(
             }
         }
 
-        inventoryUI.rebuildList()
+        listRebuildFun()
 
         return super.touchDown(screenX, screenY, pointer, button)
     }

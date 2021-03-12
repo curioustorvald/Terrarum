@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -8,13 +7,10 @@ import net.torvald.ENDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockstats.MinimapComposer
-import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.CAT_ALL
 import net.torvald.terrarum.ui.*
-import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -36,17 +32,17 @@ class UIInventoryFull(
     val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
 
     val CELLS_HOR = 10
-    val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryDynamicList.listGap) / // 134 is another magic number
-                            (UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap)
+    val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
+                                (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
 
-    private val itemListToEquipViewGap = UIItemInventoryDynamicList.listGap // used to be 24; figured out that the extra gap does nothig
+    private val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
 
-    val internalWidth: Int = UIItemInventoryDynamicList.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
-    val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryDynamicList.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
+    val internalWidth: Int = UIItemInventoryItemGrid.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
+    val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryItemGrid.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
 
-    val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryDynamicList.Companion.listGap
+    val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
-    val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryDynamicList.listGap
+    val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
     val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
     val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
 
@@ -57,22 +53,6 @@ class UIInventoryFull(
         }
         CommonResourcePool.loadAll()
     }
-
-    internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
-    internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
-    internal val catIconsMeaning = listOf( // sortedBy: catArrangement
-            arrayOf(GameItem.Category.WEAPON),
-            arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
-            arrayOf(GameItem.Category.ARMOUR),
-            arrayOf(GameItem.Category.GENERIC),
-            arrayOf(GameItem.Category.POTION),
-            arrayOf(GameItem.Category.MAGIC),
-            arrayOf(GameItem.Category.BLOCK),
-            arrayOf(GameItem.Category.WALL),
-            arrayOf(GameItem.Category.MISC),
-            arrayOf(CAT_ALL)
-    )
-
 
     private val SP = "${0x3000.toChar()} "
     val listControlHelp: String
@@ -105,11 +85,14 @@ class UIInventoryFull(
     val controlHelpHeight = AppLoader.fontGame.lineHeight
 
     val catBarWidth = 330
-    val categoryBar = UIItemInventoryCatBar(
+    val catBar = UIItemInventoryCatBar(
             this,
             (AppLoader.screenW - catBarWidth) / 2,
             42 + (AppLoader.screenH - internalHeight) / 2,
-            catBarWidth
+            internalWidth,
+            catBarWidth,
+            { i -> requestTransition(i) },
+            true
     )
 
 
@@ -128,10 +111,10 @@ class UIInventoryFull(
 
 
     init {
-        addUIitem(categoryBar)
+        addUIitem(catBar)
         addUIitem(transitionPanel)
 
-        categoryBar.selectionChangeListener = { old, new  ->
+        catBar.selectionChangeListener = { old, new  ->
             rebuildList()
             transitionalItemCells.resetStatusAsCatChanges(old, new)
         }
@@ -154,7 +137,7 @@ class UIInventoryFull(
             rebuildList()
         }
 
-        categoryBar.update(delta)
+        catBar.update(delta)
         transitionPanel.update(delta)
     }
 
@@ -193,7 +176,7 @@ class UIInventoryFull(
         batch.begin()
 
         // UI items
-        categoryBar.render(batch, camera)
+        catBar.render(batch, camera)
         transitionPanel.render(batch, camera)
     }
 
@@ -216,7 +199,7 @@ class UIInventoryFull(
     }
 
     override fun dispose() {
-        categoryBar.dispose()
+        catBar.dispose()
         transitionPanel.dispose()
 
     }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.GdxColorMap
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import kotlin.math.roundToInt
 
@@ -17,7 +18,7 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2017-10-22.
  */
 abstract class UIItemInventoryCellBase(
-        parentUI: UIInventoryFull,
+        parentUI: UICanvas,
         initialX: Int,
         initialY: Int,
         open var item: GameItem?,

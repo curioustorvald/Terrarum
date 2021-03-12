@@ -9,7 +9,6 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.ui.UICanvas
-import kotlin.math.roundToInt
 
 internal class UIInventoryCells(
         val full: UIInventoryFull
@@ -20,7 +19,7 @@ internal class UIInventoryCells(
     override var openCloseTime: Second = 0.0f
 
 
-    private val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryDynamicList.listGap
+    private val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryItemGrid.listGap
 
     internal var encumbrancePerc = 0f
         private set
@@ -28,13 +27,15 @@ internal class UIInventoryCells(
         private set
 
 
-    internal val itemList: UIItemInventoryDynamicList =
-            UIItemInventoryDynamicList(
+    internal val itemList: UIItemInventoryItemGrid =
+            UIItemInventoryItemGrid(
                     full,
+                    full.catBar,
                     full.actor.inventory,
                     full.INVENTORY_CELLS_OFFSET_X,
                     full.INVENTORY_CELLS_OFFSET_Y,
-                    full.CELLS_HOR, full.CELLS_VRT
+                    full.CELLS_HOR, full.CELLS_VRT,
+                    listRebuildFun = { rebuildList() }
             )
 
 
@@ -55,7 +56,7 @@ internal class UIInventoryCells(
     fun rebuildList() {
         AppLoader.printdbg(this, "rebuilding list")
 
-        itemList.rebuild(full.catIconsMeaning[full.categoryBar.selectedIcon])
+        itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.selectedIcon])
         equipped.rebuild()
 
         encumbrancePerc = full.actor.inventory.capacity.toFloat() / full.actor.inventory.maxCapacity
@@ -64,7 +65,7 @@ internal class UIInventoryCells(
 
     fun resetStatusAsCatChanges(oldcat: Int?, newcat: Int) {
         itemList.itemPage = 0 // set scroll to zero
-        itemList.rebuild(full.catIconsMeaning[full.catArrangement[newcat]]) // have to manually rebuild, too!
+        itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.catArrangement[newcat]]) // have to manually rebuild, too!
     }
 
     override fun updateUI(delta: Float) {

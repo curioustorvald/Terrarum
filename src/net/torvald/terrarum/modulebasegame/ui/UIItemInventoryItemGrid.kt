@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -12,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
@@ -29,15 +31,17 @@ import java.util.*
  *
  * Created by minjaesong on 2017-10-21.
  */
-class UIItemInventoryDynamicList(
-        parentUI: UIInventoryFull,
+class UIItemInventoryItemGrid(
+        parentUI: UICanvas,
+        val catBar: UIItemInventoryCatBar,
         val inventory: ActorInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
         initialX: Int,
         initialY: Int,
         val horizontalCells: Int,
         val verticalCells: Int,
         val drawScrollOnRightside: Boolean = false,
-        val drawWallet: Boolean = true
+        val drawWallet: Boolean = true,
+        val listRebuildFun: () -> Unit
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -49,8 +53,6 @@ class UIItemInventoryDynamicList(
 
     val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
     val backColour = CELLCOLOUR_BLACK
-
-    private val catArrangement = parentUI.catArrangement
 
     init {
         CommonResourcePool.addToLoadingList("inventory_walletnumberfont") {
@@ -75,9 +77,6 @@ class UIItemInventoryDynamicList(
     private var currentFilter = arrayOf(CAT_ALL)
 
     private val inventoryUI = parentUI
-
-    //private val selectedIcon: Int
-    //    get() = inventoryUI.catSelectedIcon
 
     var itemPage = 0
         set(value) {
@@ -109,8 +108,6 @@ class UIItemInventoryDynamicList(
 
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
-
-        const val CAT_ALL = "__all__"
     }
 
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -126,7 +123,8 @@ class UIItemInventoryDynamicList(
                 backCol = backColour,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
-                inactiveTextCol = defaultTextColour
+                inactiveTextCol = defaultTextColour,
+                listRebuildFun = listRebuildFun
         )
     }
     // TODO automatically determine how much columns are needed. Minimum Width = 5 grids
@@ -144,7 +142,8 @@ class UIItemInventoryDynamicList(
                 backCol = backColour,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
-                inactiveTextCol = defaultTextColour
+                inactiveTextCol = defaultTextColour,
+                listRebuildFun = listRebuildFun
         )
     }
 
@@ -160,16 +159,16 @@ class UIItemInventoryDynamicList(
     private val iconPosX = if (drawScrollOnRightside)
         posX + width + LIST_TO_CONTROL_GAP
     else
-        posX - LIST_TO_CONTROL_GAP - parentUI.catIcons.tileW + 2
+        posX - LIST_TO_CONTROL_GAP - catBar.catIcons.tileW + 2
 
     private fun getIconPosY(index: Int) =
-            posY - 2 + (4 + UIItemInventoryElem.height - (parentUI as UIInventoryFull).catIcons.tileH) * index
+            posY - 2 + (4 + UIItemInventoryElem.height - catBar.catIcons.tileH) * index
 
     /** Long/compact mode buttons */
     private val gridModeButtons = Array<UIItemImageButton>(2) { index ->
         UIItemImageButton(
                 parentUI,
-                parentUI.catIcons.get(index + 14, 0),
+                catBar.catIcons.get(index + 14, 0),
                 backgroundCol = Color(0),
                 activeBackCol = Color(0),
                 highlightBackCol = Color(0),
@@ -183,7 +182,7 @@ class UIItemInventoryDynamicList(
 
     private val scrollUpButton = UIItemImageButton(
             parentUI,
-            parentUI.catIcons.get(18, 0),
+            catBar.catIcons.get(18, 0),
             backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
@@ -195,7 +194,7 @@ class UIItemInventoryDynamicList(
 
     private val scrollDownButton = UIItemImageButton(
             parentUI,
-            parentUI.catIcons.get(19, 0),
+            catBar.catIcons.get(19, 0),
             backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
@@ -272,7 +271,7 @@ class UIItemInventoryDynamicList(
 
             batch.color = colour
             batch.draw(
-                    (parentUI as UIInventoryFull).catIcons.get(if (i == itemPage) 20 else 21, 0),
+                    catBar.catIcons.get(if (i == itemPage) 20 else 21, 0),
                     scrollUpButton.posX.toFloat(),
                     getScrollDotYHeight(i).toFloat()
             )

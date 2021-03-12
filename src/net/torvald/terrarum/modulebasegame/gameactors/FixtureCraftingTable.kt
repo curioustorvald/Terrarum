@@ -42,6 +42,15 @@ internal object UICraftingTable : UICanvas() {
         handler.allowESCtoClose = true
     }
 
+    /*private val itemList = UIItemInventoryDynamicList =
+            UIItemInventoryDynamicList(
+                    full,
+                    full.actor.inventory,
+                    full.INVENTORY_CELLS_OFFSET_X,
+                    full.INVENTORY_CELLS_OFFSET_Y,
+                    full.CELLS_HOR, full.CELLS_VRT
+            )*/
+
     override fun updateUI(delta: Float) {
 
     }

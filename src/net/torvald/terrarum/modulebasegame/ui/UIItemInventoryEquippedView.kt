@@ -13,7 +13,6 @@ import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BL
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
 import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-10-28.
@@ -31,7 +30,7 @@ class UIItemInventoryEquippedView(
     override val height = parentUI.itemListHeight
 
     companion object {
-        val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap
+        val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap
         //val HEIGHT = UIItemInventoryDynamicList.HEIGHT
         val SPRITE_DRAW_COL = Color(0xddddddff.toInt())
     }
@@ -62,7 +61,8 @@ class UIItemInventoryEquippedView(
                 mouseoverBackBlendMode = BlendMode.SCREEN,
                 backCol = CELLCOLOUR_BLACK,
                 backBlendMode = BlendMode.NORMAL,
-                drawBackOnNull = true
+                drawBackOnNull = true,
+                listRebuildFun = { parentUI.rebuildList() } // to "unselect" the equipped item and main item grid would "untick" accordingly
         )
     }
 
