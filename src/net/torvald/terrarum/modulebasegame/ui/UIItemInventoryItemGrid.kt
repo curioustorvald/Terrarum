@@ -19,6 +19,7 @@ import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
+import kotlin.math.floor
 
 /**
  * Display either extended or compact list
@@ -51,7 +52,6 @@ class UIItemInventoryItemGrid(
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
     override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-    val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
     val backColour = CELLCOLOUR_BLACK
 
     init {
@@ -128,11 +128,13 @@ class UIItemInventoryItemGrid(
         )
     }
     // TODO automatically determine how much columns are needed. Minimum Width = 5 grids
-    private val itemList = Array<UIItemInventoryCellBase>(verticalCells * 2) {
+    private val itemListColumnCount = floor(horizontalCells / 4f).toInt().coerceAtLeast(1)
+    private val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / itemListColumnCount
+    private val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
         UIItemInventoryElem(
                 parentUI = inventoryUI,
-                initialX = this.posX + (largeListWidth + listGap) * (it % 2),
-                initialY = this.posY + (UIItemInventoryElem.height + listGap) * (it / 2),
+                initialX = this.posX + (largeListWidth + listGap) * (it % itemListColumnCount),
+                initialY = this.posY + (UIItemInventoryElem.height + listGap) * (it / itemListColumnCount),
                 width = largeListWidth,
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
