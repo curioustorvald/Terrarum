@@ -8,6 +8,8 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.UICanvas
 
 internal class UIInventoryCells(
@@ -35,7 +37,8 @@ internal class UIInventoryCells(
                     full.INVENTORY_CELLS_OFFSET_X,
                     full.INVENTORY_CELLS_OFFSET_Y,
                     full.CELLS_HOR, full.CELLS_VRT,
-                    listRebuildFun = { rebuildList() }
+                    keyDownFun = createInvCellGenericKeyDownFun(),
+                    touchDownFun = createInvCellGenericTouchDownFun { rebuildList() }
             )
 
 

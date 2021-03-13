@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
@@ -46,11 +47,11 @@ internal object UIStorageChest : UICanvas(), HasInventory {
 
     private val negotiator = object : InventoryNegotiator() {
         override fun accept(item: GameItem, amount: Int) {
-            TODO("Not yet implemented")
+            printdbg(this, "Accept")
         }
 
         override fun reject(item: GameItem, amount: Int) {
-            TODO("Not yet implemented")
+            printdbg(this, "Reject")
         }
     }
 
@@ -87,8 +88,9 @@ internal object UIStorageChest : UICanvas(), HasInventory {
                 4, 5,
                 drawScrollOnRightside = true,
                 drawWallet = true,
-                listRebuildFun = { itemListUpdate() }
-    )
+                keyDownFun = { _,_ -> Unit },
+                touchDownFun = { _,_,_,_,_ -> itemListUpdate() }
+        )
 
         handler.allowESCtoClose = true
 

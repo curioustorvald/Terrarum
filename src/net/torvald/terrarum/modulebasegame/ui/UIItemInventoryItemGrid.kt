@@ -3,8 +3,11 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.Input
 import net.torvald.terrarum.*
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -42,7 +45,8 @@ class UIItemInventoryItemGrid(
         val verticalCells: Int,
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true,
-        val listRebuildFun: () -> Unit
+        keyDownFun: (GameItem?, Int) -> Unit,
+        touchDownFun: (GameItem?, Int, Int, Int, Int) -> Unit
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -98,16 +102,74 @@ class UIItemInventoryItemGrid(
 
     companion object {
         const val listGap = 8
-        //const val horizontalCells = 11
-        //const val verticalCells = 8
         const val LIST_TO_CONTROL_GAP = 12
-
-        //val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
-        //val WIDTH = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
-        //val HEIGHT = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
+
+        fun createInvCellGenericKeyDownFun(): (GameItem?, Int) -> Unit {
+            return { item: GameItem?, keycode: Int ->
+                if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
+                    val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
+                    if (player != null) {
+                        val inventory = player.inventory
+                        val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
+                        val currentSlotItem = inventory.getQuickslot(slot)
+
+
+                        inventory.setQuickBar(
+                                slot,
+                                if (currentSlotItem?.item != item.dynamicID)
+                                    item.dynamicID // register
+                                else
+                                    null // drop registration
+                        )
+
+                        // search for duplicates in the quickbar, except mine
+                        // if there is, unregister the other
+                        (0..9).minus(slot).forEach {
+                            if (inventory.getQuickslot(it)?.item == item.dynamicID) {
+                                inventory.setQuickBar(it, null)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Int, Int, Int, Int) -> Unit {
+            return { item: GameItem?, screenX: Int, screenY: Int, pointer: Int, button: Int ->
+                if (item != null && Terrarum.ingame != null) {
+                    // equip da shit
+                    val itemEquipSlot = item.equipPosition
+                    if (itemEquipSlot == GameItem.EquipPosition.NULL) {
+                        TODO("Equip position is NULL, does this mean it's single-consume items like a potion? (from item: \"$item\" with itemID: ${item?.originalID}/${item?.dynamicID})")
+                    }
+                    val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
+                    if (player != null) {
+
+                        if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
+                            player.equipItem(item)
+
+                            // also equip on the quickslot
+                            player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                                player.inventory.setQuickBar(it, item.dynamicID)
+                            }
+                        }
+                        else { // if not, unequip it
+                            player.unequipItem(item)
+
+                            // also unequip on the quickslot
+                            player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                                player.inventory.setQuickBar(it, null)
+                            }
+                        }
+                    }
+                }
+
+                listRebuildFun()
+            }
+        }
     }
 
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -124,11 +186,12 @@ class UIItemInventoryItemGrid(
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour,
-                listRebuildFun = listRebuildFun
+                keyDownFun = keyDownFun,
+                touchDownFun = touchDownFun
         )
     }
-    // TODO automatically determine how much columns are needed. Minimum Width = 5 grids
-    private val itemListColumnCount = floor(horizontalCells / 4f).toInt().coerceAtLeast(1)
+    // automatically determine how much columns are needed. Minimum Width = 5 grids
+    private val itemListColumnCount = floor(horizontalCells / 5f).toInt().coerceAtLeast(1)
     private val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / itemListColumnCount
     private val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
         UIItemInventoryElem(
@@ -145,7 +208,8 @@ class UIItemInventoryItemGrid(
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour,
-                listRebuildFun = listRebuildFun
+                keyDownFun = keyDownFun,
+                touchDownFun = touchDownFun
         )
     }
 
@@ -221,8 +285,6 @@ class UIItemInventoryItemGrid(
             gridModeButtons[1].highlighted = false
             itemPage = 0
             rebuild(currentFilter)
-
-            println("ItemGridMode 0 touchdown")
         }
         gridModeButtons[1].touchDownListener = { _, _, _, _ ->
             isCompactMode = true
@@ -230,8 +292,6 @@ class UIItemInventoryItemGrid(
             gridModeButtons[1].highlighted = true
             itemPage = 0
             rebuild(currentFilter)
-
-            println("ItemGridMode 1 touchdown")
         }
 
         scrollUpButton.clickOnceListener = { _, _, _ ->

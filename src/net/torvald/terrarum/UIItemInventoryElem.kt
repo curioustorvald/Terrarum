@@ -41,8 +41,9 @@ class UIItemInventoryElem(
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
-        val listRebuildFun: () -> Unit
-) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot) {
+        keyDownFun: (GameItem?, Int) -> Unit,
+        touchDownFun: (GameItem?, Int, Int, Int, Int) -> Unit
+) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun) {
 
     companion object {
         val height = 48
@@ -157,94 +158,6 @@ class UIItemInventoryElem(
 
     }
 
-    override fun keyDown(keycode: Int): Boolean {
-        if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
-            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
-
-            if (player == null) return false
-
-            val inventory = player.inventory
-            val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
-            val currentSlotItem = inventory.getQuickslot(slot)
-
-
-            inventory.setQuickBar(
-                    slot,
-                    if (currentSlotItem?.item != item?.dynamicID)
-                        item?.dynamicID // register
-                    else
-                        null // drop registration
-            )
-
-            // search for duplicates in the quickbar, except mine
-            // if there is, unregister the other
-            (0..9).minus(slot).forEach {
-                if (inventory.getQuickslot(it)?.item == item?.dynamicID) {
-                    inventory.setQuickBar(it, null)
-                }
-            }
-        }
-
-        return super.keyDown(keycode)
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (item != null && Terrarum.ingame != null) {
-
-            // equip da shit
-            val itemEquipSlot = item!!.equipPosition
-            if (itemEquipSlot == GameItem.EquipPosition.NULL) {
-                TODO("Equip position is NULL, does this mean it's single-consume items like a potion? (from item: \"$item\" with itemID: ${item?.originalID}/${item?.dynamicID})")
-            }
-
-            val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
-
-            if (player == null) return false
-
-            if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
-                player.equipItem(item!!)
-
-                // also equip on the quickslot
-                player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                    player.inventory.setQuickBar(it, item!!.dynamicID)
-                }
-            }
-            else { // if not, unequip it
-                player.unequipItem(item!!)
-
-                // also unequip on the quickslot
-                player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                    player.inventory.setQuickBar(it, null)
-                }
-            }
-        }
-
-        listRebuildFun()
-
-        return super.touchDown(screenX, screenY, pointer, button)
-    }
-
-
     override fun dispose() {
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        return super.keyUp(keycode)
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return super.mouseMoved(screenX, screenY)
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return super.touchDragged(screenX, screenY, pointer)
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
-    }
-
-    override fun scrolled(amount: Int): Boolean {
-        return super.scrolled(amount)
     }
 }

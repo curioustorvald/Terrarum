@@ -10,6 +10,8 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
 import net.torvald.terrarum.ui.UIItem
@@ -62,7 +64,8 @@ class UIItemInventoryEquippedView(
                 backCol = CELLCOLOUR_BLACK,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
-                listRebuildFun = { parentUI.rebuildList() } // to "unselect" the equipped item and main item grid would "untick" accordingly
+                keyDownFun = createInvCellGenericKeyDownFun(),
+                touchDownFun = createInvCellGenericTouchDownFun { parentUI.rebuildList() } // to "unselect" the equipped item and main item grid would "untick" accordingly
         )
     }
 
