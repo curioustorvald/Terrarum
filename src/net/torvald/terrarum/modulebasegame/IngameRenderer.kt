@@ -173,7 +173,7 @@ object IngameRenderer : Disposable {
             actorsRenderOverlay: List<ActorWithBody>? = null,
             particlesContainer : CircularArray<ParticleBase>? = null,
             player: ActorWithBody? = null,
-            uisToDraw: List<UICanvas?>? = null
+            uiContainer: UIContainer? = null
     ) {
         renderingActorsCount = (actorsRenderBehind?.size ?: 0) +
                                (actorsRenderMiddle?.size ?: 0) +
@@ -182,14 +182,8 @@ object IngameRenderer : Disposable {
                                (actorsRenderOverlay?.size ?: 0)
         //renderingParticleCount = particlesContainer?.size ?: 0
         //renderingParticleCount = (particlesContainer?.buffer?.map { (!it.flagDespawn).toInt() } ?: listOf(0)).sum()
-        renderingUIsCount = ((uisToDraw?.map { (it?.isVisible ?: false).toInt() }) ?: listOf(0)).sum()
-
+        renderingUIsCount = uiContainer?.countVisible() ?: 0
         val zoom = Terrarum.ingame?.screenZoom ?: 1f
-
-
-        if (uisToDraw != null) {
-            uiListToDraw = uisToDraw
-        }
 
         invokeInit()
 
@@ -331,7 +325,7 @@ object IngameRenderer : Disposable {
             batch.shader = null
             batch.color = Color.WHITE
 
-            uiListToDraw.forEach {
+            uiContainer?.forEach {
                 it?.render(batch, camera)
             }
         }

@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.EMDASH
-import net.torvald.UnsafeHelper
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -62,7 +62,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     //val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
-    val uiContainer = ArrayList<UICanvas>()
+    val uiContainer = UIContainer()
 
     private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
@@ -118,13 +118,20 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      * This will not allow multiple fixture UIs from popping up (does not prevent them actually being open)
      * because UI updating and rendering is whitelist-operated
      */
-    var uiFixture: UICanvas? = null
+    private var uiFixture: UICanvas? = null
         set(value) {
             printdbg(this, "uiFixture change: $uiFixture -> $value")
             field?.let { it.setAsClose() }
             value?.let { uiFixturesHistory.add(it) }
             field = value
         }
+
+    val getUIFixture = object : Id_UICanvasNullable { // quick workaround for the type erasure (you can't use lambda...)
+        override fun get(): UICanvas? {
+            return uiFixture
+        }
+    }
+
     lateinit var uiInventoryContainer: UICanvas
     lateinit var uiVitalPrimary: UICanvas
     lateinit var uiVitalSecondary: UICanvas
@@ -361,7 +368,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // batch-process uiAliases
         // NOTE: UIs that should pause the game (e.g. Inventory) must have relevant codes ON THEIR SIDE
-        arrayListOf(
+        uiContainer.add(
                 // drawn first
                 //uiVitalPrimary,
                 //uiVitalSecondary,
@@ -373,13 +380,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 uiWatchTierOne,
                 UIScreenZoom(),
                 uiInventoryPlayer,
-                //uiInventoryContainer,
+                getUIFixture,
                 uiTooltip,
                 consoleHandler,
                 uiCheatMotherfuckerNootNoot
                 // drawn last
-        ).forEach { addUI(it) }
-
+        )
 
 
         ingameUpdateThread = ThreadIngameUpdate(this)
@@ -605,8 +611,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
         filterVisibleActors()
-        uiContainer.forEach { it.update(Gdx.graphics.rawDeltaTime) }
-        uiFixture?.update(Gdx.graphics.rawDeltaTime)
+        uiContainer.forEach {
+            when (it) {
+                is UICanvas -> it.update(Gdx.graphics.rawDeltaTime)
+                is Id_UICanvasNullable -> it.get()?.update(Gdx.graphics.rawDeltaTime)
+            }
+        }
+        //uiFixture?.update(Gdx.graphics.rawDeltaTime)
         // deal with the uiFixture being closed
         if (uiFixture?.isClosed == true) { uiFixture = null }
 
@@ -619,7 +630,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 visibleActorsRenderOverlay,
                 particlesContainer,
                 actorNowPlaying,
-                uiContainer + uiFixture
+                uiContainer// + uiFixture
         )
     }
 
@@ -828,7 +839,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
-        val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID!!) { it.referenceID!! }
+        val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID) { it.referenceID!! }
         if (indexToDelete != null) {
             printdbg(this, "Removing actor $actor")
             printStackTrace(this)
@@ -840,23 +851,23 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
                     Actor.RenderOrder.BEHIND -> {
-                        val i = actorsRenderBehind.binarySearch(actor.referenceID!!)
+                        val i = actorsRenderBehind.binarySearch(actor.referenceID)
                         actorsRenderBehind.removeAt(i)
                     }
                     Actor.RenderOrder.MIDDLE -> {
-                        val i = actorsRenderMiddle.binarySearch(actor.referenceID!!)
+                        val i = actorsRenderMiddle.binarySearch(actor.referenceID)
                         actorsRenderMiddle.removeAt(i)
                     }
                     Actor.RenderOrder.MIDTOP -> {
-                        val i = actorsRenderMidTop.binarySearch(actor.referenceID!!)
+                        val i = actorsRenderMidTop.binarySearch(actor.referenceID)
                         actorsRenderMidTop.removeAt(i)
                     }
                     Actor.RenderOrder.FRONT  -> {
-                        val i = actorsRenderFront.binarySearch(actor.referenceID!!)
+                        val i = actorsRenderFront.binarySearch(actor.referenceID)
                         actorsRenderFront.removeAt(i)
                     }
                     Actor.RenderOrder.OVERLAY-> {
-                        val i = actorsRenderOverlay.binarySearch(actor.referenceID!!)
+                        val i = actorsRenderOverlay.binarySearch(actor.referenceID)
                         actorsRenderFront.removeAt(i)
                     }
                 }
@@ -864,7 +875,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID!!)
+    private fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
 
     private fun ArrayList<*>.binarySearch(ID: Int): Int {
         // code from collections/Collections.kt
@@ -892,7 +903,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun addNewActor(actor: Actor?) {
         if (actor == null) return
 
-        if (AppLoader.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID!!)) {
+        if (AppLoader.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID)) {
             throw Error("The actor $actor already exists in the game")
         }
         else {
@@ -924,8 +935,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     fun activateDormantActor(actor: Actor) {
-        if (AppLoader.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID!!)) {
-            if (isActive(actor.referenceID!!))
+        if (AppLoader.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID)) {
+            if (isActive(actor.referenceID))
                 throw Error("The actor $actor is already activated")
             else
                 throw Error("The actor $actor already exists in the game")
@@ -960,17 +971,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesContainer.appendHead(particle)
     }
 
-    fun addUI(ui: UICanvas) {
-        // check for exact duplicates
-        if (uiContainer.contains(ui)) {
-            throw IllegalArgumentException(
-                    "Exact copy of the UI already exists: The instance of ${ui.javaClass.simpleName}"
-            )
-        }
-
-        uiContainer.add(ui)
-    }
-
     private fun insertionSortLastElemAV(arr: ArrayList<ActorWithBody>) { // out-projection doesn't work, duh
         ReentrantLock().lock {
             var j = arr.lastIndex - 1
@@ -1003,7 +1003,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun hide() {
-        uiContainer.forEach { it.handler.dispose() }
+        uiContainer.forEach { it?.handler?.dispose() }
     }
 
 
@@ -1063,15 +1063,17 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderOverlay.forEach { it.dispose() }
 
         uiContainer.forEach {
-            it.handler.dispose()
-            it.dispose()
+            it?.handler?.dispose()
+            it?.dispose()
         }
         uiFixturesHistory.forEach {
-            it.handler.dispose()
-            it.dispose()
+            try {
+                it.handler.dispose()
+                it.dispose()
+            }
+            catch (e: GdxRuntimeException) {}
         }
 
         super.dispose()
     }
-
 }

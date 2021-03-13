@@ -193,6 +193,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        println("uiitem ${this.javaClass.name} touchdown")
+
         var actionDone = false
 
         if (parentUI.isVisible) {

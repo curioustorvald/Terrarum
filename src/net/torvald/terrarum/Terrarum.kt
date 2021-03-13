@@ -17,6 +17,7 @@ import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -26,7 +27,6 @@ import java.io.File
 import java.io.PrintStream
 import kotlin.math.absoluteValue
 import kotlin.math.round
-import kotlin.math.roundToInt
 
 
 
@@ -577,4 +577,49 @@ fun printStackTrace(obj: Any, out: PrintStream = System.out) {
             out.println("[${obj.javaClass.simpleName}] ... $it")
         }
     }
+}
+
+class UIContainer {
+    private val data = ArrayList<Any>()
+    fun add(vararg things: Any) {
+        things.forEach {
+            if (it is UICanvas || it is Id_UICanvasNullable)
+                data.add(it)
+            else throw IllegalArgumentException(it.javaClass.name) }
+    }
+
+    fun iterator() = object : Iterator<UICanvas?> {
+        private var cursor = 0
+
+        override fun hasNext() = cursor < data.size
+
+        override fun next(): UICanvas? {
+            val it = data[cursor]
+            // whatever the fucking reason when() does not work
+            if (it is UICanvas) {
+                cursor += 1
+                return it
+            }
+            else if (it is Id_UICanvasNullable) {
+                cursor += 1
+                return it.get()
+            }
+            else throw IllegalArgumentException("Unacceptable type ${it.javaClass.name}, instance of ${it.javaClass.superclass.name}")
+        }
+    }
+
+    fun forEach(operation: (UICanvas?) -> Unit) = iterator().forEach(operation)
+    fun countVisible(): Int {
+        var c = 0
+        forEach { if (it?.isVisible == true) c += 1 }
+        return c
+    }
+
+    fun contains(element: Any) = data.contains(element)
+
+    fun <T> map(transformation: (UICanvas?) -> T) = iterator().asSequence().map(transformation)
+}
+
+interface Id_UICanvasNullable {
+    fun get(): UICanvas?
 }

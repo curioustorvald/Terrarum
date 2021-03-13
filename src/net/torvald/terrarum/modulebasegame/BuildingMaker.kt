@@ -116,7 +116,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     val uiPenMenu = UIBuildingMakerPenMenu(this)
 
 
-    val uiContainer = ArrayList<UICanvas?>()
+    val uiContainer = UIContainer()
 
     private val pensMustShowSelection = arrayOf(
             PENMODE_MARQUEE, PENMODE_MARQUEE_ERASE
@@ -392,7 +392,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         _testMarkerDrawCalls = 0L
 
-        IngameRenderer.invoke(false, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
+        IngameRenderer.invoke(false, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uiContainer = uiContainer)
 
         AppLoader.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
     }

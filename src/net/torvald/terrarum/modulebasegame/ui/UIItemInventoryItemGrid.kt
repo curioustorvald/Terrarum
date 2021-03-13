@@ -221,6 +221,8 @@ class UIItemInventoryItemGrid(
             gridModeButtons[1].highlighted = false
             itemPage = 0
             rebuild(currentFilter)
+
+            println("ItemGridMode 0 touchdown")
         }
         gridModeButtons[1].touchDownListener = { _, _, _, _ ->
             isCompactMode = true
@@ -228,6 +230,8 @@ class UIItemInventoryItemGrid(
             gridModeButtons[1].highlighted = true
             itemPage = 0
             rebuild(currentFilter)
+
+            println("ItemGridMode 1 touchdown")
         }
 
         scrollUpButton.clickOnceListener = { _, _, _ ->

@@ -114,7 +114,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
 
 
-    val uiContainer = ArrayList<UICanvas?>()
+    val uiContainer = UIContainer()
     private lateinit var uiMenu: UICanvas
 
     private lateinit var worldFBO: FrameBuffer
@@ -242,7 +242,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
-            IngameRenderer.invoke(gamePaused = false, uisToDraw = uiContainer)
+            IngameRenderer.invoke(gamePaused = false, uiContainer = uiContainer)
         }
         else {
             printdbgerr(this, "Demoworld is already been destroyed")

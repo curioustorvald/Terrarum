@@ -65,10 +65,6 @@ abstract class UICanvas(
      */
     val handler = UIHandler(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant)
 
-    init {
-
-    }
-
     /**
      * In milliseconds
      *
@@ -285,6 +281,9 @@ abstract class UICanvas(
 
     // end of handler func aliases
 
+    init {
+        if (uiItems.isEmpty()) println("UICanvas '${this.javaClass.name}' has no UIItem registered, just so you know...")
+    }
 
     companion object {
         const val OPENCLOSE_GENERIC = 0.2f

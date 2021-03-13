@@ -44,9 +44,7 @@ internal object UIStorageChest : UICanvas(), HasInventory {
     override var height = 512
     override var openCloseTime: Second = 0.0f
 
-    private val negotiator = object : InventoryNegotiator {
-        override fun getItemFilter(): List<String> = listOf(CAT_ALL)
-
+    private val negotiator = object : InventoryNegotiator() {
         override fun accept(item: GameItem, amount: Int) {
             TODO("Not yet implemented")
         }
@@ -66,31 +64,37 @@ internal object UIStorageChest : UICanvas(), HasInventory {
         TODO("Not yet implemented")
     }
 
+    private lateinit var catBar: UIItemInventoryCatBar
+
+    private lateinit var itemList: UIItemInventoryItemGrid
+
     init {
+        catBar = UIItemInventoryCatBar(
+                this,
+                100,
+                50,
+                500,
+                500,
+                { itemList.rebuild(catBar.catIconsMeaning[catBar.selectedIcon]) },
+                false
+        )
+        itemList = UIItemInventoryItemGrid(
+                this,
+                catBar,
+                Terrarum.ingame!!.actorNowPlaying!!.inventory, // just for a placeholder...
+                100,
+                100,
+                4, 5,
+                drawScrollOnRightside = true,
+                drawWallet = true,
+                listRebuildFun = { itemListUpdate() }
+    )
+
         handler.allowESCtoClose = true
+
+        addUIitem(catBar)
+        addUIitem(itemList)
     }
-
-    private val catBar = UIItemInventoryCatBar(
-            this,
-            100,
-            50,
-            500,
-            500,
-            {},
-            false
-    )
-
-    private val itemList = UIItemInventoryItemGrid(
-            this,
-            catBar,
-            Terrarum.ingame!!.actorNowPlaying!!.inventory, // just for a placeholder...
-            100,
-            100,
-            4, 5,
-            drawScrollOnRightside = true,
-            drawWallet = true,
-            listRebuildFun = { itemListUpdate() }
-    )
 
     private fun itemListUpdate() {
         itemList.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
@@ -104,6 +108,7 @@ internal object UIStorageChest : UICanvas(), HasInventory {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
 
+        catBar.render(batch, camera)
         itemList.render(batch, camera)
     }
 
