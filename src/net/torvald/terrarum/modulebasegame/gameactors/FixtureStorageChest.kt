@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
 import net.torvald.terrarum.modulebasegame.ui.HasInventory
 import net.torvald.terrarum.modulebasegame.ui.InventoryNegotiator
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
@@ -20,7 +21,9 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradHeig
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradStartCol
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryEquippedView
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -29,10 +32,13 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 internal class FixtureStorageChest : FixtureBase(
         BlockBox(BlockBox.ALLOW_MOVE_DOWN, 1, 1),
-        mainUI = UIStorageChest
+        inventory = FixtureInventory(40, CAPACITY_MODE_COUNT),
+        mainUI = UIStorageChest()
 ) {
 
     init {
+        (mainUI as UIStorageChest).chest = this.inventory!!
+
         setHitboxDimension(16, 16, 0, 0)
 
         makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16))
@@ -47,7 +53,9 @@ internal class FixtureStorageChest : FixtureBase(
 }
 
 
-internal object UIStorageChest : UICanvas(), HasInventory {
+internal class UIStorageChest : UICanvas(), HasInventory {
+
+    lateinit var chest: FixtureInventory
 
     override var width = AppLoader.screenW
     override var height = AppLoader.screenH
@@ -75,45 +83,69 @@ internal object UIStorageChest : UICanvas(), HasInventory {
         TODO("Not yet implemented")
     }
 
-    private var catBar: UIItemInventoryCatBar
-    private var itemList: UIItemInventoryItemGrid
+    private lateinit var catBar: UIItemInventoryCatBar
+    private lateinit var itemListChest: UIItemInventoryItemGrid
+    private lateinit var itemListPlayer: UIItemInventoryItemGrid
 
-    init {
-        catBar = UIItemInventoryCatBar(
-                this,
-                (AppLoader.screenW - catBarWidth) / 2,
-                42 + (AppLoader.screenH - internalHeight) / 2,
-                internalWidth,
-                catBarWidth,
-                false
-        )
-        catBar.selectionChangeListener = { old, new -> itemListUpdate() }
-        itemList = UIItemInventoryItemGrid(
-                this,
-                catBar,
-                Terrarum.ingame!!.actorNowPlaying!!.inventory, // just for a placeholder...
-                INVENTORY_CELLS_OFFSET_X,
-                INVENTORY_CELLS_OFFSET_Y,
-                CELLS_HOR / 2, CELLS_VRT,
-                drawScrollOnRightside = false,
-                drawWallet = false,
-                keyDownFun = { _,_ -> Unit },
-                touchDownFun = { _,_,_,_,_ -> itemListUpdate() }
-        )
+    private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
-        handler.allowESCtoClose = true
-
-        addUIitem(catBar)
-        addUIitem(itemList)
-    }
+    private var initialised = false
 
     private fun itemListUpdate() {
-        itemList.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
     }
 
     override fun updateUI(delta: Float) {
+        if (!initialised) {
+            initialised = true
+
+            catBar = UIItemInventoryCatBar(
+                    this,
+                    (AppLoader.screenW - catBarWidth) / 2,
+                    42 + (AppLoader.screenH - internalHeight) / 2,
+                    internalWidth,
+                    catBarWidth,
+                    false
+            )
+            catBar.selectionChangeListener = { old, new -> itemListUpdate() }
+            itemListChest = UIItemInventoryItemGrid(
+                    this,
+                    catBar,
+                    chest,
+                    INVENTORY_CELLS_OFFSET_X - halfSlotOffset,
+                    INVENTORY_CELLS_OFFSET_Y,
+                    6, CELLS_VRT,
+                    drawScrollOnRightside = false,
+                    drawWallet = false,
+                    keyDownFun = { _, _ -> Unit },
+                    touchDownFun = { _, _, _, _, _ -> itemListUpdate() }
+            )
+            itemListPlayer = UIItemInventoryItemGrid(
+                    this,
+                    catBar,
+                    Terrarum.ingame!!.actorNowPlaying!!.inventory, // literally a player's inventory
+                    INVENTORY_CELLS_OFFSET_X - halfSlotOffset + (listGap + UIItemInventoryElem.height) * 7,
+                    INVENTORY_CELLS_OFFSET_Y,
+                    6, CELLS_VRT,
+                    drawScrollOnRightside = true,
+                    drawWallet = false,
+                    keyDownFun = { _, _ -> Unit },
+                    touchDownFun = { _, _, _, _, _ -> itemListUpdate() }
+            )
+
+            handler.allowESCtoClose = true
+
+            addUIitem(catBar)
+            addUIitem(itemListChest)
+            addUIitem(itemListPlayer)
+        }
+
+
+        
         catBar.update(delta)
-        itemList.update(delta)
+        itemListChest.update(delta)
+        itemListPlayer.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -142,7 +174,8 @@ internal object UIStorageChest : UICanvas(), HasInventory {
         batch.color = Color.WHITE
 
         catBar.render(batch, camera)
-        itemList.render(batch, camera)
+        itemListChest.render(batch, camera)
+        itemListPlayer.render(batch, camera)
     }
 
     override fun doOpening(delta: Float) {

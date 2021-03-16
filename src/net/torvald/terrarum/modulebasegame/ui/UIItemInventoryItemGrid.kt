@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
@@ -38,7 +39,7 @@ import kotlin.math.floor
 class UIItemInventoryItemGrid(
         parentUI: UICanvas,
         val catBar: UIItemInventoryCatBar,
-        val inventory: ActorInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
+        val inventory: FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
         initialX: Int,
         initialY: Int,
         val horizontalCells: Int,
@@ -192,7 +193,8 @@ class UIItemInventoryItemGrid(
     }
     // automatically determine how much columns are needed. Minimum Width = 5 grids
     private val itemListColumnCount = floor(horizontalCells / 5f).toInt().coerceAtLeast(1)
-    private val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / itemListColumnCount
+    private val actualItemCellWidth = (listGap + UIItemInventoryElemSimple.height) * horizontalCells - listGap // in pixels
+    private val largeListWidth = ((listGap + actualItemCellWidth) / itemListColumnCount) - (itemListColumnCount - 1).coerceAtLeast(1) * listGap
     private val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
         UIItemInventoryElem(
                 parentUI = inventoryUI,
@@ -428,24 +430,26 @@ class UIItemInventoryItemGrid(
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
                 // set quickslot number
-                for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
-                    if (sortListItem.item == inventory.getQuickslot(qs - 1)?.item) {
-                        items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
-                        break
-                    }
-                    else
-                        items[k].quickslot = null
-                }
-
-                // set equippedslot number
-                for (eq in inventory.itemEquipped.indices) {
-                    if (eq < inventory.itemEquipped.size) {
-                        if (inventory.itemEquipped[eq] == items[k].item?.dynamicID) {
-                            items[k].equippedSlot = eq
+                if (inventory is ActorInventory) {
+                    for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
+                        if (sortListItem.item == inventory.getQuickslot(qs - 1)?.item) {
+                            items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }
                         else
-                            items[k].equippedSlot = null
+                            items[k].quickslot = null
+                    }
+
+                    // set equippedslot number
+                    for (eq in inventory.itemEquipped.indices) {
+                        if (eq < inventory.itemEquipped.size) {
+                            if (inventory.itemEquipped[eq] == items[k].item?.dynamicID) {
+                                items[k].equippedSlot = eq
+                                break
+                            }
+                            else
+                                items[k].equippedSlot = null
+                        }
                     }
                 }
             }

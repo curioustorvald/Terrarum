@@ -60,7 +60,7 @@ object PlayerBuilderSigrid {
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 11, 0)
 
-        p.inventory = ActorInventory(p, 0, ActorInventory.CAPACITY_MODE_NO_ENCUMBER)
+        p.inventory = ActorInventory(p, 0, FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
 
         p.faction.add(FactionFactory.create("basegame", "factions/FactionSigrid.json"))
 

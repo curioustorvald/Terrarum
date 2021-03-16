@@ -43,7 +43,7 @@ open class ActorHumanoid(
 
 
     /** Must be set by PlayerFactory */
-    override var inventory: ActorInventory = ActorInventory(this, 2000, ActorInventory.CAPACITY_MODE_WEIGHT) // default constructor
+    override var inventory: ActorInventory = ActorInventory(this, 2000, FixtureInventory.CAPACITY_MODE_WEIGHT) // default constructor
 
 
     /** Must be set by PlayerFactory */

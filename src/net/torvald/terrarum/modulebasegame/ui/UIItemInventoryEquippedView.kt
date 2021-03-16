@@ -15,17 +15,19 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 
 /**
  * Created by minjaesong on 2017-10-28.
  */
 class UIItemInventoryEquippedView(
-        parentUI: UIInventoryFull,
+        parentUI: UICanvas,
         val inventory: ActorInventory,
         val theActor: ActorWithBody,
         initialX: Int,
-        initialY: Int
+        initialY: Int,
+        inventoryListRebuildFun: () -> Unit
 ) : UIItem(parentUI, initialX, initialY) {
 
 
@@ -66,7 +68,7 @@ class UIItemInventoryEquippedView(
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 keyDownFun = createInvCellGenericKeyDownFun(),
-                touchDownFun = createInvCellGenericTouchDownFun { parentUI.rebuildList() } // to "unselect" the equipped item and main item grid would "untick" accordingly
+                touchDownFun = createInvCellGenericTouchDownFun(inventoryListRebuildFun) // to "unselect" the equipped item and main item grid would "untick" accordingly
         )
     }
 

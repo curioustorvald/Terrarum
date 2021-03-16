@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
@@ -18,8 +19,8 @@ open class FixtureBase(
         blockBox0: BlockBox,
         val blockBoxProps: BlockBoxProps = BlockBoxProps(0),
         renderOrder: RenderOrder = RenderOrder.MIDDLE,
-        val mainUI: UICanvas? = null
-
+        val mainUI: UICanvas? = null,
+        val inventory: FixtureInventory? = null
 // disabling physics (not allowing the fixture to move) WILL make things easier in many ways
 ) : ActorWithBody(renderOrder, PhysProperties.IMMOBILE), CuedByTerrainChange {
 
@@ -35,6 +36,11 @@ open class FixtureBase(
      * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
      */
     private var worldBlockPos: Point2i? = null
+
+    init {
+        if (mainUI != null)
+            AppLoader.disposableSingletonsPool.add(mainUI)
+    }
 
     /**
      * Adds this instance of the fixture to the world
@@ -121,6 +127,7 @@ open class FixtureBase(
         }
 
         worldBlockPos = null
+        mainUI?.dispose()
 
         this.isVisible = false
     }

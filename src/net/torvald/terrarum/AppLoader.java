@@ -738,7 +738,7 @@ public class AppLoader implements ApplicationListener {
         textureWhiteCircle.dispose();
         logo.getTexture().dispose();
 
-        disposableSingletonsPool.forEach(Disposable::dispose);
+        disposableSingletonsPool.forEach((it) -> {try { it.dispose(); } catch (GdxRuntimeException e) {}});
 
         ModMgr.INSTANCE.disposeMods();
 

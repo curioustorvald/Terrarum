@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
@@ -53,7 +54,8 @@ internal class UIInventoryCells(
                     full.actor.inventory,
                     full.actor as ActorWithBody,
                     internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
-                    INVENTORY_CELLS_OFFSET_Y
+                    INVENTORY_CELLS_OFFSET_Y,
+                    { rebuildList() }
             )
 
     init {
@@ -124,7 +126,7 @@ internal class UIInventoryCells(
         batch.color = encumbCol
         batch.fillRect(
                 encumbBarXPos, encumbBarYPos,
-                if (full.actor.inventory.capacityMode == ActorInventory.CAPACITY_MODE_NO_ENCUMBER)
+                if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                     1f
                 else // make sure 1px is always be seen
                     minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
