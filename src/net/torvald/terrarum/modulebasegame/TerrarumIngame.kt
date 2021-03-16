@@ -1071,7 +1071,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 it.handler.dispose()
                 it.dispose()
             }
-            catch (e: GdxRuntimeException) {}
+            catch (e: IllegalArgumentException) {}
         }
 
         super.dispose()

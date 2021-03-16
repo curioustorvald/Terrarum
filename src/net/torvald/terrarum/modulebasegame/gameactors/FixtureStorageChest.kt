@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
 import net.torvald.terrarum.modulebasegame.ui.HasInventory
 import net.torvald.terrarum.modulebasegame.ui.InventoryNegotiator
@@ -64,24 +65,20 @@ internal class UIStorageChest : UICanvas(), HasInventory {
     private val shapeRenderer = ShapeRenderer()
 
     private val negotiator = object : InventoryNegotiator() {
-        override fun accept(item: GameItem, amount: Int) {
-            printdbg(this, "Accept")
+        override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Int) {
+            player.remove(item, amount)
+            fixture.add(item, amount)
         }
 
-        override fun reject(item: GameItem, amount: Int) {
-            printdbg(this, "Reject")
+        override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Int) {
+            fixture.remove(item, amount)
+            player.add(item, amount)
         }
     }
 
     override fun getNegotiator() = negotiator
-
-    override fun getFixtureInventory() {
-        TODO("Not yet implemented")
-    }
-
-    override fun getPlayerInventory() {
-        TODO("Not yet implemented")
-    }
+    override fun getFixtureInventory(): FixtureInventory = chest
+    override fun getPlayerInventory(): FixtureInventory = Terrarum.ingame!!.actorNowPlaying!!.inventory
 
     private lateinit var catBar: UIItemInventoryCatBar
     private lateinit var itemListChest: UIItemInventoryItemGrid
@@ -118,8 +115,13 @@ internal class UIStorageChest : UICanvas(), HasInventory {
                     6, CELLS_VRT,
                     drawScrollOnRightside = false,
                     drawWallet = false,
-                    keyDownFun = { _, _ -> Unit },
-                    touchDownFun = { _, _, _, _, _ -> itemListUpdate() }
+                    keyDownFun = { _, _, _ -> Unit },
+                    touchDownFun = { gameItem, amount, _ ->
+                        if (gameItem != null) {
+                            negotiator.reject(chest, getPlayerInventory(), gameItem, amount)
+                        }
+                        itemListUpdate()
+                    }
             )
             itemListPlayer = UIItemInventoryItemGrid(
                     this,
@@ -130,8 +132,13 @@ internal class UIStorageChest : UICanvas(), HasInventory {
                     6, CELLS_VRT,
                     drawScrollOnRightside = true,
                     drawWallet = false,
-                    keyDownFun = { _, _ -> Unit },
-                    touchDownFun = { _, _, _, _, _ -> itemListUpdate() }
+                    keyDownFun = { _, _, _ -> Unit },
+                    touchDownFun = { gameItem, amount, _ ->
+                        if (gameItem != null) {
+                            negotiator.accept(getPlayerInventory(), chest, gameItem, amount)
+                        }
+                        itemListUpdate()
+                    }
             )
 
             handler.allowESCtoClose = true
@@ -142,7 +149,7 @@ internal class UIStorageChest : UICanvas(), HasInventory {
         }
 
 
-        
+
         catBar.update(delta)
         itemListChest.update(delta)
         itemListPlayer.update(delta)
@@ -180,16 +187,19 @@ internal class UIStorageChest : UICanvas(), HasInventory {
 
     override fun doOpening(delta: Float) {
         Terrarum.ingame?.paused = true
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         Terrarum.ingame?.paused = false
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
     }
 
     override fun endClosing(delta: Float) {
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null) // required!
     }
 
 

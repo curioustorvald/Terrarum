@@ -32,16 +32,13 @@ class ActorInventory(@Transient val actor: Pocketed, maxCapacity: Int, capacityM
     val quickSlot = Array<ItemID?>(UIQuickslotBar.SLOT_COUNT) { null } // 0: Slot 1, 9: Slot 10
 
 
-    fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID]!!, count)
+    override fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID]!!, count)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
-    fun remove(item: GameItem, count: Int = 1) {
+    override fun remove(item: GameItem, count: Int) {
         super.remove(item, count) { existingItem ->
             // unequip, if applicable
             actor.unequipItem(existingItem.item)
-            // depleted item; remove entry from inventory
-            itemList.remove(existingItem)
-
             // also unequip on the quickslot
             actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
                 setQuickBar(it, null)

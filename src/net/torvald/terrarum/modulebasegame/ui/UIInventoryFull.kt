@@ -30,7 +30,7 @@ class UIInventoryFull(
     override var openCloseTime: Second = 0.0f
 
     companion object {
-        const val INVEN_DEBUG_MODE = true
+        const val INVEN_DEBUG_MODE = false
 
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
         const val CELLS_HOR = 10
@@ -247,7 +247,6 @@ class UIInventoryFull(
 
     override fun endClosing(delta: Float) {
         (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null) // required!
-
         MinimapComposer.revalidateAll()
     }
 

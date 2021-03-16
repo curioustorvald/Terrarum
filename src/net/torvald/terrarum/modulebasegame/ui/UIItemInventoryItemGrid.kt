@@ -46,8 +46,8 @@ class UIItemInventoryItemGrid(
         val verticalCells: Int,
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true,
-        keyDownFun: (GameItem?, Int) -> Unit,
-        touchDownFun: (GameItem?, Int, Int, Int, Int) -> Unit
+        keyDownFun: (GameItem?, Int, Int) -> Unit,
+        touchDownFun: (GameItem?, Int, Int) -> Unit
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -108,8 +108,8 @@ class UIItemInventoryItemGrid(
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-        fun createInvCellGenericKeyDownFun(): (GameItem?, Int) -> Unit {
-            return { item: GameItem?, keycode: Int ->
+        fun createInvCellGenericKeyDownFun(): (GameItem?, Int, Int) -> Unit {
+            return { item: GameItem?, amount: Int, keycode: Int ->
                 if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
                     val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                     if (player != null) {
@@ -138,8 +138,8 @@ class UIItemInventoryItemGrid(
             }
         }
 
-        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Int, Int, Int, Int) -> Unit {
-            return { item: GameItem?, screenX: Int, screenY: Int, pointer: Int, button: Int ->
+        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Int, Int) -> Unit {
+            return { item: GameItem?, amount: Int, button: Int ->
                 if (item != null && Terrarum.ingame != null) {
                     // equip da shit
                     val itemEquipSlot = item.equipPosition

@@ -41,8 +41,8 @@ class UIItemInventoryElem(
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
-        keyDownFun: (GameItem?, Int) -> Unit,
-        touchDownFun: (GameItem?, Int, Int, Int, Int) -> Unit
+        keyDownFun: (GameItem?, Int, Int) -> Unit,
+        touchDownFun: (GameItem?, Int, Int) -> Unit
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun) {
 
     companion object {

@@ -69,6 +69,9 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
         insertionSortLastElem(itemList)
     }
 
+    open fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID]!!, count) {}
+    open fun remove(item: GameItem, count: Int = 1) = remove(item, count) {}
+
     open fun remove(itemID: ItemID, count: Int, unequipFun: (InventoryPair) -> Unit) =
             remove(ItemCodex[itemID]!!, count, unequipFun)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
@@ -97,6 +100,9 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
                 existingItem.amount = newCount
             }
             else {
+                // depleted item; remove entry from inventory
+                itemList.remove(existingItem)
+                // do additional removal job (e.g. unequipping)
                 unequipFun(existingItem)
             }
         }
