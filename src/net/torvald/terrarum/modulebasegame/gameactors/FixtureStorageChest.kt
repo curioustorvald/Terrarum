@@ -93,6 +93,20 @@ internal class UIStorageChest : UICanvas(), HasInventory {
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
     }
 
+    private fun setCompact(yes: Boolean) {
+        itemListChest.isCompactMode = yes
+        itemListChest.gridModeButtons[0].highlighted = !yes
+        itemListChest.gridModeButtons[1].highlighted = yes
+        itemListChest.itemPage = 0
+        itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+
+        itemListPlayer.isCompactMode = yes
+        itemListPlayer.gridModeButtons[0].highlighted = !yes
+        itemListPlayer.gridModeButtons[1].highlighted = yes
+        itemListPlayer.itemPage = 0
+        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+    }
+
     override fun updateUI(delta: Float) {
         if (!initialised) {
             initialised = true
@@ -142,6 +156,12 @@ internal class UIStorageChest : UICanvas(), HasInventory {
             )
 
             handler.allowESCtoClose = true
+
+            // make grid mode buttons work together
+            itemListChest.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+            itemListChest.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+            itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+            itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
             addUIitem(catBar)
             addUIitem(itemListChest)

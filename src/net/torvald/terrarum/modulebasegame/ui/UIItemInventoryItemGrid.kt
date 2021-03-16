@@ -233,7 +233,7 @@ class UIItemInventoryItemGrid(
             posY - 2 + (4 + UIItemInventoryElem.height - catBar.catIcons.tileH) * index
 
     /** Long/compact mode buttons */
-    private val gridModeButtons = Array<UIItemImageButton>(2) { index ->
+    internal val gridModeButtons = Array<UIItemImageButton>(2) { index ->
         UIItemImageButton(
                 parentUI,
                 catBar.catIcons.get(index + 14, 0),
