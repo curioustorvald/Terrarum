@@ -7,6 +7,11 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
@@ -34,9 +39,9 @@ internal class UIInventoryCells(
                     full,
                     full.catBar,
                     full.actor.inventory,
-                    full.INVENTORY_CELLS_OFFSET_X,
-                    full.INVENTORY_CELLS_OFFSET_Y,
-                    full.CELLS_HOR, full.CELLS_VRT,
+                    INVENTORY_CELLS_OFFSET_X,
+                    INVENTORY_CELLS_OFFSET_Y,
+                    CELLS_HOR, CELLS_VRT,
                     keyDownFun = createInvCellGenericKeyDownFun(),
                     touchDownFun = createInvCellGenericTouchDownFun { rebuildList() }
             )
@@ -47,8 +52,8 @@ internal class UIInventoryCells(
                     full,
                     full.actor.inventory,
                     full.actor as ActorWithBody,
-                    full.internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - full.internalWidth) / 2,
-                    full.INVENTORY_CELLS_OFFSET_Y
+                    internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
+                    INVENTORY_CELLS_OFFSET_Y
             )
 
     init {

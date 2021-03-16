@@ -29,22 +29,48 @@ class UIInventoryFull(
     override var height: Int = AppLoader.screenH
     override var openCloseTime: Second = 0.0f
 
-    val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
+    companion object {
+        const val INVEN_DEBUG_MODE = true
 
-    val CELLS_HOR = 10
-    val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
+        const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
+        const val CELLS_HOR = 10
+        val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
                                 (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
 
-    private val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
+        const val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
 
-    val internalWidth: Int = UIItemInventoryItemGrid.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
-    val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryItemGrid.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
+        val internalWidth: Int = UIItemInventoryItemGrid.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
+        val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryItemGrid.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
 
-    val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
+        val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
-    val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
-    val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
-    val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
+        val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
+        val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
+        val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
+
+        val catBarWidth = 330
+
+        val gradStartCol = Color(0x404040_60)
+        val gradEndCol   = Color(0x000000_70)
+        val gradHeight = 48f
+    }
+
+    //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
+
+    //val CELLS_HOR = 10
+    //val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
+    //                            (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
+
+    //private val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
+
+    //val internalWidth: Int = UIItemInventoryItemGrid.getEstimatedW(CELLS_HOR) + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
+    //val internalHeight: Int = REQUIRED_MARGIN + UIItemInventoryItemGrid.getEstimatedH(CELLS_VRT) // grad_begin..grad_end..contents..grad_begin..grad_end
+
+    //val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
+
+    //val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
+    //val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
+    //val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
 
     init {
         handler.allowESCtoClose = true
@@ -84,7 +110,7 @@ class UIInventoryFull(
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"
     val controlHelpHeight = AppLoader.fontGame.lineHeight
 
-    val catBarWidth = 330
+    //val catBarWidth = 330
     val catBar = UIItemInventoryCatBar(
             this,
             (AppLoader.screenW - catBarWidth) / 2,
@@ -141,10 +167,10 @@ class UIInventoryFull(
         transitionPanel.update(delta)
     }
 
-    private val gradStartCol = Color(0x404040_60)
-    private val gradEndCol   = Color(0x000000_70)
+    //private val gradStartCol = Color(0x404040_60)
+    //private val gradEndCol   = Color(0x000000_70)
+    //private val gradHeight = 48f
     private val shapeRenderer = ShapeRenderer()
-    private val gradHeight = 48f
 
     internal var xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
         private set
@@ -235,10 +261,6 @@ class UIInventoryFull(
 
         xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
         yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
-    }
-
-    companion object {
-        const val INVEN_DEBUG_MODE = false
     }
 }
 

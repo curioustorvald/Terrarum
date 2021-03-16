@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
@@ -23,7 +25,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenuButtons = UIItemTextButtonList(
             this, gameMenu,
             (AppLoader.screenW - gameMenuListWidth) / 2,
-            full.INVENTORY_CELLS_OFFSET_Y + (full.INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
+            INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
             textAreaWidth = gameMenuListWidth,
