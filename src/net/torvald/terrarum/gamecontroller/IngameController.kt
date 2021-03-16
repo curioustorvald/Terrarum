@@ -9,8 +9,11 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
@@ -71,7 +74,11 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
             }*/
 
-            if (!Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
+            // unlatch when:
+            // - not clicking anymore
+            // - using any item that is not fixture (blocks, picks)
+            if (!Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) ||
+                GameItem.Category.FIXTURE != ItemCodex.get(terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP))?.inventoryCategory) {
                 worldPrimaryClickLatched = false
             }
 

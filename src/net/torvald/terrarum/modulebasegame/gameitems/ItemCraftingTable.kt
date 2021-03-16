@@ -15,7 +15,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 class ItemStorageChest(originalID: ItemID) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_CRAFTING_TABLE"
+    override val originalName = "ITEM_STORAGE_CHEST"
     override var baseMass = FixtureTikiTorch.MASS
     override var stackable = true
     override var inventoryCategory = Category.FIXTURE
