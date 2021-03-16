@@ -91,8 +91,8 @@ class UIInventoryFull(
             42 + (AppLoader.screenH - internalHeight) / 2,
             internalWidth,
             catBarWidth,
-            { i -> requestTransition(i) },
-            true
+            true,
+            { i -> requestTransition(i) }
     )
 
 

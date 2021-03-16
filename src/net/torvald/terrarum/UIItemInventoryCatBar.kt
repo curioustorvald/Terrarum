@@ -23,8 +23,8 @@ class UIItemInventoryCatBar(
         initialY: Int,
         uiInternalWidth: Int,
         override val width: Int,
-        val transitionReqFun: (Int) -> Unit,
-        val showSideButtons: Boolean
+        val showSideButtons: Boolean = false,
+        val panelTransitionReqFun: (Int) -> Unit = {} // for side buttons; for the selection change, override selectionChangeListener
 ) : UIItem(parentUI, initialX, initialY) {
 
     companion object {
@@ -242,7 +242,7 @@ class UIItemInventoryCatBar(
 
             if (transitionFired) {
                 transitionFired = false
-                transitionReqFun(selectedPanel)
+                panelTransitionReqFun(selectedPanel)
             }
         }
     }

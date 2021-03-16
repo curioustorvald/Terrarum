@@ -76,9 +76,9 @@ internal object UIStorageChest : UICanvas(), HasInventory {
                 50,
                 500,
                 500,
-                { itemList.rebuild(catBar.catIconsMeaning[catBar.selectedIcon]) },
                 false
         )
+        catBar.selectionChangeListener = { old, new -> itemListUpdate() }
         itemList = UIItemInventoryItemGrid(
                 this,
                 catBar,
@@ -86,7 +86,7 @@ internal object UIStorageChest : UICanvas(), HasInventory {
                 100,
                 100,
                 4, 5,
-                drawScrollOnRightside = true,
+                drawScrollOnRightside = false,
                 drawWallet = true,
                 keyDownFun = { _,_ -> Unit },
                 touchDownFun = { _,_,_,_,_ -> itemListUpdate() }
