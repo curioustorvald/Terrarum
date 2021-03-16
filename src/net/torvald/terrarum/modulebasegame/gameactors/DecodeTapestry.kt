@@ -2,6 +2,9 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import net.torvald.EMDASH
+import net.torvald.terrarum.ccC
+import net.torvald.terrarum.ccW
 import net.torvald.terrarum.gameworld.toUint
 import java.io.File
 import java.nio.charset.Charset
@@ -171,6 +174,6 @@ object DecodeTapestry {
             readCounter++
         }
 
-        return TapestryObject(outImageData, artName, authorName)
+        return TapestryObject(outImageData, artName, authorName) { "$ccW$authorName, $ccC$artName" }
     }
 }

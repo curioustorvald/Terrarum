@@ -53,6 +53,8 @@ class UIInventoryFull(
         val gradStartCol = Color(0x404040_60)
         val gradEndCol   = Color(0x000000_70)
         val gradHeight = 48f
+
+        val controlHelpHeight = AppLoader.fontGame.lineHeight
     }
 
     //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
@@ -108,9 +110,7 @@ class UIInventoryFull(
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"
-    val controlHelpHeight = AppLoader.fontGame.lineHeight
 
-    //val catBarWidth = 330
     val catBar = UIItemInventoryCatBar(
             this,
             (AppLoader.screenW - catBarWidth) / 2,

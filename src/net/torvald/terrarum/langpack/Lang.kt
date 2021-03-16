@@ -6,6 +6,10 @@ import net.torvald.terrarum.utils.JsonFetcher
 import java.io.File
 import java.util.*
 
+class LangObject(val key: String, val fromLang: Boolean) {
+    fun get() = if (fromLang) Lang[key] else key
+}
+
 /**
  * Created by minjaesong on 2016-01-22.
  */

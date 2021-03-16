@@ -8,22 +8,22 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
-import net.torvald.terrarum.modulebasegame.ui.HasInventory
-import net.torvald.terrarum.modulebasegame.ui.InventoryNegotiator
+import net.torvald.terrarum.modulebasegame.ui.*
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryCells.Companion.weightBarWidth
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.catBarWidth
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradEndCol
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradStartCol
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryEquippedView
-import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -31,14 +31,16 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2019-07-08.
  */
-internal class FixtureStorageChest : FixtureBase(
+internal class FixtureStorageChest(nameFun: () -> String) : FixtureBase(
         BlockBox(BlockBox.ALLOW_MOVE_DOWN, 1, 1),
         inventory = FixtureInventory(40, CAPACITY_MODE_COUNT),
-        mainUI = UIStorageChest()
+        mainUI = UIStorageChest(),
+        nameFun = nameFun
 ) {
 
     init {
-        (mainUI as UIStorageChest).chest = this.inventory!!
+        (mainUI as UIStorageChest).chestInventory = this.inventory!!
+        (mainUI as UIStorageChest).chestNameFun = this.nameFun
 
         setHitboxDimension(16, 16, 0, 0)
 
@@ -56,7 +58,8 @@ internal class FixtureStorageChest : FixtureBase(
 
 internal class UIStorageChest : UICanvas(), HasInventory {
 
-    lateinit var chest: FixtureInventory
+    lateinit var chestInventory: FixtureInventory
+    lateinit var chestNameFun: () -> String
 
     override var width = AppLoader.screenW
     override var height = AppLoader.screenH
@@ -77,12 +80,15 @@ internal class UIStorageChest : UICanvas(), HasInventory {
     }
 
     override fun getNegotiator() = negotiator
-    override fun getFixtureInventory(): FixtureInventory = chest
+    override fun getFixtureInventory(): FixtureInventory = chestInventory
     override fun getPlayerInventory(): FixtureInventory = Terrarum.ingame!!.actorNowPlaying!!.inventory
 
     private lateinit var catBar: UIItemInventoryCatBar
     private lateinit var itemListChest: UIItemInventoryItemGrid
     private lateinit var itemListPlayer: UIItemInventoryItemGrid
+
+    private var encumbrancePerc = 0f
+    private var isEncumbered = false
 
     private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
@@ -91,6 +97,9 @@ internal class UIStorageChest : UICanvas(), HasInventory {
     private fun itemListUpdate() {
         itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+
+        encumbrancePerc = getPlayerInventory().capacity.toFloat() / getPlayerInventory().maxCapacity
+        isEncumbered = getPlayerInventory().isEncumbered
     }
 
     private fun setCompact(yes: Boolean) {
@@ -105,6 +114,8 @@ internal class UIStorageChest : UICanvas(), HasInventory {
         itemListPlayer.gridModeButtons[1].highlighted = yes
         itemListPlayer.itemPage = 0
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+
+        itemListUpdate()
     }
 
     override fun updateUI(delta: Float) {
@@ -123,7 +134,7 @@ internal class UIStorageChest : UICanvas(), HasInventory {
             itemListChest = UIItemInventoryItemGrid(
                     this,
                     catBar,
-                    chest,
+                    getFixtureInventory(),
                     INVENTORY_CELLS_OFFSET_X - halfSlotOffset,
                     INVENTORY_CELLS_OFFSET_Y,
                     6, CELLS_VRT,
@@ -132,7 +143,7 @@ internal class UIStorageChest : UICanvas(), HasInventory {
                     keyDownFun = { _, _, _ -> Unit },
                     touchDownFun = { gameItem, amount, _ ->
                         if (gameItem != null) {
-                            negotiator.reject(chest, getPlayerInventory(), gameItem, amount)
+                            negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
                         }
                         itemListUpdate()
                     }
@@ -149,7 +160,7 @@ internal class UIStorageChest : UICanvas(), HasInventory {
                     keyDownFun = { _, _, _ -> Unit },
                     touchDownFun = { gameItem, amount, _ ->
                         if (gameItem != null) {
-                            negotiator.accept(getPlayerInventory(), chest, gameItem, amount)
+                            negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                         }
                         itemListUpdate()
                     }
@@ -195,6 +206,7 @@ internal class UIStorageChest : UICanvas(), HasInventory {
         }
 
 
+
         batch.begin()
 
         // UI items
@@ -203,6 +215,40 @@ internal class UIStorageChest : UICanvas(), HasInventory {
         catBar.render(batch, camera)
         itemListChest.render(batch, camera)
         itemListPlayer.render(batch, camera)
+
+
+        blendNormal(batch)
+
+        // encumbrance meter
+        val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+        // encumbrance bar will go one row down if control help message is too long
+        val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - weightBarWidth
+        val encumbBarTextXPos = encumbBarXPos - 6 - AppLoader.fontGame.getWidth(encumbranceText)
+        val encumbBarYPos = UIInventoryCells.encumbBarYPos
+        // encumbrance bar background
+        val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
+        val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+
+        batch.color = Color.WHITE
+        // encumb text
+        AppLoader.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
+        // chest name text
+        AppLoader.fontGame.draw(batch, chestNameFun(), itemListChest.posX + 6f, encumbBarYPos - 3f)
+        batch.color = encumbBack
+        batch.fillRect(
+                encumbBarXPos, encumbBarYPos,
+                weightBarWidth, controlHelpHeight - 6f
+        )
+        // encumbrance bar
+        batch.color = encumbCol
+        batch.fillRect(
+                encumbBarXPos, encumbBarYPos,
+                if (getPlayerInventory().capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
+                    1f
+                else // make sure 1px is always be seen
+                    minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
+                controlHelpHeight - 6f
+        )
     }
 
     override fun doOpening(delta: Float) {

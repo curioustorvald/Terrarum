@@ -19,6 +19,7 @@ open class FixtureBase(
         blockBox0: BlockBox,
         val blockBoxProps: BlockBoxProps = BlockBoxProps(0),
         renderOrder: RenderOrder = RenderOrder.MIDDLE,
+        val nameFun: () -> String,
         val mainUI: UICanvas? = null,
         val inventory: FixtureInventory? = null
 // disabling physics (not allowing the fixture to move) WILL make things easier in many ways

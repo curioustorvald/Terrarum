@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.UICanvas
@@ -26,8 +27,10 @@ internal class UIInventoryCells(
     override var height: Int = AppLoader.screenH
     override var openCloseTime: Second = 0.0f
 
-
-    private val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryItemGrid.listGap
+    companion object {
+        val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryItemGrid.listGap
+        var encumbBarYPos = 0f
+    }
 
     internal var encumbrancePerc = 0f
         private set
@@ -106,6 +109,7 @@ internal class UIInventoryCells(
                             if (AppLoader.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
                                 AppLoader.fontGame.lineHeight
                             else 0f
+        Companion.encumbBarYPos = encumbBarYPos // q&d hack to share some numbers
 
         AppLoader.fontGame.draw(batch,
                 encumbranceText,
@@ -120,7 +124,7 @@ internal class UIInventoryCells(
         batch.color = encumbBack
         batch.fillRect(
                 encumbBarXPos, encumbBarYPos,
-                weightBarWidth, full.controlHelpHeight - 6f
+                weightBarWidth, controlHelpHeight - 6f
         )
         // encumbrance bar
         batch.color = encumbCol
@@ -130,7 +134,7 @@ internal class UIInventoryCells(
                     1f
                 else // make sure 1px is always be seen
                     minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
-                full.controlHelpHeight - 6f
+                controlHelpHeight - 6f
         )
         // debug text
         batch.color = Color.LIGHT_GRAY
@@ -138,7 +142,7 @@ internal class UIInventoryCells(
             AppLoader.fontSmallNumbers.draw(batch,
                     "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
                     encumbBarTextXPos,
-                    encumbBarYPos + full.controlHelpHeight - 4f
+                    encumbBarYPos + controlHelpHeight - 4f
             )
         }
     }

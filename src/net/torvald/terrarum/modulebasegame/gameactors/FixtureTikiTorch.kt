@@ -14,7 +14,7 @@ import java.util.*
 /**
  * Created by minjaesong on 2016-06-17.
  */
-internal class FixtureTikiTorch : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 2)), Luminous {
+internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 2), nameFun = nameFun), Luminous {
 
     private val rndHash1: Int
     private val rndHash2: Int

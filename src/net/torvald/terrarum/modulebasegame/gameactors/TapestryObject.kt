@@ -10,8 +10,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2017-01-07.
  */
-class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String) :
-        FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1), renderOrder = RenderOrder.BEHIND) // placeholder blockbox
+class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String, nameFun: () -> String) :
+        FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1), renderOrder = RenderOrder.BEHIND, nameFun = nameFun) // placeholder blockbox
 {
 
     // physics = false only speeds up for ~2 frames with 50 tapestries

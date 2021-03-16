@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 
 /**
@@ -14,14 +15,14 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 class TikiTorchTester(originalID: ItemID) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "Tiki Torch"
+    override val originalName = "ITEM_TIKI_TORCH"
     override var baseMass = FixtureTikiTorch.MASS
     override var stackable = true
     override var inventoryCategory = Category.FIXTURE
     override val isUnique = false
     override val isDynamic = false
     override val material = Material()
-    override val itemImage: TextureRegion?
+    override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_48")
     override var baseToolSize: Double? = baseMass
 
@@ -30,7 +31,7 @@ class TikiTorchTester(originalID: ItemID) : GameItem(originalID) {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        val item = FixtureTikiTorch()
+        val item = FixtureTikiTorch { Lang[originalName] }
 
         return item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
         // return true when placed, false when cannot be placed
