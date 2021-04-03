@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
@@ -41,6 +42,10 @@ object IngameRenderer : Disposable {
     private lateinit var fboRGB_lightMixed: FrameBuffer
     private lateinit var fboA: FrameBuffer
     private lateinit var fboA_lightMixed: FrameBuffer
+    private lateinit var rgbTex: TextureRegion
+    private lateinit var aTex: TextureRegion
+    private lateinit var lightTex: TextureRegion
+    private lateinit var blurTex: TextureRegion
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
@@ -216,10 +221,8 @@ object IngameRenderer : Disposable {
         // use shader to mix RGB and A
         setCameraPosition(0f, 0f)
 
-        val rgbTex = fboRGB_lightMixed.colorBufferTexture
-        val aTex = fboA_lightMixed.colorBufferTexture
-        rgbTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        aTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        rgbTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        aTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // normal behaviour
         if (!KeyToggler.isOn(Input.Keys.F6) &&
@@ -227,7 +230,7 @@ object IngameRenderer : Disposable {
         ) {
             debugMode = 0
 
-            aTex.bind(1)
+            aTex.texture.bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
 
@@ -236,10 +239,10 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderBlendGlow
                 shaderBlendGlow.setUniformi("tex1", 1)
                 batch.draw(rgbTex,
-                        -0.5f * rgbTex.width * zoom + 0.5f * rgbTex.width,
-                        -0.5f * rgbTex.height * zoom + 0.5f * rgbTex.height,
-                        rgbTex.width * zoom,
-                        rgbTex.height * zoom
+                        -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
+                        -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
+                        rgbTex.regionWidth * zoom,
+                        rgbTex.regionHeight * zoom
                 )
             }
 
@@ -255,10 +258,10 @@ object IngameRenderer : Disposable {
                 blendNormal(batch)
                 batch.shader = null
                 batch.draw(rgbTex,
-                        -0.5f * rgbTex.width * zoom + 0.5f * rgbTex.width,
-                        -0.5f * rgbTex.height * zoom + 0.5f * rgbTex.height,
-                        rgbTex.width * zoom,
-                        rgbTex.height * zoom
+                        -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
+                        -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
+                        rgbTex.regionWidth * zoom,
+                        rgbTex.regionHeight * zoom
                 )
 
                 // indicator
@@ -282,10 +285,10 @@ object IngameRenderer : Disposable {
                 blendNormal(batch)
                 batch.shader = null
                 batch.draw(aTex,
-                        -0.5f * aTex.width * zoom + 0.5f * aTex.width,
-                        -0.5f * aTex.height * zoom + 0.5f * aTex.height,
-                        aTex.width * zoom,
-                        aTex.height * zoom
+                        -0.5f * aTex.regionWidth * zoom + 0.5f * aTex.regionWidth,
+                        -0.5f * aTex.regionHeight * zoom + 0.5f * aTex.regionHeight,
+                        aTex.regionWidth * zoom,
+                        aTex.regionHeight * zoom
                 )
 
                 // indicator
@@ -449,8 +452,7 @@ object IngameRenderer : Disposable {
                 batch.flush()
 
                 // multiply light on top of it
-                val lightTex = lightmapFboB.colorBufferTexture
-                lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                lightTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
                 if (KeyToggler.isOn(Input.Keys.F8))
                     blendNormal(batch)
@@ -460,8 +462,8 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderRGBOnly
                 batch.draw(lightTex,
                         xrem, yrem,
-                        lightTex.width * lightmapDownsample,
-                        lightTex.height * lightmapDownsample
+                        lightTex.regionWidth * lightmapDownsample,
+                        lightTex.regionHeight * lightmapDownsample
                 )
             }
 
@@ -531,8 +533,7 @@ object IngameRenderer : Disposable {
                 batch.flush()
 
                 // multiply light on top of it
-                val lightTex = lightmapFboB.colorBufferTexture
-                lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                lightTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
                 if (KeyToggler.isOn(Input.Keys.F8))
                     blendNormal(batch)
@@ -542,8 +543,8 @@ object IngameRenderer : Disposable {
                 batch.shader = shaderAtoGrey
                 batch.draw(lightTex,
                         xrem, yrem,
-                        lightTex.width * lightmapDownsample,
-                        lightTex.height * lightmapDownsample
+                        lightTex.regionWidth * lightmapDownsample,
+                        lightTex.regionHeight * lightmapDownsample
                 )
             }
 
@@ -639,9 +640,9 @@ object IngameRenderer : Disposable {
         for (i in 0 until blurIterations) {
             blurWriteBuffer.inAction(camera, batch) {
 
-                val texture = blurReadBuffer.colorBufferTexture
-                texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-                texture.bind(0)
+                blurTex.texture = blurReadBuffer.colorBufferTexture
+                blurTex.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                blurTex.texture.bind(0)
 
                 shaderBlur.begin()
                 shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
@@ -707,6 +708,10 @@ object IngameRenderer : Disposable {
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 true
         )
+        rgbTex = TextureRegion(fboRGB_lightMixed.colorBufferTexture)
+        aTex = TextureRegion(fboA_lightMixed.colorBufferTexture)
+        lightTex = TextureRegion(lightmapFboB.colorBufferTexture)
+        blurTex = TextureRegion()
 
         BlocksDrawer.resize(width, height)
         LightmapRenderer.resize(width, height)
