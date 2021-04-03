@@ -221,19 +221,14 @@ internal class UIStorageChest : UICanvas(), HasInventory {
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
-        // encumbrance bar will go one row down if control help message is too long
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - weightBarWidth
         val encumbBarTextXPos = encumbBarXPos - 6 - AppLoader.fontGame.getWidth(encumbranceText)
         val encumbBarYPos = UIInventoryCells.encumbBarYPos
-        // encumbrance bar background
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+        val chestName = chestNameFun()
 
-        batch.color = Color.WHITE
-        // encumb text
-        AppLoader.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
-        // chest name text
-        AppLoader.fontGame.draw(batch, chestNameFun(), itemListChest.posX + 6f, encumbBarYPos - 3f)
+        // encumbrance bar background
         batch.color = encumbBack
         batch.fillRect(
                 encumbBarXPos, encumbBarYPos,
@@ -249,6 +244,13 @@ internal class UIStorageChest : UICanvas(), HasInventory {
                     minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
                 controlHelpHeight - 6f
         )
+
+        // chest name text
+        batch.color = Color.WHITE
+        AppLoader.fontGame.draw(batch, chestName, itemListChest.posX + 6f, encumbBarYPos - 3f)
+        // encumb text
+        batch.color = Color.WHITE
+        AppLoader.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
     }
 
     override fun doOpening(delta: Float) {
