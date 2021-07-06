@@ -344,14 +344,15 @@ public class AppLoader implements ApplicationListener {
             }
         }
 
-        if (args.length == 1 && args[0].equals("isdev=true")) {
+        //if (args.length == 1 && args[0].equals("isdev=true")) {
             IS_DEVELOPMENT_BUILD = true;
             // safe area box
             //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
-        }
-        else {
-            System.err.println("Game not started using DEBUG MODE -- current build of the game will display black screen without debug mode");
-        }
+        //}
+        //else {
+        //    System.err.println("Game not started using DEBUG MODE -- current build of the game will display black screen without debug mode");
+        //}
+        
         // set some more configuration vars
         MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
 
