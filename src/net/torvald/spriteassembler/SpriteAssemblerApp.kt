@@ -284,7 +284,7 @@ class SpriteAssemblerPreview: Game() {
 
         batch.inUse {
             batch.color = Color.WHITE
-            batch.draw(renderTexture, 0f, 0f)
+            batch.draw(renderTexture, 0f, 0f, renderTexture.width * 2f, renderTexture.height * 2f)
         }
     }
 
@@ -310,9 +310,9 @@ class SpriteAssemblerPreview: Game() {
 
 fun main(args: Array<String>) {
     val appConfig = LwjglApplicationConfiguration()
-    appConfig.resizable = true
+    appConfig.resizable = false
     appConfig.width = 512
-    appConfig.height = 512
+    appConfig.height = 1024
     appConfig.foregroundFPS = 5
     appConfig.backgroundFPS = 5
 
