@@ -35,7 +35,7 @@ object PlayerBuilderWerebeastTest {
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
         p.actorValue[AVKey.__ACTION_TIMER] = 0.0
         p.actorValue[AVKey.ACTION_INTERVAL] = ActorHumanoid.BASE_ACTION_INTERVAL
-        p.actorValue[AVKey.NAME] = "Test Subject 1"
+        p.actorValue[AVKey.NAME] = "Taimu"
 
 
         /*p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/npc_template_anim_prototype.tga"), 48, 52))
@@ -43,7 +43,7 @@ object PlayerBuilderWerebeastTest {
         p.sprite!!.setRowsAndFrames(2, 4)*/
 
         p.sprite = SpriteAnimation(p)
-        //p.spriteGlow = SpriteAnimation(p)
+        p.spriteGlow = SpriteAnimation(p)
         p.reassembleSprite(p.sprite!!, p.spriteGlow)
         p.setHitboxDimension(28, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 24, 0)
 

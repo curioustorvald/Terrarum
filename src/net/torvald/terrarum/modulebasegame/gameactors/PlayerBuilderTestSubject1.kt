@@ -12,7 +12,7 @@ object PlayerBuilderTestSubject1 {
     operator fun invoke(): IngamePlayer {
         val p: IngamePlayer = IngamePlayer(
                 ModMgr.getPath("basegame", "sprites/test_sprite.properties"),
-                null,//ModMgr.getPath("basegame", "sprites/test_sprite_glow.properties"),
+                ModMgr.getPath("basegame", "sprites/test_sprite_glow.properties"),
                 -589141658L // random value thrown
         )
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
@@ -29,7 +29,7 @@ object PlayerBuilderTestSubject1 {
         p.sprite!!.setRowsAndFrames(2, 4)*/
 
         p.sprite = SpriteAnimation(p)
-        //p.spriteGlow = SpriteAnimation(p)
+        p.spriteGlow = SpriteAnimation(p)
         p.reassembleSprite(p.sprite!!, p.spriteGlow)
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 

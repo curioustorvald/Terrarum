@@ -16,7 +16,7 @@ object PlayerBuilderSigrid {
     operator fun invoke(): IngamePlayer {
         val p = IngamePlayer("lol", "lol_glow", - 9223372036854775807L) // XD
 
-        p.referenceID = 0x51621D // the only constant of this procedural universe
+        //p.referenceID = 0x51621D // the only constant of this procedural universe
 
 
         p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player.tga"), 28, 51))
