@@ -10,7 +10,7 @@ object TerrarumAppConfiguration {
     // CONFIGURATION FOR THE APP ITSELF //
     //////////////////////////////////////
     const val GAME_NAME = "Terrarum"
-    const val COPYRIGHT_DATE_NAME = "Copyright 2013-2021 Torvald (minjaesong)"
+    const val COPYRIGHT_DATE_NAME = "Copyright 2013-2021 CuriousTorvald (minjaesong)"
 
     /**
      *

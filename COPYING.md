@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 *Terrarum Sans Bitmap*
 
-Copyright (c) 2017-2020 Minjae Song ("CuriousTorvald") and the contributors
+Copyright (c) 2017-2021 Minjae Song ("CuriousTorvald") and the contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

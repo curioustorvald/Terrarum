@@ -58,8 +58,7 @@ Just in case, use this software at your own risk.
 
 ## Copyright ##
 
-Copyright 2015-2016 Torvald (skyhi14 _at_ icloud _dot_ com). All rights reserved. This game is proprietary until things are completed enough to be playable.
-
+Please refer to [```COPYING.md```](COPYING.md).
 
 ## 개요 ##
 

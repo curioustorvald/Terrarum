@@ -22,7 +22,7 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* Kotlin modified code (c) 2017 Torvald (minjaesong) */
+/* Kotlin modified code (c) 2017 CuriousTorvald (minjaesong) */
 package org.dyn4j
 
 /**

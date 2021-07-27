@@ -23,7 +23,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
- * Kotlin translated and modified code Copyright (c) 2016 Minjaesong (Torvald).
+ * Kotlin translated and modified code Copyright (c) 2016 Minjaesong (CuriousTorvald).
  */
 package org.dyn4j.geometry
 
@@ -57,7 +57,7 @@ import org.dyn4j.Epsilon
  * |a rotate th|Vector2(a).rotate(th)|
  * |a to b     |Vector2(a).to(b)     |
  *
- * @author William Bittle and Minjaesong (Torvald)
+ * @author William Bittle and Minjaesong (CuriousTorvald)
  * *
  * @version 3.1.11
  * *
