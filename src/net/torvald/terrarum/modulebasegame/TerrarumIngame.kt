@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
@@ -83,7 +82,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     companion object {
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
         fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
-            camera.position.set((-newX + AppLoader.halfScreenW).round(), (-newY + AppLoader.halfScreenH).round(), 0f)
+            camera.position.set((-newX + AppLoader.screenSize.halfScreenW).round(), (-newY + AppLoader.screenSize.halfScreenH).round(), 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
         }
@@ -184,7 +183,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun show() {
-        //initViewPort(AppLoader.screenW, AppLoader.screenH)
+        //initViewPort(AppLoader.terrarumAppConfig.screenW, AppLoader.terrarumAppConfig.screenH)
 
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
 
@@ -289,8 +288,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /** Load rest of the game with GL context */
     fun postInit() {
         //setTheRealGamerFirstTime(PlayerBuilderSigrid())
-        //setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
-        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
+        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
+        //setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
 
 
 
@@ -314,8 +313,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // init notifier
         notifier = Notification()
         notifier.setPosition(
-                (AppLoader.screenW - notifier.width) / 2,
-                AppLoader.screenH - notifier.height - AppLoader.getTvSafeGraphicsHeight()
+                (AppLoader.screenSize.screenW - notifier.width) / 2,
+                AppLoader.screenSize.screenH - notifier.height - AppLoader.screenSize.tvSafeGraphicsHeight
         )
 
 
@@ -332,11 +331,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // quick bar
         uiQuickBar = UIQuickslotBar()
         uiQuickBar.isVisible = true
-        uiQuickBar.setPosition((AppLoader.screenW - uiQuickBar.width) / 2, AppLoader.getTvSafeGraphicsHeight())
+        uiQuickBar.setPosition((AppLoader.screenSize.screenW - uiQuickBar.width) / 2, AppLoader.screenSize.tvSafeGraphicsHeight)
 
         // pie menu
         uiPieMenu = UIQuickslotPie()
-        uiPieMenu.setPosition(AppLoader.halfScreenW, AppLoader.halfScreenH)
+        uiPieMenu.setPosition(AppLoader.screenSize.halfScreenW, AppLoader.screenSize.halfScreenH)
 
         // vital metre
         // fill in getter functions by
@@ -351,14 +350,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiWatchTierOne = UITierOneWatch(actorNowPlaying)
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
-                ((AppLoader.screenW - AppLoader.getTvSafeActionWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
-                AppLoader.getTvSafeGraphicsHeight() + 8
+                ((AppLoader.screenSize.screenW - AppLoader.screenSize.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                AppLoader.screenSize.tvSafeGraphicsHeight + 8
         )
 
         // basic watch-style notification bar (temperature, new mail)
         uiBasicInfo = UIBasicInfo(actorNowPlaying)
         uiBasicInfo.setAsAlwaysVisible()
-        uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - AppLoader.getTvSafeActionWidth()) / 2 + AppLoader.getTvSafeActionWidth(), uiWatchTierOne.posY)
+        uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - AppLoader.screenSize.tvSafeActionWidth) / 2 + AppLoader.screenSize.tvSafeActionWidth, uiWatchTierOne.posY)
 
 
         uiTooltip = UITooltip()
@@ -1009,8 +1008,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
     /**
-     * @param width same as AppLoader.screenW
-     * @param height same as AppLoader.screenH
+     * @param width same as AppLoader.terrarumAppConfig.screenW
+     * @param height same as AppLoader.terrarumAppConfig.screenH
      * @see net.torvald.terrarum.Terrarum
      */
     override fun resize(width: Int, height: Int) {
@@ -1019,7 +1018,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //MegaRainGovernor.resize()
 
 
-        IngameRenderer.resize(AppLoader.screenW, AppLoader.screenH)
+        IngameRenderer.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
 
 
         if (gameInitialised) {
@@ -1031,23 +1030,23 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // resize UIs
 
             notifier.setPosition(
-                    (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
-            uiQuickBar.setPosition((AppLoader.screenW - uiQuickBar.width) / 2, AppLoader.getTvSafeGraphicsHeight())
+                    (AppLoader.screenSize.screenW - notifier.width) / 2, AppLoader.screenSize.screenH - notifier.height)
+            uiQuickBar.setPosition((AppLoader.screenSize.screenW - uiQuickBar.width) / 2, AppLoader.screenSize.tvSafeGraphicsHeight)
 
             // inventory
             /*uiInventoryPlayer =
                     UIInventory(player,
                             width = 840,
-                            height = AppLoader.screenH - 160,
+                            height = AppLoader.terrarumAppConfig.screenH - 160,
                             categoryWidth = 210
                     )*/
 
 
             // basic watch-style notification bar (temperature, new mail)
-            uiBasicInfo.setPosition(AppLoader.screenW - uiBasicInfo.width, 0)
+            uiBasicInfo.setPosition(AppLoader.screenSize.screenW - uiBasicInfo.width, 0)
             uiWatchTierOne.setPosition(
-                    ((AppLoader.screenW - AppLoader.getTvSafeGraphicsWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
-                    AppLoader.getTvSafeGraphicsHeight() + 8
+                    ((AppLoader.screenSize.screenW - AppLoader.screenSize.tvSafeGraphicsWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                    AppLoader.screenSize.tvSafeGraphicsHeight + 8
             )
 
         }

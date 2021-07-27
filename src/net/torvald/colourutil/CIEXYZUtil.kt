@@ -238,7 +238,7 @@ data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, var a
 data class CIEYXY(val yy: Float = 0f, var x: Float = 0f, var y: Float = 0f, var alpha: Float = 1f) {
     init {
         if (yy < 0f || x < 0f || y < 0f)
-            throw IllegalArgumentException("Value range error - parametres of YXY cannot be negative: ($yy, $x, $y)")
+            throw IllegalArgumentException("Value range error - parameters of YXY cannot be negative: ($yy, $x, $y)")
     }
 }
 

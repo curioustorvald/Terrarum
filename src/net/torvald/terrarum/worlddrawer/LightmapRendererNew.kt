@@ -10,7 +10,6 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
@@ -68,8 +67,8 @@ object LightmapRenderer {
     const val overscan_open: Int = 40
     const val overscan_opaque: Int = 10
 
-    private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
-    private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+    private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+    private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
 
     //private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
@@ -836,11 +835,11 @@ object LightmapRenderer {
 
         // copied from BlocksDrawer, duh!
         // FIXME 'lightBuffer' is not zoomable in this way
-        val tilesInHorizontal = (AppLoader.screenWf / TILE_SIZE).ceilInt() + 1
-        val tilesInVertical = (AppLoader.screenHf / TILE_SIZE).ceilInt() + 1
+        val tilesInHorizontal = (AppLoader.screenSize.screenWf / TILE_SIZE).ceilInt() + 1
+        val tilesInVertical = (AppLoader.screenSize.screenHf / TILE_SIZE).ceilInt() + 1
 
-        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
-        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
 
         if (_init) {
             lightBuffer.dispose()

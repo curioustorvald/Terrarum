@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitem.ItemID
@@ -20,18 +19,8 @@ import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.WriteLayerDataZip.FILE_FOOTER
-import net.torvald.terrarum.serialise.WriteLayerDataZip.PAYLOAD_FOOTER
-import net.torvald.terrarum.serialise.WriteLayerDataZip.PAYLOAD_HEADER
-import net.torvald.terrarum.serialise.toLittle
-import net.torvald.terrarum.serialise.toLittleShort
-import net.torvald.terrarum.serialise.toULittle48
-import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import java.io.File
-import java.io.FileOutputStream
 
 /**
  * Created by minjaesong on 2018-07-06.
@@ -295,11 +284,11 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiToolbox.isVisible = true
         uiToolbox.invocationArgument = arrayOf(this)
 
-        uiPaletteSelector.setPosition(AppLoader.screenW - uiPaletteSelector.width, 0)
+        uiPaletteSelector.setPosition(AppLoader.screenSize.screenW - uiPaletteSelector.width, 0)
         uiPaletteSelector.isVisible = true
 
         notifier.setPosition(
-                (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
+                (AppLoader.screenSize.screenW - notifier.width) / 2, AppLoader.screenSize.screenH - notifier.height)
 
 
         actorNowPlaying?.setPosition(512 * 16.0, 149 * 16.0)
@@ -379,8 +368,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             // position the menu to where the cursor is
             uiPenMenu.posX = Terrarum.mouseScreenX - uiPenMenu.width / 2
             uiPenMenu.posY = Terrarum.mouseScreenY - uiPenMenu.height / 2
-            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, AppLoader.screenW - uiPenMenu.width)
-            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, AppLoader.screenH - uiPenMenu.height)
+            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, AppLoader.screenSize.screenW - uiPenMenu.width)
+            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, AppLoader.screenSize.screenH - uiPenMenu.height)
 
             // actually open
             uiPenMenu.setAsOpen()
@@ -398,10 +387,10 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun resize(width: Int, height: Int) {
-        IngameRenderer.resize(AppLoader.screenW, AppLoader.screenH)
+        IngameRenderer.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
         uiToolbox.setPosition(0, 0)
         notifier.setPosition(
-                (AppLoader.screenW - notifier.width) / 2, AppLoader.screenH - notifier.height)
+                (AppLoader.screenSize.screenW - notifier.width) / 2, AppLoader.screenSize.screenH - notifier.height)
 
         println("[BuildingMaker] Resize event")
     }
@@ -518,8 +507,8 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
         return true
     }
 
-    override fun scrolled(amount: Int): Boolean {
-        screen.uiContainer.forEach { it?.scrolled(amount) }
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        screen.uiContainer.forEach { it?.scrolled(amountX, amountY) }
         return true
     }
 
@@ -563,12 +552,12 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
 
     // TODO resize-aware
     private var coerceInStart = Point2d(
-            (AppLoader.screenW - hitbox.width) / 2.0,
-            (AppLoader.screenH - hitbox.height) / 2.0
+            (AppLoader.screenSize.screenW - hitbox.width) / 2.0,
+            (AppLoader.screenSize.screenH - hitbox.height) / 2.0
     )
     private var coerceInEnd = Point2d(
-            parent.world.width * TILE_SIZE - (AppLoader.screenW - hitbox.width) / 2.0,
-            parent.world.height * TILE_SIZE - (AppLoader.screenH - hitbox.height) / 2.0
+            parent.world.width * TILE_SIZE - (AppLoader.screenSize.screenW - hitbox.width) / 2.0,
+            parent.world.height * TILE_SIZE - (AppLoader.screenSize.screenH - hitbox.height) / 2.0
     )
 
     override fun update(delta: Float) {

@@ -335,7 +335,7 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     //this.end()
     FrameBufferManager.end()
 
-    camera?.setToOrtho(true, AppLoader.screenWf, AppLoader.screenHf)
+    camera?.setToOrtho(true, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 }

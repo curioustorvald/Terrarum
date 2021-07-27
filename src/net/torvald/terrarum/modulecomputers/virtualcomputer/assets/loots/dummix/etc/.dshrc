@@ -1,8 +1,0 @@
--- dsh aliases
-os.dshenv.aliases = {
-	lua = "msh",
-	sh = "dsh",
-	shutdown = "exit", -- should be a separate program that actually halts the system
-	less = "lessismore",
-	more = "lessismore"
-}

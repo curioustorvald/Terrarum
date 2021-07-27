@@ -642,8 +642,8 @@ internal object BlocksDrawer {
     var tilesInVertical = -1; private set
 
     fun resize(screenW: Int, screenH: Int) {
-        tilesInHorizontal = (AppLoader.screenWf / TILE_SIZE).ceilInt() + 1
-        tilesInVertical = (AppLoader.screenHf / TILE_SIZE).ceilInt() + 1
+        tilesInHorizontal = (AppLoader.screenSize.screenWf / TILE_SIZE).ceilInt() + 1
+        tilesInVertical = (AppLoader.screenSize.screenHf / TILE_SIZE).ceilInt() + 1
 
         val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilInt() + 1
         val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilInt() + 1
@@ -669,9 +669,9 @@ internal object BlocksDrawer {
 
             tilesQuad.setVertices(floatArrayOf( // WARNING! not ususal quads; TexCoords of Y is flipped
                     0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 0f,
-                    AppLoader.screenWf, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                    AppLoader.screenWf, AppLoader.screenHf, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                    0f, AppLoader.screenHf, 0f, 1f, 1f, 1f, 1f, 0f, 1f
+                    AppLoader.screenSize.screenWf, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                    AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                    0f, AppLoader.screenSize.screenHf, 0f, 1f, 1f, 1f, 1f, 0f, 1f
             ))
             tilesQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
         }

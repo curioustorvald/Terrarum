@@ -25,8 +25,8 @@ class UIInventoryFull(
         doNotWarnConstant: Boolean = false
 ) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
 
-    override var width: Int = AppLoader.screenW
-    override var height: Int = AppLoader.screenH
+    override var width: Int = AppLoader.screenSize.screenW
+    override var height: Int = AppLoader.screenSize.screenH
     override var openCloseTime: Second = 0.0f
 
     companion object {
@@ -34,7 +34,7 @@ class UIInventoryFull(
 
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
         const val CELLS_HOR = 10
-        val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
+        val CELLS_VRT: Int; get() = (AppLoader.screenSize.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
                                 (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
 
         const val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
@@ -45,8 +45,8 @@ class UIInventoryFull(
         val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
         val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
-        val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
-        val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
+        val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenSize.screenW - internalWidth) / 2
+        val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenSize.screenH - internalHeight) / 2
 
         val catBarWidth = 330
 
@@ -60,7 +60,7 @@ class UIInventoryFull(
     //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
 
     //val CELLS_HOR = 10
-    //val CELLS_VRT: Int; get() = (AppLoader.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
+    //val CELLS_VRT: Int; get() = (AppLoader.terrarumAppConfig.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
     //                            (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
 
     //private val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
@@ -71,8 +71,8 @@ class UIInventoryFull(
     //val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
     //val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
-    //val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenW - internalWidth) / 2
-    //val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenH - internalHeight) / 2
+    //val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.terrarumAppConfig.screenW - internalWidth) / 2
+    //val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.terrarumAppConfig.screenH - internalHeight) / 2
 
     init {
         handler.allowESCtoClose = true
@@ -113,8 +113,8 @@ class UIInventoryFull(
 
     val catBar = UIItemInventoryCatBar(
             this,
-            (AppLoader.screenW - catBarWidth) / 2,
-            42 + (AppLoader.screenH - internalHeight) / 2,
+            (AppLoader.screenSize.screenW - catBarWidth) / 2,
+            42 + (AppLoader.screenSize.screenH - internalHeight) / 2,
             internalWidth,
             catBarWidth,
             true,
@@ -127,10 +127,10 @@ class UIInventoryFull(
     private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
             this,
-            (AppLoader.screenW - internalWidth) / 2,
+            (AppLoader.screenSize.screenW - internalWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y,
-            AppLoader.screenW,
-            AppLoader.screenH,
+            AppLoader.screenSize.screenW,
+            AppLoader.screenSize.screenH,
             1f,
             transitionalMinimap, transitionalItemCells, transitionalEscMenu
     )
@@ -151,9 +151,9 @@ class UIInventoryFull(
 
     }
 
-    internal var offsetX = ((AppLoader.screenW - internalWidth)  / 2).toFloat()
+    internal var offsetX = ((AppLoader.screenSize.screenW - internalWidth) / 2).toFloat()
         private set
-    internal var offsetY = ((AppLoader.screenH - internalHeight) / 2).toFloat()
+    internal var offsetY = ((AppLoader.screenSize.screenH - internalHeight) / 2).toFloat()
         private set
 
     fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
@@ -172,9 +172,9 @@ class UIInventoryFull(
     //private val gradHeight = 48f
     private val shapeRenderer = ShapeRenderer()
 
-    internal var xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
+    internal var xEnd = (AppLoader.screenSize.screenW + internalWidth).div(2).toFloat()
         private set
-    internal var yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
+    internal var yEnd = (AppLoader.screenSize.screenH + internalHeight).div(2).toFloat()
         private set
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -185,17 +185,17 @@ class UIInventoryFull(
         gdxSetBlendNormal()
 
 
-        val gradTopStart = (AppLoader.screenH - internalHeight).div(2).toFloat()
-        val gradBottomEnd = AppLoader.screenH - gradTopStart
+        val gradTopStart = (AppLoader.screenSize.screenH - internalHeight).div(2).toFloat()
+        val gradBottomEnd = AppLoader.screenSize.screenH - gradTopStart
 
         shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenWf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenWf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenSize.screenWf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenSize.screenWf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenWf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenSize.screenWf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, 0f, AppLoader.screenWf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, AppLoader.screenHf, AppLoader.screenWf, -(AppLoader.screenHf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, 0f, AppLoader.screenSize.screenWf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, AppLoader.screenSize.screenHf, AppLoader.screenSize.screenWf, -(AppLoader.screenSize.screenHf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
         }
 
 
@@ -255,11 +255,11 @@ class UIInventoryFull(
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
 
-        offsetX = ((AppLoader.screenW - internalWidth)   / 2).toFloat()
-        offsetY = ((AppLoader.screenH - internalHeight) / 2).toFloat()
+        offsetX = ((AppLoader.screenSize.screenW - internalWidth) / 2).toFloat()
+        offsetY = ((AppLoader.screenSize.screenH - internalHeight) / 2).toFloat()
 
-        xEnd = (AppLoader.screenW + internalWidth).div(2).toFloat()
-        yEnd = (AppLoader.screenH + internalHeight).div(2).toFloat()
+        xEnd = (AppLoader.screenSize.screenW + internalWidth).div(2).toFloat()
+        yEnd = (AppLoader.screenSize.screenH + internalHeight).div(2).toFloat()
     }
 }
 

@@ -2,8 +2,8 @@ package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.Input.Keys.*
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
@@ -133,15 +133,15 @@ class GetKeycode : Game() {
     }
 }
 
-fun main() {val appConfig = LwjglApplicationConfiguration()
-    appConfig.resizable = false
-    appConfig.width = 256
-    appConfig.height = 64
-    appConfig.foregroundFPS = 60
-    appConfig.backgroundFPS = 60
+fun main() {
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.setResizable(false)
+    appConfig.setWindowedMode(256, 64)
+    appConfig.setForegroundFPS(2)
+    appConfig.setIdleFPS(2)
 
     val gdxWindow = GetKeycode()
 
-    LwjglApplication(gdxWindow, appConfig)
+    Lwjgl3Application(gdxWindow, appConfig)
     MakeKeylayoutFile.invoke()
 }

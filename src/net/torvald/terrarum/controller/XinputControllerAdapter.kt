@@ -53,7 +53,7 @@ class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
         return -1f
     }
 
-    override fun getPov(): Int {
+    override fun getDpad(): Int {
         if (c.poll()) {
             val axes = c.components.axes
 

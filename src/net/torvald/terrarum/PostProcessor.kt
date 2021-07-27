@@ -65,13 +65,13 @@ object PostProcessor : Disposable {
             debugUI.setPosition(0, 0)
 
             batch = SpriteBatch()
-            camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
+            camera = OrthographicCamera(AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
             camera.setToOrtho(true)
 
             batch.projectionMatrix = camera.combined
 
             shapeRenderer = ShapeRenderer()
-            Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
+            Gdx.gl20.glViewport(0, 0, AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
         }
 
 
@@ -93,7 +93,7 @@ object PostProcessor : Disposable {
                 batch.color = Color.WHITE
                 batch.inUse {
                     it.draw(functionRowHelper,
-                            (AppLoader.screenW - functionRowHelper.width) / 2f,
+                            (AppLoader.screenSize.screenW - functionRowHelper.width) / 2f,
                             functionRowHelper.height.toFloat(),
                             functionRowHelper.width.toFloat(),
                             functionRowHelper.height * -1f
@@ -120,7 +120,7 @@ object PostProcessor : Disposable {
             if (AppLoader.IS_DEVELOPMENT_BUILD && Terrarum.ingame != null) {
                 batch.inUse {
                     batch.color = safeAreaCol
-                    AppLoader.fontGame.draw(it, thisIsDebugStr, 5f, AppLoader.screenH - 24f)
+                    AppLoader.fontGame.draw(it, thisIsDebugStr, 5f, AppLoader.screenSize.screenH - 24f)
                 }
             }
         }
@@ -147,37 +147,37 @@ object PostProcessor : Disposable {
     }
 
     private fun drawSafeArea() {
-        val tvSafeAreaW = AppLoader.getTvSafeGraphicsWidth().toFloat()
-        val tvSafeAreaH = AppLoader.getTvSafeGraphicsHeight().toFloat()
-        val tvSafeArea2W = AppLoader.getTvSafeActionWidth().toFloat()
-        val tvSafeArea2H = AppLoader.getTvSafeActionHeight().toFloat()
+        val tvSafeAreaW = AppLoader.screenSize.tvSafeGraphicsWidth.toFloat()
+        val tvSafeAreaH = AppLoader.screenSize.tvSafeGraphicsHeight.toFloat()
+        val tvSafeArea2W = AppLoader.screenSize.tvSafeActionWidth.toFloat()
+        val tvSafeArea2H = AppLoader.screenSize.tvSafeActionHeight.toFloat()
 
         shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
 
             // centre ind
             shapeRenderer.color = safeAreaCol2
-            shapeRenderer.line(0f, 0f, AppLoader.screenWf, AppLoader.screenHf)
-            shapeRenderer.line(0f, AppLoader.screenHf, AppLoader.screenWf, 0f)
+            shapeRenderer.line(0f, 0f, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
+            shapeRenderer.line(0f, AppLoader.screenSize.screenHf, AppLoader.screenSize.screenWf, 0f)
 
             // safe action area
             shapeRenderer.color = safeAreaCol2
             shapeRenderer.rect(
-                    tvSafeArea2W, tvSafeArea2H, AppLoader.screenW - 2 * tvSafeArea2W, AppLoader.screenH - 2 * tvSafeArea2H
+                    tvSafeArea2W, tvSafeArea2H, AppLoader.screenSize.screenW - 2 * tvSafeArea2W, AppLoader.screenSize.screenH - 2 * tvSafeArea2H
             )
 
             // safe graphics area
             shapeRenderer.color = safeAreaCol
             shapeRenderer.rect(
-                    tvSafeAreaW, tvSafeAreaH, AppLoader.screenW - 2 * tvSafeAreaW, AppLoader.screenH - 2 * tvSafeAreaH
+                    tvSafeAreaW, tvSafeAreaH, AppLoader.screenSize.screenW - 2 * tvSafeAreaW, AppLoader.screenSize.screenH - 2 * tvSafeAreaH
             )
 
             // default res ind
             shapeRenderer.color = defaultResCol
             shapeRenderer.rect(
-                    (AppLoader.screenW - AppLoader.minimumW).div(2).toFloat(),
-                    (AppLoader.screenH - AppLoader.minimumH).div(2).toFloat(),
-                    AppLoader.minimumW.toFloat(),
-                    AppLoader.minimumH.toFloat()
+                    (AppLoader.screenSize.screenW - TerrarumScreenSize.minimumW).div(2).toFloat(),
+                    (AppLoader.screenSize.screenH - TerrarumScreenSize.minimumH).div(2).toFloat(),
+                    TerrarumScreenSize.minimumW.toFloat(),
+                    TerrarumScreenSize.minimumH.toFloat()
             )
         }
 
@@ -192,14 +192,14 @@ object PostProcessor : Disposable {
                 batch.color = defaultResCol
                 AppLoader.fontSmallNumbers.draw(
                         batch, defaultResStr,
-                        (AppLoader.screenW - AppLoader.minimumW).div(2).toFloat(),
-                        (AppLoader.screenH - AppLoader.minimumH).div(2).toFloat()
+                        (AppLoader.screenSize.screenW - TerrarumScreenSize.minimumW).div(2).toFloat(),
+                        (AppLoader.screenSize.screenH - TerrarumScreenSize.minimumH).div(2).toFloat()
                 )
 
                 batch.color = currentResCol
                 AppLoader.fontSmallNumbers.draw(
                         batch, currentResStr,
-                        AppLoader.screenW - 80f,
+                        AppLoader.screenSize.screenW - 80f,
                         0f
                 )
             }
@@ -213,8 +213,8 @@ object PostProcessor : Disposable {
         }
     }
 
-    private val defaultResStr = "${AppLoader.minimumW}x${AppLoader.minimumH}"
-    private val currentResStr = "${AppLoader.screenW}x${AppLoader.screenH}"
+    private val defaultResStr = "${TerrarumScreenSize.minimumW}x${TerrarumScreenSize.minimumH}"
+    private val currentResStr = "${AppLoader.screenSize.screenW}x${AppLoader.screenSize.screenH}"
     private val safeAreaStr = "TV Safe Area"
     private val versionStr = "Version ${AppLoader.getVERSION_STRING()}"
     private val thisIsDebugStr = "${AppLoader.GAME_NAME} Develoment Build $versionStr"

@@ -273,7 +273,7 @@ class UIItemTextButtonList(
         return super.touchUp(screenX, screenY, pointer, button) || buttons.map { it.touchUp(screenX, screenY, pointer, button).toInt() }.sum() != 0
     }
 
-    override fun scrolled(amount: Int): Boolean {
-        return super.scrolled(amount) || buttons.map { it.scrolled(amount).toInt() }.sum() != 0
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        return super.scrolled(amountX, amountY) || buttons.map { it.scrolled(amountX, amountY).toInt() }.sum() != 0
     }
 }

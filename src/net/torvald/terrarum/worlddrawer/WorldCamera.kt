@@ -63,8 +63,8 @@ object WorldCamera {
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
-        width = AppLoader.screenW//FastMath.ceil(AppLoader.screenW / zoom) // div, not mul
-        height = AppLoader.screenH//FastMath.ceil(AppLoader.screenH / zoom)
+        width = AppLoader.screenSize.screenW//FastMath.ceil(AppLoader.terrarumAppConfig.screenW / zoom) // div, not mul
+        height = AppLoader.screenSize.screenH//FastMath.ceil(AppLoader.terrarumAppConfig.screenH / zoom)
         zoom = Terrarum.ingame?.screenZoom ?: 1f
         zoomSamplePoint = (1f - 1f / zoom) / 2f // will never quite exceed 0.5
 
@@ -93,8 +93,8 @@ object WorldCamera {
     private fun Int.clampCameraY(world: GameWorld): Int {
         return if (this < 0)
             0
-        else if (this > world.height.times(TILE_SIZE) - AppLoader.screenH)
-            world.height.times(TILE_SIZE) - AppLoader.screenH
+        else if (this > world.height.times(TILE_SIZE) - AppLoader.screenSize.screenH)
+            world.height.times(TILE_SIZE) - AppLoader.screenSize.screenH
         else
             this
     }

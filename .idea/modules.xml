@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ModuleRenamingHistory">
+    <module old-name="terrarum" new-name="terrarum.terrarum" />
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ingamemodule_basegame/ingamemodule_basegame.iml" filepath="$PROJECT_DIR$/ingamemodule_basegame/ingamemodule_basegame.iml" />
-      <module fileurl="file://$PROJECT_DIR$//terrarum.iml" filepath="$PROJECT_DIR$//terrarum.iml" group="terrarum" />
+      <module fileurl="file://$PROJECT_DIR$/terrarum.terrarum.iml" filepath="$PROJECT_DIR$/terrarum.terrarum.iml" />
     </modules>
   </component>
 </project>

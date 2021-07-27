@@ -4,7 +4,6 @@ import com.badlogic.gdx.Input
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 
 /**
  * Keys must be all lowercase
@@ -17,8 +16,8 @@ object DefaultConfig {
 
         jsonObject.addProperty("displayfps", 0) // 0: no limit, non-zero: limit
         jsonObject.addProperty("usevsync", false)
-        jsonObject.addProperty("screenwidth", AppLoader.defaultW)
-        jsonObject.addProperty("screenheight", AppLoader.defaultH)
+        jsonObject.addProperty("screenwidth", TerrarumScreenSize.defaultW)
+        jsonObject.addProperty("screenheight", TerrarumScreenSize.defaultH)
 
 
         //jsonObject.addProperty("imtooyoungtodie", false) // no perma-death

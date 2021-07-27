@@ -67,7 +67,7 @@ class UIItemImageGallery(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun scrolled(amount: Int): Boolean {
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

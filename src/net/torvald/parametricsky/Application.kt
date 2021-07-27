@@ -3,8 +3,8 @@ package net.torvald.parametricsky
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -284,10 +284,8 @@ class Application : Game() {
 
 
 fun main(args: Array<String>) {
-    val config = LwjglApplicationConfiguration()
-    config.width = WIDTH
-    config.height = HEIGHT
-    config.foregroundFPS = 0
+    val config = Lwjgl3ApplicationConfiguration()
+    config.setWindowedMode(WIDTH, HEIGHT)
 
-    LwjglApplication(Application(), config)
+    Lwjgl3Application(Application(), config)
 }

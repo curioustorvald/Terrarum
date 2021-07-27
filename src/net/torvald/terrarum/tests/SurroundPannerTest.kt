@@ -3,8 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.files.FileHandle
 import java.awt.BorderLayout
 import javax.swing.JFrame
@@ -59,15 +59,14 @@ class AudioPlayerSlave : Game() {
 }
 
 fun main(args: Array<String>) {
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = true
-    appConfig.width = 256
-    appConfig.height = 256
-    appConfig.backgroundFPS = 20
-    appConfig.foregroundFPS = 20
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.useVsync(false)
+    appConfig.setResizable(true)
+    appConfig.setWindowedMode(256, 256)
+    appConfig.setForegroundFPS(20)
+    appConfig.setIdleFPS(20)
 
-    LwjglApplication(AudioPlayerSlave(), appConfig)
+    Lwjgl3Application(AudioPlayerSlave(), appConfig)
 }
 
 

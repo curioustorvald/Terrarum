@@ -111,32 +111,4 @@ open class UIItemTextButton(
 
     override fun dispose() {
     }
-
-    override fun keyDown(keycode: Int): Boolean {
-        return super.keyDown(keycode)
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        return super.keyUp(keycode)
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return super.mouseMoved(screenX, screenY)
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return super.touchDragged(screenX, screenY, pointer)
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchDown(screenX, screenY, pointer, button)
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
-    }
-
-    override fun scrolled(amount: Int): Boolean {
-        return super.scrolled(amount)
-    }
 }

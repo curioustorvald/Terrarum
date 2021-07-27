@@ -16,11 +16,11 @@ import net.torvald.terrarum.ui.UICanvas
 class UICheatDetected : UICanvas() {
 
     override var width: Int
-        get() = AppLoader.screenW
+        get() = AppLoader.screenSize.screenW
         set(value) { throw UnsupportedOperationException() }
 
     override var height: Int
-        get() = AppLoader.screenH
+        get() = AppLoader.screenSize.screenH
         set(value) { throw UnsupportedOperationException() }
 
     override var openCloseTime: Second = 0f

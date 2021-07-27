@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
@@ -21,13 +20,13 @@ class UITitleLanguage : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = (AppLoader.screenW * 0.75).toInt()
-    override var height = AppLoader.screenH - textAreaHMargin * 2
+    override var width = (AppLoader.screenSize.screenW * 0.75).toInt()
+    override var height = AppLoader.screenSize.screenH - textAreaHMargin * 2
 
     private val localeList = Lang.languageList.toList().sorted()
     private val textArea = UIItemTextButtonList(this,
             localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
-            AppLoader.screenW - width, textAreaHMargin,
+            AppLoader.screenSize.screenW - width, textAreaHMargin,
             width, height,
             textAreaWidth = width,
             readFromLang = false,

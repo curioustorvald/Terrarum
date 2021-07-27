@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Terrarum_Joise">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Terrarum_Joise.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/Terrarum_Joise.jar!/" />
+    </SOURCES>
+  </library>
+</component>

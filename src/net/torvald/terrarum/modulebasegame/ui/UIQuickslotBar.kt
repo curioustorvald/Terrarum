@@ -83,10 +83,10 @@ class UIQuickslotBar : UICanvas() {
         handler.opacity = 0f
     }
 
-    override fun scrolled(amount: Int): Boolean {
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
         // super.scrolled(amount) // no UIItems here
 
-        selection = selection.plus(if (amount > 1) 1 else if (amount < -1) -1 else 0).fmod(SLOT_COUNT)
+        selection = selection.plus(if (amountX > 1) 1 else if (amountX < -1) -1 else 0).fmod(SLOT_COUNT)
 
         return true
     }

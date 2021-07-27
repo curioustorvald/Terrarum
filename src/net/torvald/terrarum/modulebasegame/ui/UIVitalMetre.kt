@@ -50,8 +50,8 @@ class UIVitalMetre(
 
     override fun updateUI(delta: Float) {
         handler.setPosition(
-                AppLoader.halfScreenW,
-                AppLoader.halfScreenH
+                AppLoader.screenSize.halfScreenW,
+                AppLoader.screenSize.halfScreenH
         )
     }
 

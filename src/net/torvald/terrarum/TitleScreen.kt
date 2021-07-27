@@ -5,9 +5,7 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
@@ -38,7 +36,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     // todo register titlescreen as the ingame, similar in a way that the buildingmaker did
 
-    var camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
+    var camera = OrthographicCamera(AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
 
 
     // invert Y
@@ -170,13 +168,13 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     override fun show() {
         printdbg(this, "show() called")
 
-        initViewPort(AppLoader.screenW, AppLoader.screenH)
+        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
 
 
         Gdx.input.inputProcessor = TitleScreenController(this)
 
 
-        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenW, AppLoader.screenH, false)
+        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenSize.screenW, AppLoader.screenSize.screenH, false)
 
         loadThingsWhileIntroIsVisible()
 
@@ -235,7 +233,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
-        //camera.setToOrtho(true, AppLoader.screenWf, AppLoader.screenHf)
+        //camera.setToOrtho(true, AppLoader.terrarumAppConfig.screenWf, AppLoader.terrarumAppConfig.screenHf)
 
         // render world
         gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
@@ -272,14 +270,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         COPYTING.forEachIndexed { index, s ->
             val textWidth = AppLoader.fontGame.getWidth(s)
             AppLoader.fontGame.draw(batch, s,
-                    (AppLoader.screenW - textWidth - 1f).toInt().toFloat(),
-                    (AppLoader.screenH - AppLoader.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
+                    (AppLoader.screenSize.screenW - textWidth - 1f).toInt().toFloat(),
+                    (AppLoader.screenSize.screenH - AppLoader.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
             )
         }
 
         AppLoader.fontGame.draw(batch, "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}",
                 1f.toInt().toFloat(),
-                (AppLoader.screenH - AppLoader.fontGame.lineHeight - 1f).toInt().toFloat()
+                (AppLoader.screenSize.screenH - AppLoader.fontGame.lineHeight - 1f).toInt().toFloat()
         )
 
     }
@@ -296,11 +294,11 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         printStackTrace(this)
 
         // Set up viewport when window is resized
-        initViewPort(AppLoader.screenW, AppLoader.screenH)
+        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
 
 
         // resize UI by re-creating it (!!)
-        uiMenu.resize(AppLoader.screenW, AppLoader.screenH)
+        uiMenu.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
         // TODO I forgot what the fuck kind of hack I was talking about
         //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         uiMenu.setPosition(0, 0) // shitty hack. Could be:
@@ -308,7 +306,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         // 2: The UI is coded shit
 
 
-        IngameRenderer.resize(AppLoader.screenW, AppLoader.screenH)
+        IngameRenderer.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
 
         printdbg(this, "resize() exit")
     }
@@ -342,8 +340,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             return true
         }
 
-        override fun scrolled(amount: Int): Boolean {
-            screen.uiContainer.forEach { it?.scrolled(amount) }
+        override fun scrolled(amountX: Float, amountY: Float): Boolean {
+            screen.uiContainer.forEach { it?.scrolled(amountX, amountY) }
             return true
         }
 

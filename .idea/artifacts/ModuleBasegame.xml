@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$/out/artifacts/ModuleBasegame</output-path>
     <root id="archive" name="ModuleBasegame.jar">
       <element id="module-output" name="ingamemodule_basegame" />
-      <element id="library" level="project" name="lib" />
     </root>
   </artifact>
 </component>

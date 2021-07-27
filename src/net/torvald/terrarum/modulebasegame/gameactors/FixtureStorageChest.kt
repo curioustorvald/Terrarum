@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.langpack.Lang
@@ -13,7 +12,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryCells.Companion.weightBarWidth
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
@@ -61,8 +59,8 @@ internal class UIStorageChest : UICanvas(), HasInventory {
     lateinit var chestInventory: FixtureInventory
     lateinit var chestNameFun: () -> String
 
-    override var width = AppLoader.screenW
-    override var height = AppLoader.screenH
+    override var width = AppLoader.screenSize.screenW
+    override var height = AppLoader.screenSize.screenH
     override var openCloseTime: Second = 0.0f
 
     private val shapeRenderer = ShapeRenderer()
@@ -124,8 +122,8 @@ internal class UIStorageChest : UICanvas(), HasInventory {
 
             catBar = UIItemInventoryCatBar(
                     this,
-                    (AppLoader.screenW - catBarWidth) / 2,
-                    42 + (AppLoader.screenH - internalHeight) / 2,
+                    (AppLoader.screenSize.screenW - catBarWidth) / 2,
+                    42 + (AppLoader.screenSize.screenH - internalHeight) / 2,
                     internalWidth,
                     catBarWidth,
                     false
@@ -192,17 +190,17 @@ internal class UIStorageChest : UICanvas(), HasInventory {
         gdxSetBlendNormal()
 
 
-        val gradTopStart = (AppLoader.screenH - internalHeight).div(2).toFloat()
-        val gradBottomEnd = AppLoader.screenH - gradTopStart
+        val gradTopStart = (AppLoader.screenSize.screenH - internalHeight).div(2).toFloat()
+        val gradBottomEnd = AppLoader.screenSize.screenH - gradTopStart
 
         shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenWf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenWf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenSize.screenWf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenSize.screenWf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenWf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenSize.screenWf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, 0f, AppLoader.screenWf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, AppLoader.screenHf, AppLoader.screenWf, -(AppLoader.screenHf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, 0f, AppLoader.screenSize.screenWf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, AppLoader.screenSize.screenHf, AppLoader.screenSize.screenWf, -(AppLoader.screenSize.screenHf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
         }
 
 

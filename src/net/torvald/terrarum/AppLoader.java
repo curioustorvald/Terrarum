@@ -2,8 +2,8 @@ package net.torvald.terrarum;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.AudioDevice;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -40,6 +40,7 @@ import net.torvald.util.ArrayListMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
@@ -94,7 +95,7 @@ public class AppLoader implements ApplicationListener {
      * @param appConfig    LWJGL(2) Application Configuration
      * @param injectScreen GDX Screen you want to run
      */
-    public AppLoader(LwjglApplicationConfiguration appConfig, Screen injectScreen) {
+    public AppLoader(Lwjgl3ApplicationConfiguration appConfig, Screen injectScreen) {
         AppLoader.injectScreen = injectScreen;
         AppLoader.appConfig = appConfig;
     }
@@ -102,9 +103,9 @@ public class AppLoader implements ApplicationListener {
     /**
      * Initialise the application with default game screen
      *
-     * @param appConfig LWJGL(2) Application Configuration
+     * @param appConfig LWJGL3 Application Configuration
      */
-    public AppLoader(LwjglApplicationConfiguration appConfig) {
+    public AppLoader(Lwjgl3ApplicationConfiguration appConfig) {
         AppLoader.appConfig = appConfig;
     }
 
@@ -148,14 +149,6 @@ public class AppLoader implements ApplicationListener {
 
     public static final int GLOBAL_FRAMERATE_LIMIT = 300;
 
-    public static final float TV_SAFE_GRAPHICS = 0.05f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
-    public static final float TV_SAFE_ACTION = 0.035f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
-
-    public static int getTvSafeGraphicsWidth() { return Math.round(screenW * TV_SAFE_GRAPHICS); }
-    public static int getTvSafeGraphicsHeight() { return Math.round(screenH * TV_SAFE_GRAPHICS); }
-    public static int getTvSafeActionWidth() { return Math.round(screenW * TV_SAFE_ACTION); }
-    public static int getTvSafeActionHeight() { return Math.round(screenH * TV_SAFE_ACTION); }
-
     /**
      * These languages won't distinguish regional differences (e.g. enUS and enUK, frFR and frCA)
      */
@@ -192,7 +185,8 @@ public class AppLoader implements ApplicationListener {
     private static boolean resizeRequested = false;
     private static Point2i resizeReqSize;
 
-    public static LwjglApplicationConfiguration appConfig;
+    public static Lwjgl3ApplicationConfiguration appConfig;
+    public static TerrarumScreenSize screenSize;
     public static GameFontBase fontGame;
     public static TinyAlphNum fontSmallNumbers;
 
@@ -209,10 +203,6 @@ public class AppLoader implements ApplicationListener {
 
     public static ArrayListMap debugTimers = new ArrayListMap<String, Long>();
 
-    public static final int defaultW = 1280;
-    public static final int defaultH = 720;
-    public static final int minimumW = 1080;
-    public static final int minimumH = 720;
 
     public static final String FONT_DIR = "assets/graphics/fonts/terrarum-sans-bitmap";
 
@@ -238,15 +228,6 @@ public class AppLoader implements ApplicationListener {
 
     private static Screen currenScreen;
     private static LoadScreenBase currentSetLoadScreen;
-    public static int screenW = 0;
-    public static int screenH = 0;
-    public static float screenWf = 0f;
-    public static float screenHf = 0f;
-    public static int halfScreenW = 0;
-    public static int halfScreenH = 0;
-    public static float halfScreenWf = 0f;
-    public static float halfScreenHf = 0f;
-    public static float aspectRatio = 0f;
 
     public static Texture textureWhiteSquare;
     public static Texture textureWhiteCircle;
@@ -315,34 +296,36 @@ public class AppLoader implements ApplicationListener {
 
         ShaderProgram.pedantic = false;
 
-        LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-        appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
-        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
-        appConfig.resizable = false;//true;
-        appConfig.width = getConfigInt("screenwidth");
-        if (appConfig.width % 2 == 1) appConfig.width -= 1;
-        if (appConfig.width < minimumW) appConfig.width = minimumW;
-        appConfig.height = getConfigInt("screenheight");
-        if (appConfig.height % 2 == 1) appConfig.height -= 1;
-        if (appConfig.height < minimumH) appConfig.height = minimumH;
-        appConfig.backgroundFPS = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
-        appConfig.foregroundFPS = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
-        appConfig.title = GAME_NAME;
-        appConfig.forceExit = true; // it seems KDE 5 likes this one better...
-        // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
-        appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
+        screenSize = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
+        int width = screenSize.getScreenW();
+        int height = screenSize.getScreenH();
 
-        if (appConfig.backgroundFPS <= 0) appConfig.backgroundFPS = GLOBAL_FRAMERATE_LIMIT;
-        if (appConfig.foregroundFPS <= 0) appConfig.foregroundFPS = GLOBAL_FRAMERATE_LIMIT;
+        Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
+        //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
+        appConfig.useVsync(getConfigBoolean("usevsync"));
+        appConfig.setResizable(false);
+        appConfig.setWindowedMode(width, height);
+        int fps = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
+        if (fps <= 0) fps = GLOBAL_FRAMERATE_LIMIT;
+        appConfig.setIdleFPS(fps);
+        appConfig.setForegroundFPS(fps);
+        appConfig.setTitle(GAME_NAME);
+        //appConfig.forceExit = true; // it seems KDE 5 likes this one better...
+        // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
+        //appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
 
         // load app icon
         int[] appIconSizes = new int[]{256,128,64,32,16};
+        ArrayList<String> appIconPaths = new ArrayList<>();
         for (int size : appIconSizes) {
             String name = "assets/appicon" + size + ".png";
             if (new File("./" + name).exists()) {
-                appConfig.addIcon(name, Files.FileType.Internal);
+                appIconPaths.add("./" + name);
             }
         }
+
+        Object[] iconPathsTemp = appIconPaths.toArray();
+        appConfig.setWindowIcon(Arrays.copyOf(iconPathsTemp, iconPathsTemp.length, String[].class));
 
         //if (args.length == 1 && args[0].equals("isdev=true")) {
             IS_DEVELOPMENT_BUILD = true;
@@ -356,7 +339,7 @@ public class AppLoader implements ApplicationListener {
         // set some more configuration vars
         MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
 
-        new LwjglApplication(new AppLoader(appConfig), appConfig);
+        new Lwjgl3Application(new AppLoader(appConfig), appConfig);
     }
     
     @Override
@@ -390,12 +373,12 @@ public class AppLoader implements ApplicationListener {
 
         // set basis of draw
         logoBatch = new SpriteBatch();
-        camera = new OrthographicCamera(((float) appConfig.width), ((float) appConfig.height));
+        camera = new OrthographicCamera((screenSize.getScreenWf()), (screenSize.getScreenHf()));
 
         batch = new SpriteBatch();
         shapeRender = new ShapeRenderer();
 
-        initViewPort(appConfig.width, appConfig.height);
+        initViewPort(screenSize.getScreenW(), screenSize.getScreenH());
 
         // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
@@ -417,7 +400,7 @@ public class AppLoader implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-        updateFullscreenQuad(appConfig.width, appConfig.height);
+        updateFullscreenQuad(screenSize.getScreenW(), screenSize.getScreenH());
 
 
         // set up renderer info variables
@@ -562,7 +545,7 @@ public class AppLoader implements ApplicationListener {
             screenshotRequested = false;
 
             try {
-                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, appConfig.width, appConfig.height);
+                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, screenSize.getScreenW(), screenSize.getScreenH());
                 PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".tga"), p, true);
                 p.dispose();
 
@@ -592,8 +575,8 @@ public class AppLoader implements ApplicationListener {
         setCameraPosition(0f, 0f);
 
         int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
-        int logoPosX = (appConfig.width - logo.getRegionWidth() - safetyTextLen) >>> 1;
-        int logoPosY = Math.round(appConfig.height / 15f);
+        int logoPosX = (screenSize.getScreenW() - logo.getRegionWidth() - safetyTextLen) >>> 1;
+        int logoPosY = Math.round(screenSize.getScreenH() / 15f);
         int textY = logoPosY + logo.getRegionHeight() - 16;
 
         // draw logo reflection
@@ -605,8 +588,8 @@ public class AppLoader implements ApplicationListener {
             logoBatch.draw(logo, logoPosX, logoPosY + logo.getRegionHeight());
         }
         else {
-            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
-                    (appConfig.height - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
+            logoBatch.draw(logo, (screenSize.getScreenW() - logo.getRegionWidth()) / 2f,
+                    (screenSize.getScreenH() - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
             );
         }
 
@@ -631,8 +614,8 @@ public class AppLoader implements ApplicationListener {
                     String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i);
 
                     fontGame.draw(logoBatch, s,
-                            (appConfig.width - fontGame.getWidth(s)) >>> 1,
-                            Math.round(appConfig.height * 12f / 15f + fontGame.getLineHeight() * (i - 1))
+                            (screenSize.getScreenW() - fontGame.getWidth(s)) >>> 1,
+                            Math.round(screenSize.getScreenH() * 12f / 15f + fontGame.getLineHeight() * (i - 1))
                     );
                 }
             }
@@ -640,15 +623,15 @@ public class AppLoader implements ApplicationListener {
             logoBatch.setColor(new Color(0x282828ff));
             Texture tex1 = CommonResourcePool.INSTANCE.getAsTexture("title_health1");
             Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
-            int virtualHeight = appConfig.height - logoPosY - logo.getRegionHeight() / 4;
-            int virtualHeightOffset = appConfig.height - virtualHeight;
-            logoBatch.draw(tex1, (appConfig.width - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
-            logoBatch.draw(tex2, (appConfig.width - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
+            int virtualHeight = screenSize.getScreenH() - logoPosY - logo.getRegionHeight() / 4;
+            int virtualHeightOffset = screenSize.getScreenH() - virtualHeight;
+            logoBatch.draw(tex1, (screenSize.getScreenW() - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
+            logoBatch.draw(tex2, (screenSize.getScreenW() - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
 
         }
         else {
-            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
-                    (appConfig.height - logo.getRegionHeight() * 2) / 2f
+            logoBatch.draw(logo, (screenSize.getScreenW() - logo.getRegionWidth()) / 2f,
+                    (screenSize.getScreenH() - logo.getRegionHeight() * 2) / 2f
             );
         }
 
@@ -662,45 +645,30 @@ public class AppLoader implements ApplicationListener {
 
         //initViewPort(width, height);
 
-        screenW = width;
-        screenH = height;
+        screenSize.setDimension(width, height);
 
-        if (currenScreen != null) currenScreen.resize(screenW, screenH);
+        if (currenScreen != null) currenScreen.resize(screenSize.getScreenW(), screenSize.getScreenH());
+        updateFullscreenQuad(screenSize.getScreenW(), screenSize.getScreenH());
 
 
         if (renderFBO == null ||
-                (renderFBO.getWidth() != screenW ||
-                        renderFBO.getHeight() != screenH)
+                (renderFBO.getWidth() != screenSize.getScreenW() ||
+                        renderFBO.getHeight() != screenSize.getScreenH())
         ) {
             renderFBO = new FrameBuffer(
                     Pixmap.Format.RGBA8888,
-                    screenW,
-                    screenH,
+                    screenSize.getScreenW(),
+                    screenSize.getScreenH(),
                     false
             );
         }
-
-        appConfig.width = screenW;
-        appConfig.height = screenH;
-
-        halfScreenW = screenW / 2;
-        halfScreenH = screenH / 2;
-
-        screenWf = (float) screenW;
-        screenHf = (float) screenH;
-        halfScreenWf = (float) halfScreenW;
-        halfScreenHf = (float) halfScreenH;
-
-        aspectRatio = screenWf / screenHf;
-
-        updateFullscreenQuad(screenW, screenH);
 
         printdbg(this, "Resize end");
     }
 
     public static void resizeScreen(int width, int height) {
         resizeRequested = true;
-        resizeReqSize = new Point2i(Math.max(width, minimumW), Math.max(height, minimumH));
+        resizeReqSize = new Point2i(width, height);
     }
 
     @Override
@@ -798,7 +766,7 @@ public class AppLoader implements ApplicationListener {
         currenScreen = screen;
 
         currenScreen.show();
-        currenScreen.resize(appConfig.width, appConfig.height);
+        currenScreen.resize(screenSize.getScreenW(), screenSize.getScreenH());
 
 
         System.gc();
@@ -847,7 +815,7 @@ public class AppLoader implements ApplicationListener {
 
 
     private void setCameraPosition(float newX, float newY) {
-        camera.position.set((-newX + appConfig.width / 2), (-newY + appConfig.height / 2), 0f); // deliberate integer division
+        camera.position.set((-newX + screenSize.getScreenW() / 2), (-newY + screenSize.getScreenH() / 2), 0f); // deliberate integer division
         camera.update();
         logoBatch.setProjectionMatrix(camera.combined);
     }

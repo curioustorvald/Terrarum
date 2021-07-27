@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.QNDTreeNode
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -221,9 +220,9 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         return true
     }
 
-    override fun scrolled(amount: Int): Boolean {
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
         screens.forEach {
-            it.second.scrolled(amount) // again, underlying handler will block unnecessary renders
+            it.second.scrolled(amountX, amountY) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -300,6 +299,6 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         val remoConWidth = 304
         fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
-        val menubarOffY: Int; get() = AppLoader.screenH / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
+        val menubarOffY: Int; get() = AppLoader.screenSize.screenH / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
     }
 }

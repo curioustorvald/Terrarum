@@ -53,7 +53,7 @@ abstract class Gen(val world: GameWorld, val seed: Long, val params: Any) {
 
 data class WorldgenParams(
         val seed: Long,
-        // optional parametres
+        // optional parameters
         val terragenParams: TerragenParams = TerragenParams(),
         val biomegenParams: BiomegenParams = BiomegenParams()
 )

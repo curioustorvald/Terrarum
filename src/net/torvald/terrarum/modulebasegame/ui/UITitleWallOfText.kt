@@ -15,8 +15,8 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = AppLoader.screenW - UIRemoCon.remoConWidth - textAreaHMargin
-    override var height = AppLoader.screenH - textAreaHMargin * 2
+    override var width = AppLoader.screenSize.screenW - UIRemoCon.remoConWidth - textAreaHMargin
+    override var height = AppLoader.screenSize.screenH - textAreaHMargin * 2
     private val textArea = UIItemTextArea(this,
             UIRemoCon.remoConWidth, textAreaHMargin,
             width, height

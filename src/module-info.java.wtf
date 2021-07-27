@@ -1,4 +1,4 @@
-module terrarum {
+module terrarum.terrarum {
     // java
     requires java.desktop;
     requires java.logging;
@@ -6,11 +6,14 @@ module terrarum {
 
     // kotlin
     requires kotlin.stdlib;
+    requires kotlin.test;
 
     // gdx
     requires gdx;
-    requires gdx.backend.lwjgl;
-    requires gdx.controllers;
+    requires gdx.platform;
+    requires gdx.backend.lwjgl3;
+    requires gdx.controllers.core;
+    requires gdx.controllers.desktop;
 
     // terrarum
     requires TerrarumSansBitmap;
@@ -19,8 +22,8 @@ module terrarum {
 
     // etc
     requires GetCpuName;
-    requires jxinput;
-    requires gson;
-    requires commons.codec;
+    requires com.google.gson;
+    requires org.apache.commons.codec;
     requires commons.csv;
+    requires jxinput;
 }

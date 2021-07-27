@@ -47,7 +47,7 @@ object MegaRainGovernor {
         val h = body.height
 
         bodies = Array(1024) {
-            //val pixmap = Pixmap(AppLoader.screenW * 2, AppLoader.screenH / 4, Pixmap.Format.RGBA8888)
+            //val pixmap = Pixmap(AppLoader.terrarumAppConfig.screenW * 2, AppLoader.terrarumAppConfig.screenH / 4, Pixmap.Format.RGBA8888)
             val pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888)
 
             val rng = HQRNG()

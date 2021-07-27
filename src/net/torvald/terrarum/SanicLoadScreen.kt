@@ -1,16 +1,13 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.util.CircularArray
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -24,7 +21,7 @@ object SanicLoadScreen : LoadScreenBase() {
     private var arrowObjPos = 0f // 0 means at starting position, regardless of screen position
     private var arrowObjGlideOffsetX = 0f
     private var arrowObjGlideSize = 0f
-    private val arrowGlideSpeed: Float; get() = AppLoader.screenW * 2f // pixels per sec
+    private val arrowGlideSpeed: Float; get() = AppLoader.screenSize.screenW * 2f // pixels per sec
     private lateinit var arrowObjTex: Texture
     private var glideTimer = 0f
     private var glideDispY = 0f
@@ -63,7 +60,7 @@ object SanicLoadScreen : LoadScreenBase() {
     }
 
 
-    val textX: Float; get() = (AppLoader.screenW * 0.72f).floor()
+    val textX: Float; get() = (AppLoader.screenSize.screenW * 0.72f).floor()
 
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
 
@@ -75,8 +72,8 @@ object SanicLoadScreen : LoadScreenBase() {
 
         val delta = Gdx.graphics.rawDeltaTime
 
-        glideDispY = AppLoader.screenH - 100f - AppLoader.fontGame.lineHeight
-        arrowObjGlideSize = arrowObjTex.width + 2f * AppLoader.screenW
+        glideDispY = AppLoader.screenSize.screenH - 100f - AppLoader.fontGame.lineHeight
+        arrowObjGlideSize = arrowObjTex.width + 2f * AppLoader.screenSize.screenW
 
 
 
@@ -137,14 +134,14 @@ object SanicLoadScreen : LoadScreenBase() {
 
 
             AppLoader.batch.inUse {
-                initViewPort(AppLoader.screenW, AppLoader.screenH) // dunno, no render without this
+                initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH) // dunno, no render without this
                 it.projectionMatrix = camera.combined
                 blendNormal(AppLoader.batch)
 
 
                 // almost black background
                 it.color = Color(0x181818ff)
-                it.fillRect(0f, 0f, AppLoader.screenWf, AppLoader.screenHf)
+                it.fillRect(0f, 0f, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
 
 
                 it.color = Color.WHITE
@@ -187,14 +184,14 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, AppLoader.screenWf, 40f + (messages.size) * AppLoader.fontGame.lineHeight)
+                it.fillRect(0f, 60f, AppLoader.screenSize.screenWf, 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
                 messages.forEachIndexed { i, s ->
                     AppLoader.fontGame.draw(it,
                             s,
-                            AppLoader.getTvSafeGraphicsWidth() + 16f,
+                            AppLoader.screenSize.tvSafeGraphicsWidth + 16f,
                             80f + (messages.size - i - 1) * AppLoader.fontGame.lineHeight
                     )
                 }
@@ -204,7 +201,7 @@ object SanicLoadScreen : LoadScreenBase() {
             AppLoader.batch.inUse {
                 // recycling part of the draw code //
 
-                initViewPort(AppLoader.screenW, AppLoader.screenH) // dunno, no render without this
+                initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH) // dunno, no render without this
                 it.projectionMatrix = camera.combined
                 blendNormal(AppLoader.batch)
 
@@ -212,14 +209,14 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, AppLoader.screenWf, 40f + (messages.size) * AppLoader.fontGame.lineHeight)
+                it.fillRect(0f, 60f, AppLoader.screenSize.screenWf, 40f + (messages.size) * AppLoader.fontGame.lineHeight)
 
                 // log messages
                 it.color = messageForegroundColour
                 messages.forEachIndexed { i, s ->
                     AppLoader.fontGame.draw(it,
                             s,
-                            AppLoader.getTvSafeGraphicsWidth() + 16f,
+                            AppLoader.screenSize.tvSafeGraphicsWidth + 16f,
                             80f + (messages.size - i - 1) * AppLoader.fontGame.lineHeight
                     )
                 }

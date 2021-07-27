@@ -3,8 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.terrarum.GdxColorMap
 
@@ -53,16 +53,9 @@ class ColorMapTest : Game() {
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
 
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false//true;
-    //appConfig.width = 1072; // IMAX ratio
-    //appConfig.height = 742; // IMAX ratio
-    appConfig.width = 1110 // photographic ratio (1.5:1)
-    appConfig.height = 740 // photographic ratio (1.5:1)
-    appConfig.backgroundFPS = 9999
-    appConfig.foregroundFPS = 9999
-    appConfig.forceExit = false
-
-    LwjglApplication(ColorMapTest(), appConfig)
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.useVsync(false)
+    appConfig.setResizable(false)
+    appConfig.setWindowedMode(1110, 740)
+    Lwjgl3Application(ColorMapTest(), appConfig)
 }

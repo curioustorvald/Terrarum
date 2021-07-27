@@ -106,11 +106,12 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open var keyUpListener: ((Int) -> Unit)? = null
     open var mouseMovedListener: ((Int, Int) -> Unit)? = null
     open var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
-    /** Parametres: screenX, screenY, pointer, button */
+    /** Parameters: screenX, screenY, pointer, button */
     open var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
     open var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
-    open var scrolledListener: ((Int) -> Unit)? = null
-    /** Parametres: relative mouseX, relative mouseY, button */
+    /** Parameters: amountX, amountY */
+    open var scrolledListener: ((Float, Float) -> Unit)? = null
+    /** Parameters: relative mouseX, relative mouseY, button */
     open var clickOnceListener: ((Int, Int, Int) -> Unit)? = null
     open var clickOnceListenerFired = false
 
@@ -219,9 +220,9 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         return false
     }
-    open fun scrolled(amount: Int): Boolean {
+    open fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (parentUI.isVisible && scrolledListener != null) {
-            scrolledListener!!.invoke(amount)
+            scrolledListener!!.invoke(amountX, amountY)
             return true
         }
 

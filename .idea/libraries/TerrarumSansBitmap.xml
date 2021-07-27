@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="TerrarumSansBitmap">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/TerrarumSansBitmap.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/TerrarumSansBitmap.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
@@ -23,8 +22,8 @@ internal class UIInventoryCells(
         val full: UIInventoryFull
 ) : UICanvas() {
 
-    override var width: Int = AppLoader.screenW
-    override var height: Int = AppLoader.screenH
+    override var width: Int = AppLoader.screenSize.screenW
+    override var height: Int = AppLoader.screenSize.screenH
     override var openCloseTime: Second = 0.0f
 
     companion object {
@@ -56,7 +55,7 @@ internal class UIInventoryCells(
                     full,
                     full.actor.inventory,
                     full.actor as ActorWithBody,
-                    internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenW - internalWidth) / 2,
+                    internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenSize.screenW - internalWidth) / 2,
                     INVENTORY_CELLS_OFFSET_Y,
                     { rebuildList() }
             )

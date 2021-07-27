@@ -19,8 +19,8 @@ class UITitleCharactersList : UICanvas() {
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8
 
-    override var width = AppLoader.screenW - UIRemoCon.remoConWidth - moduleAreaHMargin
-    override var height = AppLoader.screenH - moduleAreaHMargin * 2
+    override var width = AppLoader.screenSize.screenW - UIRemoCon.remoConWidth - moduleAreaHMargin
+    override var height = AppLoader.screenSize.screenH - moduleAreaHMargin * 2
 
     private val moduleInfoCells = ArrayList<UIItemSavegameInfoCell>()
     // build characters list

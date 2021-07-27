@@ -2,8 +2,8 @@ package net.torvald.spriteassembler
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -309,15 +309,14 @@ class SpriteAssemblerPreview: Game() {
 }
 
 fun main(args: Array<String>) {
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.resizable = false
-    appConfig.width = 512
-    appConfig.height = 1024
-    appConfig.foregroundFPS = 5
-    appConfig.backgroundFPS = 5
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.setWindowedMode(512, 1024)
+    appConfig.setIdleFPS(5)
+    appConfig.setForegroundFPS(5)
+    appConfig.setResizable(false)
 
     val gdxWindow = SpriteAssemblerPreview()
 
-    LwjglApplication(gdxWindow, appConfig)
+    Lwjgl3Application(gdxWindow, appConfig)
     SpriteAssemblerApp(gdxWindow)
 }

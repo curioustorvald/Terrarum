@@ -2,8 +2,8 @@ package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -15,10 +15,13 @@ import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.worlddrawer.toRGBA
 
+val RECTTEST_WIDTH = 768
+val RECTTEST_HEIGHT = 768
+
 /**
  * Created by minjaesong on 2019-02-04.
  */
-class NoopRectTest(val appConfig: LwjglApplicationConfiguration) : Game() {
+class NoopRectTest(val appConfig: Lwjgl3ApplicationConfiguration) : Game() {
 
     private val SIZE = 100
 
@@ -47,7 +50,7 @@ class NoopRectTest(val appConfig: LwjglApplicationConfiguration) : Game() {
         texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
         batch = SpriteBatch()
-        camera = OrthographicCamera(appConfig.width.toFloat(), appConfig.height.toFloat())
+        camera = OrthographicCamera(RECTTEST_WIDTH.toFloat(), RECTTEST_HEIGHT.toFloat())
         camera.setToOrtho(true)
     }
 
@@ -104,7 +107,7 @@ class NoopRectTest(val appConfig: LwjglApplicationConfiguration) : Game() {
 
         batch.inUse {
             batch.projectionMatrix = camera.combined
-            batch.draw(texture, 0f, 0f, appConfig.width.toFloat(), appConfig.height.toFloat())
+            batch.draw(texture, 0f, 0f, RECTTEST_WIDTH.toFloat(), RECTTEST_HEIGHT.toFloat())
         }
 
         println()
@@ -167,12 +170,8 @@ class NoopRectTest(val appConfig: LwjglApplicationConfiguration) : Game() {
 }
 
 fun main(args: Array<String>) {
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.forceExit = false
-    appConfig.width = 768
-    appConfig.height = 768
-    appConfig.backgroundFPS = 2
-    appConfig.foregroundFPS = 2
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.setWindowedMode(RECTTEST_WIDTH, RECTTEST_HEIGHT)
 
-    LwjglApplication(NoopRectTest(appConfig), appConfig)
+    Lwjgl3Application(NoopRectTest(appConfig), appConfig)
 }

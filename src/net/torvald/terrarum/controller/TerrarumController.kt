@@ -70,7 +70,7 @@ interface TerrarumController {
      *  6 2 3
      * ```
      */
-    fun getPov(): Int
+    fun getDpad(): Int
     fun getName(): String
 
     /**

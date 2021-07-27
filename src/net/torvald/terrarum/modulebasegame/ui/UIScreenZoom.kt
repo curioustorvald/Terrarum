@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumScreenSize
 import net.torvald.terrarum.keyToIcon
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
@@ -39,8 +40,8 @@ class UIScreenZoom : UICanvas(
 
         AppLoader.fontGame.draw(
                 batch, zoomText,
-                (AppLoader.screenW * AppLoader.TV_SAFE_GRAPHICS + 1).toInt().toFloat(),
-                (AppLoader.screenH - height - AppLoader.getTvSafeGraphicsHeight()).toFloat()
+                (AppLoader.screenSize.screenW * TerrarumScreenSize.TV_SAFE_GRAPHICS + 1).toInt().toFloat(),
+                (AppLoader.screenSize.screenH - height - AppLoader.screenSize.tvSafeGraphicsHeight).toFloat()
         )
     }
 

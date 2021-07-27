@@ -116,8 +116,8 @@ open class UIItemTransitionContainer(
         return true
     }
 
-    override fun scrolled(amount: Int): Boolean {
-        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.scrolled(amount) }
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.scrolled(amountX, amountY) }
         return true
     }
 

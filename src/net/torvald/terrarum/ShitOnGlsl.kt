@@ -2,8 +2,8 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
@@ -14,14 +14,11 @@ import net.torvald.terrarumsansbitmap.gdx.GameFontBase
  * Created by minjaesong on 2017-08-11.
  */
 fun main(args: Array<String>) { // LWJGL 3 won't work? java.lang.VerifyError
-    val config = LwjglApplicationConfiguration()
-    //config.useGL30 = true
-    config.vSyncEnabled = false
-    config.resizable = false
-    config.width = 1072
-    config.height = 742
-    config.foregroundFPS = 9999
-    LwjglApplication(ShitOnGlsl, config)
+    val config = Lwjgl3ApplicationConfiguration()
+    config.useVsync(false)
+    config.setResizable(false)
+    config.setWindowedMode(1072, 742)
+    Lwjgl3Application(ShitOnGlsl, config)
 }
 
 object ShitOnGlsl : ApplicationAdapter() {

@@ -3,8 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -110,14 +110,11 @@ class DummyTogglePane : UICanvas() {
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
 
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false
-    appConfig.width = 800
-    appConfig.height = 600
-    appConfig.backgroundFPS = 60
-    appConfig.foregroundFPS = 60
-    appConfig.forceExit = false
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.useVsync(false)
+    appConfig.setResizable(false)
+    appConfig.setWindowedMode(800, 600)
+    appConfig.setForegroundFPS(60)
 
-    LwjglApplication(UIElemTest(), appConfig)
+    Lwjgl3Application(UIElemTest(), appConfig)
 }

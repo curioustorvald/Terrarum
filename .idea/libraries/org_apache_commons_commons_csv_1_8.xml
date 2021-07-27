@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="org.apache.commons:commons-csv:1.8" type="repository">
+    <properties maven-id="org.apache.commons:commons-csv:1.8" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/commons-csv-1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/commons-csv-1.8-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/commons-csv-1.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

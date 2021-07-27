@@ -26,7 +26,7 @@ object Toolkit {
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width
-        val targetW = if (ui == null) AppLoader.screenW else ui.width
+        val targetW = if (ui == null) AppLoader.screenSize.screenW else ui.width
 
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }

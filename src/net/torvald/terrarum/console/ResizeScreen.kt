@@ -1,6 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.TerrarumScreenSize
 
 object ResizeScreen: ConsoleCommand {
     override fun execute(args: Array<String>) {
@@ -11,7 +12,7 @@ object ResizeScreen: ConsoleCommand {
             when (args[1]) {
                 "720p" -> AppLoader.resizeScreen(1280,720)
                 "1080p" -> AppLoader.resizeScreen(1920,1080)
-                "default" -> AppLoader.resizeScreen(AppLoader.defaultW, AppLoader.defaultH)
+                "default" -> AppLoader.resizeScreen(TerrarumScreenSize.defaultW, TerrarumScreenSize.defaultH)
                 else -> { printUsage(); return }
             }
         }
@@ -19,11 +20,11 @@ object ResizeScreen: ConsoleCommand {
             printUsage(); return
         }
 
-        Echo("Screen resized to ${AppLoader.screenW}x${AppLoader.screenH}")
+        Echo("Screen resized to ${AppLoader.screenSize.screenW}x${AppLoader.screenSize.screenH}")
     }
 
     override fun printUsage() {
-        Echo("Usage: resize [width] [height]. Minimum size is ${AppLoader.minimumW}x${AppLoader.minimumH}")
+        Echo("Usage: resize [width] [height]. Minimum size is ${TerrarumScreenSize.minimumW}x${TerrarumScreenSize.minimumH}")
         Echo("Reserved keywords: 720p, 1080p, default")
     }
 }

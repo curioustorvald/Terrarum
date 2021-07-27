@@ -3,8 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
@@ -29,8 +29,8 @@ import kotlin.math.sin
 import kotlin.random.Random
 import kotlin.coroutines.*
 
-const val WIDTH = 768
-const val HEIGHT = 512
+const val NOISEBOX_WIDTH = 768
+const val NOISEBOX_HEIGHT = 512
 const val TWO_PI = Math.PI * 2
 
 /**
@@ -60,13 +60,13 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         font = BitmapFont() // use default because fuck it
 
         batch = SpriteBatch()
-        camera = OrthographicCamera(WIDTH.toFloat(), HEIGHT.toFloat())
+        camera = OrthographicCamera(NOISEBOX_WIDTH.toFloat(), NOISEBOX_HEIGHT.toFloat())
         camera.setToOrtho(false) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
         camera.update()
         batch.projectionMatrix = camera.combined
-        Gdx.gl20.glViewport(0, 0, WIDTH, HEIGHT)
+        Gdx.gl20.glViewport(0, 0, NOISEBOX_WIDTH, NOISEBOX_HEIGHT)
 
-        testTex = Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888)
+        testTex = Pixmap(NOISEBOX_WIDTH, NOISEBOX_HEIGHT, Pixmap.Format.RGBA8888)
         testTex.blending = Pixmap.Blending.None
         tempTex = Texture(1, 1, Pixmap.Format.RGBA8888)
 
@@ -112,10 +112,10 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         // draw timer
         batch.inUse {
             if (!generationTimeInMeasure) {
-                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, HEIGHT - 8f)
+                font.draw(batch, "Generation time: ${generationTime} seconds", 8f, NOISEBOX_HEIGHT - 8f)
             }
             else {
-                font.draw(batch, "Generating...", 8f, HEIGHT - 8f)
+                font.draw(batch, "Generating...", 8f, NOISEBOX_HEIGHT - 8f)
             }
         }
     }
@@ -129,7 +129,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 
     val colourNull = Color(0x1b3281ff)
 
-    private val sampleOffset = WIDTH / 8.0
+    private val sampleOffset = NOISEBOX_WIDTH / 8.0
 
     private val testColSet = arrayOf(
             Color(0xff0000ff.toInt()),
@@ -222,8 +222,8 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         val runnables: List<RunnableFun> = (0 until testTex.width).sliceEvenly(genSlices).map { range -> {
                 val localJoise = getNoiseGenerator(seed)
                 for (x in range) {
-                    for (y in 0 until HEIGHT) {
-                        val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                    for (y in 0 until NOISEBOX_HEIGHT) {
+                        val sampleTheta = (x.toDouble() / NOISEBOX_WIDTH) * TWO_PI
                         val sampleX = sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                         val sampleZ = cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
                         val sampleY = y.toDouble()
@@ -253,16 +253,13 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
 
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false
-    appConfig.width = WIDTH
-    appConfig.height = HEIGHT
-    appConfig.backgroundFPS = 60
-    appConfig.foregroundFPS = 60
-    appConfig.forceExit = false
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.useVsync(false)
+    appConfig.setResizable(false)
+    appConfig.setWindowedMode(NOISEBOX_WIDTH, NOISEBOX_HEIGHT)
+    appConfig.setForegroundFPS(60)
 
-    LwjglApplication(WorldgenNoiseSandbox(), appConfig)
+    Lwjgl3Application(WorldgenNoiseSandbox(), appConfig)
 }
 
 internal interface NoiseMaker {

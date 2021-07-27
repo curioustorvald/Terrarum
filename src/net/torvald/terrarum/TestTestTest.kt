@@ -3,8 +3,8 @@ package net.torvald.terrarum
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -45,7 +45,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
 
     fun enter() {
         // init view port
-        camera = OrthographicCamera(AppLoader.screenWf, AppLoader.screenHf)
+        camera = OrthographicCamera(AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
 
 
         img = Texture("assets/test_texture.tga")
@@ -57,14 +57,14 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         blurFboA = FrameBuffer(Pixmap.Format.RGBA8888, img.width, img.height, false)
         blurFboB = FrameBuffer(Pixmap.Format.RGBA8888, img.width, img.height, false)
 
-        worldFbo = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenW, AppLoader.screenH, false)
+        worldFbo = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenSize.screenW, AppLoader.screenSize.screenH, false)
 
         //blurShader.begin()
         //blurShader.setUniformf("iResolution", img.width.toFloat(), img.height.toFloat(), 0f)
         //blurShader.end()
 
 
-        initViewPort(AppLoader.screenW, AppLoader.screenH)
+        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
     }
 
     override fun render(delta: Float) {
@@ -135,7 +135,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
             batch.inUse {
                 batch.shader = null
 
-                camera.position.set(AppLoader.screenW / 2f - 50f, AppLoader.screenH / 2f - 50f, 0f)
+                camera.position.set(AppLoader.screenSize.screenW / 2f - 50f, AppLoader.screenSize.screenH / 2f - 50f, 0f)
                 camera.update()
                 batch.projectionMatrix = camera.combined
 
@@ -147,11 +147,11 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         }
 
 
-        camera.setToOrtho(true, AppLoader.screenWf, AppLoader.screenHf)
+        camera.setToOrtho(true, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
         batch.projectionMatrix = camera.combined
         batch.inUse {
 
-            camera.position.set(AppLoader.screenW / 2f, AppLoader.screenH / 2f, 0f)
+            camera.position.set(AppLoader.screenSize.screenW / 2f, AppLoader.screenSize.screenH / 2f, 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
 
@@ -168,7 +168,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
-        initViewPort(AppLoader.screenW, AppLoader.screenH)
+        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
     }
 
     override fun pause() {
@@ -216,12 +216,9 @@ object TestTestMain : ApplicationAdapter() {
 }
 
 fun main(args: Array<String>) { // LWJGL 3 won't work? java.lang.VerifyError
-    val config = LwjglApplicationConfiguration()
-    //config.useGL30 = true
-    config.vSyncEnabled = false
-    config.resizable = false
-    config.width = 1072
-    config.height = 742
-    config.foregroundFPS = 9999
-    LwjglApplication(TestTestMain, config)
+    val config = Lwjgl3ApplicationConfiguration()
+    config.useVsync(false)
+    config.setResizable(false)
+    config.setWindowedMode(1072, 742)
+    Lwjgl3Application(TestTestMain, config)
 }

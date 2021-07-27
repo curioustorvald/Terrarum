@@ -1,0 +1,28 @@
+<component name="libraryTable">
+  <library name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/graal-sdk-21.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/icu4j-68.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-21.1.0-edit.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-21.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-api-21.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/regex-21.1.0-edit.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/graal-sdk-21.1.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/icu4j-68.2-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-21.1.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-21.1.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-api-21.1.0-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/regex-21.1.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/graal-sdk-21.1.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/icu4j-68.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-21.1.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/js-scriptengine-21.1.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/truffle-api-21.1.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/regex-21.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

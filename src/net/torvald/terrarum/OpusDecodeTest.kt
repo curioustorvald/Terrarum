@@ -1,18 +1,18 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.ApplicationAdapter
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
-import com.glester.jopus.JOpusBufferFile
 
 
 
 fun main(args: Array<String>) {
-
-
-    val config = LwjglApplicationConfiguration()
-    LwjglApplication(OpusDecodeTest, config)
+    val config = Lwjgl3ApplicationConfiguration()
+    config.useVsync(false)
+    config.setResizable(false)
+    config.setWindowedMode(1072, 742)
+    Lwjgl3Application(OpusDecodeTest, config)
 }
 
 /**
@@ -20,8 +20,6 @@ fun main(args: Array<String>) {
  */
 object OpusDecodeTest : ApplicationAdapter() {
 
-
-    private lateinit var opusFile: JOpusBufferFile
 
     override fun create() {
 

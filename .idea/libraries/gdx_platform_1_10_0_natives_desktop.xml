@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gdx-platform-1.10.0-natives-desktop">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/gdx-platform-1.10.0-natives-desktop.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

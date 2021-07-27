@@ -15,8 +15,8 @@ import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGH
 
 class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
-    override var width: Int = AppLoader.screenW
-    override var height: Int = AppLoader.screenH
+    override var width: Int = AppLoader.screenSize.screenW
+    override var height: Int = AppLoader.screenSize.screenH
     override var openCloseTime = 0.0f
 
     private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
@@ -24,7 +24,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenuListWidth = 400
     private val gameMenuButtons = UIItemTextButtonList(
             this, gameMenu,
-            (AppLoader.screenW - gameMenuListWidth) / 2,
+            (AppLoader.screenSize.screenW - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,

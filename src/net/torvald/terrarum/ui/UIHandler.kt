@@ -386,10 +386,10 @@ void main() {
             return false
         }
     }
-    fun scrolled(uiItems: List<UIItem>, amount: Int): Boolean {
+    fun scrolled(uiItems: List<UIItem>, amountX: Float, amountY: Float): Boolean {
         if (isVisible) {
-            uiItems.forEach { it.scrolled(amount) }
-            subUIs.forEach { it.scrolled(amount) }
+            uiItems.forEach { it.scrolled(amountX, amountY) }
+            subUIs.forEach { it.scrolled(amountX, amountY) }
             return true
         }
         else {

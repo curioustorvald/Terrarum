@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
@@ -44,8 +46,14 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         get() = (mouseY / CreateTileAtlas.TILE_SIZE).floorInt()
 
     init {
-        if (Controllers.getControllers().size == 0) {
-            printdbg(this, "Controller not found")
+        try {
+            if (Controllers.getControllers().size == 0) {
+                printdbg(this, "Controller not found")
+            }
+        }
+        catch (e: GdxRuntimeException) {
+            printdbg(this, e.message)
+            e.stackTrace.forEach { printdbgerr(this, "\t$it") }
         }
     }
 
@@ -191,18 +199,18 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         return true
     }
 
-    override fun scrolled(amount: Int): Boolean {
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (!terrarumIngame.paused) {
             // quickslot by wheel
             if (terrarumIngame.actorNowPlaying != null) {
                 terrarumIngame.actorNowPlaying!!.actorValue.set(
                         AVKey.__PLAYER_QUICKSLOTSEL,
-                        (terrarumIngame.actorNowPlaying!!.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!! - amount) fmod terrarumIngame.actorNowPlaying!!.inventory.quickSlot.size
+                        (terrarumIngame.actorNowPlaying!!.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!! - amountY.toInt()) fmod terrarumIngame.actorNowPlaying!!.inventory.quickSlot.size
                 )
             }
         }
 
-        terrarumIngame.uiContainer.forEach { it?.scrolled(amount) }
+        terrarumIngame.uiContainer.forEach { it?.scrolled(amountX, amountY) }
         return true
     }
 

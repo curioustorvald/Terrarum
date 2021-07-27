@@ -56,8 +56,8 @@ object IngameRenderer : Disposable {
     val shaderAtoGrey: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
 
-    private val WIDTH = AppLoader.screenW
-    private val HEIGHT = AppLoader.screenH
+    private val WIDTH = AppLoader.screenSize.screenW
+    private val HEIGHT = AppLoader.screenSize.screenH
     private val WIDTHF = WIDTH.toFloat()
     private val HEIGHTF = HEIGHT.toFloat()
 
@@ -608,7 +608,7 @@ object IngameRenderer : Disposable {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     private fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + AppLoader.halfScreenW).round(), (-newY + AppLoader.halfScreenH).round(), 0f)
+        camera.position.set((-newX + AppLoader.screenSize.halfScreenW).round(), (-newY + AppLoader.screenSize.halfScreenH).round(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

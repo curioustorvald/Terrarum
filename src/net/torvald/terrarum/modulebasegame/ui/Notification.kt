@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.ui.UICanvas
 
@@ -62,7 +61,7 @@ class Notification : UICanvas() {
         val displayedTextWidth = maxOf(240, realTextWidth)
 
         // force the UI to the centre of the screen
-        this.posX = (AppLoader.screenW - displayedTextWidth) / 2
+        this.posX = (AppLoader.screenSize.screenW - displayedTextWidth) / 2
 
         val textHeight = message.size * AppLoader.fontGame.lineHeight
 

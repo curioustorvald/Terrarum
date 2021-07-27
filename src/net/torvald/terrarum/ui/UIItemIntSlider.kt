@@ -115,7 +115,7 @@ class UIItemIntSlider(
     override var touchUpListener: ((Int, Int, Int, Int) -> Unit)?
         get() = super.touchUpListener
         set(value) {}
-    override var scrolledListener: ((Int) -> Unit)?
+    override var scrolledListener: ((Float, Float) -> Unit)?
         get() = super.scrolledListener
         set(value) {}
     override var clickOnceListener: ((Int, Int, Int) -> Unit)?
@@ -127,42 +127,6 @@ class UIItemIntSlider(
     override var controllerInFocus: Boolean
         get() = super.controllerInFocus
         set(value) {}
-
-    override fun update(delta: Float) {
-        super.update(delta)
-    }
-
-    override fun render(batch: SpriteBatch, camera: Camera) {
-        super.render(batch, camera)
-    }
-
-    override fun keyDown(keycode: Int): Boolean {
-        return super.keyDown(keycode)
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        return super.keyUp(keycode)
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return super.mouseMoved(screenX, screenY)
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return super.touchDragged(screenX, screenY, pointer)
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchDown(screenX, screenY, pointer, button)
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
-    }
-
-    override fun scrolled(amount: Int): Boolean {
-        return super.scrolled(amount)
-    }
 
     override fun dispose() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

@@ -1,16 +1,11 @@
 package net.torvald.terrarum.modulebasegame
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.util.CircularArray
 import kotlin.math.roundToInt
 
 /**
@@ -39,8 +34,8 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
         private val COL_AIR = Color.BLACK
     }
 
-    private val previewWidth = (AppLoader.screenW * WIDTH_RATIO).roundToInt()
-    private val previewHeight = (AppLoader.screenW * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
+    private val previewWidth = (AppLoader.screenSize.screenW * WIDTH_RATIO).roundToInt()
+    private val previewHeight = (AppLoader.screenSize.screenW * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
 
     private lateinit var previewPixmap: Pixmap
     private lateinit var previewTexture: Texture
@@ -73,15 +68,15 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
         AppLoader.batch.inUse {
             it.color = Color.WHITE
-            val previewY = (AppLoader.screenH - previewHeight.times(1.5f)).div(2f).round()
+            val previewY = (AppLoader.screenSize.screenH - previewHeight.times(1.5f)).div(2f).round()
             it.draw(previewTexture,
-                    (AppLoader.screenW - previewWidth).div(2f).round(),
+                    (AppLoader.screenSize.screenW - previewWidth).div(2f).round(),
                     previewY
             )
             val text = messages.getHeadElem() ?: ""
             AppLoader.fontGame.draw(it,
                     text,
-                    (AppLoader.screenW - AppLoader.fontGame.getWidth(text)).div(2f).round(),
+                    (AppLoader.screenSize.screenW - AppLoader.fontGame.getWidth(text)).div(2f).round(),
                     previewY + previewHeight + 98 - AppLoader.fontGame.lineHeight
             )
         }

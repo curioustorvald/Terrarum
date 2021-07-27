@@ -148,7 +148,7 @@ abstract class UICanvas(
         uiItems.add(uiItem)
     }
 
-    fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.appConfig.width && y in 0 until AppLoader.appConfig.height
+    fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.screenSize.screenW && y in 0 until AppLoader.screenSize.screenH
 
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         if (this.isVisible) {
@@ -191,10 +191,10 @@ abstract class UICanvas(
         else return false
     }
     /** Called by the screen's InputProcessor */
-    open fun scrolled(amount: Int): Boolean {
+    open fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (this.isVisible) {
-            uiItems.forEach { it.scrolled(amount) }
-            handler.subUIs.forEach { it.scrolled(amount) }
+            uiItems.forEach { it.scrolled(amountX, amountY) }
+            handler.subUIs.forEach { it.scrolled(amountX, amountY) }
             return true
         }
         else return false
@@ -316,13 +316,13 @@ abstract class UICanvas(
                 ).roundToInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenWf,
-                        AppLoader.screenW - ui.width.toFloat()
+                        AppLoader.screenSize.screenWf,
+                        AppLoader.screenSize.screenW - ui.width.toFloat()
                 ).roundToInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenHf,
-                        AppLoader.screenH - ui.height.toFloat()
+                        AppLoader.screenSize.screenHf,
+                        AppLoader.screenSize.screenH - ui.height.toFloat()
                 ).roundToInt()
             }
         }
@@ -340,13 +340,13 @@ abstract class UICanvas(
                 ).roundToInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenW - ui.width.toFloat(),
-                        AppLoader.screenWf
+                        AppLoader.screenSize.screenW - ui.width.toFloat(),
+                        AppLoader.screenSize.screenWf
                 ).roundToInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenH - ui.height.toFloat(),
-                        AppLoader.screenHf
+                        AppLoader.screenSize.screenH - ui.height.toFloat(),
+                        AppLoader.screenSize.screenHf
                 ).roundToInt()
             }
         }
@@ -354,16 +354,16 @@ abstract class UICanvas(
             when (position) {
                 Position.LEFT -> ui.handler.posX = 0
                 Position.TOP -> ui.handler.posY = 0
-                Position.RIGHT -> ui.handler.posX = AppLoader.screenW - ui.width
-                Position.BOTTOM -> ui.handler.posY = AppLoader.screenH - ui.height
+                Position.RIGHT -> ui.handler.posX = AppLoader.screenSize.screenW - ui.width
+                Position.BOTTOM -> ui.handler.posY = AppLoader.screenSize.screenH - ui.height
             }
         }
         fun endClosingPopOut(ui: UICanvas, position: Position) {
             when (position) {
                 Position.LEFT -> ui.handler.posX = -ui.width
                 Position.TOP -> ui.handler.posY = -ui.height
-                Position.RIGHT -> ui.handler.posX = AppLoader.screenW
-                Position.BOTTOM -> ui.handler.posY = AppLoader.screenH
+                Position.RIGHT -> ui.handler.posX = AppLoader.screenSize.screenW
+                Position.BOTTOM -> ui.handler.posY = AppLoader.screenSize.screenH
             }
         }
 

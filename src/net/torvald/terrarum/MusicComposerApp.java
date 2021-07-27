@@ -2,8 +2,8 @@ package net.torvald.terrarum;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Texture;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 
@@ -14,37 +14,22 @@ import java.io.File;
  */
 public class MusicComposerApp extends ApplicationAdapter {
 
-    public static LwjglApplicationConfiguration appConfig;
+    public static Lwjgl3ApplicationConfiguration appConfig;
     public static GameFontBase fontGame;
 
-    public MusicComposerApp(LwjglApplicationConfiguration appConfig) {
+    public MusicComposerApp(Lwjgl3ApplicationConfiguration appConfig) {
         this.appConfig = appConfig;
     }
 
     public void main(String[] args) {
 
-        LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-        appConfig.useGL30 = true; // utilising some GL trickeries, need this to be TRUE
-        appConfig.resizable = false;//true;
-        //appConfig.width = 1110; // photographic ratio (1.5:1)
-        //appConfig.height = 740; // photographic ratio (1.5:1)
-        appConfig.width = 1000;;;
-        appConfig.height = 666;
-        appConfig.backgroundFPS = 9999;
-        appConfig.foregroundFPS = 9999;
-        appConfig.title = "Speelklok";
-        appConfig.forceExit = false;
+        Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
 
-        // load app icon
-        int[] appIconSizes = new int[]{256,128,64,32,16};
-        for (int size : appIconSizes) {
-            String name = "assets/appicon" + size + ".png";
-            if (new File("./" + name).exists()) {
-                appConfig.addIcon(name, Files.FileType.Internal);
-            }
-        }
+        appConfig.setResizable(false);
+        appConfig.setWindowedMode(1280, 720);
+        appConfig.setTitle("Speelklok");
 
-        new LwjglApplication(new MusicComposerApp(appConfig), appConfig);
+        new Lwjgl3Application(new MusicComposerApp(appConfig), appConfig);
     }
 
     @Override

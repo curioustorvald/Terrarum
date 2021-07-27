@@ -1,1 +1,0 @@
-fs.dofile("/etc/_boot.lua")

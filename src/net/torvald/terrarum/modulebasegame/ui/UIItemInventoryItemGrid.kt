@@ -523,12 +523,12 @@ class UIItemInventoryItemGrid(
         return true
     }
 
-    override fun scrolled(amount: Int): Boolean {
-        super.scrolled(amount)
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        super.scrolled(amountX, amountY)
 
         // scroll the item list (for now)
         if (mouseUp) {
-            scrollItemPage(amount)
+            scrollItemPage(amountX.toInt())
         }
 
         return true

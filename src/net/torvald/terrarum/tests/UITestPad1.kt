@@ -3,8 +3,8 @@ package net.torvald.terrarum.tests
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.ScreenAdapter
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -12,6 +12,9 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UINSMenu
+
+val UITEST1_WIDTH = 1280
+val UITEST1_HEIGHT = 720
 
 /**
  * Created by minjaesong on 2018-12-09.
@@ -67,13 +70,13 @@ class UITestPad1 : ScreenAdapter() {
                 Yaml(treeStr)
         )
         batch = SpriteBatch()
-        camera = OrthographicCamera(AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+        camera = OrthographicCamera(UITEST1_WIDTH.toFloat(), UITEST1_HEIGHT.toFloat())
 
-        camera.setToOrtho(true, AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+        camera.setToOrtho(true, UITEST1_WIDTH.toFloat(), UITEST1_HEIGHT.toFloat())
         camera.update()
-        Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
+        Gdx.gl20.glViewport(0, 0, UITEST1_WIDTH, UITEST1_HEIGHT)
 
-        resize(AppLoader.appConfig.width, AppLoader.appConfig.height)
+        resize(UITEST1_WIDTH, UITEST1_HEIGHT)
 
         nsMenu.setPosition(0, 0)
         nsMenu.setAsAlwaysVisible()
@@ -148,16 +151,10 @@ class UITestPad1Controller(val host: UITestPad1) : InputAdapter() {
 fun main(args: Array<String>) {
     ShaderProgram.pedantic = false
 
-    val appConfig = LwjglApplicationConfiguration()
-    appConfig.vSyncEnabled = false
-    appConfig.resizable = false//true;
-    //appConfig.width = 1072; // IMAX ratio
-    //appConfig.height = 742; // IMAX ratio
-    appConfig.width = 1110 // photographic ratio (1.5:1)
-    appConfig.height = 740 // photographic ratio (1.5:1)
-    appConfig.backgroundFPS = 9999
-    appConfig.foregroundFPS = 9999
-    appConfig.forceExit = false
+    val appConfig = Lwjgl3ApplicationConfiguration()
+    appConfig.useVsync(false)
+    appConfig.setResizable(false)
+    appConfig.setWindowedMode(UITEST1_WIDTH, UITEST1_HEIGHT)
 
-    LwjglApplication(AppLoader(appConfig, UITestPad1()), appConfig)
+    Lwjgl3Application(AppLoader(appConfig, UITestPad1()), appConfig)
 }

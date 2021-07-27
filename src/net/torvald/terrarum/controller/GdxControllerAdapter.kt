@@ -1,7 +1,7 @@
 package net.torvald.terrarum.controller
 
 import com.badlogic.gdx.controllers.Controller
-import com.badlogic.gdx.controllers.PovDirection
+import net.torvald.terrarum.toInt
 
 /**
  * Created by minjaesong on 2019-02-09.
@@ -16,18 +16,11 @@ class GdxControllerAdapter(val c: Controller): TerrarumController {
         return c.getAxis(index)
     }
 
-    override fun getPov(): Int {
-        return when(c.getPov(0)) {
-            PovDirection.north -> TerrarumController.POV_N
-            PovDirection.northEast -> TerrarumController.POV_NE
-            PovDirection.northWest -> TerrarumController.POV_NW
-            PovDirection.east -> TerrarumController.POV_E
-            PovDirection.west -> TerrarumController.POV_W
-            PovDirection.south -> TerrarumController.POV_S
-            PovDirection.southEast -> TerrarumController.POV_SE
-            PovDirection.southWest -> TerrarumController.POV_SW
-            else -> 0
-        }
+    override fun getDpad(): Int {
+        return (c.getButton(c.mapping.buttonDpadLeft).toInt()) or
+                (c.getButton(c.mapping.buttonDpadDown).toInt() shl 1) or
+                (c.getButton(c.mapping.buttonDpadRight).toInt() shl 2) or
+                (c.getButton(c.mapping.buttonDpadUp).toInt() shl 3)
     }
 
     override fun getName(): String {

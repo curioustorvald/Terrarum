@@ -4,7 +4,6 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -31,8 +30,8 @@ object BlockStats {
         val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
         if (player == null) return
 
-        val renderWidth = FastMath.ceil(AppLoader.screenWf)
-        val renderHeight = FastMath.ceil(AppLoader.screenHf)
+        val renderWidth = FastMath.ceil(AppLoader.screenSize.screenWf)
+        val renderHeight = FastMath.ceil(AppLoader.screenSize.screenHf)
 
         val noZoomCameraX = Math.round(FastMath.clamp(
                 player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
