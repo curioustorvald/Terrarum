@@ -3,6 +3,8 @@ package net.torvald.terrarum.worlddrawer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -13,7 +15,6 @@ import org.dyn4j.geometry.Vector2
  * Created by minjaesong on 2016-12-30.
  */
 object WorldCamera {
-    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
     //val zoom: Float
     //    get() = Terrarum.ingame?.screenZoom ?: 1f
@@ -82,8 +83,8 @@ object WorldCamera {
 
         y = (FastMath.clamp(
                 (player.hitbox.centeredY - pVecSum.y).toFloat() - height / 2,
-                TILE_SIZE.toFloat(),
-                world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
+                TILE_SIZEF,
+                world.height * TILE_SIZE - height - TILE_SIZEF
         )).floorInt().clampCameraY(world)
 
         xEnd = x + width

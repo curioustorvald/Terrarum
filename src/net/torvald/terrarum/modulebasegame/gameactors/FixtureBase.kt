@@ -4,6 +4,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -30,9 +31,7 @@ open class FixtureBase(
 
     private val world: GameWorld
         get() = Terrarum.ingame!!.world
-
-    private val TSIZE = TILE_SIZE.toDouble()
-
+    
     /**
      * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
      */
@@ -96,7 +95,7 @@ open class FixtureBase(
         worldBlockPos = Point2i(posX, posY)
 
         this.isVisible = true
-        this.hitbox.setFromWidthHeight(posX * TSIZE, posY * TSIZE, blockBox.width * TSIZE, blockBox.height * TSIZE)
+        this.hitbox.setFromWidthHeight(posX * TILE_SIZED, posY * TILE_SIZED, blockBox.width * TILE_SIZED, blockBox.height * TILE_SIZED)
 
         // actually add this actor into the world
         Terrarum.ingame!!.addNewActor(this)

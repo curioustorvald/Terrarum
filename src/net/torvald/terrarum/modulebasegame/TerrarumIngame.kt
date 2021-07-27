@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
@@ -30,8 +32,6 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
@@ -162,8 +162,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override var gameFullyLoaded = false
         internal set
 
-
-    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
     //////////////
     // GDX code //
@@ -483,8 +481,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
                 // go to spawn position
                 actorNowPlaying?.setPosition(
-                        world.spawnX * CreateTileAtlas.TILE_SIZE.toDouble(),
-                        world.spawnY * CreateTileAtlas.TILE_SIZE.toDouble()
+                        world.spawnX * TILE_SIZED,
+                        world.spawnY * TILE_SIZED
                 )
             }
 
@@ -788,18 +786,18 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             min(// take min of normal position and wrapped (x < 0) position
                     (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
                         (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    ((a.hitbox.centeredX + world.width * CreateTileAtlas.TILE_SIZE) - p.hitbox.centeredX).sqr() +
+                    ((a.hitbox.centeredX + world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
                         (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    ((a.hitbox.centeredX - world.width * CreateTileAtlas.TILE_SIZE) - p.hitbox.centeredX).sqr() +
+                    ((a.hitbox.centeredX - world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
                         (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
             )
     private fun distToCameraSqr(a: ActorWithBody) =
             min(
                     (a.hitbox.centeredX - WorldCamera.xCentre).sqr() +
                         (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
-                    ((a.hitbox.centeredX + world.width * CreateTileAtlas.TILE_SIZE) - WorldCamera.xCentre).sqr() +
+                    ((a.hitbox.centeredX + world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
                         (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
-                    ((a.hitbox.centeredX - world.width * CreateTileAtlas.TILE_SIZE) - WorldCamera.xCentre).sqr() +
+                    ((a.hitbox.centeredX - world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
                         (a.hitbox.centeredY - WorldCamera.yCentre).sqr()
             )
 

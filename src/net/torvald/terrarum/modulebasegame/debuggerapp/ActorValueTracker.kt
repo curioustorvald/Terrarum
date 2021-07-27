@@ -1,17 +1,14 @@
 package net.torvald.terrarum.modulebasegame.debuggerapp
 
 import net.torvald.EMDASH
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.ccM
-import net.torvald.terrarum.ccW
-import net.torvald.terrarum.ccY
+import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.console.SetAV
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import java.awt.BorderLayout
 import java.awt.GridLayout
 import java.awt.event.MouseAdapter
@@ -167,8 +164,8 @@ class ActorValueTracker constructor() : JFrame() {
 
         if (actor != null) {
             sb.append("toString: ${actor!!}\n")
-            sb.append("X: ${actor!!.hitbox.canonicalX} (${(actor!!.hitbox.canonicalX / CreateTileAtlas.TILE_SIZE).toInt()})\n")
-            sb.append("Y: ${actor!!.hitbox.canonicalY} (${(actor!!.hitbox.canonicalY / CreateTileAtlas.TILE_SIZE).toInt()})")
+            sb.append("X: ${actor!!.hitbox.canonicalX} (${(actor!!.hitbox.canonicalX / TILE_SIZE).toInt()})\n")
+            sb.append("Y: ${actor!!.hitbox.canonicalY} (${(actor!!.hitbox.canonicalY / TILE_SIZE).toInt()})")
 
             avPosArea.text = "$sb"
             sb.setLength(0) // clear stringbuffer

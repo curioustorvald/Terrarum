@@ -1,42 +1,41 @@
-package net.torvald.terrarum;
+package net.torvald.terrarum
 
 /**
  * You directly modify the source code to tune the engine to suit your needs.
  *
  * Created by minjaesong on 2019-08-15.
  */
-public class TerrarumAppConfiguration {
-
+object TerrarumAppConfiguration {
     //////////////////////////////////////
     // CONFIGURATION FOR THE APP ITSELF //
     //////////////////////////////////////
-
-    public static final String GAME_NAME = "Terrarum";
-    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2021 Torvald (minjaesong)";
+    const val GAME_NAME = "Terrarum"
+    const val COPYRIGHT_DATE_NAME = "Copyright 2013-2021 Torvald (minjaesong)"
 
     /**
-     * <p>
-     * Version numbering that follows Semantic Versioning 2.0.0 (https://semver.org/)
-     * </p>
      *
-     * <p>
+     *
+     * Version numbering that follows Semantic Versioning 2.0.0 (https://semver.org/)
+     *
+     *
+     *
+     *
      * 0xAA_BB_XXXX, where:
-     * </p>
-     * <li>AA: Major version</li>
-     * <li>BB: Minor version</li>
-     * <li>XXXX: Patch version</li>
-     * <p>
+     *
+     *  * AA: Major version
+     *  * BB: Minor version
+     *  * XXXX: Patch version
+     *
+     *
      * e.g. 0x02010034 will be translated as 2.1.52
-     * </p>
+     *
      */
-    public static final int VERSION_RAW = 0x00_02_06D3;
-
+    const val VERSION_RAW = 0x000206D3
 
     //////////////////////////////////
     // CONFIGURATION FOR TILE MAKER //
     //////////////////////////////////
-
-    public static final int MAX_TEX_SIZE = 4096;
-    public static final int TILE_SIZE = 16;
-
+    const val TILE_SIZE = 16
+    const val TILE_SIZEF = TILE_SIZE.toFloat()
+    const val TILE_SIZED = TILE_SIZE.toDouble()
 }

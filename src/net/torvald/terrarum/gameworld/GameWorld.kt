@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
@@ -146,7 +147,7 @@ open class GameWorld : Disposable {
 
         tileNumberToNameMap = HashMap<Int, ItemID>()
         tileNameToNumberMap = HashMap<ItemID, Int>()
-        CreateTileAtlas.tags.forEach {
+        AppLoader.tileMaker.tags.forEach {
             printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
             tileNumberToNameMap[it.value.tileNumber] = it.key
@@ -189,7 +190,7 @@ open class GameWorld : Disposable {
         // before the renaming, update the name maps
         tileNumberToNameMap = HashMap<Int, ItemID>()
         tileNameToNumberMap = HashMap<ItemID, Int>()
-        CreateTileAtlas.tags.forEach {
+        AppLoader.tileMaker.tags.forEach {
             tileNumberToNameMap[it.value.tileNumber] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }

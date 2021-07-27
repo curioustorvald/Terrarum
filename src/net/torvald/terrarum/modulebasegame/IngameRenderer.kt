@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
@@ -725,8 +726,6 @@ object IngameRenderer : Disposable {
         blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
     }
-
-    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
     override fun dispose() {
         fboRGB.dispose()

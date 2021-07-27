@@ -136,8 +136,8 @@ object MinimapComposer : Disposable {
             for (x in if (tileSlotIndexY >= TILES_IN_X / 2) (topLeftX + LIVETILE_SIZE - 1) downTo topLeftX else topLeftX until topLeftX + LIVETILE_SIZE) {
                 val tileTerr = world.getTileFromTerrain(x, y)
                 val wallTerr = world.getTileFromWall(x, y)
-                val colTerr = CreateTileAtlas.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
-                val colWall = CreateTileAtlas.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(CreateTileAtlas.wallOverlayColour)
+                val colTerr = AppLoader.tileMaker.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
+                val colWall = AppLoader.tileMaker.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(AppLoader.tileMaker.wallOverlayColour)
 
                 val outCol = if (colTerr.a > 0.1f) colTerr else colWall
 

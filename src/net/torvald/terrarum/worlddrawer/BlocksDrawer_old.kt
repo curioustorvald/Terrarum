@@ -25,8 +25,8 @@ object BlocksDrawerOLD {
     lateinit var world: GameWorld
 
 
-    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
-    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
+    private val TILE_SIZE = TILE_SIZE
+    private val TILE_SIZEF = TILE_SIZEF
 
     // TODO modular
     //val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB

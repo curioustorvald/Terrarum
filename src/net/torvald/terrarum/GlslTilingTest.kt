@@ -35,8 +35,8 @@ object GlslTilingTest : ApplicationAdapter() {
 
     lateinit var fucktex: Texture
 
-    val TILE_SIZE = 16
-    val TILE_SIZEF = 16f
+    val TILING_SIZE = 16
+    val TILING_SIZEF = 16f
 
 
     lateinit var tilesBuffer: Pixmap
@@ -64,8 +64,8 @@ object GlslTilingTest : ApplicationAdapter() {
 
 
 
-        val tilesInHorizontal = (Gdx.graphics.width.toFloat() / TILE_SIZE).ceil() + 1f
-        val tilesInVertical = (Gdx.graphics.height.toFloat() / TILE_SIZE).ceil() + 1f
+        val tilesInHorizontal = (Gdx.graphics.width.toFloat() / TILING_SIZE).ceil() + 1f
+        val tilesInVertical = (Gdx.graphics.height.toFloat() / TILING_SIZE).ceil() + 1f
 
         tilesQuad = Mesh(
                 true, 4, 6,
@@ -129,8 +129,8 @@ object GlslTilingTest : ApplicationAdapter() {
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        val tilesInHorizontal = (Gdx.graphics.width.toFloat() / TILE_SIZE).ceil() + 1f
-        val tilesInVertical = (Gdx.graphics.height.toFloat() / TILE_SIZE).ceil() + 1f
+        val tilesInHorizontal = (Gdx.graphics.width.toFloat() / TILING_SIZE).ceil() + 1f
+        val tilesInVertical = (Gdx.graphics.height.toFloat() / TILING_SIZE).ceil() + 1f
 
 
 

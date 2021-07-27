@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
@@ -1167,7 +1170,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     private val AUTO_CLIMB_STRIDE: Int
         get() = (8 * scale).toInt() // number inspired by SM64
     //private val AUTO_CLIMB_RATE: Int // we'll just climb stairs instantly to make things work wo worrying about the details
-    //    get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZE.toDouble()).toInt()
+    //    get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZED).toInt()
 
     /**
      * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
@@ -1651,8 +1654,8 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             else if (x < TILE_SIZE + hitbox.width / 2) {
                 TILE_SIZE + hitbox.width / 2
             }
-            else if (x >= (world!!.width * TILE_SIZE).toDouble() - TILE_SIZE.toDouble() - hitbox.width / 2) {
-                (world!!.width * TILE_SIZE).toDouble() - 1.0 - TILE_SIZE.toDouble() - hitbox.width / 2
+            else if (x >= (world!!.width * TILE_SIZE).toDouble() - TILE_SIZED - hitbox.width / 2) {
+                (world!!.width * TILE_SIZE).toDouble() - 1.0 - TILE_SIZED - hitbox.width / 2
             }
             else {
                 x
@@ -1663,8 +1666,8 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             else if (y < TILE_SIZE + hitbox.height) {
                 TILE_SIZE + hitbox.height
             }
-            else if (y >= (world!!.height * TILE_SIZE).toDouble() - TILE_SIZE.toDouble() - hitbox.height) {
-                (world!!.height * TILE_SIZE).toDouble() - 1.0 - TILE_SIZE.toDouble() - hitbox.height
+            else if (y >= (world!!.height * TILE_SIZE).toDouble() - TILE_SIZED - hitbox.height) {
+                (world!!.height * TILE_SIZE).toDouble() - 1.0 - TILE_SIZED - hitbox.height
             }
             else {
                 y
@@ -1842,9 +1845,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         @Transient const val COLLISION_STATIC = 3
         @Transient const val COLLISION_KNOCKBACK_GIVER = 4 // mobs
         @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
-
-        @Transient val TILE_SIZE = CreateTileAtlas.TILE_SIZE
-        @Transient val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)

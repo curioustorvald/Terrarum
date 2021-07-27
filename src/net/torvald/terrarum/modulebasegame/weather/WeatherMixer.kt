@@ -8,6 +8,7 @@ import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
@@ -146,7 +147,7 @@ internal object WeatherMixer : RNGConsumer {
          .|         = // parallax of +1
          -+ <- 0.0  =
          */
-        val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
+        val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
         val parallaxSize = 1f / 3f
         val parallaxMidpt = (parallax + 1f) / 2f
         val parallaxTop = (parallaxMidpt - (parallaxSize / 2f)).coerceIn(0f, 1f)

@@ -3,6 +3,9 @@ package net.torvald.terrarum.blockstats
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -15,9 +18,7 @@ import java.util.*
 object BlockStats {
 
     private val tilestat = HashMap<ItemID, Int>()
-
-    private val TSIZE = CreateTileAtlas.TILE_SIZE
-
+    
     /**
      * Update tile stats from tiles on screen
      */
@@ -34,14 +35,14 @@ object BlockStats {
         val renderHeight = FastMath.ceil(AppLoader.screenSize.screenHf)
 
         val noZoomCameraX = Math.round(FastMath.clamp(
-                player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
+                player.hitbox.centeredX.toFloat() - renderWidth / 2, TILE_SIZEF, map.width * TILE_SIZE - renderWidth - TILE_SIZEF))
         val noZoomCameraY = Math.round(FastMath.clamp(
-                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TILE_SIZEF, map.width * TILE_SIZE - renderHeight - TILE_SIZEF))
 
-        val for_x_start = noZoomCameraX / TSIZE
-        val for_y_start = noZoomCameraY / TSIZE
-        val for_y_end = BlocksDrawer.clampHTile(for_y_start + (renderHeight / TSIZE) + 2)
-        val for_x_end = BlocksDrawer.clampWTile(for_x_start + (renderWidth / TSIZE) + 2)
+        val for_x_start = noZoomCameraX / TILE_SIZE
+        val for_y_start = noZoomCameraY / TILE_SIZE
+        val for_y_end = BlocksDrawer.clampHTile(for_y_start + (renderHeight / TILE_SIZE) + 2)
+        val for_x_end = BlocksDrawer.clampWTile(for_x_start + (renderWidth / TILE_SIZE) + 2)
 
         for (y in for_y_start..for_y_end - 1) {
             for (x in for_x_start..for_x_end - 1) {

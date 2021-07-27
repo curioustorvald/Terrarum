@@ -8,6 +8,7 @@ import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -89,13 +90,13 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + ccG
                                          + "${hitbox?.startX}"
                                          + " ("
-                                         + "${(hitbox?.startX?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.startX?.div(TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 2, 1, "endX "
                                          + ccG
                                          + "${hitbox?.endX}"
                                          + " ("
-                                         + "${(hitbox?.endX?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.endX?.div(TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 3, 1, "camX "
                                          + ccG
@@ -104,13 +105,13 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + ccG
                                          + "${hitbox?.startY}"
                                          + " ("
-                                         + "${(hitbox?.startY?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.startY?.div(TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 2, 2, "endY "
                                          + ccG
                                          + "${hitbox?.endY}"
                                          + " ("
-                                         + "${(hitbox?.endY?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.endY?.div(TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 3, 2, "camY "
                                          + ccG

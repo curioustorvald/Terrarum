@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.Input
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
@@ -11,8 +12,6 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import org.khelekore.prtree.*
 import kotlin.math.roundToInt
 
@@ -79,8 +78,8 @@ object WorldSimulator {
         //printdbg(this, "============================")
 
         if (player != null) {
-            updateXFrom = player.hitbox.centeredX.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
-            updateYFrom = player.hitbox.centeredY.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            updateXFrom = player.hitbox.centeredX.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
+            updateYFrom = player.hitbox.centeredY.div(TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundToInt()
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }

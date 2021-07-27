@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
@@ -40,10 +42,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         get() = WorldCamera.y + Gdx.input.y / (terrarumIngame.screenZoom)
     /** currently pointing tile coordinate */
     val mouseTileX: Int
-        get() = (mouseX / CreateTileAtlas.TILE_SIZE).floorInt()
+        get() = (mouseX / TILE_SIZE).floorInt()
     /** currently pointing tile coordinate */
     val mouseTileY: Int
-        get() = (mouseY / CreateTileAtlas.TILE_SIZE).floorInt()
+        get() = (mouseY / TILE_SIZE).floorInt()
 
     init {
         try {

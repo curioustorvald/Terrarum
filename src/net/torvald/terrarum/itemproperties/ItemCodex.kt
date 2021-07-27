@@ -8,17 +8,11 @@ import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.ITEM_ATLAS_TILES_X
 import java.util.*
 
 /**
@@ -103,18 +97,18 @@ object ItemCodex {
         // TODO: wires
         // wall
         else if (itemID.startsWith("wall@")) {
-            val itemSheetNumber = CreateTileAtlas.tileIDtoItemSheetNumber(itemID.substring(5))
+            val itemSheetNumber = AppLoader.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
             return BlocksDrawer.tileItemWall.get(
-                    itemSheetNumber % ITEM_ATLAS_TILES_X,
-                    itemSheetNumber / ITEM_ATLAS_TILES_X
+                    itemSheetNumber % AppLoader.tileMaker.ITEM_ATLAS_TILES_X,
+                    itemSheetNumber / AppLoader.tileMaker.ITEM_ATLAS_TILES_X
             )
         }
         // terrain
         else {
-            val itemSheetNumber = CreateTileAtlas.tileIDtoItemSheetNumber(itemID)
+            val itemSheetNumber = AppLoader.tileMaker.tileIDtoItemSheetNumber(itemID)
             return BlocksDrawer.tileItemTerrain.get(
-                    itemSheetNumber % ITEM_ATLAS_TILES_X,
-                    itemSheetNumber / ITEM_ATLAS_TILES_X
+                    itemSheetNumber % AppLoader.tileMaker.ITEM_ATLAS_TILES_X,
+                    itemSheetNumber / AppLoader.tileMaker.ITEM_ATLAS_TILES_X
             )
         }
 

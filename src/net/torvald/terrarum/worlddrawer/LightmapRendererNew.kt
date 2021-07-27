@@ -7,6 +7,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
@@ -34,7 +35,6 @@ import kotlin.system.exitProcess
  * own ingame renderer
  */
 object LightmapRenderer {
-    private const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
     /** World change is managed by IngameRenderer.setWorld() */
     private var world: GameWorld = GameWorld.makeNullWorld()
@@ -91,7 +91,7 @@ object LightmapRenderer {
 
     private const val AIR = Block.AIR
 
-    const val DRAW_TILE_SIZE: Float = CreateTileAtlas.TILE_SIZE / IngameRenderer.lightmapDownsample
+    const val DRAW_TILE_SIZE: Float = TILE_SIZE / IngameRenderer.lightmapDownsample
 
     internal var for_x_start = 0
     internal var for_y_start = 0

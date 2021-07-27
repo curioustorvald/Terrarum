@@ -37,6 +37,7 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.ArrayListMap;
+import org.lwjgl.opengl.GL11;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class AppLoader implements ApplicationListener {
     /**
      * Initialise the application with the alternative Screen you choose
      *
-     * @param appConfig    LWJGL(2) Application Configuration
+     * @param appConfig    LWJGL3 Application Configuration
      * @param injectScreen GDX Screen you want to run
      */
     public AppLoader(Lwjgl3ApplicationConfiguration appConfig, Screen injectScreen) {
@@ -144,9 +145,6 @@ public class AppLoader implements ApplicationListener {
     public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
     // some JVMs don't have this property, but they probably don't have "sun.misc.Unsafe" either, so it's no big issue \_(ツ)_/
 
-    public static int GL_VERSION;
-    public static final int MINIMAL_GL_VERSION = 320;
-
     public static final int GLOBAL_FRAMERATE_LIMIT = 300;
 
     /**
@@ -187,6 +185,10 @@ public class AppLoader implements ApplicationListener {
 
     public static Lwjgl3ApplicationConfiguration appConfig;
     public static TerrarumScreenSize screenSize;
+    public static TerrarumGLinfo glInfo = new TerrarumGLinfo();
+
+    public static CreateTileAtlas tileMaker;
+
     public static GameFontBase fontGame;
     public static TinyAlphNum fontSmallNumbers;
 
@@ -349,22 +351,8 @@ public class AppLoader implements ApplicationListener {
         GAME_LOCALE = getConfigString("language");
         printdbg(this, "locale = " + GAME_LOCALE);
 
-        String glInfo = Gdx.graphics.getGLVersion().getDebugVersionString();
 
-        GL_VERSION = Gdx.graphics.getGLVersion().getMajorVersion() * 100 +
-                     Gdx.graphics.getGLVersion().getMinorVersion() * 10 +
-                     Gdx.graphics.getGLVersion().getReleaseVersion();
-
-        System.out.println("GL_VERSION = " + GL_VERSION);
-        System.out.println("GL info:\n" + glInfo); // debug info
-
-
-        if (GL_VERSION < MINIMAL_GL_VERSION) {
-            // TODO notify properly
-            throw new GdxRuntimeException("Graphics device not capable -- device's GL_VERSION: " + GL_VERSION +
-                    ", required: " + MINIMAL_GL_VERSION);
-        }
-
+        glInfo.create();
 
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
 
@@ -482,7 +470,8 @@ public class AppLoader implements ApplicationListener {
 
         // create tile atlas
         printdbg(this, "Making terrain textures...");
-        CreateTileAtlas.INSTANCE.invoke(false);
+        tileMaker = new CreateTileAtlas();
+        tileMaker.invoke(false);
     }
 
     @Override

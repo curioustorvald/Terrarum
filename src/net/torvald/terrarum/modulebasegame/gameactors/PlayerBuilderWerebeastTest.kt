@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
@@ -47,7 +48,7 @@ object PlayerBuilderWerebeastTest {
         p.reassembleSprite(p.sprite!!, p.spriteGlow)
         p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 30, 0)
 
-        p.setPosition(3.0 * CreateTileAtlas.TILE_SIZE, 3.0 * CreateTileAtlas.TILE_SIZE)
+        p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)
 
 
         PlayerBuilderSigrid.fillTestInventory(p.inventory)

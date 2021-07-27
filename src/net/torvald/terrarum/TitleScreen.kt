@@ -11,6 +11,8 @@ import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
@@ -72,7 +74,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-            val tileSize = CreateTileAtlas.TILE_SIZE.toFloat()
+            val tileSize = TILE_SIZEF
             val catmullRomTension = 0f
 
             // pan camera
@@ -117,9 +119,6 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     private lateinit var worldFBO: FrameBuffer
 
-    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
-    private val TILE_SIZEF = TILE_SIZE.toFloat()
-
     private fun loadThingsWhileIntroIsVisible() {
         printdbg(this, "Intro pre-load")
 
@@ -139,7 +138,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             while (travelDownCounter < demoWorld.height && !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
                 travelDownCounter += 4
             }
-            travelDownCounter * CreateTileAtlas.TILE_SIZE.toFloat()
+            travelDownCounter * TILE_SIZEF
         }
 
 
@@ -372,7 +371,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         init {
             hitbox.setPosition(
-                    HQRNG().nextInt(demoWorld.width) * CreateTileAtlas.TILE_SIZE.toDouble(),
+                    HQRNG().nextInt(demoWorld.width) * TILE_SIZED,
                     0.0 // Y pos: placeholder; camera AI will take it over
             )
         }

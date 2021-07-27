@@ -18,6 +18,7 @@ object DefaultConfig {
         jsonObject.addProperty("usevsync", false)
         jsonObject.addProperty("screenwidth", TerrarumScreenSize.defaultW)
         jsonObject.addProperty("screenheight", TerrarumScreenSize.defaultH)
+        jsonObject.addProperty("atlastexsize", 2048)
 
 
         //jsonObject.addProperty("imtooyoungtodie", false) // no perma-death

@@ -14,6 +14,7 @@ import com.jme3.math.FastMath
 import net.torvald.UnsafeHelper
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -257,16 +258,16 @@ object Terrarum : Disposable {
         get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileX: Int
-        get() = (mouseX / CreateTileAtlas.TILE_SIZE).floorInt()
+        get() = (mouseX / TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileY: Int
-        get() = (mouseY / CreateTileAtlas.TILE_SIZE).floorInt()
+        get() = (mouseY / TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val oldMouseTileX: Int
-        get() = (oldMouseX / CreateTileAtlas.TILE_SIZE).floorInt()
+        get() = (oldMouseX / TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val oldMouseTileY: Int
-        get() = (oldMouseY / CreateTileAtlas.TILE_SIZE).floorInt()
+        get() = (oldMouseY / TILE_SIZE).floorInt()
     inline val mouseScreenX: Int
         get() = Gdx.input.x
     inline val mouseScreenY: Int

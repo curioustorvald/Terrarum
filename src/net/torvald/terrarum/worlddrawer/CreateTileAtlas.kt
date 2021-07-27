@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
@@ -26,13 +27,12 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2019-02-28.
  */
-object CreateTileAtlas {
+class CreateTileAtlas {
 
-    const val MAX_TEX_SIZE = TerrarumAppConfiguration.MAX_TEX_SIZE
-    const val TILE_SIZE = TerrarumAppConfiguration.TILE_SIZE
-    const val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
+    val MAX_TEX_SIZE = AppLoader.getConfigInt("atlastexsize").coerceIn(1024, AppLoader.glInfo.GL_MAX_TEXTURE_SIZE)
+    val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
 
-    const val ITEM_ATLAS_TILES_X = 16
+    val ITEM_ATLAS_TILES_X = 16
 
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
@@ -150,15 +150,15 @@ object CreateTileAtlas {
         val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
-        CreateTileAtlas.tags.toMap().forEach { id, tag ->
+        tags.toMap().forEach { id, tag ->
             val tilePosFromAtlas = tag.tileNumber + maskTypetoTileIDForItemImage(tag.maskType)
             val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
             val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
             val t = tileIDtoItemSheetNumber(id)
             val destX = (t % ITEM_ATLAS_TILES_X) * TILE_SIZE
             val destY = (t / ITEM_ATLAS_TILES_X) * TILE_SIZE
-            itemTerrainPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemWallPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemTerrainPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemWallPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
         }
         // darken things for the wall
         for (y in 0 until itemWallPixmap.height) {

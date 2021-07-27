@@ -2,15 +2,12 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import org.dyn4j.geometry.Vector2
 
 /**

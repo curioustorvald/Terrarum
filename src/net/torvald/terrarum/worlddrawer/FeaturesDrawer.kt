@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 
 /**
  * Created by minjaesong on 2015-12-31.
@@ -17,7 +17,7 @@ object FeaturesDrawer {
     /** World change is managed by IngameRenderer.setWorld() */
     internal var world: GameWorld = GameWorld.makeNullWorld()
 
-    //const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
+    //const val TILE_SIZE = TILE_SIZE
 
     private val ENV_COLTEMP_LOWEST = 5500
     private val ENV_COLTEMP_HIGHEST = 7500
@@ -45,7 +45,7 @@ object FeaturesDrawer {
      * usually targeted for the environmental temperature (desert/winterland), hence the name.
      */
     fun drawEnvOverlay(batch: SpriteBatch) {
-        val onscreen_tiles_max = FastMath.ceil(AppLoader.screenSize.screenH * AppLoader.screenSize.screenW / FastMath.sqr (TILE_SIZE.toFloat())) * 2
+        val onscreen_tiles_max = FastMath.ceil(AppLoader.screenSize.screenH * AppLoader.screenSize.screenW / FastMath.sqr(TILE_SIZEF)) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f
         val onscreen_cold_tiles = BlockStats.getCount(*TILES_COLD).toFloat()
         val onscreen_warm_tiles = BlockStats.getCount(*TILES_WARM).toFloat()

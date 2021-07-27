@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameitem.ItemID
@@ -14,7 +15,6 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILES_IN_X
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -35,8 +35,6 @@ internal object BlocksDrawer {
     /** World change is managed by IngameRenderer.setWorld() */
     internal var world: GameWorld = GameWorld.makeNullWorld()
 
-    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
-    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
     /**
      * Widths of the tile atlases must have exactly the same width (height doesn't matter)
@@ -98,16 +96,16 @@ internal object BlocksDrawer {
 
         // create terrain texture from pixmaps
         weatherTerrains = arrayOf(
-                TextureRegionPack(Texture(CreateTileAtlas.atlasSpring), TILE_SIZE, TILE_SIZE),
-                TextureRegionPack(Texture(CreateTileAtlas.atlas), TILE_SIZE, TILE_SIZE),
-                TextureRegionPack(Texture(CreateTileAtlas.atlasAutumn), TILE_SIZE, TILE_SIZE),
-                TextureRegionPack(Texture(CreateTileAtlas.atlasWinter), TILE_SIZE, TILE_SIZE)
+                TextureRegionPack(Texture(AppLoader.tileMaker.atlasSpring), TILE_SIZE, TILE_SIZE),
+                TextureRegionPack(Texture(AppLoader.tileMaker.atlas), TILE_SIZE, TILE_SIZE),
+                TextureRegionPack(Texture(AppLoader.tileMaker.atlasAutumn), TILE_SIZE, TILE_SIZE),
+                TextureRegionPack(Texture(AppLoader.tileMaker.atlasWinter), TILE_SIZE, TILE_SIZE)
         )
 
         //TODO make wire work with the TileAtlas system
         tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "blocks/wire.tga"), TILE_SIZE, TILE_SIZE)
-        tilesFluid = TextureRegionPack(Texture(CreateTileAtlas.atlasFluid), TILE_SIZE, TILE_SIZE)
-        tilesGlow = TextureRegionPack(Texture(CreateTileAtlas.atlasGlow), TILE_SIZE, TILE_SIZE)
+        tilesFluid = TextureRegionPack(Texture(AppLoader.tileMaker.atlasFluid), TILE_SIZE, TILE_SIZE)
+        tilesGlow = TextureRegionPack(Texture(AppLoader.tileMaker.atlasGlow), TILE_SIZE, TILE_SIZE)
 
 
         printdbg(this, "Making terrain and wall item textures...")
@@ -117,8 +115,8 @@ internal object BlocksDrawer {
         // test print
         //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/terrainitem.tga"), itemTerrainPixmap, false)
 
-        tileItemTerrain = TextureRegionPack(CreateTileAtlas.itemTerrainTexture, TILE_SIZE, TILE_SIZE)
-        tileItemWall = TextureRegionPack(CreateTileAtlas.itemWallTexture, TILE_SIZE, TILE_SIZE)
+        tileItemTerrain = TextureRegionPack(AppLoader.tileMaker.itemTerrainTexture, TILE_SIZE, TILE_SIZE)
+        tileItemWall = TextureRegionPack(AppLoader.tileMaker.itemWallTexture, TILE_SIZE, TILE_SIZE)
 
 
 
@@ -321,10 +319,10 @@ internal object BlocksDrawer {
                     0
                 }
 
-                val renderTag = CreateTileAtlas.getRenderTag(thisTile)
+                val renderTag = AppLoader.tileMaker.getRenderTag(thisTile)
                 val tileNumberBase =
                         if (mode == FLUID)
-                            CreateTileAtlas.fluidToTileNumber(world.getFluid(x, y))
+                            AppLoader.tileMaker.fluidToTileNumber(world.getFluid(x, y))
                         else if (mode == WIRE)
                             0 // TODO need new wire storing format
                         else
@@ -343,8 +341,8 @@ internal object BlocksDrawer {
                         else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
                     }
 
-                var thisTileX = tileNumber % TILES_IN_X
-                var thisTileY = tileNumber / TILES_IN_X
+                var thisTileX = tileNumber % AppLoader.tileMaker.TILES_IN_X
+                var thisTileY = tileNumber / AppLoader.tileMaker.TILES_IN_X
 
                 if (mode == FLUID && thisTileX == 22 && thisTileY == 3) {
                     //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
@@ -442,7 +440,7 @@ internal object BlocksDrawer {
         var ret = 0
         for (i in nearbyTiles.indices) {
             val fluid = world.getFluid(nearbyPos[i].x, nearbyPos[i].y)
-            if (BlockCodex[nearbyTiles[i]].isSolid || (fluid.isFluid() && 0 < CreateTileAtlas.fluidFillToTileLevel(fluid.amount))) {
+            if (BlockCodex[nearbyTiles[i]].isSolid || (fluid.isFluid() && 0 < AppLoader.tileMaker.fluidFillToTileLevel(fluid.amount))) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
@@ -579,7 +577,7 @@ internal object BlocksDrawer {
         }
         val vertexColour = when (mode) {
             TERRAIN, WIRE, FLUID -> Color.WHITE
-            WALL -> CreateTileAtlas.wallOverlayColour
+            WALL -> AppLoader.tileMaker.wallOverlayColour
             else -> throw IllegalArgumentException()
         }
 
@@ -729,7 +727,7 @@ internal object BlocksDrawer {
         tilesQuad.dispose()
         shader.dispose()
 
-        CreateTileAtlas.dispose()
+        AppLoader.tileMaker.dispose()
     }
 
     fun getRenderStartX(): Int = WorldCamera.x / TILE_SIZE
@@ -738,10 +736,10 @@ internal object BlocksDrawer {
     fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (WorldCamera.width / TILE_SIZE) + 2)
     fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (WorldCamera.height / TILE_SIZE) + 2)
 
-    fun isConnectSelf(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_SELF
-    fun isConnectMutual(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_MUTUAL
-    fun isWallSticker(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
-    fun isPlatform(b: ItemID): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
+    fun isConnectSelf(b: ItemID): Boolean = AppLoader.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_SELF
+    fun isConnectMutual(b: ItemID): Boolean = AppLoader.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_MUTUAL
+    fun isWallSticker(b: ItemID): Boolean = AppLoader.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
+    fun isPlatform(b: ItemID): Boolean = AppLoader.tileMaker.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
     //fun isBlendMul(b: Int): Boolean = TILES_BLEND_MUL.contains(b)
 
     fun tileInCamera(x: Int, y: Int) =
