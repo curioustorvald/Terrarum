@@ -29,7 +29,7 @@ public class TerrarumAppConfiguration {
      * e.g. 0x02010034 will be translated as 2.1.52
      * </p>
      */
-    public static final int VERSION_RAW = 0x00_02_0590;
+    public static final int VERSION_RAW = 0x00_02_06D3;
 
 
     //////////////////////////////////
