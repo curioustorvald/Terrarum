@@ -18,7 +18,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleBase
-import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
+import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.*
 import net.torvald.util.CircularArray

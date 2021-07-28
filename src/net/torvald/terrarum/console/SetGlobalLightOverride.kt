@@ -2,8 +2,7 @@ package net.torvald.terrarum.console
 
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.weather.WeatherMixer
 
 /**
  * Created by minjaesong on 2016-02-17.

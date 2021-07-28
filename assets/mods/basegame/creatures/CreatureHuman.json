@@ -20,6 +20,7 @@
 
   "encumbrance": 1000,
   "basedefence": 100,
+  "basereach": 50,
 
   "toolsize": 15,
   

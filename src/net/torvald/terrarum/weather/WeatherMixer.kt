@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame.weather
+package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -18,7 +18,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.util.*

@@ -1,9 +1,6 @@
-package net.torvald.terrarum.modulebasegame.console
+package net.torvald.terrarum.console
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.console.ConsoleCommand
-import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.debuggerapp.ActorValueTracker
 import java.util.*

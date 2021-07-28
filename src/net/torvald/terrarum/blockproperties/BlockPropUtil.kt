@@ -7,8 +7,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
-import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.weather.WeatherMixer
 
 /**
  * Created by minjaesong on 2016-06-16.

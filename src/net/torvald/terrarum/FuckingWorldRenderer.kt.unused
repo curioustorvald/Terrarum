@@ -34,8 +34,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.modulebasegame.console.AVTracker
-import net.torvald.terrarum.modulebasegame.console.ActorsList
+import net.torvald.terrarum.console.AVTracker
+import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.SetGlobalLightOverride
 import net.torvald.terrarum.itemproperties.ItemCodex

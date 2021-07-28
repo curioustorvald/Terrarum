@@ -42,6 +42,7 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.STRENGTH] = 1414 // this is test character, after all.
         p.actorValue[AVKey.ENCUMBRANCE] = 1000
         p.actorValue[AVKey.BASEHEIGHT] = 46
+        p.actorValue[AVKey.BASEREACH] = 50
 
         p.actorValue[AVKey.NAME] = "Sigrid"
 

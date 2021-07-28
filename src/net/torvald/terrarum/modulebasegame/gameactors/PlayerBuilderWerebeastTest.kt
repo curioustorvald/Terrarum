@@ -24,6 +24,7 @@ object PlayerBuilderWerebeastTest {
         p.actorValue[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
         p.actorValue[AVKey.ACCELBUFF] = 1.0
         p.actorValue[AVKey.JUMPPOWER] = 19.0
+        p.actorValue[AVKey.BASEREACH] = 114 // 7 tiles + 2 px
 
         p.actorValue[AVKey.BASEMASS] = 599.16
         p.actorValue[AVKey.SCALEBUFF] = 1.0 // Constant 1.0 for player, meant to be used by random mobs
@@ -46,7 +47,7 @@ object PlayerBuilderWerebeastTest {
         p.sprite = SpriteAnimation(p)
         p.spriteGlow = SpriteAnimation(p)
         p.reassembleSprite(p.sprite!!, p.spriteGlow)
-        p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 30, 0)
+        p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 30, 0)
 
         p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)
 
