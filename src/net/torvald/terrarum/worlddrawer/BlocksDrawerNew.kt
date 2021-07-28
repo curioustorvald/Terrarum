@@ -103,7 +103,7 @@ internal object BlocksDrawer {
         )
 
         //TODO make wire work with the TileAtlas system
-        tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "blocks/wire.tga"), TILE_SIZE, TILE_SIZE)
+        tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "wires/wire.tga"), TILE_SIZE, TILE_SIZE)
         tilesFluid = TextureRegionPack(Texture(AppLoader.tileMaker.atlasFluid), TILE_SIZE, TILE_SIZE)
         tilesGlow = TextureRegionPack(Texture(AppLoader.tileMaker.atlasGlow), TILE_SIZE, TILE_SIZE)
 

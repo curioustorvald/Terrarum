@@ -223,11 +223,9 @@ object ModMgr {
 
 
     object GameBlockLoader {
-        val blockPath = "blocks/"
-
         @JvmStatic operator fun invoke(module: String) {
-            BlockCodex(module, blockPath + "blocks.csv")
-            WireCodex(module, blockPath + "wires.csv")
+            BlockCodex(module, "blocks/blocks.csv")
+            WireCodex(module, "wires/wires.csv")
         }
     }
 

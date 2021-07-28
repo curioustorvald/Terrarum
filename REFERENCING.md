@@ -9,8 +9,9 @@ where Prefix is predefined (see below), Integer ID is arbitrarily chosen within 
 ### Prefixes
 |Name|Description|
 |----|-----------|
-|wall|Wall, only used by the Inventory to differentiate walls from blocks (therefore wall shares same "ID Space" with blocks/fluids/wires)|
-|item|Item (Static), uses different "ID Space" with blocks/walls/fluids/wires|
+|wall|Wall, only used by the Inventory to differentiate walls from blocks (therefore wall shares same "ID Space" with blocks)|
+|item|Item (Static)|
+|wire|Wires|
 
 Notes: 
 - BlockCodex and ItemCodex will not store prefix part of the ID, as blocks and walls are identical in properties
