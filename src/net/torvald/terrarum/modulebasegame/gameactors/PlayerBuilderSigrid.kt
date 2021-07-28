@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
@@ -92,9 +93,16 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:1", 16) // copper pick
         inventory.add("item@basegame:2") // iron pick
         inventory.add("item@basegame:3") // steel pick
-        inventory.add("item@basegame:4", 9995) // wire piece
         inventory.add("item@basegame:5", 385930603) // test tiki torch
         inventory.add("item@basegame:6", 95) // crafting table
 
+        WireCodex.getAll().forEach {
+            try {
+                inventory.add(it.id, 9995)
+            }
+            catch (e: Throwable) {
+                System.err.println("[PlayerBuilder] $e")
+            }
+        }
     }
 }

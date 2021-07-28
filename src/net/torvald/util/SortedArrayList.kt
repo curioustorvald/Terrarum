@@ -98,7 +98,7 @@ class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
      * @param searchQuery what exactly are we looking for?
      * @param searchHow and where or how can it be found?
      */
-    fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R): T? = getOrNull(searchForIndex(searchQuery, searchHow))
+    fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R = { it as R }): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 
     override fun iterator() = arrayList.iterator()
     inline fun forEach(action: (T) -> Unit) = arrayList.forEach(action)

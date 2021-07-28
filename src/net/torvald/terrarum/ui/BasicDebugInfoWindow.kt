@@ -159,10 +159,12 @@ class BasicDebugInfoWindow : UICanvas() {
         if (ingame != null) {
             val wallNum = ingame!!.world.getTileFromWall(mouseTileX, mouseTileY)
             val tileNum = ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY)
-            val wireNum = ingame!!.world.getWiringBlocks(mouseTileX, mouseTileY)
+            val wires = ingame!!.world.getAllWiresFrom(mouseTileX, mouseTileY)
             val fluid = ingame!!.world.getFluid(mouseTileX, mouseTileY)
 
-            printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG${wireNum} $ccY($mtX, $mtY)")
+            val wireCount = wires?.size?.toString() ?: "no"
+
+            printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG($wireCount wires) $ccY($mtX, $mtY)")
             printLine(batch, 10, "fluid@cursor ${ccO}Type $ccG${fluid.type.value} ${ccO}Fill $ccG${fluid.amount}f")
 
         }

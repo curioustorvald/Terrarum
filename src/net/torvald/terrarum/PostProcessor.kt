@@ -104,7 +104,7 @@ object PostProcessor : Disposable {
             if (KeyToggler.isOn(Input.Keys.F10)) {
                 batch.color = Color.WHITE
                 batch.inUse {
-                    AppLoader.fontSmallNumbers.draw(it, "Wire draw bits: ${BlocksDrawer.drawWires.toString(2)}", 2f, 2f)
+                    AppLoader.fontSmallNumbers.draw(it, "Wire draw class: ${BlocksDrawer.selectedWireRenderClass}", 2f, 2f)
                 }
             }
 

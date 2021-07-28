@@ -77,12 +77,12 @@ open class GameWorld : Disposable {
      * Single block can have multiple conduits, different types of conduits are stored separately.
      */
     @TEMzPayload("WiNt", TEMzPayload.EXTERNAL_JSON)
-    private val wirings: HashMap<BlockAddress, SortedArrayList<WiringNode>>
+    private val wirings: HashMap<BlockAddress, WiringNode>
 
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
      */
-    private val wiringBlocks: HashMap<BlockAddress, ItemID>
+    //private val wiringBlocks: HashMap<BlockAddress, ItemID>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -130,7 +130,7 @@ open class GameWorld : Disposable {
         fluidTypes = HashMap()
         fluidFills = HashMap()
 
-        wiringBlocks = HashMap()
+        //wiringBlocks = HashMap()
         wirings = HashMap()
 
         // temperature layer: 2x2 is one cell
@@ -173,7 +173,7 @@ open class GameWorld : Disposable {
         fluidTypes = layerData.fluidTypes
         fluidFills = layerData.fluidFills
 
-        wiringBlocks = HashMap()
+        //wiringBlocks = HashMap()
         wirings = HashMap()
 
         spawnX = layerData.spawnX
@@ -312,48 +312,25 @@ open class GameWorld : Disposable {
             Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, LandUtil.getBlockAddr(this, x, y))
     }
 
-    /*fun setTileWire(x: Int, y: Int, tile: Byte) {
+    fun setTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
-        val oldWire = getTileFromWire(x, y)
-        layerWire.setTile(x, y, tile)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        val wireNode = wirings[blockAddr]
 
-        if (oldWire != null)
-            Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
-    }*/
-
-    fun getWiringBlocks(x: Int, y: Int): ItemID {
-        return Block.AIR // TODO
-        //return wiringBlocks.getOrDefault(LandUtil.getBlockAddr(this, x, y), Block.AIR)
-    }
-
-    fun getAllConduitsFrom(x: Int, y: Int): SortedArrayList<WiringNode>? {
-        return wirings.get(LandUtil.getBlockAddr(this, x, y))
-    }
-
-    /**
-     * @param conduitTypeBit defined in net.torvald.terrarum.blockproperties.Wire, always power-of-two
-     */
-    fun getConduitByTypeFrom(x: Int, y: Int, conduitTypeBit: Int): WiringNode? {
-        val conduits = getAllConduitsFrom(x, y)
-        return conduits?.searchFor(conduitTypeBit) { it.typeBitMask }
-    }
-
-    fun addNewConduitTo(x: Int, y: Int, node: WiringNode) {
-        // TODO needs new conduit storage scheme
-
-        /*val blockAddr = LandUtil.getBlockAddr(this, x, y)
-
-        // check for existing type of conduit
-        // if there's no duplicate...
-        if (getWiringBlocks(x, y) and node.typeBitMask == 0) {
-            // store as-is
-            wirings.getOrPut(blockAddr) { SortedArrayList() }.add(node)
-            // synchronise wiringBlocks
-            wiringBlocks[blockAddr] = (wiringBlocks[blockAddr] ?: 0) or node.typeBitMask
+        if (wireNode == null) {
+            wirings[blockAddr] = WiringNode(blockAddr, SortedArrayList())
         }
-        else {
-            TODO("need overwriting policy for existing conduit node")
-        }*/
+
+        wirings[blockAddr]!!.wires.add(tile)
+
+        if (!bypassEvent)
+            Terrarum.ingame?.queueWireChangedEvent(tile, LandUtil.getBlockAddr(this, x, y))
+    }
+
+    fun getAllWiresFrom(x: Int, y: Int): SortedArrayList<ItemID>? {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return wirings[blockAddr]?.wires
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): ItemID {
@@ -362,9 +339,6 @@ open class GameWorld : Disposable {
         }
         else if (mode == WALL) {
             return getTileFromWall(x, y)
-        }
-        else if (mode == WIRE) {
-            return getWiringBlocks(x, y)
         }
         else
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
@@ -532,10 +506,8 @@ open class GameWorld : Disposable {
      * If the wire does not allow them (e.g. wire bridge, thicknet), connect top-bottom and left-right nodes.
      */
     data class WiringNode(
-            val position: BlockAddress,
-            /** One defined in WireCodex, always power of two */
-            val typeBitMask: Int,
-            var fills: Float = 0f
+            val position: BlockAddress, // may seem redundant and it kinda is, but don't remove!
+            val wires: SortedArrayList<ItemID> // what could possibly go wrong bloating up the RAM footprint when it's practically infinite these days?
     ) : Comparable<WiringNode> {
         override fun compareTo(other: WiringNode): Int {
             return (this.position - other.position).sign

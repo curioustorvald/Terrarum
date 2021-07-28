@@ -3,6 +3,8 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
@@ -11,6 +13,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
 
 /**
  * Created by minjaesong on 2019-05-02.
@@ -73,35 +76,36 @@ object BlockBase {
     }
 
     fun blockEffectWhenEquipped(delta: Float) {
-        IngameRenderer.selectedWireBitToDraw = 0
+        BlocksDrawer.selectedWireRenderClass = ""
     }
 
-    fun wireStartPrimaryUse(gameItem: GameItem, wireTypeBit: Int, delta: Float): Boolean {
-        return false // TODO need new wire storing format
-        /*val ingame = Terrarum.ingame!! as TerrarumIngame
+    fun wireStartPrimaryUse(gameItem: GameItem, delta: Float): Boolean {
+        val itemID = gameItem.originalID
+        val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
         // return false if the tile is already there
-        if (ingame.world.getWiringBlocks(mouseTile.x, mouseTile.y) and wireTypeBit != 0)
+        if (ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.searchFor(itemID) != null)
             return false
 
         // filter passed, do the job
-        // FIXME this is only useful for Player
-        ingame.world.addNewConduitTo(
+        ingame.world.setTileWire(
                 mouseTile.x,
                 mouseTile.y,
-                GameWorld.WiringNode(
-                        LandUtil.getBlockAddr(ingame.world, mouseTile.x, mouseTile.y),
-                        wireTypeBit,
-                        0f
-                )
+                itemID,
+                false
         )
 
-        return true*/
+        return true
     }
 
-    fun wireEffectWhenEquipped(typebit: Int, delta: Float) {
-        IngameRenderer.selectedWireBitToDraw = typebit
+    fun wireEffectWhenEquipped(gameItem: GameItem, delta: Float) {
+        val itemID = gameItem.originalID
+        BlocksDrawer.selectedWireRenderClass = WireCodex[itemID].renderClass
     }
-    
+
+    fun wireEffectWhenUnequipped(gameItem: GameItem, delta: Float) {
+        BlocksDrawer.selectedWireRenderClass = ""
+    }
+
 }

@@ -355,20 +355,6 @@ object IngameRenderer : Disposable {
 
     internal var fboRGBexportRequested = false
 
-    /**
-     * Which wires should be drawn. Normally this value is set by the wiring item (e.g. wire pieces, wirecutters)
-     * This number is directly related with the World's wire bits:
-     *
-     * ```
-     * world.getWires(x, y) -> 0000101 (for example)
-     *     value of 3 selects this ^ ^
-     *       value of 1 selects this |
-     *
-     * The wire piece gets rendered when selected bit is set.
-     * ```
-     */
-    var selectedWireBitToDraw = 0
-
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,
             actorsRenderMiddle: List<ActorWithBody>?,
@@ -411,7 +397,7 @@ object IngameRenderer : Disposable {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawFront(batch.projectionMatrix, selectedWireBitToDraw) // blue coloured filter of water, etc.
+            BlocksDrawer.drawFront(batch.projectionMatrix) // blue coloured filter of water, etc.
 
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)

@@ -170,6 +170,11 @@ internal object BlocksDrawer {
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
+    /**
+     * Which wires should be drawn. Normally this value is set by the wiring item (e.g. wire pieces, wirecutters)
+     */
+    var selectedWireRenderClass = ""
+
     internal fun renderData() {
 
         try {
@@ -200,10 +205,8 @@ internal object BlocksDrawer {
         renderUsingBuffer(FLUID, projectionMatrix, drawGlow)
     }
 
-    var drawWires = 0
-        private set
 
-    internal fun drawFront(projectionMatrix: Matrix4, drawWires: Int) {
+    internal fun drawFront(projectionMatrix: Matrix4) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -216,8 +219,7 @@ internal object BlocksDrawer {
 
         gdxSetBlendNormal()
 
-        this.drawWires = drawWires
-        if (drawWires != 0) {
+        if (selectedWireRenderClass.isNotBlank()) {
             //println("Wires! draw: $drawWires") // use F10 instead
             renderUsingBuffer(WIRE, projectionMatrix, false)
         }

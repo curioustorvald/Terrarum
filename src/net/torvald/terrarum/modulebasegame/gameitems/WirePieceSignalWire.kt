@@ -8,9 +8,11 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
 
 /**
+ * @param originalID something like `basegame:8192` (the id must exist on wires.csv)
+ *
  * Created by minjaesong on 2019-03-10.
  */
-class WirePieceSignalWire(originalID: ItemID) : GameItem(originalID) {
+class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, private val sheetX: Int, private val sheetY: Int) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_WIRE"
@@ -22,7 +24,7 @@ class WirePieceSignalWire(originalID: ItemID) : GameItem(originalID) {
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion?
-        get() = CommonResourcePool.getAsTextureRegionPack("basegame.items16").get(1,9)
+        get() = CommonResourcePool.getAsTextureRegionPack(atlasID).get(sheetX, sheetY)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
@@ -30,10 +32,14 @@ class WirePieceSignalWire(originalID: ItemID) : GameItem(originalID) {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        return BlockBase.wireStartPrimaryUse(this, Wire.BIT_SIGNAL_RED, delta)
+        return BlockBase.wireStartPrimaryUse(this, delta)
     }
 
     override fun effectWhenEquipped(delta: Float) {
-        BlockBase.wireEffectWhenEquipped(Wire.BIT_SIGNAL_RED, delta)
+        BlockBase.wireEffectWhenEquipped(this, delta)
+    }
+
+    override fun effectOnUnequip(delta: Float) {
+        BlockBase.wireEffectWhenUnequipped(this, delta)
     }
 }

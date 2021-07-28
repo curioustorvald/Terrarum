@@ -12,6 +12,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
@@ -102,12 +103,13 @@ class CreateTileAtlas {
                 throw Error("Path '${dir.path()}' is not a directory")
             }
 
-
-            dir.list().filter { tgaFile -> !tgaFile.isDirectory && (tgaFile.name().matches(tileNameRegex)) }
+            // filter files that do not exist on the blockcodex
+            dir.list().filter { tgaFile -> !tgaFile.isDirectory && (BlockCodex.getOrNull("$modname:${tgaFile.nameWithoutExtension()}") != null) }
                     .sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile -> // toInt() to sort by the number, not lexicographically
                         tgaList.add(modname to tgaFile)
                     }
         }
+
 
         // Sift through the file list for blocks, but TGA format first
         tgaList.forEach { (modname, filehandle) ->

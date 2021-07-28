@@ -161,9 +161,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * @param old previous settings of conduits in bit set format.
      * @param new current settings of conduits in bit set format.
      */
-    open fun queueWireChangedEvent(old: ItemID, new: ItemID, position: Long) {
+    open fun queueWireChangedEvent(new: ItemID, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wireChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
+        wireChangeQueue.addLast(BlockChangeQueueItem("", new, x, y))
     }
 
 

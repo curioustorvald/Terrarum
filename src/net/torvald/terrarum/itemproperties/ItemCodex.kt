@@ -16,6 +16,8 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import java.util.*
 
 /**
+ * ItemCodex holds information of every item in the game, including blocks despite the 'item' naming
+ *
  * Created by minjaesong on 2016-03-15.
  */
 object ItemCodex {
@@ -94,7 +96,10 @@ object ItemCodex {
         else if (itemID.startsWith("item@")) {
             return itemCodex[itemID]?.itemImage
         }
-        // TODO: wires
+        // wires
+        else if (itemID.startsWith("wire@")) {
+            return itemCodex[itemID]?.itemImage
+        }
         // wall
         else if (itemID.startsWith("wall@")) {
             val itemSheetNumber = AppLoader.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.gameitem.ItemID
@@ -226,6 +227,7 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             BlockCodex(module, blockPath + "blocks.csv")
+            WireCodex(module, blockPath + "wires.csv")
         }
     }
 
