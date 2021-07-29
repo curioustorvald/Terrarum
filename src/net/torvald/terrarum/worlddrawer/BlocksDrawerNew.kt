@@ -202,8 +202,10 @@ internal object BlocksDrawer {
 
     internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean) {
         gdxSetBlendNormal()
-
         renderUsingBuffer(WALL, projectionMatrix, drawGlow)
+
+        gdxSetBlendMul()
+        renderUsingBuffer(OCCLUSION, projectionMatrix, false)
     }
 
     internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean) {
@@ -215,13 +217,7 @@ internal object BlocksDrawer {
 
 
     internal fun drawFront(projectionMatrix: Matrix4) {
-        // blend mul
-        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
-
-        // draw occlusion with MUL blend
-        renderUsingBuffer(OCCLUSION, projectionMatrix, false)
+        gdxSetBlendMul()
 
         // let's just not MUL on terrain, make it FLUID only...
         renderUsingBuffer(FLUID, projectionMatrix, false)
@@ -593,7 +589,7 @@ internal object BlocksDrawer {
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
-    private val fakeOcclusionColour = Color(.65f, .65f, .65f, 1f)
+    private val occlusionIntensity = 0.3f
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
@@ -619,9 +615,8 @@ internal object BlocksDrawer {
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
-            TERRAIN, WIRE, FLUID -> Color.WHITE
+            TERRAIN, WIRE, FLUID, OCCLUSION -> Color.WHITE
             WALL -> AppLoader.tileMaker.wallOverlayColour
-            OCCLUSION -> Color.WHITE //fakeOcclusionColour
             else -> throw IllegalArgumentException()
         }
 
@@ -670,6 +665,7 @@ internal object BlocksDrawer {
         else
             0f
         )
+        shader.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
         //shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()

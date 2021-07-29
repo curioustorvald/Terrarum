@@ -439,6 +439,11 @@ fun gdxSetBlendNormal() {
     // - https://www.andersriggelsen.dk/glblendfunc.php
 }
 
+fun gdxSetBlendMul() {
+    gdxSetBlend()
+    Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+}
+
 object BlendMode {
     const val SCREEN   = "screen"
     const val MULTIPLY = "multiply"

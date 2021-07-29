@@ -35,6 +35,7 @@ uniform ivec2 cameraTranslation = ivec2(0, 0); // used to offset the drawing; it
 
 uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
 
+uniform float mulBlendIntensity = 1.0; // used my MUL-blending drawings; works about the same way as the Layer Opacity slider of Photoshop/Krita/etc.
 
 ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
@@ -101,6 +102,6 @@ void main() {
 
     vec4 finalColor = vec4(mix(finalTile.rgb, finalBreakage.rgb, finalBreakage.a), finalTile.a);
 
-    gl_FragColor = colourFilter * finalColor;
+    gl_FragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
 
 }
