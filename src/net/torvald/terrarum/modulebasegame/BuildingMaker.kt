@@ -319,16 +319,23 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         var i = 0L
         while (updateAkku >= updateRate) {
-            AppLoader.measureDebugTime("Ingame.update") { updateGame(updateRate) }
+            AppLoader.measureDebugTime("Ingame.Update") { updateGame(updateRate) }
             updateAkku -= updateRate
             i += 1
         }
-        AppLoader.setDebugTime("Ingame.updateCounter", i)
+        AppLoader.setDebugTime("Ingame.UpdateCounter", i)
 
         // render? just do it anyway
-        AppLoader.measureDebugTime("Ingame.render") { renderGame() }
-        AppLoader.setDebugTime("Ingame.render-Light",
-                (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+        AppLoader.measureDebugTime("Ingame.Render") { renderGame() }
+        AppLoader.setDebugTime("Ingame.Render - (Light + Tiling)",
+                ((AppLoader.debugTimers["Ingame.Render"] as? Long) ?: 0) -
+                (
+                        ((AppLoader.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
+                )
         )
 
     }

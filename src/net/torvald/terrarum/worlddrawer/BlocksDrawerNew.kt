@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.measureDebugTime
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
@@ -186,10 +187,12 @@ internal object BlocksDrawer {
         }
         catch (e: ClassCastException) { }
 
-        drawTiles(WALL)
-        drawTiles(TERRAIN) // regular tiles
-        drawTiles(WIRE)
-        drawTiles(FLUID)
+        measureDebugTime("Renderer.Tiling") {
+            drawTiles(WALL)
+            drawTiles(TERRAIN) // regular tiles
+            drawTiles(WIRE)
+            drawTiles(FLUID)
+        }
     }
 
     internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean) {

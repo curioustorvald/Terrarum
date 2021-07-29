@@ -199,17 +199,24 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         var i = 0L
         while (updateAkku >= updateRate) {
-            AppLoader.measureDebugTime("Ingame.update") { updateScreen(updateRate) }
+            AppLoader.measureDebugTime("Ingame.Update") { updateScreen(updateRate) }
             updateAkku -= updateRate
             i += 1
         }
-        AppLoader.setDebugTime("Ingame.updateCounter", i)
+        AppLoader.setDebugTime("Ingame.UpdateCounter", i)
 
 
         // render? just do it anyway
-        AppLoader.measureDebugTime("Ingame.render") { renderScreen() }
-        AppLoader.setDebugTime("Ingame.render-Light",
-                ((AppLoader.debugTimers["Ingame.render"] as? Long) ?: 0) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+        AppLoader.measureDebugTime("Ingame.Render") { renderScreen() }
+        AppLoader.setDebugTime("Ingame.Render - (Light + Tiling)",
+                ((AppLoader.debugTimers["Ingame.Render"] as? Long) ?: 0) -
+                (
+                        ((AppLoader.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
+                        ((AppLoader.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
+                )
         )
     }
 
