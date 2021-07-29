@@ -38,7 +38,7 @@ class CreateTileAtlas {
 
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
-    val wallOverlayColour = Color(.8f, .8f, .8f, 1f)
+    val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
 
     lateinit var atlas: Pixmap
     lateinit var atlasAutumn: Pixmap
