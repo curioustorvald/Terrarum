@@ -50,7 +50,7 @@ object BlockBase {
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK &&
             gameItem.dynamicID == ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y) ||
             gameItem.inventoryCategory == GameItem.Category.WALL &&
-            gameItem.dynamicID == ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
+            gameItem.dynamicID == "wall@"+ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
         )
             return false
 

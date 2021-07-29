@@ -378,7 +378,7 @@ class UIItemInventoryItemGrid(
             if (isCompactMode && it.item != null && it.mouseUp && !tooltipSet) {
                 (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(
                         if (INVEN_DEBUG_MODE) {
-                            it.item?.name + "/Mat: ${it.item?.material?.identifier}"
+                            it.item?.name + " (${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
                         }
                         else {
                             it.item?.name
