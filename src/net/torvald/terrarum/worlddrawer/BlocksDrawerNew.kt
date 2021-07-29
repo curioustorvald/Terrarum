@@ -60,6 +60,9 @@ internal object BlocksDrawer {
     val TERRAIN = GameWorld.TERRAIN
     val WIRE = GameWorld.WIRE
     val FLUID = -2
+    val OCCLUSION = 31337
+
+    private const val OCCLUSION_TILE_NUM_BASE = 16
 
     private const val NEARBY_TILE_KEY_UP = 0
     private const val NEARBY_TILE_KEY_RIGHT = 1
@@ -79,6 +82,7 @@ internal object BlocksDrawer {
     private lateinit var wallTilesBuffer: Array<IntArray>
     private lateinit var wireTilesBuffer: Array<IntArray>
     private lateinit var fluidTilesBuffer: Array<IntArray>
+    private lateinit var occlusionBuffer: Array<IntArray>
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
 
@@ -190,8 +194,9 @@ internal object BlocksDrawer {
         measureDebugTime("Renderer.Tiling") {
             drawTiles(WALL)
             drawTiles(TERRAIN) // regular tiles
-            drawTiles(WIRE)
             drawTiles(FLUID)
+            drawTiles(OCCLUSION)
+            //drawTiles(WIRE)
         }
     }
 
@@ -214,6 +219,9 @@ internal object BlocksDrawer {
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+
+        // draw occlusion with MUL blend
+        renderUsingBuffer(OCCLUSION, projectionMatrix, false)
 
         // let's just not MUL on terrain, make it FLUID only...
         renderUsingBuffer(FLUID, projectionMatrix, false)
@@ -297,12 +305,16 @@ internal object BlocksDrawer {
                     TERRAIN -> world.getTileFromTerrain(x, y)
                     WIRE -> "basegame:-1" // TODO need new wire storing format //world.getWiringBlocks(x, y).and(drawWires).toBitOrd() * 16
                     FLUID -> "basegame:-1" // TODO need new wire storing format //world.getFluid(x, y).type.abs()
+                    OCCLUSION -> "placeholder_occlusion"
                     else -> throw IllegalArgumentException()
                 }
 
 
                 // draw a tile
-                val nearbyTilesInfo = if (mode == FLUID) {
+                val nearbyTilesInfo = if (mode == OCCLUSION) {
+                    getNearbyTilesInfoFakeOcc(x, y)
+                }
+                else if (mode == FLUID) {
                     getNearbyTilesInfoFluids(x, y)
                 }
                 else if (mode == WIRE) {
@@ -326,7 +338,9 @@ internal object BlocksDrawer {
 
                 val renderTag = AppLoader.tileMaker.getRenderTag(thisTile)
                 val tileNumberBase =
-                        if (mode == FLUID)
+                        if (mode == OCCLUSION)
+                            OCCLUSION_TILE_NUM_BASE
+                        else if (mode == FLUID)
                             AppLoader.tileMaker.fluidToTileNumber(world.getFluid(x, y))
                         else if (mode == WIRE)
                             0 // TODO need new wire storing format
@@ -337,6 +351,9 @@ internal object BlocksDrawer {
                 else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
                 // special case: wires
                 else if (mode == WIRE) tileNumberBase + connectLut16[nearbyTilesInfo]
+                // special case: occlusion
+                else if (mode == OCCLUSION)
+                    tileNumberBase + connectLut47[nearbyTilesInfo]
                 // rest of the cases: terrain and walls
                 else tileNumberBase + when (renderTag.maskType) {
                         CreateTileAtlas.RenderTag.MASK_NA -> 0
@@ -365,7 +382,7 @@ internal object BlocksDrawer {
                     // no wire here, draw block id 255 (bottom right)
                     writeToBuffer(mode, bufferX, bufferY, 15, 15, 0)
                 }
-                else if (mode == FLUID) {
+                else if (mode == OCCLUSION || mode == FLUID) {
                     writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
                 }
                 else {
@@ -395,6 +412,24 @@ internal object BlocksDrawer {
         var ret = 0
         for (i in nearbyTiles.indices) {
             if (nearbyTiles[i] == mark) {
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+            }
+        }
+
+        return ret
+    }
+
+    private fun getNearbyTilesInfoFakeOcc(x: Int, y: Int): Int {
+        val eligible = BlockCodex[world.getTileFromWall(x, y)].isSolid && !BlockCodex[world.getTileFromTerrain(x, y)].isSolid
+        val nearbyTiles = getNearbyTilesPos(x, y).map {
+            !BlockCodex[world.getTileFromTerrain(it.x, it.y)].isSolid
+        }
+
+        if (!eligible) return 255
+
+        var ret = 0
+        for (i in nearbyTiles.indices) {
+            if (nearbyTiles[i] == true) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
@@ -549,6 +584,7 @@ internal object BlocksDrawer {
             WALL -> wallTilesBuffer
             WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
+            OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
 
@@ -557,6 +593,7 @@ internal object BlocksDrawer {
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+    private val fakeOcclusionColour = Color(.65f, .65f, .65f, 1f)
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
@@ -568,7 +605,7 @@ internal object BlocksDrawer {
 
 
         val tileAtlas = when (mode) {
-            TERRAIN, WALL -> tilesTerrain
+            TERRAIN, WALL, OCCLUSION -> tilesTerrain
             WIRE -> tilesWire
             FLUID -> tilesFluid
             else -> throw IllegalArgumentException()
@@ -578,11 +615,13 @@ internal object BlocksDrawer {
             WALL -> wallTilesBuffer
             WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
+            OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
             TERRAIN, WIRE, FLUID -> Color.WHITE
             WALL -> AppLoader.tileMaker.wallOverlayColour
+            OCCLUSION -> Color.WHITE //fakeOcclusionColour
             else -> throw IllegalArgumentException()
         }
 
@@ -657,6 +696,7 @@ internal object BlocksDrawer {
             wallTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
             wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
             fluidTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
+            occlusionBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)

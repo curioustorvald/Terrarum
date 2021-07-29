@@ -30,6 +30,7 @@ import kotlin.math.roundToInt
  */
 class CreateTileAtlas {
 
+    // min size 1024 = tile_size 16 * atlasCursor 64
     val MAX_TEX_SIZE = AppLoader.getConfigInt("atlastexsize").coerceIn(1024, AppLoader.glInfo.GL_MAX_TEXTURE_SIZE)
     val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
 
@@ -37,7 +38,7 @@ class CreateTileAtlas {
 
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
-    val wallOverlayColour = Color(5f / 9f, 5f / 9f, 5f / 9f, 1f)
+    val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
 
     lateinit var atlas: Pixmap
     lateinit var atlasAutumn: Pixmap
