@@ -176,9 +176,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         if (actorContainerActive.size == 0 && actorContainerInactive.size == 0)
             throw IllegalArgumentException("Actor with ID $ID does not exist.")
 
-        var actor = actorContainerActive.searchFor(ID) { it.referenceID!! }
+        var actor = actorContainerActive.searchFor(ID) { it.referenceID }
         if (actor == null) {
-            actor = actorContainerInactive.searchFor(ID) { it.referenceID!! }
+            actor = actorContainerInactive.searchFor(ID) { it.referenceID }
 
             if (actor == null) {
                 /*JOptionPane.showMessageDialog(

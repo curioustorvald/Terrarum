@@ -34,6 +34,8 @@ class CreateTileAtlas {
     val MAX_TEX_SIZE = AppLoader.getConfigInt("atlastexsize").coerceIn(1024, AppLoader.glInfo.GL_MAX_TEXTURE_SIZE)
     val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
 
+    val SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
+
     val ITEM_ATLAS_TILES_X = 16
 
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X

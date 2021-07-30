@@ -19,7 +19,8 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         MIDDLE, // actors
         MIDTOP, // bullets, thrown items
         FRONT,  // fake tiles
-        OVERLAY // screen overlay, not affected by lightmap
+        OVERLAY, // screen overlay, not affected by lightmap
+        WIRES
     }
 
     companion object {
@@ -27,7 +28,8 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         val RANGE_MIDDLE = ReferencingRanges.ACTORS_MIDDLE  // 3
         val RANGE_MIDTOP = ReferencingRanges.ACTORS_MIDTOP  // 1
         val RANGE_FRONT  = ReferencingRanges.ACTORS_FRONT   // 1
-        val RANDE_OVERLAY= ReferencingRanges.ACTORS_OVERLAY // 1
+        val RANGE_OVERLAY= ReferencingRanges.ACTORS_OVERLAY // 0.9375
+        val RANGE_WIRES = ReferencingRanges.ACTORS_WIRES // 0.0002
     }
 
     abstract fun update(delta: Float)
@@ -45,13 +47,13 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
 
         return referenceID == (other as Actor).referenceID
     }
-    override fun hashCode() = referenceID!!
+    override fun hashCode() = referenceID
     override fun toString() =
             if (actorValue.getAsString("name").isNullOrEmpty())
                 "${hashCode()}"
             else
                 "${hashCode()} (${actorValue.getAsString("name")})"
-    override fun compareTo(other: Actor): Int = (this.referenceID!! - other.referenceID!!).sign()
+    override fun compareTo(other: Actor): Int = (this.referenceID - other.referenceID).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 

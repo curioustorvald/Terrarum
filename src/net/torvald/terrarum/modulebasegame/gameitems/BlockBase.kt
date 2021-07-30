@@ -3,17 +3,11 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.IngameRenderer
-import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
 
 /**
  * Created by minjaesong on 2019-05-02.
@@ -77,7 +71,7 @@ object BlockBase {
     }
 
     fun blockEffectWhenEquipped(delta: Float) {
-        BlocksDrawer.selectedWireRenderClass = ""
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
     fun wireStartPrimaryUse(gameItem: GameItem, delta: Float): Boolean {
@@ -102,11 +96,11 @@ object BlockBase {
 
     fun wireEffectWhenEquipped(gameItem: GameItem, delta: Float) {
         val itemID = gameItem.originalID
-        BlocksDrawer.selectedWireRenderClass = WireCodex[itemID].renderClass
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = WireCodex[itemID].renderClass
     }
 
     fun wireEffectWhenUnequipped(gameItem: GameItem, delta: Float) {
-        BlocksDrawer.selectedWireRenderClass = ""
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
 }

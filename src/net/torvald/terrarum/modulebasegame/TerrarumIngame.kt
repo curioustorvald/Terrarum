@@ -10,6 +10,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.concurrent.ThreadExecutor
@@ -22,6 +23,7 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
+import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -32,6 +34,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
@@ -149,6 +152,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     var particlesActive = 0
         private set
+
+    var selectedWireRenderClass = ""
+    /**
+     * unlike faketiles which gets placed onto the world just like ordinary fixtures, wires are dynamically
+     * "rendered" into wire-actors, and we need to keep track of them in some way (and definitely NOT create
+     * 65536 actors all at once)
+     */
+    private var allocatedWireActorsCount = 0
 
 
 
@@ -626,6 +637,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // deal with the uiFixture being closed
         if (uiFixture?.isClosed == true) { uiFixture = null }
 
+        // fill up visibleActorsRenderFront for wires
+        fillUpWiresBuffer()
+
         IngameRenderer.invoke(
                 paused,
                 visibleActorsRenderBehind,
@@ -637,6 +651,45 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 actorNowPlaying,
                 uiContainer// + uiFixture
         )
+    }
+
+    private fun fillUpWiresBuffer() {
+        fun getOrMakeWireActor(num: Int): ActorWithBody {
+            return try {
+                getActorByID(ReferencingRanges.ACTORS_WIRES.first + num) as ActorWithBody
+            }
+            catch (_: IllegalArgumentException) {
+                val actor = WireActor(ReferencingRanges.ACTORS_WIRES.first + num)
+                addNewActor(actor)
+                actor
+            }
+        }
+
+        if (selectedWireRenderClass.isNotBlank()) {
+            val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+            val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
+
+            val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+            val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+
+            var wiringCounter = 0
+            for (y in for_y_start..for_y_end) {
+                for (x in for_x_start..for_x_end) {
+                    val wires = world.getAllWiresFrom(x, y)
+
+                    wires?.forEach {
+                        if (WireCodex[it].renderClass == selectedWireRenderClass) {
+                            val wireActor = getOrMakeWireActor(wiringCounter)
+
+                            // TODO setup the wire actor
+
+                            wiringCounter += 1
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     private fun filterVisibleActors() {
@@ -928,7 +981,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                     Actor.RenderOrder.MIDTOP -> {
                         actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
                     }
-                    Actor.RenderOrder.FRONT  -> {
+                    Actor.RenderOrder.FRONT, Actor.RenderOrder.WIRES  -> {
                         actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
                     }
                     Actor.RenderOrder.OVERLAY-> {

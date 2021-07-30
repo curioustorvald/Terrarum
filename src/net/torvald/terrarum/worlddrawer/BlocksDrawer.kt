@@ -46,7 +46,7 @@ internal object BlocksDrawer {
     val weatherTerrains: Array<TextureRegionPack>
     lateinit var tilesTerrain: TextureRegionPack; private set
     lateinit var tilesTerrainBlend: TextureRegionPack; private set
-    val tilesWire: TextureRegionPack
+    //val tilesWire: TextureRegionPack
     val tileItemTerrain: TextureRegionPack
     val tileItemWall: TextureRegionPack
     val tilesFluid: TextureRegionPack
@@ -58,7 +58,7 @@ internal object BlocksDrawer {
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
-    val WIRE = GameWorld.WIRE
+    //val WIRE = GameWorld.WIRE
     val FLUID = -2
     val OCCLUSION = 31337
 
@@ -80,7 +80,7 @@ internal object BlocksDrawer {
 
     private lateinit var terrainTilesBuffer: Array<IntArray>
     private lateinit var wallTilesBuffer: Array<IntArray>
-    private lateinit var wireTilesBuffer: Array<IntArray>
+    //private lateinit var wireTilesBuffer: Array<IntArray>
     private lateinit var fluidTilesBuffer: Array<IntArray>
     private lateinit var occlusionBuffer: Array<IntArray>
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
@@ -107,8 +107,7 @@ internal object BlocksDrawer {
                 TextureRegionPack(Texture(AppLoader.tileMaker.atlasWinter), TILE_SIZE, TILE_SIZE)
         )
 
-        //TODO make wire work with the TileAtlas system
-        tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "wires/wire.tga"), TILE_SIZE, TILE_SIZE)
+        //tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "wires/wire.tga"), TILE_SIZE, TILE_SIZE)
         tilesFluid = TextureRegionPack(Texture(AppLoader.tileMaker.atlasFluid), TILE_SIZE, TILE_SIZE)
         tilesGlow = TextureRegionPack(Texture(AppLoader.tileMaker.atlasGlow), TILE_SIZE, TILE_SIZE)
 
@@ -178,7 +177,7 @@ internal object BlocksDrawer {
     /**
      * Which wires should be drawn. Normally this value is set by the wiring item (e.g. wire pieces, wirecutters)
      */
-    var selectedWireRenderClass = ""
+//    var selectedWireRenderClass = ""
 
     internal fun renderData() {
 
@@ -226,10 +225,10 @@ internal object BlocksDrawer {
 
         gdxSetBlendNormal()
 
-        if (selectedWireRenderClass.isNotBlank()) {
+        /*if (selectedWireRenderClass.isNotBlank()) {
             //println("Wires! draw: $drawWires") // use F10 instead
             renderUsingBuffer(WIRE, projectionMatrix, false)
-        }
+        }*/
     }
 
     /**
@@ -299,7 +298,6 @@ internal object BlocksDrawer {
                 val thisTile: ItemID = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> "basegame:-1" // TODO need new wire storing format //world.getWiringBlocks(x, y).and(drawWires).toBitOrd() * 16
                     FLUID -> "basegame:-1" // TODO need new wire storing format //world.getFluid(x, y).type.abs()
                     OCCLUSION -> "placeholder_occlusion"
                     else -> throw IllegalArgumentException()
@@ -312,9 +310,6 @@ internal object BlocksDrawer {
                 }
                 else if (mode == FLUID) {
                     getNearbyTilesInfoFluids(x, y)
-                }
-                else if (mode == WIRE) {
-                    getNearbyWiringInfo(x, y, thisTile)
                 }
                 else if (isPlatform(thisTile)) {
                     getNearbyTilesInfoPlatform(x, y)
@@ -338,15 +333,11 @@ internal object BlocksDrawer {
                             OCCLUSION_TILE_NUM_BASE
                         else if (mode == FLUID)
                             AppLoader.tileMaker.fluidToTileNumber(world.getFluid(x, y))
-                        else if (mode == WIRE)
-                            0 // TODO need new wire storing format
                         else
                             renderTag.tileNumber
-                val tileNumber = if (mode != WIRE && thisTile == Block.AIR) 0
+                val tileNumber = if (thisTile == Block.AIR) 0
                 // special case: fluids
                 else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
-                // special case: wires
-                else if (mode == WIRE) tileNumberBase + connectLut16[nearbyTilesInfo]
                 // special case: occlusion
                 else if (mode == OCCLUSION)
                     tileNumberBase + connectLut47[nearbyTilesInfo]
@@ -366,25 +357,12 @@ internal object BlocksDrawer {
                     //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
                 }
 
-                val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
-                val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                val breakingStage = (breakage / maxHealth).times(BREAKAGE_STEPS).roundToInt()
-
-
+                val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
+                val maxHealth = if (mode == TERRAIN || mode == WALL) BlockCodex[world.getTileFromTerrain(x, y)].strength else 1
+                val breakingStage = if (mode == TERRAIN || mode == WALL) (breakage / maxHealth).times(BREAKAGE_STEPS).roundToInt() else 0
 
                 // draw a tile
-
-                if (mode == WIRE) {
-                    // no wire here, draw block id 255 (bottom right)
-                    writeToBuffer(mode, bufferX, bufferY, 15, 15, 0)
-                }
-                else if (mode == OCCLUSION || mode == FLUID) {
-                    writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
-                }
-                else {
-                    writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
-                }
-
+                writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
             }
         }
     }
@@ -403,7 +381,7 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: ItemID?): Int {
-        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
+        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
@@ -433,28 +411,8 @@ internal object BlocksDrawer {
         return ret
     }
 
-    /**
-     * @param wire -1 for none, 0 for signal red, 1 for untility prototype, 2 for low power, 3 for high power;
-     * log of bits defined in [net.torvald.terrarum.blockproperties.Wire]
-     *
-     * @return offset from the spritesheet's "base" tile number, 0..15.
-     */
-    private fun getNearbyWiringInfo(x: Int, y: Int, wire: ItemID): Int {
-        return 0 // TODO need new wire storing format
-        /*val nearbyTiles = getNearbyTilesPos(x, y).map { world.getWiringBlocks(it.x, it.y).and(drawWires).toBitOrd() * 16 }
-
-        var ret = 0
-        for (i in nearbyTiles.indices) {
-            if (nearbyTiles[i] == wire) {
-                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
-            }
-        }
-
-        return ret*/
-    }
-
     private fun getNearbyTilesInfoConMutual(x: Int, y: Int, mode: Int): Int {
-        val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y)!! }
+        val nearbyTiles: List<ItemID> = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
@@ -520,7 +478,7 @@ internal object BlocksDrawer {
 
     private fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
         val nearbyTiles = arrayOf(Block.NULL, Block.NULL, Block.NULL, Block.NULL)
-        val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
+        //val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
         nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y)
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y)
@@ -578,7 +536,7 @@ internal object BlocksDrawer {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
-            WIRE -> wireTilesBuffer
+            //WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
@@ -602,20 +560,20 @@ internal object BlocksDrawer {
 
         val tileAtlas = when (mode) {
             TERRAIN, WALL, OCCLUSION -> tilesTerrain
-            WIRE -> tilesWire
+            //WIRE -> tilesWire
             FLUID -> tilesFluid
             else -> throw IllegalArgumentException()
         }
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
-            WIRE -> wireTilesBuffer
+            //WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
-            TERRAIN, WIRE, FLUID, OCCLUSION -> Color.WHITE
+            TERRAIN, /*WIRE,*/ FLUID, OCCLUSION -> Color.WHITE
             WALL -> AppLoader.tileMaker.wallOverlayColour
             else -> throw IllegalArgumentException()
         }
@@ -649,6 +607,8 @@ internal object BlocksDrawer {
 
         shader.begin()
         shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
+        shader.setUniform2fv("tilesInAtlas", AppLoader.tileMaker.SHADER_SIZE_KEYS, 2, 2)
+        shader.setUniform2fv("atlasTexSize", AppLoader.tileMaker.SHADER_SIZE_KEYS, 0, 2)
         shader.setUniformf("colourFilter", vertexColour)
         shader.setUniformf("screenDimension", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         shader.setUniformi("tilesAtlas", 0)
@@ -688,11 +648,10 @@ internal object BlocksDrawer {
 
         // only update if it's really necessary
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {
-            terrainTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
-            wallTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
-            wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
-            fluidTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
-            occlusionBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
+            terrainTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
+            wallTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
+            fluidTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
+            occlusionBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
@@ -759,7 +718,7 @@ internal object BlocksDrawer {
 
         weatherTerrains.forEach { it.dispose() }
         tilesGlow.dispose()
-        tilesWire.dispose()
+        //tilesWire.dispose()
         tileItemTerrain.dispose()
         tileItemWall.dispose()
         tilesFluid.dispose()

@@ -19,7 +19,6 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -279,6 +278,9 @@ object Terrarum : Disposable {
     /** Delta converted as it it was a FPS */
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.rawDeltaTime
+
+    private val noSubActorClass = hashSetOf(Actor.RenderOrder.WIRES)
+
     /**
      * Usage:
      *
@@ -294,7 +296,8 @@ object Terrarum : Disposable {
                         Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
                         Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
                         Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
-                        Actor.RenderOrder.OVERLAY-> Actor.RANDE_OVERLAY
+                        Actor.RenderOrder.OVERLAY-> Actor.RANGE_OVERLAY
+                        Actor.RenderOrder.WIRES -> Actor.RANGE_WIRES
                     }
                 }
                 catch (gameNotInitialisedException: KotlinNullPointerException) {
@@ -303,7 +306,7 @@ object Terrarum : Disposable {
 
         var ret: Int
         do {
-            ret = HQRNG().nextInt().and(0x7FFFFF00) // set new ID
+            ret = HQRNG().nextInt().and(if (noSubActorClass.contains(renderOrder)) 0x7FFFFFFF else 0x7FFFFF00) // set new ID
         } while (hasCollision(ret)) // check for collision
         return ret
     }

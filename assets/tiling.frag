@@ -25,8 +25,8 @@ uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
 uniform sampler2D tilesBlendAtlas; // alternative terrain for the weather mix (e.g. yellowed grass)
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
-uniform vec2 tilesInAtlas = ivec2(256.0, 256.0);
-uniform vec2 atlasTexSize = ivec2(4096.0, 4096.0);
+uniform vec2 tilesInAtlas = vec2(256.0, 256.0);
+uniform vec2 atlasTexSize = vec2(4096.0, 4096.0);
 vec2 tileSizeInPx = atlasTexSize / tilesInAtlas; // should be like ivec2(16.0, 16.0)
 
 uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
