@@ -130,7 +130,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) {
             val region = textureRegion.get(currentFrame, currentRow)
             batch.color = colorFilter
 
-            val scale = parentActor.scale.toFloat()
+            //val scale = parentActor.scale.toFloat() // wtf?
 
             if (flipHorizontal && flipVertical) {
                 batch.draw(region,
