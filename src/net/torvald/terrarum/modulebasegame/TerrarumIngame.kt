@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.measureDebugTime
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
@@ -638,7 +639,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         if (uiFixture?.isClosed == true) { uiFixture = null }
 
         // fill up visibleActorsRenderFront for wires
-        fillUpWiresBuffer()
+        measureDebugTime("Ingame.WiresRenderAndDraw") {
+            fillUpWiresBuffer()
+        }
 
         IngameRenderer.invoke(
                 paused,
@@ -652,6 +655,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 uiContainer// + uiFixture
         )
     }
+
+    private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.endInclusive - ReferencingRanges.ACTORS_WIRES.first + 1
 
     private fun fillUpWiresBuffer() {
         fun getOrMakeWireActor(num: Int): WireActor {
@@ -674,6 +679,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         var wiringCounter = 0
         for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end) {
+                if (wiringCounter >= maxRenderableWires) break
+
                 val wires = world.getAllWiresFrom(x, y)
 
                 wires?.forEach {
