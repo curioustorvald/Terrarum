@@ -654,9 +654,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun fillUpWiresBuffer() {
-        fun getOrMakeWireActor(num: Int): ActorWithBody {
+        fun getOrMakeWireActor(num: Int): WireActor {
             return try {
-                getActorByID(ReferencingRanges.ACTORS_WIRES.first + num) as ActorWithBody
+                getActorByID(ReferencingRanges.ACTORS_WIRES.first + num) as WireActor
             }
             catch (_: IllegalArgumentException) {
                 val actor = WireActor(ReferencingRanges.ACTORS_WIRES.first + num)
@@ -665,29 +665,35 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             }
         }
 
-        if (selectedWireRenderClass.isNotBlank()) {
-            val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
-            val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
 
-            val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
-            val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
 
-            var wiringCounter = 0
-            for (y in for_y_start..for_y_end) {
-                for (x in for_x_start..for_x_end) {
-                    val wires = world.getAllWiresFrom(x, y)
+        var wiringCounter = 0
+        for (y in for_y_start..for_y_end) {
+            for (x in for_x_start..for_x_end) {
+                val wires = world.getAllWiresFrom(x, y)
 
-                    wires?.forEach {
-                        if (WireCodex[it].renderClass == selectedWireRenderClass) {
-                            val wireActor = getOrMakeWireActor(wiringCounter)
+                wires?.forEach {
+                    val wireActor = getOrMakeWireActor(wiringCounter)
 
-                            // TODO setup the wire actor
-
-                            wiringCounter += 1
-                        }
+                    if (WireCodex[it].renderClass == selectedWireRenderClass) {
+                        wireActor.isUpdate = true
+                        wireActor.isVisible = true
+                        wireActor.forceDormant = false
+                        wireActor.setWire(it, x, y)
+                    }
+                    else {
+                        wireActor.isUpdate = false
+                        wireActor.isVisible = false
+                        wireActor.forceDormant = true
                     }
 
+                    wiringCounter += 1
                 }
+
             }
         }
     }
@@ -746,7 +752,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
-            if (actor is ActorWithBody && actor.inUpdateRange()) {
+            if (actor is ActorWithBody && actor.inUpdateRange() && !actor.forceDormant) {
                 activateDormantActor(actor) // duplicates are checked here
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
@@ -773,7 +779,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
             // inactivate distant actors
-            else if (actor is ActorWithBody && !actor.inUpdateRange()) {
+            else if (actor is ActorWithBody && (!actor.inUpdateRange() || actor.forceDormant)) {
                 if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }

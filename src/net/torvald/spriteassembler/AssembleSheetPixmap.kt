@@ -53,7 +53,7 @@ object AssembleSheetPixmap {
         val animRow = theAnim.row
         val animFrame = properties.getFrameNumberFromName(frameName)
 
-        AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
+//        AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
         drawFrame(animRow, animFrame, canvas, properties, bodyparts, transformList)
 

@@ -32,9 +32,10 @@ object TerrarumAppConfiguration {
      */
     const val VERSION_RAW = 0x000206D3
 
-    //////////////////////////////////
-    // CONFIGURATION FOR TILE MAKER //
-    //////////////////////////////////
+    //////////////////////////////////////////////////////////
+    //             CONFIGURATION FOR TILE MAKER             //
+    // MAKE SURE THESE VALUES ARE UNIQUE IN THE SOURCE CODE //
+    //////////////////////////////////////////////////////////
     const val TILE_SIZE = 16
     const val TILE_SIZEF = TILE_SIZE.toFloat()
     const val TILE_SIZED = TILE_SIZE.toDouble()

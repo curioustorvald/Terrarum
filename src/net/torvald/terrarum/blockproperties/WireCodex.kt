@@ -1,10 +1,14 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.utils.CSVFetcher
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.csv.CSVRecord
 import java.io.IOException
 
@@ -17,23 +21,34 @@ object WireCodex {
 
     private val nullProp = WireProp()
 
+    /**
+     * `wire.csv` and texture for all wires are expected to be found in the given path.
+     *
+     * @param module name of the module
+     * @param path to the "wires" directory, not path to the CSV; must end with a slash!
+     */
     operator fun invoke(module: String, path: String) {
-        try {
-            val records = CSVFetcher.readFromModule(module, path)
+        AppLoader.printmsg(this, "Building wire properties table for module $module")
 
-            AppLoader.printmsg(this, "Building wire properties table")
+        try {
+            val records = CSVFetcher.readFromModule(module, path + "wires.csv")
+
 
             records.forEach {
-                /*if (intVal(it, "id") == -1) {
-                    setProp(nullProp, it)
-                }
-                else {
-                    setProp(wireProps[intVal(it, "id")], it)
-                }*/
-
                 WireCodex.setProp(module, intVal(it, "id"), it)
-                //val tileId = "$module:${intVal(it, "id")}"
             }
+
+            AppLoader.printmsg(this, "Registering wire textures into the resource pool")
+            wireProps.keys.forEach { id ->
+                val wireid = id.split(':').last().toInt()
+
+                CommonResourcePool.addToLoadingList(id) {
+                    val t = TextureRegionPack(ModMgr.getPath(module, "$path$wireid.tga"), TILE_SIZE, TILE_SIZE)
+                    /*return*/t
+                }
+            }
+
+            CommonResourcePool.loadAll()
         }
         catch (e: IOException) {
             e.printStackTrace()

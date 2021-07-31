@@ -214,9 +214,13 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             (world!!.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) ||
              world!!.gravitation.y < 0 && isWalled(hitbox, COLLIDING_TOP))
         }
-    /** Default to 'true'  */
+    /**
+     * Toggles rendering
+     * Default to 'true'  */
     var isVisible = true
-    /** Default to 'true'  */
+    /**
+     * Toggles the actual update
+     * Default to 'true'  */
     var isUpdate = true
     var isNoSubjectToGrav = false
     var isNoCollideWorld = false
@@ -229,6 +233,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
      * --minjaesong)
      */
     var isChronostasis = false
+
+    /**
+     * if set to TRUE, the ingame will not move the actor into the active list
+     */
+    var forceDormant = false
 
     /**
      * Gravitational Constant G. Load from gameworld.

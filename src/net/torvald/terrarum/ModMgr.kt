@@ -225,7 +225,7 @@ object ModMgr {
     object GameBlockLoader {
         @JvmStatic operator fun invoke(module: String) {
             BlockCodex(module, "blocks/blocks.csv")
-            WireCodex(module, "wires/wires.csv")
+            WireCodex(module, "wires/")
         }
     }
 
