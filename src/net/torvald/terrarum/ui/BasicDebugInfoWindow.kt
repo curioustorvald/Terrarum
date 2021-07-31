@@ -80,6 +80,8 @@ class BasicDebugInfoWindow : UICanvas() {
 
         val hitbox = player?.hitbox
 
+        val updateCount = maxOf(1L, (AppLoader.debugTimers["Ingame.UpdateCounter"] ?: 1L) as Long)
+
         /**
          * First column
          */
@@ -123,8 +125,8 @@ class BasicDebugInfoWindow : UICanvas() {
             printLine(batch, 5, "p_WalkX $ccG${player.controllerV?.x}")
             printLine(batch, 6, "p_WalkY $ccG${player.controllerV?.y}")
 
-            printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta}")
-            printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta}")
+            printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta / updateCount}")
+            printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta / updateCount}")
 
             printLineColumn(batch, 1, 7,
                     "walled " +

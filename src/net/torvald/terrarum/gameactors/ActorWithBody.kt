@@ -1613,7 +1613,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         }
     }
 
-    private fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
+    protected fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
         if (world == null) return
 
 

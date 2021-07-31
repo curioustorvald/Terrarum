@@ -1,6 +1,8 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
@@ -38,6 +40,8 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
      * @param itemID must start with "wire@"
      */
     fun setWire(itemID: ItemID, worldX: Int, worldY: Int) {
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
+
         if (oldWireId != itemID) {
             if (sprite == null) {
                 makeNewSprite(CommonResourcePool.getAsTextureRegionPack(itemID))
@@ -50,7 +54,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
         }
         this.worldX = worldX
         this.worldY = worldY
-        setPosition(worldX * TILE_SIZE + 1.0, (worldY + 1.0) * TILE_SIZE - 1.0) // what the fuck?
+        setPosition((worldX + 0.5) * TILE_SIZE, (worldY + 1.0) * TILE_SIZE - 1.0) // what the fuck?
 
         sprite!!.currentRow = 1
 
@@ -77,4 +81,10 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
 
     }
 
+    override fun drawBody(batch: SpriteBatch) {
+        if (isVisible && sprite != null) {
+            BlendMode.resolve(drawMode, batch)
+            drawSpriteInGoodPosition(sprite!!, batch)
+        }
+    }
 }
