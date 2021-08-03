@@ -3,21 +3,21 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.ReferencingRanges
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
-import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
+import kotlin.experimental.and
+import kotlin.experimental.or
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
@@ -78,6 +78,9 @@ open class GameWorld : Disposable {
      */
     @TEMzPayload("WiNt", TEMzPayload.EXTERNAL_JSON)
     private val wirings: HashMap<BlockAddress, WiringNode>
+
+    private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, Byte>>()
+    private val WIRE_POS_MAP = byteArrayOf(1,2,4,8)
 
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
@@ -325,11 +328,54 @@ open class GameWorld : Disposable {
 
         if (!bypassEvent)
             Terrarum.ingame?.queueWireChangedEvent(tile, false, LandUtil.getBlockAddr(this, x, y))
+
+
+        // figure out wiring graphs
+        val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
+            (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index
+        }.sum().toByte()
+        // setup graph of mine
+        setWireGraphOfUnsafe(blockAddr, tile, matchingNeighbours)
+        // setup graph for neighbours
+        for (i in 0.toByte() .. 3.toByte()) {
+            if (matchingNeighbours and WIRE_POS_MAP[i] > 0) {
+                val (tx, ty) = WireActor.WIRE_NEARBY[i]
+                val old = getWireGraphOf(x + tx, y + ty, tile) ?: 0
+                setWireGraphOf(x + tx, y + ty, tile, old or WIRE_POS_MAP[i])
+            }
+        }
+    }
+
+    fun getWireGraphOf(x: Int, y: Int, itemID: ItemID): Byte? {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return getWireGraphUnsafe(blockAddr, itemID)
+    }
+
+    fun getWireGraphUnsafe(blockAddr: BlockAddress, itemID: ItemID): Byte? {
+        return wiringGraph[blockAddr]?.get(itemID)
+    }
+
+    fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, byte: Byte) {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return setWireGraphOfUnsafe(blockAddr, itemID, byte)
+    }
+
+    fun setWireGraphOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, byte: Byte) {
+        if (wiringGraph[blockAddr] == null)
+            wiringGraph[blockAddr] = HashMap()
+
+        wiringGraph[blockAddr]!![itemID] = byte
     }
 
     fun getAllWiresFrom(x: Int, y: Int): SortedArrayList<ItemID>? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return getAllWiresFrom(blockAddr)
+    }
+
+    fun getAllWiresFrom(blockAddr: BlockAddress): SortedArrayList<ItemID>? {
         return wirings[blockAddr]?.wires
     }
 

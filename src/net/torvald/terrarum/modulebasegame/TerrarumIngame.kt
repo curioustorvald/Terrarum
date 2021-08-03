@@ -910,7 +910,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
-        val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID) { it.referenceID!! }
+        val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID) { it.referenceID }
         if (indexToDelete != null) {
             printdbg(this, "Removing actor $actor")
             printStackTrace(this)
@@ -978,8 +978,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             throw Error("The actor $actor already exists in the game")
         }
         else {
-            printdbg(this, "Adding actor $actor")
-            printStackTrace(this)
+            if (actor.referenceID < ReferencingRanges.ACTORS_WIRES.first) {
+                printdbg(this, "Adding actor $actor")
+                printStackTrace(this)
+            }
 
             actorContainerActive.add(actor)
 

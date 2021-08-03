@@ -16,10 +16,10 @@ import net.torvald.terrarum.gameworld.GameWorld
 class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.IMMOBILE) {
 
     companion object {
-        private val nearbyArr = arrayOf(
-                (-1 to 0), // tileL
-                (0 to +1), // tileB
+        val WIRE_NEARBY = arrayOf(
                 (+1 to 0), // tileR
+                (0 to +1), // tileB
+                (-1 to 0), // tileL
                 (0 to -1) // tileT
         )
     }
@@ -60,9 +60,9 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
 
         val nearbyTiles = getNearbyTilesPos(worldX, worldY).map { world.getAllWiresFrom(it.x, it.y) }
         var ret = 0
-        for (i in nearbyTiles.indices) {
+        for (i in 0..3) {
             if (nearbyTiles[i]?.contains(itemID) == true) {
-                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                ret = ret or (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
         sprite!!.currentFrame = ret
@@ -73,7 +73,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
                 Point2i(x + 1, y),
                 Point2i(x, y - 1),
                 Point2i(x - 1, y),
-                Point2i(x, y + 1)
+                Point2i(x, y + 1) // don't know why but it doesn't work if I don't flip Y
         )
     }
 
