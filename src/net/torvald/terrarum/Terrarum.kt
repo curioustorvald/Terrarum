@@ -582,8 +582,9 @@ inline fun printStackTrace(obj: Any) = printStackTrace(obj, System.out) // becau
 
 fun printStackTrace(obj: Any, out: PrintStream = System.out) {
     if (AppLoader.IS_DEVELOPMENT_BUILD) {
-        Thread.currentThread().stackTrace.forEach {
-            out.println("[${obj.javaClass.simpleName}] ... $it")
+        Thread.currentThread().stackTrace.forEachIndexed { index, it ->
+            if (index >= 3)
+                out.println("[${obj.javaClass.simpleName}] ... $it")
         }
     }
 }
@@ -632,3 +633,8 @@ class UIContainer {
 interface Id_UICanvasNullable {
     fun get(): UICanvas?
 }
+
+// haskell-inspired array selectors
+// head and last use first() and last()
+fun <T> Array<T>.tail() = this.sliceArray(1 until this.size)
+fun <T> Array<T>.init() = this.sliceArray(0 until this.lastIndex)

@@ -324,7 +324,7 @@ open class GameWorld : Disposable {
         wirings[blockAddr]!!.wires.add(tile)
 
         if (!bypassEvent)
-            Terrarum.ingame?.queueWireChangedEvent(tile, LandUtil.getBlockAddr(this, x, y))
+            Terrarum.ingame?.queueWireChangedEvent(tile, false, LandUtil.getBlockAddr(this, x, y))
     }
 
     fun getAllWiresFrom(x: Int, y: Int): SortedArrayList<ItemID>? {

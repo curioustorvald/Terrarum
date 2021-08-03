@@ -71,7 +71,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     protected val terrainChangeQueue = Queue<BlockChangeQueueItem>()
     protected val wallChangeQueue = Queue<BlockChangeQueueItem>()
-    protected val wireChangeQueue = Queue<BlockChangeQueueItem>()
+    protected val wireChangeQueue = Queue<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     override fun hide() {
     }
@@ -161,9 +161,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * @param old previous settings of conduits in bit set format.
      * @param new current settings of conduits in bit set format.
      */
-    open fun queueWireChangedEvent(new: ItemID, position: Long) {
+    open fun queueWireChangedEvent(wire: ItemID, isRemoval: Boolean, position: Long) {
         val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wireChangeQueue.addLast(BlockChangeQueueItem("", new, x, y))
+        wireChangeQueue.addLast(BlockChangeQueueItem(if (isRemoval) wire else "", if (isRemoval) "" else wire, x, y))
     }
 
 
