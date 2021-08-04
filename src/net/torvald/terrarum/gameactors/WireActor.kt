@@ -56,7 +56,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
         this.worldY = worldY
         setPosition((worldX + 0.5) * TILE_SIZE, (worldY + 1.0) * TILE_SIZE - 1.0) // what the fuck?
 
-        sprite!!.currentRow = 1
+        sprite!!.currentRow = 0
 
         val nearbyTiles = getNearbyTilesPos(worldX, worldY).map { world.getAllWiresFrom(it.x, it.y) }
         var ret = 0

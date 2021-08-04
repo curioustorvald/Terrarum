@@ -2,7 +2,7 @@
 "8192";"8192";"WIRE_RED";"signal";"digital_bit";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,9"
 "8193";"8193";"WIRE_GREEN";"signal";"digital_bit";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,10"
 "8194";"8194";"WIRE_BLUE";"signal";"digital_bit";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,11"
-#"8195";"8195";"WIRE_BUNDLE";"signal";"digital_3bits";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,2"
+"8195";"8195";"WIRE_BUNDLE";"signal";"digital_3bits";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,2"
 #"bundlemaker";"bundlemaker";"WIRE_BUNDLEMAKER";"signal";"digital_bit";3;"digital_bit";"digital_3bits";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,9"
 
 

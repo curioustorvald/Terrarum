@@ -86,10 +86,15 @@
   "BLOCK_SANDSTONE_BLACK": "Black Sandstone",
   "BLOCK_SANDSTONE_GREEN": "Green Sandstone",
 
-  "BLOCK_LANTERN_IRON_REGULAR": "Iron Lantern",
+  "BLOCK_LANTERN": "Lantern",
   "BLOCK_SUNSTONE": "Sunstone",
   "BLOCK_DAYLIGHT_CAPACITOR": "Daylight Capacitor",
 
   "BLOCK_WATER": "Water",
-  "BLOCK_LAVA": "Lava"
+  "BLOCK_LAVA": "Lava",
+
+  "WIRE_RED": "Red Wire",
+  "WIRE_GREEN": "Green Wire",
+  "WIRE_BLUE": "Blue Wire",
+  "WIRE_BUNDLE": "Wire Bundle"
 }

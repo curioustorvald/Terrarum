@@ -114,7 +114,7 @@ public class CSVEditor extends JFrame {
                         if (discardAgreed()) {
 
                             // actually read file
-                            JFileChooser fileChooser = new JFileChooser() {
+                            JFileChooser fileChooser = new JFileChooser("./") {
                                 {
                                     setFileSelectionMode(JFileChooser.FILES_ONLY);
                                     setMultiSelectionEnabled(false);
@@ -189,7 +189,7 @@ public class CSVEditor extends JFrame {
                 add("Save...").addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        JFileChooser fileChooser = new JFileChooser() {
+                        JFileChooser fileChooser = new JFileChooser("./") {
                             {
                                 setFileSelectionMode(JFileChooser.FILES_ONLY);
                                 setMultiSelectionEnabled(false);
