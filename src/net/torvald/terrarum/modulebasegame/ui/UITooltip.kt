@@ -40,7 +40,7 @@ class UITooltip : UICanvas() {
         val mouseX = 4f
         val mouseY = 6f
 
-        val tooltipYoff = 12
+        val tooltipYoff = 50
         val tooltipY = mouseY - height + tooltipYoff
 
         val txtW = msgWidth + 2f * textMarginX

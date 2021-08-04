@@ -10,7 +10,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object FloatDrawer : Disposable {
 
-    val tile = TextureRegionPack("assets/graphics/gui/message_white_tileable.tga", 16, 16)
+    val tile = TextureRegionPack("assets/graphics/gui/message_white_tileable.tga", 36, 36)
 
     init {
         AppLoader.disposableSingletonsPool.add(this)

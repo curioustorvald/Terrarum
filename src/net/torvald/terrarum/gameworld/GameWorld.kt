@@ -79,7 +79,7 @@ open class GameWorld : Disposable {
     @TEMzPayload("WiNt", TEMzPayload.EXTERNAL_JSON)
     private val wirings: HashMap<BlockAddress, WiringNode>
 
-    private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, Byte>>()
+    private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
     private val WIRE_POS_MAP = byteArrayOf(1,2,4,8)
 
     /**
@@ -353,7 +353,17 @@ open class GameWorld : Disposable {
     }
 
     fun getWireGraphUnsafe(blockAddr: BlockAddress, itemID: ItemID): Byte? {
-        return wiringGraph[blockAddr]?.get(itemID)
+        return wiringGraph[blockAddr]?.get(itemID)?.con
+    }
+
+    fun getWireStateOf(x: Int, y: Int, itemID: ItemID): Vector2? {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return getWireStateUnsafe(blockAddr, itemID)
+    }
+
+    fun getWireStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): Vector2? {
+        return wiringGraph[blockAddr]?.get(itemID)?.state
     }
 
     fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, byte: Byte) {
@@ -363,10 +373,29 @@ open class GameWorld : Disposable {
     }
 
     fun setWireGraphOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, byte: Byte) {
-        if (wiringGraph[blockAddr] == null)
+        if (wiringGraph[blockAddr] == null) {
             wiringGraph[blockAddr] = HashMap()
+            wiringGraph[blockAddr]!![itemID] = WiringSimCell(byte)
+        }
+        else {
+            wiringGraph[blockAddr]!![itemID]!!.con = byte
+        }
+    }
 
-        wiringGraph[blockAddr]!![itemID] = byte
+    fun setWireStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return setWireStateOfUnsafe(blockAddr, itemID, vector)
+    }
+
+    fun setWireStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, vector: Vector2) {
+        if (wiringGraph[blockAddr] == null) {
+            wiringGraph[blockAddr] = HashMap()
+            wiringGraph[blockAddr]!![itemID] = WiringSimCell(0, vector)
+        }
+        else {
+            wiringGraph[blockAddr]!![itemID]!!.state = vector
+        }
     }
 
     fun getAllWiresFrom(x: Int, y: Int): SortedArrayList<ItemID>? {
@@ -559,6 +588,11 @@ open class GameWorld : Disposable {
             return (this.position - other.position).sign
         }
     }
+
+    data class WiringSimCell(
+            var con: Byte = 0, // connections
+            var state: Vector2 = Vector2(0.0, 0.0)
+    )
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
         return null
