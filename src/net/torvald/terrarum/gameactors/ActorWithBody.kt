@@ -157,7 +157,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
     val mass: Double
-        get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
+        get() = (actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT) * Math.pow(scale, 3.0)
     /*set(value) { // use "var avBaseMass: Double"
         if (value <= 0)
             throw IllegalArgumentException("mass cannot be less than or equal to zero.")
@@ -1157,7 +1157,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
-                val tile = world!!.getTileFromTerrain(x, y) ?: Block.STONE
+                val tile = world!!.getTileFromTerrain(x, y)
 
                 if (feet) {
                     if (shouldICollideWithThisFeet(tile))
@@ -1198,7 +1198,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             var hasFloor = false
 
             for (x in pxStart..pxEnd) {
-                val tile = world!!.getTileFromTerrain(x / TILE_SIZE, y / TILE_SIZE) ?: Block.STONE
+                val tile = world!!.getTileFromTerrain(x / TILE_SIZE, y / TILE_SIZE)
 
                 if (feet) {
                     if (shouldICollideWithThisFeet(tile)) {
@@ -1499,8 +1499,8 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             var density = 0
             forEachOccupyingFluid {
                 // get max density for each tile
-                if (it?.isFluid() ?: false && it?.getProp()?.density ?: 0 > density) {
-                    density = it?.getProp()?.density ?: 0
+                if (it?.isFluid() == true && it.getProp().density > density) {
+                    density = it.getProp().density
                 }
             }
 
