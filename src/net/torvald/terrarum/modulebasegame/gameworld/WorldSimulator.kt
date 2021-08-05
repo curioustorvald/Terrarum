@@ -85,6 +85,7 @@ object WorldSimulator {
         }
         //moveFluids(delta)
         displaceFallables(delta)
+        simulateWires(delta)
 
         //printdbg(this, "============================")
     }
@@ -445,4 +446,35 @@ object WorldSimulator {
 
         minOf(dist1, minOf(dist2, dist3))
     }
+
+
+    private fun simulateWires(delta: Float) {
+
+    }
+
+    private enum class WireConStatus { THRU, END, BRANCH }
+    private val wireConToStatus = arrayOf(
+            WireConStatus.END, // 0000
+            WireConStatus.END, // 0001
+            WireConStatus.END, // 0010
+            WireConStatus.THRU,// 0011
+            WireConStatus.END, // 0100
+            WireConStatus.THRU,// 0101
+            WireConStatus.THRU,// 0110
+            WireConStatus.BRANCH,// 0111
+            WireConStatus.END, // 1000
+            WireConStatus.THRU,// 1001
+            WireConStatus.THRU,// 1010
+            WireConStatus.BRANCH,// 1011
+            WireConStatus.THRU,// 1100
+            WireConStatus.BRANCH,// 1101
+            WireConStatus.BRANCH,// 1110
+            WireConStatus.BRANCH // 1111
+    )
+
+    data class wireGraphBranch(
+            val x: Int,
+            val y: Int,
+            val con: Byte
+    )
 }
