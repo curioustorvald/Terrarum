@@ -53,9 +53,9 @@ object ItemCodex {
     operator fun get(code: ItemID?): GameItem? {
         if (code == null) return null
 
-        if (code.startsWith(PREFIX_DYNAMICITEM))
+        if (code.startsWith("$PREFIX_DYNAMICITEM:"))
             return dynamicItemDescription[code]!!
-        else if (code.startsWith(PREFIX_ACTORITEM)) {
+        else if (code.startsWith("$PREFIX_ACTORITEM:")) {
             val a = (Terrarum.ingame!! as TerrarumIngame).getActorByID(code.substring(6).toInt()) // actor item
             if (a is CanBeAnItem) return a.itemData
 
@@ -89,7 +89,7 @@ object ItemCodex {
         if (itemID == null) return null
 
         // dynamic item
-        if (itemID.startsWith(PREFIX_DYNAMICITEM)) {
+        if (itemID.startsWith("$PREFIX_DYNAMICITEM:")) {
             return getItemImage(dynamicToStaticID(itemID))
         }
         // item

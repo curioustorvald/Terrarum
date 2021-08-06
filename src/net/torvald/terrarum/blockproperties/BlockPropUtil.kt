@@ -15,7 +15,7 @@ import net.torvald.terrarum.weather.WeatherMixer
 object BlockPropUtil {
     //var flickerFuncX: Second = 0f // saves current status (time) of func
     val flickerFuncDomain: Second = 0.08f // time between two noise sample
-    val flickerFuncRange = 0.012f // intensity [0, 1]
+    val flickerFuncRange = 0.022f // intensity [0, 1]
 
     //var breathFuncX = 0f
     val breathRange = 0.02f

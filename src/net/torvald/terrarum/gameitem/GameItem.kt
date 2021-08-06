@@ -295,7 +295,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
 
     fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
-        dynamicID = "$PREFIX_DYNAMICITEM${Companion.generateUniqueDynamicID(inventory)}"
+        dynamicID = "$PREFIX_DYNAMICITEM:${Companion.generateUniqueDynamicID(inventory)}"
         ItemCodex.registerNewDynamicItem(dynamicID, this)
         return this
     }
@@ -308,7 +308,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
             var ret: Int
             do {
                 ret = (1..2147483647).pickRandom()
-            } while (inventory.contains("$PREFIX_DYNAMICITEM$ret"))
+            } while (inventory.contains("$PREFIX_DYNAMICITEM:$ret"))
 
             return ret
         }

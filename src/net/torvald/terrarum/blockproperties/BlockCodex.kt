@@ -5,6 +5,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printmsg
 import net.torvald.terrarum.ReferencingRanges
+import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
@@ -72,12 +73,12 @@ object BlockCodex {
                     // add virtual props for dynamic lights
                     val virtualChunk = ArrayList<ItemID>()
                     repeat(DYNAMIC_RANDOM_CASES) { _ ->
-                        val virtualID = "virt:$virtualTileCursor"
+                        val virtualID = "$PREFIX_VIRTUALTILE:$virtualTileCursor"
 
                         virtualToTile[virtualID] = tileId
                         virtualChunk.add(virtualID)
 
-                        setProp("virt", virtualTileCursor, it)
+                        setProp(PREFIX_VIRTUALTILE, virtualTileCursor, it)
 
                         printdbg(this, "Block ID $tileId -> Virtual ID $virtualID, baseLum: ${blockProps[virtualID]?.baseLumCol}")
                         virtualTileCursor += 1

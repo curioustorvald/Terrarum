@@ -27,9 +27,11 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         val RANGE_BEHIND = ReferencingRanges.ACTORS_BEHIND  // 1
         val RANGE_MIDDLE = ReferencingRanges.ACTORS_MIDDLE  // 3
         val RANGE_MIDTOP = ReferencingRanges.ACTORS_MIDTOP  // 1
-        val RANGE_FRONT  = ReferencingRanges.ACTORS_FRONT   // 1
+        val RANGE_FRONT  = ReferencingRanges.ACTORS_FRONT   // 0.9375
         val RANGE_OVERLAY= ReferencingRanges.ACTORS_OVERLAY // 0.9375
+
         val RANGE_WIRES = ReferencingRanges.ACTORS_WIRES // 0.0002
+        val RANGE_WIRES_HELPER = ReferencingRanges.ACTORS_WIRES_HELPER // 0.0002
     }
 
     abstract fun update(delta: Float)

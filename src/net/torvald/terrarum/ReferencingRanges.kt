@@ -17,11 +17,13 @@ object ReferencingRanges {
     val ACTORS_MIDDLE  = 0x2000_0000..0x4FFF_FFFF // Regular actors (e.g. almost all of them)
     val ACTORS_MIDTOP  = 0x5000_0000..0x5FFF_FFFF // Special (e.g. weapon swung, bullets, dropped item, particles)
     val ACTORS_FRONT   = 0x6000_0000..0x6EFF_FFFF // Rendered front (e.g. fake tile)
-    val ACTORS_WIRES   = 0x6FFF_0000..0x6FFF_FFFF // Rendered front--weres
-    val ACTORS_OVERLAY = 0x7000_0000..0x7FFF_FFFF // Rendered as screen overlay, not affected by light nor environment overlays
 
-    val VIRTUAL_TILES = -2 downTo -1048576 // index of -1 breaks things for some reason :(
+    val ACTORS_WIRES   = 0x6FFF_0000..0x6FFF_FFFF // Rendered front--wires
+    val ACTORS_WIRES_HELPER = 0x7000_0000..0x7000_FFFF // Rendered overlay--wiring port icons and logic gates
 
-    val PREFIX_DYNAMICITEM = "dyn:"
-    val PREFIX_ACTORITEM = "actor:"
+    val ACTORS_OVERLAY = 0x7001_0000..0x7FFF_FFFF // Rendered as screen overlay, not affected by light nor environment overlays
+
+    val PREFIX_DYNAMICITEM = "dyn"
+    val PREFIX_ACTORITEM = "actor"
+    val PREFIX_VIRTUALTILE = "virt"
 }
