@@ -331,10 +331,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // >- queue up game UIs that should pause the world -<
-        uiInventoryPlayer = UIInventoryFull(actorNowPlaying!!,
-                toggleKeyLiteral = AppLoader.getConfigInt("config_keyinventory"),
-                toggleButtonLiteral = AppLoader.getConfigInt("config_gamepadstart")
-        )
+        uiInventoryPlayer = UIInventoryFull()
         uiInventoryPlayer.setPosition(0, 0)
 
         // >- lesser UIs -<
@@ -357,7 +354,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiVitalItem = UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0, customPositioning = true)
         //uiVitalItem.setAsAlwaysVisible()
 
-        uiWatchTierOne = UITierOneWatch(actorNowPlaying)
+        uiWatchTierOne = UITierOneWatch()
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
                 ((AppLoader.screenSize.screenW - AppLoader.screenSize.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
@@ -365,7 +362,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         )
 
         // basic watch-style notification bar (temperature, new mail)
-        uiBasicInfo = UIBasicInfo(actorNowPlaying)
+        uiBasicInfo = UIBasicInfo()
         uiBasicInfo.setAsAlwaysVisible()
         uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - AppLoader.screenSize.tvSafeActionWidth) / 2 + AppLoader.screenSize.tvSafeActionWidth, uiWatchTierOne.posY)
 

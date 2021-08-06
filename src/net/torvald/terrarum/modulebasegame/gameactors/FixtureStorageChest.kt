@@ -55,7 +55,10 @@ internal class FixtureStorageChest(nameFun: () -> String) : FixtureBase(
 }
 
 
-internal class UIStorageChest : UICanvas(), HasInventory {
+internal class UIStorageChest : UICanvas(
+        toggleKeyLiteral = AppLoader.getConfigInt("config_keyinventory"),
+        toggleButtonLiteral = AppLoader.getConfigInt("config_gamepadstart"),
+), HasInventory {
 
     lateinit var chestInventory: FixtureInventory
     lateinit var chestNameFun: () -> String

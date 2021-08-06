@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2017-06-11.
  */
-class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
+class UITierOneWatch() : UICanvas() {
     override var width = 160
     override var height = 23
     override var openCloseTime: Second = 0f

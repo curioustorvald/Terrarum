@@ -9,6 +9,7 @@ import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -17,13 +18,14 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-10-21.
  */
 class UIInventoryFull(
-        var actor: Pocketed,
-
-        toggleKeyLiteral: Int? = null, toggleButtonLiteral: Int? = null,
+        toggleKeyLiteral: Int? = AppLoader.getConfigInt("config_keyinventory"), toggleButtonLiteral: Int? = AppLoader.getConfigInt("config_gamepadstart"),
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
 ) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
+
+    val actor: ActorHumanoid
+        get() = Terrarum.ingame!!.actorNowPlaying!!
 
     override var width: Int = AppLoader.screenSize.screenW
     override var height: Int = AppLoader.screenSize.screenH

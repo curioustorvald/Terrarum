@@ -15,7 +15,11 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2017-06-10.
  */
-class UIBasicInfo(private val player: ActorHumanoid?) : UICanvas() {
+class UIBasicInfo() : UICanvas() {
+
+    val player: ActorHumanoid?
+        get() = Terrarum.ingame?.actorNowPlaying
+
     override var width = 93
     override var height = 23
     override var openCloseTime: Second = 0f
@@ -51,7 +55,7 @@ class UIBasicInfo(private val player: ActorHumanoid?) : UICanvas() {
     private val temperature: Int
         get() {
             if (player != null) {
-                val playerTilePos = player.hIntTilewiseHitbox
+                val playerTilePos = player!!.hIntTilewiseHitbox
                 val tempCelsius = -273f + ((Terrarum.ingame as? TerrarumIngame)?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
 
                 return if (tempCelsius < -10)
