@@ -76,7 +76,7 @@ class UIInventoryFull(
 
     init {
         handler.allowESCtoClose = true
-        CommonResourcePool.addToLoadingList("inventory_caticons") {
+        CommonResourcePool.addToLoadingList("inventory_category") {
             TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
         }
         CommonResourcePool.loadAll()

@@ -31,7 +31,7 @@ class UIItemInventoryCatBar(
         const val CAT_ALL = "__all__"
     }
 
-    internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
+    internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
     internal val catIconsMeaning = listOf( // sortedBy: catArrangement
             arrayOf(GameItem.Category.WEAPON),
@@ -278,7 +278,7 @@ class UIItemInventoryCatBar(
     override fun dispose() {
         underlineIndTex.dispose()
         //catIcons.dispose() // disposed of by the AppLoader
-        mainButtons.forEach { it.dispose() }
-        sideButtons.forEach { it.dispose() }
+        //mainButtons.forEach { it.dispose() } // disposed of by the AppLoader
+        //sideButtons.forEach { it.dispose() } // disposed of by the AppLoader
     }
 }

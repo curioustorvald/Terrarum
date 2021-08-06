@@ -50,7 +50,7 @@ class UIItemInventoryEquippedView(
     
     val spriteViewBackCol: Color = CELLCOLOUR_BLACK
 
-    private val equipPosIcon = CommonResourcePool.getAsTextureRegionPack("inventory_caticons")
+    private val equipPosIcon = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val cellToIcon = intArrayOf(0,1,2,3,4,5,6,7,6,7,6,7)
     private val equipPosIconCol = Color(0xdddddd7f.toInt())
 
@@ -150,7 +150,7 @@ class UIItemInventoryEquippedView(
     
     override fun dispose() {
         itemGrid.forEach { it.dispose() }
-        equipPosIcon.dispose()
+        // equipPosIcon.dispose() // disposed of by the AppLoader
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

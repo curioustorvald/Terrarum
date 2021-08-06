@@ -478,13 +478,7 @@ class UIItemInventoryItemGrid(
     }
 
     override fun dispose() {
-        itemList.forEach { it.dispose() }
-        itemGrid.forEach { it.dispose() }
-        // the icons are using common resources that are disposed when the app quits
-        //gridModeButtons.forEach { it.dispose() }
-        //scrollUpButton.dispose()
-        //scrollDownButton.dispose()
-        //walletFont.dispose()
+
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
