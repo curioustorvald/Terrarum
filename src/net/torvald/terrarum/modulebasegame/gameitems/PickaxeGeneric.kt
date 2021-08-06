@@ -6,6 +6,7 @@ import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
@@ -53,7 +54,10 @@ object PickaxeCore {
                 mouseTileX, mouseTileY,
                 Calculate.pickaxePower(player, item.material) * swingDmgToFrameDmg
         )?.let { tileBroken ->
-            Terrarum.ingame!!.addNewActor(DroppedItem(tileBroken, mouseTileX * TILE_SIZE, mouseTileY * TILE_SIZE))
+            val drop = BlockCodex[tileBroken].drop
+            if (drop.isNotBlank()) {
+                Terrarum.ingame!!.addNewActor(DroppedItem(drop, mouseTileX * TILE_SIZE, mouseTileY * TILE_SIZE))
+            }
         }
 
         return true

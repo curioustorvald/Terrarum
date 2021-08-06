@@ -41,9 +41,6 @@ open class DroppedItem(private val itemID: ItemID, topLeftX: Int, topLeftY: Int)
         )
 
         setPosition(topLeftX + (hitbox.width / 2.0), topLeftY + hitbox.height)
-
-
-        printdbg(this, "New dropped item $itemID")
     }
 
     override fun drawBody(batch: SpriteBatch) {
