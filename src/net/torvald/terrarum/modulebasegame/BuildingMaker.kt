@@ -14,7 +14,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu

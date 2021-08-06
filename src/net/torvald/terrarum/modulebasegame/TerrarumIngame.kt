@@ -28,7 +28,7 @@ import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
+import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser

@@ -10,10 +10,8 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataZip
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import kotlin.experimental.and
@@ -102,9 +100,11 @@ open class GameWorld : Disposable {
     var disposed = false
         private set
 
-    /** time in (preferably) seconds */
-    open var TIME_T: Long = 0L
-    open var dayLength: Int = 86400
+    val worldTime: WorldTime = WorldTime( // Year EPOCH (125), Month 1, Day 1 is implied
+            7 * WorldTime.HOUR_SEC +
+            30L * WorldTime.MINUTE_SEC
+    )
+
 
     @TEMzPayload("TMaP", TEMzPayload.EXTERNAL_JSON)
     val tileNumberToNameMap: HashMap<Int, ItemID>
@@ -356,14 +356,14 @@ open class GameWorld : Disposable {
         return wiringGraph[blockAddr]?.get(itemID)?.con
     }
 
-    fun getWireStateOf(x: Int, y: Int, itemID: ItemID): Vector2? {
+    fun getWireGeneratorStateOf(x: Int, y: Int, itemID: ItemID): Vector2? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
-        return getWireStateUnsafe(blockAddr, itemID)
+        return getWireGeneratorStateUnsafe(blockAddr, itemID)
     }
 
-    fun getWireStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): Vector2? {
-        return wiringGraph[blockAddr]?.get(itemID)?.state
+    fun getWireGeneratorStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): Vector2? {
+        return wiringGraph[blockAddr]?.get(itemID)?.generatorState
     }
 
     fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, byte: Byte) {
@@ -382,19 +382,19 @@ open class GameWorld : Disposable {
         }
     }
 
-    fun setWireStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
+    fun setWireGeneratorStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
-        return setWireStateOfUnsafe(blockAddr, itemID, vector)
+        return setWireGenenatorStateOfUnsafe(blockAddr, itemID, vector)
     }
 
-    fun setWireStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, vector: Vector2) {
+    fun setWireGenenatorStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, vector: Vector2) {
         if (wiringGraph[blockAddr] == null) {
             wiringGraph[blockAddr] = HashMap()
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0, vector)
         }
         else {
-            wiringGraph[blockAddr]!![itemID]!!.state = vector
+            wiringGraph[blockAddr]!![itemID]!!.generatorState = vector
         }
     }
 
@@ -589,9 +589,18 @@ open class GameWorld : Disposable {
         }
     }
 
+    data class WireConsumerState(
+            var dist: Int,
+            var state: Vector2
+    )
+
+    /**
+     * These values must be updated by none other than [WorldSimulator]()
+     */
     data class WiringSimCell(
             var con: Byte = 0, // connections
-            var state: Vector2 = Vector2(0.0, 0.0)
+            var generatorState: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
+            var consumerStates: ArrayList<WireConsumerState> = ArrayList() // how far away are the power sources
     )
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
@@ -631,6 +640,10 @@ open class GameWorld : Disposable {
         }
 
         val DEFAULT_GRAVITATION = Vector2(0.0, 9.8)
+    }
+
+    open fun updateWorldTime(delta: Float) {
+        worldTime.update(delta)
     }
 }
 

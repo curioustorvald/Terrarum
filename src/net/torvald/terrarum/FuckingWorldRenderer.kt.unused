@@ -17,7 +17,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSol
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
+import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer

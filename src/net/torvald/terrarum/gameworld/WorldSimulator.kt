@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame.gameworld
+package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.Input
 import net.torvald.terrarum.*
@@ -9,8 +9,6 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.FluidType
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import org.khelekore.prtree.*
 import kotlin.math.roundToInt
@@ -41,6 +39,7 @@ object WorldSimulator {
     const val FLUID_MAX_MASS = 1f // The normal, un-pressurized mass of a full water cell
     const val FLUID_MAX_COMP = 0.02f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
     const val FLUID_MIN_MASS = 0.0001f //Ignore cells that are almost dry
+    const val WIRE_MIN_FLOW = 0.0001f
     const val minFlow = 0.01f
     const val maxSpeed = 1f // max units of water moved out of one block to another, per timestamp
 

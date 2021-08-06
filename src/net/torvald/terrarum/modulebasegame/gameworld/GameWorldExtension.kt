@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.serialise.ReadLayerDataZip
 
 /**
@@ -12,16 +13,7 @@ class GameWorldExtension : GameWorld {
     internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, layerData, creationTIME_T, lastPlayTIME_T, totalPlayTime)
 
 
-    /** Extended world time */
-    val worldTime: WorldTime
     val economy = GameEconomy()
-
-    override var TIME_T: Long
-        get() = worldTime.TIME_T
-        set(value) { worldTime.TIME_T = value }
-    override var dayLength: Int
-        get() = WorldTime.DAY_LENGTH
-        set(value) { throw UnsupportedOperationException() }
 
 
     // delegated properties //
@@ -44,14 +36,6 @@ class GameWorldExtension : GameWorld {
     val damageDataArray: ByteArray; get() = baseworld.damageDataArray*/
 
     init {
-        worldTime = WorldTime( // Year EPOCH (125), Month 1, Day 1 is implied
-                7 * WorldTime.HOUR_SEC +
-                30L * WorldTime.MINUTE_SEC
-        )
-    }
-
-    fun updateWorldTime(delta: Float) {
-        worldTime.update(delta)
     }
 
 }

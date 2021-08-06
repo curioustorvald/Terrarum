@@ -12,6 +12,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -127,7 +128,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // we will not care for nextSkybox for now
-        val timeNow = world.TIME_T.toInt() % world.dayLength
+        val timeNow = world.worldTime.TIME_T.toInt() % WorldTime.DAY_LENGTH
         val skyboxColourMap = currentWeather.skyboxGradColourMap
 
         // calculate global light
@@ -228,7 +229,7 @@ internal object WeatherMixer : RNGConsumer {
             getGradientColour(world, currentWeather.skyboxGradColourMap, 2, timeInSec)
 
     fun getGradientColour(world: GameWorld, colorMap: GdxColorMap, row: Int, timeInSec: Int): Cvec {
-        val dataPointDistance = world.dayLength / colorMap.width
+        val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width
 
         val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
         val phaseNext: Int = (phaseThis + 1) % colorMap.width

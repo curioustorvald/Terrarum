@@ -1,6 +1,4 @@
-package net.torvald.terrarum.modulebasegame.gameworld
-
-import net.torvald.terrarum.gameworld.fmod
+package net.torvald.terrarum.gameworld
 
 
 /**

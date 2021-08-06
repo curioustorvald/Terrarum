@@ -14,8 +14,8 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
-import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 

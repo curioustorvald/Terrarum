@@ -6,7 +6,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.weather.WeatherMixer
 
 /**

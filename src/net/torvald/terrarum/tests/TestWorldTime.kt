@@ -1,6 +1,6 @@
 package net.torvald.terrarum.tests
 
-import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 //import org.junit.Test
 
 /**
