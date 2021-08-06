@@ -33,8 +33,6 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
     private var worldX = 0
     private var worldY = 0
 
-    private val world: GameWorld
-        get() = Terrarum.ingame!!.world
 
     /**
      * @param itemID must start with "wire@"
@@ -58,7 +56,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
 
         sprite!!.currentRow = 0
 
-        val nearbyTiles = getNearbyTilesPos(worldX, worldY).map { world.getAllWiresFrom(it.x, it.y) }
+        val nearbyTiles = getNearbyTilesPos(worldX, worldY).map { world!!.getAllWiresFrom(it.x, it.y) }
         var ret = 0
         for (i in 0..3) {
             if (nearbyTiles[i]?.contains(itemID) == true) {

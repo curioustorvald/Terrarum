@@ -176,7 +176,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         private fun drawSpriteInGoodPosition(sprite: TextureRegion, batch: SpriteBatch) {
-            val leftsidePadding = world.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
+            val leftsidePadding = world!!.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
             val rightsidePadding = WorldCamera.width.ushr(1)
 
             if (hitbox.startX in WorldCamera.x - hitbox.width..WorldCamera.x + WorldCamera.width.toDouble() &&
@@ -184,14 +184,14 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
                 if (WorldCamera.xCentre > leftsidePadding && hitbox.centeredX <= rightsidePadding) {
                     // camera center neg, actor center pos
                     batch.draw(sprite,
-                            hitbox.startX.toFloat() + world.width * TILE_SIZE,
+                            hitbox.startX.toFloat() + world!!.width * TILE_SIZE,
                             hitbox.startY.toFloat()
                     )
                 }
                 else if (WorldCamera.xCentre < rightsidePadding && hitbox.centeredY >= leftsidePadding) {
                     // camera center pos, actor center neg
                     batch.draw(sprite,
-                            hitbox.startX.toFloat() - world.width * TILE_SIZE,
+                            hitbox.startX.toFloat() - world!!.width * TILE_SIZE,
                             hitbox.startY.toFloat()
                     )
                 }

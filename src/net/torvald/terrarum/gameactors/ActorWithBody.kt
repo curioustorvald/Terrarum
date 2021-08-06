@@ -49,7 +49,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     /** This is GameWorld? only because the title screen also uses this thing as its camera;
      * titlescreen does not use instance of Ingame.
      */
-    private val world: GameWorld?
+    protected val world: GameWorld?
         get() = Terrarum.ingame?.world
 
 

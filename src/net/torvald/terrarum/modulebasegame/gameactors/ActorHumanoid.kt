@@ -34,9 +34,6 @@ open class ActorHumanoid(
         physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT
 ) : ActorWithBody(RenderOrder.MIDDLE, physProp = physProp), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
-    private val world: GameWorld?
-        get() = Terrarum.ingame?.world
-
 
     var vehicleRiding: Controllable? = null // usually player only
 

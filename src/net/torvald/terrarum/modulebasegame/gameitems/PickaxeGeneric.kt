@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
@@ -11,6 +12,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
 import kotlin.math.roundToInt
@@ -20,8 +22,7 @@ import kotlin.math.roundToInt
  */
 object PickaxeCore {
     fun startPrimaryUse(delta: Float, item: GameItem): Boolean {
-        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
-        if (player == null) return false
+        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying ?: return false
 
         val mouseTileX = Terrarum.mouseTileX
         val mouseTileY = Terrarum.mouseTileY
@@ -51,7 +52,9 @@ object PickaxeCore {
         (Terrarum.ingame!!.world).inflictTerrainDamage(
                 mouseTileX, mouseTileY,
                 Calculate.pickaxePower(player, item.material) * swingDmgToFrameDmg
-        )
+        )?.let { tileBroken ->
+            Terrarum.ingame!!.addNewActor(DroppedItem(tileBroken, mouseTileX * TILE_SIZE, mouseTileY * TILE_SIZE))
+        }
 
         return true
     }

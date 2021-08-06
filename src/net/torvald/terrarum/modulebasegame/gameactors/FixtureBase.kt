@@ -29,8 +29,6 @@ open class FixtureBase(
     var blockBox: BlockBox = blockBox0
         protected set // something like TapestryObject will want to redefine this
 
-    private val world: GameWorld
-        get() = Terrarum.ingame!!.world
     
     /**
      * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
@@ -66,7 +64,7 @@ open class FixtureBase(
         checkForCollision@
         for (y in posY until posY + blockBox.height) {
             for (x in posX until posX + blockBox.width) {
-                val tile = world.getTileFromTerrain(x, y)
+                val tile = world!!.getTileFromTerrain(x, y)
                 if (BlockCodex[tile].isSolid || tile in Block.actorblocks) {
                     hasCollision = true
                     break@checkForCollision
@@ -84,10 +82,10 @@ open class FixtureBase(
                     // if the collision type is allow_move_down, only the top surface tile should be "the platform"
                     // lower part must not have such property (think of the table!)
                     // TODO does this ACTUALLY work ?!
-                    world.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, false)
+                    world!!.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, false)
                 }
                 else
-                    world.setTileTerrain(x, y, blockBox.collisionType, false)
+                    world!!.setTileTerrain(x, y, blockBox.collisionType, false)
             }
         }
 
@@ -122,7 +120,7 @@ open class FixtureBase(
         // remove filler block
         for (x in posX until posX + blockBox.width) {
             for (y in posY until posY + blockBox.height) {
-                world.setTileTerrain(x, y, Block.AIR, false)
+                world!!.setTileTerrain(x, y, Block.AIR, false)
             }
         }
 
@@ -152,7 +150,7 @@ open class FixtureBase(
         outerLoop@
         for (x in posX until posX + blockBox.width) {
             for (y in posY until posY + blockBox.height) {
-                if (world.getTileFromTerrain(x, y) != blockBox.collisionType) {
+                if (world!!.getTileFromTerrain(x, y) != blockBox.collisionType) {
                     dropThis = true
                     break@outerLoop
                 }
@@ -163,8 +161,8 @@ open class FixtureBase(
             // fill blockbox with air
             for (x in posX until posX + blockBox.width) {
                 for (y in posY until posY + blockBox.height) {
-                    if (world.getTileFromTerrain(x, y) == blockBox.collisionType) {
-                        world.setTileTerrain(x, y, Block.AIR, false)
+                    if (world!!.getTileFromTerrain(x, y) == blockBox.collisionType) {
+                        world!!.setTileTerrain(x, y, Block.AIR, false)
                     }
                 }
             }

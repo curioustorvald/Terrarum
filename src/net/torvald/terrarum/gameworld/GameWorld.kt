@@ -463,7 +463,7 @@ open class GameWorld : Disposable {
     /**
      * @return true if block is broken
      */
-    fun inflictTerrainDamage(x: Int, y: Int, damage: Double): Boolean {
+    fun inflictTerrainDamage(x: Int, y: Int, damage: Double): ItemID? {
         val damage = damage.toFloat()
         val addr = LandUtil.getBlockAddr(this, x, y)
 
@@ -483,12 +483,13 @@ open class GameWorld : Disposable {
 
         // remove tile from the world
         if (terrainDamages[addr] ?: 0f >= BlockCodex[getTileFromTerrain(x, y)].strength) {
+            val tileBroke = getTileFromTerrain(x, y)
             setTileTerrain(x, y, Block.AIR, false)
             terrainDamages.remove(addr)
-            return true
+            return tileBroke
         }
 
-        return false
+        return null
     }
     fun getTerrainDamage(x: Int, y: Int): Float =
             terrainDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
@@ -496,7 +497,7 @@ open class GameWorld : Disposable {
     /**
      * @return true if block is broken
      */
-    fun inflictWallDamage(x: Int, y: Int, damage: Double): Boolean {
+    fun inflictWallDamage(x: Int, y: Int, damage: Double): ItemID? {
         val damage = damage.toFloat()
         val addr = LandUtil.getBlockAddr(this, x, y)
 
@@ -512,12 +513,13 @@ open class GameWorld : Disposable {
 
         // remove tile from the world
         if (wallDamages[addr]!! >= BlockCodex[getTileFromWall(x, y)].strength) {
+            val tileBroke = getTileFromWall(x, y)
             setTileWall(x, y, Block.AIR, false)
             wallDamages.remove(addr)
-            return true
+            return tileBroke
         }
 
-        return false
+        return null
     }
     fun getWallDamage(x: Int, y: Int): Float =
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
