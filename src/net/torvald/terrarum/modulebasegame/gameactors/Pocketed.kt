@@ -61,6 +61,9 @@ interface Pocketed {
             inventory.add(item)
         }
 
+        // unequip item that's already there
+        unequipSlot(item.equipPosition)
+
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item.dynamicID
             item.effectWhenEquipped(AppLoader.UPDATE_RATE)
