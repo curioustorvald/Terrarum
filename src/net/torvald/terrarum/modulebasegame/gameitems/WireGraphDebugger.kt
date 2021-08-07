@@ -2,16 +2,14 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
-import kotlin.math.roundToInt
 
 class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
 
@@ -55,9 +53,15 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
                 val connexionIcon = (simCell.con + 0xE0A0).toChar()
                 val wireName = WireCodex[itemID].nameKey
 
-                // todo
+                val emit = simCell.emitState
+                val recv = simCell.recvStates
 
                 sb.append("$connexionIcon $wireName")
+                sb.append("\nE: $emit")
+                recv.forEach {
+                    val src = Terrarum.ingame!!.world.getWireEmitStateOf(it.src.x, it.src.y, itemID)!!
+                    sb.append("\nR: $src $EMDASH d ${it.dist}")
+                }
             }
         }
 
