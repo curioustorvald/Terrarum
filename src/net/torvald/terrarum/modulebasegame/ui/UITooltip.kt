@@ -15,13 +15,17 @@ class UITooltip : UICanvas() {
 
     override var openCloseTime: Second = 0f
 
-    private val tooltipBackCol = Color(0xd5d4d3ff.toInt())
-    private val tooltipForeCol = Color(0x404040ff)
+    private val tooltipBackCol = Color.WHITE
+    private val tooltipForeCol = Color(0xfafafaff.toInt())
 
+    private var msgBuffer = ArrayList<String>()
     var message: String = ""
         set(value) {
             field = value
-            msgWidth = font.getWidth(value)
+            msgBuffer.clear()
+
+            msgBuffer.addAll(value.split('\n'))
+            msgWidth = msgBuffer.fold(0) { acc, s -> font.getWidth(s).let { if (it > acc) it else acc } }
         }
 
     private val font = AppLoader.fontGame
@@ -37,21 +41,34 @@ class UITooltip : UICanvas() {
         set(value) { throw Error("You are not supposed to set the height of the tooltip manually.") }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        val mouseX = 4f
-        val mouseY = 6f
-
-        val tooltipYoff = 50
-        val tooltipY = mouseY - height + tooltipYoff
-
+        val mouseXoff = 28f
+        val mouseYoff = 0f
         val txtW = msgWidth + 2f * textMarginX
 
+        val tooltipW = txtW
+        val tooltipH = font.lineHeight * msgBuffer.size
+
+        val tooltipX = mouseXoff
+        val tooltipY = mouseYoff - (tooltipH / 2)
+
+
         batch.color = tooltipBackCol
-        FloatDrawer(batch, mouseX - textMarginX, tooltipY, txtW, font.lineHeight)
-        batch.color = tooltipForeCol
-        font.draw(batch, message,
-                mouseX,
-                mouseY - height + tooltipYoff
+
+        FloatDrawer(batch,
+                tooltipX - textMarginX,
+                tooltipY,
+                tooltipW,
+                font.lineHeight * msgBuffer.size
         )
+
+        batch.color = tooltipForeCol
+
+        msgBuffer.forEachIndexed { index, s ->
+            font.draw(batch, s,
+                    tooltipX,
+                    tooltipY + font.lineHeight * index
+            )
+        }
     }
 
     override fun updateUI(delta: Float) {

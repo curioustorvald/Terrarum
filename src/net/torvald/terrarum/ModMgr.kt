@@ -106,12 +106,23 @@ object ModMgr {
 
                 // run entry script in entry point
                 if (entryPoint.isNotBlank()) {
-                    val newClass = Class.forName(entryPoint)
-                    val newClassConstructor = newClass.getConstructor(/* no args defined */)
-                    val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+                    var newClass: Class<*>? = null
+                    try {
+                        newClass = Class.forName(entryPoint)
+                    }
+                    catch (e: ClassNotFoundException) {
+                        printdbgerr(this, "$moduleName has nonexisting entry point, skipping...")
+                        printdbgerr(this, "\t$e")
+                        moduleInfo.remove(moduleName)
+                    }
 
-                    entryPointClasses.add(newClassInstance as ModuleEntryPoint)
-                    (newClassInstance as ModuleEntryPoint).invoke()
+                    newClass?.let {
+                        val newClassConstructor = newClass.getConstructor(/* no args defined */)
+                        val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+
+                        entryPointClasses.add(newClassInstance as ModuleEntryPoint)
+                        (newClassInstance as ModuleEntryPoint).invoke()
+                    }
                 }
 
 
@@ -121,8 +132,9 @@ object ModMgr {
                 printdbgerr(this, "No such module: $moduleName, skipping...")
                 moduleInfo.remove(moduleName)
             }
-            catch (e: ClassNotFoundException) {
-                printdbgerr(this, "$moduleName has nonexisting entry point, skipping...")
+            catch (e: Throwable) {
+                printdbgerr(this, "There was an error while loading module $moduleName")
+                printdbgerr(this, "\t$e")
                 moduleInfo.remove(moduleName)
             }
         }

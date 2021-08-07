@@ -25,6 +25,8 @@ class EntryPoint : ModuleEntryPoint() {
 
     override fun invoke() {
 
+        printdbg(this, "Hello, world!")
+
         // the order of invocation is important! Material should be the first as blocks and items are depend on it.
         ModMgr.GameMaterialLoader.invoke(moduleName)
         ModMgr.GameBlockLoader.invoke(moduleName)

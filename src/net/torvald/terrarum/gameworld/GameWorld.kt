@@ -366,6 +366,16 @@ open class GameWorld : Disposable {
         return wiringGraph[blockAddr]?.get(itemID)?.generatorState
     }
 
+    fun getWireConsumerStateOf(x: Int, y: Int, itemID: ItemID): ArrayList<WireConsumerState>? {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return getWireConsumerStateUnsafe(blockAddr, itemID)
+    }
+
+    fun getWireConsumerStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): ArrayList<WireConsumerState>? {
+        return wiringGraph[blockAddr]?.get(itemID)?.consumerStates
+    }
+
     fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, byte: Byte) {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
@@ -373,13 +383,12 @@ open class GameWorld : Disposable {
     }
 
     fun setWireGraphOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, byte: Byte) {
-        if (wiringGraph[blockAddr] == null) {
+        if (wiringGraph[blockAddr] == null)
             wiringGraph[blockAddr] = HashMap()
+        if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(byte)
-        }
-        else {
-            wiringGraph[blockAddr]!![itemID]!!.con = byte
-        }
+
+        wiringGraph[blockAddr]!![itemID]!!.con = byte
     }
 
     fun setWireGeneratorStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
@@ -389,12 +398,48 @@ open class GameWorld : Disposable {
     }
 
     fun setWireGenenatorStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, vector: Vector2) {
-        if (wiringGraph[blockAddr] == null) {
+        if (wiringGraph[blockAddr] == null)
             wiringGraph[blockAddr] = HashMap()
+        if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0, vector)
-        }
-        else {
-            wiringGraph[blockAddr]!![itemID]!!.generatorState = vector
+
+        wiringGraph[blockAddr]!![itemID]!!.generatorState = vector
+    }
+
+    fun addWireConsumerStateOf(x: Int, y: Int, itemID: ItemID, state: WireConsumerState) {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return addWireConsumerStateOfUnsafe(blockAddr, itemID, state)
+    }
+
+    fun clearAllWireConsumerState(x: Int, y: Int) {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return clearAllWireConsumerStateUnsafe(blockAddr)
+    }
+
+    fun addWireConsumerStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, state: WireConsumerState) {
+        if (wiringGraph[blockAddr] == null)
+            wiringGraph[blockAddr] = HashMap()
+        if (wiringGraph[blockAddr]!![itemID] == null)
+            wiringGraph[blockAddr]!![itemID] = WiringSimCell(0)
+
+        wiringGraph[blockAddr]!![itemID]!!.consumerStates.add(state)
+    }
+
+    fun getAllWiringGraph(x: Int, y: Int): Iterable<Map.Entry<ItemID, WiringSimCell>>? {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        return getAllWiringGraphUnsafe(blockAddr)
+    }
+
+    fun getAllWiringGraphUnsafe(blockAddr: BlockAddress): Iterable<Map.Entry<ItemID, WiringSimCell>>? {
+        return wiringGraph[blockAddr]?.asIterable()
+    }
+
+    fun clearAllWireConsumerStateUnsafe(blockAddr: BlockAddress) {
+        wiringGraph[blockAddr]?.forEach {
+            it.value.consumerStates.clear()
         }
     }
 

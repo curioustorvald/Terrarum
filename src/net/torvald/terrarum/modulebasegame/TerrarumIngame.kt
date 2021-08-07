@@ -683,7 +683,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 wires?.forEach {
                     val wireActor = getOrMakeWireActor(wiringCounter)
 
-                    if (WireCodex[it].renderClass == selectedWireRenderClass) {
+                    if (WireCodex[it].renderClass == selectedWireRenderClass || selectedWireRenderClass == "wire_render_all") {
                         wireActor.isUpdate = true
                         wireActor.isVisible = true
                         wireActor.forceDormant = false
