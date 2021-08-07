@@ -79,6 +79,7 @@ open class GameWorld : Disposable {
 
     private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
     private val WIRE_POS_MAP = byteArrayOf(1,2,4,8)
+    private val WIRE_ANTIPOS_MAP = byteArrayOf(4,8,1,2)
 
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
@@ -341,7 +342,7 @@ open class GameWorld : Disposable {
             if (matchingNeighbours and WIRE_POS_MAP[i] > 0) {
                 val (tx, ty) = WireActor.WIRE_NEARBY[i]
                 val old = getWireGraphOf(x + tx, y + ty, tile) ?: 0
-                setWireGraphOf(x + tx, y + ty, tile, old or WIRE_POS_MAP[i])
+                setWireGraphOf(x + tx, y + ty, tile, old or WIRE_ANTIPOS_MAP[i])
             }
         }
     }

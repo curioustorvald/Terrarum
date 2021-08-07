@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -78,6 +79,14 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     override fun show() {
         // the very basic show() implementation
+
+        // add blockmarking_actor into the actorlist
+        (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor).let {
+            it.isVisible = false // make sure the actor is invisible on new instance
+            try { addNewActor(it) } catch (e: Error) {}
+        }
+
+
         gameInitialised = true
     }
 

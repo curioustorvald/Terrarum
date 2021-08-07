@@ -24,6 +24,7 @@ import net.torvald.terrarum.concurrent.ThreadExecutor;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
+import net.torvald.terrarum.gameactors.*;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
@@ -46,6 +47,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 
+import static net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED;
 import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
 import static net.torvald.terrarum.TerrarumKt.printStackTrace;
 
@@ -355,6 +357,7 @@ public class AppLoader implements ApplicationListener {
         glInfo.create();
 
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
 
         newTempFile("wenquanyi.tga"); // temp file required by the font
 

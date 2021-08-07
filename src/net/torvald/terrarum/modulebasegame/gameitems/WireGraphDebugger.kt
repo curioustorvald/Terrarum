@@ -1,8 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
@@ -30,10 +32,15 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     }
 
     private val sb = StringBuilder()
+    private val blockMarker = CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor
 
     override fun effectWhenEquipped(delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
 
+        blockMarker.shape = 3
+        blockMarker.color = Color.YELLOW
+        blockMarker.isVisible = true
+        blockMarker.update(delta)
 
         val mx = Terrarum.mouseTileX
         val my = Terrarum.mouseTileY
@@ -65,5 +72,6 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override fun effectOnUnequip(delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
         (Terrarum.ingame!! as TerrarumIngame).setTooltipMessage(null)
+        blockMarker.isVisible = false
     }
 }

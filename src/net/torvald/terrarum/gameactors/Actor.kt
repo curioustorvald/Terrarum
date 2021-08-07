@@ -40,7 +40,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      * Valid RefID is equal to or greater than 16777216.
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
-    open var referenceID: ActorID = Terrarum.generateUniqueReferenceID(renderOrder) // once this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
+    open var referenceID: ActorID = Terrarum.generateUniqueReferenceID(renderOrder) // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
     var actorValue = ActorValue(this) // FIXME cyclic reference on GSON
     @Volatile var flagDespawn = false
 

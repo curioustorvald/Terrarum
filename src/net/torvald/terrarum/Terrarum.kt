@@ -289,7 +289,7 @@ object Terrarum : Disposable {
     fun generateUniqueReferenceID(renderOrder: Actor.RenderOrder): ActorID {
         fun hasCollision(value: ActorID) =
                 try {
-                    Terrarum.ingame!!.theGameHasActor(value) ||
+                    Terrarum.ingame?.theGameHasActor(value) == true ||
                     value < ItemCodex.ACTORID_MIN ||
                     value !in when (renderOrder) {
                         Actor.RenderOrder.BEHIND -> Actor.RANGE_BEHIND
