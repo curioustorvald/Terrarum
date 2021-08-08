@@ -96,6 +96,7 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:5", 385930603) // test tiki torch
         inventory.add("item@basegame:6", 95) // storage chest
         inventory.add("item@basegame:7", 1) // wire debugger
+        inventory.add("item@basegame:8", 9995) // power source
 
         WireCodex.getAll().forEach {
             try {

@@ -10,6 +10,8 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.khelekore.prtree.*
 import kotlin.math.roundToInt
 
@@ -447,8 +449,28 @@ object WorldSimulator {
     }
 
 
-    private fun simulateWires(delta: Float) {
+    private val wiresimOverscan = 60
 
+    /*private fun wiresimGetSourceBlocks(): List<Q> {
+        val ret = ArrayList<Q>()
+
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
+
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+
+        for (y in for_y_start - wiresimOverscan..for_y_end + wiresimOverscan) {
+            for (x in for_x_start - wiresimOverscan..for_x_end + wiresimOverscan) {
+
+            }
+        }
+
+        return ret
+    }*/
+
+    private fun simulateWires(delta: Float) {
+        //val sourceBlocks = wiresimGetSourceBlocks()
     }
 
     private enum class WireConStatus { THRU, END, BRANCH }

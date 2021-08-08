@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
+import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 2016-06-17.
@@ -29,6 +30,9 @@ open class FixtureBase(
     var blockBox: BlockBox = blockBox0
         protected set // something like TapestryObject will want to redefine this
 
+    open val wireEmitterType = ""
+    open val wireEmission = Vector2()
+    open val wireConsumption = Vector2()
     
     /**
      * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
@@ -100,13 +104,6 @@ open class FixtureBase(
 
 
         return true
-
-    }
-
-    /**
-     * Update code that runs once for every frame
-     */
-    open fun updateSelf() {
 
     }
 

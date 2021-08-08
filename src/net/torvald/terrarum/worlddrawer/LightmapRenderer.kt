@@ -211,46 +211,9 @@ object LightmapRenderer {
             }
         }
 
-        // YE OLDE LIGHT UPDATER
-        // O((5*9)n where n is a size of the map.
-        // Because of inevitable overlaps on the area, it only works with MAX blend
-        /*fun or1() {
-            // Round 1
-            for (y in for_y_start - overscan_open..for_y_end) {
-                for (x in for_x_start - overscan_open..for_x_end) {
-                    calculateAndAssign(lightmap, x, y)
-                }
-            }
-        }
-        fun or2() {
-            // Round 2
-            for (y in for_y_end + overscan_open downTo for_y_start) {
-                for (x in for_x_start - overscan_open..for_x_end) {
-                    calculateAndAssign(lightmap, x, y)
-                }
-            }
-        }
-        fun or3() {
-            // Round 3
-            for (y in for_y_end + overscan_open downTo for_y_start) {
-                for (x in for_x_end + overscan_open downTo for_x_start) {
-                    calculateAndAssign(lightmap, x, y)
-                }
-            }
-        }
-        fun or4() {
-            // Round 4
-            for (y in for_y_start - overscan_open..for_y_end) {
-                for (x in for_x_end + overscan_open downTo for_x_start) {
-                    calculateAndAssign(lightmap, x, y)
-                }
-            }
-        }*/
-
         // 'NEWLIGHT2' LIGHT SWIPER
         // O((8*2)n) where n is a size of the map.
         fun r1() {
-            // TODO test non-parallel
             swipeDiag = false
             for (line in 1 until LIGHTMAP_HEIGHT - 1) {
                 swipeLight(
@@ -261,7 +224,6 @@ object LightmapRenderer {
             }
         }
         fun r2() {
-            // TODO test non-parallel
             swipeDiag = false
             for (line in 1 until LIGHTMAP_WIDTH - 1) {
                 swipeLight(
@@ -272,7 +234,6 @@ object LightmapRenderer {
             }
         }
         fun r3() {
-            // TODO test non-parallel
             swipeDiag = true
             /* construct indices such that:
                   56789ABC
@@ -310,7 +271,6 @@ object LightmapRenderer {
             }
         }
         fun r4() {
-            // TODO test non-parallel
             swipeDiag = true
             /*
                 1       w-2
@@ -611,59 +571,6 @@ object LightmapRenderer {
             swipeY -= dy
         }
     }
-
-    /** Another YE OLDE light simulator
-     * Calculates the light simulation, using main lightmap as one of the input.
-     */
-    /*private fun calculateAndAssign(lightmap: UnsafeCvecArray, worldX: Int, worldY: Int) {
-
-        //if (inNoopMask(worldX, worldY)) return
-
-        // O(9n) == O(n) where n is a size of the map
-
-        //getLightsAndShades(worldX, worldY)
-
-        val x = worldX.convX()
-        val y = worldY.convY()
-
-        // calculate ambient
-        /*  + * +  0 4 1
-         *  * @ *  6 @ 7
-         *  + * +  2 5 3
-         *  sample ambient for eight points and apply attenuation for those
-         *  maxblend eight values and use it
-         */
-
-
-        // TODO getLightsAndShades is replaced with precalculate; change following codes accordingly!
-        _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
-        _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
-        _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
-        _ambientAccumulator.a = _mapLightLevelThis.getA(x, y)
-
-        _thisTileOpacity.r = _mapThisTileOpacity.getR(x, y)
-        _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
-        _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
-        _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
-
-        _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
-        _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
-        _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
-        _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
-
-        // will "overwrite" what's there in the lightmap if it's the first pass
-        // takes about 2 ms on 6700K
-        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x - 1, y - 1, _thisTileOpacity2))
-        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y - 1, _thisTileOpacity2))
-        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x - 1, y + 1, _thisTileOpacity2))
-        /* + */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y + 1, _thisTileOpacity2))
-        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x, y - 1, _thisTileOpacity))
-        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x, y + 1, _thisTileOpacity))
-        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x - 1, y, _thisTileOpacity))
-        /* * */_ambientAccumulator.maxAndAssign(darkenColoured(x + 1, y, _thisTileOpacity))
-
-        lightmap.setVec(x, y, _ambientAccumulator)
-    }*/
 
     private fun isSolid(x: Int, y: Int): Float? { // ...so that they wouldn't appear too dark
         if (!inBounds(x, y)) return null
