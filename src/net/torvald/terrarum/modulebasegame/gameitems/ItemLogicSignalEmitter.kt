@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 
 class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
@@ -43,6 +44,12 @@ class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
         // return true when placed, false when cannot be placed
     }
 
+    override fun effectWhenEquipped(delta: Float) {
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
+    }
 
+    override fun effectOnUnequip(delta: Float) {
+        (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
+    }
 
 }

@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
