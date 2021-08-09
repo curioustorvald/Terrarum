@@ -2,19 +2,20 @@ package net.torvald.util
 
 import net.torvald.terrarum.lock
 import java.util.concurrent.locks.ReentrantLock
+import java.util.function.Consumer
 
 /**
  * The modification of the arraylist that its element is always sorted.
  *
  * Created by minjaesong on 2019-03-12.
  */
-class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
+class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : List<T> {
 
     val arrayList = ArrayList<T>(initialSize)
 
     /**
      */
-    fun add(elem: T) {
+    fun add(elem: Comparable<T>) {
         // don't append-at-tail-and-sort; just insert at right index
         // this is a modified binary search to search the right "spot" where the insert elem fits
         ReentrantLock().lock {
@@ -24,29 +25,34 @@ class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
             while (low < high) {
                 val mid = (low + high).ushr(1)
 
-                if ((arrayList[mid] as Comparable<T>).compareTo(elem) > 0)
+                if ((arrayList[mid] as Comparable<T>).compareTo(elem as T) > 0)
                     high = mid
                 else
                     low = mid + 1
             }
 
-            arrayList.add(low, elem)
+            arrayList.add(low, elem as T)
         }
     }
 
-    val size: Int
+    override val size: Int
         get() = arrayList.size
+    override inline fun isEmpty() = arrayList.isEmpty()
+    override inline fun lastIndexOf(element: T) = arrayList.lastIndexOf(element)
 
     inline fun removeAt(index: Int) = arrayList.removeAt(index)
-    inline fun remove(element: T) = arrayList.remove(element)
+    inline fun remove(element: T) = indexOf(element).let { if (it != -1) removeAt(it) }
     inline fun removeLast() = arrayList.removeAt(arrayList.size - 1)
 
-    operator fun get(index: Int) = arrayList[index]
+    override operator inline fun get(index: Int) = arrayList[index]
     fun getOrNull(index: Int?) = if (index == null) null else get(index)
+
+    override fun indexOf(element: T): Int = searchForIndex(element.hashCode()) { element.hashCode() } ?: -1
+
     /**
      * Searches for the element. Null if the element was not found
      */
-    fun contains(element: T): Boolean {
+    override fun contains(element: T): Boolean {
         // code from collections/Collections.kt
         var low = 0
         var high = this.size - 1
@@ -56,7 +62,7 @@ class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
 
             val midVal = get(mid)
 
-            if ((element as Comparable<T>).compareTo(midVal) > 0)
+            if ((element) > midVal)
                 low = mid + 1
             else if (element < midVal)
                 high = mid - 1
@@ -65,6 +71,8 @@ class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
         }
         return false // key not found
     }
+
+    override fun containsAll(elements: Collection<T>) = arrayList.containsAll(elements)
 
     /** Searches the element using given predicate instead of the element itself. Returns index in the array where desired, null when there is no such element.
      * element is stored.
@@ -100,8 +108,11 @@ class SortedArrayList<T>(initialSize: Int = 10) : Iterable<T> {
      */
     fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R = { it as R }): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 
-    override fun iterator() = arrayList.iterator()
-    inline fun forEach(action: (T) -> Unit) = arrayList.forEach(action)
+    override inline fun iterator() = arrayList.iterator()
+    override inline fun listIterator() = arrayList.listIterator()
+    override inline fun listIterator(index: Int) = arrayList.listIterator(index)
+    override inline fun subList(fromIndex: Int, toIndex: Int) = arrayList.subList(fromIndex, toIndex)
+    override inline fun forEach(action: Consumer<in T>?) = arrayList.forEach(action)
     inline fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
 
 

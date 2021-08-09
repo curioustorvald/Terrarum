@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.khelekore.prtree.*
@@ -459,6 +460,8 @@ object WorldSimulator {
 
         val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
         val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+
+        val fixtures = Terrarum.ingame!!.actorContainer.filterIsInstance<FixtureBase>()
 
         for (y in for_y_start - wiresimOverscan..for_y_end + wiresimOverscan) {
             for (x in for_x_start - wiresimOverscan..for_x_end + wiresimOverscan) {
