@@ -156,6 +156,7 @@ object BlockCodex {
         prop.nameKey = record.get("name")
 
         prop.id = "$modname:$key"
+        prop.numericID = key
         prop.drop = "$modname:${intVal(record, "drop")}"
 
         prop.shadeColR = floatVal(record, "shdr")

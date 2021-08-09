@@ -104,6 +104,7 @@ object WireCodex {
         prop.nameKey = record.get("name")
 
         prop.id = "wire@$modname:$key"
+        prop.numericID = key
         prop.renderClass = record.get("renderclass")
         prop.accepts = record.get("accept")
         prop.inputCount = intVal(record, "inputcount")

@@ -12,6 +12,7 @@ import net.torvald.terrarum.serialise.toLittle
 class BlockProp {
 
     var id: ItemID = ""
+    var numericID: Int = -1
 
     var nameKey: String = ""
 

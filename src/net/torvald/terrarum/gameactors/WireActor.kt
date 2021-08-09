@@ -1,14 +1,13 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.toInt
 
 /**
  * Created by minjaesong on 2021-07-30.
@@ -29,7 +28,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
         setHitboxDimension(2, 2, 0, 0)
     }
 
-    private var oldWireId = ""
+    private var wireID = ""
     private var worldX = 0
     private var worldY = 0
 
@@ -40,7 +39,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
     fun setWire(itemID: ItemID, worldX: Int, worldY: Int) {
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
 
-        if (oldWireId != itemID) {
+        if (wireID != itemID) {
             if (sprite == null) {
                 makeNewSprite(CommonResourcePool.getAsTextureRegionPack(itemID))
                 sprite!!.delays = floatArrayOf(1f,1f)
@@ -48,7 +47,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
             }
             else sprite!!.setSpriteImage(CommonResourcePool.getAsTextureRegionPack(itemID))
 
-            oldWireId = itemID
+            wireID = itemID
         }
         this.worldX = worldX
         this.worldY = worldY
@@ -76,11 +75,24 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
     }
 
     override fun update(delta: Float) {
-
     }
 
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
+            if (WireCodex[wireID].accepts == "digital_3bits") {
+                // "digital_3bits" must come right after three wires it bundles
+                val rootID = wireID.substringBefore(':') + ":"
+                var row = 0
+                (WireCodex[wireID].numericID - 3 .. WireCodex[wireID].numericID - 1).forEachIndexed { index, it ->
+                    val itemID = rootID + it
+                    row = row or ((world?.getWireEmitStateOf(worldX, worldY, itemID)?.isNotZero == true).toInt() shl index)
+                }
+                sprite?.currentRow = row
+            }
+            else {
+                sprite?.currentRow = (world?.getWireEmitStateOf(worldX, worldY, wireID)?.isNotZero == true).toInt()
+            }
+
             BlendMode.resolve(drawMode, batch)
             drawSpriteInGoodPosition(sprite!!, batch)
         }

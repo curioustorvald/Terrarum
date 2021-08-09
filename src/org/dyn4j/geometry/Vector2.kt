@@ -537,6 +537,13 @@ class Vector2 {
         get() = Math.abs(this.x) <= Epsilon.E && Math.abs(this.y) <= Epsilon.E
 
     /**
+     * Returns false if this [Vector2] is the zero [Vector2].
+     * @return boolean
+     */
+    val isNotZero: Boolean
+        get() = !isZero
+
+    /**
      * Negates this [Vector2].
      * @return [Vector2] this vector
      */

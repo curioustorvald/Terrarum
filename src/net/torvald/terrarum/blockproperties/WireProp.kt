@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameitem.ItemID
 class WireProp {
 
     var id: ItemID = ""
+    var numericID: Int = -1
     var nameKey: String = ""
 
     var renderClass: String = ""
