@@ -41,7 +41,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : List<T> {
     override inline fun lastIndexOf(element: T) = arrayList.lastIndexOf(element)
 
     inline fun removeAt(index: Int) = arrayList.removeAt(index)
-    inline fun remove(element: T) = indexOf(element).let { if (it != -1) removeAt(it) }
+    inline fun remove(element: T) = arrayList.remove(element) // don't mess up with your own half-assed implementation
     inline fun removeLast() = arrayList.removeAt(arrayList.size - 1)
 
     override operator inline fun get(index: Int) = arrayList[index]

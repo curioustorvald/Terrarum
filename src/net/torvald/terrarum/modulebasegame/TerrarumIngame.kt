@@ -39,6 +39,7 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
+import net.torvald.util.SortedArrayList
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
@@ -67,12 +68,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
     val uiContainer = UIContainer()
 
-    private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderOverlay= ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderBehind = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMiddle = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMidTop = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderFront  = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderOverlay= SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
 
+    // these are required because actors always change their position
     private var visibleActorsRenderBehind: List<ActorWithBody> = ArrayList(1)
     private var visibleActorsRenderMiddle: List<ActorWithBody> = ArrayList(1)
     private var visibleActorsRenderMidTop: List<ActorWithBody> = ArrayList(1)
@@ -624,7 +626,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
-        filterVisibleActors()
+        measureDebugTime("Ingame.FilterVisibleActors") {
+            filterVisibleActors()
+        }
+
         uiContainer.forEach {
             when (it) {
                 is UICanvas -> it.update(Gdx.graphics.rawDeltaTime)
@@ -890,6 +895,16 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private val cameraWindowX = WorldCamera.x.toDouble()..WorldCamera.xEnd.toDouble()
     private val cameraWindowY = WorldCamera.y.toDouble()..WorldCamera.yEnd.toDouble()
 
+    private fun actorToRenderQueue(actor: ActorWithBody): SortedArrayList<ActorWithBody> {
+        return when (actor.renderOrder) {
+            Actor.RenderOrder.BEHIND -> actorsRenderBehind
+            Actor.RenderOrder.MIDDLE -> actorsRenderMiddle
+            Actor.RenderOrder.MIDTOP -> actorsRenderMidTop
+            Actor.RenderOrder.FRONT, Actor.RenderOrder.WIRES  -> actorsRenderFront
+            Actor.RenderOrder.OVERLAY-> actorsRenderOverlay
+        }
+    }
+
     /** whether the actor is within update range */
     private fun ActorWithBody.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
 
@@ -917,28 +932,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // indexToDelete >= 0 means that the actor certainly exists in the game
             // which means we don't need to check if i >= 0 again
             if (actor is ActorWithBody) {
-                when (actor.renderOrder) {
-                    Actor.RenderOrder.BEHIND -> {
-                        val i = actorsRenderBehind.binarySearch(actor.referenceID)
-                        actorsRenderBehind.removeAt(i)
-                    }
-                    Actor.RenderOrder.MIDDLE -> {
-                        val i = actorsRenderMiddle.binarySearch(actor.referenceID)
-                        actorsRenderMiddle.removeAt(i)
-                    }
-                    Actor.RenderOrder.MIDTOP -> {
-                        val i = actorsRenderMidTop.binarySearch(actor.referenceID)
-                        actorsRenderMidTop.removeAt(i)
-                    }
-                    Actor.RenderOrder.FRONT  -> {
-                        val i = actorsRenderFront.binarySearch(actor.referenceID)
-                        actorsRenderFront.removeAt(i)
-                    }
-                    Actor.RenderOrder.OVERLAY-> {
-                        val i = actorsRenderOverlay.binarySearch(actor.referenceID)
-                        actorsRenderFront.removeAt(i)
-                    }
-                }
+                actorToRenderQueue(actor).remove(actor)
             }
         }
     }
@@ -983,23 +977,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             actorContainerActive.add(actor)
 
             if (actor is ActorWithBody) {
-                when (actor.renderOrder) {
-                    Actor.RenderOrder.BEHIND -> {
-                        actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
-                    }
-                    Actor.RenderOrder.MIDDLE -> {
-                        actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle)
-                    }
-                    Actor.RenderOrder.MIDTOP -> {
-                        actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
-                    }
-                    Actor.RenderOrder.FRONT, Actor.RenderOrder.WIRES  -> {
-                        actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
-                    }
-                    Actor.RenderOrder.OVERLAY-> {
-                        actorsRenderOverlay.add(actor); insertionSortLastElemAV(actorsRenderOverlay)
-                    }
-                }
+                actorToRenderQueue(actor).add(actor)
             }
         }
     }
@@ -1016,23 +994,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             actorContainerActive.add(actor)
 
             if (actor is ActorWithBody) {
-                when (actor.renderOrder) {
-                    Actor.RenderOrder.BEHIND -> {
-                        actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
-                    }
-                    Actor.RenderOrder.MIDDLE -> {
-                        actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle)
-                    }
-                    Actor.RenderOrder.MIDTOP -> {
-                        actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
-                    }
-                    Actor.RenderOrder.FRONT  -> {
-                        actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
-                    }
-                    Actor.RenderOrder.OVERLAY-> {
-                        actorsRenderOverlay.add(actor); insertionSortLastElemAV(actorsRenderOverlay)
-                    }
-                }
+                actorToRenderQueue(actor).add(actor)
             }
         }
     }
