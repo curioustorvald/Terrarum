@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
@@ -26,6 +27,15 @@ class FixtureLogicSignalEmitter(nameFun: () -> String) : FixtureBase(BlockBox(Bl
 
     companion object {
         const val MASS = 1.0
+    }
+
+    override fun update(delta: Float) {
+        // set emit
+        worldBlockPos?.let { (x, y) ->
+            WireCodex.getAll().filter { it.renderClass == "signal" }.forEach { prop ->
+                world?.setWireEmitStateOf(x, y, prop.id, wireEmission)
+            }
+        }
     }
 }
 

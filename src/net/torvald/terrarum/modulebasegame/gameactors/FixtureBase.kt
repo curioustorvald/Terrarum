@@ -37,11 +37,21 @@ open class FixtureBase(
     /**
      * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
      */
-    private var worldBlockPos: Point2i? = null
+    protected var worldBlockPos: Point2i? = null
 
     init {
         if (mainUI != null)
             AppLoader.disposableSingletonsPool.add(mainUI)
+    }
+
+    fun forEachBlockbox(action: (Int, Int) -> Unit) {
+        worldBlockPos?.let { (posX, posY) ->
+            for (y in posY until posY + blockBox.height) {
+                for (x in posX until posX + blockBox.width) {
+                    action(x, y)
+                }
+            }
+        }
     }
 
     /**
@@ -80,8 +90,7 @@ open class FixtureBase(
 
 
         // fill the area with the filler blocks
-        for (y in posY until posY + blockBox.height) {
-            for (x in posX until posX + blockBox.width) {
+        forEachBlockbox { x, y ->
                 if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
                     // if the collision type is allow_move_down, only the top surface tile should be "the platform"
                     // lower part must not have such property (think of the table!)
@@ -90,7 +99,6 @@ open class FixtureBase(
                 }
                 else
                     world!!.setTileTerrain(x, y, blockBox.collisionType, false)
-            }
         }
 
         // set the position of this actor
@@ -115,10 +123,8 @@ open class FixtureBase(
         val posY = worldBlockPos!!.y
 
         // remove filler block
-        for (x in posX until posX + blockBox.width) {
-            for (y in posY until posY + blockBox.height) {
+        forEachBlockbox { x, y ->
                 world!!.setTileTerrain(x, y, Block.AIR, false)
-            }
         }
 
         worldBlockPos = null
@@ -156,11 +162,9 @@ open class FixtureBase(
 
         if (dropThis) {
             // fill blockbox with air
-            for (x in posX until posX + blockBox.width) {
-                for (y in posY until posY + blockBox.height) {
-                    if (world!!.getTileFromTerrain(x, y) == blockBox.collisionType) {
-                        world!!.setTileTerrain(x, y, Block.AIR, false)
-                    }
+            forEachBlockbox { x, y ->
+                if (world!!.getTileFromTerrain(x, y) == blockBox.collisionType) {
+                    world!!.setTileTerrain(x, y, Block.AIR, false)
                 }
             }
 

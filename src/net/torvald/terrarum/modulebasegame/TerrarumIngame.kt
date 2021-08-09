@@ -25,6 +25,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.gameactors.WireActor
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -52,8 +53,6 @@ import kotlin.math.roundToInt
  */
 
 open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
-
-    private val ACTOR_UPDATE_RANGE = 4096
 
     var historicalFigureIDBucket: ArrayList<Int> = ArrayList<Int>()
 
@@ -100,6 +99,45 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                                       " $EMDASH M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / U${Terrarum.memUnsafe}M / X${Terrarum.memXmx}M"
                                   else
                                       ""
+
+        val ACTOR_UPDATE_RANGE = 4096
+
+        fun distToActorSqr(world: GameWorld, a: ActorWithBody, p: ActorWithBody) =
+                minOf(// take min of normal position and wrapped (x < 0) position
+                        (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                        ((a.hitbox.centeredX + world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                        ((a.hitbox.centeredX - world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+                )
+        fun distToCameraSqr(world: GameWorld, a: ActorWithBody) =
+                minOf(
+                        (a.hitbox.centeredX - WorldCamera.xCentre).sqr() +
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
+                        ((a.hitbox.centeredX + world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
+                        ((a.hitbox.centeredX - world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr()
+                )
+
+        /** whether the actor is within update range */
+        fun ActorWithBody.inUpdateRange(world: GameWorld) = distToCameraSqr(world, this) <= ACTOR_UPDATE_RANGE.sqr()
+
+        /** whether the actor is within screen */
+        fun ActorWithBody.inScreen(world: GameWorld) =
+
+                // y
+                this.hitbox.endY >= WorldCamera.y && this.hitbox.startY <= WorldCamera.yEnd
+
+                &&
+
+                // x: camera is on the right side of the seam
+                ((this.hitbox.endX - world.width >= WorldCamera.x && this.hitbox.startX - world.width <= WorldCamera.xEnd) ||
+                 // x: camera in on the left side of the seam
+                 (this.hitbox.endX + world.width >= WorldCamera.x && this.hitbox.startX + world.width <= WorldCamera.xEnd) ||
+                 // x: neither
+                 (this.hitbox.endX >= WorldCamera.x && this.hitbox.startX <= WorldCamera.xEnd))
     }
 
 
@@ -708,11 +746,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun filterVisibleActors() {
-        visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen() }
-        visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen() }
-        visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
-        visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
-        visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
+        visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen(world) }
+        visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen(world) }
+        visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen(world) }
+        visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen(world) }
+        visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen(world) }
     }
 
     private fun repossessActor() {
@@ -761,7 +799,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
-            if (actor is ActorWithBody && actor.inUpdateRange() && !actor.forceDormant) {
+            if (actor is ActorWithBody && actor.inUpdateRange(world) && !actor.forceDormant) {
                 activateDormantActor(actor) // duplicates are checked here
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
@@ -788,7 +826,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
             // inactivate distant actors
-            else if (actor is ActorWithBody && (!actor.inUpdateRange() || actor.forceDormant)) {
+            else if (actor is ActorWithBody && (!actor.inUpdateRange(world) || actor.forceDormant)) {
                 if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }
@@ -857,39 +895,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         d.forEach { if (it < ret) ret = it }
         return ret
     }
-    private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody) =
-            min(// take min of normal position and wrapped (x < 0) position
-                    (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
-                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    ((a.hitbox.centeredX + world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
-                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    ((a.hitbox.centeredX - world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
-                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
-            )
-    private fun distToCameraSqr(a: ActorWithBody) =
-            min(
-                    (a.hitbox.centeredX - WorldCamera.xCentre).sqr() +
-                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
-                    ((a.hitbox.centeredX + world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
-                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
-                    ((a.hitbox.centeredX - world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
-                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr()
-            )
-
-    /** whether the actor is within screen */
-    private fun ActorWithBody.inScreen() =
-
-            // y
-            this.hitbox.endY >= WorldCamera.y && this.hitbox.startY <= WorldCamera.yEnd
-
-            &&
-
-            // x: camera is on the right side of the seam
-            ((this.hitbox.endX - worldWidth >= WorldCamera.x && this.hitbox.startX - worldWidth <= WorldCamera.xEnd) ||
-            // x: camera in on the left side of the seam
-            (this.hitbox.endX + worldWidth >= WorldCamera.x && this.hitbox.startX + worldWidth <= WorldCamera.xEnd) ||
-            // x: neither
-            (this.hitbox.endX >= WorldCamera.x && this.hitbox.startX <= WorldCamera.xEnd))
 
 
     private val cameraWindowX = WorldCamera.x.toDouble()..WorldCamera.xEnd.toDouble()
@@ -904,9 +909,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             Actor.RenderOrder.OVERLAY-> actorsRenderOverlay
         }
     }
-
-    /** whether the actor is within update range */
-    private fun ActorWithBody.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
 
     override fun removeActor(ID: Int) = removeActor(getActorByID(ID))
     /**
