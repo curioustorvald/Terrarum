@@ -428,14 +428,14 @@ open class GameWorld : Disposable {
         wiringGraph[blockAddr]!![itemID]!!.recvStates.add(state)
     }
 
-    fun getAllWiringGraph(x: Int, y: Int): Iterable<Map.Entry<ItemID, WiringSimCell>>? {
+    fun getAllWiringGraph(x: Int, y: Int): HashMap<ItemID, WiringSimCell>? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         return getAllWiringGraphUnsafe(blockAddr)
     }
 
-    fun getAllWiringGraphUnsafe(blockAddr: BlockAddress): Iterable<Map.Entry<ItemID, WiringSimCell>>? {
-        return wiringGraph[blockAddr]?.asIterable()
+    fun getAllWiringGraphUnsafe(blockAddr: BlockAddress): HashMap<ItemID, WiringSimCell>? {
+        return wiringGraph[blockAddr]
     }
 
     fun clearAllWireRecvStateUnsafe(blockAddr: BlockAddress) {

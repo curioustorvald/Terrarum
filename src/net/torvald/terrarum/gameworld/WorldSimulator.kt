@@ -6,9 +6,11 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBoxIndex
@@ -478,11 +480,28 @@ object WorldSimulator {
         fixture.worldBlockPos?.let {
             val branchesVisited = ArrayList<Point2i>()
             val branchingStack = Stack<Point2i>()
-            val startPoint = it + fixture.blockBoxIndexToPoint2i(bbi)
-            branchingStack.push(startPoint)
+            val point = it + fixture.blockBoxIndexToPoint2i(bbi)
+            branchingStack.push(point.copy())
 
             while (branchingStack.isNotEmpty()) {
-                
+                // get all wires that matches 'accepts' (such as Red/Green/Blue wire) and propagate signal for each of them
+                world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
+                    world.getAllWiringGraph(point.x, point.y)?.get(wire)?.let { node ->
+                        val connexion = node.con.toInt()
+                        when (wireConToStatus[connexion]) {
+                            WireConStatus.THRU -> {
+                                // TODO
+                            }
+                            WireConStatus.END    -> {
+                                // TODO
+                            }
+                            WireConStatus.BRANCH -> {
+                                // TODO
+                                branchingStack.push(point.copy())
+                            }
+                        }
+                    }
+                }
             }
         }
     }
