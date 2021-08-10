@@ -11,10 +11,12 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.BlockBoxIndex
+import net.torvald.terrarum.modulebasegame.gameactors.Electric
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.khelekore.prtree.*
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
 /**
@@ -453,16 +455,34 @@ object WorldSimulator {
 
     private val wiresimOverscan = 60
 
+    /**
+     * @return List of FixtureBases, safe to cast into Electric
+     */
     private fun wiresimGetSourceBlocks(): List<FixtureBase> =
             Terrarum.ingame!!.actorContainerActive.filter {
-                it is FixtureBase && it.inUpdateRange(world) && it.wireEmitterType.isNotBlank()
+                it is FixtureBase && it is Electric && it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
             } as List<FixtureBase>
 
     private fun simulateWires(delta: Float) {
         wiresimGetSourceBlocks().let { sources ->
             // signal-emitting fixtures must set emitState of its own tiles via update()
             sources.forEach {
-                // TODO
+                (it as Electric).wireEmitterTypes.forEach { wireType, bbi ->
+                    traverseWireGraph(world, it, wireType, bbi)
+                }
+            }
+        }
+    }
+
+    private fun traverseWireGraph(world: GameWorld, fixture: FixtureBase, wireType: String, bbi: BlockBoxIndex) {
+        fixture.worldBlockPos?.let {
+            val branchesVisited = ArrayList<Point2i>()
+            val branchingStack = Stack<Point2i>()
+            val startPoint = it + fixture.blockBoxIndexToPoint2i(bbi)
+            branchingStack.push(startPoint)
+
+            while (branchingStack.isNotEmpty()) {
+                
             }
         }
     }
@@ -487,7 +507,7 @@ object WorldSimulator {
             WireConStatus.BRANCH // 1111
     )
 
-    data class wireGraphBranch(
+    data class WireGraphBranch(
             val x: Int,
             val y: Int,
             val con: Byte

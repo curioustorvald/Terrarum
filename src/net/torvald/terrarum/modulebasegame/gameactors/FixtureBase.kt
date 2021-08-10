@@ -14,6 +14,14 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
 
+typealias BlockBoxIndex = Int
+
+interface Electric {
+    val wireEmitterTypes: HashMap<String, BlockBoxIndex>
+    val wireEmission: HashMap<BlockBoxIndex, Vector2>
+    val wireConsumption: HashMap<BlockBoxIndex, Vector2>
+}
+
 /**
  * Created by minjaesong on 2016-06-17.
  */
@@ -29,15 +37,15 @@ open class FixtureBase(
 
     var blockBox: BlockBox = blockBox0
         protected set // something like TapestryObject will want to redefine this
+    fun blockBoxIndexToPoint2i(it: BlockBoxIndex): Point2i = this.blockBox.width.let { w -> Point2i(it % w, it / w) }
 
-    open val wireEmitterType = ""
-    open val wireEmission = Vector2()
-    open val wireConsumption = Vector2()
-    
+
+
     /**
-     * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
+     * Tile-wise position of this fixture when it's placed on the world, top-left origin. Null if it's not on the world
      */
-    protected var worldBlockPos: Point2i? = null
+    var worldBlockPos: Point2i? = null
+        private set
 
     init {
         if (mainUI != null)

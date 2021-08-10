@@ -7,10 +7,12 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
-class FixtureLogicSignalEmitter(nameFun: () -> String) : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1), nameFun = nameFun) {
+class FixtureLogicSignalEmitter(nameFun: () -> String)
+    : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1), nameFun = nameFun), Electric {
 
-    override val wireEmitterType = "digital_bit"
-    override val wireEmission = Vector2(1.0, 0.0)
+    override val wireEmitterTypes: HashMap<String, BlockBoxIndex> = HashMap()
+    override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
+    override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
 
     init {
         density = 1400.0
@@ -20,6 +22,9 @@ class FixtureLogicSignalEmitter(nameFun: () -> String) : FixtureBase(BlockBox(Bl
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = MASS
+
+        wireEmitterTypes["digital_bit"] = 0
+        wireEmission[0] = Vector2(1.0, 0.0)
     }
 
     override fun dispose() { }
@@ -31,8 +36,8 @@ class FixtureLogicSignalEmitter(nameFun: () -> String) : FixtureBase(BlockBox(Bl
     override fun update(delta: Float) {
         // set emit
         worldBlockPos?.let { (x, y) ->
-            WireCodex.getAll().filter { it.renderClass == "signal" }.forEach { prop ->
-                world?.setWireEmitStateOf(x, y, prop.id, wireEmission)
+            WireCodex.getAll().filter { it.accepts == "digital_bit" }.forEach { prop ->
+                world?.setWireEmitStateOf(x, y, prop.id, wireEmission[0]!!)
             }
         }
     }
