@@ -10,7 +10,6 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBoxIndex
@@ -487,8 +486,8 @@ object WorldSimulator {
                 // get all wires that matches 'accepts' (such as Red/Green/Blue wire) and propagate signal for each of them
                 world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
                     world.getAllWiringGraph(point.x, point.y)?.get(wire)?.let { node ->
-                        val connexion = node.con.toInt()
-                        when (wireConToStatus[connexion]) {
+                        val cnx = node.connections.toInt()
+                        when (wireConToStatus[cnx]) {
                             WireConStatus.THRU -> {
                                 // TODO
                             }

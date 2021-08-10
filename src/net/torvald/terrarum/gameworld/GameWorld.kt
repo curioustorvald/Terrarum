@@ -354,7 +354,7 @@ open class GameWorld : Disposable {
     }
 
     fun getWireGraphUnsafe(blockAddr: BlockAddress, itemID: ItemID): Byte? {
-        return wiringGraph[blockAddr]?.get(itemID)?.con
+        return wiringGraph[blockAddr]?.get(itemID)?.connections
     }
 
     fun getWireEmitStateOf(x: Int, y: Int, itemID: ItemID): Vector2? {
@@ -389,7 +389,7 @@ open class GameWorld : Disposable {
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(byte)
 
-        wiringGraph[blockAddr]!![itemID]!!.con = byte
+        wiringGraph[blockAddr]!![itemID]!!.connections = byte
     }
 
     fun setWireEmitStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
@@ -647,7 +647,7 @@ open class GameWorld : Disposable {
      * These values must be updated by none other than [WorldSimulator]()
      */
     data class WiringSimCell(
-            var con: Byte = 0, // connections
+            var connections: Byte = 0, // connections
             var emitState: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
             var recvStates: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
     )
