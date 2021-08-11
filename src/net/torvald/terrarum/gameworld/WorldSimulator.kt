@@ -90,9 +90,16 @@ object WorldSimulator {
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }
-        //moveFluids(delta)
-        displaceFallables(delta)
-        simulateWires(delta)
+
+        AppLoader.measureDebugTime("WorldSimulator.fluids") {
+            //moveFluids(delta)
+        }
+        AppLoader.measureDebugTime("WorldSimulator.fallables") {
+            displaceFallables(delta)
+        }
+        AppLoader.measureDebugTime("WorldSimulator.wires") {
+            simulateWires(delta)
+        }
 
         //printdbg(this, "============================")
     }
