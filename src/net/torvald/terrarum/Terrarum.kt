@@ -531,6 +531,8 @@ fun Int.abs() = this.absoluteValue
 fun Double.bipolarClamp(limit: Double) =
         this.coerceIn(-limit, limit)
 fun Boolean.toInt() = if (this) 1 else 0
+fun Int.bitCount() = java.lang.Integer.bitCount(this)
+fun Long.bitCount() = java.lang.Long.bitCount(this)
 
 
 fun absMax(left: Double, right: Double): Double {

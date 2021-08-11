@@ -46,11 +46,11 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
         sb.clear()
 
         Terrarum.ingame!!.world.getAllWiringGraph(mx, my)?.let {
-            it.forEachIndexed { index, (itemID, simCell) ->
+            it.forEach { (itemID, simCell) ->
                 if (sb.isNotEmpty()) sb.append('\n')
 
 
-                val connexionIcon = (simCell.con + 0xE0A0).toChar()
+                val connexionIcon = (simCell.connections + 0xE0A0).toChar()
                 val wireName = WireCodex[itemID].nameKey
 
                 val emit = simCell.emitState

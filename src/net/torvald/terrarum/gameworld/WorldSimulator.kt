@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.Input
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -476,58 +477,111 @@ object WorldSimulator {
     }
 
     private fun traverseWireGraph(world: GameWorld, fixture: FixtureBase, wireType: String, bbi: BlockBoxIndex) {
-        fixture.worldBlockPos?.let {
-            val branchesVisited = ArrayList<Point2i>()
-            val branchingStack = Stack<Point2i>()
-            val point = it + fixture.blockBoxIndexToPoint2i(bbi)
-            branchingStack.push(point.copy())
+        fixture.worldBlockPos?.let { sourceBlockPos ->
+            val branchesVisited = ArrayList<WireGraphCursor>()
+            val points = ArrayList<WireGraphCursor>() // a queue, enqueued at the end
+            var point = WireGraphCursor(sourceBlockPos + fixture.blockBoxIndexToPoint2i(bbi))
+            var terminate = false
 
-            while (branchingStack.isNotEmpty()) {
+            fun dequeue() {
+                points.removeAt(0)
+                if (points.size == 0) terminate = true
+                else point = points[0]
+            }
+
+            points.add(point.copy())
+
+            while (points.isNotEmpty() && !terminate) {
+                // break if there are no available wires underneath
+                if (world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.isEmpty() != false)
+                    break
+
+                printdbg(this, branchesVisited)
+
                 // get all wires that matches 'accepts' (such as Red/Green/Blue wire) and propagate signal for each of them
                 world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
+
                     world.getAllWiringGraph(point.x, point.y)?.get(wire)?.let { node ->
-                        val cnx = node.connections.toInt()
-                        when (wireConToStatus[cnx]) {
-                            WireConStatus.THRU -> {
-                                // TODO
-                            }
-                            WireConStatus.END    -> {
-                                // TODO
-                            }
-                            WireConStatus.BRANCH -> {
-                                // TODO
-                                branchingStack.push(point.copy())
+
+                        val signal = node.emitState
+                        val cnx = node.connections.toInt() // 1-15
+                        val nextDirBit = cnx and (15 - point.fromWhere) // cnx minus where the old cursur was; also 1-15
+                        printdbg(this, "(${point.x}, ${point.y}) from ${point.fromWhere} to $nextDirBit")
+
+                        // mark current position as visited
+                        branchesVisited.add(point.copy())
+
+                        // termination condition 1
+                        if (branchesVisited.linearSearch { it.x == point.x && it.y == point.y }!! < branchesVisited.lastIndex) {
+                            printdbg(this, "(${point.x}, ${point.y}) was already visited")
+                            dequeue()
+                        }
+                        else {
+
+                            when (nextDirBit.bitCount()) {
+                                in 4..64 -> { throw IllegalArgumentException("Bad nextDirBit: $nextDirBit") }
+                                // nowhere to go
+                                0 -> {
+                                    dequeue()
+                                }
+                                // only one direction to go
+                                1 -> {
+                                    // move the "cursor"
+                                    point.moveOneCell(nextDirBit)
+
+                                    // propagate the signal to next position
+                                    world.setWireEmitStateOf(point.x, point.y, wire, signal)
+                                }
+                                // two or three directions to go
+                                else -> {
+                                    return
+
+                                    // propagate the signal
+
+                                    // mark this branch
+                                    points.add(point.copy())
+
+                                    // move the "cursor" by try right, down, left then up
+
+                                }
                             }
                         }
                     }
                 }
-            }
+
+                printdbg(this, "Point = $point")
+            } // end While
+
+            printdbg(this, "------------------------------------------")
         }
     }
 
-    private enum class WireConStatus { THRU, END, BRANCH }
-    private val wireConToStatus = arrayOf(
-            WireConStatus.END, // 0000
-            WireConStatus.END, // 0001
-            WireConStatus.END, // 0010
-            WireConStatus.THRU,// 0011
-            WireConStatus.END, // 0100
-            WireConStatus.THRU,// 0101
-            WireConStatus.THRU,// 0110
-            WireConStatus.BRANCH,// 0111
-            WireConStatus.END, // 1000
-            WireConStatus.THRU,// 1001
-            WireConStatus.THRU,// 1010
-            WireConStatus.BRANCH,// 1011
-            WireConStatus.THRU,// 1100
-            WireConStatus.BRANCH,// 1101
-            WireConStatus.BRANCH,// 1110
-            WireConStatus.BRANCH // 1111
-    )
+    private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
+        return arrayOf(
+                Point2i(x + 1, y),
+                Point2i(x, y - 1),
+                Point2i(x - 1, y),
+                Point2i(x, y + 1) // don't know why but it doesn't work if I don't flip Y
+        )
+    }
 
-    data class WireGraphBranch(
-            val x: Int,
-            val y: Int,
-            val con: Byte
-    )
+    data class WireGraphCursor(
+            var x: Int,
+            var y: Int,
+            var fromWhere: Int, //1: right, 2: down, 4: left, 8: up, 0: *shrug*
+            var len: Int
+    ) {
+        constructor(point2i: Point2i): this(point2i.x, point2i.y, 0, 0)
+
+        fun moveOneCell(dir: Int) {
+            when (dir) {
+                1 -> { x += 1; fromWhere = 4 }
+                2 -> { y += 1; fromWhere = 8 }
+                4 -> { x -= 1; fromWhere = 1 }
+                8 -> { y -= 1; fromWhere = 2 }
+                else -> throw IllegalArgumentException("Unacceptable direction: $dir")
+            }
+            len += 1
+        }
+    }
 }
