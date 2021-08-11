@@ -636,7 +636,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         ingameController.update(delta)
 
         if (!paused) {
-
+            printdbg(this, "Clear tile change queues")
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
             wallChangeQueue.clear()
@@ -877,7 +877,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                     }
 
                     if (it is CuedByTerrainChange) {
+                        printdbg(this, "actor is CuedByTerrainChange: ${terrainChangeQueue}")
                         terrainChangeQueue.forEach { cue ->
+                            printdbg(this, "Ingame actors terrainChangeCue: ${cue}")
                             it.updateForWorldChange(cue)
                         }
                     }

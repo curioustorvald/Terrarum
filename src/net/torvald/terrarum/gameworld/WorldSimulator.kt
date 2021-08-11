@@ -496,7 +496,7 @@ object WorldSimulator {
                 if (world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.isEmpty() != false)
                     break
 
-                printdbg(this, branchesVisited)
+                //printdbg(this, branchesVisited)
 
                 // get all wires that matches 'accepts' (such as Red/Green/Blue wire) and propagate signal for each of them
                 world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
@@ -506,14 +506,14 @@ object WorldSimulator {
                         val signal = node.emitState
                         val cnx = node.connections.toInt() // 1-15
                         val nextDirBit = cnx and (15 - point.fromWhere) // cnx minus where the old cursur was; also 1-15
-                        printdbg(this, "(${point.x}, ${point.y}) from ${point.fromWhere} to $nextDirBit")
+                        //printdbg(this, "(${point.x}, ${point.y}) from ${point.fromWhere} to $nextDirBit")
 
                         // mark current position as visited
                         branchesVisited.add(point.copy())
 
                         // termination condition 1
                         if (branchesVisited.linearSearch { it.x == point.x && it.y == point.y }!! < branchesVisited.lastIndex) {
-                            printdbg(this, "(${point.x}, ${point.y}) was already visited")
+                            //printdbg(this, "(${point.x}, ${point.y}) was already visited")
                             dequeue()
                         }
                         else {
@@ -549,10 +549,10 @@ object WorldSimulator {
                     }
                 }
 
-                printdbg(this, "Point = $point")
+                //printdbg(this, "Point = $point")
             } // end While
 
-            printdbg(this, "------------------------------------------")
+            //printdbg(this, "------------------------------------------")
         }
     }
 

@@ -283,7 +283,7 @@ open class GameWorld : Disposable {
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
 
         if (!bypassEvent)
-            Terrarum.ingame?.queueWallChangedEvent(oldWall, itemID, LandUtil.getBlockAddr(this, x, y))
+            Terrarum.ingame?.queueWallChangedEvent(oldWall, itemID, x, y)
     }
 
     /**
@@ -313,7 +313,7 @@ open class GameWorld : Disposable {
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
         if (!bypassEvent)
-            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, LandUtil.getBlockAddr(this, x, y))
+            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, x, y)
     }
 
     fun setTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
@@ -328,7 +328,7 @@ open class GameWorld : Disposable {
         wirings[blockAddr]!!.wires.add(tile)
 
         if (!bypassEvent)
-            Terrarum.ingame?.queueWireChangedEvent(tile, false, LandUtil.getBlockAddr(this, x, y))
+            Terrarum.ingame?.queueWireChangedEvent(tile, false, x, y)
 
 
         // figure out wiring graphs

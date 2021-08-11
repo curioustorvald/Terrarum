@@ -40,7 +40,6 @@ object BlockBase {
         }
 
         // return false if the tile is already there
-        // FIXME doesn't work for WALLs?
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK &&
             gameItem.dynamicID == ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y) ||
             gameItem.inventoryCategory == GameItem.Category.WALL &&

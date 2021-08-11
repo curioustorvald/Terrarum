@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
@@ -53,7 +54,7 @@ open class FixtureBase(
     }
 
     fun forEachBlockbox(action: (Int, Int) -> Unit) {
-        worldBlockPos?.let { (posX, posY) ->
+        worldBlockPos!!.let { (posX, posY) ->
             for (y in posY until posY + blockBox.height) {
                 for (x in posX until posX + blockBox.width) {
                     action(x, y)
@@ -96,21 +97,24 @@ open class FixtureBase(
 
         if (hasCollision) return false
 
-
-        // fill the area with the filler blocks
-        forEachBlockbox { x, y ->
-                if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
-                    // if the collision type is allow_move_down, only the top surface tile should be "the platform"
-                    // lower part must not have such property (think of the table!)
-                    // TODO does this ACTUALLY work ?!
-                    world!!.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, false)
-                }
-                else
-                    world!!.setTileTerrain(x, y, blockBox.collisionType, false)
-        }
+        printdbg(this, "spawn ${nameFun()}")
 
         // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
+
+        // fill the area with the filler blocks
+        forEachBlockbox { x, y ->
+            printdbg(this, "fillerblock ${blockBox.collisionType} at ($x, $y)")
+            if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
+                // if the collision type is allow_move_down, only the top surface tile should be "the platform"
+                // lower part must not have such property (think of the table!)
+                // TODO does this ACTUALLY work ?!
+                world!!.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, false)
+            }
+            else
+                world!!.setTileTerrain(x, y, blockBox.collisionType, false)
+        }
+
 
         this.isVisible = true
         this.hitbox.setFromWidthHeight(posX * TILE_SIZED, posY * TILE_SIZED, blockBox.width * TILE_SIZED, blockBox.height * TILE_SIZED)
@@ -148,6 +152,7 @@ open class FixtureBase(
      * E.g. if a fixture block that is inside of BlockBox is missing, destroy and drop self.
      */
     override fun updateForWorldChange(cue: IngameInstance.BlockChangeQueueItem) {
+        printdbg(this, "updateForWorldChange ${nameFun()}")
         // check for marker blocks.
         // if at least one of them is missing, destroy all the markers and drop self as an item
 

@@ -70,9 +70,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
-    protected val terrainChangeQueue = Queue<BlockChangeQueueItem>()
-    protected val wallChangeQueue = Queue<BlockChangeQueueItem>()
-    protected val wireChangeQueue = Queue<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
+    // FIXME queues will not work; input processing (blocks will queue) and queue consuming cannot be synchronised
+    protected val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
+    protected val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
+    protected val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     override fun hide() {
     }
@@ -151,17 +152,16 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      *
      * Queueing schema is used to make sure things are synchronised.
      */
-    open fun queueTerrainChangedEvent(old: ItemID, new: ItemID, position: Long) {
-        val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        terrainChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
+    open fun queueTerrainChangedEvent(old: ItemID, new: ItemID, x: Int, y: Int) {
+        printdbg(this, "Terrain change enqueued: ${BlockChangeQueueItem(old, new, x, y)}")
+        printdbg(this, terrainChangeQueue)
     }
 
     /**
      * Wall version of terrainChanged() event
      */
-    open fun queueWallChangedEvent(old: ItemID, new: ItemID, position: Long) {
-        val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wallChangeQueue.addLast(BlockChangeQueueItem(old, new, x, y))
+    open fun queueWallChangedEvent(old: ItemID, new: ItemID, x: Int, y: Int) {
+        wallChangeQueue.add(BlockChangeQueueItem(old, new, x, y))
     }
 
     /**
@@ -170,9 +170,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * @param old previous settings of conduits in bit set format.
      * @param new current settings of conduits in bit set format.
      */
-    open fun queueWireChangedEvent(wire: ItemID, isRemoval: Boolean, position: Long) {
-        val (x, y) = LandUtil.resolveBlockAddr(world, position)
-        wireChangeQueue.addLast(BlockChangeQueueItem(if (isRemoval) wire else "", if (isRemoval) "" else wire, x, y))
+    open fun queueWireChangedEvent(wire: ItemID, isRemoval: Boolean, x: Int, y: Int) {
+        wireChangeQueue.add(BlockChangeQueueItem(if (isRemoval) wire else "", if (isRemoval) "" else wire, x, y))
     }
 
 
