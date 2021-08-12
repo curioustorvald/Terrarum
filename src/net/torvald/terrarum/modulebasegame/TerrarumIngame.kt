@@ -589,6 +589,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (!paused) {
 
+            //hypothetical_input_capturing_function_if_you_finally_decided_to_forgo_gdx_input_processor_and_implement_your_own_to_synchronise_everything()
+
             WorldSimulator.resetForThisFrame()
 
             ///////////////////////////
@@ -635,13 +637,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // world click events (e.g. opening the UI that a fixture has) must go here
         ingameController.update(delta)
 
-        if (!paused) {
-            printdbg(this, "Clear tile change queues")
+        /*if (!paused) {
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
             wallChangeQueue.clear()
             wireChangeQueue.clear()
-        }
+        }*/
 
 
         ////////////////////////
@@ -876,13 +877,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                         }
                     }
 
-                    if (it is CuedByTerrainChange) {
+                    /*if (it is CuedByTerrainChange) {
                         printdbg(this, "actor is CuedByTerrainChange: ${terrainChangeQueue}")
                         terrainChangeQueue.forEach { cue ->
                             printdbg(this, "Ingame actors terrainChangeCue: ${cue}")
                             it.updateForWorldChange(cue)
                         }
-                    }
+                    }*/
                 }
             }
             actorNowPlaying?.update(delta)

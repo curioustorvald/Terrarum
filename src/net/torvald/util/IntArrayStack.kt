@@ -18,6 +18,9 @@ class IntArrayStack {
 
     private lateinit var data: IntArray
 
+    fun isEmpty() = depth == 0
+    fun isNotEmpty() = depth > 0
+
     constructor(stackSize: Int) {
         data = IntArray(stackSize)
     }

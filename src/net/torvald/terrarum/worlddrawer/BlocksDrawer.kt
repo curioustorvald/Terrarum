@@ -264,7 +264,7 @@ internal object BlocksDrawer {
     }
 
     /**
-     * Writes to buffer. Actual draw code must be called after this operation.
+     * Autotiling; writes to buffer. Actual draw code must be called after this operation.
      *
      * @param drawModeTilesBlendMul If current drawing mode is MULTIPLY. Doesn't matter if mode is FLUID.
      * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.

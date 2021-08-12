@@ -145,18 +145,8 @@ open class FixtureBase(
         this.isVisible = false
     }
 
-    /**
-     * Fired by world's BlockChanged event (fired when blocks are placed/removed).
-     * The flooding check must run on every frame. use updateSelf() for that.
-     *
-     * E.g. if a fixture block that is inside of BlockBox is missing, destroy and drop self.
-     */
-    override fun updateForWorldChange(cue: IngameInstance.BlockChangeQueueItem) {
-        printdbg(this, "updateForWorldChange ${nameFun()}")
-        // check for marker blocks.
-        // if at least one of them is missing, destroy all the markers and drop self as an item
-
-        // you need to implement Dropped Item first to satisfyingly implement this function
+    override fun update(delta: Float) {
+        super.update(delta)
 
         val posX = worldBlockPos!!.x
         val posY = worldBlockPos!!.y
@@ -182,9 +172,10 @@ open class FixtureBase(
             }
 
             // TODO drop self as an item (instance of DroppedItem)
-            
+
         }
     }
+
 }
 
 interface CuedByTerrainChange {
@@ -194,7 +185,7 @@ interface CuedByTerrainChange {
      *
      * E.g. if a fixture block that is inside of BlockBox is missing, destroy and drop self.
      */
-    fun updateForWorldChange(cue: IngameInstance.BlockChangeQueueItem)
+    //fun updateForWorldChange(cue: IngameInstance.BlockChangeQueueItem)
 }
 
 /**

@@ -16,6 +16,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBoxIndex
 import net.torvald.terrarum.modulebasegame.gameactors.Electric
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.util.IntArrayStack
+import org.dyn4j.geometry.Vector2
 import org.khelekore.prtree.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -200,44 +202,38 @@ object WorldSimulator {
         // displace fallables (TODO implement blocks with fallable supports e.g. scaffolding)
         // only displace SINGLE BOTTOMMOST block on single X-coord (this doesn't mean they must fall only one block)
         // so that the "falling" should be visible to the end user
-        if (!DEBUG_STEPPING_MODE || DEBUG_STEPPING_MODE && KeyToggler.isOn (Input.Keys.PERIOD)) {
-            for (x in updateXFrom..updateXTo) {
-                var fallDownCounter = 0
-                var fallableStackProcessed = false
-                // one "stack" is a contiguous fallable blocks, regardless of the actual block number
-                // when you are simulating the gradual falling, it is natural to process all the "stacks" at the same run,
-                // otherwise you'll get an artefact.
-                for (y in updateYTo downTo updateYFrom) {
-                    val currentTile = world.getTileFromTerrain(x, y)
-                    val prop = BlockCodex[currentTile]
-                    val isAir = currentTile == Block.AIR
-                    val support = prop.maxSupport
-                    val isFallable = support != -1
+        for (x in updateXFrom..updateXTo) {
+            var fallDownCounter = 0
+            var fallableStackProcessed = false
+            // one "stack" is a contiguous fallable blocks, regardless of the actual block number
+            // when you are simulating the gradual falling, it is natural to process all the "stacks" at the same run,
+            // otherwise you'll get an artefact.
+            for (y in updateYTo downTo updateYFrom) {
+                val currentTile = world.getTileFromTerrain(x, y)
+                val prop = BlockCodex[currentTile]
+                val isAir = currentTile == Block.AIR
+                val support = prop.maxSupport
+                val isFallable = support != -1
 
-                    // mark the beginnig of the new "stack"
-                    if (fallableStackProcessed && !isFallable) {
-                        fallableStackProcessed = false
-                    } // do not chain with "else if"
+                // mark the beginnig of the new "stack"
+                if (fallableStackProcessed && !isFallable) {
+                    fallableStackProcessed = false
+                } // do not chain with "else if"
 
-                    // process the gradual falling of the selected "stack"
-                    if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
-                        // replace blocks
-                        world.setTileTerrain(x, y, Block.AIR, true)
-                        world.setTileTerrain(x, y + fallDownCounter, currentTile, true)
+                // process the gradual falling of the selected "stack"
+                if (!fallableStackProcessed && fallDownCounter != 0 && isFallable) {
+                    // replace blocks
+                    world.setTileTerrain(x, y, Block.AIR, true)
+                    world.setTileTerrain(x, y + fallDownCounter, currentTile, true)
 
-                        fallableStackProcessed = true
-                    }
-                    else if (!isAir) {
-                        fallDownCounter = 0
-                    }
-                    else if (!isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
-                        fallDownCounter += 1
-                    }
+                    fallableStackProcessed = true
                 }
-            }
-
-            if (DEBUG_STEPPING_MODE) {
-                KeyToggler.forceSet(Input.Keys.PERIOD, false)
+                else if (!isAir) {
+                    fallDownCounter = 0
+                }
+                else if (!isFallable && fallDownCounter < FALLABLE_MAX_FALL_SPEED) {
+                    fallDownCounter += 1
+                }
             }
         }
 
@@ -491,9 +487,14 @@ object WorldSimulator {
             var terminate = false
 
             fun dequeue() {
+                //printdbg(this, "points before deq: $points")
                 points.removeAt(0)
+                //printdbg(this, "points after deq: $points")
                 if (points.size == 0) terminate = true
-                else point = points[0]
+                else {
+                    point = points[0]
+                    //printdbg(this, "new point: $point")
+                }
             }
 
             points.add(point.copy())
@@ -510,7 +511,7 @@ object WorldSimulator {
 
                     world.getAllWiringGraph(point.x, point.y)?.get(wire)?.let { node ->
 
-                        val signal = node.emitState
+                        val signal = Vector2(1.0, 0.0)//node.emitState // FIXME branching wires somehow fetches wrong signal value
                         val cnx = node.connections.toInt() // 1-15
                         val nextDirBit = cnx and (15 - point.fromWhere) // cnx minus where the old cursur was; also 1-15
                         //printdbg(this, "(${point.x}, ${point.y}) from ${point.fromWhere} to $nextDirBit")
@@ -526,7 +527,7 @@ object WorldSimulator {
                         else {
 
                             when (nextDirBit.bitCount()) {
-                                in 4..64 -> { throw IllegalArgumentException("Bad nextDirBit: $nextDirBit") }
+                                in 5..64 -> { throw IllegalArgumentException("Bad nextDirBit: $nextDirBit") }
                                 // nowhere to go
                                 0 -> {
                                     dequeue()
@@ -539,17 +540,35 @@ object WorldSimulator {
                                     // propagate the signal to next position
                                     world.setWireEmitStateOf(point.x, point.y, wire, signal)
                                 }
-                                // two or three directions to go
+                                // two, three or four (starting point only) directions to go
                                 else -> {
-                                    return
-
-                                    // propagate the signal
-
                                     // mark this branch
-                                    points.add(point.copy())
+                                    //branchesVisited.add(point.copy())
 
-                                    // move the "cursor" by try right, down, left then up
+                                    // spawn and move the "cursor" by try right, down, left then up
+                                    val movableDirs = IntArrayStack(4)
+                                    for (s in 3 downTo 0) { // so that top of the stack holds lowest of the direction-number
+                                        (nextDirBit and (1 shl s)).let {
+                                            if (it != 0) movableDirs.push(it)
+                                        }
+                                    }
+                                    //printdbg(this, movableDirs.depth) // stack size is correct..?
+                                    // take top of the stack as mine
+                                    val mine = movableDirs.pop()
 
+                                    while (movableDirs.isNotEmpty()) {
+                                        // obviously 'point' must not me altered beforehand
+                                        movableDirs.pop().let { dir ->
+                                            points.add(point.copy().moveOneCell(dir))
+                                        }
+                                    }
+                                    //printdbg(this, points) // and points are also correct...
+
+                                    // finally move the cursor of mine
+                                    point.moveOneCell(mine)
+
+                                    // propagate the signal to next position
+                                    world.setWireEmitStateOf(point.x, point.y, wire, signal)
                                 }
                             }
                         }
@@ -562,6 +581,11 @@ object WorldSimulator {
             //printdbg(this, "------------------------------------------")
         }
     }
+
+    private const val RIGHT = 1
+    private const val DOWN = 2
+    private const val LEFT = 4
+    private const val UP = 8
 
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
         return arrayOf(
@@ -580,15 +604,17 @@ object WorldSimulator {
     ) {
         constructor(point2i: Point2i): this(point2i.x, point2i.y, 0, 0)
 
-        fun moveOneCell(dir: Int) {
+        fun moveOneCell(dir: Int): WireGraphCursor {
             when (dir) {
-                1 -> { x += 1; fromWhere = 4 }
-                2 -> { y += 1; fromWhere = 8 }
-                4 -> { x -= 1; fromWhere = 1 }
-                8 -> { y -= 1; fromWhere = 2 }
+                1 -> { x += 1; fromWhere = LEFT }
+                2 -> { y += 1; fromWhere = UP }
+                4 -> { x -= 1; fromWhere = RIGHT }
+                8 -> { y -= 1; fromWhere = DOWN }
                 else -> throw IllegalArgumentException("Unacceptable direction: $dir")
             }
             len += 1
+
+            return this
         }
     }
 }
