@@ -35,11 +35,13 @@ class FixtureLogicSignalEmitter(nameFun: () -> String)
 
     override fun update(delta: Float) {
         // set emit
-        worldBlockPos?.let { (x, y) ->
+        /*worldBlockPos?.let { (x, y) ->
             WireCodex.getAll().filter { it.accepts == "digital_bit" }.forEach { prop ->
-                world?.setWireEmitStateOf(x, y, prop.id, wireEmission[0]!!)
+                // only set a state of wire that actually exists on the world
+                if (world?.getWireGraphOf(x, y, prop.id) != null)
+                    world?.setWireEmitStateOf(x, y, prop.id, wireEmission[0]!!)
             }
-        }
+        }*/
     }
 }
 

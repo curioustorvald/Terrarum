@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -21,6 +22,7 @@ import org.dyn4j.geometry.Vector2
 import org.khelekore.prtree.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.experimental.and
 import kotlin.math.roundToInt
 
 /**
@@ -480,105 +482,55 @@ object WorldSimulator {
     }
 
     private fun traverseWireGraph(world: GameWorld, fixture: FixtureBase, wireType: String, bbi: BlockBoxIndex) {
-        fixture.worldBlockPos?.let { sourceBlockPos ->
-            val branchesVisited = ArrayList<WireGraphCursor>()
-            val points = ArrayList<WireGraphCursor>() // a queue, enqueued at the end
-            var point = WireGraphCursor(sourceBlockPos + fixture.blockBoxIndexToPoint2i(bbi))
-            var terminate = false
 
-            fun dequeue() {
-                //printdbg(this, "points before deq: $points")
-                points.removeAt(0)
-                //printdbg(this, "points after deq: $points")
-                if (points.size == 0) terminate = true
-                else {
-                    point = points[0]
-                    //printdbg(this, "new point: $point")
-                }
+        fun getAdjacent(cnx: Int, point: WireGraphCursor): List<WireGraphCursor> {
+            val r = ArrayList<WireGraphCursor>()
+            for (dir in intArrayOf(RIGHT,DOWN,LEFT,UP)) {
+                if (cnx and dir != 0) r.add(point.copy().moveOneCell(dir))
             }
+            return r
+        }
 
-            points.add(point.copy())
+        fixture.worldBlockPos?.let { sourceBlockPos ->
 
-            while (points.isNotEmpty() && !terminate) {
-                // break if there are no available wires underneath
-                if (world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.isEmpty() != false)
-                    break
+            val signal = (fixture as Electric).wireEmission[bbi] ?: Vector2(0.0, 0.0)
+            var point = WireGraphCursor(sourceBlockPos + fixture.blockBoxIndexToPoint2i(bbi))
 
-                //printdbg(this, branchesVisited)
+            world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
+                // this makes sure that only the emitters with wires installed will get traversed
+                world.getWireGraphOf(point.x, point.y, wire)?.let { _ ->
+                    printdbg(this, wire)
+                    
+                    val points = Queue<WireGraphCursor>() // a queue, enqueued at the end
+                    var marked = HashSet<Long>()
 
-                // get all wires that matches 'accepts' (such as Red/Green/Blue wire) and propagate signal for each of them
-                world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
+                    fun mark(point: WireGraphCursor) {
+                        marked.add(point.longHash())
+                        // do some signal action
+                        world.setWireEmitStateOf(point.x, point.y, wire, signal)
+                    }
 
-                    world.getAllWiringGraph(point.x, point.y)?.get(wire)?.let { node ->
+                    fun isMarked(point: WireGraphCursor) = marked.contains(point.longHash())
+                    fun enq(point: WireGraphCursor) = points.addFirst(point.copy())
+                    fun deq() = points.removeLast()
 
-                        val signal = Vector2(1.0, 0.0)//node.emitState // FIXME branching wires somehow fetches wrong signal value
-                        val cnx = node.connections.toInt() // 1-15
-                        val nextDirBit = cnx and (15 - point.fromWhere) // cnx minus where the old cursur was; also 1-15
-                        //printdbg(this, "(${point.x}, ${point.y}) from ${point.fromWhere} to $nextDirBit")
+                    enq(point)
+                    mark(point)
 
-                        // mark current position as visited
-                        branchesVisited.add(point.copy())
-
-                        // termination condition 1
-                        if (branchesVisited.linearSearch { it.x == point.x && it.y == point.y }!! < branchesVisited.lastIndex) {
-                            //printdbg(this, "(${point.x}, ${point.y}) was already visited")
-                            dequeue()
-                        }
-                        else {
-
-                            when (nextDirBit.bitCount()) {
-                                in 5..64 -> { throw IllegalArgumentException("Bad nextDirBit: $nextDirBit") }
-                                // nowhere to go
-                                0 -> {
-                                    dequeue()
-                                }
-                                // only one direction to go
-                                1 -> {
-                                    // move the "cursor"
-                                    point.moveOneCell(nextDirBit)
-
-                                    // propagate the signal to next position
-                                    world.setWireEmitStateOf(point.x, point.y, wire, signal)
-                                }
-                                // two, three or four (starting point only) directions to go
-                                else -> {
-                                    // mark this branch
-                                    //branchesVisited.add(point.copy())
-
-                                    // spawn and move the "cursor" by try right, down, left then up
-                                    val movableDirs = IntArrayStack(4)
-                                    for (s in 3 downTo 0) { // so that top of the stack holds lowest of the direction-number
-                                        (nextDirBit and (1 shl s)).let {
-                                            if (it != 0) movableDirs.push(it)
-                                        }
-                                    }
-                                    //printdbg(this, movableDirs.depth) // stack size is correct..?
-                                    // take top of the stack as mine
-                                    val mine = movableDirs.pop()
-
-                                    while (movableDirs.isNotEmpty()) {
-                                        // obviously 'point' must not me altered beforehand
-                                        movableDirs.pop().let { dir ->
-                                            points.add(point.copy().moveOneCell(dir))
-                                        }
-                                    }
-                                    //printdbg(this, points) // and points are also correct...
-
-                                    // finally move the cursor of mine
-                                    point.moveOneCell(mine)
-
-                                    // propagate the signal to next position
-                                    world.setWireEmitStateOf(point.x, point.y, wire, signal)
-                                }
+                    while (points.notEmpty()) {
+                        point = deq()
+                        // TODO if we found a power receiver, do something to it
+                        for (x in getAdjacent(world.getWireGraphOf(point.x, point.y, wire)!!, point)) {
+                            if (!isMarked(x)) {
+                                mark(x)
+                                enq(x)
                             }
                         }
                     }
                 }
+            }
 
-                //printdbg(this, "Point = $point")
-            } // end While
-
-            //printdbg(this, "------------------------------------------")
+            printdbg(this, "------------------------------------------")
         }
     }
 
@@ -616,5 +568,7 @@ object WorldSimulator {
 
             return this
         }
+
+        fun longHash() = x.toLong().shl(32) or y.toLong()
     }
 }

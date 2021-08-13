@@ -78,8 +78,8 @@ open class GameWorld : Disposable {
     private val wirings: HashMap<BlockAddress, WiringNode>
 
     private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
-    private val WIRE_POS_MAP = byteArrayOf(1,2,4,8)
-    private val WIRE_ANTIPOS_MAP = byteArrayOf(4,8,1,2)
+    private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
+    private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)
 
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
@@ -334,11 +334,11 @@ open class GameWorld : Disposable {
         // figure out wiring graphs
         val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
             (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index
-        }.sum().toByte()
+        }.sum()
         // setup graph of mine
         setWireGraphOfUnsafe(blockAddr, tile, matchingNeighbours)
         // setup graph for neighbours
-        for (i in 0.toByte() .. 3.toByte()) {
+        for (i in 0..3) {
             if (matchingNeighbours and WIRE_POS_MAP[i] > 0) {
                 val (tx, ty) = WireActor.WIRE_NEARBY[i]
                 val old = getWireGraphOf(x + tx, y + ty, tile) ?: 0
@@ -347,13 +347,13 @@ open class GameWorld : Disposable {
         }
     }
 
-    fun getWireGraphOf(x: Int, y: Int, itemID: ItemID): Byte? {
+    fun getWireGraphOf(x: Int, y: Int, itemID: ItemID): Int? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         return getWireGraphUnsafe(blockAddr, itemID)
     }
 
-    fun getWireGraphUnsafe(blockAddr: BlockAddress, itemID: ItemID): Byte? {
+    fun getWireGraphUnsafe(blockAddr: BlockAddress, itemID: ItemID): Int? {
         return wiringGraph[blockAddr]?.get(itemID)?.connections
     }
 
@@ -377,19 +377,19 @@ open class GameWorld : Disposable {
         return wiringGraph[blockAddr]?.get(itemID)?.recvStates
     }
 
-    fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, byte: Byte) {
+    fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, cnx: Int) {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
-        return setWireGraphOfUnsafe(blockAddr, itemID, byte)
+        return setWireGraphOfUnsafe(blockAddr, itemID, cnx)
     }
 
-    fun setWireGraphOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, byte: Byte) {
+    fun setWireGraphOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, cnx: Int) {
         if (wiringGraph[blockAddr] == null)
             wiringGraph[blockAddr] = HashMap()
         if (wiringGraph[blockAddr]!![itemID] == null)
-            wiringGraph[blockAddr]!![itemID] = WiringSimCell(byte)
+            wiringGraph[blockAddr]!![itemID] = WiringSimCell(cnx)
 
-        wiringGraph[blockAddr]!![itemID]!!.connections = byte
+        wiringGraph[blockAddr]!![itemID]!!.connections = cnx
     }
 
     fun setWireEmitStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
@@ -647,7 +647,7 @@ open class GameWorld : Disposable {
      * These values must be updated by none other than [WorldSimulator]()
      */
     data class WiringSimCell(
-            var connections: Byte = 0, // connections
+            var connections: Int = 0, // connections
             var emitState: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
             var recvStates: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
     )
