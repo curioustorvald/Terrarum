@@ -39,11 +39,11 @@ object MaterialCodex {
 
             records.forEach {
                 val prop = Material()
-                prop.strength = intVal(it, "tens")
-                prop.density = intVal(it, "dsty")
-                prop.forceMod = intVal(it, "fmod")
-                prop.enduranceMod = floatVal(it, "endurance")
-                prop.thermalConductivity = floatVal(it, "tcond")
+                prop.strength = it.intVal("tens")
+                prop.density = it.intVal("dsty")
+                prop.forceMod = it.intVal("fmod")
+                prop.enduranceMod = it.floatVal("endurance")
+                prop.thermalConductivity = it.floatVal("tcond")
                 prop.identifier = it.get("idst").toUpperCase()
 
                 materialProps[prop.identifier] = prop

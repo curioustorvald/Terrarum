@@ -56,15 +56,15 @@ object BlockCodex {
             AppLoader.printmsg(this, "Building block properties table")
 
             records.forEach {
-                /*if (intVal(it, "id") == -1) {
+                /*if (it.intVal("id") == -1) {
                     setProp(nullProp, it)
                 }
                 else {
-                    setProp(blockProps[intVal(it, "id")], it)
+                    setProp(blockProps[it.intVal("id")], it)
                 }*/
 
-                setProp(module, intVal(it, "id"), it)
-                val tileId = "$module:${intVal(it, "id")}"
+                setProp(module, it.intVal("id"), it)
+                val tileId = "$module:${it.intVal("id")}"
 
                 // register tiles with dynamic light
                 if ((blockProps[tileId]?.dynamicLuminosityFunction ?: 0) != 0) {
@@ -157,36 +157,36 @@ object BlockCodex {
 
         prop.id = "$modname:$key"
         prop.numericID = key
-        prop.drop = "$modname:${intVal(record, "drop")}"
+        prop.drop = "$modname:${record.intVal("drop")}"
 
-        prop.shadeColR = floatVal(record, "shdr")
-        prop.shadeColG = floatVal(record, "shdg")
-        prop.shadeColB = floatVal(record, "shdb")
-        prop.shadeColA = floatVal(record, "shduv")
+        prop.shadeColR = record.floatVal("shdr")
+        prop.shadeColG = record.floatVal("shdg")
+        prop.shadeColB = record.floatVal("shdb")
+        prop.shadeColA = record.floatVal("shduv")
         prop.opacity = Cvec(prop.shadeColR, prop.shadeColG, prop.shadeColB, prop.shadeColA)
 
-        prop.strength = intVal(record, "str")
-        prop.density = intVal(record, "dsty")
+        prop.strength = record.intVal("str")
+        prop.density = record.intVal("dsty")
 
-        prop.baseLumColR = floatVal(record, "lumr")
-        prop.baseLumColG = floatVal(record, "lumg")
-        prop.baseLumColB = floatVal(record, "lumb")
-        prop.baseLumColA = floatVal(record, "lumuv")
+        prop.baseLumColR = record.floatVal("lumr")
+        prop.baseLumColG = record.floatVal("lumg")
+        prop.baseLumColB = record.floatVal("lumb")
+        prop.baseLumColA = record.floatVal("lumuv")
         prop.baseLumCol.set(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
 
-        prop.friction = intVal(record, "fr")
-        prop.viscosity = intVal(record, "vscs")
-        prop.colour = str16ToInt(record, "colour")
+        prop.friction = record.intVal("fr")
+        prop.viscosity = record.intVal("vscs")
+        prop.colour = record.str16ToInt("colour")
 
-        //prop.isFluid = boolVal(record, "fluid")
-        prop.isSolid = boolVal(record, "solid")
-        //prop.isClear = boolVal(record, "clear")
-        prop.isPlatform = boolVal(record, "plat")
-        prop.isWallable = boolVal(record, "wall")
-        prop.maxSupport = intVal(record, "grav")
-        prop.isVertFriction = boolVal(record, "fv")
+        //prop.isFluid = record.boolVal("fluid")
+        prop.isSolid = record.boolVal("solid")
+        //prop.isClear = record.boolVal("clear")
+        prop.isPlatform = record.boolVal("plat")
+        prop.isWallable = record.boolVal("wall")
+        prop.maxSupport = record.intVal("grav")
+        prop.isVertFriction = record.boolVal("fv")
 
-        prop.dynamicLuminosityFunction = intVal(record, "dlfn")
+        prop.dynamicLuminosityFunction = record.intVal("dlfn")
 
         blockProps[prop.id] = prop
 
@@ -194,10 +194,10 @@ object BlockCodex {
     }
 }
 
-fun str16ToInt(rec: CSVRecord, s: String): Int {
+fun CSVRecord.str16ToInt(s: String): Int {
     var ret = 0
     try {
-        ret = rec.get(s).toLong(16).toInt()
+        ret = this.get(s).toLong(16).toInt()
     }
     catch (e: NumberFormatException) {
     }
@@ -209,10 +209,10 @@ fun str16ToInt(rec: CSVRecord, s: String): Int {
     return ret
 }
 
-fun intVal(rec: CSVRecord, s: String): Int {
+fun CSVRecord.intVal(s: String): Int {
     var ret = -1
     try {
-        ret = rec.get(s).toInt()
+        ret = this.get(s).toInt()
     }
     catch (e: NumberFormatException) {
     }
@@ -224,10 +224,10 @@ fun intVal(rec: CSVRecord, s: String): Int {
     return ret
 }
 
-fun floatVal(rec: CSVRecord, s: String): Float {
+fun CSVRecord.floatVal(s: String): Float {
     var ret = -1f
     try {
-        ret = rec.get(s).toFloat()
+        ret = this.get(s).toFloat()
     }
     catch (e: NumberFormatException) {
     }
@@ -239,4 +239,4 @@ fun floatVal(rec: CSVRecord, s: String): Float {
     return ret
 }
 
-fun boolVal(rec: CSVRecord, s: String) = intVal(rec, s) != 0
+fun CSVRecord.boolVal(s: String) = this.intVal(s) != 0

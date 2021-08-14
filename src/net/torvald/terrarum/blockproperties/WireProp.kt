@@ -17,4 +17,6 @@ class WireProp {
     var inputType: String = ""
     var outputType: String = ""
 
+    var canBranch: Boolean = true
+
 }

@@ -35,7 +35,7 @@ object WireCodex {
 
 
             records.forEach {
-                WireCodex.setProp(module, intVal(it, "id"), it)
+                WireCodex.setProp(module, it.intVal("id"), it)
             }
 
             AppLoader.printmsg(this, "Registering wire textures into the resource pool")
@@ -107,9 +107,10 @@ object WireCodex {
         prop.numericID = key
         prop.renderClass = record.get("renderclass")
         prop.accepts = record.get("accept")
-        prop.inputCount = intVal(record, "inputcount")
+        prop.inputCount = record.intVal("inputcount")
         prop.inputType = record.get("inputtype") ?: prop.accepts
         prop.outputType = record.get("outputtype") ?: prop.accepts
+        prop.canBranch = record.boolVal("branching")
 
         WireCodex.wireProps[prop.id] = prop
 
