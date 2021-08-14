@@ -68,6 +68,7 @@ object LightmapRenderer {
 
     const val overscan_open: Int = 40
     const val overscan_opaque: Int = 10
+    const val LIGHTMAP_OVERRENDER = 8
 
     private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
     private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
@@ -160,16 +161,16 @@ object LightmapRenderer {
 
         for_x_start = WorldCamera.zoomedX / TILE_SIZE // fix for premature lightmap rendering
         for_y_start = WorldCamera.zoomedY / TILE_SIZE // on topmost/leftmost side
-        for_draw_x_start = WorldCamera.x / TILE_SIZE
-        for_draw_y_start = WorldCamera.y / TILE_SIZE
+        for_draw_x_start = WorldCamera.x / TILE_SIZE - LIGHTMAP_OVERRENDER
+        for_draw_y_start = WorldCamera.y / TILE_SIZE - LIGHTMAP_OVERRENDER
 
         if (WorldCamera.x < 0) for_draw_x_start -= 1 // edge case fix that light shift 1 tile to the left when WorldCamera.x < 0
         //if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_draw_x_start -= 1 // another edge-case fix; we don't need this anymore?
 
         for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 3 // same fix as above
-        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3
-        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3
+        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 1 + LIGHTMAP_OVERRENDER
+        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 1 + LIGHTMAP_OVERRENDER
 
         camX = WorldCamera.x / TILE_SIZE
         camY = WorldCamera.y / TILE_SIZE
@@ -179,20 +180,6 @@ object LightmapRenderer {
         AppLoader.measureDebugTime("Renderer.Lanterns") {
             buildLanternmap(actorContainers)
         } // usually takes 3000 ns
-
-        /*
-         * Updating order:
-         * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
-         * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
-         * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
-         * |  |1    |   |  |1    |   |    1|  |   |    1|  |
-         * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
-         * |  |    3|   |↗       |   |       ↖|   |3    |  |
-         * `--+-----'   `--------'   `--------'   `-----+--'
-         * round:   1            2            3            4
-         * for all lightmap[y][x], run in this order: 2-3-4-1
-         *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
-         */
 
         // set sunlight
         sunLight.set(world.globalLight)
@@ -754,8 +741,8 @@ object LightmapRenderer {
 
         // copied from BlocksDrawer, duh!
         // FIXME 'lightBuffer' is not zoomable in this way
-        val tilesInHorizontal = (AppLoader.screenSize.screenWf / TILE_SIZE).ceilInt() + 1
-        val tilesInVertical = (AppLoader.screenSize.screenHf / TILE_SIZE).ceilInt() + 1
+        val tilesInHorizontal = (AppLoader.screenSize.screenWf / TILE_SIZE).ceilInt() + 1 + LIGHTMAP_OVERRENDER * 2
+        val tilesInVertical = (AppLoader.screenSize.screenHf / TILE_SIZE).ceilInt() + 1 + LIGHTMAP_OVERRENDER * 2
 
         LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenW).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
         LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(AppLoader.screenSize.screenH).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3

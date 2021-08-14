@@ -752,6 +752,6 @@ object IngameRenderer : Disposable {
         val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF) - (xoff * TILE_SIZEF)
         val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF) - (yoff * TILE_SIZEF)
 
-        return xrem to yrem
+        return (xrem - LightmapRenderer.LIGHTMAP_OVERRENDER * TILE_SIZEF) to (yrem - LightmapRenderer.LIGHTMAP_OVERRENDER * TILE_SIZEF)
     }
 }
