@@ -206,7 +206,7 @@ object IngameRenderer : Disposable {
         if (!gamePaused) {
             measureDebugTime("Renderer.ApparentLightRun") {
                 // recalculate for even frames, or if the sign of the cam-x changed
-                if (AppLoader.GLOBAL_RENDER_TIMER % 2 == 0 || WorldCamera.x * oldCamX < 0)
+                if (AppLoader.GLOBAL_RENDER_TIMER % 3 == 0 || WorldCamera.x * oldCamX < 0)
                     LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
                 oldCamX = WorldCamera.x
