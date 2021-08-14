@@ -38,6 +38,7 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.ArrayListMap;
+import net.torvald.util.DebugTimers;
 import org.lwjgl.opengl.GL11;
 
 import java.io.File;
@@ -205,7 +206,7 @@ public class AppLoader implements ApplicationListener {
     public static int GLOBAL_RENDER_TIMER = new Random().nextInt(1020) + 1;
 
 
-    public static ArrayListMap debugTimers = new ArrayListMap<String, Long>();
+    public static DebugTimers debugTimers = new DebugTimers();
 
 
     public static final String FONT_DIR = "assets/graphics/fonts/terrarum-sans-bitmap";

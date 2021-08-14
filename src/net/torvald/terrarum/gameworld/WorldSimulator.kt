@@ -500,7 +500,7 @@ object WorldSimulator {
                 // this makes sure that only the emitters with wires installed will get traversed
                 world.getWireGraphOf(point.x, point.y, wire)?.let { _ ->
                     printdbg(this, wire)
-                    
+
                     val points = Queue<WireGraphCursor>() // a queue, enqueued at the end
                     var marked = HashSet<Long>()
 

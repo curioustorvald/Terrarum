@@ -38,6 +38,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import net.torvald.util.SortedArrayList
@@ -630,7 +631,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // TODO thread pool(?)
             CollisionSolver.process()
 
-            WorldCamera.update(gameworld, actorNowPlaying)
+            //WorldCamera.update(gameworld, actorNowPlaying)
 
         }
 
@@ -664,6 +665,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun renderGame() {
         Gdx.graphics.setTitle(getCanonicalTitle())
+
+        WorldCamera.update(gameworld, actorNowPlaying)
 
         measureDebugTime("Ingame.FilterVisibleActors") {
             filterVisibleActors()

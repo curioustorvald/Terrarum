@@ -235,6 +235,9 @@ class BasicDebugInfoWindow : UICanvas() {
         // FPS count
         AppLoader.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
                 (AppLoader.screenSize.screenW - 3 - 15 * TinyAlphNum.W).toFloat(), line(2))
+        // global render counter
+        AppLoader.fontSmallNumbers.draw(batch, "${ccO}${AppLoader.GLOBAL_RENDER_TIMER.toString().padStart(10, ' ')}",
+                (AppLoader.screenSize.screenW - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
 
         /**
          * Bottom left

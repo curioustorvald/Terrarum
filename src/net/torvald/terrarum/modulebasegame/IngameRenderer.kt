@@ -11,7 +11,9 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ScreenUtils
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.measureDebugTime
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -170,6 +172,8 @@ object IngameRenderer : Disposable {
             }
         }
 
+    private var oldCamX = 0
+
     operator fun invoke(
             gamePaused: Boolean,
             actorsRenderBehind : List<ActorWithBody>? = null,
@@ -200,7 +204,13 @@ object IngameRenderer : Disposable {
 
 
         if (!gamePaused) {
-            LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
+            measureDebugTime("Renderer.ApparentLightRun") {
+                // recalculate for even frames, or if the sign of the cam-x changed
+                if (AppLoader.GLOBAL_RENDER_TIMER % 2 == 0 || WorldCamera.x * oldCamX < 0)
+                    LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
+
+                oldCamX = WorldCamera.x
+            }
 
             prepLightmapRGBA()
             BlocksDrawer.renderData()
@@ -737,8 +747,10 @@ object IngameRenderer : Disposable {
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {
         // for some reason it does not like integer. No, really; it breaks (jitter when you move) when you try to "fix" that.
-        val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
-        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
+        val xoff = (WorldCamera.x / TILE_SIZE) - LightmapRenderer.camX
+        val yoff = (WorldCamera.y / TILE_SIZE) - LightmapRenderer.camY
+        val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF) - (xoff * TILE_SIZEF)
+        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF) - (yoff * TILE_SIZEF)
 
         return xrem to yrem
     }
