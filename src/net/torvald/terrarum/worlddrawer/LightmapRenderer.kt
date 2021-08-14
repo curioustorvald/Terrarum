@@ -10,9 +10,11 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -205,9 +207,8 @@ object LightmapRenderer {
         AppLoader.measureDebugTime("Renderer.LightPrecalc") {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
-            lightmap.zerofill()
+
             _mapLightLevelThis.zerofill()
-            //lightsourceMap.clear()
 
             for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
                 for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
@@ -218,7 +219,7 @@ object LightmapRenderer {
 
         // 'NEWLIGHT2' LIGHT SWIPER
         // O((8*2)n) where n is a size of the map.
-        fun r1() {
+        /* - */fun r1() {
             swipeDiag = false
             for (line in 1 until LIGHTMAP_HEIGHT - 1) {
                 swipeLight(
@@ -228,7 +229,7 @@ object LightmapRenderer {
                 )
             }
         }
-        fun r2() {
+        /* | */fun r2() {
             swipeDiag = false
             for (line in 1 until LIGHTMAP_WIDTH - 1) {
                 swipeLight(
@@ -238,7 +239,7 @@ object LightmapRenderer {
                 )
             }
         }
-        fun r3() {
+        /* \ */fun r3() {
             swipeDiag = true
             /* construct indices such that:
                   56789ABC
@@ -275,7 +276,7 @@ object LightmapRenderer {
                 )
             }
         }
-        fun r4() {
+        /* / */fun r4() {
             swipeDiag = true
             /*
                 1       w-2
@@ -329,6 +330,7 @@ object LightmapRenderer {
 
             r1();r2();r3();r4()
             r1();r2();r3();r4() // two looks better than one
+            // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
         }
 
     }
@@ -407,6 +409,9 @@ object LightmapRenderer {
     private val _thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
     private val _fluidAmountToCol = Cvec(0)
     private val _thisTileLuminosity = Cvec(0)
+    private var _thisTerrainProp: BlockProp = BlockProp()
+    private var _thisWallProp: BlockProp = BlockProp()
+    private var _thisFluidProp: BlockProp = BlockProp()
 
     fun precalculate(rawx: Int, rawy: Int) {
         val lx = rawx.convX(); val ly = rawy.convY()
@@ -421,8 +426,11 @@ object LightmapRenderer {
 
 
         _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
-        _thisFluid = world.getFluid(worldX, worldY)
+        _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain]]
         _thisWall = world.getTileFromWallRaw(worldX, worldY)
+        _thisWallProp = BlockCodex[world.tileNumberToNameMap[_thisWall]]
+        _thisFluid = world.getFluid(worldX, worldY)
+        _thisFluidProp = BlockCodex[_thisFluid.type]
 
 
         // regarding the issue #26
@@ -448,18 +456,17 @@ object LightmapRenderer {
             exitProcess(1)
         }*/
 
-
         if (_thisFluid.type != Fluid.NULL) {
             _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
 
-            _thisTileLuminosity.set(BlockCodex[world.tileNumberToNameMap[_thisTerrain]].getLumCol(worldX, worldY))
-            _thisTileLuminosity.maxAndAssign(BlockCodex[_thisFluid.type].getLumCol(worldX, worldY).mul(_fluidAmountToCol)) // already been div by four
-            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[world.tileNumberToNameMap[_thisTerrain]].opacity)
-            _mapThisTileOpacity.max(lx, ly, BlockCodex[_thisFluid.type].opacity.mul(_fluidAmountToCol))// already been div by four
+            _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
+            _thisTileLuminosity.maxAndAssign(_thisFluidProp.getLumCol(worldX, worldY).mul(_fluidAmountToCol)) // already been div by four
+            _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
+            _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.mul(_fluidAmountToCol))// already been div by four
         }
         else {
-            _thisTileLuminosity.set(BlockCodex[world.tileNumberToNameMap[_thisTerrain]].getLumCol(worldX, worldY))
-            _mapThisTileOpacity.setVec(lx, ly, BlockCodex[world.tileNumberToNameMap[_thisTerrain]].opacity)
+            _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
+            _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
         }
 
         _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
@@ -469,8 +476,8 @@ object LightmapRenderer {
 
 
         // open air || luminous tile backed by sunlight
-        if ((world.tileNumberToNameMap[_thisTerrain] == AIR && world.tileNumberToNameMap[_thisWall] == AIR) ||
-            (_thisTileLuminosity.nonZero() && world.tileNumberToNameMap[_thisWall] == AIR)) {
+        if ((!_thisTerrainProp.isSolid && !_thisWallProp.isSolid) ||
+            (_thisTileLuminosity.nonZero() && !_thisWallProp.isSolid)) {
             _mapLightLevelThis.setVec(lx, ly, sunLight)
         }
 

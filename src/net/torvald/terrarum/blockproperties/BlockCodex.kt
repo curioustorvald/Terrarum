@@ -120,7 +120,7 @@ object BlockCodex {
         }
     }*/
     operator fun get(blockID: ItemID?): BlockProp {
-        if (blockID == null || blockID == "basegame:"+Block.NULL) {
+        if (blockID == null || blockID == Block.NULL) {
             return nullProp
         }
 
@@ -136,7 +136,7 @@ object BlockCodex {
         // TODO fluid from other mods
 
         if (fluidType == null || fluidType.value == 0) {
-            return blockProps["basegame:"+Block.AIR]!!
+            return blockProps[Block.AIR]!!
         }
 
         try {

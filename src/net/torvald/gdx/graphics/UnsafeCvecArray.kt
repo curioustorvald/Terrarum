@@ -76,6 +76,27 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
         setA(x, y, getA(x, y) * scalar)
     }
 
+    fun mulAndAssign(x: Int, y: Int, scalar: Float) {
+        val addr = toAddr(x, y)
+        for (k in 0..3) {
+            array.setFloat(addr + 4*k, (array.getFloat(addr + 4*k) * scalar))
+        }
+    }
+
+    fun forAllMulAssign(scalar: Float) {
+        for (i in 0 until TOTAL_SIZE_IN_BYTES step 4) {
+            array.setFloat(i, array.getFloat(i) * scalar)
+        }
+    }
+
+    fun forAllMulAssign(vector: Cvec) {
+        for (i in 0 until TOTAL_SIZE_IN_BYTES step 16) {
+            for (k in 0 until 4) {
+                array.setFloat(i + 4*k, array.getFloat(i + 4*k) * vector.getElem(k))
+            }
+        }
+    }
+
     fun destroy() = this.array.destroy()
 
 }
