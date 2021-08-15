@@ -21,6 +21,8 @@ open class DroppedItem(private val itemID: ItemID, topLeftX: Int, topLeftY: Int)
 
     private val textureRegion = ItemCodex.getItemImage(itemID)
 
+    var itemCount = 1
+
     init {
         if (itemID.startsWith("actor@"))
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
@@ -86,5 +88,7 @@ open class DroppedItem(private val itemID: ItemID, topLeftX: Int, topLeftY: Int)
 
     override fun update(delta: Float) {
         super.update(delta)
+
+        // TODO merge into the already existing droppeditem with isStationary==true if one is detected
     }
 }

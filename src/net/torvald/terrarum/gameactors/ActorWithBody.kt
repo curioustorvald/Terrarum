@@ -58,7 +58,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
     var drawMode = BlendMode.NORMAL
 
-    open var hasMoved: Boolean = false
+    open var isStationary: Boolean = true
         protected set
     open var tooltipText: String? = null // null: display nothing
     val mouseUp: Boolean
@@ -499,7 +499,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
         }
 
-        hasMoved = (oldHitbox != hitbox)
+        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
     }
 
     /**
