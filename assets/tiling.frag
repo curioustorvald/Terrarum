@@ -4,7 +4,7 @@
 
 #version 120
 #ifdef GL_ES
-    precision mediump float;
+precision mediump float;
 #endif
 #extension GL_EXT_gpu_shader4 : enable
 
@@ -27,7 +27,10 @@ uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws til
 
 uniform vec2 tilesInAtlas = vec2(256.0, 256.0);
 uniform vec2 atlasTexSize = vec2(4096.0, 4096.0);
-vec2 tileSizeInPx = atlasTexSize / tilesInAtlas; // should be like ivec2(16.0, 16.0)
+
+vec2 _tilesInAtlas = vec2(1.0, 1.0) / tilesInAtlas;
+vec2 tileSizeInPx = atlasTexSize * _tilesInAtlas; // should be like ivec2(16.0, 16.0)
+vec2 _tileSizeInPx = vec2(1.0, 1.0) / tileSizeInPx; // should be like ivec2(0.06125, 0.06125)
 
 uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
@@ -36,6 +39,8 @@ uniform ivec2 cameraTranslation = ivec2(0, 0); // used to offset the drawing; it
 uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to draw it; NEVER set to any other values.
 
 uniform float mulBlendIntensity = 1.0; // used my MUL-blending drawings; works about the same way as the Layer Opacity slider of Photoshop/Krita/etc.
+
+const vec2 bc = vec2(1.0, 0.0); //binary constant
 
 ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
@@ -82,9 +87,9 @@ void main() {
     // calculate the UV coord value for texture sampling //
 
     // don't really need highp here; read the GLES spec
-    vec2 uvCoordForTile = (mod(flippedFragCoord, tileSizeInPx) / tileSizeInPx) / tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
-    vec2 uvCoordOffsetTile = tileXY / tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
-    vec2 uvCoordOffsetBreakage = breakageXY / tilesInAtlas;
+    vec2 uvCoordForTile = (mod(flippedFragCoord, tileSizeInPx) * _tileSizeInPx) * _tilesInAtlas; // 0..0.00390625 regardless of tile position in atlas
+    vec2 uvCoordOffsetTile = tileXY * _tilesInAtlas; // where the tile starts in the atlas, using uv coord (0..1)
+    vec2 uvCoordOffsetBreakage = breakageXY * _tilesInAtlas;
 
     // get final UV coord for the actual sampling //
 
@@ -100,7 +105,7 @@ void main() {
 
     vec4 finalBreakage = drawBreakage * texture2D(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
 
-    vec4 finalColor = vec4(mix(finalTile.rgb, finalBreakage.rgb, finalBreakage.a), finalTile.a);
+    vec4 finalColor =mix(finalTile, finalBreakage, finalBreakage.a) * bc.xxxy + (finalTile * bc.yyyx);
 
     gl_FragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
 
