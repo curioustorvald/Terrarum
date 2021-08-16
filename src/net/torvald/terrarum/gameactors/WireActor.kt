@@ -25,7 +25,7 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
 
     init {
         referenceID = id
-        setHitboxDimension(2, 2, 0, 0)
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
     }
 
     private var wireID = ""
@@ -63,14 +63,15 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
             }
         }
         sprite!!.currentFrame = ret
+        sprite!!.flipVertical = true // turns out the sprites are rendered upside-down by default :(
     }
 
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
         return arrayOf(
                 Point2i(x + 1, y),
-                Point2i(x, y - 1),
+                Point2i(x, y + 1),
                 Point2i(x - 1, y),
-                Point2i(x, y + 1) // don't know why but it doesn't work if I don't flip Y
+                Point2i(x, y - 1)
         )
     }
 
