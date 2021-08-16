@@ -5,7 +5,7 @@
 #"8195";"8195";"WIRE_BUNDLE";"signal";"digital_3bits";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,1,2";"1"
 "8196";"8196";"WIRE_POWER_LOW";"power";"power_low";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,2,9";"1"
 "8197";"8197";"WIRE_POWER_HIGH";"power";"power_high";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,3,9";"1"
-"8198";"8198";"WIRE_ETHERNET_BUS";"network";"10base5";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,4,9";"0"
+"8198";"8198";"WIRE_ETHERNET";"network";"10base2";"3";"N/A";"N/A";"net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire";"basegame.items16,4,9";"1"
 
 
 # accept: which wiretype (defined elsewhere) the wires acceps. Use comma to separate multiple. N/A for electronic components (aka "not wires")
