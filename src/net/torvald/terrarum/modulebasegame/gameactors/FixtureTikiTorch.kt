@@ -70,7 +70,7 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
         if (spawnTimer >= nextDelay) {
             (Terrarum.ingame as TerrarumIngame).addParticle(ParticleVanishingSprite(
                     CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
-                    0.25f, hitbox.centeredX, hitbox.startY + 10, rng.nextInt(256)
+                    0.25f, hitbox.centeredX, hitbox.startY + 5, rng.nextInt(256)
             ))
 
             spawnTimer -= nextDelay
