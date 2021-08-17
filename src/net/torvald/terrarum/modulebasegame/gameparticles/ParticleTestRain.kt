@@ -1,9 +1,10 @@
-package net.torvald.terrarum.modulebasegame.gameactors
+package net.torvald.terrarum.modulebasegame.gameparticles
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameparticles.ParticleBase
 
 /**
  * Created by minjaesong on 2017-01-20.

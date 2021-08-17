@@ -103,6 +103,9 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
     fun setPositionX(x: Double) = setPosition(x, startY)
     fun setPositionY(y: Double) = setPosition(startX, y)
 
+    /**
+     * Set position from bottom-centre point
+     */
     fun setPositionFromPointed(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1 - width / 2, y1 - height)
         return this

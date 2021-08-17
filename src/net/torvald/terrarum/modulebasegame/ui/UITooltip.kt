@@ -25,7 +25,7 @@ class UITooltip : UICanvas() {
             msgBuffer.clear()
 
             msgBuffer.addAll(value.split('\n'))
-            msgWidth = msgBuffer.fold(0) { acc, s -> font.getWidth(s).let { if (it > acc) it else acc } }
+            msgWidth = msgBuffer.maxOf { font.getWidth(it) }
         }
 
     private val font = AppLoader.fontGame

@@ -1,9 +1,9 @@
-package net.torvald.terrarum.modulebasegame.gameactors
+package net.torvald.terrarum.gameparticles
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.Actor
@@ -25,8 +25,9 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0
 
-    private val lifetimeMax = maxLifeTime ?: 5f
-    private var lifetimeCounter = 0f
+    val lifetimeMax = maxLifeTime ?: 5f
+    var lifetimeCounter = 0f
+        protected set
 
     val velocity = Vector2(0.0, 0.0)
     val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
@@ -34,19 +35,21 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     open lateinit var body: TextureRegion // you might want to use SpriteAnimation
     open var glow: TextureRegion? = null
 
+    val drawColour = Color(1f, 1f, 1f, 1f)
+
     init {
 
     }
 
-    fun update(delta: Float) {
+    open fun update(delta: Float) {
         if (!flagDespawn) {
             lifetimeCounter += delta
             if (despawnUponCollision) {
                 if (velocity.isZero ||
                     // simple stuck check
                     BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(
-                            hitbox.canonicalX.div(TILE_SIZE).floorInt(),
-                            hitbox.canonicalY.div(TILE_SIZE).floorInt()
+                            hitbox.canonicalX.div(TerrarumAppConfiguration.TILE_SIZE).floorInt(),
+                            hitbox.canonicalY.div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
                     ) ?: Block.STONE].isSolid) {
                     flagDespawn = true
                 }
@@ -67,15 +70,21 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
         }
     }
 
-    fun drawBody(batch: SpriteBatch) {
+    open fun drawBody(batch: SpriteBatch) {
         if (!flagDespawn) {
+            batch.color = drawColour
             batch.draw(body, hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
         }
     }
 
-    fun drawGlow(batch: SpriteBatch) {
+    open fun drawGlow(batch: SpriteBatch) {
         if (!flagDespawn && glow != null) {
+            batch.color = drawColour
             batch.draw(glow, hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
         }
+    }
+
+    open fun dispose() {
+
     }
 }

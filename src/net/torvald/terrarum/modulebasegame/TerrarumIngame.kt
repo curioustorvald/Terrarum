@@ -24,6 +24,7 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
+import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.*
@@ -38,7 +39,6 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import net.torvald.util.SortedArrayList

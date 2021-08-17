@@ -24,7 +24,13 @@ object TinyAlphNum : BitmapFont() {
     }
 
     fun getWidth(str: String): Int {
-        return W * str.length
+        var l = 0
+        for (char in str) {
+            if (!isColourCodeHigh(char) && !isColourCodeLow(char)) {
+                l += 1
+            }
+        }
+        return W * l
     }
 
     lateinit var colMain: Color

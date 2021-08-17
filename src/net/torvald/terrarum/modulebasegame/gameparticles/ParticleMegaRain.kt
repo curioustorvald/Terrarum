@@ -7,6 +7,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameparticles.ParticleBase
 
 /**
  * Created by minjaesong on 2017-12-18.
