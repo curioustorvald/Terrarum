@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameparticles.ParticleBase
 /**
  * Created by minjaesong on 2017-01-20.
  */
-class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, true, 6f) {
+class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, true, false, 6f) {
 
     init {
         body = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/raindrop.tga")))

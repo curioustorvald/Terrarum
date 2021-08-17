@@ -61,7 +61,7 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
 
     }
 
-    private var nextDelay = 0.4f
+    private var nextDelay = 0.25f
     private var spawnTimer = 0f
 
     override fun update(delta: Float) {
@@ -70,11 +70,11 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
         if (spawnTimer >= nextDelay) {
             (Terrarum.ingame as TerrarumIngame).addParticle(ParticleVanishingSprite(
                     CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
-                    0.25f, hitbox.centeredX, hitbox.startY + 5, rng.nextInt(256)
+                    0.25f, hitbox.centeredX, hitbox.startY + 5, rng.nextInt(256), false
             ))
 
             spawnTimer -= nextDelay
-            nextDelay = rng.nextFloat() * 0.4f + 0.4f
+            nextDelay = rng.nextFloat() * 0.25f + 0.25f
 
             sprite?.delays?.set(0, rng.nextFloat() * 0.4f + 0.1f)
         }

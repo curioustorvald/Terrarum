@@ -12,7 +12,7 @@ import net.torvald.terrarum.gameparticles.ParticleBase
 /**
  * Created by minjaesong on 2017-12-18.
  */
-class ParticleMegaRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, true, 3.2f) {
+class ParticleMegaRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, true, false, 3.2f) {
 
     init {
         body = MegaRainGovernor.get()

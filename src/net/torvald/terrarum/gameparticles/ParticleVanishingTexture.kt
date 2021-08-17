@@ -12,7 +12,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * @param x x-coord of the particle's initial spawn position, bottom-centre
  * @param y y-coord of the particle's initial spawn position, bottom-centre
  */
-open class ParticleVanishingTexture(val tex: TextureRegion, x: Double, y: Double) : ParticleBase(Actor.RenderOrder.OVERLAY, false, 2f) {
+open class ParticleVanishingTexture(val tex: TextureRegion, x: Double, y: Double, noCollision: Boolean = true) : ParticleBase(Actor.RenderOrder.OVERLAY, false, noCollision, 2f) {
 
     init {
         velocity.set(0.0, -1.0)
@@ -36,7 +36,7 @@ open class ParticleVanishingTexture(val tex: TextureRegion, x: Double, y: Double
  * @param x x-coord of the particle's initial spawn position, bottom-centre
  * @param y y-coord of the particle's initial spawn position, bottom-centre
  */
-class ParticleVanishingText(val text: String, x: Double, y: Double) : ParticleBase(Actor.RenderOrder.OVERLAY, false, 2f) {
+class ParticleVanishingText(val text: String, x: Double, y: Double, noCollision: Boolean = true) : ParticleBase(Actor.RenderOrder.OVERLAY, false, noCollision, 2f) {
 
     private val lines = text.split('\n')
 
@@ -69,7 +69,7 @@ class ParticleVanishingText(val text: String, x: Double, y: Double) : ParticleBa
  * @param x x-coord of the particle's initial spawn position, bottom-centre
  * @param y y-coord of the particle's initial spawn position, bottom-centre
  */
-open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Float, x: Double, y: Double, val start: Int = 0) : ParticleBase(Actor.RenderOrder.OVERLAY, false, 2f) {
+open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Float, x: Double, y: Double, val start: Int = 0, noCollision: Boolean = true) : ParticleBase(Actor.RenderOrder.OVERLAY, false, noCollision, 2f) {
 
     private var row = 0
     private var frame = start % sprite.horizontalCount
