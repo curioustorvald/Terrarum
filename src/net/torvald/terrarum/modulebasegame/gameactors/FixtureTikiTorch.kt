@@ -3,15 +3,14 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
+import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.gameparticles.ParticleVanishingText
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -36,6 +35,15 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
     override val lightBoxList: ArrayList<Hitbox>
 
     init {
+        // loading textures
+        CommonResourcePool.addToLoadingList("sprites-fixtures-tiki_torch.tga") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32)
+        }
+        CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/tiki_smoke.tga"), 10, 10)
+        }
+        CommonResourcePool.loadAll()
+
         density = 1200.0
 
         setHitboxDimension(16, 32, 0, 0)
@@ -43,13 +51,14 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
         lightBoxList = ArrayList(1)
         lightBoxList.add(Hitbox(6.0, 5.0, 4.0, 3.0))
 
-        makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32))
-        sprite!!.setRowsAndFrames(1, 1)
+        makeNewSprite(CommonResourcePool.getAsTextureRegionPack("sprites-fixtures-tiki_torch.tga"))
+        sprite!!.setRowsAndFrames(1, 2)
 
         actorValue[AVKey.BASEMASS] = MASS
 
         rndHash1 = rng.nextInt()
         rndHash2 = rng.nextInt()
+
     }
 
     private var nextDelay = 0.4f
@@ -59,11 +68,15 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
         super.update(delta)
 
         if (spawnTimer >= nextDelay) {
-            val s = rng.nextInt(1, 1000).toString()
-            (Terrarum.ingame as TerrarumIngame).addParticle(ParticleVanishingText(s, hitbox.centeredX, hitbox.startY + 10))
+            (Terrarum.ingame as TerrarumIngame).addParticle(ParticleVanishingSprite(
+                    CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
+                    0.25f, hitbox.centeredX, hitbox.startY + 10, rng.nextInt(256)
+            ))
 
             spawnTimer -= nextDelay
             nextDelay = rng.nextFloat() * 0.4f + 0.4f
+
+            sprite?.delays?.set(0, rng.nextFloat() * 0.4f + 0.1f)
         }
 
         spawnTimer += delta

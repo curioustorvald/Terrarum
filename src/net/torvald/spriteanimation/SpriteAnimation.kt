@@ -43,7 +43,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) {
 
     private var delta = 0f
 
-    val looping = true
+    var looping = true
     private var animationRunning = true
     var flipHorizontal = false
     var flipVertical = false
