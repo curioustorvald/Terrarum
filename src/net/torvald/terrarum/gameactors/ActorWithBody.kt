@@ -84,28 +84,28 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
      *
      * e.g. USE `for (x in hitbox.startX..hitbox.endX)`, NOT `for (x in hitbox.startX until hitbox.endX)`
      */ // got the idea from gl_FragCoord
-    val hIntTilewiseHitbox: Hitbox
-        get() = Hitbox.fromTwoPoints(
+    val hIntTilewiseHitbox: Hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+        /*get() = Hitbox.fromTwoPoints(
                 hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
                 hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
                 hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
                 hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
                 true
-        )
+        )*/
 
 
     /** Used by non-physics shits. (e.g. BlockBase determining "occupied" blocks)
      *
      * e.g. USE `for (x in hitbox.startX..hitbox.endX)`, NOT `for (x in hitbox.startX until hitbox.endX)`
      */
-    val intTilewiseHitbox: Hitbox
-        get() = Hitbox.fromTwoPoints(
+    val intTilewiseHitbox: Hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+        /*get() = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
                 hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
                 hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
                 true
-        )
+        )*/
 
     /**
      * Unit: Pixels per 1/60 (or AppLoader.UPDATE_RATE) seconds.
@@ -490,12 +490,24 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 colliding = false
             }
 
+            hIntTilewiseHitbox.setFromTwoPoints(
+                    hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+                    hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+                    hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+                    hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5
+            )
+            intTilewiseHitbox.setFromTwoPoints(
+                    hitbox.startX.div(TILE_SIZE).floor(),
+                    hitbox.startY.div(TILE_SIZE).floor(),
+                    hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+                    hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor()
+            )
+
             centrePosVector.set(hitbox.centeredX, hitbox.centeredY)
             centrePosPoint.set(hitbox.centeredX, hitbox.centeredY)
             feetPosVector.set(hitbox.centeredX, hitbox.endY)
             feetPosPoint.set(hitbox.centeredX, hitbox.endY)
-            feetPosTile.x = hIntTilewiseHitbox.centeredX.floorInt()
-            feetPosTile.y = hIntTilewiseHitbox.endY.floorInt()
+            feetPosTile.set(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
         }
 
@@ -1609,7 +1621,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 }
             }
 
-            //println(intTilewiseHitbox)
         }
     }
 
