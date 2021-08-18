@@ -475,64 +475,59 @@ object WorldSimulator {
             // signal-emitting fixtures must set emitState of its own tiles via update()
             sources.forEach {
                 (it as Electric).wireEmitterTypes.forEach { wireType, bbi ->
-                    traverseWireGraph(world, it, wireType, bbi)
+
+                    val startingPoint = WireGraphCursor(it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi))
+                    val signal = (it as Electric).wireEmission[bbi] ?: Vector2(0.0, 0.0)
+
+                    world.getAllWiringGraph(startingPoint.x, startingPoint.y)?.keys?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
+                        traverseWireGraph(world, wire, startingPoint, signal)
+                    }
                 }
             }
         }
     }
 
-    private fun traverseWireGraph(world: GameWorld, fixture: FixtureBase, wireType: String, bbi: BlockBoxIndex) {
+    private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2) {
 
         fun getAdjacent(cnx: Int, point: WireGraphCursor): List<WireGraphCursor> {
             val r = ArrayList<WireGraphCursor>()
-            for (dir in intArrayOf(RIGHT,DOWN,LEFT,UP)) {
+            for (dir in intArrayOf(RIGHT, DOWN, LEFT, UP)) {
                 if (cnx and dir != 0) r.add(point.copy().moveOneCell(dir))
             }
             return r
         }
 
-        fixture.worldBlockPos?.let { sourceBlockPos ->
+        var point = startingPoint.copy()
+        val points = Queue<WireGraphCursor>() // a queue, enqueued at the end
+        val marked = HashSet<Long>()
 
-            val signal = (fixture as Electric).wireEmission[bbi] ?: Vector2(0.0, 0.0)
-            var point = WireGraphCursor(sourceBlockPos + fixture.blockBoxIndexToPoint2i(bbi))
+        fun mark(point: WireGraphCursor) {
+            marked.add(point.longHash())
+            // do some signal action
+            world.setWireEmitStateOf(point.x, point.y, wire, signal)
+        }
 
-            world.getAllWiresFrom(point.x, point.y)?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
-                // this makes sure that only the emitters with wires installed will get traversed
-                world.getWireGraphOf(point.x, point.y, wire)?.let { _ ->
-                    printdbg(this, wire)
+        fun isMarked(point: WireGraphCursor) = marked.contains(point.longHash())
+        fun enq(point: WireGraphCursor) = points.addFirst(point.copy())
+        fun deq() = points.removeLast()
 
-                    val points = Queue<WireGraphCursor>() // a queue, enqueued at the end
-                    var marked = HashSet<Long>()
+        enq(point)
+        mark(point)
 
-                    fun mark(point: WireGraphCursor) {
-                        marked.add(point.longHash())
-                        // do some signal action
-                        world.setWireEmitStateOf(point.x, point.y, wire, signal)
-                    }
-
-                    fun isMarked(point: WireGraphCursor) = marked.contains(point.longHash())
-                    fun enq(point: WireGraphCursor) = points.addFirst(point.copy())
-                    fun deq() = points.removeLast()
-
-                    enq(point)
-                    mark(point)
-
-                    while (points.notEmpty()) {
-                        point = deq()
-                        // TODO if we found a power receiver, do something to it
-                        for (x in getAdjacent(world.getWireGraphOf(point.x, point.y, wire)!!, point)) {
-                            if (!isMarked(x)) {
-                                mark(x)
-                                enq(x)
-                            }
-                        }
+        while (points.notEmpty()) {
+            point = deq()
+            // TODO if we found a power receiver, do something to it
+            world.getWireGraphOf(point.x, point.y, wire)?.let { connections ->
+                for (x in getAdjacent(connections, point)) {
+                    if (!isMarked(x)) {
+                        mark(x)
+                        enq(x)
                     }
                 }
             }
-
-            printdbg(this, "------------------------------------------")
         }
     }
+
 
     private const val RIGHT = 1
     private const val DOWN = 2
