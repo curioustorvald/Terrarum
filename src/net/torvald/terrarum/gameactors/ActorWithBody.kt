@@ -698,7 +698,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
 
             val vectorSum = (externalV + controllerV)
-            val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
+            val ccdSteps = minOf(16, (vectorSum.magnitude / TILE_SIZE).floorInt() + 1) // adaptive
 
 
 
