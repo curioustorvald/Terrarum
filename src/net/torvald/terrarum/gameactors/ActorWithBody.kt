@@ -280,14 +280,14 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     @Transient private val A_PIXEL = 1.0
     @Transient private val HALF_PIXEL = 0.5
 
-    @Transient private val COLLIDING_LEFT = 0
-    @Transient private val COLLIDING_BOTTOM = 1
-    @Transient private val COLLIDING_RIGHT = 2
-    @Transient private val COLLIDING_TOP = 3
+    @Transient private val COLLIDING_LEFT = 1
+    @Transient private val COLLIDING_BOTTOM = 2
+    @Transient private val COLLIDING_RIGHT = 4
+    @Transient private val COLLIDING_TOP = 8
 
-    @Transient private val COLLIDING_UD = 4
+    @Transient private val COLLIDING_UD = 10
     @Transient private val COLLIDING_LR = 5
-    @Transient private val COLLIDING_ALLSIDE = 6
+    @Transient private val COLLIDING_ALLSIDE = 15
     //@Transient private val COLLIDING_LEFT_EXTRA = 7
     //@Transient private val COLLIDING_RIGHT_EXTRA = 7
 
@@ -693,12 +693,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                        (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
             }
 
-            fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
+            fun Double.modTile() = this.div(TILE_SIZE).floorInt().times(TILE_SIZE)
             fun Double.modTileDelta() = this - this.modTile()
 
 
             val vectorSum = (externalV + controllerV)
-            val ccdSteps = minOf(16, (vectorSum.magnitude / TILE_SIZE).floorInt() + 1) // adaptive
+            val ccdSteps = (vectorSum.magnitude / TILE_SIZE).floorInt().coerceIn(1, 16) // adaptive
 
 
 
@@ -739,12 +739,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 if (collidingStep != null) break
             }
 
-
-            val COLL_LEFTSIDE = 1
-            val COLL_BOTTOMSIDE = 2
-            val COLL_RIGHTSIDE = 4
-            val COLL_TOPSIDE = 8
-
             var bounceX = false
             var bounceY = false
             var zeroX = false
@@ -759,14 +753,9 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 debug1("== Collision step: $collidingStep / $ccdSteps")
 
 
-                val newHitbox = hitbox.reassign(sixteenStep[collidingStep!!])
+                val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
 
-                //var selfCollisionStatus = 0
-
-                var collisionStatus = (0..3).map { isWalledStairs(newHitbox, it) }
-
-                // made compatible with old variable and its usage
-                var selfCollisionStatus = collisionStatus.foldIndexed(0) { index, acc, b -> acc or (b.shr(1) shl index) }
+                val selfCollisionStatus = intArrayOf(1,2,4,8).fold(0) { acc, state -> acc or (state * isWalledStairs(newHitbox, state).coerceAtMost(1)) }
 
                 // superseded by isWalledStairs-related codes
                 //if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
@@ -1022,10 +1011,10 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         val y2 = hitbox.endY - A_PIXEL
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENDED!
 
-        val txStart = x1.plus(0.5f).floorInt()
-        val txEnd =   x2.plus(0.5f).floorInt()
-        val tyStart = y1.plus(0.5f).floorInt()
-        val tyEnd =   y2.plus(0.5f).floorInt()
+        val txStart = x1.plus(HALF_PIXEL).floorInt()
+        val txEnd =   x2.plus(HALF_PIXEL).floorInt()
+        val tyStart = y1.plus(HALF_PIXEL).floorInt()
+        val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
 
         return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, feet) == 2
     }
@@ -1089,10 +1078,10 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(0.5f).floorInt()
-        val txEnd =   x2.plus(0.5f).floorInt()
-        val tyStart = y1.plus(0.5f).floorInt()
-        val tyEnd =   y2.plus(0.5f).floorInt()
+        val txStart = x1.plus(HALF_PIXEL).floorInt()
+        val txEnd =   x2.plus(HALF_PIXEL).floorInt()
+        val tyStart = y1.plus(HALF_PIXEL).floorInt()
+        val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
 
         return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM) == 2
     }
@@ -1154,14 +1143,14 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         else if (option == COLLIDING_UD) {
             return maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM), isWalledStairs(hitbox, COLLIDING_TOP))
         }
-        else throw IllegalArgumentException()
+        else throw IllegalArgumentException("$option")
 
         val pxStart = x1.plus(0.5f).floorInt()
         val pxEnd =   x2.plus(0.5f).floorInt()
         val pyStart = y1.plus(0.5f).floorInt()
         val pyEnd =   y2.plus(0.5f).floorInt()
 
-        return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, option == COLLIDING_BOTTOM)
+        return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, gravitation.y >= 0.0 && option == COLLIDING_BOTTOM || gravitation.y < 0.0 && option == COLLIDING_TOP)
     }
 
     /*private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
@@ -1210,7 +1199,9 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             var hasFloor = false
 
             for (x in pxStart..pxEnd) {
-                val tile = world!!.getTileFromTerrain(x / TILE_SIZE, y / TILE_SIZE)
+                val tx = (x / TILE_SIZE) - (if (x < 0) 1 else 0) // round down toward negative infinity
+                val ty = (y / TILE_SIZE) - (if (y < 0) 1 else 0) // round down toward negative infinity
+                val tile = world!!.getTileFromTerrain(tx, ty)
 
                 if (feet) {
                     if (shouldICollideWithThisFeet(tile)) {
