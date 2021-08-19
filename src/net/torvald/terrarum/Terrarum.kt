@@ -93,32 +93,21 @@ object Terrarum : Disposable {
     val memJavaHeap: Int
         get() {
             javaHeapCircularArray.appendHead((Gdx.app.javaHeap shr 20).toInt())
-
-            var acc = 0
-            javaHeapCircularArray.forEach { acc = maxOf(acc, it) }
-            return acc
+            return javaHeapCircularArray.maxOrNull() ?: 0
         }
     val memNativeHeap: Int
         get() {
             nativeHeapCircularArray.appendHead((Gdx.app.nativeHeap shr 20).toInt())
-
-            var acc = 0
-            nativeHeapCircularArray.forEach { acc = maxOf(acc, it) }
-            return acc
+            return nativeHeapCircularArray.maxOrNull() ?: 0
         }
     val memUnsafe: Int
-        get() {
-            return (UnsafeHelper.unsafeAllocatedSize shr 20).toInt()
-        }
+        get() = (UnsafeHelper.unsafeAllocatedSize shr 20).toInt()
     val memXmx: Int
         get() = (Runtime.getRuntime().maxMemory() shr 20).toInt()
     val updateRateStr: String
         get() {
             updateRateCircularArray.appendHead(updateRate)
-
-            var acc = 0.0
-            updateRateCircularArray.forEach { acc = maxOf(acc, it) }
-            return String.format("%.2f", acc)
+            return String.format("%.2f", updateRateCircularArray.maxOrNull() ?: 0.0)
         }
 
     lateinit var testTexture: Texture
