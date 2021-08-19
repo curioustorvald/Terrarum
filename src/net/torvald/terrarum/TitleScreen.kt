@@ -245,7 +245,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
-            IngameRenderer.invoke(gamePaused = false, uiContainer = uiContainer)
+            IngameRenderer.invoke(gamePaused = true, uiContainer = uiContainer)
         }
         else {
             printdbgerr(this, "Demoworld is already been destroyed")
