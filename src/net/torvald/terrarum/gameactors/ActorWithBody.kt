@@ -870,7 +870,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                             (offendingTileWorldY - offendingHitboxPointY).abs()
                     )
 
-
                     // FIXME jump-thru-ceil bug on 1px-wide (the edge), case-9 collision (does not occur on case-12 coll.)
 
 
@@ -895,6 +894,15 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                                         displacementAbs.x * displacementUnitVector.x,
                                         displacementAbs.y * displacementUnitVector.y
                                 )
+
+                    // adjust finalDisplacement for honest-to-god staircasing
+                    if (staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
+                        // TODO!!
+                        // remove Y displacement
+                        // let original X velocity to pass-thru instead of snapping to tiles coded above
+                        // pass-thru values are held by the vectorSum
+                    }
+
 
                     newHitbox.translate(finalDisplacement)
 
