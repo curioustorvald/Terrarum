@@ -10,9 +10,11 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.toInt
 
 /**
+ * FIXME Constructor is super expensive
+ *
  * Created by minjaesong on 2021-07-30.
  */
-class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.IMMOBILE) {
+class WireActor(id: ActorID) : ActorWithBody(RenderOrder.OVERLAY, PhysProperties.IMMOBILE, id) {
 
     companion object {
         val WIRE_NEARBY = arrayOf(
@@ -24,7 +26,6 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.WIRES, PhysProperties.I
     }
 
     init {
-        referenceID = id
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
     }
 

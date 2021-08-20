@@ -54,7 +54,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
         }
         catch (e: GdxRuntimeException) {
-            printdbg(this, e.message)
+            printdbgerr(this, "Error initialising controller: ${e.message}")
             e.stackTrace.forEach { printdbgerr(this, "\t$it") }
         }
     }

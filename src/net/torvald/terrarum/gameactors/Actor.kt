@@ -12,15 +12,14 @@ typealias ActorID = Int
  *
  * Created by minjaesong on 2015-12-31.
  */
-abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable {
+abstract class Actor(var renderOrder: RenderOrder, id: ActorID?) : Comparable<Actor>, Runnable {
 
     enum class RenderOrder {
         BEHIND, // tapestries, some particles (obstructed by terrain)
         MIDDLE, // actors
         MIDTOP, // bullets, thrown items
         FRONT,  // fake tiles
-        OVERLAY, // screen overlay, not affected by lightmap
-        WIRES
+        OVERLAY // screen overlay, not affected by lightmap
     }
 
     companion object {
@@ -29,9 +28,6 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         val RANGE_MIDTOP = ReferencingRanges.ACTORS_MIDTOP  // 1
         val RANGE_FRONT  = ReferencingRanges.ACTORS_FRONT   // 0.9375
         val RANGE_OVERLAY= ReferencingRanges.ACTORS_OVERLAY // 0.9375
-
-        val RANGE_WIRES = ReferencingRanges.ACTORS_WIRES // 0.0002
-        val RANGE_WIRES_HELPER = ReferencingRanges.ACTORS_WIRES_HELPER // 0.0002
     }
 
     abstract fun update(delta: Float)
@@ -40,7 +36,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      * Valid RefID is equal to or greater than 16777216.
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
-    open var referenceID: ActorID = Terrarum.generateUniqueReferenceID(renderOrder) // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
+    open var referenceID: ActorID = id ?: Terrarum.generateUniqueReferenceID(renderOrder) // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
     var actorValue = ActorValue(this) // FIXME cyclic reference on GSON
     @Volatile var flagDespawn = false
 

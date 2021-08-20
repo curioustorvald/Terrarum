@@ -202,7 +202,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             return actor
     }
 
-    //fun SortedArrayList<*>.binarySearch(actor: Actor) = this.toArrayList().binarySearch(actor.referenceID!!)
+    //fun SortedArrayList<*>.binarySearch(actor: Actor) = this.toArrayList().binarySearch(actor.referenceID)
     //fun SortedArrayList<*>.binarySearch(ID: Int) = this.toArrayList().binarySearch(ID)
 
     open fun removeActor(ID: Int) = removeActor(getActorByID(ID))
@@ -217,7 +217,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open fun removeActor(actor: Actor?) {
         if (actor == null) return
 
-        val indexToDelete = actorContainerActive.searchFor(actor.referenceID!!) { it.referenceID!! }
+        val indexToDelete = actorContainerActive.searchFor(actor.referenceID) { it.referenceID }
         if (indexToDelete != null) {
             actorContainerActive.remove(indexToDelete)
         }
@@ -229,7 +229,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open fun addNewActor(actor: Actor?) {
         if (actor == null) return
 
-        if (theGameHasActor(actor.referenceID!!)) {
+        if (theGameHasActor(actor.referenceID)) {
             throw Error("The actor $actor already exists in the game")
         }
         else {
@@ -241,18 +241,18 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             if (actorContainerActive.size == 0)
                 false
             else
-                actorContainerActive.searchFor(ID) { it.referenceID!! } != null
+                actorContainerActive.searchFor(ID) { it.referenceID } != null
 
     fun isInactive(ID: Int): Boolean =
             if (actorContainerInactive.size == 0)
                 false
             else
-                actorContainerInactive.searchFor(ID) { it.referenceID!! } != null
+                actorContainerInactive.searchFor(ID) { it.referenceID } != null
 
     /**
      * actorContainerActive extensions
      */
-    fun theGameHasActor(actor: Actor?) = if (actor == null) false else theGameHasActor(actor.referenceID!!)
+    fun theGameHasActor(actor: Actor?) = if (actor == null) false else theGameHasActor(actor.referenceID)
 
     fun theGameHasActor(ID: Int): Boolean =
             isActive(ID) || isInactive(ID)

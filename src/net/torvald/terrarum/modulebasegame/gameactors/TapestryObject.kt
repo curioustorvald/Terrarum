@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**

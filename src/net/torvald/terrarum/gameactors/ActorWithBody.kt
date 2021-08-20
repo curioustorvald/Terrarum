@@ -38,8 +38,8 @@ import kotlin.math.sign
  *
  * Created by minjaesong on 2016-01-13.
  */
-open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties) :
-        Actor(renderOrder) {
+open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties, id: ActorID? = null) :
+        Actor(renderOrder, id) {
 
 
     @Transient val COLLISION_TEST_MODE = false

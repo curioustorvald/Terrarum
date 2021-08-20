@@ -63,23 +63,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     //val ACTORCONTAINER_INITIAL_SIZE = 64
     val PARTICLES_MAX = AppLoader.getConfigInt("maxparticles")
-    //val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
-    //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
     val uiContainer = UIContainer()
 
-    private val actorsRenderBehind = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMiddle = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMidTop = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderFront  = SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderOverlay= SortedArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-
     // these are required because actors always change their position
-    private var visibleActorsRenderBehind: List<ActorWithBody> = ArrayList(1)
-    private var visibleActorsRenderMiddle: List<ActorWithBody> = ArrayList(1)
-    private var visibleActorsRenderMidTop: List<ActorWithBody> = ArrayList(1)
-    private var visibleActorsRenderFront: List<ActorWithBody> = ArrayList(1)
-    private var visibleActorsRenderOverlay: List<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderBehind: ArrayList<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderMiddle: ArrayList<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderMidTop: ArrayList<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderFront: ArrayList<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderOverlay: ArrayList<ActorWithBody> = ArrayList(1)
 
     //var screenZoom = 1.0f   // definition moved to IngameInstance
     //val ZOOM_MAXIMUM = 4.0f // definition moved to IngameInstance
@@ -196,12 +188,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         private set
 
     var selectedWireRenderClass = ""
-    /**
-     * unlike faketiles which gets placed onto the world just like ordinary fixtures, wires are dynamically
-     * "rendered" into wire-actors, and we need to keep track of them in some way (and definitely NOT create
-     * 65536 actors all at once)
-     */
-    private var allocatedWireActorsCount = 0
 
 
 
@@ -683,7 +669,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         if (uiFixture?.isClosed == true) { uiFixture = null }
 
         // fill up visibleActorsRenderFront for wires
-        measureDebugTime("Ingame.WiresRenderAndDraw") {
+        measureDebugTime("Ingame.FillUpWiresBuffer") {
             fillUpWiresBuffer()
         }
 
@@ -701,19 +687,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.endInclusive - ReferencingRanges.ACTORS_WIRES.first + 1
+    private val wireActorsContainer = Array(maxRenderableWires) { WireActor(ReferencingRanges.ACTORS_WIRES.first + it).let {
+        addNewActor(it)
+        /*^let*/ it
+    } }
 
     private fun fillUpWiresBuffer() {
-        fun getOrMakeWireActor(num: Int): WireActor {
-            return try {
-                getActorByID(ReferencingRanges.ACTORS_WIRES.first + num) as WireActor
-            }
-            catch (_: IllegalArgumentException) {
-                val actor = WireActor(ReferencingRanges.ACTORS_WIRES.first + num)
-                addNewActor(actor)
-                actor
-            }
-        }
-
         val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
         val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
 
@@ -724,37 +703,46 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end) {
                 if (wiringCounter >= maxRenderableWires) break
+                world.getAllWiresFrom(x, y)?.forEach {
+                    val wireActor = wireActorsContainer[wiringCounter]
 
-                val wires = world.getAllWiresFrom(x, y)
-
-                wires?.forEach {
-                    val wireActor = getOrMakeWireActor(wiringCounter)
+                    wireActor.setWire(it, x, y)
 
                     if (WireCodex[it].renderClass == selectedWireRenderClass || selectedWireRenderClass == "wire_render_all") {
-                        wireActor.isUpdate = true
-                        wireActor.isVisible = true
-                        wireActor.forceDormant = false
-                        wireActor.setWire(it, x, y)
+                        wireActor.renderOrder = Actor.RenderOrder.OVERLAY
                     }
                     else {
-                        wireActor.isUpdate = false
-                        wireActor.isVisible = false
-                        wireActor.forceDormant = true
+                        wireActor.renderOrder = Actor.RenderOrder.BEHIND
                     }
+
+                    wireActor.isUpdate = true
+                    wireActor.isVisible = true
+                    wireActor.forceDormant = false
 
                     wiringCounter += 1
                 }
 
             }
         }
+
+        for (i in wiringCounter until maxRenderableWires) {
+            wireActorsContainer[i].isUpdate = false
+            wireActorsContainer[i].isVisible = false
+            wireActorsContainer[i].forceDormant = true
+        }
     }
 
     private fun filterVisibleActors() {
-        visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen(world) }
-        visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen(world) }
-        visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen(world) }
-        visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen(world) }
-        visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen(world) }
+        visibleActorsRenderBehind.clear()
+        visibleActorsRenderMiddle.clear()
+        visibleActorsRenderMidTop.clear()
+        visibleActorsRenderFront.clear()
+        visibleActorsRenderOverlay.clear()
+
+        actorContainerActive.forEach {
+            if (it is ActorWithBody)
+                actorToRenderQueue(it).add(it)
+        }
     }
 
     private fun repossessActor() {
@@ -906,13 +894,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private val cameraWindowX = WorldCamera.x.toDouble()..WorldCamera.xEnd.toDouble()
     private val cameraWindowY = WorldCamera.y.toDouble()..WorldCamera.yEnd.toDouble()
 
-    private fun actorToRenderQueue(actor: ActorWithBody): SortedArrayList<ActorWithBody> {
+    private fun actorToRenderQueue(actor: ActorWithBody): ArrayList<ActorWithBody> {
         return when (actor.renderOrder) {
-            Actor.RenderOrder.BEHIND -> actorsRenderBehind
-            Actor.RenderOrder.MIDDLE -> actorsRenderMiddle
-            Actor.RenderOrder.MIDTOP -> actorsRenderMidTop
-            Actor.RenderOrder.FRONT, Actor.RenderOrder.WIRES  -> actorsRenderFront
-            Actor.RenderOrder.OVERLAY-> actorsRenderOverlay
+            Actor.RenderOrder.BEHIND -> visibleActorsRenderBehind
+            Actor.RenderOrder.MIDDLE -> visibleActorsRenderMiddle
+            Actor.RenderOrder.MIDTOP -> visibleActorsRenderMidTop
+            Actor.RenderOrder.FRONT  -> visibleActorsRenderFront
+            Actor.RenderOrder.OVERLAY-> visibleActorsRenderOverlay
         }
     }
 
@@ -977,7 +965,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             throw Error("The actor $actor already exists in the game")
         }
         else {
-            if (actor.referenceID < ReferencingRanges.ACTORS_WIRES.first) {
+            if (actor.referenceID !in ReferencingRanges.ACTORS_WIRES && actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER) {
                 printdbg(this, "Adding actor $actor")
                 printStackTrace(this)
             }
@@ -1096,11 +1084,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        actorsRenderBehind.forEach { it.dispose() }
-        actorsRenderMiddle.forEach { it.dispose() }
-        actorsRenderMidTop.forEach { it.dispose() }
-        actorsRenderFront.forEach { it.dispose() }
-        actorsRenderOverlay.forEach { it.dispose() }
+        visibleActorsRenderBehind.forEach { it.dispose() }
+        visibleActorsRenderMiddle.forEach { it.dispose() }
+        visibleActorsRenderMidTop.forEach { it.dispose() }
+        visibleActorsRenderFront.forEach { it.dispose() }
+        visibleActorsRenderOverlay.forEach { it.dispose() }
 
         uiContainer.forEach {
             it?.handler?.dispose()

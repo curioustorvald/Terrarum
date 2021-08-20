@@ -268,26 +268,22 @@ object Terrarum : Disposable {
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.rawDeltaTime
 
-    private val noSubActorClass = hashSetOf(Actor.RenderOrder.WIRES)
-
     /**
      * Usage:
      *
      * override var referenceID: Int = generateUniqueReferenceID()
      */
     fun generateUniqueReferenceID(renderOrder: Actor.RenderOrder): ActorID {
+        fun renderOrderToRange(renderOrder: Actor.RenderOrder) = when (renderOrder) {
+            Actor.RenderOrder.BEHIND -> Actor.RANGE_BEHIND
+            Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
+            Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
+            Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
+            Actor.RenderOrder.OVERLAY-> Actor.RANGE_OVERLAY
+        }
         fun hasCollision(value: ActorID) =
                 try {
-                    Terrarum.ingame?.theGameHasActor(value) == true ||
-                    value < ItemCodex.ACTORID_MIN ||
-                    value !in when (renderOrder) {
-                        Actor.RenderOrder.BEHIND -> Actor.RANGE_BEHIND
-                        Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
-                        Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
-                        Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
-                        Actor.RenderOrder.OVERLAY-> Actor.RANGE_OVERLAY
-                        Actor.RenderOrder.WIRES -> Actor.RANGE_WIRES
-                    }
+                    Terrarum.ingame?.theGameHasActor(value) == true
                 }
                 catch (gameNotInitialisedException: KotlinNullPointerException) {
                     false
@@ -295,7 +291,9 @@ object Terrarum : Disposable {
 
         var ret: Int
         do {
-            ret = HQRNG().nextInt().and(if (noSubActorClass.contains(renderOrder)) 0x7FFFFFFF else 0x7FFFFF00) // set new ID
+            val range = renderOrderToRange(renderOrder)
+            val size = range.last - range.first + 1
+            ret = (HQRNG().nextInt().rem(size) + range.first) and 0x7FFF_FF00 // make room for sub-actors
         } while (hasCollision(ret)) // check for collision
         return ret
     }
