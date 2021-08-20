@@ -4,6 +4,7 @@ import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.random.Fudge3
 import net.torvald.terrarum.langpack.Lang
 import com.google.gson.JsonObject
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorValue
@@ -15,6 +16,7 @@ import java.security.SecureRandom
 object InjectCreatureRaw {
 
     private const val JSONMULT = "mult" // one appears in JSON files
+    private const val BUFF = AVKey.BUFF // one appears in JSON files
 
     /**
      * 'Injects' creature raw ActorValue to the ActorValue reference provided.
@@ -25,115 +27,46 @@ object InjectCreatureRaw {
     operator fun invoke(actorValueRef: ActorValue, module: String, jsonFileName: String) {
         val jsonObj = JsonFetcher(ModMgr.getPath(module, "creatures/$jsonFileName"))
 
-        // TODO make it work for every possible keys (maybe except ones starts with '_')
+        jsonObj.keySet().filter { !it.startsWith("_") }.forEach { key ->
 
-        val elementsInt = arrayOf(AVKey.BASEHEIGHT, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
-        val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
-        val elementsDouble = arrayOf(AVKey.BASEMASS, AVKey.ACCEL)
-        val elementsDoubleVariable = arrayOf(AVKey.STRENGTH, AVKey.SPEED, AVKey.JUMPPOWER, AVKey.SCALE)
-        val elementsBoolean = arrayOf(AVKey.INTELLIGENT)
-        // val elementsMultiplyFromOne = arrayOf()
+            val diceRollers = ArrayList<String>()
 
-        setAVInts(actorValueRef, elementsInt, jsonObj)
-        setAVStrings(actorValueRef, elementsString, jsonObj)
-        setAVDoubles(actorValueRef, elementsDouble, jsonObj)
-        setAVDoublesVariable(actorValueRef, elementsDoubleVariable, jsonObj)
-        // setAVMultiplyFromOne(actorValueRef, elementsMultiplyFromOne, jsonObj)
-        setAVBooleans(actorValueRef, elementsBoolean, jsonObj)
+            jsonObj[key].let {
+                if (it.isJsonPrimitive) {
+                    val raw = it.asString
+                    val lowraw = raw.toLowerCase()
+                    // can the value be cast to Boolean?
+                    if (lowraw == "true") actorValueRef[key] = true
+                    else if (lowraw == "false") actorValueRef[key] = false
+                    else {
+                        try {
+                            actorValueRef[key] =
+                                    if (raw.contains('.')) it.asDouble
+                                    else it.asInt
+                        }
+                        catch (e: NumberFormatException) {
+                            actorValueRef[key] = raw
+                        }
+                    }
+                }
+                else if (key.endsWith(JSONMULT) && it.isJsonArray) {
+                    diceRollers.add(key)
+                }
+                else {
+                    printdbg(this, "Unknown Creature Raw key: $key")
+                }
+            }
 
-        actorValueRef[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
-        actorValueRef[AVKey.ACCELBUFF] = 1.0
-    }
+            diceRollers.forEach { keymult ->
+                val keybase = keymult.substring(0, keymult.length - 4)
+                val baseValue = jsonObj[keybase].asDouble
+                val selected = Fudge3(SecureRandom()).rollForArray()
+                val mult = jsonObj[keymult].asJsonArray.get(selected).asInt
+                val realValue = baseValue * mult / 100.0
 
-    /**
-     * Fetch and set actor values that have 'variable' appended. E.g. strength
-     * @param avRef
-     * *
-     * @param elemSet
-     * *
-     * @param jsonObject
-     */
-    private fun setAVDoublesVariable(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
-        for (s in elemSet) {
-            val baseValue = jsonObject.get(s).asDouble
-            // roll fudge dice and get value [-3, 3] as [0, 6]
-            val varSelected = Fudge3(SecureRandom()).rollForArray()
-            // get multiplier from json. Assuming percentile
-            val multiplier = jsonObject.get(s + JSONMULT).asJsonArray.get(varSelected).asInt
-            val realValue = baseValue * multiplier / 100.0
-
-            avRef[s] = realValue
-            avRef[s + "buff"] = 1.0 // buffed value: use multiplied value as 'base' for all sort of things
-        }
-    }
-
-    /**
-     * Fetch and set string actor values
-     * @param avRef
-     * *
-     * @param elemSet
-     * *
-     * @param jsonObject
-     */
-    private fun setAVStrings(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
-        for (s in elemSet) {
-            val key = jsonObject.get(s).asString
-            avRef[s] = Lang[key]
-        }
-    }
-
-    /**
-     * Fetch and set double actor values
-     * @param avRef
-     * *
-     * @param elemSet
-     * *
-     * @param jsonObject
-     */
-    private fun setAVDoubles(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
-        for (s in elemSet) {
-            avRef[s] = jsonObject.get(s).asDouble
-        }
-    }
-
-    /**
-     * Fetch and set int actor values
-     * @param avRef
-     * *
-     * @param elemSet
-     * *
-     * @param jsonObject
-     */
-    private fun setAVInts(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
-        for (s in elemSet) {
-            avRef[s] = jsonObject.get(s).asInt
-        }
-    }
-
-    /**
-     * Fetch and set actor values that should multiplier be applied to the base value of 1.
-     * @param avRef
-     * *
-     * @param elemSet
-     * *
-     * @param jsonObject
-     */
-    private fun setAVMultiplyFromOne(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
-        for (s in elemSet) {
-            val baseValue = 1.0
-            // roll fudge dice and get value [-3, 3] as [0, 6]
-            val varSelected = Fudge3(SecureRandom()).rollForArray()
-            // get multiplier from json. Assuming percentile
-            val multiplier = jsonObject.get(s).asJsonArray.get(varSelected).asInt
-            val realValue = baseValue * multiplier / 100.0
-
-            avRef[s] = realValue
-        }
-    }
-
-    private fun setAVBooleans(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
-        for (s in elemSet) {
-            avRef[s] = jsonObject.get(s).asBoolean
+                actorValueRef[keybase] = realValue
+                actorValueRef[keybase + BUFF] = 1.0
+            }
         }
     }
 }

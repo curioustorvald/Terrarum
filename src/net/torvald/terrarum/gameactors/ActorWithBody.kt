@@ -904,18 +904,23 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                                 )
 
                     // adjust finalDisplacement for honest-to-god staircasing
-                    if (staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
+                    if (vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
                         // TODO!!
                         // remove Y displacement
                         // let original X velocity to pass-thru instead of snapping to tiles coded above
                         // pass-thru values are held by the vectorSum
-                        println("staiscasing: $staircaseStatus for $selfCollisionStatus")
+                        println("staircasing: $staircaseStatus for $selfCollisionStatus")
 
                         finalDisplacement.y = if (staircaseStatus == COLLIDING_LEFT) -stairHeightLeft else -stairHeightRight
                         finalDisplacement.x = vectorSum.x
 
                         bounceX = false
                         bounceY = false
+
+                        // maybe slow down the player?
+                        if (controllerV != null) {
+                            controllerV!!.x *= 0.5
+                        }
                     }
                     else {
                         bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
