@@ -1126,7 +1126,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         val tyStart = y1.plus(HALF_PIXEL).floorInt()
         val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
 
-        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first > 0
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first == 2
     }
 
     /**
