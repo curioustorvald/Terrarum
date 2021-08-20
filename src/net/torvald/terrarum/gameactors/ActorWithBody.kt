@@ -905,11 +905,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
 
                     // adjust finalDisplacement for honest-to-god staircasing
                     if (vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
-                        // TODO!!
                         // remove Y displacement
                         // let original X velocity to pass-thru instead of snapping to tiles coded above
                         // pass-thru values are held by the vectorSum
-                        println("staircasing: $staircaseStatus for $selfCollisionStatus")
+
+                        //println("staircasing: $staircaseStatus for $selfCollisionStatus")
 
                         finalDisplacement.y = if (staircaseStatus == COLLIDING_LEFT) -stairHeightLeft else -stairHeightRight
                         finalDisplacement.x = vectorSum.x
@@ -917,9 +917,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
                         bounceX = false
                         bounceY = false
 
-                        // maybe slow down the player?
+                        // this will slow down the player, but its main purpose is to hide a bug
+                        // where when player happens to be "walled" (which zeroes the x velo) and keeps moving left/right
+                        // so we also zero the same exact value here for perfect hiding
                         if (controllerV != null) {
-                            controllerV!!.x *= 0.5
+                            controllerV!!.x = 0.0
                         }
                     }
                     else {
