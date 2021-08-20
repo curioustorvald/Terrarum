@@ -173,7 +173,7 @@ public class LwjglGraphics implements Graphics {
         }
     }
 
-    public float getRawDeltaTime () {
+    public float getDeltaTime () {
         return deltaTime;
     }
 

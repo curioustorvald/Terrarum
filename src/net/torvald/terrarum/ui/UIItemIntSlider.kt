@@ -96,37 +96,37 @@ class UIItemIntSlider(
         get() = super.mouseOverCall
     override var updateListener: ((Float) -> Unit)?
         get() = super.updateListener
-        set(value) {}
+        set(_) {}
     override var keyDownListener: ((Int) -> Unit)?
         get() = super.keyDownListener
-        set(value) {}
+        set(_) {}
     override var keyUpListener: ((Int) -> Unit)?
         get() = super.keyUpListener
-        set(value) {}
+        set(_) {}
     override var mouseMovedListener: ((Int, Int) -> Unit)?
         get() = super.mouseMovedListener
-        set(value) {}
+        set(_) {}
     override var touchDraggedListener: ((Int, Int, Int) -> Unit)?
         get() = super.touchDraggedListener
-        set(value) {}
+        set(_) {}
     override var touchDownListener: ((Int, Int, Int, Int) -> Unit)?
         get() = super.touchDownListener
-        set(value) {}
+        set(_) {}
     override var touchUpListener: ((Int, Int, Int, Int) -> Unit)?
         get() = super.touchUpListener
-        set(value) {}
+        set(_) {}
     override var scrolledListener: ((Float, Float) -> Unit)?
         get() = super.scrolledListener
-        set(value) {}
+        set(_) {}
     override var clickOnceListener: ((Int, Int, Int) -> Unit)?
         get() = super.clickOnceListener
-        set(value) {}
+        set(_) {}
     override var clickOnceListenerFired: Boolean
         get() = super.clickOnceListenerFired
-        set(value) {}
+        set(_) {}
     override var controllerInFocus: Boolean
         get() = super.controllerInFocus
-        set(value) {}
+        set(_) {}
 
     override fun dispose() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

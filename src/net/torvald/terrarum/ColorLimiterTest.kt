@@ -39,11 +39,10 @@ object ColorLimiterTest : ApplicationAdapter() {
         ShaderProgram.pedantic = false
 
         shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
-        shader4096.begin()
+        shader4096.bind()
         shader4096.setUniformf("rcount", 4f)
         shader4096.setUniformf("gcount", 4f)
         shader4096.setUniformf("bcount", 4f)
-        shader4096.end()
 
         //img = Texture("assets/test_gradient.tga")
         img = Texture("assets/test_texture.tga")

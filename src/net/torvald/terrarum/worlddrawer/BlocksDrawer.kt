@@ -605,7 +605,7 @@ internal object BlocksDrawer {
             tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
         }
 
-        shader.begin()
+        shader.bind()
         shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
         shader.setUniform2fv("tilesInAtlas", AppLoader.tileMaker.SHADER_SIZE_KEYS, 2, 2)
         shader.setUniform2fv("atlasTexSize", AppLoader.tileMaker.SHADER_SIZE_KEYS, 0, 2)
@@ -628,7 +628,6 @@ internal object BlocksDrawer {
         shader.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
         //shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
-        shader.end()
 
         //tilesBufferAsTex.dispose()
     }

@@ -534,7 +534,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // ASYNCHRONOUS UPDATE AND RENDER //
 
         /** UPDATE CODE GOES HERE */
-        val dt = Gdx.graphics.rawDeltaTime
+        val dt = Gdx.graphics.deltaTime
         updateAkku += dt
 
         var i = 0L
@@ -549,16 +549,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** RENDER CODE GOES HERE */
         AppLoader.measureDebugTime("Ingame.Render") { renderGame() }
-        AppLoader.setDebugTime("Ingame.Render - (Light + Tiling)",
-                ((AppLoader.debugTimers["Ingame.Render"] as? Long) ?: 0) -
-                (
-                        ((AppLoader.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
-                )
-        )
 
     }
 
@@ -660,11 +650,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         uiContainer.forEach {
             when (it) {
-                is UICanvas -> it.update(Gdx.graphics.rawDeltaTime)
-                is Id_UICanvasNullable -> it.get()?.update(Gdx.graphics.rawDeltaTime)
+                is UICanvas -> it.update(Gdx.graphics.deltaTime)
+                is Id_UICanvasNullable -> it.get()?.update(Gdx.graphics.deltaTime)
             }
         }
-        //uiFixture?.update(Gdx.graphics.rawDeltaTime)
+        //uiFixture?.update(Gdx.graphics.deltaTime)
         // deal with the uiFixture being closed
         if (uiFixture?.isClosed == true) { uiFixture = null }
 

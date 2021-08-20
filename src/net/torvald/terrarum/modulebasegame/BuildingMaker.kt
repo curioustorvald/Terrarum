@@ -314,7 +314,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
-        val dt = Gdx.graphics.rawDeltaTime
+        val dt = Gdx.graphics.deltaTime
         updateAkku += dt
 
         var i = 0L

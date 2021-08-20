@@ -93,11 +93,10 @@ object IngameRenderer : Disposable {
 
         if (AppLoader.getConfigBoolean("fxdither")) {
             shaderBayer = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
-            shaderBayer.begin()
+            shaderBayer.bind()
             shaderBayer.setUniformf("rcount", 64f)
             shaderBayer.setUniformf("gcount", 64f)
             shaderBayer.setUniformf("bcount", 64f)
-            shaderBayer.end()
         }
         else {
             shaderBayer = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
@@ -626,11 +625,10 @@ object IngameRenderer : Disposable {
             val texture = LightmapRenderer.draw()
             texture.bind(0)
 
-            shaderPassthru.begin()
+            shaderPassthru.bind()
             shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
             shaderPassthru.setUniformi("u_texture", 0)
             blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
-            shaderPassthru.end()
         }
 
         // do blurring
@@ -641,7 +639,7 @@ object IngameRenderer : Disposable {
                 blurTex.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
                 blurTex.texture.bind(0)
 
-                shaderBlur.begin()
+                shaderBlur.bind()
                 shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
                 shaderBlur.setUniformi("u_texture", 0)
                 shaderBlur.setUniformf("iResolution",
@@ -652,7 +650,6 @@ object IngameRenderer : Disposable {
                 else
                     shaderBlur.setUniformf("direction", 0f, blurRadius)
                 blurWriteQuad.render(shaderBlur, GL20.GL_TRIANGLES)
-                shaderBlur.end()
 
 
                 // swap

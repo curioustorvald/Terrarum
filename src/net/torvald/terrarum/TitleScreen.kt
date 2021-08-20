@@ -194,7 +194,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         // async update and render
 
-        val dt = Gdx.graphics.rawDeltaTime
+        val dt = Gdx.graphics.deltaTime
         updateAkku += dt
 
         var i = 0L
@@ -208,16 +208,6 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         // render? just do it anyway
         AppLoader.measureDebugTime("Ingame.Render") { renderScreen() }
-        AppLoader.setDebugTime("Ingame.Render - (Light + Tiling)",
-                ((AppLoader.debugTimers["Ingame.Render"] as? Long) ?: 0) -
-                (
-                        ((AppLoader.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
-                )
-        )
     }
 
     fun updateScreen(delta: Float) {

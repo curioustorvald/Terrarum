@@ -266,7 +266,7 @@ object Terrarum : Disposable {
         get() = Gdx.input.deltaY
     /** Delta converted as it it was a FPS */
     inline val updateRate: Double
-        get() = 1.0 / Gdx.graphics.rawDeltaTime
+        get() = 1.0 / Gdx.graphics.deltaTime
 
     /**
      * Usage:

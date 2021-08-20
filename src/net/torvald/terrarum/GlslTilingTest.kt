@@ -139,7 +139,7 @@ object GlslTilingTest : ApplicationAdapter() {
         tilesBufferAsTex.bind(2)
         tileAtlas.bind(1) // for some fuck reason, it must be bound as last
 
-        shader.begin()
+        shader.bind()
         shader.setUniformMatrix("u_projTrans", batch.projectionMatrix)//camera.combined)
         //shader.setUniformf("colourFilter", Color.RED)
         shader.setUniformf("screenDimension", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
@@ -152,7 +152,6 @@ object GlslTilingTest : ApplicationAdapter() {
         shader.setUniformf("tilesInAtlas", 256f, 256f) //depends on the tile atlas
         shader.setUniformf("atlasTexSize", 4096f, 4096f) //depends on the tile atlas
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
-        shader.end()
         tilesBufferAsTex.dispose()
 
 

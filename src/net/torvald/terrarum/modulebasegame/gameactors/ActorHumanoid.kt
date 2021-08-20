@@ -567,7 +567,7 @@ open class ActorHumanoid(
 
                     val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jmpCtr)
                     forceVec.y -= getJumpAcc(jumpPower, timedJumpCharge)
-                    forceVec.y += getDrag(AppLoader.UPDATE_RATE, forceVec).y
+                    forceVec.y += getDrag(forceVec).y
 
                     simYPos += forceVec.y // ignoring all the fluid drag OTHER THAN THE AIR
 

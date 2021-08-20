@@ -39,7 +39,7 @@ class UIElemTest : ApplicationAdapter() {
 
 
     override fun render() {
-        ui.update(Gdx.graphics.rawDeltaTime)
+        ui.update(Gdx.graphics.deltaTime)
         ui.render(batch, camera)
     }
 

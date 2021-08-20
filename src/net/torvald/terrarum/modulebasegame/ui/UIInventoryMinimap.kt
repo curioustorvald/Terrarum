@@ -36,7 +36,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     override fun updateUI(delta: Float) {
         MinimapComposer.setWorld(Terrarum.ingame!!.world)
         MinimapComposer.update()
-        minimapRerenderTimer += Gdx.graphics.rawDeltaTime
+        minimapRerenderTimer += Gdx.graphics.deltaTime
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

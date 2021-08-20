@@ -49,7 +49,7 @@ object SavegameWriter {
     private lateinit var playerName: String
 
     operator fun invoke(pnameOverride: String? = null): Boolean {
-        playerName = pnameOverride ?: "${Terrarum.ingame!!.actorGamer!!.actorValue[AVKey.NAME]}"
+        playerName = pnameOverride ?: "${Terrarum.ingame!!.actorGamer.actorValue[AVKey.NAME]}"
         if (playerName.isEmpty()) playerName = "Test subject ${Math.random().times(0x7FFFFFFF).roundToInt()}"
 
         try {
@@ -71,7 +71,7 @@ object SavegameWriter {
         val creationDate = System.currentTimeMillis() / 1000L
         val ingame = Terrarum.ingame!!
         val gameworld = ingame.world
-        val player = ingame.actorGamer!!
+        val player = ingame.actorGamer
         val disk = VDUtil.createNewDisk(0x7FFFFFFFFFFFFFFFL, "Tesv-$playerName", charset)
         val ROOT = disk.root.entryID
 

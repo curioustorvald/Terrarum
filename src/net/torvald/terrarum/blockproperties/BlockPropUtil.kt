@@ -81,7 +81,7 @@ object BlockPropUtil {
 
             // FPS-time compensation
             if (Gdx.graphics.framesPerSecond > 0) {
-                prop.rngBase0 += Gdx.graphics.rawDeltaTime
+                prop.rngBase0 += Gdx.graphics.deltaTime
             }
 
             // reset timer

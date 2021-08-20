@@ -487,7 +487,7 @@ public class AppLoader implements ApplicationListener {
             postInit();
         }
 
-        AppLoader.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getRawDeltaTime() * 1000_000_000f));
+        AppLoader.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getDeltaTime() * 1000_000_000f));
 
 
         FrameBufferManager.begin(renderFBO);
@@ -500,7 +500,7 @@ public class AppLoader implements ApplicationListener {
         if (currenScreen == null) {
             drawSplash();
 
-            loadTimer += Gdx.graphics.getRawDeltaTime();
+            loadTimer += Gdx.graphics.getDeltaTime();
 
             if (loadTimer >= showupTime) {
                 // hand over the scene control to this single class; Terrarum must call
@@ -556,13 +556,12 @@ public class AppLoader implements ApplicationListener {
     }
 
     private void drawSplash() {
-        shaderBayerSkyboxFill.begin();
+        shaderBayerSkyboxFill.bind();
         shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
         shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
         shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b);
         shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b);
         fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
-        shaderBayerSkyboxFill.end();
 
 
         setCameraPosition(0f, 0f);

@@ -18,14 +18,12 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 
 /**
@@ -33,8 +31,8 @@ import kotlin.math.sign
  * Also has all the usePhysics
  *
  * @param renderOrder Rendering order (BEHIND, MIDDLE, MIDTOP, FRONT)
- * @param immobileBody use realistic air friction (1/1000 of "unrealistic" canonical setup)
- * @param usePhysics use usePhysics simulation
+ * @param physProp physics properties
+ * @param id use custom ActorID
  *
  * Created by minjaesong on 2016-01-13.
  */
@@ -328,8 +326,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
      * @param h
      * @param tx positive: translate sprite to LEFT.
      * @param ty positive: translate sprite to DOWN.
-     * @see ActorWBMovable.drawBody
-     * @see ActorWBMovable.drawGlow
      */
     fun setHitboxDimension(w: Int, h: Int, tx: Int, ty: Int) {
         baseHitboxH = h
@@ -423,7 +419,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
                 // Actors are subject to the gravity and the buoyancy if they are not levitating
 
                 if (!isNoSubjectToGrav) {
-                    applyGravitation(delta)
+                    applyGravitation()
                 }
 
                 //applyBuoyancy()
@@ -463,9 +459,9 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
                 // TODO less friction for non-animating objects (make items glide far more on ice)
 
                 // FIXME asymmetry on friction
-                setHorizontalFriction(delta) // friction SHOULD use and alter externalV
+                setHorizontalFriction() // friction SHOULD use and alter externalV
                 //if (isNoClip) { // TODO also hanging on the rope, etc.
-                setVerticalFriction(delta)
+                setVerticalFriction()
                 //}
 
 
@@ -514,54 +510,12 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
         isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
     }
 
-    /**
-     * Similar to applyForce but deals with walking. Read below:
-     *
-     * how speedcap is achieved with moveDelta:
-     * moveDelta is (velo + walk), but this added value is reset every update.
-     * if it wasn't, it will go like this:
-     *  F 0     velo + walk
-     *  F 1     velo + walk + velo + walk
-     * as a result, the speed will keep increase without it
-     */
-    /*private fun combineVeloToMoveDelta() {
-        if (this is Controllable) {
-            // decide whether to ignore walkX
-            if (!(isWalled(hitbox, COLLIDING_LEFT) && walkX < 0)
-                || !(isWalled(hitbox, COLLIDING_RIGHT) && walkX > 0)
-                    ) {
-                moveDelta.x = externalV.x + walkX
-            }
-
-            // decide whether to ignore walkY
-            if (!(isWalled(hitbox, COLLIDING_TOP) && walkY < 0)
-                || !(isWalled(hitbox, COLLIDING_BOTTOM) && walkY > 0)
-                    ) {
-                moveDelta.y = externalV.y + walkY
-            }
-        }
-        else {
-            if (!isWalled(hitbox, COLLIDING_LEFT)
-                || !isWalled(hitbox, COLLIDING_RIGHT)
-                    ) {
-                moveDelta.x = externalV.x
-            }
-
-            // decide whether to ignore walkY
-            if (!isWalled(hitbox, COLLIDING_TOP)
-                || !isWalled(hitbox, COLLIDING_BOTTOM)
-                    ) {
-                moveDelta.y = externalV.y
-            }
-        }
-    }*/
-
-    fun getDrag(delta: Float, externalForce: Vector2): Vector2 {
+    fun getDrag(externalForce: Vector2): Vector2 {
         /**
          * weight; gravitational force in action
          * W = mass * G (9.8 [m/s^2])
          */
-        val W: Vector2 = gravitation * Terrarum.PHYS_TIME_FRAME.toDouble()
+        val W: Vector2 = gravitation * Terrarum.PHYS_TIME_FRAME
         /**
          * Area
          */
@@ -595,41 +549,14 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
      *
      * Apply only if not grounded; normal force is precessed separately.
      */
-    private fun applyGravitation(delta: Float) {
+    private fun applyGravitation() {
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
-            applyForce(getDrag(delta, externalV))
+            applyForce(getDrag(externalV))
             //}
         }
     }
-
-    /**
-     * nextHitbox must NOT be altered before this method is called!
-     */
-    /*@Deprecated("It's stupid anyway.") private fun displaceByCCD() {
-        if (!isNoCollideWorld) {
-            if (!isColliding(hitbox))
-                return
-
-            // do some CCD between hitbox and nextHitbox
-            val ccdDelta = (hitbox.toVector() - hitbox.toVector())
-            if (ccdDelta.x != 0.0 || ccdDelta.y != 0.0) {
-                //ccdDelta.set(ccdDelta.setMagnitude(CCD_TICK)) // fixed tick
-                val displacement = Math.min(1.0.div(moveDelta.magnitude * 2), 0.5) // adaptive tick
-                ccdDelta.set(ccdDelta.setMagnitude(displacement))
-            }
-
-            //println("deltaMax: $deltaMax")
-            //println("ccdDelta: $ccdDelta")
-
-            while (!ccdDelta.isZero && isColliding(hitbox)) {
-                hitbox.translate(-ccdDelta)
-            }
-
-            //println("ccdCollided: $ccdCollided")
-        }
-    }*/
 
     private fun displaceHitbox() {
         // // HOW IT SHOULD WORK // //
@@ -1002,7 +929,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
             val intpStep = 64.0
 
             // make interpolation even if the "next" position is clear of collision
-            var clearOfCollision = true
             val testHitbox = hitbox.clone()
 
             // divide the vectors by the constant
@@ -1020,13 +946,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
                 if (isWalled2(testHitbox, COLLIDING_UD)) {
                     externalV.y *= elasticity // TODO also multiply the friction value
                     controllerV?.let { controllerV!!.y *= elasticity } // TODO also multiply the friction value
-                    clearOfCollision = false
                 }
                 // horizontal collision
                 if (isWalled2(testHitbox, COLLIDING_LR)) {
                     externalV.x *= elasticity // TODO also multiply the friction value
                     controllerV?.let { controllerV!!.x *= elasticity } // TODO also multiply the friction value
-                    clearOfCollision = false
                 }
 
             }
@@ -1241,7 +1165,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
         val ys = if (gravitation.y >= 0) pyEnd downTo pyStart else pyStart..pyEnd
         val yheight = (ys.last - ys.first).absoluteValue
         var stairHeight = 0
-        var countUpForStairHeight = true
         var hitFloor = false
 
         for (y in ys) {
@@ -1370,7 +1293,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
 
     /** about stopping
      * for about get moving, see updateMovementControl */
-    private fun setHorizontalFriction(delta: Float) {
+    private fun setHorizontalFriction() {
         val friction = if (isNoClip)
             BASE_FRICTION * (actorValue.getAsDouble(AVKey.FRICTIONMULT) ?: 1.0) * BlockCodex[Block.STONE].friction.frictionToMult()
         else {
@@ -1399,7 +1322,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
         }
     }
 
-    private fun setVerticalFriction(delta: Float) {
+    private fun setVerticalFriction() {
         val friction = if (isNoClip)
             BASE_FRICTION * (actorValue.getAsDouble(AVKey.FRICTIONMULT) ?: 1.0) * BlockCodex[Block.STONE].friction.frictionToMult()
         else

@@ -54,7 +54,7 @@ open class UIItemTransitionContainer(
         }
 
         if (transitionOngoing) {
-            transitionTimer += Gdx.graphics.rawDeltaTime
+            transitionTimer += Gdx.graphics.deltaTime
 
             currentPosition = UIUtils.moveLinear(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
 

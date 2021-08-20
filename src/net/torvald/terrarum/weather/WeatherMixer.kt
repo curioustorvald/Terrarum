@@ -193,7 +193,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // don't use shader to just fill the whole screen... frag shader will be called a million times and it's best to not burden it
         /*
-        IngameRenderer.shaderSkyboxFill.begin()
+        IngameRenderer.shaderSkyboxFill.bind()
         IngameRenderer.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
         IngameRenderer.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
         IngameRenderer.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
@@ -201,7 +201,6 @@ internal object WeatherMixer : RNGConsumer {
         IngameRenderer.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
         IngameRenderer.shaderSkyboxFill.setUniformf("zoomInv", 1f / (Terrarum.ingame?.screenZoom ?: 1f))
         AppLoader.fullscreenQuad.render(IngameRenderer.shaderSkyboxFill, GL20.GL_TRIANGLES)
-        IngameRenderer.shaderSkyboxFill.end()
         */
 
 

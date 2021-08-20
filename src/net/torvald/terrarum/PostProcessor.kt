@@ -75,7 +75,7 @@ object PostProcessor : Disposable {
         }
 
 
-        debugUI.update(Gdx.graphics.rawDeltaTime)
+        debugUI.update(Gdx.graphics.deltaTime)
 
 
         AppLoader.measureDebugTime("Renderer.PostProcessor") {
@@ -135,11 +135,10 @@ object PostProcessor : Disposable {
 
         fbo.colorBufferTexture.bind(0)
 
-        shader?.begin()
+        shader?.bind()
         shader?.setUniformMatrix("u_projTrans", projMat)
         shader?.setUniformi("u_texture", 0)
         AppLoader.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
-        shader?.end()
 
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it

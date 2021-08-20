@@ -70,7 +70,7 @@ object SanicLoadScreen : LoadScreenBase() {
     override fun render(delta: Float) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
-        val delta = Gdx.graphics.rawDeltaTime
+        val delta = Gdx.graphics.deltaTime
 
         glideDispY = AppLoader.screenSize.screenH - 100f - AppLoader.fontGame.lineHeight
         arrowObjGlideSize = arrowObjTex.width + 2f * AppLoader.screenSize.screenW

@@ -30,13 +30,13 @@ class UIVitalMetre(
     private val gap = 4f
 
     override var width: Int = 80 + 2 * margin; set(value) { throw Error("operation not permitted") }
-    override var height: Int; get() = player.baseHitboxH ?: 0 * 3 + margin; set(value) { throw Error("operation not permitted") }
+    override var height: Int; get() = player.baseHitboxH; set(value) { throw Error("operation not permitted") }
 
     override var openCloseTime: Second = 0.05f
 
     //private val relativePX = width / 2f
-    private val offsetY: Float; get() = (player.baseHitboxH ?: 0) * 1.5f
-    private val circleRadius: Float; get() = (player.baseHitboxH ?: 0) * 3f
+    private val offsetY: Float; get() = player.baseHitboxH * 1.5f
+    private val circleRadius: Float; get() = player.baseHitboxH * 3f
 
     private val theta = 33f
     private val halfTheta = theta / 2f
