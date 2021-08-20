@@ -760,12 +760,20 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                 val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
 
                 var staircaseStatus = 0
+                var stairHeightLeft = 0.0
+                var stairHeightRight = 0.0
                 val selfCollisionStatus = intArrayOf(1,2,4,8).fold(0) { acc, state ->
                     // also update staircaseStatus while we're iterating
                     if (state and 5 != 0) {
-                        staircaseStatus = staircaseStatus or (state * (isWalledStairs(newHitbox, state) == 1).toInt())
+                        isWalledStairs(newHitbox, state).let {
+                            staircaseStatus = staircaseStatus or (state * (it.first == 1).toInt())
+                            if (state == COLLIDING_LEFT)
+                                stairHeightLeft = it.second.toDouble()
+                            else
+                                stairHeightRight = it.second.toDouble()
+                        }
                     }
-                    acc or (state * isWalledStairs(newHitbox, state).coerceAtMost(1))
+                    acc or (state * isWalledStairs(newHitbox, state).first.coerceAtMost(1))
                 }
 
                 // superseded by isWalledStairs-related codes
@@ -776,7 +784,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
                 // fixme UP and RIGHT && LEFT and DOWN bug
 
-                println("collision: $selfCollisionStatus\tstaircasing: $staircaseStatus")
+                //println("collision: $selfCollisionStatus\tstaircasing: $staircaseStatus")
 
                 when (selfCollisionStatus) {
                     0     -> {
@@ -901,6 +909,17 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
                         // remove Y displacement
                         // let original X velocity to pass-thru instead of snapping to tiles coded above
                         // pass-thru values are held by the vectorSum
+                        println("staiscasing: $staircaseStatus for $selfCollisionStatus")
+
+                        finalDisplacement.y = if (staircaseStatus == COLLIDING_LEFT) -stairHeightLeft else -stairHeightRight
+                        finalDisplacement.x = vectorSum.x
+
+                        bounceX = false
+                        bounceY = false
+                    }
+                    else {
+                        bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
+                        bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
                     }
 
 
@@ -912,8 +931,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
                     // TODO: translate other axis proportionally to the incident vector
 
-                    bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
-                    bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
 
                 }
 
@@ -1037,7 +1054,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         val tyStart = y1.plus(HALF_PIXEL).floorInt()
         val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
 
-        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, feet) > 0
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, feet).first > 0
     }
 
     /**
@@ -1104,13 +1121,13 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         val tyStart = y1.plus(HALF_PIXEL).floorInt()
         val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
 
-        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM) > 0
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first > 0
     }
 
     /**
-     * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
+     * @return First int: 0 - no collision, 1 - staircasing, 2 - "bonk" to the wall; Second int: stair height
      */
-    private fun isWalledStairs(hitbox: Hitbox, option: Int): Int {
+    private fun isWalledStairs(hitbox: Hitbox, option: Int): Pair<Int, Int> {
         val x1: Double
         val x2: Double
         val y1: Double
@@ -1154,15 +1171,20 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
             y2 = hitbox.endY - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
-            return maxOf(maxOf(isWalledStairs(hitbox, COLLIDING_LEFT), isWalledStairs(hitbox, COLLIDING_RIGHT)),
-                    maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM), isWalledStairs(hitbox, COLLIDING_TOP)))
+            return maxOf(maxOf(isWalledStairs(hitbox, COLLIDING_LEFT).first,
+                    isWalledStairs(hitbox, COLLIDING_RIGHT).first),
+                    maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
+                            isWalledStairs(hitbox, COLLIDING_TOP).first)) to 0
 
         }
         else if (option == COLLIDING_LR) {
-            return maxOf(isWalledStairs(hitbox, COLLIDING_LEFT),isWalledStairs(hitbox, COLLIDING_RIGHT))
+            val v1 = isWalledStairs(hitbox, COLLIDING_LEFT)
+            val v2 = isWalledStairs(hitbox, COLLIDING_RIGHT)
+            return maxOf(v1.first, v2.first) to maxOf(v2.first, v2.second)
         }
         else if (option == COLLIDING_UD) {
-            return maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM), isWalledStairs(hitbox, COLLIDING_TOP))
+            return maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
+                    isWalledStairs(hitbox, COLLIDING_TOP).first) to 0
         }
         else throw IllegalArgumentException("$option")
 
@@ -1199,15 +1221,15 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
     }*/
 
     private val AUTO_CLIMB_STRIDE: Int
-        get() = (8 * scale).toInt() // number inspired by SM64
+        get() = ((actorValue.getAsInt(AVKey.VERTSTRIDE) ?: 8) * scale).toInt()
     //private val AUTO_CLIMB_RATE: Int // we'll just climb stairs instantly to make things work wo worrying about the details
     //    get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZED).toInt()
 
     /**
-     * @return 0 - no collision, 1 - stair, 2 - "bonk" to the wall
+     * @return First int: 0 - no collision, 1 - staircasing, 2 - "bonk" to the wall; Second int: stair height
      */
-    private fun isCollidingInternalStairs(pxStart: Int, pyStart: Int, pxEnd: Int, pyEnd: Int, feet: Boolean = false): Int {
-        if (world == null) return 0
+    private fun isCollidingInternalStairs(pxStart: Int, pyStart: Int, pxEnd: Int, pyEnd: Int, feet: Boolean = false): Pair<Int, Int> {
+        if (world == null) return 0 to 0
 
         val ys = if (gravitation.y >= 0) pyEnd downTo pyStart else pyStart..pyEnd
         val yheight = (ys.last - ys.first).absoluteValue
@@ -1248,7 +1270,7 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
 
             if (stairHeight > AUTO_CLIMB_STRIDE) {
                 //println(" -> $stairHeight ending prematurely")
-                return 2
+                return 2 to stairHeight
             }
 
         }
@@ -1256,11 +1278,11 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties)
         //println("-> $stairHeight")
 
                // edge-detect mode
-        return if (yheight == 0) hitFloor.toInt() * 2
+        return if (yheight == 0) hitFloor.toInt() * 2 to stairHeight
                // not an edge-detect && no collision
-               else if (stairHeight == 0) 0
+               else if (stairHeight == 0) 0 to 0
                // there was collision and stairHeight <= AUTO_CLIMB_STRIDE
-               else 1 // 1; your main code is not ready to handle return code 1 (try "setscale 2")
+               else 1 to stairHeight // 1; your main code is not ready to handle return code 1 (try "setscale 2")
     }
 
     /**

@@ -1,31 +1,31 @@
 {
   "racename": "RACE_HUMAN",
   "racenameplural": "RACE_HUMAN_PLURAL",
-  "baseheight": 40,
-  "basemass": 60.0,
+  "baseheight": 90,
+  "basemass": 600.0,
 
-  "strength": 1000,
+  "strength": 5000,
   "strengthmult": [90,95,98,100,102,105,110],
 
-  "accel": 0.32,
+  "accel": 0.67,
 
-  "speed": 3.0,
+  "speed": 6.0,
   "speedmult": [100,100,100,100,100,100,100],
 
-  "vertstride": 8,
+  "vertstride": 32,
 
-  "jumppower": 13.0,
+  "jumppower": 19.0,
   "jumppowermult": [100,100,100,100,100,100,100],
 
   "scale": 1.0,
   "scalemult": [100,100,100,100,100,100,100],
 
-  "encumbrance": 1000,
+  "encumbrance": 10000,
   "basedefence": 100,
-  "basereach": 50,
+  "basereach": 114,
 
-  "toolsize": 15,
-  
+  "toolsize": 40,
+
   "intelligent": true
 
 }

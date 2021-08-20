@@ -25,6 +25,8 @@ object InjectCreatureRaw {
     operator fun invoke(actorValueRef: ActorValue, module: String, jsonFileName: String) {
         val jsonObj = JsonFetcher(ModMgr.getPath(module, "creatures/$jsonFileName"))
 
+        // TODO make it work for every possible keys (maybe except ones starts with '_')
+
         val elementsInt = arrayOf(AVKey.BASEHEIGHT, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
         val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
         val elementsDouble = arrayOf(AVKey.BASEMASS, AVKey.ACCEL)

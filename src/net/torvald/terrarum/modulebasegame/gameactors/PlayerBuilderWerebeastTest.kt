@@ -16,23 +16,8 @@ object PlayerBuilderWerebeastTest {
                 ModMgr.getPath("basegame", "sprites/taimu_glow.properties"),
                 -589141658L // random value thrown
         )
-        //InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreatureWerebeastBase.json")
 
-        p.actorValue[AVKey.SCALE] = 1.0
-        p.actorValue[AVKey.SPEED] = 6.0
-        p.actorValue[AVKey.SPEEDBUFF] = 1.0
-        p.actorValue[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
-        p.actorValue[AVKey.ACCELBUFF] = 1.0
-        p.actorValue[AVKey.JUMPPOWER] = 19.0
-        p.actorValue[AVKey.BASEREACH] = 114 // 7 tiles + 2 px
-
-        p.actorValue[AVKey.BASEMASS] = 599.16
-        p.actorValue[AVKey.SCALEBUFF] = 1.0 // Constant 1.0 for player, meant to be used by random mobs
-        p.actorValue[AVKey.STRENGTH] = 5000
-        p.actorValue[AVKey.ENCUMBRANCE] = 10000
-        p.actorValue[AVKey.BASEHEIGHT] = 90
-
-        p.actorValue[AVKey.INTELLIGENT] = true
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
         p.actorValue[AVKey.__ACTION_TIMER] = 0.0
