@@ -33,7 +33,7 @@ object KeyToggler {
      * Set ```toggleGameKeys = true``` to make toggling work for keys like Q, W, E, ...; otherwise only F1-F12 keys will be toggled
      */
     fun update(toggleGameKeys: Boolean) {
-        for (it in 0..255) {
+        for (it in 1..255) {
             if (!toggleGameKeys && gameKeys.contains(it)) {
                 continue
             }

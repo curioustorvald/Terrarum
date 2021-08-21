@@ -202,9 +202,6 @@ class UINSMenu(
     override fun endClosing(delta: Float) {
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return super.mouseMoved(screenX, screenY)
-    }
 
     private var dragOriginX = 0 // relative mousepos
     private var dragOriginY = 0 // relative mousepos

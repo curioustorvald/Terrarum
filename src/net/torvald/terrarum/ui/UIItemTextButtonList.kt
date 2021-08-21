@@ -257,10 +257,6 @@ class UIItemTextButtonList(
         return super.keyUp(keycode) || buttons.map { it.keyUp(keycode).toInt() }.sum() != 0
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return super.mouseMoved(screenX, screenY) || buttons.map { it.mouseMoved(screenX, screenY).toInt() }.sum() != 0
-    }
-
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         return super.touchDragged(screenX, screenY, pointer) || buttons.map { it.touchDragged(screenX, screenY, pointer).toInt() }.sum() != 0
     }

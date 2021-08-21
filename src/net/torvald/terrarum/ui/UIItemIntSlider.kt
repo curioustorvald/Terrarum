@@ -103,9 +103,6 @@ class UIItemIntSlider(
     override var keyUpListener: ((Int) -> Unit)?
         get() = super.keyUpListener
         set(_) {}
-    override var mouseMovedListener: ((Int, Int) -> Unit)?
-        get() = super.mouseMovedListener
-        set(_) {}
     override var touchDraggedListener: ((Int, Int, Int) -> Unit)?
         get() = super.touchDraggedListener
         set(_) {}

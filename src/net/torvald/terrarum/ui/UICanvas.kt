@@ -14,10 +14,10 @@ import kotlin.math.roundToInt
  * ## UI Items
  *
  * UI can contain one or more UI elements (called UIItem). Each UIItem can have one or more events programmed to it.
- * Events have their own listener are governed by their GDX event handlers (e.g. mouseMoved).
+ * Events have their own listener are governed by their GDX event handlers (e.g. touchDragged).
  * These GDX handlers are what makes the our own handler to work.
  *
- * UIItems have following event handlers: updateLister, keyDownListener, mouseMovedListener, touchDraggedListener, touchDownListener, touchUpListener, scrolledListener, and clickOnceListener.
+ * UIItems have following event handlers: updateLister, keyDownListener, touchDraggedListener, touchDownListener, touchUpListener, scrolledListener, and clickOnceListener.
  * (perhaps clickOnceListener is the one most useful)
  *
  * To make them work without any hassle on your part,
@@ -149,15 +149,6 @@ abstract class UICanvas(
     }
 
     fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.screenSize.screenW && y in 0 until AppLoader.screenSize.screenH
-
-    open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        if (this.isVisible) {
-            uiItems.forEach { it.mouseMoved(screenX, screenY) }
-            handler.subUIs.forEach { it.mouseMoved(screenX, screenY) }
-            return true
-        }
-        else return false
-    }
 
     /**
      * Called by the screen's InputProcessor

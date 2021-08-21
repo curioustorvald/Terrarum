@@ -346,16 +346,6 @@ void main() {
         TerrarumIngame.setCameraPosition(batch, camera, newX, newY)
     }
 
-    fun mouseMoved(uiItems: List<UIItem>, screenX: Int, screenY: Int): Boolean {
-        if (isVisible) {
-            uiItems.forEach { it.mouseMoved(screenX, screenY) }
-            subUIs.forEach { it.mouseMoved(screenX, screenY) }
-            return true
-        }
-        else {
-            return false
-        }
-    }
     fun touchDragged(uiItems: List<UIItem>, screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (isVisible) {
             uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }

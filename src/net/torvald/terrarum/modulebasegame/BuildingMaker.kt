@@ -505,11 +505,6 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
         return true
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        screen.uiContainer.forEach { it?.mouseMoved(screenX, screenY) }
-        return true
-    }
-
     override fun keyTyped(character: Char): Boolean {
         screen.uiContainer.forEach { it?.keyTyped(character) }
         return true

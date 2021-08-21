@@ -188,14 +188,6 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        screens.forEach {
-            it.second.mouseMoved(screenX, screenY) // again, underlying handler will block unnecessary renders
-        }
-
-        return true
-    }
-
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         screens.forEach {
             it.second.touchDragged(screenX, screenY, pointer) // again, underlying handler will block unnecessary renders

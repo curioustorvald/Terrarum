@@ -96,11 +96,6 @@ open class UIItemTransitionContainer(
         return true
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.mouseMoved(screenX, screenY) }
-        return true
-    }
-
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.touchDragged(screenX, screenY, pointer) }
         return true

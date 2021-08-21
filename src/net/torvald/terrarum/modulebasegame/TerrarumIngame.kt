@@ -564,6 +564,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesActive = 0
 
 
+        // synchronised Ingame Input Updater
+        ingameController.update(delta)
+
+
         if (!paused) {
 
             //hypothetical_input_capturing_function_if_you_finally_decided_to_forgo_gdx_input_processor_and_implement_your_own_to_synchronise_everything()
@@ -610,9 +614,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             //WorldCamera.update(gameworld, actorNowPlaying)
 
         }
-
-        // world click events (e.g. opening the UI that a fixture has) must go here
-        ingameController.update(delta)
 
         /*if (!paused) {
             // completely consume block change queues because why not

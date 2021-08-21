@@ -16,8 +16,7 @@ import net.torvald.terrarum.Terrarum
  * - updateListener
  * - keyDownListener
  * - keyUpListener
- * - mouseMovedListene
- * - touchDraggedListe
+ * - touchDraggedLister
  * - touchDownListener
  * - touchUpListener
  * - scrolledListener
@@ -104,7 +103,6 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open var keyDownListener: ((Int) -> Unit)? = null
     /** Parametre: keycode */
     open var keyUpListener: ((Int) -> Unit)? = null
-    open var mouseMovedListener: ((Int, Int) -> Unit)? = null
     open var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
     /** Parameters: screenX, screenY, pointer, button */
     open var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
@@ -177,14 +175,6 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     }
 
     // mouse controlled
-    open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        if (parentUI.isVisible && mouseMovedListener != null) {
-            mouseMovedListener!!.invoke(relativeMouseX, relativeMouseY)
-            return true
-        }
-
-        return false
-    }
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (parentUI.isVisible && touchDraggedListener != null) {
             touchDraggedListener!!.invoke(relativeMouseX, relativeMouseY, pointer)
