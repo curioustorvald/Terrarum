@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.measureDebugTime
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -188,6 +187,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         private set
 
     var selectedWireRenderClass = ""
+    private var oldSelectedWireRenderClass = ""
 
 
 
@@ -539,16 +539,16 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         var i = 0L
         while (updateAkku >= updateRate) {
-            AppLoader.measureDebugTime("Ingame.Update") { updateGame(updateRate) }
+            measureDebugTime("Ingame.Update") { updateGame(updateRate) }
             updateAkku -= updateRate
             i += 1
         }
-        AppLoader.setDebugTime("Ingame.UpdateCounter", i)
+        setDebugTime("Ingame.UpdateCounter", i)
 
 
 
         /** RENDER CODE GOES HERE */
-        AppLoader.measureDebugTime("Ingame.Render") { renderGame() }
+        measureDebugTime("Ingame.Render") { renderGame() }
 
     }
 
@@ -579,16 +579,23 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             ///////////////////////////
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
-            AppLoader.measureDebugTime("WorldSimulator.update") {
+            measureDebugTime("WorldSimulator.update") {
                 WorldSimulator.invoke(actorNowPlaying, delta)
             }
-            AppLoader.measureDebugTime("WeatherMixer.update") {
+            measureDebugTime("WeatherMixer.update") {
                 WeatherMixer.update(delta, actorNowPlaying, world)
             }
-            AppLoader.measureDebugTime("BlockStats.update") {
+            measureDebugTime("BlockStats.update") {
                 BlockStats.update()
             }
-
+            // fill up visibleActorsRenderFront for wires, if:
+            // 1. something is cued on the wire change queue
+            // 2. wire renderclass changed
+            if (wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
+                measureDebugTime("Ingame.FillUpWiresBuffer") {
+                    fillUpWiresBuffer()
+                }
+            }
 
 
             ////////////////////////////
@@ -620,6 +627,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             terrainChangeQueue.clear()
             wallChangeQueue.clear()
             wireChangeQueue.clear()
+
+            oldSelectedWireRenderClass = selectedWireRenderClass
         }
 
 
@@ -658,11 +667,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiFixture?.update(Gdx.graphics.deltaTime)
         // deal with the uiFixture being closed
         if (uiFixture?.isClosed == true) { uiFixture = null }
-
-        // fill up visibleActorsRenderFront for wires
-        measureDebugTime("Ingame.FillUpWiresBuffer") {
-            fillUpWiresBuffer()
-        }
 
         IngameRenderer.invoke(
                 paused,

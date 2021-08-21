@@ -22,7 +22,7 @@ object ReferencingRanges {
     // IDs doesn't effect the render order at all, but we're kinda enforcing these ID ranging.
     // However, these two wire-related actor will break the rule. But as we want them to render on top of others
     // in the same render orders, we're giveng them relatively high IDs for them.
-    val ACTORS_WIRES   = 0x7FFF_E000..0x7FFF_EFFF // Rendered front--wires
+    val ACTORS_WIRES   = 0x7FFF_C000..0x7FFF_EFFF // Rendered front--wires
     val ACTORS_WIRES_HELPER = 0x7FFF_F000..0x7FFF_FF00 // Rendered overlay--wiring port icons and logic gates
 
     val ACTORS_OVERLAY = 0x7001_0000..0x7FFE_FFFF // Rendered as screen overlay, not affected by light nor environment overlays
