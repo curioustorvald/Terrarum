@@ -65,6 +65,10 @@ open class FixtureBase(
         }
     }
 
+    override fun updateForTerrainChange(cue: IngameInstance.BlockChangeQueueItem) {
+        // TODO check for despawn code here
+    }
+
     /**
      * Adds this instance of the fixture to the world
      *
@@ -187,8 +191,17 @@ interface CuedByTerrainChange {
      *
      * E.g. if a fixture block that is inside of BlockBox is missing, destroy and drop self.
      */
-    //fun updateForWorldChange(cue: IngameInstance.BlockChangeQueueItem)
+    fun updateForTerrainChange(cue: IngameInstance.BlockChangeQueueItem)
 }
+
+interface CuedByWallChange {
+    fun updateForWallChange(cue: IngameInstance.BlockChangeQueueItem)
+}
+
+interface CuedByWireChange {
+    fun updateForWireChange(cue: IngameInstance.BlockChangeQueueItem)
+}
+
 
 /**
  * Standard 32-bit binary flags.

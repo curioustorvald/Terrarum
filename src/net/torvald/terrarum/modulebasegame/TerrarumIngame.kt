@@ -565,8 +565,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // synchronised Ingame Input Updater
+        // will also queue up the block/wall/wire placed events
         ingameController.update(delta)
-
 
         if (!paused) {
 
@@ -615,12 +615,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         }
 
-        /*if (!paused) {
+        if (!paused) {
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
             wallChangeQueue.clear()
             wireChangeQueue.clear()
-        }*/
+        }
 
 
         ////////////////////////
@@ -859,13 +859,26 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                         }
                     }
 
-                    /*if (it is CuedByTerrainChange) {
-                        printdbg(this, "actor is CuedByTerrainChange: ${terrainChangeQueue}")
+                    if (it is CuedByTerrainChange) {
                         terrainChangeQueue.forEach { cue ->
                             printdbg(this, "Ingame actors terrainChangeCue: ${cue}")
-                            it.updateForWorldChange(cue)
+                            it.updateForTerrainChange(cue)
                         }
-                    }*/
+                    }
+
+                    if (it is CuedByWallChange) {
+                        wallChangeQueue.forEach { cue ->
+                            printdbg(this, "Ingame actors wallChangeCue: ${cue}")
+                            it.updateForWallChange(cue)
+                        }
+                    }
+
+                    if (it is CuedByWireChange) {
+                        wireChangeQueue.forEach { cue ->
+                            printdbg(this, "Ingame actors wireChangeCue: ${cue}")
+                            it.updateForWireChange(cue)
+                        }
+                    }
                 }
             }
             actorNowPlaying?.update(delta)

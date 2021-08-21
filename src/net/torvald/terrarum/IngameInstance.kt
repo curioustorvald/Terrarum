@@ -71,9 +71,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
     // FIXME queues will not work; input processing (blocks will queue) and queue consuming cannot be synchronised
-    //protected val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
-    //protected val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
-    //protected val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
+    protected val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
+    protected val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
+    protected val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     override fun hide() {
     }
@@ -153,6 +153,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * Queueing schema is used to make sure things are synchronised.
      */
     open fun queueTerrainChangedEvent(old: ItemID, new: ItemID, x: Int, y: Int) {
+        terrainChangeQueue.add(BlockChangeQueueItem(old, new, x, y))
         //printdbg(this, terrainChangeQueue)
     }
 
@@ -160,7 +161,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * Wall version of terrainChanged() event
      */
     open fun queueWallChangedEvent(old: ItemID, new: ItemID, x: Int, y: Int) {
-        //wallChangeQueue.add(BlockChangeQueueItem(old, new, x, y))
+        wallChangeQueue.add(BlockChangeQueueItem(old, new, x, y))
     }
 
     /**
@@ -170,7 +171,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * @param new current settings of conduits in bit set format.
      */
     open fun queueWireChangedEvent(wire: ItemID, isRemoval: Boolean, x: Int, y: Int) {
-        //wireChangeQueue.add(BlockChangeQueueItem(if (isRemoval) wire else "", if (isRemoval) "" else wire, x, y))
+        wireChangeQueue.add(BlockChangeQueueItem(if (isRemoval) wire else "", if (isRemoval) "" else wire, x, y))
+        //printdbg(this, wireChangeQueue)
     }
 
 
