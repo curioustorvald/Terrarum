@@ -71,9 +71,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
     // FIXME queues will not work; input processing (blocks will queue) and queue consuming cannot be synchronised
-    protected val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
-    protected val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
-    protected val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
+    val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
+    val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
+    val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     override fun hide() {
     }

@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
@@ -39,11 +40,14 @@ object BlockBase {
             if (!ret1) return ret1
         }
 
-        // return false if the tile is already there
+        // return false if the tile underneath is:
+        // 0. same tile
+        // 1. actorblock
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK &&
             gameItem.dynamicID == ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y) ||
             gameItem.inventoryCategory == GameItem.Category.WALL &&
-            gameItem.dynamicID == "wall@"+ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
+            gameItem.dynamicID == "wall@" + ingame.world.getTileFromWall(mouseTile.x, mouseTile.y) ||
+            BlockCodex[ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)].nameKey.contains("ACTORBLOCK_")
         )
             return false
 

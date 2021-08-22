@@ -628,6 +628,8 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
             fun Double.modTileDelta() = this - this.modTile()
 
 
+            // the job of the ccd is that the "next hitbox" would not dig into the terrain greater than the tile size,
+            // in which the modTileDelta returns a wrong value
             val vectorSum = (externalV + controllerV)
             val ccdSteps = (vectorSum.magnitude / TILE_SIZE).floorInt().coerceIn(2, 16) // adaptive
 

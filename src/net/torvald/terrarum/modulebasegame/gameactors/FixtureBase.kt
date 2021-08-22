@@ -69,6 +69,20 @@ open class FixtureBase(
         // TODO check for despawn code here
     }
 
+    private fun fillFillerBlock(bypassEvent: Boolean = false) {
+        forEachBlockbox { x, y ->
+            //printdbg(this, "fillerblock ${blockBox.collisionType} at ($x, $y)")
+            if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
+                // if the collision type is allow_move_down, only the top surface tile should be "the platform"
+                // lower part must not have such property (think of the table!)
+                // TODO does this ACTUALLY work ?!
+                world!!.setTileTerrain(x, y, if (y == worldBlockPos!!.y) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, bypassEvent)
+            }
+            else
+                world!!.setTileTerrain(x, y, blockBox.collisionType, bypassEvent)
+        }
+    }
+
     /**
      * Adds this instance of the fixture to the world
      *
@@ -109,17 +123,7 @@ open class FixtureBase(
         worldBlockPos = Point2i(posX, posY)
 
         // fill the area with the filler blocks
-        forEachBlockbox { x, y ->
-            printdbg(this, "fillerblock ${blockBox.collisionType} at ($x, $y)")
-            if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
-                // if the collision type is allow_move_down, only the top surface tile should be "the platform"
-                // lower part must not have such property (think of the table!)
-                // TODO does this ACTUALLY work ?!
-                world!!.setTileTerrain(x, y, if (y == posY) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, false)
-            }
-            else
-                world!!.setTileTerrain(x, y, blockBox.collisionType, false)
-        }
+        fillFillerBlock()
 
 
         this.isVisible = true
@@ -142,43 +146,27 @@ open class FixtureBase(
 
         // remove filler block
         forEachBlockbox { x, y ->
+            if (world!!.getTileFromTerrain(x, y) == blockBox.collisionType) {
                 world!!.setTileTerrain(x, y, Block.AIR, false)
+            }
         }
 
         worldBlockPos = null
         mainUI?.dispose()
 
         this.isVisible = false
+
+        // TODO drop self as an item (instance of DroppedItem)
     }
 
     override fun update(delta: Float) {
         super.update(delta)
-
-        val posX = worldBlockPos!!.x
-        val posY = worldBlockPos!!.y
-        var dropThis = false
-
-        // remove filler block
-        outerLoop@
-        for (x in posX until posX + blockBox.width) {
-            for (y in posY until posY + blockBox.height) {
-                if (world!!.getTileFromTerrain(x, y) != blockBox.collisionType) {
-                    dropThis = true
-                    break@outerLoop
-                }
-            }
+        // if not flagged to despawn and not actually despawned (which sets worldBlockPos as null), always fill up fillerBlock
+        if (!flagDespawn && worldBlockPos != null) {
+            fillFillerBlock(true)
         }
-
-        if (dropThis) {
-            // fill blockbox with air
-            forEachBlockbox { x, y ->
-                if (world!!.getTileFromTerrain(x, y) == blockBox.collisionType) {
-                    world!!.setTileTerrain(x, y, Block.AIR, false)
-                }
-            }
-
-            // TODO drop self as an item (instance of DroppedItem)
-
+        else if (flagDespawn) {
+            despawn()
         }
     }
 

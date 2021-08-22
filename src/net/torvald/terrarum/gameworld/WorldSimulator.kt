@@ -17,6 +17,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBoxIndex
 import net.torvald.terrarum.modulebasegame.gameactors.Electric
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.IntArrayStack
 import org.dyn4j.geometry.Vector2
 import org.khelekore.prtree.*
@@ -95,6 +97,8 @@ object WorldSimulator {
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }
 
+        degrass()
+
         AppLoader.measureDebugTime("WorldSimulator.fluids") {
             //moveFluids(delta)
         }
@@ -143,6 +147,52 @@ object WorldSimulator {
             t[0]
         else
             null
+    }
+
+    fun degrass() {
+        if (ingame.terrainChangeQueue.isNotEmpty()) { AppLoader.measureDebugTime("WorldSimulator.degrass") {
+
+            //val grassPlacedByPlayer = ArrayList<IngameInstance.BlockChangeQueueItem>()
+
+            ingame.terrainChangeQueue.forEach {
+                if (BlockCodex[it.new].isSolid) {
+                    if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
+                        //grassPlacedByPlayer.add(it)
+                        world.setTileTerrain(it.posX, it.posY + 1, Block.DIRT, true)
+                    }
+                }
+            }
+
+            // kill grasses surrounded by dirts in cruciform formation
+            // NOPE this part would not work; environment-depending degrassing must be done by the "grass spread simulator"
+            /*val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+            val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
+
+            val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+            val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+            for (y in for_y_start..for_y_end) {
+                for (x in for_x_start..for_x_end) {
+                    // do not de-grass ones placed by player
+                    var nogo = false
+                    grassPlacedByPlayer.forEach {
+                        if (x == it.posX && y == it.posY) nogo = true
+                    }
+
+                    if (!nogo) {
+                        val tile = world.getTileFromTerrain(x, y)
+                        if (tile == Block.GRASS) {
+                            if (world.getTileFromTerrain(x - 1, y) != Block.GRASS &&
+                                world.getTileFromTerrain(x + 1, y) != Block.GRASS &&
+                                world.getTileFromTerrain(x, y - 1) != Block.GRASS &&
+                                world.getTileFromTerrain(x, y + 1) != Block.GRASS) {
+                                world.setTileTerrain(x, y, Block.DIRT, true)
+                            }
+                        }
+                    }
+                }
+            }*/
+
+        } }
     }
 
     /**
