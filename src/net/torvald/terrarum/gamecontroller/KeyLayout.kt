@@ -1,7 +1,11 @@
 package net.torvald.terrarum.gamecontroller
 
+import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.utils.JsonFetcher
 import java.util.*
+
+
+
 
 /**
  * Created by minjaesong on 2016-07-28.
@@ -16,17 +20,18 @@ object KeyLayout {
     init {
         layouts = HashMap<String, KeyLayoutClass>()
 
-        val json = JsonFetcher("./res/keylayout.json")
-        json.entrySet().forEach { it ->
+        val map = net.torvald.terrarum.utils.JsonFetcher("./res/keylayout.json")
+        JsonFetcher.forEach(map) { name, entry ->
             layouts.put(
-                    it.key,
+                    name,
                     KeyLayoutClass(
-                            it.value.asJsonObject.get("layout").asString,
-                            it.value.asJsonObject.get("name").asString,
-                            it.value.asJsonObject.get("capslock").asString
+                            entry.getString("layout"),
+                            entry.getString("name"),
+                            entry.getString("capslock")
                     )
             )
         }
+
     }
 
 }

@@ -5,7 +5,6 @@ module terrarum.terrarum {
     requires jdk.unsupported; // sun.misc.Unsafe
 
     // kotlin
-    requires kotlin.stdlib;
     requires kotlin.test;
 
     // gdx
@@ -22,7 +21,9 @@ module terrarum.terrarum {
 
     // etc
     requires GetCpuName;
-    requires com.google.gson;
+    requires kotlinx.serialization.core.jvm;
+    requires kotlinx.serialization.json;
+    requires kotlinx.serialization.json.jvm;
     requires org.apache.commons.codec;
     requires commons.csv;
     requires jxinput;

@@ -13,7 +13,7 @@ import java.io.IOException
 /**
  * Created by minjaesong on 2016-02-10.
  */
-internal object GsonTest : ConsoleCommand {
+/*internal object GsonTest : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
 
@@ -51,4 +51,4 @@ internal object GsonTest : ConsoleCommand {
 
         Echo("Usage: gsontest filename-without-extension")
     }
-}
+}*/

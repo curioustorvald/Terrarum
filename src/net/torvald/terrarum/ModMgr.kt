@@ -62,6 +62,8 @@ object ModMgr {
     val moduleInfo = HashMap<String, ModuleMetadata>()
     val entryPointClasses = ArrayList<ModuleEntryPoint>()
 
+    val loadOrder = ArrayList<String>()
+
     init {
         // load modules
         val loadOrderCSVparser = CSVParser.parse(
@@ -75,6 +77,7 @@ object ModMgr {
 
         loadOrder.forEachIndexed { index, it ->
             val moduleName = it[0]
+            this.loadOrder.add(moduleName)
             printmsg(this, "Loading module $moduleName")
 
             try {

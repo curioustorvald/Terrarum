@@ -20,7 +20,7 @@ internal object ExportAV : ConsoleCommand {
                 if (player == null) return
 
                 JsonWriter.writeToFile(
-                        player.actorValue,
+                        player,
                         AppLoader.defaultDir + "/Exports/" + args[1] + ".json")
 
                 Echo("ExportAV: exported to " + args[1] + ".json")

@@ -82,9 +82,10 @@ object Lang {
          *      "<<STRING ID>>" = "<<LOCALISED TEXT>>"
          */
         //println(json.entrySet())
-        json.entrySet().forEach {
-            langpack.put("${it.key}_$lang", it.value.asString)
+        JsonFetcher.forEach(json) { key, value ->
+            langpack.put("${key}_$lang", value.asString())
         }
+
     }
 
     private fun processPolyglotLangFile(file: File, lang: String) {
@@ -106,12 +107,13 @@ object Lang {
          *             (the array continues)
          *
          */
-        json.getAsJsonObject("resources").getAsJsonArray("data").forEach {
+        JsonFetcher.forEach(json.get("resources").get("data")) { _, entry ->
             langpack.put(
-                    "${it.asJsonObject["n"].asString}_$lang",
-                    it.asJsonObject["s"].asString
+                    "${entry.getString("n")}_$lang",
+                    entry.getString("s")
             )
         }
+
     }
 
     operator fun get(key: String): String {

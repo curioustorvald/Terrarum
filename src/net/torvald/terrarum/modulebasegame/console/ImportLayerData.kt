@@ -5,7 +5,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.serialise.ReadLayerDataZip
 import java.io.File
 
 /**
@@ -13,7 +12,7 @@ import java.io.File
  */
 object ImportLayerData : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        if (args.size < 2) {
+        /*if (args.size < 2) {
             ExportLayerData.printUsage()
             return
         }
@@ -28,7 +27,7 @@ object ImportLayerData : ConsoleCommand {
                 (Terrarum.ingame!!.world).spawnX * TILE_SIZED
         )
 
-        Echo("Successfully loaded ${args[1]}")
+        Echo("Successfully loaded ${args[1]}")*/
     }
 
     override fun printUsage() {

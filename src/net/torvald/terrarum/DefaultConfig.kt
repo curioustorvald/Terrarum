@@ -1,8 +1,7 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Input
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
+import com.badlogic.gdx.utils.Json
 import net.torvald.terrarum.blockproperties.Block
 
 /**
@@ -11,126 +10,110 @@ import net.torvald.terrarum.blockproperties.Block
  * Created by minjaesong on 2016-03-12.
  */
 object DefaultConfig {
-    fun fetch(): JsonObject {
-        val jsonObject = JsonObject()
 
-        jsonObject.addProperty("displayfps", 0) // 0: no limit, non-zero: limit
-        jsonObject.addProperty("usevsync", false)
-        jsonObject.addProperty("screenwidth", TerrarumScreenSize.defaultW)
-        jsonObject.addProperty("screenheight", TerrarumScreenSize.defaultH)
-        jsonObject.addProperty("atlastexsize", 2048)
+    val hashMap = hashMapOf<String, Any>(
+            "displayfps" to 0, // 0: no limit, non-zero: limit
+            "usevsync" to false,
+            "screenwidth" to TerrarumScreenSize.defaultW,
+            "screenheight" to TerrarumScreenSize.defaultH,
+            "atlastexsize" to 2048,
 
+            "language" to AppLoader.getSysLang(),
+            "notificationshowuptime" to 4000,
+            "multithread" to true,
+            "multithreadedlight" to false,
 
-        //jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
-        jsonObject.addProperty("language", AppLoader.getSysLang())
-        jsonObject.addProperty("notificationshowuptime", 4000)
-        jsonObject.addProperty("multithread", true) // experimental!
-        jsonObject.addProperty("multithreadedlight", false) // experimental!
+            "showhealthmessageonstartup" to true,
 
-        jsonObject.addProperty("showhealthmessageonstartup", true)
+            "usexinput" to true, // when FALSE, LT+RT input on xbox controller is impossible
 
-        // control-gamepad
+            "config_gamepadkeyn" to 3,
+            "config_gamepadkeyw" to 2,
+            "config_gamepadkeys" to 0,
+            "config_gamepadkeye" to 1, // xbox indices
 
-        // "config_key", "config_mouse", "config_gamepad" are keyword recognised by control setup UI
+            "config_gamepadlup" to 4,
+            "config_gamepadrup" to 5,
+            "config_gamepadselect" to 6,
+            "config_gamepadstart" to 7,
 
-        jsonObject.addProperty("usexinput", true) // when FALSE, LT+RT input on xbox controller is impossible
-
-        jsonObject.addProperty("config_gamepadkeyn", 3)
-        jsonObject.addProperty("config_gamepadkeyw", 2)
-        jsonObject.addProperty("config_gamepadkeys", 0)
-        jsonObject.addProperty("config_gamepadkeye", 1) // xbox indices
-
-        jsonObject.addProperty("config_gamepadlup", 4)
-        jsonObject.addProperty("config_gamepadrup", 5)
-        jsonObject.addProperty("config_gamepadselect", 6)
-        jsonObject.addProperty("config_gamepadstart", 7)
-
-        jsonObject.addProperty("config_gamepadltrigger", 8)
-        jsonObject.addProperty("config_gamepadrtrigger", 9)
-        jsonObject.addProperty("config_gamepadlthumb", 10)
-        jsonObject.addProperty("config_gamepadrthumb", 11)
+            "config_gamepadltrigger" to 8,
+            "config_gamepadrtrigger" to 9,
+            "config_gamepadlthumb" to 10,
+            "config_gamepadrthumb" to 11,
 
 
-        jsonObject.addProperty("config_gamepadaxislx", 1)
-        jsonObject.addProperty("config_gamepadaxisly", 0)
-        jsonObject.addProperty("config_gamepadaxisrx", 3)
-        jsonObject.addProperty("config_gamepadaxisry", 2) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
-        jsonObject.addProperty("config_gamepadtriggeraxis", 4) // positive: LT, negative: RT (xbox pad)
-        jsonObject.addProperty("config_gamepadtriggeraxis2", 5) // just in case... (RT)
+            "config_gamepadaxislx" to 1,
+            "config_gamepadaxisly" to 0,
+            "config_gamepadaxisrx" to 3,
+            "config_gamepadaxisry" to 2, // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
+            "config_gamepadtriggeraxis" to 4, // positive: LT, negative: RT (xbox pad)
+            "config_gamepadtriggeraxis2" to 5, // just in case... (RT)
 
-        val axesZeroPoints = JsonArray(); axesZeroPoints.add(-0.011f); axesZeroPoints.add(-0.022f); axesZeroPoints.add(-0.033f); axesZeroPoints.add(-0.044f)
-        jsonObject.add("gamepadaxiszeropoints", axesZeroPoints) // to accomodate shifted zero point of analog stick
+            // to accomodate shifted zero point of analog stick
+            "gamepadaxiszeropoints" to doubleArrayOf(-0.011, -0.022, -0.033, -0.044),
 
-        jsonObject.addProperty("gamepadlabelstyle", "msxbone") // "nwii", "logitech", "sonyps", "msxb360", "msxbone"
+            "gamepadlabelstyle" to "msxbone", // "nwii", "logitech", "sonyps", "msxb360", "msxbone"
 
-        // control-keyboard (GDX key codes)
-        jsonObject.addProperty("config_keyup", Input.Keys.E)
-        jsonObject.addProperty("config_keyleft", Input.Keys.S)
-        jsonObject.addProperty("config_keydown", Input.Keys.D)
-        jsonObject.addProperty("config_keyright", Input.Keys.F) // ESDF Masterrace
+            // control-keyboard (GDX key codes,
+            "config_keyup" to Input.Keys.E,
+            "config_keyleft" to Input.Keys.S,
+            "config_keydown" to Input.Keys.D,
+            "config_keyright" to Input.Keys.F, // ESDF Masterrace
 
-        jsonObject.addProperty("config_keymovementaux", Input.Keys.A) // movement-auxiliary, or hookshot
-        jsonObject.addProperty("config_keyinventory", Input.Keys.Q)
-        jsonObject.addProperty("config_keyinteract", Input.Keys.R)
-        jsonObject.addProperty("config_keyclose", Input.Keys.C) // this or hard-coded ESC
-        jsonObject.addProperty("config_keyzoom", Input.Keys.Z)
+            "config_keymovementaux" to Input.Keys.A, // movement-auxiliary, or hookshot
+            "config_keyinventory" to Input.Keys.Q,
+            "config_keyinteract" to Input.Keys.R,
+            "config_keyclose" to Input.Keys.C, // this or hard-coded ESC
+            "config_keyzoom" to Input.Keys.Z,
 
-        jsonObject.addProperty("config_keygamemenu", Input.Keys.TAB)
-        jsonObject.addProperty("config_keyquicksel", Input.Keys.SHIFT_LEFT) // pie menu is now LShift because GDX does not read CapsLock
-        val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Input.Keys.CONTROL_LEFT); keyquickselalt.add(Input.Keys.BACKSLASH)
-        // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
-        // so these keys are treated as the same.
-        // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
-        jsonObject.add("config_keyquickselalt", keyquickselalt)
-        jsonObject.addProperty("config_mousequicksel", Input.Buttons.MIDDLE) // middle click to open pie menu
+            "config_keygamemenu" to Input.Keys.TAB,
+            "config_keyquicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because GDX does not read CapsLock
+            // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
+            // so these keys are treated as the same.
+            // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
+            "config_keyquickselalt" to intArrayOf(Input.Keys.BACKSPACE, Input.Keys.CONTROL_LEFT, Input.Keys.BACKSLASH),
+            "config_mousequicksel" to Input.Buttons.MIDDLE, // middle click to open pie menu
 
-        jsonObject.addProperty("config_keyjump", Input.Keys.SPACE)
+            "config_keyjump" to Input.Keys.SPACE,
 
-        val keyquickslots = JsonArray(); for (i in Input.Keys.NUM_1..Input.Keys.NUM_9) keyquickslots.add(i); keyquickslots.add(Input.Keys.NUM_0) // NUM_1 to NUM_0
-        jsonObject.add("config_keyquickslots", keyquickslots)
+            "config_keyquickslots" to (Input.Keys.NUM_0..Input.Keys.NUM_9).toList(),
 
-        jsonObject.addProperty("config_mouseprimary", Input.Buttons.LEFT) // left mouse
-        jsonObject.addProperty("config_mousesecondary", Input.Buttons.RIGHT) // right mouse
+            "config_mouseprimary" to Input.Buttons.LEFT, // left mouse
+            "config_mousesecondary" to Input.Buttons.RIGHT, // right mouse
 
 
-        jsonObject.addProperty("pcgamepadenv", "console")
+            "pcgamepadenv" to "console",
 
-        //jsonObject.addProperty("safetywarning", true)
-
-
-        jsonObject.addProperty("maxparticles", 768)
-
-        jsonObject.addProperty("temperatureunit", 1) // -1: american, 0: kelvin, 1: celcius
+            //jsonObject.writeValue("safetywarning" to true,
 
 
-        // "fancy" graphics settings
-        jsonObject.addProperty("fxdither", true)
-        jsonObject.addProperty("fxretro", false)
-        //jsonObject.addProperty("fx3dlut", false)
+            "maxparticles" to 768,
+
+            "temperatureunit" to 1, // -1: american, 0: kelvin, 1: celcius
 
 
-        // settings regarding debugger
-        val buildingMakerFavs = JsonArray()
-        arrayOf(
-                Block.GLASS_CRUDE,
-                Block.PLANK_NORMAL,
-                Block.PLANK_BIRCH,
-                Block.STONE_QUARRIED,
-                Block.STONE_BRICKS,
-
-                Block.STONE_TILE_WHITE,
-                Block.TORCH,
-                "wall@" + Block.PLANK_NORMAL,
-                "wall@" + Block.PLANK_BIRCH,
-                "wall@" + Block.GLASS_CRUDE
-        ).forEach {
-            buildingMakerFavs.add(it)
-        }
-        jsonObject.add("buildingmakerfavs", buildingMakerFavs)
+            // "fancy" graphics settings
+            "fxdither" to true,
+            "fxretro" to false,
+            //"fx3dlut" to false,
 
 
-        return jsonObject
-    }
+            // settings regarding debugger
+            /*"buildingmakerfavs" to arrayOf(
+                    Block.GLASS_CRUDE,
+                    Block.PLANK_NORMAL,
+                    Block.PLANK_BIRCH,
+                    Block.STONE_QUARRIED,
+                    Block.STONE_BRICKS,
+
+                    Block.STONE_TILE_WHITE,
+                    Block.TORCH,
+                    "wall@" + Block.PLANK_NORMAL,
+                    "wall@" + Block.PLANK_BIRCH,
+                    "wall@" + Block.GLASS_CRUDE
+            )*/
+    )
 }
 
 /*

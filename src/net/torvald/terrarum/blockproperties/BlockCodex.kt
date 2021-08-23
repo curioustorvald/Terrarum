@@ -20,7 +20,7 @@ import java.io.IOException
  */
 object BlockCodex {
 
-    private var blockProps = HashMap<ItemID, BlockProp>()
+    val blockProps = HashMap<ItemID, BlockProp>()
 
     val dynamicLights = SortedArrayList<ItemID>() // does not include virtual ones
 

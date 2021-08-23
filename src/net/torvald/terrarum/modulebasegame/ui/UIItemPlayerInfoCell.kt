@@ -2,10 +2,10 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.serialise.ReadWorldInfo
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import java.util.*
@@ -17,7 +17,7 @@ import java.util.*
  */
 class UIItemPlayerInfoCell(
         parent: UICanvas,
-        val saveInfo: ReadWorldInfo.SaveMetaData,
+        val saveInfo: JsonValue,
         override val width: Int,
         initialX: Int,
         initialY: Int,
@@ -50,18 +50,18 @@ class UIItemPlayerInfoCell(
     init {
         val cal = Calendar.getInstance()
 
-        cal.timeInMillis = saveInfo.creationTime * 1000
+        cal.timeInMillis = saveInfo.getLong("creation_t") * 1000
         creationTimeStr = "${cal[Calendar.YEAR]}-" +
                 "${cal[Calendar.MONTH].toString().padStart(2,'0')}-" +
                 "${cal[Calendar.DATE].toString().padStart(2,'0')}"
 
-        cal.timeInMillis = saveInfo.lastPlayTime * 1000
+        cal.timeInMillis = saveInfo.getLong("lastplay_t") * 1000
         modificationTimeStr = "${cal[Calendar.YEAR]}-" +
                 "${cal[Calendar.MONTH].toString().padStart(2,'0')}-" +
                 "${cal[Calendar.DATE].toString().padStart(2,'0')}"
 
 
-        worldCountStr = Lang["CONTEXT_WORLD_COUNT"] + saveInfo.worldCount
+        worldCountStr = Lang["CONTEXT_WORLD_COUNT"] + saveInfo.get("worlds").asIntArray().size
         worldCountStrWidth = AppLoader.fontGame.getWidth(worldCountStr)
     }
 

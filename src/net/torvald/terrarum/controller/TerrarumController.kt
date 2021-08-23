@@ -1,7 +1,7 @@
 package net.torvald.terrarum.controller
 
 import net.torvald.terrarum.AppLoader.gamepadDeadzone
-import net.torvald.terrarum.AppLoader.getConfigFloatArray
+import net.torvald.terrarum.AppLoader.getConfigDoubleArray
 
 /**
  * Created by minjaesong on 2019-02-09.
@@ -49,7 +49,7 @@ interface TerrarumController {
      */
     fun getAxis(index:Int): Float {
         val raw = getAxisRaw(index)
-        val zero = if (index < 4) getConfigFloatArray("gamepadaxiszeropoints")[index] else 0f
+        val zero = if (index < 4) getConfigDoubleArray("gamepadaxiszeropoints")[index] else 0.0
         val compensatedRaw = raw - zero
         val inDeadzone = Math.abs(compensatedRaw) < gamepadDeadzone
 
@@ -58,7 +58,7 @@ interface TerrarumController {
 
     fun inDeadzone(axis: Int): Boolean {
         val ax = getAxisRaw(axis)
-        val zero = if (axis < 4) getConfigFloatArray("gamepadaxiszeropoints")[axis] else 0f
+        val zero = if (axis < 4) getConfigDoubleArray("gamepadaxiszeropoints")[axis] else 0.0
 
         return Math.abs(ax - zero) < gamepadDeadzone
     }

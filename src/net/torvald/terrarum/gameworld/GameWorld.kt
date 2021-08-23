@@ -11,7 +11,6 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.ReadLayerDataZip
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import kotlin.experimental.and
@@ -165,31 +164,10 @@ open class GameWorld : Disposable {
     /**
      * Load existing world
      */
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
+    /*internal constructor(worldIndex: Int, json: JsonObject) {
         this.worldIndex = worldIndex
 
-        layerTerrain = layerData.layerTerrain
-        layerWall = layerData.layerWall
-        //layerWire = layerData.layerWire
-
-        wallDamages = layerData.wallDamages
-        terrainDamages = layerData.terrainDamages
-        fluidTypes = layerData.fluidTypes
-        fluidFills = layerData.fluidFills
-
-        //wiringBlocks = HashMap()
-        wirings = HashMap()
-
-        spawnX = layerData.spawnX
-        spawnY = layerData.spawnY
-
-        width = layerTerrain.width
-        height = layerTerrain.height
-
-
-        creationTime = creationTIME_T
-        lastPlayTime = lastPlayTIME_T
-        this.totalPlayTime = totalPlayTime
+        // TODO setup layerTerrain, layerWall, etc. from the json
 
         // before the renaming, update the name maps
         tileNumberToNameMap = HashMap<Int, ItemID>()
@@ -200,7 +178,7 @@ open class GameWorld : Disposable {
         }
 
         // perform renaming of tile layers
-        val oldTileNumberToNameMap = layerData.tileNumberToNameMap
+        val oldTileNumberToNameMap = /* todo */
         for (y in 0 until layerTerrain.height) {
             for (x in 0 until layerTerrain.width) {
                 layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]]!!)
@@ -212,7 +190,7 @@ open class GameWorld : Disposable {
 
         // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
         tileNumberToNameMap[0] = Block.AIR
-    }
+    }*/
 
     /**
      * Get 2d array data of wire

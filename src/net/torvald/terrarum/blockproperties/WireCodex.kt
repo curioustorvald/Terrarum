@@ -17,7 +17,7 @@ import java.io.IOException
  */
 object WireCodex {
 
-    private var wireProps = HashMap<ItemID, WireProp>()
+    val wireProps = HashMap<ItemID, WireProp>()
 
     private val nullProp = WireProp()
 

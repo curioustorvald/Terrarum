@@ -303,7 +303,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // init map as chosen size
             val timeNow = System.currentTimeMillis() / 1000
             gameworld = GameWorldExtension(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
-            gameworldCount++
+            gameworldIndices.add(gameworld.worldIndex)
             world = gameworld
 
             // generate terrain for the map

@@ -48,7 +48,6 @@ object CommandDict {
 
             // Test codes
             "bulletintest" to SetBulletin,
-            "gsontest" to GsonTest,
             "tips" to PrintRandomTips,
             "langtest" to LangTest,
             "spawnball" to SpawnPhysTestBall,

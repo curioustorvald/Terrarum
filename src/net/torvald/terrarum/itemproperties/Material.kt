@@ -28,7 +28,7 @@ class Material {
 
 object MaterialCodex {
 
-    private var materialProps = HashMap<String, Material>()
+    val materialProps = HashMap<String, Material>()
     private val nullMaterial = Material()
 
     operator fun invoke(module: String, path: String) {

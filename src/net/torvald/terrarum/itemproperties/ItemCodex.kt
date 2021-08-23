@@ -26,7 +26,7 @@ object ItemCodex {
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
-    private val itemCodex = HashMap<ItemID, GameItem>()
+    val itemCodex = HashMap<ItemID, GameItem>()
     val dynamicItemDescription = HashMap<ItemID, GameItem>()
     val dynamicToStaticTable = HashMap<ItemID, ItemID>()
 
@@ -119,5 +119,5 @@ object ItemCodex {
 
     }
 
-    fun hasItem(itemID: Int): Boolean = dynamicItemDescription.containsKey(itemID)
+    fun hasItem(itemID: ItemID): Boolean = dynamicItemDescription.containsKey(itemID)
 }

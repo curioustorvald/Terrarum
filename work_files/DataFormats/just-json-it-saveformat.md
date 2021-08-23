@@ -10,8 +10,8 @@ Following code is an example savegame JSON files.
     weatseed: "e5e72beb4e3c6926d3dc9e3e2ef7833b",
     playerid: 9545698,
     creation_t: <creation time in real-world unix time>,
-    lastplay_t: <creation time in real-world unix time>,
-    creation_t: <creation time in real-world unix time>,
+    lastplay_t: <last play time in real-world unix time>,
+    playtime_t: <total play time in real-world unix time>,
     thumb: <Ascii85-encoded gzipped thumbnail image in TGA>,
     
     blocks: <BlockCodex serialised>,

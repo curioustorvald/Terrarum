@@ -92,7 +92,7 @@ class UINSMenu(
 
         val listWidth = maxOf(
                 AppLoader.fontGame.getWidth(menuTitle), minimumWidth,
-                stringsFromTree.map { AppLoader.fontGame.getWidth(it) }.max() ?: 0
+                stringsFromTree.map { AppLoader.fontGame.getWidth(it) }.maxOrNull() ?: 0
         )
         val uiWidth = listWidth + (2 * TEXT_OFFSETX.toInt())
         val listHeight = stringsFromTree.size * LINE_HEIGHT

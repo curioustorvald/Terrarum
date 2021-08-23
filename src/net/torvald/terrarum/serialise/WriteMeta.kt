@@ -1,70 +1,73 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
-import java.nio.charset.Charset
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonWriter
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.MaterialCodex
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
+import net.torvald.terrarum.weather.WeatherMixer
 
-/**
- * Created by minjaesong on 2016-03-15.
- */
-// internal for everything: prevent malicious module from messing up the savedata
-internal object WriteMeta {
+open class WriteMeta(val ingame: TerrarumIngame) {
 
-    val META_FILENAME = "worldinfo0"
+    open fun invoke(): String {
+        val world = ingame.world
+        
+        val props = hashMapOf<String, Any>(
+            "genver" to 4,
+            "savename" to world.worldName,
+            "terrseed" to world.generatorSeed,
+            "randseed0" to RoguelikeRandomiser.RNG.state0,
+            "randseed1" to RoguelikeRandomiser.RNG.state1,
+            "weatseed0" to WeatherMixer.RNG.state0,
+            "weatseed1" to WeatherMixer.RNG.state1,
+            "playerid" to ingame.theRealGamer.referenceID,
+            "creation_t" to world.creationTime,
+            "lastplay_t" to world.lastPlayTime,
+            "playtime_t" to world.totalPlayTime,
 
-    val MAGIC = "TESV".toByteArray(charset = Charset.forName("US-ASCII"))
+            // CSVs
+            "blocks" to StringBuilder().let {
+                ModMgr.getFilesFromEveryMod("blocks/blocks.csv").forEach { (modname, file) ->
+                    it.append("\n\n## module: $modname ##\n\n")
+                    it.append(file.readText())
+                }
+                it.toString()
+            },
 
+            "items" to StringBuilder().let {
+                ModMgr.getFilesFromEveryMod("items/itemid.csv").forEach { (modname, file) ->
+                    it.append("\n\n## module: $modname ##\n\n")
+                    it.append(file.readText())
+                }
+                it.toString()
+            },
 
-    val BYTE_NULL: Byte = 0
+            "wires" to StringBuilder().let {
+                ModMgr.getFilesFromEveryMod("wires/wires.csv").forEach { (modname, file) ->
+                    it.append("\n\n## module: $modname ##\n\n")
+                    it.append(file.readText())
+                }
+                it.toString()
+            },
 
-    val terraseed: Long = Worldgen.params.seed
+            // TODO fluids
+            "materials" to StringBuilder().let {
+                ModMgr.getFilesFromEveryMod("materials/materials.csv").forEach { (modname, file) ->
+                    it.append("\n\n## module: $modname ##\n\n")
+                    it.append(file.readText())
+                }
+                it.toString()
+            },
 
-
-    /**
-     * Write save meta to specified directory. Returns false if something went wrong.
-     * @param saveDirectoryName
-     * @param savegameName -- Nullable. If the value is not specified, saveDirectoryName will be used instead.
-     */
-    internal fun write(saveDirectoryName: String, savegameName: String?): Boolean {
-        /*val hashArray: ArrayList<ByteArray> = ArrayList()
-        val savenameAsByteArray: ByteArray =
-                (savegameName ?: saveDirectoryName).toByteArray(Charsets.UTF_8)
-
-        // define Strings to be hashed
-        val props = arrayOf(
-                TilePropCSV()
-                //, (item, mat, ...)
+            "loadorder" to ModMgr.loadOrder,
+            "worlds" to ingame.gameworldIndices
         )
-
-        // get and store hash from the list
-        props.map { hashArray.add(DigestUtils.sha256(it)) }
-
-        // open file and delete it
-        val metaPath = Paths.get("$AppLoader.defaultSaveDir" +
-                                       "/$saveDirectoryName/$META_FILENAME")
-        val metaTempPath = Files.createTempFile(metaPath.toString(), "_temp")
-
-        // TODO gzip
-
-        // write bytes in tempfile
-        Files.write(metaTempPath, MAGIC)
-        Files.write(metaTempPath, savenameAsByteArray)
-        Files.write(metaTempPath, byteArrayOf(BYTE_NULL))
-        Files.write(metaTempPath, toByteArray(terraseed))
-        Files.write(metaTempPath, toByteArray(rogueseed))
-        for (hash in hashArray)
-            Files.write(metaTempPath, hash)
-
-        // replace savemeta with tempfile
-        try {
-            Files.copy(metaTempPath, metaPath, StandardCopyOption.REPLACE_EXISTING)
-            Files.deleteIfExists(metaTempPath)
-            println("Saved metadata to $saveDirectoryName.")
-
-            return true
-        }
-        catch (e: IOException) {
-            e.printStackTrace()
-        }*/
-        return false
+        
+        return Json(JsonWriter.OutputType.json).toJson(props)
     }
+
 }

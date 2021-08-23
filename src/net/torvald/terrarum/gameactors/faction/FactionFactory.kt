@@ -16,12 +16,12 @@ object FactionFactory {
     @Throws(IOException::class)
     fun create(module: String, path: String): Faction {
         val jsonObj = JsonFetcher(ModMgr.getFile(module, path))
-        val factionObj = Faction(jsonObj.get("factionname").asString)
+        val factionObj = Faction(jsonObj.getString("factionname"))
 
-        jsonObj.get("factionamicable").asJsonArray.forEach { factionObj.addFactionAmicable(it.asString) }
-        jsonObj.get("factionneutral").asJsonArray.forEach { factionObj.addFactionNeutral(it.asString) }
-        jsonObj.get("factionhostile").asJsonArray.forEach { factionObj.addFactionHostile(it.asString) }
-        jsonObj.get("factionfearful").asJsonArray.forEach { factionObj.addFactionFearful(it.asString) }
+        jsonObj.get("factionamicable").asStringArray().forEach { factionObj.addFactionAmicable(it) }
+        jsonObj.get("factionneutral").asStringArray().forEach { factionObj.addFactionNeutral(it) }
+        jsonObj.get("factionhostile").asStringArray().forEach { factionObj.addFactionHostile(it) }
+        jsonObj.get("factionfearful").asStringArray().forEach { factionObj.addFactionFearful(it) }
 
         return factionObj
     }

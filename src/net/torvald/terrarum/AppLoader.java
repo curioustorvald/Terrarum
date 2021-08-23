@@ -12,12 +12,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.strikerx3.jxinput.XInputDevice;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.concurrent.ThreadExecutor;
@@ -37,18 +34,10 @@ import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
-import net.torvald.util.ArrayListMap;
 import net.torvald.util.DebugTimers;
-import org.lwjgl.opengl.GL11;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
-
-import static net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED;
+import java.util.*;
 import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
 import static net.torvald.terrarum.TerrarumKt.printStackTrace;
 
@@ -973,7 +962,7 @@ public class AppLoader implements ApplicationListener {
         File configFile = new File(configDir);
 
         if (!configFile.exists() || configFile.length() == 0L) {
-            JsonWriter.INSTANCE.writeToFile(DefaultConfig.INSTANCE.fetch(), configDir);
+            JsonWriter.INSTANCE.writeToFile(DefaultConfig.INSTANCE.getHashMap(), configDir);
         }
     }
 
@@ -984,12 +973,18 @@ public class AppLoader implements ApplicationListener {
     private static Boolean readConfigJson() {
         try {
             // read from disk and build config from it
-            JsonObject jsonObject = JsonFetcher.INSTANCE.invoke(configDir);
+            JsonValue map = JsonFetcher.INSTANCE.invoke(configDir);
 
             // make config
-            jsonObject.entrySet().forEach((entry) ->
-                    gameConfig.set(entry.getKey(), entry.getValue())
-            );
+            for (JsonValue entry = map.child; entry != null; entry = entry.next) {
+                gameConfig.set(entry.name,
+                        entry.isArray() ? entry.asDoubleArray() :
+                        entry.isDouble() ? entry.asDouble() :
+                        entry.isBoolean() ? entry.asBoolean() :
+                        entry.isLong() ? entry.asInt() :
+                        entry.asString()
+                );
+            }
 
             return true;
         }
@@ -1018,10 +1013,7 @@ public class AppLoader implements ApplicationListener {
      */
     public static int getConfigInt(String key) {
         Object cfg = getConfigMaster(key);
-        if (cfg instanceof JsonPrimitive)
-            return ((JsonPrimitive) cfg).getAsInt();
-        else
-            return Integer.parseInt(((String) cfg));
+        return ((int) cfg);
     }
 
     /**
@@ -1034,10 +1026,7 @@ public class AppLoader implements ApplicationListener {
      */
     public static String getConfigString(String key) {
         Object cfg = getConfigMaster(key);
-        if (cfg instanceof JsonPrimitive)
-            return ((JsonPrimitive) cfg).getAsString();
-        else
-            return ((String) cfg);
+        return ((String) cfg);
     }
 
     /**
@@ -1049,17 +1038,14 @@ public class AppLoader implements ApplicationListener {
     public static boolean getConfigBoolean(String key) {
         try {
             Object cfg = getConfigMaster(key);
-            if (cfg instanceof JsonPrimitive)
-                return ((JsonPrimitive) cfg).getAsBoolean();
-            else
-                return ((boolean) cfg);
+            return ((boolean) cfg);
         }
         catch (NullPointerException keyNotFound) {
             return false;
         }
     }
 
-    public static int[] getConfigIntArray(String key) {
+    /*public static int[] getConfigIntArray(String key) {
         Object cfg = getConfigMaster(key);
         if (cfg instanceof JsonArray) {
             JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
@@ -1072,24 +1058,23 @@ public class AppLoader implements ApplicationListener {
         }
         else
             return ((int[]) cfg);
-    }
+    }*/
 
-    public static float[] getConfigFloatArray(String key) {
+    public static double[] getConfigDoubleArray(String key) {
         Object cfg = getConfigMaster(key);
-        if (cfg instanceof JsonArray) {
-            JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
-            //return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
-            float[] floatArray = new float[jsonArray.size()];
-            for (int i = 0; i < jsonArray.size(); i++) {
-                floatArray[i] = jsonArray.get(i).getAsInt();
-            }
-            return floatArray;
-        }
-        else
-            return ((float[]) cfg);
+        return ((double[]) cfg);
     }
 
-    public static String[] getConfigStringArray(String key) {
+    public static int[] getConfigIntArray(String key) {
+        double[] a = getConfigDoubleArray(key);
+        int[] r = new int[a.length];
+        for (int i = 0; i < a.length; i++) {
+            r[i] = ((int) a[i]);
+        }
+        return r;
+    }
+
+    /*public static String[] getConfigStringArray(String key) {
         Object cfg = getConfigMaster(key);
         if (cfg instanceof JsonArray) {
             JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
@@ -1102,13 +1087,13 @@ public class AppLoader implements ApplicationListener {
         }
         else
             return ((String[]) cfg);
-    }
+    }*/
 
     /**
      * Get config from config file. If the entry does not exist, get from defaults; if the entry is not in the default, NullPointerException will be thrown
      */
-    private static JsonObject getDefaultConfig() {
-        return DefaultConfig.INSTANCE.fetch();
+    private static HashMap<String, Object> getDefaultConfig() {
+        return DefaultConfig.INSTANCE.getHashMap();
     }
 
     private static Object getConfigMaster(String key1) {

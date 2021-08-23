@@ -45,7 +45,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             field = value
         }
     /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
-    var gameworldCount = 0
+    var gameworldIndices = ArrayList<Int>()
+
     /** The actor the game is currently allowing you to control.
      *
      *  Most of the time it'd be the "player", but think about the case where you have possessed

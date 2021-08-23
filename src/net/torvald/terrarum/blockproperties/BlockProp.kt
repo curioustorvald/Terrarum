@@ -4,7 +4,6 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.XXHash32
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.serialise.toLittle
 
 /**
  * Created by minjaesong on 2016-02-16.
@@ -92,7 +91,7 @@ class BlockProp {
 
     var material: String = ""
 
-    var rngBase0 = Math.random().toFloat() // initial cycle phase (xxxxFuncX)
-    var rngBase1 = Math.random().toFloat() // flicker P0, etc
-    var rngBase2 = Math.random().toFloat() // flicker P1, etc
+    @Transient var rngBase0 = Math.random().toFloat() // initial cycle phase (xxxxFuncX)
+    @Transient var rngBase1 = Math.random().toFloat() // flicker P0, etc
+    @Transient var rngBase2 = Math.random().toFloat() // flicker P1, etc
 }

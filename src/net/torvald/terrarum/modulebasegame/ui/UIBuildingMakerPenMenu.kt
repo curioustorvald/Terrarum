@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.ui.UICanvas
@@ -153,7 +154,19 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
         // draw blocks slot
         batch.color = blockCellCol
-        val slotConfig = AppLoader.getConfigStringArray("buildingmakerfavs")
+        val slotConfig = arrayOf(
+                Block.GLASS_CRUDE,
+                Block.PLANK_NORMAL,
+                Block.PLANK_BIRCH,
+                Block.STONE_QUARRIED,
+                Block.STONE_BRICKS,
+
+                Block.STONE_TILE_WHITE,
+                Block.TORCH,
+                "wall@" + Block.PLANK_NORMAL,
+                "wall@" + Block.PLANK_BIRCH,
+                "wall@" + Block.GLASS_CRUDE
+        )//AppLoader.getConfigStringArray("buildingmakerfavs")
         for (i in 0 until PALETTE_SIZE) {
             val x = blockCellPos[i].x.roundToInt().toFloat()
             val y = blockCellPos[i].y.roundToInt().toFloat()

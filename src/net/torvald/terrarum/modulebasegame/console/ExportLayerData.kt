@@ -1,22 +1,31 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import com.badlogic.gdx.utils.Json
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.serialise.WriteMeta
+import net.torvald.terrarum.utils.JsonWriter
+import java.io.IOException
 
 /**
  * Created by minjaesong on 2017-07-18.
  */
 object ExportLayerData : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        /*try {
-            val outfile = WriteLayerDataZip()
-            WriteWorldInfo()
-            Echo("Layer data exported to ${outfile!!.canonicalPath}")
+        try {
+            val str = WriteMeta(Terrarum.ingame!! as TerrarumIngame).invoke()
+            val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/savegame.json", false)
+            writer.write(str)
+            writer.close()
+            Echo("Exportlayer: exported to savegame.json")
         }
-        catch (e: Exception) {
+        catch (e: IOException) {
+            Echo("Exportlayer: IOException raised.")
             e.printStackTrace()
-            EchoError("Layer data export failed; see console for error traces.")
-        }*/
+        }
     }
 
     override fun printUsage() {

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.tests
 
+import com.badlogic.gdx.utils.Json
 import net.torvald.terrarum.utils.JsonWriter
 import org.dyn4j.geometry.Vector2
 
@@ -22,13 +23,12 @@ object GsonTest {
 
     operator fun invoke() {
 
-        val gson = JsonWriter.getJsonBuilder()
-        val jsonString = gson.toJson(testClass)
+        val jsonString = Json(com.badlogic.gdx.utils.JsonWriter.OutputType.json).toJson(testClass)
 
         println(jsonString)
 
+        val deserialised = Json().fromJson(GsonTestSuper::class.java, jsonString)
 
-        val deserialised = gson.fromJson(jsonString, GsonTestSuper::class.java)
         println(deserialised)
         println(deserialised as GsonTestClass) // ClassCastException
     }

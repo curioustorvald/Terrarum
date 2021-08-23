@@ -12,7 +12,6 @@
     <orderEntry type="library" name="com.badlogicgames.gdx:gdx-backend-lwjgl3:1.10.0" level="project" />
     <orderEntry type="library" name="GetCpuName-src" level="project" />
     <orderEntry type="library" name="jxinput-1.0.0-javadoc" level="project" />
-    <orderEntry type="library" name="gson-2.8.5-javadoc" level="project" />
     <orderEntry type="library" name="prtree" level="project" />
     <orderEntry type="library" name="TerranVirtualDisk-src" level="project" />
     <orderEntry type="library" name="Terrarum_Joise" level="project" />
@@ -22,7 +21,6 @@
     <orderEntry type="library" name="gdx-controllers-desktop-2.2.1-javadoc" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-csv:1.8" level="project" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
-    <orderEntry type="library" name="com.google.code.gson:gson:2.8.7" level="project" />
     <orderEntry type="library" name="gdx-controllers-core-2.2.1" level="project" />
     <orderEntry type="library" name="gdx-controllers-desktop-2.2.1" level="project" />
     <orderEntry type="library" name="jxinput-1.0.0" level="project" />

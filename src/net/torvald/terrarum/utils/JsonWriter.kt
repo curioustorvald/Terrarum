@@ -1,7 +1,7 @@
 package net.torvald.terrarum.utils
 
-import com.google.gson.GsonBuilder
-import net.torvald.terrarum.AppLoader
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonWriter
 
 /**
  * Created by minjaesong on 2016-03-04.
@@ -9,25 +9,6 @@ import net.torvald.terrarum.AppLoader
 object JsonWriter {
 
     private val formattingRegex = Regex("""(?<=[\{,\[])|(?=[\]}])""")
-
-    fun getJsonBuilder() = if (AppLoader.IS_DEVELOPMENT_BUILD) {
-        getPrettyBuilder()
-    }
-    else {
-        GsonBuilder()
-                .serializeNulls()
-                .disableHtmlEscaping()
-                .enableComplexMapKeySerialization()
-                .create()
-    }
-
-    fun getPrettyBuilder() = GsonBuilder()
-            .setPrettyPrinting()
-
-            .serializeNulls()
-            .disableHtmlEscaping()
-            .enableComplexMapKeySerialization()
-            .create()
 
     /**
      * serialise a class to the file as JSON, using Google GSON.
@@ -37,10 +18,8 @@ object JsonWriter {
      */
     @Throws(java.io.IOException::class)
     fun writeToFile(c: Any, path: String) {
-        val jsonString = getJsonBuilder().toJson(c)
-
         val writer = java.io.FileWriter(path, false)
-        writer.write(jsonString.replace(formattingRegex, "\n"))
+        writer.write(Json(JsonWriter.OutputType.json).toJson(c).replace(formattingRegex, "\n"))
         writer.close()
     }
 
@@ -50,13 +29,13 @@ object JsonWriter {
      * @param jsonObject
      * @param path: path to write a file
      */
-    @Throws(java.io.IOException::class)
-    fun writeToFile(jsonObject: com.google.gson.JsonObject, path: String) {
+    /*@Throws(java.io.IOException::class)
+    fun writeToFile(jsonObject: Json, path: String) {
         val writer = java.io.FileWriter(path, false)
 
-        writer.write(getPrettyBuilder().toJson(jsonObject))
+        writer.write(jsonObject.)
         //writer.write(jsonObject.toString().replace(formattingRegex, "\n"))
         writer.close()
-    }
+    }*/
 
 }

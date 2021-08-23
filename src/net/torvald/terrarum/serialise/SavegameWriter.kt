@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
-import net.torvald.terrarum.utils.JsonWriter.getJsonBuilder
 import net.torvald.util.SortedArrayList
 import java.io.File
 import java.nio.charset.Charset
@@ -77,76 +76,17 @@ object SavegameWriter {
 
         // serialise current world (stage)
 
-        val worldBytes = WriteLayerDataZip(gameworld) // filename can be anything that is "world[n]" where [n] is any number
-        if (worldBytes == null) {
-            throw Error("Serialising world failed")
-        }
 
-        if (!worldBytes.sliceArray(0..3).contentEquals(WriteLayerDataZip.MAGIC)) {
-            worldBytes.forEach {
-                print(it.toUInt().and(255u).toString(16).toUpperCase().padStart(2, '0'))
-                print(' ')
-            }; println()
-            throw Error()
-        }
-
-        // add current world (stage) to the disk
-        VDUtil.registerFile(disk, DiskEntry(
-                gameworld.worldIndex, ROOT,
-                "world${gameworld.worldIndex}".toByteArray(charset),
-                creationDate, creationDate,
-                EntryFile(worldBytes)
-        ))
-
-
-
-        // TODO world[n] is done, needs whole other things
-
-
-        // worldinfo0..3
-        val worldinfoBytes = WriteWorldInfo(ingame)
-        worldinfoBytes?.forEachIndexed { index, bytes ->
-            VDUtil.registerFile(disk, DiskEntry(
-                    32766 - index, ROOT, "worldinfo$index".toByteArray(charset),
-                    creationDate, creationDate,
-                    EntryFile(bytes)
-            ))
-        } ?: throw Error("Serialising worldinfo failed")
-
-        // loadorder.txt
-        VDUtil.registerFile(disk, DiskEntry(
-                32767, ROOT, "load_order.txt".toByteArray(charset),
-                creationDate, creationDate,
-                EntryFile(ByteArray64.fromByteArray(Gdx.files.internal("./assets/mods/LoadOrder.csv").readBytes()))
-        ))
-
-        // actors
-        ingame.actorContainerActive.forEach {
-            VDUtil.registerFile(disk, DiskEntry(
-                    rngPool.next(), ROOT,
-                    it.referenceID.toString(16).toUpperCase().toByteArray(charset),
-                    creationDate, creationDate,
-                    EntryFile(serialiseActor(it))
-            ))
-        }
-        ingame.actorContainerInactive.forEach {
-            VDUtil.registerFile(disk, DiskEntry(
-                    rngPool.next(), ROOT,
-                    it.referenceID.toString(16).toUpperCase().toByteArray(charset),
-                    creationDate, creationDate,
-                    EntryFile(serialiseActor(it))
-            ))
-        }
 
         // items
-        ItemCodex.dynamicItemDescription.forEach { dynamicID, item ->
+        /*ItemCodex.dynamicItemDescription.forEach { dynamicID, item ->
             VDUtil.registerFile(disk, DiskEntry(
                     rngPool.next(), ROOT,
                     dynamicID.toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseItem(item))
             ))
-        }
+        }*/
 
         System.gc()
 
@@ -156,14 +96,79 @@ object SavegameWriter {
     fun modifyExistingSave(savefile: File): VirtualDisk {
         TODO()
     }
-
-    private fun serialiseActor(a: Actor): ByteArray64 {
-        val gson = getJsonBuilder().toJson(a).toByteArray(charset)
-        return ByteArray64.fromByteArray(gson)
-    }
-
-    private fun serialiseItem(i: GameItem): ByteArray64 {
-        val gson = getJsonBuilder().toJson(i).toByteArray(charset)
-        return ByteArray64.fromByteArray(gson)
-    }
 }
+
+fun Int.toLittle() = byteArrayOf(
+        this.and(0xFF).toByte(),
+        this.ushr(8).and(0xFF).toByte(),
+        this.ushr(16).and(0xFF).toByte(),
+        this.ushr(24).and(0xFF).toByte()
+)
+/** Converts int as 2-byte array, discarding the sign.*/
+fun Int.toULittleShort() = byteArrayOf(
+        this.and(0xFF).toByte(),
+        this.ushr(8).and(0xFF).toByte()
+)
+/** Converts int as 2-byte array, preserving the sign. In other words, it converts int to short. */
+fun Int.toLittleShort() = byteArrayOf(
+        this.and(0xFF).toByte(),
+        this.shr(8).and(0xFF).toByte()
+)
+fun Long.toLittle() = byteArrayOf(
+        this.and(0xFF).toByte(),
+        this.ushr(8).and(0xFF).toByte(),
+        this.ushr(16).and(0xFF).toByte(),
+        this.ushr(24).and(0xFF).toByte(),
+        this.ushr(32).and(0xFF).toByte(),
+        this.ushr(40).and(0xFF).toByte(),
+        this.ushr(48).and(0xFF).toByte(),
+        this.ushr(56).and(0xFF).toByte()
+)
+/** Converts long as 6-byte array, discarding the sign. */
+fun Long.toULittle48() = byteArrayOf(
+        this.and(0xFF).toByte(),
+        this.ushr(8).and(0xFF).toByte(),
+        this.ushr(16).and(0xFF).toByte(),
+        this.ushr(24).and(0xFF).toByte(),
+        this.ushr(32).and(0xFF).toByte(),
+        this.ushr(40).and(0xFF).toByte()
+)
+fun Double.toLittle() = java.lang.Double.doubleToRawLongBits(this).toLittle()
+fun Boolean.toLittle() = byteArrayOf(if (this) 0xFF.toByte() else 0.toByte())
+
+fun ByteArray.toLittleInt() =
+        if (this.size != 4) throw Error("Array not in size of 4")
+        else    this[0].toUint() or
+                this[1].toUint().shl(8) or
+                this[2].toUint().shl(16) or
+                this[3].toUint().shl(24)
+fun ByteArray.toULittleShort() =
+        if (this.size != 4) throw Error("Array not in size of 2")
+        else    this[0].toUint() or
+                this[1].toUint().shl(8)
+fun ByteArray.toLittleShort() =
+        if (this.size != 4) throw Error("Array not in size of 2")
+        else    this[0].toUint() or
+                this[1].toInt().shl(8)
+fun ByteArray.toLittleLong() =
+        if (this.size != 8) throw Error("Array not in size of 8")
+        else    this[0].toUlong() or
+                this[1].toUlong().shl(8) or
+                this[2].toUlong().shl(16) or
+                this[3].toUlong().shl(24) or
+                this[4].toUlong().shl(32) or
+                this[5].toUlong().shl(40) or
+                this[6].toUlong().shl(48) or
+                this[7].toUlong().shl(56)
+fun ByteArray.toLittleInt48() =
+        if (this.size != 6) throw Error("Array not in size of 6")
+        else    this[0].toUlong() or
+                this[1].toUlong().shl(8) or
+                this[2].toUlong().shl(16) or
+                this[3].toUlong().shl(24) or
+                this[4].toUlong().shl(32) or
+                this[5].toUlong().shl(40)
+fun ByteArray.toLittleFloat() = java.lang.Float.intBitsToFloat(this.toLittleInt())
+
+fun Byte.toUlong() = java.lang.Byte.toUnsignedLong(this)
+fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)

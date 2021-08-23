@@ -1,14 +1,11 @@
 package net.torvald.terrarum
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
-
 typealias ItemValue = KVHashMap
 
 /**
  * Created by minjaesong on 2015-12-30.
  */
-open class KVHashMap : GsonSerialisable {
+open class KVHashMap {
 
     constructor() {
         hashMap = HashMap<String, Any>()
@@ -49,8 +46,7 @@ open class KVHashMap : GsonSerialisable {
 
         if (value == null) return null
 
-        if (value is JsonPrimitive)
-            return value.asInt
+//        if (value is JsonPrimitive) return value.asInt
 
         return value as Int
     }
@@ -62,8 +58,7 @@ open class KVHashMap : GsonSerialisable {
 
         if (value is Int)
             return value.toDouble()
-        else if (value is JsonPrimitive)
-            return value.asDouble
+//        else if (value is JsonPrimitive) return value.asDouble
 
         return value as Double
     }
@@ -77,8 +72,7 @@ open class KVHashMap : GsonSerialisable {
 
         if (value == null) return null
 
-        if (value is JsonPrimitive)
-            return value.asString
+//        if (value is JsonPrimitive) return value.asString
 
         return value as String
     }
@@ -88,8 +82,7 @@ open class KVHashMap : GsonSerialisable {
 
         if (value == null) return null
 
-        if (value is JsonPrimitive)
-            return value.asBoolean
+//        if (value is JsonPrimitive) return value.asBoolean
 
         return value as Boolean
     }
@@ -109,9 +102,4 @@ open class KVHashMap : GsonSerialisable {
         val cloneOfMap = hashMap.clone() as HashMap<String, Any>
         return KVHashMap(cloneOfMap)
     }
-
-    override fun read(gson: JsonObject) {
-        TODO()
-    }
-
 }

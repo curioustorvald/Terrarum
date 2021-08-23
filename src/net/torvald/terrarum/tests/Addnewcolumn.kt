@@ -1,5 +1,6 @@
 package net.torvald.terrarum.tests
 
+import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
 import java.io.File
@@ -63,7 +64,7 @@ fun main() {
                 val key = record[0]
                 val value = record[index + 2]
                 if (value.isNotBlank()) {
-                    jsonObject.addProperty(key, value)
+                    jsonObject.addChild(key, JsonValue(value))
                 }
             }
 

@@ -1,7 +1,6 @@
 package net.torvald.terrarum.tests
 
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
-import net.torvald.terrarum.serialise.WriteLayerDataZip
 import net.torvald.terrarum.serialise.toLittle
 import net.torvald.terrarum.serialise.toULittle48
 import java.util.zip.Deflater
@@ -33,7 +32,7 @@ Ooh, black and yellow! Let's shake it up a little.""".trimIndent().toByteArray()
 
 
 
-        wb(WriteLayerDataZip.MAGIC); wb(WriteLayerDataZip.VERSION_NUMBER); wb(WriteLayerDataZip.NUMBER_OF_LAYERS); wb(WriteLayerDataZip.NUMBER_OF_PAYLOADS); wb(WriteLayerDataZip.COMPRESSION_ALGORITHM); wb(WriteLayerDataZip.GENERATOR_VERSION)
+        //wb(WriteLayerDataZip.MAGIC); wb(WriteLayerDataZip.VERSION_NUMBER); wb(WriteLayerDataZip.NUMBER_OF_LAYERS); wb(WriteLayerDataZip.NUMBER_OF_PAYLOADS); wb(WriteLayerDataZip.COMPRESSION_ALGORITHM); wb(WriteLayerDataZip.GENERATOR_VERSION)
         val deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
         repeat(20001) {
             deflater.write(Math.random().times(256).toInt().and(255))
