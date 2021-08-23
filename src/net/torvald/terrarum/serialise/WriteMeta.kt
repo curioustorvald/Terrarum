@@ -92,6 +92,7 @@ open class WriteMeta(val ingame: TerrarumIngame) {
         ba.forEach {
             if (bai > 0 && bai % 4 == 0) {
                 sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+                buf.fill(Ascii85.PAD_BYTE)
             }
 
             buf[bai % 4] = it.toInt() and 255
