@@ -17,7 +17,7 @@ class WriteWorld {
 
     /**
      * @param b a BlockLayer
-     * @return Bytes in BlockLayer, GZip'd then Ascii85-encoded
+     * @return Bytes in [b] which are GZip'd then Ascii85-encoded
      */
     private fun blockLayerToStr(b: BlockLayer): String {
         val sb = StringBuilder()
