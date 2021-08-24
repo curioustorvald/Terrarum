@@ -32,7 +32,7 @@ File is named as `"world"+world_index+".json"`
 ```
 {
     worldname: "New World",
-    comp: <0 for uncompressed, 1 for GZip, 2 for LZMA>,
+    comp: <null, "gzip">,
     width: 8192,
     height: 2048,
     spawnx: 4096,

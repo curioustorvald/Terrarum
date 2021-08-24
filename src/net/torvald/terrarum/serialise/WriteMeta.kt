@@ -3,12 +3,14 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.weather.WeatherMixer
+import java.io.ByteArrayInputStream
 import java.util.zip.GZIPOutputStream
 
 /**
@@ -80,6 +82,34 @@ fun bytesToZipdStr(b: ByteArray): String {
         zo.write(it.toInt())
     }
     zo.flush(); zo.close()
+
+    val ba = bo.toByteArray64()
+    var bai = 0
+    val buf = IntArray(4) { Ascii85.PAD_BYTE }
+    ba.forEach {
+        if (bai > 0 && bai % 4 == 0) {
+            sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+            buf.fill(Ascii85.PAD_BYTE)
+        }
+
+        buf[bai % 4] = it.toInt() and 255
+
+        bai += 1
+    }; sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+
+    return sb.toString()
+}
+
+/**
+ * @param b a ByteArray
+ * @return Bytes in [b] which are LZMA'd then Ascii85-encoded
+ */
+fun bytesToLzmadStr(b: ByteArray): String {
+    val sb = StringBuilder()
+    val bi = ByteArrayInputStream(b)
+    val bo = ByteArray64GrowableOutputStream()
+
+    Lzma.compress(bi, bo); bo.flush(); bo.close()
 
     val ba = bo.toByteArray64()
     var bai = 0

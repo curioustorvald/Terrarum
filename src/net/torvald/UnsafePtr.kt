@@ -2,6 +2,9 @@ package net.torvald
 
 import net.torvald.terrarum.printStackTrace
 import sun.misc.Unsafe
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * Further read:
@@ -184,4 +187,38 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
 
     override fun toString() = "0x${ptr.toString(16)} with size $size"
     override fun equals(other: Any?) = this.ptr == (other as UnsafePtr).ptr && this.size == other.size
+}
+
+internal class UnsafePtrInputStream(val ptr: UnsafePtr): InputStream() {
+    private var p = 0L
+
+    override fun reset() {
+        p = 0L
+    }
+
+    override fun read(): Int {
+        if (p < ptr.size) {
+            p += 1
+            return ptr[p - 1].toInt().and(255)
+        }
+        else return -1
+    }
+}
+
+internal class UnsafePtrOutputStream(val ptr: UnsafePtr): OutputStream() {
+    private var p = 0L
+
+    override fun write(p0: Int) {
+        if (p < ptr.size) {
+            p += 1
+            ptr[p - 1] = p0.toByte()
+        }
+        else throw IOException("Buffer overflow: $p for allocated size ${ptr.size}")
+    }
+
+    override fun write(b: ByteArray, off: Int, len: Int) {
+        if (p + len >= ptr.size) throw IOException("Buffer overflow: ${p+len} for allocated size ${ptr.size}")
+        UnsafeHelper.unsafe.copyMemory(b, off.toLong(), null, ptr.ptr + p, len.toLong())
+        p += len
+    }
 }

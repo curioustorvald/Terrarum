@@ -5,6 +5,9 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import com.badlogic.gdx.utils.compression.Lzma
+import net.torvald.UnsafePtr
+import net.torvald.UnsafePtrInputStream
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
@@ -16,6 +19,8 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Ascii85
+import net.torvald.terrarum.serialise.bytesToLzmadStr
+import net.torvald.terrarum.serialise.bytesToZipdStr
 import net.torvald.util.SortedArrayList
 import org.apache.commons.codec.digest.DigestUtils
 import org.dyn4j.geometry.Vector2
@@ -699,11 +704,14 @@ open class GameWorld : Disposable {
         layerWall.bytesIterator().forEachRemaining { digester.update(it) }
         val wallhash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
 
+        // use gzip; lzma's slower and larger for some reason
         return arrayListOf(
                 """"worldname": "$worldName"""",
-                """"comp": 1""",
+                """"comp": "gzip"""",
                 """"width": $width""",
                 """"height": $height""",
+                """"spawnx": $spawnX""",
+                """"spawny": $spawnY""",
                 """"genver": 4""",
                 """"time_t": ${worldTime.TIME_T}""",
                 """"terr": {
@@ -714,22 +722,22 @@ open class GameWorld : Disposable {
                     |"b": "${blockLayerToStr(layerWall)}"}""".trimMargin(),
                 """"tdmg": {
                     |"h": "${StringBuilder().let { sb -> digester.digest(tdmgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": $tdmgstr}""".trimMargin(),
+                    |"b": "${bytesToZipdStr(tdmgstr.toByteArray())}"}""".trimMargin(),
                 """"wdmg": {
                     |"h": "${StringBuilder().let { sb -> digester.digest(wdmgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": $wdmgstr}""".trimMargin(),
+                    |"b": "${bytesToZipdStr(wdmgstr.toByteArray())}"}""".trimMargin(),
                 """"flut": {
                     |"h": "${StringBuilder().let { sb -> digester.digest(flutstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": $flutstr}""".trimMargin(),
+                    |"b": "${bytesToZipdStr(flutstr.toByteArray())}"}""".trimMargin(),
                 """"fluf": {
                     |"h": "${StringBuilder().let { sb -> digester.digest(flufstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": $flufstr}""".trimMargin(),
+                    |"b": "${bytesToZipdStr(flufstr.toByteArray())}"}""".trimMargin(),
                 """"wire": {
                     |"h": "${StringBuilder().let { sb -> digester.digest(wirestr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": $wirestr}""".trimMargin(),
+                    |"b": "${bytesToZipdStr(wirestr.toByteArray())}"}""".trimMargin(),
                 """"wirg": {
                     |"h": "${StringBuilder().let { sb -> digester.digest(wirgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": $wirgstr}""".trimMargin()
+                    |"b": "${bytesToZipdStr(wirgstr.toByteArray())}"}""".trimMargin()
         )
     }
 }
@@ -757,6 +765,34 @@ fun blockLayerToStr(b: BlockLayer): String {
         zo.write(it.toInt())
     }
     zo.flush(); zo.close()
+
+    val ba = bo.toByteArray64()
+    var bai = 0
+    val buf = IntArray(4) { Ascii85.PAD_BYTE }
+    ba.forEach {
+        if (bai > 0 && bai % 4 == 0) {
+            sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+            buf.fill(Ascii85.PAD_BYTE)
+        }
+
+        buf[bai % 4] = it.toInt() and 255
+
+        bai += 1
+    }; sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+
+    return sb.toString()
+}
+
+/**
+ * @param b a BlockLayer
+ * @return Bytes in [b] which are LZMA'd then Ascii85-encoded
+ */
+fun blockLayerToStr2(b: BlockLayer): String {
+    val sb = StringBuilder()
+    val bi = UnsafePtrInputStream(b.ptr)
+    val bo = ByteArray64GrowableOutputStream()
+
+    Lzma.compress(bi, bo); bo.flush(); bo.close()
 
     val ba = bo.toByteArray64()
     var bai = 0
