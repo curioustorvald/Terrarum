@@ -2,8 +2,10 @@ package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.weather.WeatherMixer
 import java.io.ByteArrayInputStream
@@ -62,6 +64,12 @@ open class WriteMeta(val ingame: TerrarumIngame) {
 }"""
         
         return json
+    }
+
+    fun encodeToByteArray64(): ByteArray64 {
+        val ba = ByteArray64()
+        this.invoke().toByteArray().forEach { ba.add(it) }
+        return ba
     }
 }
 

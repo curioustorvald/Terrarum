@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import java.math.BigInteger
 
 /**
@@ -28,6 +29,12 @@ object WriteActor {
 
     operator fun invoke(actor: Actor): String {
         return jsoner.toJson(actor)
+    }
+
+    fun encodeToByteArray64(actor: Actor): ByteArray64 {
+        val ba = ByteArray64()
+        this.invoke(actor).toByteArray().forEach { ba.add(it) }
+        return ba
     }
 
 }
