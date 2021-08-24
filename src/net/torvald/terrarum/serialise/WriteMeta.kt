@@ -1,11 +1,7 @@
 package net.torvald.terrarum.serialise
 
-import com.badlogic.gdx.utils.Json
-import com.badlogic.gdx.utils.JsonValue
-import com.badlogic.gdx.utils.JsonWriter
 import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream

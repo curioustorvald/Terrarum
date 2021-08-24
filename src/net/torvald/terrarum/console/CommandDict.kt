@@ -61,6 +61,7 @@ object CommandDict {
 
             /* !! */"exportmeta" to ExportMeta,
             /* !! */"exportworld" to ExportWorld,
+            /* !! */"exportactor" to ExportActor,
             /* !! */"importlayer" to ImportLayerData,
             /* !! */"exportfborgb" to ExportRendererFboRGB
     )

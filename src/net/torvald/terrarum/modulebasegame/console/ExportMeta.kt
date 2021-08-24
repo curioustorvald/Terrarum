@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.serialise.WriteActor
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.serialise.WriteWorld
 import net.torvald.terrarum.utils.JsonWriter
@@ -52,5 +53,37 @@ object ExportWorld : ConsoleCommand {
 
     override fun printUsage() {
         Echo("Usage: Exportworld")
+    }
+}
+
+object ExportActor : ConsoleCommand {
+    override fun execute(args: Array<String>) {
+        if (args.size == 2) {
+            try {
+                val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
+                if (player == null) return
+
+                val str = WriteActor(player)
+                val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}.json", false)
+                writer.write(str)
+                writer.close()
+
+                Echo("Exportactor: exported to ${args[1]}.json")
+            }
+            catch (e: IOException) {
+                Echo("Exportactor: IOException raised.")
+                e.printStackTrace()
+            }
+
+        }
+        else {
+            printUsage()
+        }
+    }
+
+    override fun printUsage() {
+        Echo("Export Actor as JSON format.")
+        Echo("Usage: exportactor (id) filename-without-extension")
+        Echo("blank ID for player")
     }
 }
