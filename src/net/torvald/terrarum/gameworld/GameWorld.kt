@@ -2,6 +2,9 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
+import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
@@ -10,9 +13,13 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.serialise.Ascii85
 import net.torvald.util.SortedArrayList
+import org.apache.commons.codec.digest.DigestUtils
 import org.dyn4j.geometry.Vector2
+import java.util.zip.GZIPOutputStream
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.absoluteValue
@@ -47,9 +54,7 @@ open class GameWorld : Disposable {
     open val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
-    @TEMzPayload("WALL", TEMzPayload.INT16_LITTLE)
     val layerWall: BlockLayer
-    @TEMzPayload("TERR", TEMzPayload.INT16_LITTLE)
     val layerTerrain: BlockLayer
     //val layerWire: MapLayer
 
@@ -61,19 +66,14 @@ open class GameWorld : Disposable {
     /** Tilewise spawn point */
     open var spawnY: Int
 
-    @TEMzPayload("WdMG", TEMzPayload.INT48_FLOAT_PAIR)
     val wallDamages: HashMap<BlockAddress, Float>
-    @TEMzPayload("TdMG", TEMzPayload.INT48_FLOAT_PAIR)
     val terrainDamages: HashMap<BlockAddress, Float>
-    @TEMzPayload("FlTP", TEMzPayload.INT48_SHORT_PAIR)
     val fluidTypes: HashMap<BlockAddress, FluidType>
-    @TEMzPayload("FlFL", TEMzPayload.INT48_FLOAT_PAIR)
     val fluidFills: HashMap<BlockAddress, Float>
 
     /**
      * Single block can have multiple conduits, different types of conduits are stored separately.
      */
-    @TEMzPayload("WiNt", TEMzPayload.EXTERNAL_JSON)
     private val wirings: HashMap<BlockAddress, WiringNode>
 
     private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
@@ -106,7 +106,6 @@ open class GameWorld : Disposable {
     )
 
 
-    @TEMzPayload("TMaP", TEMzPayload.EXTERNAL_JSON)
     val tileNumberToNameMap: HashMap<Int, ItemID>
     // does not go to the savefile
     val tileNameToNumberMap: HashMap<ItemID, Int>
@@ -672,6 +671,67 @@ open class GameWorld : Disposable {
     open fun updateWorldTime(delta: Float) {
         worldTime.update(delta)
     }
+
+    /**
+     * Returns lines that are part of the entire JSON
+     *
+     * To extend this function, you can code something like this:
+     * ```
+     * return super.getJsonFields() + arrayListOf(
+     *     """"<myModuleName>.<myNewObject>": ${Json(JsonWriter.OutputType.json).toJson(<myNewObject>)}"""
+     * )
+     * ```
+     */
+    open fun getJsonFields(): List<String> {
+        fun Byte.tostr() = this.toInt().and(255).toString(16).padStart(2,'0')
+
+        val tdmgstr = Json(JsonWriter.OutputType.json).toJson(terrainDamages)
+        val wdmgstr = Json(JsonWriter.OutputType.json).toJson(wallDamages)
+        val flutstr = Json(JsonWriter.OutputType.json).toJson(fluidTypes)
+        val flufstr = Json(JsonWriter.OutputType.json).toJson(fluidFills)
+        val wirestr = Json(JsonWriter.OutputType.json).toJson(wirings)
+        val wirgstr = Json(JsonWriter.OutputType.json).toJson(wiringGraph)
+
+        val digester = DigestUtils.getSha256Digest()
+
+        layerTerrain.bytesIterator().forEachRemaining { digester.update(it) }
+        val terrhash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
+        layerWall.bytesIterator().forEachRemaining { digester.update(it) }
+        val wallhash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
+
+        return arrayListOf(
+                """"worldname": "$worldName"""",
+                """"comp": 1""",
+                """"width": $width""",
+                """"height": $height""",
+                """"genver": 4""",
+                """"time_t": ${worldTime.TIME_T}""",
+                """"terr": {
+                    |"h": "$terrhash",
+                    |"b": "${blockLayerToStr(layerTerrain)}"}""".trimMargin(),
+                """"wall": {
+                    |"h": "$wallhash",
+                    |"b": "${blockLayerToStr(layerWall)}"}""".trimMargin(),
+                """"tdmg": {
+                    |"h": "${StringBuilder().let { sb -> digester.digest(tdmgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
+                    |"b": $tdmgstr}""".trimMargin(),
+                """"wdmg": {
+                    |"h": "${StringBuilder().let { sb -> digester.digest(wdmgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
+                    |"b": $wdmgstr}""".trimMargin(),
+                """"flut": {
+                    |"h": "${StringBuilder().let { sb -> digester.digest(flutstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
+                    |"b": $flutstr}""".trimMargin(),
+                """"fluf": {
+                    |"h": "${StringBuilder().let { sb -> digester.digest(flufstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
+                    |"b": $flufstr}""".trimMargin(),
+                """"wire": {
+                    |"h": "${StringBuilder().let { sb -> digester.digest(wirestr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
+                    |"b": $wirestr}""".trimMargin(),
+                """"wirg": {
+                    |"h": "${StringBuilder().let { sb -> digester.digest(wirgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
+                    |"b": $wirgstr}""".trimMargin()
+        )
+    }
 }
 
 infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
@@ -683,21 +743,34 @@ inline class FluidType(val value: Int) {
     fun abs() = this.value.absoluteValue
 }
 
+
 /**
- * @param payloadName Payload name defined in Map Data Format.txt
- * * 4 Letters: regular payload
- * * 3 Letters: only valid for arrays with 16 elements, names are auto-generated by appending '0'..'9'+'a'..'f'. E.g.: 'CfL' turns into 'CfL0', 'CfL1' ... 'CfLe', 'CfLf'
- *
- * @param arg 0 for 8 MSBs of Terrain/Wall layer, 1 for 4 LSBs of Terrain/Wall layer, 2 for Int48-Float pair, 3 for Int48-Short pair, 4 for Int48-Int pair
+ * @param b a BlockLayer
+ * @return Bytes in [b] which are GZip'd then Ascii85-encoded
  */
-annotation class TEMzPayload(val payloadName: String, val arg: Int) {
-    companion object {
-        const val EXTERNAL_JAVAPROPERTIES = -3
-        const val EXTERNAL_CSV = -2
-        const val EXTERNAL_JSON = -1
-        const val INT16_LITTLE = 1
-        const val INT48_FLOAT_PAIR = 2
-        const val INT48_SHORT_PAIR = 3
-        const val INT48_INT_PAIR = 4
+fun blockLayerToStr(b: BlockLayer): String {
+    val sb = StringBuilder()
+    val bo = ByteArray64GrowableOutputStream()
+    val zo = GZIPOutputStream(bo)
+
+    b.bytesIterator().forEachRemaining {
+        zo.write(it.toInt())
     }
+    zo.flush(); zo.close()
+
+    val ba = bo.toByteArray64()
+    var bai = 0
+    val buf = IntArray(4) { Ascii85.PAD_BYTE }
+    ba.forEach {
+        if (bai > 0 && bai % 4 == 0) {
+            sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+            buf.fill(Ascii85.PAD_BYTE)
+        }
+
+        buf[bai % 4] = it.toInt() and 255
+
+        bai += 1
+    }; sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
+
+    return sb.toString()
 }

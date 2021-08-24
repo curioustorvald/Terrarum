@@ -60,6 +60,7 @@ object CommandDict {
             "savetest" to SavegameWriterTest,
 
             /* !! */"exportmeta" to ExportMeta,
+            /* !! */"exportworld" to ExportWorld,
             /* !! */"importlayer" to ImportLayerData,
             /* !! */"exportfborgb" to ExportRendererFboRGB
     )

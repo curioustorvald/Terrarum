@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 
@@ -35,6 +37,12 @@ class GameWorldExtension : GameWorld {
     val damageDataArray: ByteArray; get() = baseworld.damageDataArray*/
 
     init {
+    }
+
+    override fun getJsonFields(): List<String> {
+        return super.getJsonFields() + arrayListOf(
+                """"basegame.economy": ${Json(JsonWriter.OutputType.json).toJson(economy)}"""
+        )
     }
 
 }

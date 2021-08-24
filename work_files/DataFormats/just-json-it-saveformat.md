@@ -40,37 +40,38 @@ File is named as `"world"+world_index+".json"`
     genver: 4, /* generator version in integer */
     time_t: <in-game TIME_T of this world>,
     terr: {
-        s: 33554432,
         h: "a441b15fe9a3cf56661190a0b93b9dec7d04127288cc87250967cf3b52894d11",
         b: <Ascii85-encoded gzipped terrain layerdata>
     },
     wall: {
-        s: 33554432,
         h: <SHA-256 hash of 'b'>,
         b: <Ascii85-encoded gzipped wall layerdata>
     },
     tdmg: {
-        s: 8795,
         h: <SHA-256 hash of 'b'>,
         b: <Ascii85-encoded gzipped terrain damage in JSON>
     },
     wdmg: {
-        s: 2,
         h: <SHA-256 hash of 'b'>,
         b: <Ascii85-encoded gzipped wall damage in JSON>
     },
-    flui: {
-        s: 15734
+    flut: {
         h: <SHA-256 hash of 'b'>,
-        b: <Ascii85-encoded gzipped fluids in JSON>
+        b: <Ascii85-encoded gzipped fluidTypes in JSON>
+    },
+    fluf: {
+        h: <SHA-256 hash of 'b'>,
+        b: <Ascii85-encoded gzipped fluidFills in JSON>
     },
     wire: {
-        s: 2,
         h: <SHA-256 hash of 'b'>,
-        b: <Ascii85-encoded gzipped wiring nodes in JSON>
+        b: <Ascii85-encoded gzipped wirings in JSON>
+    },
+    wirg: {
+        h: <SHA-256 hash of 'b'>,
+        b: <Ascii85-encoded gzipped wiringGraph in JSON>
     },
     tmap: {
-        s: 4316,
         h: <SHA-256 hash of 'b'>,
         b: <Ascii85-encoded gzipped tilenumber-to-tilename map in JSON>
     }
