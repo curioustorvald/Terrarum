@@ -59,7 +59,7 @@ object CommandDict {
             "spawnlunarlander" to SpawnPhysTestLunarLander,
             "savetest" to SavegameWriterTest,
 
-            /* !! */"exportlayer" to ExportLayerData,
+            /* !! */"exportmeta" to ExportMeta,
             /* !! */"importlayer" to ImportLayerData,
             /* !! */"exportfborgb" to ExportRendererFboRGB
     )

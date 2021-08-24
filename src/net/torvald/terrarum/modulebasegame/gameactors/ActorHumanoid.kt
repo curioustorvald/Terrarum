@@ -127,8 +127,8 @@ open class ActorHumanoid(
     internal var walkCounterY = 0
     @Transient private val MAX_JUMP_LENGTH = 25 // manages "heaviness" of the jump control. Higher = heavier
 
-    private var readonly_totalX = 0.0
-    private var readonly_totalY = 0.0
+    @Transient private var readonly_totalX = 0.0
+    @Transient private var readonly_totalY = 0.0
 
     internal var jumping = false
 
@@ -531,11 +531,11 @@ open class ActorHumanoid(
         return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
     }
 
-    private var oldMAX_JUMP_LENGTH = -1 // init
-    private var oldJUMPPOWER = -1.0 // init
-    private var oldJUMPPOWERBUFF = -1.0 // init
-    private var oldScale = -1.0
-    private var oldDragCoefficient = -1.0
+    @Transient private var oldMAX_JUMP_LENGTH = -1 // init
+    @Transient private var oldJUMPPOWER = -1.0 // init
+    @Transient private var oldJUMPPOWERBUFF = -1.0 // init
+    @Transient private var oldScale = -1.0
+    @Transient private var oldDragCoefficient = -1.0
     // used by some AIs
     var jumpAirTime: Double = -1.0
         get() {

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameworld.BlockLayer
@@ -18,58 +19,51 @@ open class WriteMeta(val ingame: TerrarumIngame) {
     open fun invoke(): String {
         val world = ingame.world
         
-        val props = hashMapOf<String, Any>(
-            "genver" to 4,
-            "savename" to world.worldName,
-            "terrseed" to world.generatorSeed,
-            "randseed0" to RoguelikeRandomiser.RNG.state0,
-            "randseed1" to RoguelikeRandomiser.RNG.state1,
-            "weatseed0" to WeatherMixer.RNG.state0,
-            "weatseed1" to WeatherMixer.RNG.state1,
-            "playerid" to ingame.theRealGamer.referenceID,
-            "creation_t" to world.creationTime,
-            "lastplay_t" to world.lastPlayTime,
-            "playtime_t" to world.totalPlayTime,
-
-            // CSVs
-            "blocks" to StringBuilder().let {
-                ModMgr.getFilesFromEveryMod("blocks/blocks.csv").forEach { (modname, file) ->
-                    it.append("\n\n## module: $modname ##\n\n")
-                    it.append(file.readText())
-                }
-                bytesToZipdStr(it.toString().toByteArray())
-            },
-
-            "items" to StringBuilder().let {
-                ModMgr.getFilesFromEveryMod("items/itemid.csv").forEach { (modname, file) ->
-                    it.append("\n\n## module: $modname ##\n\n")
-                    it.append(file.readText())
-                }
-                bytesToZipdStr(it.toString().toByteArray())
-            },
-
-            "wires" to StringBuilder().let {
-                ModMgr.getFilesFromEveryMod("wires/wires.csv").forEach { (modname, file) ->
-                    it.append("\n\n## module: $modname ##\n\n")
-                    it.append(file.readText())
-                }
-                bytesToZipdStr(it.toString().toByteArray())
-            },
-
-            // TODO fluids
-            "materials" to StringBuilder().let {
-                ModMgr.getFilesFromEveryMod("materials/materials.csv").forEach { (modname, file) ->
-                    it.append("\n\n## module: $modname ##\n\n")
-                    it.append(file.readText())
-                }
-                bytesToZipdStr(it.toString().toByteArray())
-            },
-
-            "loadorder" to ModMgr.loadOrder,
-            "worlds" to ingame.gameworldIndices
-        )
+        val json = """{
+"genver": 4,
+"savename": "${world.worldName}",
+"terrseed": ${world.generatorSeed},
+"randseed0": ${RoguelikeRandomiser.RNG.state0},
+"randseed1": ${RoguelikeRandomiser.RNG.state1},
+"weatseed0": ${WeatherMixer.RNG.state0},
+"weatseed1": ${WeatherMixer.RNG.state1},
+"playerid": ${ingame.theRealGamer.referenceID},
+"creation_t": ${world.creationTime},
+"lastplay_t": ${world.lastPlayTime},
+"playtime_t": ${world.totalPlayTime},
+"blocks": "${StringBuilder().let {
+    ModMgr.getFilesFromEveryMod("blocks/blocks.csv").forEach { (modname, file) ->
+        it.append("\n\n## module: $modname ##\n\n")
+        it.append(file.readText())
+    }
+    bytesToZipdStr(it.toString().toByteArray())
+}}",
+"items": "${StringBuilder().let {
+    ModMgr.getFilesFromEveryMod("items/itemid.csv").forEach { (modname, file) ->
+        it.append("\n\n## module: $modname ##\n\n")
+        it.append(file.readText())
+    }
+    bytesToZipdStr(it.toString().toByteArray())
+}}",
+"wires": "${StringBuilder().let {
+    ModMgr.getFilesFromEveryMod("wires/wires.csv").forEach { (modname, file) ->
+        it.append("\n\n## module: $modname ##\n\n")
+        it.append(file.readText())
+    }
+    bytesToZipdStr(it.toString().toByteArray())
+}}",
+"materials": "${StringBuilder().let {
+    ModMgr.getFilesFromEveryMod("materials/materials.csv").forEach { (modname, file) ->
+        it.append("\n\n## module: $modname ##\n\n")
+        it.append(file.readText())
+    }
+    bytesToZipdStr(it.toString().toByteArray())
+}}",
+"loadorder": [${ModMgr.loadOrder.map { "\"${it}\"" }.joinToString()}],
+"worlds": [${ingame.gameworldIndices.joinToString()}]
+}"""
         
-        return Json(JsonWriter.OutputType.json).toJson(props)
+        return json
     }
 
     /**

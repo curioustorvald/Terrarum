@@ -295,7 +295,6 @@ open class ActorWithBody(renderOrder: RenderOrder, val physProp: PhysProperties,
 
     @Transient private var assertPrinted = false
 
-    // debug only
     internal var walledLeft = false
     internal var walledRight = false
     internal var walledTop = false    // UNUSED; only for BasicDebugInfoWindow

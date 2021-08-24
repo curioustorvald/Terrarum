@@ -13,22 +13,22 @@ import java.io.IOException
 /**
  * Created by minjaesong on 2017-07-18.
  */
-object ExportLayerData : ConsoleCommand {
+object ExportMeta : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
             val str = WriteMeta(Terrarum.ingame!! as TerrarumIngame).invoke()
             val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/savegame.json", false)
             writer.write(str)
             writer.close()
-            Echo("Exportlayer: exported to savegame.json")
+            Echo("Exportmeta: exported to savegame.json")
         }
         catch (e: IOException) {
-            Echo("Exportlayer: IOException raised.")
+            Echo("Exportmeta: IOException raised.")
             e.printStackTrace()
         }
     }
 
     override fun printUsage() {
-        Echo("Usage: exportlayer")
+        Echo("Usage: Exportmeta")
     }
 }
