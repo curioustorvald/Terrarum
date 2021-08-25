@@ -37,22 +37,26 @@ object ExportMeta : ConsoleCommand {
 
 object ExportWorld : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        try {
-            val world = Terrarum.ingame!!.world
-            val str = WriteWorld(Terrarum.ingame!! as TerrarumIngame).invoke()
-            val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/world${world.worldIndex}.json", false)
-            writer.write(str)
-            writer.close()
-            Echo("Exportworld: exported to world${world.worldIndex}.json")
+        if (args.size == 2) {
+            try {
+                val str = WriteWorld(Terrarum.ingame!! as TerrarumIngame).invoke()
+                val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}", false)
+                writer.write(str)
+                writer.close()
+                Echo("Exportworld: exported to ${args[1]}")
+            }
+            catch (e: IOException) {
+                Echo("Exportworld: IOException raised.")
+                e.printStackTrace()
+            }
         }
-        catch (e: IOException) {
-            Echo("Exportworld: IOException raised.")
-            e.printStackTrace()
+        else {
+            ImportWorld.printUsage()
         }
     }
 
     override fun printUsage() {
-        Echo("Usage: Exportworld")
+        Echo("Usage: Exportworld filename.json")
     }
 }
 

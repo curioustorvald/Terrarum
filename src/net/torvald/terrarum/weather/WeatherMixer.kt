@@ -17,7 +17,6 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
@@ -88,7 +87,7 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Part of Ingame update
      */
-    fun update(delta: Float, player: ActorWithBody?, world: GameWorldExtension) {
+    fun update(delta: Float, player: ActorWithBody?, world: GameWorld) {
         if (player == null) return
 
         currentWeather = weatherList[WEATHER_GENERIC]!![0]

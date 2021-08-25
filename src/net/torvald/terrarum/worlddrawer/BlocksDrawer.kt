@@ -13,7 +13,6 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -182,7 +181,7 @@ internal object BlocksDrawer {
     internal fun renderData() {
 
         try {
-            drawTIME_T = (world as GameWorldExtension).worldTime.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
+            drawTIME_T = world.worldTime.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
             val seasonalMonth = (drawTIME_T.div(WorldTime.DAY_LENGTH) fmod WorldTime.YEAR_DAYS.toLong()).toInt() / WorldTime.MONTH_LENGTH + 1
 
             tilesTerrain = weatherTerrains[seasonalMonth - 1]
@@ -620,7 +619,7 @@ internal object BlocksDrawer {
         shader.setUniformf("tilesInAtlas", tileAtlas.horizontalCount.toFloat(), tileAtlas.verticalCount.toFloat()) //depends on the tile atlas
         shader.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
-        shader.setUniformf("tilesBlend", if (world is GameWorldExtension && (mode == TERRAIN || mode == WALL))
+        shader.setUniformf("tilesBlend", if (mode == TERRAIN || mode == WALL)
             drawTIME_T.fmod(SECONDS_IN_MONTH) / SECONDS_IN_MONTH.toFloat()
         else
             0f

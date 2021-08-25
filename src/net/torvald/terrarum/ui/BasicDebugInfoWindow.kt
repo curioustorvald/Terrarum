@@ -14,7 +14,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -41,8 +40,6 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val world: GameWorld?
         get() = Terrarum.ingame?.world
-    private val world2: GameWorldExtension?
-        get() = Terrarum.ingame?.world as? GameWorldExtension?
 
 
     override fun updateUI(delta: Float) {
@@ -188,8 +185,8 @@ class BasicDebugInfoWindow : UICanvas() {
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
 
         if (world != null) {
-            printLineColumn(batch, 2, 5, "Time $ccG${world2?.worldTime?.todaySeconds.toString().padStart(5, '0')}" +
-                                         " (${world2?.worldTime?.getFormattedTime()})")
+            printLineColumn(batch, 2, 5, "Time $ccG${world?.worldTime?.todaySeconds.toString().padStart(5, '0')}" +
+                                         " (${world?.worldTime?.getFormattedTime()})")
         }
 
         if (player != null) {

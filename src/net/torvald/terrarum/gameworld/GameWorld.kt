@@ -32,7 +32,7 @@ import kotlin.math.sign
 
 typealias BlockAddress = Long
 
-open class GameWorld : Disposable {
+class GameWorld : Disposable {
 
     var worldName: String = "New World"
     /** Index start at 1 */
@@ -49,37 +49,37 @@ open class GameWorld : Disposable {
     val width: Int
     val height: Int
 
-    open val creationTime: Long
-    open var lastPlayTime: Long
+    var creationTime: Long
+        internal set
+    var lastPlayTime: Long
         internal set // there's a case of save-and-continue-playing
-    open var totalPlayTime: Int
+    var totalPlayTime: Int
         internal set
 
     /** Used to calculate play time */
     @Transient open val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
-    val layerWall: BlockLayer
-    val layerTerrain: BlockLayer
-    //val layerWire: MapLayer
+    lateinit var layerWall: BlockLayer
+    lateinit var layerTerrain: BlockLayer
 
     //val layerThermal: MapLayerHalfFloat // in Kelvins
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
 
     /** Tilewise spawn point */
-    open var spawnX: Int
+    var spawnX: Int
     /** Tilewise spawn point */
-    open var spawnY: Int
+    var spawnY: Int
 
-    val wallDamages: HashMap<BlockAddress, Float>
-    val terrainDamages: HashMap<BlockAddress, Float>
-    val fluidTypes: HashMap<BlockAddress, FluidType>
-    val fluidFills: HashMap<BlockAddress, Float>
+    val wallDamages = HashMap<BlockAddress, Float>()
+    val terrainDamages = HashMap<BlockAddress, Float>()
+    val fluidTypes = HashMap<BlockAddress, FluidType>()
+    val fluidFills = HashMap<BlockAddress, Float>()
 
     /**
      * Single block can have multiple conduits, different types of conduits are stored separately.
      */
-    private val wirings: HashMap<BlockAddress, WiringNode>
+    private val wirings = HashMap<BlockAddress, WiringNode>()
 
     private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
     @Transient private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
@@ -111,9 +111,11 @@ open class GameWorld : Disposable {
     )
 
 
-    val tileNumberToNameMap: HashMap<Int, ItemID>
+    val tileNumberToNameMap = HashMap<Int, ItemID>()
     // does not go to the savefile
-    @Transient val tileNameToNumberMap: HashMap<ItemID, Int>
+    @Transient val tileNameToNumberMap = HashMap<ItemID, Int>()
+
+    val extraFields = HashMap<String, Any?>()
 
     /**
      * Create new world
@@ -130,15 +132,6 @@ open class GameWorld : Disposable {
 
         layerTerrain = BlockLayer(width, height)
         layerWall = BlockLayer(width, height)
-        //layerWire = MapLayer(width, height)
-
-        wallDamages = HashMap()
-        terrainDamages = HashMap()
-        fluidTypes = HashMap()
-        fluidFills = HashMap()
-
-        //wiringBlocks = HashMap()
-        wirings = HashMap()
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -151,9 +144,22 @@ open class GameWorld : Disposable {
         lastPlayTime = lastPlayTIME_T
         this.totalPlayTime = totalPlayTime
 
+        postLoad()
+    }
 
-        tileNumberToNameMap = HashMap<Int, ItemID>()
-        tileNameToNumberMap = HashMap<ItemID, Int>()
+    constructor() {
+        worldIndex = 1234567890
+        width = 999
+        height = 999
+        val time = AppLoader.getTIME_T()
+        creationTime = time
+        lastPlayTime = time
+        totalPlayTime = 0
+        spawnX = 0
+        spawnY = 0
+    }
+
+    fun postLoad() {
         AppLoader.tileMaker.tags.forEach {
             printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
@@ -211,7 +217,14 @@ open class GameWorld : Disposable {
      */
     fun getTileFromWall(rawX: Int, rawY: Int): ItemID {
         val (x, y) = coerceXY(rawX, rawY)
-        return tileNumberToNameMap[layerWall.unsafeGetTile(x, y)]!!
+
+        try {
+            return tileNumberToNameMap[layerWall.unsafeGetTile(x, y)]!!
+        }
+        catch (e: NullPointerException) {
+            System.err.println("NPE for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y)")
+            throw e
+        }
     }
 
     /**
@@ -224,7 +237,7 @@ open class GameWorld : Disposable {
             return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]!!
         }
         catch (e: NullPointerException) {
-            System.err.println("NPE for tilenum ${layerTerrain.unsafeGetTile(x, y)}")
+            System.err.println("NPE for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y)")
             throw e
         }
     }
@@ -597,7 +610,7 @@ open class GameWorld : Disposable {
         else -> throw IllegalArgumentException("Unsupported fluid type: $type")
     }
 
-    data class FluidInfo(val type: FluidType, val amount: Float) {
+    data class FluidInfo(val type: FluidType = Fluid.NULL, val amount: Float = 0f) {
         /** test if this fluid should be considered as one */
         fun isFluid() = type != Fluid.NULL && amount >= WorldSimulator.FLUID_MIN_MASS
         fun getProp() = BlockCodex[type]
@@ -611,8 +624,8 @@ open class GameWorld : Disposable {
      * If the wire does not allow them (e.g. wire bridge, thicknet), connect top-bottom and left-right nodes.
      */
     data class WiringNode(
-            val position: BlockAddress, // may seem redundant and it kinda is, but don't remove!
-            val wires: SortedArrayList<ItemID> // what could possibly go wrong bloating up the RAM footprint when it's practically infinite these days?
+            val position: BlockAddress = -1, // may seem redundant and it kinda is, but don't remove!
+            val wires: SortedArrayList<ItemID> = SortedArrayList<ItemID>() // what could possibly go wrong bloating up the RAM footprint when it's practically infinite these days?
     ) : Comparable<WiringNode> {
         override fun compareTo(other: WiringNode): Int {
             return (this.position - other.position).sign
@@ -620,8 +633,8 @@ open class GameWorld : Disposable {
     }
 
     data class WireRecvState(
-            var dist: Int, // how many tiles it took to traverse
-            var src: Point2i // xy position
+            var dist: Int = -1, // how many tiles it took to traverse
+            var src: Point2i = Point2i(0,0) // xy position
             // to get the state, use the src to get the state of the source emitter directly, then use dist to apply attenuation
     )
 

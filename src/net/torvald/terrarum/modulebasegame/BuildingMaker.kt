@@ -12,8 +12,8 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
@@ -66,7 +66,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val timeNow = System.currentTimeMillis() / 1000
 
-    val gameWorld = GameWorldExtension(1, 1024, 256, timeNow, timeNow, 0)
+    val gameWorld = GameWorld(1, 1024, 256, timeNow, timeNow, 0)
 
     init {
         // ghetto world for building

@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 object PlayerBuilder {
 
     operator fun invoke(): Actor {
-        val world = (Terrarum.ingame!! as TerrarumIngame).gameworld
+        val world = (Terrarum.ingame!! as TerrarumIngame).world
 
         val p: Actor = IngamePlayer("lol", "lol_glow", world.worldTime.TIME_T)
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")

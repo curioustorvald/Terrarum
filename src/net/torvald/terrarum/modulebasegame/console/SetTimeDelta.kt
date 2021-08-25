@@ -13,7 +13,7 @@ internal object SetTimeDelta : ConsoleCommand {
     val HARD_LIMIT = 60
 
     override fun execute(args: Array<String>) {
-        val world = (Terrarum.ingame!! as TerrarumIngame).gameworld
+        val world = (Terrarum.ingame!! as TerrarumIngame).world
         
         
         if (args.size == 2) {

@@ -1,0 +1,36 @@
+package net.torvald.terrarum.modulebasegame.console
+
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.console.ConsoleCommand
+import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.serialise.ReadWorld
+import net.torvald.terrarum.serialise.WriteMeta
+import java.io.IOException
+
+/**
+ * Created by minjaesong on 2021-08-25.
+ */
+object ImportWorld : ConsoleCommand {
+    override fun execute(args: Array<String>) {
+        if (args.size == 2) {
+            try {
+                val reader = java.io.FileReader(AppLoader.defaultDir + "/Exports/${args[1]}")
+                ReadWorld(Terrarum.ingame!! as TerrarumIngame).invoke(reader)
+                Echo("Importworld: imported a world from ${args[1]}")
+            }
+            catch (e: IOException) {
+                Echo("Importworld: IOException raised.")
+                e.printStackTrace()
+            }
+        }
+        else {
+            printUsage()
+        }
+    }
+
+    override fun printUsage() {
+        Echo("Usage: Importworld filename.json")
+    }
+}

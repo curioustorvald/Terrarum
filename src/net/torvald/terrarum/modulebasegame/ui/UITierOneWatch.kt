@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarum.ui.UICanvas
@@ -39,7 +38,7 @@ class UITierOneWatch() : UICanvas() {
         //get() = if (ELon) lcdLitColELon else lcdLitColELoff
 
     private val worldTime: WorldTime
-        get() = (Terrarum.ingame!!.world as GameWorldExtension).worldTime
+        get() = Terrarum.ingame!!.world.worldTime
 
 
     override fun updateUI(delta: Float) {

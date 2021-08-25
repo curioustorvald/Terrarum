@@ -22,7 +22,6 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
@@ -55,7 +54,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     //private var loadDone = false // not required; draw-while-loading is implemented in the AppLoader
 
-    private lateinit var demoWorld: GameWorldExtension
+    private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
     private val cameraAI = object : ActorAI {
         private val axisMax = 1f
@@ -122,7 +121,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         printdbg(this, "Intro pre-load")
 
 
-        demoWorld = GameWorldExtension(1, 64, 64, 0L, 0L, 0)
+        demoWorld = GameWorld(1, 64, 64, 0L, 0L, 0)
 
         printdbg(this, "Demo world gen complete")
 

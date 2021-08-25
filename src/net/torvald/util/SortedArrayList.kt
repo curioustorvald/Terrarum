@@ -9,13 +9,13 @@ import java.util.function.Consumer
  *
  * Created by minjaesong on 2019-03-12.
  */
-class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : List<T> {
+class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : MutableCollection<T> {
 
     val arrayList = ArrayList<T>(initialSize)
 
     /**
      */
-    fun add(elem: Comparable<T>) {
+    override fun add(element: T): Boolean {
         // don't append-at-tail-and-sort; just insert at right index
         // this is a modified binary search to search the right "spot" where the insert elem fits
         ReentrantLock().lock {
@@ -25,29 +25,44 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : List<T> {
             while (low < high) {
                 val mid = (low + high).ushr(1)
 
-                if ((arrayList[mid] as Comparable<T>).compareTo(elem as T) > 0)
+                if ((arrayList[mid] as Comparable<T>) > element)
                     high = mid
                 else
                     low = mid + 1
             }
 
-            arrayList.add(low, elem as T)
+            arrayList.add(low, element)
         }
+
+        return true
+    }
+
+    override fun addAll(elements: Collection<T>): Boolean {
+        ReentrantLock().lock {
+            arrayList.addAll(elements)
+            arrayList.sort()
+        }
+
+        return true
     }
 
     override val size: Int
         get() = arrayList.size
+
     override inline fun isEmpty() = arrayList.isEmpty()
-    override inline fun lastIndexOf(element: T) = arrayList.lastIndexOf(element)
+    inline fun lastIndexOf(element: T) = arrayList.lastIndexOf(element)
 
     inline fun removeAt(index: Int) = arrayList.removeAt(index)
-    inline fun remove(element: T) = arrayList.remove(element) // don't mess up with your own half-assed implementation
+    override inline fun remove(element: T) = arrayList.remove(element) // don't mess up with your own half-assed implementation
+    override inline fun removeAll(elements: Collection<T>) = arrayList.removeAll(elements)
     inline fun removeLast() = arrayList.removeAt(arrayList.size - 1)
 
-    override operator inline fun get(index: Int) = arrayList[index]
+    override fun retainAll(elements: Collection<T>) = arrayList.retainAll(elements)
+
+    operator inline fun get(index: Int) = arrayList[index]
     fun getOrNull(index: Int?) = if (index == null) null else get(index)
 
-    override fun indexOf(element: T): Int = searchForIndex(element.hashCode()) { element.hashCode() } ?: -1
+    fun indexOf(element: T): Int = searchForIndex(element.hashCode()) { element.hashCode() } ?: -1
 
     /**
      * Searches for the element. Null if the element was not found
@@ -109,9 +124,9 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : List<T> {
     fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R = { it as R }): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 
     override inline fun iterator() = arrayList.iterator()
-    override inline fun listIterator() = arrayList.listIterator()
-    override inline fun listIterator(index: Int) = arrayList.listIterator(index)
-    override inline fun subList(fromIndex: Int, toIndex: Int) = arrayList.subList(fromIndex, toIndex)
+    inline fun listIterator() = arrayList.listIterator()
+    inline fun listIterator(index: Int) = arrayList.listIterator(index)
+    inline fun subList(fromIndex: Int, toIndex: Int) = arrayList.subList(fromIndex, toIndex)
     override inline fun forEach(action: Consumer<in T>?) = arrayList.forEach(action)
     inline fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
 
@@ -132,7 +147,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : List<T> {
      */
     fun toArrayList() = arrayList
 
-    fun clear() = arrayList.clear()
+    override fun clear() = arrayList.clear()
 }
 
 fun <T: Comparable<T>> sortedArrayListOf(vararg elements: T): SortedArrayList<T> {

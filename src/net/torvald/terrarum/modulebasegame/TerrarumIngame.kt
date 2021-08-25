@@ -28,8 +28,8 @@ import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -209,7 +209,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameLoadMode: GameLoadMode
     lateinit var gameLoadInfoPayload: Any
-    lateinit var gameworld: GameWorldExtension
     lateinit var theRealGamer: IngamePlayer
         // get() = actorGamer as IngamePlayer
 
@@ -229,14 +228,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as GameSaveData)
         }
 
-        IngameRenderer.setRenderedWorld(gameworld)
+        IngameRenderer.setRenderedWorld(world)
 
 
         super.show() // gameInitialised = true
     }
 
     data class GameSaveData(
-            val world: GameWorldExtension,
+            val world: GameWorld,
             val historicalFigureIDBucket: ArrayList<Int>,
             val realGamePlayer: IngamePlayer,
             val rogueS0: Long,
@@ -270,18 +269,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            AppLoader.getLoadScreen().addMessage("Loading world from save")
-
-
-            gameworld = gameSaveData.world
-            world = gameworld
-            historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
-            setTheRealGamerFirstTime(gameSaveData.realGamePlayer)
-
-
-            // set the randomisers right
-            RoguelikeRandomiser.loadFromSave(gameSaveData.rogueS0, gameSaveData.rogueS1)
-            WeatherMixer.loadFromSave(gameSaveData.weatherS0, gameSaveData.weatherS1)
+            TODO()
         }
     }
 
@@ -302,9 +290,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             // init map as chosen size
             val timeNow = System.currentTimeMillis() / 1000
-            gameworld = GameWorldExtension(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
-            gameworldIndices.add(gameworld.worldIndex)
-            world = gameworld
+            world = GameWorld(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
+            gameworldIndices.add(world.worldIndex)
+            world.extraFields["basegame.economy"] = GameEconomy()
 
             // generate terrain for the map
             //WorldGenerator.attachMap(world)
@@ -558,7 +546,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      * Ingame (world) related updates; UI update must go to renderGame()
      */
     protected fun updateGame(delta: Float) {
-        val world = this.world as GameWorldExtension
+        val world = this.world
         worldWidth = world.width.toDouble() * TILE_SIZE
 
         particlesActive = 0
@@ -652,7 +640,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
-        WorldCamera.update(gameworld, actorNowPlaying)
+        WorldCamera.update(world, actorNowPlaying)
 
         measureDebugTime("Ingame.FilterVisibleActors") {
             filterVisibleActors()
