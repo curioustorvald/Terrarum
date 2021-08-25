@@ -14,8 +14,8 @@ class GameWorldExtension : GameWorld {
     //internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, layerData, creationTIME_T, lastPlayTIME_T, totalPlayTime)
 
 
-    val economy = GameEconomy()
-
+    var economy = GameEconomy()
+        internal set
 
     // delegated properties //
     /*val layerWall: MapLayer; get() = baseworld.layerWall

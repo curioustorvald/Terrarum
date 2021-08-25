@@ -56,7 +56,7 @@ open class GameWorld : Disposable {
         internal set
 
     /** Used to calculate play time */
-    open val loadTime: Long = System.currentTimeMillis() / 1000L
+    @Transient open val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
     val layerWall: BlockLayer
@@ -82,8 +82,8 @@ open class GameWorld : Disposable {
     private val wirings: HashMap<BlockAddress, WiringNode>
 
     private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
-    private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
-    private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)
+    @Transient private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
+    @Transient private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)
 
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
@@ -102,7 +102,7 @@ open class GameWorld : Disposable {
     open var generatorSeed: Long = 0
         internal set
 
-    var disposed = false
+    @Transient var disposed = false
         private set
 
     val worldTime: WorldTime = WorldTime( // Year EPOCH (125), Month 1, Day 1 is implied
@@ -113,7 +113,7 @@ open class GameWorld : Disposable {
 
     val tileNumberToNameMap: HashMap<Int, ItemID>
     // does not go to the savefile
-    val tileNameToNumberMap: HashMap<ItemID, Int>
+    @Transient val tileNameToNumberMap: HashMap<ItemID, Int>
 
     /**
      * Create new world
