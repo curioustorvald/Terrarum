@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.WorldTime
@@ -11,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
+import net.torvald.terrarum.serialise.WriteWorld.Companion.tostr
 import org.apache.commons.codec.digest.DigestUtils
 import java.math.BigInteger
 import java.util.zip.GZIPInputStream
@@ -73,6 +75,10 @@ open class WriteWorld(val ingame: TerrarumIngame) {
                     val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
 
                     val layer = LayerInfo(hash, blockLayerToStr(obj), obj.width, obj.height)
+
+                    printdbg(this, "pre: ${(0L..1023L).map { obj.ptr[it].tostr() }.joinToString(" ")}")
+
+
                     json.writeValue(layer)
                 }
 
@@ -123,15 +129,13 @@ open class WriteWorld(val ingame: TerrarumIngame) {
                 zo.write(it.toInt())
             }
             zo.flush(); zo.close()*/
-            b.bytesIterator().forEachRemaining {
-                bo.write(it.toInt())
-            }
 
             // enascii
             val ba = bo.toByteArray64()
             var bai = 0
             val buf = IntArray(4) { Ascii85.PAD_BYTE }
-            ba.forEach {
+//            ba.forEach {
+            b.bytesIterator().forEachRemaining {
                 if (bai > 0 && bai % 4 == 0) {
                     sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
                     buf.fill(Ascii85.PAD_BYTE)
@@ -176,14 +180,25 @@ open class WriteWorld(val ingame: TerrarumIngame) {
             // write to blocklayer and the digester
             digester.reset()
             var writeCursor = 0L
+            val sb = StringBuilder()
 //            unzipdBytes.forEach {
             unasciidBytes.forEach {
                 if (writeCursor < layer.ptr.size) {
+
+                    if (writeCursor < 1024) {
+                        sb.append("${it.tostr()} ")
+                    }
+
+
                     layer.ptr[writeCursor] = it
                     digester.update(it)
                     writeCursor += 1
                 }
             }
+
+
+            printdbg(this, "post: $sb")
+
 
             // check hash
             val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
