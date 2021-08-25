@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.ConsoleWindow
@@ -41,8 +42,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         set(value) {
             printdbg(this, "Ingame instance ${this.hashCode()}, accepting new world ${value.layerTerrain}; called from")
             printStackTrace(this)
-
             field = value
+            IngameRenderer.setRenderedWorld(value)
         }
     /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
     var gameworldIndices = ArrayList<Int>()

@@ -35,37 +35,6 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         data.forEachIndexed { index, byte -> UnsafeHelper.unsafe.putByte(ptr.ptr + index, byte) }
     }
 
-
-    /**
-     * Returns an iterator over blocks of type `Int`.
-     *
-     * @return an Iterator.
-     */
-    fun blocksIterator(): Iterator<Int> {
-        return object : Iterator<Int> {
-
-            private var iteratorCount = 0
-
-            override fun hasNext(): Boolean {
-                return iteratorCount < width * height
-            }
-
-            override fun next(): Int {
-                val y = iteratorCount / width
-                val x = iteratorCount % width
-                // advance counter
-                iteratorCount += 1
-
-                val offset = BYTES_PER_BLOCK * (y * width + x)
-                val lsb = ptr[offset]
-                val msb = ptr[offset + 1]
-
-
-                return lsb.toUint() + msb.toUint().shl(8)
-            }
-        }
-    }
-
     /**
      * Returns an iterator over stored bytes.
      *
@@ -73,17 +42,13 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
      */
     fun bytesIterator(): Iterator<Byte> {
         return object : Iterator<Byte> {
-
             private var iteratorCount = 0L
-
             override fun hasNext(): Boolean {
-                return iteratorCount < width * height
+                return iteratorCount < width * height * BYTES_PER_BLOCK
             }
-
             override fun next(): Byte {
                 iteratorCount += 1
-
-                return ptr[iteratorCount]
+                return ptr[iteratorCount - 1]
             }
         }
     }

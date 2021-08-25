@@ -222,8 +222,8 @@ class GameWorld : Disposable {
             return tileNumberToNameMap[layerWall.unsafeGetTile(x, y)]!!
         }
         catch (e: NullPointerException) {
-            System.err.println("NPE for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y)")
-            throw e
+            val msg = "No tile name mapping for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y)"
+            throw NoSuchElementException(msg)
         }
     }
 
@@ -237,8 +237,8 @@ class GameWorld : Disposable {
             return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]!!
         }
         catch (e: NullPointerException) {
-            System.err.println("NPE for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y)")
-            throw e
+            val msg = "No tile name mapping for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y)"
+            throw NoSuchElementException(msg)
         }
     }
 

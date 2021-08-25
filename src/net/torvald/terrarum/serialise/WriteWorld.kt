@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -43,7 +44,7 @@ open class WriteWorld(val ingame: TerrarumIngame) {
 
     companion object {
         /** dispose of the `offendingObject` after rejection! */
-        class BlockLayerHashMismatchError(val offendingObject: BlockLayer) : Error()
+        class BlockLayerHashMismatchError(val oldHash: String, val newHash: String, val offendingObject: BlockLayer) : Error("Old Hash $oldHash != New Hash $newHash")
 
         private fun Byte.tostr() = this.toInt().and(255).toString(16).padStart(2,'0')
         private val digester = DigestUtils.getSha256Digest()
@@ -80,12 +81,18 @@ open class WriteWorld(val ingame: TerrarumIngame) {
                     //return strToBlockLayer(json.fromJson(type, jsonData.toJson(JsonWriter.OutputType.minimal)) as LayerInfo)
 
                     // full manual
-                    return strToBlockLayer(LayerInfo(
-                            jsonData.getString("h"),
-                            jsonData.getString("b"),
-                            jsonData.getInt("x"),
-                            jsonData.getInt("y")
-                    ))
+                    try {
+                        return strToBlockLayer(LayerInfo(
+                                jsonData.getString("h"),
+                                jsonData.getString("b"),
+                                jsonData.getInt("x"),
+                                jsonData.getInt("y")
+                        ))
+                    }
+                    catch (e: BlockLayerHashMismatchError) {
+                        EchoError(e.message ?: "")
+                        return e.offendingObject
+                    }
                 }
             })
             // WorldTime
@@ -112,10 +119,13 @@ open class WriteWorld(val ingame: TerrarumIngame) {
             val zo = GZIPOutputStream(bo)
 
             // zip
-            b.bytesIterator().forEachRemaining {
+            /*b.bytesIterator().forEachRemaining {
                 zo.write(it.toInt())
             }
-            zo.flush(); zo.close()
+            zo.flush(); zo.close()*/
+            b.bytesIterator().forEachRemaining {
+                bo.write(it.toInt())
+            }
 
             // enascii
             val ba = bo.toByteArray64()
@@ -155,18 +165,19 @@ open class WriteWorld(val ingame: TerrarumIngame) {
             }; Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
 
             // unzip
-            val zi = GZIPInputStream(ByteArray64InputStream(unasciidBytes))
+            /*val zi = GZIPInputStream(ByteArray64InputStream(unasciidBytes))
             while (true) {
                 val byte = zi.read()
                 if (byte == -1) break
                 unzipdBytes.add(byte.toByte())
             }
-            zi.close()
+            zi.close()*/
 
             // write to blocklayer and the digester
             digester.reset()
             var writeCursor = 0L
-            unzipdBytes.forEach {
+//            unzipdBytes.forEach {
+            unasciidBytes.forEach {
                 if (writeCursor < layer.ptr.size) {
                     layer.ptr[writeCursor] = it
                     digester.update(it)
@@ -178,7 +189,7 @@ open class WriteWorld(val ingame: TerrarumIngame) {
             val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
 
             if (hash != layerInfo.h) {
-                throw BlockLayerHashMismatchError(layer)
+                throw BlockLayerHashMismatchError(layerInfo.h, hash, layer)
             }
 
             return layer

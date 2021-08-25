@@ -989,7 +989,7 @@ public class AppLoader implements ApplicationListener {
             return true;
         }
         catch (java.nio.file.NoSuchFileException e) {
-            // write default config to game dir. Call this method again to read config from it.
+            // write default config to game dir. Call th.is method again to read config from it.
             try {
                 createConfigJson();
             }

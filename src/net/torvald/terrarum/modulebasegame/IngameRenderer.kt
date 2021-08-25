@@ -153,11 +153,12 @@ object IngameRenderer : Disposable {
     fun setRenderedWorld(world: GameWorld) {
             try {
                 if (this.world != world) {
-                    printdbg(this, "World change detected -- " +
-                                   "old world: ${this.world.hashCode()}, " +
-                                   "new world: ${world.hashCode()}")
+//                    printdbg(this, "World change detected -- " +
+//                                   "old world: ${this.world.hashCode()}, " +
+//                                   "new world: ${world.hashCode()}")
 
                     // change worlds from internal methods
+                    this.world = world
                     LightmapRenderer.internalSetWorld(world)
                     BlocksDrawer.world = world
                     FeaturesDrawer.world = world
@@ -165,8 +166,6 @@ object IngameRenderer : Disposable {
             }
             catch (e: UninitializedPropertyAccessException) {
                 // new init, do nothing
-            }
-            finally {
                 this.world = world
             }
         }
