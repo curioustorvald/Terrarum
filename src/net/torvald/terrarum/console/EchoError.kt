@@ -9,12 +9,12 @@ import net.torvald.terrarum.ui.ConsoleWindow
  */
 internal object EchoError : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val argsWoHeader = Array<String>(args.size - 1, {it -> args[it + 1]})
+        val argsWoHeader = Array(args.size - 1) { args[it + 1] }
         argsWoHeader.forEach { execute(it) }
     }
 
     fun execute(single_line: String) {
-        (Terrarum.ingame!!.consoleHandler as ConsoleWindow).sendMessage("$ccR$single_line")
+        (Terrarum.ingame!!.consoleHandler).sendMessage("$ccR$single_line")
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

@@ -89,10 +89,10 @@ object TinyAlphNum : BitmapFont() {
         if (colourBuffer.containsKey(codePoint))
             return colourBuffer[codePoint]!!
 
-        val r = codePoint.and(0xF000).ushr(12)
-        val g = codePoint.and(0x0F00).ushr(8)
-        val b = codePoint.and(0x00F0).ushr(4)
-        val a = codePoint.and(0x000F)
+        val a = codePoint.and(0xF000).ushr(12)
+        val r = codePoint.and(0x0F00).ushr(8)
+        val g = codePoint.and(0x00F0).ushr(4)
+        val b = codePoint.and(0x000F)
 
         val col = Color(r.shl(28) or r.shl(24) or g.shl(20) or g.shl(16) or b.shl(12) or b.shl(8) or a.shl(4) or a)
 
