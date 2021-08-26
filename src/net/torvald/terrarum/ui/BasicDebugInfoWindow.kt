@@ -15,6 +15,7 @@ import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -163,7 +164,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
             val wireCount = wires?.size?.toString() ?: "no"
 
-            printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG($wireCount wires) $ccY($mtX, $mtY)")
+            printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG($wireCount wires) $ccY($mtX,$mtY;$ccO${LandUtil.getBlockAddr(ingame!!.world, mouseTileX, mouseTileY)}$ccY)")
             printLine(batch, 10, "fluid@cursor ${ccO}Type $ccG${fluid.type.value} ${ccO}Fill $ccG${fluid.amount}f")
 
         }

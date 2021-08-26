@@ -66,7 +66,62 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     private val mouseStatus = BitSet(8)
     private val controllerButtonStatus = BitSet(64)
 
-    fun update(delta: Float) {
+    private fun updateKeyboard() {
+        /////////////////////
+        // GAMEPAD CONTROL //
+        /////////////////////
+
+
+        //////////////////////
+        // KEYBOARD CONTROL //
+        //////////////////////
+
+        //KeyToggler.update(terrarumIngame.canPlayerControl)
+        //printdbg(this, terrarumIngame.canPlayerControl)
+
+        // control key events
+        var noKeyHeldDown = true
+        for (key in 1..Input.Keys.MAX_KEYCODE) {
+            val keyDown = Gdx.input.isKeyPressed(key)
+
+            noKeyHeldDown = noKeyHeldDown and keyDown
+
+            if (keyDown && !keyStatus[key])
+                tKeyDown(key)
+            else if (!keyDown && keyStatus[key])
+                tKeyUp(key)
+
+            keyStatus[key] = keyDown
+
+
+
+            if (key == Input.Keys.ENTER && keyDown) {
+                printdbg(this, "ENTER down")
+            }
+        }
+        // control mouse/touch events
+        val newmx = Gdx.input.x
+        val newmy = Gdx.input.y
+        for (touch in 0..4) {
+            val touchDown = Gdx.input.isButtonPressed(touch)
+
+            if (touchDown && !mouseStatus[touch])
+                tTouchDown(newmx, newmy, 0, touch)
+            else if (!touchDown && keyStatus[touch])
+                tTouchUp(newmx, newmy, 0, touch)
+
+            if (touchDown && mouseStatus.bitCount() != 0) {
+                tTouchDragged(newmx, newmy, 0)
+            }
+
+            mouseStatus[touch] = touchDown
+        }
+
+        inputMouseX = newmx
+        inputMouseY = newmy
+    }
+
+    fun update() {
 
         ///////////////////
         // MOUSE CONTROL //
@@ -100,52 +155,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
 
-        /////////////////////
-        // GAMEPAD CONTROL //
-        /////////////////////
-
-
-        //////////////////////
-        // KEYBOARD CONTROL //
-        //////////////////////
-
-        //KeyToggler.update(terrarumIngame.canPlayerControl)
-        //printdbg(this, terrarumIngame.canPlayerControl)
-
-        // control key events
-        var noKeyHeldDown = true
-        for (key in 1..Input.Keys.MAX_KEYCODE) {
-            val keyDown = Gdx.input.isKeyPressed(key)
-
-            noKeyHeldDown = noKeyHeldDown and keyDown
-
-            if (keyDown && !keyStatus[key])
-                tKeyDown(key)
-            else if (!keyDown && keyStatus[key])
-                tKeyUp(key)
-
-            keyStatus[key] = keyDown
-        }
-        // control mouse/touch events
-        val newmx = Gdx.input.x
-        val newmy = Gdx.input.y
-        for (touch in 0..4) {
-            val touchDown = Gdx.input.isButtonPressed(touch)
-
-            if (touchDown && !mouseStatus[touch])
-                tTouchDown(newmx, newmy, 0, touch)
-            else if (!touchDown && keyStatus[touch])
-                tTouchUp(newmx, newmy, 0, touch)
-
-            if (touchDown && mouseStatus.bitCount() != 0) {
-                tTouchDragged(newmx, newmy, 0)
-            }
-
-            mouseStatus[touch] = touchDown
-        }
-
-        inputMouseX = newmx
-        inputMouseY = newmy
+        updateKeyboard()
     }
 
     private var f12Down = false

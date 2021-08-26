@@ -516,6 +516,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             gameFullyLoaded = true
         }
 
+
+        ingameController.update()
+
+
         // define custom update rate
         val updateRate = if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else AppLoader.UPDATE_RATE
 
@@ -554,7 +558,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // synchronised Ingame Input Updater
         // will also queue up the block/wall/wire placed events
-        ingameController.update(delta)
+        ingameController.update()
 
         if (!paused) {
 
