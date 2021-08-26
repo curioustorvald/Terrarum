@@ -92,12 +92,6 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 tKeyUp(key)
 
             keyStatus[key] = keyDown
-
-
-
-            if (key == Input.Keys.ENTER && keyDown) {
-                printdbg(this, "ENTER down")
-            }
         }
         // control mouse/touch events
         val newmx = Gdx.input.x

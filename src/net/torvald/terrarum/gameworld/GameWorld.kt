@@ -3,10 +3,8 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Json
-import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import com.badlogic.gdx.utils.compression.Lzma
-import net.torvald.UnsafePtr
 import net.torvald.UnsafePtrInputStream
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
@@ -19,16 +17,13 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Ascii85
-import net.torvald.terrarum.serialise.bytesToLzmadStr
 import net.torvald.terrarum.serialise.bytesToZipdStr
+import net.torvald.terrarum.utils.*
 import net.torvald.util.SortedArrayList
 import org.apache.commons.codec.digest.DigestUtils
 import org.dyn4j.geometry.Vector2
 import java.util.zip.GZIPOutputStream
-import kotlin.experimental.and
-import kotlin.experimental.or
 import kotlin.math.absoluteValue
-import kotlin.math.sign
 
 typealias BlockAddress = Long
 
@@ -71,24 +66,24 @@ class GameWorld : Disposable {
     /** Tilewise spawn point */
     var spawnY: Int
 
-    val wallDamages = HashMap<BlockAddress, Float>()
-    val terrainDamages = HashMap<BlockAddress, Float>()
-    val fluidTypes = HashMap<BlockAddress, FluidType>()
-    val fluidFills = HashMap<BlockAddress, Float>()
+    val wallDamages = HashArray<Float>()
+    val terrainDamages = HashArray<Float>()
+    val fluidTypes = HashedFluidType()
+    val fluidFills = HashArray<Float>()
 
     /**
      * Single block can have multiple conduits, different types of conduits are stored separately.
      */
-    private val wirings = HashMap<BlockAddress, WiringNode>()
+    public val wirings = HashedWirings()
 
-    private val wiringGraph = HashMap<BlockAddress, HashMap<ItemID, WiringSimCell>>()
+    private val wiringGraph = HashedWiringGraph()
     @Transient private val WIRE_POS_MAP = intArrayOf(1,2,4,8)
     @Transient private val WIRE_ANTIPOS_MAP = intArrayOf(4,8,1,2)
 
     /**
      * Used by the renderer. When wirings are updated, `wirings` and this properties must be synchronised.
      */
-    //private val wiringBlocks: HashMap<BlockAddress, ItemID>
+    //private val wiringBlocks: HashArray<ItemID>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -111,7 +106,7 @@ class GameWorld : Disposable {
     )
 
 
-    val tileNumberToNameMap = HashMap<Int, ItemID>()
+    val tileNumberToNameMap = HashArray<ItemID>()
     // does not go to the savefile
     @Transient val tileNameToNumberMap = HashMap<ItemID, Int>()
 
@@ -163,7 +158,7 @@ class GameWorld : Disposable {
         AppLoader.tileMaker.tags.forEach {
             printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
-            tileNumberToNameMap[it.value.tileNumber] = it.key
+            tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }
 
@@ -219,7 +214,7 @@ class GameWorld : Disposable {
         val (x, y) = coerceXY(rawX, rawY)
 
         try {
-            return tileNumberToNameMap[layerWall.unsafeGetTile(x, y)]!!
+            return tileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()]!!
         }
         catch (e: NullPointerException) {
             val msg = "No tile name mapping for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y)"
@@ -234,7 +229,7 @@ class GameWorld : Disposable {
         val (x, y) = coerceXY(rawX, rawY)
 
         try {
-            return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]!!
+            return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]!!
         }
         catch (e: NullPointerException) {
             val msg = "No tile name mapping for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y)"
@@ -317,10 +312,10 @@ class GameWorld : Disposable {
         val wireNode = wirings[blockAddr]
 
         if (wireNode == null) {
-            wirings[blockAddr] = WiringNode(blockAddr, SortedArrayList())
+            wirings[blockAddr] = WiringNode(SortedArrayList())
         }
 
-        wirings[blockAddr]!!.wires.add(tile)
+        wirings[blockAddr]!!.ws.add(tile)
 
         if (!bypassEvent)
             Terrarum.ingame?.queueWireChangedEvent(tile, false, x, y)
@@ -349,7 +344,7 @@ class GameWorld : Disposable {
     }
 
     fun getWireGraphUnsafe(blockAddr: BlockAddress, itemID: ItemID): Int? {
-        return wiringGraph[blockAddr]?.get(itemID)?.connections
+        return wiringGraph[blockAddr]?.get(itemID)?.cnx
     }
 
     fun getWireEmitStateOf(x: Int, y: Int, itemID: ItemID): Vector2? {
@@ -359,7 +354,7 @@ class GameWorld : Disposable {
     }
 
     fun getWireEmitStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): Vector2? {
-        return wiringGraph[blockAddr]?.get(itemID)?.emitState
+        return wiringGraph[blockAddr]?.get(itemID)?.emt
     }
 
     fun getWireRecvStateOf(x: Int, y: Int, itemID: ItemID): ArrayList<WireRecvState>? {
@@ -369,7 +364,7 @@ class GameWorld : Disposable {
     }
 
     fun getWireRecvStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): ArrayList<WireRecvState>? {
-        return wiringGraph[blockAddr]?.get(itemID)?.recvStates
+        return wiringGraph[blockAddr]?.get(itemID)?.rcv
     }
 
     fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, cnx: Int) {
@@ -380,11 +375,11 @@ class GameWorld : Disposable {
 
     fun setWireGraphOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, cnx: Int) {
         if (wiringGraph[blockAddr] == null)
-            wiringGraph[blockAddr] = HashMap()
+            wiringGraph[blockAddr] = WiringGraphMap()
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(cnx)
 
-        wiringGraph[blockAddr]!![itemID]!!.connections = cnx
+        wiringGraph[blockAddr]!![itemID]!!.cnx = cnx
     }
 
     fun setWireEmitStateOf(x: Int, y: Int, itemID: ItemID, vector: Vector2) {
@@ -395,11 +390,11 @@ class GameWorld : Disposable {
 
     fun setWireEmitStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, vector: Vector2) {
         if (wiringGraph[blockAddr] == null)
-            wiringGraph[blockAddr] = HashMap()
+            wiringGraph[blockAddr] = WiringGraphMap()
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0, vector)
 
-        wiringGraph[blockAddr]!![itemID]!!.emitState = vector
+        wiringGraph[blockAddr]!![itemID]!!.emt = vector
     }
 
     fun addWireRecvStateOf(x: Int, y: Int, itemID: ItemID, state: WireRecvState) {
@@ -416,11 +411,11 @@ class GameWorld : Disposable {
 
     fun addWireRecvStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, state: WireRecvState) {
         if (wiringGraph[blockAddr] == null)
-            wiringGraph[blockAddr] = HashMap()
+            wiringGraph[blockAddr] = WiringGraphMap()
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0)
 
-        wiringGraph[blockAddr]!![itemID]!!.recvStates.add(state)
+        wiringGraph[blockAddr]!![itemID]!!.rcv.add(state)
     }
 
     fun getAllWiringGraph(x: Int, y: Int): HashMap<ItemID, WiringSimCell>? {
@@ -435,7 +430,7 @@ class GameWorld : Disposable {
 
     fun clearAllWireRecvStateUnsafe(blockAddr: BlockAddress) {
         wiringGraph[blockAddr]?.forEach {
-            it.value.recvStates.clear()
+            it.value.rcv.clear()
         }
     }
 
@@ -446,7 +441,7 @@ class GameWorld : Disposable {
     }
 
     fun getAllWiresFrom(blockAddr: BlockAddress): SortedArrayList<ItemID>? {
-        return wirings[blockAddr]?.wires
+        return wirings[blockAddr]?.ws
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): ItemID {
@@ -624,13 +619,8 @@ class GameWorld : Disposable {
      * If the wire does not allow them (e.g. wire bridge, thicknet), connect top-bottom and left-right nodes.
      */
     data class WiringNode(
-            val position: BlockAddress = -1, // may seem redundant and it kinda is, but don't remove!
-            val wires: SortedArrayList<ItemID> = SortedArrayList<ItemID>() // what could possibly go wrong bloating up the RAM footprint when it's practically infinite these days?
-    ) : Comparable<WiringNode> {
-        override fun compareTo(other: WiringNode): Int {
-            return (this.position - other.position).sign
-        }
-    }
+            val ws: SortedArrayList<ItemID> = SortedArrayList<ItemID>() // what could possibly go wrong bloating up the RAM footprint when it's practically infinite these days?
+    )
 
     data class WireRecvState(
             var dist: Int = -1, // how many tiles it took to traverse
@@ -642,9 +632,9 @@ class GameWorld : Disposable {
      * These values must be updated by none other than [WorldSimulator]()
      */
     data class WiringSimCell(
-            var connections: Int = 0, // connections
-            var emitState: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
-            var recvStates: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
+            var cnx: Int = 0, // connections
+            var emt: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
+            var rcv: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
     )
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {

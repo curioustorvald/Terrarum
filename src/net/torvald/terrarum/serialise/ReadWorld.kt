@@ -13,11 +13,11 @@ import java.io.Reader
 open class ReadWorld(val ingame: TerrarumIngame) {
 
     open fun invoke(worldDataStream: InputStream) {
-        postRead(WriteWorld.jsoner.fromJson(GameWorld::class.java, worldDataStream))
+        postRead(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream))
     }
 
     open fun invoke(worldDataStream: Reader) {
-        postRead(WriteWorld.jsoner.fromJson(GameWorld::class.java, worldDataStream))
+        postRead(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream))
     }
 
     private fun postRead(world: GameWorld) {

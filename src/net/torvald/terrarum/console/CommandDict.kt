@@ -63,7 +63,8 @@ object CommandDict {
             /* !! */"exportworld" to ExportWorld,
             /* !! */"exportactor" to ExportActor,
             /* !! */"importworld" to ImportWorld,
-            /* !! */"exportfborgb" to ExportRendererFboRGB
+            /* !! */"exportfborgb" to ExportRendererFboRGB,
+            /* !! */"printworld" to PrintWorld
     )
 
     operator fun get(commandName: String): ConsoleCommand {

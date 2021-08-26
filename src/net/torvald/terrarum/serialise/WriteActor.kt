@@ -12,23 +12,8 @@ import java.math.BigInteger
  */
 object WriteActor {
 
-    private val jsoner = Json(JsonWriter.OutputType.json)
-
-    // install custom (de)serialiser
-    init {
-        jsoner.setSerializer(BigInteger::class.java, object : Json.Serializer<BigInteger> {
-            override fun write(json: Json, obj: BigInteger?, knownType: Class<*>?) {
-                json.writeValue(obj?.toString())
-            }
-
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BigInteger {
-                return BigInteger(jsonData.asString())
-            }
-        })
-    }
-
     operator fun invoke(actor: Actor): String {
-        return jsoner.toJson(actor)
+        return Common.jsoner.toJson(actor)
     }
 
     fun encodeToByteArray64(actor: Actor): ByteArray64 {

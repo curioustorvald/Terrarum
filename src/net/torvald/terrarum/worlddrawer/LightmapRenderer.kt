@@ -413,9 +413,9 @@ object LightmapRenderer {
 
 
         _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
-        _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain]]
+        _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain.toLong()]]
         _thisWall = world.getTileFromWallRaw(worldX, worldY)
-        _thisWallProp = BlockCodex[world.tileNumberToNameMap[_thisWall]]
+        _thisWallProp = BlockCodex[world.tileNumberToNameMap[_thisWall.toLong()]]
         _thisFluid = world.getFluid(worldX, worldY)
         _thisFluidProp = BlockCodex[_thisFluid.type]
 

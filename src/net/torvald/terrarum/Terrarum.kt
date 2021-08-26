@@ -483,17 +483,17 @@ fun MutableList<Any>.shuffle() {
 
 
 val ccW = GameFontBase.toColorCode(0xFFFF)
-val ccY = GameFontBase.toColorCode(0xFE8F)
-val ccO = GameFontBase.toColorCode(0xFB2F)
-val ccR = GameFontBase.toColorCode(0xF88F)
-val ccF = GameFontBase.toColorCode(0xFAEF)
-val ccM = GameFontBase.toColorCode(0xEAFF)
-val ccB = GameFontBase.toColorCode(0x88FF)
-val ccC = GameFontBase.toColorCode(0x8FFF)
-val ccG = GameFontBase.toColorCode(0x8F8F)
-val ccV = GameFontBase.toColorCode(0x080F)
-val ccX = GameFontBase.toColorCode(0x853F)
-val ccK = GameFontBase.toColorCode(0x888F)
+val ccY = GameFontBase.toColorCode(0xFFE8)
+val ccO = GameFontBase.toColorCode(0xFFB2)
+val ccR = GameFontBase.toColorCode(0xFF88)
+val ccF = GameFontBase.toColorCode(0xFFAE)
+val ccM = GameFontBase.toColorCode(0xFEAF)
+val ccB = GameFontBase.toColorCode(0xF88F)
+val ccC = GameFontBase.toColorCode(0xF8FF)
+val ccG = GameFontBase.toColorCode(0xF8F8)
+val ccV = GameFontBase.toColorCode(0xF080)
+val ccX = GameFontBase.toColorCode(0xF853)
+val ccK = GameFontBase.toColorCode(0xF888)
 
 
 typealias Second = Float

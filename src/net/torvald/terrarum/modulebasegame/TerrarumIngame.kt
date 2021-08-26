@@ -560,7 +560,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // will also queue up the block/wall/wire placed events
         ingameController.update()
 
-        if (!paused) {
+        if (!paused || newWorldLoadedLatch) {
 
             //hypothetical_input_capturing_function_if_you_finally_decided_to_forgo_gdx_input_processor_and_implement_your_own_to_synchronise_everything()
 
@@ -583,7 +583,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // fill up visibleActorsRenderFront for wires, if:
             // 1. something is cued on the wire change queue
             // 2. wire renderclass changed
-            if (wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
+            if (newWorldLoadedLatch || wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
                 measureDebugTime("Ingame.FillUpWiresBuffer") {
                     fillUpWiresBuffer()
                 }
@@ -614,7 +614,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         }
 
-        if (!paused) {
+        if (!paused || newWorldLoadedLatch) {
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
             wallChangeQueue.clear()
@@ -638,6 +638,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         //println("paused = $paused")
+
+        if (!paused && newWorldLoadedLatch) newWorldLoadedLatch = false
     }
 
 

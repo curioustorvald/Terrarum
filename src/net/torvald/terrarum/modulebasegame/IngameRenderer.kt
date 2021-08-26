@@ -84,6 +84,7 @@ object IngameRenderer : Disposable {
     var world: GameWorld = GameWorld.makeNullWorld()
         private set // the grammar "IngameRenderer.world = gameWorld" seemes mundane and this function needs special care!
 
+    private var newWorldLoadedLatch = false
 
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
@@ -162,6 +163,8 @@ object IngameRenderer : Disposable {
                     LightmapRenderer.internalSetWorld(world)
                     BlocksDrawer.world = world
                     FeaturesDrawer.world = world
+
+                    newWorldLoadedLatch = true
                 }
             }
             catch (e: UninitializedPropertyAccessException) {
@@ -201,10 +204,10 @@ object IngameRenderer : Disposable {
         this.player = player
 
 
-        if (!gamePaused) {
+        if (!gamePaused || newWorldLoadedLatch) {
             measureDebugTime("Renderer.ApparentLightRun") {
                 // recalculate for even frames, or if the sign of the cam-x changed
-                if (AppLoader.GLOBAL_RENDER_TIMER % 3 == 0 || WorldCamera.x * oldCamX < 0)
+                if (AppLoader.GLOBAL_RENDER_TIMER % 3 == 0 || WorldCamera.x * oldCamX < 0 || newWorldLoadedLatch)
                     LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
                 oldCamX = WorldCamera.x
@@ -345,6 +348,9 @@ object IngameRenderer : Disposable {
         // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
         blendNormal(batch)
         batch.color = Color.WHITE
+
+
+        if (newWorldLoadedLatch) newWorldLoadedLatch = false
     }
 
 

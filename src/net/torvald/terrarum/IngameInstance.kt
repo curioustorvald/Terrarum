@@ -2,7 +2,6 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
@@ -10,7 +9,6 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
 import java.util.concurrent.locks.Lock
@@ -31,6 +29,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val consoleOpened: Boolean
         get() = consoleHandler.isOpened || consoleHandler.isOpening
 
+    var newWorldLoadedLatch = false
+
     init {
         consoleHandler.setPosition(0, 0)
 
@@ -40,6 +40,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     open var world: GameWorld = GameWorld.makeNullWorld()
         set(value) {
+            newWorldLoadedLatch = true
             printdbg(this, "Ingame instance ${this.hashCode()}, accepting new world ${value.layerTerrain}; called from")
             printStackTrace(this)
             field = value
