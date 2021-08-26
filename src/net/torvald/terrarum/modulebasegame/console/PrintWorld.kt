@@ -1,6 +1,8 @@
 package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ccG
+import net.torvald.terrarum.ccO
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.BlockAddress
@@ -18,12 +20,8 @@ object PrintWorld : ConsoleCommand {
             val fieldAccessibility = field.isAccessible
 
             field.isAccessible = true
-            Echo(field.get(w).toString())
-            Echo(field.get(w).javaClass.simpleName)
-            w.wirings.forEach { i, node ->
-                Echo(i.toString())
-            }
-
+            Echo("$ccO${field.get(w).javaClass.simpleName}")
+            Echo("$ccG${field.get(w)}")
             field.isAccessible = fieldAccessibility
         }
         else {

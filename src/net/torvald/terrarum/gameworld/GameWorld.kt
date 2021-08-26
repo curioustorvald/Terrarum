@@ -17,6 +17,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Ascii85
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.bytesToZipdStr
 import net.torvald.terrarum.utils.*
 import net.torvald.util.SortedArrayList
@@ -111,6 +112,9 @@ class GameWorld : Disposable {
     @Transient val tileNameToNumberMap = HashMap<ItemID, Int>()
 
     val extraFields = HashMap<String, Any?>()
+
+    internal var genver = -1
+    internal var comp = -1
 
     /**
      * Create new world
@@ -678,70 +682,6 @@ class GameWorld : Disposable {
 
     open fun updateWorldTime(delta: Float) {
         worldTime.update(delta)
-    }
-
-    /**
-     * Returns lines that are part of the entire JSON
-     *
-     * To extend this function, you can code something like this:
-     * ```
-     * return super.getJsonFields() + arrayListOf(
-     *     """"<myModuleName>.<myNewObject>": ${Json(JsonWriter.OutputType.json).toJson(<myNewObject>)}"""
-     * )
-     * ```
-     */
-    open fun getJsonFields(): List<String> {
-        fun Byte.tostr() = this.toInt().and(255).toString(16).padStart(2,'0')
-
-        val tdmgstr = Json(JsonWriter.OutputType.json).toJson(terrainDamages)
-        val wdmgstr = Json(JsonWriter.OutputType.json).toJson(wallDamages)
-        val flutstr = Json(JsonWriter.OutputType.json).toJson(fluidTypes)
-        val flufstr = Json(JsonWriter.OutputType.json).toJson(fluidFills)
-        val wirestr = Json(JsonWriter.OutputType.json).toJson(wirings)
-        val wirgstr = Json(JsonWriter.OutputType.json).toJson(wiringGraph)
-
-        val digester = DigestUtils.getSha256Digest()
-
-        layerTerrain.bytesIterator().forEachRemaining { digester.update(it) }
-        val terrhash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
-        layerWall.bytesIterator().forEachRemaining { digester.update(it) }
-        val wallhash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
-
-        // use gzip; lzma's slower and larger for some reason
-        return arrayListOf(
-                """"worldname": "$worldName"""",
-                """"comp": "gzip"""",
-                """"width": $width""",
-                """"height": $height""",
-                """"spawnx": $spawnX""",
-                """"spawny": $spawnY""",
-                """"genver": 4""",
-                """"time_t": ${worldTime.TIME_T}""",
-                """"terr": {
-                    |"h": "$terrhash",
-                    |"b": "${blockLayerToStr(layerTerrain)}"}""".trimMargin(),
-                """"wall": {
-                    |"h": "$wallhash",
-                    |"b": "${blockLayerToStr(layerWall)}"}""".trimMargin(),
-                """"tdmg": {
-                    |"h": "${StringBuilder().let { sb -> digester.digest(tdmgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": "${bytesToZipdStr(tdmgstr.toByteArray())}"}""".trimMargin(),
-                """"wdmg": {
-                    |"h": "${StringBuilder().let { sb -> digester.digest(wdmgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": "${bytesToZipdStr(wdmgstr.toByteArray())}"}""".trimMargin(),
-                """"flut": {
-                    |"h": "${StringBuilder().let { sb -> digester.digest(flutstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": "${bytesToZipdStr(flutstr.toByteArray())}"}""".trimMargin(),
-                """"fluf": {
-                    |"h": "${StringBuilder().let { sb -> digester.digest(flufstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": "${bytesToZipdStr(flufstr.toByteArray())}"}""".trimMargin(),
-                """"wire": {
-                    |"h": "${StringBuilder().let { sb -> digester.digest(wirestr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": "${bytesToZipdStr(wirestr.toByteArray())}"}""".trimMargin(),
-                """"wirg": {
-                    |"h": "${StringBuilder().let { sb -> digester.digest(wirgstr.toByteArray()).forEach { sb.append(it.tostr()) }; sb.toString() }}",
-                    |"b": "${bytesToZipdStr(wirgstr.toByteArray())}"}""".trimMargin()
-        )
     }
 }
 

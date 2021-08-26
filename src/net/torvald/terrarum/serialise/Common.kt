@@ -3,23 +3,29 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
 import java.math.BigInteger
+import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 /**
  * Created by minjaesong on 2021-08-26.
  */
 object Common {
+
+    const val GENVER = 4
+    const val COMP_NONE = 0
+    const val COMP_GZIP = 1
+    const val COMP_LZMA = 2
+
     /** dispose of the `offendingObject` after rejection! */
     class BlockLayerHashMismatchError(val oldHash: String, val newHash: String, val offendingObject: BlockLayer) : Error("Old Hash $oldHash != New Hash $newHash")
 
@@ -51,7 +57,7 @@ object Common {
 
                 val layer = LayerInfo(hash, blockLayerToStr(obj), obj.width, obj.height)
 
-                AppLoader.printdbg(this, "pre: ${(0L..1023L).map { obj.ptr[it].tostr() }.joinToString(" ")}")
+//                printdbg(this, "pre: ${(0L..1023L).map { obj.ptr[it].tostr() }.joinToString(" ")}")
 
 
                 json.writeValue(layer)
@@ -98,10 +104,8 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashArray<*> {
                 val hashMap = HashArray<Any>()
-                printdbg(type?.canonicalName, "deserialising '$jsonData'")
                 JsonFetcher.forEach(jsonData) { key, obj ->
                     hashMap[key.toLong()] = json.readValue(null, obj)
-                    printdbg(this, "key: $key, value: ${hashMap[key.toLong()]}")
                 }
                 return hashMap
             }
@@ -118,10 +122,8 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWirings {
                 val hashMap = HashedWirings()
-                printdbg(type?.canonicalName, "deserialising '$jsonData'")
                 JsonFetcher.forEach(jsonData) { key, obj ->
                     hashMap[key.toLong()] = json.readValue(GameWorld.WiringNode::class.java, obj)
-                    printdbg(this, "key: $key, value: ${hashMap[key.toLong()]}")
                 }
                 return hashMap
             }
@@ -138,10 +140,8 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWiringGraph {
                 val hashMap = HashedWiringGraph()
-                printdbg(type?.canonicalName, "deserialising '$jsonData'")
                 JsonFetcher.forEach(jsonData) { key, obj ->
                     hashMap[key.toLong()] = json.readValue(WiringGraphMap::class.java, obj)
-                    printdbg(this, "key: $key, value: ${hashMap[key.toLong()]}")
                 }
                 return hashMap
             }
@@ -158,10 +158,8 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WiringGraphMap {
                 val hashMap = WiringGraphMap()
-                printdbg(type?.canonicalName, "deserialising '$jsonData'")
                 JsonFetcher.forEach(jsonData) { key, obj ->
                     hashMap[key] = json.readValue(GameWorld.WiringSimCell::class.java, obj)
-                    printdbg(this, "key: $key, value: ${hashMap[key]}")
                 }
                 return hashMap
             }
@@ -180,17 +178,17 @@ object Common {
         val zo = GZIPOutputStream(bo)
 
         // zip
-        /*b.bytesIterator().forEachRemaining {
+        b.bytesIterator().forEach {
             zo.write(it.toInt())
         }
-        zo.flush(); zo.close()*/
+        zo.flush(); zo.close()
 
         // enascii
         val ba = bo.toByteArray64()
         var bai = 0
         val buf = IntArray(4) { Ascii85.PAD_BYTE }
-//            ba.forEach {
-        b.bytesIterator().forEachRemaining {
+        ba.forEach {
+//        b.bytesIterator().forEachRemaining {
             if (bai > 0 && bai % 4 == 0) {
                 sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
                 buf.fill(Ascii85.PAD_BYTE)
@@ -224,20 +222,20 @@ object Common {
         }; Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
 
         // unzip
-        /*val zi = GZIPInputStream(ByteArray64InputStream(unasciidBytes))
+        val zi = GZIPInputStream(ByteArray64InputStream(unasciidBytes))
         while (true) {
             val byte = zi.read()
             if (byte == -1) break
             unzipdBytes.add(byte.toByte())
         }
-        zi.close()*/
+        zi.close()
 
         // write to blocklayer and the digester
         digester.reset()
         var writeCursor = 0L
         val sb = StringBuilder()
-//            unzipdBytes.forEach {
-        unasciidBytes.forEach {
+        unzipdBytes.forEach {
+//        unasciidBytes.forEach {
             if (writeCursor < layer.ptr.size) {
 
                 if (writeCursor < 1024) {
@@ -252,7 +250,7 @@ object Common {
         }
 
 
-        AppLoader.printdbg(this, "post: $sb")
+//        printdbg(this, "post: $sb")
 
 
         // check hash

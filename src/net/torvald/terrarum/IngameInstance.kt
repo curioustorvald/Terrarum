@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
@@ -40,11 +41,13 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     open var world: GameWorld = GameWorld.makeNullWorld()
         set(value) {
+            val oldWorld = field
             newWorldLoadedLatch = true
             printdbg(this, "Ingame instance ${this.hashCode()}, accepting new world ${value.layerTerrain}; called from")
             printStackTrace(this)
             field = value
             IngameRenderer.setRenderedWorld(value)
+            oldWorld.dispose()
         }
     /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
     var gameworldIndices = ArrayList<Int>()
