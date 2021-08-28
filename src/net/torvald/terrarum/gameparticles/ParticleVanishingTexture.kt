@@ -69,10 +69,9 @@ class ParticleVanishingText(val text: String, x: Double, y: Double, noCollision:
  * @param x x-coord of the particle's initial spawn position, bottom-centre
  * @param y y-coord of the particle's initial spawn position, bottom-centre
  */
-open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Float, x: Double, y: Double, val start: Int = 0, noCollision: Boolean = true) : ParticleBase(Actor.RenderOrder.OVERLAY, false, noCollision, 2f) {
+open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Float, val loop: Boolean, x: Double, y: Double, noCollision: Boolean = true, startFrame: Int = 0, val row: Int = 0) : ParticleBase(Actor.RenderOrder.OVERLAY, false, noCollision, 2f) {
 
-    private var row = 0
-    private var frame = start % sprite.horizontalCount
+    private var frame = startFrame % sprite.horizontalCount
     private var frameAdvanceCounter = 0f
 
     init {
@@ -90,7 +89,11 @@ open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Flo
 
         if (frameAdvanceCounter >= delay) {
             frameAdvanceCounter -= delay
-            frame = (frame + 1) % sprite.horizontalCount
+
+            if (frame == sprite.horizontalCount - 1 && loop)
+                frame = 0
+            else if (frame != sprite.horizontalCount - 1)
+                frame += 1
         }
         frameAdvanceCounter += delta
     }
