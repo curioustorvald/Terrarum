@@ -41,7 +41,7 @@ internal class UIInventoryCells(
             UIItemInventoryItemGrid(
                     full,
                     full.catBar,
-                    full.actor.inventory,
+                    { full.actor.inventory },
                     INVENTORY_CELLS_OFFSET_X,
                     INVENTORY_CELLS_OFFSET_Y,
                     CELLS_HOR, CELLS_VRT,
@@ -53,8 +53,6 @@ internal class UIInventoryCells(
     private val equipped: UIItemInventoryEquippedView =
             UIItemInventoryEquippedView(
                     full,
-                    full.actor.inventory,
-                    full.actor as ActorWithBody,
                     internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenSize.screenW - internalWidth) / 2,
                     INVENTORY_CELLS_OFFSET_Y,
                     { rebuildList() }

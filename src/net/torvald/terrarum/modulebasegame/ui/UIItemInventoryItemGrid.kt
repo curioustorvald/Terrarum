@@ -39,7 +39,7 @@ import kotlin.math.floor
 class UIItemInventoryItemGrid(
         parentUI: UICanvas,
         val catBar: UIItemInventoryCatBar,
-        val inventory: FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
+        var getInventory: () -> FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
         initialX: Int,
         initialY: Int,
         val horizontalCells: Int,
@@ -411,7 +411,7 @@ class UIItemInventoryItemGrid(
         inventorySortList = ArrayList<InventoryPair>()
 
         // filter items
-        inventory.forEach {
+        getInventory().forEach {
             if ((filter.contains(ItemCodex[it.itm]!!.inventoryCategory) || filter[0] == CAT_ALL))
                 inventorySortList.add(it)
         }
@@ -430,9 +430,11 @@ class UIItemInventoryItemGrid(
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.itm)
 
                 // set quickslot number
-                if (inventory is ActorInventory) {
+                if (getInventory() is ActorInventory) {
+                    val ainv = getInventory() as ActorInventory
+
                     for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
-                        if (sortListItem.itm == inventory.getQuickslot(qs - 1)?.itm) {
+                        if (sortListItem.itm == ainv.getQuickslot(qs - 1)?.itm) {
                             items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }
@@ -441,9 +443,9 @@ class UIItemInventoryItemGrid(
                     }
 
                     // set equippedslot number
-                    for (eq in inventory.itemEquipped.indices) {
-                        if (eq < inventory.itemEquipped.size) {
-                            if (inventory.itemEquipped[eq] == items[k].item?.dynamicID) {
+                    for (eq in ainv.itemEquipped.indices) {
+                        if (eq < ainv.itemEquipped.size) {
+                            if (ainv.itemEquipped[eq] == items[k].item?.dynamicID) {
                                 items[k].equippedSlot = eq
                                 break
                             }
@@ -471,7 +473,7 @@ class UIItemInventoryItemGrid(
         // ¤ 6969g
         // ¤ 2147483647g
         // g is read as "grave" /ɡraːv/ or /ɡɹeɪv/, because it isn't gram.
-        walletText = "<;?" + inventory.wallet.toString().padStart(4, '?') + ":"
+        walletText = "<;?" + getInventory().wallet.toString().padStart(4, '?') + ":"
 
 
         rebuildList = false

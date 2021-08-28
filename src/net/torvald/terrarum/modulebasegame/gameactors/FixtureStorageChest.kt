@@ -136,7 +136,7 @@ internal class UIStorageChest : UICanvas(
             itemListChest = UIItemInventoryItemGrid(
                     this,
                     catBar,
-                    getFixtureInventory(),
+                    { getFixtureInventory() },
                     INVENTORY_CELLS_OFFSET_X - halfSlotOffset,
                     INVENTORY_CELLS_OFFSET_Y,
                     6, CELLS_VRT,
@@ -153,7 +153,7 @@ internal class UIStorageChest : UICanvas(
             itemListPlayer = UIItemInventoryItemGrid(
                     this,
                     catBar,
-                    Terrarum.ingame!!.actorNowPlaying!!.inventory, // literally a player's inventory
+                    { Terrarum.ingame!!.actorNowPlaying!!.inventory }, // literally a player's inventory
                     INVENTORY_CELLS_OFFSET_X - halfSlotOffset + (listGap + UIItemInventoryElem.height) * 7,
                     INVENTORY_CELLS_OFFSET_Y,
                     6, CELLS_VRT,

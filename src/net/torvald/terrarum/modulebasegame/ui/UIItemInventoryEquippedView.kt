@@ -23,8 +23,6 @@ import net.torvald.terrarum.ui.UIItem
  */
 class UIItemInventoryEquippedView(
         parentUI: UICanvas,
-        val inventory: ActorInventory,
-        val theActor: ActorWithBody,
         initialX: Int,
         initialY: Int,
         inventoryListRebuildFun: () -> Unit
@@ -92,7 +90,7 @@ class UIItemInventoryEquippedView(
 
 
         // sprite
-        val sprite = theActor.sprite
+        val sprite = Terrarum.ingame!!.actorNowPlaying?.sprite
         sprite?.let {
             blendNormal(batch)
 
@@ -121,28 +119,30 @@ class UIItemInventoryEquippedView(
     internal fun rebuild() {
         rebuildList = false
 
-        // sort by equip position
+        Terrarum.ingame!!.actorNowPlaying?.inventory?.let {
+            // sort by equip position
 
-        // fill the grid from fastest index, make no gap in-between of slots
-        for (k in itemGrid.indices) {
-            val item = inventory.itemEquipped[k]
+            // fill the grid from fastest index, make no gap in-between of slots
+            for (k in itemGrid.indices) {
+                val item = it.itemEquipped[k]
 
-            if (item == null) {
+                if (item == null) {
 
-                itemGrid[k].item = null
-                itemGrid[k].amount = 0
-                itemGrid[k].itemImage = null
-                itemGrid[k].quickslot = null
-                itemGrid[k].equippedSlot = null
-            }
-            else {
-                val itemRecord = inventory.invSearchByDynamicID(item)!!
+                    itemGrid[k].item = null
+                    itemGrid[k].amount = 0
+                    itemGrid[k].itemImage = null
+                    itemGrid[k].quickslot = null
+                    itemGrid[k].equippedSlot = null
+                }
+                else {
+                    val itemRecord = it.invSearchByDynamicID(item)!!
 
-                itemGrid[k].item = ItemCodex[item]
-                itemGrid[k].amount = itemRecord.qty
-                itemGrid[k].itemImage = ItemCodex.getItemImage(item)
-                itemGrid[k].quickslot = null // don't need to be displayed
-                itemGrid[k].equippedSlot = null // don't need to be displayed
+                    itemGrid[k].item = ItemCodex[item]
+                    itemGrid[k].amount = itemRecord.qty
+                    itemGrid[k].itemImage = ItemCodex.getItemImage(item)
+                    itemGrid[k].quickslot = null // don't need to be displayed
+                    itemGrid[k].equippedSlot = null // don't need to be displayed
+                }
             }
         }
     }
