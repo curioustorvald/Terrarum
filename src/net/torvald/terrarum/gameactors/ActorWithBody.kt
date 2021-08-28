@@ -310,6 +310,10 @@ open class ActorWithBody : Actor {
     var isWalkingH = false
     var isWalkingV = false
 
+    @Transient private var stairPenaltyMax = 1
+    private var stairPenaltyCounter = 0 // unit: update count. 1 second is roughly 64 updates.
+    private var stairPenaltyVector = 1.0
+
     init {
         // some initialiser goes here...
     }
@@ -449,6 +453,7 @@ open class ActorWithBody : Actor {
                     //collisionInterpolatorRun()
                 }
                 else {
+                    stairPenaltyCounter = 999
                     val vecSum = externalV + (controllerV ?: Vector2(0.0, 0.0))
                     hitbox.translate(vecSum)
                 }
@@ -472,6 +477,8 @@ open class ActorWithBody : Actor {
 
                 // make sure if the actor tries to go out of the map, loop back instead
                 clampHitbox()
+
+                if (stairPenaltyCounter < 999) stairPenaltyCounter += 1
             }
 
 
@@ -631,6 +638,13 @@ open class ActorWithBody : Actor {
 
             fun Double.modTile() = this.div(TILE_SIZE).floorInt().times(TILE_SIZE)
             fun Double.modTileDelta() = this - this.modTile()
+
+
+
+            if (controllerV != null && stairPenaltyCounter < stairPenaltyMax) {
+                controllerV!!.x  *= stairPenaltyVector
+            }
+
 
 
             // the job of the ccd is that the "next hitbox" would not dig into the terrain greater than the tile size,
@@ -845,7 +859,8 @@ open class ActorWithBody : Actor {
 
                         //println("staircasing: $staircaseStatus for $selfCollisionStatus")
 
-                        finalDisplacement.y = if (staircaseStatus == COLLIDING_LEFT) -stairHeightLeft else -stairHeightRight
+                        val stairHeight = if (staircaseStatus == COLLIDING_LEFT) stairHeightLeft else stairHeightRight
+                        finalDisplacement.y = -stairHeight
                         finalDisplacement.x = vectorSum.x
 
                         bounceX = false
@@ -855,7 +870,11 @@ open class ActorWithBody : Actor {
                         // where when player happens to be "walled" (which zeroes the x velo) and keeps moving left/right
                         // so we also zero the same exact value here for perfect hiding
                         if (controllerV != null) {
+                            val stairRatio = stairHeight / hitbox.height
+                            stairPenaltyVector = Math.pow(1.0 - (stairRatio), 90 * stairRatio).times(10).coerceIn(0.00005, 1.0)
                             controllerV!!.x = 0.0
+                            stairPenaltyCounter = 0
+                            stairPenaltyMax = Math.pow(stairRatio, 2.4).times(166).roundToInt().coerceAtMost(64)
                         }
                     }
                     else {
