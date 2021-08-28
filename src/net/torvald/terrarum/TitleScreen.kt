@@ -257,8 +257,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         batch.color = Color.LIGHT_GRAY
 
         val COPYTING = arrayOf(
-                AppLoader.COPYRIGHT_DATE_NAME,
-                Lang["COPYRIGHT_GNU_GPL_3"]
+                TerrarumAppConfiguration.COPYRIGHT_DATE_NAME,
+                TerrarumAppConfiguration.COPYRIGHT_LICENSE
         )
 
         COPYTING.forEachIndexed { index, s ->

@@ -18,6 +18,16 @@ interface HasAssembledSprite {
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)
 
+    /**
+     * Example usage:
+     * ```
+     * this.animDescPath = "..."
+     * this.animDescPathGlow = "..."
+     * this.sprite = SpriteAnimation(actor)
+     * this.spriteGlow = SpriteAnimation(actor)
+     * reassembleSprite(this.sprite, this.spriteGlow)
+     * ```
+     */
     fun reassembleSprite(sprite: SpriteAnimation, spriteGlow: SpriteAnimation? = null) {
         _rebuild(ADProperties(Gdx.files.internal(animDescPath).read()), sprite)
         if (animDescPathGlow != null && spriteGlow != null)

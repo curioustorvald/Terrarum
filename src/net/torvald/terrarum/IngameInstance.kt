@@ -225,9 +225,16 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open fun removeActor(actor: Actor?) {
         if (actor == null) return
 
-        val indexToDelete = actorContainerActive.searchFor(actor.referenceID) { it.referenceID }
-        if (indexToDelete != null) {
-            actorContainerActive.remove(indexToDelete)
+        forceRemoveActor(actor)
+    }
+
+    open fun forceRemoveActor(actor: Actor) {
+        arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
+            val indexToDelete = actorContainer.searchFor(actor.referenceID) { it.referenceID }
+            if (indexToDelete != null) {
+                actor.dispose()
+                actorContainer.remove(indexToDelete)
+            }
         }
     }
 

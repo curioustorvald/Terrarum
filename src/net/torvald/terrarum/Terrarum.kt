@@ -494,6 +494,7 @@ val ccG = GameFontBase.toColorCode(0xF8F8)
 val ccV = GameFontBase.toColorCode(0xF080)
 val ccX = GameFontBase.toColorCode(0xF853)
 val ccK = GameFontBase.toColorCode(0xF888)
+val ccE = GameFontBase.toColorCode(0xFBBB)
 
 
 typealias Second = Float

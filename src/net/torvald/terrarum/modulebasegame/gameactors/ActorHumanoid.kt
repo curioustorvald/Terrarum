@@ -9,11 +9,9 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -28,12 +26,13 @@ import java.util.*
  *
  * Created by minjaesong on 2016-10-24.
  */
-open class ActorHumanoid(
-        birth: Long,
-        death: Long? = null,
-        physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT
-) : ActorWithBody(RenderOrder.MIDDLE, physProp = physProp), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+open class ActorHumanoid() : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
+    constructor(birth: Long, death: Long? = null, physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT) : this() {
+        actorValue[AVKey.__HISTORICAL_BORNTIME] = birth
+        death?.let { actorValue[AVKey.__HISTORICAL_DEADTIME] = death }
+        this.physProp = physProp
+    }
 
     var vehicleRiding: Controllable? = null // usually player only
 
@@ -176,11 +175,6 @@ open class ActorHumanoid(
         override val material = Material()
     }
 
-    init {
-        actorValue[AVKey.__HISTORICAL_BORNTIME] = birth
-        death?.let { actorValue[AVKey.__HISTORICAL_DEADTIME] = death }
-    }
-
     override fun update(delta: Float) {
         super.update(delta)
 
@@ -217,11 +211,11 @@ open class ActorHumanoid(
 
         // update inventory items
         inventory.forEach {
-            if (!inventory.itemEquipped.contains(it.item)) { // unequipped
-                ItemCodex[it.item]!!.effectWhileInPocket(delta)
+            if (!inventory.itemEquipped.contains(it.itm)) { // unequipped
+                ItemCodex[it.itm]!!.effectWhileInPocket(delta)
             }
             else { // equipped
-                ItemCodex[it.item]!!.effectWhenEquipped(delta)
+                ItemCodex[it.itm]!!.effectWhenEquipped(delta)
             }
         }
     }
@@ -640,7 +634,7 @@ open class ActorHumanoid(
         // make quickslot work
         if (key == AVKey.__PLAYER_QUICKSLOTSEL && value != null) {
             // ONLY FOR HAND_GRIPs!!
-            val quickBarItem = ItemCodex[inventory.getQuickslot(actorValue.getAsInt(key)!!)?.item]
+            val quickBarItem = ItemCodex[inventory.getQuickslot(actorValue.getAsInt(key)!!)?.itm]
 
             if (quickBarItem != null && quickBarItem.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
                 equipItem(quickBarItem)

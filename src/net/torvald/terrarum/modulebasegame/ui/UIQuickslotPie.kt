@@ -64,7 +64,7 @@ class UIQuickslotPie : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
-            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
+            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslot(i)?.itm]
 
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise

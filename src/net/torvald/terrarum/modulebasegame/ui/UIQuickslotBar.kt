@@ -48,7 +48,7 @@ class UIQuickslotBar : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         for (i in 0..SLOT_COUNT - 1) {
-            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
+            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslot(i)?.itm]
 
             val image = if (i == selection)
                 ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)

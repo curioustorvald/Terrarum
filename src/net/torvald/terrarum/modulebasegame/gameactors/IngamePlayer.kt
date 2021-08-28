@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.AVKey
 
 
 /**
@@ -10,11 +11,17 @@ import net.torvald.terrarum.Terrarum
  * Created by minjaesong on 2015-12-31.
  */
 
-class IngamePlayer(
-        override var animDescPath: String,
-        override var animDescPathGlow: String? = null,
-        born: Long
-) : ActorHumanoid(born), HasAssembledSprite {
+class IngamePlayer() : ActorHumanoid(), HasAssembledSprite {
+
+    override var animDescPath = "invalid"
+    override var animDescPathGlow: String? = null
+
+
+    constructor(animDescPath: String, animDescPathGlow: String?, born: Long) : this() {
+        this.animDescPath = animDescPath
+        this.animDescPathGlow = animDescPathGlow
+        actorValue[AVKey.__HISTORICAL_BORNTIME] = born
+    }
 
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.).

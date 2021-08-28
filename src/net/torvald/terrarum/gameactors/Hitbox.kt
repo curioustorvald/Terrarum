@@ -11,18 +11,15 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2016-01-15.
  */
-class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppressWarning: Boolean = true) {
+class Hitbox {
 
-    @Volatile var hitboxStart: Point2d
-        private set
-    inline val hitboxEnd: Point2d
-        get() = Point2d(hitboxStart.x + width, hitboxStart.y + height)
-    var width: Double = 0.0
-        private set
-    var height: Double = 0.0
-        private set
+    var suppressWarning = true
 
-    init {
+    private constructor()
+
+    constructor(x1: Double, y1: Double, width: Double, height: Double, suppressWarning: Boolean = true) : this() {
+        this.suppressWarning = suppressWarning
+
         hitboxStart = Point2d(x1, y1)
         this.width = width
         this.height = height
@@ -32,6 +29,15 @@ class Hitbox (x1: Double, y1: Double, width: Double, height: Double, var suppres
             printStackTrace(this)
         }
     }
+
+    @Volatile var hitboxStart: Point2d = Point2d(-1.0, -1.0)
+        private set
+    inline val hitboxEnd: Point2d
+        get() = Point2d(hitboxStart.x + width, hitboxStart.y + height)
+    var width: Double = 0.0
+        private set
+    var height: Double = 0.0
+        private set
 
 
     val startX: Double

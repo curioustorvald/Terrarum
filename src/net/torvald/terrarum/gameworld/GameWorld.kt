@@ -28,11 +28,11 @@ import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
 
-class GameWorld : Disposable {
+class GameWorld() : Disposable {
 
     var worldName: String = "New World"
     /** Index start at 1 */
-    var worldIndex: Int
+    var worldIndex: Int = 1234567890
         set(value) {
             if (value <= 0)
                 throw Error("World index start at 1; you've entered $value")
@@ -42,14 +42,14 @@ class GameWorld : Disposable {
 
             field = value
         }
-    val width: Int
-    val height: Int
+    var width: Int = 999; private set
+    var height: Int = 999; private set
 
-    var creationTime: Long
+    var creationTime: Long = AppLoader.getTIME_T()
         internal set
-    var lastPlayTime: Long
+    var lastPlayTime: Long = AppLoader.getTIME_T()
         internal set // there's a case of save-and-continue-playing
-    var totalPlayTime: Int
+    var totalPlayTime: Int = 0
         internal set
 
     /** Used to calculate play time */
@@ -63,9 +63,9 @@ class GameWorld : Disposable {
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
 
     /** Tilewise spawn point */
-    var spawnX: Int
+    var spawnX: Int = 0
     /** Tilewise spawn point */
-    var spawnY: Int
+    var spawnY: Int = 0
 
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
@@ -119,7 +119,7 @@ class GameWorld : Disposable {
     /**
      * Create new world
      */
-    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
+    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int): this() {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
 
         this.worldIndex = worldIndex
@@ -144,18 +144,6 @@ class GameWorld : Disposable {
         this.totalPlayTime = totalPlayTime
 
         postLoad()
-    }
-
-    constructor() {
-        worldIndex = 1234567890
-        width = 999
-        height = 999
-        val time = AppLoader.getTIME_T()
-        creationTime = time
-        lastPlayTime = time
-        totalPlayTime = 0
-        spawnX = 0
-        spawnY = 0
     }
 
     fun postLoad() {

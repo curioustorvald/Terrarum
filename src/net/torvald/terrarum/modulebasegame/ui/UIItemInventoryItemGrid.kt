@@ -120,7 +120,7 @@ class UIItemInventoryItemGrid(
 
                         inventory.setQuickBar(
                                 slot,
-                                if (currentSlotItem?.item != item.dynamicID)
+                                if (currentSlotItem?.itm != item.dynamicID)
                                     item.dynamicID // register
                                 else
                                     null // drop registration
@@ -129,7 +129,7 @@ class UIItemInventoryItemGrid(
                         // search for duplicates in the quickbar, except mine
                         // if there is, unregister the other
                         (0..9).minus(slot).forEach {
-                            if (inventory.getQuickslot(it)?.item == item.dynamicID) {
+                            if (inventory.getQuickslot(it)?.itm == item.dynamicID) {
                                 inventory.setQuickBar(it, null)
                             }
                         }
@@ -412,27 +412,27 @@ class UIItemInventoryItemGrid(
 
         // filter items
         inventory.forEach {
-            if ((filter.contains(ItemCodex[it.item]!!.inventoryCategory) || filter[0] == CAT_ALL))
+            if ((filter.contains(ItemCodex[it.itm]!!.inventoryCategory) || filter[0] == CAT_ALL))
                 inventorySortList.add(it)
         }
 
         // sort if needed
         // test sort by name
-        inventorySortList.sortBy { ItemCodex[it.item]!!.name }
+        inventorySortList.sortBy { ItemCodex[it.itm]!!.name }
 
         // map sortList to item list
         for (k in items.indices) {
             // we have an item
             try {
                 val sortListItem = inventorySortList[k + itemPage * items.size]
-                items[k].item = ItemCodex[sortListItem.item]
-                items[k].amount = sortListItem.amount
-                items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
+                items[k].item = ItemCodex[sortListItem.itm]
+                items[k].amount = sortListItem.qty
+                items[k].itemImage = ItemCodex.getItemImage(sortListItem.itm)
 
                 // set quickslot number
                 if (inventory is ActorInventory) {
                     for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
-                        if (sortListItem.item == inventory.getQuickslot(qs - 1)?.item) {
+                        if (sortListItem.itm == inventory.getQuickslot(qs - 1)?.itm) {
                             items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }

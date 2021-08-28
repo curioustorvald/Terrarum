@@ -32,7 +32,6 @@ import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.ui.UICanvas
@@ -40,7 +39,6 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
-import net.torvald.util.SortedArrayList
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
@@ -313,8 +311,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /** Load rest of the game with GL context */
     fun postInit() {
         //setTheRealGamerFirstTime(PlayerBuilderSigrid())
-//        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
-        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
+        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
+//        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
 
 
 
@@ -850,9 +848,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
                     if (it is Pocketed) {
                         it.inventory.forEach { inventoryEntry ->
-                            ItemCodex[inventoryEntry.item]!!.effectWhileInPocket(delta)
-                            if (it.equipped(inventoryEntry.item)) {
-                                ItemCodex[inventoryEntry.item]!!.effectWhenEquipped(delta)
+                            ItemCodex[inventoryEntry.itm]!!.effectWhileInPocket(delta)
+                            if (it.equipped(inventoryEntry.itm)) {
+                                ItemCodex[inventoryEntry.itm]!!.effectWhenEquipped(delta)
                             }
                         }
                     }
@@ -920,17 +918,25 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
-        val indexToDelete = actorContainerActive.searchForIndex(actor.referenceID) { it.referenceID }
-        if (indexToDelete != null) {
-            printdbg(this, "Removing actor $actor")
-            printStackTrace(this)
 
-            actorContainerActive.removeAt(indexToDelete)
+        forceRemoveActor(actor)
+    }
 
-            // indexToDelete >= 0 means that the actor certainly exists in the game
-            // which means we don't need to check if i >= 0 again
-            if (actor is ActorWithBody) {
-                actorToRenderQueue(actor).remove(actor)
+    override fun forceRemoveActor(actor: Actor) {
+        arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
+            val indexToDelete = actorContainer.searchForIndex(actor.referenceID) { it.referenceID }
+            if (indexToDelete != null) {
+                printdbg(this, "Removing actor $actor")
+                printStackTrace(this)
+
+                actor.dispose()
+                actorContainer.removeAt(indexToDelete)
+
+                // indexToDelete >= 0 means that the actor certainly exists in the game
+                // which means we don't need to check if i >= 0 again
+                if (actor is ActorWithBody) {
+                    actorToRenderQueue(actor).remove(actor)
+                }
             }
         }
     }
@@ -973,10 +979,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             }
 
             actorContainerActive.add(actor)
-
-            if (actor is ActorWithBody) {
-                actorToRenderQueue(actor).add(actor)
-            }
+            if (actor is ActorWithBody) actorToRenderQueue(actor).add(actor)
         }
     }
 

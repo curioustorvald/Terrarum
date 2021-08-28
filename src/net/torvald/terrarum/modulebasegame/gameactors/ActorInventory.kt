@@ -1,28 +1,29 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.lock
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
-import java.math.BigInteger
-import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Created by minjaesong on 2016-03-15.
  */
 
-class ActorInventory(@Transient val actor: Pocketed, maxCapacity: Int, capacityMode: Int):
-        FixtureInventory(maxCapacity, capacityMode) {
+class ActorInventory() : FixtureInventory() {
 
     // FIXME unless absolutely necessary, don't store full item object; only store its dynamicID
+
+    @Transient lateinit var actor: Pocketed
+        internal set
+
+    constructor(actor: Pocketed, maxCapacity: Int, capacityMode: Int) : this() {
+        this.actor = actor
+        this.maxCapacity = maxCapacity
+        this.capacityMode = capacityMode
+    }
 
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
@@ -38,7 +39,7 @@ class ActorInventory(@Transient val actor: Pocketed, maxCapacity: Int, capacityM
     override fun remove(item: GameItem, count: Int) {
         super.remove(item, count) { existingItem ->
             // unequip, if applicable
-            actor.unequipItem(existingItem.item)
+            actor.unequipItem(existingItem.itm)
             // also unequip on the quickslot
             actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
                 setQuickBar(it, null)

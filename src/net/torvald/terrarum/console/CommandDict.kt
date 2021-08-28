@@ -8,6 +8,7 @@ import java.util.*
  */
 object CommandDict {
 
+    // todo replace with reflection?
     internal val dict: HashMap<String, ConsoleCommand> = hashMapOf(
             "echo" to Echo,
             "error" to EchoError,
@@ -63,6 +64,7 @@ object CommandDict {
             /* !! */"exportworld" to ExportWorld,
             /* !! */"exportactor" to ExportActor,
             /* !! */"importworld" to ImportWorld,
+            /* !! */"importactor" to ImportActor,
             /* !! */"exportfborgb" to ExportRendererFboRGB,
             /* !! */"printworld" to PrintWorld
     )

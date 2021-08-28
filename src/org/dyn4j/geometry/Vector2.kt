@@ -132,6 +132,9 @@ class Vector2 {
         this.y = Math.sin(direction)
     }
 
+    operator fun component1() = x
+    operator fun component2() = y
+
     /**
      * Returns a copy of this [Vector2].
      * @return [Vector2]

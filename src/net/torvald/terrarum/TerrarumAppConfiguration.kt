@@ -1,5 +1,7 @@
 package net.torvald.terrarum
 
+import net.torvald.terrarum.langpack.Lang
+
 /**
  * You directly modify the source code to tune the engine to suit your needs.
  *
@@ -11,6 +13,7 @@ object TerrarumAppConfiguration {
     //////////////////////////////////////
     const val GAME_NAME = "Terrarum"
     const val COPYRIGHT_DATE_NAME = "Copyright 2013-2021 CuriousTorvald (minjaesong)"
+    val COPYRIGHT_LICENSE: String; get() = Lang["COPYRIGHT_GNU_GPL_3"]
 
     /**
      *

@@ -4,12 +4,12 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
+import net.torvald.EMDASH
+import net.torvald.terrarum.*
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.util.CircularArray
 
 
@@ -183,7 +183,8 @@ class ConsoleWindow : UICanvas() {
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {
-            sendMessage("${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}")
+            sendMessage("$ccE${TerrarumAppConfiguration.GAME_NAME} ${AppLoader.getVERSION_STRING()} $EMDASH ${TerrarumAppConfiguration.COPYRIGHT_DATE_NAME}")
+            sendMessage("$ccE${TerrarumAppConfiguration.COPYRIGHT_LICENSE}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }
     }

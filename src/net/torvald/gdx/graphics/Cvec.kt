@@ -77,6 +77,11 @@ class Cvec {
         set(color)
     }
 
+    operator fun component1() = r
+    operator fun component2() = g
+    operator fun component3() = b
+    operator fun component4() = a
+
     /**
      * Get RGBA Element using index, of which:
      * - 0: R

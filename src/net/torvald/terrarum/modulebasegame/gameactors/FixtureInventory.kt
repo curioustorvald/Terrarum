@@ -13,8 +13,16 @@ import java.util.concurrent.locks.ReentrantLock
  * Created by minjaesong on 2021-03-16.
  */
 
-open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
-    
+open class FixtureInventory() {
+
+    var maxCapacity = 100
+    var capacityMode = CAPACITY_MODE_COUNT
+
+    constructor(maxCapacity: Int, capacityMode: Int) : this() {
+        this.maxCapacity = maxCapacity
+        this.capacityMode = capacityMode
+    }
+
     companion object {
         val CAPACITY_MODE_NO_ENCUMBER = 0
         val CAPACITY_MODE_COUNT = 1
@@ -60,7 +68,7 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
         // if the item already exists
         if (existingItem != null) {
             // increment count
-            existingItem.amount += count
+            existingItem.qty += count
         }
         // new item
         else {
@@ -90,14 +98,14 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
 
         val existingItem = invSearchByDynamicID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
-            val newCount = existingItem.amount - count
+            val newCount = existingItem.qty - count
 
             if (newCount < 0) {
-                throw Error("Tried to remove $count of $item, but the inventory only contains ${existingItem.amount} of them.")
+                throw Error("Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
             }
             else if (newCount > 0) {
                 // decrement count
-                existingItem.amount = newCount
+                existingItem.qty = newCount
             }
             else {
                 // depleted item; remove entry from inventory
@@ -128,12 +136,12 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
         else
             getTotalCount().toDouble()
 
-    fun getTotalWeight(): Double = itemList.map { ItemCodex[it.item]!!.mass * it.amount }.sum()
+    fun getTotalWeight(): Double = itemList.map { ItemCodex[it.itm]!!.mass * it.qty }.sum()
 
     /**
      * Real amount
      */
-    fun getTotalCount(): Int = itemList.map { it.amount }.sum()
+    fun getTotalCount(): Int = itemList.map { it.qty }.sum()
 
     /**
      * Unique amount, multiple items are calculated as one
@@ -182,7 +190,7 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
         ReentrantLock().lock {
             var j = arr.lastIndex - 1
             val x = arr.last()
-            while (j >= 0 && arr[j].item > x.item) {
+            while (j >= 0 && arr[j].itm > x.itm) {
                 arr[j + 1] = arr[j]
                 j -= 1
             }
@@ -200,9 +208,9 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
             val mid = (low + high).ushr(1) // safe from overflows
 
             val midVal = if (searchMode == STATIC_ID)
-                ItemCodex[this[mid].item]!!.originalID
+                ItemCodex[this[mid].itm]!!.originalID
             else
-                ItemCodex[this[mid].item]!!.dynamicID
+                ItemCodex[this[mid].itm]!!.dynamicID
 
             if (ID > midVal)
                 low = mid + 1
@@ -215,4 +223,19 @@ open class FixtureInventory(var maxCapacity: Int, var capacityMode: Int) {
     }
 }
 
-data class InventoryPair(val item: ItemID, var amount: Int)
+class InventoryPair {
+
+    var itm: ItemID = ""; private set
+    var qty: Int = 0
+
+    private constructor()
+
+    constructor(item: ItemID, quantity: Int) : this() {
+        itm = item
+        qty = quantity
+    }
+
+    operator fun component1() = itm
+    operator fun component2() = qty
+
+}

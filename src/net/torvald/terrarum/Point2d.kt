@@ -5,7 +5,15 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 2016-01-15.
  */
-data class Point2d(var x: Double, var y: Double) : Cloneable {
+class Point2d() : Cloneable {
+
+    var x: Double = 0.0
+    var y: Double = 0.0
+
+    constructor(x: Double, y: Double) : this() {
+        this.x = x
+        this.y = y
+    }
 
     override fun toString(): String {
         return "($x, $y)"
@@ -66,9 +74,21 @@ data class Point2d(var x: Double, var y: Double) : Cloneable {
 
         return this
     }
+
+    operator fun component1() = x
+    operator fun component2() = y
 }
 
-data class Point2i(var x: Int, var y: Int) {
+class Point2i() {
+
+    var x: Int = 0
+    var y: Int = 0
+
+    constructor(x: Int, y: Int) : this() {
+        this.x = x
+        this.y = y
+    }
+
     fun set(x: Int, y: Int) {
         this.x = x
         this.y = y
@@ -94,4 +114,7 @@ data class Point2i(var x: Int, var y: Int) {
 
         return this
     }
+
+    operator fun component1() = x
+    operator fun component2() = y
 }

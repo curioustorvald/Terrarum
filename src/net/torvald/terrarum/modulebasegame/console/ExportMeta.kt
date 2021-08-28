@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.serialise.WriteActor
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.serialise.WriteWorld
@@ -40,10 +41,10 @@ object ExportWorld : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val str = WriteWorld(Terrarum.ingame!! as TerrarumIngame).invoke()
-                val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}", false)
+                val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}.json", false)
                 writer.write(str)
                 writer.close()
-                Echo("Exportworld: exported to ${args[1]}")
+                Echo("Exportworld: exported to ${args[1]}.json")
             }
             catch (e: IOException) {
                 Echo("Exportworld: IOException raised.")
@@ -56,7 +57,7 @@ object ExportWorld : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo("Usage: Exportworld filename.json")
+        Echo("Usage: Exportworld filename-without-extension")
     }
 }
 
@@ -67,7 +68,7 @@ object ExportActor : ConsoleCommand {
                 val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                 if (player == null) return
 
-                val str = WriteActor(player)
+                val str = WriteActor(player as IngamePlayer)
                 val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}.json", false)
                 writer.write(str)
                 writer.close()

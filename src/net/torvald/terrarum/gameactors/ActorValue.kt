@@ -5,17 +5,23 @@ import net.torvald.terrarum.KVHashMap
 /**
  * Created by minjaesong on 2017-04-28.
  */
-class ActorValue(@Transient val actor: Actor) : KVHashMap() {
+class ActorValue : KVHashMap {
 
-    private constructor(actor: Actor, newMap: HashMap<String, Any>): this(actor) {
+    @Transient lateinit var actor: Actor
+        internal set
+
+    private constructor()
+
+    constructor(actor: Actor) : this() {
+        this.actor = actor
+    }
+
+    private constructor(actor: Actor, newMap: HashMap<String, Any>): this() {
+        this.actor = actor
         hashMap = newMap
     }
 
     override fun set(key: String, value: Any) {
-        /*if (key == AVKey.__PLAYER_QUICKSLOTSEL) {
-            printStackTrace(this)
-        }*/
-
         super.set(key, value)
         actor.onActorValueChange(key, value) // fire the event handler
     }

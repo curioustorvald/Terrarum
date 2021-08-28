@@ -50,7 +50,6 @@ import static net.torvald.terrarum.TerrarumKt.printStackTrace;
 public class AppLoader implements ApplicationListener {
 
     public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
-    public static final String COPYRIGHT_DATE_NAME = TerrarumAppConfiguration.COPYRIGHT_DATE_NAME;
 
     // is this jvm good?
     static {

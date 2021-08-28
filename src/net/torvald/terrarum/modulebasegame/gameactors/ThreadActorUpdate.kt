@@ -16,9 +16,9 @@ class ThreadActorUpdate(val startIndex: Int, val endIndex: Int) : Callable<Unit>
 
             if (it is Pocketed) {
                 it.inventory.forEach { inventoryEntry ->
-                    ItemCodex[inventoryEntry.item]?.effectWhileInPocket(AppLoader.UPDATE_RATE)
-                    if (it.equipped(inventoryEntry.item)) {
-                        ItemCodex[inventoryEntry.item]?.effectWhenEquipped(AppLoader.UPDATE_RATE)
+                    ItemCodex[inventoryEntry.itm]?.effectWhileInPocket(AppLoader.UPDATE_RATE)
+                    if (it.equipped(inventoryEntry.itm)) {
+                        ItemCodex[inventoryEntry.itm]?.effectWhenEquipped(AppLoader.UPDATE_RATE)
                     }
                 }
             }
