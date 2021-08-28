@@ -11,13 +11,14 @@ import net.torvald.terrarum.gameactors.AVKey
  * Created by minjaesong on 2015-12-31.
  */
 
-class IngamePlayer() : ActorHumanoid(), HasAssembledSprite {
+class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
     override var animDescPath = "invalid"
     override var animDescPathGlow: String? = null
 
+    private constructor()
 
-    constructor(animDescPath: String, animDescPathGlow: String?, born: Long) : this() {
+    constructor(animDescPath: String, animDescPathGlow: String?, born: Long) : super(born) {
         this.animDescPath = animDescPath
         this.animDescPathGlow = animDescPathGlow
         actorValue[AVKey.__HISTORICAL_BORNTIME] = born

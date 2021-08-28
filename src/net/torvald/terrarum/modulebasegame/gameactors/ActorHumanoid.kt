@@ -26,9 +26,11 @@ import java.util.*
  *
  * Created by minjaesong on 2016-10-24.
  */
-open class ActorHumanoid() : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
-    constructor(birth: Long, death: Long? = null, physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT) : this() {
+    protected constructor()
+
+    constructor(birth: Long, death: Long? = null, physProp: PhysProperties = PhysProperties.HUMANOID_DEFAULT) : super() {
         actorValue[AVKey.__HISTORICAL_BORNTIME] = birth
         death?.let { actorValue[AVKey.__HISTORICAL_DEADTIME] = death }
         this.physProp = physProp

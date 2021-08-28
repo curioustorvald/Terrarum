@@ -8,7 +8,7 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
  * Created by minjaesong on 2016-01-31.
  */
 interface AIControlled {
-    val ai: ActorAI
+    var ai: ActorAI
 
     fun moveLeft(amount: Float = 1f)
     fun moveRight(amount: Float = 1f)

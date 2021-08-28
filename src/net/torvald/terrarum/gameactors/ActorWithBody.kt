@@ -36,14 +36,14 @@ import kotlin.math.roundToInt
  *
  * Created by minjaesong on 2016-01-13.
  */
-open class ActorWithBody() : Actor() {
+open class ActorWithBody : Actor {
 
     var physProp = PhysProperties.HUMANOID_DEFAULT
 
-    constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID? = null) : this() {
+    protected constructor()
+
+    constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID? = null) : super(renderOrder, id) {
         this.physProp = physProp
-        this.renderOrder = renderOrder
-        id?.let { this.referenceID = id }
     }
 
     @Transient val COLLISION_TEST_MODE = false

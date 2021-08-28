@@ -12,7 +12,7 @@ typealias ActorID = Int
  *
  * Created by minjaesong on 2015-12-31.
  */
-abstract class Actor() : Comparable<Actor>, Runnable {
+abstract class Actor : Comparable<Actor>, Runnable {
 
     /**
      * Valid RefID is equal to or greater than 16777216.
@@ -20,6 +20,8 @@ abstract class Actor() : Comparable<Actor>, Runnable {
      */
     open var referenceID: ActorID = 0 // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
     var renderOrder = RenderOrder.MIDDLE
+
+    protected constructor()
 
     // needs zero-arg constructor for serialiser to work
     constructor(renderOrder: RenderOrder, id: ActorID?) : this() {

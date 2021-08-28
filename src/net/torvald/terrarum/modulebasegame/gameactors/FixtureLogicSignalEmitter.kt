@@ -7,12 +7,17 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
-class FixtureLogicSignalEmitter(nameFun: () -> String)
-    : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1), nameFun = nameFun), Electric {
+class FixtureLogicSignalEmitter : FixtureBase, Electric {
 
     override val wireEmitterTypes: HashMap<String, BlockBoxIndex> = HashMap()
     override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
     override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
+
+    protected constructor()
+
+    constructor(nameFun: () -> String) : super(
+            BlockBox(BlockBox.NO_COLLISION, 1, 1),
+            nameFun = nameFun)
 
     init {
         density = 1400.0

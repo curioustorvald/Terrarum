@@ -12,14 +12,18 @@ import net.torvald.terrarum.itemproperties.Material
  *
  * Created by minjaesong on 2016-01-31.
  */
-open class HumanoidNPC(
-        override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
-        born: Long
-        //forceAssignRefID: Int? = null
-) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
+
+    override lateinit var ai: ActorAI
 
     companion object {
         val DEFAULT_COLLISION_TYPE = COLLISION_DYNAMIC
+    }
+
+    protected constructor()
+
+    constructor(ai: ActorAI, born: Long) : super(born) {
+        this.ai = ai
     }
 
     init {

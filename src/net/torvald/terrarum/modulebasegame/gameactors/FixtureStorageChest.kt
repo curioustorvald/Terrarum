@@ -30,14 +30,17 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2019-07-08.
  */
-internal class FixtureStorageChest(nameFun: () -> String) : FixtureBase(
-        BlockBox(BlockBox.ALLOW_MOVE_DOWN, 1, 1),
-        inventory = FixtureInventory(40, CAPACITY_MODE_COUNT),
-        mainUI = UIStorageChest(),
-        nameFun = nameFun
-) {
+internal class FixtureStorageChest : FixtureBase {
 
-    init {
+    private constructor()
+
+    constructor(nameFun: () -> String) : super(
+            BlockBox(BlockBox.ALLOW_MOVE_DOWN, 1, 1),
+            mainUI = UIStorageChest(),
+            inventory = FixtureInventory(40, CAPACITY_MODE_COUNT),
+            nameFun = nameFun
+    ) {
+
         (mainUI as UIStorageChest).chestInventory = this.inventory!!
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
 

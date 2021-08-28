@@ -17,13 +17,18 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2016-03-15.
  */
-open class DroppedItem(private val itemID: ItemID, topLeftX: Int, topLeftY: Int) : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+open class DroppedItem : ActorWithBody {
 
+    private var itemID: ItemID = ""
     private val textureRegion = ItemCodex.getItemImage(itemID)
 
     var itemCount = 1
 
-    init {
+    protected constructor()
+
+    constructor(itemID: ItemID, topLeftX: Int, topLeftY: Int) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+        this.itemID = itemID
+
         if (itemID.startsWith("actor@"))
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
 

@@ -21,16 +21,13 @@ import java.util.*
  */
 
 // TODO simplified, lightweight physics (does not call PhysicsSolver)
-open class ProjectileSimple(
-        private val type: Int,
-        fromPoint: Vector2, // projected coord
-        toPoint: Vector2    // arriving coord
-) : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT), Luminous, Projectile {
+open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
 
-    val damage: Int
-    val displayColour: Color
+    private var type: Int = 0
+    var damage: Int = 0
+    lateinit var displayColour: Color
     /** scalar part of velocity */
-    val speed: Int
+    var speed: Int = 0
 
 
     override var color: Cvec
@@ -48,9 +45,17 @@ open class ProjectileSimple(
     private val lifetimeMax = 2500
     private var lifetimeCounter = 0f
 
-    private val posPre: Point2d
+    private lateinit var posPre: Point2d
 
-    init {
+    protected constructor()
+
+    constructor(type: Int,
+                fromPoint: Vector2, // projected coord
+                toPoint: Vector2    // arriving coord
+             ) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+        this.type = type
+
+
         setPosition(fromPoint.x, fromPoint.y)
         posPre = Point2d(fromPoint.x, fromPoint.y)
         // lightbox sized 8x8 centered to the bullet

@@ -20,8 +20,6 @@ class ReadActor(val ingame: TerrarumIngame) {
     }
 
     open fun invoke(worldDataStream: Reader) {
-        IngamePlayer()
-
         postRead(Common.jsoner.fromJson(IngamePlayer::class.java, worldDataStream))
     }
 

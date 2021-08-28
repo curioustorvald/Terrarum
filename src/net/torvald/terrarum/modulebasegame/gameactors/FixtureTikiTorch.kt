@@ -20,11 +20,11 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2016-06-17.
  */
-internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 2), nameFun = nameFun), Luminous {
+internal class FixtureTikiTorch : FixtureBase, Luminous {
 
     private val rng = HQRNG()
-    private val rndHash1: Int
-    private val rndHash2: Int
+    private val rndHash1 = rng.nextInt()
+    private val rndHash2 = rng.nextInt()
 
     override var color: Cvec
         get() = BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)
@@ -32,9 +32,15 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
             throw UnsupportedOperationException()
         }
 
-    override val lightBoxList: ArrayList<Hitbox>
+    override val lightBoxList: ArrayList<Hitbox> = ArrayList(1)
 
-    init {
+    private constructor()
+
+    constructor(nameFun: () -> String) : super(
+            BlockBox(BlockBox.NO_COLLISION, 1, 2),
+            nameFun = nameFun
+    ) {
+
         // loading textures
         CommonResourcePool.addToLoadingList("sprites-fixtures-tiki_torch.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32)
@@ -48,17 +54,12 @@ internal class FixtureTikiTorch(nameFun: () -> String) : FixtureBase(BlockBox(Bl
 
         setHitboxDimension(16, 32, 0, 0)
 
-        lightBoxList = ArrayList(1)
         lightBoxList.add(Hitbox(6.0, 5.0, 4.0, 3.0))
 
         makeNewSprite(CommonResourcePool.getAsTextureRegionPack("sprites-fixtures-tiki_torch.tga"))
         sprite!!.setRowsAndFrames(1, 2)
 
         actorValue[AVKey.BASEMASS] = MASS
-
-        rndHash1 = rng.nextInt()
-        rndHash2 = rng.nextInt()
-
     }
 
     private var nextDelay = 0.25f

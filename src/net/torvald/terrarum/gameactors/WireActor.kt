@@ -14,7 +14,7 @@ import net.torvald.terrarum.toInt
  *
  * Created by minjaesong on 2021-07-30.
  */
-class WireActor(id: ActorID) : ActorWithBody(RenderOrder.OVERLAY, PhysProperties.IMMOBILE, id) {
+class WireActor : ActorWithBody {
 
     companion object {
         val WIRE_NEARBY = arrayOf(
@@ -24,6 +24,10 @@ class WireActor(id: ActorID) : ActorWithBody(RenderOrder.OVERLAY, PhysProperties
                 (0 to -1) // tileT
         )
     }
+
+    private constructor()
+
+    constructor(id: ActorID) : super(RenderOrder.OVERLAY, PhysProperties.IMMOBILE, id)
 
     init {
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)

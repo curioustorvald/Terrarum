@@ -27,33 +27,40 @@ interface Electric {
 /**
  * Created by minjaesong on 2016-06-17.
  */
-open class FixtureBase(
-        blockBox0: BlockBox,
-        val blockBoxProps: BlockBoxProps = BlockBoxProps(0),
-        renderOrder: RenderOrder = RenderOrder.MIDDLE,
-        val nameFun: () -> String,
-        val mainUI: UICanvas? = null,
-        val inventory: FixtureInventory? = null,
-        id: ActorID? = null
-// disabling physics (not allowing the fixture to move) WILL make things easier in many ways
-) : ActorWithBody(renderOrder, PhysProperties.IMMOBILE, id), CuedByTerrainChange {
+open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
-    var blockBox: BlockBox = blockBox0
-        protected set // something like TapestryObject will want to redefine this
+    lateinit var blockBox: BlockBox // something like TapestryObject will want to redefine this
     fun blockBoxIndexToPoint2i(it: BlockBoxIndex): Point2i = this.blockBox.width.let { w -> Point2i(it % w, it / w) }
+    var blockBoxProps: BlockBoxProps = BlockBoxProps(0)
+    var nameFun: () -> String = { "" }
+    var mainUI: UICanvas? = null
+    var inventory: FixtureInventory? = null
 
+    protected constructor()
 
+    constructor(blockBox0: BlockBox,
+                blockBoxProps: BlockBoxProps = BlockBoxProps(0),
+                renderOrder: RenderOrder = RenderOrder.MIDDLE,
+                nameFun: () -> String,
+                mainUI: UICanvas? = null,
+                inventory: FixtureInventory? = null,
+                id: ActorID? = null) : super(renderOrder, PhysProperties.IMMOBILE, id) {
+        blockBox = blockBox0
+        this.blockBoxProps = blockBoxProps
+        this.renderOrder = renderOrder
+        this.nameFun = nameFun
+        this.mainUI = mainUI
+        this.inventory = inventory
+
+        if (mainUI != null)
+            AppLoader.disposableSingletonsPool.add(mainUI)
+    }
 
     /**
      * Tile-wise position of this fixture when it's placed on the world, top-left origin. Null if it's not on the world
      */
     var worldBlockPos: Point2i? = null
         private set
-
-    init {
-        if (mainUI != null)
-            AppLoader.disposableSingletonsPool.add(mainUI)
-    }
 
     fun forEachBlockbox(action: (Int, Int) -> Unit) {
         worldBlockPos!!.let { (posX, posY) ->
