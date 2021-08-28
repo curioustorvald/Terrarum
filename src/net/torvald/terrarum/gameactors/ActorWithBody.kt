@@ -310,7 +310,7 @@ open class ActorWithBody : Actor {
     var isWalkingH = false
     var isWalkingV = false
 
-    @Transient private var stairPenaltyMax = 1
+    private var stairPenaltyMax = 1
     private var stairPenaltyCounter = 0 // unit: update count. 1 second is roughly 64 updates.
     private var stairPenaltyVector = 1.0
 
