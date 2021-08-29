@@ -2,9 +2,9 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
@@ -90,7 +90,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         // add blockmarking_actor into the actorlist
         (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor).let {
             it.isVisible = false // make sure the actor is invisible on new instance
-            try { addNewActor(it) } catch (e: Error) {}
+            try { addNewActor(it) } catch (e: ReferencedActorAlreadyExistsException) {}
         }
 
 
@@ -189,7 +189,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     fun getActorByID(ID: Int): Actor {
         if (actorContainerActive.size == 0 && actorContainerInactive.size == 0)
-            throw IllegalArgumentException("Actor with ID $ID does not exist.")
+            throw NoSuchActorWithIDException(ID)
 
         var actor = actorContainerActive.searchFor(ID) { it.referenceID }
         if (actor == null) {
@@ -201,7 +201,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
                         "Actor with ID $ID does not exist.",
                         null, JOptionPane.ERROR_MESSAGE
                 )*/
-                throw IllegalArgumentException("Actor with ID $ID does not exist.")
+                throw NoSuchActorWithIDException(ID)
             }
             else
                 return actor
@@ -245,7 +245,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         if (actor == null) return
 
         if (theGameHasActor(actor.referenceID)) {
-            throw Error("The actor $actor already exists in the game")
+            throw ReferencedActorAlreadyExistsException(actor)
         }
         else {
             actorContainerActive.add(actor)
@@ -291,3 +291,8 @@ inline fun Lock.lock(body: () -> Unit) {
         this.unlock()
     }
 }
+
+class NoSuchActorWithIDException(id: ActorID) : Exception("Actor with ID $id does not exist.")
+class NoSuchActorWithRefException(actor: Actor) : Exception("No such actor in the game: $actor")
+class ReferencedActorAlreadyExistsException(actor: Actor) : Exception("The actor $actor already exists in the game")
+class ProtectedActorRemovalException(whatisit: String) : Exception("Attempted to removed protected actor '$whatisit'")

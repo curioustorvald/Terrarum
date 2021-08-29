@@ -14,7 +14,8 @@ import java.math.BigInteger
 object WriteActor {
 
     operator fun invoke(actor: IngamePlayer): String {
-        return Common.jsoner.toJson(actor)
+        val s = Common.jsoner.toJson(actor, actor.javaClass)
+        return """{"class":"${actor.javaClass.canonicalName}",${s.substring(1)}"""
     }
 
     fun encodeToByteArray64(actor: IngamePlayer): ByteArray64 {

@@ -22,11 +22,9 @@ object CommandDict {
             "togglenoclip" to ToggleNoClip,
             "nc" to ToggleNoClip,
             "setlocale" to SetLocale,
-            //"zoom" to Zoom,
             "teleport" to Teleport,
             "tp" to Teleport,
             "cat" to CatStdout,
-            "exportav" to ExportAV,
             "setgl" to SetGlobalLightOverride,
             "getfaction" to GetFactioning,
             "auth" to Authenticator,
@@ -43,11 +41,12 @@ object CommandDict {
             "actorslist" to ActorsList,
             "setscale" to SetScale,
             "kill" to KillActor,
-            "money" to MoneyDisp,
             "screenshot" to TakeScreenshot,
             "resize" to ResizeScreen,
+            "possess" to Possess,
 
             // Test codes
+            "money" to MoneyDisp,
             "bulletintest" to SetBulletin,
             "tips" to PrintRandomTips,
             "langtest" to LangTest,
@@ -60,6 +59,7 @@ object CommandDict {
             "spawnlunarlander" to SpawnPhysTestLunarLander,
             "savetest" to SavegameWriterTest,
 
+            "exportav" to ExportAV,
             /* !! */"exportmeta" to ExportMeta,
             /* !! */"exportworld" to ExportWorld,
             /* !! */"exportactor" to ExportActor,

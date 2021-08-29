@@ -27,7 +27,7 @@ open class WriteMeta(val ingame: TerrarumIngame) {
 "randseed1": ${RoguelikeRandomiser.RNG.state1},
 "weatseed0": ${WeatherMixer.RNG.state0},
 "weatseed1": ${WeatherMixer.RNG.state1},
-"playerid": ${ingame.theRealGamer.referenceID},
+"playerid": ${ingame.actorGamer.referenceID},
 "creation_t": ${world.creationTime},
 "lastplay_t": ${world.lastPlayTime},
 "playtime_t": ${world.totalPlayTime},

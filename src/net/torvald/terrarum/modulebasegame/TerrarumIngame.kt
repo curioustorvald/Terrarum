@@ -207,8 +207,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameLoadMode: GameLoadMode
     lateinit var gameLoadInfoPayload: Any
-    lateinit var theRealGamer: IngamePlayer
-        // get() = actorGamer as IngamePlayer
 
 
 
@@ -255,7 +253,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         actorNowPlaying = actor
-        theRealGamer = actor
         addNewActor(actorNowPlaying)
     }
 
@@ -736,23 +733,23 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // check if currently pocessed actor is removed from game
         if (!theGameHasActor(actorNowPlaying)) {
             // re-possess canonical player
-            if (theGameHasActor(Terrarum.PLAYER_REF_ID))
-                changePossession(Terrarum.PLAYER_REF_ID)
+            if (theGameHasActor(actorGamer))
+                changePossession(actorGamer)
             else
-                changePossession(0x51621D) // FIXME fallback debug mode (FIXME is there for a reminder visible in ya IDE)
+                actorNowPlaying = null
         }
     }
 
-    private fun changePossession(newActor: ActorHumanoid) {
+    internal fun changePossession(newActor: ActorHumanoid) {
         if (!theGameHasActor(actorNowPlaying)) {
-            throw IllegalArgumentException("No such actor in the game: $newActor")
+            throw NoSuchActorWithRefException(newActor)
         }
 
         actorNowPlaying = newActor
         //WorldSimulator(actorNowPlaying, AppLoader.getSmoothDelta().toFloat())
     }
 
-    private fun changePossession(refid: Int) {
+    internal fun changePossession(refid: Int) {
         val actorToChange = getActorByID(refid)
 
         if (actorToChange !is ActorHumanoid) {
@@ -916,8 +913,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun removeActor(actor: Actor?) {
         if (actor == null) return
 
-        if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
-            throw RuntimeException("Attempted to remove player.")
+        if (actor.referenceID == actorGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
+            throw ProtectedActorRemovalException("Player")
 
         forceRemoveActor(actor)
     }
@@ -970,7 +967,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         if (actor == null) return
 
         if (AppLoader.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID)) {
-            throw Error("The actor $actor already exists in the game")
+            throw ReferencedActorAlreadyExistsException(actor)
         }
         else {
             if (actor.referenceID !in ReferencingRanges.ACTORS_WIRES && actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER) {
@@ -985,10 +982,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     fun activateDormantActor(actor: Actor) {
         if (AppLoader.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID)) {
-            if (isActive(actor.referenceID))
+            /*if (isActive(actor.referenceID))
                 throw Error("The actor $actor is already activated")
             else
-                throw Error("The actor $actor already exists in the game")
+                throw Error("The actor $actor already exists in the game")*/
+            return
         }
         else {
             actorContainerInactive.remove(actor)
