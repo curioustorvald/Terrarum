@@ -20,7 +20,7 @@ open class WriteMeta(val ingame: TerrarumIngame) {
         val world = ingame.world
         
         val json = """{
-"genver": 4,
+"genver": ${Common.GENVER},
 "savename": "${world.worldName}",
 "terrseed": ${world.generatorSeed},
 "randseed0": ${RoguelikeRandomiser.RNG.state0},

@@ -18,7 +18,7 @@ open class WriteWorld(val ingame: TerrarumIngame) {
     }
 
     fun encodeToByteArray64(): ByteArray64 {
-        val world = ingame.world
+        /*val world = ingame.world
         world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
 
@@ -38,6 +38,10 @@ open class WriteWorld(val ingame: TerrarumIngame) {
         Common.jsoner.toJson(world, wr)
         wr.flush(); wr.close()
 
+        return ba*/
+
+        val ba = ByteArray64()
+        this.invoke().toByteArray().forEach { ba.add(it) }
         return ba
     }
 

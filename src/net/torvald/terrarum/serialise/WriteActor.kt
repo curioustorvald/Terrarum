@@ -13,12 +13,12 @@ import java.math.BigInteger
  */
 object WriteActor {
 
-    operator fun invoke(actor: IngamePlayer): String {
+    operator fun invoke(actor: Actor): String {
         val s = Common.jsoner.toJson(actor, actor.javaClass)
         return """{"class":"${actor.javaClass.canonicalName}",${s.substring(1)}"""
     }
 
-    fun encodeToByteArray64(actor: IngamePlayer): ByteArray64 {
+    fun encodeToByteArray64(actor: Actor): ByteArray64 {
         val ba = ByteArray64()
         this.invoke(actor).toByteArray().forEach { ba.add(it) }
         return ba
