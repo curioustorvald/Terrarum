@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.console
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import net.torvald.terrarum.console.ConsoleAlias
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 //import net.torvald.terrarum.swingapp.IMStringReader
@@ -10,6 +11,7 @@ import net.torvald.terrarum.console.Echo
  * Created by minjaesong on 2017-02-05.
  */
 
+@ConsoleAlias("imtest")
 internal object JavaIMTest : ConsoleCommand {
 
     override fun execute(args: Array<String>) {

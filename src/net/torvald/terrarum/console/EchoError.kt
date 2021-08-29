@@ -7,6 +7,7 @@ import net.torvald.terrarum.ui.ConsoleWindow
 /**
  * Created by minjaesong on 2016-04-25.
  */
+@ConsoleAlias("error")
 internal object EchoError : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val argsWoHeader = Array(args.size - 1) { args[it + 1] }

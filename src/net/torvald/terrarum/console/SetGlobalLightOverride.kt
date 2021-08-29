@@ -7,6 +7,7 @@ import net.torvald.terrarum.weather.WeatherMixer
 /**
  * Created by minjaesong on 2016-02-17.
  */
+@ConsoleAlias("setgl")
 internal object SetGlobalLightOverride : ConsoleCommand {
 
     override fun execute(args: Array<String>) {

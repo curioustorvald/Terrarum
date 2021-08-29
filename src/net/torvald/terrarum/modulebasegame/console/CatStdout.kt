@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import net.torvald.terrarum.console.ConsoleAlias
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import java.io.IOException
@@ -9,6 +10,7 @@ import java.nio.file.Files
 /**
  * Created by minjaesong on 2016-02-10.
  */
+@ConsoleAlias("cat")
 internal object CatStdout : ConsoleCommand {
     override fun execute(args: Array<String>) {
 

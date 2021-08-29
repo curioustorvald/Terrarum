@@ -14,7 +14,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: Pocketed? = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
+    private var target: Pocketed? = null
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {

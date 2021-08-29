@@ -2,6 +2,7 @@ package net.torvald.terrarum.console
 
 import net.torvald.terrarum.AppLoader
 
+@ConsoleNoExport
 object TakeScreenshot: ConsoleCommand {
     override fun execute(args: Array<String>) {
         AppLoader.requestScreenshot()

@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.console.ConsoleAlias
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
@@ -12,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 /**
  * Created by minjaesong on 2016-01-24.
  */
+@ConsoleAlias("tp,goto")
 internal object Teleport : ConsoleCommand {
 
     override fun execute(args: Array<String>) {

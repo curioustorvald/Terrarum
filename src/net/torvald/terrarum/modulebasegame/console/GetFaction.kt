@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
@@ -12,12 +12,7 @@ import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 /**
  * Created by minjaesong on 2016-02-17.
  */
-internal object GetFactioning : ConsoleCommand {
-    val ccW = GameFontBase.toColorCode(0xFFFF)
-    val ccY = GameFontBase.toColorCode(0xFE8F)
-    val ccM = GameFontBase.toColorCode(0xEAFF)
-    val ccG = GameFontBase.toColorCode(0x8F8F)
-    val ccK = GameFontBase.toColorCode(0x888F)
+internal object GetFaction : ConsoleCommand {
 
     private val PRINT_INDENTATION = "$ccK    --> $ccW"
 

@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.terrarum.ccO
 import net.torvald.terrarum.console.CommandDict
+import net.torvald.terrarum.console.ConsoleAlias
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.langpack.Lang
@@ -11,6 +12,7 @@ import java.util.Formatter
 /**
  * Created by minjaesong on 2016-01-16.
  */
+@ConsoleAlias("codex")
 internal object CodexEdictis : ConsoleCommand {
 
     override fun execute(args: Array<String>) {

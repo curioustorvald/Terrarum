@@ -24,6 +24,7 @@ import org.apache.commons.codec.digest.DigestUtils
  *
  * Created by minjaesong on 2016-02-19.
  */
+@ConsoleAlias("auth")
 internal object Authenticator : ConsoleCommand {
 
     private var a = false

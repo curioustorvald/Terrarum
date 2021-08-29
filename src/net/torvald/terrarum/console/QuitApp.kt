@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 /**
  * Created by minjaesong on 2016-01-15.
  */
+@ConsoleAlias("qqq")
 internal object QuitApp : ConsoleCommand {
 
     override fun execute(args: Array<String>) {

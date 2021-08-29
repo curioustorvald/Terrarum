@@ -18,6 +18,7 @@ import com.github.strikerx3.jxinput.XInputDevice;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.concurrent.ThreadExecutor;
+import net.torvald.terrarum.console.ConsoleCommand;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
@@ -28,6 +29,7 @@ import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
+import net.torvald.terrarum.modulebasegame.console.ToggleNoClip;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
@@ -1138,20 +1140,29 @@ public class AppLoader implements ApplicationListener {
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            System.out.println("[" + out + "] " + message.toString());
+            if (message == null)
+                System.out.println("[" + out + "] null");
+            else
+                System.out.println("[" + out + "] " + message.toString());
         }
     }
 
     public static void printdbgerr(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            System.err.println("[" + out + "] " + message.toString());
+            if (message == null)
+                System.err.println("[" + out + "] null");
+            else
+                System.err.println("[" + out + "] " + message.toString());
         }
     }
 
     public static void printmsg(Object obj, Object message) {
         String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-        System.out.println("[" + out + "] " + message.toString());
+        if (message == null)
+            System.out.println("[" + out + "] null");
+        else
+            System.out.println("[" + out + "] " + message.toString());
     }
 
     public static ShaderProgram loadShaderFromFile(String vert, String frag) {

@@ -16,3 +16,6 @@ interface ConsoleCommand {
     fun printUsage()
 
 }
+
+annotation class ConsoleAlias(val aliasesCSV: String)
+annotation class ConsoleNoExport()

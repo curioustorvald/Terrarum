@@ -3,6 +3,7 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.TerrarumScreenSize
 
+@ConsoleAlias("resize")
 object ResizeScreen: ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 3) {

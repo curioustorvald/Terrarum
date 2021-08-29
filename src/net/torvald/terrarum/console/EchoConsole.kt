@@ -3,6 +3,7 @@ package net.torvald.terrarum.console
 /**
  * Created by minjaesong on 2016-09-07.
  */
+@ConsoleAlias("println")
 internal object EchoConsole : ConsoleCommand {
     /**
      * Args 0: command given

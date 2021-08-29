@@ -16,14 +16,15 @@ internal object CommandInterpreter {
     private val commandsNoAuth = arrayOf(
             "auth",
             "qqq",
-            "zoom",
             "setlocale",
             "getlocale",
             "help",
             "version",
             "tips",
             "screenshot",
-            "resize"
+            "resize",
+            "echo",
+            "error"
     )
 
     internal fun execute(command: String) {
@@ -38,7 +39,7 @@ internal object CommandInterpreter {
             var commandObj: ConsoleCommand? = null
             try {
                 if (single_command.name.toLowerCase().startsWith("qqq")) {
-                    commandObj = CommandDict["qqq"]
+                    commandObj = CommandDict["QuitApp"]
                 }
                 else if (commandsNoAuth.contains(single_command.name.toLowerCase())) {
                     commandObj = CommandDict[single_command.name.toLowerCase()]

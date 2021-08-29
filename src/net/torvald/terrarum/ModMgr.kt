@@ -43,6 +43,7 @@ object ModMgr {
             val properName: String,
             val description: String,
             val author: String,
+            val packageName: String,
             val entryPoint: String,
             val releaseDate: String,
             val version: String,
@@ -96,13 +97,14 @@ object ModMgr {
                 val properName = modMetadata.getProperty("propername")
                 val description = modMetadata.getProperty("description")
                 val author = modMetadata.getProperty("author")
+                val packageName = modMetadata.getProperty("package")
                 val entryPoint = modMetadata.getProperty("entrypoint")
                 val releaseDate = modMetadata.getProperty("releasedate")
                 val version = modMetadata.getProperty("version")
                 val libs = modMetadata.getProperty("libraries").split(Regex(""";[ ]*""")).toTypedArray()
                 val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
                 val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs, dependency)
+                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, packageName, entryPoint, releaseDate, version, libs, dependency)
 
                 printdbg(this, moduleInfo[moduleName])
 

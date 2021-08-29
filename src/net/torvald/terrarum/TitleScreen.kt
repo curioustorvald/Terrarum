@@ -14,6 +14,7 @@ import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
@@ -154,6 +155,10 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         uiContainer.add(uiMenu)
+
+        CommandDict // invoke
+        // TODO add console here
+
 
         //loadDone = true
     }
