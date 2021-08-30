@@ -11,11 +11,17 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64OutputStream
+import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
+import java.io.Reader
 import java.io.Writer
 import java.math.BigInteger
+import java.nio.CharBuffer
 import java.nio.channels.ClosedChannelException
+import java.nio.charset.Charset
+import java.nio.charset.CharsetDecoder
+import java.nio.charset.UnsupportedCharsetException
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
@@ -28,6 +34,8 @@ object Common {
     const val COMP_NONE = 0
     const val COMP_GZIP = 1
     const val COMP_LZMA = 2
+
+    val CHARSET = Charsets.UTF_8
 
     /** dispose of the `offendingObject` after rejection! */
     class BlockLayerHashMismatchError(val oldHash: String, val newHash: String, val offendingObject: BlockLayer) : Error("Old Hash $oldHash != New Hash $newHash")
@@ -305,4 +313,100 @@ class ByteArray64Writer() : Writer() {
     override fun flush() {}
 
     fun toByteArray64() = if (closed) ba64 else throw IllegalAccessException("Writer not closed")
+}
+
+class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader() {
+
+    private val acceptableCharsets = arrayOf(Charsets.UTF_8, Charset.forName("CP437"))
+
+    init {
+        if (!acceptableCharsets.contains(charset))
+            throw UnsupportedCharsetException(charset.name())
+    }
+
+    private var readCursor = 0L
+    private val remaining
+        get() = ba.size - readCursor
+
+    /**
+     *   U+0000 .. U+007F 	0xxxxxxx
+     *   U+0080 .. U+07FF 	110xxxxx 	10xxxxxx
+     *   U+0800 .. U+FFFF 	1110xxxx 	10xxxxxx 	10xxxxxx
+     * U+10000 .. U+10FFFF 	11110xxx 	10xxxxxx 	10xxxxxx 	10xxxxxx
+     */
+    private fun utf8GetBytes(head: Byte) = when (head.toInt() and 255) {
+        in 0b11110_000..0b11110_111 -> 4
+        in 0b1110_0000..0b1110_1111 -> 3
+        in 0b110_00000..0b110_11111 -> 2
+        in 0b0_0000000..0b0_1111111 -> 1
+        else -> throw IllegalArgumentException("Invalid UTF-8 Character head byte: ${head.toInt() and 255}")
+    }
+
+    /**
+     * @param list of bytes that encodes one unicode character. Get required byte length using [utf8GetBytes].
+     * @return A codepoint of the character.
+     */
+    private fun utf8decode(bytes0: List<Byte>): Int {
+        val bytes = bytes0.map { it.toInt() and 255 }
+        var ret = when (bytes.size) {
+            4 -> (bytes[0] and 7) shl 15
+            3 -> (bytes[0] and 15) shl 10
+            2 -> (bytes[0] and 31) shl 5
+            1 -> (bytes[0] and 127)
+            else -> throw IllegalArgumentException("Expected bytes size: 1..4, got ${bytes.size}")
+        }
+        bytes.tail().forEachIndexed { index, byte ->
+            ret = ret or (byte and 63).shl(5 * (2 - index))
+        }
+        return ret
+    }
+
+    override fun read(cbuf: CharArray, off: Int, len: Int): Int {
+        var readCount = 0
+
+        when (charset) {
+            Charsets.UTF_8 -> {
+                while (readCount < len && remaining > 0) {
+                    val bbuf = (0..minOf(3L, remaining)).map { ba[readCursor + it] }
+                    val codePoint = utf8decode(bbuf.subList(0, utf8GetBytes(bbuf[0])))
+
+                    if (codePoint < 65536) {
+                        cbuf[off + readCount] = codePoint.toChar()
+                        readCount += 1
+                        readCursor += bbuf.size
+                    }
+                    else {
+                        /*
+                         * U' = yyyyyyyyyyxxxxxxxxxx  // U - 0x10000
+                         * W1 = 110110yyyyyyyyyy      // 0xD800 + yyyyyyyyyy
+                         * W2 = 110111xxxxxxxxxx      // 0xDC00 + xxxxxxxxxx
+                         */
+                        val surroLead = (0xD800 or codePoint.ushr(10)).toChar()
+                        val surroTrail = (0xDC00 or codePoint.and(1023)).toChar()
+
+                        cbuf[off + readCount] = surroLead
+                        cbuf[off + readCount + 1] = surroTrail
+
+                        readCount += 2
+                        readCursor + 4
+                    }
+                }
+            }
+            Charset.forName("CP437") -> {
+                for (i in 0 until minOf(len.toLong(), remaining)) {
+                    cbuf[(off + i).toInt()] = ba[readCursor].toChar()
+                    readCursor += 1
+                    readCount += 1
+                }
+            }
+            else -> throw UnsupportedCharsetException(charset.name())
+        }
+
+        return readCount
+    }
+
+    override fun close() { readCursor = 0L }
+    override fun reset() { readCursor = 0L }
+    override fun markSupported() = false
+
 }

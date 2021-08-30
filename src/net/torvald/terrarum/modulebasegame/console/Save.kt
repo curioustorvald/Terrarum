@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntry
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntryContent
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.EntryFile
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteActor
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.serialise.WriteWorld
@@ -39,7 +40,7 @@ object Save : ConsoleCommand {
                 val creation_t = VDUtil.currentUnixtime
                 val time_t = VDUtil.currentUnixtime
 
-                val disk = VDUtil.createNewDisk(1L shl 60, savename, Charsets.UTF_8)
+                val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
 
                 // NOTE: don't bother with the entryID of DiskEntries; it will be overwritten anyway
 

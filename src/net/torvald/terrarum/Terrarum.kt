@@ -628,3 +628,5 @@ interface Id_UICanvasNullable {
 // head and last use first() and last()
 fun <T> Array<T>.tail() = this.sliceArray(1 until this.size)
 fun <T> Array<T>.init() = this.sliceArray(0 until this.lastIndex)
+fun <T> List<T>.tail() = this.subList(1, this.size)
+fun <T> List<T>.init() = this.subList(0, this.lastIndex)
