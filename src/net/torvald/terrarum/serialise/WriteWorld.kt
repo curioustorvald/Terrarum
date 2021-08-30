@@ -2,6 +2,7 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64OutputStream
 import java.io.Writer
 
@@ -18,31 +19,21 @@ open class WriteWorld(val ingame: TerrarumIngame) {
     }
 
     fun encodeToByteArray64(): ByteArray64 {
-        /*val world = ingame.world
+        val world = ingame.world
         world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
 
-        val ba = ByteArray64()
-        val bao = ByteArray64OutputStream(ba)
-        val wr = object : Writer() {
-            override fun close() {
-            }
+        val baw = ByteArray64Writer()
 
-            override fun flush() {
-            }
+        Common.jsoner.toJson(world, baw)
+        baw.flush(); baw.close()
 
-            override fun write(cbuf: CharArray, off: Int, len: Int) {
-                bao.write(cbuf.copyOfRange(off, off + len).toString().toByteArray())
-            }
-        }
-        Common.jsoner.toJson(world, wr)
-        wr.flush(); wr.close()
+        return baw.toByteArray64()
 
-        return ba*/
 
-        val ba = ByteArray64()
+        /*val ba = ByteArray64()
         this.invoke().toByteArray().forEach { ba.add(it) }
-        return ba
+        return ba*/
     }
 
 }

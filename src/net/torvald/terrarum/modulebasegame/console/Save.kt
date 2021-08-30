@@ -41,20 +41,22 @@ object Save : ConsoleCommand {
 
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Charsets.UTF_8)
 
+                // NOTE: don't bother with the entryID of DiskEntries; it will be overwritten anyway
+
                 val metaContent = EntryFile(WriteMeta(ingame).encodeToByteArray64())
-                val meta = DiskEntry(32768, 0, "savegame.json".toByteArray(), creation_t, time_t, metaContent)
-                VDUtil.addFile(disk, 0, meta, false)
+                val meta = DiskEntry(0, 0, "savegame".toByteArray(), creation_t, time_t, metaContent)
+                VDUtil.addFile(disk, 0, meta)
 
                 val worldContent = EntryFile(WriteWorld(ingame).encodeToByteArray64())
-                val world = DiskEntry(ingame.world.worldIndex, 0, "world${ingame.world.worldIndex}.json".toByteArray(), creation_t, time_t, worldContent)
-                VDUtil.addFile(disk, 0, world, false)
+                val world = DiskEntry(0, 0, "world${ingame.world.worldIndex}".toByteArray(), creation_t, time_t, worldContent)
+                VDUtil.addFile(disk, 0, world)
 
                 listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
                     actors.forEach {
                         if (acceptable(it)) {
                             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                            val actor = DiskEntry(it.referenceID, 0, "actor${it.referenceID}.json".toByteArray(), creation_t, time_t, actorContent)
-                            VDUtil.addFile(disk, 0, actor, false)
+                            val actor = DiskEntry(0, 0, "actor${it.referenceID}".toByteArray(), creation_t, time_t, actorContent)
+                            VDUtil.addFile(disk, 0, actor)
                         }
                     }
                 }

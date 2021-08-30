@@ -10,9 +10,12 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64OutputStream
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
+import java.io.Writer
 import java.math.BigInteger
+import java.nio.channels.ClosedChannelException
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
@@ -188,7 +191,6 @@ object Common {
         var bai = 0
         val buf = IntArray(4) { Ascii85.PAD_BYTE }
         ba.forEach {
-//        b.bytesIterator().forEachRemaining {
             if (bai > 0 && bai % 4 == 0) {
                 sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
                 buf.fill(Ascii85.PAD_BYTE)
@@ -235,7 +237,6 @@ object Common {
         var writeCursor = 0L
         val sb = StringBuilder()
         unzipdBytes.forEach {
-//        unasciidBytes.forEach {
             if (writeCursor < layer.ptr.size) {
 
                 if (writeCursor < 1024) {
@@ -262,4 +263,46 @@ object Common {
 
         return layer
     }
+}
+
+class ByteArray64Writer() : Writer() {
+
+    private var closed = false
+    private val ba64 = ByteArray64()
+
+    init {
+        this.lock = ba64
+    }
+
+    private fun checkOpen() {
+        if (closed) throw ClosedChannelException()
+    }
+
+    override fun write(c: Int) {
+        checkOpen()
+        "${c.toChar()}".toByteArray().forEach { ba64.add(it) }
+    }
+
+    override fun write(cbuf: CharArray) {
+        checkOpen()
+        write(String(cbuf))
+    }
+
+    override fun write(str: String) {
+        checkOpen()
+        str.toByteArray().forEach { ba64.add(it) }
+    }
+
+    override fun write(cbuf: CharArray, off: Int, len: Int) {
+        write(cbuf.copyOfRange(off, off + len))
+    }
+
+    override fun write(str: String, off: Int, len: Int) {
+        write(str.substring(off, off + len))
+    }
+
+    override fun close() { closed = true }
+    override fun flush() {}
+
+    fun toByteArray64() = if (closed) ba64 else throw IllegalAccessException("Writer not closed")
 }
