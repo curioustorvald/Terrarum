@@ -10,10 +10,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntry
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntryContent
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.EntryFile
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteActor
 import net.torvald.terrarum.serialise.WriteMeta
@@ -32,6 +29,12 @@ object Save : ConsoleCommand {
                actor != (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor)
     }
 
+    private fun addFile(disk: VirtualDisk, file: DiskEntry) {
+        VDUtil.getAsDirectory(disk, 0).add(file.entryID)
+        disk.entries[file.entryID] = file
+        file.parentEntryID = 0
+    }
+
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
@@ -45,19 +48,19 @@ object Save : ConsoleCommand {
                 // NOTE: don't bother with the entryID of DiskEntries; it will be overwritten anyway
 
                 val metaContent = EntryFile(WriteMeta(ingame).encodeToByteArray64())
-                val meta = DiskEntry(0, 0, "savegame".toByteArray(), creation_t, time_t, metaContent)
-                VDUtil.addFile(disk, 0, meta)
+                val meta = DiskEntry(-1, 0, "savegame".toByteArray(), creation_t, time_t, metaContent)
+                addFile(disk, meta)
 
                 val worldContent = EntryFile(WriteWorld(ingame).encodeToByteArray64())
-                val world = DiskEntry(0, 0, "world${ingame.world.worldIndex}".toByteArray(), creation_t, time_t, worldContent)
-                VDUtil.addFile(disk, 0, world)
+                val world = DiskEntry(ingame.world.worldIndex, 0, "world${ingame.world.worldIndex}".toByteArray(), creation_t, time_t, worldContent)
+                addFile(disk, world)
 
                 listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
                     actors.forEach {
                         if (acceptable(it)) {
                             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                            val actor = DiskEntry(0, 0, "actor${it.referenceID}".toByteArray(), creation_t, time_t, actorContent)
-                            VDUtil.addFile(disk, 0, actor)
+                            val actor = DiskEntry(it.referenceID, 0, "actor${it.referenceID}".toByteArray(), creation_t, time_t, actorContent)
+                            addFile(disk, actor)
                         }
                     }
                 }

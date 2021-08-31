@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
@@ -20,7 +21,12 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 open class DroppedItem : ActorWithBody {
 
     private var itemID: ItemID = ""
-    private val textureRegion = ItemCodex.getItemImage(itemID)
+        set(value) {
+            field = value
+            textureRegion = ItemCodex.getItemImage(itemID)!!
+        }
+
+    @Transient private lateinit var textureRegion: TextureRegion
 
     var itemCount = 1
 
