@@ -23,17 +23,12 @@ open class WriteWorld(val ingame: TerrarumIngame) {
         world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
 
-        val baw = ByteArray64Writer()
+        val baw = ByteArray64Writer(Common.CHARSET)
 
         Common.jsoner.toJson(world, baw)
         baw.flush(); baw.close()
 
         return baw.toByteArray64()
-
-
-        /*val ba = ByteArray64()
-        this.invoke().toByteArray().forEach { ba.add(it) }
-        return ba*/
     }
 
 }

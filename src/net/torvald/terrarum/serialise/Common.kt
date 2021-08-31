@@ -3,6 +3,7 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
@@ -10,17 +11,14 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64OutputStream
 import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.Reader
 import java.io.Writer
 import java.math.BigInteger
-import java.nio.CharBuffer
 import java.nio.channels.ClosedChannelException
 import java.nio.charset.Charset
-import java.nio.charset.CharsetDecoder
 import java.nio.charset.UnsupportedCharsetException
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
@@ -273,7 +271,7 @@ object Common {
     }
 }
 
-class ByteArray64Writer() : Writer() {
+class ByteArray64Writer(val charset: Charset) : Writer() {
 
     private var closed = false
     private val ba64 = ByteArray64()
@@ -288,7 +286,7 @@ class ByteArray64Writer() : Writer() {
 
     override fun write(c: Int) {
         checkOpen()
-        "${c.toChar()}".toByteArray().forEach { ba64.add(it) }
+        "${c.toChar()}".toByteArray(charset).forEach { ba64.add(it) }
     }
 
     override fun write(cbuf: CharArray) {
@@ -298,7 +296,7 @@ class ByteArray64Writer() : Writer() {
 
     override fun write(str: String) {
         checkOpen()
-        str.toByteArray().forEach { ba64.add(it) }
+        str.toByteArray(charset).forEach { ba64.add(it) }
     }
 
     override fun write(cbuf: CharArray, off: Int, len: Int) {
@@ -334,7 +332,7 @@ class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader() {
      *   U+0800 .. U+FFFF 	1110xxxx 	10xxxxxx 	10xxxxxx
      * U+10000 .. U+10FFFF 	11110xxx 	10xxxxxx 	10xxxxxx 	10xxxxxx
      */
-    private fun utf8GetBytes(head: Byte) = when (head.toInt() and 255) {
+    private fun utf8GetCharLen(head: Byte) = when (head.toInt() and 255) {
         in 0b11110_000..0b11110_111 -> 4
         in 0b1110_0000..0b1110_1111 -> 3
         in 0b110_00000..0b110_11111 -> 2
@@ -343,23 +341,25 @@ class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader() {
     }
 
     /**
-     * @param list of bytes that encodes one unicode character. Get required byte length using [utf8GetBytes].
+     * @param list of bytes that encodes one unicode character. Get required byte length using [utf8GetCharLen].
      * @return A codepoint of the character.
      */
     private fun utf8decode(bytes0: List<Byte>): Int {
         val bytes = bytes0.map { it.toInt() and 255 }
         var ret = when (bytes.size) {
-            4 -> (bytes[0] and 7) shl 15
-            3 -> (bytes[0] and 15) shl 10
-            2 -> (bytes[0] and 31) shl 5
+            4 -> (bytes[0] and 7) shl 18
+            3 -> (bytes[0] and 15) shl 12
+            2 -> (bytes[0] and 31) shl 6
             1 -> (bytes[0] and 127)
             else -> throw IllegalArgumentException("Expected bytes size: 1..4, got ${bytes.size}")
         }
-        bytes.tail().forEachIndexed { index, byte ->
-            ret = ret or (byte and 63).shl(5 * (2 - index))
+        bytes.tail().reversed().forEachIndexed { index, byte ->
+            ret = ret or (byte and 63).shl(6 * index)
         }
         return ret
     }
+
+    private var surrogateLeftover = ' '
 
     override fun read(cbuf: CharArray, off: Int, len: Int): Int {
         var readCount = 0
@@ -367,28 +367,47 @@ class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader() {
         when (charset) {
             Charsets.UTF_8 -> {
                 while (readCount < len && remaining > 0) {
-                    val bbuf = (0..minOf(3L, remaining)).map { ba[readCursor + it] }
-                    val codePoint = utf8decode(bbuf.subList(0, utf8GetBytes(bbuf[0])))
+                    if (surrogateLeftover != ' ') {
+                        cbuf[off + readCount] = surrogateLeftover
 
-                    if (codePoint < 65536) {
-                        cbuf[off + readCount] = codePoint.toChar()
                         readCount += 1
-                        readCursor += bbuf.size
+                        surrogateLeftover = ' '
                     }
                     else {
-                        /*
+                        val bbuf = (0 until minOf(4L, remaining)).map { ba[readCursor + it] }
+                        val charLen = utf8GetCharLen(bbuf[0])
+                        val codePoint = utf8decode(bbuf.subList(0, charLen))
+
+                        if (codePoint < 65536) {
+                            cbuf[off + readCount] = codePoint.toChar()
+
+                            readCount += 1
+                            readCursor += charLen
+                        }
+                        else {
+                            /*
                          * U' = yyyyyyyyyyxxxxxxxxxx  // U - 0x10000
                          * W1 = 110110yyyyyyyyyy      // 0xD800 + yyyyyyyyyy
                          * W2 = 110111xxxxxxxxxx      // 0xDC00 + xxxxxxxxxx
                          */
-                        val surroLead = (0xD800 or codePoint.ushr(10)).toChar()
-                        val surroTrail = (0xDC00 or codePoint.and(1023)).toChar()
+                            val codPoin = codePoint - 65536
+                            val surroLead = (0xD800 or codPoin.ushr(10)).toChar()
+                            val surroTrail = (0xDC00 or codPoin.and(1023)).toChar()
 
-                        cbuf[off + readCount] = surroLead
-                        cbuf[off + readCount + 1] = surroTrail
+                            cbuf[off + readCount] = surroLead
 
-                        readCount += 2
-                        readCursor + 4
+                            if (off + readCount + 1 < cbuf.size) {
+                                cbuf[off + readCount + 1] = surroTrail
+
+                                readCount += 2
+                                readCursor += 4
+                            }
+                            else {
+                                readCount += 1
+                                readCursor += 4
+                                surrogateLeftover = surroTrail
+                            }
+                        }
                     }
                 }
             }
@@ -402,7 +421,7 @@ class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader() {
             else -> throw UnsupportedCharsetException(charset.name())
         }
 
-        return readCount
+        return if (readCount == 0) -1 else readCount
     }
 
     override fun close() { readCursor = 0L }

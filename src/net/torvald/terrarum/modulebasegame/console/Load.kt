@@ -26,7 +26,7 @@ object Load : ConsoleCommand {
                 val disk = VDUtil.readDiskArchive(file, charset = charset)
 
                 val metaFile = VDUtil.getFile(disk, VDUtil.VDPath("savegame", charset))!!
-                val metaReader = ByteArray64Reader(metaFile.contents.serialize().array)
+                val metaReader = ByteArray64Reader(metaFile.contents.serialize().array, charset)
                 val meta = Common.jsoner.fromJson(JsonValue::class.java, metaReader)
 
             }

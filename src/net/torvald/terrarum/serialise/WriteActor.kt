@@ -19,9 +19,12 @@ object WriteActor {
     }
 
     fun encodeToByteArray64(actor: Actor): ByteArray64 {
-        val ba = ByteArray64()
-        this.invoke(actor).toByteArray().forEach { ba.add(it) }
-        return ba
+        val baw = ByteArray64Writer(Common.CHARSET)
+
+        Common.jsoner.toJson(actor, actor.javaClass, baw)
+        baw.flush(); baw.close()
+
+        return baw.toByteArray64()
     }
 
 }

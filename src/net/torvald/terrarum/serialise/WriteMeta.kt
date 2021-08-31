@@ -36,28 +36,28 @@ open class WriteMeta(val ingame: TerrarumIngame) {
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray())
+    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
 }}",
 "items": "${StringBuilder().let {
     ModMgr.getFilesFromEveryMod("items/itemid.csv").forEach { (modname, file) ->
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray())
+    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
 }}",
 "wires": "${StringBuilder().let {
     ModMgr.getFilesFromEveryMod("wires/wires.csv").forEach { (modname, file) ->
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray())
+    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
 }}",
 "materials": "${StringBuilder().let {
     ModMgr.getFilesFromEveryMod("materials/materials.csv").forEach { (modname, file) ->
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray())
+    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
 }}",
 "loadorder": [${ModMgr.loadOrder.map { "\"${it}\"" }.joinToString()}],
 "worlds": [${ingame.gameworldIndices.joinToString()}]
@@ -68,7 +68,7 @@ open class WriteMeta(val ingame: TerrarumIngame) {
 
     fun encodeToByteArray64(): ByteArray64 {
         val ba = ByteArray64()
-        this.invoke().toByteArray().forEach { ba.add(it) }
+        this.invoke().toByteArray(Common.CHARSET).forEach { ba.add(it) }
         return ba
     }
 }
