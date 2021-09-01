@@ -1,12 +1,8 @@
 package net.torvald.terrarum.serialise
 
-import com.badlogic.gdx.utils.Json
-import com.badlogic.gdx.utils.JsonValue
-import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
-import java.math.BigInteger
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Writer
 
 /**
  * Created by minjaesong on 2021-08-24.

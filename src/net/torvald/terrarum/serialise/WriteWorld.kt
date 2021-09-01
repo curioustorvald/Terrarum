@@ -2,9 +2,7 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64OutputStream
-import java.io.Writer
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Writer
 
 /**
  * Created by minjaesong on 2021-08-23.

@@ -2,10 +2,6 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.Json
-import com.badlogic.gdx.utils.JsonWriter
-import com.badlogic.gdx.utils.compression.Lzma
-import net.torvald.UnsafePtrInputStream
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
@@ -14,16 +10,10 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.Ascii85
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.bytesToZipdStr
 import net.torvald.terrarum.utils.*
 import net.torvald.util.SortedArrayList
-import org.apache.commons.codec.digest.DigestUtils
 import org.dyn4j.geometry.Vector2
-import java.util.zip.GZIPOutputStream
 import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
@@ -49,7 +39,7 @@ class GameWorld() : Disposable {
         internal set
     var lastPlayTime: Long = AppLoader.getTIME_T()
         internal set // there's a case of save-and-continue-playing
-    var totalPlayTime: Int = 0
+    var totalPlayTime: Long = 0
         internal set
 
     /** Used to calculate play time */
@@ -119,7 +109,7 @@ class GameWorld() : Disposable {
     /**
      * Create new world
      */
-    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int): this() {
+    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Long): this() {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
 
         this.worldIndex = worldIndex

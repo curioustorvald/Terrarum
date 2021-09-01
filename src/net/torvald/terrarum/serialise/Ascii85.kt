@@ -6,8 +6,13 @@ package net.torvald.terrarum.serialise
  * just gzip the inputstream instead!
  */
 object Ascii85 {
-    /** As per RFC-1924 */
-    private const val CHAR_TABLE = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#${'$'}%&()*+-;<=>?@^_`{|}~"
+    /** My own string set that:
+     * - no "/": avoids nonstandard JSON comment key which GDX will happily parse away
+     * - no "\": you know what I mean\\intention
+     * - no "$": avoids Kotlin string template
+     * - no "[{]},": even the dumbest parser can comprehend the output
+     */
+    private const val CHAR_TABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#%&'()*+-.:;<=>?@^_`|~"
     /** As per Adobe standard */
     //private val CHAR_TABLE = (33 until (33+85)).toList().map { it.toChar() }.joinToString("") // testing only!
 
