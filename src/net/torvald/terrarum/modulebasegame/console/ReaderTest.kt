@@ -4,6 +4,8 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.serialise.ByteArray64Reader
 import net.torvald.terrarum.serialise.ByteArray64Writer
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.toUint
 import java.io.File
 
 /**
@@ -29,5 +31,20 @@ object ReaderTest : ConsoleCommand {
 
     override fun printUsage() {
         Echo("Usage: readertest")
+    }
+}
+
+object WriterTest : ConsoleCommand {
+    override fun execute(args: Array<String>) {
+        val str = "\ud83c\udfde"
+        val baw = ByteArray64Writer(Common.CHARSET)
+        str.forEach { baw.write(it.toInt()) }
+        baw.close()
+        baw.toByteArray64().forEach { print(it.toUint().toString(16).uppercase().padStart(2,'0')); print(" ") }
+        println()
+    }
+
+    override fun printUsage() {
+        Echo("Usage: writertest")
     }
 }

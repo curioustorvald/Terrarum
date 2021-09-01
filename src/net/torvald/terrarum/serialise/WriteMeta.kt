@@ -3,12 +3,16 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
 import net.torvald.terrarum.weather.WeatherMixer
 import java.io.ByteArrayInputStream
+import java.io.StringReader
+import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 /**
@@ -36,28 +40,28 @@ open class WriteMeta(val ingame: TerrarumIngame) {
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
+    zipStrAndEnascii(it.toString())
 }}",
 "items": "${StringBuilder().let {
     ModMgr.getFilesFromEveryMod("items/itemid.csv").forEach { (modname, file) ->
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
+    zipStrAndEnascii(it.toString())
 }}",
 "wires": "${StringBuilder().let {
     ModMgr.getFilesFromEveryMod("wires/wires.csv").forEach { (modname, file) ->
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
+    zipStrAndEnascii(it.toString())
 }}",
 "materials": "${StringBuilder().let {
     ModMgr.getFilesFromEveryMod("materials/materials.csv").forEach { (modname, file) ->
         it.append("\n\n## module: $modname ##\n\n")
         it.append(file.readText())
     }
-    bytesToZipdStr(it.toString().toByteArray(Common.CHARSET))
+    zipStrAndEnascii(it.toString())
 }}",
 "loadorder": [${ModMgr.loadOrder.map { "\"${it}\"" }.joinToString()}],
 "worlds": [${ingame.gameworldIndices.joinToString()}]
@@ -71,63 +75,22 @@ open class WriteMeta(val ingame: TerrarumIngame) {
         this.invoke().toByteArray(Common.CHARSET).forEach { ba.add(it) }
         return ba
     }
-}
 
-/**
- * @param b a ByteArray
- * @return Bytes in [b] which are GZip'd then Ascii85-encoded
- */
-fun bytesToZipdStr(b: ByteArray): String {
-    val sb = StringBuilder()
-    val bo = ByteArray64GrowableOutputStream()
-    val zo = GZIPOutputStream(bo)
+    data class WorldMeta(
+            val genver: Int,
+            val savename: String
+    )
 
-    b.forEach {
-        zo.write(it.toInt())
+    /**
+     * @param [s] a String
+     * @return UTF-8 encoded [s] which are GZip'd then Ascii85-encoded
+     */
+    fun zipStrAndEnascii(s: String): String {
+        return Common.bytesToZipdStr(s.toByteArray(Common.CHARSET).iterator())
     }
-    zo.flush(); zo.close()
 
-    val ba = bo.toByteArray64()
-    var bai = 0
-    val buf = IntArray(4) { Ascii85.PAD_BYTE }
-    ba.forEach {
-        if (bai > 0 && bai % 4 == 0) {
-            sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
-            buf.fill(Ascii85.PAD_BYTE)
-        }
-
-        buf[bai % 4] = it.toInt() and 255
-
-        bai += 1
-    }; sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
-
-    return sb.toString()
+    fun unasciiAndUnzipStr(s: String): String {
+        return ByteArray64Reader(Common.strToBytes(StringReader(s)), Common.CHARSET).readText()
+    }
 }
 
-/**
- * @param b a ByteArray
- * @return Bytes in [b] which are LZMA'd then Ascii85-encoded
- */
-fun bytesToLzmadStr(b: ByteArray): String {
-    val sb = StringBuilder()
-    val bi = ByteArrayInputStream(b)
-    val bo = ByteArray64GrowableOutputStream()
-
-    Lzma.compress(bi, bo); bo.flush(); bo.close()
-
-    val ba = bo.toByteArray64()
-    var bai = 0
-    val buf = IntArray(4) { Ascii85.PAD_BYTE }
-    ba.forEach {
-        if (bai > 0 && bai % 4 == 0) {
-            sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
-            buf.fill(Ascii85.PAD_BYTE)
-        }
-
-        buf[bai % 4] = it.toInt() and 255
-
-        bai += 1
-    }; sb.append(Ascii85.encode(buf[0], buf[1], buf[2], buf[3]))
-
-    return sb.toString()
-}

@@ -15,6 +15,7 @@ import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.Reader
+import java.io.StringReader
 import java.io.Writer
 import java.math.BigInteger
 import java.nio.channels.ClosedChannelException
@@ -182,12 +183,41 @@ object Common {
      * @return Bytes in [b] which are GZip'd then Ascii85-encoded
      */
     private fun blockLayerToStr(b: BlockLayer): String {
+        return bytesToZipdStr(b.bytesIterator())
+    }
+
+    private fun strToBlockLayer(layerInfo: LayerInfo): BlockLayer {
+        val layer = BlockLayer(layerInfo.x, layerInfo.y)
+        val unzipdBytes = strToBytes(StringReader(layerInfo.b))
+
+        // write to blocklayer and the digester
+        digester.reset()
+        var writeCursor = 0L
+        unzipdBytes.forEach {
+            if (writeCursor < layer.ptr.size) {
+                layer.ptr[writeCursor] = it
+                digester.update(it)
+                writeCursor += 1
+            }
+        }
+
+        // check hash
+        val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
+
+        if (hash != layerInfo.h) {
+            throw BlockLayerHashMismatchError(layerInfo.h, hash, layer)
+        }
+
+        return layer
+    }
+
+    fun bytesToZipdStr(byteIterator: Iterator<Byte>): String {
         val sb = StringBuilder()
         val bo = ByteArray64GrowableOutputStream()
         val zo = GZIPOutputStream(bo)
 
         // zip
-        b.bytesIterator().forEach {
+        byteIterator.forEach {
             zo.write(it.toInt())
         }
         zo.flush(); zo.close()
@@ -210,21 +240,22 @@ object Common {
         return sb.toString()
     }
 
-    private fun strToBlockLayer(layerInfo: LayerInfo): BlockLayer {
-        val layer = BlockLayer(layerInfo.x, layerInfo.y)
+    fun strToBytes(reader: Reader): ByteArray64 {
         val unasciidBytes = ByteArray64()
         val unzipdBytes = ByteArray64()
 
         // unascii
         var bai = 0
         val buf = CharArray(5) { Ascii85.PAD_CHAR }
-        layerInfo.b.forEach {
+        while (true) {
+            val char = reader.read()
+            if (char < 0) break
             if (bai > 0 && bai % 5 == 0) {
                 Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
                 buf.fill(Ascii85.PAD_CHAR)
             }
 
-            buf[bai % 5] = it
+            buf[bai % 5] = char.toChar()
 
             bai += 1
         }; Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
@@ -238,43 +269,22 @@ object Common {
         }
         zi.close()
 
-        // write to blocklayer and the digester
-        digester.reset()
-        var writeCursor = 0L
-        val sb = StringBuilder()
-        unzipdBytes.forEach {
-            if (writeCursor < layer.ptr.size) {
-
-                if (writeCursor < 1024) {
-                    sb.append("${it.tostr()} ")
-                }
-
-
-                layer.ptr[writeCursor] = it
-                digester.update(it)
-                writeCursor += 1
-            }
-        }
-
-
-//        printdbg(this, "post: $sb")
-
-
-        // check hash
-        val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
-
-        if (hash != layerInfo.h) {
-            throw BlockLayerHashMismatchError(layerInfo.h, hash, layer)
-        }
-
-        return layer
+        return unzipdBytes
     }
 }
 
 class ByteArray64Writer(val charset: Charset) : Writer() {
 
-    private var closed = false
+    private val acceptableCharsets = arrayOf(Charsets.UTF_8, Charset.forName("CP437"))
+
+    init {
+        if (!acceptableCharsets.contains(charset))
+            throw UnsupportedCharsetException(charset.name())
+    }
+
     private val ba64 = ByteArray64()
+    private var closed = false
+    private var surrogateBuf = 0
 
     init {
         this.lock = ba64
@@ -284,9 +294,54 @@ class ByteArray64Writer(val charset: Charset) : Writer() {
         if (closed) throw ClosedChannelException()
     }
 
+    private fun Int.isSurroHigh() = this.ushr(10) == 0b110110
+    private fun Int.isSurroLow() = this.ushr(10) == 0b110111
+    private fun Int.toUcode() = 'u' + this.toString(16).uppercase().padStart(4,'0')
+
+    /**
+     * @param c not a freakin' codepoint; just a Java's Char casted into Int
+     */
     override fun write(c: Int) {
         checkOpen()
-        "${c.toChar()}".toByteArray(charset).forEach { ba64.add(it) }
+        when (charset) {
+            Charsets.UTF_8 -> {
+                if (surrogateBuf == 0 && !c.isSurroHigh() && !c.isSurroLow())
+                    writeUtf8Codepoint(c)
+                else if (surrogateBuf == 0 && c.isSurroHigh())
+                    surrogateBuf = c
+                else if (surrogateBuf != 0 && c.isSurroLow())
+                    writeUtf8Codepoint(65536 + surrogateBuf.and(1023).shl(10) or c.and(1023))
+                // invalid surrogate pair input
+                else
+                    throw IllegalStateException("Surrogate high: ${surrogateBuf.toUcode()}, surrogate low: ${c.toUcode()}")
+            }
+            Charset.forName("CP437") -> {
+                ba64.add(c.toByte())
+            }
+            else -> throw UnsupportedCharsetException(charset.name())
+        }
+    }
+
+    fun writeUtf8Codepoint(codepoint: Int) {
+        when (codepoint) {
+            in 0..127 -> ba64.add(codepoint.toByte())
+            in 128..2047 -> {
+                ba64.add((0xC0 or codepoint.ushr(6).and(31)).toByte())
+                ba64.add((0x80 or codepoint.and(63)).toByte())
+            }
+            in 2048..65535 -> {
+                ba64.add((0xE0 or codepoint.ushr(12).and(15)).toByte())
+                ba64.add((0x80 or codepoint.ushr(6).and(63)).toByte())
+                ba64.add((0x80 or codepoint.and(63)).toByte())
+            }
+            in 65536..1114111 -> {
+                ba64.add((0xF0 or codepoint.ushr(18).and(7)).toByte())
+                ba64.add((0x80 or codepoint.ushr(12).and(63)).toByte())
+                ba64.add((0x80 or codepoint.ushr(6).and(63)).toByte())
+                ba64.add((0x80 or codepoint.and(63)).toByte())
+            }
+            else -> throw IllegalArgumentException("Not a unicode code point: U+${codepoint.toString(16).uppercase()}")
+        }
     }
 
     override fun write(cbuf: CharArray) {
