@@ -1,9 +1,7 @@
 package net.torvald.terrarum.debuggerapp
 
 import net.torvald.terrarum.TerrarumAppConfiguration
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.toCanonicalString
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import net.torvald.terrarum.serialise.Common
 import java.io.File
 import java.io.InputStream
@@ -63,7 +61,7 @@ class SavegameCracker(
     private val cc0 = colourCodes[0]
 
     private val prompt: String
-        get() = "$ccConst${disk?.diskName?.toString(charset) ?: ""}$cc0% "
+        get() = "$ccConst${disk?.getDiskNameString(charset) ?: ""}$cc0% "
 
     private val cmds: HashMap<String, KFunction<*>> = HashMap()
     init {
@@ -80,7 +78,7 @@ class SavegameCracker(
                 load(listOf("load", args[1]))
             }
             else {
-                println("Disk not loaded; load the disk by running 'load <path-to-savefile>'")
+                println("Disk not loaded; load the disk by running 'load <path-to-file>'")
             }
         }
 
@@ -101,7 +99,17 @@ class SavegameCracker(
                     printerrln("${args[0]}: command not found")
                 else {
                     try {
-                        it.call(this, args)
+                        val annot = it.findAnnotation<Command>()!!
+                        // check arguments
+                        val synopsis = annot.synopsis.split(' ').filter { it.isNotBlank() }
+                        // print out synopsis
+                        if (synopsis.size + 1 != args.size) {
+                            print("${cc0}Synopsis: $ccNoun${args[0]} ")
+                            synopsis.forEach { print("$ccNoun2<$it> ") }
+                            println(cc0)
+                        }
+                        else
+                            it.call(this, args)
                     }
                     catch (e: Throwable) {
                         printerrln("An error occured:")
@@ -122,32 +130,22 @@ class SavegameCracker(
         return null
     }
 
-    private fun printSynopsis(name: String, vararg params: String) {
-        print("${cc0}Synopsis: $ccNoun$name ")
-        params.forEach { print("$ccNoun2<$it> ") }
-        println(cc0)
-    }
-
-    @Command("Loads a disk archive")
+    @Command("Loads a disk archive", "path-to-file")
     fun load(args: List<String>) {
-        args.getOrNull(1).let {
-            if (it == null)
-                printSynopsis(args[0], "path-to-file")
-            else {
-                file = File(args[1])
-                file!!.copyTo(File(file!!.absolutePath + ".bak"), true)
-                disk = VDUtil.readDiskArchive(file!!, Level.SEVERE, { printerrln("# Warning: $it") }, charset)
-            }
-        }
+        file = File(args[1])
+        disk = VDUtil.readDiskArchive(file!!, Level.SEVERE, { printerrln("# Warning: $it") }, charset)
+        file!!.copyTo(File(file!!.absolutePath + ".bak"), true)
     }
 
     @Command("Lists contents of the disk")
     fun ls(args: List<String>) {
         letdisk {
             it.entries.forEach { i, entry ->
-                println(ccNoun + i.toString(10).padStart(11, ' '), ccNoun2 + entry.filename.toCanonicalString(charset))
+                if (i != 0)
+                    println(ccNoun + i.toString(10).padStart(11, ' '), ccNoun2 + entry.filename.toCanonicalString(charset), ccConst + entry.contents.getSizePure() + " bytes")
             }
-            println("${cc0}Entries: ${it.entries.size}, Size: ${it.usedBytes}/${it.capacity} bytes")
+            val entryCount = it.entries.size - 1
+            println("${cc0}$entryCount ${if (entryCount != 1) "Entries" else "Entry"}, total ${it.usedBytes}/${it.capacity} bytes")
         }
     }
 
@@ -162,9 +160,71 @@ class SavegameCracker(
     fun exit(args: List<String>) {
         this.exit = true
     }
+
+    @Command("Exports contents of the entry into a real file", "entry-id output-file")
+    fun export(args: List<String>) {
+        letdisk {
+            val entryID = args[1].toInt(10)
+            val outfile = File(args[2])
+            VDUtil.exportFile(it.entries[entryID]?.contents as? EntryFile ?: throw NullPointerException("No entry with ID $entryID"), outfile)
+        }
+    }
+
+    @Command("Changes one entry-ID into another", "change-from change-to")
+    fun renum(args: List<String>) {
+        letdisk {
+            val id0 = args[1].toInt(10)
+            val id1 = args[2].toInt(10)
+
+            val entry = it.entries.remove(id0)!!
+            entry.entryID = id1
+            it.entries[id1] = entry
+            VDUtil.getAsDirectory(it, 0).remove(id0)
+            VDUtil.getAsDirectory(it, 0).add(id1)
+        }
+    }
+
+    @Command("Renames one file into another", "entry-id new-name")
+    fun mv(args: List<String>) {
+        letdisk {
+            val id = args[1].toInt(10)
+            val newname = args[2]
+            it.entries[id]!!.filename = newname.toByteArray(charset)
+            return@letdisk null
+        }
+    }
+
+    @Command("Imports a real file onto the savefile", "input-file entry-id")
+    fun import(args: List<String>) {
+        letdisk {
+            val file = File(args[1])
+            val id = args[2].toInt(10)
+            val entry = VDUtil.importFile(file, id, charset)
+
+            it.entries[id] = entry
+            entry.parentEntryID = 0
+            VDUtil.getAsDirectory(it, 0).add(id)
+        }
+    }
+
+    @Command("Removes a file within the savefile", "entry-id")
+    fun rm(args: List<String>) {
+        letdisk {
+            val id = args[1].toInt(10)
+            it.entries.remove(id)
+            VDUtil.getAsDirectory(it, 0).remove(id)
+        }
+    }
+
+    @Command("Saves changes onto the savefile")
+    fun save(args: List<String>) {
+        letdisk {
+            VDUtil.dumpToRealMachine(it, file!!)
+        }
+    }
 }
 
-internal annotation class Command(val help: String = "")
+internal annotation class Command(val help: String = "", val synopsis: String = "")
 
 fun main(args: Array<String>) {
     SavegameCracker(args).invoke()
