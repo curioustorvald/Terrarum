@@ -14,6 +14,7 @@ import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
+import org.apache.commons.csv.CSVRecord
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -250,7 +251,20 @@ object ModMgr {
         val itemPath = "items/"
 
         @JvmStatic operator fun invoke(module: String) {
-            val csv = CSVFetcher.readFromModule(module, itemPath + "itemid.csv")
+            register(module, CSVFetcher.readFromModule(module, itemPath + "itemid.csv"))
+        }
+
+        fun fromCSV(module: String, csvString: String) {
+            val csvParser = org.apache.commons.csv.CSVParser.parse(
+                    csvString,
+                    CSVFetcher.terrarumCSVFormat
+            )
+            val csvRecordList = csvParser.records
+            csvParser.close()
+            register(module, csvRecordList)
+        }
+
+        private fun register(module: String, csv: List<CSVRecord>) {
             csv.forEach {
                 val className: String = it["classname"].toString()
                 val internalID: Int = it["id"].toInt()

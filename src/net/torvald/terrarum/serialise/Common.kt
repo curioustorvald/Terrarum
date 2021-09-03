@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
 import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
@@ -47,7 +48,6 @@ object Common {
     init {
         // BigInteger
         jsoner.setSerializer(BigInteger::class.java, object : Json.Serializer<BigInteger> {
-
             override fun write(json: Json, obj: BigInteger?, knownType: Class<*>?) {
                 json.writeValue(obj?.toString())
             }
@@ -56,18 +56,24 @@ object Common {
                 return BigInteger(jsonData.asString())
             }
         })
+        // ZipCodedStr
+        jsoner.setSerializer(ZipCodedStr::class.java, object : Json.Serializer<ZipCodedStr> {
+            override fun write(json: Json, obj: ZipCodedStr, knownType: Class<*>?) {
+                json.writeValue(zipStrAndEnascii(obj.doc))
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ZipCodedStr {
+                return ZipCodedStr(unasciiAndUnzipStr(jsonData.asString()))
+            }
+        })
         // BlockLayer
         jsoner.setSerializer(BlockLayer::class.java, object : Json.Serializer<BlockLayer> {
-
             override fun write(json: Json, obj: BlockLayer, knownType: Class<*>?) {
                 digester.reset()
                 obj.bytesIterator().forEachRemaining { digester.update(it) }
                 val hash = StringBuilder().let { sb -> digester.digest().forEach { sb.append(it.tostr()) }; sb.toString() }
 
                 val layer = LayerInfo(hash, blockLayerToStr(obj), obj.width, obj.height)
-
-//                printdbg(this, "pre: ${(0L..1023L).map { obj.ptr[it].tostr() }.joinToString(" ")}")
-
 
                 json.writeValue(layer)
             }
@@ -269,5 +275,17 @@ object Common {
         zi.close()
 
         return unzipdBytes
+    }
+
+    /**
+     * @param [s] a String
+     * @return UTF-8 encoded [s] which are GZip'd then Ascii85-encoded
+     */
+    fun zipStrAndEnascii(s: String): String {
+        return Common.bytesToZipdStr(s.toByteArray(Common.CHARSET).iterator())
+    }
+
+    fun unasciiAndUnzipStr(s: String): String {
+        return ByteArray64Reader(strToBytes(StringReader(s)), CHARSET).readText()
     }
 }

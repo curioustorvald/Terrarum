@@ -46,49 +46,70 @@ object BlockCodex {
      */
     val virtualToTile = HashMap<ItemID, ItemID>()
 
+    fun clear() {
+        blockProps.clear()
+        dynamicLights.clear()
+        highestNumber = -1
+        virtualTileCursor = 1
+        tileToVirtual.clear()
+        virtualToTile.clear()
+    }
+
     /**
      * Later entry (possible from other modules) will replace older ones
      */
     operator fun invoke(module: String, path: String) {
+        AppLoader.printmsg(this, "Building block properties table")
         try {
-            val records = CSVFetcher.readFromModule(module, path)
-
-            AppLoader.printmsg(this, "Building block properties table")
-
-            records.forEach {
-                /*if (it.intVal("id") == -1) {
-                    setProp(nullProp, it)
-                }
-                else {
-                    setProp(blockProps[it.intVal("id")], it)
-                }*/
-
-                setProp(module, it.intVal("id"), it)
-                val tileId = "$module:${it.intVal("id")}"
-
-                // register tiles with dynamic light
-                if ((blockProps[tileId]?.dynamicLuminosityFunction ?: 0) != 0) {
-                    dynamicLights.add(tileId)
-
-                    // add virtual props for dynamic lights
-                    val virtualChunk = ArrayList<ItemID>()
-                    repeat(DYNAMIC_RANDOM_CASES) { _ ->
-                        val virtualID = "$PREFIX_VIRTUALTILE:$virtualTileCursor"
-
-                        virtualToTile[virtualID] = tileId
-                        virtualChunk.add(virtualID)
-
-                        setProp(PREFIX_VIRTUALTILE, virtualTileCursor, it)
-
-                        printdbg(this, "Block ID $tileId -> Virtual ID $virtualID, baseLum: ${blockProps[virtualID]?.baseLumCol}")
-                        virtualTileCursor += 1
-                    }
-                    tileToVirtual[tileId] = virtualChunk.sorted().toList()
-                }
-            }
+            register(module, CSVFetcher.readFromModule(module, path))
         }
-        catch (e: IOException) {
-            e.printStackTrace()
+        catch (e: IOException) { e.printStackTrace() }
+    }
+
+    fun fromCSV(module: String, csvString: String) {
+        AppLoader.printmsg(this, "Building wire properties table for module $module")
+
+        val csvParser = org.apache.commons.csv.CSVParser.parse(
+                csvString,
+                CSVFetcher.terrarumCSVFormat
+        )
+        val csvRecordList = csvParser.records
+        csvParser.close()
+
+        register(module, csvRecordList)
+    }
+
+    private fun register(module: String, records: List<CSVRecord>) {
+        records.forEach {
+            /*if (it.intVal("id") == -1) {
+                setProp(nullProp, it)
+            }
+            else {
+                setProp(blockProps[it.intVal("id")], it)
+            }*/
+
+            setProp(module, it.intVal("id"), it)
+            val tileId = "$module:${it.intVal("id")}"
+
+            // register tiles with dynamic light
+            if ((blockProps[tileId]?.dynamicLuminosityFunction ?: 0) != 0) {
+                dynamicLights.add(tileId)
+
+                // add virtual props for dynamic lights
+                val virtualChunk = ArrayList<ItemID>()
+                repeat(DYNAMIC_RANDOM_CASES) { _ ->
+                    val virtualID = "$PREFIX_VIRTUALTILE:$virtualTileCursor"
+
+                    virtualToTile[virtualID] = tileId
+                    virtualChunk.add(virtualID)
+
+                    setProp(PREFIX_VIRTUALTILE, virtualTileCursor, it)
+
+                    printdbg(this, "Block ID $tileId -> Virtual ID $virtualID, baseLum: ${blockProps[virtualID]?.baseLumCol}")
+                    virtualTileCursor += 1
+                }
+                tileToVirtual[tileId] = virtualChunk.sorted().toList()
+            }
         }
     }
 

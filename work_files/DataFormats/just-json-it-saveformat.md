@@ -1,4 +1,37 @@
-Following code is an example savegame JSON files.
+## Savegame Structure
+
+- The Savegame is a TerranVirtualDisk archive that stores multiple files in the disk's root directory
+- Savegame stores metadata, Worlds and Actors in the game
+- A player gets one unique Savegame
+- A player can have Multiple worlds
+    - Worlds are identified using integer ranged 1 through 32767 (inclusive)
+- Actor ID is unique within the scope of the Savegame
+    - A World stores list of Actor IDs that resides in the world
+  
+
+### File Structure
+
+Each file on the Savegame has following convention:
+
+|Type|Filename|ID|
+|--|--|--|
+|Metadata|savegame|-1|
+|Worlds|world$n ($n is a world index)|$n|
+|Actors|actor$n ($n is an Actor ID)|$n|
+
+
+### Solving Problems
+
+#### How do I determine which world to read in?
+
+Load the player (always has the entry ID of 9545698) and the property "worldCurrentlyPlaying" should
+contain an integer that is a world index. Only the actors that are instance of IngamePlayer will have
+the property.
+
+
+### Save File Examples
+
+Following code is an example Savegame JSON files.
 
 #### savegame.json
 ```

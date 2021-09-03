@@ -32,6 +32,12 @@ object ItemCodex {
 
     val ACTORID_MIN = ReferencingRanges.ACTORS.first
 
+    fun clear() {
+        itemCodex.clear()
+        dynamicItemDescription.clear()
+        dynamicToStaticTable.clear()
+    }
+
     private val itemImagePlaceholder: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
 

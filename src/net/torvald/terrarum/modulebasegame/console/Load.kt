@@ -23,17 +23,9 @@ object Load : ConsoleCommand {
                 val charset = Common.CHARSET
                 val file = File(AppLoader.defaultDir + "/Exports/${args[1]}")
                 val disk = VDUtil.readDiskArchive(file, charset = charset)
+                val meta = ReadMeta(disk)
 
-                val metaFile = disk.entries[-1]!!
-
-                val metaReader = ByteArray64Reader((metaFile.contents as EntryFile).getContent(), Common.CHARSET)
-                val meta = Common.jsoner.fromJson(WriteMeta.WorldMeta::class.java, metaReader)
-
-                WriteMeta.WorldMeta::class.declaredMemberProperties.forEach {
-                    println("${it.name} = ${it.get(meta)}")
-                }
-
-                println(WriteMeta.unasciiAndUnzipStr(meta.blocks))
+                meta.blocks.forEach { s, str -> println("Module $s\n"); println(str.doc) }
                 println(meta.loadorder.joinToString())
             }
             catch (e: IOException) {

@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
 import java.util.concurrent.locks.Lock
@@ -19,6 +20,9 @@ import java.util.concurrent.locks.Lock
  * this instance only stores the stage that is currently being used.
  */
 open class IngameInstance(val batch: SpriteBatch) : Screen {
+
+    lateinit var savegameArchive: VirtualDisk
+        internal set
 
     var screenZoom = 1.0f
     val ZOOM_MAXIMUM = 4.0f
@@ -81,6 +85,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
+    var loadedTime_t = AppLoader.getTIME_T()
+        protected set
+
     override fun hide() {
     }
 
@@ -119,6 +126,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         printdbg(this, "dispose called by")
         printStackTrace(this)
 
+        actorContainerActive.forEach { it.dispose() }
+        actorContainerInactive.forEach { it.dispose() }
         world.dispose()
     }
 
@@ -271,6 +280,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     fun theGameHasActor(ID: Int): Boolean =
             isActive(ID) || isInactive(ID)
+
 
 
 

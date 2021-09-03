@@ -21,6 +21,10 @@ object WireCodex {
 
     private val nullProp = WireProp()
 
+    fun clear() {
+        wireProps.clear()
+    }
+
     /**
      * `wire.csv` and texture for all wires are expected to be found in the given path.
      *
@@ -29,30 +33,41 @@ object WireCodex {
      */
     operator fun invoke(module: String, path: String) {
         AppLoader.printmsg(this, "Building wire properties table for module $module")
-
         try {
-            val records = CSVFetcher.readFromModule(module, path + "wires.csv")
-
-
-            records.forEach {
-                WireCodex.setProp(module, it.intVal("id"), it)
-            }
-
-            AppLoader.printmsg(this, "Registering wire textures into the resource pool")
-            wireProps.keys.forEach { id ->
-                val wireid = id.split(':').last().toInt()
-
-                CommonResourcePool.addToLoadingList(id) {
-                    val t = TextureRegionPack(ModMgr.getPath(module, "$path$wireid.tga"), TILE_SIZE, TILE_SIZE)
-                    /*return*/t
-                }
-            }
-
-            CommonResourcePool.loadAll()
+            register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"))
         }
-        catch (e: IOException) {
-            e.printStackTrace()
+        catch (e: IOException) { e.printStackTrace() }
+    }
+
+    fun fromCSV(module: String, path: String, csvString: String) {
+        AppLoader.printmsg(this, "Building wire properties table for module $module")
+
+        val csvParser = org.apache.commons.csv.CSVParser.parse(
+                csvString,
+                CSVFetcher.terrarumCSVFormat
+        )
+        val csvRecordList = csvParser.records
+        csvParser.close()
+
+        register(module, path, csvRecordList)
+    }
+
+    private fun register(module: String, path: String, records: List<CSVRecord>) {
+        records.forEach {
+            WireCodex.setProp(module, it.intVal("id"), it)
         }
+
+        AppLoader.printmsg(this, "Registering wire textures into the resource pool")
+        wireProps.keys.forEach { id ->
+            val wireid = id.split(':').last().toInt()
+
+            CommonResourcePool.addToLoadingList(id) {
+                val t = TextureRegionPack(ModMgr.getPath(module, "$path$wireid.tga"), TILE_SIZE, TILE_SIZE)
+                /*return*/t
+            }
+        }
+
+        CommonResourcePool.loadAll()
     }
 
     fun getAll() = WireCodex.wireProps.values

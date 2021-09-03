@@ -11,10 +11,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.WriteActor
-import net.torvald.terrarum.serialise.WriteMeta
-import net.torvald.terrarum.serialise.WriteWorld
+import net.torvald.terrarum.serialise.*
 import java.io.File
 import java.io.IOException
 
@@ -40,33 +37,11 @@ object Save : ConsoleCommand {
             try {
                 val ingame = Terrarum.ingame!! as TerrarumIngame
                 val savename = args[1].trim()
-                val creation_t = VDUtil.currentUnixtime
-                val time_t = VDUtil.currentUnixtime
-
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
+                val file = File(AppLoader.defaultDir + "/Exports/${args[1]}")
 
-                // NOTE: don't bother with the entryID of DiskEntries; it will be overwritten anyway
 
-                val metaContent = EntryFile(WriteMeta(ingame).encodeToByteArray64())
-                val meta = DiskEntry(-1, 0, "savegame".toByteArray(), creation_t, time_t, metaContent)
-                addFile(disk, meta)
-
-                val worldContent = EntryFile(WriteWorld(ingame).encodeToByteArray64())
-                val world = DiskEntry(ingame.world.worldIndex, 0, "world${ingame.world.worldIndex}".toByteArray(), creation_t, time_t, worldContent)
-                addFile(disk, world)
-
-                listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
-                    actors.forEach {
-                        if (acceptable(it)) {
-                            val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                            val actor = DiskEntry(it.referenceID, 0, "actor${it.referenceID}".toByteArray(), creation_t, time_t, actorContent)
-                            addFile(disk, actor)
-                        }
-                    }
-                }
-
-                disk.capacity = 0
-                VDUtil.dumpToRealMachine(disk, File(AppLoader.defaultDir + "/Exports/${args[1]}"))
+                WriteSavegame(disk, file, ingame)
             }
             catch (e: IOException) {
                 Echo("Save: IOException raised.")

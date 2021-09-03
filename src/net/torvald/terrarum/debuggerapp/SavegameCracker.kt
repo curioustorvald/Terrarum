@@ -110,8 +110,10 @@ class SavegameCracker(
                             it.call(this, args)
                     }
                     catch (e: Throwable) {
-                        printerrln("An error occured:")
-                        e.printStackTrace(stderr)
+                        val error = e.cause ?: e
+                        printerrln("Error -- ${error}")
+                        error.printStackTrace(stderr)
+                        printerrln("Error -- ${error}")
                     }
                 }
             }
@@ -128,6 +130,13 @@ class SavegameCracker(
         return null
     }
 
+    private fun String.padEnd(len: Int, padfun: (Int) -> Char): String {
+        val sb = StringBuilder()
+        for (i in 0 until len - this.length)
+            sb.append(padfun(i))
+        return this + sb.toString()
+    }
+
     @Command("Loads a disk archive", "path-to-file")
     fun load(args: List<String>) {
         file = File(args[1])
@@ -142,12 +151,12 @@ class SavegameCracker(
                 if (i != 0)
                     println(
                             ccNoun + i.toString(10).padStart(11, ' ') + " " +
-                            ccNoun2 + (entry.filename.toCanonicalString(charset) + " " + cc0).padEnd(18, '.') + " " +
-                            ccConst + entry.contents.getSizePure() + " bytes"
+                            ccNoun2 + (entry.filename.toCanonicalString(charset) + cc0).padEnd(18) { if (it == 0) ' ' else '.' }  +
+                            ccConst + " " + entry.contents.getSizePure() + " bytes"
                     )
             }
             val entryCount = it.entries.size - 1
-            println("${cc0}$entryCount ${if (entryCount != 1) "Entries" else "Entry"}, total ${it.usedBytes}/${it.capacity} bytes")
+            println("${cc0}$entryCount entries, total ${it.usedBytes} bytes")
         }
     }
 

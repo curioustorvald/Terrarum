@@ -1,9 +1,11 @@
 package net.torvald.terrarum.itemproperties
 
 import net.torvald.terrarum.AppLoader.printmsg
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.floatVal
 import net.torvald.terrarum.blockproperties.intVal
 import net.torvald.terrarum.utils.CSVFetcher
+import org.apache.commons.csv.CSVRecord
 import java.io.IOException
 
 /**
@@ -32,29 +34,36 @@ object MaterialCodex {
     private val nullMaterial = Material()
 
     operator fun invoke(module: String, path: String) {
-        try {
-            val records = CSVFetcher.readFromModule(module, path)
+        register(CSVFetcher.readFromModule(module, path))
+    }
 
-            printmsg(this, "Building materials table")
+    fun fromCSV(module: String, csvString: String) {
+        val csvParser = org.apache.commons.csv.CSVParser.parse(
+                csvString,
+                CSVFetcher.terrarumCSVFormat
+        )
+        val csvRecordList = csvParser.records
+        csvParser.close()
+        register(csvRecordList)
+    }
 
-            records.forEach {
-                val prop = Material()
-                prop.strength = it.intVal("tens")
-                prop.density = it.intVal("dsty")
-                prop.forceMod = it.intVal("fmod")
-                prop.enduranceMod = it.floatVal("endurance")
-                prop.thermalConductivity = it.floatVal("tcond")
-                prop.identifier = it.get("idst").toUpperCase()
+    private fun register(records: List<CSVRecord>) {
+        records.forEach {
+            val prop = Material()
+            prop.strength = it.intVal("tens")
+            prop.density = it.intVal("dsty")
+            prop.forceMod = it.intVal("fmod")
+            prop.enduranceMod = it.floatVal("endurance")
+            prop.thermalConductivity = it.floatVal("tcond")
+            prop.identifier = it.get("idst").toUpperCase()
 
-                materialProps[prop.identifier] = prop
+            materialProps[prop.identifier] = prop
 
-                printmsg(this, "${prop.identifier}\t${prop.strength}\t${prop.density}\t${prop.forceMod}\t${prop.enduranceMod}")
-            }
-        }
-        catch (e: IOException) {
-            e.printStackTrace()
+            printmsg(this, "${prop.identifier}\t${prop.strength}\t${prop.density}\t${prop.forceMod}\t${prop.enduranceMod}")
         }
     }
+
+    fun clear() = materialProps.clear()
 
     operator fun get(identifier: String) = try {
         materialProps[identifier.toUpperCase()]!!

@@ -9,6 +9,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.blockstats.BlockStats
@@ -23,17 +24,24 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
 import net.torvald.terrarum.modulebasegame.ui.*
+import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -221,7 +229,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         when (gameLoadMode) {
             GameLoadMode.CREATE_NEW -> enterCreateNewWorld(gameLoadInfoPayload as NewWorldParameters)
-            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as GameSaveData)
+            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as WriteMeta.WorldMeta)
         }
 
         IngameRenderer.setRenderedWorld(world)
@@ -229,16 +237,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         super.show() // gameInitialised = true
     }
-
-    data class GameSaveData(
-            val world: GameWorld,
-            val historicalFigureIDBucket: ArrayList<Int>,
-            val realGamePlayer: IngamePlayer,
-            val rogueS0: Long,
-            val rogueS1: Long,
-            val weatherS0: Long,
-            val weatherS1: Long
-    )
 
     data class NewWorldParameters(
             val width: Int,
@@ -259,12 +257,30 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Init instance by loading saved world
      */
-    private fun enterLoadFromSave(gameSaveData: GameSaveData) {
+    private fun enterLoadFromSave(meta: WriteMeta.WorldMeta) {
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            TODO()
+            RoguelikeRandomiser.loadFromSave(meta.randseed0, meta.randseed1)
+            WeatherMixer.loadFromSave(meta.weatseed0, meta.weatseed1)
+
+            // Load BlockCodex //
+            BlockCodex.clear()
+            meta.blocks.forEach { module, csv -> BlockCodex.fromCSV(module, csv.doc) }
+
+            // Load WireCodex //
+            WireCodex.clear()
+            meta.wires.forEach { module, csv -> WireCodex.fromCSV(module, ModMgr.getPath(module, "wires/"), csv.doc) }
+
+            // Load ItemCodex //
+            ItemCodex.clear()
+            meta.items.forEach { module, csv -> ModMgr.GameItemLoader.fromCSV(module, csv.doc) }
+            // TODO registerNewDynamicItem
+
+            // Load MaterialCodex //
+            MaterialCodex.clear()
+            meta.materials.forEach { module, csv -> MaterialCodex.fromCSV(module, csv.doc) }
         }
     }
 
@@ -284,7 +300,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // init map as chosen size
-            val timeNow = System.currentTimeMillis() / 1000
+            val timeNow = AppLoader.getTIME_T()
             world = GameWorld(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
             gameworldIndices.add(world.worldIndex)
             world.extraFields["basegame.economy"] = GameEconomy()
@@ -307,10 +323,17 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     /** Load rest of the game with GL context */
     fun postInit() {
-        //setTheRealGamerFirstTime(PlayerBuilderSigrid())
-        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
+        if (actorNowPlaying == null) {
+            //setTheRealGamerFirstTime(PlayerBuilderSigrid())
+            setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
 //        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
 
+            savegameArchive = VDUtil.createNewDisk(
+                    1L shl 60,
+                    actorNowPlaying!!.actorValue.getAsString(AVKey.NAME) ?: "Player ${AppLoader.getTIME_T()}",
+                    Common.CHARSET
+            )
+        }
 
 
         MegaRainGovernor // invoke MegaRain Governor

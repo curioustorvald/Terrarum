@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.console
 import com.badlogic.gdx.utils.Json
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.Terrarum.ingame
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -19,7 +20,8 @@ import java.io.IOException
 object ExportMeta : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
-            val str = WriteMeta(Terrarum.ingame!! as TerrarumIngame).invoke()
+            val currentPlayTime_t = AppLoader.getTIME_T() - ingame!!.loadedTime_t
+            val str = WriteMeta(ingame!! as TerrarumIngame, currentPlayTime_t)
             val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/savegame.json", false)
             writer.write(str)
             writer.close()
@@ -40,7 +42,7 @@ object ExportWorld : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
-                val str = WriteWorld(Terrarum.ingame!! as TerrarumIngame).invoke()
+                val str = WriteWorld(ingame!! as TerrarumIngame)
                 val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}.json", false)
                 writer.write(str)
                 writer.close()

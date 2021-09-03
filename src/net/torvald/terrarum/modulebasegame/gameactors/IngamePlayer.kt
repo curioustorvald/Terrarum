@@ -15,6 +15,7 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
     override var animDescPath = "invalid"
     override var animDescPathGlow: String? = null
+    internal var worldCurrentlyPlaying = 0 // only filled up on save and load; DO NOT USE THIS
 
     private constructor()
 
@@ -33,6 +34,7 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
         referenceID = Terrarum.PLAYER_REF_ID // forcibly set ID
         density = BASE_DENSITY
         collisionType = COLLISION_KINEMATIC
+        worldCurrentlyPlaying = Terrarum.ingame?.world?.worldIndex ?: 0
     }
 
 }

@@ -8,6 +8,7 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.realestate.LandUtil
@@ -41,9 +42,6 @@ class GameWorld() : Disposable {
         internal set // there's a case of save-and-continue-playing
     var totalPlayTime: Long = 0
         internal set
-
-    /** Used to calculate play time */
-    @Transient open val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
     lateinit var layerWall: BlockLayer
@@ -105,6 +103,8 @@ class GameWorld() : Disposable {
 
     internal var genver = -1
     internal var comp = -1
+
+    internal val actors = ArrayList<ActorID>() // only filled up on save and load; DO NOT USE THIS
 
     /**
      * Create new world
