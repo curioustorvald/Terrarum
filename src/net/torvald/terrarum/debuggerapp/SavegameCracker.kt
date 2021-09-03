@@ -22,7 +22,7 @@ private val ESC = 27.toChar()
  */
 class SavegameCracker(
         val args: Array<String>,
-        val stdin: InputStream = System.`in`,
+        val readFun: () -> String = { Scanner(System.`in`).nextLine() },
         val stdout: PrintStream = System.out,
         val stderr: PrintStream = System.out,
         val charset: Charset = Common.CHARSET,
@@ -38,8 +38,6 @@ class SavegameCracker(
 
     private var file: File? = null
     private var disk: VirtualDisk? = null
-
-    private val scanner = Scanner(stdin)
 
     private fun println(vararg o: Any?) = stdout.println(o.map { it.toString() }.joinToString("\t"))
     private fun print(vararg o: Any?) = stdout.print(o.map { it.toString() }.joinToString("\t"))
@@ -89,7 +87,7 @@ class SavegameCracker(
 
     private fun runInterpreter() {
         print(prompt)
-        val line = scanner.nextLine()
+        val line = readFun().trim()
         val args = tokenise(line)
 
 //        println(args.mapIndexed { index, s -> if (index == 0) "$ccNoun$s$cc0" else "$ccVerb$s$cc0" }.joinToString(" "))
@@ -142,7 +140,11 @@ class SavegameCracker(
         letdisk {
             it.entries.forEach { i, entry ->
                 if (i != 0)
-                    println(ccNoun + i.toString(10).padStart(11, ' '), ccNoun2 + entry.filename.toCanonicalString(charset), ccConst + entry.contents.getSizePure() + " bytes")
+                    println(
+                            ccNoun + i.toString(10).padStart(11, ' ') + " " +
+                            ccNoun2 + (entry.filename.toCanonicalString(charset) + " " + cc0).padEnd(18, '.') + " " +
+                            ccConst + entry.contents.getSizePure() + " bytes"
+                    )
             }
             val entryCount = it.entries.size - 1
             println("${cc0}$entryCount ${if (entryCount != 1) "Entries" else "Entry"}, total ${it.usedBytes}/${it.capacity} bytes")
@@ -157,9 +159,9 @@ class SavegameCracker(
     }
 
     @Command("Exits the program")
-    fun exit(args: List<String>) {
-        this.exit = true
-    }
+    fun exit(args: List<String>) { this.exit = true }
+    @Command("Exits the program")
+    fun quit(args: List<String>) = exit(args)
 
     @Command("Exports contents of the entry into a real file", "entry-id output-file")
     fun export(args: List<String>) {
