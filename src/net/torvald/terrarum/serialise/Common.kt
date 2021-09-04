@@ -11,16 +11,12 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
-import net.torvald.terrarum.tail
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
+import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
-import java.io.Writer
 import java.math.BigInteger
-import java.nio.channels.ClosedChannelException
-import java.nio.charset.Charset
-import java.nio.charset.UnsupportedCharsetException
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
@@ -216,8 +212,10 @@ object Common {
         return layer
     }
 
-    fun bytesToZipdStr(byteIterator: Iterator<Byte>): String {
-        val sb = StringBuilder()
+    fun bytesToZipdStr(byteIterator: Iterator<Byte>): String = enasciiToString(zip(byteIterator))
+
+    fun zip(ba: ByteArray64) = Common.zip(ba.iterator())
+    fun zip(byteIterator: Iterator<Byte>): ByteArray64 {
         val bo = ByteArray64GrowableOutputStream()
         val zo = GZIPOutputStream(bo)
 
@@ -226,9 +224,13 @@ object Common {
             zo.write(it.toInt())
         }
         zo.flush(); zo.close()
+        return bo.toByteArray64()
+    }
 
+    fun enasciiToString(ba: ByteArray64): String = enasciiToString(ba.iterator())
+    fun enasciiToString(ba: Iterator<Byte>): String {
+        val sb = StringBuilder()
         // enascii
-        val ba = bo.toByteArray64()
         var bai = 0
         val buf = IntArray(4) { Ascii85.PAD_BYTE }
         ba.forEach {
@@ -245,9 +247,20 @@ object Common {
         return sb.toString()
     }
 
-    fun strToBytes(reader: Reader): ByteArray64 {
-        val unasciidBytes = ByteArray64()
+    fun unzip(bytes: ByteArray64): ByteArray64 {
         val unzipdBytes = ByteArray64()
+        val zi = GZIPInputStream(ByteArray64InputStream(bytes))
+        while (true) {
+            val byte = zi.read()
+            if (byte == -1) break
+            unzipdBytes.add(byte.toByte())
+        }
+        zi.close()
+        return unzipdBytes
+    }
+
+    fun unasciiToBytes(reader: Reader): ByteArray64 {
+        val unasciidBytes = ByteArray64()
 
         // unascii
         var bai = 0
@@ -265,17 +278,14 @@ object Common {
             bai += 1
         }; Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
 
-        // unzip
-        val zi = GZIPInputStream(ByteArray64InputStream(unasciidBytes))
-        while (true) {
-            val byte = zi.read()
-            if (byte == -1) break
-            unzipdBytes.add(byte.toByte())
-        }
-        zi.close()
-
-        return unzipdBytes
+        return unasciidBytes
     }
+
+    fun getUnzipInputStream(bytes: ByteArray64): InputStream {
+        return GZIPInputStream(ByteArray64InputStream(bytes))
+    }
+
+    fun strToBytes(reader: Reader): ByteArray64 = unzip(unasciiToBytes(reader))
 
     /**
      * @param [s] a String
@@ -288,4 +298,5 @@ object Common {
     fun unasciiAndUnzipStr(s: String): String {
         return ByteArray64Reader(strToBytes(StringReader(s)), CHARSET).readText()
     }
+
 }
