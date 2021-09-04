@@ -1,8 +1,8 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.SanicLoadScreen
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
@@ -36,6 +36,26 @@ object WriteSavegame {
         val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, currentPlayTime_t))
         val meta = DiskEntry(-1, 0, "savegame".toByteArray(), creation_t, time_t, metaContent)
         addFile(disk, meta)
+
+        // Write BlockCodex//
+        /*val blockCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex, BlockCodex.javaClass).toByteArray(Common.CHARSET)))
+        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(), creation_t, time_t, blockCodexContent)
+        addFile(disk, blocks)
+
+        // Write ItemCodex//
+        val itemCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex, ItemCodex.javaClass).toByteArray(Common.CHARSET)))
+        val items = DiskEntry(-17, 0, "items".toByteArray(), creation_t, time_t, itemCodexContent)
+        addFile(disk, items)
+
+        // Write WireCodex//
+        val wireCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex, WireCodex.javaClass).toByteArray(Common.CHARSET)))
+        val wires = DiskEntry(-18, 0, "wires".toByteArray(), creation_t, time_t, wireCodexContent)
+        addFile(disk, wires)
+
+        // Write MaterialCodex//
+        val materialCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex, MaterialCodex.javaClass).toByteArray(Common.CHARSET)))
+        val materials = DiskEntry(-19, 0, "materials".toByteArray(), creation_t, time_t, materialCodexContent)
+        addFile(disk, materials)*/
 
         // Write World //
         val worldNum = ingame.world.worldIndex

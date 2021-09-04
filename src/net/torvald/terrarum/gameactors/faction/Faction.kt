@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors.faction
 
 import net.torvald.random.HQRNG
-import java.util.HashSet
+import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2016-02-15.

@@ -28,12 +28,14 @@ class Material {
     var identifier: String = "Name not set"
 }
 
-object MaterialCodex {
+class MaterialCodex {
 
     val materialProps = HashMap<String, Material>()
-    private val nullMaterial = Material()
+    @Transient private val nullMaterial = Material()
 
-    operator fun invoke(module: String, path: String) {
+    private constructor()
+
+    internal constructor(module: String, path: String) : this() {
         register(CSVFetcher.readFromModule(module, path))
     }
 

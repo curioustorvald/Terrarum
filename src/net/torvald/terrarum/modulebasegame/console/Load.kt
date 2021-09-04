@@ -25,7 +25,6 @@ object Load : ConsoleCommand {
                 val disk = VDUtil.readDiskArchive(file, charset = charset)
                 val meta = ReadMeta(disk)
 
-                meta.blocks.forEach { s, str -> println("Module $s\n"); println(str.doc) }
                 println(meta.loadorder.joinToString())
             }
             catch (e: IOException) {

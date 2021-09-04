@@ -5,6 +5,7 @@ import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2016-01-15.

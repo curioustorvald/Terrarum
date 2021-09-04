@@ -6,13 +6,17 @@ import java.util.*
 /**
  * Created by minjaesong on 2016-03-27.
  */
-object RealEstateCodex {
+class RealEstateCodex {
     /**
      * HashMap<Absolute block number, Actor/Faction ID>
      *
      * Note that a block can have only ONE owner (as an Actor or Faction ID)
      */
-    private var ownershipRegistry: HashMap<Long, Int> = HashMap()
+    private val ownershipRegistry: HashMap<Long, Int> = HashMap()
+
+    fun clear() = ownershipRegistry.clear()
+
+    internal constructor()
 
     fun setOwner(world: GameWorld, tileX: Int, tileY: Int, refID: Int) {
         ownershipRegistry[LandUtil.getBlockAddr(world, tileX, tileY)] = refID

@@ -8,10 +8,7 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.EntryFile
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
-import net.torvald.terrarum.utils.MetaModuleCSVPair
-import net.torvald.terrarum.utils.ZipCodedStr
 import net.torvald.terrarum.weather.WeatherMixer
-import java.io.StringReader
 
 /**
  * Created by minjaesong on 2021-08-23.
@@ -33,26 +30,6 @@ object WriteMeta {
                 creation_t = world.creationTime,
                 lastplay_t = world.lastPlayTime,
                 playtime_t = world.totalPlayTime + currentPlayTime_t,
-                blocks = ModMgr.getFilesFromEveryMod("blocks/blocks.csv").fold(MetaModuleCSVPair()) {
-                    map, (modname, file) ->
-                    map[modname] = ZipCodedStr(file.readText ())
-                    /*return*/map
-                },
-                items = ModMgr.getFilesFromEveryMod("items/itemid.csv").fold(MetaModuleCSVPair()) {
-                    map, (modname, file) ->
-                    map[modname] = ZipCodedStr(file.readText ())
-                    /*return*/map
-                },
-                wires = ModMgr.getFilesFromEveryMod("wires/wires.csv").fold(MetaModuleCSVPair()) {
-                    map, (modname, file) ->
-                    map[modname] = ZipCodedStr(file.readText ())
-                    /*return*/map
-                },
-                materials = ModMgr.getFilesFromEveryMod("materials/materials.csv").fold(MetaModuleCSVPair()) {
-                    map, (modname, file) ->
-                    map[modname] = ZipCodedStr(file.readText ())
-                    /*return*/map
-                },
                 loadorder = ModMgr.loadOrder.toTypedArray(),
                 worlds = ingame.gameworldIndices.toTypedArray()
         )
@@ -78,13 +55,10 @@ object WriteMeta {
             val creation_t: Long = 0,
             val lastplay_t: Long = 0,
             val playtime_t: Long = 0,
-            val blocks: MetaModuleCSVPair = MetaModuleCSVPair(),
-            val items: MetaModuleCSVPair = MetaModuleCSVPair(),
-            val wires: MetaModuleCSVPair = MetaModuleCSVPair(),
-            val materials: MetaModuleCSVPair = MetaModuleCSVPair(),
             val loadorder: Array<String> = arrayOf(), // do not use list; Could not instantiate instance of class: java.util.Collections$SingletonList
             val worlds: Array<Int> = arrayOf() // do not use list; Could not instantiate instance of class: java.util.Collections$SingletonList
     ) {
+
         override fun equals(other: Any?): Boolean {
             throw UnsupportedOperationException()
         }

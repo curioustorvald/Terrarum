@@ -10,6 +10,7 @@ import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import net.torvald.terrarum.*
 
 typealias ItemID = String
 

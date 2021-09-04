@@ -2,18 +2,15 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
-import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2016-03-15.

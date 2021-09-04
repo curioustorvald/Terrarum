@@ -20,7 +20,7 @@ import java.util.*
  *
  * Created by minjaesong on 2016-03-15.
  */
-object ItemCodex {
+class ItemCodex {
 
     /**
      * <ItemID or RefID for Actor, TheItem>
@@ -30,7 +30,9 @@ object ItemCodex {
     val dynamicItemDescription = HashMap<ItemID, GameItem>()
     val dynamicToStaticTable = HashMap<ItemID, ItemID>()
 
-    val ACTORID_MIN = ReferencingRanges.ACTORS.first
+    @Transient val ACTORID_MIN = ReferencingRanges.ACTORS.first
+
+    internal constructor()
 
     fun clear() {
         itemCodex.clear()

@@ -1,15 +1,10 @@
 package net.torvald.terrarum.modulebasegame
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.ModuleEntryPoint
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -29,8 +24,8 @@ class EntryPoint : ModuleEntryPoint() {
 
         // the order of invocation is important! Material should be the first as blocks and items are depend on it.
         ModMgr.GameMaterialLoader.invoke(moduleName)
-        ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameItemLoader.invoke(moduleName)
+        ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameLanguageLoader.invoke(moduleName)
 
 

@@ -18,7 +18,7 @@ import java.io.IOException
 /**
  * Created by minjaesong on 2016-02-16.
  */
-object BlockCodex {
+class BlockCodex {
 
     val blockProps = HashMap<ItemID, BlockProp>()
 
@@ -27,13 +27,13 @@ object BlockCodex {
     /** 65536 */
     //val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
 
-    private val nullProp = BlockProp()
+    @Transient private val nullProp = BlockProp()
 
     var highestNumber = -1 // does not include virtual ones
         private set
 
     // fake props for "randomised" dynamic lights
-    const val DYNAMIC_RANDOM_CASES = 64
+    @Transient val DYNAMIC_RANDOM_CASES = 64
     private var virtualTileCursor = 1
 
     /**
@@ -55,10 +55,12 @@ object BlockCodex {
         virtualToTile.clear()
     }
 
+    private constructor()
+
     /**
      * Later entry (possible from other modules) will replace older ones
      */
-    operator fun invoke(module: String, path: String) {
+    internal constructor(module: String, path: String) : this() {
         AppLoader.printmsg(this, "Building block properties table")
         try {
             register(module, CSVFetcher.readFromModule(module, path))

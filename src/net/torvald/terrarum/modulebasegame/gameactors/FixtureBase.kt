@@ -15,6 +15,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
+import net.torvald.terrarum.*
 
 typealias BlockBoxIndex = Int
 

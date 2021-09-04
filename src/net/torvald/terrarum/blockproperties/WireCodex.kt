@@ -1,28 +1,35 @@
 package net.torvald.terrarum.blockproperties
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.csv.CSVRecord
 import java.io.IOException
-
 /**
+ * ItemCodex must be initialised first!
+ *
  * Created by minjaesong on 2016-02-16.
  */
-object WireCodex {
+class WireCodex {
 
     val wireProps = HashMap<ItemID, WireProp>()
 
-    private val nullProp = WireProp()
+    @Transient private val nullProp = WireProp()
 
     fun clear() {
         wireProps.clear()
+    }
+
+    private constructor() {
+        try {
+            Terrarum.ItemCodex["testtesttest"]
+        }
+        catch (e: UninitializedPropertyAccessException) {
+            throw UninitializedPropertyAccessException("ItemCodex not initialised!")
+        }
     }
 
     /**
@@ -31,7 +38,7 @@ object WireCodex {
      * @param module name of the module
      * @param path to the "wires" directory, not path to the CSV; must end with a slash!
      */
-    operator fun invoke(module: String, path: String) {
+    internal constructor(module: String, path: String) : this() {
         AppLoader.printmsg(this, "Building wire properties table for module $module")
         try {
             register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"))
@@ -54,7 +61,7 @@ object WireCodex {
 
     private fun register(module: String, path: String, records: List<CSVRecord>) {
         records.forEach {
-            WireCodex.setProp(module, it.intVal("id"), it)
+            setProp(module, it.intVal("id"), it)
         }
 
         AppLoader.printmsg(this, "Registering wire textures into the resource pool")
@@ -70,7 +77,7 @@ object WireCodex {
         CommonResourcePool.loadAll()
     }
 
-    fun getAll() = WireCodex.wireProps.values
+    fun getAll() = wireProps.values
 
     /*fun get(index: Int): WireProp {
         try {
@@ -99,11 +106,11 @@ object WireCodex {
     }*/
     operator fun get(blockID: ItemID?): WireProp {
         if (blockID == null || blockID == "basegame:"+Block.NULL) {
-            return WireCodex.nullProp
+            return nullProp
         }
 
         try {
-            return WireCodex.wireProps[blockID]!!
+            return wireProps[blockID]!!
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Wireprop with id $blockID does not exist.")
@@ -111,7 +118,7 @@ object WireCodex {
     }
 
     fun getOrNull(blockID: ItemID?): WireProp? {//<O>
-        return WireCodex.wireProps[blockID]
+        return wireProps[blockID]
     }
 
     private fun setProp(modname: String, key: Int, record: CSVRecord) {
@@ -127,7 +134,7 @@ object WireCodex {
         prop.outputType = record.get("outputtype") ?: prop.accepts
         prop.canBranch = record.boolVal("branching")
 
-        WireCodex.wireProps[prop.id] = prop
+        wireProps[prop.id] = prop
 
         // load java class
         val invImgRef = record.get("inventoryimg").split(',')

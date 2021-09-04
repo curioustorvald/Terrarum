@@ -6,7 +6,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 /**

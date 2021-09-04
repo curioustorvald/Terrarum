@@ -5,8 +5,12 @@ import java.util.*
 /**
  * Created by minjaesong on 2016-05-09.
  */
-object FactionCodex {
+class FactionCodex {
     val factionContainer = ArrayList<Faction>()
+
+    fun clear() = factionContainer.clear()
+
+    internal constructor()
 
     fun hasFaction(ID: FactionID): Boolean =
             if (factionContainer.size == 0)

@@ -13,6 +13,7 @@ import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameactors.PhysProperties
 import org.dyn4j.geometry.Vector2
 import java.util.*
+import net.torvald.terrarum.*
 
 /**
  * Simplest projectile.

@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.weather.WeatherMixer
 

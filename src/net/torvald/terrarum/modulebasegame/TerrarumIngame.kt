@@ -215,6 +215,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameLoadMode: GameLoadMode
     lateinit var gameLoadInfoPayload: Any
+    lateinit var newBlockCodex: Any
+    lateinit var newWireCodex: Any
+    lateinit var newItemCodex: Any
+    lateinit var newMaterialCodex: Any
+
 
 
 
@@ -229,7 +234,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         when (gameLoadMode) {
             GameLoadMode.CREATE_NEW -> enterCreateNewWorld(gameLoadInfoPayload as NewWorldParameters)
-            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as WriteMeta.WorldMeta)
+            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as WriteMeta.WorldMeta, newItemCodex)
         }
 
         IngameRenderer.setRenderedWorld(world)
@@ -257,7 +262,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Init instance by loading saved world
      */
-    private fun enterLoadFromSave(meta: WriteMeta.WorldMeta) {
+    private fun enterLoadFromSave(meta: WriteMeta.WorldMeta, items: Any) {
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
         }
@@ -266,21 +271,21 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             WeatherMixer.loadFromSave(meta.weatseed0, meta.weatseed1)
 
             // Load BlockCodex //
-            BlockCodex.clear()
-            meta.blocks.forEach { module, csv -> BlockCodex.fromCSV(module, csv.doc) }
+            /*BlockCodex.clear()
+            (BlockCodex::class as Any).javaClass.getField("INSTANCE").set(BlockCodex::class.objectInstance, meta.blocks)
 
             // Load WireCodex //
             WireCodex.clear()
-            meta.wires.forEach { module, csv -> WireCodex.fromCSV(module, ModMgr.getPath(module, "wires/"), csv.doc) }
-
+            (WireCodex::class as Any).javaClass.getField("INSTANCE").set(WireCodex::class.objectInstance, meta.wires)
+            */
             // Load ItemCodex //
             ItemCodex.clear()
-            meta.items.forEach { module, csv -> ModMgr.GameItemLoader.fromCSV(module, csv.doc) }
-            // TODO registerNewDynamicItem
+            (ItemCodex::class as Any).javaClass.getField("INSTANCE").set(ItemCodex::class.objectInstance, items)
 
             // Load MaterialCodex //
-            MaterialCodex.clear()
-            meta.materials.forEach { module, csv -> MaterialCodex.fromCSV(module, csv.doc) }
+            /*MaterialCodex.clear()
+            (MaterialCodex::class as Any).javaClass.getField("INSTANCE").set(MaterialCodex::class.objectInstance, meta.materials)
+            */
         }
     }
 

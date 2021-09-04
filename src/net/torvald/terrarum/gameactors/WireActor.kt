@@ -1,13 +1,9 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.Point2i
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.toInt
 
 /**
  * FIXME Constructor is super expensive

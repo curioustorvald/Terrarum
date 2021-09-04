@@ -1,6 +1,8 @@
 package net.torvald.terrarum;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -21,7 +23,7 @@ import net.torvald.terrarum.concurrent.ThreadExecutor;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
-import net.torvald.terrarum.gameactors.*;
+import net.torvald.terrarum.gameactors.BlockMarkerActor;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
@@ -35,9 +37,11 @@ import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.DebugTimers;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
 import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
 import static net.torvald.terrarum.TerrarumKt.printStackTrace;
 

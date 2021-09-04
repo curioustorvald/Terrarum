@@ -3,11 +3,16 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
@@ -306,3 +311,7 @@ class NoSuchActorWithIDException(id: ActorID) : Exception("Actor with ID $id doe
 class NoSuchActorWithRefException(actor: Actor) : Exception("No such actor in the game: $actor")
 class ReferencedActorAlreadyExistsException(actor: Actor) : Exception("The actor $actor already exists in the game")
 class ProtectedActorRemovalException(whatisit: String) : Exception("Attempted to removed protected actor '$whatisit'")
+
+val INGAME: IngameInstance
+    get() = Terrarum.ingame!!
+

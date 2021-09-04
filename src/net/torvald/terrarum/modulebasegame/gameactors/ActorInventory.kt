@@ -1,10 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
 

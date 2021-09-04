@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.utils.GdxRuntimeException
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
@@ -15,7 +16,6 @@ import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.util.*

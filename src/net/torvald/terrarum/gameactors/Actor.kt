@@ -2,7 +2,6 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.itemproperties.ItemCodex.ACTORID_MIN
 
 
 typealias ActorID = Int

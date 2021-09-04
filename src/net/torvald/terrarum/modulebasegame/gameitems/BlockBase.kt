@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2019-05-02.

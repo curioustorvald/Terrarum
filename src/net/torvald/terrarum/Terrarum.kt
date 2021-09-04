@@ -15,9 +15,13 @@ import net.torvald.UnsafeHelper
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -50,6 +54,14 @@ object Terrarum : Disposable {
         action(shapeRender)
         shapeRender.end()
     }
+
+
+    open lateinit var BlockCodex: BlockCodex
+    open lateinit var ItemCodex: ItemCodex
+    open lateinit var WireCodex: WireCodex
+    open lateinit var MaterialCodex: MaterialCodex
+    open lateinit var FactionCodex: FactionCodex
+    open var Apocryphas = HashMap<String, Any>()
 
 
     //////////////////////////////
@@ -630,3 +642,16 @@ fun <T> Array<T>.tail() = this.sliceArray(1 until this.size)
 fun <T> Array<T>.init() = this.sliceArray(0 until this.lastIndex)
 fun <T> List<T>.tail() = this.subList(1, this.size)
 fun <T> List<T>.init() = this.subList(0, this.lastIndex)
+
+val BlockCodex: BlockCodex
+    get() = Terrarum.BlockCodex
+val ItemCodex: ItemCodex
+    get() = Terrarum.ItemCodex
+val WireCodex: WireCodex
+    get() = Terrarum.WireCodex
+val MaterialCodex: MaterialCodex
+    get() = Terrarum.MaterialCodex
+val FactionCodex: FactionCodex
+    get() = Terrarum.FactionCodex
+val Apocryphas: HashMap<String, Any>
+    get() = Terrarum.Apocryphas

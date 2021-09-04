@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.*
 
 /**
  * A bar-shaped representation of the Quickslot.

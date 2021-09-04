@@ -6,8 +6,8 @@ import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.utils.CSVFetcher
@@ -141,6 +141,7 @@ object ModMgr {
             catch (e: Throwable) {
                 printdbgerr(this, "There was an error while loading module $moduleName")
                 printdbgerr(this, "\t$e")
+                e.printStackTrace(System.err)
                 moduleInfo.remove(moduleName)
             }
         }
@@ -242,8 +243,8 @@ object ModMgr {
 
     object GameBlockLoader {
         @JvmStatic operator fun invoke(module: String) {
-            BlockCodex(module, "blocks/blocks.csv")
-            WireCodex(module, "wires/")
+            Terrarum.BlockCodex = BlockCodex(module, "blocks/blocks.csv")
+            Terrarum.WireCodex = WireCodex(module, "wires/")
         }
     }
 
@@ -265,6 +266,8 @@ object ModMgr {
         }
 
         private fun register(module: String, csv: List<CSVRecord>) {
+            Terrarum.ItemCodex = ItemCodex()
+
             csv.forEach {
                 val className: String = it["classname"].toString()
                 val internalID: Int = it["id"].toInt()
@@ -293,7 +296,7 @@ object ModMgr {
         val matePath = "materials/"
 
         @JvmStatic operator fun invoke(module: String) {
-            MaterialCodex(module, matePath + "materials.csv")
+            Terrarum.MaterialCodex = MaterialCodex(module, matePath + "materials.csv")
         }
     }
 }
