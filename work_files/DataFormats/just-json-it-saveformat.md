@@ -16,6 +16,12 @@ Each file on the Savegame has following convention:
 |Type|Filename|ID|
 |--|--|--|
 |Metadata|savegame|-1|
+|Blocks Properties|blocks|-16|
+|Items Properties|items|-17|
+|Wires Properties|wires|-18|
+|Materials Properties|materials|-19|
+|Factions Properties|factions|-20|
+|Other Properties used by modules|modprops|-1024|
 |Worlds|world$n ($n is a world index)|$n|
 |Actors|actor$n ($n is an Actor ID)|$n|
 
@@ -46,13 +52,6 @@ Following code is an example Savegame JSON files.
     lastplay_t: <last play time in real-world unix time>,
     playtime_t: <total play time in real-world unix time>,
     thumb: <Ascii85-encoded gzipped thumbnail image in TGA>,
-    
-    blocks: <BlockCodex serialised>,
-    items: <ItemCodex serialised>,
-    itemd: <DynamicItems serialised>,
-    wires: <WireCodex serialised>,
-    fluids: <FluidCodex serialised>,
-    materials: <MaterialCodex serialised>,
     loadorder: <LoadOrder serialised>,
     worlds: [1,2,6,7]
 }

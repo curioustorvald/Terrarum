@@ -23,9 +23,9 @@ class WireCodex {
         wireProps.clear()
     }
 
-    private constructor() {
+    internal constructor() {
         try {
-            Terrarum.ItemCodex["testtesttest"]
+            Terrarum.itemCodex["testtesttest"]
         }
         catch (e: UninitializedPropertyAccessException) {
             throw UninitializedPropertyAccessException("ItemCodex not initialised!")

@@ -1,8 +1,6 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.SanicLoadScreen
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
@@ -38,24 +36,34 @@ object WriteSavegame {
         addFile(disk, meta)
 
         // Write BlockCodex//
-        /*val blockCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex, BlockCodex.javaClass).toByteArray(Common.CHARSET)))
+        val blockCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex).toByteArray(Common.CHARSET)))
         val blocks = DiskEntry(-16, 0, "blocks".toByteArray(), creation_t, time_t, blockCodexContent)
         addFile(disk, blocks)
 
         // Write ItemCodex//
-        val itemCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex, ItemCodex.javaClass).toByteArray(Common.CHARSET)))
+        val itemCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET)))
         val items = DiskEntry(-17, 0, "items".toByteArray(), creation_t, time_t, itemCodexContent)
         addFile(disk, items)
 
         // Write WireCodex//
-        val wireCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex, WireCodex.javaClass).toByteArray(Common.CHARSET)))
+        val wireCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex).toByteArray(Common.CHARSET)))
         val wires = DiskEntry(-18, 0, "wires".toByteArray(), creation_t, time_t, wireCodexContent)
         addFile(disk, wires)
 
         // Write MaterialCodex//
-        val materialCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex, MaterialCodex.javaClass).toByteArray(Common.CHARSET)))
+        val materialCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex).toByteArray(Common.CHARSET)))
         val materials = DiskEntry(-19, 0, "materials".toByteArray(), creation_t, time_t, materialCodexContent)
-        addFile(disk, materials)*/
+        addFile(disk, materials)
+
+        // Write FactionCodex//
+        val factionCodexContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(FactionCodex).toByteArray(Common.CHARSET)))
+        val factions = DiskEntry(-20, 0, "factions".toByteArray(), creation_t, time_t, factionCodexContent)
+        addFile(disk, factions)
+
+        // Write Apocryphas//
+        val apocryphasContent = EntryFile(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET)))
+        val apocryphas = DiskEntry(-1024, 0, "modprops".toByteArray(), creation_t, time_t, apocryphasContent)
+        addFile(disk, apocryphas)
 
         // Write World //
         val worldNum = ingame.world.worldIndex

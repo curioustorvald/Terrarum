@@ -243,8 +243,8 @@ object ModMgr {
 
     object GameBlockLoader {
         @JvmStatic operator fun invoke(module: String) {
-            Terrarum.BlockCodex = BlockCodex(module, "blocks/blocks.csv")
-            Terrarum.WireCodex = WireCodex(module, "wires/")
+            Terrarum.blockCodex = BlockCodex(module, "blocks/blocks.csv")
+            Terrarum.wireCodex = WireCodex(module, "wires/")
         }
     }
 
@@ -266,7 +266,7 @@ object ModMgr {
         }
 
         private fun register(module: String, csv: List<CSVRecord>) {
-            Terrarum.ItemCodex = ItemCodex()
+            Terrarum.itemCodex = ItemCodex()
 
             csv.forEach {
                 val className: String = it["classname"].toString()
@@ -296,7 +296,7 @@ object ModMgr {
         val matePath = "materials/"
 
         @JvmStatic operator fun invoke(module: String) {
-            Terrarum.MaterialCodex = MaterialCodex(module, matePath + "materials.csv")
+            Terrarum.materialCodex = MaterialCodex(module, matePath + "materials.csv")
         }
     }
 }

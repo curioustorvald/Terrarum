@@ -56,12 +56,12 @@ object Terrarum : Disposable {
     }
 
 
-    open lateinit var BlockCodex: BlockCodex
-    open lateinit var ItemCodex: ItemCodex
-    open lateinit var WireCodex: WireCodex
-    open lateinit var MaterialCodex: MaterialCodex
-    open lateinit var FactionCodex: FactionCodex
-    open var Apocryphas = HashMap<String, Any>()
+    var blockCodex = BlockCodex()
+    var itemCodex = ItemCodex()
+    var wireCodex = WireCodex()
+    var materialCodex = MaterialCodex()
+    var factionCodex = FactionCodex()
+    var apocryphas = HashMap<String, Any>()
 
 
     //////////////////////////////
@@ -644,14 +644,14 @@ fun <T> List<T>.tail() = this.subList(1, this.size)
 fun <T> List<T>.init() = this.subList(0, this.lastIndex)
 
 val BlockCodex: BlockCodex
-    get() = Terrarum.BlockCodex
+    get() = Terrarum.blockCodex
 val ItemCodex: ItemCodex
-    get() = Terrarum.ItemCodex
+    get() = Terrarum.itemCodex
 val WireCodex: WireCodex
-    get() = Terrarum.WireCodex
+    get() = Terrarum.wireCodex
 val MaterialCodex: MaterialCodex
-    get() = Terrarum.MaterialCodex
+    get() = Terrarum.materialCodex
 val FactionCodex: FactionCodex
-    get() = Terrarum.FactionCodex
+    get() = Terrarum.factionCodex
 val Apocryphas: HashMap<String, Any>
-    get() = Terrarum.Apocryphas
+    get() = Terrarum.apocryphas

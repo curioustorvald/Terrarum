@@ -55,7 +55,7 @@ class BlockCodex {
         virtualToTile.clear()
     }
 
-    private constructor()
+    internal constructor()
 
     /**
      * Later entry (possible from other modules) will replace older ones

@@ -1,17 +1,16 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import com.badlogic.gdx.Gdx
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ReferencingRanges
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
-import net.torvald.terrarum.serialise.*
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntry
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.WriteSavegame
 import java.io.File
 import java.io.IOException
 
@@ -42,6 +41,7 @@ object Save : ConsoleCommand {
 
 
                 WriteSavegame(disk, file, ingame)
+                Echo ("${ccW}Saved with size of $ccG${file.length()}$ccW bytes")
             }
             catch (e: IOException) {
                 Echo("Save: IOException raised.")

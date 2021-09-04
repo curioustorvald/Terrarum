@@ -9,7 +9,7 @@ import net.torvald.terrarum.serialise.Common
  */
 object ExportCodices : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        println(Common.jsoner.toJson(Terrarum.BlockCodex))
+        println(Common.jsoner.toJson(Terrarum.blockCodex))
     }
 
     override fun printUsage() {
