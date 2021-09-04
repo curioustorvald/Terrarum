@@ -56,12 +56,12 @@ object Terrarum : Disposable {
     }
 
 
-    var blockCodex = BlockCodex()
-    var itemCodex = ItemCodex()
-    var wireCodex = WireCodex()
-    var materialCodex = MaterialCodex()
-    var factionCodex = FactionCodex()
-    var apocryphas = HashMap<String, Any>()
+    var blockCodex = BlockCodex(); internal set
+    var itemCodex = ItemCodex(); internal set
+    var wireCodex = WireCodex(); internal set
+    var materialCodex = MaterialCodex(); internal set
+    var factionCodex = FactionCodex(); internal set
+    var apocryphas = HashMap<String, Any>(); internal set
 
 
     //////////////////////////////

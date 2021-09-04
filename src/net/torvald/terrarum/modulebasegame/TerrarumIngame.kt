@@ -15,39 +15,38 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.concurrent.ThreadExecutor
+import net.torvald.terrarum.console.AVTracker
+import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.WireActor
+import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.console.AVTracker
-import net.torvald.terrarum.console.ActorsList
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameparticles.ParticleBase
-import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
-import net.torvald.terrarum.gameworld.WorldSimulator
-import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
-import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
 
@@ -215,12 +214,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameLoadMode: GameLoadMode
     lateinit var gameLoadInfoPayload: Any
-    lateinit var newBlockCodex: Any
-    lateinit var newWireCodex: Any
-    lateinit var newItemCodex: Any
-    lateinit var newMaterialCodex: Any
-
-
 
 
     enum class GameLoadMode {
@@ -234,7 +227,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         when (gameLoadMode) {
             GameLoadMode.CREATE_NEW -> enterCreateNewWorld(gameLoadInfoPayload as NewWorldParameters)
-            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as WriteMeta.WorldMeta, newItemCodex)
+            GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as Codices)
         }
 
         IngameRenderer.setRenderedWorld(world)
@@ -250,6 +243,16 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // other worldgen options
     )
 
+    data class Codices(
+            val meta: WriteMeta.WorldMeta,
+            val block: BlockCodex,
+            val item: ItemCodex,
+            val wire: WireCodex,
+            val material: MaterialCodex,
+            val faction: FactionCodex,
+            val apocryphas: Map<String, Any>
+    )
+
     private fun setTheRealGamerFirstTime(actor: IngamePlayer) {
         if (actor.referenceID != Terrarum.PLAYER_REF_ID) {
             throw Error()
@@ -262,30 +265,23 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Init instance by loading saved world
      */
-    private fun enterLoadFromSave(meta: WriteMeta.WorldMeta, items: Any) {
+    private fun enterLoadFromSave(codices: Codices) {
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            RoguelikeRandomiser.loadFromSave(meta.randseed0, meta.randseed1)
-            WeatherMixer.loadFromSave(meta.weatseed0, meta.weatseed1)
+            RoguelikeRandomiser.loadFromSave(codices.meta.randseed0, codices.meta.randseed1)
+            WeatherMixer.loadFromSave(codices.meta.weatseed0, codices.meta.weatseed1)
 
             // Load BlockCodex //
-            /*BlockCodex.clear()
-            (BlockCodex::class as Any).javaClass.getField("INSTANCE").set(BlockCodex::class.objectInstance, meta.blocks)
 
             // Load WireCodex //
-            WireCodex.clear()
-            (WireCodex::class as Any).javaClass.getField("INSTANCE").set(WireCodex::class.objectInstance, meta.wires)
-            */
+
             // Load ItemCodex //
-            ItemCodex.clear()
-            (ItemCodex::class as Any).javaClass.getField("INSTANCE").set(ItemCodex::class.objectInstance, items)
+            Terrarum.itemCodex = codices.item
 
             // Load MaterialCodex //
-            /*MaterialCodex.clear()
-            (MaterialCodex::class as Any).javaClass.getField("INSTANCE").set(MaterialCodex::class.objectInstance, meta.materials)
-            */
+
         }
     }
 
