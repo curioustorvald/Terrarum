@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.UnsafeHelper
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -655,3 +656,15 @@ val FactionCodex: FactionCodex
     get() = Terrarum.factionCodex
 val Apocryphas: HashMap<String, Any>
     get() = Terrarum.apocryphas
+
+class Codex : KVHashMap() {
+
+    fun getAsCvec(key: String): Cvec? {
+        val value = get(key)
+
+        if (value == null) return null
+
+        return value as Cvec
+    }
+
+}

@@ -18,6 +18,11 @@ class Faction(name: String) : Comparable<Faction> {
     lateinit var factionFearful: HashSet<String>
     var referenceID: FactionID = generateUniqueID()
 
+    /**
+     * Mainly intended to be used by third-party modules
+     */
+    val extra = Codex()
+
     init {
         factionAmicable = HashSet<String>()
         factionNeutral = HashSet<String>()

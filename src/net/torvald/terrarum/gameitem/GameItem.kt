@@ -144,6 +144,11 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     @Transient var using = false // Always false when loaded from savegame
 
     /**
+     * Mainly intended to be used by third-party modules
+     */
+    open val extra = Codex()
+
+    /**
      * Effects applied continuously while in pocket
      */
     open fun effectWhileInPocket(delta: Float) { }

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.itemproperties
 
 import net.torvald.terrarum.AppLoader.printmsg
+import net.torvald.terrarum.Codex
 import net.torvald.terrarum.blockproperties.floatVal
 import net.torvald.terrarum.blockproperties.intVal
 import net.torvald.terrarum.utils.CSVFetcher
@@ -24,6 +25,11 @@ class Material {
     var durability: Int = 0 // tools only
 
     var identifier: String = "Name not set"
+
+    /**
+     * Mainly intended to be used by third-party modules
+     */
+    val extra = Codex()
 }
 
 class MaterialCodex {

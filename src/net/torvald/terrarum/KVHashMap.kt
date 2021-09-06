@@ -46,8 +46,6 @@ open class KVHashMap {
 
         if (value == null) return null
 
-//        if (value is JsonPrimitive) return value.asInt
-
         return value as Int
     }
 
@@ -58,12 +56,17 @@ open class KVHashMap {
 
         if (value is Int)
             return value.toDouble()
-//        else if (value is JsonPrimitive) return value.asDouble
 
         return value as Double
     }
 
     fun getAsFloat(key: String): Float? {
+        val value = get(key)
+
+        if (value == null) return null
+
+        if (value is Float) return value as Float
+
         return getAsDouble(key)?.toFloat()
     }
 
@@ -72,8 +75,6 @@ open class KVHashMap {
 
         if (value == null) return null
 
-//        if (value is JsonPrimitive) return value.asString
-
         return value as String
     }
 
@@ -81,8 +82,6 @@ open class KVHashMap {
         val value = get(key)
 
         if (value == null) return null
-
-//        if (value is JsonPrimitive) return value.asBoolean
 
         return value as Boolean
     }

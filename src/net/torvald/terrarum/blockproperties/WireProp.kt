@@ -1,5 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
+import net.torvald.terrarum.Codex
 import net.torvald.terrarum.gameitem.ItemID
 
 /**
@@ -19,4 +20,8 @@ class WireProp {
 
     var canBranch: Boolean = true
 
+    /**
+     * Mainly intended to be used by third-party modules
+     */
+    val extra = Codex()
 }

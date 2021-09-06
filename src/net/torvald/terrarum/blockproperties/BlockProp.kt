@@ -95,4 +95,9 @@ class BlockProp {
     @Transient var rngBase0 = Math.random().toFloat() // initial cycle phase (xxxxFuncX)
     @Transient var rngBase1 = Math.random().toFloat() // flicker P0, etc
     @Transient var rngBase2 = Math.random().toFloat() // flicker P1, etc
+
+    /**
+     * Mainly intended to be used by third-party modules
+     */
+    val extra = Codex()
 }
