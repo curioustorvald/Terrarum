@@ -509,6 +509,11 @@ val ccX = GameFontBase.toColorCode(0xF853)
 val ccK = GameFontBase.toColorCode(0xF888)
 val ccE = GameFontBase.toColorCode(0xFBBB)
 
+// Zelda-esque text colour emphasis
+val emphStrong = GameFontBase.toColorCode(0xFF88)
+val emphObj = GameFontBase.toColorCode(0xF0FF)
+val emphVerb = GameFontBase.toColorCode(0xFFF6)
+
 
 typealias Second = Float
 
