@@ -32,7 +32,7 @@ class ItemStorageChest(originalID: ItemID) : GameItem(originalID) {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        val item = FixtureStorageChest { Lang[originalName] }
+        val item = FixtureStorageChest()
 
         return item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
         // return true when placed, false when cannot be placed

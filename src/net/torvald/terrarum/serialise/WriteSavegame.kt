@@ -1,6 +1,10 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.ELLIPSIS
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
@@ -39,29 +43,33 @@ object WriteSavegame {
         addFile(disk, meta)
 
         // Write BlockCodex//
-        val blockCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex).toByteArray(Common.CHARSET))))
-        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(), creation_t, time_t, blockCodexContent)
-        addFile(disk, blocks)
+//        val blockCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex).toByteArray(Common.CHARSET))))
+//        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(), creation_t, time_t, blockCodexContent)
+//        addFile(disk, blocks)
+        // Commented out; nothing to write
 
         // Write ItemCodex//
         val itemCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
         val items = DiskEntry(-17, 0, "items".toByteArray(), creation_t, time_t, itemCodexContent)
         addFile(disk, items)
+        // Gotta save dynamicIDs
 
         // Write WireCodex//
-        val wireCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex).toByteArray(Common.CHARSET))))
-        val wires = DiskEntry(-18, 0, "wires".toByteArray(), creation_t, time_t, wireCodexContent)
-        addFile(disk, wires)
+//        val wireCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex).toByteArray(Common.CHARSET))))
+//        val wires = DiskEntry(-18, 0, "wires".toByteArray(), creation_t, time_t, wireCodexContent)
+//        addFile(disk, wires)
+        // Commented out; nothing to write
 
         // Write MaterialCodex//
-        val materialCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex).toByteArray(Common.CHARSET))))
-        val materials = DiskEntry(-19, 0, "materials".toByteArray(), creation_t, time_t, materialCodexContent)
-        addFile(disk, materials)
+//        val materialCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex).toByteArray(Common.CHARSET))))
+//        val materials = DiskEntry(-19, 0, "materials".toByteArray(), creation_t, time_t, materialCodexContent)
+//        addFile(disk, materials)
+        // Commented out; nothing to write
 
         // Write FactionCodex//
-        val factionCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(FactionCodex).toByteArray(Common.CHARSET))))
-        val factions = DiskEntry(-20, 0, "factions".toByteArray(), creation_t, time_t, factionCodexContent)
-        addFile(disk, factions)
+//        val factionCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(FactionCodex).toByteArray(Common.CHARSET))))
+//        val factions = DiskEntry(-20, 0, "factions".toByteArray(), creation_t, time_t, factionCodexContent)
+//        addFile(disk, factions)
 
         // Write Apocryphas//
         val apocryphasContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
@@ -105,29 +113,41 @@ object LoadSavegame {
     private fun getFileReader(disk: VirtualDisk, id: Int): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
     operator fun invoke(disk: VirtualDisk) {
+        val ingame = TerrarumIngame(AppLoader.batch)
+
+        // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
+        // you'll inevitably read the player actor twice, and they're separate instances of the player!
         val meta = ReadMeta(disk)
-        val player = ReadActor.readActorOnly(getFileReader(disk, 9545698)) as IngamePlayer
-        val world = ReadWorld.readWorldOnly(getFileReader(disk, player.worldCurrentlyPlaying))
-        val actors = world.actors.map { ReadActor.readActorOnly(getFileReader(disk, it)) }
-        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
+        val currentWorld = (ReadActor(getFileReader(disk, Terrarum.PLAYER_REF_ID)) as IngamePlayer).worldCurrentlyPlaying
+        val world = ReadWorld(getFileReader(disk, currentWorld))
+        val actors = world.actors.map { ReadActor(getFileReader(disk, it)) }
+//        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
         val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
-        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))
-        val material = Common.jsoner.fromJson(MaterialCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -19)))
-        val faction = Common.jsoner.fromJson(FactionCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -20)))
+//        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))
+//        val material = Common.jsoner.fromJson(MaterialCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -19)))
+//        val faction = Common.jsoner.fromJson(FactionCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -20)))
         val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
 
-        val ingame = TerrarumIngame(AppLoader.batch)
-        val worldParam = TerrarumIngame.Codices(meta, block, item, wire, material, faction, apocryphas)
+        val worldParam = TerrarumIngame.Codices(meta, item, apocryphas)
         ingame.world = world
         ingame.gameLoadInfoPayload = worldParam
         ingame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
         ingame.savegameArchive = disk
         actors.forEach { ingame.addNewActor(it) }
-        ingame.actorNowPlaying = player
+
+        // by doing this, whatever the "possession" the player had will be broken by the game load
+        ingame.actorNowPlaying = ingame.getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
+
+
+//        ModMgr.reloadModules()
 
         Terrarum.setCurrentIngameInstance(ingame)
-        val loadScreen = SanicLoadScreen
-        AppLoader.setLoadScreen(loadScreen)
+        AppLoader.setScreen(ingame)
+
+        Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")
+        printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")
+
+        Terrarum.ingame!!.consoleHandler.setAsOpen()
     }
 
 }

@@ -233,7 +233,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         IngameRenderer.setRenderedWorld(world)
 
 
-        super.show() // gameInitialised = true
+        super.show() // this function sets gameInitialised = true
     }
 
     data class NewWorldParameters(
@@ -245,11 +245,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     data class Codices(
             val meta: WriteMeta.WorldMeta,
-            val block: BlockCodex,
+//            val block: BlockCodex,
             val item: ItemCodex,
-            val wire: WireCodex,
-            val material: MaterialCodex,
-            val faction: FactionCodex,
+//            val wire: WireCodex,
+//            val material: MaterialCodex,
+//            val faction: FactionCodex,
             val apocryphas: Map<String, Any>
     )
 
@@ -270,18 +270,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
+            printdbg(this, "Ingame setting things up from the savegame")
+
             RoguelikeRandomiser.loadFromSave(codices.meta.randseed0, codices.meta.randseed1)
             WeatherMixer.loadFromSave(codices.meta.weatseed0, codices.meta.weatseed1)
 
-            // Load BlockCodex //
-
-            // Load WireCodex //
-
-            // Load ItemCodex //
-            Terrarum.itemCodex = codices.item
-
-            // Load MaterialCodex //
-
+            Terrarum.itemCodex.loadFromSave(codices.item)
+            Terrarum.apocryphas = HashMap(codices.apocryphas)
         }
     }
 
@@ -683,6 +678,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.invoke(
                 paused,
+                screenZoom,
                 visibleActorsRenderBehind,
                 visibleActorsRenderMiddle,
                 visibleActorsRenderMidTop,

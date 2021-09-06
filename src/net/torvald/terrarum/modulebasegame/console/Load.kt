@@ -1,6 +1,10 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import net.torvald.ELLIPSIS
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.ccC
+import net.torvald.terrarum.ccG
+import net.torvald.terrarum.ccR
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
@@ -20,12 +24,13 @@ object Load : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
+                Echo("${ccC}Changing context, ${ccR}do not touch the controller$ccC and ${ccG}wait$ccC$ELLIPSIS")
+
                 val charset = Common.CHARSET
                 val file = File(AppLoader.defaultDir + "/Exports/${args[1]}")
                 val disk = VDUtil.readDiskArchive(file, charset = charset)
-                val meta = ReadMeta(disk)
 
-                println(meta.loadorder.joinToString())
+                LoadSavegame(disk)
             }
             catch (e: IOException) {
                 Echo("Load: IOException raised.")

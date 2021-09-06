@@ -15,7 +15,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_TIKI_TORCH"
+    override val originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override var stackable = true
     override var inventoryCategory = Category.FIXTURE
@@ -38,7 +38,7 @@ class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {
-        val item = FixtureLogicSignalEmitter { Lang[originalName] }
+        val item = FixtureLogicSignalEmitter()
 
         return item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY)
         // return true when placed, false when cannot be placed

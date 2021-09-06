@@ -36,7 +36,7 @@ object PostProcessor : Disposable {
     private val defaultResCol = Color(0x66ffff66)
     private val safeAreaCol = Color(0xffffff66.toInt())
     private val safeAreaCol2 = Color(0xffffff44.toInt())
-    private val currentResCol = Color(0xff00ff44.toInt())
+    private val currentResCol = Color(0xffffee44.toInt())
 
     private val debugUI = BasicDebugInfoWindow()
 

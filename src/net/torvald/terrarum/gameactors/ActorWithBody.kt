@@ -3,9 +3,11 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
@@ -40,7 +42,7 @@ open class ActorWithBody : Actor {
 
     var physProp = PhysProperties.HUMANOID_DEFAULT
 
-    protected constructor()
+    protected constructor() : super()
 
     constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID? = null) : super(renderOrder, id) {
         this.physProp = physProp
@@ -1644,11 +1646,19 @@ open class ActorWithBody : Actor {
             )
         }
         else {
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat(),
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
+            try {
+                sprite.render(batch,
+                        (hitbox.startX - offsetX).toFloat(),
+                        (hitbox.startY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
+            catch (e: UninitializedPropertyAccessException) {
+                printdbgerr(this, this.javaClass.simpleName)
+                printdbgerr(this, actorValue.getAsString(AVKey.NAME))
+                printdbgerr(this, if (this is HasAssembledSprite) this.animDescPath else "(not HasAssembledSprite)")
+                printdbgerr(this, e)
+            }
         }
     }
 

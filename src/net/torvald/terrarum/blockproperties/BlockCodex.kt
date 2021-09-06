@@ -20,31 +20,31 @@ import java.io.IOException
  */
 class BlockCodex {
 
-    val blockProps = HashMap<ItemID, BlockProp>()
+    @Transient val blockProps = HashMap<ItemID, BlockProp>()
 
-    val dynamicLights = SortedArrayList<ItemID>() // does not include virtual ones
+    @Transient val dynamicLights = SortedArrayList<ItemID>() // does not include virtual ones
 
     /** 65536 */
     //val MAX_TERRAIN_TILES = GameWorld.TILES_SUPPORTED
 
     @Transient private val nullProp = BlockProp()
 
-    var highestNumber = -1 // does not include virtual ones
+    @Transient var highestNumber = -1 // does not include virtual ones
         private set
 
     // fake props for "randomised" dynamic lights
     @Transient val DYNAMIC_RANDOM_CASES = 64
-    private var virtualTileCursor = 1
+    @Transient private var virtualTileCursor = 1
 
     /**
      * One-to-Many
      */
-    val tileToVirtual = HashMap<ItemID, List<ItemID>>()
+    @Transient val tileToVirtual = HashMap<ItemID, List<ItemID>>()
 
     /**
      * Many-to-One
      */
-    val virtualToTile = HashMap<ItemID, ItemID>()
+    @Transient val virtualToTile = HashMap<ItemID, ItemID>()
 
     fun clear() {
         blockProps.clear()

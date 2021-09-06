@@ -26,6 +26,8 @@ interface Electric {
 }
 
 /**
+ * Protip: do not make child classes take any argument, especially no function (function "classes" have no zero-arg constructor)
+ *
  * Created by minjaesong on 2016-06-17.
  */
 open class FixtureBase : ActorWithBody, CuedByTerrainChange {
@@ -37,7 +39,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     var mainUI: UICanvas? = null
     var inventory: FixtureInventory? = null
 
-    protected constructor()
+    protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
 
     constructor(blockBox0: BlockBox,
                 blockBoxProps: BlockBoxProps = BlockBoxProps(0),
@@ -45,7 +47,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 nameFun: () -> String,
                 mainUI: UICanvas? = null,
                 inventory: FixtureInventory? = null,
-                id: ActorID? = null) : super(renderOrder, PhysProperties.IMMOBILE, id) {
+                id: ActorID? = null
+    ) : super(renderOrder, PhysProperties.IMMOBILE, id) {
         blockBox = blockBox0
         this.blockBoxProps = blockBoxProps
         this.renderOrder = renderOrder
@@ -223,7 +226,10 @@ inline class BlockBoxProps(val flags: Int) {
  * @param width Width of the block box, tile-wise
  * @param height Height of the block box, tile-wise
  */
-data class BlockBox(val collisionType: ItemID, val width: Int, val height: Int) {
+data class BlockBox(
+        val collisionType: ItemID = NO_COLLISION,
+        val width: Int = 0,
+        val height: Int = 0) {
 
     /*fun redefine(collisionType: Int, width: Int, height: Int) {
         redefine(collisionType)
@@ -246,6 +252,6 @@ data class BlockBox(val collisionType: ItemID, val width: Int, val height: Int) 
         const val NO_PASS_RIGHT = Block.ACTORBLOCK_NO_PASS_RIGHT
         const val NO_PASS_LEFT = Block.ACTORBLOCK_NO_PASS_LEFT
 
-        val NULL = BlockBox(NO_COLLISION, 0, 0)
+        val NULL = BlockBox()
     }
 }

@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.gameparticles.ParticleVanishingText
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
@@ -34,11 +35,9 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
 
     override val lightBoxList: ArrayList<Hitbox> = ArrayList(1)
 
-    private constructor()
-
-    constructor(nameFun: () -> String) : super(
+    constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 2),
-            nameFun = nameFun
+            nameFun = { Lang["ITEM_TIKI_TORCH"] }
     ) {
 
         // loading textures

@@ -4,6 +4,7 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -13,13 +14,15 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
     override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
     override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
 
-    protected constructor()
 
-    constructor(nameFun: () -> String) : super(
+    constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
-            nameFun = nameFun)
+            nameFun = { Lang["ITEM_LOGIC_SIGNAL_EMITTER"] }
+    )
 
     init {
+        println("INIT AGAIN FixtureLogicSignalEmitter")
+
         density = 1400.0
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
 

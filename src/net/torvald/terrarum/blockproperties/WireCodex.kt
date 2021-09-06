@@ -15,7 +15,7 @@ import java.io.IOException
  */
 class WireCodex {
 
-    val wireProps = HashMap<ItemID, WireProp>()
+    @Transient val wireProps = HashMap<ItemID, WireProp>()
 
     @Transient private val nullProp = WireProp()
 

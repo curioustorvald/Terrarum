@@ -1139,6 +1139,9 @@ public class AppLoader implements ApplicationListener {
 
     // //
 
+    public static String csiR = "\u001B[31m";
+    public static String csi0 = "\u001B[m";
+
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
@@ -1153,9 +1156,9 @@ public class AppLoader implements ApplicationListener {
         if (IS_DEVELOPMENT_BUILD) {
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
             if (message == null)
-                System.err.println("[" + out + "] null");
+                System.out.println(csiR + "[" + out + "] null" + csi0);
             else
-                System.err.println("[" + out + "] " + message.toString());
+                System.out.println(csiR + "[" + out + "] " + message.toString() + csi0);
         }
     }
 

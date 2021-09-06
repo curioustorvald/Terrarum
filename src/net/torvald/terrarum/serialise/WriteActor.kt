@@ -2,6 +2,7 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.NoSuchActorWithIDException
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -25,10 +26,19 @@ object WriteActor {
     fun encodeToByteArray64(actor: Actor): ByteArray64 {
         val baw = ByteArray64Writer(Common.CHARSET)
 
+        val classDef = """{"class":"${actor.javaClass.canonicalName}""""
+        baw.write(classDef)
         Common.jsoner.toJson(actor, actor.javaClass, baw)
         baw.flush(); baw.close()
+        // by this moment, contents of the baw will be:
+        //  {"class":"some.class.Name"{"actorValue":{},......}
+        //  (note that first bracket is not closed, and another open bracket after "class" property)
+        // and we want to turn it into this:
+        //  {"class":"some.class.Name","actorValue":{},......}
+        val ba = baw.toByteArray64()
+        ba[classDef.toByteArray(Common.CHARSET).size.toLong()] = ','.code.toByte()
 
-        return baw.toByteArray64()
+        return ba
     }
 
 }
@@ -45,14 +55,11 @@ object WriteActor {
  */
 object ReadActor {
 
-    fun readActorOnly(worldDataStream: Reader): Actor =
-            Common.jsoner.fromJson(null, worldDataStream)
+    operator fun invoke(worldDataStream: Reader): Actor =
+            fillInDetails(Common.jsoner.fromJson(null, worldDataStream))
 
-    operator fun invoke(ingame: TerrarumIngame, worldDataStream: Reader): Actor =
-            postRead(ingame, readActorOnly(worldDataStream))
 
-    private fun postRead(ingame: TerrarumIngame, actor: Actor): Actor {
-        // filling in Transients
+    private fun fillInDetails(actor: Actor): Actor {
         actor.actorValue.actor = actor
 
         if (actor is Pocketed)
@@ -66,6 +73,13 @@ object ReadActor {
                 actor.reassembleSprite(actor.sprite!!, actor.spriteGlow)
             }
         }
+
+        return actor
+    }
+
+    fun readActorAndAddToWorld(ingame: TerrarumIngame, worldDataStream: Reader): Actor {
+        val actor = invoke(worldDataStream)
+
         // replace existing player
         val oldPlayerID = ingame.actorNowPlaying?.referenceID
         try {

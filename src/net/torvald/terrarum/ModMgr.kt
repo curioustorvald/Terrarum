@@ -123,7 +123,7 @@ object ModMgr {
                     }
 
                     newClass?.let {
-                        val newClassConstructor = newClass.getConstructor(/* no args defined */)
+                        val newClassConstructor = newClass!!.getConstructor(/* no args defined */)
                         val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
 
                         entryPointClasses.add(newClassInstance as ModuleEntryPoint)
@@ -141,28 +141,62 @@ object ModMgr {
             catch (e: Throwable) {
                 printdbgerr(this, "There was an error while loading module $moduleName")
                 printdbgerr(this, "\t$e")
-                e.printStackTrace(System.err)
+                print(AppLoader.csiR); e.printStackTrace(System.out); print(AppLoader.csi0)
                 moduleInfo.remove(moduleName)
             }
         }
 
-
-        // lists available engines
-        /*val manager = ScriptEngineManager()
-        val factories = manager.engineFactories
-        for (f in factories) {
-            println("engine name:" + f.engineName)
-            println("engine version:" + f.engineVersion)
-            println("language name:" + f.languageName)
-            println("language version:" + f.languageVersion)
-            println("names:" + f.names)
-            println("mime:" + f.mimeTypes)
-            println("extension:" + f.extensions)
-            println("-----------------------------------------------")
-        }*/
     }
 
     operator fun invoke() { }
+
+    fun reloadModules() {
+        loadOrder.forEach {
+            val moduleName = it
+
+            printmsg(this, "Reloading module $moduleName")
+
+            try {
+                checkExistence(moduleName)
+                val modMetadata = moduleInfo[it]!!
+                val entryPoint = modMetadata.entryPoint
+
+
+                // run entry script in entry point
+                if (entryPoint.isNotBlank()) {
+                    var newClass: Class<*>? = null
+                    try {
+                        newClass = Class.forName(entryPoint)
+                    }
+                    catch (e: ClassNotFoundException) {
+                        printdbgerr(this, "$moduleName has nonexisting entry point, skipping...")
+                        printdbgerr(this, "\t$e")
+                        moduleInfo.remove(moduleName)
+                    }
+
+                    newClass?.let {
+                        val newClassConstructor = newClass!!.getConstructor(/* no args defined */)
+                        val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+
+                        entryPointClasses.add(newClassInstance as ModuleEntryPoint)
+                        (newClassInstance as ModuleEntryPoint).invoke()
+                    }
+                }
+
+                printdbg(this, "$moduleName reloaded successfully")
+            }
+            catch (noSuchModule: FileNotFoundException) {
+                printdbgerr(this, "No such module: $moduleName, skipping...")
+                moduleInfo.remove(moduleName)
+            }
+            catch (e: Throwable) {
+                printdbgerr(this, "There was an error while loading module $moduleName")
+                printdbgerr(this, "\t$e")
+                print(AppLoader.csiR); e.printStackTrace(System.out); print(AppLoader.csi0)
+                moduleInfo.remove(moduleName)
+            }
+        }
+    }
 
     private fun checkExistence(module: String) {
         if (!moduleInfo.containsKey(module))

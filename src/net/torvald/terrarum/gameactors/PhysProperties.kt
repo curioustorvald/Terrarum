@@ -1,9 +1,9 @@
 package net.torvald.terrarum.gameactors
 
 data class PhysProperties(
-        val immobileBody: Boolean,
-        var usePhysics: Boolean,
-        val useStairs: Boolean
+        val immobileBody: Boolean = false,
+        var usePhysics: Boolean = true,
+        val useStairs: Boolean = false
 ) {
     companion object {
         val HUMANOID_DEFAULT = PhysProperties(

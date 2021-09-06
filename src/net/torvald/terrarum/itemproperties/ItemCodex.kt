@@ -26,9 +26,9 @@ class ItemCodex {
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
-    val itemCodex = HashMap<ItemID, GameItem>()
-    val dynamicItemDescription = HashMap<ItemID, GameItem>()
-    val dynamicToStaticTable = HashMap<ItemID, ItemID>()
+    @Transient val itemCodex = HashMap<ItemID, GameItem>()
+    @Transient var dynamicItemDescription = HashMap<ItemID, GameItem>(); private set
+    var dynamicToStaticTable = HashMap<ItemID, ItemID>(); private set
 
     @Transient val ACTORID_MIN = ReferencingRanges.ACTORS.first
 
@@ -38,6 +38,17 @@ class ItemCodex {
         itemCodex.clear()
         dynamicItemDescription.clear()
         dynamicToStaticTable.clear()
+    }
+
+    /**
+     * This method does not alter already-been-loaded itemCodex; only filles up dynamicitem-related fields
+     */
+    fun loadFromSave(other: ItemCodex) {
+        this.dynamicToStaticTable = other.dynamicToStaticTable
+        dynamicToStaticTable.forEach { dynid, itemid ->
+            printdbg(this, "Loadfromsave dynid $dynid ->> $itemid")
+            dynamicItemDescription[dynid] = itemCodex[itemid]!!
+        }
     }
 
     private val itemImagePlaceholder: TextureRegion
@@ -62,7 +73,7 @@ class ItemCodex {
         if (code == null) return null
 
         if (code.startsWith("$PREFIX_DYNAMICITEM:"))
-            return dynamicItemDescription[code]!!
+            return dynamicItemDescription[code] ?: throw NullPointerException("No ItemProp with id $code")
         else if (code.startsWith("$PREFIX_ACTORITEM:")) {
             val a = (Terrarum.ingame!! as TerrarumIngame).getActorByID(code.substring(6).toInt()) // actor item
             if (a is CanBeAnItem) return a.itemData

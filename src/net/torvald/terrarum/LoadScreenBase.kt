@@ -9,6 +9,7 @@ import net.torvald.util.CircularArray
 
 open class LoadScreenBase : ScreenAdapter(), Disposable {
 
+    open var preLoadJob: (LoadScreenBase) -> Unit = {}
     open var screenToLoad: IngameInstance? = null
     open lateinit var screenLoadingThread: Thread
 
@@ -33,6 +34,7 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
         else {
             val runnable = {
                 try {
+                    preLoadJob(this)
                     screenToLoad!!.show()
                 }
                 catch (e: Exception) {

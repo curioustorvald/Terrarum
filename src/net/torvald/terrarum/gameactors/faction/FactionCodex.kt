@@ -6,7 +6,7 @@ import java.util.*
  * Created by minjaesong on 2016-05-09.
  */
 class FactionCodex {
-    val factionContainer = ArrayList<Faction>()
+    @Transient val factionContainer = ArrayList<Faction>()
 
     fun clear() = factionContainer.clear()
 

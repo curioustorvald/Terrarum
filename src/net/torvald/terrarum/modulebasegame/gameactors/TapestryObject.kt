@@ -19,7 +19,7 @@ class TapestryObject : FixtureBase {
     var artName = ""; private set
     var artAuthor = ""; private set
 
-    private constructor()
+    private constructor() : super()
 
     constructor(pixmap: Pixmap, artName: String, artAuthor: String, nameFun: () -> String) : super() {
         this.artName = artName

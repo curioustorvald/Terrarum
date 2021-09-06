@@ -188,7 +188,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // log messages
                 it.color = messageForegroundColour
-                messages.forEachIndexed { i, s ->
+                messages.reversed().forEachIndexed { i, s ->
                     AppLoader.fontGame.draw(it,
                             s,
                             AppLoader.screenSize.tvSafeGraphicsWidth + 16f,
@@ -213,7 +213,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // log messages
                 it.color = messageForegroundColour
-                messages.forEachIndexed { i, s ->
+                messages.reversed().forEachIndexed { i, s ->
                     AppLoader.fontGame.draw(it,
                             s,
                             AppLoader.screenSize.tvSafeGraphicsWidth + 16f,

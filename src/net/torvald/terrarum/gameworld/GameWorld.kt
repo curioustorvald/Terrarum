@@ -133,10 +133,7 @@ class GameWorld() : Disposable {
         lastPlayTime = lastPlayTIME_T
         this.totalPlayTime = totalPlayTime
 
-        postLoad()
-    }
 
-    fun postLoad() {
         AppLoader.tileMaker.tags.forEach {
             printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
@@ -147,6 +144,8 @@ class GameWorld() : Disposable {
         // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
         tileNumberToNameMap[0] = Block.AIR
     }
+
+
 
     /**
      * Load existing world
@@ -271,7 +270,7 @@ class GameWorld() : Disposable {
      */
     fun setTileTerrain(x: Int, y: Int, itemID: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
-        val tilenum = tileNameToNumberMap[itemID]!!
+        val tilenum = tileNameToNumberMap[itemID] ?: throw NullPointerException("Unknown tile name $itemID")
 
         val oldTerrain = getTileFromTerrain(x, y)
         layerTerrain.unsafeSetTile(x, y, tilenum)

@@ -53,16 +53,20 @@ object WriteWorld {
  */
 object ReadWorld {
 
-    fun readWorldOnly(worldDataStream: Reader): GameWorld =
-            Common.jsoner.fromJson(GameWorld::class.java, worldDataStream)
+    operator fun invoke(worldDataStream: Reader): GameWorld =
+            fillInDetails(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream))
 
-    operator fun invoke(ingame: TerrarumIngame, worldDataStream: Reader): GameWorld =
-            postRead(ingame, readWorldOnly(worldDataStream))
+    private fun fillInDetails(world: GameWorld): GameWorld {
+        world.tileNumberToNameMap.forEach { l, s ->
+            world.tileNameToNumberMap[s] = l.toInt()
+        }
 
-    private fun postRead(ingame: TerrarumIngame, world: GameWorld): GameWorld {
-        world.postLoad()
+        return world
+    }
+
+    fun readWorldAndSetNewWorld(ingame: TerrarumIngame, worldDataStream: Reader): GameWorld {
+        val world = invoke(worldDataStream)
         ingame.world = world
-
         return world
     }
 

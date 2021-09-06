@@ -34,7 +34,7 @@ class Material {
 
 class MaterialCodex {
 
-    val materialProps = HashMap<String, Material>()
+    @Transient val materialProps = HashMap<String, Material>()
     @Transient private val nullMaterial = Material()
 
     internal constructor()

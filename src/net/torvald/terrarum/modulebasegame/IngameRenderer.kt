@@ -177,6 +177,7 @@ object IngameRenderer : Disposable {
 
     operator fun invoke(
             gamePaused: Boolean,
+            zoom: Float = 1f,
             actorsRenderBehind : List<ActorWithBody>? = null,
             actorsRenderMiddle : List<ActorWithBody>? = null,
             actorsRenderMidTop : List<ActorWithBody>? = null,
@@ -194,7 +195,6 @@ object IngameRenderer : Disposable {
         //renderingParticleCount = particlesContainer?.size ?: 0
         //renderingParticleCount = (particlesContainer?.buffer?.map { (!it.flagDespawn).toInt() } ?: listOf(0)).sum()
         renderingUIsCount = uiContainer?.countVisible() ?: 0
-        val zoom = Terrarum.ingame?.screenZoom ?: 1f
 
         invokeInit()
 

@@ -18,7 +18,7 @@ object ImportWorld : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val reader = java.io.FileReader(AppLoader.defaultDir + "/Exports/${args[1]}.json")
-                ReadWorld(Terrarum.ingame!! as TerrarumIngame, reader)
+                ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
                 Echo("Importworld: imported a world from ${args[1]}.json")
             }
             catch (e: IOException) {
@@ -41,7 +41,7 @@ object ImportActor : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val reader = java.io.FileReader(AppLoader.defaultDir + "/Exports/${args[1]}.json")
-                ReadActor(Terrarum.ingame!! as TerrarumIngame, reader)
+                ReadActor.readActorAndAddToWorld(Terrarum.ingame!! as TerrarumIngame, reader)
                 Echo("Importactor: imported an actor from ${args[1]}.json")
             }
             catch (e: IOException) {
