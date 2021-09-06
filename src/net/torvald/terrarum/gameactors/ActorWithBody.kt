@@ -12,7 +12,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
@@ -1658,6 +1657,7 @@ open class ActorWithBody : Actor {
                 printdbgerr(this, actorValue.getAsString(AVKey.NAME))
                 printdbgerr(this, if (this is HasAssembledSprite) this.animDescPath else "(not HasAssembledSprite)")
                 printdbgerr(this, e)
+                throw e
             }
         }
     }

@@ -2,7 +2,6 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.NoSuchActorWithIDException
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -65,13 +64,10 @@ object ReadActor {
         if (actor is Pocketed)
             actor.inventory.actor = actor
 
-        if (actor is ActorWithBody) {
+        if (actor is ActorWithBody && actor is HasAssembledSprite) {
             actor.sprite = SpriteAnimation(actor)
-
-            if (actor is HasAssembledSprite) {
-                if (actor.animDescPathGlow != null) actor.spriteGlow = SpriteAnimation(actor)
-                actor.reassembleSprite(actor.sprite!!, actor.spriteGlow)
-            }
+            if (actor.animDescPathGlow != null) actor.spriteGlow = SpriteAnimation(actor)
+            actor.reassembleSprite(actor.sprite!!, actor.spriteGlow)
         }
 
         return actor
