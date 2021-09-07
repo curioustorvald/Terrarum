@@ -7,17 +7,27 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.ui.Notification
+import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.util.SortedArrayList
+import org.khelekore.prtree.DistanceCalculator
+import org.khelekore.prtree.DistanceResult
+import org.khelekore.prtree.MBRConverter
+import org.khelekore.prtree.PRTree
+import org.khelekore.prtree.PointND
 import java.util.concurrent.locks.Lock
 
 /**
@@ -25,6 +35,23 @@ import java.util.concurrent.locks.Lock
  * this instance only stores the stage that is currently being used.
  */
 open class IngameInstance(val batch: SpriteBatch) : Screen {
+
+    open protected val actorMBRConverter = object : MBRConverter<ActorWithBody> {
+        override fun getDimensions(): Int = 2
+        override fun getMin(axis: Int, t: ActorWithBody): Double =
+                when (axis) {
+                    0 -> t.hitbox.startX
+                    1 -> t.hitbox.startY
+                    else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
+                }
+
+        override fun getMax(axis: Int, t: ActorWithBody): Double =
+                when (axis) {
+                    0 -> t.hitbox.endX
+                    1 -> t.hitbox.endY
+                    else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
+                }
+    }
 
     lateinit var savegameArchive: VirtualDisk
         internal set
@@ -41,8 +68,17 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     var newWorldLoadedLatch = false
 
+    /** For in-world text overlays? e.g. cursor on the ore block and tooltip will say "Malachite" or something */
+    open var uiTooltip: UITooltip = UITooltip()
+    open var notifier: Notification = Notification()
+
+
     init {
         consoleHandler.setPosition(0, 0)
+        notifier.setPosition(
+                (AppLoader.screenSize.screenW - notifier.width) / 2,
+                AppLoader.screenSize.screenH - notifier.height - AppLoader.screenSize.tvSafeGraphicsHeight
+        )
 
         printdbg(this, "New ingame instance ${this.hashCode()}, called from")
         printStackTrace(this)
@@ -85,7 +121,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
-    // FIXME queues will not work; input processing (blocks will queue) and queue consuming cannot be synchronised
+    var actorsRTree: PRTree<ActorWithBody> = PRTree(actorMBRConverter, 24) // no lateinit!
+        protected set
+
     val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
@@ -288,13 +326,84 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
 
 
-
-
     data class BlockChangeQueueItem(val old: ItemID, val new: ItemID, val posX: Int, val posY: Int)
 
-    open fun sendNotification(messages: Array<String>) {}
-    open fun sendNotification(messages: List<String>) {}
-    open fun sendNotification(singleMessage: String) {}
+    open fun sendNotification(messages: Array<String>) {
+        notifier.sendNotification(messages.toList())
+    }
+
+    open fun sendNotification(messages: List<String>) {
+        notifier.sendNotification(messages)
+    }
+
+    open fun sendNotification(singleMessage: String) = sendNotification(listOf(singleMessage))
+
+
+    open fun setTooltipMessage(message: String?) {
+        if (message == null) {
+            uiTooltip.setAsClose()
+        }
+        else {
+            if (uiTooltip.isClosed || uiTooltip.isClosing) {
+                uiTooltip.setAsOpen()
+            }
+            uiTooltip.message = message
+        }
+    }
+
+
+    // simple euclidean norm, squared
+    private val actorDistanceCalculator = DistanceCalculator<ActorWithBody> { t: ActorWithBody, p: PointND ->
+        val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+        // ROUNDWORLD implementation
+        val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TerrarumAppConfiguration.TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+        val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TerrarumAppConfiguration.TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+
+        minOf(dist1, minOf(dist2, dist3))
+    }
+
+    /**
+     * @return list of actors under the bounding box given, list may be empty if no actor is under the point.
+     */
+    fun getActorsAt(startPoint: Point2d, endPoint: Point2d): List<ActorWithBody> {
+        val outList = ArrayList<ActorWithBody>()
+        try {
+            actorsRTree.find(startPoint.x, startPoint.y, endPoint.x, endPoint.y, outList)
+        }
+        catch (e: NullPointerException) {}
+        return outList
+    }
+
+    fun getActorsAt(worldX: Double, worldY: Double): List<ActorWithBody> {
+        val outList = ArrayList<ActorWithBody>()
+        try {
+            actorsRTree.find(worldX, worldY, worldX + 1.0, worldY + 1.0, outList)
+        }
+        catch (e: NullPointerException) {}
+        return outList
+    }
+
+    /** Will use centre point of the actors
+     * @return List of DistanceResult, list may be empty */
+    fun findKNearestActors(from: ActorWithBody, maxHits: Int): List<DistanceResult<ActorWithBody>> {
+        return actorsRTree.nearestNeighbour(actorDistanceCalculator, null, maxHits, object : PointND {
+            override fun getDimensions(): Int = 2
+            override fun getOrd(axis: Int): Double = when(axis) {
+                0 -> from.hitbox.centeredX
+                1 -> from.hitbox.centeredY
+                else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
+            }
+        })
+    }
+    /** Will use centre point of the actors
+     * @return Pair of: the actor, distance from the actor; null if none found */
+    fun findNearestActors(from: ActorWithBody): DistanceResult<ActorWithBody>? {
+        val t = findKNearestActors(from, 1)
+        return if (t.isNotEmpty())
+            t[0]
+        else
+            null
+    }
 }
 
 inline fun Lock.lock(body: () -> Unit) {

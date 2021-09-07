@@ -74,18 +74,12 @@ object WorldSimulator {
             get() = ingame.world
 
 
-    private lateinit var actorsRTree: PRTree<ActorWithBody>
-
     fun resetForThisFrame() {
 
     }
 
     /** Must be called BEFORE the actors update -- actors depend on the R-Tree for various things */
     operator fun invoke(player: ActorHumanoid?, delta: Float) {
-        // build the r-tree that will be used during a single frame of updating
-        actorsRTree = PRTree(actorMBRConverter, 24)
-        actorsRTree.load(ingame.actorContainerActive.filterIsInstance<ActorWithBody>())
-
 
 
         //printdbg(this, "============================")
@@ -112,42 +106,7 @@ object WorldSimulator {
         //printdbg(this, "============================")
     }
 
-    /**
-     * @return list of actors under the bounding box given, list may be empty if no actor is under the point.
-     */
-    fun getActorsAt(startPoint: Point2d, endPoint: Point2d): List<ActorWithBody> {
-        val outList = ArrayList<ActorWithBody>()
-        actorsRTree.find(startPoint.x, startPoint.y, endPoint.x, endPoint.y, outList)
-        return outList
-    }
 
-    fun getActorsAt(worldX: Double, worldY: Double): List<ActorWithBody> {
-        val outList = ArrayList<ActorWithBody>()
-        actorsRTree.find(worldX, worldY, worldX + 1.0, worldY + 1.0, outList)
-        return outList
-    }
-
-    /** Will use centre point of the actors
-     * @return List of DistanceResult, list may be empty */
-    fun findKNearestActors(from: ActorWithBody, maxHits: Int): List<DistanceResult<ActorWithBody>> {
-        return actorsRTree.nearestNeighbour(actorDistanceCalculator, null, maxHits, object : PointND {
-            override fun getDimensions(): Int = 2
-            override fun getOrd(axis: Int): Double = when(axis) {
-                0 -> from.hitbox.centeredX
-                1 -> from.hitbox.centeredY
-                else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
-            }
-        })
-    }
-    /** Will use centre point of the actors
-     * @return Pair of: the actor, distance from the actor; null if none found */
-    fun findNearestActors(from: ActorWithBody): DistanceResult<ActorWithBody>? {
-        val t = findKNearestActors(from, 1)
-        return if (t.isNotEmpty())
-            t[0]
-        else
-            null
-    }
 
     fun degrass() {
         if (ingame.terrainChangeQueue.isNotEmpty()) { AppLoader.measureDebugTime("WorldSimulator.degrass") {
@@ -482,32 +441,7 @@ object WorldSimulator {
     fun ItemID.isFallable() = BlockCodex[this].maxSupport
 
 
-    private val actorMBRConverter = object : MBRConverter<ActorWithBody> {
-        override fun getDimensions(): Int = 2
-        override fun getMin(axis: Int, t: ActorWithBody): Double =
-                when (axis) {
-                    0 -> t.hitbox.startX
-                    1 -> t.hitbox.startY
-                    else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
-                }
 
-        override fun getMax(axis: Int, t: ActorWithBody): Double =
-                when (axis) {
-                    0 -> t.hitbox.endX
-                    1 -> t.hitbox.endY
-                    else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
-                }
-    }
-
-    // simple euclidean norm, squared
-    private val actorDistanceCalculator = DistanceCalculator<ActorWithBody> { t: ActorWithBody, p: PointND ->
-        val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
-        // ROUNDWORLD implementation
-        val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
-        val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
-
-        minOf(dist1, minOf(dist2, dist3))
-    }
 
 
     private val wiresimOverscan = 60

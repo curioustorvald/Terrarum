@@ -100,7 +100,6 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera(this)
 
     val uiToolbox = UINSMenu("Menu", 100, menuYaml)
-    val notifier = Notification()
     val uiPaletteSelector = UIPaletteSelector(this)
     val uiPalette = UIBuildingMakerBlockChooser(this)
     val uiPenMenu = UIBuildingMakerPenMenu(this)

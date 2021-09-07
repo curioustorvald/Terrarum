@@ -8,7 +8,9 @@ import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.util.CircularArray
 
@@ -25,7 +27,7 @@ class ConsoleWindow : UICanvas() {
     private var inputCursorPos: Int = 0
     private val MESSAGES_MAX = 5000
     private val COMMAND_HISTORY_MAX = 100
-    private var messages = Array(MESSAGES_MAX, {""})
+    private var messages = Array(MESSAGES_MAX) { "" }
     private var messageDisplayPos: Int = 0
     private var messagesCount: Int = 0
 
@@ -50,7 +52,19 @@ class ConsoleWindow : UICanvas() {
         reset()
     }
 
+    private val lb = ArrayList<String>()
+
     override fun updateUI(delta: Float) {
+        Terrarum.ingame?.let {
+            lb.clear()
+
+            val actorsUnderCursor = it.getActorsAt(Terrarum.mouseX, Terrarum.mouseY)
+            actorsUnderCursor.forEach {
+                lb.add("${it.referenceID} (${it.actorValue[AVKey.NAME] ?: "\u03AF-${it.javaClass.simpleName}"})")
+            }
+
+            it.setTooltipMessage(if (lb.size > 0) lb.joinToString("\n") else null)
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -175,7 +189,7 @@ class ConsoleWindow : UICanvas() {
     }
 
     fun reset() {
-        messages = Array(MESSAGES_MAX, {""})
+        messages = Array(MESSAGES_MAX) { "" }
         messageDisplayPos = 0
         messagesCount = 0
         inputCursorPos = 0
@@ -212,6 +226,7 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun endClosing(delta: Float) {
+        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
         Terrarum.ingame?.paused = false
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f

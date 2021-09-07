@@ -47,6 +47,8 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
+import org.khelekore.prtree.MBRConverter
+import org.khelekore.prtree.PRTree
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
 
@@ -143,9 +145,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
 
-
-    lateinit var notifier: UICanvas
-
     lateinit var uiPieMenu: UICanvas
     lateinit var uiQuickBar: UICanvas
     lateinit var uiInventoryPlayer: UICanvas
@@ -181,9 +180,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private lateinit var uiBasicInfo: UICanvas
     private lateinit var uiWatchTierOne: UICanvas
-
-    /** For in-world text overlays? e.g. cursor on the ore block and tooltip will say "Malachite" or something */
-    private lateinit var uiTooltip: UITooltip
 
     lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
 
@@ -349,14 +345,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //consoleHandler.setPosition(0, 0)
 
 
-        // init notifier
-        notifier = Notification()
-        notifier.setPosition(
-                (AppLoader.screenSize.screenW - notifier.width) / 2,
-                AppLoader.screenSize.screenH - notifier.height - AppLoader.screenSize.tvSafeGraphicsHeight
-        )
-
-
 
 
         // >- queue up game UIs that should pause the world -<
@@ -395,8 +383,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiBasicInfo.setAsAlwaysVisible()
         uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - AppLoader.screenSize.tvSafeActionWidth) / 2 + AppLoader.screenSize.tvSafeActionWidth, uiWatchTierOne.posY)
 
-
-        uiTooltip = UITooltip()
 
 
         uiCheatMotherfuckerNootNoot = UICheatDetected()
@@ -447,7 +433,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         var uiOpened = false
 
         // TODO actorsUnderMouse: support ROUNDWORLD
-        val actorsUnderMouse: List<FixtureBase> = WorldSimulator.getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
+        val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
         if (actorsUnderMouse.size > 1) {
             AppLoader.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
         }
@@ -580,29 +566,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             WorldSimulator.resetForThisFrame()
 
-            ///////////////////////////
-            // world-related updates //
-            ///////////////////////////
-            BlockPropUtil.dynamicLumFuncTickClock()
-            world.updateWorldTime(delta)
-            measureDebugTime("WorldSimulator.update") {
-                WorldSimulator.invoke(actorNowPlaying, delta)
-            }
-            measureDebugTime("WeatherMixer.update") {
-                WeatherMixer.update(delta, actorNowPlaying, world)
-            }
-            measureDebugTime("BlockStats.update") {
-                BlockStats.update()
-            }
-            // fill up visibleActorsRenderFront for wires, if:
-            // 1. something is cued on the wire change queue
-            // 2. wire renderclass changed
-            if (newWorldLoadedLatch || wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
-                measureDebugTime("Ingame.FillUpWiresBuffer") {
-                    fillUpWiresBuffer()
-                }
-            }
-
 
             ////////////////////////////
             // camera-related updates //
@@ -624,7 +587,32 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // TODO thread pool(?)
             CollisionSolver.process()
 
-            //WorldCamera.update(gameworld, actorNowPlaying)
+
+            ///////////////////////////
+            // world-related updates //
+            ///////////////////////////
+            actorsRTree = PRTree(actorMBRConverter, 24)
+            actorsRTree.load(actorContainerActive.filterIsInstance<ActorWithBody>())
+
+            BlockPropUtil.dynamicLumFuncTickClock()
+            world.updateWorldTime(delta)
+            measureDebugTime("WorldSimulator.update") {
+                WorldSimulator.invoke(actorNowPlaying, delta)
+            }
+            measureDebugTime("WeatherMixer.update") {
+                WeatherMixer.update(delta, actorNowPlaying, world)
+            }
+            measureDebugTime("BlockStats.update") {
+                BlockStats.update()
+            }
+            // fill up visibleActorsRenderFront for wires, if:
+            // 1. something is cued on the wire change queue
+            // 2. wire renderclass changed
+            if (newWorldLoadedLatch || wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
+                measureDebugTime("Ingame.FillUpWiresBuffer") {
+                    fillUpWiresBuffer()
+                }
+            }
 
         }
 
@@ -778,17 +766,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         changePossession(getActorByID(refid) as ActorHumanoid)
     }
-
-    /** Send message to notifier UI and toggle the UI as opened. */
-    override fun sendNotification(messages: Array<String>) {
-        (notifier as Notification).sendNotification(messages.toList())
-    }
-
-    override fun sendNotification(messages: List<String>) {
-        (notifier as Notification).sendNotification(messages)
-    }
-
-    override fun sendNotification(singleMessage: String) = sendNotification(listOf(singleMessage))
 
     fun wakeDormantActors() {
         var actorContainerSize = actorContainerInactive.size
@@ -1034,18 +1011,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    fun setTooltipMessage(message: String?) {
-        if (message == null) {
-            uiTooltip.setAsClose()
-        }
-        else {
-            if (uiTooltip.isClosed || uiTooltip.isClosing) {
-                uiTooltip.setAsOpen()
-            }
-            uiTooltip.message = message
-        }
-    }
-
     override fun pause() {
         // TODO no pause when off-focus on desktop
     }
@@ -1056,7 +1021,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun hide() {
         uiContainer.forEach { it?.handler?.dispose() }
     }
-
 
     /**
      * @param width same as AppLoader.terrarumAppConfig.screenW
