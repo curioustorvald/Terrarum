@@ -18,12 +18,8 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 open class DroppedItem : ActorWithBody {
 
     private var itemID: ItemID = ""
-        set(value) {
-            field = value
-            textureRegion = ItemCodex.getItemImage(itemID)!!
-        }
 
-    @Transient private lateinit var textureRegion: TextureRegion
+    @Transient private var textureRegion: TextureRegion? = null // deserialiser won't call setter of the fields
 
     var itemCount = 1
 
@@ -54,8 +50,12 @@ open class DroppedItem : ActorWithBody {
     }
 
     override fun drawBody(batch: SpriteBatch) {
-        // copy-pasted from ActorWithBody.drawSpriteInGoodPosition()
+        // deserialiser won't call setter of the fields
+        if (textureRegion == null) {
+            textureRegion = ItemCodex.getItemImage(itemID)!!
+        }
 
+        // copy-pasted from ActorWithBody.drawSpriteInGoodPosition()
         if (world == null) return
 
 
