@@ -25,6 +25,7 @@ Each file on the Savegame has following convention:
 |Worlds|world$n ($n is a world index)|$n|
 |Actors|actor$n ($n is an Actor ID)|$n|
 
+User formats can have ID of -2147483648..-65536
 
 ### Solving Problems
 
