@@ -28,14 +28,12 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.serialise.ReadWorld
+import net.torvald.terrarum.sign
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.IOException
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
+import kotlin.math.*
 
 /**
  * Created by minjaesong on 2017-09-02.
@@ -67,18 +65,22 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private val cameraAI = object : ActorAI {
 
         private var firstTime = true
+        private val lookaheadDist = 320.0
 
         override fun update(actor: Actor, delta: Float) {
-            val actor = actor as ActorWithBody
+            val actor = actor as CameraPlayer
             val ww = TILE_SIZEF * demoWorld.width
 
-            val indexThis = ((actor.hitbox.canonicalX / ww * cameraNodes.size).floorInt()) % cameraNodes.size
-            val indexNext = (indexThis + 1) % cameraNodes.size
+            val px: Double = (actor.hitbox.canonicalX) % ww.toDouble()
+            val pxN = px + lookaheadDist * cos(actor.targetBearing)
+            val pxP = px - lookaheadDist * cos(actor.targetBearing)
+
+            val indexThis = ((pxN / ww * cameraNodes.size).floorInt()) fmod cameraNodes.size
+            val indexNext = ((pxP / ww * cameraNodes.size).floorInt()) fmod cameraNodes.size
             val xwstart: Float = indexThis.toFloat() / cameraNodes.size * ww
             val xwend: Float = ((indexThis + 1).toFloat() / cameraNodes.size) * ww
             val xw: Float = xwend - xwstart
 
-            val px: Double = (actor.hitbox.canonicalX + actor.actorValue.getAsDouble(AVKey.SPEED)!!) % ww.toDouble()
             val xperc: Double = (px - xwstart) / xw
 
             val y = FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis], cameraNodes[indexNext])
@@ -88,7 +90,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
                 actor.hitbox.setPositionY(y - 8.0)
             }
             else {
-                (actor as CameraPlayer).moveTo(px, y - 8.0)
+                (actor as CameraPlayer).moveTo(pxN, y - 8.0)
             }
         }
     }
@@ -124,11 +126,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         // construct camera nodes
-        val nodeCount = 400
+        val nodeCount = demoWorld.width / 10
         cameraNodes = kotlin.FloatArray(nodeCount) {
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
-            while (travelDownCounter < demoWorld.height && !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
+            while (travelDownCounter < demoWorld.height &&
+                   !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid &&
+                   !BlockCodex[demoWorld.getTileFromWall(tileXPos, travelDownCounter)].isSolid
+            ) {
                 travelDownCounter += 1
             }
 //            println("Camera node #${it+1} = $travelDownCounter")
@@ -145,6 +150,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             val off3 = cameraNodes[(i+3) fmod cameraNodes.size] * 0.025f
 
             cameraNodes[i] = offM3 + offM2 + offM1 + off0 + off1 + off2 + off3
+            println(cameraNodes[i])
         }
 
 
@@ -412,10 +418,16 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             TODO("not implemented")
         }
 
+        var targetBearing = 0.0
+        var currentBearing = Double.NaN
+
         override fun moveTo(bearing: Double) {
-            println(bearing)
+            targetBearing = bearing
+            if (currentBearing.isNaN()) currentBearing = bearing
             val v = actorValue.getAsDouble(AVKey.SPEED)!!
-            hitbox.translate(v * cos(bearing), v * sin(bearing))
+
+            currentBearing = interpolateLinear(1.0 / 32.0, currentBearing, targetBearing)
+            hitbox.translate(v * cos(currentBearing), v * sin(currentBearing))
         }
 
         override fun moveTo(toX: Double, toY: Double) {
