@@ -330,6 +330,21 @@ object IngameRenderer : Disposable {
 
         blendNormal(batch)
 
+        ///////////////////////////////////////////////////////////////////////
+
+        if (fboRGBexportRequested) {
+            fboRGBexportRequested = false
+            try {
+                val w = 960
+                val h = 640
+                val p = Pixmap.createFromFrameBuffer((fboRGB.width - w).ushr(1), (fboRGB.height - h).ushr(1), w, h)
+                PixmapIO2.writeTGA(Gdx.files.absolute(fboRGBexportPath), p, true)
+                p.dispose()
+            }
+            catch (e: Throwable) {
+                e.printStackTrace()
+            }
+        }
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -368,6 +383,7 @@ object IngameRenderer : Disposable {
     }
 
     internal var fboRGBexportRequested = false
+    internal var fboRGBexportPath = ""
 
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,
@@ -415,25 +431,6 @@ object IngameRenderer : Disposable {
 
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)
-            }
-        }
-
-        if (fboRGBexportRequested) {
-            fboRGBexportRequested = false
-            val fileChooser = JFileChooser()
-            fileChooser.showSaveDialog(null)
-
-            try {
-                if (fileChooser.selectedFile != null) {
-                    fboRGB.inAction(null, null) {
-                        val p = ScreenUtils.getFrameBufferPixmap(0, 0, fboRGB.width, fboRGB.height)
-                        PixmapIO2.writeTGA(Gdx.files.absolute(fileChooser.selectedFile.absolutePath), p, false)
-                        p.dispose()
-                    }
-                }
-            }
-            catch (e: Throwable) {
-                e.printStackTrace()
             }
         }
 

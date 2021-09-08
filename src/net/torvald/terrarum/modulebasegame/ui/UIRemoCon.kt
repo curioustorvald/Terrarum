@@ -248,11 +248,14 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>) {
 
+        private val lineHeight = 36
 
         private val menubar = UIItemTextButtonList(
                 uiRemoCon,
+                lineHeight,
                 labels,
-                0, menubarOffY,
+                menubarOffX,
+                menubarOffY - lineHeight * labels.size + 16,
                 uiRemoCon.width, getRemoConHeight(labels),
                 textAreaWidth = uiRemoCon.width,
                 readFromLang = true,
@@ -261,7 +264,8 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                 backgroundCol = Color(0),
                 inactiveCol = Color.WHITE,
                 defaultSelection = null,
-                itemHitboxSize = 34
+                itemHitboxSize = lineHeight - 2,
+                alignment = UIItemTextButton.Companion.Alignment.LEFT
         )
 
         fun update(delta: Float) {
@@ -288,9 +292,10 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
     }
 
     companion object {
-        val remoConWidth = 304
+        val remoConWidth = 300
         fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
-        val menubarOffY: Int; get() = AppLoader.screenSize.screenH / 2 - (AppLoader.fontGame.lineHeight * 1.5).toInt()
+        val menubarOffX: Int; get() = (0.11 * AppLoader.screenSize.screenW).toInt()
+        val menubarOffY: Int; get() = (0.82 * AppLoader.screenSize.screenH).toInt()
     }
 }

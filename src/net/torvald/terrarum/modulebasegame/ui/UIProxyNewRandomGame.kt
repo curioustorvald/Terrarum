@@ -38,12 +38,12 @@ class UIProxyNewRandomGame : UICanvas() {
 
 
         val ingame = TerrarumIngame(AppLoader.batch)
-        val worldParam = TerrarumIngame.NewWorldParameters(2400, 1280, 0x51621DL)
-        //val worldParam = TerrarumIngame.NewWorldParameters(2400, 1280, HQRNG().nextLong())
+//        val worldParam = TerrarumIngame.NewWorldParameters(2400, 1280, 0x51621DL)
+        val worldParam = TerrarumIngame.NewWorldParameters(2400, 1280, HQRNG().nextLong())
 
         //val worldParam = TerrarumIngame.NewWorldParameters(6000, 1800, 0x51621DL) // small
 //        val worldParam = TerrarumIngame.NewWorldParameters(9000, 2250, 0x51621DL) // normal
-        //val worldParam = TerrarumIngame.NewWorldParameters(13500, 3000, 0x51621DL) // large
+        //val worldParam = TerrarumIngame.NewWorldParDoubleameters(13500, 3000, 0x51621DL) // large
         //val worldParam = TerrarumIngame.NewWorldParameters(22500, 4500, 0x51621DL) // huge
         ingame.gameLoadInfoPayload = worldParam
         ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW

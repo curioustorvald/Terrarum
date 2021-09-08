@@ -12,11 +12,12 @@ import kotlin.math.roundToInt
  */
 class UIItemTextButtonList(
         parentUI: UICanvas,
+        val lineHeight: Int,
         labelsList: Array<String>,
         initialX: Int,
         initialY: Int,
         override var width: Int,
-        override var height: Int = DEFAULT_LINE_HEIGHT * labelsList.size,
+        override var height: Int = lineHeight * labelsList.size,
         val readFromLang: Boolean = false,
         val defaultSelection: Int? = null, // negative: INVALID, positive: valid, null: no select
 
@@ -48,7 +49,7 @@ class UIItemTextButtonList(
         val kinematic: Boolean = false,
 
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
-        val itemHitboxSize: Int = DEFAULT_LINE_HEIGHT
+        val itemHitboxSize: Int = lineHeight
 ) : UIItem(parentUI, initialX, initialY) {
 
     companion object {
@@ -75,7 +76,7 @@ class UIItemTextButtonList(
         val h = height.toFloat()
         val ss = labelsList.size.toFloat()
         val lh = itemHitboxSize
-        val vertOff = (h/ss * i + (h/ss - lh) / 2f).roundToInt()
+        val vertOff = lineHeight * i
 
         if (!kinematic) {
             UIItemTextButton(

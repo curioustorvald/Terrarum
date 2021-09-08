@@ -72,7 +72,7 @@ public class AppLoader implements ApplicationListener {
     /**
      * when FALSE, some assertion and print code will not execute
      */
-    public static boolean IS_DEVELOPMENT_BUILD = false;
+    public static boolean IS_DEVELOPMENT_BUILD = true;
 
 
     /**
@@ -277,6 +277,11 @@ public class AppLoader implements ApplicationListener {
     };
 
     public static void main(String[] args) {
+        // print copyright message
+        System.out.println(csiB+GAME_NAME+" "+csiG+getVERSION_STRING()+" "+csiK+"\u2014"+" "+csi0+TerrarumAppConfiguration.COPYRIGHT_DATE_NAME);
+        System.out.println(csiG+TerrarumAppConfiguration.COPYRIGHT_LICENSE_TERMS_SHORT+csi0);
+
+
         // load configs
         getDefaultDirectory();
         createDirs();
@@ -925,7 +930,8 @@ public class AppLoader implements ApplicationListener {
             defaultDir = System.getProperty("user.home") + "/.Terrarum";
         }
 
-        defaultSaveDir = defaultDir + "/Saves";
+//        defaultSaveDir = defaultDir + "/Players"; // as per the save format in the game's planning
+        defaultSaveDir = defaultDir + "/Saves"; // for the demo release
         configDir = defaultDir + "/config.json";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
@@ -1140,6 +1146,9 @@ public class AppLoader implements ApplicationListener {
     // //
 
     public static String csiR = "\u001B[31m";
+    public static String csiG = "\u001B[32m";
+    public static String csiB = "\u001B[34m";
+    public static String csiK = "\u001B[37m";
     public static String csi0 = "\u001B[m";
 
     public static void printdbg(Object obj, Object message) {
@@ -1148,7 +1157,7 @@ public class AppLoader implements ApplicationListener {
             if (message == null)
                 System.out.println("[" + out + "] null");
             else
-                System.out.println("[" + out + "] " + message.toString());
+                System.out.println("[" + out + "] " + message);
         }
     }
 
@@ -1158,7 +1167,7 @@ public class AppLoader implements ApplicationListener {
             if (message == null)
                 System.out.println(csiR + "[" + out + "] null" + csi0);
             else
-                System.out.println(csiR + "[" + out + "] " + message.toString() + csi0);
+                System.out.println(csiR + "[" + out + "] " + message + csi0);
         }
     }
 
@@ -1167,7 +1176,7 @@ public class AppLoader implements ApplicationListener {
         if (message == null)
             System.out.println("[" + out + "] null");
         else
-            System.out.println("[" + out + "] " + message.toString());
+            System.out.println("[" + out + "] " + message);
     }
 
     public static ShaderProgram loadShaderFromFile(String vert, String frag) {

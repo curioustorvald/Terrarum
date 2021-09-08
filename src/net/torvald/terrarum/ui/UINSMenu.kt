@@ -99,6 +99,7 @@ class UINSMenu(
 
         val list = UIItemTextButtonList(
                 this,
+                UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
                 stringsFromTree,
                 width, LINE_HEIGHT,
                 uiWidth, listHeight,

@@ -15,6 +15,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.console.CommandDict
+import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
@@ -26,9 +27,15 @@ import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
+import net.torvald.terrarum.serialise.ReadWorld
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import java.io.IOException
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /**
  * Created by minjaesong on 2017-09-02.
@@ -58,53 +65,31 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
     private val cameraAI = object : ActorAI {
-        private val axisMax = 1f
 
         private var firstTime = true
 
         override fun update(actor: Actor, delta: Float) {
-            val actor = actor as HumanoidNPC
+            val actor = actor as ActorWithBody
+            val ww = TILE_SIZEF * demoWorld.width
 
-            // fuck
-            val avSpeed = 1.0 // FIXME camera goes faster when FPS is high
-            actor.actorValue[AVKey.SPEED] = avSpeed
-            actor.actorValue[AVKey.ACCEL] = avSpeed / 6.0
-            // end fuck
+            val indexThis = ((actor.hitbox.canonicalX / ww * cameraNodes.size).floorInt()) % cameraNodes.size
+            val indexNext = (indexThis + 1) % cameraNodes.size
+            val xwstart: Float = indexThis.toFloat() / cameraNodes.size * ww
+            val xwend: Float = ((indexThis + 1).toFloat() / cameraNodes.size) * ww
+            val xw: Float = xwend - xwstart
 
+            val px: Double = (actor.hitbox.canonicalX + actor.actorValue.getAsDouble(AVKey.SPEED)!!) % ww.toDouble()
+            val xperc: Double = (px - xwstart) / xw
 
+            val y = FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis], cameraNodes[indexNext])
 
-            val tileSize = TILE_SIZEF
-            val catmullRomTension = 0f
-
-            // pan camera
-            actor.moveRight(axisMax)
-
-
-            val domainSize = demoWorld.width * tileSize
-            val codomainSize = cameraNodes.size
-            val x = actor.hitbox.canonicalX.toFloat()
-
-            val p1 = (x / (domainSize / codomainSize)).floorInt() fmod cameraNodes.size
-            val p0 = ((p1 - 1) fmod codomainSize) fmod cameraNodes.size
-            val p2 = ((p1 + 1) fmod codomainSize) fmod cameraNodes.size
-            val p3 = ((p1 + 2) fmod codomainSize) fmod cameraNodes.size
-            val u: Float = 1f - (p2 - (x / (domainSize / codomainSize))) / (p2 - p1)
-
-            //val targetYPos = FastMath.interpolateCatmullRom(u, catmullRomTension, cameraNodes[p0], cameraNodes[p1], cameraNodes[p2], cameraNodes[p3])
-            val targetYPos = FastMath.interpolateLinear(u, cameraNodes[p1], cameraNodes[p2])
-            val yDiff = targetYPos - actor.hitbox.canonicalY
-
-            /*if (!firstTime) {
-                actor.moveDown(yDiff.bipolarClamp(axisMax.toDouble()).toFloat())
+            if (firstTime) {
+                firstTime = false
+                actor.hitbox.setPositionY(y - 8.0)
             }
             else {
-                actor.hitbox.setPosition(actor.hitbox.canonicalX, targetYPos.toDouble())
-                firstTime = false
-            }*/
-            actor.hitbox.setPosition(actor.hitbox.canonicalX, targetYPos.toDouble()) // just move the cameraY to interpolated path
-
-
-            //println("${actor.hitbox.canonicalX}, ${actor.hitbox.canonicalY}")
+                (actor as CameraPlayer).moveTo(px, y - 8.0)
+            }
         }
     }
     private lateinit var cameraPlayer: ActorWithBody
@@ -122,28 +107,51 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         printdbg(this, "Intro pre-load")
 
 
-        demoWorld = GameWorld(1, 64, 64, 0L, 0L, 0)
+        try {
+            val reader = java.io.FileReader(ModMgr.getFile("basegame", "demoworld"))
+            //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
+            val world = ReadWorld.invoke(reader)
+            demoWorld = world
+            printdbg(this, "Demo world loaded")
+        }
+        catch (e: IOException) {
+            demoWorld = GameWorld(1, 64, 64, 0L, 0L, 0)
+            printdbg(this, "Demo world not found, using empty world")
+        }
 
-        printdbg(this, "Demo world gen complete")
 
         // set time to summer
         demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         // construct camera nodes
-        val nodeCount = 100
-        cameraNodes = kotlin.FloatArray(nodeCount) { it ->
+        val nodeCount = 400
+        cameraNodes = kotlin.FloatArray(nodeCount) {
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
             while (travelDownCounter < demoWorld.height && !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
-                travelDownCounter += 4
+                travelDownCounter += 1
             }
+//            println("Camera node #${it+1} = $travelDownCounter")
             travelDownCounter * TILE_SIZEF
         }
+        // apply gaussian blur to the camera nodes
+        for (i in cameraNodes.indices) {
+            val offM3 = cameraNodes[(i-3) fmod cameraNodes.size] * 0.025f
+            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 0.11f
+            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 0.29f
+            val off0 = cameraNodes[i] * 0.15f
+            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 0.29f
+            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 0.11f
+            val off3 = cameraNodes[(i+3) fmod cameraNodes.size] * 0.025f
+
+            cameraNodes[i] = offM3 + offM2 + offM1 + off0 + off1 + off2 + off3
+        }
+
 
 
         cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
-        demoWorld.worldTime.timeDelta = 150
+        demoWorld.worldTime.timeDelta = 0//150
 
 
         IngameRenderer.setRenderedWorld(demoWorld)
@@ -239,7 +247,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
-            IngameRenderer.invoke(gamePaused = true, uiContainer = uiContainer)
+            IngameRenderer.invoke(gamePaused = false, uiContainer = uiContainer)
         }
         else {
             printdbgerr(this, "Demoworld is already been destroyed")
@@ -365,6 +373,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         override val hitbox = Hitbox(0.0, 0.0, 2.0, 2.0)
 
         init {
+            actorValue[AVKey.SPEED] = 3.0
             hitbox.setPosition(
                     HQRNG().nextInt(demoWorld.width) * TILE_SIZED,
                     0.0 // Y pos: placeholder; camera AI will take it over
@@ -375,7 +384,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         override fun drawGlow(batch: SpriteBatch) { }
 
         override fun update(delta: Float) {
-
+            ai.update(this, delta)
         }
 
         override fun onActorValueChange(key: String, value: Any?) { }
@@ -404,11 +413,21 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         override fun moveTo(bearing: Double) {
-            TODO("not implemented")
+            println(bearing)
+            val v = actorValue.getAsDouble(AVKey.SPEED)!!
+            hitbox.translate(v * cos(bearing), v * sin(bearing))
         }
 
         override fun moveTo(toX: Double, toY: Double) {
-            TODO("not implemented")
+            val ww = TILE_SIZED * demoWorld.width
+            // select appropriate toX because ROUNDWORLD
+            val xdiff1 = toX - hitbox.canonicalX
+            val xdiff2 = (toX + ww) - hitbox.canonicalX
+
+            val xdiff = if (xdiff1 < 0) xdiff2 else xdiff1
+            val ydiff = toY - hitbox.canonicalY
+            moveTo(atan2(ydiff, xdiff))
+            hitbox.setPositionX(hitbox.canonicalX % ww)
         }
     }
 

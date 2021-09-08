@@ -13,12 +13,9 @@ object UITitleRemoConYaml {
      * The class must be the UICanvas
      */
     val menus = """
-        - MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UITitleCharactersList
-         - CONTEXT_CHARACTER_NEW
-         - CONTEXT_CHARACTER_DELETE
-         - MENU_LABEL_RETURN
-        - MENU_MODE_MULTIPLAYER
-         - MENU_LABEL_RETURN
+        - MENU_LABEL_CONTINUE
+        - MENU_LABEL_NEW_GAME : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
+        - MENU_IO_LOAD
         - MENU_OPTIONS
          - MENU_OPTIONS_GRAPHICS
          - MENU_OPTIONS_CONTROLS
@@ -38,12 +35,12 @@ object UITitleRemoConYaml {
         - MENU_LABEL_QUIT
         """.trimIndent()
 
-    val debugTools = """
+    val debugTools = "" /*"""
         -  Development Tools $
          - Building Maker : net.torvald.terrarum.modulebasegame.ui.UIProxyNewBuildingMaker
          - Start New Random Game : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
          - MENU_LABEL_RETURN
-        """.trimIndent()
+        """.trimIndent()*/
 
     operator fun invoke() = if (AppLoader.IS_DEVELOPMENT_BUILD)
         Yaml(menus + "\n" + debugTools).parse()

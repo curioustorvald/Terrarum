@@ -45,12 +45,12 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     // TODO scrolling of the palette, as the old method flat out won't work with The Flattening
 
     private val tabs = UIItemTextButtonList(
-            this, arrayOf("Terrain", "Wall", "Wire"),
+            this, 36, arrayOf("Terrain", "Wall", "Wire"),
             0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
             defaultSelection = 0
     )
     private val closeButton = UIItemTextButtonList(
-            this, arrayOf("Close"),
+            this, 36, arrayOf("Close"),
             0, this.height - UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
             width = MENUBAR_SIZE, textAreaWidth = MENUBAR_SIZE
     )

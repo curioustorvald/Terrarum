@@ -25,6 +25,7 @@ class UITitleLanguage : UICanvas() {
 
     private val localeList = Lang.languageList.toList().sorted()
     private val textArea = UIItemTextButtonList(this,
+            24,
             localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
             AppLoader.screenSize.screenW - width, textAreaHMargin,
             width, height,

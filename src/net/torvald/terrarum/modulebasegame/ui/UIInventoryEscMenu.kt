@@ -23,7 +23,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
     private val gameMenuButtons = UIItemTextButtonList(
-            this, gameMenu,
+            this, DEFAULT_LINE_HEIGHT, gameMenu,
             (AppLoader.screenSize.screenW - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
             gameMenuListWidth, gameMenuListHeight,
