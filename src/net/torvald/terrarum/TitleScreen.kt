@@ -13,27 +13,24 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.console.CommandDict
-import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
-import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.serialise.ReadWorld
-import net.torvald.terrarum.sign
-import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.IOException
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Created by minjaesong on 2017-09-02.
@@ -71,7 +68,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             val actor = actor as CameraPlayer
             val ww = TILE_SIZEF * demoWorld.width
 
-            val px: Double = (actor.hitbox.canonicalX) % ww.toDouble()
+            val px: Double = actor.hitbox.canonicalX
             val pxN = px + lookaheadDist * cos(actor.targetBearing)
             val pxP = px - lookaheadDist * cos(actor.targetBearing)
 
@@ -90,7 +87,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
                 actor.hitbox.setPositionY(y - 8.0)
             }
             else {
-                (actor as CameraPlayer).moveTo(pxN, y - 8.0)
+                actor.moveTo(pxN, y - 8.0)
             }
         }
     }
@@ -157,7 +154,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
-        demoWorld.worldTime.timeDelta = 0//150
+        demoWorld.worldTime.timeDelta = 100
 
 
         IngameRenderer.setRenderedWorld(demoWorld)
@@ -379,7 +376,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         override val hitbox = Hitbox(0.0, 0.0, 2.0, 2.0)
 
         init {
-            actorValue[AVKey.SPEED] = 3.0
+            actorValue[AVKey.SPEED] = 1.666
             hitbox.setPosition(
                     HQRNG().nextInt(demoWorld.width) * TILE_SIZED,
                     0.0 // Y pos: placeholder; camera AI will take it over
