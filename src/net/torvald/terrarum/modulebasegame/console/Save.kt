@@ -1,6 +1,9 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ReferencingRanges
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
@@ -39,9 +42,8 @@ object Save : ConsoleCommand {
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
                 val file = File(AppLoader.defaultDir + "/Exports/${args[1]}")
 
-
                 WriteSavegame(disk, file, ingame)
-                Echo ("${ccW}Saved with size of $ccG${file.length()}$ccW bytes")
+
             }
             catch (e: IOException) {
                 Echo("Save: IOException raised.")

@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
 
 /**
  * Must be called by the App Loader
@@ -216,7 +215,7 @@ object PostProcessor : Disposable {
     private val currentResStr = "${AppLoader.screenSize.screenW}x${AppLoader.screenSize.screenH}"
     private val safeAreaStr = "TV Safe Area"
     private val versionStr = "Version ${AppLoader.getVERSION_STRING()}"
-    private val thisIsDebugStr = "${AppLoader.GAME_NAME} Develoment Build $versionStr"
+    internal val thisIsDebugStr = "${AppLoader.GAME_NAME} Develoment Build $versionStr"
 
     /**
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.

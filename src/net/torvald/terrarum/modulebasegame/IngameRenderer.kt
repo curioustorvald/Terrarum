@@ -8,23 +8,22 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.ScreenUtils
-import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.measureDebugTime
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.gameparticles.ParticleBase
-import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.worlddrawer.*
+import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
-import javax.swing.JFileChooser
 import kotlin.system.exitProcess
 
 /**
@@ -335,11 +334,7 @@ object IngameRenderer : Disposable {
         if (fboRGBexportRequested) {
             fboRGBexportRequested = false
             try {
-                val w = 960
-                val h = 640
-                val p = Pixmap.createFromFrameBuffer((fboRGB.width - w).ushr(1), (fboRGB.height - h).ushr(1), w, h)
-                PixmapIO2.writeTGA(Gdx.files.absolute(fboRGBexportPath), p, true)
-                p.dispose()
+                fboRGBexportCallback(fboRGB)
             }
             catch (e: Throwable) {
                 e.printStackTrace()
@@ -383,7 +378,7 @@ object IngameRenderer : Disposable {
     }
 
     internal var fboRGBexportRequested = false
-    internal var fboRGBexportPath = ""
+    internal var fboRGBexportCallback: (FrameBuffer) -> Unit = {}
 
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,

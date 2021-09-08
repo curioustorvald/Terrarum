@@ -285,10 +285,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             )
         }
 
-        AppLoader.fontGame.draw(batch, "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}",
-                1f.toInt().toFloat(),
-                (AppLoader.screenSize.screenH - AppLoader.fontGame.lineHeight - 1f).toInt().toFloat()
-        )
+        AppLoader.fontGame.draw(batch, PostProcessor.thisIsDebugStr, 5f, AppLoader.screenSize.screenH - 24f)
 
     }
 

@@ -1,10 +1,11 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.ELLIPSIS
+import com.badlogic.gdx.graphics.Pixmap
+import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
@@ -13,6 +14,7 @@ import net.torvald.terrarum.serialise.Common.zip
 import net.torvald.terrarum.serialise.WriteWorld.actorAcceptable
 import java.io.File
 import java.io.Reader
+import java.util.zip.GZIPOutputStream
 
 /**
  * It's your responsibility to create a new VirtualDisk if your save is new, and create a backup for modifying existing save.
@@ -32,69 +34,91 @@ object WriteSavegame {
     }
 
     operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame) {
-        val creation_t = ingame.world.creationTime
-        val time_t = AppLoader.getTIME_T()
-        val currentPlayTime_t = time_t - ingame.loadedTime_t
+        val tgaout = ByteArray64GrowableOutputStream()
+        val gzout = GZIPOutputStream(tgaout)
+        IngameRenderer.fboRGBexportCallback = {
+            val w = 960
+            val h = 640
+            val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
+            PixmapIO2._writeTGA(gzout, p, true, true)
+            p.dispose()
+            
+
+            val creation_t = ingame.world.creationTime
+            val time_t = AppLoader.getTIME_T()
+            val currentPlayTime_t = time_t - ingame.loadedTime_t
 
 
-        // Write Meta //
-        val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, currentPlayTime_t))
-        val meta = DiskEntry(-1, 0, "savegame".toByteArray(), creation_t, time_t, metaContent)
-        addFile(disk, meta)
+            // Write Meta //
+            val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, currentPlayTime_t))
+            val meta = DiskEntry(-1, 0, "savegame".toByteArray(Common.CHARSET), creation_t, time_t, metaContent)
+            addFile(disk, meta)
+            
+            
+            val thumbContent = EntryFile(tgaout.toByteArray64())
+            val thumb = DiskEntry(-2, 0, "thumb".toByteArray(Common.CHARSET), creation_t, time_t, thumbContent)
+            addFile(disk, thumb)
+            
 
-        // Write BlockCodex//
+            // Write BlockCodex//
 //        val blockCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex).toByteArray(Common.CHARSET))))
-//        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(), creation_t, time_t, blockCodexContent)
+//        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(Common.CHARSET), creation_t, time_t, blockCodexContent)
 //        addFile(disk, blocks)
-        // Commented out; nothing to write
+            // Commented out; nothing to write
 
-        // Write ItemCodex//
-        val itemCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
-        val items = DiskEntry(-17, 0, "items".toByteArray(), creation_t, time_t, itemCodexContent)
-        addFile(disk, items)
-        // Gotta save dynamicIDs
+            // Write ItemCodex//
+            val itemCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
+            val items = DiskEntry(-17, 0, "items".toByteArray(Common.CHARSET), creation_t, time_t, itemCodexContent)
+            addFile(disk, items)
+            // Gotta save dynamicIDs
 
-        // Write WireCodex//
+            // Write WireCodex//
 //        val wireCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex).toByteArray(Common.CHARSET))))
-//        val wires = DiskEntry(-18, 0, "wires".toByteArray(), creation_t, time_t, wireCodexContent)
+//        val wires = DiskEntry(-18, 0, "wires".toByteArray(Common.CHARSET), creation_t, time_t, wireCodexContent)
 //        addFile(disk, wires)
-        // Commented out; nothing to write
+            // Commented out; nothing to write
 
-        // Write MaterialCodex//
+            // Write MaterialCodex//
 //        val materialCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex).toByteArray(Common.CHARSET))))
-//        val materials = DiskEntry(-19, 0, "materials".toByteArray(), creation_t, time_t, materialCodexContent)
+//        val materials = DiskEntry(-19, 0, "materials".toByteArray(Common.CHARSET), creation_t, time_t, materialCodexContent)
 //        addFile(disk, materials)
-        // Commented out; nothing to write
+            // Commented out; nothing to write
 
-        // Write FactionCodex//
+            // Write FactionCodex//
 //        val factionCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(FactionCodex).toByteArray(Common.CHARSET))))
-//        val factions = DiskEntry(-20, 0, "factions".toByteArray(), creation_t, time_t, factionCodexContent)
+//        val factions = DiskEntry(-20, 0, "factions".toByteArray(Common.CHARSET), creation_t, time_t, factionCodexContent)
 //        addFile(disk, factions)
 
-        // Write Apocryphas//
-        val apocryphasContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
-        val apocryphas = DiskEntry(-1024, 0, "modprops".toByteArray(), creation_t, time_t, apocryphasContent)
-        addFile(disk, apocryphas)
+            // Write Apocryphas//
+            val apocryphasContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
+            val apocryphas = DiskEntry(-1024, 0, "modprops".toByteArray(Common.CHARSET), creation_t, time_t, apocryphasContent)
+            addFile(disk, apocryphas)
 
-        // Write World //
-        val worldNum = ingame.world.worldIndex
-        val worldContent = EntryFile(WriteWorld.encodeToByteArray64(ingame))
-        val world = DiskEntry(worldNum, 0, "world${worldNum}".toByteArray(), creation_t, time_t, worldContent)
-        addFile(disk, world)
+            // Write World //
+            val worldNum = ingame.world.worldIndex
+            val worldContent = EntryFile(WriteWorld.encodeToByteArray64(ingame))
+            val world = DiskEntry(worldNum, 0, "world${worldNum}".toByteArray(Common.CHARSET), creation_t, time_t, worldContent)
+            addFile(disk, world)
 
-        // Write Actors //
-        listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
-            actors.forEach {
-                if (actorAcceptable(it)) {
-                    val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                    val actor = DiskEntry(it.referenceID, 0, "actor${it.referenceID}".toByteArray(), creation_t, time_t, actorContent)
-                    addFile(disk, actor)
+            // Write Actors //
+            listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
+                actors.forEach {
+                    if (actorAcceptable(it)) {
+                        val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
+                        val actor = DiskEntry(it.referenceID, 0, "actor${it.referenceID}".toByteArray(Common.CHARSET), creation_t, time_t, actorContent)
+                        addFile(disk, actor)
+                    }
                 }
             }
-        }
 
-        disk.capacity = 0
-        VDUtil.dumpToRealMachine(disk, outFile)
+            disk.capacity = 0
+            VDUtil.dumpToRealMachine(disk, outFile)
+
+
+
+            Echo ("${ccW}Game saved with size of $ccG${outFile.length()}$ccW bytes")
+        }
+        IngameRenderer.fboRGBexportRequested = true
     }
 }
 
