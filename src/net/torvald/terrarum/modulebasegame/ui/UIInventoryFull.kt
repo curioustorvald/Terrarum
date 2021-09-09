@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.ENDASH
@@ -10,7 +11,8 @@ import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -179,8 +181,6 @@ class UIInventoryFull(
         private set
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-
-        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 1f,0, 0, width, height)
 
         // background fill
         batch.end()

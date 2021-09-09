@@ -140,9 +140,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
 
-    lateinit var uiPieMenu: UICanvas
-    lateinit var uiQuickBar: UICanvas
-    lateinit var uiInventoryPlayer: UICanvas
+    lateinit var uiBlur: UIFakeBlurOverlay
+    lateinit var uiPieMenu: UIQuickslotPie
+    lateinit var uiQuickBar: UIQuickslotBar
+    lateinit var uiInventoryPlayer: UIInventoryFull
     /**
      * This is a dedicated property for the fixtures' UI.
      *
@@ -166,7 +167,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    lateinit var uiInventoryContainer: UICanvas
     lateinit var uiVitalPrimary: UICanvas
     lateinit var uiVitalSecondary: UICanvas
     lateinit var uiVitalItem: UICanvas // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
@@ -366,6 +366,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiVitalItem = UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0, customPositioning = true)
         //uiVitalItem.setAsAlwaysVisible()
 
+        // fake UI for blurring the background
+        uiBlur = UIFakeBlurOverlay(1f, true)
+        uiBlur.setPosition(0,0)
+
         uiWatchTierOne = UITierOneWatch()
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
@@ -390,6 +394,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 //uiVitalPrimary,
                 //uiVitalSecondary,
                 //uiVitalItem,
+
+                uiBlur,
 
                 uiPieMenu,
                 uiQuickBar,
@@ -627,6 +633,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiContainer.forEach { it.update(delta) }
         //debugWindow.update(delta)
         //notifier.update(delta)
+        // open/close fake blur UI according to what's opened
+        if (uiInventoryPlayer.isVisible ||
+            getUIFixture.get()?.isVisible == true) {
+            uiBlur.setAsOpen()
+        }
+        else {
+            uiBlur.setAsClose()
+        }
 
         // update debuggers using javax.swing //
         if (Authenticator.b()) {

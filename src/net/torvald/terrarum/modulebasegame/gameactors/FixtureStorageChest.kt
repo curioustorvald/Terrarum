@@ -18,9 +18,6 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.catBarWidth
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradEndCol
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradHeight
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradStartCol
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
@@ -191,7 +188,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
-        batch.end()
+        /*batch.end()
         gdxSetBlendNormal()
 
 
@@ -210,7 +207,7 @@ internal class UIStorageChest : UICanvas(
 
 
 
-        batch.begin()
+        batch.begin()*/
 
         // UI items
         batch.color = Color.WHITE

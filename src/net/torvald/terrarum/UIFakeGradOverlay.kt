@@ -1,9 +1,9 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 
@@ -43,7 +43,7 @@ class UIFakeGradOverlay : UICanvas() {
     override fun dispose() {}
 }
 
-class UIFakeBlurOverlay : UICanvas() {
+class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas() {
 
     override var width: Int
         get() = App.scr.width
@@ -61,13 +61,15 @@ class UIFakeBlurOverlay : UICanvas() {
 
     override fun updateUI(delta: Float) {}
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 2f,0, 0, width, height)
+        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius, 0, 0, width, height)
 
-        blendMul(batch)
-        batch.color = darken
-        batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+        if (!nodarken) {
+            blendMul(batch)
+            batch.color = darken
+            batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 
-        blendNormal(batch)
+            blendNormal(batch)
+        }
     }
 
     override fun doOpening(delta: Float) {}

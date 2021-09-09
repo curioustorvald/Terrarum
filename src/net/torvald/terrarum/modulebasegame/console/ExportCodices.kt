@@ -13,6 +13,5 @@ object ExportCodices : ConsoleCommand {
     }
 
     override fun printUsage() {
-        TODO("Not yet implemented")
     }
 }

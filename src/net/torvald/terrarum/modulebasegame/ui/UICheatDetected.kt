@@ -2,12 +2,14 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 
 /**
@@ -33,6 +35,7 @@ class UICheatDetected : UICanvas() {
         Terrarum.ingame?.consoleHandler?.setAsClose()
         Terrarum.ingame?.consoleHandler?.isVisible = false
 
+        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 2f, 0, 0, width, height)
         batch.color = backgroundCol
         batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 
