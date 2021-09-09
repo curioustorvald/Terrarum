@@ -1,7 +1,7 @@
 package net.torvald.terrarum.controller
 
-import net.torvald.terrarum.AppLoader.gamepadDeadzone
-import net.torvald.terrarum.AppLoader.getConfigDoubleArray
+import net.torvald.terrarum.App.gamepadDeadzone
+import net.torvald.terrarum.App.getConfigDoubleArray
 
 /**
  * Created by minjaesong on 2019-02-09.

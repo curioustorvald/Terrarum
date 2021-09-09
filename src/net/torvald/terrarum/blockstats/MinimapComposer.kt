@@ -5,12 +5,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.Queue
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
 object MinimapComposer : Disposable {
 
@@ -22,7 +19,7 @@ object MinimapComposer : Disposable {
     fun setWorld(world: GameWorld) {
         try {
             if (this.world != world) {
-                AppLoader.printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
+                App.printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
 
                 // TODO, also set totalWidth/Height
             }
@@ -59,7 +56,7 @@ object MinimapComposer : Disposable {
     private val liveTilesMeta = Array(TILES_IN_X * TILES_IN_Y) { LiveTileMeta(revalidate = true) }
 
     private val updaterQueue = Queue<Runnable>(TILES_IN_X * TILES_IN_Y * 2)
-    private var currentThreads = Array(maxOf(1, AppLoader.THREAD_COUNT.times(2).div(3))) {
+    private var currentThreads = Array(maxOf(1, App.THREAD_COUNT.times(2).div(3))) {
         Thread()
     }
 
@@ -67,7 +64,7 @@ object MinimapComposer : Disposable {
         totalWidth = minimap.width
         totalHeight = minimap.height
 
-        AppLoader.disposableSingletonsPool.add(this)
+        App.disposableSingletonsPool.add(this)
     }
 
     fun update() {
@@ -136,8 +133,8 @@ object MinimapComposer : Disposable {
             for (x in if (tileSlotIndexY >= TILES_IN_X / 2) (topLeftX + LIVETILE_SIZE - 1) downTo topLeftX else topLeftX until topLeftX + LIVETILE_SIZE) {
                 val tileTerr = world.getTileFromTerrain(x, y)
                 val wallTerr = world.getTileFromWall(x, y)
-                val colTerr = AppLoader.tileMaker.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
-                val colWall = AppLoader.tileMaker.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(AppLoader.tileMaker.wallOverlayColour)
+                val colTerr = App.tileMaker.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
+                val colWall = App.tileMaker.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(App.tileMaker.wallOverlayColour)
 
                 val outCol = if (colTerr.a > 0.1f) colTerr else colWall
 

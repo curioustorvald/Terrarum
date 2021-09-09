@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
@@ -376,7 +376,7 @@ open class ActorWithBody : Actor {
     val feetPosTile: Point2i = Point2i(0,0)
         //get() = Point2i(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
-    override fun run() = update(AppLoader.UPDATE_RATE)
+    override fun run() = update(App.UPDATE_RATE)
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.

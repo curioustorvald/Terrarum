@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.CreditSingleton
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.ui.UICanvas
@@ -15,8 +15,8 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = AppLoader.screenSize.screenW - UIRemoCon.remoConWidth - textAreaHMargin
-    override var height = AppLoader.screenSize.screenH - textAreaHMargin * 2
+    override var width = App.scr.width - UIRemoCon.remoConWidth - textAreaHMargin
+    override var height = App.scr.height - textAreaHMargin * 2
     private val textArea = UIItemTextArea(this,
             UIRemoCon.remoConWidth, textAreaHMargin,
             width, height

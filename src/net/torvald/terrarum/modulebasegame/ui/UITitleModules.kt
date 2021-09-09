@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.blendNormal
@@ -21,8 +21,8 @@ class UITitleModules : UICanvas() {
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8
 
-    override var width = AppLoader.screenSize.screenW - UIRemoCon.remoConWidth - moduleAreaHMargin
-    override var height = AppLoader.screenSize.screenH - moduleAreaHMargin * 2
+    override var width = App.scr.width - UIRemoCon.remoConWidth - moduleAreaHMargin
+    override var height = App.scr.height - moduleAreaHMargin * 2
 
 
     private val moduleInfoCells = ArrayList<UIItemModuleInfoCell>()

@@ -1,16 +1,14 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printmsg
-import net.torvald.terrarum.ReferencingRanges
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printmsg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.CSVFetcher
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.util.SortedArrayList
 import org.apache.commons.csv.CSVRecord
 import java.io.IOException
@@ -61,7 +59,7 @@ class BlockCodex {
      * Later entry (possible from other modules) will replace older ones
      */
     internal constructor(module: String, path: String) : this() {
-        AppLoader.printmsg(this, "Building block properties table")
+        App.printmsg(this, "Building block properties table")
         try {
             register(module, CSVFetcher.readFromModule(module, path))
         }
@@ -69,7 +67,7 @@ class BlockCodex {
     }
 
     fun fromCSV(module: String, csvString: String) {
-        AppLoader.printmsg(this, "Building wire properties table for module $module")
+        App.printmsg(this, "Building wire properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csvString,

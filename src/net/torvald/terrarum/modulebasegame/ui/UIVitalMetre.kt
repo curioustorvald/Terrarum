@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.darkerLab
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.UICanvas
@@ -50,8 +50,8 @@ class UIVitalMetre(
 
     override fun updateUI(delta: Float) {
         handler.setPosition(
-                AppLoader.screenSize.halfScreenW,
-                AppLoader.screenSize.halfScreenH
+                App.scr.halfw,
+                App.scr.halfh
         )
     }
 

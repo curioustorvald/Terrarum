@@ -1,13 +1,12 @@
 package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.utils.RasterWriter
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.toRGBA
 import java.io.File
 import java.io.IOException
@@ -33,7 +32,7 @@ internal object ExportMap : ConsoleCommand {
             var mapDataPointer = 0
 
             for (tile in world.terrainIterator()) {
-                val colArray = AppLoader.tileMaker.terrainTileColourMap.get(tile)!!.toByteArray()
+                val colArray = App.tileMaker.terrainTileColourMap.get(tile)!!.toByteArray()
 
                 for (i in 0..2) {
                     mapData[mapDataPointer + i] = colArray[i]
@@ -42,7 +41,7 @@ internal object ExportMap : ConsoleCommand {
                 mapDataPointer += 3
             }
 
-            val dir = AppLoader.defaultDir + "/Exports/"
+            val dir = App.defaultDir + "/Exports/"
             val dirAsFile = File(dir)
             if (!dirAsFile.exists()) {
                 dirAsFile.mkdir()

@@ -1,12 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.faction.FactionFactory
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.terrarum.*
 
@@ -79,7 +76,7 @@ object PlayerBuilderSigrid {
 
     fun fillTestInventory(inventory: ActorInventory) {
 
-        AppLoader.tileMaker.tags.forEach { t, _ ->
+        App.tileMaker.tags.forEach { t, _ ->
             inventory.add(t, 9995)
             try {
                 inventory.add("wall@"+t, 9995) // this code will try to add nonexisting wall items, do not get surprised with NPEs

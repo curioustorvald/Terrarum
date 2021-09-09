@@ -17,8 +17,7 @@ import com.sudoplay.joise.module.ModuleBasisFunction
 import com.sudoplay.joise.module.ModuleFractal
 import com.sudoplay.joise.module.ModuleScaleOffset
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.App
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
@@ -45,11 +44,11 @@ class NoiseGenerator : ScreenAdapter() {
         Gdx.input.inputProcessor = NoiseGeneratorController(this)
 
         batch = SpriteBatch()
-        camera = OrthographicCamera(AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
+        camera = OrthographicCamera(App.scr.wf, App.scr.hf)
 
-        camera.setToOrtho(true, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
+        camera.setToOrtho(true, App.scr.wf, App.scr.hf)
         camera.update()
-        Gdx.gl20.glViewport(0, 0, AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        Gdx.gl20.glViewport(0, 0, App.scr.width, App.scr.height)
 
         pixmap = Pixmap(IMAGE_SIZE, IMAGE_SIZE, Pixmap.Format.RGBA8888)
         texture = Texture(1, 1, Pixmap.Format.RGBA8888)
@@ -142,7 +141,7 @@ class NoiseGenerator : ScreenAdapter() {
             batch.draw(texture, 0f, 0f)
 
             batch.color = Color.CYAN
-            AppLoader.fontGame.draw(batch, "Tests: $totalTestsDone / ${testSets.size * samplingCount}", 10f, 10f)
+            App.fontGame.draw(batch, "Tests: $totalTestsDone / ${testSets.size * samplingCount}", 10f, 10f)
         }
 
     }
@@ -258,5 +257,5 @@ fun main(args: Array<String>) {
     appConfig.setResizable(false)
     appConfig.setWindowedMode(1024, 1024)
 
-    Lwjgl3Application(AppLoader(appConfig, NoiseGenerator()), appConfig)
+    Lwjgl3Application(App(appConfig, NoiseGenerator()), appConfig)
 }

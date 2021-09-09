@@ -1,30 +1,18 @@
 package net.torvald.terrarum.gameworld
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.blockproperties.WireCodex
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.gameactors.BlockBoxIndex
 import net.torvald.terrarum.modulebasegame.gameactors.Electric
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.util.IntArrayStack
 import org.dyn4j.geometry.Vector2
-import org.khelekore.prtree.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.experimental.and
 import kotlin.math.roundToInt
 
 /**
@@ -93,13 +81,13 @@ object WorldSimulator {
 
         degrass()
 
-        AppLoader.measureDebugTime("WorldSimulator.fluids") {
+        App.measureDebugTime("WorldSimulator.fluids") {
             //moveFluids(delta)
         }
-        AppLoader.measureDebugTime("WorldSimulator.fallables") {
+        App.measureDebugTime("WorldSimulator.fallables") {
             displaceFallables(delta)
         }
-        AppLoader.measureDebugTime("WorldSimulator.wires") {
+        App.measureDebugTime("WorldSimulator.wires") {
             simulateWires(delta)
         }
 
@@ -109,7 +97,7 @@ object WorldSimulator {
 
 
     fun degrass() {
-        if (ingame.terrainChangeQueue.isNotEmpty()) { AppLoader.measureDebugTime("WorldSimulator.degrass") {
+        if (ingame.terrainChangeQueue.isNotEmpty()) { App.measureDebugTime("WorldSimulator.degrass") {
 
             //val grassPlacedByPlayer = ArrayList<IngameInstance.BlockChangeQueueItem>()
 
@@ -167,7 +155,7 @@ object WorldSimulator {
 
         simCompression()
 
-        if (AppLoader.IS_DEVELOPMENT_BUILD) {
+        if (App.IS_DEVELOPMENT_BUILD) {
             monitorIllegalFluidSetup() // non-air non-zero fluid is kinda inevitable
         }
 

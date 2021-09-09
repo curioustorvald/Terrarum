@@ -14,7 +14,7 @@ import com.jme3.math.FastMath
 import net.torvald.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader.*
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
@@ -129,7 +129,7 @@ object Terrarum : Disposable {
         println("[Terrarum] init called by:")
         printStackTrace(this)
 
-        println("[Terrarum] ${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
+        println("[Terrarum] ${App.GAME_NAME} version ${App.getVERSION_STRING()}")
         println("[Terrarum] LibGDX version ${com.badlogic.gdx.Version.VERSION}")
 
 
@@ -144,7 +144,7 @@ object Terrarum : Disposable {
         println("[Terrarum] vendor = $processorVendor")
 
 
-        AppLoader.disposableSingletonsPool.add(this)
+        App.disposableSingletonsPool.add(this)
 
 
 
@@ -199,8 +199,8 @@ object Terrarum : Disposable {
         //shapeRender = ShapeRenderer()
 
 
-        AppLoader.GAME_LOCALE = getConfigString("language")
-        printdbg(this, "locale = ${AppLoader.GAME_LOCALE}")
+        App.GAME_LOCALE = getConfigString("language")
+        printdbg(this, "locale = ${App.GAME_LOCALE}")
 
 
 
@@ -216,7 +216,7 @@ object Terrarum : Disposable {
 
 
         // title screen
-        AppLoader.setScreen(TitleScreen(batch))
+        App.setScreen(TitleScreen(batch))
     }
 
     /** Don't call this! Call AppLoader.dispose() */
@@ -339,7 +339,7 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     //this.end()
     FrameBufferManager.end()
 
-    camera?.setToOrtho(true, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
+    camera?.setToOrtho(true, App.scr.wf, App.scr.hf)
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 }
@@ -347,10 +347,10 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
 
 // ShapeRenderer alternative for rects
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(AppLoader.textureWhiteSquare, x, y, w, h)
+    this.draw(App.textureWhiteSquare, x, y, w, h)
 }
 fun SpriteBatch.fillCircle(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(AppLoader.textureWhiteCircle, x, y, w, h)
+    this.draw(App.textureWhiteCircle, x, y, w, h)
 }
 fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)
@@ -589,7 +589,7 @@ fun <T> List<T>.linearSearchBy(selector: (T) -> Boolean): T? {
 inline fun printStackTrace(obj: Any) = printStackTrace(obj, System.out) // because of Java
 
 fun printStackTrace(obj: Any, out: PrintStream = System.out) {
-    if (AppLoader.IS_DEVELOPMENT_BUILD) {
+    if (App.IS_DEVELOPMENT_BUILD) {
         Thread.currentThread().stackTrace.forEachIndexed { index, it ->
             if (index >= 3)
                 out.println("[${obj.javaClass.simpleName}] ... $it")

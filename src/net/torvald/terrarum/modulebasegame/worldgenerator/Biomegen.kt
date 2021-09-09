@@ -1,18 +1,16 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import com.badlogic.gdx.graphics.Pixmap
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.ModuleAutoCorrect
 import com.sudoplay.joise.module.ModuleBasisFunction
 import com.sudoplay.joise.module.ModuleFractal
 import com.sudoplay.joise.module.ModuleScaleDomain
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -49,7 +47,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
         ThreadExecutor.join()
 
-        AppLoader.printdbg(this, "Waking up Worldgen")
+        App.printdbg(this, "Waking up Worldgen")
     }
 
     companion object {

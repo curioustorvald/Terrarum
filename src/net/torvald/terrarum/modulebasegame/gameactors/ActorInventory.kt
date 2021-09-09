@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
@@ -96,7 +96,7 @@ class ActorInventory() : FixtureInventory() {
                 actor.avStrength / 1000.0
             else
                 1.0 // TODO variable: scale, strength
-            val swingDmgToFrameDmg = AppLoader.UPDATE_RATE.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val swingDmgToFrameDmg = App.UPDATE_RATE.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
             // damage the item
             newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()

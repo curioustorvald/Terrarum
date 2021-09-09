@@ -3,8 +3,8 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -37,7 +37,7 @@ class UIProxyNewRandomGame : UICanvas() {
         printdbg(this, "endOpening")
 
 
-        val ingame = TerrarumIngame(AppLoader.batch)
+        val ingame = TerrarumIngame(App.batch)
 //        val worldParam = TerrarumIngame.NewWorldParameters(2400, 1280, 0x51621DL)
         val worldParam = TerrarumIngame.NewWorldParameters(2400, 1280, HQRNG().nextLong())
 
@@ -52,7 +52,7 @@ class UIProxyNewRandomGame : UICanvas() {
         //LoadScreen.screenToLoad = ingame
         //AppLoader.setScreen(LoadScreen)
         val loadScreen = WorldgenLoadScreen(ingame, worldParam.width, worldParam.height)
-        AppLoader.setLoadScreen(loadScreen)
+        App.setLoadScreen(loadScreen)
     }
 
     override fun endClosing(delta: Float) {

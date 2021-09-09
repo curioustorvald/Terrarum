@@ -3,14 +3,11 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.XXHash32
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.toInt
-import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 

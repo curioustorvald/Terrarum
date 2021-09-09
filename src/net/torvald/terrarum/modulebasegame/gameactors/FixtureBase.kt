@@ -1,18 +1,16 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
 import net.torvald.terrarum.*
@@ -57,7 +55,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         this.inventory = inventory
 
         if (mainUI != null)
-            AppLoader.disposableSingletonsPool.add(mainUI)
+            App.disposableSingletonsPool.add(mainUI)
     }
 
     /**

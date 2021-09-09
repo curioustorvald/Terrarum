@@ -12,8 +12,8 @@ class ModOptionsHost : UICanvas() {
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8
 
-    override var width = AppLoader.screenSize.screenW - UIRemoCon.remoConWidth - moduleAreaHMargin
-    override var height = AppLoader.screenSize.screenH - moduleAreaHMargin * 2
+    override var width = App.scr.width - UIRemoCon.remoConWidth - moduleAreaHMargin
+    override var height = App.scr.height - moduleAreaHMargin * 2
 
     override fun updateUI(delta: Float) {
     }

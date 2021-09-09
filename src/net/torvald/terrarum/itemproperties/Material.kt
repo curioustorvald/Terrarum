@@ -1,6 +1,6 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.AppLoader.printmsg
+import net.torvald.terrarum.App.printmsg
 import net.torvald.terrarum.Codex
 import net.torvald.terrarum.blockproperties.floatVal
 import net.torvald.terrarum.blockproperties.intVal

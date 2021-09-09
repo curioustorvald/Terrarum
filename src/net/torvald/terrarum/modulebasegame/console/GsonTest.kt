@@ -1,15 +1,5 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.console.ConsoleCommand
-import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.utils.JsonWriter
-import java.io.BufferedWriter
-import java.io.FileWriter
-import java.io.IOException
-
 /**
  * Created by minjaesong on 2016-02-10.
  */

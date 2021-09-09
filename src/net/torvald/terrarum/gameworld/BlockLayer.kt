@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.UnsafeHelper
 import net.torvald.UnsafePtr
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 
 /**
  * Memory layout:

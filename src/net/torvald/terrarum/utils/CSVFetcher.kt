@@ -1,6 +1,6 @@
 package net.torvald.terrarum.utils
 
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import org.apache.commons.csv.CSVFormat
 

@@ -5,12 +5,13 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.console.CommandDict
@@ -39,7 +40,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     // todo register titlescreen as the ingame, similar in a way that the buildingmaker did
 
-    var camera = OrthographicCamera(AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
+    var camera = OrthographicCamera(App.scr.wf, App.scr.hf)
 
 
     // invert Y
@@ -160,6 +161,15 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         IngameRenderer.setRenderedWorld(demoWorld)
 
 
+        // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs
+        CommonResourcePool.addToLoadingList("title_halfgrad") { Texture(Gdx.files.internal("./assets/graphics/halfgrad.png")) }
+        CommonResourcePool.loadAll()
+
+
+        // fake UI for gradient overlay
+        val uiFakeGradOverlay = UIFakeGradOverlay()
+
+
         uiMenu = UIRemoCon(UITitleRemoConYaml())//UITitleRemoConRoot()
         uiMenu.setPosition(0, 0)
         uiMenu.setAsOpen()
@@ -181,13 +191,13 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     override fun show() {
         printdbg(this, "show() called")
 
-        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        initViewPort(App.scr.width, App.scr.height)
 
 
         Gdx.input.inputProcessor = TitleScreenController(this)
 
 
-        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, AppLoader.screenSize.screenW, AppLoader.screenSize.screenH, false)
+        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, App.scr.width, App.scr.height, false)
 
         loadThingsWhileIntroIsVisible()
 
@@ -214,15 +224,15 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         var i = 0L
         while (updateAkku >= updateRate) {
-            AppLoader.measureDebugTime("Ingame.Update") { updateScreen(updateRate) }
+            App.measureDebugTime("Ingame.Update") { updateScreen(updateRate) }
             updateAkku -= updateRate
             i += 1
         }
-        AppLoader.setDebugTime("Ingame.UpdateCounter", i)
+        App.setDebugTime("Ingame.UpdateCounter", i)
 
 
         // render? just do it anyway
-        AppLoader.measureDebugTime("Ingame.Render") { renderScreen() }
+        App.measureDebugTime("Ingame.Render") { renderScreen() }
     }
 
     fun updateScreen(delta: Float) {
@@ -278,14 +288,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         )
 
         COPYTING.forEachIndexed { index, s ->
-            val textWidth = AppLoader.fontGame.getWidth(s)
-            AppLoader.fontGame.draw(batch, s,
-                    (AppLoader.screenSize.screenW - textWidth - 1f).toInt().toFloat(),
-                    (AppLoader.screenSize.screenH - AppLoader.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
+            val textWidth = App.fontGame.getWidth(s)
+            App.fontGame.draw(batch, s,
+                    (App.scr.width - textWidth - 1f).toInt().toFloat(),
+                    (App.scr.height - App.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
             )
         }
 
-        AppLoader.fontGame.draw(batch, PostProcessor.thisIsDebugStr, 5f, AppLoader.screenSize.screenH - 24f)
+        App.fontGame.draw(batch, PostProcessor.thisIsDebugStr, 5f, App.scr.height - 24f)
 
     }
 
@@ -301,11 +311,11 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         printStackTrace(this)
 
         // Set up viewport when window is resized
-        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        initViewPort(App.scr.width, App.scr.height)
 
 
         // resize UI by re-creating it (!!)
-        uiMenu.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        uiMenu.resize(App.scr.width, App.scr.height)
         // TODO I forgot what the fuck kind of hack I was talking about
         //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         uiMenu.setPosition(0, 0) // shitty hack. Could be:
@@ -313,7 +323,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         // 2: The UI is coded shit
 
 
-        IngameRenderer.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        IngameRenderer.resize(App.scr.width, App.scr.height)
 
         printdbg(this, "resize() exit")
     }

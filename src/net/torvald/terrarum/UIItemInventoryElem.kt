@@ -1,15 +1,10 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
@@ -108,7 +103,7 @@ class UIItemInventoryElem(
             batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             // draw name of the item
             if (INVEN_DEBUG_MODE) {
-                AppLoader.fontGame.draw(batch,
+                App.fontGame.draw(batch,
                         // print static id, dynamic id, and count
                         "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
                         posX + textOffsetX,
@@ -116,7 +111,7 @@ class UIItemInventoryElem(
                 )
             }
             else {
-                AppLoader.fontGame.draw(batch,
+                App.fontGame.draw(batch,
                         // print name and amount in parens
                         item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else "") +
                         // TEMPORARY print eqipped slot info as well
@@ -147,8 +142,8 @@ class UIItemInventoryElem(
 
             if (quickslot != null) {
                 val label = quickslot!!.plus(0xE010).toChar()
-                val labelW = AppLoader.fontGame.getWidth("$label")
-                AppLoader.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+                val labelW = App.fontGame.getWidth("$label")
+                App.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
             }
 
         }

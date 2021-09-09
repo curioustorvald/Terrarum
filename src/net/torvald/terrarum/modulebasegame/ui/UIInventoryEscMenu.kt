@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
@@ -15,8 +15,8 @@ import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGH
 
 class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
-    override var width: Int = AppLoader.screenSize.screenW
-    override var height: Int = AppLoader.screenSize.screenH
+    override var width: Int = App.scr.width
+    override var height: Int = App.scr.height
     override var openCloseTime = 0.0f
 
     private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
@@ -24,7 +24,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenuListWidth = 400
     private val gameMenuButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, gameMenu,
-            (AppLoader.screenSize.screenW - gameMenuListWidth) / 2,
+            (App.scr.width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
@@ -41,7 +41,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
         gameMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
-                0 -> AppLoader.setScreen(TitleScreen(AppLoader.batch))
+                0 -> App.setScreen(TitleScreen(App.batch))
                 1 -> Gdx.app.exit()
             }
         }
@@ -55,7 +55,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
+        App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
 
         // text buttons
         gameMenuButtons.render(batch, camera)

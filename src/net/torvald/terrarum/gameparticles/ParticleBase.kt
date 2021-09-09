@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
 import org.dyn4j.geometry.Vector2
@@ -20,7 +18,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
 
-    override fun run() = update(AppLoader.UPDATE_RATE)
+    override fun run() = update(App.UPDATE_RATE)
 
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0

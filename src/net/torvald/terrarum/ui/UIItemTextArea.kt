@@ -2,7 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.floor
 import net.torvald.terrarum.ui.UIItemTextButton.Companion.Alignment
 
@@ -13,7 +13,7 @@ class UIItemTextArea(
         override val width: Int,
         override val height: Int,
         val lineGap: Int = 0,
-        val lineCount: Int = ((height + lineGap) / AppLoader.fontGame.lineHeight).toInt(),
+        val lineCount: Int = ((height + lineGap) / App.fontGame.lineHeight).toInt(),
         val align: Alignment = Alignment.LEFT
 ) : UIItem(parentUI, initialX, initialY) {
 
@@ -36,12 +36,12 @@ class UIItemTextArea(
         for (i in scrollPos until minOf(lineCount + scrollPos, entireText.size)) {
             val yPtr = i - scrollPos
 
-            val textWidth = AppLoader.fontGame.getWidth(entireText[i])
+            val textWidth = App.fontGame.getWidth(entireText[i])
 
             when (align) {
-                Alignment.LEFT -> AppLoader.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (AppLoader.fontGame.lineHeight + lineGap))
-                Alignment.CENTRE -> AppLoader.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).floor(), posY + yPtr * (AppLoader.fontGame.lineHeight + lineGap))
-                Alignment.RIGHT -> AppLoader.fontGame.draw(batch, entireText[i], posX + width - textWidth.toFloat(), posY + yPtr * (AppLoader.fontGame.lineHeight + lineGap))
+                Alignment.LEFT -> App.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
+                Alignment.CENTRE -> App.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).floor(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
+                Alignment.RIGHT -> App.fontGame.draw(batch, entireText[i], posX + width - textWidth.toFloat(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
             }
         }
     }

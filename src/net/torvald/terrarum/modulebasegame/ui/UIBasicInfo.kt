@@ -42,7 +42,7 @@ class UIBasicInfo() : UICanvas() {
             ELuptimer += delta
         }
 
-        if (mouseUp || Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyinteract"))) {
+        if (mouseUp || Gdx.input.isKeyPressed(App.getConfigInt("config_keyinteract"))) {
             ELuptimer = 0f
             ELon = true
         }

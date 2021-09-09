@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.random.Fudge3
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorValue

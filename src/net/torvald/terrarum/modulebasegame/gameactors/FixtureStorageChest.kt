@@ -57,15 +57,15 @@ internal class FixtureStorageChest : FixtureBase {
 
 
 internal class UIStorageChest : UICanvas(
-        toggleKeyLiteral = AppLoader.getConfigInt("config_keyinventory"),
-        toggleButtonLiteral = AppLoader.getConfigInt("config_gamepadstart"),
+        toggleKeyLiteral = App.getConfigInt("config_keyinventory"),
+        toggleButtonLiteral = App.getConfigInt("config_gamepadstart"),
 ), HasInventory {
 
     lateinit var chestInventory: FixtureInventory
     lateinit var chestNameFun: () -> String
 
-    override var width = AppLoader.screenSize.screenW
-    override var height = AppLoader.screenSize.screenH
+    override var width = App.scr.width
+    override var height = App.scr.height
     override var openCloseTime: Second = 0.0f
 
     private val shapeRenderer = ShapeRenderer()
@@ -127,8 +127,8 @@ internal class UIStorageChest : UICanvas(
 
             catBar = UIItemInventoryCatBar(
                     this,
-                    (AppLoader.screenSize.screenW - catBarWidth) / 2,
-                    42 + (AppLoader.screenSize.screenH - internalHeight) / 2,
+                    (App.scr.width - catBarWidth) / 2,
+                    42 + (App.scr.height - internalHeight) / 2,
                     internalWidth,
                     catBarWidth,
                     false
@@ -195,17 +195,17 @@ internal class UIStorageChest : UICanvas(
         gdxSetBlendNormal()
 
 
-        val gradTopStart = (AppLoader.screenSize.screenH - internalHeight).div(2).toFloat()
-        val gradBottomEnd = AppLoader.screenSize.screenH - gradTopStart
+        val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
+        val gradBottomEnd = App.scr.height - gradTopStart
 
         shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenSize.screenWf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenSize.screenWf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenSize.screenWf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, 0f, AppLoader.screenSize.screenWf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, AppLoader.screenSize.screenHf, AppLoader.screenSize.screenWf, -(AppLoader.screenSize.screenHf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
         }
 
 
@@ -225,7 +225,7 @@ internal class UIStorageChest : UICanvas(
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - weightBarWidth
-        val encumbBarTextXPos = encumbBarXPos - 6 - AppLoader.fontGame.getWidth(encumbranceText)
+        val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
         val encumbBarYPos = UIInventoryCells.encumbBarYPos
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
@@ -250,10 +250,10 @@ internal class UIStorageChest : UICanvas(
 
         // chest name text
         batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, chestName, itemListChest.posX + 6f, encumbBarYPos - 3f)
+        App.fontGame.draw(batch, chestName, itemListChest.posX + 6f, encumbBarYPos - 3f)
         // encumb text
         batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
+        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
     }
 
     override fun doOpening(delta: Float) {

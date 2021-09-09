@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumScreenSize
 import net.torvald.terrarum.keyToIcon
@@ -17,13 +17,13 @@ import net.torvald.terrarum.ui.UICanvas
  * Created by minjaesong on 2019-08-11.
  */
 class UIScreenZoom : UICanvas(
-        AppLoader.getConfigInt("config_keyzoom")
+        App.getConfigInt("config_keyzoom")
 ) {
 
     val zoomText = "${keyToIcon(handler.toggleKeyLiteral!!)} $EMDASH Zoom Out"
 
-    override var width = AppLoader.fontGame.getWidth(zoomText)
-    override var height = AppLoader.fontGame.lineHeight.toInt()
+    override var width = App.fontGame.getWidth(zoomText)
+    override var height = App.fontGame.lineHeight.toInt()
 
     override var openCloseTime = 0.15f
 
@@ -38,10 +38,10 @@ class UIScreenZoom : UICanvas(
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
 
-        AppLoader.fontGame.draw(
+        App.fontGame.draw(
                 batch, zoomText,
-                (AppLoader.screenSize.screenW * TerrarumScreenSize.TV_SAFE_GRAPHICS + 1).toInt().toFloat(),
-                (AppLoader.screenSize.screenH - height - AppLoader.screenSize.tvSafeGraphicsHeight).toFloat()
+                (App.scr.width * TerrarumScreenSize.TV_SAFE_GRAPHICS + 1).toInt().toFloat(),
+                (App.scr.height - height - App.scr.tvSafeGraphicsHeight).toFloat()
         )
     }
 

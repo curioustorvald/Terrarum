@@ -99,8 +99,8 @@ internal object WeatherMixer : RNGConsumer {
             val playerPosY = player.hitbox.centeredY
             kotlin.repeat(7) {
                 val rainParticle = ParticleMegaRain(
-                        playerPosX + HQRNG().nextInt(AppLoader.screenSize.screenW) - AppLoader.screenSize.halfScreenW,
-                        playerPosY - AppLoader.screenSize.screenH
+                        playerPosX + HQRNG().nextInt(App.scr.width) - App.scr.halfw,
+                        playerPosY - App.scr.height
                 )
                 (Terrarum.ingame!! as TerrarumIngame).addParticle(rainParticle)
             }
@@ -177,7 +177,7 @@ internal object WeatherMixer : RNGConsumer {
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
-        if (AppLoader.getConfigBoolean("fxdither")) {
+        if (App.getConfigBoolean("fxdither")) {
             batch.shader = IngameRenderer.shaderBayer
             batch.shader.setUniformf("rcount", 64f)
             batch.shader.setUniformf("gcount", 64f)
@@ -187,7 +187,7 @@ internal object WeatherMixer : RNGConsumer {
             batch.shader = null
         }
         batch.inUse {
-            it.draw(skyboxTexture, 0f, -AppLoader.screenSize.halfScreenHf, AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf * 2f) // because of how the linear filter works, we extend the image by two
+            it.draw(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
         }
 
         // don't use shader to just fill the whole screen... frag shader will be called a million times and it's best to not burden it

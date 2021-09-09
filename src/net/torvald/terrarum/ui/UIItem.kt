@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 
 
@@ -88,7 +88,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))
+        get() = mouseUp && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))
 
 
     /** UI to call (show up) while mouse is up */

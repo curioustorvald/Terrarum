@@ -1,7 +1,7 @@
 package net.torvald.terrarum.langpack
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.utils.JsonFetcher
 import java.io.File
 import java.util.*
@@ -120,17 +120,17 @@ object Lang {
         fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "$$key"
 
 
-        val ret = langpack["${key}_${AppLoader.GAME_LOCALE}"]
+        val ret = langpack["${key}_${App.GAME_LOCALE}"]
         val ret2 = if (ret.isNullOrEmpty()) fallback() else ret!!
 
         // special treatment
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
-            return ret2.replace('>', AppLoader.gamepadLabelStart).capitalize()
+            return ret2.replace('>', App.gamepadLabelStart).capitalize()
 
         return if (key.getEndTag().contains("bg"))
-            "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideDefault}"
+            "${App.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${App.fontGame.charsetOverrideDefault}"
         else if (key.getEndTag().contains("sr"))
-            "${AppLoader.fontGame.charsetOverrideSerbian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideDefault}"
+            "${App.fontGame.charsetOverrideSerbian}${ret2.capitalize()}${App.fontGame.charsetOverrideDefault}"
         else
             ret2.capitalize()
     }
@@ -144,7 +144,7 @@ object Lang {
     fun pluralise(word: String, count: Int): String {
         if (count < 2) return word
 
-        when (AppLoader.GAME_LOCALE) {
+        when (App.GAME_LOCALE) {
             "fr" -> {
                 if (Arrays.binarySearch(FRENCH_WORD_NORMAL_PLURAL, word) >= 0) {
                     return word + "s"

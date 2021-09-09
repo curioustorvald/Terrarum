@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.SanicLoadScreen
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
@@ -32,11 +32,11 @@ class UIProxyNewBuildingMaker : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
-        val ingame = BuildingMaker(AppLoader.batch)
+        val ingame = BuildingMaker(App.batch)
 
         Terrarum.setCurrentIngameInstance(ingame)
         SanicLoadScreen.screenToLoad = ingame
-        AppLoader.setLoadScreen(SanicLoadScreen)
+        App.setLoadScreen(SanicLoadScreen)
     }
 
     override fun endClosing(delta: Float) {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -26,7 +26,7 @@ object Toolkit {
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width
-        val targetW = if (ui == null) AppLoader.screenSize.screenW else ui.width
+        val targetW = if (ui == null) App.scr.width else ui.width
 
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }

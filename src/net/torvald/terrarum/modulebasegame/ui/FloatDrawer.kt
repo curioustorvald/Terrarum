@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -13,7 +13,7 @@ object FloatDrawer : Disposable {
     val tile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
 
     init {
-        AppLoader.disposableSingletonsPool.add(this)
+        App.disposableSingletonsPool.add(this)
     }
 
     /**

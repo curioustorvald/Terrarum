@@ -106,7 +106,7 @@ class UITestPad1 : ScreenAdapter() {
                 Color.LIME
             else
                 Color.FIREBRICK
-            AppLoader.fontGame.draw(batch, "Mouse: ${Terrarum.mouseScreenX}, ${Terrarum.mouseScreenY}", 8f, 740 - 28f)
+            App.fontGame.draw(batch, "Mouse: ${Terrarum.mouseScreenX}, ${Terrarum.mouseScreenY}", 8f, 740 - 28f)
         }
 
         _dct = (_dct + delta*2) % 10f
@@ -156,5 +156,5 @@ fun main(args: Array<String>) {
     appConfig.setResizable(false)
     appConfig.setWindowedMode(UITEST1_WIDTH, UITEST1_HEIGHT)
 
-    Lwjgl3Application(AppLoader(appConfig, UITestPad1()), appConfig)
+    Lwjgl3Application(App(appConfig, UITestPad1()), appConfig)
 }

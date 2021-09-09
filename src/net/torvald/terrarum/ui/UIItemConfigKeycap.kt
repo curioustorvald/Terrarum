@@ -3,7 +3,6 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack

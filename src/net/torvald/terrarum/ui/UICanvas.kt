@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import kotlin.math.roundToInt
@@ -86,7 +86,7 @@ abstract class UICanvas(
         get() = _mouseUpThis || handler.mouseUp
     /** If mouse is hovering over it and mouse is down */
     val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))
+        get() = mouseUp && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))
 
     private val _mouseUpThis: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
@@ -148,7 +148,7 @@ abstract class UICanvas(
         uiItems.add(uiItem)
     }
 
-    fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.screenSize.screenW && y in 0 until AppLoader.screenSize.screenH
+    fun mouseInScreen(x: Int, y: Int) = x in 0 until App.scr.width && y in 0 until App.scr.height
 
     /**
      * Called by the screen's InputProcessor
@@ -307,13 +307,13 @@ abstract class UICanvas(
                 ).roundToInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenSize.screenWf,
-                        AppLoader.screenSize.screenW - ui.width.toFloat()
+                        App.scr.wf,
+                        App.scr.width - ui.width.toFloat()
                 ).roundToInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenSize.screenHf,
-                        AppLoader.screenSize.screenH - ui.height.toFloat()
+                        App.scr.hf,
+                        App.scr.height - ui.height.toFloat()
                 ).roundToInt()
             }
         }
@@ -331,13 +331,13 @@ abstract class UICanvas(
                 ).roundToInt()
                 Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenSize.screenW - ui.width.toFloat(),
-                        AppLoader.screenSize.screenWf
+                        App.scr.width - ui.width.toFloat(),
+                        App.scr.wf
                 ).roundToInt()
                 Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
                         ui.handler.openCloseCounter / openCloseTime,
-                        AppLoader.screenSize.screenH - ui.height.toFloat(),
-                        AppLoader.screenSize.screenHf
+                        App.scr.height - ui.height.toFloat(),
+                        App.scr.hf
                 ).roundToInt()
             }
         }
@@ -345,16 +345,16 @@ abstract class UICanvas(
             when (position) {
                 Position.LEFT -> ui.handler.posX = 0
                 Position.TOP -> ui.handler.posY = 0
-                Position.RIGHT -> ui.handler.posX = AppLoader.screenSize.screenW - ui.width
-                Position.BOTTOM -> ui.handler.posY = AppLoader.screenSize.screenH - ui.height
+                Position.RIGHT -> ui.handler.posX = App.scr.width - ui.width
+                Position.BOTTOM -> ui.handler.posY = App.scr.height - ui.height
             }
         }
         fun endClosingPopOut(ui: UICanvas, position: Position) {
             when (position) {
                 Position.LEFT -> ui.handler.posX = -ui.width
                 Position.TOP -> ui.handler.posY = -ui.height
-                Position.RIGHT -> ui.handler.posX = AppLoader.screenSize.screenW
-                Position.BOTTOM -> ui.handler.posY = AppLoader.screenSize.screenH
+                Position.RIGHT -> ui.handler.posX = App.scr.width
+                Position.BOTTOM -> ui.handler.posY = App.scr.height
             }
         }
 

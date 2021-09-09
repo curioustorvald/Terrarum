@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
@@ -21,7 +21,7 @@ internal object ExportAV : ConsoleCommand {
 
                 JsonWriter.writeToFile(
                         player,
-                        AppLoader.defaultDir + "/Exports/" + args[1] + ".json")
+                        App.defaultDir + "/Exports/" + args[1] + ".json")
 
                 Echo("ExportAV: exported to " + args[1] + ".json")
             }

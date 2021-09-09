@@ -51,7 +51,7 @@ import static net.torvald.terrarum.TerrarumKt.printStackTrace;
  *
  * Created by minjaesong on 2017-08-01.
  */
-public class AppLoader implements ApplicationListener {
+public class App implements ApplicationListener {
 
     public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
 
@@ -78,7 +78,7 @@ public class AppLoader implements ApplicationListener {
     /**
      * Singleton instance
      */
-    private static AppLoader INSTANCE = null;
+    private static App INSTANCE = null;
 
     /**
      * Screen injected at init, so that you run THAT screen instead of the main game.
@@ -91,9 +91,9 @@ public class AppLoader implements ApplicationListener {
      * @param appConfig    LWJGL3 Application Configuration
      * @param injectScreen GDX Screen you want to run
      */
-    public AppLoader(Lwjgl3ApplicationConfiguration appConfig, Screen injectScreen) {
-        AppLoader.injectScreen = injectScreen;
-        AppLoader.appConfig = appConfig;
+    public App(Lwjgl3ApplicationConfiguration appConfig, Screen injectScreen) {
+        App.injectScreen = injectScreen;
+        App.appConfig = appConfig;
     }
 
     /**
@@ -101,14 +101,14 @@ public class AppLoader implements ApplicationListener {
      *
      * @param appConfig LWJGL3 Application Configuration
      */
-    public AppLoader(Lwjgl3ApplicationConfiguration appConfig) {
-        AppLoader.appConfig = appConfig;
+    public App(Lwjgl3ApplicationConfiguration appConfig) {
+        App.appConfig = appConfig;
     }
 
     /**
      * Default null constructor. Don't use it.
      */
-    private AppLoader() {
+    private App() {
     }
 
     /**
@@ -119,9 +119,9 @@ public class AppLoader implements ApplicationListener {
      *
      * @return
      */
-    public static AppLoader getINSTANCE() {
+    public static App getINSTANCE() {
         if (INSTANCE == null) {
-            INSTANCE = new AppLoader();
+            INSTANCE = new App();
         }
         return INSTANCE;
     }
@@ -179,7 +179,7 @@ public class AppLoader implements ApplicationListener {
     private static Point2i resizeReqSize;
 
     public static Lwjgl3ApplicationConfiguration appConfig;
-    public static TerrarumScreenSize screenSize;
+    public static TerrarumScreenSize scr;
     public static TerrarumGLinfo glInfo = new TerrarumGLinfo();
 
     public static CreateTileAtlas tileMaker;
@@ -298,9 +298,9 @@ public class AppLoader implements ApplicationListener {
 
         ShaderProgram.pedantic = false;
 
-        screenSize = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
-        int width = screenSize.getScreenW();
-        int height = screenSize.getScreenH();
+        scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
+        int width = scr.getWidth();
+        int height = scr.getHeight();
 
         Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
         //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
@@ -341,7 +341,7 @@ public class AppLoader implements ApplicationListener {
         // set some more configuration vars
         MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
 
-        new Lwjgl3Application(new AppLoader(appConfig), appConfig);
+        new Lwjgl3Application(new App(appConfig), appConfig);
     }
     
     @Override
@@ -362,12 +362,12 @@ public class AppLoader implements ApplicationListener {
 
         // set basis of draw
         logoBatch = new SpriteBatch();
-        camera = new OrthographicCamera((screenSize.getScreenWf()), (screenSize.getScreenHf()));
+        camera = new OrthographicCamera((scr.getWf()), (scr.getHf()));
 
         batch = new SpriteBatch();
         shapeRender = new ShapeRenderer();
 
-        initViewPort(screenSize.getScreenW(), screenSize.getScreenH());
+        initViewPort(scr.getWidth(), scr.getHeight());
 
         // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
@@ -389,7 +389,7 @@ public class AppLoader implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-        updateFullscreenQuad(screenSize.getScreenW(), screenSize.getScreenH());
+        updateFullscreenQuad(scr.getWidth(), scr.getHeight());
 
 
         // set up renderer info variables
@@ -398,7 +398,7 @@ public class AppLoader implements ApplicationListener {
 
 
         // make gamepad(s)
-        if (AppLoader.getConfigBoolean("usexinput")) {
+        if (App.getConfigBoolean("usexinput")) {
             try {
                 gamepad = new XinputControllerAdapter(XInputDevice.getDeviceFor(0));
             }
@@ -484,7 +484,7 @@ public class AppLoader implements ApplicationListener {
             postInit();
         }
 
-        AppLoader.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getDeltaTime() * 1000_000_000f));
+        App.setDebugTime("GDX.rawDelta", (long) (Gdx.graphics.getDeltaTime() * 1000_000_000f));
 
 
         FrameBufferManager.begin(renderFBO);
@@ -535,7 +535,7 @@ public class AppLoader implements ApplicationListener {
             screenshotRequested = false;
 
             try {
-                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, screenSize.getScreenW(), screenSize.getScreenH());
+                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, scr.getWidth(), scr.getHeight());
                 PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".tga"), p, true);
                 p.dispose();
 
@@ -564,8 +564,8 @@ public class AppLoader implements ApplicationListener {
         setCameraPosition(0f, 0f);
 
         int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
-        int logoPosX = (screenSize.getScreenW() - logo.getRegionWidth() - safetyTextLen) >>> 1;
-        int logoPosY = Math.round(screenSize.getScreenH() / 15f);
+        int logoPosX = (scr.getWidth() - logo.getRegionWidth() - safetyTextLen) >>> 1;
+        int logoPosY = Math.round(scr.getHeight() / 15f);
         int textY = logoPosY + logo.getRegionHeight() - 16;
 
         // draw logo reflection
@@ -577,8 +577,8 @@ public class AppLoader implements ApplicationListener {
             logoBatch.draw(logo, logoPosX, logoPosY + logo.getRegionHeight());
         }
         else {
-            logoBatch.draw(logo, (screenSize.getScreenW() - logo.getRegionWidth()) / 2f,
-                    (screenSize.getScreenH() - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
+            logoBatch.draw(logo, (scr.getWidth() - logo.getRegionWidth()) / 2f,
+                    (scr.getHeight() - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
             );
         }
 
@@ -603,8 +603,8 @@ public class AppLoader implements ApplicationListener {
                     String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i);
 
                     fontGame.draw(logoBatch, s,
-                            (screenSize.getScreenW() - fontGame.getWidth(s)) >>> 1,
-                            Math.round(screenSize.getScreenH() * 12f / 15f + fontGame.getLineHeight() * (i - 1))
+                            (scr.getWidth() - fontGame.getWidth(s)) >>> 1,
+                            Math.round(scr.getHeight() * 12f / 15f + fontGame.getLineHeight() * (i - 1))
                     );
                 }
             }
@@ -612,15 +612,15 @@ public class AppLoader implements ApplicationListener {
             logoBatch.setColor(new Color(0x282828ff));
             Texture tex1 = CommonResourcePool.INSTANCE.getAsTexture("title_health1");
             Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
-            int virtualHeight = screenSize.getScreenH() - logoPosY - logo.getRegionHeight() / 4;
-            int virtualHeightOffset = screenSize.getScreenH() - virtualHeight;
-            logoBatch.draw(tex1, (screenSize.getScreenW() - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
-            logoBatch.draw(tex2, (screenSize.getScreenW() - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
+            int virtualHeight = scr.getHeight() - logoPosY - logo.getRegionHeight() / 4;
+            int virtualHeightOffset = scr.getHeight() - virtualHeight;
+            logoBatch.draw(tex1, (scr.getWidth() - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
+            logoBatch.draw(tex2, (scr.getWidth() - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
 
         }
         else {
-            logoBatch.draw(logo, (screenSize.getScreenW() - logo.getRegionWidth()) / 2f,
-                    (screenSize.getScreenH() - logo.getRegionHeight() * 2) / 2f
+            logoBatch.draw(logo, (scr.getWidth() - logo.getRegionWidth()) / 2f,
+                    (scr.getHeight() - logo.getRegionHeight() * 2) / 2f
             );
         }
 
@@ -634,20 +634,20 @@ public class AppLoader implements ApplicationListener {
 
         //initViewPort(width, height);
 
-        screenSize.setDimension(width, height);
+        scr.setDimension(width, height);
 
-        if (currenScreen != null) currenScreen.resize(screenSize.getScreenW(), screenSize.getScreenH());
-        updateFullscreenQuad(screenSize.getScreenW(), screenSize.getScreenH());
+        if (currenScreen != null) currenScreen.resize(scr.getWidth(), scr.getHeight());
+        updateFullscreenQuad(scr.getWidth(), scr.getHeight());
 
 
         if (renderFBO == null ||
-                (renderFBO.getWidth() != screenSize.getScreenW() ||
-                        renderFBO.getHeight() != screenSize.getScreenH())
+                (renderFBO.getWidth() != scr.getWidth() ||
+                        renderFBO.getHeight() != scr.getHeight())
         ) {
             renderFBO = new FrameBuffer(
                     Pixmap.Format.RGBA8888,
-                    screenSize.getScreenW(),
-                    screenSize.getScreenH(),
+                    scr.getWidth(),
+                    scr.getHeight(),
                     false
             );
         }
@@ -755,7 +755,7 @@ public class AppLoader implements ApplicationListener {
         currenScreen = screen;
 
         currenScreen.show();
-        currenScreen.resize(screenSize.getScreenW(), screenSize.getScreenH());
+        currenScreen.resize(scr.getWidth(), scr.getHeight());
 
 
         System.gc();
@@ -804,7 +804,7 @@ public class AppLoader implements ApplicationListener {
 
 
     private void setCameraPosition(float newX, float newY) {
-        camera.position.set((-newX + screenSize.getScreenW() / 2), (-newY + screenSize.getScreenH() / 2), 0f); // deliberate integer division
+        camera.position.set((-newX + scr.getWidth() / 2), (-newY + scr.getHeight() / 2), 0f); // deliberate integer division
         camera.update();
         logoBatch.setProjectionMatrix(camera.combined);
     }

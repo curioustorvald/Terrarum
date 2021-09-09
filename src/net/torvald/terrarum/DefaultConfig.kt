@@ -1,8 +1,6 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.utils.Json
-import net.torvald.terrarum.blockproperties.Block
 
 /**
  * Keys must be all lowercase
@@ -18,7 +16,7 @@ object DefaultConfig {
             "screenheight" to TerrarumScreenSize.defaultH,
             "atlastexsize" to 2048,
 
-            "language" to AppLoader.getSysLang(),
+            "language" to App.getSysLang(),
             "notificationshowuptime" to 4000,
             "multithread" to true,
             "multithreadedlight" to false,

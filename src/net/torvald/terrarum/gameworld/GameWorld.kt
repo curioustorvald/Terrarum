@@ -4,9 +4,8 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.WireActor
@@ -36,9 +35,9 @@ class GameWorld() : Disposable {
     var width: Int = 999; private set
     var height: Int = 999; private set
 
-    var creationTime: Long = AppLoader.getTIME_T()
+    var creationTime: Long = App.getTIME_T()
         internal set
-    var lastPlayTime: Long = AppLoader.getTIME_T()
+    var lastPlayTime: Long = App.getTIME_T()
         internal set // there's a case of save-and-continue-playing
     var totalPlayTime: Long = 0
         internal set
@@ -134,7 +133,7 @@ class GameWorld() : Disposable {
         this.totalPlayTime = totalPlayTime
 
 
-        AppLoader.tileMaker.tags.forEach {
+        App.tileMaker.tags.forEach {
             printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
             tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key

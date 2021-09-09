@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
@@ -40,7 +40,7 @@ object Save : ConsoleCommand {
                 val ingame = Terrarum.ingame!! as TerrarumIngame
                 val savename = args[1].trim()
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
-                val file = File(AppLoader.defaultDir + "/Exports/${args[1]}")
+                val file = File(App.defaultDir + "/Exports/${args[1]}")
 
                 WriteSavegame(disk, file, ingame)
 

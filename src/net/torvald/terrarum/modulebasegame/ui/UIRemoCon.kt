@@ -5,8 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.ui.UICanvas
@@ -295,7 +295,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         val remoConWidth = 300
         fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
-        val menubarOffX: Int; get() = (0.11 * AppLoader.screenSize.screenW).toInt()
-        val menubarOffY: Int; get() = (0.82 * AppLoader.screenSize.screenH).toInt()
+        val menubarOffX: Int; get() = (0.11 * App.scr.width).toInt()
+        val menubarOffY: Int; get() = (0.82 * App.scr.height).toInt()
     }
 }

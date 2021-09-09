@@ -2,7 +2,7 @@ package net.torvald.terrarum.utils
 
 import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 
 /**
  * Created by minjaesong on 2016-02-15.

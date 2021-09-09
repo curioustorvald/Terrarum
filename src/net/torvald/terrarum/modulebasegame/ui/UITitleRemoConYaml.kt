@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Yaml
 
 
@@ -42,7 +42,7 @@ object UITitleRemoConYaml {
          - MENU_LABEL_RETURN
         """.trimIndent()*/
 
-    operator fun invoke() = if (AppLoader.IS_DEVELOPMENT_BUILD)
+    operator fun invoke() = if (App.IS_DEVELOPMENT_BUILD)
         Yaml(menus + "\n" + debugTools).parse()
     else
         Yaml(menus).parse()

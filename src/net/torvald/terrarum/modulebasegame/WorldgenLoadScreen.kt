@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.roundToInt
 
@@ -18,7 +17,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
     // a Class impl is chosen to make resize-handling easier, there's not much benefit making this a singleton anyway
 
     init {
-        AppLoader.disposableSingletonsPool.add(this)
+        App.disposableSingletonsPool.add(this)
     }
 
     override var screenToLoad: IngameInstance? = screenToBeLoaded
@@ -27,15 +26,15 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
     companion object {
         private const val WIDTH_RATIO = 0.7
-        private const val PREVIEW_UPDATE_RATE = AppLoader.UPDATE_RATE
+        private const val PREVIEW_UPDATE_RATE = App.UPDATE_RATE
 
         private val COL_TERR = Color.WHITE
         private val COL_WALLED = Color(.5f, .5f, .5f, 1f)
         private val COL_AIR = Color.BLACK
     }
 
-    private val previewWidth = (AppLoader.screenSize.screenW * WIDTH_RATIO).roundToInt()
-    private val previewHeight = (AppLoader.screenSize.screenW * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
+    private val previewWidth = (App.scr.width * WIDTH_RATIO).roundToInt()
+    private val previewHeight = (App.scr.width * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
 
     private lateinit var previewPixmap: Pixmap
     private lateinit var previewTexture: Texture
@@ -66,18 +65,18 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
         }
 
 
-        AppLoader.batch.inUse {
+        App.batch.inUse {
             it.color = Color.WHITE
-            val previewY = (AppLoader.screenSize.screenH - previewHeight.times(1.5f)).div(2f).round()
+            val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).round()
             it.draw(previewTexture,
-                    (AppLoader.screenSize.screenW - previewWidth).div(2f).round(),
+                    (App.scr.width - previewWidth).div(2f).round(),
                     previewY
             )
             val text = messages.getHeadElem() ?: ""
-            AppLoader.fontGame.draw(it,
+            App.fontGame.draw(it,
                     text,
-                    (AppLoader.screenSize.screenW - AppLoader.fontGame.getWidth(text)).div(2f).round(),
-                    previewY + previewHeight + 98 - AppLoader.fontGame.lineHeight
+                    (App.scr.width - App.fontGame.getWidth(text)).div(2f).round(),
+                    previewY + previewHeight + 98 - App.fontGame.lineHeight
             )
         }
 

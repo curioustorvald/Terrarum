@@ -12,7 +12,7 @@ import net.torvald.gdx.graphics.Cvec
 class GdxColorMap {
 
     constructor(imageFile: FileHandle) {
-        AppLoader.printdbg(this, "Loading colormap from ${imageFile.name()}")
+        App.printdbg(this, "Loading colormap from ${imageFile.name()}")
         printStackTrace(this)
 
         val pixmap = Pixmap(imageFile)

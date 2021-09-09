@@ -1,9 +1,8 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
-import java.util.concurrent.Callable
 
 /**
  * New world generator.
@@ -35,7 +34,7 @@ object Worldgen {
 
             val it = jobs[i]
 
-            AppLoader.getLoadScreen().addMessage(it.loadingScreenName)
+            App.getLoadScreen().addMessage(it.loadingScreenName)
             it.theWork.getDone()
         }
 

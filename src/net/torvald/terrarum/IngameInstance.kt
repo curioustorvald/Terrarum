@@ -2,26 +2,19 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.BlockMarkerActor
-import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.WorldSimulator
-import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
-import net.torvald.terrarum.ui.UICanvas
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.DistanceCalculator
 import org.khelekore.prtree.DistanceResult
@@ -76,8 +69,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     init {
         consoleHandler.setPosition(0, 0)
         notifier.setPosition(
-                (AppLoader.screenSize.screenW - notifier.width) / 2,
-                AppLoader.screenSize.screenH - notifier.height - AppLoader.screenSize.tvSafeGraphicsHeight
+                (App.scr.width - notifier.width) / 2,
+                App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
         )
 
         printdbg(this, "New ingame instance ${this.hashCode()}, called from")
@@ -128,7 +121,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
-    var loadedTime_t = AppLoader.getTIME_T()
+    var loadedTime_t = App.getTIME_T()
         protected set
 
     override fun hide() {

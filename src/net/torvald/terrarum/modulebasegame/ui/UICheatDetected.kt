@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.fillRect
@@ -16,11 +16,11 @@ import net.torvald.terrarum.ui.UICanvas
 class UICheatDetected : UICanvas() {
 
     override var width: Int
-        get() = AppLoader.screenSize.screenW
+        get() = App.scr.width
         set(value) { throw UnsupportedOperationException() }
 
     override var height: Int
-        get() = AppLoader.screenSize.screenH
+        get() = App.scr.height
         set(value) { throw UnsupportedOperationException() }
 
     override var openCloseTime: Second = 0f
@@ -38,10 +38,10 @@ class UICheatDetected : UICanvas() {
 
         batch.color = Color.WHITE
         val txt = Lang["ERROR_GENERIC_CHEATING"]
-        val txtW = AppLoader.fontGame.getWidth(txt)
-        val txtH = AppLoader.fontGame.lineHeight.toInt()
+        val txtW = App.fontGame.getWidth(txt)
+        val txtH = App.fontGame.lineHeight.toInt()
 
-        AppLoader.fontGame.draw(batch, txt, width.minus(txtW).ushr(1).toFloat(), height.minus(txtH).ushr(1).toFloat())
+        App.fontGame.draw(batch, txt, width.minus(txtW).ushr(1).toFloat(), height.minus(txtH).ushr(1).toFloat())
     }
 
     override fun updateUI(delta: Float) {

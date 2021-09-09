@@ -8,11 +8,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
@@ -31,7 +28,7 @@ import kotlin.math.roundToInt
 class CreateTileAtlas {
 
     // min size 1024 = tile_size 16 * atlasCursor 64
-    val MAX_TEX_SIZE = AppLoader.getConfigInt("atlastexsize").coerceIn(1024, AppLoader.glInfo.GL_MAX_TEXTURE_SIZE)
+    val MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE)
     val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
 
     val SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())

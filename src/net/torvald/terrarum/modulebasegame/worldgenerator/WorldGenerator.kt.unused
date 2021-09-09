@@ -4,8 +4,8 @@ import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
@@ -64,8 +64,8 @@ object WorldCamera {
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
-        width = AppLoader.screenSize.screenW//FastMath.ceil(AppLoader.terrarumAppConfig.screenW / zoom) // div, not mul
-        height = AppLoader.screenSize.screenH//FastMath.ceil(AppLoader.terrarumAppConfig.screenH / zoom)
+        width = App.scr.width//FastMath.ceil(AppLoader.terrarumAppConfig.screenW / zoom) // div, not mul
+        height = App.scr.height//FastMath.ceil(AppLoader.terrarumAppConfig.screenH / zoom)
         zoom = Terrarum.ingame?.screenZoom ?: 1f
         zoomSamplePoint = (1f - 1f / zoom) / 2f // will never quite exceed 0.5
 
@@ -94,8 +94,8 @@ object WorldCamera {
     private fun Int.clampCameraY(world: GameWorld): Int {
         return if (this < 0)
             0
-        else if (this > world.height.times(TILE_SIZE) - AppLoader.screenSize.screenH)
-            world.height.times(TILE_SIZE) - AppLoader.screenSize.screenH
+        else if (this > world.height.times(TILE_SIZE) - App.scr.height)
+            world.height.times(TILE_SIZE) - App.scr.height
         else
             this
     }

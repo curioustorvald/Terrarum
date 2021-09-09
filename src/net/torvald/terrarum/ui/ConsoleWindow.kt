@@ -36,7 +36,7 @@ class ConsoleWindow : UICanvas() {
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 11
 
-    override var width: Int = AppLoader.screenSize.screenW
+    override var width: Int = App.scr.width
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime = 0f
@@ -78,12 +78,12 @@ class ConsoleWindow : UICanvas() {
         batch.fillRect(drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
 
         val input = commandInputPool!!.toString()
-        val inputDrawWidth = AppLoader.fontGame.getWidth(input)
-        val inputDrawHeight = AppLoader.fontGame.lineHeight
+        val inputDrawWidth = App.fontGame.getWidth(input)
+        val inputDrawHeight = App.fontGame.lineHeight
 
         // text and cursor
         batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
+        App.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
 
         batch.color = Color(0x7f7f7f_ff)
         batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight)
@@ -94,7 +94,7 @@ class ConsoleWindow : UICanvas() {
         // messages
         for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {
             val message = messages[messageDisplayPos + i]
-            AppLoader.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
+            App.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
         }
     }
 
@@ -201,7 +201,7 @@ class ConsoleWindow : UICanvas() {
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {
-            sendMessage("$ccE${TerrarumAppConfiguration.GAME_NAME} ${AppLoader.getVERSION_STRING()} $EMDASH ${TerrarumAppConfiguration.COPYRIGHT_DATE_NAME}")
+            sendMessage("$ccE${TerrarumAppConfiguration.GAME_NAME} ${App.getVERSION_STRING()} $EMDASH ${TerrarumAppConfiguration.COPYRIGHT_DATE_NAME}")
             sendMessage("$ccE${TerrarumAppConfiguration.COPYRIGHT_LICENSE}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }

@@ -5,12 +5,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.ENDASH
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.*
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -18,7 +17,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-10-21.
  */
 class UIInventoryFull(
-        toggleKeyLiteral: Int? = AppLoader.getConfigInt("config_keyinventory"), toggleButtonLiteral: Int? = AppLoader.getConfigInt("config_gamepadstart"),
+        toggleKeyLiteral: Int? = App.getConfigInt("config_keyinventory"), toggleButtonLiteral: Int? = App.getConfigInt("config_gamepadstart"),
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
@@ -27,8 +26,8 @@ class UIInventoryFull(
     val actor: ActorHumanoid
         get() = Terrarum.ingame!!.actorNowPlaying!!
 
-    override var width: Int = AppLoader.screenSize.screenW
-    override var height: Int = AppLoader.screenSize.screenH
+    override var width: Int = App.scr.width
+    override var height: Int = App.scr.height
     override var openCloseTime: Second = 0.0f
 
     companion object {
@@ -36,7 +35,7 @@ class UIInventoryFull(
 
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
         const val CELLS_HOR = 10
-        val CELLS_VRT: Int; get() = (AppLoader.screenSize.screenH - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
+        val CELLS_VRT: Int; get() = (App.scr.height - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
                                 (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
 
         const val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
@@ -47,8 +46,8 @@ class UIInventoryFull(
         val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
         val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
-        val INVENTORY_CELLS_OFFSET_X = 0 + (AppLoader.screenSize.screenW - internalWidth) / 2
-        val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.screenSize.screenH - internalHeight) / 2
+        val INVENTORY_CELLS_OFFSET_X = 0 + (App.scr.width - internalWidth) / 2
+        val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (App.scr.height - internalHeight) / 2
 
         val catBarWidth = 330
 
@@ -56,7 +55,7 @@ class UIInventoryFull(
         val gradEndCol   = Color(0x000000_70)
         val gradHeight = 48f
 
-        val controlHelpHeight = AppLoader.fontGame.lineHeight
+        val controlHelpHeight = App.fontGame.lineHeight
     }
 
     //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
@@ -86,7 +85,7 @@ class UIInventoryFull(
 
     private val SP = "${0x3000.toChar()} "
     val listControlHelp: String
-        get() = if (AppLoader.environment == RunningEnvironment.PC)
+        get() = if (App.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}$ENDASH${0x2009.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
@@ -99,7 +98,7 @@ class UIInventoryFull(
             "$gamepadLabelNorth$gamepadLabelLStick ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "$gamepadLabelEast ${Lang["GAME_INVENTORY_DROP"]}"
     val minimapControlHelp: String
-        get() = if (AppLoader.environment == RunningEnvironment.PC)
+        get() = if (App.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "${0xe006.toChar()} ${Lang["GAME_ACTION_MOVE_VERB"]}"
         else
@@ -107,7 +106,7 @@ class UIInventoryFull(
             "$gamepadLabelRStick ${Lang["GAME_ACTION_MOVE_VERB"]}$SP" +
             "$gamepadLabelRT ${Lang["GAME_INVENTORY"]}"
     val gameMenuControlHelp: String
-        get() = if (AppLoader.environment == RunningEnvironment.PC)
+        get() = if (App.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
@@ -115,8 +114,8 @@ class UIInventoryFull(
 
     val catBar = UIItemInventoryCatBar(
             this,
-            (AppLoader.screenSize.screenW - catBarWidth) / 2,
-            42 + (AppLoader.screenSize.screenH - internalHeight) / 2,
+            (App.scr.width - catBarWidth) / 2,
+            42 + (App.scr.height - internalHeight) / 2,
             internalWidth,
             catBarWidth,
             true,
@@ -129,10 +128,10 @@ class UIInventoryFull(
     private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
             this,
-            (AppLoader.screenSize.screenW - internalWidth) / 2,
+            (App.scr.width - internalWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y,
-            AppLoader.screenSize.screenW,
-            AppLoader.screenSize.screenH,
+            App.scr.width,
+            App.scr.height,
             1f,
             transitionalMinimap, transitionalItemCells, transitionalEscMenu
     )
@@ -153,9 +152,9 @@ class UIInventoryFull(
 
     }
 
-    internal var offsetX = ((AppLoader.screenSize.screenW - internalWidth) / 2).toFloat()
+    internal var offsetX = ((App.scr.width - internalWidth) / 2).toFloat()
         private set
-    internal var offsetY = ((AppLoader.screenSize.screenH - internalHeight) / 2).toFloat()
+    internal var offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
         private set
 
     fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
@@ -174,9 +173,9 @@ class UIInventoryFull(
     //private val gradHeight = 48f
     private val shapeRenderer = ShapeRenderer()
 
-    internal var xEnd = (AppLoader.screenSize.screenW + internalWidth).div(2).toFloat()
+    internal var xEnd = (App.scr.width + internalWidth).div(2).toFloat()
         private set
-    internal var yEnd = (AppLoader.screenSize.screenH + internalHeight).div(2).toFloat()
+    internal var yEnd = (App.scr.height + internalHeight).div(2).toFloat()
         private set
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -187,17 +186,17 @@ class UIInventoryFull(
         gdxSetBlendNormal()
 
 
-        val gradTopStart = (AppLoader.screenSize.screenH - internalHeight).div(2).toFloat()
-        val gradBottomEnd = AppLoader.screenSize.screenH - gradTopStart
+        val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
+        val gradBottomEnd = App.scr.height - gradTopStart
 
         shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, AppLoader.screenSize.screenWf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, AppLoader.screenSize.screenWf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, AppLoader.screenSize.screenWf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-            shapeRenderer.rect(0f, 0f, AppLoader.screenSize.screenWf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, AppLoader.screenSize.screenHf, AppLoader.screenSize.screenWf, -(AppLoader.screenSize.screenHf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
         }
 
 
@@ -257,11 +256,11 @@ class UIInventoryFull(
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
 
-        offsetX = ((AppLoader.screenSize.screenW - internalWidth) / 2).toFloat()
-        offsetY = ((AppLoader.screenSize.screenH - internalHeight) / 2).toFloat()
+        offsetX = ((App.scr.width - internalWidth) / 2).toFloat()
+        offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
 
-        xEnd = (AppLoader.screenSize.screenW + internalWidth).div(2).toFloat()
-        yEnd = (AppLoader.screenSize.screenH + internalHeight).div(2).toFloat()
+        xEnd = (App.scr.width + internalWidth).div(2).toFloat()
+        yEnd = (App.scr.height + internalHeight).div(2).toFloat()
     }
 }
 

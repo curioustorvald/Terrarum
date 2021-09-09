@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.UICanvas
@@ -28,7 +28,7 @@ class UITooltip : UICanvas() {
             msgWidth = msgBuffer.maxOf { font.getWidth(it) }
         }
 
-    private val font = AppLoader.fontGame
+    private val font = App.fontGame
     private var msgWidth = 0
 
     val textMarginX = 4

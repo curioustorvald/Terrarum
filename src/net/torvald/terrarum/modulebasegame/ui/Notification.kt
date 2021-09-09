@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.ui.UICanvas
@@ -26,7 +26,7 @@ class Notification : UICanvas() {
 
     override var height: Int = 0
     private val visibleTime = Math.min(
-            AppLoader.getConfigInt("notificationshowuptime"),
+            App.getConfigInt("notificationshowuptime"),
             SHOWUP_MAX
     ) / 1000f
     private var displayTimer = 0f
@@ -55,15 +55,15 @@ class Notification : UICanvas() {
         fontCol.a = handler.opacity
 
         val realTextWidth = 12 + if (message.size == 1)
-            AppLoader.fontGame.getWidth(message[0])
+            App.fontGame.getWidth(message[0])
         else
-            message.map { AppLoader.fontGame.getWidth(it) }.sorted().last()
+            message.map { App.fontGame.getWidth(it) }.sorted().last()
         val displayedTextWidth = maxOf(240, realTextWidth)
 
         // force the UI to the centre of the screen
-        this.posX = (AppLoader.screenSize.screenW - displayedTextWidth) / 2
+        this.posX = (App.scr.width - displayedTextWidth) / 2
 
-        val textHeight = message.size * AppLoader.fontGame.lineHeight
+        val textHeight = message.size * App.fontGame.lineHeight
 
         batch.color = drawColor
 
@@ -72,8 +72,8 @@ class Notification : UICanvas() {
         batch.color = fontCol
         message.forEachIndexed { index, s ->
             val xoff = 6 + (displayedTextWidth - realTextWidth) / 2
-            val y = -textHeight + AppLoader.fontGame.lineHeight * index
-            AppLoader.fontGame.draw(batch, s, LRmargin + xoff, y)
+            val y = -textHeight + App.fontGame.lineHeight * index
+            App.fontGame.draw(batch, s, LRmargin + xoff, y)
         }
 
 

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -115,7 +115,7 @@ void main() {
 
     var openCloseCounter = 0f
 
-    private val shader = AppLoader.loadShaderInline(SHADER_PROG_VERT, SHADER_PROG_FRAG)
+    private val shader = App.loadShaderInline(SHADER_PROG_VERT, SHADER_PROG_FRAG)
 
     init {
         //UI.handler = this

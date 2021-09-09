@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarum.ui.UICanvas
@@ -46,7 +45,7 @@ class UITierOneWatch() : UICanvas() {
             ELuptimer += delta
         }
 
-        if (mouseUp || Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyinteract"))) {
+        if (mouseUp || Gdx.input.isKeyPressed(App.getConfigInt("config_keyinteract"))) {
             ELuptimer = 0f
             ELon = true
         }

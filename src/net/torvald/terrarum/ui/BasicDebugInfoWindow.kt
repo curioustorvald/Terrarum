@@ -16,7 +16,6 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
@@ -25,8 +24,8 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
  */
 class BasicDebugInfoWindow : UICanvas() {
 
-    override var width: Int = AppLoader.screenSize.screenW
-    override var height: Int = AppLoader.screenSize.screenH
+    override var width: Int = App.scr.width
+    override var height: Int = App.scr.height
 
     override var openCloseTime: Float = 0f
 
@@ -78,7 +77,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         val hitbox = player?.hitbox
 
-        val updateCount = maxOf(1L, (AppLoader.debugTimers["Ingame.UpdateCounter"] ?: 1L) as Long)
+        val updateCount = maxOf(1L, (App.debugTimers["Ingame.UpdateCounter"] ?: 1L) as Long)
 
         /**
          * First column
@@ -172,7 +171,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // print time
         var dbgCnt = 12
-        AppLoader.debugTimers.forEach { t, u ->
+        App.debugTimers.forEach { t, u ->
             printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
             dbgCnt++
         }
@@ -206,9 +205,9 @@ class BasicDebugInfoWindow : UICanvas() {
         val gamepad = (Terrarum.ingame as? TerrarumIngame)?.ingameController?.gamepad
         if (gamepad != null) {
             drawGamepadAxis(gamepad, batch,
-                    gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxislx")),
-                    gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxisly")),
-                    AppLoader.screenSize.screenW - 128 - TinyAlphNum.W * 2,
+                    gamepad.getAxis(App.getConfigInt("config_gamepadaxislx")),
+                    gamepad.getAxis(App.getConfigInt("config_gamepadaxisly")),
+                    App.scr.width - 128 - TinyAlphNum.W * 2,
                     line(3).toInt()
             )
         }
@@ -218,68 +217,68 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         // memory pressure
-        AppLoader.fontSmallNumbers.draw(batch, "${ccY}MEM ", (AppLoader.screenSize.screenW - 23 * TinyAlphNum.W - 2).toFloat(), line(1))
+        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (App.scr.width - 23 * TinyAlphNum.W - 2).toFloat(), line(1))
         // thread count
-        AppLoader.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (AppLoader.MULTITHREAD) ccG else ccR}${AppLoader.THREAD_COUNT.toString().padStart(2, ' ')}",
-                (AppLoader.screenSize.screenW - 2 - 8 * TinyAlphNum.W).toFloat(), line(2))
+        App.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (App.MULTITHREAD) ccG else ccR}${App.THREAD_COUNT.toString().padStart(2, ' ')}",
+                (App.scr.width - 2 - 8 * TinyAlphNum.W).toFloat(), line(2))
 
         // memory texts
-        AppLoader.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
-                (AppLoader.screenSize.screenW - 19 * TinyAlphNum.W - 2).toFloat(), line(1))
-        AppLoader.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
-                (AppLoader.screenSize.screenW - 14 * TinyAlphNum.W - 2).toFloat(), line(1))
-        AppLoader.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
-                (AppLoader.screenSize.screenW - 7 * TinyAlphNum.W - 2).toFloat(), line(1))
+        App.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
+                (App.scr.width - 19 * TinyAlphNum.W - 2).toFloat(), line(1))
+        App.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
+                (App.scr.width - 14 * TinyAlphNum.W - 2).toFloat(), line(1))
+        App.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
+                (App.scr.width - 7 * TinyAlphNum.W - 2).toFloat(), line(1))
         // FPS count
-        AppLoader.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
-                (AppLoader.screenSize.screenW - 3 - 15 * TinyAlphNum.W).toFloat(), line(2))
+        App.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
+                (App.scr.width - 3 - 15 * TinyAlphNum.W).toFloat(), line(2))
         // global render counter
-        AppLoader.fontSmallNumbers.draw(batch, "${ccO}${AppLoader.GLOBAL_RENDER_TIMER.toString().padStart(10, ' ')}",
-                (AppLoader.screenSize.screenW - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
+        App.fontSmallNumbers.draw(batch, "${ccO}${App.GLOBAL_RENDER_TIMER.toString().padStart(10, ' ')}",
+                (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
 
         /**
          * Bottom left
          */
 
         if (ingame != null) {
-            AppLoader.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
-                    TinyAlphNum.W * 2f, AppLoader.screenSize.screenH - TinyAlphNum.H * 2f)
-            AppLoader.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
-                    (TinyAlphNum.W * 2 + 17 * 8).toFloat(), AppLoader.screenSize.screenH - TinyAlphNum.H * 2f)
-            AppLoader.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
-                    (TinyAlphNum.W * 2 + 28 * 8).toFloat(), AppLoader.screenSize.screenH - TinyAlphNum.H * 2f)
+            App.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
+                    TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 2f)
+            App.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
+                    (TinyAlphNum.W * 2 + 17 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+            App.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
+                    (TinyAlphNum.W * 2 + 28 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
             if (ingame is TerrarumIngame) {
-                AppLoader.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}",
-                        (TinyAlphNum.W * 2 + 41 * 8).toFloat(), AppLoader.screenSize.screenH - TinyAlphNum.H * 2f)
+                App.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}",
+                        (TinyAlphNum.W * 2 + 41 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
             }
         }
 
-        AppLoader.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
-                TinyAlphNum.W * 2f, AppLoader.screenSize.screenH - TinyAlphNum.H * 3f)
-        AppLoader.fontSmallNumbers.draw(batch, "${ccY}UIs rendering $ccG${IngameRenderer.renderingUIsCount}",
-                TinyAlphNum.W * 2f + (21 * 8), AppLoader.screenSize.screenH - TinyAlphNum.H * 3f)
+        App.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
+                TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 3f)
+        App.fontSmallNumbers.draw(batch, "${ccY}UIs rendering $ccG${IngameRenderer.renderingUIsCount}",
+                TinyAlphNum.W * 2f + (21 * 8), App.scr.height - TinyAlphNum.H * 3f)
 
         /**
          * Bottom right
          */
 
         // processor and renderer
-        AppLoader.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
-                (AppLoader.screenSize.screenW - (totalHardwareName.length + 2) * TinyAlphNum.W).toFloat(), AppLoader.screenSize.screenH - TinyAlphNum.H * 2f)
+        App.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
+                (App.scr.width - (totalHardwareName.length + 2) * TinyAlphNum.W).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
     }
 
-    private val processorName = AppLoader.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (AppLoader.is32BitJVM) " (32-bit)" else ""
-    private val rendererName = AppLoader.renderer
+    private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""
+    private val rendererName = App.renderer
     private val totalHardwareName = "$processorName  $rendererName"
 
     private fun printLine(batch: SpriteBatch, l: Int, s: String) {
-        AppLoader.fontSmallNumbers.draw(batch,
+        App.fontSmallNumbers.draw(batch,
                 s, TinyAlphNum.W * 2f, line(l)
         )
     }
 
     private fun printLineColumn(batch: SpriteBatch, col: Int, row: Int, s: String) {
-        AppLoader.fontSmallNumbers.draw(batch,
+        App.fontSmallNumbers.draw(batch,
                 s, (TinyAlphNum.W * 2f + column(col)), line(row)
         )
     }
@@ -303,9 +302,9 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = uiColour
         batch.fillRect(x.toFloat(), y.toFloat(), w.plus(1), h)
         batch.color = Color.GRAY
-        AppLoader.fontSmallNumbers.draw(batch, "0", x.toFloat(), y.toFloat() + h + 2)
-        AppLoader.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8 * 3, y.toFloat() + h + 2)
-        AppLoader.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
+        App.fontSmallNumbers.draw(batch, "0", x.toFloat(), y.toFloat() + h + 2)
+        App.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8 * 3, y.toFloat() + h + 2)
+        App.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
         blendScreen(batch)
         for (c in 0..3) {
@@ -340,7 +339,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val pointDX = axisX * halfW
         val pointDY = -axisY * halfH
 
-        val deadzone = AppLoader.gamepadDeadzone
+        val deadzone = App.gamepadDeadzone
 
         blendNormal(batch)
 
@@ -348,16 +347,16 @@ class BasicDebugInfoWindow : UICanvas() {
         gdxSetBlendNormal()
         Terrarum.inShapeRenderer {
             it.color = uiColour
-            it.rect(uiX.toFloat(), AppLoader.screenSize.screenH - uiY.toFloat(), w, -h)
+            it.rect(uiX.toFloat(), App.scr.height - uiY.toFloat(), w, -h)
             it.color = deadzoneColour
-            it.rect(uiX + halfW - (halfW * deadzone), AppLoader.screenSize.screenH - (uiY + halfH - halfH * deadzone), w * deadzone, -h * deadzone)
+            it.rect(uiX + halfW - (halfW * deadzone), App.scr.height - (uiY + halfH - halfH * deadzone), w * deadzone, -h * deadzone)
             it.color = Color.WHITE
-            it.line(uiX + halfW, AppLoader.screenSize.screenH - (uiY + halfH), uiX + halfW + pointDX, AppLoader.screenSize.screenH - (uiY + halfH + pointDY))
+            it.line(uiX + halfW, App.scr.height - (uiY + halfH), uiX + halfW + pointDX, App.scr.height - (uiY + halfH + pointDY))
             it.color = Color.GRAY
         }
         batch.begin()
 
-        AppLoader.fontSmallNumbers.draw(batch, gamepad.getName(), AppLoader.screenSize.screenW - (gamepad.getName().length + 2f) * TinyAlphNum.W, uiY.toFloat() + h + 2)
+        App.fontSmallNumbers.draw(batch, gamepad.getName(), App.scr.width - (gamepad.getName().length + 2f) * TinyAlphNum.W, uiY.toFloat() + h + 2)
 
     }
 

@@ -4,18 +4,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_BACKGROUNDCOL
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import kotlin.math.roundToInt
 import net.torvald.terrarum.*
 
@@ -89,7 +86,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         }
 
         // respond to click
-        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
+        if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
             // scroll bar
             if (relativeMouseX in width - SCROLLBAR_SIZE until width && relativeMouseY in 0 until height) {
                 mouseOnScroll = true

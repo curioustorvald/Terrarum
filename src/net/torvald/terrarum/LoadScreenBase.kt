@@ -22,7 +22,7 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
     internal var errorTrapped = false
     internal var doContextChange = false
 
-    var camera = OrthographicCamera(AppLoader.screenSize.screenWf, AppLoader.screenSize.screenHf)
+    var camera = OrthographicCamera(App.scr.wf, App.scr.hf)
 
     override fun show() {
         messages.clear()
@@ -51,7 +51,7 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
         }
 
 
-        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        initViewPort(App.scr.width, App.scr.height)
     }
 
     fun initViewPort(width: Int, height: Int) {
@@ -74,11 +74,11 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
 
         if (doContextChange) {
             Thread.sleep(80)
-            AppLoader.setScreen(screenToLoad!!)
+            App.setScreen(screenToLoad!!)
         }
     }
 
     override fun resize(width: Int, height: Int) {
-        initViewPort(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        initViewPort(App.scr.width, App.scr.height)
     }
 }

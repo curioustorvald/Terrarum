@@ -7,9 +7,9 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
@@ -130,8 +130,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
             // the very job.
 
-            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) && !worldPrimaryClickLatched) {
-                terrarumIngame.worldPrimaryClickStart(AppLoader.UPDATE_RATE)
+            if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) && !worldPrimaryClickLatched) {
+                terrarumIngame.worldPrimaryClickStart(App.UPDATE_RATE)
                 worldPrimaryClickLatched = true
             }
             /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary")) {
@@ -141,7 +141,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // unlatch when:
             // - not clicking anymore
             // - using any item that is not fixture (blocks, picks)
-            if (!Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) ||
+            if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) ||
                 GameItem.Category.FIXTURE != ItemCodex.get(terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP))?.inventoryCategory) {
                 worldPrimaryClickLatched = false
             }
@@ -160,14 +160,14 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.actorNowPlaying?.keyDown(keycode)
 
             // quickslot by number keys
-            val quickslotKeys = AppLoader.getConfigIntArray("config_keyquickslots")
+            val quickslotKeys = App.getConfigIntArray("config_keyquickslots")
             if (keycode in quickslotKeys) {
                 terrarumIngame.actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, quickslotKeys.indexOf(keycode))
             }
 
             // pie menu
-            if (AppLoader.getConfigIntArray("config_keyquickselalt").contains(keycode)
-                || keycode == AppLoader.getConfigInt("config_keyquicksel")) {
+            if (App.getConfigIntArray("config_keyquickselalt").contains(keycode)
+                || keycode == App.getConfigInt("config_keyquicksel")) {
                 terrarumIngame.uiPieMenu.setAsOpen()
                 terrarumIngame.uiQuickBar.setAsClose()
             }
@@ -183,7 +183,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
         // screenshot key
         if (keycode == Input.Keys.F12 && !f12Down) {
-            AppLoader.requestScreenshot()
+            App.requestScreenshot()
             f12Down = true
             println("Screenshot taken.")
         }
@@ -192,8 +192,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     private fun tKeyUp(keycode: Int): Boolean {
-        if (AppLoader.getConfigIntArray("config_keyquickselalt").contains(keycode)
-            || keycode == AppLoader.getConfigInt("config_keyquicksel")) {
+        if (App.getConfigIntArray("config_keyquickselalt").contains(keycode)
+            || keycode == App.getConfigInt("config_keyquicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -219,9 +219,9 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (
-                        button == AppLoader.getConfigInt("config_mouseprimary") ||
-                        button == AppLoader.getConfigInt("config_mousesecondary")) {
-                    terrarumIngame.worldPrimaryClickEnd(AppLoader.UPDATE_RATE)
+                        button == App.getConfigInt("config_mouseprimary") ||
+                        button == App.getConfigInt("config_mousesecondary")) {
+                    terrarumIngame.worldPrimaryClickEnd(App.UPDATE_RATE)
                 }
                 /*if (button == AppLoader.getConfigInt("config_mousesecondary")) {
                     ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE)
@@ -230,7 +230,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
         // pie menu
-        if (button == AppLoader.getConfigInt("config_mousequicksel")) {
+        if (button == App.getConfigInt("config_mousequicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -263,7 +263,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         terrarumIngame.uiContainer.forEach { it?.touchDown(screenX, screenY, pointer, button) }
         
         // pie menu
-        if (button == AppLoader.getConfigInt("config_mousequicksel")) {
+        if (button == App.getConfigInt("config_mousequicksel")) {
             terrarumIngame.uiPieMenu.setAsOpen()
             terrarumIngame.uiQuickBar.setAsClose()
         }

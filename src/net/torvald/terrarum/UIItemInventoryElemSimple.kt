@@ -1,15 +1,10 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
@@ -117,10 +112,10 @@ class UIItemInventoryElemSimple(
                 }
 
 
-                AppLoader.fontSmallNumbers.draw(batch,
+                App.fontSmallNumbers.draw(batch,
                         amountString,
-                        posX + (width - AppLoader.fontSmallNumbers.getWidth(amountString)).toFloat(),
-                        posY + (height - AppLoader.fontSmallNumbers.H).toFloat()
+                        posX + (width - App.fontSmallNumbers.getWidth(amountString)).toFloat(),
+                        posY + (height - App.fontSmallNumbers.H).toFloat()
                 )
             }
 

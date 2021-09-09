@@ -1,14 +1,10 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.ModMgr.loadOrder
-import net.torvald.terrarum.modulebasegame.console.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.util.*
-import kotlin.streams.toList
 
 /**
  * Created by minjaesong on 2016-01-15.

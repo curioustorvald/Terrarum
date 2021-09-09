@@ -31,7 +31,7 @@ class UINSMenu(
     override var openCloseTime: Second = 0f
     val LINE_HEIGHT = 24
     val TEXT_OFFSETX = 3f
-    val TEXT_OFFSETY = (LINE_HEIGHT - AppLoader.fontGame.lineHeight) / 2f
+    val TEXT_OFFSETY = (LINE_HEIGHT - App.fontGame.lineHeight) / 2f
     val CHILD_ARROW = "${0x2023.toChar()}"
 
 
@@ -91,8 +91,8 @@ class UINSMenu(
         }
 
         val listWidth = maxOf(
-                AppLoader.fontGame.getWidth(menuTitle), minimumWidth,
-                stringsFromTree.map { AppLoader.fontGame.getWidth(it) }.maxOrNull() ?: 0
+                App.fontGame.getWidth(menuTitle), minimumWidth,
+                stringsFromTree.map { App.fontGame.getWidth(it) }.maxOrNull() ?: 0
         )
         val uiWidth = listWidth + (2 * TEXT_OFFSETX.toInt())
         val listHeight = stringsFromTree.size * LINE_HEIGHT
@@ -175,7 +175,7 @@ class UINSMenu(
 
             batch.color = titleTextCol
             blendNormal(batch)
-            AppLoader.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.ui.posX, TEXT_OFFSETY + it.ui.posY - LINE_HEIGHT)
+            App.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.ui.posX, TEXT_OFFSETY + it.ui.posY - LINE_HEIGHT)
 
             // draw the list
             batch.color = Color.WHITE

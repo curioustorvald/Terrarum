@@ -4,11 +4,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
@@ -50,7 +49,7 @@ class UIQuickslotPie : UICanvas() {
         // update controls
         if (handler.isOpened || handler.isOpening) {
             val cursorPos = Vector2(Terrarum.mouseScreenX.toDouble(), Terrarum.mouseScreenY.toDouble())
-            val centre = Vector2(AppLoader.screenSize.halfScreenW.toDouble(), AppLoader.screenSize.halfScreenH.toDouble())
+            val centre = Vector2(App.scr.halfw.toDouble(), App.scr.halfh.toDouble())
             val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)

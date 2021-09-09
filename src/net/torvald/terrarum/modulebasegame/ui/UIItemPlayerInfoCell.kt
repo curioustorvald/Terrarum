@@ -38,7 +38,7 @@ class UIItemPlayerInfoCell(
     private val backColInactive = ItemSlotImageFactory.CELLCOLOUR_BLACK
     private val backColActive = ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 
-    private val textRow1 = (((height / 2) - AppLoader.fontGame.lineHeight) / 2).toFloat()
+    private val textRow1 = (((height / 2) - App.fontGame.lineHeight) / 2).toFloat()
     private val textRow2 = textRow1 + (height / 2)
 
     private val creationTimeStr: String
@@ -62,7 +62,7 @@ class UIItemPlayerInfoCell(
 
 
         worldCountStr = Lang["CONTEXT_WORLD_COUNT"] + saveInfo.get("worlds").asIntArray().size
-        worldCountStrWidth = AppLoader.fontGame.getWidth(worldCountStr)
+        worldCountStrWidth = App.fontGame.getWidth(worldCountStr)
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {

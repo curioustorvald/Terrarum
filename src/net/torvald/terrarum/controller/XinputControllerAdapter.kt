@@ -2,7 +2,7 @@ package net.torvald.terrarum.controller
 
 import com.github.strikerx3.jxinput.XInputAxes
 import com.github.strikerx3.jxinput.XInputDevice
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import kotlin.math.roundToInt
 
 /**
@@ -26,8 +26,8 @@ class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
                 5 -> button.rShoulder
                 6 -> button.back
                 7 -> button.start
-                8 -> getAxis(4) >= AppLoader.gamepadDeadzone
-                9 -> getAxis(5) >= AppLoader.gamepadDeadzone
+                8 -> getAxis(4) >= App.gamepadDeadzone
+                9 -> getAxis(5) >= App.gamepadDeadzone
                 10 -> button.lThumb
                 11 -> button.rThumb
                 else -> throw UnsupportedOperationException("Unknown button: $index")

@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
@@ -20,14 +20,14 @@ class UITitleLanguage : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = (AppLoader.screenSize.screenW * 0.75).toInt()
-    override var height = AppLoader.screenSize.screenH - textAreaHMargin * 2
+    override var width = (App.scr.width * 0.75).toInt()
+    override var height = App.scr.height - textAreaHMargin * 2
 
     private val localeList = Lang.languageList.toList().sorted()
     private val textArea = UIItemTextButtonList(this,
             24,
             localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
-            AppLoader.screenSize.screenW - width, textAreaHMargin,
+            App.scr.width - width, textAreaHMargin,
             width, height,
             textAreaWidth = width,
             readFromLang = false,
@@ -51,7 +51,7 @@ class UITitleLanguage : UICanvas() {
 
         // attach listeners
         textArea.selectionChangeListener = { _, newSelectionIndex ->
-            AppLoader.GAME_LOCALE = localeList[newSelectionIndex]
+            App.GAME_LOCALE = localeList[newSelectionIndex]
         }
 
 

@@ -6,12 +6,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.*
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockPropUtil
-import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.concurrent.ThreadExecutor
@@ -22,7 +20,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.WireActor
-import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.GameItem
@@ -30,7 +27,6 @@ import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
@@ -47,7 +43,6 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
-import org.khelekore.prtree.MBRConverter
 import org.khelekore.prtree.PRTree
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
@@ -68,7 +63,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      * list of Actors that is sorted by Actors' referenceID
      */
     //val ACTORCONTAINER_INITIAL_SIZE = 64
-    val PARTICLES_MAX = AppLoader.getConfigInt("maxparticles")
+    val PARTICLES_MAX = App.getConfigInt("maxparticles")
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX, true)
     val uiContainer = UIContainer()
 
@@ -86,14 +81,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     companion object {
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
         fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
-            camera.position.set((-newX + AppLoader.screenSize.halfScreenW).round(), (-newY + AppLoader.screenSize.halfScreenH).round(), 0f)
+            camera.position.set((-newX + App.scr.halfw).round(), (-newY + App.scr.halfh).round(), 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
         }
 
-        fun getCanonicalTitle() = AppLoader.GAME_NAME +
+        fun getCanonicalTitle() = App.GAME_NAME +
                                   " $EMDASH F: ${Gdx.graphics.framesPerSecond}" +
-                                  if (AppLoader.IS_DEVELOPMENT_BUILD)
+                                  if (App.IS_DEVELOPMENT_BUILD)
                                       " (ΔF${Terrarum.updateRateStr})" +
                                       " $EMDASH M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / U${Terrarum.memUnsafe}M / X${Terrarum.memXmx}M"
                                   else
@@ -287,12 +282,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "loaded successfully.")
         }
         else {
-            AppLoader.getLoadScreen().addMessage("${AppLoader.GAME_NAME} version ${AppLoader.getVERSION_STRING()}")
-            AppLoader.getLoadScreen().addMessage("Creating new world")
+            App.getLoadScreen().addMessage("${App.GAME_NAME} version ${App.getVERSION_STRING()}")
+            App.getLoadScreen().addMessage("Creating new world")
 
 
             // init map as chosen size
-            val timeNow = AppLoader.getTIME_T()
+            val timeNow = App.getTIME_T()
             world = GameWorld(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
             gameworldIndices.add(world.worldIndex)
             world.extraFields["basegame.economy"] = GameEconomy()
@@ -322,7 +317,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             savegameArchive = VDUtil.createNewDisk(
                     1L shl 60,
-                    actorNowPlaying!!.actorValue.getAsString(AVKey.NAME) ?: "Player ${AppLoader.getTIME_T()}",
+                    actorNowPlaying!!.actorValue.getAsString(AVKey.NAME) ?: "Player ${App.getTIME_T()}",
                     Common.CHARSET
             )
         }
@@ -335,8 +330,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // make controls work
         Gdx.input.inputProcessor = ingameController
-        if (AppLoader.gamepad != null) {
-            ingameController.gamepad = AppLoader.gamepad
+        if (App.gamepad != null) {
+            ingameController.gamepad = App.gamepad
         }
 
         // init console window
@@ -355,11 +350,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // quick bar
         uiQuickBar = UIQuickslotBar()
         uiQuickBar.isVisible = true
-        uiQuickBar.setPosition((AppLoader.screenSize.screenW - uiQuickBar.width) / 2, AppLoader.screenSize.tvSafeGraphicsHeight)
+        uiQuickBar.setPosition((App.scr.width - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
 
         // pie menu
         uiPieMenu = UIQuickslotPie()
-        uiPieMenu.setPosition(AppLoader.screenSize.halfScreenW, AppLoader.screenSize.halfScreenH)
+        uiPieMenu.setPosition(App.scr.halfw, App.scr.halfh)
 
         // vital metre
         // fill in getter functions by
@@ -374,14 +369,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiWatchTierOne = UITierOneWatch()
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
-                ((AppLoader.screenSize.screenW - AppLoader.screenSize.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
-                AppLoader.screenSize.tvSafeGraphicsHeight + 8
+                ((App.scr.width - App.scr.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                App.scr.tvSafeGraphicsHeight + 8
         )
 
         // basic watch-style notification bar (temperature, new mail)
         uiBasicInfo = UIBasicInfo()
         uiBasicInfo.setAsAlwaysVisible()
-        uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - AppLoader.screenSize.tvSafeActionWidth) / 2 + AppLoader.screenSize.tvSafeActionWidth, uiWatchTierOne.posY)
+        uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - App.scr.tvSafeActionWidth) / 2 + App.scr.tvSafeActionWidth, uiWatchTierOne.posY)
 
 
 
@@ -418,7 +413,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // these need to appear on top of any others
         uiContainer.add(notifier)
 
-        AppLoader.setDebugTime("Ingame.UpdateCounter", 0)
+        App.setDebugTime("Ingame.UpdateCounter", 0)
 
         // some sketchy test code here
 
@@ -435,7 +430,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // TODO actorsUnderMouse: support ROUNDWORLD
         val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
         if (actorsUnderMouse.size > 1) {
-            AppLoader.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
+            App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
         }
         // scan for the one with non-null UI.
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
@@ -521,7 +516,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // define custom update rate
-        val updateRate = if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else AppLoader.UPDATE_RATE
+        val updateRate = if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else App.UPDATE_RATE
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
@@ -822,11 +817,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             val actors = actorContainerActive.size.toFloat()
             // set up indices
-            for (i in 0..AppLoader.THREAD_COUNT - 1) {
+            for (i in 0..App.THREAD_COUNT - 1) {
                 ThreadExecutor.submit(
                         ThreadActorUpdate(
-                                actors.div(AppLoader.THREAD_COUNT).times(i).roundToInt(),
-                                actors.div(AppLoader.THREAD_COUNT).times(i + 1).roundToInt() - 1
+                                actors.div(App.THREAD_COUNT).times(i).roundToInt(),
+                                actors.div(App.THREAD_COUNT).times(i + 1).roundToInt() - 1
                         )
                 )
             }
@@ -963,7 +958,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun addNewActor(actor: Actor?) {
         if (actor == null) return
 
-        if (AppLoader.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID)) {
+        if (App.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID)) {
             throw ReferencedActorAlreadyExistsException(actor)
         }
         else {
@@ -978,7 +973,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     fun activateDormantActor(actor: Actor) {
-        if (AppLoader.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID)) {
+        if (App.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID)) {
             /*if (isActive(actor.referenceID))
                 throw Error("The actor $actor is already activated")
             else
@@ -1033,7 +1028,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //MegaRainGovernor.resize()
 
 
-        IngameRenderer.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        IngameRenderer.resize(App.scr.width, App.scr.height)
 
 
         if (gameInitialised) {
@@ -1045,8 +1040,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // resize UIs
 
             notifier.setPosition(
-                    (AppLoader.screenSize.screenW - notifier.width) / 2, AppLoader.screenSize.screenH - notifier.height)
-            uiQuickBar.setPosition((AppLoader.screenSize.screenW - uiQuickBar.width) / 2, AppLoader.screenSize.tvSafeGraphicsHeight)
+                    (App.scr.width - notifier.width) / 2, App.scr.height - notifier.height)
+            uiQuickBar.setPosition((App.scr.width - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
 
             // inventory
             /*uiInventoryPlayer =
@@ -1058,10 +1053,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // basic watch-style notification bar (temperature, new mail)
-            uiBasicInfo.setPosition(AppLoader.screenSize.screenW - uiBasicInfo.width, 0)
+            uiBasicInfo.setPosition(App.scr.width - uiBasicInfo.width, 0)
             uiWatchTierOne.setPosition(
-                    ((AppLoader.screenSize.screenW - AppLoader.screenSize.tvSafeGraphicsWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
-                    AppLoader.screenSize.tvSafeGraphicsHeight + 8
+                    ((App.scr.width - App.scr.tvSafeGraphicsWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                    App.scr.tvSafeGraphicsHeight + 8
             )
 
         }

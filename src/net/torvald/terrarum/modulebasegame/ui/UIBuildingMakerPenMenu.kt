@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
@@ -71,8 +70,8 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             {
                 parent.uiPalette.isVisible = true
                 parent.uiPalette.setPosition(Gdx.input.x - parent.uiPalette.width / 2, Gdx.input.y - parent.uiPalette.height / 2)
-                parent.uiPalette.posX = parent.uiPalette.posX.coerceIn(0, AppLoader.screenSize.screenW - parent.uiPalette.width)
-                parent.uiPalette.posY = parent.uiPalette.posY.coerceIn(0, AppLoader.screenSize.screenH - parent.uiPalette.height)
+                parent.uiPalette.posX = parent.uiPalette.posX.coerceIn(0, App.scr.width - parent.uiPalette.width)
+                parent.uiPalette.posY = parent.uiPalette.posY.coerceIn(0, App.scr.height - parent.uiPalette.height)
             },
             {
                 parent.currentPenMode = BuildingMaker.PENMODE_PENCIL_ERASE
@@ -100,7 +99,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             uiItems.add(button)
 
             button.clickOnceListener = { _, _, b ->
-                if (b == AppLoader.getConfigInt("config_mouseprimary")) {
+                if (b == App.getConfigInt("config_mouseprimary")) {
                     toolButtonsJob[index].invoke()
                     closeGracefully()
                 }
@@ -134,7 +133,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         }
 
         // primary click
-        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
+        if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
             // close by clicking close button or out-of-boud
             if (mouseVec.distanceSquared(RADIUS, RADIUS) !in CLOSE_BUTTON_RADIUS.sqr()..RADIUSF.sqr()) {
                 closeGracefully()
@@ -176,7 +175,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             batch.draw(ItemCodex.getItemImage(slotConfig[i]), x - 16, y - 16, 32f, 32f)
 
             // update as well while looping
-            if (i == mouseOnBlocksSlot && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary"))) {
+            if (i == mouseOnBlocksSlot && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
                 parent.setPencilColour(slotConfig[i])
                 closeGracefully()
             }

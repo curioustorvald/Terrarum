@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import com.badlogic.gdx.utils.Json
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Terrarum.ingame
 import net.torvald.terrarum.console.ConsoleCommand
@@ -11,7 +10,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.serialise.WriteActor
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.serialise.WriteWorld
-import net.torvald.terrarum.utils.JsonWriter
 import java.io.IOException
 
 /**
@@ -20,9 +18,9 @@ import java.io.IOException
 object ExportMeta : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
-            val currentPlayTime_t = AppLoader.getTIME_T() - ingame!!.loadedTime_t
+            val currentPlayTime_t = App.getTIME_T() - ingame!!.loadedTime_t
             val str = WriteMeta(ingame!! as TerrarumIngame, currentPlayTime_t)
-            val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/savegame.json", false)
+            val writer = java.io.FileWriter(App.defaultDir + "/Exports/savegame.json", false)
             writer.write(str)
             writer.close()
             Echo("Exportmeta: exported to savegame.json")
@@ -43,7 +41,7 @@ object ExportWorld : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val str = WriteWorld(ingame!! as TerrarumIngame)
-                val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}.json", false)
+                val writer = java.io.FileWriter(App.defaultDir + "/Exports/${args[1]}.json", false)
                 writer.write(str)
                 writer.close()
                 Echo("Exportworld: exported to ${args[1]}.json")
@@ -71,7 +69,7 @@ object ExportActor : ConsoleCommand {
                 if (player == null) return
 
                 val str = WriteActor(player as IngamePlayer)
-                val writer = java.io.FileWriter(AppLoader.defaultDir + "/Exports/${args[1]}.json", false)
+                val writer = java.io.FileWriter(App.defaultDir + "/Exports/${args[1]}.json", false)
                 writer.write(str)
                 writer.close()
 

@@ -3,12 +3,11 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.*
@@ -23,7 +22,7 @@ class UIQuickslotBar : UICanvas() {
 
     private val gutter = 10 - 6 // do -6 to get a gutter size of not-enlarged cells
     override var width: Int = cellSize * SLOT_COUNT + gutter * (SLOT_COUNT - 1) // 452
-    override var height: Int = ItemSlotImageFactory.slotImage.tileH + 4 + AppLoader.fontGame.lineHeight.toInt()
+    override var height: Int = ItemSlotImageFactory.slotImage.tileH + 4 + App.fontGame.lineHeight.toInt()
     /**
      * In milliseconds
      */

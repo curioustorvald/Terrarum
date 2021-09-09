@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
@@ -22,8 +21,8 @@ internal class UIInventoryCells(
         val full: UIInventoryFull
 ) : UICanvas() {
 
-    override var width: Int = AppLoader.screenSize.screenW
-    override var height: Int = AppLoader.screenSize.screenH
+    override var width: Int = App.scr.width
+    override var height: Int = App.scr.height
     override var openCloseTime: Second = 0.0f
 
     companion object {
@@ -53,7 +52,7 @@ internal class UIInventoryCells(
     private val equipped: UIItemInventoryEquippedView =
             UIItemInventoryEquippedView(
                     full,
-                    internalWidth - UIItemInventoryEquippedView.WIDTH + (AppLoader.screenSize.screenW - internalWidth) / 2,
+                    internalWidth - UIItemInventoryEquippedView.WIDTH + (App.scr.width - internalWidth) / 2,
                     INVENTORY_CELLS_OFFSET_Y,
                     { rebuildList() }
             )
@@ -64,7 +63,7 @@ internal class UIInventoryCells(
     }
 
     fun rebuildList() {
-        AppLoader.printdbg(this, "rebuilding list")
+        App.printdbg(this, "rebuilding list")
 
         itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.selectedIcon])
         equipped.rebuild()
@@ -94,21 +93,21 @@ internal class UIInventoryCells(
         val controlHintXPos = full.offsetX
         blendNormal(batch)
         batch.color = Color.WHITE
-        AppLoader.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)
+        App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)
 
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         // encumbrance bar will go one row down if control help message is too long
         val encumbBarXPos = full.xEnd - weightBarWidth
-        val encumbBarTextXPos = encumbBarXPos - 6 - AppLoader.fontGame.getWidth(encumbranceText)
+        val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
         val encumbBarYPos = full.yEnd-20 + 3f +
-                            if (AppLoader.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
-                                AppLoader.fontGame.lineHeight
+                            if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
+                                App.fontGame.lineHeight
                             else 0f
         Companion.encumbBarYPos = encumbBarYPos // q&d hack to share some numbers
 
-        AppLoader.fontGame.draw(batch,
+        App.fontGame.draw(batch,
                 encumbranceText,
                 encumbBarTextXPos,
                 encumbBarYPos - 3f
@@ -136,7 +135,7 @@ internal class UIInventoryCells(
         // debug text
         batch.color = Color.LIGHT_GRAY
         if (INVEN_DEBUG_MODE) {
-            AppLoader.fontSmallNumbers.draw(batch,
+            App.fontSmallNumbers.draw(batch,
                     "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
                     encumbBarTextXPos,
                     encumbBarYPos + controlHelpHeight - 4f

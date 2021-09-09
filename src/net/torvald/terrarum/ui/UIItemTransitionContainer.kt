@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.App
 
 open class UIItemTransitionContainer(
         parent: UICanvas,
@@ -72,7 +72,7 @@ open class UIItemTransitionContainer(
                 ui.render(batch, camera)
 
                 if (debugvals) {
-                    AppLoader.fontSmallNumbers.draw(batch, "$index", 300f + (20 * index), 10f)
+                    App.fontSmallNumbers.draw(batch, "$index", 300f + (20 * index), 10f)
                 }
             }
             else {
@@ -82,7 +82,7 @@ open class UIItemTransitionContainer(
 
         if (debugvals) {
             batch.color = Color.WHITE
-            AppLoader.fontSmallNumbers.draw(batch, "position:$currentPosition", 500f, 10f)
+            App.fontSmallNumbers.draw(batch, "position:$currentPosition", 500f, 10f)
         }
     }
 

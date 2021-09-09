@@ -3,7 +3,7 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -45,7 +45,7 @@ object WriteSavegame {
             
 
             val creation_t = ingame.world.creationTime
-            val time_t = AppLoader.getTIME_T()
+            val time_t = App.getTIME_T()
             val currentPlayTime_t = time_t - ingame.loadedTime_t
 
 
@@ -137,7 +137,7 @@ object LoadSavegame {
     private fun getFileReader(disk: VirtualDisk, id: Int): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
     operator fun invoke(disk: VirtualDisk) {
-        val ingame = TerrarumIngame(AppLoader.batch)
+        val ingame = TerrarumIngame(App.batch)
 
         // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
         // you'll inevitably read the player actor twice, and they're separate instances of the player!
@@ -166,7 +166,7 @@ object LoadSavegame {
 //        ModMgr.reloadModules()
 
         Terrarum.setCurrentIngameInstance(ingame)
-        AppLoader.setScreen(ingame)
+        App.setScreen(ingame)
 
         Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")
         printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")

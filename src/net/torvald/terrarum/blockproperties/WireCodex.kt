@@ -39,7 +39,7 @@ class WireCodex {
      * @param path to the "wires" directory, not path to the CSV; must end with a slash!
      */
     internal constructor(module: String, path: String) : this() {
-        AppLoader.printmsg(this, "Building wire properties table for module $module")
+        App.printmsg(this, "Building wire properties table for module $module")
         try {
             register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"))
         }
@@ -47,7 +47,7 @@ class WireCodex {
     }
 
     fun fromCSV(module: String, path: String, csvString: String) {
-        AppLoader.printmsg(this, "Building wire properties table for module $module")
+        App.printmsg(this, "Building wire properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csvString,
@@ -64,7 +64,7 @@ class WireCodex {
             setProp(module, it.intVal("id"), it)
         }
 
-        AppLoader.printmsg(this, "Registering wire textures into the resource pool")
+        App.printmsg(this, "Registering wire textures into the resource pool")
         wireProps.keys.forEach { id ->
             val wireid = id.split(':').last().toInt()
 
@@ -148,6 +148,6 @@ class WireCodex {
         val loadedClassInstance = loadedClassConstructor.newInstance(prop.id, invImgSheet, invImgX, invImgY)
         ItemCodex[prop.id] = loadedClassInstance as GameItem
 
-        AppLoader.printmsg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}")
+        App.printmsg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}")
     }
 }

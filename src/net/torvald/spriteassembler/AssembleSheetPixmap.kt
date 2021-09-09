@@ -2,7 +2,6 @@ package net.torvald.spriteassembler
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.linearSearch
 import java.io.File
 

@@ -1,8 +1,8 @@
 package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase

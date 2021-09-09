@@ -5,11 +5,10 @@ import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import org.dyn4j.geometry.Vector2
@@ -224,22 +223,22 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     private fun updateGamerControlBox() {
         if (isGamer) {
-            isUpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyup"))
-            isLeftDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyleft"))
-            isDownDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keydown"))
-            isRightDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyright"))
-            isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyjump"))
+            isUpDown = Gdx.input.isKeyPressed(App.getConfigInt("config_keyup"))
+            isLeftDown = Gdx.input.isKeyPressed(App.getConfigInt("config_keyleft"))
+            isDownDown = Gdx.input.isKeyPressed(App.getConfigInt("config_keydown"))
+            isRightDown = Gdx.input.isKeyPressed(App.getConfigInt("config_keyright"))
+            isJumpDown = Gdx.input.isKeyPressed(App.getConfigInt("config_keyjump"))
 
-            val gamepad = AppLoader.gamepad
+            val gamepad = App.gamepad
 
             if (gamepad != null) {
-                axisX =  gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxislx"))
-                axisY =  gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxisly"))
-                axisRX = gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxisrx"))
-                axisRY = gamepad.getAxis(AppLoader.getConfigInt("config_gamepadaxisry"))
+                axisX =  gamepad.getAxis(App.getConfigInt("config_gamepadaxislx"))
+                axisY =  gamepad.getAxis(App.getConfigInt("config_gamepadaxisly"))
+                axisRX = gamepad.getAxis(App.getConfigInt("config_gamepadaxisrx"))
+                axisRY = gamepad.getAxis(App.getConfigInt("config_gamepadaxisry"))
 
-                isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("config_keyjump")) ||
-                             gamepad.getButton(AppLoader.getConfigInt("config_gamepadltrigger"))
+                isJumpDown = Gdx.input.isKeyPressed(App.getConfigInt("config_keyjump")) ||
+                             gamepad.getButton(App.getConfigInt("config_gamepadltrigger"))
             }
 
             if (isJumpJustDown && jumpJustPressedLatched) {
@@ -263,7 +262,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     }
 
     private inline val hasController: Boolean
-        get() = if (isGamer) AppLoader.gamepad != null
+        get() = if (isGamer) App.gamepad != null
                 else true
 
     private var playerJumpKeyHeldDown = false
@@ -308,11 +307,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = AppLoader.getConfigInt("config_keyright")
+            prevHMoveKey = App.getConfigInt("config_keyright")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = AppLoader.getConfigInt("config_keyleft")
+            prevHMoveKey = App.getConfigInt("config_keyleft")
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
@@ -336,11 +335,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = AppLoader.getConfigInt("config_keydown")
+                prevVMoveKey = App.getConfigInt("config_keydown")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = AppLoader.getConfigInt("config_keyup")
+                prevVMoveKey = App.getConfigInt("config_keyup")
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {

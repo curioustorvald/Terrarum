@@ -9,8 +9,8 @@ import net.torvald.terrarum.langpack.Lang
 
 object ErrorDisp : Screen {
 
-    private val logoTex = AppLoader.logo
-    private val font = AppLoader.fontGame
+    private val logoTex = App.logo
+    private val font = App.fontGame
 
 
     var title = Lang["ERROR_GENERIC_TEXT"]
@@ -25,7 +25,7 @@ object ErrorDisp : Screen {
 
 
     private val titleTextLeftMargin = 8
-    private val titleText = "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}"
+    private val titleText = "${App.GAME_NAME} ${App.getVERSION_STRING()}"
 
 
     override fun show() {

@@ -1,8 +1,8 @@
 package net.torvald.terrarum.itemproperties
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
@@ -58,7 +58,7 @@ class ItemCodex {
      * @param: dynamicID string of "dyn:<random id>"
      */
     fun registerNewDynamicItem(dynamicID: ItemID, item: GameItem) {
-        if (AppLoader.IS_DEVELOPMENT_BUILD) {
+        if (App.IS_DEVELOPMENT_BUILD) {
             printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
         }
         dynamicItemDescription[dynamicID] = item
@@ -121,18 +121,18 @@ class ItemCodex {
         }
         // wall
         else if (itemID.startsWith("wall@")) {
-            val itemSheetNumber = AppLoader.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
             return BlocksDrawer.tileItemWall.get(
-                    itemSheetNumber % AppLoader.tileMaker.ITEM_ATLAS_TILES_X,
-                    itemSheetNumber / AppLoader.tileMaker.ITEM_ATLAS_TILES_X
+                    itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
+                    itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
             )
         }
         // terrain
         else {
-            val itemSheetNumber = AppLoader.tileMaker.tileIDtoItemSheetNumber(itemID)
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
             return BlocksDrawer.tileItemTerrain.get(
-                    itemSheetNumber % AppLoader.tileMaker.ITEM_ATLAS_TILES_X,
-                    itemSheetNumber / AppLoader.tileMaker.ITEM_ATLAS_TILES_X
+                    itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
+                    itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
             )
         }
 

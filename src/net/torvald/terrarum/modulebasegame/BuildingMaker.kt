@@ -15,7 +15,6 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
@@ -284,11 +283,11 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiToolbox.isVisible = true
         uiToolbox.invocationArgument = arrayOf(this)
 
-        uiPaletteSelector.setPosition(AppLoader.screenSize.screenW - uiPaletteSelector.width, 0)
+        uiPaletteSelector.setPosition(App.scr.width - uiPaletteSelector.width, 0)
         uiPaletteSelector.isVisible = true
 
         notifier.setPosition(
-                (AppLoader.screenSize.screenW - notifier.width) / 2, AppLoader.screenSize.screenH - notifier.height)
+                (App.scr.width - notifier.width) / 2, App.scr.height - notifier.height)
 
 
         actorNowPlaying?.setPosition(512 * 16.0, 149 * 16.0)
@@ -318,22 +317,22 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         var i = 0L
         while (updateAkku >= updateRate) {
-            AppLoader.measureDebugTime("Ingame.Update") { updateGame(updateRate) }
+            App.measureDebugTime("Ingame.Update") { updateGame(updateRate) }
             updateAkku -= updateRate
             i += 1
         }
-        AppLoader.setDebugTime("Ingame.UpdateCounter", i)
+        App.setDebugTime("Ingame.UpdateCounter", i)
 
         // render? just do it anyway
-        AppLoader.measureDebugTime("Ingame.Render") { renderGame() }
-        AppLoader.setDebugTime("Ingame.Render - (Light + Tiling)",
-                ((AppLoader.debugTimers["Ingame.Render"] as? Long) ?: 0) -
+        App.measureDebugTime("Ingame.Render") { renderGame() }
+        App.setDebugTime("Ingame.Render - (Light + Tiling)",
+                ((App.debugTimers["Ingame.Render"] as? Long) ?: 0) -
                 (
-                        ((AppLoader.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
-                        ((AppLoader.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
+                        ((App.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
+                        ((App.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
+                        ((App.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
+                        ((App.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
+                        ((App.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
                 )
         )
 
@@ -364,19 +363,19 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         // make pen work HERE
         // when LEFT mouse is down
-        if (!tappedOnUI && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mouseprimary")) && !mouseOnUI) {
+        if (!tappedOnUI && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) && !mouseOnUI) {
 
             makePenWork(Terrarum.mouseTileX, Terrarum.mouseTileY)
             // TODO drag support using bresenham's algo
             //      for some reason it just doesn't work...
         }
-        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary"))) {
+        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
             // open pen menu
             // position the menu to where the cursor is
             uiPenMenu.posX = Terrarum.mouseScreenX - uiPenMenu.width / 2
             uiPenMenu.posY = Terrarum.mouseScreenY - uiPenMenu.height / 2
-            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, AppLoader.screenSize.screenW - uiPenMenu.width)
-            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, AppLoader.screenSize.screenH - uiPenMenu.height)
+            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, App.scr.width - uiPenMenu.width)
+            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, App.scr.height - uiPenMenu.height)
 
             // actually open
             uiPenMenu.setAsOpen()
@@ -390,14 +389,14 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.invoke(false, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uiContainer = uiContainer)
 
-        AppLoader.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
+        App.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
     }
 
     override fun resize(width: Int, height: Int) {
-        IngameRenderer.resize(AppLoader.screenSize.screenW, AppLoader.screenSize.screenH)
+        IngameRenderer.resize(App.scr.width, App.scr.height)
         uiToolbox.setPosition(0, 0)
         notifier.setPosition(
-                (AppLoader.screenSize.screenW - notifier.width) / 2, AppLoader.screenSize.screenH - notifier.height)
+                (App.scr.width - notifier.width) / 2, App.scr.height - notifier.height)
 
         println("[BuildingMaker] Resize event")
     }
@@ -554,12 +553,12 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
 
     // TODO resize-aware
     private var coerceInStart = Point2d(
-            (AppLoader.screenSize.screenW - hitbox.width) / 2.0,
-            (AppLoader.screenSize.screenH - hitbox.height) / 2.0
+            (App.scr.width - hitbox.width) / 2.0,
+            (App.scr.height - hitbox.height) / 2.0
     )
     private var coerceInEnd = Point2d(
-            parent.world.width * TILE_SIZE - (AppLoader.screenSize.screenW - hitbox.width) / 2.0,
-            parent.world.height * TILE_SIZE - (AppLoader.screenSize.screenH - hitbox.height) / 2.0
+            parent.world.width * TILE_SIZE - (App.scr.width - hitbox.width) / 2.0,
+            parent.world.height * TILE_SIZE - (App.scr.height - hitbox.height) / 2.0
     )
 
     override fun update(delta: Float) {
@@ -582,7 +581,7 @@ class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, physProp 
 
 class YamlCommandExit : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        AppLoader.setScreen(TitleScreen(AppLoader.batch))
+        App.setScreen(TitleScreen(App.batch))
     }
 }
 

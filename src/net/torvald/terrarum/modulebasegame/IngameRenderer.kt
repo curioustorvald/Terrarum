@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.measureDebugTime
+import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -58,8 +58,8 @@ object IngameRenderer : Disposable {
     val shaderAtoGrey: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
 
-    private val WIDTH = AppLoader.screenSize.screenW
-    private val HEIGHT = AppLoader.screenSize.screenH
+    private val WIDTH = App.scr.width
+    private val HEIGHT = App.scr.height
     private val WIDTHF = WIDTH.toFloat()
     private val HEIGHTF = HEIGHT.toFloat()
 
@@ -88,25 +88,25 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-        shaderBlur = AppLoader.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
+        shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
 
 
-        if (AppLoader.getConfigBoolean("fxdither")) {
-            shaderBayer = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
+        if (App.getConfigBoolean("fxdither")) {
+            shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
             shaderBayer.bind()
             shaderBayer.setUniformf("rcount", 64f)
             shaderBayer.setUniformf("gcount", 64f)
             shaderBayer.setUniformf("bcount", 64f)
         }
         else {
-            shaderBayer = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
+            shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
         }
 
 
-        shaderBlendGlow = AppLoader.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
+        shaderBlendGlow = App.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
 
-        shaderRGBOnly = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
-        shaderAtoGrey = AppLoader.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
+        shaderRGBOnly = App.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
+        shaderAtoGrey = App.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
 
 
         if (!shaderBlendGlow.isCompiled) {
@@ -115,7 +115,7 @@ object IngameRenderer : Disposable {
         }
 
 
-        if (AppLoader.getConfigBoolean("fxdither")) {
+        if (App.getConfigBoolean("fxdither")) {
             if (!shaderBayer.isCompiled) {
                 Gdx.app.log("shaderBayer", shaderBayer.log)
                 exitProcess(1)
@@ -132,7 +132,7 @@ object IngameRenderer : Disposable {
      * actually matter */
     @JvmStatic fun initialise() {
         if (!initialisedExternally) {
-            AppLoader.disposableSingletonsPool.add(this)
+            App.disposableSingletonsPool.add(this)
 
             // also initialise these sinigletons
             BlocksDrawer
@@ -206,7 +206,7 @@ object IngameRenderer : Disposable {
         if (!gamePaused || newWorldLoadedLatch) {
             measureDebugTime("Renderer.ApparentLightRun") {
                 // recalculate for even frames, or if the sign of the cam-x changed
-                if (AppLoader.GLOBAL_RENDER_TIMER % 3 == 0 || WorldCamera.x * oldCamX < 0 || newWorldLoadedLatch)
+                if (App.GLOBAL_RENDER_TIMER % 3 == 0 || WorldCamera.x * oldCamX < 0 || newWorldLoadedLatch)
                     LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
                 oldCamX = WorldCamera.x
@@ -601,7 +601,7 @@ object IngameRenderer : Disposable {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     private fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + AppLoader.screenSize.halfScreenW).round(), (-newY + AppLoader.screenSize.halfScreenH).round(), 0f)
+        camera.position.set((-newX + App.scr.halfw).round(), (-newY + App.scr.halfh).round(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

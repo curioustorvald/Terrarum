@@ -2,7 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import net.torvald.terrarum.AppLoader.*
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitem.GameItem
@@ -141,7 +141,7 @@ object ModMgr {
             catch (e: Throwable) {
                 printdbgerr(this, "There was an error while loading module $moduleName")
                 printdbgerr(this, "\t$e")
-                print(AppLoader.csiR); e.printStackTrace(System.out); print(AppLoader.csi0)
+                print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
                 moduleInfo.remove(moduleName)
             }
         }
@@ -192,7 +192,7 @@ object ModMgr {
             catch (e: Throwable) {
                 printdbgerr(this, "There was an error while loading module $moduleName")
                 printdbgerr(this, "\t$e")
-                print(AppLoader.csiR); e.printStackTrace(System.out); print(AppLoader.csi0)
+                print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
                 moduleInfo.remove(moduleName)
             }
         }
