@@ -153,13 +153,13 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         }
         // apply gaussian blur to the camera nodes
         for (i in cameraNodes.indices) {
-            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 0.05f
-            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 0.2f
-            val off0 = cameraNodes[i] * 0.5f
-            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 0.2f
-            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 0.05f
+            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 1f
+            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 4f
+            val off0 = cameraNodes[i] * 6f
+            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 4f
+            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 1f
 
-            cameraNodes[i] = offM2 + offM1 + off0 + off1 + off2
+            cameraNodes[i] = (offM2 + offM1 + off0 + off1 + off2) / 16f
         }
 
 
