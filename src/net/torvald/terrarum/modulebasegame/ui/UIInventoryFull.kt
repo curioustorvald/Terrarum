@@ -180,6 +180,7 @@ class UIInventoryFull(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
+        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 1f,0, 0, width, height)
 
         // background fill
         batch.end()

@@ -2,11 +2,13 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.fillRect
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import net.torvald.terrarum.*
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 
@@ -16,6 +18,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 object Toolkit {
 
     val DEFAULT_BOX_BORDER_COL = Color(1f, 1f, 1f, 0.2f)
+
+    private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur2.frag")
 
     init {
         CommonResourcePool.addToLoadingList("toolkit_box_border") {
@@ -66,6 +70,32 @@ object Toolkit {
         // bottom right point
         batch.draw(pack.get(2, 2), x + tx, y + ty)*/
 
+    }
+
+    fun blurEntireScreen(batch: SpriteBatch, camera: OrthographicCamera, blurRadius: Float, x: Int, y: Int, w: Int, h: Int) {
+        for (i in 0 until 6) {
+            val scalar = blurRadius * (1 shl i.ushr(1))
+
+            batch.shader = shaderBlur
+            shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
+            shaderBlur.setUniformi("u_texture", 0)
+            shaderBlur.setUniformf("iResolution", w.toFloat(), h.toFloat())
+            IngameRenderer.shaderBlur.setUniformf("flip", 1f)
+            if (i % 2 == 0)
+                IngameRenderer.shaderBlur.setUniformf("direction", scalar, 0f)
+            else
+                IngameRenderer.shaderBlur.setUniformf("direction", 0f, scalar)
+
+            val p = Pixmap.createFromFrameBuffer(0, 0, w, h)
+            val t = Texture(p); t.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+
+            batch.draw(t, 0f, 0f)
+            batch.flush() // so I can safely dispose of the texture
+
+            t.dispose(); p.dispose()
+        }
+
+        batch.shader = null
     }
 
 }
