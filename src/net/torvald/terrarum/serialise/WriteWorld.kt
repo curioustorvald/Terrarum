@@ -3,6 +3,7 @@ package net.torvald.terrarum.serialise
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -25,8 +26,13 @@ object WriteWorld {
         val world = ingame.world
         world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
-        ingame.actorContainerActive.filter { actorAcceptable(it) }.forEach { world.actors.add(it.referenceID) }
-        ingame.actorContainerInactive.filter { actorAcceptable(it) }.forEach { world.actors.add(it.referenceID) }
+
+        val actorIDbuf = ArrayList<ActorID>()
+        ingame.actorContainerActive.filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
+        ingame.actorContainerInactive.filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
+
+        world.actors.clear()
+        world.actors.addAll(actorIDbuf.sorted().distinct())
 
         return world
     }

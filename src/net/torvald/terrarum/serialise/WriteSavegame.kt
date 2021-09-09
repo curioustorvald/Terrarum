@@ -137,14 +137,14 @@ object LoadSavegame {
     private fun getFileReader(disk: VirtualDisk, id: Int): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
     operator fun invoke(disk: VirtualDisk) {
-        val ingame = TerrarumIngame(App.batch)
+        val newIngame = TerrarumIngame(App.batch)
 
         // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
         // you'll inevitably read the player actor twice, and they're separate instances of the player!
         val meta = ReadMeta(disk)
         val currentWorld = (ReadActor(getFileReader(disk, Terrarum.PLAYER_REF_ID)) as IngamePlayer).worldCurrentlyPlaying
         val world = ReadWorld(getFileReader(disk, currentWorld))
-        val actors = world.actors.map { ReadActor(getFileReader(disk, it)) }
+        val actors = world.actors.distinct().map { ReadActor(getFileReader(disk, it)) }
 //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
         val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
 //        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))
@@ -153,25 +153,26 @@ object LoadSavegame {
         val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
 
         val worldParam = TerrarumIngame.Codices(meta, item, apocryphas)
-        ingame.world = world
-        ingame.gameLoadInfoPayload = worldParam
-        ingame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
-        ingame.savegameArchive = disk
-        actors.forEach { ingame.addNewActor(it) }
+        newIngame.world = world
+        newIngame.gameLoadInfoPayload = worldParam
+        newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
+        newIngame.savegameArchive = disk
+
+        actors.forEach { newIngame.addNewActor(it) }
 
         // by doing this, whatever the "possession" the player had will be broken by the game load
-        ingame.actorNowPlaying = ingame.getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
+        newIngame.actorNowPlaying = newIngame.getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
 
 
 //        ModMgr.reloadModules()
 
-        Terrarum.setCurrentIngameInstance(ingame)
-        App.setScreen(ingame)
+        Terrarum.setCurrentIngameInstance(newIngame)
+        App.setScreen(newIngame)
 
         Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")
         printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")
 
-        Terrarum.ingame!!.consoleHandler.setAsOpen()
+//        Terrarum.ingame!!.consoleHandler.setAsOpen()
     }
 
 }

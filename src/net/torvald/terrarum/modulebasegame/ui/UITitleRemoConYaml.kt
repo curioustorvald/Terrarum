@@ -15,7 +15,8 @@ object UITitleRemoConYaml {
     val menus = """
         - MENU_LABEL_CONTINUE
         - MENU_LABEL_NEW_GAME : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
-        - MENU_IO_LOAD
+        - MENU_IO_LOAD : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles
+         - MENU_LABEL_RETURN
         - MENU_OPTIONS
          - MENU_OPTIONS_GRAPHICS
          - MENU_OPTIONS_CONTROLS
