@@ -607,9 +607,6 @@ object IngameRenderer : Disposable {
     }
 
     fun processBlur(lightmapFboA: FrameBuffer, lightmapFboB: FrameBuffer) {
-        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
-        val blurRadius = 4f / lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
-
         var blurWriteBuffer = lightmapFboA
         var blurReadBuffer = lightmapFboB
 
@@ -629,7 +626,9 @@ object IngameRenderer : Disposable {
         }
 
         // do blurring
-        for (i in 0 until blurIterations) {
+        for (i in 0 until 4) {
+            val blurRadius = (4f / lightmapDownsample) * (1 shl i.ushr(1))
+
             blurWriteBuffer.inAction(camera, batch) {
 
                 blurTex.texture = blurReadBuffer.colorBufferTexture

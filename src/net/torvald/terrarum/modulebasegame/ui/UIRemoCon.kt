@@ -99,6 +99,8 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                     currentRemoConContents = currentRemoConContents.parent!!
                     currentlySelectedRemoConItem = currentRemoConContents.data
                     remoConTray = generateNewRemoCon(currentRemoConContents)
+
+                    parent.uiFakeBlurOverlay.setAsClose()
                 }
                 else {
                     throw NullPointerException("No parent node to return")
@@ -143,7 +145,6 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 }
                 else {
                     it.second.setAsClose()
-                    parent.uiFakeBlurOverlay.setAsClose()
                 }
             }
         }
