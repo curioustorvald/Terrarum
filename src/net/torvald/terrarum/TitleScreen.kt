@@ -63,32 +63,46 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private val cameraAI = object : ActorAI {
 
         private var firstTime = true
-        private val lookaheadDist = 320.0
+        private val lookaheadDist = 100.0
 
-        override fun update(actor: Actor, delta: Float) {
-            val actor = actor as CameraPlayer
+        private fun getPointAt(px: Double): Float {
             val ww = TILE_SIZEF * demoWorld.width
+            val x = px % ww
 
-            val px: Double = actor.hitbox.canonicalX
-            val pxN = px + lookaheadDist * cos(actor.targetBearing)
-            val pxP = px - lookaheadDist * cos(actor.targetBearing)
-
-            val indexThis = ((pxN / ww * cameraNodes.size).floorInt()) fmod cameraNodes.size
-            val indexNext = ((pxP / ww * cameraNodes.size).floorInt()) fmod cameraNodes.size
+            val indexThis = ((x / ww * cameraNodes.size).floorInt()) fmod cameraNodes.size
             val xwstart: Float = indexThis.toFloat() / cameraNodes.size * ww
             val xwend: Float = ((indexThis + 1).toFloat() / cameraNodes.size) * ww
             val xw: Float = xwend - xwstart
+            val xperc: Double = (x - xwstart) / xw
 
-            val xperc: Double = (px - xwstart) / xw
+            return FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis], cameraNodes[(indexThis + 1) % cameraNodes.size])
+        }
 
-            val y = FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis], cameraNodes[indexNext])
+        override fun update(actor: Actor, delta: Float) {
+            val ww = TILE_SIZEF * demoWorld.width
+            val actor = actor as CameraPlayer
+
+            val px: Double = actor.hitbox.canonicalX + actor.actorValue.getAsDouble(AVKey.SPEED)!!
+            val pxP = px - lookaheadDist * cos(actor.targetBearing)
+            val pxN = px + lookaheadDist * cos(actor.targetBearing)
+
+            val yP = getPointAt(pxP)
+            val yN = getPointAt(pxN)
+
+            val y = (yP + yN) / 2f
 
             if (firstTime) {
                 firstTime = false
                 actor.hitbox.setPositionY(y - 8.0)
             }
             else {
-                actor.moveTo(pxN, y - 8.0)
+                //actor.moveTo(px, y - 8.0)
+                //actor.hitbox.setPosition(px, y - 8.0)
+                actor.moveTo(atan2((yN - yP).toDouble(), pxN - pxP))
+            }
+
+            if (actor.hitbox.canonicalX > ww) {
+                actor.hitbox.translatePosX(-ww.toDouble())
             }
         }
     }
@@ -100,6 +114,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     val uiContainer = UIContainer()
     private lateinit var uiMenu: UICanvas
+    internal lateinit var uiFakeBlurOverlay: UICanvas
 
     private lateinit var worldFBO: FrameBuffer
 
@@ -129,33 +144,29 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
             while (travelDownCounter < demoWorld.height &&
-                   !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid &&
-                   !BlockCodex[demoWorld.getTileFromWall(tileXPos, travelDownCounter)].isSolid
+                   !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid
+//                   !BlockCodex[demoWorld.getTileFromWall(tileXPos, travelDownCounter)].isSolid
             ) {
-                travelDownCounter += 1
+                travelDownCounter += 2
             }
-//            println("Camera node #${it+1} = $travelDownCounter")
             travelDownCounter * TILE_SIZEF
         }
         // apply gaussian blur to the camera nodes
         for (i in cameraNodes.indices) {
-            val offM3 = cameraNodes[(i-3) fmod cameraNodes.size] * 0.025f
-            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 0.11f
-            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 0.29f
-            val off0 = cameraNodes[i] * 0.15f
-            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 0.29f
-            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 0.11f
-            val off3 = cameraNodes[(i+3) fmod cameraNodes.size] * 0.025f
+            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 0.05f
+            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 0.2f
+            val off0 = cameraNodes[i] * 0.5f
+            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 0.2f
+            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 0.05f
 
-            cameraNodes[i] = offM3 + offM2 + offM1 + off0 + off1 + off2 + off3
-//            println(cameraNodes[i])
+            cameraNodes[i] = offM2 + offM1 + off0 + off1 + off2
         }
 
 
 
         cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
-        demoWorld.worldTime.timeDelta = 100
+        demoWorld.worldTime.timeDelta = 0// 100
 
 
         IngameRenderer.setRenderedWorld(demoWorld)
@@ -172,7 +183,13 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiFakeGradOverlay)
 
 
-        uiMenu = UIRemoCon(UITitleRemoConYaml())//UITitleRemoConRoot()
+        // fake UI for blur
+        uiFakeBlurOverlay = UIFakeBlurOverlay()
+        uiFakeBlurOverlay.setPosition(0,0)
+        uiContainer.add(uiFakeBlurOverlay)
+
+
+        uiMenu = UIRemoCon(this, UITitleRemoConYaml())//UITitleRemoConRoot()
         uiMenu.setPosition(0, 0)
         uiMenu.setAsOpen()
 
@@ -432,7 +449,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             if (currentBearing.isNaN()) currentBearing = bearing
             val v = actorValue.getAsDouble(AVKey.SPEED)!!
 
-            currentBearing = interpolateLinear(1.0 / 32.0, currentBearing, targetBearing)
+            //currentBearing = interpolateLinear(1.0 / 22.0, currentBearing, targetBearing)
+            currentBearing = targetBearing
             hitbox.translate(v * cos(currentBearing), v * sin(currentBearing))
         }
 

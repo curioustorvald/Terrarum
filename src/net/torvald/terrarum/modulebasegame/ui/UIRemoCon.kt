@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.QNDTreeNode
+import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -17,7 +18,7 @@ import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGH
 /**
  * Created by minjaesong on 2018-08-29.
  */
-open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
+open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override var openCloseTime = 0f
 
@@ -135,13 +136,14 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                 //printdbg(this, "> ${it.first}")
 
                 if (currentlySelectedRemoConItem == it.first) {
+                    parent.uiFakeBlurOverlay.setAsOpen()
                     it.second.setAsOpen()
-
 
                     //printdbg(this, ">> ding - ${it.second.javaClass.canonicalName}")
                 }
                 else {
                     it.second.setAsClose()
+                    parent.uiFakeBlurOverlay.setAsClose()
                 }
             }
         }

@@ -3,10 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.*
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemList
 import net.torvald.terrarum.ui.UIItemModuleInfoCell
@@ -64,6 +61,7 @@ class UITitleModules : UICanvas() {
     }
 
     override fun doOpening(delta: Float) {
+
     }
 
     override fun doClosing(delta: Float) {
