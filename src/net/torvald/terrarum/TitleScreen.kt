@@ -148,14 +148,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             val off3 = cameraNodes[(i+3) fmod cameraNodes.size] * 0.025f
 
             cameraNodes[i] = offM3 + offM2 + offM1 + off0 + off1 + off2 + off3
-            println(cameraNodes[i])
+//            println(cameraNodes[i])
         }
 
 
 
         cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
-        demoWorld.worldTime.timeDelta = 100
+        demoWorld.worldTime.timeDelta = 0//100
 
 
         IngameRenderer.setRenderedWorld(demoWorld)
@@ -168,6 +168,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         // fake UI for gradient overlay
         val uiFakeGradOverlay = UIFakeGradOverlay()
+        uiFakeGradOverlay.setPosition(0, 0)
+        uiContainer.add(uiFakeGradOverlay)
 
 
         uiMenu = UIRemoCon(UITitleRemoConYaml())//UITitleRemoConRoot()
