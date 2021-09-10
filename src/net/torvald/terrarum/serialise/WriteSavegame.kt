@@ -97,7 +97,7 @@ object WriteSavegame {
             // Write World //
             val worldNum = ingame.world.worldIndex
             val worldContent = EntryFile(WriteWorld.encodeToByteArray64(ingame))
-            val world = DiskEntry(worldNum, 0, "world${worldNum}".toByteArray(Common.CHARSET), creation_t, time_t, worldContent)
+            val world = DiskEntry(worldNum.toLong(), 0, "world${worldNum}".toByteArray(Common.CHARSET), creation_t, time_t, worldContent)
             addFile(disk, world)
 
             // Write Actors //
@@ -105,7 +105,7 @@ object WriteSavegame {
                 actors.forEach {
                     if (actorAcceptable(it)) {
                         val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                        val actor = DiskEntry(it.referenceID, 0, "actor${it.referenceID}".toByteArray(Common.CHARSET), creation_t, time_t, actorContent)
+                        val actor = DiskEntry(it.referenceID.toLong(), 0, "actor${it.referenceID}".toByteArray(Common.CHARSET), creation_t, time_t, actorContent)
                         addFile(disk, actor)
                     }
                 }
@@ -133,8 +133,8 @@ object WriteSavegame {
  */
 object LoadSavegame {
 
-    private fun getFileBytes(disk: VirtualDisk, id: Int): ByteArray64 = VDUtil.getAsNormalFile(disk, id).getContent()
-    private fun getFileReader(disk: VirtualDisk, id: Int): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
+    private fun getFileBytes(disk: VirtualDisk, id: Long): ByteArray64 = VDUtil.getAsNormalFile(disk, id).getContent()
+    private fun getFileReader(disk: VirtualDisk, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
     operator fun invoke(disk: VirtualDisk) {
         val newIngame = TerrarumIngame(App.batch)
@@ -142,9 +142,9 @@ object LoadSavegame {
         // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
         // you'll inevitably read the player actor twice, and they're separate instances of the player!
         val meta = ReadMeta(disk)
-        val currentWorld = (ReadActor(getFileReader(disk, Terrarum.PLAYER_REF_ID)) as IngamePlayer).worldCurrentlyPlaying
-        val world = ReadWorld(getFileReader(disk, currentWorld))
-        val actors = world.actors.distinct().map { ReadActor(getFileReader(disk, it)) }
+        val currentWorld = (ReadActor(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
+        val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
+        val actors = world.actors.distinct().map { ReadActor(getFileReader(disk, it.toLong())) }
 //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
         val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
 //        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))

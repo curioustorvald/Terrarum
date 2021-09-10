@@ -148,7 +148,7 @@ class SavegameCracker(
     fun ls(args: List<String>) {
         letdisk {
             it.entries.forEach { i, entry ->
-                if (i != 0)
+                if (i != 0L)
                     println(
                             ccNoun + i.toString(10).padStart(11, ' ') + " " +
                             ccNoun2 + (entry.filename.toCanonicalString(charset) + cc0).padEnd(18) { if (it == 0) ' ' else '.' }  +
@@ -175,7 +175,7 @@ class SavegameCracker(
     @Command("Exports contents of the entry into a real file", "entry-id output-file")
     fun export(args: List<String>) {
         letdisk {
-            val entryID = args[1].toInt(10)
+            val entryID = args[1].toLong(10)
             val outfile = File(args[2])
             VDUtil.exportFile(it.entries[entryID]?.contents as? EntryFile ?: throw NullPointerException("No entry with ID $entryID"), outfile)
         }
@@ -184,8 +184,8 @@ class SavegameCracker(
     @Command("Changes one entry-ID into another", "change-from change-to")
     fun renum(args: List<String>) {
         letdisk {
-            val id0 = args[1].toInt(10)
-            val id1 = args[2].toInt(10)
+            val id0 = args[1].toLong(10)
+            val id1 = args[2].toLong(10)
 
             val entry = it.entries.remove(id0)!!
             entry.entryID = id1
@@ -198,7 +198,7 @@ class SavegameCracker(
     @Command("Renames one file into another", "entry-id new-name")
     fun mv(args: List<String>) {
         letdisk {
-            val id = args[1].toInt(10)
+            val id = args[1].toLong(10)
             val newname = args[2]
             it.entries[id]!!.filename = newname.toByteArray(charset)
             return@letdisk null
@@ -209,7 +209,7 @@ class SavegameCracker(
     fun import(args: List<String>) {
         letdisk {
             val file = File(args[1])
-            val id = args[2].toInt(10)
+            val id = args[2].toLong(10)
             val entry = VDUtil.importFile(file, id, charset)
 
             it.entries[id] = entry
@@ -221,7 +221,7 @@ class SavegameCracker(
     @Command("Removes a file within the savefile", "entry-id")
     fun rm(args: List<String>) {
         letdisk {
-            val id = args[1].toInt(10)
+            val id = args[1].toLong(10)
             it.entries.remove(id)
             VDUtil.getAsDirectory(it, 0).remove(id)
         }
