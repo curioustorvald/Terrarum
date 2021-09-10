@@ -1,19 +1,19 @@
 package net.torvald.terrarum.debuggerapp
 
 import net.torvald.terrarum.TerrarumAppConfiguration
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.tvda.EntryFile
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.tvda.diskIDtoReadableFilename
 import java.io.File
-import java.io.InputStream
 import java.io.PrintStream
 import java.nio.charset.Charset
 import java.util.*
 import java.util.logging.Level
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.jvm.isAccessible
 
 private val ESC = 27.toChar()
 
@@ -151,7 +151,7 @@ class SavegameCracker(
                 if (i != 0L)
                     println(
                             ccNoun + i.toString(10).padStart(11, ' ') + " " +
-                            ccNoun2 + (entry.filename.toCanonicalString(charset) + cc0).padEnd(18) { if (it == 0) ' ' else '.' }  +
+                            ccNoun2 + (diskIDtoReadableFilename(entry.entryID) + cc0).padEnd(24) { if (it == 0) ' ' else '.' }  +
                             ccConst + " " + entry.contents.getSizePure() + " bytes"
                     )
             }
@@ -192,16 +192,6 @@ class SavegameCracker(
             it.entries[id1] = entry
             VDUtil.getAsDirectory(it, 0).remove(id0)
             VDUtil.getAsDirectory(it, 0).add(id1)
-        }
-    }
-
-    @Command("Renames one file into another", "entry-id new-name")
-    fun mv(args: List<String>) {
-        letdisk {
-            val id = args[1].toLong(10)
-            val newname = args[2]
-            it.entries[id]!!.filename = newname.toByteArray(charset)
-            return@letdisk null
         }
     }
 

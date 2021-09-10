@@ -1,27 +1,47 @@
 package net.torvald.terrarum.realestate
 
+import net.torvald.terrarum.FactionCodex
+import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2016-03-27.
  */
 object LandUtil {
+
+    const val CHUNK_W = 90
+    const val CHUNK_H = 90
+
+    const val LAYER_TERR = 0
+    const val LAYER_WALL = 1
+    const val LAYER_WIRE = 2
+    const val LAYER_FLUID = 3
+
+    fun toChunkNum(world: GameWorld, x: Int, y: Int): Int {
+        // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
+        val (x, y) = world.coerceXY(x, y)
+        return (x / CHUNK_W) + (y / CHUNK_H) * (world.width / CHUNK_W)
+    }
+
+    fun toChunkIndices(world: GameWorld, x: Int, y: Int): Point2i {
+        // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
+        val (x, y) = world.coerceXY(x, y)
+        return Point2i(x / CHUNK_W, y / CHUNK_H)
+    }
+
     fun getBlockAddr(world: GameWorld, x: Int, y: Int): BlockAddress {
         // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
         val (x, y) = world.coerceXY(x, y)
         return (world.width.toLong() * y) + x
     }
 
-    fun resolveBlockAddr(world: GameWorld, t: BlockAddress): Pair<Int, Int> =
-            Pair((t % world.width).toInt(), (t / world.width).toInt())
+    fun resolveBlockAddr(world: GameWorld, t: BlockAddress): Point2i =
+            Point2i((t % world.width).toInt(), (t / world.width).toInt())
 
-    fun resolveBlockAddr(width: Int, t: BlockAddress): Pair<Int, Int> =
-            Pair((t % width).toInt(), (t / width).toInt())
+    fun resolveBlockAddr(width: Int, t: BlockAddress): Point2i =
+            Point2i((t % width).toInt(), (t / width).toInt())
 
     /**
      * Get owner ID as an Actor/Faction

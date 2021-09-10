@@ -7,7 +7,7 @@ import net.torvald.terrarum.ccG
 import net.torvald.terrarum.ccR
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.serialise.*
 import java.io.File
 import java.io.IOException

@@ -5,10 +5,12 @@ import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Writer
+import net.torvald.terrarum.tvda.ByteArray64
+import net.torvald.terrarum.tvda.ByteArray64Writer
+import net.torvald.terrarum.realestate.LandUtil
 import java.io.Reader
 
 /**
@@ -50,8 +52,22 @@ object WriteWorld {
         return baw.toByteArray64()
     }
 
-}
+    /**
+     * @return Gzipped chunk. Tile numbers are stored in Big Endian.
+     */
+    fun encodeChunk(layer: BlockLayer, cx: Int, cy: Int): ByteArray64 {
+        val ba = ByteArray64()
+        for (y in cy * LandUtil.CHUNK_H until (cy + 1) * LandUtil.CHUNK_H) {
+            for (x in cx * LandUtil.CHUNK_W until (cx + 1) * LandUtil.CHUNK_W) {
+                val tilenum = layer.unsafeGetTile(x, y)
+                ba.add(tilenum.ushr(8).and(255).toByte())
+                ba.add(tilenum.and(255).toByte())
+            }
+        }
 
+        return Common.zip(ba)
+    }
+}
 
 
 /**
@@ -74,6 +90,23 @@ object ReadWorld {
         val world = invoke(worldDataStream)
         ingame.world = world
         return world
+    }
+
+    private val cw = LandUtil.CHUNK_W
+    private val ch = LandUtil.CHUNK_H
+
+    fun decodeToLayer(chunk: ByteArray64, targetLayer: BlockLayer, cx: Int, cy: Int) {
+        val bytes = Common.unzip(chunk)
+        if (bytes.size != cw * ch * 2L)
+            throw UnsupportedOperationException("Chunk size mismatch: decoded chunk size is ${bytes.size} bytes " +
+                                                "where ${LandUtil.CHUNK_W * LandUtil.CHUNK_H * 2L} bytes (Int16 of ${LandUtil.CHUNK_W}x${LandUtil.CHUNK_H}) were expected")
+
+        for (k in 0 until cw * ch) {
+            val tilenum = bytes[2L*k].toUint().shl(8) or bytes[2L*k + 1].toUint()
+            val offx = k % cw
+            val offy = k / cw
+            targetLayer.unsafeSetTile(cx * cw + offx, cy * ch * offy, tilenum)
+        }
     }
 
 }

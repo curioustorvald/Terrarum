@@ -34,7 +34,8 @@ import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.ui.UICanvas
@@ -232,7 +233,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             val height: Int,
             val worldGenSeed: Long
             // other worldgen options
-    )
+    ) {
+        init {
+            if (width % LandUtil.CHUNK_W != 0 || height % LandUtil.CHUNK_H != 0) {
+                throw IllegalArgumentException("World size is not a multiple of chunk size; World size: ($width, $height), Chunk size: (${LandUtil.CHUNK_W}, ${LandUtil.CHUNK_H})")
+            }
+        }
+    }
 
     data class Codices(
             val meta: WriteMeta.WorldMeta,

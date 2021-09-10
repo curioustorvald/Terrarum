@@ -4,10 +4,10 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.EntryFile
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.tvda.ByteArray64
+import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.tvda.EntryFile
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.weather.WeatherMixer
 
 /**

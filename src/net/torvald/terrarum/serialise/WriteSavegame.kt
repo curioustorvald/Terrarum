@@ -8,10 +8,11 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Common.getUnzipInputStream
 import net.torvald.terrarum.serialise.Common.zip
 import net.torvald.terrarum.serialise.WriteWorld.actorAcceptable
+import net.torvald.terrarum.tvda.*
 import java.io.File
 import java.io.Reader
 import java.util.zip.GZIPOutputStream
@@ -51,12 +52,12 @@ object WriteSavegame {
 
             // Write Meta //
             val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, currentPlayTime_t))
-            val meta = DiskEntry(-1, 0, "savegame".toByteArray(Common.CHARSET), creation_t, time_t, metaContent)
+            val meta = DiskEntry(-1, 0, creation_t, time_t, metaContent)
             addFile(disk, meta)
             
             
             val thumbContent = EntryFile(tgaout.toByteArray64())
-            val thumb = DiskEntry(-2, 0, "thumb".toByteArray(Common.CHARSET), creation_t, time_t, thumbContent)
+            val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
             addFile(disk, thumb)
             
 
@@ -68,7 +69,7 @@ object WriteSavegame {
 
             // Write ItemCodex//
             val itemCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
-            val items = DiskEntry(-17, 0, "items".toByteArray(Common.CHARSET), creation_t, time_t, itemCodexContent)
+            val items = DiskEntry(-17, 0, creation_t, time_t, itemCodexContent)
             addFile(disk, items)
             // Gotta save dynamicIDs
 
@@ -91,21 +92,42 @@ object WriteSavegame {
 
             // Write Apocryphas//
             val apocryphasContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
-            val apocryphas = DiskEntry(-1024, 0, "modprops".toByteArray(Common.CHARSET), creation_t, time_t, apocryphasContent)
+            val apocryphas = DiskEntry(-1024, 0, creation_t, time_t, apocryphasContent)
             addFile(disk, apocryphas)
 
             // Write World //
             val worldNum = ingame.world.worldIndex
-            val worldContent = EntryFile(WriteWorld.encodeToByteArray64(ingame))
+            /*val worldContent = EntryFile(WriteWorld.encodeToByteArray64(ingame))
             val world = DiskEntry(worldNum.toLong(), 0, "world${worldNum}".toByteArray(Common.CHARSET), creation_t, time_t, worldContent)
-            addFile(disk, world)
+            addFile(disk, world)*/
+
+            val layers = arrayOf(ingame.world.layerTerrain, ingame.world.layerWall)
+            val cw = ingame.world.width / LandUtil.CHUNK_W
+            val ch = ingame.world.height / LandUtil.CHUNK_H
+            for (layer in layers.indices) {
+                for (cy in 0 until ch) {
+                    for (cx in 0 until cw) {
+                        val chunkNumber = (cy * cw + cx).toLong()
+                        val chunkBytes = WriteWorld.encodeChunk(layers[layer], cx, cy)
+                        val entryID = worldNum.toLong().shl(32) or layer.toLong().shl(24) or chunkNumber
+
+                        val entryContent = EntryFile(chunkBytes)
+                        val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)
+                        // "W1L0-92,15"
+                        addFile(disk, entry)
+                    }
+                }
+            }
+
+            // TODO save worldinfo
+
 
             // Write Actors //
             listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
                 actors.forEach {
                     if (actorAcceptable(it)) {
                         val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                        val actor = DiskEntry(it.referenceID.toLong(), 0, "actor${it.referenceID}".toByteArray(Common.CHARSET), creation_t, time_t, actorContent)
+                        val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
                         addFile(disk, actor)
                     }
                 }

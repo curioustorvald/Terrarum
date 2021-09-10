@@ -13,14 +13,11 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
-import org.khelekore.prtree.DistanceCalculator
-import org.khelekore.prtree.DistanceResult
-import org.khelekore.prtree.MBRConverter
-import org.khelekore.prtree.PRTree
-import org.khelekore.prtree.PointND
+import org.khelekore.prtree.*
 import java.util.concurrent.locks.Lock
 
 /**
@@ -120,6 +117,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val terrainChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
+
+    val modifiedChunks = Array(16) { HashSet<Int>() }
 
     var loadedTime_t = App.getTIME_T()
         protected set
@@ -226,6 +225,14 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         //printdbg(this, wireChangeQueue)
     }
 
+
+    open fun modified(layer: Int, x: Int, y: Int) {
+        modifiedChunks[layer].add(LandUtil.toChunkNum(world, x, y))
+    }
+
+    open fun clearModifiedChunks() {
+        modifiedChunks.forEach { it.clear() }
+    }
 
 
     ///////////////////////

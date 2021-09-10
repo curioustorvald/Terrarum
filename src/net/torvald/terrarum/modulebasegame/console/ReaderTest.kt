@@ -2,8 +2,8 @@ package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Writer
+import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.tvda.ByteArray64Writer
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.toUint
 import java.io.File

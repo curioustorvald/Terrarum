@@ -9,9 +9,9 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntry
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.tvda.DiskEntry
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteSavegame
 import java.io.File

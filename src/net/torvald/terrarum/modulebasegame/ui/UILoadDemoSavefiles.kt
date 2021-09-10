@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.tvda.ByteArray64InputStream
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta

@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Reader
+import net.torvald.terrarum.tvda.ByteArray64Reader
 import net.torvald.terrarum.serialise.Common
 import java.io.StringReader
 

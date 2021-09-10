@@ -8,8 +8,8 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64Writer
+import net.torvald.terrarum.tvda.ByteArray64
+import net.torvald.terrarum.tvda.ByteArray64Writer
 import java.io.Reader
 
 /**
