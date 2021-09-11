@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
@@ -40,18 +39,17 @@ class UILoadDemoSavefiles : UICanvas() {
 
     // read savegames
     init {
-        File(App.defaultSaveDir).listFiles().forEachIndexed { index, file ->
-            printdbg(this, "save file: ${file.absolutePath}")
-
+        File(App.defaultSaveDir).listFiles().map { file ->
             try {
-                val x = (width - UIItemDemoSaveCells.WIDTH) / 2
-                val y = 144 + (24 + UIItemDemoSaveCells.HEIGHT) * index
-                val disk = VDUtil.readDiskArchive(file, charset = Common.CHARSET)
-                addUIitem(UIItemDemoSaveCells(this, x, y, disk))
+                VDUtil.readDiskArchive(file, charset = Common.CHARSET)
             }
             catch (e: Throwable) {
                 e.printStackTrace()
             }
+        }.sortedByDescending { (it as VirtualDisk).entries[0]!!.modificationDate }.forEachIndexed { index, disk ->
+            val x = (width - UIItemDemoSaveCells.WIDTH) / 2
+            val y = 144 + (24 + UIItemDemoSaveCells.HEIGHT) * index
+            addUIitem(UIItemDemoSaveCells(this, x, y, disk as VirtualDisk))
         }
     }
 
@@ -138,7 +136,7 @@ class UIItemDemoSaveCells(
 
         // TODO draw border
         batch.color = highlightCol
-        Toolkit.drawBoxBorder(batch, x.toInt()-1, y.toInt()-1, width+1, height+1)
+        Toolkit.drawBoxBorder(batch, x.toInt()-1, y.toInt()-1, width+2, height+2)
 
         // draw thumbnail
         batch.color = Color.WHITE
