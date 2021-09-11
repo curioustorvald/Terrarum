@@ -66,7 +66,7 @@ object LightmapRenderer {
 
     const val overscan_open: Int = 40
     const val overscan_opaque: Int = 10
-    const val LIGHTMAP_OVERRENDER = 8
+    const val LIGHTMAP_OVERRENDER = 40
 
     private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
     private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3

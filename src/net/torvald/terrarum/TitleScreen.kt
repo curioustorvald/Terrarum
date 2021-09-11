@@ -185,7 +185,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // fake UI for blur
-        uiFakeBlurOverlay = UIFakeBlurOverlay(2f, false)
+        uiFakeBlurOverlay = UIFakeBlurOverlay(1f, false)
         uiFakeBlurOverlay.setPosition(0,0)
         uiContainer.add(uiFakeBlurOverlay)
 

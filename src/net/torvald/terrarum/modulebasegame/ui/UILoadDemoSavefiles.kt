@@ -9,16 +9,20 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.tvda.ByteArray64InputStream
-import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta
+import net.torvald.terrarum.tvda.ByteArray64InputStream
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarum.ui.UIItemTextButton
 import java.io.File
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.util.*
 import java.util.zip.GZIPInputStream
 
 /**
@@ -100,6 +104,10 @@ class UIItemDemoSaveCells(
     private val x = initialX.toFloat()
     private val y = initialY.toFloat()
 
+    private val lastPlayedTimestamp = Instant.ofEpochSecond(meta.lastplay_t)
+            .atZone(TimeZone.getDefault().toZoneId())
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
     init {
         try {
             // load a thumbnail
@@ -125,22 +133,32 @@ class UIItemDemoSaveCells(
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        batch.color = Color.WHITE
+        val highlightCol = if (mouseUp) UIItemTextButton.defaultActiveCol else Color.WHITE
+
+
+        // TODO draw border
+        batch.color = highlightCol
+        Toolkit.drawBoxBorder(batch, x.toInt()-1, y.toInt()-1, width+1, height+1)
 
         // draw thumbnail
+        batch.color = Color.WHITE
         blendNormal(batch)
         batch.draw(thumb, x, y + height, width.toFloat(), -height.toFloat())
         // draw gradient
         blendMul(batch)
         batch.draw(grad, x + width, y, -width.toFloat(), height.toFloat())
+
+        // draw texts
+        batch.color = highlightCol
+
         // draw timestamp
         blendNormal(batch)
-        val timestamp = "${meta.lastplay_t}"
-        val tlen = App.fontGame.getWidth(timestamp)
-        App.fontGame.draw(batch, timestamp, posX + (width - tlen) - 5f, posY + height - 23f)
+        val tlen = App.fontSmallNumbers.getWidth(lastPlayedTimestamp)
+        App.fontSmallNumbers.draw(batch, lastPlayedTimestamp, posX + (width - tlen) - 3f, posY + height - 16f)
 
 
         super.render(batch, camera)
+        batch.color = Color.WHITE
     }
 
     override fun dispose() {
