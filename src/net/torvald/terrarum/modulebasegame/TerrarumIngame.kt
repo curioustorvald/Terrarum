@@ -34,10 +34,10 @@ import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
-import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteMeta
+import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -296,6 +296,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // init map as chosen size
             val timeNow = App.getTIME_T()
             world = GameWorld(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
+            world.generatorSeed = worldParams.worldGenSeed
             gameworldIndices.add(world.worldIndex)
             world.extraFields["basegame.economy"] = GameEconomy()
 

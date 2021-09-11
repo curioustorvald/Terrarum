@@ -75,9 +75,6 @@ object Common {
             }
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>): BlockLayer {
-                // full auto
-                //return strToBlockLayer(json.fromJson(type, jsonData.toJson(JsonWriter.OutputType.minimal)) as LayerInfo)
-
                 // full manual
                 try {
                     return strToBlockLayer(LayerInfo(

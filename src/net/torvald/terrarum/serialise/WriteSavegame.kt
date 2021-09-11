@@ -5,6 +5,7 @@ import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -97,11 +98,11 @@ object WriteSavegame {
 
             // Write World //
             val worldNum = ingame.world.worldIndex
-            /*val worldContent = EntryFile(WriteWorld.encodeToByteArray64(ingame))
-            val world = DiskEntry(worldNum.toLong(), 0, "world${worldNum}".toByteArray(Common.CHARSET), creation_t, time_t, worldContent)
-            addFile(disk, world)*/
+            val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame))
+            val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
+            addFile(disk, world)
 
-            val layers = arrayOf(ingame.world.layerTerrain, ingame.world.layerWall)
+            val layers = intArrayOf(0,1).map { ingame.world.getLayer(it) }
             val cw = ingame.world.width / LandUtil.CHUNK_W
             val ch = ingame.world.height / LandUtil.CHUNK_H
             for (layer in layers.indices) {
@@ -118,8 +119,6 @@ object WriteSavegame {
                     }
                 }
             }
-
-            // TODO save worldinfo
 
 
             // Write Actors //
@@ -174,11 +173,30 @@ object LoadSavegame {
 //        val faction = Common.jsoner.fromJson(FactionCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -20)))
         val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
 
+        // set lateinit vars on the gameworld
+        world.layerTerrain = BlockLayer(world.width, world.height)
+        world.layerWall = BlockLayer(world.width, world.height)
+
         val worldParam = TerrarumIngame.Codices(meta, item, apocryphas)
         newIngame.world = world
         newIngame.gameLoadInfoPayload = worldParam
         newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
         newIngame.savegameArchive = disk
+
+        // load all the world blocklayer chunks
+        val worldnum = world.worldIndex.toLong()
+        val cw = LandUtil.CHUNK_W; val ch = LandUtil.CHUNK_H
+        val chunksX = world.width / cw
+        for (layer in 0L..1L) {
+            val worldLayer = world.getLayer(layer.toInt())
+
+            for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
+                val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.shl(24) or chunk)
+                val cx = chunk % chunksX
+                val cy = chunk / chunksX
+                ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer, cx.toInt(), cy.toInt())
+            }
+        }
 
         actors.forEach { newIngame.addNewActor(it) }
 

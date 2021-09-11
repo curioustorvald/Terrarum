@@ -68,8 +68,14 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         val msb = tile.ushr(8).and(0xff).toByte()
 
 
-        ptr[offset] = lsb
-        ptr[offset + 1] = msb
+//        try {
+            ptr[offset] = lsb
+            ptr[offset + 1] = msb
+//        }
+//        catch (e: IndexOutOfBoundsException) {
+//            printdbgerr(this, "IndexOutOfBoundsException: x = $x, y = $y; offset = $offset")
+//            throw e
+//        }
     }
 
     /**

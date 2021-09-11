@@ -24,6 +24,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadWorld
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
@@ -125,12 +126,12 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         try {
             val reader = java.io.FileReader(ModMgr.getFile("basegame", "demoworld"))
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
-            val world = ReadWorld.invoke(reader)
+            val world = ReadWorld.readLayerFormat(reader)
             demoWorld = world
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
-            demoWorld = GameWorld(1, 64, 64, 0L, 0L, 0)
+            demoWorld = GameWorld(1, LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L, 0)
             printdbg(this, "Demo world not found, using empty world")
         }
 

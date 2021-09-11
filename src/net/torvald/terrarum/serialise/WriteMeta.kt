@@ -21,7 +21,6 @@ object WriteMeta {
         val meta = WorldMeta(
                 genver = Common.GENVER,
                 savename = world.worldName,
-                terrseed = world.generatorSeed,
                 randseed0 = RoguelikeRandomiser.RNG.state0,
                 randseed1 = RoguelikeRandomiser.RNG.state1,
                 weatseed0 = WeatherMixer.RNG.state0,
@@ -46,7 +45,6 @@ object WriteMeta {
     data class WorldMeta(
             val genver: Int = -1,
             val savename: String = "",
-            val terrseed: Long = 0,
             val randseed0: Long = 0,
             val randseed1: Long = 0,
             val weatseed0: Long = 0,

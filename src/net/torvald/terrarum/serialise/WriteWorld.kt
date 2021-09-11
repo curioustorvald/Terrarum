@@ -7,10 +7,11 @@ import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.GameWorldTitleScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.tvda.ByteArray64
 import net.torvald.terrarum.tvda.ByteArray64Writer
-import net.torvald.terrarum.realestate.LandUtil
 import java.io.Reader
 
 /**
@@ -75,6 +76,9 @@ object WriteWorld {
  */
 object ReadWorld {
 
+    fun readLayerFormat(worldDataStream: Reader): GameWorld =
+            fillInDetails(Common.jsoner.fromJson(GameWorldTitleScreen::class.java, worldDataStream))
+
     operator fun invoke(worldDataStream: Reader): GameWorld =
             fillInDetails(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream))
 
@@ -87,7 +91,7 @@ object ReadWorld {
     }
 
     fun readWorldAndSetNewWorld(ingame: TerrarumIngame, worldDataStream: Reader): GameWorld {
-        val world = invoke(worldDataStream)
+        val world = readLayerFormat(worldDataStream)
         ingame.world = world
         return world
     }
@@ -95,7 +99,7 @@ object ReadWorld {
     private val cw = LandUtil.CHUNK_W
     private val ch = LandUtil.CHUNK_H
 
-    fun decodeToLayer(chunk: ByteArray64, targetLayer: BlockLayer, cx: Int, cy: Int) {
+    fun decodeChunkToLayer(chunk: ByteArray64, targetLayer: BlockLayer, cx: Int, cy: Int) {
         val bytes = Common.unzip(chunk)
         if (bytes.size != cw * ch * 2L)
             throw UnsupportedOperationException("Chunk size mismatch: decoded chunk size is ${bytes.size} bytes " +
@@ -105,7 +109,14 @@ object ReadWorld {
             val tilenum = bytes[2L*k].toUint().shl(8) or bytes[2L*k + 1].toUint()
             val offx = k % cw
             val offy = k / cw
-            targetLayer.unsafeSetTile(cx * cw + offx, cy * ch * offy, tilenum)
+
+//            try {
+                targetLayer.unsafeSetTile(cx * cw + offx, cy * ch + offy, tilenum)
+//            }
+//            catch (e: IndexOutOfBoundsException) {
+//                printdbgerr(this, "IndexOutOfBoundsException, cx = $cx, cy = $cy, k = $k, offx = $offx, offy = $offy")
+//                throw e
+//            }
         }
     }
 

@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Second
@@ -37,8 +38,8 @@ class UIProxyNewRandomGame : UICanvas() {
 
 
         val ingame = TerrarumIngame(App.batch)
-//        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1344, HQRNG().nextLong())
-        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, 0x51621D)
+        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong())
+//        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, 0x51621D)
 
         //val worldParam = TerrarumIngame.NewWorldParameters(6000, 1800, 0x51621DL) // small
 //        val worldParam = TerrarumIngame.NewWorldParameters(9000, 2250, 0x51621DL) // normal

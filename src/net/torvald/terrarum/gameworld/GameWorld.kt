@@ -18,7 +18,15 @@ import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
 
-class GameWorld() : Disposable {
+/**
+ * Special version of GameWorld where layer data are not transient
+ */
+class GameWorldTitleScreen : GameWorld() {
+    override lateinit var layerWall: BlockLayer
+    override lateinit var layerTerrain: BlockLayer
+}
+
+open class GameWorld() : Disposable {
 
     var worldName: String = "New World"
     /** Index start at 1 */
@@ -43,8 +51,8 @@ class GameWorld() : Disposable {
         internal set
 
     //layers
-    lateinit var layerWall: BlockLayer
-    lateinit var layerTerrain: BlockLayer
+    @Transient lateinit open var layerWall: BlockLayer
+    @Transient lateinit open var layerTerrain: BlockLayer
 
     //val layerThermal: MapLayerHalfFloat // in Kelvins
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
@@ -184,6 +192,12 @@ class GameWorld() : Disposable {
      */
     //val wireArray: ByteArray
     //    get() = layerWire.data
+
+    fun getLayer(index: Int) = when(index) {
+        0 -> layerTerrain
+        1 -> layerWall
+        else -> throw IllegalArgumentException("Unknown layer index: $index")
+    }
 
     fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
 
