@@ -46,13 +46,12 @@ object WriteSavegame {
             p.dispose()
             
 
-            val creation_t = ingame.world.creationTime
+            val creation_t = ingame.creationTime
             val time_t = App.getTIME_T()
-            val currentPlayTime_t = time_t - ingame.loadedTime_t
 
 
             // Write Meta //
-            val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, currentPlayTime_t))
+            val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, time_t))
             val meta = DiskEntry(-1, 0, creation_t, time_t, metaContent)
             addFile(disk, meta)
             
@@ -98,7 +97,7 @@ object WriteSavegame {
 
             // Write World //
             val worldNum = ingame.world.worldIndex
-            val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame))
+            val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
             val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
             addFile(disk, world)
 
@@ -182,6 +181,9 @@ object LoadSavegame {
         newIngame.gameLoadInfoPayload = worldParam
         newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
         newIngame.savegameArchive = disk
+        newIngame.creationTime = meta.creation_t
+        newIngame.lastPlayTime = meta.lastplay_t
+        newIngame.totalPlayTime = meta.playtime_t
 
         // load all the world blocklayer chunks
         val worldnum = world.worldIndex.toLong()

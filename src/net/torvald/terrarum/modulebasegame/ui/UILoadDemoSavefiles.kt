@@ -45,8 +45,9 @@ class UILoadDemoSavefiles : UICanvas() {
             }
             catch (e: Throwable) {
                 e.printStackTrace()
+                null
             }
-        }.sortedByDescending { (it as VirtualDisk).entries[0]!!.modificationDate }.forEachIndexed { index, disk ->
+        }.filter { it != null }.sortedByDescending { (it as VirtualDisk).entries[0]!!.modificationDate }.forEachIndexed { index, disk ->
             val x = (width - UIItemDemoSaveCells.WIDTH) / 2
             val y = 144 + (24 + UIItemDemoSaveCells.HEIGHT) * index
             addUIitem(UIItemDemoSaveCells(this, x, y, disk as VirtualDisk))
@@ -102,9 +103,21 @@ class UIItemDemoSaveCells(
     private val x = initialX.toFloat()
     private val y = initialY.toFloat()
 
+    private fun parseDuration(seconds: Long): String {
+        val s = seconds % 60
+        val m = (seconds / 60) % 60
+        val h = (seconds / 3600) % 24
+        val d = seconds / 86400
+        return if (d == 0L)
+            "${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
+        else
+            "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
+    }
+
     private val lastPlayedTimestamp = Instant.ofEpochSecond(meta.lastplay_t)
             .atZone(TimeZone.getDefault().toZoneId())
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
+                                      "/${parseDuration(meta.playtime_t)}"
 
     init {
         try {

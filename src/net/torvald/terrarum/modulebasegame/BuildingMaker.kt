@@ -65,7 +65,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val timeNow = System.currentTimeMillis() / 1000
 
-    val gameWorld = GameWorld(1, 1024, 256, timeNow, timeNow, 0)
+    val gameWorld = GameWorld(1, 1024, 256, timeNow, timeNow)
 
     init {
         // ghetto world for building

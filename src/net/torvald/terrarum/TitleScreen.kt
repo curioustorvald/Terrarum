@@ -131,7 +131,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
-            demoWorld = GameWorld(1, LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L, 0)
+            demoWorld = GameWorld(1, LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
             printdbg(this, "Demo world not found, using empty world")
         }
 

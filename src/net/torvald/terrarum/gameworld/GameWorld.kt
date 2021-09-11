@@ -43,12 +43,15 @@ open class GameWorld() : Disposable {
     var width: Int = 999; private set
     var height: Int = 999; private set
 
-    var creationTime: Long = App.getTIME_T()
+    /** Creation time for this world, NOT the entire savegame */
+    internal var creationTime: Long = App.getTIME_T()
         internal set
-    var lastPlayTime: Long = App.getTIME_T()
+    /** Creation time for this world, NOT the entire savegame */
+    internal var lastPlayTime: Long = App.getTIME_T()
         internal set // there's a case of save-and-continue-playing
-    var totalPlayTime: Long = 0
-        internal set
+    /** Creation time for this world, NOT the entire savegame */
+    internal var totalPlayTime = 0L // cumulative value for this very world
+
 
     //layers
     @Transient lateinit open var layerWall: BlockLayer
@@ -116,7 +119,7 @@ open class GameWorld() : Disposable {
     /**
      * Create new world
      */
-    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Long): this() {
+    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long): this() {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
 
         this.worldIndex = worldIndex
@@ -138,7 +141,6 @@ open class GameWorld() : Disposable {
 
         creationTime = creationTIME_T
         lastPlayTime = lastPlayTIME_T
-        this.totalPlayTime = totalPlayTime
 
 
         App.tileMaker.tags.forEach {
@@ -668,7 +670,7 @@ open class GameWorld() : Disposable {
 
         fun makeNullWorld(): GameWorld {
             if (nullWorldInstance == null)
-                nullWorldInstance = GameWorld(1, 1, 1, 0, 0, 0)
+                nullWorldInstance = GameWorld(1, 1, 1, 0, 0)
 
             return nullWorldInstance!!
         }

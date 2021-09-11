@@ -25,10 +25,14 @@ object WriteWorld {
                actor != (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor)
     }
 
-    private fun preWrite(ingame: TerrarumIngame): GameWorld {
+    private fun preWrite(ingame: TerrarumIngame, time_t: Long): GameWorld {
         val world = ingame.world
+        val currentPlayTime_t = time_t - ingame.loadedTime_t
+
         world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
+        world.lastPlayTime = time_t
+        world.totalPlayTime += currentPlayTime_t
 
         val actorIDbuf = ArrayList<ActorID>()
         ingame.actorContainerActive.filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
@@ -40,14 +44,14 @@ object WriteWorld {
         return world
     }
 
-    operator fun invoke(ingame: TerrarumIngame): String {
-        return Common.jsoner.toJson(preWrite(ingame))
+    operator fun invoke(ingame: TerrarumIngame, time_t: Long): String {
+        return Common.jsoner.toJson(preWrite(ingame, time_t))
     }
 
-    fun encodeToByteArray64(ingame: TerrarumIngame): ByteArray64 {
+    fun encodeToByteArray64(ingame: TerrarumIngame, time_t: Long): ByteArray64 {
         val baw = ByteArray64Writer(Common.CHARSET)
 
-        Common.jsoner.toJson(preWrite(ingame), baw)
+        Common.jsoner.toJson(preWrite(ingame, time_t), baw)
         baw.flush(); baw.close()
 
         return baw.toByteArray64()

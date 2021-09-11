@@ -18,8 +18,7 @@ import java.io.IOException
 object ExportMeta : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
-            val currentPlayTime_t = App.getTIME_T() - ingame!!.loadedTime_t
-            val str = WriteMeta(ingame!! as TerrarumIngame, currentPlayTime_t)
+            val str = WriteMeta(ingame!! as TerrarumIngame, App.getTIME_T())
             val writer = java.io.FileWriter(App.defaultDir + "/Exports/savegame.json", false)
             writer.write(str)
             writer.close()
@@ -40,7 +39,7 @@ object ExportWorld : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
-                val str = WriteWorld(ingame!! as TerrarumIngame)
+                val str = WriteWorld(ingame!! as TerrarumIngame, App.getTIME_T())
                 val writer = java.io.FileWriter(App.defaultDir + "/Exports/${args[1]}.json", false)
                 writer.write(str)
                 writer.close()

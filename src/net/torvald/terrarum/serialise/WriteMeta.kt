@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.terrarum.App
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -15,8 +16,9 @@ import net.torvald.terrarum.weather.WeatherMixer
  */
 object WriteMeta {
 
-    operator fun invoke(ingame: TerrarumIngame, currentPlayTime_t: Long): String {
+    operator fun invoke(ingame: TerrarumIngame, time_t: Long): String {
         val world = ingame.world
+        val currentPlayTime_t = time_t - ingame.loadedTime_t
 
         val meta = WorldMeta(
                 genver = Common.GENVER,
@@ -26,9 +28,9 @@ object WriteMeta {
                 weatseed0 = WeatherMixer.RNG.state0,
                 weatseed1 = WeatherMixer.RNG.state1,
                 playerid = ingame.actorGamer.referenceID,
-                creation_t = world.creationTime,
-                lastplay_t = world.lastPlayTime,
-                playtime_t = world.totalPlayTime + currentPlayTime_t,
+                creation_t = ingame.creationTime,
+                lastplay_t = App.getTIME_T(),
+                playtime_t = ingame.totalPlayTime + currentPlayTime_t,
                 loadorder = ModMgr.loadOrder.toTypedArray(),
                 worlds = ingame.gameworldIndices.toTypedArray()
         )
@@ -36,9 +38,9 @@ object WriteMeta {
         return Common.jsoner.toJson(meta)
     }
 
-    fun encodeToByteArray64(ingame: TerrarumIngame, currentPlayTime_t: Long): ByteArray64 {
+    fun encodeToByteArray64(ingame: TerrarumIngame, time_t: Long): ByteArray64 {
         val ba = ByteArray64()
-        this.invoke(ingame, currentPlayTime_t).toByteArray(Common.CHARSET).forEach { ba.add(it) }
+        this.invoke(ingame, time_t).toByteArray(Common.CHARSET).forEach { ba.add(it) }
         return ba
     }
 

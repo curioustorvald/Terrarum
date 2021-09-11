@@ -13,8 +13,8 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
-import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.*
@@ -119,6 +119,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     val modifiedChunks = Array(16) { HashSet<Int>() }
+
+    internal var creationTime = App.getTIME_T() // cumulative value for the savegame
+    internal var lastPlayTime = App.getTIME_T() // cumulative value for the savegame
+    internal var totalPlayTime = 0L // cumulative value for the savegame
 
     var loadedTime_t = App.getTIME_T()
         protected set
