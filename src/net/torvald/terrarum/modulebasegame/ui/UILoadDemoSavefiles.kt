@@ -148,12 +148,12 @@ class UIItemDemoSaveCells(
 
         // draw texts
         batch.color = highlightCol
-
         // draw timestamp
         blendNormal(batch)
         val tlen = App.fontSmallNumbers.getWidth(lastPlayedTimestamp)
         App.fontSmallNumbers.draw(batch, lastPlayedTimestamp, posX + (width - tlen) - 3f, posY + height - 16f)
-
+        // draw savegame name
+//        App.fontGame.draw(batch, disk.getDiskNameString(Common.CHARSET), posX + 3f, posY + 1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE
