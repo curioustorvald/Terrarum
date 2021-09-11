@@ -7,8 +7,110 @@ import java.util.zip.CRC32
 import kotlin.experimental.and
 import kotlin.experimental.or
 
+
+/*
+# Terran Virtual Disk Image Format Specification
+
+current specversion number: 254
+
+## Changes
+
+Version 254 is a customised version of TEVD tailored to be used as a savegame format for Terrarum.
+
+### 254
+- Removed compressed file; instead we're providing compression tool
+- Footer moved upto the header (thus freeing the entry id 0xFEFEFEFE)
+- Entry IDs are extended to 8 bytes
+- Removed file name field
+
+### 0x03
+- Option to compress file entry
+
+### 0x02
+- 48-Bit filesize and timestamp (Max 256 TiB / 8.9 million years)
+- 8 Reserved footer
+
+### 0x01
+**Note: this version were never released in public**
+- Doubly Linked List instead of Singly
+
+
+## Specs
+
+* File structure
+
+
+    Header
+    <entry>
+    <entry>
+    <entry>
+    ...
+
+
+* Order of the indices does not matter. Actual sorting is a job of the application.
+* Endianness: Big
+
+
+##  Header
+    Uint8[4]    Magic: TEVd
+    Int48       Disk size in bytes (max 256 TiB)
+    Uint8[32]   Disk name
+    Int32       CRC-32
+                1. create list of arrays that contains CRC
+                2. put all the CRCs of entries
+                3. sort the list (here's the catch -- you will treat CRCs as SIGNED integer)
+                4. for elems on list: update crc with the elem (crc = calculateCRC(crc, elem))
+    Int8        Version
+    Int8        0xFE
+    Int8        Disk properties flag 1
+                0th bit: readonly
+    Int8[15]    Extra info bytes
+    Unit8[236]  Rest of the long disk name (268 bytes total)
+
+    (Header size: 300 bytes)
+
+
+
+##  IndexNumber and Contents
+    <Entry Header>
+    <Actual Entry>
+
+NOTES:
+- entries are not guaranteed to be sorted, even though the disk cracker will make it sorted.
+- Root entry (ID=0) however, must be the first entry that comes right after the header.
+- Parent node of the root is undefined; do not make an assumption that root node's parent is 0.
+
+###  Entry Header
+    Int64       EntryID (random Long). This act as "jump" position for directory listing.
+                NOTE: Index 0 must be a root "Directory"
+    Int64       EntryID of parent directory
+    UInt8       Flag for file or directory or symlink
+                0b d000 00tt, where:
+                tt - 0x01: Normal file, 0x02: Directory list, 0x03: Symlink
+                d - discard the entry if the bit is set
+    UInt8[3]    <Reserved>
+    Int48       Creation date in real-life UNIX timestamp
+    Int48       Last modification date in real-life UNIX timestamp
+    Int32       CRC-32 of Actual Entry (entrysize and the actual bytes concatenated)
+
+    (Header size: 36 bytes)
+
+###  Entry of File (Uncompressed)
+    Int48       File size in bytes (max 256 TiB)
+    <Bytes>     Actual Contents
+
+    (Header size: 6 bytes)
+
+###  Entry of Directory
+    Uint32      Number of entries (normal files, other directories, symlinks)
+    <Int64s>    Entry listing, contains IndexNumber
+
+    (Header size: 4 bytes)
+
+ */
+
 /**
- * Created by minjaesong on 2017-03-31.
+ * Created by minjaesong on 2021-09-10.
  */
 
 typealias EntryID = Long
@@ -50,14 +152,19 @@ class VirtualDisk(
         val buffer = AppendableByteBuffer(HEADER_SIZE + entriesBuffer.size)
         val crc = hashCode().toBigEndian()
 
+        val diskName0 = diskName.forceSize(NAME_LENGTH)
+        val diskName1 = diskName0.sliceArray(0..31).forceSize(32)
+        val diskName2 = diskName0.sliceArray(32 until NAME_LENGTH).forceSize(NAME_LENGTH - 32)
+
         buffer.put(MAGIC)
 
         buffer.put(capacity.toInt48())
-        buffer.put(diskName.forceSize(NAME_LENGTH))
+        buffer.put(diskName1)
         buffer.put(crc)
         buffer.put(specversion)
         buffer.put(0xFE.toByte())
         buffer.put(extraInfoBytes)
+        buffer.put(diskName2)
 
         buffer.put(entriesBuffer)
 
@@ -94,8 +201,8 @@ class VirtualDisk(
     override fun toString() = "VirtualDisk(name: ${getDiskNameString(Charsets.UTF_8)}, capacity: $capacity bytes, crc: ${hashCode().toHex()})"
 
     companion object {
-        val HEADER_SIZE = 64L // according to the spec
-        val NAME_LENGTH = 32
+        val HEADER_SIZE = 300L // according to the spec
+        val NAME_LENGTH = 268
 
         val MAGIC = "TEVd".toByteArray()
     }

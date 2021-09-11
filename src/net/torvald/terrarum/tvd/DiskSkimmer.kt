@@ -67,7 +67,7 @@ removefile:
 
         println("[DiskSkimmer] loading the diskfile ${diskFile.canonicalPath}")
 
-        var currentPosition = fis.skip(64) // skip disk header
+        var currentPosition = fis.skip(VirtualDisk.HEADER_SIZE) // skip disk header
 
 
         fun skipRead(bytes: Long) {
