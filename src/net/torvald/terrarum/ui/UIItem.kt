@@ -57,6 +57,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     abstract val width: Int
     abstract val height: Int
 
+    private val mouseButton = App.getConfigInt("config_mouseprimary")
+
     /** This variable is NOT updated on its own.
      * ```
      * val posXDelta = posX - oldPosX
@@ -88,8 +90,19 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))
+        get() = mouseUp && Gdx.input.isButtonPressed(mouseButton)
+    /** If mouse is just pushed */
+    open val mouseJustPushed: Boolean
+        get() {
+            if (mouseUp && !mouseLatched && Gdx.input.isButtonJustPressed(mouseButton)) {
+                mouseLatched = true
+                return true
+            }
+            return false
+        }
 
+
+    private var mouseLatched = false
 
     /** UI to call (show up) while mouse is up */
     open val mouseOverCall: UICanvas? = null
@@ -139,6 +152,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                 if (mouseOverCall?.isVisible ?: false) {
                     mouseOverCall?.setAsClose()
                 }
+
+                mouseLatched = false
             }
         }
     }

@@ -3,9 +3,11 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.*
+import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-03-13.
@@ -186,7 +188,7 @@ class UIItemTextButtonList(
             btn.update(delta)
 
 
-            if (btn.mousePushed && index != selectedIndex) {
+            if (btn.mouseJustPushed && index != selectedIndex) {
                 val oldIndex = selectedIndex
 
                 if (kinematic) {
