@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.strikerx3.jxinput.XInputDevice;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
@@ -535,7 +534,7 @@ public class App implements ApplicationListener {
             screenshotRequested = false;
 
             try {
-                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, scr.getWidth(), scr.getHeight());
+                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, scr.getWidth(), scr.getHeight());
                 PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".tga"), p, true);
                 p.dispose();
 

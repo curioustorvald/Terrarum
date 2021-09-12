@@ -188,26 +188,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
-        /*batch.end()
-        gdxSetBlendNormal()
-
-
-        val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
-        val gradBottomEnd = App.scr.height - gradTopStart
-
-        shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
-
-            shapeRenderer.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-        }
-
-
-
-        batch.begin()*/
+        UIInventoryFull.drawBackground(batch, shapeRenderer)
 
         // UI items
         batch.color = Color.WHITE

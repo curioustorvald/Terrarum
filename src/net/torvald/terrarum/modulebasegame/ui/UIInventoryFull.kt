@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.ENDASH
+import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockstats.MinimapComposer
@@ -58,6 +59,29 @@ class UIInventoryFull(
         val gradHeight = 48f
 
         val controlHelpHeight = App.fontGame.lineHeight
+
+        fun drawBackground(batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
+            batch.end()
+            gdxSetBlendNormal()
+
+
+            val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
+            val gradBottomEnd = App.scr.height - gradTopStart
+
+            shapeRenderer.inUse {
+                // shaperender starts at bottom-left!
+
+                shapeRenderer.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+                shapeRenderer.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+
+                shapeRenderer.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+
+                shapeRenderer.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+                shapeRenderer.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            }
+
+            batch.begin()
+        }
     }
 
     //val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
@@ -85,13 +109,13 @@ class UIInventoryFull(
         CommonResourcePool.loadAll()
     }
 
-    private val SP = "${0x3000.toChar()} "
+    private val SP = "\u3000 "
     val listControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getKeycapPC(App.getConfigInt("config_keyinventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}$ENDASH${0x2009.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
+            "${getKeycapPC(App.getConfigInt("config_keydiscard"))} ${Lang["GAME_INVENTORY_DROP"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["CONTEXT_ITEM_MAP"]}$SP" +
@@ -182,26 +206,7 @@ class UIInventoryFull(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        // background fill
-        batch.end()
-        gdxSetBlendNormal()
-
-
-        val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
-        val gradBottomEnd = App.scr.height - gradTopStart
-
-        shapeRenderer.inUse {
-            shapeRenderer.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-            shapeRenderer.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-
-            shapeRenderer.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
-
-            shapeRenderer.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-            shapeRenderer.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-        }
-
-
-        batch.begin()
+        drawBackground(batch, shapeRenderer)
 
         // UI items
         catBar.render(batch, camera)

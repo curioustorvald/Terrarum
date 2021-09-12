@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
+import net.torvald.getKeycapPC
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumScreenSize
-import net.torvald.terrarum.keyToIcon
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
 
@@ -20,7 +20,7 @@ class UIScreenZoom : UICanvas(
         App.getConfigInt("config_keyzoom")
 ) {
 
-    val zoomText = "${keyToIcon(handler.toggleKeyLiteral!!)} $EMDASH Zoom Out"
+    val zoomText = "${getKeycapPC(handler.toggleKeyLiteral!!)} $EMDASH Zoom Out"
 
     override var width = App.fontGame.getWidth(zoomText)
     override var height = App.fontGame.lineHeight.toInt()

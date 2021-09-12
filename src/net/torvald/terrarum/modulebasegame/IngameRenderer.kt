@@ -85,6 +85,7 @@ object IngameRenderer : Disposable {
 
     private var newWorldLoadedLatch = false
 
+
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {

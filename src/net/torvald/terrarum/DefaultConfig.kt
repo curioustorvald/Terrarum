@@ -62,6 +62,7 @@ object DefaultConfig {
             "config_keymovementaux" to Input.Keys.A, // movement-auxiliary, or hookshot
             "config_keyinventory" to Input.Keys.Q,
             "config_keyinteract" to Input.Keys.R,
+            "config_keydiscard" to Input.Keys.T,
             "config_keyclose" to Input.Keys.C, // this or hard-coded ESC
             "config_keyzoom" to Input.Keys.Z,
 
