@@ -55,13 +55,15 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
 
     override var openCloseTime: Second = 0f
 
-    private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur2.frag")
+    private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
 
     private val darken = Color(0.5f, 0.5f, 0.5f, 1f)
 
     override fun updateUI(delta: Float) {}
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius, 0, 0, width, height)
+        if (App.getConfigBoolean("fxblurredbackground")) {
+            Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius, 0, 0, width, height)
+        }
 
         if (!nodarken) {
             blendMul(batch)

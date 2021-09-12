@@ -83,7 +83,7 @@ object DefaultConfig {
 
             "pcgamepadenv" to "console",
 
-            //jsonObject.writeValue("safetywarning" to true,
+            //"safetywarning" to true,
 
 
             "maxparticles" to 768,
@@ -94,6 +94,7 @@ object DefaultConfig {
             // "fancy" graphics settings
             "fxdither" to true,
             "fxretro" to false,
+            "fxblurredbackground" to true,
             //"fx3dlut" to false,
 
 
