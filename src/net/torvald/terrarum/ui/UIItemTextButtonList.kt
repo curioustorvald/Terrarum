@@ -242,10 +242,16 @@ class UIItemTextButtonList(
 
     fun select(index: Int) {
         selectedIndex = index
+        buttons.forEachIndexed { index, btn ->
+            btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
+        }
     }
 
     fun deselect() {
         selectedIndex = null
+        buttons.forEachIndexed { index, btn ->
+            btn.highlighted = false
+        }
     }
 
     override fun dispose() {

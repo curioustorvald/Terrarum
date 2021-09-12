@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.langpack.Lang
 
 /**
@@ -69,12 +68,18 @@ open class UIItemTextButton(
 
     var highlighted: Boolean = false
 
+    override fun update(delta: Float) {
+        super.update(delta)
+
+
+    }
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         val textW = font.getWidth(label)
 
 
         // draw background
-        if (highlighted) {
+        /*if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode, batch)
             batch.color = highlightBackCol
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -88,7 +93,7 @@ open class UIItemTextButton(
             batch.color = backgroundCol
             BlendMode.resolve(backgroundBlendMode, batch)
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
-        }
+        }*/
 
 
         blendNormal(batch)
@@ -99,7 +104,8 @@ open class UIItemTextButton(
         else inactiveCol
 
         font.draw(batch,
-                label, //"$label/H:${highlighted.toInt()}, M:${mouseUp.toInt()}",
+                label,
+//                "$label/H:${highlighted.toInt()}, M:${mouseUp.toInt()}",
                 when (alignment) {
                     Alignment.CENTRE -> posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2)
                     Alignment.LEFT -> posX.toFloat() + preGapX

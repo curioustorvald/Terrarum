@@ -76,20 +76,31 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
         gameMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
-                4 -> screen = 2
-                5 -> screen = 1
+                4 -> {
+                    screen = 2; gameMenuButtons.deselect()
+                }
+                5 -> {
+                    screen = 1; gameMenuButtons.deselect()
+                }
             }
         }
         areYouSureMainMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
-                1 -> App.setScreen(TitleScreen(App.batch))
-                2 -> screen = 0
+                1 -> {
+                    areYouSureMainMenuButtons.deselect()
+                    App.setScreen(TitleScreen(App.batch))
+                }
+                2 -> {
+                    screen = 0; areYouSureMainMenuButtons.deselect()
+                }
             }
         }
         areYouSureQuitButtons.selectionChangeListener = { _, new ->
             when (new) {
                 1 -> Gdx.app.exit()
-                2 -> screen = 0
+                2 -> {
+                    screen = 0; areYouSureQuitButtons.deselect()
+                }
             }
         }
     }
