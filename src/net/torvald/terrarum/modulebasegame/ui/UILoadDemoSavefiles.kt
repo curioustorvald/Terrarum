@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
@@ -39,11 +38,7 @@ class UILoadDemoSavefiles : UICanvas() {
     override var openCloseTime: Second = 0f
 
 
-    private val shaderAlfamul = ShaderProgram(vert, frag)
-
     private val shapeRenderer = ShapeRenderer()
-    private val transparent = Color(1f,1f,1f,0f)
-    private val white = Color(1f, 1f, 1f, 1f)
 
 
     private val uiWidth = UIItemDemoSaveCells.WIDTH // 480
@@ -72,7 +67,7 @@ class UILoadDemoSavefiles : UICanvas() {
 
     // read savegames
     init {
-        File(App.defaultSaveDir).listFiles().map { file ->
+        File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
             try {
                 VDUtil.readDiskArchive(file, charset = Common.CHARSET)
             }
@@ -98,7 +93,6 @@ class UILoadDemoSavefiles : UICanvas() {
     private val scrollAnimLen = 0.1f
 
     private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
-    private var sliderFBO2 = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
 
     override fun updateUI(delta: Float) {
 
@@ -213,6 +207,21 @@ class UILoadDemoSavefiles : UICanvas() {
         return true
     }
 
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        if (this.isVisible) {
+            if (amountY <= -1f && scrollTarget > 0) {
+                scrollFrom = listScroll
+                scrollTarget -= 1
+                scrollAnimCounter = 0f
+            }
+            else if (amountY >= 1f && scrollTarget < uiItems.size - savesVisible) {
+                scrollFrom = listScroll
+                scrollTarget += 1
+                scrollAnimCounter = 0f
+            }
+        }
+        return true
+    }
 
     override fun doOpening(delta: Float) {
     }
@@ -232,8 +241,6 @@ class UILoadDemoSavefiles : UICanvas() {
     override fun dispose() {
         shapeRenderer.dispose()
         sliderFBO.dispose()
-        sliderFBO2.dispose()
-        shaderAlfamul.dispose()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -247,9 +254,6 @@ class UILoadDemoSavefiles : UICanvas() {
 
         sliderFBO.dispose()
         sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
-
-        sliderFBO2.dispose()
-        sliderFBO2 = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
     }
 
     private fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
@@ -258,46 +262,6 @@ class UILoadDemoSavefiles : UICanvas() {
         batch.projectionMatrix = camera.combined
     }
 
-    companion object {
-        private val vert = """
-attribute vec4 a_position;
-attribute vec4 a_color;
-attribute vec2 a_texCoord0;
-
-uniform mat4 u_projTrans; // camera.combined
-
-varying vec4 v_color;
-varying vec2 v_texCoords;
-
-void main() {
-    v_color = a_color;
-    v_texCoords = a_texCoord0;
-    gl_Position = u_projTrans * a_position;
-}
-        """.trimIndent()
-
-        private val frag = """
-#version 120
-#ifdef GL_ES
-    precision mediump float;
-#endif
-
-
-varying vec4 v_color;
-varying vec2 v_texCoords;
-uniform sampler2D u_texture;
-
-uniform sampler2D tex1;
-
-void main(void) {
-    vec4 colorTex0 = texture2D(u_texture, v_texCoords); // dest
-    vec4 colorTex1 = texture2D(tex1, v_texCoords); // src mask; must be (1,1,1,a)
-
-//    gl_FragColor = colorTex0 * colorTex1;
-    gl_FragColor = colorTex1.aaar;
-}
-        """.trimIndent()
-    }
 }
 
 class UIItemDemoSaveCells(
