@@ -46,7 +46,7 @@ class UILoadDemoSavefiles : UICanvas() {
 
     private val textH = App.fontGame.lineHeight.toInt()
 
-    private val cellGap = 24
+    private val cellGap = 20
     private val cellInterval = cellGap + UIItemDemoSaveCells.HEIGHT
     private val gradAreaHeight = 32
 
