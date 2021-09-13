@@ -153,68 +153,78 @@ object WriteSavegame {
  */
 object LoadSavegame {
 
-    private fun getFileBytes(disk: VirtualDisk, id: Long): ByteArray64 = VDUtil.getAsNormalFile(disk, id).getContent()
-    private fun getFileReader(disk: VirtualDisk, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
+    fun getFileBytes(disk: VirtualDisk, id: Long): ByteArray64 = VDUtil.getAsNormalFile(disk, id).getContent()
+    fun getFileReader(disk: VirtualDisk, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
     operator fun invoke(disk: VirtualDisk) {
         val newIngame = TerrarumIngame(App.batch)
 
-        // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
-        // you'll inevitably read the player actor twice, and they're separate instances of the player!
-        val meta = ReadMeta(disk)
-        val currentWorld = (ReadActor(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
-        val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
-        val actors = world.actors.distinct().map { ReadActor(getFileReader(disk, it.toLong())) }
-//        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
-        val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
-//        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))
-//        val material = Common.jsoner.fromJson(MaterialCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -19)))
-//        val faction = Common.jsoner.fromJson(FactionCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -20)))
-        val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
 
-        // set lateinit vars on the gameworld
-        world.layerTerrain = BlockLayer(world.width, world.height)
-        world.layerWall = BlockLayer(world.width, world.height)
 
-        val worldParam = TerrarumIngame.Codices(meta, item, apocryphas)
-        newIngame.world = world
-        newIngame.gameLoadInfoPayload = worldParam
-        newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
-        newIngame.savegameArchive = disk
-        newIngame.creationTime = meta.creation_t
-        newIngame.lastPlayTime = meta.lastplay_t
-        newIngame.totalPlayTime = meta.playtime_t
 
-        // load all the world blocklayer chunks
-        val worldnum = world.worldIndex.toLong()
-        val cw = LandUtil.CHUNK_W; val ch = LandUtil.CHUNK_H
-        val chunksX = world.width / cw
-        for (layer in 0L..1L) {
-            val worldLayer = world.getLayer(layer.toInt())
+        val loadJob = { loadscreen: LoadScreenBase ->
+            val meta = ReadMeta(disk)
+            // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
+            // you'll inevitably read the player actor twice, and they're separate instances of the player!
+            val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
+            val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
+            val actors = world.actors.distinct()//.map { ReadActor(getFileReader(disk, it.toLong())) }
+    //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
+            val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
+    //        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))
+    //        val material = Common.jsoner.fromJson(MaterialCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -19)))
+    //        val faction = Common.jsoner.fromJson(FactionCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -20)))
+            val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
 
-            for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
-                val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.shl(24) or chunk)
-                val cx = chunk % chunksX
-                val cy = chunk / chunksX
-                ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer, cx.toInt(), cy.toInt())
+
+            // set lateinit vars on the gameworld
+            world.layerTerrain = BlockLayer(world.width, world.height)
+            world.layerWall = BlockLayer(world.width, world.height)
+
+            val worldParam = TerrarumIngame.Codices(disk, meta, item, apocryphas, actors)
+            newIngame.world = world
+            newIngame.gameLoadInfoPayload = worldParam
+            newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
+            newIngame.savegameArchive = disk
+            newIngame.creationTime = meta.creation_t
+            newIngame.lastPlayTime = meta.lastplay_t
+            newIngame.totalPlayTime = meta.playtime_t
+
+            // load all the world blocklayer chunks
+            val worldnum = world.worldIndex.toLong()
+            val cw = LandUtil.CHUNK_W;
+            val ch = LandUtil.CHUNK_H
+            val chunksX = world.width / cw
+            for (layer in 0L..1L) {
+                val worldLayer = world.getLayer(layer.toInt())
+
+                for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
+                    val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.shl(24) or chunk)
+                    val cx = chunk % chunksX
+                    val cy = chunk / chunksX
+                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer, cx.toInt(), cy.toInt())
+                }
             }
-        }
 
-        actors.forEach { newIngame.addNewActor(it) }
-
-        // by doing this, whatever the "possession" the player had will be broken by the game load
-        newIngame.actorNowPlaying = newIngame.getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
+//            actors.forEach { newIngame.addNewActor(it) }
 
 
+
+
+//            newIngame.gameInitialised = true
 //        ModMgr.reloadModules()
 
+
+            Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")
+            printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")
+        }
+
+        SanicLoadScreen.preLoadJob = loadJob
+        SanicLoadScreen.screenToLoad = newIngame
         Terrarum.setCurrentIngameInstance(newIngame)
-        App.setScreen(newIngame)
+        App.setLoadScreen(SanicLoadScreen)
 
-        Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")
-        printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")
 
-//        Terrarum.ingame!!.consoleHandler.setAsOpen()
     }
 
 }

@@ -16,10 +16,7 @@ import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.WireActor
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.GameItem
@@ -36,8 +33,11 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.LoadSavegame
+import net.torvald.terrarum.serialise.ReadActor
 import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -242,13 +242,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     data class Codices(
+            val disk: VirtualDisk,
             val meta: WriteMeta.WorldMeta,
 //            val block: BlockCodex,
             val item: ItemCodex,
 //            val wire: WireCodex,
 //            val material: MaterialCodex,
 //            val faction: FactionCodex,
-            val apocryphas: Map<String, Any>
+            val apocryphas: Map<String, Any>,
+            val actors: List<ActorID>
     )
 
     private fun setTheRealGamerFirstTime(actor: IngamePlayer) {
@@ -275,7 +277,20 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             Terrarum.itemCodex.loadFromSave(codices.item)
             Terrarum.apocryphas = HashMap(codices.apocryphas)
+
+
         }
+    }
+
+    /** Load rest of the game with GL context */
+    private fun postInitForLoadFromSave(codices: Codices) {
+        codices.actors.forEach {
+            val actor = ReadActor(LoadSavegame.getFileReader(codices.disk, it.toLong()))
+            addNewActor(actor)
+        }
+
+        // by doing this, whatever the "possession" the player had will be broken by the game load
+        actorNowPlaying = getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
     }
 
     /**
@@ -517,6 +532,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                         world.spawnX * TILE_SIZED,
                         world.spawnY * TILE_SIZED
                 )
+            }
+            else if (gameLoadMode == GameLoadMode.LOAD_FROM) {
+                postInitForLoadFromSave(gameLoadInfoPayload as Codices)
             }
 
             postInit()

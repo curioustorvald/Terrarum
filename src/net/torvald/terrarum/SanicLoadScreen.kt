@@ -62,7 +62,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
     val textX: Float; get() = (App.scr.width * 0.72f).floor()
 
-    private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
+    private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it
 
     private var messageBackgroundColour = Color(0x404040ff)
     private var messageForegroundColour = Color.WHITE

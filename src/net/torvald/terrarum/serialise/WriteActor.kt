@@ -57,6 +57,8 @@ object ReadActor {
     operator fun invoke(worldDataStream: Reader): Actor =
             fillInDetails(Common.jsoner.fromJson(null, worldDataStream))
 
+    fun readActorBare(worldDataStream: Reader): Actor =
+            Common.jsoner.fromJson(null, worldDataStream)
 
     private fun fillInDetails(actor: Actor): Actor {
         actor.actorValue.actor = actor
