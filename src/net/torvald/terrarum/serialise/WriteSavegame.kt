@@ -6,6 +6,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.BlockLayer
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -164,10 +165,19 @@ object LoadSavegame {
 
         val loadJob = { loadscreen: LoadScreenBase ->
             val meta = ReadMeta(disk)
+
+            loadscreen.addMessage("${Lang["MENU_LABEL_WELCOME"]} !")
+
+
             // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
             // you'll inevitably read the player actor twice, and they're separate instances of the player!
             val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
             val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
+
+            loadscreen.addMessage("${Lang["MENU_LABEL_WORLD"]} : $currentWorld")
+            loadscreen.addMessage("${Lang["MENU_OPTIONS_SIZE"]} : ${world.width}x${world.height}")
+
+
             val actors = world.actors.distinct()//.map { ReadActor(getFileReader(disk, it.toLong())) }
     //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
             val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
@@ -195,23 +205,22 @@ object LoadSavegame {
             val cw = LandUtil.CHUNK_W;
             val ch = LandUtil.CHUNK_H
             val chunksX = world.width / cw
+            val chunkCount = world.width * world.height / (cw * ch)
             for (layer in 0L..1L) {
                 val worldLayer = world.getLayer(layer.toInt())
-
                 for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
+
+                    loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${layer * chunkCount + chunk + 1}/${2 * chunkCount}")
+
                     val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.shl(24) or chunk)
                     val cx = chunk % chunksX
                     val cy = chunk / chunksX
+
                     ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer, cx.toInt(), cy.toInt())
                 }
             }
 
-//            actors.forEach { newIngame.addNewActor(it) }
 
-
-
-
-//            newIngame.gameInitialised = true
 //        ModMgr.reloadModules()
 
 
