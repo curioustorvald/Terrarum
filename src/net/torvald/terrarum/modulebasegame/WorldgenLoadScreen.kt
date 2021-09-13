@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.roundToInt
 
 /**
@@ -67,9 +68,11 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
         App.batch.inUse {
             it.color = Color.WHITE
+            val previewX = (App.scr.width - previewWidth).div(2f).round()
             val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).round()
+            Toolkit.drawBoxBorder(it, previewX.toInt()-1, previewY.toInt()-1, previewWidth+2, previewHeight+2)
             it.draw(previewTexture,
-                    (App.scr.width - previewWidth).div(2f).round(),
+                    previewX,
                     previewY
             )
             val text = messages.getHeadElem() ?: ""

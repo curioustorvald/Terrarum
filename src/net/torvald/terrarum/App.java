@@ -30,6 +30,7 @@ import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
+import net.torvald.terrarum.tvda.VirtualDisk;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
@@ -41,8 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
-import static net.torvald.terrarum.TerrarumKt.printStackTrace;
+import static net.torvald.terrarum.TerrarumKt.*;
 
 /**
  * The framework's Application Loader
@@ -192,6 +192,16 @@ public class App implements ApplicationListener {
 
 
     /**
+     * Sorted by the lastplaytime, in reverse order (index 0 is the most recent game played)
+     */
+    public static ArrayList<VirtualDisk> savegames = new ArrayList<>();
+
+    public static void updateListOfSavegames() {
+        AppUpdateListOfSavegames();
+    }
+
+
+    /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
      */
     public static int GLOBAL_RENDER_TIMER = new Random().nextInt(1020) + 1;
@@ -285,6 +295,7 @@ public class App implements ApplicationListener {
         getDefaultDirectory();
         createDirs();
         readConfigJson();
+        updateListOfSavegames();
 
         setGamepadButtonLabels();
 
@@ -461,7 +472,7 @@ public class App implements ApplicationListener {
 
 
         fontGame = new GameFontBase(FONT_DIR, false, true,
-                false, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 64, false
+                false, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 90, false
         );
         Lang.invoke();
 

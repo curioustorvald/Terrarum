@@ -3,7 +3,11 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemList
 import net.torvald.terrarum.ui.UIItemModuleInfoCell
@@ -18,7 +22,7 @@ class UITitleModules : UICanvas() {
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8
 
-    override var width = App.scr.width - UIRemoCon.remoConWidth - moduleAreaHMargin
+    override var width = 600//App.scr.width - UIRemoCon.remoConWidth - moduleAreaHMargin
     override var height = App.scr.height - moduleAreaHMargin * 2
 
 
@@ -35,10 +39,10 @@ class UITitleModules : UICanvas() {
         }
     }
 
-    private val mouduleArea = UIItemList<UIItemModuleInfoCell>(
+    private val moduleArea = UIItemList<UIItemModuleInfoCell>(
             this,
             moduleInfoCells,
-            UIRemoCon.remoConWidth, moduleAreaHMargin,
+            (App.scr.width - this.width) / 2, moduleAreaHMargin,
             width,
             height,
             inactiveCol = Color.WHITE,
@@ -47,17 +51,18 @@ class UITitleModules : UICanvas() {
 
 
     init {
-        uiItems.add(mouduleArea)
+        uiItems.add(moduleArea)
     }
 
     override fun updateUI(delta: Float) {
-        mouduleArea.update(delta)
+        moduleArea.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
         blendNormal(batch)
-        mouduleArea.render(batch, camera)
+        Toolkit.drawBoxBorder(batch, moduleArea.posX, moduleArea.posY, width, height)
+        moduleArea.render(batch, camera)
     }
 
     override fun doOpening(delta: Float) {

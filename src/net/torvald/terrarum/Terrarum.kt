@@ -23,6 +23,9 @@ import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -673,4 +676,18 @@ class Codex : KVHashMap() {
         return value as Cvec
     }
 
+}
+
+fun AppUpdateListOfSavegames() {
+    File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
+        try {
+            VDUtil.readDiskArchive(file, charset = Common.CHARSET)
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+            null
+        }
+    }.filter { it != null }.sortedByDescending { (it as VirtualDisk).entries[0]!!.modificationDate }.forEach {
+        App.savegames.add(it!!)
+    }
 }

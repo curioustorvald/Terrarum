@@ -43,7 +43,6 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     var camera = OrthographicCamera(App.scr.wf, App.scr.hf)
 
-
     // invert Y
     fun initViewPort(width: Int, height: Int) {
         // Set Y to point downwards
@@ -220,6 +219,9 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, App.scr.width, App.scr.height, false)
 
         loadThingsWhileIntroIsVisible()
+
+        // load list of savegames
+        App.updateListOfSavegames()
 
         printdbg(this, "show() exit")
     }

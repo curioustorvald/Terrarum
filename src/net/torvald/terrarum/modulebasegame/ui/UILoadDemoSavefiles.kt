@@ -10,14 +10,12 @@ import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta
 import net.torvald.terrarum.tvda.ByteArray64InputStream
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.*
-import java.io.File
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -67,15 +65,7 @@ class UILoadDemoSavefiles : UICanvas() {
 
     // read savegames
     init {
-        File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
-            try {
-                VDUtil.readDiskArchive(file, charset = Common.CHARSET)
-            }
-            catch (e: Throwable) {
-                e.printStackTrace()
-                null
-            }
-        }.filter { it != null }.sortedByDescending { (it as VirtualDisk).entries[0]!!.modificationDate }.forEachIndexed { index, disk ->
+        App.savegames.forEachIndexed { index, disk ->
             val x = uiX
             val y = titleTopGradEnd + cellInterval * index
             addUIitem(UIItemDemoSaveCells(this, x, y, disk as VirtualDisk))
@@ -180,7 +170,9 @@ class UILoadDemoSavefiles : UICanvas() {
 
             // draw texts
             val loadGameTitleStr = Lang["MENU_IO_LOAD_GAME"]
+            // "Game Load"
             App.fontGame.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
+            // Control help
             App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
         }
 
@@ -264,6 +256,12 @@ class UILoadDemoSavefiles : UICanvas() {
 
 }
 
+
+
+
+
+
+
 class UIItemDemoSaveCells(
         parent: UILoadDemoSavefiles,
         initialX: Int,
@@ -344,12 +342,15 @@ class UIItemDemoSaveCells(
 
         // draw texts
         batch.color = highlightCol
-        // draw timestamp
+
+        // timestamp
         blendNormal(batch)
         val tlen = App.fontSmallNumbers.getWidth(lastPlayedTimestamp)
         App.fontSmallNumbers.draw(batch, lastPlayedTimestamp, x + (width - tlen) - 3f, y + height - 16f)
-        // draw savegame name
-//        App.fontGame.draw(batch, disk.getDiskNameString(Common.CHARSET), posX + 3f, posY + 1f)
+        // file size
+        App.fontSmallNumbers.draw(batch, "${disk.usedBytes.ushr(10)} KiB", x + 3f, y + height - 16f)
+        // savegame name
+//        App.fontGame.draw(batch, disk.getDiskNameString(Common.CHARSET), x + 3f, y + 1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE
