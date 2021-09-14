@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.WriteSavegame
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2021-09-14.
@@ -33,7 +35,7 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
         App.fontGame.draw(batch, t, (posX + (width - tlen) / 2).toFloat(), posY.toFloat())
 
         // -1..63
-        val index = (App.GLOBAL_RENDER_TIMER % 256) / 4 //((WriteSavegame.saveProgress / WriteSavegame.saveProgressMax) * circles).roundToInt() - 1
+        val index = ((WriteSavegame.saveProgress / WriteSavegame.saveProgressMax) * circles).roundToInt() - 1
         if (index >= 0) {
             val sx = index % circleSheet.horizontalCount
             val sy = index / circleSheet.horizontalCount

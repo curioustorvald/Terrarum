@@ -5,13 +5,17 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
+import net.torvald.terrarum.serialise.WriteSavegame
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
+import java.io.File
 
 class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
@@ -79,6 +83,8 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             when (new) {
                 0 -> {
                     screen = 3; gameMenuButtons.deselect()
+                    // save the game
+                    WriteSavegame(Terrarum.ingame!!.savegameArchive, File(App.defaultSaveDir, "${App.getTIME_T()}"), Terrarum.ingame!! as TerrarumIngame)
                 }
                 4 -> {
                     screen = 2; gameMenuButtons.deselect()
