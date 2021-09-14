@@ -189,7 +189,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiFakeBlurOverlay)
 
 
-        uiMenu = UIRemoCon(this, UITitleRemoConYaml())//UITitleRemoConRoot()
+        uiMenu = UIRemoCon(this, UITitleRemoConYaml(App.savegames.isNotEmpty()))
         uiMenu.setPosition(0, 0)
         uiMenu.setAsOpen()
 
