@@ -68,6 +68,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )
+    private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
 
     private var screen = 0
 
@@ -76,6 +77,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
         gameMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
+                0 -> {
+                    screen = 3; gameMenuButtons.deselect()
+                }
                 4 -> {
                     screen = 2; gameMenuButtons.deselect()
                 }
@@ -114,6 +118,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             },
             { delta: Float ->
                 areYouSureMainMenuButtons.update(delta)
+            },
+            { delta: Float ->
+                savingUI.update(delta)
+                // TODO make UI not closable until saving is done
             }
     )
     private val screenRenders = arrayOf(
@@ -135,6 +143,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
 
                 areYouSureMainMenuButtons.render(batch, camera)
+            },
+            { batch: SpriteBatch, camera: Camera ->
+                savingUI.render(batch, camera)
             }
     )
 
