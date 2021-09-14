@@ -27,6 +27,10 @@ import java.util.zip.GZIPOutputStream
  */
 object WriteSavegame {
 
+    @Volatile var savingStatus = -1 // -1: not started, 0: saving in progress, 255: saving finished
+    @Volatile var saveProgress = 0f
+    @Volatile var saveProgressMax = 1f
+
     /**
      * Will happily overwrite existing entry
      */
@@ -38,109 +42,31 @@ object WriteSavegame {
     }
 
     operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame) {
-        val tgaout = ByteArray64GrowableOutputStream()
-        val gzout = GZIPOutputStream(tgaout)
+        savingStatus = 0
+
+        Echo("Save queued")
+
         IngameRenderer.fboRGBexportCallback = {
+            Echo("Generating thumbnail...")
+
             val w = 960
             val h = 640
             val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
-            PixmapIO2._writeTGA(gzout, p, true, true)
-            p.dispose()
-            
+            IngameRenderer.fboRGBexport = p
+            //PixmapIO2._writeTGA(gzout, p, true, true)
+            //p.dispose()
+            IngameRenderer.fboRGBexportedLatch = true
 
-            val creation_t = ingame.creationTime
-            val time_t = App.getTIME_T()
-
-
-            // Write Meta //
-            val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, time_t))
-            val meta = DiskEntry(-1, 0, creation_t, time_t, metaContent)
-            addFile(disk, meta)
-            
-            
-            val thumbContent = EntryFile(tgaout.toByteArray64())
-            val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
-            addFile(disk, thumb)
-            
-
-            // Write BlockCodex//
-//        val blockCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex).toByteArray(Common.CHARSET))))
-//        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(Common.CHARSET), creation_t, time_t, blockCodexContent)
-//        addFile(disk, blocks)
-            // Commented out; nothing to write
-
-            // Write ItemCodex//
-            val itemCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
-            val items = DiskEntry(-17, 0, creation_t, time_t, itemCodexContent)
-            addFile(disk, items)
-            // Gotta save dynamicIDs
-
-            // Write WireCodex//
-//        val wireCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex).toByteArray(Common.CHARSET))))
-//        val wires = DiskEntry(-18, 0, "wires".toByteArray(Common.CHARSET), creation_t, time_t, wireCodexContent)
-//        addFile(disk, wires)
-            // Commented out; nothing to write
-
-            // Write MaterialCodex//
-//        val materialCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex).toByteArray(Common.CHARSET))))
-//        val materials = DiskEntry(-19, 0, "materials".toByteArray(Common.CHARSET), creation_t, time_t, materialCodexContent)
-//        addFile(disk, materials)
-            // Commented out; nothing to write
-
-            // Write FactionCodex//
-//        val factionCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(FactionCodex).toByteArray(Common.CHARSET))))
-//        val factions = DiskEntry(-20, 0, "factions".toByteArray(Common.CHARSET), creation_t, time_t, factionCodexContent)
-//        addFile(disk, factions)
-
-            // Write Apocryphas//
-            val apocryphasContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
-            val apocryphas = DiskEntry(-1024, 0, creation_t, time_t, apocryphasContent)
-            addFile(disk, apocryphas)
-
-            // Write World //
-            val worldNum = ingame.world.worldIndex
-            val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
-            val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
-            addFile(disk, world)
-
-            val layers = intArrayOf(0,1).map { ingame.world.getLayer(it) }
-            val cw = ingame.world.width / LandUtil.CHUNK_W
-            val ch = ingame.world.height / LandUtil.CHUNK_H
-            for (layer in layers.indices) {
-                for (cx in 0 until cw) {
-                    for (cy in 0 until ch) {
-                        val chunkNumber = (cx * ch + cy).toLong()
-                        val chunkBytes = WriteWorld.encodeChunk(layers[layer], cx, cy)
-                        val entryID = worldNum.toLong().shl(32) or layer.toLong().shl(24) or chunkNumber
-
-                        val entryContent = EntryFile(chunkBytes)
-                        val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)
-                        // "W1L0-92,15"
-                        addFile(disk, entry)
-                    }
-                }
-            }
-
-
-            // Write Actors //
-            listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
-                actors.forEach {
-                    if (actorAcceptable(it)) {
-                        val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                        val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
-                        addFile(disk, actor)
-                    }
-                }
-            }
-
-            disk.capacity = 0
-            VDUtil.dumpToRealMachine(disk, outFile)
-
-
-
-            Echo ("${ccW}Game saved with size of $ccG${outFile.length()}$ccW bytes")
+            Echo("Done thumbnail generation")
         }
         IngameRenderer.fboRGBexportRequested = true
+
+        val savingThread = Thread(GameSavingThread(disk, outFile, ingame), "TerrarumBasegameGameSaveThread")
+        savingThread.start()
+
+
+        // it is caller's job to keep the game paused or keep a "save in progress" ui up
+        // use field 'savingStatus' to know when the saving is done
     }
 }
 
@@ -173,6 +99,9 @@ object LoadSavegame {
 
         val loadJob = { it: LoadScreenBase ->
             val loadscreen = it as ChunkLoadingLoadScreen
+
+            loadscreen.addMessage(Lang["MENU_IO_LOADING"])
+
             val actors = world.actors.distinct()//.map { ReadActor(getFileReader(disk, it.toLong())) }
     //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
             val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
@@ -203,12 +132,14 @@ object LoadSavegame {
             val chunkCount = world.width * world.height / (cw * ch)
             val worldLayer = arrayOf(world.getLayer(0), world.getLayer(1))
             for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
-                for (layer in 0L..1L) {
-                    val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.shl(24) or chunk)
+                for (layer in worldLayer.indices) {
+                    loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*worldLayer.size+layer+1}/${chunkCount*2}")
+
+                    val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.toLong().shl(24) or chunk)
                     val cy = chunk % chunksY
                     val cx = chunk / chunksY
 
-                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer.toInt()], cx.toInt(), cy.toInt())
+                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer], cx.toInt(), cy.toInt())
                 }
             }
 

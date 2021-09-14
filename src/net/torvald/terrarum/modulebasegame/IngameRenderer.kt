@@ -378,8 +378,10 @@ object IngameRenderer : Disposable {
         processBlur(lightmapFboA, lightmapFboB)
     }
 
-    internal var fboRGBexportRequested = false
-    internal var fboRGBexportCallback: (FrameBuffer) -> Unit = {}
+    @Volatile internal var fboRGBexportRequested = false
+    @Volatile internal var fboRGBexportedLatch = false
+    @Volatile internal var fboRGBexportCallback: (FrameBuffer) -> Unit = {}
+    @Volatile internal lateinit var fboRGBexport: Pixmap
 
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,
@@ -737,6 +739,11 @@ object IngameRenderer : Disposable {
         shaderRGBOnly.dispose()
         shaderAtoGrey.dispose()
         shaderPassthru.dispose()
+
+        try {
+            fboRGBexport.dispose()
+        }
+        catch (e: Throwable) { e.printStackTrace() }
     }
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {

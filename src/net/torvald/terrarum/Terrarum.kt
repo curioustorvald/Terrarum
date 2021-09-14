@@ -679,6 +679,7 @@ class Codex : KVHashMap() {
 }
 
 fun AppUpdateListOfSavegames() {
+    App.savegames.clear()
     File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
             VDUtil.readDiskArchive(file, charset = Common.CHARSET)
