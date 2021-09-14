@@ -743,6 +743,7 @@ object IngameRenderer : Disposable {
         try {
             fboRGBexport.dispose()
         }
+        catch (e: UninitializedPropertyAccessException) {}
         catch (e: Throwable) { e.printStackTrace() }
     }
 
