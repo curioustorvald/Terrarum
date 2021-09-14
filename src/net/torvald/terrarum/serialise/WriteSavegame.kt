@@ -7,6 +7,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.ChunkLoadingLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -106,9 +107,9 @@ object WriteSavegame {
             val cw = ingame.world.width / LandUtil.CHUNK_W
             val ch = ingame.world.height / LandUtil.CHUNK_H
             for (layer in layers.indices) {
-                for (cy in 0 until ch) {
-                    for (cx in 0 until cw) {
-                        val chunkNumber = (cy * cw + cx).toLong()
+                for (cx in 0 until cw) {
+                    for (cy in 0 until ch) {
+                        val chunkNumber = (cx * ch + cy).toLong()
                         val chunkBytes = WriteWorld.encodeChunk(layers[layer], cx, cy)
                         val entryID = worldNum.toLong().shl(32) or layer.toLong().shl(24) or chunkNumber
 
@@ -160,24 +161,18 @@ object LoadSavegame {
     operator fun invoke(disk: VirtualDisk) {
         val newIngame = TerrarumIngame(App.batch)
 
+        val meta = ReadMeta(disk)
+
+        // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
+        // you'll inevitably read the player actor twice, and they're separate instances of the player!
+        val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
+        val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
 
 
 
-        val loadJob = { loadscreen: LoadScreenBase ->
-            val meta = ReadMeta(disk)
 
-            loadscreen.addMessage("${Lang["MENU_LABEL_WELCOME"]} !")
-
-
-            // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
-            // you'll inevitably read the player actor twice, and they're separate instances of the player!
-            val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
-            val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
-
-            loadscreen.addMessage("${Lang["MENU_LABEL_WORLD"]} : $currentWorld")
-            loadscreen.addMessage("${Lang["MENU_OPTIONS_SIZE"]} : ${world.width}x${world.height}")
-
-
+        val loadJob = { it: LoadScreenBase ->
+            val loadscreen = it as ChunkLoadingLoadScreen
             val actors = world.actors.distinct()//.map { ReadActor(getFileReader(disk, it.toLong())) }
     //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
             val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
@@ -204,19 +199,16 @@ object LoadSavegame {
             val worldnum = world.worldIndex.toLong()
             val cw = LandUtil.CHUNK_W;
             val ch = LandUtil.CHUNK_H
-            val chunksX = world.width / cw
+            val chunksY = world.height / ch
             val chunkCount = world.width * world.height / (cw * ch)
-            for (layer in 0L..1L) {
-                val worldLayer = world.getLayer(layer.toInt())
-                for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
-
-                    loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${layer * chunkCount + chunk + 1}/${2 * chunkCount}")
-
+            val worldLayer = arrayOf(world.getLayer(0), world.getLayer(1))
+            for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
+                for (layer in 0L..1L) {
                     val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.shl(24) or chunk)
-                    val cx = chunk % chunksX
-                    val cy = chunk / chunksX
+                    val cy = chunk % chunksY
+                    val cx = chunk / chunksY
 
-                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer, cx.toInt(), cy.toInt())
+                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer.toInt()], cx.toInt(), cy.toInt())
                 }
             }
 
@@ -228,10 +220,9 @@ object LoadSavegame {
             printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")
         }
 
-        SanicLoadScreen.preLoadJob = loadJob
-        SanicLoadScreen.screenToLoad = newIngame
+        val loadScreen = ChunkLoadingLoadScreen(newIngame, world.width, world.height, loadJob)
         Terrarum.setCurrentIngameInstance(newIngame)
-        App.setLoadScreen(SanicLoadScreen)
+        App.setLoadScreen(loadScreen)
 
 
     }

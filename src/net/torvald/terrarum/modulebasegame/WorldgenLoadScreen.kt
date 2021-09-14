@@ -26,12 +26,12 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
         get() = screenToLoad!!.world
 
     companion object {
-        private const val WIDTH_RATIO = 0.7
-        private const val PREVIEW_UPDATE_RATE = App.UPDATE_RATE
+        const val WIDTH_RATIO = 0.7
+        const val PREVIEW_UPDATE_RATE = App.UPDATE_RATE
 
-        private val COL_TERR = Color.WHITE
-        private val COL_WALLED = Color(.5f, .5f, .5f, 1f)
-        private val COL_AIR = Color.BLACK
+        val COL_TERR = Color.WHITE
+        val COL_WALLED = Color(.5f, .5f, .5f, 1f)
+        val COL_AIR = Color.BLACK
     }
 
     private val previewWidth = (App.scr.width * WIDTH_RATIO).roundToInt()
