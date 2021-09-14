@@ -1,7 +1,6 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.graphics.Pixmap
-import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
@@ -13,12 +12,9 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Common.getUnzipInputStream
-import net.torvald.terrarum.serialise.Common.zip
-import net.torvald.terrarum.serialise.WriteWorld.actorAcceptable
 import net.torvald.terrarum.tvda.*
 import java.io.File
 import java.io.Reader
-import java.util.zip.GZIPOutputStream
 
 /**
  * It's your responsibility to create a new VirtualDisk if your save is new, and create a backup for modifying existing save.
@@ -41,7 +37,7 @@ object WriteSavegame {
         if (!dir.contains(file.entryID)) dir.add(file.entryID)
     }
 
-    operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame) {
+    operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
         savingStatus = 0
 
         Echo("Save queued")
@@ -61,7 +57,7 @@ object WriteSavegame {
         }
         IngameRenderer.fboRGBexportRequested = true
 
-        val savingThread = Thread(GameSavingThread(disk, outFile, ingame), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
 

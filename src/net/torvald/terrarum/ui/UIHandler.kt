@@ -117,6 +117,8 @@ void main() {
 
     private val shader = App.loadShaderInline(SHADER_PROG_VERT, SHADER_PROG_FRAG)
 
+    private var uiToggleLocked = false
+
     init {
         //UI.handler = this
     }
@@ -150,11 +152,18 @@ void main() {
         subUIs.remove(ui)
     }
 
+    fun lockToggle() {
+        uiToggleLocked = true
+    }
+    fun unlockToggle() {
+        uiToggleLocked = false
+    }
+
 
     fun update(ui: UICanvas, delta: Float) {
         // open/close UI by key pressed
         // some UIs will pause the game, and they still need to be closed
-        if (Terrarum.ingame?.consoleOpened == false && (Terrarum.ingame?.paused == false || isOpened)) {
+        if (!uiToggleLocked && (Terrarum.ingame?.consoleOpened == false && (Terrarum.ingame?.paused == false || isOpened))) {
             if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!)) {
                 if (isClosed)
                     setAsOpen()

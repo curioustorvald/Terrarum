@@ -83,8 +83,13 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             when (new) {
                 0 -> {
                     screen = 3; gameMenuButtons.deselect()
+                    full.handler.lockToggle()
                     // save the game
-                    WriteSavegame(Terrarum.ingame!!.savegameArchive, File(App.defaultSaveDir, "${App.getTIME_T()}"), Terrarum.ingame!! as TerrarumIngame)
+                    WriteSavegame(Terrarum.ingame!!.savegameArchive, File(App.defaultSaveDir, "${App.getTIME_T()}"), Terrarum.ingame!! as TerrarumIngame) {
+                        // callback:
+                        screen = 0
+                        full.handler.unlockToggle()
+                    }
                 }
                 4 -> {
                     screen = 2; gameMenuButtons.deselect()
@@ -127,7 +132,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             },
             { delta: Float ->
                 savingUI.update(delta)
-                // TODO make UI not closable until saving is done
             }
     )
     private val screenRenders = arrayOf(

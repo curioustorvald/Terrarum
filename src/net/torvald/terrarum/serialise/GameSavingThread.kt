@@ -13,7 +13,7 @@ import java.util.zip.GZIPOutputStream
 /**
  * Created by minjaesong on 2021-09-14.
  */
-class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame) : Runnable {
+class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val callback: () -> Unit) : Runnable {
 
     /**
      * Will happily overwrite existing entry
@@ -25,10 +25,24 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         if (!dir.contains(file.entryID)) dir.add(file.entryID)
     }
 
+    private val chunkProgressMultiplier = 1f
+    private val actorProgressMultiplier = 1f
+
     override fun run() {
         while (!IngameRenderer.fboRGBexportedLatch) {
             Thread.sleep(1L)
         }
+
+        val actorsList = listOf(ingame.actorContainerActive, ingame.actorContainerInactive).flatMap { it.filter { WriteWorld.actorAcceptable(it) } }
+        val layers = intArrayOf(0,1).map { ingame.world.getLayer(it) }
+        val cw = ingame.world.width / LandUtil.CHUNK_W
+        val ch = ingame.world.height / LandUtil.CHUNK_H
+
+        WriteSavegame.saveProgress = 0f
+        WriteSavegame.saveProgressMax = 2f +
+                                        (cw * ch * layers.size) * chunkProgressMultiplier +
+                                        actorsList.size * actorProgressMultiplier
+
 
         val tgaout = ByteArray64GrowableOutputStream()
         val gzout = GZIPOutputStream(tgaout)
@@ -50,6 +64,8 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         val thumbContent = EntryFile(tgaout.toByteArray64())
         val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
         addFile(disk, thumb)
+
+        WriteSavegame.saveProgress += 1f
 
 
         // Write BlockCodex//
@@ -92,11 +108,8 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
         addFile(disk, world)
 
-        val layers = intArrayOf(0,1).map { ingame.world.getLayer(it) }
-        val cw = ingame.world.width / LandUtil.CHUNK_W
-        val ch = ingame.world.height / LandUtil.CHUNK_H
+        WriteSavegame.saveProgress += 1f
 
-        WriteSavegame.saveProgressMax = (cw * ch * layers.size).toFloat()
 
         for (layer in layers.indices) {
             for (cx in 0 until cw) {
@@ -113,7 +126,7 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
                     // "W1L0-92,15"
                     addFile(disk, entry)
 
-                    WriteSavegame.saveProgress += 1
+                    WriteSavegame.saveProgress += chunkProgressMultiplier
                 }
             }
         }
@@ -121,14 +134,12 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         Echo("Writing actors...")
 
         // Write Actors //
-        listOf(ingame.actorContainerActive, ingame.actorContainerInactive).forEach { actors ->
-            actors.forEach {
-                if (WriteWorld.actorAcceptable(it)) {
-                    val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-                    val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
-                    addFile(disk, actor)
-                }
-            }
+        actorsList.forEach {
+            val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
+            val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
+            addFile(disk, actor)
+
+            WriteSavegame.saveProgress += actorProgressMultiplier
         }
 
         disk.capacity = 0
@@ -141,5 +152,8 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
 
         IngameRenderer.fboRGBexportedLatch = false
         WriteSavegame.savingStatus = 255
+
+
+        callback()
     }
 }
