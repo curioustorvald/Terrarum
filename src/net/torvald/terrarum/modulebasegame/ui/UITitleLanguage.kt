@@ -8,6 +8,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
+import kotlin.math.roundToInt
 
 class UITitleLanguage : UICanvas() {
 
@@ -19,17 +20,34 @@ class UITitleLanguage : UICanvas() {
     override var openCloseTime: Second = 0f
 
 
-    private val textAreaHMargin = 48
-    override var width = (App.scr.width * 0.75).toInt()
-    override var height = App.scr.height - textAreaHMargin * 2
+    private val textButtonLineHeight = 32
 
     private val localeList = Lang.languageList.toList().sorted()
-    private val textArea = UIItemTextButtonList(this,
-            24,
-            localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
-            App.scr.width - width, textAreaHMargin,
-            width, height,
-            textAreaWidth = width,
+    private val localeFirstHalf = localeList.subList(0, localeList.size / 2)
+    private val localeSecondHalf = localeList.subList(localeList.size / 2, localeList.size)
+
+    override var width = 480
+    override var height = maxOf(localeFirstHalf.size, localeSecondHalf.size) * textButtonLineHeight
+
+    private val textArea1 = UIItemTextButtonList(this,
+            textButtonLineHeight,
+            localeFirstHalf.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
+            (App.scr.width - width) / 2, (App.scr.height - height) / 2,
+            width / 2, height,
+            textAreaWidth = width / 2,
+            readFromLang = false,
+            activeBackCol = Color(0),
+            highlightBackCol = Color(0),
+            backgroundCol = Color(0),
+            inactiveCol = Color.WHITE,
+            defaultSelection = null
+    )
+    private val textArea2 = UIItemTextButtonList(this,
+            textButtonLineHeight,
+            localeSecondHalf.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
+            (App.scr.width - width) / 2 + (width / 2), (App.scr.height - height) / 2,
+            width / 2, height,
+            textAreaWidth = width / 2,
             readFromLang = false,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
@@ -50,15 +68,20 @@ class UITitleLanguage : UICanvas() {
 
 
         // attach listeners
-        textArea.selectionChangeListener = { _, newSelectionIndex ->
+        textArea1.selectionChangeListener = { _, newSelectionIndex ->
             App.GAME_LOCALE = localeList[newSelectionIndex]
+            textArea2.deselect()
         }
-
+        textArea2.selectionChangeListener = { _, newSelectionIndex ->
+            App.GAME_LOCALE = localeList[newSelectionIndex + localeFirstHalf.size]
+            textArea1.deselect()
+        }
 
     }
 
     override fun updateUI(delta: Float) {
-        textArea.update(delta)
+        textArea1.update(delta)
+        textArea2.update(delta)
 
         //AppLoader.printdbg(this, "should be printing indefinitely")
     }
@@ -66,7 +89,8 @@ class UITitleLanguage : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         batch.color = Color.WHITE
-        textArea.render(batch, camera)
+        textArea1.render(batch, camera)
+        textArea2.render(batch, camera)
     }
 
     override fun doOpening(delta: Float) {

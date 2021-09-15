@@ -47,6 +47,7 @@ object Lang {
         load("./assets/locales/")
     }
 
+
     @JvmStatic operator fun invoke() { /* dummy method for manual initialisation */ }
 
     fun load(localesDir: String) {
@@ -56,6 +57,10 @@ object Lang {
 
         // get all of the languages installed
         localesDir.listFiles().filter { it.isDirectory }.forEach { languageList.add(it.name) }
+
+        // temporary filter
+        languageList.remove("isIC")
+        languageList.remove("jakanaJP")
 
         for (lang in languageList) {
             val langFileListFiles = File("$localesDir/$lang/").listFiles()

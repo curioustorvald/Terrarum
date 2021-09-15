@@ -15,15 +15,14 @@ object UITitleRemoConYaml {
 - MENU_OPTIONS
  - MENU_OPTIONS_GRAPHICS
  - MENU_OPTIONS_CONTROLS
-  - MENU_CONTROLS_KEYBOARD
+  - MENU_CONTROLS_KEYBOARD : net.torvald.terrarum.modulebasegame.ui.UIKeyboardControlPanel
   - MENU_CONTROLS_GAMEPAD
   - MENU_LABEL_RETURN
- - MENU_OPTIONS_SOUND
  - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
  - MENU_MODULES : net.torvald.terrarum.ModOptionsHost
  - MENU_LABEL_RETURN
-- MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
- - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
+- MENU_LABEL_CREDITS
+ - MENU_LABEL_COPYRIGHT : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
  - MENU_CREDIT_GPL_DNT : net.torvald.terrarum.modulebasegame.ui.UITitleGPL3
  - MENU_LABEL_RETURN
 - MENU_LABEL_QUIT

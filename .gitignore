@@ -29,6 +29,7 @@ workspace.xml
 .tmp*
 tmp_*
 *.bak
+*-autosave.kra
 ## Microsoft Office
 ~$*
 ## Generic temp files in Linux
