@@ -142,6 +142,10 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
             WriteSavegame.saveProgress += actorProgressMultiplier
         }
 
+
+        disk.entries[0]!!.modificationDate = time_t
+        // entry zero MUST NOT be used to get lastPlayDate, but we'll update it anyway
+        // use entry -1 for that purpose!
         disk.capacity = 0
         VDUtil.dumpToRealMachine(disk, outFile)
 

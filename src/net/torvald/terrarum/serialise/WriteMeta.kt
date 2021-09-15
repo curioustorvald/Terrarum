@@ -29,7 +29,7 @@ object WriteMeta {
                 weatseed1 = WeatherMixer.RNG.state1,
                 playerid = ingame.actorGamer.referenceID,
                 creation_t = ingame.creationTime,
-                lastplay_t = App.getTIME_T(),
+                lastplay_t = time_t,
                 playtime_t = ingame.totalPlayTime + currentPlayTime_t,
                 loadorder = ModMgr.loadOrder.toTypedArray(),
                 worlds = ingame.gameworldIndices.toTypedArray()

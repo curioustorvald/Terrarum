@@ -688,7 +688,8 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { (it as VirtualDisk).entries[0]!!.modificationDate }.forEach {
+    }.filter { it != null && it.entries.contains(-1) }
+            .sortedByDescending { (it as VirtualDisk).entries[-1]!!.modificationDate }.forEach {
         App.savegames.add(it!!)
     }
 }
