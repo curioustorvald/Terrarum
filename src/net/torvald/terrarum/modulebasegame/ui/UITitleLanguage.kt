@@ -28,9 +28,10 @@ class UITitleLanguage : UICanvas() {
     override var width = 480
     override var height = maxOf(localeFirstHalf.size, localeSecondHalf.size) * textButtonLineHeight
 
+
     private val textArea1 = UIItemTextButtonList(this,
             textButtonLineHeight,
-            localeFirstHalf.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
+            localeFirstHalf.map { Lang.get("MENU_LANGUAGE_THIS", it) ?: "!ERR: $it" }.toTypedArray(),
             (App.scr.width - width) / 2, (App.scr.height - height) / 2,
             width / 2, height,
             textAreaWidth = width / 2,
@@ -43,7 +44,7 @@ class UITitleLanguage : UICanvas() {
     )
     private val textArea2 = UIItemTextButtonList(this,
             textButtonLineHeight,
-            localeSecondHalf.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
+            localeSecondHalf.map { Lang.get("MENU_LANGUAGE_THIS", it) ?: "!ERR: $it" }.toTypedArray(),
             (App.scr.width - width) / 2 + (width / 2), (App.scr.height - height) / 2,
             width / 2, height,
             textAreaWidth = width / 2,

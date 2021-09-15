@@ -22,7 +22,7 @@ object Lang {
      *
      *     E.g. langpack["MENU_LANGUAGE_THIS_fiFI"]
      */
-    val langpack = HashMap<String, String>()
+    private val langpack = HashMap<String, String>()
     private val FALLBACK_LANG_CODE = "en"
 
     private val HANGUL_SYL_START = 0xAC00
@@ -122,22 +122,18 @@ object Lang {
     }
 
     operator fun get(key: String): String {
-        fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "$$key"
+        return get(key, App.GAME_LOCALE) ?: get(key, FALLBACK_LANG_CODE) ?: "$$key"
+    }
 
+    fun get(key: String, locale: String): String? {
+        val ret = langpack["${key}_$locale"] ?: return null
 
-        val ret = langpack["${key}_${App.GAME_LOCALE}"]
-        val ret2 = if (ret.isNullOrEmpty()) fallback() else ret!!
-
-        // special treatment
-        if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
-            return ret2.replace('>', App.gamepadLabelStart).capitalize()
-
-        return if (key.getEndTag().contains("bg"))
-            "${App.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${App.fontGame.charsetOverrideDefault}"
-        else if (key.getEndTag().contains("sr"))
-            "${App.fontGame.charsetOverrideSerbian}${ret2.capitalize()}${App.fontGame.charsetOverrideDefault}"
+        return if (locale.startsWith("bg"))
+            "${App.fontGame.charsetOverrideBulgarian}${ret.capitalize()}${App.fontGame.charsetOverrideDefault}"
+        else if (locale.startsWith("sr"))
+            "${App.fontGame.charsetOverrideSerbian}${ret.capitalize()}${App.fontGame.charsetOverrideDefault}"
         else
-            ret2.capitalize()
+            ret.capitalize()
     }
 
     private fun String.getEndTag() = this.split("_").last()
