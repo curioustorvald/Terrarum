@@ -1,24 +1,12 @@
 package net.torvald.terrarum
 
-import net.torvald.terrarum.langpack.Lang
-
 object CreditSingleton {
 
     val credit: List<String>; get() =
-            ("${Lang["CREDITS_PROGRAMMER"]}\n\nCuriousTorvald (minjaesong)\n\n\n" +
-             "${Lang["CREDITS_ARTIST_PLURAL"]}\n\nCuriousTorvald (minjaesong)\nRoundworld (leedonggeun)\n\n\n" +
-             "${Lang["CREDITS_POLYGLOT"]}\n\n\n" +
-             "${Lang["CREDITS_SOUNDTRACK"]}: FreeSound.org\n" +
+            ("Programming, Arts, Directed by CuriousTorvald (minjaesong)\n" +
+             "Sound Effects by FreeSound.org and Klankbeeld\n" +
+             "Translation Database by the Polyglot Project\n" +
             """
-Klankbeeld
-
-
-
-
-Copyright Information
-
-
-
 
 
 Terrarum
