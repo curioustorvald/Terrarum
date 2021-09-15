@@ -166,7 +166,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         cameraPlayer = CameraPlayer(demoWorld, cameraAI)
 
-        demoWorld.worldTime.timeDelta = 0// 100
+        demoWorld.worldTime.timeDelta = 0//60
 
 
         IngameRenderer.setRenderedWorld(demoWorld)

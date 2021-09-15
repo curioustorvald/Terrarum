@@ -47,7 +47,7 @@ class UIItemTextArea(
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        scrollPos += Math.round(amountX * 3)
+        scrollPos += Math.round(amountY * 5)
         if (scrollPos > entireText.size - lineCount) scrollPos = entireText.size - lineCount
         if (scrollPos < 0) scrollPos = 0
 

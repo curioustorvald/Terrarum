@@ -1,6 +1,8 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.csi0
+import net.torvald.terrarum.App.csiG
 import net.torvald.terrarum.ui.ConsoleWindow
 
 /**
@@ -16,15 +18,15 @@ internal object Echo : ConsoleCommand {
         val sb = StringBuilder()
         for (ch in single_line) {
             if (ch == '\n') {
-                (Terrarum.ingame!!.consoleHandler as ConsoleWindow).sendMessage(sb.toString())
-                println(sb.toString())
+                Terrarum.ingame!!.consoleHandler.sendMessage(sb.toString())
+                println("[Echo] $csiG$sb$csi0")
                 sb.delete(0, sb.length - 1)
             }
             else
                 sb.append(ch)
         }
-        (Terrarum.ingame!!.consoleHandler as ConsoleWindow).sendMessage(sb.toString())
-        println(sb.toString())
+        Terrarum.ingame!!.consoleHandler.sendMessage(sb.toString())
+        println("[Echo] $csiG$sb$csi0")
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

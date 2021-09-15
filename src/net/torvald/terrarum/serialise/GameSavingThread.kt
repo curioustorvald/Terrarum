@@ -131,10 +131,11 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
             }
         }
 
-        Echo("Writing actors...")
 
         // Write Actors //
-        actorsList.forEach {
+        actorsList.forEachIndexed { count, it ->
+            Echo("Writing actors... ${count+1}/${actorsList.size}")
+
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
             val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
             addFile(disk, actor)
@@ -142,6 +143,8 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
             WriteSavegame.saveProgress += actorProgressMultiplier
         }
 
+
+        Echo("Writing file to disk...")
 
         disk.entries[0]!!.modificationDate = time_t
         // entry zero MUST NOT be used to get lastPlayDate, but we'll update it anyway

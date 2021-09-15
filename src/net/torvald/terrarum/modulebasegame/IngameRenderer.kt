@@ -744,7 +744,7 @@ object IngameRenderer : Disposable {
             fboRGBexport.dispose()
         }
         catch (e: UninitializedPropertyAccessException) {}
-        catch (e: Throwable) { e.printStackTrace() }
+        catch (e: Throwable) { e.printStackTrace(System.out) }
     }
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {

@@ -138,6 +138,15 @@ class UIInventoryFull(
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"
 
+    private var panelTransitionLocked = false
+
+    fun lockTransition() {
+        panelTransitionLocked = true
+    }
+    fun unlockTransition() {
+        panelTransitionLocked = false
+    }
+
     val catBar = UIItemInventoryCatBar(
             this,
             (App.scr.width - catBarWidth) / 2,
@@ -145,7 +154,7 @@ class UIInventoryFull(
             internalWidth,
             catBarWidth,
             true,
-            { i -> requestTransition(i) }
+            { i -> if (!panelTransitionLocked) requestTransition(i) }
     )
 
 
@@ -167,9 +176,11 @@ class UIInventoryFull(
         addUIitem(catBar)
         addUIitem(transitionPanel)
 
-        catBar.selectionChangeListener = { old, new  ->
-            rebuildList()
-            transitionalItemCells.resetStatusAsCatChanges(old, new)
+        catBar.selectionChangeListener = { old, new ->
+            if (!panelTransitionLocked) {
+                rebuildList()
+                transitionalItemCells.resetStatusAsCatChanges(old, new)
+            }
         }
 
 
@@ -190,7 +201,7 @@ class UIInventoryFull(
             rebuildList()
         }
 
-        catBar.update(delta)
+        if (!panelTransitionLocked) catBar.update(delta)
         transitionPanel.update(delta)
     }
 
