@@ -8,7 +8,6 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
-import kotlin.math.roundToInt
 
 class UITitleLanguage : UICanvas() {
 
@@ -75,6 +74,18 @@ class UITitleLanguage : UICanvas() {
         textArea2.selectionChangeListener = { _, newSelectionIndex ->
             App.GAME_LOCALE = localeList[newSelectionIndex + localeFirstHalf.size]
             textArea1.deselect()
+        }
+
+        // highlight initial
+        textArea1.buttons.forEachIndexed { index, it ->
+            if (it.labelText == Lang["MENU_LANGUAGE_THIS"]) {
+                textArea1.select(index)
+            }
+        }
+        textArea2.buttons.forEachIndexed { index, it ->
+            if (it.labelText == Lang["MENU_LANGUAGE_THIS"]) {
+                textArea2.select(index)
+            }
         }
 
     }
