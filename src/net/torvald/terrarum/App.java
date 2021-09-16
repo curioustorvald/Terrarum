@@ -472,8 +472,9 @@ public class App implements ApplicationListener {
         }*/
 
 
-        fontGame = new GameFontBase(FONT_DIR, false, true,
-                false, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 90, false
+        fontGame = new GameFontBase(FONT_DIR, false, true, false,
+                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
+                256, false
         );
         Lang.invoke();
 
