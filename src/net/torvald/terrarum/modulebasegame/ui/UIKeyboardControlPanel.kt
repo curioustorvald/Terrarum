@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ui.Toolkit
@@ -24,6 +25,8 @@ class UIKeyboardControlPanel : UICanvas() {
         }
         CommonResourcePool.loadAll()
     }
+
+    private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     override var width = 600
     override var height = 600
@@ -115,8 +118,32 @@ class UIKeyboardControlPanel : UICanvas() {
             // ...
     )
 
+    private val symbolLeft = labels.get(0,2)
+    private val symbolUp = labels.get(1,2)
+    private val symbolRight = labels.get(2,2)
+    private val symbolDown = labels.get(3,2)
+    private val symbolJump = labels.get(4,2)
+    private val symbolZoom = labels.get(5,2)
+    private val symbolInventory = labels.get(9,0)
+    private val symbolGrapplingHook = labels.get(5,1)
+    private val symbolGamemenu = labels.get(6,2)
+
+
     init {
         keycaps.values.forEach { addUIitem(it) }
+
+        // read config and put icons
+        keycaps[App.getConfigInt("config_keyup")]?.symbolControl = symbolUp
+        keycaps[App.getConfigInt("config_keyleft")]?.symbolControl = symbolLeft
+        keycaps[App.getConfigInt("config_keydown")]?.symbolControl = symbolDown
+        keycaps[App.getConfigInt("config_keyright")]?.symbolControl = symbolRight
+
+        keycaps[App.getConfigInt("config_keyjump")]?.symbolControl = symbolJump
+        keycaps[App.getConfigInt("config_keyzoom")]?.symbolControl = symbolZoom
+        keycaps[App.getConfigInt("config_keyinventory")]?.symbolControl = symbolInventory
+        keycaps[App.getConfigInt("config_keymovementaux")]?.symbolControl = symbolGrapplingHook
+
+        keycaps[App.getConfigInt("config_keygamemenu")]?.symbolControl = symbolGamemenu
     }
 
     override fun updateUI(delta: Float) {
@@ -174,7 +201,7 @@ class UIItemKeycap(
 
     private val s1 = if (symbolDefault.isNotBlank()) symbolDefault.split(',').map { it.toInt() } else null
 
-    val symbolControl = ""
+    var symbolControl: TextureRegion? = null
 
     private val borderKeyForbidden = Color(0x000000C0)
     private val borderKeyNormal = Color(0xFFFFFFAA.toInt())
@@ -184,6 +211,7 @@ class UIItemKeycap(
     private val keycapFill = Color(0x404040_C0)
 
     private val keylabelCol = Color(0xFFFFFF40.toInt())
+    private val configuredKeyCol = Color.WHITE
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -213,8 +241,12 @@ class UIItemKeycap(
         Toolkit.fillArea(batch, posX, posY, width, height)
 
         // default keycap
-        batch.color = keylabelCol
-        if (s1 != null) {
+        if (symbolControl != null) {
+            batch.color = configuredKeyCol
+            batch.draw(symbolControl, (posX + (width - 20) / 2).toFloat(), posY + 4f)
+        }
+        else if (s1 != null) {
+            batch.color = keylabelCol
             batch.draw(labels.get(s1[0], s1[1]), (posX + (width - 20) / 2).toFloat(), posY + 4f)
         }
     }
