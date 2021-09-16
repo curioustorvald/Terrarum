@@ -3,11 +3,9 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
@@ -1625,41 +1623,30 @@ open class ActorWithBody : Actor {
         val offsetX = hitboxTranslateX * scale
         val offsetY = sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
-
-        // FIXME test me: this extra IF statement is supposed to not draw actors that's outside of the camera.
-        //                basic code without offsetX/Y DOES work, but obviously offsets are not tested.
-        if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-            // camera center neg, actor center pos
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZE,
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
-        }
-        else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-            // camera center pos, actor center neg
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZE,
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
-        }
-        else {
-            try {
+        // it would be great if you can eliminate the try-catch because it may hurt the performance when there's too many actors on screen to draw
+//        try {
+            if (Math.abs(WorldCamera.x - hitbox.startX) > App.scr.halfw) {
+                sprite.render(batch,
+                        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
+                        (hitbox.startY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
+            else {
                 sprite.render(batch,
                         (hitbox.startX - offsetX).toFloat(),
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
-            catch (e: UninitializedPropertyAccessException) {
-                printdbgerr(this, this.javaClass.simpleName)
-                printdbgerr(this, actorValue.getAsString(AVKey.NAME))
-                printdbgerr(this, if (this is HasAssembledSprite) this.animDescPath else "(not HasAssembledSprite)")
-                printdbgerr(this, e)
-                throw e
-            }
-        }
+//        }
+//        catch (e: UninitializedPropertyAccessException) {
+//            printdbgerr(this, this.javaClass.simpleName)
+//            printdbgerr(this, actorValue.getAsString(AVKey.NAME))
+//            printdbgerr(this, if (this is HasAssembledSprite) this.animDescPath else "(not HasAssembledSprite)")
+//            printdbgerr(this, e)
+//            throw e
+//        }
     }
 
     override fun onActorValueChange(key: String, value: Any?) {

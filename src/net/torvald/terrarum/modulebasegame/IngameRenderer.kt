@@ -207,7 +207,7 @@ object IngameRenderer : Disposable {
         if (!gamePaused || newWorldLoadedLatch) {
             measureDebugTime("Renderer.ApparentLightRun") {
                 // recalculate for even frames, or if the sign of the cam-x changed
-                if (App.GLOBAL_RENDER_TIMER % 3 == 0 || WorldCamera.x * oldCamX <= 0 || newWorldLoadedLatch) {
+                if (App.GLOBAL_RENDER_TIMER % 3 == 0 || Math.abs(WorldCamera.x - oldCamX) >= world.width * 0.85f * TILE_SIZEF || newWorldLoadedLatch) {
                     LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
                 }
                 oldCamX = WorldCamera.x
