@@ -9,6 +9,7 @@ import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -61,6 +62,9 @@ object WorldCamera {
 
     private val nullVec = Vector2(0.0, 0.0)
 
+    private var worldWidth = 0
+    private var worldHeight = 0
+
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 
@@ -68,12 +72,14 @@ object WorldCamera {
         height = App.scr.height//FastMath.ceil(AppLoader.terrarumAppConfig.screenH / zoom)
         zoom = Terrarum.ingame?.screenZoom ?: 1f
         zoomSamplePoint = (1f - 1f / zoom) / 2f // will never quite exceed 0.5
+        worldWidth = world.width * TILE_SIZE
+        worldHeight = world.height * TILE_SIZE
 
         // TOP-LEFT position of camera border
 
         // some hacky equation to position player at the dead centre
         // implementing the "lag behind" camera the right way
-        val pVecSum = if (player is ActorWithBody)
+        /*val pVecSum = if (player is ActorWithBody)
             player.externalV + (player.controllerV ?: nullVec)
         else
             nullVec
@@ -85,6 +91,19 @@ object WorldCamera {
                 (player.hitbox.centeredY - pVecSum.y).toFloat() - height / 2,
                 TILE_SIZEF,
                 world.height * TILE_SIZE - height - TILE_SIZEF
+        )).floorInt().clampCameraY(world)*/
+
+
+        val oldX = x.toFloat()
+        val newX1 = (player.hitbox.centeredX).toFloat() - (width / 2)
+        val newX2 = newX1 + worldWidth
+        val newX = if (Math.abs(newX1 - oldX) < Math.abs(newX2 - oldX)) newX1 else newX2
+
+        x = FastMath.interpolateLinear(0.49f, oldX, newX).floorInt() fmod worldWidth
+        y = FastMath.interpolateLinear(0.49f, y.toFloat(), FastMath.clamp(
+                (player.hitbox.centeredY).toFloat() - (height / 2),
+                TILE_SIZEF,
+                worldHeight - height - TILE_SIZEF
         )).floorInt().clampCameraY(world)
 
         xEnd = x + width
@@ -94,8 +113,17 @@ object WorldCamera {
     private fun Int.clampCameraY(world: GameWorld): Int {
         return if (this < 0)
             0
-        else if (this > world.height.times(TILE_SIZE) - App.scr.height)
-            world.height.times(TILE_SIZE) - App.scr.height
+        else if (this > worldHeight - App.scr.height)
+            worldHeight - App.scr.height
+        else
+            this
+    }
+
+    private fun Float.clampCameraY(world: GameWorld): Float {
+        return if (this < 0f)
+            0f
+        else if (this > worldHeight - App.scr.height)
+            (worldHeight - App.scr.height).toFloat()
         else
             this
     }
