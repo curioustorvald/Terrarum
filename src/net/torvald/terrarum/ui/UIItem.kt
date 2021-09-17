@@ -57,7 +57,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     abstract val width: Int
     abstract val height: Int
 
-    private val mouseButton = App.getConfigInt("config_mouseprimary")
+    protected val mouseButton = App.getConfigInt("config_mouseprimary")
 
     /** This variable is NOT updated on its own.
      * ```
@@ -91,18 +91,9 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
         get() = mouseUp && Gdx.input.isButtonPressed(mouseButton)
-    /** If mouse is just pushed */
-    open val mouseJustPushed: Boolean
-        get() {
-            if (mouseUp && !mouseLatched && Gdx.input.isButtonJustPressed(mouseButton)) {
-                mouseLatched = true
-                return true
-            }
-            return false
-        }
 
 
-    private var mouseLatched = false
+    private var mouseLatched = Gdx.input.isButtonPressed(mouseButton)
 
     /** UI to call (show up) while mouse is up */
     open val mouseOverCall: UICanvas? = null
@@ -130,6 +121,10 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     /** Since gamepads can't just choose which UIItem to control, this variable is used to allow processing of
      * gamepad button events for one or more UIItems in one or more UICanvases. */
     open var controllerInFocus = false
+
+
+    open fun show() {}
+    open fun hide() {}
 
 
     open fun update(delta: Float) {

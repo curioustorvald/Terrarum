@@ -1,8 +1,10 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.fillRect
@@ -156,6 +158,13 @@ class UIItemTextButtonList(
     private var highlighterYStart = highlightY
     private var highlighterYEnd = highlightY
 
+    private var clickLatched = false
+
+    override fun show() {
+        printdbg(this, "${this.javaClass.simpleName} show()")
+        clickLatched = true
+    }
+
     /** (oldIndex: Int?, newIndex: Int) -> Unit */
     var selectionChangeListener: ((Int?, Int) -> Unit)? = null
 
@@ -188,7 +197,7 @@ class UIItemTextButtonList(
             btn.update(delta)
 
 
-            if (btn.mouseJustPushed && index != selectedIndex) {
+            if (!clickLatched && btn.mousePushed && index != selectedIndex) {
                 val oldIndex = selectedIndex
 
                 if (kinematic) {
@@ -206,6 +215,10 @@ class UIItemTextButtonList(
             }
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
+        }
+
+        if (!Gdx.input.isButtonPressed(mouseButton)) {
+            clickLatched = false
         }
 
         oldPosX = posX

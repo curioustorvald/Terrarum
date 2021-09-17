@@ -71,6 +71,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
     private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
 
+    private var oldScreen = 0
     private var screen = 0
 
     init {
@@ -120,20 +121,11 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         }
     }
 
-    private val screenUpdates = arrayOf(
-            { delta: Float ->
-                gameMenuButtons.update(delta)
-            },
-            { delta: Float ->
-                areYouSureQuitButtons.update(delta)
-            },
-            { delta: Float ->
-                areYouSureMainMenuButtons.update(delta)
-            },
-            { delta: Float ->
-                savingUI.update(delta)
-            }
+    private val screens = arrayOf(
+            gameMenuButtons, areYouSureQuitButtons, areYouSureMainMenuButtons, savingUI
     )
+
+
     private val screenRenders = arrayOf(
             { batch: SpriteBatch, camera: Camera ->
                 // control hints
@@ -161,7 +153,11 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
 
     override fun updateUI(delta: Float) {
-        screenUpdates[screen](delta)
+        if (oldScreen != screen) {
+            screens[screen].show()
+            oldScreen = screen
+        }
+        screens[screen].update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

@@ -106,6 +106,10 @@ abstract class UICanvas(
     }
 
 
+    open fun show() {}
+    open fun hide() {}
+
+
     /** **DO NOT CALL THIS FUNCTION FOR THE ACTUAL UPDATING OF THE UI — USE update() INSTEAD**
      *
      * Override this for the actual update. Note that you must update uiItems by yourself. */
