@@ -1620,12 +1620,14 @@ open class ActorWithBody : Actor {
         val leftsidePadding = world!!.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
         val rightsidePadding = WorldCamera.width.ushr(1)
 
+        val offendingPad = world!!.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
+
         val offsetX = hitboxTranslateX * scale
         val offsetY = sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
         // it would be great if you can eliminate the try-catch because it may hurt the performance when there's too many actors on screen to draw
 //        try {
-            if (Math.abs(WorldCamera.x - hitbox.startX) > App.scr.halfw) {
+            /*if (Math.abs(WorldCamera.x - hitbox.startX) > App.scr.halfw) {
                 sprite.render(batch,
                         (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
                         (hitbox.startY - offsetY).toFloat(),
@@ -1638,7 +1640,30 @@ open class ActorWithBody : Actor {
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
-            }
+            }*/
+        batch.color = Color.WHITE
+        sprite.render(batch,
+                (hitbox.startX - offsetX).toFloat(),
+                (hitbox.startY - offsetY).toFloat(),
+                (scale).toFloat()
+        )
+
+        batch.color = Color.BLUE
+        sprite.render(batch,
+                (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZEF,
+                (hitbox.startY - offsetY).toFloat(),
+                (scale).toFloat()
+        )
+
+        batch.color = Color.GREEN
+        sprite.render(batch,
+        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
+                (hitbox.startY - offsetY).toFloat(),
+                (scale).toFloat()
+        )
+
+
+
 //        }
 //        catch (e: UninitializedPropertyAccessException) {
 //            printdbgerr(this, this.javaClass.simpleName)
@@ -1681,10 +1706,10 @@ open class ActorWithBody : Actor {
             }
 
     private fun clampWtile(x: Int): Int =
-            if (x < 0) 0 else if (x >= world?.width ?: 0) (world?.width ?: 0) - 1 else x
+            if (x < 0) 0 else if (x >= (world?.width ?: 0)) (world?.width ?: 0) - 1 else x
 
     private fun clampHtile(x: Int): Int =
-            if (x < 0) 0 else if (x >= world?.height ?: 0) (world?.height ?: 0) - 1 else x
+            if (x < 0) 0 else if (x >= (world?.height ?: 0)) (world?.height ?: 0) - 1 else x
 
 
     var isNoClip: Boolean = false

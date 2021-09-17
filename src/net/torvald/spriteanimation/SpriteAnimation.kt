@@ -128,7 +128,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) {
 
         if (visible) {
             val region = textureRegion.get(currentFrame, currentRow)
-            batch.color = colorFilter
+//            batch.color = colorFilter
 
             //val scale = parentActor.scale.toFloat() // wtf?
 
