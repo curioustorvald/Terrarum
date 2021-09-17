@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.console
 
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.console.ConsoleAlias
 import net.torvald.terrarum.console.ConsoleCommand
@@ -56,13 +56,13 @@ internal object Teleport : ConsoleCommand {
                 // if from == target, ignore the action
                 if (fromActorID == targetActorID) return
 
-                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWithBody ||
-                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWithBody) {
+                if (INGAME.getActorByID(fromActorID) !is ActorWithBody ||
+                    INGAME.getActorByID(targetActorID) !is ActorWithBody) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWithBody
-                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWithBody
+                    fromActor = INGAME.getActorByID(fromActorID) as ActorWithBody
+                    targetActor = INGAME.getActorByID(targetActorID) as ActorWithBody
                 }
             }
             catch (e: NumberFormatException) {
@@ -93,11 +93,11 @@ internal object Teleport : ConsoleCommand {
                 y = args[4].toInt() * TILE_SIZE + TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWithBody) {
+                if (INGAME.getActorByID(actorID) !is ActorWithBody) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWithBody
+                    actor = INGAME.getActorByID(actorID) as ActorWithBody
                 }
             }
             catch (e: NumberFormatException) {

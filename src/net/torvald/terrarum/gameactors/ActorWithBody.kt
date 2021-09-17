@@ -405,7 +405,7 @@ open class ActorWithBody : Actor {
             if (spriteGlow != null) spriteGlow!!.update(delta)
 
             // make NoClip work for player
-            if (true) {//this == Terrarum.ingame!!.actorNowPlaying) {
+            if (true) {//this == INGAME.actorNowPlaying) {
                 isNoSubjectToGrav = isNoClip || COLLISION_TEST_MODE
                 isNoCollideWorld = isNoClip
                 isNoSubjectToFluidResistance = isNoClip
@@ -1616,62 +1616,29 @@ open class ActorWithBody : Actor {
     protected fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
         if (world == null) return
 
+        //val offendingPad = world!!.width.times(TILE_SIZE) - WorldCamera.width - 1
 
-        val leftsidePadding = world!!.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
-        val rightsidePadding = WorldCamera.width.ushr(1)
+        val offsetX = (hitboxTranslateX * scale).toFloat()
+        val offsetY = (sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1).toFloat()
 
-        val offendingPad = world!!.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
+        drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
+            sprite.render(batch, x - offsetX, y - offsetY, scale.toFloat())
+        }
 
-        val offsetX = hitboxTranslateX * scale
-        val offsetY = sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
-
-        // it would be great if you can eliminate the try-catch because it may hurt the performance when there's too many actors on screen to draw
-//        try {
-            /*if (Math.abs(WorldCamera.x - hitbox.startX) > App.scr.halfw) {
-                sprite.render(batch,
-                        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else {
-                sprite.render(batch,
-                        (hitbox.startX - offsetX).toFloat(),
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }*/
-        batch.color = Color.WHITE
-        sprite.render(batch,
-                (hitbox.startX - offsetX).toFloat(),
-                (hitbox.startY - offsetY).toFloat(),
-                (scale).toFloat()
-        )
-
-        batch.color = Color.BLUE
-        sprite.render(batch,
-                (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZEF,
-                (hitbox.startY - offsetY).toFloat(),
-                (scale).toFloat()
-        )
-
-        batch.color = Color.GREEN
-        sprite.render(batch,
-        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
-                (hitbox.startY - offsetY).toFloat(),
-                (scale).toFloat()
-        )
-
-
-
-//        }
-//        catch (e: UninitializedPropertyAccessException) {
-//            printdbgerr(this, this.javaClass.simpleName)
-//            printdbgerr(this, actorValue.getAsString(AVKey.NAME))
-//            printdbgerr(this, if (this is HasAssembledSprite) this.animDescPath else "(not HasAssembledSprite)")
-//            printdbgerr(this, e)
-//            throw e
-//        }
+        /*if (WorldCamera.x >= offendingPad && hitbox.startX < WorldCamera.width) {
+            sprite.render(batch,
+                    (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
+        }
+        else {
+            sprite.render(batch,
+                    (hitbox.startX - offsetX).toFloat(),
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
+        }*/
     }
 
     override fun onActorValueChange(key: String, value: Any?) {
@@ -1881,8 +1848,8 @@ open class ActorWithBody : Actor {
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= Terrarum.ingame!!.world.width shl 4)
-                return Terrarum.ingame!!.world.width - 1
+            else if (x >= INGAME.world.width shl 4)
+                return INGAME.world.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -1890,8 +1857,8 @@ open class ActorWithBody : Actor {
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= Terrarum.ingame!!.world.height shl 4)
-                return Terrarum.ingame!!.world.height - 1
+            else if (y >= INGAME.world.height shl 4)
+                return INGAME.world.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }
@@ -1954,3 +1921,13 @@ open class ActorWithBody : Actor {
     }
 }
 
+inline fun drawBodyInGoodPosition(startX: Float, startY: Float, drawFun: (x: Float, y: Float) -> Unit) {
+    val offendingPad = INGAME.world.width.times(TerrarumAppConfiguration.TILE_SIZE) - WorldCamera.width - 1
+
+    if (WorldCamera.x >= offendingPad && startX < WorldCamera.width) {
+        drawFun(startX + INGAME.world.width * TILE_SIZEF, startY)
+    }
+    else {
+        drawFun(startX , startY)
+    }
+}

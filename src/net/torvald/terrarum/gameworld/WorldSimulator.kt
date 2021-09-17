@@ -438,7 +438,7 @@ object WorldSimulator {
      * @return List of FixtureBases, safe to cast into Electric
      */
     private fun wiresimGetSourceBlocks(): List<FixtureBase> =
-            Terrarum.ingame!!.actorContainerActive.filter {
+            INGAME.actorContainerActive.filter {
                 it is FixtureBase && it is Electric && it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
             } as List<FixtureBase>
 

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.weather.WeatherMixer
 
 /**
@@ -20,7 +20,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 val GL = Cvec(r, g, b, a)
 
                 WeatherMixer.globalLightOverridden = true
-                (Terrarum.ingame!!.world).globalLight = GL
+                (INGAME.world).globalLight = GL
             }
             catch (e: NumberFormatException) {
                 Echo("Wrong number input.")

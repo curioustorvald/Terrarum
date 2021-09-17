@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -33,13 +34,13 @@ class PhysTestBall : ActorWithBody(RenderOrder.MIDDLE, PhysProperties.PHYSICS_OB
             )
 
             it.circle(
-                    hitbox.startX.toFloat() + (Terrarum.ingame!!.world).width * TILE_SIZE - 1f,
+                    hitbox.startX.toFloat() + (INGAME.world).width * TILE_SIZE - 1f,
                     hitbox.startY.toFloat() - 1f,
                     hitbox.width.toFloat()
             )
 
             it.circle(
-                    hitbox.startX.toFloat() - (Terrarum.ingame!!.world).width * TILE_SIZE - 1f,
+                    hitbox.startX.toFloat() - (INGAME.world).width * TILE_SIZE - 1f,
                     hitbox.startY.toFloat() - 1f,
                     hitbox.width.toFloat()
             )

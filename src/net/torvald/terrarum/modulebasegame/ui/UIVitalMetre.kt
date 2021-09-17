@@ -63,8 +63,8 @@ class UIVitalMetre(
         
         /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
             g.translate(
-                    Terrarum.ingame!!.screenZoom * (player.centrePosPoint.x.toFloat() - (WorldCamera.x)),
-                    Terrarum.ingame!!.screenZoom * (player.centrePosPoint.y.toFloat() - (WorldCamera.y))
+                    INGAME.screenZoom * (player.centrePosPoint.x.toFloat() - (WorldCamera.x)),
+                    INGAME.screenZoom * (player.centrePosPoint.y.toFloat() - (WorldCamera.y))
             )
 
 

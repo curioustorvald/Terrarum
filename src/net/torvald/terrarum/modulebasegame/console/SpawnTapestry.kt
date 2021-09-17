@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.gameactors.DecodeTapestry
@@ -17,7 +17,7 @@ internal object SpawnTapestry : ConsoleCommand {
         }
 
         val tapestry = DecodeTapestry(File(args[1]))
-        Terrarum.ingame!!.addNewActor(tapestry)
+        INGAME.addNewActor(tapestry)
     }
 
     override fun printUsage() {

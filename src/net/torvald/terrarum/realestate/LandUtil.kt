@@ -1,8 +1,8 @@
 package net.torvald.terrarum.realestate
 
 import net.torvald.terrarum.FactionCodex
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 
@@ -48,7 +48,7 @@ object LandUtil {
      */
     fun resolveOwner(id: Int): Any =
             if (id >= 0)
-                Terrarum.ingame!!.getActorByID(id)
+                INGAME.getActorByID(id)
             else
                 FactionCodex.getFactionByID(id)
 

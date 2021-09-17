@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 
@@ -20,14 +20,14 @@ internal object Zoom : ConsoleCommand {
                 return
             }
 
-            if (zoom < Terrarum.ingame!!.ZOOM_MINIMUM) {
-                zoom = Terrarum.ingame!!.ZOOM_MINIMUM
+            if (zoom < INGAME.ZOOM_MINIMUM) {
+                zoom = INGAME.ZOOM_MINIMUM
             }
-            else if (zoom > Terrarum.ingame!!.ZOOM_MAXIMUM) {
-                zoom = Terrarum.ingame!!.ZOOM_MAXIMUM
+            else if (zoom > INGAME.ZOOM_MAXIMUM) {
+                zoom = INGAME.ZOOM_MAXIMUM
             }
 
-            Terrarum.ingame!!.screenZoom = zoom
+            INGAME.screenZoom = zoom
 
             System.gc()
 

@@ -45,7 +45,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
 
         sb.clear()
 
-        Terrarum.ingame!!.world.getAllWiringGraph(mx, my)?.forEach { (itemID, simCell) ->
+        INGAME.world.getAllWiringGraph(mx, my)?.forEach { (itemID, simCell) ->
             if (sb.isNotEmpty()) sb.append('\n')
 
             val connexionIcon = (simCell.cnx + 0xE0A0).toChar()
@@ -57,7 +57,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
             sb.append("$connexionIcon $wireName")
             sb.append("\nE: $emit")
             recv.forEach {
-                val src = Terrarum.ingame!!.world.getWireEmitStateOf(it.src.x, it.src.y, itemID)!!
+                val src = INGAME.world.getWireEmitStateOf(it.src.x, it.src.y, itemID)!!
                 sb.append("\nR: $src $EMDASH d ${it.dist}")
             }
         }

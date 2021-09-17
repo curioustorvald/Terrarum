@@ -11,8 +11,8 @@ import net.torvald.terrarum.console.Echo
 internal object Seed : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
-        Echo("Map$ccW: $ccG${(Terrarum.ingame!!.world).generatorSeed}")
-        println("[seed] Map$ccW: $ccG${(Terrarum.ingame!!.world).generatorSeed}")
+        Echo("Map$ccW: $ccG${(INGAME.world).generatorSeed}")
+        println("[seed] Map$ccW: $ccG${(INGAME.world).generatorSeed}")
         // TODO display randomiser seed
     }
 

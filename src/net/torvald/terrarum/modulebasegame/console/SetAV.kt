@@ -78,7 +78,7 @@ internal object SetAV : ConsoleCommand {
             try {
                 val id = args[1].toInt()
                 val newValue = parseAVInput(args[3])
-                val actor = Terrarum.ingame!!.getActorByID(id)
+                val actor = INGAME.getActorByID(id)
 
                 // check if av is number
                 if (args[2].isNum()) {

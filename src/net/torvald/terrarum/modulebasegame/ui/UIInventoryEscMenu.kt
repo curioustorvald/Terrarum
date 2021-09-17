@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TitleScreen
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
@@ -86,7 +83,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     full.handler.lockToggle()
                     full.lockTransition()
                     // save the game
-                    WriteSavegame(Terrarum.ingame!!.savegameArchive, File(App.defaultSaveDir, "${App.getTIME_T()}"), Terrarum.ingame!! as TerrarumIngame) {
+                    WriteSavegame(INGAME.savegameArchive, File(App.defaultSaveDir, "${App.getTIME_T()}"), Terrarum.ingame!! as TerrarumIngame) {
                         // callback:
                         System.gc()
                         screen = 0

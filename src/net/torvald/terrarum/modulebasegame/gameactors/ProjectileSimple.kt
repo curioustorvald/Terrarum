@@ -83,7 +83,7 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
         lifetimeCounter += delta
         if (walledTop || walledBottom || walledRight || walledLeft || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(feetPosTile.x, feetPosTile.y) ?: Block.STONE].isSolid
+            BlockCodex[(INGAME.world).getTileFromTerrain(feetPosTile.x, feetPosTile.y) ?: Block.STONE].isSolid
                 ) {
             flagDespawn()
         }
@@ -103,13 +103,13 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
         /*batch.end()
         Terrarum.inShapeRenderer {
             // draw trail of solid colour (Terraria style maybe?)
-            it.lineWidth = 2f * Terrarum.ingame!!.screenZoom
+            it.lineWidth = 2f * INGAME.screenZoom
             g.drawGradientLine(
-                    hitbox.centeredX.toFloat() * Terrarum.ingame!!.screenZoom,
-                    hitbox.centeredY.toFloat() * Terrarum.ingame!!.screenZoom,
+                    hitbox.centeredX.toFloat() * INGAME.screenZoom,
+                    hitbox.centeredY.toFloat() * INGAME.screenZoom,
                     displayColour,
-                    posPre.x.toFloat() * Terrarum.ingame!!.screenZoom,
-                    posPre.y.toFloat() * Terrarum.ingame!!.screenZoom,
+                    posPre.x.toFloat() * INGAME.screenZoom,
+                    posPre.y.toFloat() * INGAME.screenZoom,
                     colourTail
             )
         }

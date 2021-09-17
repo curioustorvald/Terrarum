@@ -88,7 +88,7 @@ class ActorValueTracker constructor() : JFrame() {
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {
-                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithBody
+                    actor = INGAME.getActorByID(actorIDField.text.toInt()) as ActorWithBody
                     actorValue = actor!!.actorValue
                 }
             }

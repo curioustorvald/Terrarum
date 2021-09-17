@@ -27,7 +27,7 @@ class UIInventoryFull(
 ) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
 
     val actor: ActorHumanoid
-        get() = Terrarum.ingame!!.actorNowPlaying!!
+        get() = INGAME.actorNowPlaying!!
 
     override var width: Int = App.scr.width
     override var height: Int = App.scr.height

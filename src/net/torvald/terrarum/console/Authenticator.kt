@@ -1,7 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.ui.ConsoleWindow
+import net.torvald.terrarum.INGAME
 import org.apache.commons.codec.digest.DigestUtils
 
 /**
@@ -40,7 +39,7 @@ internal object Authenticator : ConsoleCommand {
                 Echo(msg)
                 println("[Authenticator] " + msg)
                 a = !a
-                Terrarum.ingame!!.consoleHandler.reset()
+                INGAME.consoleHandler.reset()
             }
             else {
                 printUsage() // thou shalt not pass!

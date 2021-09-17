@@ -81,7 +81,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun getNegotiator() = negotiator
     override fun getFixtureInventory(): FixtureInventory = chestInventory
-    override fun getPlayerInventory(): FixtureInventory = Terrarum.ingame!!.actorNowPlaying!!.inventory
+    override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
     private lateinit var catBar: UIItemInventoryCatBar
     private lateinit var itemListChest: UIItemInventoryItemGrid
@@ -151,7 +151,7 @@ internal class UIStorageChest : UICanvas(
             itemListPlayer = UIItemInventoryItemGrid(
                     this,
                     catBar,
-                    { Terrarum.ingame!!.actorNowPlaying!!.inventory }, // literally a player's inventory
+                    { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
                     INVENTORY_CELLS_OFFSET_X - halfSlotOffset + (listGap + UIItemInventoryElem.height) * 7,
                     INVENTORY_CELLS_OFFSET_Y,
                     6, CELLS_VRT,

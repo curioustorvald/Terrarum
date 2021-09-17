@@ -139,7 +139,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         this.hitbox.setFromWidthHeight(posX * TILE_SIZED, posY * TILE_SIZED, blockBox.width * TILE_SIZED, blockBox.height * TILE_SIZED)
 
         // actually add this actor into the world
-        Terrarum.ingame!!.addNewActor(this)
+        INGAME.addNewActor(this)
 
 
         return true

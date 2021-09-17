@@ -90,7 +90,7 @@ class UIItemInventoryEquippedView(
 
 
         // sprite
-        val sprite = Terrarum.ingame!!.actorNowPlaying?.sprite
+        val sprite = INGAME.actorNowPlaying?.sprite
         sprite?.let {
             blendNormal(batch)
 
@@ -119,7 +119,7 @@ class UIItemInventoryEquippedView(
     internal fun rebuild() {
         rebuildList = false
 
-        Terrarum.ingame!!.actorNowPlaying?.inventory?.let {
+        INGAME.actorNowPlaying?.inventory?.let {
             // sort by equip position
 
             // fill the grid from fastest index, make no gap in-between of slots

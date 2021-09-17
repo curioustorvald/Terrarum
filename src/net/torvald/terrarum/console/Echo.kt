@@ -18,14 +18,14 @@ internal object Echo : ConsoleCommand {
         val sb = StringBuilder()
         for (ch in single_line) {
             if (ch == '\n') {
-                Terrarum.ingame!!.consoleHandler.sendMessage(sb.toString())
+                INGAME.consoleHandler.sendMessage(sb.toString())
                 println("[Echo] $csiG$sb$csi0")
                 sb.delete(0, sb.length - 1)
             }
             else
                 sb.append(ch)
         }
-        Terrarum.ingame!!.consoleHandler.sendMessage(sb.toString())
+        INGAME.consoleHandler.sendMessage(sb.toString())
         println("[Echo] $csiG$sb$csi0")
     }
 

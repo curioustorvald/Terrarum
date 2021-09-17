@@ -1,9 +1,9 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.debuggerapp.ActorValueTracker
-import java.util.*
 
 /**
  * Created by minjaesong on 2016-12-29.
@@ -19,8 +19,8 @@ internal object AVTracker : ConsoleCommand {
             try {
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame!!.theGameHasActor(actorID)) {
-                    jPanelInstances.add(ActorValueTracker(Terrarum.ingame!!.getActorByID(actorID)))
+                if (INGAME.theGameHasActor(actorID)) {
+                    jPanelInstances.add(ActorValueTracker(INGAME.getActorByID(actorID)))
                 }
                 else {
                     throw IllegalArgumentException()

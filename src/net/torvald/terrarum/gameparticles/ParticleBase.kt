@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -44,11 +45,11 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
             lifetimeCounter += delta
             if (velocity.isZero ||
                 // simple stuck check
-                BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(
+                BlockCodex[(INGAME.world).getTileFromTerrain(
                         hitbox.centeredX.div(TerrarumAppConfiguration.TILE_SIZE).floorInt(),
                         hitbox.startY.div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
                 )].isSolid ||
-                BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(
+                BlockCodex[(INGAME.world).getTileFromTerrain(
                         hitbox.centeredX.div(TerrarumAppConfiguration.TILE_SIZE).floorInt(),
                         hitbox.endY.div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
                 )].isSolid) {
@@ -64,7 +65,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
 
             // gravity, winds, etc. (external forces)
             if (!isNoSubjectToGrav) {
-                velocity.plusAssign((Terrarum.ingame!!.world).gravitation / dragCoefficient)
+                velocity.plusAssign((INGAME.world).gravitation / dragCoefficient)
             }
 
 
@@ -76,14 +77,18 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     open fun drawBody(batch: SpriteBatch) {
         if (!flagDespawn) {
             batch.color = drawColour
-            batch.draw(body, hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
+            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
+                batch.draw(body, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
+            }
         }
     }
 
     open fun drawGlow(batch: SpriteBatch) {
         if (!flagDespawn && glow != null) {
             batch.color = drawColour
-            batch.draw(glow, hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
+            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
+                batch.draw(glow, x, y, hitbox.width.toFloat(), hitbox.height.toFloat())
+            }
         }
     }
 

@@ -104,7 +104,7 @@ internal object WeatherMixer : RNGConsumer {
                 )
                 (Terrarum.ingame!! as TerrarumIngame).addParticle(rainParticle)
             }
-            //globalLightNow.set(getGlobalLightOfTime((Terrarum.ingame!!.world).time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
+            //globalLightNow.set(getGlobalLightOfTime((INGAME.world).time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
         }
 
 

@@ -1,8 +1,7 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ccR
-import net.torvald.terrarum.ui.ConsoleWindow
 
 /**
  * Created by minjaesong on 2016-04-25.
@@ -15,7 +14,7 @@ internal object EchoError : ConsoleCommand {
     }
 
     fun execute(single_line: String) {
-        (Terrarum.ingame!!.consoleHandler).sendMessage("$ccR$single_line")
+        (INGAME.consoleHandler).sendMessage("$ccR$single_line")
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

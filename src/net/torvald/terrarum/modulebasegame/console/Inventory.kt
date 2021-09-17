@@ -49,7 +49,7 @@ internal object Inventory : ConsoleCommand {
     }
 
     private fun setTarget(actorRefId: Int = Terrarum.PLAYER_REF_ID) {
-        val actor = Terrarum.ingame!!.getActorByID(actorRefId)
+        val actor = INGAME.getActorByID(actorRefId)
         if (actor !is Pocketed) {
             EchoError("Cannot edit inventory of incompatible actor: $actor")
         }

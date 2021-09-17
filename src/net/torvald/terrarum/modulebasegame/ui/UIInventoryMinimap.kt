@@ -34,7 +34,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     private val minimapRerenderInterval = .5f
 
     override fun updateUI(delta: Float) {
-        MinimapComposer.setWorld(Terrarum.ingame!!.world)
+        MinimapComposer.setWorld(INGAME.world)
         MinimapComposer.update()
         minimapRerenderTimer += Gdx.graphics.deltaTime
     }

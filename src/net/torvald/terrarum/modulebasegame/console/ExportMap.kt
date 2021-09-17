@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
@@ -22,7 +22,7 @@ internal object ExportMap : ConsoleCommand {
 
 
     override fun execute(args: Array<String>) {
-        val world = (Terrarum.ingame!!.world)
+        val world = (INGAME.world)
         
         if (args.size == 2) {
 

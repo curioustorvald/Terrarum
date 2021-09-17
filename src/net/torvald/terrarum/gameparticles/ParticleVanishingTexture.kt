@@ -2,8 +2,8 @@ package net.torvald.terrarum.gameparticles
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -58,7 +58,9 @@ class ParticleVanishingText(val text: String, x: Double, y: Double, noCollision:
         if (!flagDespawn) {
             batch.color = drawColour
             lines.forEachIndexed { index, line ->
-                TinyAlphNum.draw(batch, line, hitbox.startX.toFloat(), hitbox.startY.toFloat() + TinyAlphNum.H * index)
+                drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat() + TinyAlphNum.H * index) { x, y ->
+                    TinyAlphNum.draw(batch, line, x, y )
+                }
             }
         }
     }
@@ -101,7 +103,9 @@ open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Flo
     override fun drawBody(batch: SpriteBatch) {
         if (!flagDespawn) {
             batch.color = drawColour
-            batch.draw(sprite.get(frame, row), hitbox.startX.toFloat(), hitbox.startY.toFloat())
+            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
+                batch.draw(sprite.get(frame, row), x, y)
+            }
         }
     }
 }

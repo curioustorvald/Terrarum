@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
@@ -52,7 +53,7 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
             try {
                 // place the actor to the world
                 this@HumanoidNPC.setPosition(Terrarum.mouseX, Terrarum.mouseY)
-                Terrarum.ingame!!.addNewActor(this@HumanoidNPC)
+                INGAME.addNewActor(this@HumanoidNPC)
                 // successful
                 return true
             }

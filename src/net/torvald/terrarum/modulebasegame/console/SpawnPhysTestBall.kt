@@ -1,9 +1,10 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.modulebasegame.gameactors.PhysTestBall
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.modulebasegame.gameactors.PhysTestBall
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -26,7 +27,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             ball.elasticity = elasticity
             ball.applyForce(Vector2(xvel, yvel))
 
-            Terrarum.ingame!!.addNewActor(ball)
+            INGAME.addNewActor(ball)
         }
         else if (args.size == 2) {
             val elasticity = args[1].toDouble()
@@ -35,7 +36,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             ball.setPosition(mouseX, mouseY)
             ball.elasticity = elasticity
 
-            Terrarum.ingame!!.addNewActor(ball)
+            INGAME.addNewActor(ball)
         }
         else {
             printUsage()

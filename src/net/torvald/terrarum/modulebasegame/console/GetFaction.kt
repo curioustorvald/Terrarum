@@ -21,7 +21,7 @@ internal object GetFaction : ConsoleCommand {
         val error = Error()
 
         fun printOutFactioning(id: Int) {
-            val a = Terrarum.ingame!!.getActorByID(id)
+            val a = INGAME.getActorByID(id)
             if (a is Factionable) {
                 Echo("$ccW== Faction assignment for $ccY${if (id == Terrarum.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
                 println("[GetFactioning] == Faction assignment for '${if (id == Terrarum.PLAYER_REF_ID) "player" else id.toString()}' ==")
