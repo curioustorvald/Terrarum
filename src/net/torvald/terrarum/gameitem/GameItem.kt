@@ -3,14 +3,14 @@ package net.torvald.terrarum.gameitem
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.Codex
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.*
 
 typealias ItemID = String
 
@@ -210,7 +210,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
     
     override fun toString(): String {
-        return "$dynamicID/$originalID"
+        return "GameItem(dynID:$dynamicID,origID:$originalID)"
     }
 
     override fun hashCode(): Int {

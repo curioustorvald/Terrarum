@@ -331,6 +331,11 @@ open class GameWorld() : Disposable {
         val wireNode = wirings[blockAddr]
 
         if (wireNode != null) {
+            if (!bypassEvent) {
+                Terrarum.ingame?.queueWireChangedEvent(tile, true, x, y)
+                Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
+            }
+
             // figure out wiring graphs
             val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
                 (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index

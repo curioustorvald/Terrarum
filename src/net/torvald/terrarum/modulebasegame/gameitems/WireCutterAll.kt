@@ -20,9 +20,9 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
     override val originalName = "ITEM_WIRE_CUTTER"
     override var baseMass = 0.1
     override var baseToolSize: Double? = baseMass
-    override var stackable = true
+    override var stackable = false
     override var inventoryCategory = Category.TOOL
-    override val isUnique = false
+    override val isUnique = true
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion
@@ -35,7 +35,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(delta: Float): Boolean {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
-        val wires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)
+        val wires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.cloneToList()
 
         wires?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)

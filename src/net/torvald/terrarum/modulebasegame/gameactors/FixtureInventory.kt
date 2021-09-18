@@ -1,14 +1,13 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import java.math.BigInteger
 import java.util.concurrent.locks.ReentrantLock
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2021-03-16.
@@ -109,10 +108,10 @@ open class FixtureInventory() {
                 existingItem.qty = newCount
             }
             else {
+                // unequip must be done before the entry removal
+                unequipFun(existingItem)
                 // depleted item; remove entry from inventory
                 itemList.remove(existingItem)
-                // do additional removal job (e.g. unequipping)
-                unequipFun(existingItem)
             }
         }
         else {

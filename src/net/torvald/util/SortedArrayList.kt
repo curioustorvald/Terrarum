@@ -130,6 +130,14 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : MutableCollecti
     override inline fun forEach(action: Consumer<in T>?) = arrayList.forEach(action)
     inline fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
 
+    fun cloneToList(): List<T> {
+        val ret = ArrayList<T>()
+        forEach {
+            ret.add(it)
+        }
+        return ret
+    }
+
 
     inline fun <reified R> map(transformation: (T) -> R) = arrayList.map(transformation)
 
