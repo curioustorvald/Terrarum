@@ -28,7 +28,6 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
-
     }
 
     override fun startPrimaryUse(delta: Float): Boolean {

@@ -325,6 +325,29 @@ open class GameWorld() : Disposable {
         }
     }
 
+    fun removeTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
+        val (x, y) = coerceXY(x, y)
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        val wireNode = wirings[blockAddr]
+
+        if (wireNode != null) {
+            // figure out wiring graphs
+            val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
+                (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index
+            }.sum()
+            for (i in 0..3) {
+                if (matchingNeighbours and WIRE_POS_MAP[i] > 0) {
+                    val (tx, ty) = WireActor.WIRE_NEARBY[i]
+                    val old = getWireGraphOf(x + tx, y + ty, tile) ?: 0
+                    setWireGraphOf(x + tx, y + ty, tile, old and (15 - WIRE_ANTIPOS_MAP[i]))
+                }
+            }
+
+            wiringGraph[blockAddr]!!.remove(tile)
+            wirings[blockAddr]!!.ws.remove(tile)
+        }
+    }
+
     fun getWireGraphOf(x: Int, y: Int, itemID: ItemID): Int? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
