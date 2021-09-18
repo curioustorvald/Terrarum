@@ -1,19 +1,16 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
-import net.torvald.terrarum.*
 
 typealias BlockBoxIndex = Int
 
@@ -109,6 +106,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         //     posX: centre of the blockBox
         //     posY: bottom of the blockBox
         // using the actor's hitbox
+
+
+        // wrap x-position
+        val posX = posX fmod world!!.width
 
 
         // check for existing blocks (and fixtures)

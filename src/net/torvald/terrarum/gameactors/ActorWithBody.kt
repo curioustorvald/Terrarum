@@ -1625,20 +1625,26 @@ open class ActorWithBody : Actor {
             sprite.render(batch, x - offsetX, y - offsetY, scale.toFloat())
         }
 
-        /*if (WorldCamera.x >= offendingPad && hitbox.startX < WorldCamera.width) {
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
-        }
-        else {
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat(),
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
-        }*/
+        /*
+        sprite.render(batch,
+                (hitbox.startX - offsetX).toFloat(),
+                (hitbox.startY - offsetY).toFloat(),
+                (scale).toFloat()
+        )
+
+        batch.color = Color.BLUE
+        sprite.render(batch,
+                (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZEF,
+                (hitbox.startY - offsetY).toFloat(),
+                (scale).toFloat()
+        )
+
+        batch.color = Color.GREEN
+        sprite.render(batch,
+                (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
+                (hitbox.startY - offsetY).toFloat(),
+                (scale).toFloat()
+        )*/
     }
 
     override fun onActorValueChange(key: String, value: Any?) {
@@ -1923,10 +1929,14 @@ open class ActorWithBody : Actor {
 
 inline fun drawBodyInGoodPosition(startX: Float, startY: Float, drawFun: (x: Float, y: Float) -> Unit) {
     val offendingPad = INGAME.world.width.times(TerrarumAppConfiguration.TILE_SIZE) - WorldCamera.width - 1
+    val offendingPad2 = WorldCamera.width + 1
 
     if (WorldCamera.x >= offendingPad && startX < WorldCamera.width) {
         drawFun(startX + INGAME.world.width * TILE_SIZEF, startY)
     }
+//    else if (WorldCamera.x <= offendingPad2 && startX > offendingPad) {
+//        drawFun(startX - INGAME.world.width * TILE_SIZEF, startY)
+//    }
     else {
         drawFun(startX , startY)
     }
