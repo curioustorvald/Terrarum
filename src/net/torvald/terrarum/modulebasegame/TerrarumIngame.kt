@@ -422,7 +422,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
                 uiPieMenu,
                 uiQuickBar,
-                uiBasicInfo,
+//                uiBasicInfo, // temporarily commenting out: wouldn't make sense for v 0.3 release
                 uiWatchTierOne,
                 UIScreenZoom(),
                 uiInventoryPlayer,
