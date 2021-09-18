@@ -291,67 +291,78 @@ public class App implements ApplicationListener {
         System.out.println(csiG+TerrarumAppConfiguration.COPYRIGHT_LICENSE_TERMS_SHORT+csi0);
 
 
-        // load configs
-        getDefaultDirectory();
-        createDirs();
-        readConfigJson();
-        updateListOfSavegames();
-
-        setGamepadButtonLabels();
+        try {
 
 
-        try { processor = GetCpuName.getModelName(); }
-        catch (IOException e1) { processor = "Unknown CPU"; }
-        try { processorVendor = GetCpuName.getCPUID(); }
-        catch (IOException e2) { processorVendor = "Unknown CPU"; }
+            // load configs
+            getDefaultDirectory();
+            createDirs();
+            readConfigJson();
+            updateListOfSavegames();
+
+            setGamepadButtonLabels();
 
 
-        ShaderProgram.pedantic = false;
-
-        scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
-        int width = scr.getWidth();
-        int height = scr.getHeight();
-
-        Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
-        //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
-        appConfig.useVsync(getConfigBoolean("usevsync"));
-        appConfig.setResizable(false);
-        appConfig.setWindowedMode(width, height);
-        int fps = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
-        if (fps <= 0) fps = GLOBAL_FRAMERATE_LIMIT;
-        appConfig.setIdleFPS(fps);
-        appConfig.setForegroundFPS(fps);
-        appConfig.setTitle(GAME_NAME);
-        //appConfig.forceExit = true; // it seems KDE 5 likes this one better...
-        // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
-        //appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
-
-        // load app icon
-        int[] appIconSizes = new int[]{256,128,64,32,16};
-        ArrayList<String> appIconPaths = new ArrayList<>();
-        for (int size : appIconSizes) {
-            String name = "assets/appicon" + size + ".png";
-            if (new File("./" + name).exists()) {
-                appIconPaths.add("./" + name);
+            try {
+                processor = GetCpuName.getModelName();
             }
-        }
+            catch (IOException e1) {
+                processor = "Unknown CPU";
+            }
+            try {
+                processorVendor = GetCpuName.getCPUID();
+            }
+            catch (IOException e2) {
+                processorVendor = "Unknown CPU";
+            }
 
-        Object[] iconPathsTemp = appIconPaths.toArray();
-        appConfig.setWindowIcon(Arrays.copyOf(iconPathsTemp, iconPathsTemp.length, String[].class));
 
-        //if (args.length == 1 && args[0].equals("isdev=true")) {
+            ShaderProgram.pedantic = false;
+
+            scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
+            int width = scr.getWidth();
+            int height = scr.getHeight();
+
+            Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
+            //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
+            appConfig.useVsync(getConfigBoolean("usevsync"));
+            appConfig.setResizable(false);
+            appConfig.setWindowedMode(width, height);
+            int fps = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
+            if (fps <= 0) fps = GLOBAL_FRAMERATE_LIMIT;
+            appConfig.setIdleFPS(fps);
+            appConfig.setForegroundFPS(fps);
+            appConfig.setTitle(GAME_NAME);
+            //appConfig.forceExit = true; // it seems KDE 5 likes this one better...
+            // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
+            //appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
+
+            // load app icon
+            int[] appIconSizes = new int[]{256, 128, 64, 32, 16};
+            ArrayList<String> appIconPaths = new ArrayList<>();
+            for (int size : appIconSizes) {
+                String name = "assets/appicon" + size + ".png";
+                if (new File("./" + name).exists()) {
+                    appIconPaths.add("./" + name);
+                }
+            }
+
+            Object[] iconPathsTemp = appIconPaths.toArray();
+            appConfig.setWindowIcon(Arrays.copyOf(iconPathsTemp, iconPathsTemp.length, String[].class));
+
             IS_DEVELOPMENT_BUILD = true;
-            // safe area box
-            //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
-        //}
-        //else {
-        //    System.err.println("Game not started using DEBUG MODE -- current build of the game will display black screen without debug mode");
-        //}
-        
-        // set some more configuration vars
-        MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
 
-        new Lwjgl3Application(new App(appConfig), appConfig);
+            // set some more configuration vars
+            MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
+
+            new Lwjgl3Application(new App(appConfig), appConfig);
+        }
+        catch (Throwable e) {
+            if (Gdx.app != null) {
+                Gdx.app.exit();
+            }
+            new GameCrashHandler(e);
+        }
     }
     
     @Override

@@ -213,7 +213,7 @@ open class GameWorld() : Disposable {
             return tileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()]!!
         }
         catch (e: NullPointerException) {
-            val msg = "No tile name mapping for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y)"
+            val msg = "No tile name mapping for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y) from $layerWall"
             throw NoSuchElementException(msg)
         }
     }
@@ -228,7 +228,7 @@ open class GameWorld() : Disposable {
             return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]!!
         }
         catch (e: NullPointerException) {
-            val msg = "No tile name mapping for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y)"
+            val msg = "No tile name mapping for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y) from $layerTerrain"
             throw NoSuchElementException(msg)
         }
     }
