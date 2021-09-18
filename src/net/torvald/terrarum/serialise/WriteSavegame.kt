@@ -90,6 +90,15 @@ object LoadSavegame {
         val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
         val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
 
+        // set lateinit vars on the gameworld FIRST
+        world.layerTerrain = BlockLayer(world.width, world.height)
+        world.layerWall = BlockLayer(world.width, world.height)
+
+        newIngame.savegameArchive = disk
+        newIngame.creationTime = meta.creation_t
+        newIngame.lastPlayTime = meta.lastplay_t
+        newIngame.totalPlayTime = meta.playtime_t
+        newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
 
 
 
@@ -107,18 +116,11 @@ object LoadSavegame {
             val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
 
 
-            // set lateinit vars on the gameworld
-            world.layerTerrain = BlockLayer(world.width, world.height)
-            world.layerWall = BlockLayer(world.width, world.height)
 
             val worldParam = TerrarumIngame.Codices(disk, meta, item, apocryphas, actors)
-            newIngame.world = world
             newIngame.gameLoadInfoPayload = worldParam
             newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
-            newIngame.savegameArchive = disk
-            newIngame.creationTime = meta.creation_t
-            newIngame.lastPlayTime = meta.lastplay_t
-            newIngame.totalPlayTime = meta.playtime_t
+
 
             // load all the world blocklayer chunks
             val worldnum = world.worldIndex.toLong()

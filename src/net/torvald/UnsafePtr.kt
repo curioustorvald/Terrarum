@@ -1,5 +1,6 @@
 package net.torvald
 
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.printStackTrace
 import sun.misc.Unsafe
 import java.io.IOException
@@ -30,6 +31,10 @@ internal object UnsafeHelper {
      */
     fun allocate(size: Long): UnsafePtr {
         val ptr = unsafe.allocateMemory(size)
+
+        printdbg(this, "Allocating 0x${ptr.toString(16)} with size $size, called by:")
+        printStackTrace(this)
+
         return UnsafePtr(ptr, size)
     }
 
@@ -93,6 +98,10 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
             destroyed = true
 
             UnsafeHelper.unsafeAllocatedSize -= size
+        }
+        else {
+            println("[UnsafePtr] Destroy() is called but the pointer $this is already been destroyed; called from:")
+            printStackTrace(this)
         }
     }
 
