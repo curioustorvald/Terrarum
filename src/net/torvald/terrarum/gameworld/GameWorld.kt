@@ -410,7 +410,7 @@ open class GameWorld() : Disposable {
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0, vector)
 
-        wiringGraph[blockAddr]!![itemID]!!.emt = vector
+        wiringGraph[blockAddr]!![itemID]!!.emt.set(vector)
     }
 
     fun addWireRecvStateOf(x: Int, y: Int, itemID: ItemID, state: WireRecvState) {
@@ -649,8 +649,8 @@ open class GameWorld() : Disposable {
      */
     data class WiringSimCell(
             var cnx: Int = 0, // connections
-            var emt: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
-            var rcv: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
+            val emt: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
+            val rcv: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
     )
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {

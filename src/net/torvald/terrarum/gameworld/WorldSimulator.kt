@@ -11,8 +11,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Electric
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import org.dyn4j.geometry.Vector2
-import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
 /**
@@ -442,17 +440,31 @@ object WorldSimulator {
                 it is FixtureBase && it is Electric && it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
             } as List<FixtureBase>
 
+    private val wireSimMarked = HashSet<Long>()
+    private val wireSimPoints = Queue<WireGraphCursor>()
+    private val oldTraversedNodes = ArrayList<WireGraphCursor>()
+
     private fun simulateWires(delta: Float) {
+        // unset old wires before we begin
+        oldTraversedNodes.forEach { (x, y, _, _, wire) ->
+            world.getAllWiringGraph(x, y)?.get(wire)?.emt?.set(0.0, 0.0)
+        }
+
+        oldTraversedNodes.clear()
+
         wiresimGetSourceBlocks().let { sources ->
             // signal-emitting fixtures must set emitState of its own tiles via update()
             sources.forEach {
                 (it as Electric).wireEmitterTypes.forEach { wireType, bbi ->
 
-                    val startingPoint = WireGraphCursor(it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi))
+                    val startingPoint = it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi)
                     val signal = (it as Electric).wireEmission[bbi] ?: Vector2(0.0, 0.0)
 
                     world.getAllWiringGraph(startingPoint.x, startingPoint.y)?.keys?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
-                        traverseWireGraph(world, wire, startingPoint, signal)
+                        val simStartingPoint = WireGraphCursor(startingPoint, wire)
+                        wireSimMarked.clear()
+                        wireSimPoints.clear()
+                        traverseWireGraph(world, wire, simStartingPoint, signal)
                     }
                 }
             }
@@ -470,23 +482,22 @@ object WorldSimulator {
         }
 
         var point = startingPoint.copy()
-        val points = Queue<WireGraphCursor>() // a queue, enqueued at the end
-        val marked = HashSet<Long>()
 
         fun mark(point: WireGraphCursor) {
-            marked.add(point.longHash())
+            wireSimMarked.add(point.longHash())
+            oldTraversedNodes.add(point.copy())
             // do some signal action
             world.setWireEmitStateOf(point.x, point.y, wire, signal)
         }
 
-        fun isMarked(point: WireGraphCursor) = marked.contains(point.longHash())
-        fun enq(point: WireGraphCursor) = points.addFirst(point.copy())
-        fun deq() = points.removeLast()
+        fun isMarked(point: WireGraphCursor) = wireSimMarked.contains(point.longHash())
+        fun enq(point: WireGraphCursor) = wireSimPoints.addFirst(point.copy())
+        fun deq() = wireSimPoints.removeLast()
 
         enq(point)
         mark(point)
 
-        while (points.notEmpty()) {
+        while (wireSimPoints.notEmpty()) {
             point = deq()
             // TODO if we found a power receiver, do something to it
             world.getWireGraphOf(point.x, point.y, wire)?.let { connections ->
@@ -519,9 +530,10 @@ object WorldSimulator {
             var x: Int,
             var y: Int,
             var fromWhere: Int, //1: right, 2: down, 4: left, 8: up, 0: *shrug*
-            var len: Int
+            var len: Int,
+            var wire: ItemID
     ) {
-        constructor(point2i: Point2i): this(point2i.x, point2i.y, 0, 0)
+        constructor(point2i: Point2i, wire: ItemID): this(point2i.x, point2i.y, 0, 0, wire)
 
         fun moveOneCell(dir: Int): WireGraphCursor {
             when (dir) {
