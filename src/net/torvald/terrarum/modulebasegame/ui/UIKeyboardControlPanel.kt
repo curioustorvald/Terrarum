@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -35,8 +36,8 @@ class UIKeyboardControlPanel : UICanvas() {
     private val drawX = (App.scr.width - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    internal val kbx = (App.scr.width - width) / 2 + 61
-    internal val kby = (App.scr.height - height) / 2 + 95
+    internal val kbx = drawX + 61
+    internal val kby = drawY + 95
 
     private val oneu = 28
     private val onehalfu = 44
@@ -155,8 +156,12 @@ class UIKeyboardControlPanel : UICanvas() {
 //        Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 //        batch.color = fillCol
 //        Toolkit.fillArea(batch, drawX, drawY, width, height)
-
         uiItems.forEach { it.render(batch, camera) }
+
+        batch.color = Color.WHITE
+        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+
     }
 
     override fun doOpening(delta: Float) {

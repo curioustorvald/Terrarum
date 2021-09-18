@@ -1343,7 +1343,7 @@
             },
             {
                 "n": "GAME_INVENTORY",
-                "s": "Inventory"
+                "s": "Birgðir"
             },
             {
                 "n": "GAME_INVENTORY_AMMO",
@@ -1371,11 +1371,11 @@
             },
             {
                 "n": "GAME_INVENTORY_DROP",
-                "s": "Drop"
+                "s": "Drjúpa"
             },
             {
                 "n": "GAME_INVENTORY_ENCUMBRANCE",
-                "s": "Encumbrance"
+                "s": "Kvaðir"
             },
             {
                 "n": "GAME_INVENTORY_FULL",
@@ -1399,7 +1399,7 @@
             },
             {
                 "n": "GAME_INVENTORY_USE",
-                "s": "Use"
+                "s": "Nota"
             },
             {
                 "n": "GAME_INVENTORY_WEAPON",
@@ -1691,15 +1691,15 @@
             },
             {
                 "n": "MENU_CONTROLS_KEY",
-                "s": "Key"
+                "s": "Lykill"
             },
             {
                 "n": "MENU_CONTROLS_KEYBOARD",
-                "s": "Keyboard"
+                "s": "Lyklaborð"
             },
             {
                 "n": "MENU_CONTROLS_MOUSE",
-                "s": "Mouse"
+                "s": "Mús"
             },
             {
                 "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
@@ -1715,7 +1715,7 @@
             },
             {
                 "n": "MENU_CONTROLS_SCROLL",
-                "s": "Scroll"
+                "s": "Fletta"
             },
             {
                 "n": "MENU_CONTROLS_SHAKE",
@@ -1899,15 +1899,15 @@
             },
             {
                 "n": "MENU_IO_LOAD",
-                "s": "Load"
+                "s": "Hlaða"
             },
             {
                 "n": "MENU_IO_LOAD_GAME",
-                "s": "Load Game"
+                "s": "Hlaða leik "
             },
             {
                 "n": "MENU_IO_LOADING",
-                "s": "Loading..."
+                "s": "Hleður..."
             },
             {
                 "n": "MENU_IO_PLEASE_WAIT",
@@ -1919,19 +1919,19 @@
             },
             {
                 "n": "MENU_IO_SAVE",
-                "s": "Save"
+                "s": "Vista"
             },
             {
                 "n": "MENU_IO_SAVE_DATA",
-                "s": "Save data"
+                "s": "Vista gögn"
             },
             {
                 "n": "MENU_IO_SAVE_GAME",
-                "s": "Save Game"
+                "s": "Vista leik "
             },
             {
                 "n": "MENU_IO_SAVING",
-                "s": "Saving..."
+                "s": " Vistar..."
             },
             {
                 "n": "MENU_LABEL_AGE",
@@ -1951,7 +1951,7 @@
             },
             {
                 "n": "MENU_LABEL_BACK",
-                "s": "Back"
+                "s": "Til baka"
             },
             {
                 "n": "MENU_LABEL_BACKGROUND_MUSIC",
@@ -1959,11 +1959,11 @@
             },
             {
                 "n": "MENU_LABEL_CANCEL",
-                "s": "Cancel"
+                "s": "Hætta við"
             },
             {
                 "n": "MENU_LABEL_CLOSE",
-                "s": "Close"
+                "s": "Loka"
             },
             {
                 "n": "MENU_LABEL_CONFIRM_BUTTON",
@@ -1971,11 +1971,11 @@
             },
             {
                 "n": "MENU_LABEL_CONTINUE",
-                "s": "Continue"
+                "s": "Halda áfram "
             },
             {
                 "n": "MENU_LABEL_CONTINUE_QUESTION",
-                "s": "Continue?"
+                "s": "halda áfram?"
             },
             {
                 "n": "MENU_LABEL_CREDITS",
@@ -1983,11 +1983,11 @@
             },
             {
                 "n": "MENU_LABEL_DESKTOP",
-                "s": "Exit to Desktop"
+                "s": "Hætta á skrifborð "
             },
             {
                 "n": "MENU_LABEL_DESKTOP_QUESTION",
-                "s": "Exit to Desktop?"
+                "s": "Hætta á skrifborð?"
             },
             {
                 "n": "MENU_LABEL_DLC",
@@ -2027,7 +2027,7 @@
             },
             {
                 "n": "MENU_LABEL_GRAPHICS",
-                "s": "Graphics"
+                "s": "Grafík"
             },
             {
                 "n": "MENU_LABEL_IAP",
@@ -2035,7 +2035,7 @@
             },
             {
                 "n": "MENU_LABEL_LANGUAGE",
-                "s": "Language"
+                "s": "Tungumál"
             },
             {
                 "n": "MENU_LABEL_LEVEL",
@@ -2063,7 +2063,7 @@
             },
             {
                 "n": "MENU_LABEL_NEW_GAME",
-                "s": "New Game"
+                "s": "Nýr leikur"
             },
             {
                 "n": "MENU_LABEL_NEXT",
@@ -2075,11 +2075,11 @@
             },
             {
                 "n": "MENU_LABEL_NO",
-                "s": "No"
+                "s": "Nei"
             },
             {
                 "n": "MENU_LABEL_NO_CAPS",
-                "s": "NO"
+                "s": "NEI"
             },
             {
                 "n": "MENU_LABEL_NOPE",
@@ -2143,7 +2143,7 @@
             },
             {
                 "n": "MENU_LABEL_QUIT",
-                "s": "Quit"
+                "s": "Hætta"
             },
             {
                 "n": "MENU_LABEL_QUIT_CONFIRM",
@@ -2151,7 +2151,7 @@
             },
             {
                 "n": "MENU_LABEL_QUIT_QUESTION",
-                "s": "Quit?"
+                "s": "hætta?"
             },
             {
                 "n": "MENU_LABEL_REPLAY",
@@ -2159,15 +2159,15 @@
             },
             {
                 "n": "MENU_LABEL_RETURN",
-                "s": "Return"
+                "s": "Til baka"
             },
             {
                 "n": "MENU_LABEL_RETURN_MAIN",
-                "s": "Return to Main Menu"
+                "s": "Fara aftur í höfuðvalmyndina"
             },
             {
                 "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
-                "s": "Return to Main Menu?"
+                "s": "Fara aftur í höfuðvalmyndina?"
             },
             {
                 "n": "MENU_LABEL_SHARE",
@@ -2207,7 +2207,7 @@
             },
             {
                 "n": "MENU_LABEL_WORLD",
-                "s": "World"
+                "s": "Heimur"
             },
             {
                 "n": "MENU_LABEL_YEAH",
@@ -2215,11 +2215,11 @@
             },
             {
                 "n": "MENU_LABEL_YES",
-                "s": "Yes"
+                "s": "Já"
             },
             {
                 "n": "MENU_LABEL_YES_CAPS",
-                "s": "YES"
+                "s": "JÁ"
             },
             {
                 "n": "MENU_LANGUAGE_DIRECTION",
@@ -2335,7 +2335,7 @@
             },
             {
                 "n": "MENU_OPTIONS",
-                "s": "Options"
+                "s": "Stillingar "
             },
             {
                 "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
@@ -2399,7 +2399,7 @@
             },
             {
                 "n": "MENU_OPTIONS_GRAPHICS",
-                "s": "Graphics Options"
+                "s": "Grafíkstillingar"
             },
             {
                 "n": "MENU_OPTIONS_HUD",

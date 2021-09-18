@@ -13,7 +13,7 @@ object UITitleRemoConYaml {
      */
     private val menuBase = """
 - MENU_OPTIONS
- - MENU_OPTIONS_GRAPHICS
+ - MENU_LABEL_GRAPHICS
  - MENU_OPTIONS_CONTROLS : net.torvald.terrarum.modulebasegame.ui.UIKeyboardControlPanel
  - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
  - MENU_MODULES : net.torvald.terrarum.ModOptionsHost

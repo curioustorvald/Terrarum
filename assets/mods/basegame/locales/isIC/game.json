@@ -10,5 +10,6 @@
   "GAME_INVENTORY_BLOCKS" : "Blokkir",
   "GAME_INVENTORY_WALLS" : "Veggir",
   "CONTEXT_ITEM_TOOL_PLURAL" : "Verkfærar",
-  "GAME_INVENTORY_FAVORITES" : "Uppáhalds"
+  "GAME_INVENTORY_FAVORITES" : "Uppáhalds",
+  "GAME_INVENTORY_REGISTER": "Skrá"
 }

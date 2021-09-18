@@ -485,7 +485,7 @@ public class App implements ApplicationListener {
 
         fontGame = new GameFontBase(FONT_DIR, false, true, false,
                 Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
-                256, false
+                256, false, 0.5f, false
         );
         Lang.invoke();
 

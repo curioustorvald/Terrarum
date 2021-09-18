@@ -59,7 +59,6 @@ object Lang {
         localesDir.listFiles().filter { it.isDirectory }.forEach { languageList.add(it.name) }
 
         // temporary filter
-        languageList.remove("isIC")
         languageList.remove("jakanaJP")
 
         for (lang in languageList) {
