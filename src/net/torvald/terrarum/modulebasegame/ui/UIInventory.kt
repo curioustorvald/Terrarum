@@ -157,10 +157,10 @@ package net.torvald.terrarum.modulebasegame.ui
     private var isEncumbered = false
 
 
-    private val seekLeft: Int;  get() = AppLoader.getConfigInt("config_keyleft")  // getter used to support in-game keybind changing
-    private val seekRight: Int; get() = AppLoader.getConfigInt("config_keyright") // getter used to support in-game keybind changing
-    private val seekUp: Int;    get() = AppLoader.getConfigInt("config_keyup")    // getter used to support in-game keybind changing
-    private val seekDown: Int;  get() = AppLoader.getConfigInt("config_keydown")  // getter used to support in-game keybind changing
+    private val seekLeft: Int;  get() = AppLoader.getConfigInt("control_key_left")  // getter used to support in-game keybind changing
+    private val seekRight: Int; get() = AppLoader.getConfigInt("control_key_right") // getter used to support in-game keybind changing
+    private val seekUp: Int;    get() = AppLoader.getConfigInt("control_key_up")    // getter used to support in-game keybind changing
+    private val seekDown: Int;  get() = AppLoader.getConfigInt("control_key_down")  // getter used to support in-game keybind changing
 
 
     init {

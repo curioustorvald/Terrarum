@@ -92,7 +92,7 @@ object IngameRenderer : Disposable {
         shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
 
 
-        if (App.getConfigBoolean("fxdither")) {
+        if (App.getConfigBoolean("fx_dither")) {
             shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
             shaderBayer.bind()
             shaderBayer.setUniformf("rcount", 64f)
@@ -116,7 +116,7 @@ object IngameRenderer : Disposable {
         }
 
 
-        if (App.getConfigBoolean("fxdither")) {
+        if (App.getConfigBoolean("fx_dither")) {
             if (!shaderBayer.isCompiled) {
                 Gdx.app.log("shaderBayer", shaderBayer.log)
                 exitProcess(1)

@@ -473,7 +473,7 @@ public class App implements ApplicationListener {
                     gamepad.getAxisRaw(2),
                     gamepad.getAxisRaw(3)
             };
-            setConfig("gamepadaxiszeropoints", axesZeroPoints);
+            setConfig("control_gamepad_axiszeropoints", axesZeroPoints);
             for (int i = 0; i < 4; i++) {
                 printdbg(this, "Axis " + i + ": " + axesZeroPoints[i]);
             }
@@ -844,14 +844,14 @@ public class App implements ApplicationListener {
     }
 
     public static void setGamepadButtonLabels() {
-        switch (getConfigString("gamepadlabelstyle")) {
+        switch (getConfigString("control_gamepad_labelstyle")) {
             case "nwii"     : gamepadLabelStart = 0xE04B; break; // + mark
             case "logitech" : gamepadLabelStart = 0xE05A; break; // number 10
             case "msxbone"  : gamepadLabelStart = 0xE049; break; // trifold equal sign?
             default         : gamepadLabelStart = 0xE042; break; // |> mark (sonyps, msxb360, generic)
         }
 
-        switch (getConfigString("gamepadlabelstyle")) {
+        switch (getConfigString("control_gamepad_labelstyle")) {
             case "nwii"     : gamepadLabelSelect = 0xE04D; break; // - mark
             case "logitech" : gamepadLabelSelect = 0xE059; break; // number 9
             case "sonyps"   : gamepadLabelSelect = 0xE043; break; // solid rectangle
@@ -861,7 +861,7 @@ public class App implements ApplicationListener {
         }
 
 
-        switch (getConfigString("gamepadlabelstyle")) {
+        switch (getConfigString("control_gamepad_labelstyle")) {
             case "msxb360": case "msxbone" : {
                 gamepadLabelSouth = 0xE061;
                 gamepadLabelEast = 0xE062;

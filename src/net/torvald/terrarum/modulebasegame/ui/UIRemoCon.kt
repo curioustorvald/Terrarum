@@ -37,7 +37,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     private val screens = ArrayList<Pair<String, UICanvas>>()
 
     private val yamlSep = Yaml.SEPARATOR
-
+    private val tagSep = "+"
     init {
         remoConTray = generateNewRemoCon(currentRemoConContents)
 
@@ -70,8 +70,9 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     private var mouseActionAvailable = true
 
     private fun generateNewRemoCon(node: QNDTreeNode<String>): UIRemoConElement {
-        val dynamicStrArray = Array(node.children.size, { node.children[it].data?.split(yamlSep)?.get(0) ?: "(null)" })
-        return UIRemoConElement(this, dynamicStrArray)
+        val labels = Array(node.children.size) { node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep)?.get(0) ?: "(null)" }
+        val tags = Array(node.children.size) { arrayOf(node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep)?.getOrNull(1) ?: "") }
+        return UIRemoConElement(this, labels, tags)
     }
 
     // currently there's no resetter for this!
@@ -94,11 +95,9 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 Gdx.app.exit()
             }
             else if (it.labelText.startsWith("MENU_LABEL_RETURN")) {
-                val tag = it.labelText.substringAfter('+')
+                val tag = it.tags
+                if (tag.contains("WRITETOCONFIG")) WriteConfig()
 
-                when (tag) {
-                    "WRITETOCONFIG" -> WriteConfig()
-                }
 
                 if (currentRemoConContents.parent != null) {
                     remoConTray.consume()
@@ -256,7 +255,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
 
 
 
-    class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>) {
+    class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>, val tags: Array<Array<String>>) {
 
         private val lineHeight = 36
 
@@ -275,7 +274,8 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 inactiveCol = Color.WHITE,
                 defaultSelection = null,
                 itemHitboxSize = lineHeight - 2,
-                alignment = UIItemTextButton.Companion.Alignment.LEFT
+                alignment = UIItemTextButton.Companion.Alignment.LEFT,
+                tagsCollection = tags
         )
 
         fun update(delta: Float) {

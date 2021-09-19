@@ -17,7 +17,7 @@ import net.torvald.terrarum.ui.UICanvas
  * Created by minjaesong on 2019-08-11.
  */
 class UIScreenZoom : UICanvas(
-        App.getConfigInt("config_keyzoom")
+        App.getConfigInt("control_key_zoom")
 ) {
 
     val zoomText = "${getKeycapPC(handler.toggleKeyLiteral!!)} $EMDASH Zoom Out"

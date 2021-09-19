@@ -45,7 +45,7 @@ class UITierOneWatch() : UICanvas() {
             ELuptimer += delta
         }
 
-        if (mouseUp || Gdx.input.isKeyPressed(App.getConfigInt("config_keyinteract"))) {
+        if (mouseUp || Gdx.input.isKeyPressed(App.getConfigInt("control_key_interact"))) {
             ELuptimer = 0f
             ELon = true
         }

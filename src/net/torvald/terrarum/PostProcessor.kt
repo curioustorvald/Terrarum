@@ -127,7 +127,7 @@ object PostProcessor : Disposable {
 
     private fun postShader(projMat: Matrix4, fbo: FrameBuffer) {
         val shader: ShaderProgram? =
-                if (App.getConfigBoolean("fxretro"))
+                if (App.getConfigBoolean("fx_retro"))
                     App.shaderHicolour
                 else
                     App.shaderPassthruRGB

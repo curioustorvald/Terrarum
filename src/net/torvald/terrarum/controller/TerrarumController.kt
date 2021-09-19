@@ -45,11 +45,11 @@ interface TerrarumController {
      */
     fun getAxisRaw(index: Int): Float
     /**
-     * Returns deadzone-applied axis value. Deadzone must be stored in the app's config database as the IntArray gamepadaxiszeropoints
+     * Returns deadzone-applied axis value. Deadzone must be stored in the app's config database as the IntArray control_gamepad_axiszeropoints
      */
     fun getAxis(index:Int): Float {
         val raw = getAxisRaw(index)
-        val zero = if (index < 4) getConfigDoubleArray("gamepadaxiszeropoints")[index] else 0.0
+        val zero = if (index < 4) getConfigDoubleArray("control_gamepad_axiszeropoints")[index] else 0.0
         val compensatedRaw = raw - zero
         val inDeadzone = Math.abs(compensatedRaw) < gamepadDeadzone
 
@@ -58,7 +58,7 @@ interface TerrarumController {
 
     fun inDeadzone(axis: Int): Boolean {
         val ax = getAxisRaw(axis)
-        val zero = if (axis < 4) getConfigDoubleArray("gamepadaxiszeropoints")[axis] else 0.0
+        val zero = if (axis < 4) getConfigDoubleArray("control_gamepad_axiszeropoints")[axis] else 0.0
 
         return Math.abs(ax - zero) < gamepadDeadzone
     }

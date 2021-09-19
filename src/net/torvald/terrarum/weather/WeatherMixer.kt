@@ -177,7 +177,7 @@ internal object WeatherMixer : RNGConsumer {
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
-        if (App.getConfigBoolean("fxdither")) {
+        if (App.getConfigBoolean("fx_dither")) {
             batch.shader = IngameRenderer.shaderBayer
             batch.shader.setUniformf("rcount", 64f)
             batch.shader.setUniformf("gcount", 64f)

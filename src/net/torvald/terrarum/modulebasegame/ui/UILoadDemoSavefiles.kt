@@ -58,7 +58,7 @@ class UILoadDemoSavefiles : UICanvas() {
 
     private val controlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("config_keyup"))}${getKeycapPC(App.getConfigInt("config_keydown"))}" +
+            "${getKeycapPC(App.getConfigInt("control_key_up"))}${getKeycapPC(App.getConfigInt("control_key_down"))}" +
             " ${Lang["MENU_CONTROLS_SCROLL"]}"
         else
             "${getKeycapConsole('R')} ${Lang["MENU_CONTROLS_SCROLL"]}"
@@ -185,12 +185,12 @@ class UILoadDemoSavefiles : UICanvas() {
 
     override fun keyDown(keycode: Int): Boolean {
         if (this.isVisible) {
-            if ((keycode == Input.Keys.UP || keycode == App.getConfigInt("config_keyup")) && scrollTarget > 0) {
+            if ((keycode == Input.Keys.UP || keycode == App.getConfigInt("control_key_up")) && scrollTarget > 0) {
                 scrollFrom = listScroll
                 scrollTarget -= 1
                 scrollAnimCounter = 0f
             }
-            else if ((keycode == Input.Keys.DOWN || keycode == App.getConfigInt("config_keydown")) && scrollTarget < uiItems.size - savesVisible) {
+            else if ((keycode == Input.Keys.DOWN || keycode == App.getConfigInt("control_key_down")) && scrollTarget < uiItems.size - savesVisible) {
                 scrollFrom = listScroll
                 scrollTarget += 1
                 scrollAnimCounter = 0f

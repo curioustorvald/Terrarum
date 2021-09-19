@@ -25,7 +25,7 @@ class UIItemConfigKeycap(
         if (keySize < 3) throw IllegalArgumentException("Key size must be greater than 2 (got $keySize)")
 
         CommonResourcePool.addToLoadingList("ui_item_keymap_keycap") {
-            TextureRegionPack("./assets/graphics/gui/ui_config_keymap_keycap.tga", 8, 32)
+            TextureRegionPack("./assets/graphics/gui/ui_control_key_map_keycap.tga", 8, 32)
         }
         CommonResourcePool.loadAll()
     }

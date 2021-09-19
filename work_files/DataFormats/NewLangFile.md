@@ -6,7 +6,7 @@ Text = Tag , Text | PlainText , Text ;
 Tag = "{" , Code , { TagArgs } , "}" ;
 TagArgs = " " , Text ;
 Code = Number | "G" | "P" | "KC" | "SYM" | "NORMAL" | "EMPH" | "VERB" | "RED" | Code , "." , Subcode ;
-    (* KC: keycap. e.g. "{KC config_keyinteract}" | "{KC e}" *)
+    (* KC: keycap. e.g. "{KC control_key_interact}" | "{KC e}" *)
     (* G: grammatical gender *)
     (* P: singualr/plural *)
     (* EMPH: emphasize noun. e.g. "Treasure for the {EMPH}paraglider{NORMAL}. A fair exchange, I believe." *)

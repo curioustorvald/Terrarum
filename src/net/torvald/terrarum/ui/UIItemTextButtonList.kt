@@ -53,7 +53,8 @@ class UIItemTextButtonList(
         val kinematic: Boolean = false,
 
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
-        val itemHitboxSize: Int = lineHeight
+        val itemHitboxSize: Int = lineHeight,
+        tagsCollection: Array<Array<String>> = Array(labelsList.size) { arrayOf("") }
 ) : UIItem(parentUI, initialX, initialY) {
 
     companion object {
@@ -101,7 +102,8 @@ class UIItemTextButtonList(
                     preGapX = pregap,
                     postGapX = postgap,
                     alignment = alignment,
-                    hitboxSize = itemHitboxSize
+                    hitboxSize = itemHitboxSize,
+                    tags = tagsCollection[i]
             )
         }
         else {
@@ -122,7 +124,8 @@ class UIItemTextButtonList(
                     preGapX = pregap,
                     postGapX = postgap,
                     alignment = alignment,
-                    hitboxSize = itemHitboxSize
+                    hitboxSize = itemHitboxSize,
+                    tags = tagsCollection[i]
             )
         }
     }

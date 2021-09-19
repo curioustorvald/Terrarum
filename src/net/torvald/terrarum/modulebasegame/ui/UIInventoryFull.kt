@@ -20,7 +20,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-10-21.
  */
 class UIInventoryFull(
-        toggleKeyLiteral: Int? = App.getConfigInt("config_keyinventory"), toggleButtonLiteral: Int? = App.getConfigInt("config_gamepadstart"),
+        toggleKeyLiteral: Int? = App.getConfigInt("control_key_inventory"), toggleButtonLiteral: Int? = App.getConfigInt("control_gamepad_start"),
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
@@ -112,10 +112,10 @@ class UIInventoryFull(
     private val SP = "\u3000 "
     val listControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("config_keyinventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}$ENDASH${0x2009.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "${getKeycapPC(App.getConfigInt("config_keydiscard"))} ${Lang["GAME_INVENTORY_DROP"]}"
+            "${getKeycapPC(App.getConfigInt("control_key_discard"))} ${Lang["GAME_INVENTORY_DROP"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["CONTEXT_ITEM_MAP"]}$SP" +

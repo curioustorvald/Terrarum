@@ -160,14 +160,14 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             terrarumIngame.actorNowPlaying?.keyDown(keycode)
 
             // quickslot by number keys
-            val quickslotKeys = App.getConfigIntArray("config_keyquickslots")
+            val quickslotKeys = App.getConfigIntArray("control_key_quickslots")
             if (keycode in quickslotKeys) {
                 terrarumIngame.actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, quickslotKeys.indexOf(keycode))
             }
 
             // pie menu
-            if (App.getConfigIntArray("config_keyquickselalt").contains(keycode)
-                || keycode == App.getConfigInt("config_keyquicksel")) {
+            if (App.getConfigIntArray("control_key_quickselalt").contains(keycode)
+                || keycode == App.getConfigInt("control_key_quicksel")) {
                 terrarumIngame.uiPieMenu.setAsOpen()
                 terrarumIngame.uiQuickBar.setAsClose()
             }
@@ -192,8 +192,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     private fun tKeyUp(keycode: Int): Boolean {
-        if (App.getConfigIntArray("config_keyquickselalt").contains(keycode)
-            || keycode == App.getConfigInt("config_keyquicksel")) {
+        if (App.getConfigIntArray("control_key_quickselalt").contains(keycode)
+            || keycode == App.getConfigInt("control_key_quicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -230,7 +230,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
         // pie menu
-        if (button == App.getConfigInt("config_mousequicksel")) {
+        if (button == App.getConfigInt("control_mouse_quicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }
@@ -263,7 +263,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         terrarumIngame.uiContainer.forEach { it?.touchDown(screenX, screenY, pointer, button) }
         
         // pie menu
-        if (button == App.getConfigInt("config_mousequicksel")) {
+        if (button == App.getConfigInt("control_mouse_quicksel")) {
             terrarumIngame.uiPieMenu.setAsOpen()
             terrarumIngame.uiQuickBar.setAsClose()
         }

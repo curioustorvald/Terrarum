@@ -134,17 +134,17 @@ class UIKeyboardControlPanel : UICanvas() {
         keycaps.values.forEach { addUIitem(it) }
 
         // read config and put icons
-        keycaps[App.getConfigInt("config_keyup")]?.symbolControl = symbolUp
-        keycaps[App.getConfigInt("config_keyleft")]?.symbolControl = symbolLeft
-        keycaps[App.getConfigInt("config_keydown")]?.symbolControl = symbolDown
-        keycaps[App.getConfigInt("config_keyright")]?.symbolControl = symbolRight
+        keycaps[App.getConfigInt("control_key_up")]?.symbolControl = symbolUp
+        keycaps[App.getConfigInt("control_key_left")]?.symbolControl = symbolLeft
+        keycaps[App.getConfigInt("control_key_down")]?.symbolControl = symbolDown
+        keycaps[App.getConfigInt("control_key_right")]?.symbolControl = symbolRight
 
-        keycaps[App.getConfigInt("config_keyjump")]?.symbolControl = symbolJump
-        keycaps[App.getConfigInt("config_keyzoom")]?.symbolControl = symbolZoom
-        keycaps[App.getConfigInt("config_keyinventory")]?.symbolControl = symbolInventory
-        keycaps[App.getConfigInt("config_keymovementaux")]?.symbolControl = symbolGrapplingHook
+        keycaps[App.getConfigInt("control_key_jump")]?.symbolControl = symbolJump
+        keycaps[App.getConfigInt("control_key_zoom")]?.symbolControl = symbolZoom
+        keycaps[App.getConfigInt("control_key_inventory")]?.symbolControl = symbolInventory
+        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = symbolGrapplingHook
 
-        keycaps[App.getConfigInt("config_keygamemenu")]?.symbolControl = symbolGamemenu
+        keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = symbolGamemenu
     }
 
     override fun updateUI(delta: Float) {

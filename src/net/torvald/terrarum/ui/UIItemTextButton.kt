@@ -44,7 +44,9 @@ open class UIItemTextButton(
         val postGapX: Int = 0,
 
         val alignment: Alignment = Alignment.CENTRE,
-        val hitboxSize: Int = UIItemTextButton.height
+        val hitboxSize: Int = UIItemTextButton.height,
+
+        val tags: Array<String> = arrayOf("")
 ) : UIItem(parentUI, initialX, initialY) {
 
     companion object {

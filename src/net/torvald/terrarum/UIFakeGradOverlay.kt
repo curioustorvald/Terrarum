@@ -61,7 +61,7 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
 
     override fun updateUI(delta: Float) {}
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        if (App.getConfigBoolean("fxblurredbackground")) {
+        if (App.getConfigBoolean("fx_backgroundblur")) {
             Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius, 0, 0, width, height)
         }
 

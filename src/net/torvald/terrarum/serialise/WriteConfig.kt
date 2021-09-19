@@ -37,12 +37,6 @@ object WriteConfig {
     }
 
     operator fun invoke() {
-        println("Writing config...")
-        App.gameConfig.hashMap.forEach { s, any ->
-            println("config $s = $any")
-        }
-
-
         val writer = java.io.FileWriter(App.configDir, false)
         writer.write(jsoner.prettyPrint(App.gameConfig))
         writer.close()
