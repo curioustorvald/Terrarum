@@ -76,7 +76,7 @@ object DefaultConfig {
 
             "config_keyjump" to Input.Keys.SPACE,
 
-            "config_keyquickslots" to (Input.Keys.NUM_0..Input.Keys.NUM_9).toList(),
+            "config_keyquickslots" to (Input.Keys.NUM_0..Input.Keys.NUM_9).toList().toIntArray(),
 
             "config_mouseprimary" to Input.Buttons.LEFT, // left mouse
             "config_mousesecondary" to Input.Buttons.RIGHT, // right mouse

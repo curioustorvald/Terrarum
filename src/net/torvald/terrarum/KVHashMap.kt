@@ -15,7 +15,7 @@ open class KVHashMap {
         hashMap = newMap
     }
 
-    protected var hashMap: HashMap<String, Any>
+    var hashMap: HashMap<String, Any>
 
     /**
      * Add key-value pair to the configuration table.

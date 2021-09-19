@@ -70,10 +70,12 @@ class UITitleLanguage : UICanvas() {
         // attach listeners
         textArea1.selectionChangeListener = { _, newSelectionIndex ->
             App.GAME_LOCALE = localeList[newSelectionIndex]
+            App.setConfig("language", localeList[newSelectionIndex])
             textArea2.deselect()
         }
         textArea2.selectionChangeListener = { _, newSelectionIndex ->
             App.GAME_LOCALE = localeList[newSelectionIndex + localeFirstHalf.size]
+            App.setConfig("language", localeList[newSelectionIndex + localeFirstHalf.size])
             textArea1.deselect()
         }
 

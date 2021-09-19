@@ -51,7 +51,7 @@ object JsonFetcher {
         var counter = 0
         var entry = map.child
         while (entry != null) {
-            action(entry.name ?: "(arrayindex $counter)", entry)
+            action(entry.name ?: "$counter", entry)
             entry = entry.next
             counter += 1
         }

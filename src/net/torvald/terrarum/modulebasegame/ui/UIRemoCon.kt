@@ -10,6 +10,7 @@ import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.Yaml
+import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -92,7 +93,13 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 //System.exit(0)
                 Gdx.app.exit()
             }
-            else if (it.labelText == "MENU_LABEL_RETURN") {
+            else if (it.labelText.startsWith("MENU_LABEL_RETURN")) {
+                val tag = it.labelText.substringAfter('+')
+
+                when (tag) {
+                    "WRITETOCONFIG" -> WriteConfig()
+                }
+
                 if (currentRemoConContents.parent != null) {
                     remoConTray.consume()
 

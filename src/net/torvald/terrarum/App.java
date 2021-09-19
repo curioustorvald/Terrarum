@@ -297,6 +297,7 @@ public class App implements ApplicationListener {
             // load configs
             getDefaultDirectory();
             createDirs();
+            initialiseConfig();
             readConfigJson();
             updateListOfSavegames();
 
@@ -988,13 +989,22 @@ public class App implements ApplicationListener {
 
     // CONFIG //
 
-    private static KVHashMap gameConfig = new KVHashMap();
+    public static KVHashMap gameConfig = new KVHashMap();
 
     private static void createConfigJson() throws IOException {
         File configFile = new File(configDir);
 
         if (!configFile.exists() || configFile.length() == 0L) {
             JsonWriter.INSTANCE.writeToFile(DefaultConfig.INSTANCE.getHashMap(), configDir);
+        }
+    }
+
+    /**
+     * Reads DefaultConfig to populate the gameConfig
+     */
+    private static void initialiseConfig() {
+        for (Map.Entry<String, Object> entry : DefaultConfig.INSTANCE.getHashMap().entrySet()) {
+            gameConfig.set(entry.getKey(), entry.getValue());
         }
     }
 
