@@ -1,15 +1,14 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.Input
 import net.torvald.terrarum.*
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
@@ -22,7 +21,6 @@ import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import java.util.*
 import kotlin.math.floor
 
 /**
@@ -524,7 +522,7 @@ class UIItemInventoryItemGrid(
 
         // scroll the item list (for now)
         if (mouseUp) {
-            scrollItemPage(amountX.toInt())
+            scrollItemPage(amountY.toInt())
         }
 
         return true

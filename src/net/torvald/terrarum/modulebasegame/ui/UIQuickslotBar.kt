@@ -4,13 +4,13 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.*
 
 /**
  * A bar-shaped representation of the Quickslot.
@@ -86,7 +86,7 @@ class UIQuickslotBar : UICanvas() {
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         // super.scrolled(amount) // no UIItems here
 
-        selection = selection.plus(if (amountX > 1) 1 else if (amountX < -1) -1 else 0).fmod(SLOT_COUNT)
+        selection = selection.plus(if (amountY > 1) 1 else if (amountY < -1) -1 else 0).fmod(SLOT_COUNT)
 
         return true
     }

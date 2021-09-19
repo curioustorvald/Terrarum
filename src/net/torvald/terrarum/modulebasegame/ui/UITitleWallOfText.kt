@@ -15,10 +15,10 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = App.scr.width - UIRemoCon.remoConWidth - textAreaHMargin
+    override var width = 600
     override var height = App.scr.height - textAreaHMargin * 2
     private val textArea = UIItemTextArea(this,
-            UIRemoCon.remoConWidth, textAreaHMargin,
+            (App.scr.width - width) / 2, textAreaHMargin,
             width, height
     )
 

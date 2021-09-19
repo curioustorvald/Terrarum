@@ -77,9 +77,9 @@ object PlayerBuilderSigrid {
     fun fillTestInventory(inventory: ActorInventory) {
 
         App.tileMaker.tags.forEach { t, _ ->
-            inventory.add(t, 5)
+            inventory.add(t, 9995)
             try {
-                inventory.add("wall@"+t, 9995) // this code will try to add nonexisting wall items, do not get surprised with NPEs
+                inventory.add("wall@$t", 9995) // this code will try to add nonexisting wall items, do not get surprised with NPEs
             }
             catch (e: Throwable) {
                 System.err.println("[PlayerBuilder] $e")
