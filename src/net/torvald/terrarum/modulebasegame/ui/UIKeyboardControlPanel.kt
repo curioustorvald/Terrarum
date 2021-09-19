@@ -321,6 +321,10 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             UIItemImageButton(parent, icons.get(6,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
     )
 
+    // close button is just for the cosmetics; the uiitem closes when you click anywhere on the UI
+    private val closeButton =
+            UIItemImageButton(parent, icons.get(22,0), initialX = initialX + width - 20, initialY = initialY, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0))
+
     companion object {
         val indexToConfigKey = hashMapOf(
                 0 to "control_key_left",
@@ -347,9 +351,11 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             Toolkit.drawBoxBorder(batch, it.posX-4, it.posY-4, 28, 28)
         }
 
+        closeButton.render(batch, camera)
+
         // texts
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], posX + 258f, posY + 40f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], posX + 262f, posY + 40f)
 
         App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], posX + 90f, posY + 100f)
         App.fontGame.draw(batch, Lang["GAME_INVENTORY"], posX + 90f, posY + 140f)
@@ -358,10 +364,10 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], posX + (width / 2) + 60f, posY + 140f)
     }
 
-    private var selected = -1
 
     override fun update(delta: Float) {
         super.update(delta) // unlatches mouse
+        var selected = -1
 
         iconButtons.forEachIndexed { index, it ->
             it.update(delta)
@@ -369,6 +375,8 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
                 selected  = index
             }
         }
+
+        closeButton.update(delta)
 
         // close
         if (!mouseLatched && mousePushed) {
