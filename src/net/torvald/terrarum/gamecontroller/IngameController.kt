@@ -6,10 +6,10 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.*
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
@@ -101,7 +101,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
             if (touchDown && !mouseStatus[touch])
                 tTouchDown(newmx, newmy, 0, touch)
-            else if (!touchDown && keyStatus[touch])
+            else if (!touchDown && mouseStatus[touch])
                 tTouchUp(newmx, newmy, 0, touch)
 
             if (touchDown && mouseStatus.bitCount() != 0) {
