@@ -93,7 +93,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         get() = mouseUp && Gdx.input.isButtonPressed(mouseButton)
 
 
-    private var mouseLatched = Gdx.input.isButtonPressed(mouseButton)
+    protected var mouseLatched = Gdx.input.isButtonPressed(mouseButton)
 
     /** UI to call (show up) while mouse is up */
     open val mouseOverCall: UICanvas? = null

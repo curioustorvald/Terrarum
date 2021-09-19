@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import net.torvald.terrarum.*
+import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -15,18 +17,28 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2016-08-04.
  */
-object Toolkit {
+object Toolkit : Disposable {
 
     val DEFAULT_BOX_BORDER_COL = Color(1f, 1f, 1f, 0.2f)
 
     private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur2.frag")
+    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
+
 
     init {
+        App.disposableSingletonsPool.add(this)
+
         CommonResourcePool.addToLoadingList("toolkit_box_border") {
             TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/box_border_flat_tileable.tga"), 1, 1)
         }
         CommonResourcePool.loadAll()
     }
+
+
+    override fun dispose() {
+        baloonTile.dispose()
+    }
+
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width
@@ -96,6 +108,23 @@ object Toolkit {
         }
 
         batch.shader = null
+    }
+
+    fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) {
+        // centre area
+        batch.draw(baloonTile.get(1, 1), x, y, w, h)
+
+        // edges
+        batch.draw(baloonTile.get(1, 0), x, y - baloonTile.tileH, w, baloonTile.tileH.toFloat())
+        batch.draw(baloonTile.get(1, 2), x, y + h, w, baloonTile.tileH.toFloat())
+        batch.draw(baloonTile.get(0, 1), x - baloonTile.tileW, y, baloonTile.tileW.toFloat(), h)
+        batch.draw(baloonTile.get(2, 1), x + w, y, baloonTile.tileW.toFloat(), h)
+
+        // corners
+        batch.draw(baloonTile.get(0, 0), x - baloonTile.tileW, y - baloonTile.tileH)
+        batch.draw(baloonTile.get(2, 0), x + w, y - baloonTile.tileH)
+        batch.draw(baloonTile.get(2, 2), x + w, y + h)
+        batch.draw(baloonTile.get(0, 2), x - baloonTile.tileW, y + h)
     }
 
 }

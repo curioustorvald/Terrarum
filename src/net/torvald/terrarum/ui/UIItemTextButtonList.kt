@@ -52,6 +52,9 @@ class UIItemTextButtonList(
 
         val kinematic: Boolean = false,
 
+        val leftPadding: Int = 0,
+        val rightPadding: Int = 0,
+
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
         val itemHitboxSize: Int = lineHeight,
         tagsCollection: Array<Array<String>> = Array(labelsList.size) { arrayOf("") }
@@ -70,8 +73,8 @@ class UIItemTextButtonList(
 
     // zero if iconSpriteSheet is null
     val iconsWithGap: Int = iconToTextGap + iconCellWidth
-    val pregap = (width - textAreaWidth - iconsWithGap) / 2 + iconsWithGap
-    val postgap = (width - textAreaWidth - iconsWithGap) / 2
+    val pregap = (width - textAreaWidth - iconsWithGap) / 2 + iconsWithGap + leftPadding
+    val postgap = (width - textAreaWidth - iconsWithGap) / 2 + rightPadding
 
 
 
@@ -99,8 +102,8 @@ class UIItemTextButtonList(
                     inactiveCol = inactiveCol,
                     backgroundCol = backgroundCol,
                     backgroundBlendMode = backgroundBlendMode,
-                    preGapX = pregap,
-                    postGapX = postgap,
+                    paddingLeft = pregap,
+                    paddingRight = postgap,
                     alignment = alignment,
                     hitboxSize = itemHitboxSize,
                     tags = tagsCollection[i]
@@ -121,8 +124,8 @@ class UIItemTextButtonList(
                     highlightBackBlendMode = activeBackBlendMode, // we are using custom highlighter
                     backgroundCol = Color(0),
                     inactiveCol = inactiveCol,
-                    preGapX = pregap,
-                    postGapX = postgap,
+                    paddingLeft = pregap,
+                    paddingRight = postgap,
                     alignment = alignment,
                     hitboxSize = itemHitboxSize,
                     tags = tagsCollection[i]

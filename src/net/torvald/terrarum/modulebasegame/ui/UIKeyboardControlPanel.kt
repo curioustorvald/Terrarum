@@ -116,8 +116,7 @@ class UIKeyboardControlPanel : UICanvas() {
             -4 to UIItemKeycap(this, 401,129,  null, oneu, ""),
             Input.Keys.CONTROL_RIGHT to UIItemKeycap(this, 433,129,  Input.Keys.CONTROL_RIGHT, onehalfu, "21,3"),
 
-            // ...
-    )
+    ) // end of keycaps
 
     private val symbolLeft = labels.get(0,2)
     private val symbolUp = labels.get(1,2)
@@ -129,6 +128,7 @@ class UIKeyboardControlPanel : UICanvas() {
     private val symbolGrapplingHook = labels.get(5,1)
     private val symbolGamemenu = labels.get(6,2)
 
+    private val controlPalette = UIItemControlPaletteBaloon(this, (App.scr.width - 480) / 2, kby + 199)
 
     init {
         keycaps.values.forEach { addUIitem(it) }
@@ -147,8 +147,26 @@ class UIKeyboardControlPanel : UICanvas() {
         keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = symbolGamemenu
     }
 
+    internal var keycapClicked = -13372
+        set(value) {
+            if (field != value) keycaps[field]?.selected = false
+            field = value
+        }
+    internal var controlSelected = -1
+
     override fun updateUI(delta: Float) {
-        uiItems.forEach { it.update(delta) }
+        uiItems.forEach {
+            it.update(delta)
+            if (it is UIItemKeycap && it.mousePushed) {
+                it.selected = true
+//                println("key ${it.key}; selected = ${it.selected}")
+                keycapClicked = it.key ?: -13372
+            }
+        }
+
+        if (keycapClicked >= 0 && controlSelected < 0) {
+            controlPalette.update(delta)
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -159,6 +177,12 @@ class UIKeyboardControlPanel : UICanvas() {
         uiItems.forEach { it.render(batch, camera) }
 
         batch.color = Color.WHITE
+
+        if (keycapClicked >= 0 && controlSelected < 0) {
+            controlPalette.render(batch, camera)
+        }
+
+
         val title = Lang["MENU_CONTROLS_KEYBOARD"]
         App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
@@ -207,11 +231,13 @@ class UIItemKeycap(
     private val s1 = if (symbolDefault.isNotBlank()) symbolDefault.split(',').map { it.toInt() } else null
 
     var symbolControl: TextureRegion? = null
+    var selected = false
 
     private val borderKeyForbidden = Color(0x000000C0)
     private val borderKeyNormal = Color(0xFFFFFFAA.toInt())
     private val borderMouseUp = UIItemTextButton.defaultActiveCol
     private val borderKeyPressed = UIItemTextButton.defaultHighlightCol
+    private val borderKeyPressedAndSelected = Color(0x33FF33FF.toInt())
 
     private val keycapFill = Color(0x404040_C0)
 
@@ -227,7 +253,9 @@ class UIItemKeycap(
 
         batch.color = if (key == null)
             borderKeyForbidden
-        else if (Gdx.input.isKeyPressed(key))
+        else if (Gdx.input.isKeyPressed(key) && selected)
+            borderKeyPressedAndSelected
+        else if (Gdx.input.isKeyPressed(key) || selected)
             borderKeyPressed
         else if (mouseUp)
             borderMouseUp
@@ -260,3 +288,26 @@ class UIItemKeycap(
     }
 }
 
+class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: Int, initialY: Int) : UIItem(parent, initialX, initialY) {
+    override val width = 480
+    override val height = 240
+    override fun dispose() {}
+
+
+    override fun render(batch: SpriteBatch, camera: Camera) {
+        super.render(batch, camera)
+
+        Toolkit.drawBaloon(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+    }
+
+    override fun update(delta: Float) {
+        super.update(delta) // unlatches mouse
+
+
+        // close
+        if (!mouseLatched && mousePushed) {
+            mouseLatched = true
+            parent.keycapClicked = -13372
+        }
+    }
+}

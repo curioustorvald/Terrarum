@@ -258,14 +258,15 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>, val tags: Array<Array<String>>) {
 
         private val lineHeight = 36
+        private val paddingLeft = 48
 
         private val menubar = UIItemTextButtonList(
                 uiRemoCon,
                 lineHeight,
                 labels,
-                menubarOffX,
+                menubarOffX - paddingLeft,
                 menubarOffY - lineHeight * labels.size + 16,
-                uiRemoCon.width, getRemoConHeight(labels),
+                uiRemoCon.width + paddingLeft, getRemoConHeight(labels),
                 textAreaWidth = uiRemoCon.width,
                 readFromLang = true,
                 activeBackCol = Color(0),//Color(1f,0f,.75f,1f),
@@ -275,6 +276,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 defaultSelection = null,
                 itemHitboxSize = lineHeight - 2,
                 alignment = UIItemTextButton.Companion.Alignment.LEFT,
+                leftPadding = paddingLeft,
                 tagsCollection = tags
         )
 
@@ -302,7 +304,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     }
 
     companion object {
-        val remoConWidth = 300
+        val remoConWidth = 160
         fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         val menubarOffX: Int; get() = (0.11 * App.scr.width).toInt()

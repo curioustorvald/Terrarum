@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 
 /**
@@ -34,10 +35,10 @@ class UITooltip : UICanvas() {
     val textMarginX = 4
 
     override var width: Int
-        get() = msgWidth + (textMarginX + FloatDrawer.tile.tileW) * 2
+        get() = msgWidth + (textMarginX + Toolkit.baloonTile.tileW) * 2
         set(value) { throw Error("You are not supposed to set the width of the tooltip manually.") }
     override var height: Int
-        get() = FloatDrawer.tile.tileH * 2 + font.lineHeight.toInt()
+        get() = Toolkit.baloonTile.tileH * 2 + font.lineHeight.toInt()
         set(value) { throw Error("You are not supposed to set the height of the tooltip manually.") }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -54,7 +55,7 @@ class UITooltip : UICanvas() {
 
         batch.color = tooltipBackCol
 
-        FloatDrawer(batch,
+        Toolkit.drawBaloon(batch,
                 tooltipX - textMarginX,
                 tooltipY,
                 tooltipW,

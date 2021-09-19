@@ -40,8 +40,8 @@ open class UIItemTextButton(
         val backgroundBlendMode: String = BlendMode.NORMAL,
 
 
-        val preGapX:  Int = 0,
-        val postGapX: Int = 0,
+        val paddingLeft:  Int = 0,
+        val paddingRight: Int = 0,
 
         val alignment: Alignment = Alignment.CENTRE,
         val hitboxSize: Int = UIItemTextButton.height,
@@ -109,9 +109,9 @@ open class UIItemTextButton(
                 label,
 //                "$label/H:${highlighted.toInt()}, M:${mouseUp.toInt()}",
                 when (alignment) {
-                    Alignment.CENTRE -> posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2)
-                    Alignment.LEFT -> posX.toFloat() + preGapX
-                    Alignment.RIGHT -> width - postGapX - textW.toFloat()
+                    Alignment.CENTRE -> posX.toFloat() + width.minus(textW).div(2) + (paddingLeft - paddingRight).div(2)
+                    Alignment.LEFT -> posX.toFloat() + paddingLeft
+                    Alignment.RIGHT -> width - paddingRight - textW.toFloat()
                 },
                 posY.toFloat() + (hitboxSize - UIItemTextButton.height) / 2f
         )
