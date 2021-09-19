@@ -9,10 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemTextButton
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -132,7 +129,11 @@ class UIKeyboardControlPanel : UICanvas() {
 
     init {
         keycaps.values.forEach { addUIitem(it) }
+        updateKeycaps()
+    }
 
+    private fun updateKeycaps() {
+        keycaps.values.forEach { it.symbolControl = null }
         // read config and put icons
         keycaps[App.getConfigInt("control_key_up")]?.symbolControl = symbolUp
         keycaps[App.getConfigInt("control_key_left")]?.symbolControl = symbolLeft
@@ -142,7 +143,7 @@ class UIKeyboardControlPanel : UICanvas() {
         keycaps[App.getConfigInt("control_key_jump")]?.symbolControl = symbolJump
         keycaps[App.getConfigInt("control_key_zoom")]?.symbolControl = symbolZoom
         keycaps[App.getConfigInt("control_key_inventory")]?.symbolControl = symbolInventory
-        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = symbolGrapplingHook
+//        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = symbolGrapplingHook
 
         keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = symbolGamemenu
     }
@@ -186,6 +187,16 @@ class UIKeyboardControlPanel : UICanvas() {
         val title = Lang["MENU_CONTROLS_KEYBOARD"]
         App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
+    }
+
+    fun setControlOf(key: Int, control: Int) {
+        println("control: $control")
+        println("config-key: ${UIItemControlPaletteBaloon.indexToConfigKey[control]}")
+        App.setConfig(UIItemControlPaletteBaloon.indexToConfigKey[control]!!, key)
+        println("keyboard-key: $key ${Input.Keys.toString(key)}")
+        println("after: ${App.getConfigInt(UIItemControlPaletteBaloon.indexToConfigKey[control]!!)} ${Input.Keys.toString(App.getConfigInt(UIItemControlPaletteBaloon.indexToConfigKey[control]!!))}")
+
+        updateKeycaps()
     }
 
     override fun doOpening(delta: Float) {
@@ -290,23 +301,72 @@ class UIItemKeycap(
 
 class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: Int, initialY: Int) : UIItem(parent, initialX, initialY) {
     override val width = 480
-    override val height = 240
+    override val height = 260
     override fun dispose() {}
 
+    private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+
+    private val iconButtons = arrayOf(
+            // left up right down
+            UIItemImageButton(parent, icons.get(0,2), initialX = initialX + 30, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(1,2), initialX = initialX + 60, initialY = initialY + 20, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(2,2), initialX = initialX + 90, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(3,2), initialX = initialX + 60, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // jump
+            UIItemImageButton(parent, icons.get(4,2), initialX = initialX + 30, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // inventory
+            UIItemImageButton(parent, icons.get(9,0), initialX = initialX + 30, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // zoom
+            UIItemImageButton(parent, icons.get(5,2), initialX = initialX + 30, initialY = initialY + 180, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // system menu
+            UIItemImageButton(parent, icons.get(6,2), initialX = initialX + 30, initialY = initialY + 220, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+    )
+
+    companion object {
+        val indexToConfigKey = hashMapOf(
+                0 to "control_key_left",
+                1 to "control_key_up",
+                2 to "control_key_right",
+                3 to "control_key_down",
+                4 to "control_key_junp",
+                5 to "control_key_inventory",
+                6 to "control_key_zoom",
+                7 to "control_key_gamemenu"
+        )
+    }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         super.render(batch, camera)
 
         Toolkit.drawBaloon(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+
+        iconButtons.forEach { it.render(batch, camera) }
+
+        // texts
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], posX + 130f, posY + 40f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], posX + 70f, posY + 100f)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], posX + 70f, posY + 140f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], posX + 70f, posY + 180f)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], posX + 70f, posY + 220f)
     }
+
+    private var selected = -1
 
     override fun update(delta: Float) {
         super.update(delta) // unlatches mouse
 
+        iconButtons.forEachIndexed { index, it ->
+            it.update(delta)
+            if (it.mousePushed) {
+                selected  = index
+            }
+        }
 
         // close
         if (!mouseLatched && mousePushed) {
             mouseLatched = true
+            parent.setControlOf(parent.keycapClicked, selected)
             parent.keycapClicked = -13372
         }
     }

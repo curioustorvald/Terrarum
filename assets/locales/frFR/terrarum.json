@@ -4,5 +4,7 @@
   "COPYRIGHT_GNU_GPL_3": "Distribué sous GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "ATTENTION-SANTÉ ET SÉCURITÉ",
   "MENU_LABEL_PRESS_START_SYMBOL": "Appuyez sur >",
-  "MENU_MODULES" : "Modules"
+  "MENU_MODULES" : "Modules",
+  "GAME_ACTION_MOVE_VERB" : "Déplacer",
+  "GAME_ACTION_ZOOM" : "Agrandir"
 }

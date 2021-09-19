@@ -944,11 +944,6 @@ public class App implements ApplicationListener {
             operationSystem = "SOLARIS";
             defaultDir = System.getProperty("user.home") + "/.Terrarum";
         }
-        /*else if (System.getProperty("java.runtime.name").toUpperCase().contains("ANDROID")) {
-            operationSystem = "ANDROID";
-            defaultDir = System.getProperty("user.home") + "/.Terrarum";
-            environment = RunningEnvironment.MOBILE;
-        }*/
         else {
             operationSystem = "UNKNOWN";
             defaultDir = System.getProperty("user.home") + "/.Terrarum";

@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "分佈在GNU GPL 3下",
   "APP_WARNING_HEALTH_AND_SAFETY": "警告ー健康和安全",
   "MENU_LABEL_PRESS_START_SYMBOL": "按下 >",
-  "MENU_MODULES" : "模塊"
+  "MENU_MODULES" : "模塊",
+  "GAME_ACTION_MOVE_VERB" : "移動"
 }
