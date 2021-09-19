@@ -190,12 +190,9 @@ class UIKeyboardControlPanel : UICanvas() {
     }
 
     fun setControlOf(key: Int, control: Int) {
-        println("control: $control")
-        println("config-key: ${UIItemControlPaletteBaloon.indexToConfigKey[control]}")
-        App.setConfig(UIItemControlPaletteBaloon.indexToConfigKey[control]!!, key)
-        println("keyboard-key: $key ${Input.Keys.toString(key)}")
-        println("after: ${App.getConfigInt(UIItemControlPaletteBaloon.indexToConfigKey[control]!!)} ${Input.Keys.toString(App.getConfigInt(UIItemControlPaletteBaloon.indexToConfigKey[control]!!))}")
-
+        if (control >= 0) {
+            App.setConfig(UIItemControlPaletteBaloon.indexToConfigKey[control]!!, key)
+        }
         updateKeycaps()
     }
 
@@ -306,20 +303,22 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
+    private val buttonBackground = Color(0x2C2C2CFF)
+
     private val iconButtons = arrayOf(
             // left up right down
-            UIItemImageButton(parent, icons.get(0,2), initialX = initialX + 30, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, icons.get(1,2), initialX = initialX + 60, initialY = initialY + 20, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, icons.get(2,2), initialX = initialX + 90, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, icons.get(3,2), initialX = initialX + 60, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(0,2), initialX = initialX + 154, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(1,2), initialX = initialX + 188, initialY = initialY + 23, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(2,2), initialX = initialX + 222, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(3,2), initialX = initialX + 188, initialY = initialY + 57, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // jump
-            UIItemImageButton(parent, icons.get(4,2), initialX = initialX + 30, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(4,2), initialX = initialX + 50, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // inventory
-            UIItemImageButton(parent, icons.get(9,0), initialX = initialX + 30, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(9,0), initialX = initialX + 50, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // zoom
-            UIItemImageButton(parent, icons.get(5,2), initialX = initialX + 30, initialY = initialY + 180, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(5,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // system menu
-            UIItemImageButton(parent, icons.get(6,2), initialX = initialX + 30, initialY = initialY + 220, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, icons.get(6,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
     )
 
     companion object {
@@ -328,7 +327,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
                 1 to "control_key_up",
                 2 to "control_key_right",
                 3 to "control_key_down",
-                4 to "control_key_junp",
+                4 to "control_key_jump",
                 5 to "control_key_inventory",
                 6 to "control_key_zoom",
                 7 to "control_key_gamemenu"
@@ -340,15 +339,23 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
         Toolkit.drawBaloon(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
-        iconButtons.forEach { it.render(batch, camera) }
+        iconButtons.forEach {
+            batch.color = buttonBackground
+            Toolkit.fillArea(batch, it.posX-4, it.posY-4, 28, 28)
+            it.render(batch, camera)
+            batch.color = Color(batch.color.r, batch.color.g, batch.color.b, batch.color.a * (if (it.mouseUp) 0.9f else 0.6f))
+            Toolkit.drawBoxBorder(batch, it.posX-4, it.posY-4, 28, 28)
+        }
 
         // texts
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], posX + 130f, posY + 40f)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], posX + 70f, posY + 100f)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], posX + 70f, posY + 140f)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], posX + 70f, posY + 180f)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], posX + 70f, posY + 220f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], posX + 258f, posY + 40f)
+
+        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], posX + 90f, posY + 100f)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], posX + 90f, posY + 140f)
+
+        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], posX + (width / 2) + 60f, posY + 100f)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], posX + (width / 2) + 60f, posY + 140f)
     }
 
     private var selected = -1

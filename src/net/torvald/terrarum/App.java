@@ -615,7 +615,7 @@ public class App implements ApplicationListener {
         if (getConfigBoolean("showhealthmessageonstartup")) {
 
             logoBatch.draw(logo, logoPosX, logoPosY);
-            logoBatch.setColor(new Color(0x666666ff));
+            logoBatch.setColor(new Color(0x282828ff));
             fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"),
                     logoPosX + logo.getRegionWidth(),
                     textY
