@@ -15,7 +15,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 object SanicLoadScreen : LoadScreenBase() {
 
     init {
-        App.disposableSingletonsPool.add(this)
+        App.disposables.add(this)
     }
 
     private var arrowObjPos = 0f // 0 means at starting position, regardless of screen position

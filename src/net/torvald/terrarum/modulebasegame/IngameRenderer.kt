@@ -133,7 +133,7 @@ object IngameRenderer : Disposable {
      * actually matter */
     @JvmStatic fun initialise() {
         if (!initialisedExternally) {
-            App.disposableSingletonsPool.add(this)
+            App.disposables.add(this)
 
             // also initialise these sinigletons
             BlocksDrawer

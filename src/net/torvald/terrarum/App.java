@@ -257,7 +257,7 @@ public class App implements ApplicationListener {
     private static FrameBuffer renderFBO;
 
     public static HashSet<File> tempFilePool = new HashSet<>();
-    public static HashSet<Disposable> disposableSingletonsPool = new HashSet<>();
+    public static HashSet<Disposable> disposables = new HashSet<>();
 
     public static char gamepadLabelStart = 0xE000; // lateinit
     public static char gamepadLabelSelect = 0xE000; // lateinit
@@ -376,9 +376,9 @@ public class App implements ApplicationListener {
 
         glInfo.create();
 
-        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
-        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
 
         newTempFile("wenquanyi.tga"); // temp file required by the font
 
@@ -720,7 +720,12 @@ public class App implements ApplicationListener {
         textureWhiteCircle.dispose();
         logo.getTexture().dispose();
 
-        disposableSingletonsPool.forEach((it) -> {try { it.dispose(); } catch (IllegalArgumentException e) {}});
+        disposables.forEach((it) -> {
+            try {
+                it.dispose();
+            }
+            catch (NullPointerException | IllegalArgumentException e) { }
+        });
 
         ModMgr.INSTANCE.disposeMods();
 

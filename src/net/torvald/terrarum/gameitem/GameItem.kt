@@ -287,7 +287,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         @JvmStatic val BLOCK = "block"
         @JvmStatic val WALL = "wall"
         @JvmStatic val WIRE = "wire"
-        @JvmStatic val FIXTURE = "fixture"
+//        @JvmStatic val FIXTURE = "fixture"
         @JvmStatic val MISC = "misc"
     }
 

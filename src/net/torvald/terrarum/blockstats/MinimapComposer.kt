@@ -64,7 +64,7 @@ object MinimapComposer : Disposable {
         totalWidth = minimap.width
         totalHeight = minimap.height
 
-        App.disposableSingletonsPool.add(this)
+        App.disposables.add(this)
     }
 
     fun update() {

@@ -56,12 +56,14 @@ class ParticleVanishingText(val text: String, x: Double, y: Double, noCollision:
 
     override fun drawBody(batch: SpriteBatch) {
         if (!flagDespawn) {
+            val oldColour = batch.color.cpy()
             batch.color = drawColour
             lines.forEachIndexed { index, line ->
                 drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat() + TinyAlphNum.H * index) { x, y ->
                     TinyAlphNum.draw(batch, line, x, y )
                 }
             }
+            batch.color = oldColour
         }
     }
 }
@@ -102,10 +104,12 @@ open class ParticleVanishingSprite(val sprite: TextureRegionPack, val delay: Flo
 
     override fun drawBody(batch: SpriteBatch) {
         if (!flagDespawn) {
+            val oldColour = batch.color.cpy()
             batch.color = drawColour
             drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
                 batch.draw(sprite.get(frame, row), x, y)
             }
+            batch.color = oldColour
         }
     }
 }

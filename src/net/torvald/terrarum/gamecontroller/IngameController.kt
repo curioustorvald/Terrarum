@@ -142,7 +142,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // - not clicking anymore
             // - using any item that is not fixture (blocks, picks)
             if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) ||
-                GameItem.Category.FIXTURE != ItemCodex.get(terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP))?.inventoryCategory) {
+                GameItem.Category.MISC != ItemCodex.get(terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP))?.inventoryCategory) {
                 worldPrimaryClickLatched = false
             }
 

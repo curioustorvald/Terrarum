@@ -52,7 +52,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         this.inventory = inventory
 
         if (mainUI != null)
-            App.disposableSingletonsPool.add(mainUI)
+            App.disposables.add(mainUI)
     }
 
     /**
@@ -72,7 +72,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     override fun updateForTerrainChange(cue: IngameInstance.BlockChangeQueueItem) {
-        // TODO check for despawn code here
+
     }
 
     private fun fillFillerBlock(bypassEvent: Boolean = false) {
@@ -151,20 +151,23 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * Removes this instance of the fixture from the world
      */
     open fun despawn() {
-        val posX = worldBlockPos!!.x
-        val posY = worldBlockPos!!.y
+        println("${this.javaClass.simpleName} dispose")
 
         // remove filler block
         forEachBlockbox { x, y ->
-            if (world!!.getTileFromTerrain(x, y) == blockBox.collisionType) {
-                world!!.setTileTerrain(x, y, Block.AIR, false)
-            }
+            world!!.setTileTerrain(x, y, Block.AIR, false)
         }
 
         worldBlockPos = null
         mainUI?.dispose()
 
         this.isVisible = false
+
+        if (this is Electric) {
+            wireEmitterTypes.clear()
+            wireEmission.clear()
+            wireConsumption.clear()
+        }
 
         // TODO drop self as an item (instance of DroppedItem)
     }
@@ -173,11 +176,16 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         super.update(delta)
         // if not flagged to despawn and not actually despawned (which sets worldBlockPos as null), always fill up fillerBlock
         if (!flagDespawn && worldBlockPos != null) {
-            fillFillerBlock(true)
+            // for removal-by-player because player is removing the filler block by pick
+            forEachBlockbox { x, y ->
+                if (world!!.getTileFromTerrain(x, y) != blockBox.collisionType) {
+                    flagDespawn = true
+                }
+            }
+
+            if (flagDespawn) despawn()
         }
-        else if (flagDespawn) {
-            despawn()
-        }
+        // actual actor removal is performed by the TerrarumIngame
     }
 
 }

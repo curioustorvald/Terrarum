@@ -18,7 +18,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
     // a Class impl is chosen to make resize-handling easier, there's not much benefit making this a singleton anyway
 
     init {
-        App.disposableSingletonsPool.add(this)
+        App.disposables.add(this)
     }
 
     override var screenToLoad: IngameInstance? = screenToBeLoaded

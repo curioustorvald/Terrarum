@@ -2,7 +2,7 @@
 "1";"net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper"
 "2";"net.torvald.terrarum.modulebasegame.gameitems.PickaxeIron"
 "3";"net.torvald.terrarum.modulebasegame.gameitems.PickaxeSteel"
-"5";"net.torvald.terrarum.modulebasegame.gameitems.TikiTorchTester"
+"5";"net.torvald.terrarum.modulebasegame.gameitems.ItemTikiTorch"
 "6";"net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChest"
 "7";"net.torvald.terrarum.modulebasegame.gameitems.WireGraphDebugger"
 "8";"net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter"

@@ -6,7 +6,6 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 
@@ -19,12 +18,12 @@ class ItemStorageChest(originalID: ItemID) : GameItem(originalID) {
     override val originalName = "ITEM_STORAGE_CHEST"
     override var baseMass = FixtureTikiTorch.MASS
     override var stackable = true
-    override var inventoryCategory = Category.FIXTURE
+    override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
+        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_32")
     override var baseToolSize: Double? = baseMass
 
     init {

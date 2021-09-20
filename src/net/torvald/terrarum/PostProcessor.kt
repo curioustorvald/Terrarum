@@ -42,7 +42,7 @@ object PostProcessor : Disposable {
     private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
     init {
-        App.disposableSingletonsPool.add(this)
+        App.disposables.add(this)
     }
 
     override fun dispose() {

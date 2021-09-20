@@ -147,7 +147,7 @@ object Terrarum : Disposable {
         println("[Terrarum] vendor = $processorVendor")
 
 
-        App.disposableSingletonsPool.add(this)
+        App.disposables.add(this)
 
 
 

@@ -1922,8 +1922,8 @@ open class ActorWithBody : Actor {
                 this
 
     override fun dispose() {
-        sprite?.dispose()
-        spriteGlow?.dispose()
+        App.disposables.add(sprite)
+        App.disposables.add(spriteGlow)
     }
 }
 

@@ -26,7 +26,7 @@ object Toolkit : Disposable {
 
 
     init {
-        App.disposableSingletonsPool.add(this)
+        App.disposables.add(this)
 
         CommonResourcePool.addToLoadingList("toolkit_box_border") {
             TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/box_border_flat_tileable.tga"), 1, 1)

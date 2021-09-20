@@ -8,7 +8,6 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 
@@ -18,7 +17,7 @@ class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
     override val originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
     override var baseMass = FixtureLogicSignalEmitter.MASS
     override var stackable = true
-    override var inventoryCategory = Category.FIXTURE
+    override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
     override val material = Material()

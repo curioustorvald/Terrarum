@@ -453,6 +453,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun worldPrimaryClickStart(delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
 
+        val itemOnGrip = ItemCodex[actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)]
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
         var uiOpened = false
 
@@ -463,28 +464,29 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         // scan for the one with non-null UI.
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-        for (kk in actorsUnderMouse.indices) {
-            actorsUnderMouse[kk].mainUI?.let {
-                uiOpened = true
+        if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
+            for (kk in actorsUnderMouse.indices) {
+                actorsUnderMouse[kk].mainUI?.let {
+                    uiOpened = true
 
-                // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
-                // when it's not null, the UI will be updated and rendered
-                // when the UI is closed, it'll be replaced with a null value
-                uiFixture = it
+                    // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                    // when it's not null, the UI will be updated and rendered
+                    // when the UI is closed, it'll be replaced with a null value
+                    uiFixture = it
 
-                it.setPosition(0, 0)
-                it.setAsOpen()
+                    it.setPosition(0, 0)
+                    it.setAsOpen()
+                }
+                break
             }
-            break
         }
 
 
         // don't want to open the UI and use the item at the same time, would ya?
         if (!uiOpened) {
-            val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-            val consumptionSuccessful = ItemCodex[itemOnGrip]?.startPrimaryUse(delta) ?: false
+            val consumptionSuccessful = itemOnGrip?.startPrimaryUse(delta) ?: false
             if (consumptionSuccessful)
-                actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!)
+                actorNowPlaying?.inventory?.consumeItem(itemOnGrip!!)
         }
     }
 

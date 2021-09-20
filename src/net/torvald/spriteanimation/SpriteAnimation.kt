@@ -6,6 +6,7 @@ package net.torvald.spriteanimation
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -14,7 +15,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * This class should not be serialised; save its Animation Description Language instead.
  */
-class SpriteAnimation(@Transient val parentActor: ActorWithBody) {
+class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
 
     lateinit var textureRegion: TextureRegionPack; private set
 
@@ -206,7 +207,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) {
         flipVertical = vertical
     }
 
-    fun dispose() {
+    override fun dispose() {
         textureRegion.dispose()
     }
 }
