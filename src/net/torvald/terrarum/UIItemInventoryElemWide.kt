@@ -19,7 +19,7 @@ import net.torvald.terrarum.ui.UIItemTextButton
  *
  * Created by minjaesong on 2017-03-16.
  */
-class UIItemInventoryElem(
+class UIItemInventoryElemWide(
         parentUI: UICanvas,
         initialX: Int,
         initialY: Int,
@@ -47,7 +47,7 @@ class UIItemInventoryElem(
         internal val durabilityBarThickness = 3f
     }
 
-    override val height = UIItemInventoryElem.height
+    override val height = UIItemInventoryElemWide.height
 
     private val imgOffset: Float
         get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
@@ -113,9 +113,7 @@ class UIItemInventoryElem(
             else {
                 App.fontGame.draw(batch,
                         // print name and amount in parens
-                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else "") +
-                        // TEMPORARY print eqipped slot info as well
-                        (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
+                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
 
                         posX + textOffsetX,
                         posY + textOffsetY

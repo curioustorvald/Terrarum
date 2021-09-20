@@ -152,7 +152,7 @@ internal class UIStorageChest : UICanvas(
                     this,
                     catBar,
                     { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-                    INVENTORY_CELLS_OFFSET_X - halfSlotOffset + (listGap + UIItemInventoryElem.height) * 7,
+                    INVENTORY_CELLS_OFFSET_X - halfSlotOffset + (listGap + UIItemInventoryElemWide.height) * 7,
                     INVENTORY_CELLS_OFFSET_Y,
                     6, CELLS_VRT,
                     drawScrollOnRightside = true,

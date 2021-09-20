@@ -177,7 +177,7 @@ class UIItemInventoryItemGrid(
                 initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
                 initialY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
                 item = null,
-                amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
+                amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
                 mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
@@ -194,13 +194,13 @@ class UIItemInventoryItemGrid(
     private val actualItemCellWidth = (listGap + UIItemInventoryElemSimple.height) * horizontalCells - listGap // in pixels
     private val largeListWidth = ((listGap + actualItemCellWidth) / itemListColumnCount) - (itemListColumnCount - 1).coerceAtLeast(1) * listGap
     private val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
-        UIItemInventoryElem(
+        UIItemInventoryElemWide(
                 parentUI = inventoryUI,
                 initialX = this.posX + (largeListWidth + listGap) * (it % itemListColumnCount),
-                initialY = this.posY + (UIItemInventoryElem.height + listGap) * (it / itemListColumnCount),
+                initialY = this.posY + (UIItemInventoryElemWide.height + listGap) * (it / itemListColumnCount),
                 width = largeListWidth,
                 item = null,
-                amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
+                amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
                 mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
@@ -228,7 +228,7 @@ class UIItemInventoryItemGrid(
         posX - LIST_TO_CONTROL_GAP - catBar.catIcons.tileW + 2
 
     private fun getIconPosY(index: Int) =
-            posY - 2 + (4 + UIItemInventoryElem.height - catBar.catIcons.tileH) * index
+            posY - 2 + (4 + UIItemInventoryElemWide.height - catBar.catIcons.tileH) * index
 
     /** Long/compact mode buttons */
     internal val gridModeButtons = Array<UIItemImageButton>(2) { index ->

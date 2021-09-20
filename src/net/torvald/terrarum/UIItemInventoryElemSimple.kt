@@ -38,7 +38,7 @@ class UIItemInventoryElemSimple(
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun) {
     
     companion object {
-        val height = UIItemInventoryElem.height
+        val height = UIItemInventoryElemWide.height
     }
 
     override val width = UIItemInventoryElemSimple.height
@@ -91,7 +91,7 @@ class UIItemInventoryElemSimple(
                 // draw durability metre
                 val barFullLen = width
                 val barOffset = posX.toFloat()
-                val thickness = UIItemInventoryElem.durabilityBarThickness
+                val thickness = UIItemInventoryElemWide.durabilityBarThickness
                 val percentage = item!!.durability / item!!.maxDurability
                 val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
                 val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
