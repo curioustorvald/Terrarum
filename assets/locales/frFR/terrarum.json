@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Appuyez sur >",
   "MENU_MODULES" : "Modules",
   "GAME_ACTION_MOVE_VERB" : "Déplacer",
-  "GAME_ACTION_ZOOM" : "Agrandir"
+  "GAME_ACTION_ZOOM" : "Agrandir",
+  "MENU_LABEL_RESET" : "Réinitialiser"
 }

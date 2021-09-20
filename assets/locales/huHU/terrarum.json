@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Elosztott GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "VIGYÁZAT-EGÉSZSÉGÜGYI ÉS BIZTONSÁGI",
   "MENU_LABEL_PRESS_START_SYMBOL": "Nyomd meg a >ot",
-  "MENU_MODULES" : "Modulok"
+  "MENU_MODULES" : "Modulok",
+  "MENU_LABEL_RESET" : "Visszaállítás"
 }

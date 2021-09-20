@@ -115,6 +115,8 @@ class UIKeyboardControlPanel : UICanvas() {
 
     ) // end of keycaps
 
+    private val buttonReset = UIItemTextButton(this, "MENU_LABEL_RESET", kbx + 1, kby + 165, 180, true, alignment = UIItemTextButton.Companion.Alignment.LEFT)
+
     private val symbolLeft = labels.get(0,2)
     private val symbolUp = labels.get(1,2)
     private val symbolRight = labels.get(2,2)
@@ -125,11 +127,29 @@ class UIKeyboardControlPanel : UICanvas() {
     private val symbolGrapplingHook = labels.get(5,1)
     private val symbolGamemenu = labels.get(6,2)
 
-    private val controlPalette = UIItemControlPaletteBaloon(this, (App.scr.width - 480) / 2, kby + 199)
+    private val controlPalette = UIItemControlPaletteBaloon(this, (App.scr.width - 480) / 2, kby + 219)
 
     init {
         keycaps.values.forEach { addUIitem(it) }
         updateKeycaps()
+
+        buttonReset.clickOnceListener = { x, y, button ->
+            println("reset keys!")
+            resetKeyConfig()
+            updateKeycaps()
+        }
+    }
+
+    private fun resetKeyConfig() {
+        App.setConfig("control_key_up", Input.Keys.E)
+        App.setConfig("control_key_left", Input.Keys.S)
+        App.setConfig("control_key_down", Input.Keys.D)
+        App.setConfig("control_key_right", Input.Keys.F)
+        App.setConfig("control_key_jump", Input.Keys.SPACE)
+        App.setConfig("control_key_zoom", Input.Keys.Z)
+        App.setConfig("control_key_inventory", Input.Keys.Q)
+        App.setConfig("control_key_movementaux", Input.Keys.A)
+        App.setConfig("control_key_gamemenu", Input.Keys.TAB)
     }
 
     private fun updateKeycaps() {
@@ -165,6 +185,8 @@ class UIKeyboardControlPanel : UICanvas() {
             }
         }
 
+        buttonReset.update(delta)
+
         if (keycapClicked >= 0 && controlSelected < 0) {
             controlPalette.update(delta)
         }
@@ -176,6 +198,7 @@ class UIKeyboardControlPanel : UICanvas() {
 //        batch.color = fillCol
 //        Toolkit.fillArea(batch, drawX, drawY, width, height)
         uiItems.forEach { it.render(batch, camera) }
+        buttonReset.render(batch, camera)
 
         batch.color = Color.WHITE
 
@@ -196,6 +219,16 @@ class UIKeyboardControlPanel : UICanvas() {
         updateKeycaps()
     }
 
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        buttonReset.touchDown(screenX, screenY, pointer, button)
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        buttonReset.touchUp(screenX, screenY, pointer, button)
+        return true
+    }
+
     override fun doOpening(delta: Float) {
     }
 
@@ -210,6 +243,8 @@ class UIKeyboardControlPanel : UICanvas() {
 
     override fun dispose() {
     }
+
+
 }
 
 
@@ -298,7 +333,7 @@ class UIItemKeycap(
 
 class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: Int, initialY: Int) : UIItem(parent, initialX, initialY) {
     override val width = 480
-    override val height = 260
+    override val height = 230
     override fun dispose() {}
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")

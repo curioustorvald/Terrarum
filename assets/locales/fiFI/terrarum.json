@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Jaetaan GNU GPL 3:n mukaisesti",
   "APP_WARNING_HEALTH_AND_SAFETY": "VAROITUS-TERVEYS JA TURVALLISUUS",
   "MENU_LABEL_PRESS_START_SYMBOL": "Paina >",
-  "MENU_MODULES" : "Moduulit"
+  "MENU_MODULES" : "Moduulit",
+  "MENU_LABEL_RESET" : "Nollaa"
 }

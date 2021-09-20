@@ -4,5 +4,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "атисни >",
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Всички права запазени",
   "COPYRIGHT_GNU_GPL_3": "Разпределени под GNU GPL 3",
-  "MENU_MODULES" : "Модули"
+  "MENU_MODULES" : "Модули",
+  "MENU_LABEL_RESET" : "Нулиране"
 }

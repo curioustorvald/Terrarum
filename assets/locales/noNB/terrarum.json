@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Distribuert under GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "ADVARSEL-HELSE OG SIKKERHET",
   "MENU_LABEL_PRESS_START_SYMBOL": "Trykk >",
-  "MENU_MODULES" : "Moduler"
+  "MENU_MODULES" : "Moduler",
+  "MENU_LABEL_RESET" : "Nullstill"
 }

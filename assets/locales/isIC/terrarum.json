@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Dreift samkvæmt GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "VIÐVÖRUN-HEILSA OG ÖRYGGI",
   "MENU_LABEL_PRESS_START_SYMBOL": "Ýttu >",
-  "MENU_MODULES" : "Einingar"
+  "MENU_MODULES" : "Einingar",
+  "GAME_ACTION_MOVE_VERB" : "Hreyfa"
 }

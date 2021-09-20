@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Rozpowszechniana w GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "UWAGA-ZDROWIE I BEZPIECZEŃSTWO",
   "MENU_LABEL_PRESS_START_SYMBOL": "Naciśnij >",
-  "MENU_MODULES" : "Moduły"
+  "MENU_MODULES" : "Moduły",
+  "MENU_LABEL_RESET" : "Reset"
 }

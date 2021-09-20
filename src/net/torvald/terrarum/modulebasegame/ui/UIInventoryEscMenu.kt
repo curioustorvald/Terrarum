@@ -10,6 +10,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
 import net.torvald.terrarum.serialise.WriteSavegame
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
 import java.io.File
@@ -24,9 +25,8 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             "MENU_IO_SAVE_GAME",
             "MENU_LABEL_GRAPHICS",
             "MENU_OPTIONS_CONTROLS",
-            "MENU_OPTIONS_SOUND",
-            "MENU_LABEL_RETURN_MAIN",
-            "MENU_LABEL_DESKTOP",
+            "MENU_LABEL_MAINMENU",
+            "MENU_LABEL_QUIT",
     )
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
@@ -71,6 +71,8 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
     private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
 
+    private val keyConfigUI = UIKeyboardControlPanel()
+
     private var oldScreen = 0
     private var screen = 0
 
@@ -92,10 +94,13 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                         full.unlockTransition()
                     }
                 }
-                4 -> {
+                2 -> {
+                    screen = 4; gameMenuButtons.deselect()
+                }
+                3 -> {
                     screen = 2; gameMenuButtons.deselect()
                 }
-                5 -> {
+                4 -> {
                     screen = 1; gameMenuButtons.deselect()
                 }
             }
@@ -122,7 +127,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     }
 
     private val screens = arrayOf(
-            gameMenuButtons, areYouSureQuitButtons, areYouSureMainMenuButtons, savingUI
+            gameMenuButtons, areYouSureQuitButtons, areYouSureMainMenuButtons, savingUI, keyConfigUI
     )
 
 
@@ -148,16 +153,26 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             },
             { batch: SpriteBatch, camera: Camera ->
                 savingUI.render(batch, camera)
-            }
+            },
+            { batch: SpriteBatch, camera: Camera ->
+                keyConfigUI.render(batch, camera)
+            },
     )
 
 
     override fun updateUI(delta: Float) {
+        val yeet = screens[screen]
         if (oldScreen != screen) {
-            screens[screen].show()
+            if (yeet is UIItem)
+                yeet.show()
+            else if (yeet is UICanvas)
+                yeet.show()
             oldScreen = screen
         }
-        screens[screen].update(delta)
+        if (yeet is UIItem)
+            yeet.update(delta)
+        else if (yeet is UICanvas)
+            yeet.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

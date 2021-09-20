@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "เผยแพร่ภายใต้ GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "คำเตือน-อนามัยและความปลอดภัย",
   "MENU_LABEL_PRESS_START_SYMBOL": "กดปุ่ม >",
-  "MENU_MODULES" : "โมดูล"
+  "MENU_MODULES" : "โมดูล",
+  "MENU_LABEL_RESET" : "รีเซ็ต"
 }

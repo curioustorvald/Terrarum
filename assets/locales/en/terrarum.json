@@ -7,5 +7,6 @@
   "MENU_MODULES" : "Modules",
   "MENU_CREDIT_GPL_DNT" : "GPL",
   "GAME_ACTION_MOVE_VERB" : "Move",
-  "GAME_ACTION_ZOOM" : "Zoom"
+  "GAME_ACTION_ZOOM" : "Zoom",
+  "MENU_LABEL_RESET" : "Reset"
 }

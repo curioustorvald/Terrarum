@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "GNU GPL 3 kapsamında dağıtılan",
   "APP_WARNING_HEALTH_AND_SAFETY": "UYARI-SAĞLIK VE GÜVENLİK",
   "MENU_LABEL_PRESS_START_SYMBOL": "> basınız",
-  "MENU_MODULES" : "Modüller"
+  "MENU_MODULES" : "Modüller",
+  "MENU_LABEL_RESET" : "Sıfırla"
 }
