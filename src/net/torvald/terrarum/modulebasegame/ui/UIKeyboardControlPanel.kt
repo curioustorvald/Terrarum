@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.DefaultConfig
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -141,15 +142,18 @@ class UIKeyboardControlPanel : UICanvas() {
     }
 
     private fun resetKeyConfig() {
-        App.setConfig("control_key_up", Input.Keys.E)
-        App.setConfig("control_key_left", Input.Keys.S)
-        App.setConfig("control_key_down", Input.Keys.D)
-        App.setConfig("control_key_right", Input.Keys.F)
-        App.setConfig("control_key_jump", Input.Keys.SPACE)
-        App.setConfig("control_key_zoom", Input.Keys.Z)
-        App.setConfig("control_key_inventory", Input.Keys.Q)
-        App.setConfig("control_key_movementaux", Input.Keys.A)
-        App.setConfig("control_key_gamemenu", Input.Keys.TAB)
+        listOf("control_key_up",
+                "control_key_left",
+                "control_key_down",
+                "control_key_right",
+                "control_key_jump",
+                "control_key_zoom",
+                "control_key_inventory",
+                "control_key_movementaux",
+                "control_key_gamemenu").forEach {
+
+                    App.setConfig(it, DefaultConfig.hashMap[it]!! as Int)
+        }
     }
 
     private fun updateKeycaps() {
