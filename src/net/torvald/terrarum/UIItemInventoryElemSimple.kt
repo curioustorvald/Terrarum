@@ -44,8 +44,10 @@ class UIItemInventoryElemSimple(
     override val width = UIItemInventoryElemSimple.height
     override val height = UIItemInventoryElemSimple.height
 
-    private val imgOffset: Float
+    private val imgOffsetY: Float
         get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
+    private val imgOffsetX: Float
+        get() = (this.height - itemImage!!.regionWidth).div(2).toFloat() // to snap to the pixel grid
 
     override fun update(delta: Float) {
 
@@ -79,7 +81,7 @@ class UIItemInventoryElemSimple(
 
             // item image
             batch.color = Color.WHITE
-            batch.draw(itemImage, posX + imgOffset, posY + imgOffset)
+            batch.draw(itemImage, posX + imgOffsetX, posY + imgOffsetY)
 
             // if mouse is over, text lights up
             // this one-liner sets color

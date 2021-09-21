@@ -49,8 +49,11 @@ class UIItemInventoryElemWide(
 
     override val height = UIItemInventoryElemWide.height
 
-    private val imgOffset: Float
+    private val imgOffsetY: Float
         get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
+    private val imgOffsetX: Float
+        get() = (this.height - itemImage!!.regionWidth).div(2).toFloat() // NOTE we're using this.height to get horizontal value; this is absofreakinlutely intentional (otherwise images would draw center of this wide cell which is not something we want)
+
     private val textOffsetX = 50f
     private val textOffsetY = 8f
 
@@ -96,7 +99,7 @@ class UIItemInventoryElemWide(
             
             // item image
             batch.color = Color.WHITE
-            batch.draw(itemImage, posX + imgOffset, posY + imgOffset)
+            batch.draw(itemImage, posX + imgOffsetX, posY + imgOffsetY)
 
             // if mouse is over, text lights up
             // this one-liner sets color
