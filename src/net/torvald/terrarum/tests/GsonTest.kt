@@ -1,7 +1,6 @@
 package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.utils.Json
-import net.torvald.terrarum.utils.JsonWriter
 import org.dyn4j.geometry.Vector2
 
 /**

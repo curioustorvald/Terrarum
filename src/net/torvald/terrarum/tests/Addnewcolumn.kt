@@ -1,8 +1,8 @@
 package net.torvald.terrarum.tests
 
+import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.utils.JsonWriter
 import java.io.File
 
 /**
@@ -68,7 +68,9 @@ fun main() {
                 }
             }
 
-            JsonWriter.writeToFile(jsonObject, file.absolutePath)
+            val writer = java.io.FileWriter(file, false)
+            writer.write(Json().toJson(jsonObject))
+            writer.close()
         }
     }
 }

@@ -30,9 +30,9 @@ import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
+import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.tvda.VirtualDisk;
 import net.torvald.terrarum.utils.JsonFetcher;
-import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
@@ -995,7 +995,7 @@ public class App implements ApplicationListener {
         File configFile = new File(configDir);
 
         if (!configFile.exists() || configFile.length() == 0L) {
-            JsonWriter.INSTANCE.writeToFile(DefaultConfig.INSTANCE.getHashMap(), configDir);
+            WriteConfig.INSTANCE.invoke();
         }
     }
 

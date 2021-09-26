@@ -20,14 +20,7 @@ object WriteConfig {
             override fun write(json: Json, obj: KVHashMap, knownType: Class<*>?) {
                 json.writeObjectStart()
                 obj.hashMap.toSortedMap().forEach { (k, v) ->
-                    json.writeValue(k,
-                            if (v is Int) v as Int
-                            else if (v is Double) v as Double
-                            else if (v is IntArray) v as IntArray
-                            else if (v is DoubleArray) v as DoubleArray
-                            else if (v is Boolean) v as Boolean
-                            else v.toString()
-                    )
+                    json.writeValue(k, v)
                 }
                 json.writeObjectEnd()
             }
@@ -43,8 +36,28 @@ object WriteConfig {
 
     }
 
+    /*fun getJson(): String {
+        val sb = StringBuilder()
+
+        App.gameConfig.hashMap.toSortedMap().forEach { (k, v) ->
+            sb.append("$k:")
+
+            when (v) {
+                is DoubleArray -> { sb.append("[${v.joinToString(",")}]") }
+                is IntArray -> { sb.append("[${v.joinToString(",")}]") }
+                is Array<*> -> { sb.append("[${v.joinToString(",")}]") }
+                else -> { sb.append("$v") }
+            }
+
+            sb.append("\n")
+        }
+
+        return "{\n$sb}"
+    }*/
+
     operator fun invoke() {
         val writer = java.io.FileWriter(App.configDir, false)
+        //writer.write(getJson())
         writer.write(jsoner.prettyPrint(App.gameConfig))
         writer.close()
     }
