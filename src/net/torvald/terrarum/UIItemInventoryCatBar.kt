@@ -6,11 +6,10 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
+import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
-import net.torvald.terrarum.ui.UIUtils
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -136,8 +135,18 @@ class UIItemInventoryCatBar(
     /**
      * 0: map, 1: inventory caticons, 2: menu
      */
-    var selectedPanel = 1
-        private set
+    var selectedPanel = 1; private set
+
+
+    fun setSelectedPanel(n: Int) {
+        if (n !in 0..2) throw IllegalArgumentException("$n")
+        selectedPanel = n
+
+        sideButtons[0].highlighted = (n == 0)
+        mainButtons[selectedIndex].highlighted = (n == 1)
+        sideButtons[3].highlighted = (n == 2)
+    }
+
 
     // set up underlined indicator
     init {
@@ -171,7 +180,7 @@ class UIItemInventoryCatBar(
         if (highlighterMoving) {
             highlighterMoveTimer += delta
 
-            highlighterXPos = UIUtils.moveQuick(
+            highlighterXPos = Movement.moveQuick(
                     highlighterXStart,
                     highlighterXEnd,
                     highlighterMoveTimer,

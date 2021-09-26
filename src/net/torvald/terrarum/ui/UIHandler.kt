@@ -24,12 +24,13 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
  * Created by minjaesong on 2015-12-31.
  */
 class UIHandler(//var UI: UICanvas,
-                var toggleKeyLiteral: Int? = null,
-                var toggleButtonLiteral: Int? = null,
+        var toggleKeyLiteral: Int? = null,
+        var toggleButtonLiteral: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
-                var customPositioning: Boolean = false, // mainly used by vital meter
-                var doNotWarnConstant: Boolean = false,
-                internal var allowESCtoClose: Boolean = false
+        var customPositioning: Boolean = false, // mainly used by vital meter
+        var doNotWarnConstant: Boolean = false,
+        internal var allowESCtoClose: Boolean = false,
+        var uiTogglerFunctionDefault: ((UIHandler) -> Unit)? = null
 ): Disposable {
 
     companion object {
@@ -128,6 +129,21 @@ void main() {
     private val toggleButton: Int?; get() = toggleButtonLiteral // to support in-screen keybind changing
 
 
+    val toggleKeyExtra: ArrayList<() -> Int> = arrayListOf()
+
+    /**
+     * Takes a function that works with UIHandler.
+     * For the function, try starting from the:
+     * ```
+     * if (it.isClosed)
+     *     it.setAsOpen()
+     * else if (it.isOpened)
+     *     setAsClose()
+     * ```
+     */
+    val toggleKeyExtraAction: ArrayList<(UIHandler) -> Unit> = arrayListOf()
+
+
     val subUIs = ArrayList<UICanvas>()
 
     val mouseUp: Boolean
@@ -165,15 +181,30 @@ void main() {
         // some UIs will pause the game, and they still need to be closed
         if (!uiToggleLocked && (Terrarum.ingame?.consoleOpened == false && (Terrarum.ingame?.paused == false || isOpened))) {
             if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!)) {
-                if (isClosed)
-                    setAsOpen()
-                else if (isOpened)
-                    setAsClose()
+                if (uiTogglerFunctionDefault == null) {
+                    if (isClosed)
+                        setAsOpen()
+                    else if (isOpened)
+                        setAsClose()
+                }
+                else uiTogglerFunctionDefault!!.invoke(this)
 
                 // for the case of intermediate states, do nothing.
             }
-            if (toggleButton != null) {
-                /* */
+            if (toggleButton != null && Gdx.input.isButtonJustPressed(toggleButton!!)) {
+                if (uiTogglerFunctionDefault == null) {
+                    if (isClosed)
+                        setAsOpen()
+                    else if (isOpened)
+                        setAsClose()
+                }
+                else uiTogglerFunctionDefault!!.invoke(this)
+            }
+
+            toggleKeyExtra.forEachIndexed { index, getKey ->
+                if (Gdx.input.isKeyJustPressed(getKey())) {
+                    toggleKeyExtraAction[0].invoke(this)
+                }
             }
 
             // ESC is a master key for closing

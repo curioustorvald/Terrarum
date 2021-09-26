@@ -63,7 +63,7 @@ class UIItemList<Item: UIItem>(
             highlighterMoveTimer += delta
 
             if (selectedIndex != null) {
-                highlightY = UIUtils.moveQuick(
+                highlightY = Movement.moveQuick(
                         highlighterYStart!!,
                         highlighterYEnd!!,
                         highlighterMoveTimer,

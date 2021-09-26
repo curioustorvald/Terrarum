@@ -58,6 +58,7 @@ object DefaultConfig {
             "control_key_down" to Input.Keys.D,
             "control_key_right" to Input.Keys.F, // ESDF Masterrace
 
+            "control_key_jump" to Input.Keys.SPACE,
             "control_key_movementaux" to Input.Keys.A, // movement-auxiliary, or hookshot
             "control_key_inventory" to Input.Keys.Q,
             "control_key_interact" to Input.Keys.R,
@@ -67,15 +68,14 @@ object DefaultConfig {
 
             "control_key_gamemenu" to Input.Keys.TAB,
             "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because GDX does not read CapsLock
+            "control_mouse_quicksel" to Input.Buttons.MIDDLE, // middle click to open pie menu
+
             // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
             // so these keys are treated as the same.
             // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
-            "control_key_quickselalt" to intArrayOf(Input.Keys.BACKSPACE, Input.Keys.CONTROL_LEFT, Input.Keys.BACKSLASH),
-            "control_mouse_quicksel" to Input.Buttons.MIDDLE, // middle click to open pie menu
+            "control_key_quickslots" to (Input.Keys.NUM_0..Input.Keys.NUM_9).map { 1.0*it }.toDoubleArray(),
+            "control_key_quickselalt" to intArrayOf(Input.Keys.BACKSPACE, Input.Keys.CONTROL_LEFT, Input.Keys.BACKSLASH).map { 1.0*it }.toDoubleArray(),
 
-            "control_key_jump" to Input.Keys.SPACE,
-
-            "control_key_quickslots" to (Input.Keys.NUM_0..Input.Keys.NUM_9).toList().toIntArray(),
 
             "config_mouseprimary" to Input.Buttons.LEFT, // left mouse
             "config_mousesecondary" to Input.Buttons.RIGHT, // right mouse

@@ -184,6 +184,30 @@ class UIInventoryFull(
         }
 
 
+        // force position of things to UI when opened with "control_key_inventory"
+        this.handler.uiTogglerFunctionDefault = {
+            if (it.isClosed) {
+                transitionPanel.forcePosition(1)
+                catBar.setSelectedPanel(1)
+                it.setAsOpen()
+            }
+            else if (it.isOpened)
+                setAsClose()
+        }
+
+        // allow "control_key_gamemenu" to open this UI
+        this.handler.toggleKeyExtra.add { App.getConfigInt("control_key_gamemenu") }
+        this.handler.toggleKeyExtraAction.add {
+            if (it.isClosed) {
+                transitionPanel.forcePosition(2)
+                catBar.setSelectedPanel(2)
+                it.setAsOpen()
+            }
+            else if (it.isOpened)
+                setAsClose()
+        }
+
+
         rebuildList()
 
 

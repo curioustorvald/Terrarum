@@ -37,6 +37,14 @@ open class UIItemTransitionContainer(
         }
     }
 
+    fun forcePosition(target: Int) {
+        transitionOngoing = false
+        transitionRequested = false
+        transitionTimer = 0f
+        currentPosition = target.toFloat()
+        onTransition(currentPosition, uis)
+    }
+
     override fun update(delta: Float) {
         super.update(delta)
         uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.update(delta) }
@@ -56,7 +64,7 @@ open class UIItemTransitionContainer(
         if (transitionOngoing) {
             transitionTimer += Gdx.graphics.deltaTime
 
-            currentPosition = UIUtils.moveLinear(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
+            currentPosition = Movement.moveLinear(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
 
             if (transitionTimer > transitionLength) {
                 transitionOngoing = false

@@ -20,7 +20,14 @@ object WriteConfig {
             override fun write(json: Json, obj: KVHashMap, knownType: Class<*>?) {
                 json.writeObjectStart()
                 obj.hashMap.toSortedMap().forEach { (k, v) ->
-                    json.writeValue(k, v)
+                    json.writeValue(k,
+                            if (v is Int) v as Int
+                            else if (v is Double) v as Double
+                            else if (v is IntArray) v as IntArray
+                            else if (v is DoubleArray) v as DoubleArray
+                            else if (v is Boolean) v as Boolean
+                            else v.toString()
+                    )
                 }
                 json.writeObjectEnd()
             }
