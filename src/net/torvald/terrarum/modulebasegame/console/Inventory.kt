@@ -7,6 +7,8 @@ import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.*
+import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
+import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 /**
@@ -14,66 +16,92 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: Pocketed? = null
+    private var targetID: ActorID = PLAYER_REF_ID
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
             printUsage()
         }
         else {
-            when (args[1]) {
-                "list"   -> listInventory()
-                "add"    -> if (args.size > 3) addItem(args[2], args[3].toInt())
-                            else addItem(args[2])
-                "target" -> setTarget(args[2].toInt())
-                "equip"  -> equipItem(args[2])
-                else     -> printUsage()
-            }
-        }
-    }
-
-    private fun listInventory() {
-        if (target != null) {
-            if (target!!.inventory.getTotalUniqueCount() == 0) {
-                Echo("(inventory empty)")
-            }
-            else {
-                target!!.inventory.forEach { val (item, amount) = it
-                    if (amount == 0) {
-                        EchoError("Unexpected zero-amounted item: ID $item")
-                    }
-                    Echo("ID $item${if (amount > 1) " ($amount)" else ""}")
+            val actor = getActor()
+            if (actor != null) {
+                when (args[1]) {
+                    "list"   -> listInventory(actor)
+                    "add"    -> if (args.size > 3) addItem(actor, args[2], args[3].toInt()) else addItem(actor, args[2])
+                    "remove" -> if (args.size > 3) removeItem(actor, args[2], args[3].toInt()) else removeItem(actor, args[2])
+                    "target" -> targetID = if (args[2].lowercase() == "player") PLAYER_REF_ID else args[2].toInt()
+                    "equip"  -> equipItem(actor, args[2])
+                    "unequip"-> unequipItem(actor, args[2])
+                    else     -> printUsage()
                 }
             }
+            else {
+                Echo("Actor $targetID is not Pocketed or does not exists")
+            }
         }
     }
 
-    private fun setTarget(actorRefId: Int = Terrarum.PLAYER_REF_ID) {
-        val actor = INGAME.getActorByID(actorRefId)
-        if (actor !is Pocketed) {
-            EchoError("Cannot edit inventory of incompatible actor: $actor")
+    private fun getActor() = Terrarum.ingame?.getActorByID(targetID) as? Pocketed
+
+    private fun listInventory(actor: Pocketed) {
+        if (actor.inventory.getTotalUniqueCount() == 0) {
+            Echo("(inventory empty)")
         }
         else {
-            target = actor
+            actor.inventory.forEach { val (item, amount) = it
+                if (amount == 0) {
+                    EchoError("Unexpected zero-amounted item: ID $item")
+                }
+                Echo("${ccW}ID $ccY$item${if (amount > 1) "$ccW ($ccG$amount$ccW)" else ""}")
+            }
         }
     }
 
-    private fun addItem(refId: ItemID, amount: Int = 1) {
-        if (target != null) {
-            target!!.addItem(ItemCodex[refId]!!, amount)
+    private fun addItem(actor: Pocketed, refId: ItemID, amount: Int = 1) {
+        val item = ItemCodex[refId]
+        if (item != null) {
+            actor.addItem(item, amount)
+            Echo("${ccW}Added$ccG $amount$ccY $refId$ccW to $ccO$targetID")
         }
+        else EchoError("No such item: $refId")
     }
 
-    private fun equipItem(refId: ItemID) {
-        if (target != null) {
-            val item = ItemCodex[refId]!!
-            target!!.equipItem(item)
+    private fun removeItem(actor: Pocketed, refId: ItemID, amount: Int = 1) {
+        val item = ItemCodex[refId]
+        if (item != null) {
+            actor.removeItem(item, amount)
+            Echo("${ccW}Removed$ccG $amount$ccY $refId$ccW from $ccO$targetID")
         }
+        else EchoError("No such item: $refId")
+    }
+
+    private fun equipItem(actor: Pocketed, refId: ItemID) {
+        val item = ItemCodex[refId]
+        if (item != null) {
+            actor.equipItem(item)
+            Echo("${ccW}Equipped$ccY $refId$ccW to $ccO$targetID")
+        }
+        else EchoError("No such item: $refId")
+    }
+
+    private fun unequipItem(actor: Pocketed, refId: ItemID) {
+        val item = ItemCodex[refId]
+        if (item != null) {
+            actor.unequipItem(item)
+            Echo("${ccW}Stripped$ccY $refId$ccW out of $ccO$targetID")
+        }
+        else EchoError("No such item: $refId")
     }
 
     override fun printUsage() {
-        Echo("Usage: inventory command arguments")
-        Echo("Available commands:")
-        Echo("list | assign slot | add itemid [amount] | target [actorid] | equip itemid")
+        Echo("${ccW}Usage:$ccY inventory$ccG [command]")
+        Echo("${ccW}Available commands:")
+        Echo("$ccY    target$ccG [actorid|“player”]")
+        Echo("$ccY    add$ccG [itemid] [amount]")
+        Echo("$ccY    remove$ccG [itemid] [amount]")
+        Echo("$ccY    equip$ccG [itemid]")
+        Echo("$ccY    unequip$ccG [itemid]")
+        Echo("$ccY    list")
+        Echo("Currently targeted: $ccO$targetID")
     }
 }
