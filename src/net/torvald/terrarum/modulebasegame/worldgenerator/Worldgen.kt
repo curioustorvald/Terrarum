@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
@@ -30,12 +31,29 @@ object Worldgen {
 
 
         for (i in jobs.indices) {
-            printdbg(this, "Worldgen: job #$i")
+            printdbg(this, "Worldgen: job #${i+1}")
 
             val it = jobs[i]
 
             App.getLoadScreen().addMessage(it.loadingScreenName)
             it.theWork.getDone()
+        }
+
+        // determine spawn point
+        world.spawnX = 0
+        world.spawnY = 180
+        // go up?
+        if (BlockCodex[world.getTileFromTerrain(world.spawnX, world.spawnY)].isSolid) {
+            // go up!
+            while (BlockCodex[world.getTileFromTerrain(world.spawnX, world.spawnY)].isSolid) {
+                world.spawnY -= 1
+            }
+        }
+        else {
+            // go down!
+            while (!BlockCodex[world.getTileFromTerrain(world.spawnX, world.spawnY)].isSolid) {
+                world.spawnY += 1
+            }
         }
 
         printdbg(this, "Generation job finished")

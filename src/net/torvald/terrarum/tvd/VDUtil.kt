@@ -37,7 +37,6 @@ object VDUtil {
     }
 
     fun dumpToRealMachine(disk: VirtualDisk, outfile: File) {
-        if (!outfile.exists()) outfile.createNewFile()
         outfile.writeBytes64(disk.serialize().array)
     }
 

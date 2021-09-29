@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -27,16 +28,6 @@ object WriteSavegame {
     @Volatile var saveProgress = 0f
     @Volatile var saveProgressMax = 1f
 
-    /**
-     * Will happily overwrite existing entry
-     */
-    private fun addFile(disk: VirtualDisk, file: DiskEntry) {
-        disk.entries[file.entryID] = file
-        file.parentEntryID = 0
-        val dir = VDUtil.getAsDirectory(disk, 0)
-        if (!dir.contains(file.entryID)) dir.add(file.entryID)
-    }
-
     operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
         savingStatus = 0
 
@@ -57,14 +48,27 @@ object WriteSavegame {
         }
         IngameRenderer.fboRGBexportRequested = true
 
-        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, true, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
+        // it is caller's job to keep the game paused or keep a "save in progress" ui up
+        // use field 'savingStatus' to know when the saving is done
+    }
+
+
+    fun immediate(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
+        savingStatus = 0
+
+        Echo("Immediate save fired")
+
+        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, false, callback), "TerrarumBasegameGameSaveThread")
+        savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
         // use field 'savingStatus' to know when the saving is done
     }
 }
+
 
 
 

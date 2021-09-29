@@ -45,6 +45,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     lateinit var savegameArchive: VirtualDisk
         internal set
+    var savegameNickname: String = "SplinesReticulated"
+        internal set
 
     var screenZoom = 1.0f
     val ZOOM_MAXIMUM = 4.0f

@@ -235,20 +235,20 @@ internal class UIStorageChest : UICanvas(
     }
 
     override fun doOpening(delta: Float) {
-        Terrarum.ingame?.paused = true
-        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
+        INGAME.pause()
+        INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
-        Terrarum.ingame?.paused = false
-        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
+        INGAME.resume()
+        INGAME.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
     }
 
     override fun endClosing(delta: Float) {
-        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null) // required!
+        INGAME.setTooltipMessage(null) // required!
     }
 
 

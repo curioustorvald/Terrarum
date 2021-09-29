@@ -56,7 +56,7 @@ object Save : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo("Usage: save <filename>")
+        Echo("Usage: save <new-savegame-name>")
     }
 
 }

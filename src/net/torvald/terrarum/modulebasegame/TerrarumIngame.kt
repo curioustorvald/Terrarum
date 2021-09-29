@@ -32,19 +32,18 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.serialise.ReadActor
-import net.torvald.terrarum.serialise.WriteMeta
+import net.torvald.terrarum.serialise.*
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
+import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
 
@@ -231,7 +230,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     data class NewWorldParameters(
             val width: Int,
             val height: Int,
-            val worldGenSeed: Long
+            val worldGenSeed: Long,
+            val savegameName: String
             // other worldgen options
     ) {
         init {
@@ -278,7 +278,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             Terrarum.itemCodex.loadFromSave(codices.item)
             Terrarum.apocryphas = HashMap(codices.apocryphas)
 
-
+            savegameNickname = codices.disk.getDiskNameString(Common.CHARSET)
         }
     }
 
@@ -291,6 +291,32 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // by doing this, whatever the "possession" the player had will be broken by the game load
         actorNowPlaying = getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
+    }
+
+    private fun postInitForNewGame() {
+        // go to spawn position
+        printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
+
+//        setTheRealGamerFirstTime(PlayerBuilderSigrid())
+        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
+//        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
+
+        savegameArchive = VDUtil.createNewDisk(
+                1L shl 60,
+                savegameNickname,
+                Common.CHARSET
+        )
+
+        actorNowPlaying!!.setPosition(
+                world.spawnX * TILE_SIZED,
+                world.spawnY * TILE_SIZED
+        )
+
+        // make initial savefile
+//        pause()
+        WriteSavegame.immediate(savegameArchive, File(App.defaultSaveDir, savegameNickname), this) {
+//            resume()
+        }
     }
 
     /**
@@ -324,6 +350,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             historicalFigureIDBucket = ArrayList<Int>()
+
+            savegameNickname = worldParams.savegameName
         }
 
         KeyToggler.forceSet(Input.Keys.Q, false)
@@ -333,17 +361,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     /** Load rest of the game with GL context */
     fun postInit() {
-        if (actorNowPlaying == null) {
-            //setTheRealGamerFirstTime(PlayerBuilderSigrid())
-            setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
-//        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
-
-            savegameArchive = VDUtil.createNewDisk(
-                    1L shl 60,
-                    actorNowPlaying!!.actorValue.getAsString(AVKey.NAME) ?: "Player ${App.getTIME_T()}",
-                    Common.CHARSET
-            )
-        }
+        actorNowPlaying!! // null check, just in case...
 
 
         MegaRainGovernor // invoke MegaRain Governor
@@ -529,18 +547,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         if (!gameFullyLoaded) {
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
-                // go to spawn position
-                actorNowPlaying?.setPosition(
-                        world.spawnX * TILE_SIZED,
-                        world.spawnY * TILE_SIZED
-                )
+                postInitForNewGame()
             }
             else if (gameLoadMode == GameLoadMode.LOAD_FROM) {
                 postInitForLoadFromSave(gameLoadInfoPayload as Codices)
             }
 
             postInit()
-
 
             gameFullyLoaded = true
         }
@@ -1054,10 +1067,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun pause() {
-        // TODO no pause when off-focus on desktop
+        paused = true
     }
 
     override fun resume() {
+        paused = false
     }
 
     override fun hide() {

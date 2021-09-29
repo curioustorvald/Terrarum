@@ -14,7 +14,7 @@ object CommonResourcePool {
 
     private val loadingList = Queue<ResourceLoadingDescriptor>()
     private val pool = HashMap<String, Any>()
-    private val poolKillFun = HashMap<String, (() -> Unit)?>()
+    private val poolKillFun = HashMap<String, ((Any) -> Unit)?>()
     //private val typesMap = HashMap<String, Class<*>>()
     private var loadCounter = -1 // using counters so that the loading can be done on separate thread (gg if the asset requires GL context to be loaded)
     val loaded: Boolean // see if there's a thing to load
@@ -77,7 +77,7 @@ object CommonResourcePool {
      * - com.badlogic.gdx.graphics.g2d.TextureRegion
      * - net.torvald.UnsafePtr
      */
-    fun addToLoadingList(identifier: String, loadFunction: () -> Any, destroyFunction: (() -> Unit)?) {
+    fun addToLoadingList(identifier: String, loadFunction: () -> Any, destroyFunction: ((Any) -> Unit)?) {
         // check if resource is already there
         if (!resourceExists(identifier)) {
             loadingList.addFirst(ResourceLoadingDescriptor(identifier, loadFunction, destroyFunction))
@@ -128,7 +128,7 @@ object CommonResourcePool {
                     u is Texture -> u.dispose()
                     u is TextureRegion -> u.texture.dispose()
                     u is UnsafePtr -> u.destroy()
-                    else -> poolKillFun[name]?.invoke()
+                    else -> poolKillFun[name]?.invoke(u)
                 }
             }
             catch (e: Throwable) {
@@ -140,6 +140,6 @@ object CommonResourcePool {
     private data class ResourceLoadingDescriptor(
             val name: String,
             val loadfun: () -> Any,
-            val killfun: (() -> Unit)? = null
+            val killfun: ((Any) -> Unit)? = null
     )
 }

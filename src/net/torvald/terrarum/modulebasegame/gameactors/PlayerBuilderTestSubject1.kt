@@ -34,7 +34,9 @@ object PlayerBuilderTestSubject1 {
         p.reassembleSprite(p.sprite!!, p.spriteGlow)
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 
-        p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)
+        // ingame must teleport the player to the spawn point
+        // see `TerrarumIngame.render`
+//        p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)
 
 
         PlayerBuilderSigrid.fillTestInventory(p.inventory)

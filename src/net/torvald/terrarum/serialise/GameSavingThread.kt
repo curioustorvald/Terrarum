@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.console.Echo
@@ -13,7 +14,7 @@ import java.util.zip.GZIPOutputStream
 /**
  * Created by minjaesong on 2021-09-14.
  */
-class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val callback: () -> Unit) : Runnable {
+class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val callback: () -> Unit) : Runnable {
 
     /**
      * Will happily overwrite existing entry
@@ -29,8 +30,10 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
     private val actorProgressMultiplier = 1f
 
     override fun run() {
-        while (!IngameRenderer.fboRGBexportedLatch) {
-            Thread.sleep(1L)
+        if (hasThumbnail) {
+            while (!IngameRenderer.fboRGBexportedLatch) {
+                Thread.sleep(1L)
+            }
         }
 
         val actorsList = listOf(ingame.actorContainerActive, ingame.actorContainerInactive).flatMap { it.filter { WriteWorld.actorAcceptable(it) } }
@@ -58,12 +61,14 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         val meta = DiskEntry(-1, 0, creation_t, time_t, metaContent)
         addFile(disk, meta)
 
+        if (hasThumbnail) {
+            PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
+            IngameRenderer.fboRGBexport.dispose()
 
-        PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
-        IngameRenderer.fboRGBexport.dispose()
-        val thumbContent = EntryFile(tgaout.toByteArray64())
-        val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
-        addFile(disk, thumb)
+            val thumbContent = EntryFile(tgaout.toByteArray64())
+            val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
+            addFile(disk, thumb)
+        }
 
         WriteSavegame.saveProgress += 1f
 
@@ -157,7 +162,7 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         Echo ("${ccW}Game saved with size of $ccG${outFile.length()}$ccW bytes")
 
 
-        IngameRenderer.fboRGBexportedLatch = false
+        if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false
         WriteSavegame.savingStatus = 255
 
 

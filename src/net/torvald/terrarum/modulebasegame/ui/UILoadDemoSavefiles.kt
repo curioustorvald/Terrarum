@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -10,6 +11,7 @@ import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta
 import net.torvald.terrarum.tvda.ByteArray64InputStream
@@ -26,6 +28,13 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2021-09-09.
  */
 class UILoadDemoSavefiles : UICanvas() {
+
+    init {
+        CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
+            TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
+        }
+        CommonResourcePool.loadAll()
+    }
 
     override var width: Int
         get() = App.scr.width
@@ -277,7 +286,7 @@ class UIItemDemoSaveCells(
     override val height: Int = HEIGHT
 
     private lateinit var thumbPixmap: Pixmap
-    private lateinit var thumb: TextureRegion
+    private var thumb: TextureRegion? = null
     private val grad = CommonResourcePool.getAsTexture("title_halfgrad")
 
     private val meta = ReadMeta(disk)
@@ -309,7 +318,7 @@ class UIItemDemoSaveCells(
             val thumbTex = Texture(thumbPixmap)
             thumbTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             thumb = TextureRegion(thumbTex)
-            thumb.setRegion(0, (thumbTex.height - 2 * height) / 2, width * 2, height * 2)
+            thumb!!.setRegion(0, (thumbTex.height - 2 * height) / 2, width * 2, height * 2)
         }
         catch (e: NullPointerException) {
             // use stock texture
@@ -335,7 +344,7 @@ class UIItemDemoSaveCells(
         // draw thumbnail
         batch.color = Color.WHITE
         blendNormal(batch)
-        batch.draw(thumb, x, y + height, width.toFloat(), -height.toFloat())
+        batch.draw(thumb ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb"), x, y + height, width.toFloat(), -height.toFloat())
         // draw gradient
         blendMul(batch)
         batch.draw(grad, x + width.toFloat(), y, -width.toFloat(), height.toFloat())
@@ -350,14 +359,14 @@ class UIItemDemoSaveCells(
         // file size
         App.fontSmallNumbers.draw(batch, "${disk.usedBytes.ushr(10)} KiB", x + 3f, y + height - 16f)
         // savegame name
-//        App.fontGame.draw(batch, disk.getDiskNameString(Common.CHARSET), x + 3f, y + 1f)
+        App.fontGame.draw(batch, disk.getDiskNameString(Common.CHARSET), x + 3f, y + 1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE
     }
 
     override fun dispose() {
-        thumb.texture.dispose()
+        thumb?.texture?.dispose()
         thumbPixmap.dispose()
     }
 

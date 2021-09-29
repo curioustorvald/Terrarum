@@ -374,7 +374,7 @@ class UIItemInventoryItemGrid(
 
             // set tooltip accordingly
             if (isCompactMode && it.item != null && it.mouseUp && !tooltipSet) {
-                (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(
+                INGAME.setTooltipMessage(
                         if (INVEN_DEBUG_MODE) {
                             it.item?.name + " (${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
                         }
@@ -387,7 +387,7 @@ class UIItemInventoryItemGrid(
         }
 
         if (!tooltipSet) {
-            (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
+            INGAME.setTooltipMessage(null)
         }
 
 

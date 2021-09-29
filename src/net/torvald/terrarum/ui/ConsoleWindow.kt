@@ -10,7 +10,6 @@ import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.CircularArray
 
 
@@ -208,7 +207,7 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun doOpening(delta: Float) {
-        Terrarum.ingame?.paused = true
+        Terrarum.ingame?.pause()
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 -height.toFloat(), 0f
@@ -216,7 +215,7 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun doClosing(delta: Float) {
-        Terrarum.ingame?.paused = false
+        Terrarum.ingame?.resume()
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 0f, -height.toFloat()
@@ -224,14 +223,14 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
-        Terrarum.ingame?.paused = true
+        Terrarum.ingame?.pause()
         drawOffY = 0f
         openingTimeCounter = 0f
     }
 
     override fun endClosing(delta: Float) {
-        (Terrarum.ingame as? TerrarumIngame)?.setTooltipMessage(null)
-        Terrarum.ingame?.paused = false
+        Terrarum.ingame?.setTooltipMessage(null)
+        Terrarum.ingame?.resume()
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
     }

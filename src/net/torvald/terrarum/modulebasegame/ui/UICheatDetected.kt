@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -51,7 +48,7 @@ class UICheatDetected : UICanvas() {
     }
 
     override fun doOpening(delta: Float) {
-        Terrarum.ingame?.paused = true
+        INGAME.pause()
     }
 
     override fun doClosing(delta: Float) {

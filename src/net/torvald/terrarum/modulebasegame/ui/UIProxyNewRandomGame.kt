@@ -10,6 +10,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.utils.RandomWordsName
 
 /**
  * Created by minjaesong on 2018-12-08.
@@ -38,7 +39,7 @@ class UIProxyNewRandomGame : UICanvas() {
 
 
         val ingame = TerrarumIngame(App.batch)
-        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong())
+        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong(), RandomWordsName(4))
 //        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, 0x51621D)
 
 //        val worldParam = TerrarumIngame.NewWorldParameters(6030, 1800, HQRNG().nextLong()) // small

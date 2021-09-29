@@ -126,6 +126,7 @@ open class GameWorld() : Disposable {
         this.width = width
         this.height = height
 
+        // preliminary spawn points
         this.spawnX = width / 2
         this.spawnY = 200
 
