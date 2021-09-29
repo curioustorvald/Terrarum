@@ -18,6 +18,9 @@ import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.*
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.util.concurrent.locks.Lock
 
 /**
@@ -356,6 +359,25 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             uiTooltip.message = message
         }
     }
+
+    /**
+     * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
+     */
+    fun makeSavegameBackupCopy() {
+        try {
+            File(App.defaultSaveDir, INGAME.savegameNickname+".1").copyTo(
+                    File(App.defaultSaveDir, INGAME.savegameNickname+".2"), // don't use .bak as it's used by the savecracker
+                    true
+            )
+        } catch (e: NoSuchFileException) {}
+        try {
+            File(App.defaultSaveDir, INGAME.savegameNickname).copyTo(
+                    File(App.defaultSaveDir, INGAME.savegameNickname+".1"), // don't use .bak as it's used by the savecracker
+                    true
+            )
+        } catch (e: NoSuchFileException) {}
+    }
+
 
 
     // simple euclidean norm, squared

@@ -313,9 +313,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         )
 
         // make initial savefile
-//        pause()
         WriteSavegame.immediate(savegameArchive, File(App.defaultSaveDir, savegameNickname), this) {
-//            resume()
+            makeSavegameBackupCopy()
         }
     }
 

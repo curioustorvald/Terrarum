@@ -85,11 +85,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     screen = 3; gameMenuButtons.deselect()
                     full.handler.lockToggle()
                     full.lockTransition()
-                    // make backup of the old save
-                    File(App.defaultSaveDir, INGAME.savegameNickname).copyTo(
-                            File(App.defaultSaveDir, INGAME.savegameNickname+".1"), // don't use .bak as it's used by the savecracker
-                            true
-                    )
+
+                    INGAME.makeSavegameBackupCopy()
+
                     // save the game
                     WriteSavegame(INGAME.savegameArchive, File(App.defaultSaveDir, INGAME.savegameNickname), Terrarum.ingame!! as TerrarumIngame) {
                         // callback:
