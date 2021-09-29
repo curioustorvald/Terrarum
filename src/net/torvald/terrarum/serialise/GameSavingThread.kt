@@ -1,6 +1,5 @@
 package net.torvald.terrarum.serialise
 
-import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.console.Echo
@@ -30,6 +29,8 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
     private val actorProgressMultiplier = 1f
 
     override fun run() {
+        disk.saveMode = 0 // no quick, no auto
+
         if (hasThumbnail) {
             while (!IngameRenderer.fboRGBexportedLatch) {
                 Thread.sleep(1L)

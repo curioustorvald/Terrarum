@@ -35,8 +35,8 @@ object WriteWorld {
         world.totalPlayTime += currentPlayTime_t
 
         val actorIDbuf = ArrayList<ActorID>()
-        ingame.actorContainerActive.filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
-        ingame.actorContainerInactive.filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
+        ingame.actorContainerActive.cloneToList().filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
+        ingame.actorContainerInactive.cloneToList().filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
 
         world.actors.clear()
         world.actors.addAll(actorIDbuf.sorted().distinct())

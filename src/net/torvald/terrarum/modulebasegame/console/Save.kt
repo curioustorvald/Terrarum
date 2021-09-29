@@ -1,19 +1,13 @@
 package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.tvda.DiskEntry
-import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteSavegame
+import net.torvald.terrarum.tvda.VDUtil
 import java.io.File
 import java.io.IOException
 
@@ -28,7 +22,7 @@ object Save : ConsoleCommand {
                 val ingame = Terrarum.ingame!! as TerrarumIngame
                 val savename = args[1].trim()
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
-                val file = File(App.defaultDir + "/Exports/${args[1]}")
+                val file = File(App.defaultSaveDir + "/${args[1]}")
 
                 WriteSavegame(disk, file, ingame)
 

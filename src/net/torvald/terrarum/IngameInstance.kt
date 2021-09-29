@@ -19,11 +19,10 @@ import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.*
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.locks.Lock
-import kotlin.collections.ArrayList
 
 /**
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
@@ -367,11 +366,18 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      */
     fun makeSavegameBackupCopy() {
         try {
-            File(App.defaultSaveDir, INGAME.savegameNickname+".1").copyTo(
-                    File(App.defaultSaveDir, INGAME.savegameNickname+".2"), // don't use .bak as it's used by the savecracker
-                    true
-            )
-        } catch (e: NoSuchFileException) {}
+            // do not overwrite clean .2 with dirty .1
+            val file2 = File(App.defaultSaveDir, INGAME.savegameNickname+".2")
+            val file1 = File(App.defaultSaveDir, INGAME.savegameNickname+".1")
+
+            val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
+            val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
+
+            if (!(flags2 == 0 && flags1 != 0)) {
+                file1.copyTo(file2, true)
+            }
+        } catch (e: NoSuchFileException) {
+        } catch (e: FileNotFoundException) {}
         try {
             File(App.defaultSaveDir, INGAME.savegameNickname).copyTo(
                     File(App.defaultSaveDir, INGAME.savegameNickname+".1"), // don't use .bak as it's used by the savecracker
