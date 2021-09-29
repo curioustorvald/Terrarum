@@ -8,6 +8,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.toInt
 import net.torvald.terrarum.tvda.*
 import java.io.File
 import java.util.zip.GZIPOutputStream
@@ -15,7 +16,7 @@ import java.util.zip.GZIPOutputStream
 /**
  * Created by minjaesong on 2021-09-29.
  */
-class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val callback: () -> Unit) : Runnable {
+class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
 
     /**
      * Will happily overwrite existing entry
@@ -130,14 +131,14 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
 
         skimmer.rewriteDirectories()
         skimmer.injectDiskCRC(disk.hashCode())
-
+        skimmer.setSaveMode(1 + 2 * isAuto.toInt())
 
         Echo ("${ccW}Game saved with size of $ccG${file.length()}$ccW bytes")
 
 
         if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false
         WriteSavegame.savingStatus = 255
-        ingame.modifiedChunks.forEach { it.clear() }
+        ingame.clearModifiedChunks()
 
         callback()
     }

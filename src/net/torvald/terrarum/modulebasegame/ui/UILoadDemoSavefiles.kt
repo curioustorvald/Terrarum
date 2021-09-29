@@ -359,7 +359,8 @@ class UIItemDemoSaveCells(
         // file size
         App.fontSmallNumbers.draw(batch, "${disk.usedBytes.ushr(10)} KiB", x + 3f, y + height - 16f)
         // savegame name
-        App.fontGame.draw(batch, disk.getDiskNameString(Common.CHARSET), x + 3f, y + 1f)
+        val diskName = disk.getDiskNameString(Common.CHARSET)
+        App.fontGame.draw(batch, diskName + "${if (disk.saveMode % 2 == 1) "*" else ""}", x + 3f, y + 1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE

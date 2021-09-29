@@ -301,6 +301,11 @@ removefile:
         }
     }
 
+    fun setSaveMode(bits: Int) {
+        fa.seek(49L)
+        fa.writeByte(bits)
+    }
+
     ///////////////////////////////////////////////////////
     // THESE ARE METHODS TO SUPPORT ON-LINE MODIFICATION //
     ///////////////////////////////////////////////////////

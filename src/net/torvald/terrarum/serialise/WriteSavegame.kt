@@ -68,7 +68,7 @@ object WriteSavegame {
         // use field 'savingStatus' to know when the saving is done
     }
 
-    fun quick(disk: VirtualDisk, file: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
+    fun quick(disk: VirtualDisk, file: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
         savingStatus = 0
 
         Echo("Quicksave queued")
@@ -88,7 +88,7 @@ object WriteSavegame {
         }
         IngameRenderer.fboRGBexportRequested = true
 
-        val savingThread = Thread(QuickSaveThread(disk, file, ingame, true, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(QuickSaveThread(disk, file, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up

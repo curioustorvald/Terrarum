@@ -291,6 +291,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // by doing this, whatever the "possession" the player had will be broken by the game load
         actorNowPlaying = getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
+
+        makeSavegameBackupCopy() // don't put it on the postInit() or render(); postInitForNewGame calls this function on the savegamewriter's callback
     }
 
     private fun postInitForNewGame() {
@@ -314,7 +316,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // make initial savefile
         WriteSavegame.immediate(savegameArchive, getSaveFileMain(), this) {
-            makeSavegameBackupCopy()
+            makeSavegameBackupCopy() // don't put it on the postInit() or render(); must be called using callback
         }
     }
 

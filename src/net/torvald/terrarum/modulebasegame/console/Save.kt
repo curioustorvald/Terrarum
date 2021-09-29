@@ -53,7 +53,7 @@ object Quicksave : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
 
-        WriteSavegame.quick(ingame.savegameArchive, ingame.getSaveFileMain(), ingame) {
+        WriteSavegame.quick(ingame.savegameArchive, ingame.getSaveFileMain(), ingame, false) {
 
         }
     }
