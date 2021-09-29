@@ -3,6 +3,7 @@ package net.torvald.terrarum.tvda
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
+import java.util.logging.Level
 import kotlin.experimental.and
 
 /**
@@ -120,19 +121,19 @@ removefile:
         val currentLength = diskFile.length()
         while (currentPosition < currentLength) {
 
-            val entryID = readLongBig() // at this point, cursor is 4 bytes past to the entry head
+            val entryID = readLongBig() // at this point, cursor is 8 bytes past to the entry head
 
             // fill up the offset table
             val offset = currentPosition
 
-            skipRead(8)
+            skipRead(8) // parent ID
             val typeFlag = readByte()
             skipRead(3)
             skipRead(16) // skip rest of the header
 
             val entrySize = when (typeFlag and 127) {
                 DiskEntry.NORMAL_FILE -> readInt48()
-                DiskEntry.DIRECTORY -> readIntBig().toLong()
+                DiskEntry.DIRECTORY -> readIntBig().toLong() * 8L
                 else -> 0
             }
 
@@ -270,16 +271,58 @@ removefile:
     }*/
 
     fun invalidateEntry(id: EntryID) {
-        fa.seek(entryToOffsetTable[id]!! + 8)
-        val type = fa.read()
-        fa.seek(entryToOffsetTable[id]!! + 8)
-        fa.write(type or 128)
-        entryToOffsetTable.remove(id)
+        entryToOffsetTable[id]?.let {
+            fa.seek(it + 8)
+            val type = fa.read()
+            fa.seek(it + 8)
+            fa.write(type or 128)
+            entryToOffsetTable.remove(id)
+        }
+    }
+
+
+    fun injectDiskCRC(crc: Int) {
+        fa.seek(42L)
+        fa.write(crc.toBigEndian())
+    }
+
+    private val modifiedDirectories = TreeSet<DiskEntry>()
+
+    fun rewriteDirectories() {
+        modifiedDirectories.forEach {
+            invalidateEntry(it.entryID)
+
+            val appendAt = fa.length()
+            fa.seek(appendAt)
+
+            // append new file
+            entryToOffsetTable[it.entryID] = appendAt + 8
+            it.serialize().forEach { fa.writeByte(it.toInt()) }
+        }
     }
 
     ///////////////////////////////////////////////////////
     // THESE ARE METHODS TO SUPPORT ON-LINE MODIFICATION //
     ///////////////////////////////////////////////////////
+
+    fun appendEntryOnly(entry: DiskEntry) {
+        val parentDir = requestFile(entry.parentEntryID)!!
+        val id = entry.entryID
+
+        // add the entry to its parent directory if there was none
+        val dirContent = (parentDir.contents as EntryDirectory)
+        if (!dirContent.contains(id)) dirContent.add(id)
+        modifiedDirectories.add(parentDir)
+
+        invalidateEntry(id)
+
+        val appendAt = fa.length()
+        fa.seek(appendAt)
+
+        // append new file
+        entryToOffsetTable[id] = appendAt + 8
+        entry.serialize().forEach { fa.writeByte(it.toInt()) }
+    }
 
     fun appendEntry(entry: DiskEntry) {
         val parentDir = requestFile(entry.parentEntryID)!!
@@ -331,7 +374,7 @@ removefile:
      */
     fun sync(): VirtualDisk {
         // rebuild VirtualDisk out of this and use it to write out
-        return VDUtil.readDiskArchive(diskFile, charset = charset)
+        return VDUtil.readDiskArchive(diskFile, Level.INFO)
     }
 
 

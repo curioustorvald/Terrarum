@@ -25,7 +25,8 @@ internal object CommandInterpreter {
             "resize",
             "echo",
             "error",
-            "seed"
+            "seed",
+            "quicksave"
     )
 
     internal fun execute(command: String) {

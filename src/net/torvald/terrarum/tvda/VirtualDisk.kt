@@ -234,7 +234,10 @@ class DiskEntry(
 
         // content
         val contents: DiskEntryContent
-) {
+): Comparable<DiskEntry> {
+
+    override fun compareTo(other: DiskEntry) = entryID.compareTo(other.entryID)
+
     val serialisedSize: Long
         get() = contents.getSizeEntry() + HEADER_SIZE
 

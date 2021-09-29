@@ -22,13 +22,22 @@ object LandUtil {
     fun toChunkNum(world: GameWorld, x: Int, y: Int): Int {
         // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
         val (x, y) = world.coerceXY(x, y)
-        return (x / CHUNK_W) + (y / CHUNK_H) * (world.width / CHUNK_W)
+        return chunkXYtoChunkNum(world, x / CHUNK_W, y / CHUNK_H)
     }
 
-    fun toChunkIndices(world: GameWorld, x: Int, y: Int): Point2i {
+    fun toChunkXY(world: GameWorld, x: Int, y: Int): Point2i {
         // coercing and fmod-ing follows ROUNDWORLD rule. See: GameWorld.coerceXY()
         val (x, y) = world.coerceXY(x, y)
         return Point2i(x / CHUNK_W, y / CHUNK_H)
+    }
+
+    fun chunkXYtoChunkNum(world: GameWorld, cx: Int, cy: Int): Int {
+        val ch = world.height / CHUNK_H
+        return cx * ch + cy
+    }
+    fun chunkNumToChunkXY(world: GameWorld, chunkNum: Int): Point2i {
+        val ch = world.height / CHUNK_H
+        return Point2i(chunkNum / ch, chunkNum % ch)
     }
 
     fun getBlockAddr(world: GameWorld, x: Int, y: Int): BlockAddress {

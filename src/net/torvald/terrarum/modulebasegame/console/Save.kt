@@ -22,18 +22,6 @@ import java.io.IOException
  */
 object Save : ConsoleCommand {
 
-    private fun acceptable(actor: Actor): Boolean {
-        return actor.referenceID !in ReferencingRanges.ACTORS_WIRES &&
-               actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER &&
-               actor != (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor)
-    }
-
-    private fun addFile(disk: VirtualDisk, file: DiskEntry) {
-        VDUtil.getAsDirectory(disk, 0).add(file.entryID)
-        disk.entries[file.entryID] = file
-        file.parentEntryID = 0
-    }
-
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
@@ -59,4 +47,18 @@ object Save : ConsoleCommand {
         Echo("Usage: save <new-savegame-name>")
     }
 
+}
+
+object Quicksave : ConsoleCommand {
+    override fun execute(args: Array<String>) {
+        val ingame = Terrarum.ingame!! as TerrarumIngame
+
+        WriteSavegame.quick(ingame.savegameArchive, ingame.getSaveFileMain(), ingame) {
+
+        }
+    }
+
+    override fun printUsage() {
+        Echo("Usage: quicksave")
+    }
 }

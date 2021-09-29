@@ -47,7 +47,7 @@ object VDUtil {
      *
      * @param crcWarnLevel Level.OFF -- no warning, Level.WARNING -- print out warning, Level.SEVERE -- throw error
      */
-    fun readDiskArchive(infile: File, crcWarnLevel: Level = Level.SEVERE, warningFunc: ((String) -> Unit)? = null, charset: Charset): VirtualDisk {
+    fun readDiskArchive(infile: File, crcWarnLevel: Level = Level.SEVERE, warningFunc: ((String) -> Unit)? = null): VirtualDisk {
         val inbytes = infile.readBytes64()
 
 
@@ -100,7 +100,7 @@ object VDUtil {
             }
 
             if (DEBUG_PRINT_READ) {
-                println("== Entry deserialise debugprint for entry ID $entryID (child of $entryParentID)")
+                println("[tvda.VDUtil] == Entry deserialise debugprint for entry ID $entryID (child of $entryParentID)")
                 println("Entry type flag: ${entryTypeFlag and 127}${if (entryTypeFlag < 0) "*" else ""}")
                 println("Entry raw contents bytes: (len: ${entryData.size})")
                 entryData.forEachIndexed { i, it ->
@@ -121,7 +121,7 @@ object VDUtil {
 
 
             // check for the discard bit
-            if (entryTypeFlag in 1..127) {
+            if (entryTypeFlag > 0) {
 
                 // create entry
                 val diskEntry = DiskEntry(
@@ -158,7 +158,7 @@ object VDUtil {
                         (diskEntry.contents as? EntryDirectory)?.forEach {
                             println("entry: ${it.toHex()}")
                         }
-                        println("bytes to calculate crc against:")
+                        println("[tvda.VDUtil] bytes to calculate crc against:")
                         testbytes.forEachIndexed { i, it ->
                             if (i % 4 == 0L) print(" ")
                             print(it.toInt().toHex().substring(6))
@@ -175,7 +175,7 @@ object VDUtil {
 
                     if (calculatedCRC != entryCRC) {
 
-                        println("CRC failed; entry info:\n$diskEntry")
+                        println("[tvda.VDUtil] CRC failed; entry info:\n$diskEntry")
 
                         if (crcWarnLevel == Level.SEVERE)
                             throw IOException(crcMsg)
@@ -186,6 +186,11 @@ object VDUtil {
 
                 // add entry to disk
                 vdisk.entries[entryID] = diskEntry
+            }
+            else {
+                if (DEBUG_PRINT_READ) {
+                    println("[tvda.VDUtil] Discarding entry ${entryID.toHex()} (raw type flag: $entryTypeFlag)")
+                }
             }
         }
 

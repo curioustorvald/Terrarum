@@ -21,7 +21,9 @@ import org.khelekore.prtree.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.util.*
 import java.util.concurrent.locks.Lock
+import kotlin.collections.ArrayList
 
 /**
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
@@ -123,7 +125,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val wallChangeQueue = ArrayList<BlockChangeQueueItem>()
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
-    val modifiedChunks = Array(16) { HashSet<Int>() }
+    val modifiedChunks = Array(16) { TreeSet<Int>() }
 
     internal var creationTime = App.getTIME_T() // cumulative value for the savegame
     internal var lastPlayTime = App.getTIME_T() // cumulative value for the savegame
@@ -377,6 +379,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             )
         } catch (e: NoSuchFileException) {}
     }
+
+    fun getSaveFileMain() = File(App.defaultSaveDir, savegameNickname)
 
 
 

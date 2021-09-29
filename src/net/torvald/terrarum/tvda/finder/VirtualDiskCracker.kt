@@ -205,7 +205,7 @@ class VirtualDiskCracker(val sysCharset: Charset = Charsets.UTF_8) : JFrame() {
                     fileChooser.showOpenDialog(null)
                     if (fileChooser.selectedFile != null) {
                         try {
-                            vdisk = VDUtil.readDiskArchive(fileChooser.selectedFile, Level.WARNING, { popupWarning(it) }, sysCharset)
+                            vdisk = VDUtil.readDiskArchive(fileChooser.selectedFile, Level.WARNING) { popupWarning(it) }
                             if (vdisk != null) {
                                 gotoRoot()
                                 updateDiskInfo()

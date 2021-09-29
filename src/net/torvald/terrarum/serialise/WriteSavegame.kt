@@ -67,6 +67,33 @@ object WriteSavegame {
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
         // use field 'savingStatus' to know when the saving is done
     }
+
+    fun quick(disk: VirtualDisk, file: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
+        savingStatus = 0
+
+        Echo("Quicksave queued")
+
+        IngameRenderer.fboRGBexportCallback = {
+            Echo("Generating thumbnail...")
+
+            val w = 960
+            val h = 640
+            val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
+            IngameRenderer.fboRGBexport = p
+            //PixmapIO2._writeTGA(gzout, p, true, true)
+            //p.dispose()
+            IngameRenderer.fboRGBexportedLatch = true
+
+            Echo("Done thumbnail generation")
+        }
+        IngameRenderer.fboRGBexportRequested = true
+
+        val savingThread = Thread(QuickSaveThread(disk, file, ingame, true, callback), "TerrarumBasegameGameSaveThread")
+        savingThread.start()
+
+        // it is caller's job to keep the game paused or keep a "save in progress" ui up
+        // use field 'savingStatus' to know when the saving is done
+    }
 }
 
 
@@ -128,9 +155,8 @@ object LoadSavegame {
 
             // load all the world blocklayer chunks
             val worldnum = world.worldIndex.toLong()
-            val cw = LandUtil.CHUNK_W;
+            val cw = LandUtil.CHUNK_W
             val ch = LandUtil.CHUNK_H
-            val chunksY = world.height / ch
             val chunkCount = world.width * world.height / (cw * ch)
             val worldLayer = arrayOf(world.getLayer(0), world.getLayer(1))
             for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
@@ -138,10 +164,9 @@ object LoadSavegame {
                     loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*worldLayer.size+layer+1}/${chunkCount*2}")
 
                     val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.toLong().shl(24) or chunk)
-                    val cy = chunk % chunksY
-                    val cx = chunk / chunksY
+                    val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
-                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer], cx.toInt(), cy.toInt())
+                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer], chunkXY.x, chunkXY.y)
                 }
             }
 

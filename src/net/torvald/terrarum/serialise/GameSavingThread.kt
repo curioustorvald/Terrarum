@@ -119,7 +119,7 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         for (layer in layers.indices) {
             for (cx in 0 until cw) {
                 for (cy in 0 until ch) {
-                    val chunkNumber = (cx * ch + cy).toLong()
+                    val chunkNumber = LandUtil.chunkXYtoChunkNum(ingame.world, cx, cy).toLong()
 
                     Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
 

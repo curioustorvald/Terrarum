@@ -33,6 +33,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
+import java.util.logging.Level
 import kotlin.math.absoluteValue
 import kotlin.math.round
 
@@ -682,7 +683,9 @@ fun AppUpdateListOfSavegames() {
     App.savegames.clear()
     File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
-            VDUtil.readDiskArchive(file, charset = Common.CHARSET)
+            VDUtil.readDiskArchive(file, Level.INFO) {
+                printdbgerr("Terrarum", "Possibly corrupted savefile '${file.absolutePath}':\n$it")
+            }
         }
         catch (e: Throwable) {
             e.printStackTrace()

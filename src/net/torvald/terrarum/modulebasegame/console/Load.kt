@@ -11,6 +11,7 @@ import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.serialise.*
 import java.io.File
 import java.io.IOException
+import java.util.logging.Level
 
 /**
  * Created by minjaesong on 2021-08-30.
@@ -24,7 +25,7 @@ object Load : ConsoleCommand {
 
                 val charset = Common.CHARSET
                 val file = File(App.defaultDir + "/Exports/${args[1]}")
-                val disk = VDUtil.readDiskArchive(file, charset = charset)
+                val disk = VDUtil.readDiskArchive(file, Level.INFO)
 
                 LoadSavegame(disk)
             }

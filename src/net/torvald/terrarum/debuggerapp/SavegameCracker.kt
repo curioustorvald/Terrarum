@@ -140,7 +140,7 @@ class SavegameCracker(
     @Command("Loads a disk archive", "path-to-file")
     fun load(args: List<String>) {
         file = File(args[1])
-        disk = VDUtil.readDiskArchive(file!!, Level.SEVERE, { printerrln("# Warning: $it") }, charset)
+        disk = VDUtil.readDiskArchive(file!!, Level.INFO) { printerrln("# Warning: $it") }
         file!!.copyTo(File(file!!.absolutePath + ".bak"), true)
     }
 
