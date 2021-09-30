@@ -199,7 +199,7 @@ open class GameWorld() : Disposable {
     fun getLayer(index: Int) = when(index) {
         0 -> layerTerrain
         1 -> layerWall
-        else -> throw IllegalArgumentException("Unknown layer index: $index")
+        else -> null//throw IllegalArgumentException("Unknown layer index: $index")
     }
 
     fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
@@ -701,6 +701,7 @@ open class GameWorld() : Disposable {
 infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
 infix fun Long.fmod(other: Long) = Math.floorMod(this, other)
 infix fun Float.fmod(other: Float) = if (this >= 0f) this % other else (this % other) + other
+infix fun Double.fmod(other: Double) = if (this >= 0.0) this % other else (this % other) + other
 
 inline class FluidType(val value: Int) {
     infix fun sameAs(other: FluidType) = this.value.absoluteValue == other.value.absoluteValue

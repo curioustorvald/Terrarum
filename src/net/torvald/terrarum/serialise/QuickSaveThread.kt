@@ -91,27 +91,27 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
         chunks.forEachIndexed { layerNum, chunks ->
 
             if (chunks.size != 0) {
-                val layer = ingame.world.getLayer(layerNum)
+                ingame.world.getLayer(layerNum)?.let { layer ->
+                    chunks.forEach { chunkNumber ->
 
-                chunks.forEach { chunkNumber ->
+                        Echo("Writing chunks... $chunksWrote/$chunkCount")
 
-                    Echo("Writing chunks... $chunksWrote/$chunkCount")
-
-                    val chunkXY = LandUtil.chunkNumToChunkXY(ingame.world, chunkNumber)
+                        val chunkXY = LandUtil.chunkNumToChunkXY(ingame.world, chunkNumber)
 
 //                    println("Chunk xy from number $chunkNumber -> (${chunkXY.x}, ${chunkXY.y})")
 
-                    val chunkBytes = WriteWorld.encodeChunk(layer, chunkXY.x, chunkXY.y)
-                    val entryID = worldNum.toLong().shl(32) or layerNum.toLong().shl(24) or chunkNumber.toLong()
+                        val chunkBytes = WriteWorld.encodeChunk(layer, chunkXY.x, chunkXY.y)
+                        val entryID = worldNum.toLong().shl(32) or layerNum.toLong().shl(24) or chunkNumber.toLong()
 
-                    val entryContent = EntryFile(chunkBytes)
-                    val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)
-                    // "W1L0-92,15"
-                    addFile(disk, entry); skimmer.appendEntryOnly(entry)
+                        val entryContent = EntryFile(chunkBytes)
+                        val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)
+                        // "W1L0-92,15"
+                        addFile(disk, entry); skimmer.appendEntryOnly(entry)
 
-                    WriteSavegame.saveProgress += chunkProgressMultiplier
-                    chunksWrote += 1
+                        WriteSavegame.saveProgress += chunkProgressMultiplier
+                        chunksWrote += 1
 
+                    }
                 }
             }
         }

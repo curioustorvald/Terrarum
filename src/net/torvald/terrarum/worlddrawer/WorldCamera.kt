@@ -62,8 +62,12 @@ object WorldCamera {
 
     private val nullVec = Vector2(0.0, 0.0)
 
-    private var worldWidth = 0
-    private var worldHeight = 0
+    /** World width in pixels */
+    var worldWidth = 0
+        private set
+    /** World height in pixels */
+    var worldHeight = 0
+        private set
 
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return

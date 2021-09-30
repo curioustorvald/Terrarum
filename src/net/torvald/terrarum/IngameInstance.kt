@@ -373,7 +373,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
 
-            if (!(flags2 == 0 && flags1 != 0)) {
+            if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) {
                 file1.copyTo(file2, true)
             }
         } catch (e: NoSuchFileException) {

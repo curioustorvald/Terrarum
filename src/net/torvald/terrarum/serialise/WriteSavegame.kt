@@ -166,7 +166,7 @@ object LoadSavegame {
                     val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.toLong().shl(24) or chunk)
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
-                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer], chunkXY.x, chunkXY.y)
+                    ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, chunkXY.x, chunkXY.y)
                 }
             }
 

@@ -21,9 +21,9 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.UICanvas
@@ -251,13 +251,13 @@ object Terrarum : Disposable {
 
     /** Position of the cursor in the world */
     val mouseX: Double
-        get() = WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = (WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val mouseY: Double
-        get() = WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = (WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble())
     /** Position of the cursor in the world */
     val oldMouseX: Double
-        get() = WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = (WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val oldMouseY: Double
         get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
@@ -539,8 +539,7 @@ fun Float.sqr() = this * this
 fun Double.sqrt() = Math.sqrt(this)
 fun Float.sqrt() = FastMath.sqrt(this)
 fun Int.abs() = this.absoluteValue
-fun Double.bipolarClamp(limit: Double) =
-        this.coerceIn(-limit, limit)
+fun Double.bipolarClamp(limit: Double) = this.coerceIn(-limit, limit)
 fun Boolean.toInt() = if (this) 1 else 0
 fun Int.bitCount() = java.lang.Integer.bitCount(this)
 fun Long.bitCount() = java.lang.Long.bitCount(this)

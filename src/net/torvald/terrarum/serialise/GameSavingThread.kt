@@ -124,7 +124,7 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
 
                     Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
 
-                    val chunkBytes = WriteWorld.encodeChunk(layers[layer], cx, cy)
+                    val chunkBytes = WriteWorld.encodeChunk(layers[layer]!!, cx, cy)
                     val entryID = worldNum.toLong().shl(32) or layer.toLong().shl(24) or chunkNumber
 
                     val entryContent = EntryFile(chunkBytes)
