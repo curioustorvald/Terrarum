@@ -15,6 +15,7 @@ import net.torvald.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
@@ -24,6 +25,8 @@ import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.tvda.EntryFile
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.UICanvas
@@ -694,4 +697,20 @@ fun AppUpdateListOfSavegames() {
             .sortedByDescending { (it as VirtualDisk).entries[-1]!!.modificationDate }.forEach {
         App.savegames.add(it!!)
     }
+}
+
+fun checkForSavegameDamage(disk: VirtualDisk): Boolean {
+    // # check if The Player is there
+    val player = disk.entries[PLAYER_REF_ID.toLong().and(0xFFFFFFFFL)] ?: return true
+    // # check if the world The Player is at actually exists
+    val currentWorld = (player as EntryFile).bytes.let {
+        val maxsize = 1 shl 30
+        val worldIndexRegex = Regex("""worldIndex: ?([0-9]+)""")
+        val rawJson = it.sliceArray(0 until minOf(maxsize, if (it.size >= maxsize) maxsize else it.size.toInt())).toString(Common.CHARSET)
+
+    // todo
+    }
+
+
+    return false
 }
