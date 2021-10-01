@@ -15,10 +15,12 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta
-import net.torvald.terrarum.serialise.WriteMeta
-import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.tvda.ByteArray64InputStream
+import net.torvald.terrarum.tvda.DiskSkimmer
+import net.torvald.terrarum.tvda.EntryFile
+import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.ui.*
-import java.io.File
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -301,8 +303,12 @@ class UIItemDemoSaveCells(
         const val HEIGHT = 120
     }
 
-
     init {
+        CommonResourcePool.addToLoadingList("savegame_status_icon") {
+            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)
+        }
+        CommonResourcePool.loadAll()
+
         printdbg(this, "Rebuilding skimmer for savefile ${skimmer.diskFile.absolutePath}")
         skimmer.rebuild()
     }
@@ -315,6 +321,8 @@ class UIItemDemoSaveCells(
     private var thumbPixmap: Pixmap? = null
     private var thumb: TextureRegion? = null
     private val grad = CommonResourcePool.getAsTexture("title_halfgrad")
+
+    private val icons = CommonResourcePool.getAsTextureRegionPack("savegame_status_icon")
 
     private fun parseDuration(seconds: Long): String {
         val s = seconds % 60
@@ -331,6 +339,8 @@ class UIItemDemoSaveCells(
 
     private val saveName = skimmer.getDiskName(Common.CHARSET)
     private val saveMode = skimmer.getSaveMode()
+    private val isQuick = (saveMode % 2 == 1)
+    private val isAuto = (saveMode.ushr(1) != 0)
     private val meta = if (metaFile != null) ReadMeta.fromDiskEntry(metaFile) else null
 
     private val colourBad = Color(0xFF8888FF.toInt())
@@ -382,16 +392,23 @@ class UIItemDemoSaveCells(
 
         // draw texts
         batch.color = highlightCol
-
-        // timestamp
         blendNormal(batch)
+
+        // save status icon
+        (if (saveDamaged) icons.get(1,0)
+         else if (isAuto) icons.get(0,0)
+         else if (isQuick) icons.get(2,0)
+         else null)?.let {
+            batch.draw(it, x + width - icons.tileW - 2f, y + 2f)
+        }
+        // timestamp
         val tlen = App.fontSmallNumbers.getWidth(lastPlayedTimestamp)
         App.fontSmallNumbers.draw(batch, lastPlayedTimestamp, x + (width - tlen) - 3f, y + height - 16f)
         // file size
         App.fontSmallNumbers.draw(batch, "${skimmer.diskFile.length().ushr(10)} KiB", x + 3f, y + height - 16f)
         // savegame name
         if (saveDamaged) batch.color = colourBad
-        App.fontGame.draw(batch, saveName + "${if (saveMode % 2 == 1) "*" else ""}", x + 3f, y + 1f)
+        App.fontGame.draw(batch, saveName, x + 3f, y + 1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE
