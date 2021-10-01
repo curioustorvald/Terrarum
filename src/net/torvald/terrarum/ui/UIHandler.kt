@@ -78,7 +78,7 @@ void main() {
     var initialX = posX
     var initialY = posY
 
-    private var alwaysVisible = false
+    var alwaysVisible = false; private set
 
     var isOpening = false
     var isClosing = false

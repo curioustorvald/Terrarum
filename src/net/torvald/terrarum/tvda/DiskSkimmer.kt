@@ -1,7 +1,9 @@
 package net.torvald.terrarum.tvda
 
+import net.torvald.terrarum.serialise.Common
 import java.io.*
 import java.nio.charset.Charset
+import java.nio.file.NoSuchFileException
 import java.util.*
 import java.util.logging.Level
 import kotlin.experimental.and
@@ -18,9 +20,9 @@ import kotlin.experimental.and
  * Created by minjaesong on 2017-11-17.
  */
 class DiskSkimmer(
-        private val diskFile: File,
+        val diskFile: File,
         val charset: Charset = Charset.defaultCharset(),
-        private val skimmingStopFunction: (HashMap<EntryID, Long>) -> Boolean = { false }
+        noInit: Boolean = false
 ) {
 
     /*
@@ -45,6 +47,23 @@ removefile:
 
      */
 
+    fun checkFileSanity() {
+        if (!diskFile.exists()) throw NoSuchFileException(diskFile.absoluteFile)
+        if (diskFile.length() < 310L) throw RuntimeException("Invalid Virtual Disk file!")
+
+        // check magic
+        val fis = FileInputStream(diskFile)
+
+        val magic = ByteArray(4).let { fis.read(it); it }
+        if (!magic.contentEquals(VirtualDisk.MAGIC)) throw RuntimeException("Invalid Virtual Disk file!")
+
+        fis.close()
+    }
+
+    init {
+        checkFileSanity()
+    }
+
     /**
      * EntryID to Offset.
      *
@@ -52,32 +71,30 @@ removefile:
      */
     private var entryToOffsetTable = HashMap<EntryID, Long>()
 
-
-    /** temporary storage to store tree edges */
-//    private var directoryStruct = ArrayList<DirectoryEdge>()
-
-    /** root node of the directory tree */
-//    private var directory = DirectoryNode(0, null, DiskEntry.DIRECTORY, "")
-
-//    private data class DirectoryEdge(val nodeParent: EntryID, val node: EntryID, val type: Byte, val name: String)
-//    private data class DirectoryNode(var nodeThis: EntryID, val nodeParent: EntryID?, var type: Byte, var name: String)
-
-    private val dirDelim = Regex("""[\\/]""")
-    private val DIR = "/"
-
-    val fa = RandomAccessFile(diskFile, "rw")
+    lateinit var fa: RandomAccessFile//RandomAccessFile(diskFile, "rw")
 
     private fun debugPrintln(s: Any) {
         if (false) println(s.toString())
     }
 
+    var initialised = false
+        private set
+
     init {
+        if (!noInit) {
+            rebuild()
+        }
+    }
+
+    fun rebuild() {
+        checkFileSanity() // state of the file may have been changed (e.g. file deleted) so we check again
+
+        fa = RandomAccessFile(diskFile, "rw")
+
         val fis = FileInputStream(diskFile)
-
-        println("[DiskSkimmer] loading the diskfile ${diskFile.canonicalPath}")
-
         var currentPosition = fis.skip(VirtualDisk.HEADER_SIZE) // skip disk header
 
+        println("[DiskSkimmer] loading the diskfile ${diskFile.canonicalPath}")
 
         fun skipRead(bytes: Long) {
             currentPosition += fis.skip(bytes)
@@ -126,6 +143,7 @@ removefile:
             return buffer.toLongBig()
         }
 
+
         val currentLength = diskFile.length()
         while (currentPosition < currentLength) {
 
@@ -154,12 +172,14 @@ removefile:
             else {
                 debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
             }
-
-            if (skimmingStopFunction(entryToOffsetTable)) break
         }
 
+        fis.close()
+        initialised = true
     }
 
+
+    fun hasEntry(entryID: EntryID) = entryToOffsetTable.containsKey(entryID)
 
     //////////////////////////////////////////////////
     // THESE ARE METHODS TO SUPPORT ON-LINE READING //

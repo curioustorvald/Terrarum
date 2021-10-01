@@ -14,7 +14,7 @@
 Each file on the Savegame has following convention:
 
 |Type|Filename|ID|
-|--|--|--|
+|---|---|---|
 |Metadata|savegame|-1|
 |Blocks Properties|blocks|-16|
 |Items Properties|items|-17|

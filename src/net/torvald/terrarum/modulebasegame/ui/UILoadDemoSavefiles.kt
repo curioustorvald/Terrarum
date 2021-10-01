@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
@@ -73,14 +74,6 @@ class UILoadDemoSavefiles : UICanvas() {
         else
             "${getKeycapConsole('R')} ${Lang["MENU_CONTROLS_SCROLL"]}"
 
-    // read savegames
-    init {
-        App.savegames.forEachIndexed { index, fileMetaPair ->
-            val x = uiX
-            val y = titleTopGradEnd + cellInterval * index
-            addUIitem(UIItemDemoSaveCells(this, x, y, fileMetaPair.first, fileMetaPair.second))
-        }
-    }
 
     private var scrollAreaHeight = height - 2 * App.scr.tvSafeGraphicsHeight - 64
     private var listScroll = 0 // only update when animation is finished
@@ -93,6 +86,31 @@ class UILoadDemoSavefiles : UICanvas() {
     private val scrollAnimLen = 0.1f
 
     private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
+
+    override fun show() {
+        printdbg(this, "savefiles show()")
+
+        // read savegames
+        var savegamesCount = 0
+        App.savegames.forEach { skimmer ->
+            val x = uiX
+            val y = titleTopGradEnd + cellInterval * savegamesCount
+            try {
+                addUIitem(UIItemDemoSaveCells(this, x, y, skimmer))
+                savegamesCount += 1
+            }
+            catch (e: Throwable) {
+                System.err.println("[UILoadDemoSavefiles] Savefile '${skimmer.diskFile.absolutePath}' cannot be loaded")
+                e.printStackTrace()
+            }
+
+        }
+    }
+
+    override fun hide() {
+        uiItems.forEach { it.dispose() }
+        uiItems.clear()
+    }
 
     override fun updateUI(delta: Float) {
 
@@ -276,23 +294,27 @@ class UIItemDemoSaveCells(
         parent: UILoadDemoSavefiles,
         initialX: Int,
         initialY: Int,
-        val diskfile: File, val meta: WriteMeta.WorldMeta) : UIItem(parent, initialX, initialY) {
-
-    private val skimmer = DiskSkimmer(diskfile, Common.CHARSET)
+        val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
 
     companion object {
         const val WIDTH = 480
         const val HEIGHT = 120
     }
 
+
+    init {
+        printdbg(this, "Rebuilding skimmer for savefile ${skimmer.diskFile.absolutePath}")
+        skimmer.rebuild()
+    }
+
+    private var saveDamaged = checkForSavegameDamage(skimmer)
+
     override val width: Int = WIDTH
     override val height: Int = HEIGHT
 
-    private lateinit var thumbPixmap: Pixmap
+    private var thumbPixmap: Pixmap? = null
     private var thumb: TextureRegion? = null
     private val grad = CommonResourcePool.getAsTexture("title_halfgrad")
-
-    private var saveDamaged = checkForSavegameDamage(skimmer)
 
     private fun parseDuration(seconds: Long): String {
         val s = seconds % 60
@@ -305,18 +327,25 @@ class UIItemDemoSaveCells(
             "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
     }
 
+    private val metaFile = skimmer.requestFile(-1)
+
     private val saveName = skimmer.getDiskName(Common.CHARSET)
     private val saveMode = skimmer.getSaveMode()
+    private val meta = if (metaFile != null) ReadMeta.fromDiskEntry(metaFile) else null
 
-    private val lastPlayedTimestamp = Instant.ofEpochSecond(meta.lastplay_t)
+    private val colourBad = Color(0xFF8888FF.toInt())
+
+    private val lastPlayedTimestamp = if (meta != null)
+        Instant.ofEpochSecond(meta.lastplay_t)
             .atZone(TimeZone.getDefault().toZoneId())
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
                                       "/${parseDuration(meta.playtime_t)}"
+        else "--:--:--/--h--m--s"
 
     init {
-        try {
-            // load a thumbnail
-            val zippedTga = (skimmer.requestFile(-2)!!.contents as EntryFile).bytes
+        // load thumbnail or use stock if the file is not there
+        skimmer.requestFile(-2)?.let {
+            val zippedTga = (it.contents as EntryFile).bytes
             val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
             val tgaFileContents = gzin.readAllBytes(); gzin.close()
 
@@ -326,15 +355,11 @@ class UIItemDemoSaveCells(
             thumb = TextureRegion(thumbTex)
             thumb!!.setRegion(0, (thumbTex.height - 2 * height) / 2, width * 2, height * 2)
         }
-        catch (e: NullPointerException) {
-            // use stock texture
-        }
-
 
     }
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
-        LoadSavegame(VDUtil.readDiskArchive(diskfile, Level.INFO))
+        LoadSavegame(VDUtil.readDiskArchive(skimmer.diskFile, Level.INFO))
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -363,9 +388,9 @@ class UIItemDemoSaveCells(
         val tlen = App.fontSmallNumbers.getWidth(lastPlayedTimestamp)
         App.fontSmallNumbers.draw(batch, lastPlayedTimestamp, x + (width - tlen) - 3f, y + height - 16f)
         // file size
-        App.fontSmallNumbers.draw(batch, "${diskfile.length().ushr(10)} KiB", x + 3f, y + height - 16f)
+        App.fontSmallNumbers.draw(batch, "${skimmer.diskFile.length().ushr(10)} KiB", x + 3f, y + height - 16f)
         // savegame name
-        if (saveDamaged) batch.color = Color.RED
+        if (saveDamaged) batch.color = colourBad
         App.fontGame.draw(batch, saveName + "${if (saveMode % 2 == 1) "*" else ""}", x + 3f, y + 1f)
 
         super.render(batch, camera)
@@ -374,7 +399,7 @@ class UIItemDemoSaveCells(
 
     override fun dispose() {
         thumb?.texture?.dispose()
-        thumbPixmap.dispose()
+        thumbPixmap?.dispose()
     }
 
 }

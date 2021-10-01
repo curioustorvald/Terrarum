@@ -31,7 +31,7 @@ class UIFakeGradOverlay : UICanvas() {
     override fun updateUI(delta: Float) {}
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         blendMul(batch)
-        batch.draw(tex, 0f, 0f, App.scr.halfwf * 1.5f, App.scr.hf)
+        batch.draw(tex, 0f, 0f, App.scr.wf, App.scr.hf)
 
         blendNormal(batch)
     }

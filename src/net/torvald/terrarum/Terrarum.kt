@@ -22,15 +22,13 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.ReadMeta
-import net.torvald.terrarum.tvda.DiskSkimmer
-import net.torvald.terrarum.tvda.EntryFile
-import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.serialise.*
+import net.torvald.terrarum.tvda.*
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -520,7 +518,7 @@ val ccK = GameFontBase.toColorCode(0xF888)
 val ccE = GameFontBase.toColorCode(0xFBBB)
 
 // Zelda-esque text colour emphasis
-val emphStrong = GameFontBase.toColorCode(0xFF88)
+val emphRed = GameFontBase.toColorCode(0xFF88)
 val emphObj = GameFontBase.toColorCode(0xF0FF)
 val emphVerb = GameFontBase.toColorCode(0xFFF6)
 
@@ -687,39 +685,52 @@ fun AppUpdateListOfSavegames() {
     App.savegames.clear()
     File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
-            DiskSkimmer(file, Common.CHARSET) { it.containsKey(-1) }.requestFile(-1)?.let {
-                file to ReadMeta.fromDiskEntry(it)
-            }
+            DiskSkimmer(file, Common.CHARSET, true)
         }
         catch (e: Throwable) {
             System.err.println("Unable to load a savefile ${file.absolutePath}")
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { it!!.second.lastplay_t }.forEach {
+    }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() }.forEach {
         App.savegames.add(it!!)
     }
 }
 
 /**
- * @param skimmer loaded with the savefile
+ * @param skimmer loaded with the savefile, rebuilt/updated beforehand
  */
 fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
-    // # check if The Player is there
-    val player = skimmer.requestFile(PLAYER_REF_ID.toLong().and(0xFFFFFFFFL))?.contents ?: return true
-    // # check if:
-    //      the world The Player is at actually exists
-    //      all the actors for the world actually exists
-    val currentWorld = (player as EntryFile).bytes.let {
-        val maxsize = 1 shl 30
-        val worldIndexRegex = Regex("""worldIndex: ?([0-9]+)""")
-        val rawJson = it.sliceArray(0 until minOf(maxsize, if (it.size >= maxsize) maxsize else it.size.toInt())).toString(Common.CHARSET)
+    try {
+        // # check for meta
+        val metaFile = skimmer.requestFile(-1) ?: return true
+        // # check if The Player is there
+        val player = skimmer.requestFile(PLAYER_REF_ID.toLong().and(0xFFFFFFFFL))?.contents ?: return true
+        // # check if:
+        //      the world The Player is at actually exists
+        //      all the actors for the world actually exists
+        // TODO might want SAX parser for JSON
+        val currentWorld = (player as EntryFile).bytes.let {
+            (ReadActor.readActorBare(ByteArray64Reader(it, Common.CHARSET)) as? IngamePlayer
+             ?: return true).worldCurrentlyPlaying
+        }
+        if (currentWorld == 0) return true
+        val worldData = (skimmer.requestFile(currentWorld.toLong())?.contents as? EntryFile)?.bytes ?: return true
+        val world = Common.jsoner.fromJson(GameWorld::class.java, ByteArray64Reader(worldData, Common.CHARSET))
 
-    // todo
+        var hasMissingActor = false
+        world.actors.forEach {
+            if (!skimmer.hasEntry(it.toLong().and(0xFFFFFFFFL))) {
+                System.err.println("Nonexisting actor $it for savegame ${skimmer.diskFile.absolutePath}")
+                hasMissingActor = true
+            }
+        }; if (hasMissingActor) return true
+
+
+        return false
     }
-
-//    skimmer.requestFile(367228416) ?: return true
-
-
-    return false
+    catch (e: Throwable) {
+        e.printStackTrace()
+        return true
+    }
 }

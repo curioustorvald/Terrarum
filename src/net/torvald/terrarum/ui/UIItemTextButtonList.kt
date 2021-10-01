@@ -167,7 +167,7 @@ class UIItemTextButtonList(
     private var clickLatched = false
 
     override fun show() {
-        printdbg(this, "${this.javaClass.simpleName} show()")
+//        printdbg(this, "${this.javaClass.simpleName} show()")
         clickLatched = true
     }
 

@@ -233,18 +233,36 @@ abstract class UICanvas(
 
     fun setAsAlwaysVisible() {
         handler.setAsAlwaysVisible()
+        show()
     }
 
     open fun setAsOpen() {
         handler.setAsOpen()
+        show()
     }
 
     open fun setAsClose() {
         handler.setAsClose()
+        hide()
     }
 
     open fun toggleOpening() {
-        handler.toggleOpening()
+//        handler.toggleOpening()
+        if (handler.alwaysVisible && !handler.doNotWarnConstant) {
+            throw RuntimeException("[UIHandler] Tried to 'toggle opening of' constant UI")
+        }
+        if (isVisible) {
+            if (!isClosing) {
+                setAsClose()
+                hide()
+            }
+        }
+        else {
+            if (!isOpening) {
+                setAsOpen()
+                show()
+            }
+        }
     }
 
     inline val isOpened: Boolean

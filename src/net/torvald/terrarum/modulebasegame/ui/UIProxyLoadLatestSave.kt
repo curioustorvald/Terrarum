@@ -32,8 +32,8 @@ class UIProxyLoadLatestSave : UICanvas() {
 
     override fun endOpening(delta: Float) {
         if (App.savegames.size > 0) {
-            LoadSavegame(VDUtil.readDiskArchive(App.savegames[0].first, Level.INFO) {
-                System.err.println("Possibly damaged savefile ${App.savegames[0].first.absolutePath}:\n$it")
+            LoadSavegame(VDUtil.readDiskArchive(App.savegames[0].diskFile, Level.INFO) {
+                System.err.println("Possibly damaged savefile ${App.savegames[0].diskFile.absolutePath}:\n$it")
             })
         }
     }

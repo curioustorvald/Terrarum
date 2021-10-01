@@ -218,11 +218,14 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, App.scr.width, App.scr.height, false)
 
-        loadThingsWhileIntroIsVisible()
-
         // load list of savegames
+        println("[TitleScreen] update list of savegames")
         App.updateListOfSavegames()
 
+//        App.savegames.forEach { println(it.diskFile.absolutePath) }
+
+
+        loadThingsWhileIntroIsVisible()
         printdbg(this, "show() exit")
     }
 

@@ -33,6 +33,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.serialise.WriteMeta;
+import net.torvald.terrarum.tvda.DiskSkimmer;
 import net.torvald.terrarum.tvda.VirtualDisk;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
@@ -196,7 +197,7 @@ public class App implements ApplicationListener {
     /**
      * Sorted by the lastplaytime, in reverse order (index 0 is the most recent game played)
      */
-    public static ArrayList<Pair<File, WriteMeta.WorldMeta>> savegames = new ArrayList<>();
+    public static ArrayList<DiskSkimmer> savegames = new ArrayList<>();
 
     public static void updateListOfSavegames() {
         AppUpdateListOfSavegames();
@@ -301,7 +302,6 @@ public class App implements ApplicationListener {
             createDirs();
             initialiseConfig();
             readConfigJson();
-            updateListOfSavegames();
 
             setGamepadButtonLabels();
 
