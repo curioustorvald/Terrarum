@@ -5,11 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbgerr
-import net.torvald.terrarum.QNDTreeNode
-import net.torvald.terrarum.TitleScreen
-import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -280,11 +277,30 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 tagsCollection = tags
         )
 
+        private val spinner = CommonResourcePool.getAsTextureRegionPack("inline_loading_spinner")
+        private var spinnerTimer = 0f
+        private var spinnerFrame = 0
+        private val spinnerInterval = 1f / 60f
+
         fun update(delta: Float) {
+            spinnerTimer += delta
+            if (spinnerTimer > spinnerInterval) {
+                spinnerFrame = (spinnerFrame + 1) % 32
+                spinnerTimer -= spinnerInterval
+            }
+
             menubar.update(delta)
         }
 
         fun render(batch: SpriteBatch, camera: Camera) {
+            val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
+
+            val inlineOffsetY = if (App.GAME_LOCALE.startsWith("th")) 0f
+            else if (App.GAME_LOCALE.startsWith("ko")) 0f
+            else 1f
+
+            batch.draw(spin, menubar.posX + paddingLeft - 5f, menubar.posY + (lineHeight - 20) / 2 - inlineOffsetY)
+
             menubar.render(batch, camera)
         }
 
