@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.EMDASH
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.gdxClearAndSetBlend
 import net.torvald.terrarum.inUse
@@ -38,56 +39,35 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
 
     private lateinit var adProperties: ADProperties
 
-    private val props = Properties()
     private val lang = Properties()
 
-    private val captionProperties = "" + // dummy string to make IDE happy with the auto indent
-
-                                    "id=ID of this block\n" +
-                                    "drop=ID of the block this very block should drop when mined\n" +
-                                    "name=String identifier of the block\n" +
-                                    "shdr=Shade Red (light absorption). Valid range 0.0-4.0\n" +
-                                    "shdg=Shade Green (light absorption). Valid range 0.0-4.0\n" +
-                                    "shdb=Shade Blue (light absorption). Valid range 0.0-4.0\n" +
-                                    "shduv=Shade UV (light absorbtion). Valid range 0.0-4.0\n" +
-                                    "lumr=Luminosity Red (light intensity). Valid range 0.0-4.0\n" +
-                                    "lumg=Luminosity Green (light intensity). Valid range 0.0-4.0\n" +
-                                    "lumb=Luminosity Blue (light intensity). Valid range 0.0-4.0\n" +
-                                    "lumuv=Luminosity UV (light intensity). Valid range 0.0-4.0\n" +
-                                    "str=Strength of the block\n" +
-                                    "dsty=Density of the block. Water have 1000 in the in-game scale\n" +
-                                    "mate=Material of the block\n" +
-                                    "solid=Whether the file has full collision\n" +
-                                    "plat=Whether the block should behave like a platform\n" +
-                                    "wall=Whether the block can be used as a wall\n" +
-                                    "fall=Whether the block should fall through the empty space\n" +
-                                    "dlfn=Dynamic Light Function. 0=Static. Please see <strong>notes</strong>\n" +
-                                    "fv=Vertical friction when player slide on the cliff. 0 means not slide-able\n" +
-                                    "fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky\n"
 
     /**
      * ¤ is used as a \n marker
      */
-    private val translations = "" +
-                               "WARNING_CONTINUE=Continue?\n" +
-                               "WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost.\n" +
-                               "OPERATION_CANCELLED=Operation cancelled.\n" +
-                               "NO_SUCH_FILE=No such file exists, operation cancelled.\n" +
-                               "NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows later.\n" +
-                               "ADD_ROWS=Enter the number of rows to add:\n" +
-                               "WRITE_FAIL=Writing to file has failed:\n" +
-                               "STAT_INIT=Creating a new CSV. You can still open existing file.\n" +
-                               "STAT_SAVE_TGA_SUCCESSFUL=Spritesheet exported successfully.\n" +
-                               "STAT_LOAD_SUCCESSFUL=File loaded successfully.\n" +
-                               "ERROR_INTERNAL=Something went wrong.\n" +
-                               "ERROR_PARSE_FAIL=Parsing failed\n" +
-                               "SPRITE_DEF_LOAD_SUCCESSFUL=Sprite definition loaded.\n" +
-                               "SPRITE_ASSEMBLE_SUCCESSFUL=Sprite assembled."
+    private val translations = """
+        WARNING_CONTINUE=Continue?
+        WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost.
+        OPERATION_CANCELLED=Operation cancelled.
+        NO_SUCH_FILE=No such file exists, operation cancelled.
+        NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows later.
+        ADD_ROWS=Enter the number of rows to add:
+        WRITE_FAIL=Writing to file has failed:
+        STAT_INIT=Creating a new CSV. You can still open existing file.
+        STAT_SAVE_TGA_SUCCESSFUL=Spritesheet exported successfully.
+        STAT_LOAD_SUCCESSFUL=File loaded successfully.
+        ERROR_INTERNAL=Something went wrong.
+        ERROR_PARSE_FAIL=Parsing failed
+        SPRITE_DEF_LOAD_SUCCESSFUL=Sprite definition loaded.
+        SPRITE_ASSEMBLE_SUCCESSFUL=Sprite assembled.
+        PROPERTIES_GO_HERE=Properties will be shown here.
+    """.trimIndent()
+
+    private var panelCodeInit = true
 
     init {
         // setup application properties //
         try {
-            props.load(StringReader(captionProperties))
             lang.load(StringReader(translations))
         }
         catch (e: Throwable) {
@@ -95,7 +75,29 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         }
 
         panelCode.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-        panelCode.text = "Enter your descriptor code here…"
+        panelCode.text = """Terrarum Sprite Assembler
+            |Copyright 2019${EMDASH} CuriousTorvald (minjaesong)
+            |
+            |This program is free software: you can redistribute it and/or modify
+            |it under the terms of the GNU General Public License as published by
+            |the Free Software Foundation, either version 3 of the License, or
+            |(at your option) any later version.
+            |
+            |This program is distributed in the hope that it will be useful,
+            |but WITHOUT ANY WARRANTY; without even the implied warranty of
+            |MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+            |GNU General Public License for more details.
+            |
+            |You should have received a copy of the GNU General Public License
+            |along with this program.  If not, see <https://www.gnu.org/licenses/>.""".trimMargin()
+        panelCode.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                if (panelCodeInit) {
+                    panelCodeInit = false
+                    panelCode.text = ""
+                }
+            }
+        })
 
         panelAnimationsList.model = DefaultListModel()
         panelBodypartsList.model = DefaultListModel()
@@ -112,6 +114,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         panelPartsList.add("Transforms", JScrollPane(panelTransformsList))
         panelPartsList.add("Stats", JScrollPane(panelStatList))
 
+        panelProperties.model = DefaultTreeModel(DefaultMutableTreeNode(lang.getProperty("PROPERTIES_GO_HERE")))
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
         panelDataView.resizeWeight = 0.333
 
@@ -123,7 +126,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         panelMain.resizeWeight = 0.666
 
         val menu = JMenuBar()
-        menu.add(JMenu("Parse")).addMouseListener(object : MouseAdapter() {
+        menu.add(JMenu("Update")).addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 try {
                     adProperties = ADProperties(StringReader(panelCode.text))
@@ -175,17 +178,9 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     (panelStatList.model as DefaultListModel).addElement("Spritesheet columns: ${adProperties.cols}")
                     (panelStatList.model as DefaultListModel).addElement("Frame size: ${adProperties.frameWidth}, ${adProperties.frameHeight}")
                     (panelStatList.model as DefaultListModel).addElement("Origin position: ${adProperties.originX}, ${adProperties.originY}")
-                }
-                catch (fehler: Throwable) {
-                    displayError("ERROR_PARSE_FAIL", fehler)
-                    fehler.printStackTrace()
-                }
 
-            }
-        })
-        menu.add(JMenu("Run")).addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent?) {
-                try {
+
+
                     gdxWindow.requestAssemblyTest(adProperties)
                     statBar.text = lang.getProperty("SPRITE_ASSEMBLE_SUCCESSFUL")
                 }
@@ -193,17 +188,27 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     displayError("ERROR_PARSE_FAIL", fehler)
                     fehler.printStackTrace()
                 }
+
             }
         })
-        menu.add(JMenu("Export")).addMouseListener(object : MouseAdapter() {
+        menu.add(JMenu("Zoom 1x")).addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
-                val fileChooser = JFileChooser()
-                fileChooser.showSaveDialog(null)
-
-                if (fileChooser.selectedFile != null) {
-                    gdxWindow.requestExport(fileChooser.selectedFile.absolutePath)
-                    statBar.text = lang.getProperty("STAT_SAVE_TGA_SUCCESSFUL")
-                } // else, do nothing
+                gdxWindow.zoom = 1f
+            }
+        })
+        menu.add(JMenu("2x")).addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                gdxWindow.zoom = 2f
+            }
+        })
+        menu.add(JMenu("3x")).addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                gdxWindow.zoom = 3f
+            }
+        })
+        menu.add(JMenu("4x")).addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                gdxWindow.zoom = 4f
             }
         })
 
@@ -241,6 +246,8 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
 
 class SpriteAssemblerPreview: Game() {
     private lateinit var batch: SpriteBatch
+
+    var zoom = 1f
 
     private lateinit var renderTexture: Texture
     private var image: Pixmap? = null
@@ -284,7 +291,7 @@ class SpriteAssemblerPreview: Game() {
 
         batch.inUse {
             batch.color = Color.WHITE
-            batch.draw(renderTexture, 0f, 0f, renderTexture.width * 2f, renderTexture.height * 2f)
+            batch.draw(renderTexture, 0f, 0f, renderTexture.width * zoom, renderTexture.height * zoom)
         }
     }
 
