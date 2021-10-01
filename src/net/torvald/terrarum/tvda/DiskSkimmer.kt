@@ -17,7 +17,11 @@ import kotlin.experimental.and
  *
  * Created by minjaesong on 2017-11-17.
  */
-class DiskSkimmer(private val diskFile: File, val charset: Charset = Charset.defaultCharset()) {
+class DiskSkimmer(
+        private val diskFile: File,
+        val charset: Charset = Charset.defaultCharset(),
+        private val skimmingStopFunction: (HashMap<EntryID, Long>) -> Boolean = { false }
+) {
 
     /*
 
@@ -62,6 +66,10 @@ removefile:
     private val DIR = "/"
 
     val fa = RandomAccessFile(diskFile, "rw")
+
+    private fun debugPrintln(s: Any) {
+        if (false) println(s.toString())
+    }
 
     init {
         val fis = FileInputStream(diskFile)
@@ -141,11 +149,13 @@ removefile:
 
             if (typeFlag > 0) {
                 entryToOffsetTable[entryID] = offset
-                println("[DiskSkimmer] successfully read the entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
+                debugPrintln("[DiskSkimmer] ... successfully read the entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
             }
             else {
-                println("[DiskSkimmer] discarding entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
+                debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
             }
+
+            if (skimmingStopFunction(entryToOffsetTable)) break
         }
 
     }
@@ -162,7 +172,7 @@ removefile:
     fun requestFile(entryID: EntryID): DiskEntry? {
         entryToOffsetTable[entryID].let { offset ->
             if (offset == null) {
-                println("[DiskSkimmer.requestFile] entry $entryID does not exist on the table")
+                debugPrintln("[DiskSkimmer.requestFile] entry $entryID does not exist on the table")
                 return null
             }
             else {
@@ -231,17 +241,17 @@ removefile:
         // fixme pretty much untested
 
         val path = path.split(dirDelim)
-        //println(path)
+        //debugPrintln(path)
 
         // bunch-of-io-access approach (for reading)
         var traversedDir = 0L // entry ID
         var dirFile: DiskEntry? = null
         path.forEachIndexed { index, dirName ->
-            println("[DiskSkimmer.requestFile] $index\t$dirName, traversedDir = $traversedDir")
+            debugPrintln("[DiskSkimmer.requestFile] $index\t$dirName, traversedDir = $traversedDir")
 
             dirFile = requestFile(traversedDir)
             if (dirFile == null) {
-                println("[DiskSkimmer.requestFile] requestFile($traversedDir) came up null")
+                debugPrintln("[DiskSkimmer.requestFile] requestFile($traversedDir) came up null")
                 return null
             } // outright null
             if (dirFile!!.contents !is EntryDirectory && index < path.lastIndex) { // unexpectedly encountered non-directory
@@ -257,7 +267,7 @@ removefile:
                     // get name of the file
                     val childDirFile = requestFile(it)!!
                     if (childDirFile.filename.toCanonicalString(charset) == dirName) {
-                        //println("[DiskSkimmer] found, $traversedDir -> $it")
+                        //debugPrintln("[DiskSkimmer] found, $traversedDir -> $it")
                         dirGotcha = true
                         traversedDir = it
                     }
@@ -304,6 +314,20 @@ removefile:
     fun setSaveMode(bits: Int) {
         fa.seek(49L)
         fa.writeByte(bits)
+    }
+
+    fun getSaveMode(): Int {
+        fa.seek(49L)
+        return fa.read()
+    }
+
+    fun getDiskName(charset: Charset): String {
+        val bytes = ByteArray(268)
+        fa.seek(10L)
+        fa.read(bytes, 0, 32)
+        fa.seek(60L)
+        fa.read(bytes, 32, 236)
+        return bytes.toCanonicalString(charset)
     }
 
     ///////////////////////////////////////////////////////
@@ -409,7 +433,7 @@ removefile:
 
         val HEADER_SIZE = DiskEntry.HEADER_SIZE
 
-        println("[DiskSkimmer.getEntryBlockSize] offset for entry $id = $offset")
+        debugPrintln("[DiskSkimmer.getEntryBlockSize] offset for entry $id = $offset")
 
         val fis = FileInputStream(diskFile)
         fis.skip(offset + 8)

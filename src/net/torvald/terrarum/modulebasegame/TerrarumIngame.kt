@@ -285,8 +285,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /** Load rest of the game with GL context */
     private fun postInitForLoadFromSave(codices: Codices) {
         codices.actors.forEach {
-            val actor = ReadActor(LoadSavegame.getFileReader(codices.disk, it.toLong()))
-            addNewActor(actor)
+            try {
+                val actor = ReadActor(LoadSavegame.getFileReader(codices.disk, it.toLong()))
+                addNewActor(actor)
+            }
+            catch (e: NullPointerException) {
+                System.err.println("Could not read the actor ${it} from the disk")
+//                throw e // TODO don't rethrow -- let players play the corrupted world if it loads, they'll be able to cope with their losses even though there will be buncha lone actorblocks lying around...
+            }
         }
 
         // by doing this, whatever the "possession" the player had will be broken by the game load

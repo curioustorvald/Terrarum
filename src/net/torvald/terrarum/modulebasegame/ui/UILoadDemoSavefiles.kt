@@ -14,13 +14,14 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta
-import net.torvald.terrarum.tvda.ByteArray64InputStream
-import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.serialise.WriteMeta
+import net.torvald.terrarum.tvda.*
 import net.torvald.terrarum.ui.*
+import java.io.File
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.logging.Level
 import java.util.zip.GZIPInputStream
 import kotlin.math.roundToInt
 
@@ -74,10 +75,10 @@ class UILoadDemoSavefiles : UICanvas() {
 
     // read savegames
     init {
-        App.savegames.forEachIndexed { index, disk ->
+        App.savegames.forEachIndexed { index, fileMetaPair ->
             val x = uiX
             val y = titleTopGradEnd + cellInterval * index
-            addUIitem(UIItemDemoSaveCells(this, x, y, disk as VirtualDisk))
+            addUIitem(UIItemDemoSaveCells(this, x, y, fileMetaPair.first, fileMetaPair.second))
         }
     }
 
@@ -275,7 +276,9 @@ class UIItemDemoSaveCells(
         parent: UILoadDemoSavefiles,
         initialX: Int,
         initialY: Int,
-        val disk: VirtualDisk) : UIItem(parent, initialX, initialY) {
+        val diskfile: File, val meta: WriteMeta.WorldMeta) : UIItem(parent, initialX, initialY) {
+
+    private val skimmer = DiskSkimmer(diskfile, Common.CHARSET)
 
     companion object {
         const val WIDTH = 480
@@ -289,7 +292,7 @@ class UIItemDemoSaveCells(
     private var thumb: TextureRegion? = null
     private val grad = CommonResourcePool.getAsTexture("title_halfgrad")
 
-    private val meta = ReadMeta(disk)
+    private var saveDamaged = checkForSavegameDamage(skimmer)
 
     private fun parseDuration(seconds: Long): String {
         val s = seconds % 60
@@ -302,6 +305,9 @@ class UIItemDemoSaveCells(
             "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
     }
 
+    private val saveName = skimmer.getDiskName(Common.CHARSET)
+    private val saveMode = skimmer.getSaveMode()
+
     private val lastPlayedTimestamp = Instant.ofEpochSecond(meta.lastplay_t)
             .atZone(TimeZone.getDefault().toZoneId())
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
@@ -310,7 +316,7 @@ class UIItemDemoSaveCells(
     init {
         try {
             // load a thumbnail
-            val zippedTga = VDUtil.getAsNormalFile(disk, -2).getContent()
+            val zippedTga = (skimmer.requestFile(-2)!!.contents as EntryFile).bytes
             val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
             val tgaFileContents = gzin.readAllBytes(); gzin.close()
 
@@ -328,7 +334,7 @@ class UIItemDemoSaveCells(
     }
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
-        LoadSavegame(disk)
+        LoadSavegame(VDUtil.readDiskArchive(diskfile, Level.INFO))
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -357,10 +363,10 @@ class UIItemDemoSaveCells(
         val tlen = App.fontSmallNumbers.getWidth(lastPlayedTimestamp)
         App.fontSmallNumbers.draw(batch, lastPlayedTimestamp, x + (width - tlen) - 3f, y + height - 16f)
         // file size
-        App.fontSmallNumbers.draw(batch, "${disk.usedBytes.ushr(10)} KiB", x + 3f, y + height - 16f)
+        App.fontSmallNumbers.draw(batch, "${diskfile.length().ushr(10)} KiB", x + 3f, y + height - 16f)
         // savegame name
-        val diskName = disk.getDiskNameString(Common.CHARSET)
-        App.fontGame.draw(batch, diskName + "${if (disk.saveMode % 2 == 1) "*" else ""}", x + 3f, y + 1f)
+        if (saveDamaged) batch.color = Color.RED
+        App.fontGame.draw(batch, saveName + "${if (saveMode % 2 == 1) "*" else ""}", x + 3f, y + 1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE

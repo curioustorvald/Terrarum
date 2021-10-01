@@ -26,6 +26,8 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.ReadMeta
+import net.torvald.terrarum.tvda.DiskSkimmer
 import net.torvald.terrarum.tvda.EntryFile
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
@@ -685,24 +687,29 @@ fun AppUpdateListOfSavegames() {
     App.savegames.clear()
     File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
-            VDUtil.readDiskArchive(file, Level.INFO) {
-                printdbgerr("Terrarum", "Possibly corrupted savefile '${file.absolutePath}':\n$it")
+            DiskSkimmer(file, Common.CHARSET) { it.containsKey(-1) }.requestFile(-1)?.let {
+                file to ReadMeta.fromDiskEntry(it)
             }
         }
         catch (e: Throwable) {
+            System.err.println("Unable to load a savefile ${file.absolutePath}")
             e.printStackTrace()
             null
         }
-    }.filter { it != null && it.entries.contains(-1) }
-            .sortedByDescending { (it as VirtualDisk).entries[-1]!!.modificationDate }.forEach {
+    }.filter { it != null }.sortedByDescending { it!!.second.lastplay_t }.forEach {
         App.savegames.add(it!!)
     }
 }
 
-fun checkForSavegameDamage(disk: VirtualDisk): Boolean {
+/**
+ * @param skimmer loaded with the savefile
+ */
+fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
     // # check if The Player is there
-    val player = disk.entries[PLAYER_REF_ID.toLong().and(0xFFFFFFFFL)] ?: return true
-    // # check if the world The Player is at actually exists
+    val player = skimmer.requestFile(PLAYER_REF_ID.toLong().and(0xFFFFFFFFL))?.contents ?: return true
+    // # check if:
+    //      the world The Player is at actually exists
+    //      all the actors for the world actually exists
     val currentWorld = (player as EntryFile).bytes.let {
         val maxsize = 1 shl 30
         val worldIndexRegex = Regex("""worldIndex: ?([0-9]+)""")
@@ -710,6 +717,8 @@ fun checkForSavegameDamage(disk: VirtualDisk): Boolean {
 
     // todo
     }
+
+//    skimmer.requestFile(367228416) ?: return true
 
 
     return false

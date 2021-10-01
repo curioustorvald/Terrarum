@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.serialise.LoadSavegame
+import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.ui.UICanvas
+import java.util.logging.Level
 
 /**
  * Created by minjaesong on 2021-09-13.
@@ -30,7 +32,9 @@ class UIProxyLoadLatestSave : UICanvas() {
 
     override fun endOpening(delta: Float) {
         if (App.savegames.size > 0) {
-            LoadSavegame(App.savegames[0])
+            LoadSavegame(VDUtil.readDiskArchive(App.savegames[0].first, Level.INFO) {
+                System.err.println("Possibly damaged savefile ${App.savegames[0].first.absolutePath}:\n$it")
+            })
         }
     }
 

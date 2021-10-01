@@ -5,10 +5,7 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.tvda.ByteArray64
-import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.EntryFile
-import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.tvda.*
 import net.torvald.terrarum.weather.WeatherMixer
 
 /**
@@ -78,6 +75,11 @@ object ReadMeta {
 
     operator fun invoke(savefile: VirtualDisk): WriteMeta.WorldMeta {
         val metaFile = savefile.entries[-1]!!
+        val metaReader = ByteArray64Reader((metaFile.contents as EntryFile).getContent(), Common.CHARSET)
+        return Common.jsoner.fromJson(WriteMeta.WorldMeta::class.java, metaReader)
+    }
+
+    fun fromDiskEntry(metaFile: DiskEntry): WriteMeta.WorldMeta {
         val metaReader = ByteArray64Reader((metaFile.contents as EntryFile).getContent(), Common.CHARSET)
         return Common.jsoner.fromJson(WriteMeta.WorldMeta::class.java, metaReader)
     }

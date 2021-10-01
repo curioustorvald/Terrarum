@@ -17,7 +17,8 @@ object DefaultConfig {
             "atlastexsize" to 2048,
 
             "language" to App.getSysLang(),
-            "notificationshowuptime" to 4000,
+            "notificationshowuptime" to 4096, // 4s
+            "autosaveinterval" to 262144, // 4m22s
             "multithread" to true,
 
             "showhealthmessageonstartup" to true,

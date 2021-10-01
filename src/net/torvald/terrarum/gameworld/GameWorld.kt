@@ -128,7 +128,7 @@ open class GameWorld() : Disposable {
 
         // preliminary spawn points
         this.spawnX = width / 2
-        this.spawnY = 200
+        this.spawnY = 150
 
         layerTerrain = BlockLayer(width, height)
         layerWall = BlockLayer(width, height)

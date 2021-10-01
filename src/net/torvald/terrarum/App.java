@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
+import kotlin.Pair;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.concurrent.ThreadExecutor;
@@ -31,6 +32,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.serialise.WriteConfig;
+import net.torvald.terrarum.serialise.WriteMeta;
 import net.torvald.terrarum.tvda.VirtualDisk;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
@@ -194,7 +196,7 @@ public class App implements ApplicationListener {
     /**
      * Sorted by the lastplaytime, in reverse order (index 0 is the most recent game played)
      */
-    public static ArrayList<VirtualDisk> savegames = new ArrayList<>();
+    public static ArrayList<Pair<File, WriteMeta.WorldMeta>> savegames = new ArrayList<>();
 
     public static void updateListOfSavegames() {
         AppUpdateListOfSavegames();
