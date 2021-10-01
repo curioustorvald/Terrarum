@@ -5,8 +5,11 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbgerr
+import net.torvald.terrarum.QNDTreeNode
+import net.torvald.terrarum.TitleScreen
+import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -85,69 +88,71 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
         val selectedItem = remoConTray.selectedItem
         val selectedIndex = remoConTray.selectedIndex
 
-        selectedItem?.let {
-            // selection change
-            if (it.labelText == "MENU_LABEL_QUIT") {
-                //System.exit(0)
-                Gdx.app.exit()
-            }
-            else if (it.labelText.startsWith("MENU_LABEL_RETURN")) {
-                val tag = it.tags
-                if (tag.contains("WRITETOCONFIG")) WriteConfig()
-
-
-                if (currentRemoConContents.parent != null) {
-                    remoConTray.consume()
-
-                    currentRemoConContents = currentRemoConContents.parent!!
-                    currentlySelectedRemoConItem = currentRemoConContents.data
-                    remoConTray = generateNewRemoCon(currentRemoConContents)
-
-                    parent.uiFakeBlurOverlay.setAsClose()
+        if (!handler.uiToggleLocked) {
+            selectedItem?.let {
+                // selection change
+                if (it.labelText == "MENU_LABEL_QUIT") {
+                    //System.exit(0)
+                    Gdx.app.exit()
                 }
-                else {
-                    throw NullPointerException("No parent node to return")
-                }
-            }
-            else {
-                // check if target exists
-                //println("current node: ${currentRemoConContents.data}")
-                //currentRemoConContents.children.forEach { println("- ${it.data}") }
-
-                if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
+                else if (it.labelText.startsWith("MENU_LABEL_RETURN")) {
+                    val tag = it.tags
+                    if (tag.contains("WRITETOCONFIG")) WriteConfig()
 
 
-                    val newCurrentRemoConContents = currentRemoConContents.children[selectedIndex!!]
-
-                    // only go deeper if that node has child to navigate
-                    if (currentRemoConContents.children[selectedIndex].children.size != 0) {
+                    if (currentRemoConContents.parent != null) {
                         remoConTray.consume()
-                        remoConTray = generateNewRemoCon(newCurrentRemoConContents)
-                        currentRemoConContents = newCurrentRemoConContents
+
+                        currentRemoConContents = currentRemoConContents.parent!!
+                        currentlySelectedRemoConItem = currentRemoConContents.data
+                        remoConTray = generateNewRemoCon(currentRemoConContents)
+
+                        parent.uiFakeBlurOverlay.setAsClose()
                     }
-
-                    currentlySelectedRemoConItem = newCurrentRemoConContents.data
+                    else {
+                        throw NullPointerException("No parent node to return")
+                    }
                 }
                 else {
-                    throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
+                    // check if target exists
+                    //println("current node: ${currentRemoConContents.data}")
+                    //currentRemoConContents.children.forEach { println("- ${it.data}") }
+
+                    if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
+
+
+                        val newCurrentRemoConContents = currentRemoConContents.children[selectedIndex!!]
+
+                        // only go deeper if that node has child to navigate
+                        if (currentRemoConContents.children[selectedIndex].children.size != 0) {
+                            remoConTray.consume()
+                            remoConTray = generateNewRemoCon(newCurrentRemoConContents)
+                            currentRemoConContents = newCurrentRemoConContents
+                        }
+
+                        currentlySelectedRemoConItem = newCurrentRemoConContents.data
+                    }
+                    else {
+                        throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
+                    }
                 }
-            }
 
 
-            // do something with the actual selection
-            //printdbg(this, "$currentlySelectedRemoConItem")
+                // do something with the actual selection
+                //printdbg(this, "$currentlySelectedRemoConItem")
 
-            screens.forEach {
-                //printdbg(this, "> ${it.first}")
+                screens.forEach {
+                    //printdbg(this, "> ${it.first}")
 
-                if (currentlySelectedRemoConItem == it.first) {
-                    parent.uiFakeBlurOverlay.setAsOpen()
-                    it.second.setAsOpen()
+                    if (currentlySelectedRemoConItem == it.first) {
+                        parent.uiFakeBlurOverlay.setAsOpen()
+                        it.second.setAsOpen()
 
-                    //printdbg(this, ">> ding - ${it.second.javaClass.canonicalName}")
-                }
-                else {
-                    it.second.setAsClose()
+                        //printdbg(this, ">> ding - ${it.second.javaClass.canonicalName}")
+                    }
+                    else {
+                        it.second.setAsClose()
+                    }
                 }
             }
         }
@@ -277,30 +282,11 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 tagsCollection = tags
         )
 
-        private val spinner = CommonResourcePool.getAsTextureRegionPack("inline_loading_spinner")
-        private var spinnerTimer = 0f
-        private var spinnerFrame = 0
-        private val spinnerInterval = 1f / 60f
-
         fun update(delta: Float) {
-            spinnerTimer += delta
-            if (spinnerTimer > spinnerInterval) {
-                spinnerFrame = (spinnerFrame + 1) % 32
-                spinnerTimer -= spinnerInterval
-            }
-
             menubar.update(delta)
         }
 
         fun render(batch: SpriteBatch, camera: Camera) {
-            val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
-
-            val inlineOffsetY = if (App.GAME_LOCALE.startsWith("th")) 0f
-            else if (App.GAME_LOCALE.startsWith("ko")) 0f
-            else 1f
-
-            batch.draw(spin, menubar.posX + paddingLeft - 5f, menubar.posY + (lineHeight - 20) / 2 - inlineOffsetY)
-
             menubar.render(batch, camera)
         }
 

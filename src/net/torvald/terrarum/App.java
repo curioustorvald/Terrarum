@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
-import kotlin.Pair;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.concurrent.ThreadExecutor;
@@ -32,9 +31,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.serialise.WriteConfig;
-import net.torvald.terrarum.serialise.WriteMeta;
 import net.torvald.terrarum.tvda.DiskSkimmer;
-import net.torvald.terrarum.tvda.VirtualDisk;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
@@ -235,7 +232,7 @@ public class App implements ApplicationListener {
     private static com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
     private static com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
 
-    private static Screen currenScreen;
+    private static Screen currentScreen;
     private static LoadScreenBase currentSetLoadScreen;
 
     public static Texture textureWhiteSquare;
@@ -287,6 +284,10 @@ public class App implements ApplicationListener {
     public static String[] gamepadWhitelist = {
             "xinput", "xbox", "game", "joy", "pad"
     };
+
+    public static Screen getCurrentScreen() {
+        return currentScreen;
+    }
 
     public static void main(String[] args) {
         // print copyright message
@@ -521,7 +522,7 @@ public class App implements ApplicationListener {
         // draw splash screen when predefined screen is null
         // because in normal operation, the only time screen == null is when the app is cold-launched
         // you can't have a text drawn here :v
-        if (currenScreen == null) {
+        if (currentScreen == null) {
             drawSplash();
 
             loadTimer += Gdx.graphics.getDeltaTime();
@@ -539,10 +540,10 @@ public class App implements ApplicationListener {
         }
         // draw the screen
         else {
-            currenScreen.render(UPDATE_RATE);
+            currentScreen.render(UPDATE_RATE);
         }
 
-        KeyToggler.INSTANCE.update(currenScreen instanceof TerrarumIngame);
+        KeyToggler.INSTANCE.update(currentScreen instanceof TerrarumIngame);
 
         // nested FBOs are just not a thing in GL!
         net.torvald.terrarum.FrameBufferManager.end();
@@ -663,7 +664,7 @@ public class App implements ApplicationListener {
 
         scr.setDimension(width, height);
 
-        if (currenScreen != null) currenScreen.resize(scr.getWidth(), scr.getHeight());
+        if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(scr.getWidth(), scr.getHeight());
 
 
@@ -692,9 +693,9 @@ public class App implements ApplicationListener {
         System.out.println("Goodbye !");
 
 
-        if (currenScreen != null) {
-            currenScreen.hide();
-            currenScreen.dispose();
+        if (currentScreen != null) {
+            currentScreen.hide();
+            currentScreen.dispose();
         }
 
         //IngameRenderer.INSTANCE.dispose();
@@ -741,12 +742,12 @@ public class App implements ApplicationListener {
 
     @Override
     public void pause() {
-        if (currenScreen != null) currenScreen.pause();
+        if (currentScreen != null) currentScreen.pause();
     }
 
     @Override
     public void resume() {
-        if (currenScreen != null) currenScreen.resume();
+        if (currentScreen != null) currentScreen.resume();
     }
 
     public static LoadScreenBase getLoadScreen() {
@@ -773,26 +774,26 @@ public class App implements ApplicationListener {
 
         // this whole thing is directtly copied from com.badlogic.gdx.Game
 
-        if (currenScreen != null) {
-            printdbg("AppLoader-Static", "Screen before change: " + currenScreen.getClass().getCanonicalName());
+        if (currentScreen != null) {
+            printdbg("AppLoader-Static", "Screen before change: " + currentScreen.getClass().getCanonicalName());
 
-            currenScreen.hide();
-            currenScreen.dispose();
+            currentScreen.hide();
+            currentScreen.dispose();
         }
         else {
             printdbg("AppLoader-Static", "Screen before change: null");
         }
 
 
-        currenScreen = screen;
+        currentScreen = screen;
 
-        currenScreen.show();
-        currenScreen.resize(scr.getWidth(), scr.getHeight());
+        currentScreen.show();
+        currentScreen.resize(scr.getWidth(), scr.getHeight());
 
 
         System.gc();
 
-        printdbg("AppLoader-Static", "Screen transition complete: " + currenScreen.getClass().getCanonicalName());
+        printdbg("AppLoader-Static", "Screen transition complete: " + currentScreen.getClass().getCanonicalName());
     }
 
     /**

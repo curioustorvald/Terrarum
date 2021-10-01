@@ -15,10 +15,8 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadMeta
-import net.torvald.terrarum.tvda.ByteArray64InputStream
-import net.torvald.terrarum.tvda.DiskSkimmer
-import net.torvald.terrarum.tvda.EntryFile
-import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.serialise.WriteMeta
+import net.torvald.terrarum.tvda.*
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
@@ -29,6 +27,8 @@ import java.util.zip.GZIPInputStream
 import kotlin.math.roundToInt
 
 /**
+ * Only works if current screen set by the App is [TitleScreen]
+ *
  * Created by minjaesong on 2021-09-09.
  */
 class UILoadDemoSavefiles : UICanvas() {
@@ -36,6 +36,9 @@ class UILoadDemoSavefiles : UICanvas() {
     init {
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
             TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
+        }
+        CommonResourcePool.addToLoadingList("savegame_status_icon") {
+            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)
         }
         CommonResourcePool.loadAll()
     }
@@ -52,21 +55,21 @@ class UILoadDemoSavefiles : UICanvas() {
     private val shapeRenderer = ShapeRenderer()
 
 
-    private val uiWidth = UIItemDemoSaveCells.WIDTH // 480
-    private val uiX = (width - uiWidth) / 2
+    internal val uiWidth = UIItemDemoSaveCells.WIDTH // 480
+    internal val uiX = (width - uiWidth) / 2
 
-    private val textH = App.fontGame.lineHeight.toInt()
+    internal val textH = App.fontGame.lineHeight.toInt()
 
-    private val cellGap = 20
-    private val cellInterval = cellGap + UIItemDemoSaveCells.HEIGHT
-    private val gradAreaHeight = 32
+    internal val cellGap = 20
+    internal val cellInterval = cellGap + UIItemDemoSaveCells.HEIGHT
+    internal val gradAreaHeight = 32
 
-    private val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
-    private val titleTopGradStart: Int = titleTextPosY + textH
-    private val titleTopGradEnd: Int = titleTopGradStart + gradAreaHeight
-    private val titleBottomGradStart: Int = height - App.scr.tvSafeGraphicsHeight - gradAreaHeight
-    private val titleBottomGradEnd: Int = titleBottomGradStart + gradAreaHeight
-    private val controlHelperY: Int = titleBottomGradStart + gradAreaHeight - textH
+    internal val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
+    internal val titleTopGradStart: Int = titleTextPosY + textH
+    internal val titleTopGradEnd: Int = titleTopGradStart + gradAreaHeight
+    internal val titleBottomGradStart: Int = height - App.scr.tvSafeGraphicsHeight - gradAreaHeight
+    internal val titleBottomGradEnd: Int = titleBottomGradStart + gradAreaHeight
+    internal val controlHelperY: Int = titleBottomGradStart + gradAreaHeight - textH
 
 
     private val controlHelp: String
@@ -89,24 +92,42 @@ class UILoadDemoSavefiles : UICanvas() {
 
     private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
 
+    private var showSpinner = false
+
     override fun show() {
         printdbg(this, "savefiles show()")
 
-        // read savegames
-        var savegamesCount = 0
-        App.savegames.forEach { skimmer ->
-            val x = uiX
-            val y = titleTopGradEnd + cellInterval * savegamesCount
-            try {
-                addUIitem(UIItemDemoSaveCells(this, x, y, skimmer))
-                savegamesCount += 1
-            }
-            catch (e: Throwable) {
-                System.err.println("[UILoadDemoSavefiles] Savefile '${skimmer.diskFile.absolutePath}' cannot be loaded")
-                e.printStackTrace()
-            }
+        try {
+            val remoCon = (App.getCurrentScreen() as TitleScreen).uiRemoCon
+
+            remoCon.handler.lockToggle()
+            showSpinner = true
+
+            Thread {
+                // read savegames
+                var savegamesCount = 0
+                App.savegames.forEach { skimmer ->
+                    val x = uiX
+                    val y = titleTopGradEnd + cellInterval * savegamesCount
+                    try {
+                        addUIitem(UIItemDemoSaveCells(this, x, y, skimmer))
+                        savegamesCount += 1
+                    }
+                    catch (e: Throwable) {
+                        System.err.println("[UILoadDemoSavefiles] Savefile '${skimmer.diskFile.absolutePath}' cannot be loaded")
+                        e.printStackTrace()
+                    }
+
+
+                }
+
+
+                remoCon.handler.unlockToggle()
+                showSpinner = false
+            }.start()
 
         }
+        catch (e: UninitializedPropertyAccessException) {}
     }
 
     override fun hide() {
@@ -132,8 +153,8 @@ class UILoadDemoSavefiles : UICanvas() {
             }
         }
 
-
-        uiItems.forEachIndexed { index, it ->
+        for (index in 0 until uiItems.size) {
+            val it = uiItems[index]
             if (index in listScroll - 2 until listScroll + savesVisible + 2) {
                 // re-position
                 it.posY = (it.initialY - uiScroll).roundToInt()
@@ -155,7 +176,8 @@ class UILoadDemoSavefiles : UICanvas() {
             setCameraPosition(batch, camera, 0f, 0f)
             batch.color = Color.WHITE
             batch.inUse {
-                uiItems.forEachIndexed { index, it ->
+                for (index in 0 until uiItems.size) {
+                    val it = uiItems[index]
                     if (index in listScroll - 2 until listScroll + savesVisible + 2) {
                         it.render(batch, camera)
                     }
@@ -303,26 +325,36 @@ class UIItemDemoSaveCells(
         const val HEIGHT = 120
     }
 
-    init {
-        CommonResourcePool.addToLoadingList("savegame_status_icon") {
-            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)
-        }
-        CommonResourcePool.loadAll()
 
+    private val metaFile: DiskEntry?
+    private val saveName: String
+    private val saveMode: Int
+    private val isQuick: Boolean
+    private val isAuto: Boolean
+    private val meta: WriteMeta.WorldMeta?
+    private val saveDamaged: Boolean
+    private val lastPlayedTimestamp: String
+
+    init {
         printdbg(this, "Rebuilding skimmer for savefile ${skimmer.diskFile.absolutePath}")
         skimmer.rebuild()
+
+        metaFile = skimmer.requestFile(-1)
+        saveName = skimmer.getDiskName(Common.CHARSET)
+        saveMode = skimmer.getSaveMode()
+        isQuick = (saveMode % 2 == 1)
+        isAuto = (saveMode.ushr(1) != 0)
+        meta = if (metaFile != null) ReadMeta.fromDiskEntry(metaFile) else null
+
+        saveDamaged = checkForSavegameDamage(skimmer)
+
+        lastPlayedTimestamp = if (meta != null)
+            Instant.ofEpochSecond(meta.lastplay_t)
+                    .atZone(TimeZone.getDefault().toZoneId())
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
+            "/${parseDuration(meta.playtime_t)}"
+        else "--:--:--/--h--m--s"
     }
-
-    private var saveDamaged = checkForSavegameDamage(skimmer)
-
-    override val width: Int = WIDTH
-    override val height: Int = HEIGHT
-
-    private var thumbPixmap: Pixmap? = null
-    private var thumb: TextureRegion? = null
-    private val grad = CommonResourcePool.getAsTexture("title_halfgrad")
-
-    private val icons = CommonResourcePool.getAsTextureRegionPack("savegame_status_icon")
 
     private fun parseDuration(seconds: Long): String {
         val s = seconds % 60
@@ -335,36 +367,20 @@ class UIItemDemoSaveCells(
             "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
     }
 
-    private val metaFile = skimmer.requestFile(-1)
+    override val width: Int = WIDTH
+    override val height: Int = HEIGHT
 
-    private val saveName = skimmer.getDiskName(Common.CHARSET)
-    private val saveMode = skimmer.getSaveMode()
-    private val isQuick = (saveMode % 2 == 1)
-    private val isAuto = (saveMode.ushr(1) != 0)
-    private val meta = if (metaFile != null) ReadMeta.fromDiskEntry(metaFile) else null
+    private var thumbPixmap: Pixmap? = null
+    private var thumb: TextureRegion? = null
+    private val grad = CommonResourcePool.getAsTexture("title_halfgrad")
 
-    private val colourBad = Color(0xFF8888FF.toInt())
+    private val icons = CommonResourcePool.getAsTextureRegionPack("savegame_status_icon")
 
-    private val lastPlayedTimestamp = if (meta != null)
-        Instant.ofEpochSecond(meta.lastplay_t)
-            .atZone(TimeZone.getDefault().toZoneId())
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
-                                      "/${parseDuration(meta.playtime_t)}"
-        else "--:--:--/--h--m--s"
+
+    private val colourBad = Color(0xFF0011FF.toInt())
+
 
     init {
-        // load thumbnail or use stock if the file is not there
-        skimmer.requestFile(-2)?.let {
-            val zippedTga = (it.contents as EntryFile).bytes
-            val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
-            val tgaFileContents = gzin.readAllBytes(); gzin.close()
-
-            thumbPixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
-            val thumbTex = Texture(thumbPixmap)
-            thumbTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            thumb = TextureRegion(thumbTex)
-            thumb!!.setRegion(0, (thumbTex.height - 2 * height) / 2, width * 2, height * 2)
-        }
 
     }
 
@@ -372,7 +388,29 @@ class UIItemDemoSaveCells(
         LoadSavegame(VDUtil.readDiskArchive(skimmer.diskFile, Level.INFO))
     }
 
+    internal var hasTexture = false
+        private set
+
     override fun render(batch: SpriteBatch, camera: Camera) {
+        // try to generate a texture
+        if (skimmer.initialised && !hasTexture) {
+            // load thumbnail or use stock if the file is not there
+            skimmer.requestFile(-2)?.let {
+                val zippedTga = (it.contents as EntryFile).bytes
+                val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
+                val tgaFileContents = gzin.readAllBytes(); gzin.close()
+
+                thumbPixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
+                val thumbTex = Texture(thumbPixmap)
+                thumbTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                thumb = TextureRegion(thumbTex)
+                thumb!!.setRegion(0, (thumbTex.height - 2 * height) / 2, width * 2, height * 2)
+            }
+
+
+            hasTexture = true
+        }
+
         val highlightCol = if (mouseUp) UIItemTextButton.defaultActiveCol else Color.WHITE
         val x = posX.toFloat()
         val y = posY.toFloat()

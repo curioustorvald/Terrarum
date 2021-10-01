@@ -113,7 +113,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
     val uiContainer = UIContainer()
-    private lateinit var uiMenu: UICanvas
+    internal lateinit var uiRemoCon: UICanvas
     internal lateinit var uiFakeBlurOverlay: UICanvas
 
     private lateinit var worldFBO: FrameBuffer
@@ -189,12 +189,12 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiFakeBlurOverlay)
 
 
-        uiMenu = UIRemoCon(this, UITitleRemoConYaml(App.savegames.isNotEmpty()))
-        uiMenu.setPosition(0, 0)
-        uiMenu.setAsOpen()
+        uiRemoCon = UIRemoCon(this, UITitleRemoConYaml(App.savegames.isNotEmpty()))
+        uiRemoCon.setPosition(0, 0)
+        uiRemoCon.setAsOpen()
 
 
-        uiContainer.add(uiMenu)
+        uiContainer.add(uiRemoCon)
 
         CommandDict // invoke
         // TODO add console here
@@ -340,10 +340,10 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // resize UI by re-creating it (!!)
-        uiMenu.resize(App.scr.width, App.scr.height)
+        uiRemoCon.resize(App.scr.width, App.scr.height)
         // TODO I forgot what the fuck kind of hack I was talking about
         //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
-        uiMenu.setPosition(0, 0) // shitty hack. Could be:
+        uiRemoCon.setPosition(0, 0) // shitty hack. Could be:
         // 1: Init code and resize code are different
         // 2: The UI is coded shit
 
@@ -354,7 +354,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        uiMenu.dispose()
+        uiRemoCon.dispose()
         demoWorld.dispose()
     }
 

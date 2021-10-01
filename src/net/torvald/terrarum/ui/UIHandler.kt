@@ -118,7 +118,7 @@ void main() {
 
     private val shader = App.loadShaderInline(SHADER_PROG_VERT, SHADER_PROG_FRAG)
 
-    private var uiToggleLocked = false
+    var uiToggleLocked = false; private set
 
     init {
         //UI.handler = this
