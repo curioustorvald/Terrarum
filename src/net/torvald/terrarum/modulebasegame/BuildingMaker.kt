@@ -304,7 +304,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         super.show()
     }
 
-    private var updateAkku = 0.0
+    private var updateAkku = 0f
 
     override fun render(updateRate: Float) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())

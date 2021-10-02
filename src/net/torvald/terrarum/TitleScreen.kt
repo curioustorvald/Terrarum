@@ -232,7 +232,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val introUncoverTime: Second = 0.3f
     private var introUncoverDeltaCounter = 0f
-    private var updateAkku = 0.0
+    private var updateAkku = 0f
 
     private var fucklatch = false
 

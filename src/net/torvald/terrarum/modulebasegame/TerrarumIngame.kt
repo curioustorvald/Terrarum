@@ -16,7 +16,10 @@ import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.GameItem
@@ -37,14 +40,12 @@ import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
-import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.roundToInt
 
@@ -322,8 +323,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         )
 
         // make initial savefile
+        uiAutosaveNotifier.setAsOpen()
         WriteSavegame.immediate(savegameArchive, getSaveFileMain(), this, true) {
             makeSavegameBackupCopy() // don't put it on the postInit() or render(); must be called using callback
+            uiAutosaveNotifier.setAsClose()
         }
     }
 
@@ -430,8 +433,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiBasicInfo = UIBasicInfo()
         uiBasicInfo.setAsAlwaysVisible()
         uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - App.scr.tvSafeActionWidth) / 2 + App.scr.tvSafeActionWidth, uiWatchTierOne.posY)
-
-        uiAutosaveNotifier = UIAutosaveNotifier()
 
 
         uiCheatMotherfuckerNootNoot = UICheatDetected()
@@ -549,12 +550,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private var updateAkku = 0.0
+    private var updateAkku = 0f
+    private var autosaveTimer = 0f
 
     override fun render(`_`: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
         // there's still things to load which needs GL context to be present
         if (!gameFullyLoaded) {
+
+            uiAutosaveNotifier = UIAutosaveNotifier()
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
                 postInitForNewGame()
@@ -580,6 +584,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         /** UPDATE CODE GOES HERE */
         val dt = Gdx.graphics.deltaTime
         updateAkku += dt
+        autosaveTimer += dt
 
         var i = 0L
         while (updateAkku >= updateRate) {
@@ -593,6 +598,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** RENDER CODE GOES HERE */
         measureDebugTime("Ingame.Render") { renderGame() }
+
+        val autosaveInterval = App.getConfigInt("autosaveinterval") / 1000f
+        if (autosaveTimer >= autosaveInterval) {
+            queueAutosave()
+            autosaveTimer -= autosaveInterval
+        }
 
     }
 
@@ -608,14 +619,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         particlesActive = 0
 
-        if (KeyToggler.isOn(Input.Keys.SLASH) && !uiAutosaveNotifier.isVisible) {
-            println("autosave open")
-            uiAutosaveNotifier.setAsOpen()
-        }
-        else if (!KeyToggler.isOn(Input.Keys.SLASH) && uiAutosaveNotifier.isOpened) {
-            println("autosave close")
-            uiAutosaveNotifier.setAsClose()
-        }
 
         // synchronised Ingame Input Updater
         // will also queue up the block/wall/wire placed events
@@ -948,6 +951,19 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             //AmmoMeterProxy(player, uiVitalItem.UI as UIVitalMetre)
         }
     }
+
+    fun queueAutosave() {
+        val start = System.nanoTime()
+
+        uiAutosaveNotifier.setAsOpen()
+        makeSavegameBackupCopy()
+        WriteSavegame.quick(savegameArchive, getSaveFileMain(), this, true) {
+            uiAutosaveNotifier.setAsClose()
+
+            debugTimers.put("Last Autosave Duration", System.nanoTime() - start)
+        }
+    }
+
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this
