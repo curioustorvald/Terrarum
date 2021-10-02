@@ -154,9 +154,9 @@ object WorldSimulator {
                     val s = actor.scale
                     val w = actor.baseHitboxW * s
                     val h = actor.baseHitboxH * s
-                    val pickupDistance = w*w + h*h// TODO refer to the actorValue
-//                    println("${result.distance}\t$pickupDistance")
-                    if (result.distance < pickupDistance) {
+                    val pickupDistSqr = w*w + h*h// TODO refer to the actorValue
+//                    println("${result.distance}\pickupDistSqr")
+                    if (result.distance < pickupDistSqr) {
                         droppedItem.flagDespawn = true
                         (actor as Pocketed).inventory.add(droppedItem.itemID, droppedItem.itemCount)
                         break

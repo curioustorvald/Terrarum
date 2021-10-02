@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -396,8 +397,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     private val actorDistanceCalculator = DistanceCalculator<ActorWithBody> { t: ActorWithBody, p: PointND ->
         val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
         // ROUNDWORLD implementation
-        val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TerrarumAppConfiguration.TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
-        val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TerrarumAppConfiguration.TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+        val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
+        val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
 
         minOf(dist1, minOf(dist2, dist3))
     }
@@ -424,6 +425,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     }
 
     /** Will use centre point of the actors
+     * HOPEFULLY sorted by the distance...?
      * @return List of DistanceResult, list may be empty */
     fun findKNearestActors(from: ActorWithBody, maxHits: Int, nodeFilter: (ActorWithBody) -> Boolean): List<DistanceResult<ActorWithBody>> {
         return actorsRTree.nearestNeighbour(actorDistanceCalculator, nodeFilter, maxHits, object : PointND {
