@@ -17,13 +17,21 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
  */
 open class DroppedItem : ActorWithBody {
 
-    private var itemID: ItemID = ""
+    companion object {
+        const val NO_PICKUP_TIME = 1f
+    }
+
+    var itemID: ItemID = ""; private set
 
     @Transient private var textureRegion: TextureRegion? = null // deserialiser won't call setter of the fields
 
     var itemCount = 1
 
     protected constructor()
+
+    private var timeSinceSpawned = 0f
+
+    fun canBePickedUp() = timeSinceSpawned > NO_PICKUP_TIME
 
     constructor(itemID: ItemID, topLeftX: Int, topLeftY: Int) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
         this.itemID = itemID
@@ -97,6 +105,7 @@ open class DroppedItem : ActorWithBody {
     override fun update(delta: Float) {
         super.update(delta)
 
+        timeSinceSpawned += delta
         // TODO merge into the already existing droppeditem with isStationary==true if one is detected
     }
 }

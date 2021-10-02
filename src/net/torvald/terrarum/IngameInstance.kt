@@ -425,8 +425,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     /** Will use centre point of the actors
      * @return List of DistanceResult, list may be empty */
-    fun findKNearestActors(from: ActorWithBody, maxHits: Int): List<DistanceResult<ActorWithBody>> {
-        return actorsRTree.nearestNeighbour(actorDistanceCalculator, null, maxHits, object : PointND {
+    fun findKNearestActors(from: ActorWithBody, maxHits: Int, nodeFilter: (ActorWithBody) -> Boolean): List<DistanceResult<ActorWithBody>> {
+        return actorsRTree.nearestNeighbour(actorDistanceCalculator, nodeFilter, maxHits, object : PointND {
             override fun getDimensions(): Int = 2
             override fun getOrd(axis: Int): Double = when(axis) {
                 0 -> from.hitbox.centeredX
@@ -437,8 +437,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     }
     /** Will use centre point of the actors
      * @return Pair of: the actor, distance from the actor; null if none found */
-    fun findNearestActors(from: ActorWithBody): DistanceResult<ActorWithBody>? {
-        val t = findKNearestActors(from, 1)
+    fun findNearestActor(from: ActorWithBody, nodeFilter: (ActorWithBody) -> Boolean): DistanceResult<ActorWithBody>? {
+        val t = findKNearestActors(from, 1, nodeFilter)
         return if (t.isNotEmpty())
             t[0]
         else

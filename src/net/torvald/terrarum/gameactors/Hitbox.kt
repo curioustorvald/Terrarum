@@ -156,6 +156,13 @@ class Hitbox {
     infix fun intersects(position: Point2d) =
             (position.x >= startX && position.x <= startX + width) &&
             (position.y >= startY && position.y <= startY + height)
+    infix fun intersects(other: Hitbox) =
+            (this.startX <= other.startX && other.startX <= this.endX) ||
+            (this.startX <= other.endX && other.endX <= this.endX) &&
+
+            (this.startY <= other.startY && other.startY <= this.endY) ||
+            (this.startY <= other.endY && other.endY <= this.endY)
+
 
     fun toVector(): Vector2 = Vector2(startX, startY)
 

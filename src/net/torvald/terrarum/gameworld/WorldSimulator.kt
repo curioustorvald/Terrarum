@@ -5,11 +5,11 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
-import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.gameactors.Electric
-import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.modulebasegame.gameactors.*
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
@@ -88,6 +88,9 @@ object WorldSimulator {
         App.measureDebugTime("WorldSimulator.wires") {
             simulateWires(delta)
         }
+        App.measureDebugTime("WorldSimulator.collisionDroppedItem") {
+            collideDroppedItems()
+        }
 
         //printdbg(this, "============================")
     }
@@ -138,6 +141,29 @@ object WorldSimulator {
             }*/
 
         } }
+    }
+
+    fun collideDroppedItems() {
+        ingame.actorContainerActive.filter { it is DroppedItem }.forEach { droppedItem0 ->
+            val droppedItem = droppedItem0 as DroppedItem
+            if (droppedItem.canBePickedUp()) {
+                val actors = ingame.findKNearestActors(droppedItem0 as ActorWithBody, 64) { it is Controllable && it is Pocketed }
+                for (result in actors) {
+                    val actor = result.get()
+                    // if hitbox overlaps, pick up
+                    val s = actor.scale
+                    val w = actor.baseHitboxW * s
+                    val h = actor.baseHitboxH * s
+                    val pickupDistance = w*w + h*h// TODO refer to the actorValue
+//                    println("${result.distance}\t$pickupDistance")
+                    if (result.distance < pickupDistance) {
+                        droppedItem.flagDespawn = true
+                        (actor as Pocketed).inventory.add(droppedItem.itemID, droppedItem.itemCount)
+                        break
+                    }
+                }
+            }
+        }
     }
 
     /**

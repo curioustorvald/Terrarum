@@ -114,6 +114,7 @@ open class GameWorld() : Disposable {
     internal var genver = -1
     internal var comp = -1
 
+    @Deprecated("This value is only used for savegames; DO NOT USE THIS", ReplaceWith("INGAME.actorContainerActive", "net.torvald.terrarum.INGAME"))
     internal val actors = ArrayList<ActorID>() // only filled up on save and load; DO NOT USE THIS
 
     /**
