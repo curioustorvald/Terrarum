@@ -35,6 +35,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.*
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarum.weather.WeatherMixer
@@ -175,7 +176,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private lateinit var uiBasicInfo: UICanvas
     private lateinit var uiWatchTierOne: UICanvas
-
+    lateinit var uiAutosaveNotifier: UIAutosaveNotifier
     lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
 
 
@@ -430,6 +431,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiBasicInfo.setAsAlwaysVisible()
         uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - App.scr.tvSafeActionWidth) / 2 + App.scr.tvSafeActionWidth, uiWatchTierOne.posY)
 
+        uiAutosaveNotifier = UIAutosaveNotifier()
 
 
         uiCheatMotherfuckerNootNoot = UICheatDetected()
@@ -450,6 +452,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 //                uiBasicInfo, // temporarily commenting out: wouldn't make sense for v 0.3 release
                 uiWatchTierOne,
                 UIScreenZoom(),
+                uiAutosaveNotifier,
                 uiInventoryPlayer,
                 getUIFixture,
                 uiTooltip,
@@ -605,6 +608,14 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         particlesActive = 0
 
+        if (KeyToggler.isOn(Input.Keys.SLASH) && !uiAutosaveNotifier.isVisible) {
+            println("autosave open")
+            uiAutosaveNotifier.setAsOpen()
+        }
+        else if (!KeyToggler.isOn(Input.Keys.SLASH) && uiAutosaveNotifier.isOpened) {
+            println("autosave close")
+            uiAutosaveNotifier.setAsClose()
+        }
 
         // synchronised Ingame Input Updater
         // will also queue up the block/wall/wire placed events
@@ -1126,7 +1137,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                     ((App.scr.width - App.scr.tvSafeGraphicsWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
                     App.scr.tvSafeGraphicsHeight + 8
             )
-
         }
 
 

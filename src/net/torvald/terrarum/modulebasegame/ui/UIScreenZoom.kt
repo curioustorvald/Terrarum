@@ -8,8 +8,10 @@ import net.torvald.getKeycapPC
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumScreenSize
+import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
+import kotlin.math.roundToInt
 
 /**
  * Screen zooms in when the UI is opened; zooms out when being closed.
@@ -25,7 +27,7 @@ class UIScreenZoom : UICanvas(
     override var width = App.fontGame.getWidth(zoomText)
     override var height = App.fontGame.lineHeight.toInt()
 
-    override var openCloseTime = 0.15f
+    override var openCloseTime = COMMON_OPEN_CLOSE
 
     override val mouseUp = false
 
@@ -38,11 +40,10 @@ class UIScreenZoom : UICanvas(
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
 
-        App.fontGame.draw(
-                batch, zoomText,
-                (App.scr.width * TerrarumScreenSize.TV_SAFE_GRAPHICS + 1).toInt().toFloat(),
-                (App.scr.height - height - App.scr.tvSafeGraphicsHeight).toFloat()
-        )
+        val offX = (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
+        val offY = App.scr.height - height - App.scr.tvSafeGraphicsHeight - 4f
+
+        App.fontGame.draw(batch, zoomText, offX, offY)
     }
 
     override fun dispose() {
