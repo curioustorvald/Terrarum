@@ -13,7 +13,7 @@ import java.util.zip.GZIPOutputStream
 /**
  * Created by minjaesong on 2021-09-14.
  */
-class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val callback: () -> Unit) : Runnable {
+class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
 
     /**
      * Will happily overwrite existing entry
@@ -29,7 +29,7 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
     private val actorProgressMultiplier = 1f
 
     override fun run() {
-        disk.saveMode = 0 // no quick, no auto
+        disk.saveMode = 2 * isAuto.toInt() // no quick
 
         if (hasThumbnail) {
             while (!IngameRenderer.fboRGBexportedLatch) {

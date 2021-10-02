@@ -24,7 +24,7 @@ object Save : ConsoleCommand {
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
                 val file = File(App.defaultSaveDir + "/${args[1]}")
 
-                WriteSavegame(disk, file, ingame)
+                WriteSavegame(disk, file, ingame, false)
 
             }
             catch (e: IOException) {

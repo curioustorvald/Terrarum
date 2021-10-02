@@ -89,7 +89,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     INGAME.makeSavegameBackupCopy()
 
                     // save the game
-                    WriteSavegame(INGAME.savegameArchive, File(App.defaultSaveDir, INGAME.savegameNickname), Terrarum.ingame!! as TerrarumIngame) {
+                    WriteSavegame(INGAME.savegameArchive, File(App.defaultSaveDir, INGAME.savegameNickname), Terrarum.ingame!! as TerrarumIngame, false) {
                         // callback:
                         System.gc()
                         screen = 0

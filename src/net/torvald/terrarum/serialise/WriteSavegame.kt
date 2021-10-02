@@ -28,7 +28,7 @@ object WriteSavegame {
     @Volatile var saveProgress = 0f
     @Volatile var saveProgressMax = 1f
 
-    operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
+    operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
         savingStatus = 0
 
         Echo("Save queued")
@@ -48,7 +48,7 @@ object WriteSavegame {
         }
         IngameRenderer.fboRGBexportRequested = true
 
-        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, true, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
@@ -56,12 +56,12 @@ object WriteSavegame {
     }
 
 
-    fun immediate(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, callback: () -> Unit = {}) {
+    fun immediate(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
         savingStatus = 0
 
         Echo("Immediate save fired")
 
-        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, false, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, false, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up

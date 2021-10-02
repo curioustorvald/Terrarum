@@ -39,7 +39,7 @@ class UIAutosaveNotifier : UICanvas() {
         val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
         val offX = (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
         val offY = App.scr.tvSafeGraphicsHeight + 4f
-        
+
         batch.color = Color.WHITE
         batch.draw(spin, offX, offY)
         App.fontGame.draw(batch, Lang["MENU_IO_SAVING"], offX + 30f, offY)
