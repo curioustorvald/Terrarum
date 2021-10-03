@@ -3,7 +3,6 @@ package net.torvald.spriteassembler
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.linearSearch
-import java.io.File
 
 /**
  * Assembles the single frame of the animation, outputs GDX Pixmap.
@@ -34,19 +33,11 @@ object AssembleSheetPixmap {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
-        val bodyparts = Array<Pixmap?>(skeleton.size) {
-            // if file does not exist, null it
-            val file = File("assets/" + properties.toFilename(skeleton[it].name))
-
-            //printdbg(this, "Loading file ${file.absolutePath}, exists: ${file.exists()}")
-
-            /*return*/if (file.exists()) {
-            Pixmap(Gdx.files.internal(file.path))
-            }
-            else {
-                null
-            }
-        }
+        val bodypartOrigins = properties.bodyparts
+        val bodypartImages = properties.bodyparts.keys.map {
+            val file = Gdx.files.internal("assets/${properties.toFilename(it)}")
+            it to (if (file.exists()) Pixmap(file) else null)
+        }.toMap()
         val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
 
         val animRow = theAnim.row
@@ -54,25 +45,26 @@ object AssembleSheetPixmap {
 
 //        AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
-        drawFrame(animRow, animFrame, canvas, properties, bodyparts, transformList)
+        drawFrame(animRow, animFrame, canvas, properties, bodypartOrigins, bodypartImages, transformList)
 
-        bodyparts.forEach { it?.dispose() }
+        bodypartImages.values.forEach { it?.dispose() }
     }
 
     private fun drawFrame(row: Int, column: Int,
                           canvas: Pixmap,
                           props: ADProperties,
-                          bodyparts: Array<Pixmap?>,
+                          bodypartOrigins: HashMap<String, ADPropertyObject.Vector2i>,
+                          bodypartImages: Map<String, Pixmap?>,
                           transformList: List<Pair<String, ADPropertyObject.Vector2i>>
     ) {
         val tmpFrame = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888)
 
-        bodyparts.forEachIndexed { index, image ->
-            if (image != null) {
-                val imgCentre = AssembleFrameBase.getCentreOf(image)
-                val drawPos = transformList[index].second.invertY() + props.origin - imgCentre
+        transformList.forEach { (name, pos) ->
+            bodypartImages[name]?.let { image ->
+                val imgCentre = bodypartOrigins[name]!!.invertX()
+                val drawPos = props.origin + pos + imgCentre
 
-                tmpFrame.drawPixmap(image, drawPos.x, drawPos.y)
+                tmpFrame.drawPixmap(image, drawPos.x, props.frameHeight - drawPos.y - 1)
             }
         }
 

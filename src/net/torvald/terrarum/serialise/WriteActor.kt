@@ -69,7 +69,7 @@ object ReadActor {
         if (actor is ActorWithBody && actor is HasAssembledSprite) {
             actor.sprite = SpriteAnimation(actor)
             if (actor.animDescPathGlow != null) actor.spriteGlow = SpriteAnimation(actor)
-            actor.reassembleSprite(actor.sprite!!, actor.spriteGlow)
+            actor.reassembleSprite(actor.sprite ?: throw InternalError("actor.sprite (type: SpriteAnimation) is null"), actor.spriteGlow)
         }
 
         return actor

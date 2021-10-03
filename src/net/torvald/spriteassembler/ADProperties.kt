@@ -1,11 +1,10 @@
 package net.torvald.spriteassembler
 
+import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.linearSearchBy
 import java.io.InputStream
 import java.io.Reader
 import java.util.*
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 internal data class Joint(val name: String, val position: ADPropertyObject.Vector2i) {
     override fun toString() = "$name $position"
@@ -14,6 +13,7 @@ internal data class Joint(val name: String, val position: ADPropertyObject.Vecto
 internal data class Skeleton(val name: String, val joints: List<Joint>) {
     override fun toString() = "$name=$joints"
 }
+
 
 /**
  * @param name You know it
@@ -32,22 +32,25 @@ internal data class Transform(val joint: Joint, val translate: ADPropertyObject.
 }
 
 class ADProperties {
+    private var fileFrom = ""
     private val javaProp = Properties()
 
     /** Every key is CAPITALISED */
     private val propTable = HashMap<String, List<ADPropertyObject>>()
 
     /** list of bodyparts used by all the skeletons (HEAD, UPPER_TORSO, LOWER_TORSO) */
-    lateinit var bodyparts: List<String>; private set
+//    lateinit var bodyparts: List<String>; private set
     lateinit var bodypartFiles: List<String>; private set
     /** properties that are being used as skeletons (SKELETON_STAND) */
     internal lateinit var skeletons: HashMap<String, Skeleton>; private set
+    /** properties that defines position of joint of the bodypart */
+    internal val bodyparts = HashMap<String, ADPropertyObject.Vector2i>()
     /** properties that are recognised as animations (ANIM_RUN, ANIM)IDLE) */
     internal lateinit var animations: HashMap<String, Animation>; private set
     /** an "animation frame" property (ANIM_RUN_1, ANIM_RUN_2) */
     internal lateinit var transforms: HashMap<String, List<Transform>>; private set
 
-    private val reservedProps = listOf("SPRITESHEET", "EXTENSION")
+    private val reservedProps = listOf("SPRITESHEET", "EXTENSION", "CONFIG", "BODYPARTS")
     private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
 
     lateinit var baseFilename: String; private set
@@ -55,9 +58,8 @@ class ADProperties {
     var frameWidth: Int = -1; private set
     var frameHeight: Int = -1; private set
     var originX: Int = -1; private set
-    var originY: Int = -1; private set
     internal val origin: ADPropertyObject.Vector2i
-        get() = ADPropertyObject.Vector2i(originX, originY)
+        get() = ADPropertyObject.Vector2i(originX, 0)
 
     private val animFrameSuffixRegex = Regex("""_[0-9]+""")
 
@@ -68,6 +70,12 @@ class ADProperties {
 
     companion object {
         const val ALL_JOINT_SELECT_KEY = "ALL"
+    }
+
+    constructor(gdxFile: FileHandle) {
+        fileFrom = gdxFile.path()
+        javaProp.load(gdxFile.read())
+        continueLoad()
     }
 
     constructor(reader: Reader) {
@@ -85,6 +93,16 @@ class ADProperties {
     }
 
     private fun continueLoad() {
+        // sanity check
+        reservedProps.forEach {
+            try {
+                javaProp[it]!!
+            }
+            catch (e: NullPointerException) {
+                throw IllegalArgumentException("Prop '$it' not found from ${fileFrom.ifBlank { "(path unavailable)" }}", e)
+            }
+        }
+
         javaProp.keys.forEach { propName ->
             val propsStr = javaProp.getProperty(propName as String)
             val propsList = propsStr.split(';').map { ADPropertyObject(it) }
@@ -99,11 +117,9 @@ class ADProperties {
         frameWidth = frameSizeVec.x
         frameHeight = frameSizeVec.y
         originX = (get("CONFIG").linearSearchBy { it.name == "ORIGINX" }!!.input as Float).toInt()
-        originY = frameHeight - 1
 
         var maxColFinder = -1
         var maxRowFinder = -1
-        val bodyparts = HashSet<String>()
         val skeletons = HashMap<String, Skeleton>()
         val animations = HashMap<String, Animation>()
         val animFrames = HashMap<String, Int>()
@@ -153,13 +169,6 @@ class ADProperties {
             }
         }
 
-        // populate the bodyparts using skeletons
-        skeletons.forEach { (_, prop: Skeleton) ->
-            prop.joints.forEach {
-                bodyparts.add(it.name)
-            }
-        }
-
         // populate transforms
         animations.forEach { t, u ->
             for (fc in 1..u.frames) {
@@ -190,17 +199,28 @@ class ADProperties {
             }
         }
 
-        this.bodyparts = bodyparts.toList().sorted()
+        get("BODYPARTS").forEach {
+            try {
+                this.bodyparts[it.name] = (it.input as ADPropertyObject.Vector2i)
+            }
+            catch (e: NullPointerException) {
+                if (it.name.isBlank())
+                    throw IllegalArgumentException("Empty Bodypart name on BODYPARTS; try removing trailing semicolon (';')?")
+                else
+                    throw IllegalArgumentException("Bodyparts definition for '${it.name}' not found from ${fileFrom.ifBlank { "(path unavailable)" }}", e)
+            }
+        }
+
         this.skeletons = skeletons
         this.animations = animations
-        this.bodypartFiles = this.bodyparts.map { toFilename(it) }
+        this.bodypartFiles = this.bodyparts.keys.map { toFilename(it) }
         this.transforms = transforms
 
         cols = maxColFinder
         rows = maxRowFinder
     }
 
-    operator fun get(identifier: String) = propTable[identifier.toUpperCase()]!!
+    operator fun get(identifier: String): List<ADPropertyObject> = propTable[identifier.toUpperCase()]!!
     val keys
         get() = propTable.keys
     fun containsKey(key: String) = propTable.containsKey(key)
@@ -299,6 +319,8 @@ class ADPropertyObject(propertyRaw: String) {
         operator fun minus(other: Vector2i) = Vector2i(this.x - other.x, this.y - other.y)
 
         fun invertY() = Vector2i(this.x, -this.y)
+        fun invertX() = Vector2i(-this.x, this.y)
+        fun invertXY() = Vector2i(-this.x, -this.y)
     }
 
     enum class ADPropertyType {

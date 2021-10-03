@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -293,7 +294,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             }
             catch (e: NullPointerException) {
                 System.err.println("Could not read the actor ${it} from the disk")
-//                throw e // TODO don't rethrow -- let players play the corrupted world if it loads, they'll be able to cope with their losses even though there will be buncha lone actorblocks lying around...
+                e.printStackTrace()
+                if (it == PLAYER_REF_ID) throw e
+//                throw e // if not player, don't rethrow -- let players play the corrupted world if it loads, they'll be able to cope with their losses even though there will be buncha lone actorblocks lying around...
             }
         }
 

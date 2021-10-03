@@ -29,9 +29,9 @@ interface HasAssembledSprite {
      * ```
      */
     fun reassembleSprite(sprite: SpriteAnimation, spriteGlow: SpriteAnimation? = null) {
-        _rebuild(ADProperties(Gdx.files.internal(animDescPath).read()), sprite)
+        _rebuild(ADProperties(Gdx.files.internal(animDescPath)), sprite)
         if (animDescPathGlow != null && spriteGlow != null)
-            _rebuild(ADProperties(Gdx.files.internal(animDescPathGlow).read()), spriteGlow)
+            _rebuild(ADProperties(Gdx.files.internal(animDescPathGlow)), spriteGlow)
     }
 
     /*fun rebuild(animDescPath: String, spriteAnimation: SpriteAnimation) {

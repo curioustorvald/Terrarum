@@ -89,7 +89,9 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
             |GNU General Public License for more details.
             |
             |You should have received a copy of the GNU General Public License
-            |along with this program.  If not, see <https://www.gnu.org/licenses/>.""".trimMargin()
+            |along with this program.  If not, see <https://www.gnu.org/licenses/>.
+            |
+            |Paste your Animation Description here and press 'Update'!""".trimMargin()
         panelCode.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (panelCodeInit) {
@@ -116,14 +118,14 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
 
         panelProperties.model = DefaultTreeModel(DefaultMutableTreeNode(lang.getProperty("PROPERTIES_GO_HERE")))
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
-        panelDataView.resizeWeight = 0.333
+        panelDataView.resizeWeight = 0.4
 
         // to disable text wrap
         //val panelCodeNoWrap = JPanel(BorderLayout())
         //panelCodeNoWrap.add(panelCode)
 
         val panelMain = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, JScrollPane(panelCode), panelDataView)
-        panelMain.resizeWeight = 0.666
+        panelMain.resizeWeight = 0.6
 
         val menu = JMenuBar()
         menu.add(JMenu("Update")).addMouseListener(object : MouseAdapter() {
@@ -158,8 +160,8 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                         (panelAnimationsList.model as DefaultListModel).addElement("${it.value}")
                     }
                     // populate bodyparts view
-                    adProperties.bodyparts.forEach { partName ->
-                        (panelBodypartsList.model as DefaultListModel).addElement(partName)
+                    adProperties.bodyparts.toSortedMap().forEach { part ->
+                        (panelBodypartsList.model as DefaultListModel).addElement("${part.key}: ${part.value}")
                     }
                     // populate image file list view
                     adProperties.bodypartFiles.forEach { partName ->
@@ -177,7 +179,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     (panelStatList.model as DefaultListModel).addElement("Spritesheet rows: ${adProperties.rows}")
                     (panelStatList.model as DefaultListModel).addElement("Spritesheet columns: ${adProperties.cols}")
                     (panelStatList.model as DefaultListModel).addElement("Frame size: ${adProperties.frameWidth}, ${adProperties.frameHeight}")
-                    (panelStatList.model as DefaultListModel).addElement("Origin position: ${adProperties.originX}, ${adProperties.originY}")
+                    (panelStatList.model as DefaultListModel).addElement("Origin position: ${adProperties.origin}")
 
 
 
@@ -218,7 +220,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         this.add(statBar, BorderLayout.SOUTH)
         this.title = "Terrarum Sprite Assembler and Viewer"
         this.isVisible = true
-        this.setSize(1154, 768)
+        this.setSize(1120, 768)
         this.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
     }
 
@@ -317,7 +319,7 @@ class SpriteAssemblerPreview: Game() {
 
 fun main(args: Array<String>) {
     val appConfig = Lwjgl3ApplicationConfiguration()
-    appConfig.setWindowedMode(800, 800)
+    appConfig.setWindowedMode(1024, 1024)
     appConfig.setIdleFPS(5)
     appConfig.setForegroundFPS(5)
     appConfig.setResizable(false)
