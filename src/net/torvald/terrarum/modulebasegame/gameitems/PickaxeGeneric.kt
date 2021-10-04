@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
@@ -18,7 +19,7 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2019-03-10.
  */
 object PickaxeCore {
-    fun startPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
+    fun startPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem) = inInteractableRange(actor) {
         val mouseTileX = Terrarum.mouseTileX
         val mouseTileY = Terrarum.mouseTileY
 
@@ -39,7 +40,7 @@ object PickaxeCore {
 
         // return false if here's no tile
         if (Block.AIR == (INGAME.world).getTileFromTerrain(mouseTileX, mouseTileY))
-            return false
+            return@inInteractableRange false
 
         // filter passed, do the job
         val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
@@ -54,7 +55,7 @@ object PickaxeCore {
             }
         }
 
-        return true
+        true
     }
 
     fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {

@@ -1,11 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.App
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.WireCodex
-import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.faction.FactionFactory
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2016-02-03.
@@ -13,7 +9,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 object PlayerBuilderSigrid {
 
-    operator fun invoke(): IngamePlayer {
+    /*operator fun invoke(): IngamePlayer {
         val p = IngamePlayer("lol", "lol_glow", - 9223372036854775807L) // XD
 
         //p.referenceID = 0x51621D // the only constant of this procedural universe
@@ -41,7 +37,7 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.STRENGTH] = 1414 // this is test character, after all.
         p.actorValue[AVKey.ENCUMBRANCE] = 1000
         p.actorValue[AVKey.BASEHEIGHT] = 46
-        p.actorValue[AVKey.BASEREACH] = 50
+        p.actorValue[AVKey.BASEREACH] = 84
 
         p.actorValue[AVKey.NAME] = "Sigrid"
 
@@ -72,7 +68,7 @@ object PlayerBuilderSigrid {
 
 
         return p
-    }
+    }*/
 
     fun fillTestInventory(inventory: ActorInventory) {
 
