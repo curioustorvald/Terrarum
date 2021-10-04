@@ -4,6 +4,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
@@ -82,12 +83,12 @@ class EntryPoint : ModuleEntryPoint() {
             equipPosition = EquipPosition.HAND_GRIP
         }
 
-        override fun startPrimaryUse(delta: Float): Boolean {
-            return BlockBase.blockStartPrimaryUse(this, dynamicID, delta)
+        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
+            return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)
         }
 
-        override fun effectWhenEquipped(delta: Float) {
-            BlockBase.blockEffectWhenEquipped(delta)
+        override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+            BlockBase.blockEffectWhenEquipped(actor, delta)
         }
     }
 

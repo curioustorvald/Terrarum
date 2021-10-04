@@ -3,14 +3,16 @@ package net.torvald.terrarum.gameitem
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.Codex
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.ItemValue
+import net.torvald.terrarum.*
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import org.dyn4j.geometry.Vector2
 
 typealias ItemID = String
 
@@ -151,12 +153,12 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     /**
      * Effects applied continuously while in pocket
      */
-    open fun effectWhileInPocket(delta: Float) { }
+    open fun effectWhileInPocket(actor: ActorWithBody, delta: Float) { }
 
     /**
      * Effects applied immediately only once if picked up
      */
-    open fun effectWhenPickedUp(delta: Float) { }
+    open fun effectWhenPickedUp(actor: ActorWithBody, delta: Float) { }
 
     /**
      * Apply effects (continuously or not) while primary button is down.
@@ -174,7 +176,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * Consumption function is executed in net.torvald.terrarum.gamecontroller.IngameController,
      * in which the function itself is defined in net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
      */
-    open fun startPrimaryUse(delta: Float): Boolean = false
+    open fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean = false
 
     /**
      * I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
@@ -190,23 +192,23 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      */
     //open fun startSecondaryUse(delta: Float): Boolean = false
 
-    open fun endPrimaryUse(delta: Float): Boolean = false
-    open fun endSecondaryUse(delta: Float): Boolean = false
+    open fun endPrimaryUse(actor: ActorWithBody, delta: Float): Boolean = false
+    open fun endSecondaryUse(actor: ActorWithBody, delta: Float): Boolean = false
 
     /**
      * Effects applied immediately only once if thrown (discarded) from pocket
      */
-    open fun effectWhenThrown(delta: Float) { }
+    open fun effectWhenThrown(actor: ActorWithBody, delta: Float) { }
 
     /**
      * Effects applied (continuously or not) when equipped (drawn/pulled out)
      */
-    open fun effectWhenEquipped(delta: Float) { }
+    open fun effectWhenEquipped(actor: ActorWithBody, delta: Float) { }
 
     /**
      * Effects applied only once when unequipped
      */
-    open fun effectOnUnequip(delta: Float) { }
+    open fun effectOnUnequip(actor: ActorWithBody, delta: Float) { }
 
     
     override fun toString(): String {
@@ -306,6 +308,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         return this
     }
 
+
     companion object {
 
         val DURABILITY_NA = 0
@@ -320,7 +323,15 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         }
     }
 }
-
+fun inInteractableRange(actor: ActorWithBody, action: () -> Boolean): Boolean {
+    val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+    val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
+    val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
+    val actorPos = actor.centrePosVector
+    val dist = minOf(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2), actorPos.distanceSquared(mousePos3))
+    val distMax = actor.actorValue.getAsInt(AVKey.BASEREACH)!! * actor.scale // perform some error checking here
+    if (dist <= distMax.sqr()) return action() else return false
+}
 fun IntRange.pickRandom() = HQRNG().nextInt(this.endInclusive - this.start + 1) + this.start // count() on 200 million entries? Se on vitun hyvää idea
 fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
 fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]

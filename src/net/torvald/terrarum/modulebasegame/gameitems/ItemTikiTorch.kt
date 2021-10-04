@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -38,11 +40,12 @@ class ItemTikiTorch(originalID: ItemID) : GameItem(originalID) {
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(delta: Float): Boolean {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = inInteractableRange(actor) {
         val item = FixtureTikiTorch()
 
-        return item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
+        item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
         // return true when placed, false when cannot be placed
+
     }
 
 }

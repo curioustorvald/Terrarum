@@ -1,36 +1,29 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.Point2d
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Calculate
-import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
 import kotlin.math.roundToInt
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2019-03-10.
  */
 object PickaxeCore {
-    fun startPrimaryUse(delta: Float, item: GameItem): Boolean {
-        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying ?: return false
-
+    fun startPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
         val mouseTileX = Terrarum.mouseTileX
         val mouseTileY = Terrarum.mouseTileY
 
         val mousePoint = Point2d(mouseTileX.toDouble(), mouseTileY.toDouble())
-        val actorvalue = player.actorValue
+        val actorvalue = actor.actorValue
 
         item.using = true
 
@@ -53,7 +46,7 @@ object PickaxeCore {
 
         (INGAME.world).inflictTerrainDamage(
                 mouseTileX, mouseTileY,
-                Calculate.pickaxePower(player, item.material) * swingDmgToFrameDmg
+                Calculate.pickaxePower(actor, item.material) * swingDmgToFrameDmg
         )?.let { tileBroken ->
             val drop = BlockCodex[tileBroken].drop
             if (drop.isNotBlank()) {
@@ -64,13 +57,11 @@ object PickaxeCore {
         return true
     }
 
-    fun endPrimaryUse(delta: Float, item: GameItem): Boolean {
-        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
-        if (player == null) return false
+    fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
 
         item.using = false
         // reset action timer to zero
-        player.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+        actor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
     }
 
@@ -101,8 +92,8 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
         super.name = "Copper Pickaxe"
     }
 
-    override fun startPrimaryUse(delta: Float) = PickaxeCore.startPrimaryUse(delta, this)
-    override fun endPrimaryUse(delta: Float) = PickaxeCore.endPrimaryUse(delta, this)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
 
 /**
@@ -128,8 +119,8 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
         super.name = "Iron Pickaxe"
     }
 
-    override fun startPrimaryUse(delta: Float) = PickaxeCore.startPrimaryUse(delta, this)
-    override fun endPrimaryUse(delta: Float) = PickaxeCore.endPrimaryUse(delta, this)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor , delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
 
 /**
@@ -155,6 +146,6 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
         super.name = "Steel Pickaxe"
     }
 
-    override fun startPrimaryUse(delta: Float) = PickaxeCore.startPrimaryUse(delta, this)
-    override fun endPrimaryUse(delta: Float) = PickaxeCore.endPrimaryUse(delta, this)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this)
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }

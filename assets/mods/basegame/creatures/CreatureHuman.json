@@ -23,10 +23,12 @@
 
   "encumbrance": 1000,
   "basedefence": 100,
-  "basereach": 50,
+  "basereach": 56,
 
   "toolsize": 15,
   
-  "intelligent": true
+  "intelligent": true,
+  "barehandactionminheight": 80,
+  "basebarehanddiggingsize": 0.5
 
 }

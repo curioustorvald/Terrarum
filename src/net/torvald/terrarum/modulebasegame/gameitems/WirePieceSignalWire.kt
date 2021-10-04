@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.blockproperties.Wire
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
@@ -30,15 +30,15 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(delta: Float): Boolean {
-        return BlockBase.wireStartPrimaryUse(this, delta)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
+        return BlockBase.wireStartPrimaryUse(actor,this, delta)
     }
 
-    override fun effectWhenEquipped(delta: Float) {
+    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
         BlockBase.wireEffectWhenEquipped(this, delta)
     }
 
-    override fun effectOnUnequip(delta: Float) {
+    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
         BlockBase.wireEffectWhenUnequipped(this, delta)
     }
 }

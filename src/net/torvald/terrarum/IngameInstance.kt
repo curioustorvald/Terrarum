@@ -184,13 +184,13 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     /**
      * Event for triggering held item's `startPrimaryUse(Float)`
      */
-    open fun worldPrimaryClickStart(delta: Float) {
+    open fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
     }
 
     /**
      * Event for triggering held item's `endPrimaryUse(Float)`
      */
-    open fun worldPrimaryClickEnd(delta: Float) {
+    open fun worldPrimaryClickEnd(actor: ActorWithBody, delta: Float) {
     }
 
     /**

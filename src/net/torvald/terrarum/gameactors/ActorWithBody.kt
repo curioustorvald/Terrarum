@@ -26,7 +26,7 @@ import kotlin.math.roundToInt
 
 
 /**
- * Actor with body movable. Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
+ * Actor with body movable; or more like, 'Actor that has defined XY-Position'. Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
  * Also has all the usePhysics
  *
  * @param renderOrder Rendering order (BEHIND, MIDDLE, MIDTOP, FRONT)
@@ -206,6 +206,41 @@ open class ActorWithBody : Actor {
 
             field = value
         }
+    var avBaseScale: Double // use canonical "scale" for apparent scale (base * buff)
+        get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
+        set(value) {
+            actorValue[AVKey.SCALE] = value
+        }
+    /**
+     * Apparent strength. 1 000 is default value
+     */
+    val avStrength: Double
+        get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 1000.0) *
+                (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * scale
+    var avBaseStrength: Double?
+        get() = actorValue.getAsDouble(AVKey.STRENGTH)
+        set(value) {
+            actorValue[AVKey.STRENGTH] = value!!
+        }
+    var avBaseMass: Double
+        inline get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
+        set(value) {
+            if (value <= 0 || value.isNaN() || value.isInfinite())
+                throw IllegalArgumentException("Tried to set base mass to invalid value ($value)")
+            actorValue[AVKey.BASEMASS] = value
+        }
+    val avAcceleration: Double
+        get() { if (accelMultMovement.isNaN()) println("accelMultMovement: $accelMultMovement")
+            return actorValue.getAsDouble(AVKey.ACCEL)!! *
+                   (actorValue.getAsDouble(AVKey.ACCELBUFF) ?: 1.0) *
+                   accelMultMovement *
+                   scale.sqrt()
+        }
+    val avSpeedCap: Double
+        get() = actorValue.getAsDouble(AVKey.SPEED)!! *
+                (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) *
+                speedMultByTile *
+                scale.sqrt()
 
     /**
      * Flags and Properties
@@ -1877,43 +1912,6 @@ open class ActorWithBody : Actor {
         @Transient private val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
     }
 
-    // gameplay-related actorvalue macros
-
-    var avBaseScale: Double // use canonical "scale" for apparent scale (base * buff)
-        get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
-        set(value) {
-            actorValue[AVKey.SCALE] = value
-        }
-    /**
-     * Apparent strength. 1 000 is default value
-     */
-    internal val avStrength: Double
-        get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 1000.0) *
-                (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * scale
-    internal var avBaseStrength: Double?
-        get() = actorValue.getAsDouble(AVKey.STRENGTH)
-        set(value) {
-            actorValue[AVKey.STRENGTH] = value!!
-        }
-    internal var avBaseMass: Double
-        inline get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
-        set(value) {
-            if (value <= 0 || value.isNaN() || value.isInfinite())
-                throw IllegalArgumentException("Tried to set base mass to invalid value ($value)")
-            actorValue[AVKey.BASEMASS] = value
-        }
-    internal val avAcceleration: Double
-        get() { if (accelMultMovement.isNaN()) println("accelMultMovement: $accelMultMovement")
-            return actorValue.getAsDouble(AVKey.ACCEL)!! *
-                   (actorValue.getAsDouble(AVKey.ACCELBUFF) ?: 1.0) *
-                   accelMultMovement *
-                   scale.sqrt()
-        }
-    internal val avSpeedCap: Double
-        get() = actorValue.getAsDouble(AVKey.SPEED)!! *
-                (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) *
-                speedMultByTile *
-                scale.sqrt()
 
     private fun Double.toPositiveRad() = // rad(0..pi, -pi..0) -> rad(0..2pi)
             if (-Math.PI <= this && this < 0.0)

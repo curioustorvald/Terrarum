@@ -27,6 +27,8 @@
 
   "toolsize": 40,
 
-  "intelligent": true
+  "intelligent": true,
+  "barehandactionminheight": 40,
+  "basebarehanddiggingsize": 1.0
 
 }

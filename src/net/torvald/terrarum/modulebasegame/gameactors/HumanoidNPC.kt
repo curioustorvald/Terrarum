@@ -4,6 +4,7 @@ import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.Material
@@ -49,7 +50,7 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
         override val isDynamic = false
         override val material = Material()
 
-        override fun startPrimaryUse(delta: Float): Boolean {
+        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
             try {
                 // place the actor to the world
                 this@HumanoidNPC.setPosition(Terrarum.mouseX, Terrarum.mouseY)

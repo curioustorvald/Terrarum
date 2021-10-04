@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
@@ -32,22 +34,23 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(delta: Float): Boolean {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = inInteractableRange(actor) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
         val wires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.cloneToList()
 
         wires?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
-        } ?: return false
-        return true
+        } ?: return@inInteractableRange false
+
+        true
     }
 
-    override fun effectWhenEquipped(delta: Float) {
+    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
     }
 
-    override fun effectOnUnequip(delta: Float) {
+    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 }

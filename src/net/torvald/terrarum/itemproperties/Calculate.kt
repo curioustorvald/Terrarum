@@ -1,6 +1,6 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.sqrt
 
 /**
@@ -16,7 +16,7 @@ object Calculate {
      *
      * TODO Newtons as unit?
      */
-    @JvmStatic fun pickaxePower(actor: ActorHumanoid, material: Material): Float {
+    @JvmStatic fun pickaxePower(actor: ActorWithBody, material: Material): Float {
         return (4.0 * material.forceMod.toDouble().sqrt() * (actor.avStrength / 1000.0)).toFloat()
     }
 

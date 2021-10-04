@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.itemproperties.Material
@@ -36,18 +37,18 @@ class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(delta: Float): Boolean {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
         val item = FixtureLogicSignalEmitter()
 
         return item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY)
         // return true when placed, false when cannot be placed
     }
 
-    override fun effectWhenEquipped(delta: Float) {
+    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
     }
 
-    override fun effectOnUnequip(delta: Float) {
+    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 

@@ -130,8 +130,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
             // the very job.
 
-            if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) && !worldPrimaryClickLatched) {
-                terrarumIngame.worldPrimaryClickStart(App.UPDATE_RATE)
+            if (terrarumIngame.actorNowPlaying != null && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) && !worldPrimaryClickLatched) {
+                terrarumIngame.worldPrimaryClickStart(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 worldPrimaryClickLatched = true
             }
             /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary")) {
@@ -219,9 +219,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             if (terrarumIngame.uiContainer.map { if ((it?.isOpening == true || it?.isOpened == true) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (
-                        button == App.getConfigInt("config_mouseprimary") ||
-                        button == App.getConfigInt("config_mousesecondary")) {
-                    terrarumIngame.worldPrimaryClickEnd(App.UPDATE_RATE)
+                        terrarumIngame.actorNowPlaying != null &&
+                        (button == App.getConfigInt("config_mouseprimary") ||
+                        button == App.getConfigInt("config_mousesecondary"))) {
+                    terrarumIngame.worldPrimaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 }
                 /*if (button == AppLoader.getConfigInt("config_mousesecondary")) {
                     ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE)

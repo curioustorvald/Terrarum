@@ -13,7 +13,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
-import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
@@ -48,7 +47,6 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.math.roundToInt
 
 
 /**
@@ -482,10 +480,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     }// END enter
 
-    override fun worldPrimaryClickStart(delta: Float) {
+    override fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
 
-        val itemOnGrip = ItemCodex[actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)]
+        val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
         var uiOpened = false
 
@@ -516,15 +514,15 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // don't want to open the UI and use the item at the same time, would ya?
         if (!uiOpened) {
-            val consumptionSuccessful = itemOnGrip?.startPrimaryUse(delta) ?: false
+            val consumptionSuccessful = itemOnGrip?.startPrimaryUse(actor, delta) ?: false
             if (consumptionSuccessful)
-                actorNowPlaying?.inventory?.consumeItem(itemOnGrip!!)
+                (actor as Pocketed).inventory.consumeItem(itemOnGrip!!)
         }
     }
 
-    override fun worldPrimaryClickEnd(delta: Float) {
-        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        ItemCodex[itemOnGrip]?.endPrimaryUse(delta)
+    override fun worldPrimaryClickEnd(actor: ActorWithBody, delta: Float) {
+        val itemOnGrip = (actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
+        ItemCodex[itemOnGrip]?.endPrimaryUse(actor, delta)
     }
 
     // I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
@@ -897,7 +895,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     fun updateActors(delta: Float) {
         if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainerActive.size > Terrarum.THREADS) {
-            ThreadExecutor.renew()
+            /*ThreadExecutor.renew()
 
             val actors = actorContainerActive.size.toFloat()
             // set up indices
@@ -912,7 +910,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             ThreadExecutor.join()
 
-            actorNowPlaying?.update(delta)
+            actorNowPlaying?.update(delta)*/
         }
         else {
             actorContainerActive.forEach {
@@ -921,9 +919,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
                     if (it is Pocketed) {
                         it.inventory.forEach { inventoryEntry ->
-                            ItemCodex[inventoryEntry.itm]!!.effectWhileInPocket(delta)
+                            ItemCodex[inventoryEntry.itm]!!.effectWhileInPocket(it as ActorWithBody, delta) // kind of an error checking because all Pocketed must be ActorWithBody
                             if (it.equipped(inventoryEntry.itm)) {
-                                ItemCodex[inventoryEntry.itm]!!.effectWhenEquipped(delta)
+                                ItemCodex[inventoryEntry.itm]!!.effectWhenEquipped(it as ActorWithBody, delta)
                             }
                         }
                     }

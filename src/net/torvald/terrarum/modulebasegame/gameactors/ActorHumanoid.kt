@@ -12,7 +12,6 @@ import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import org.dyn4j.geometry.Vector2
-import java.util.*
 
 /**
  * Humanoid actor class to provide same controlling function (such as work, jump)
@@ -213,10 +212,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // update inventory items
         inventory.forEach {
             if (!inventory.itemEquipped.contains(it.itm)) { // unequipped
-                ItemCodex[it.itm]!!.effectWhileInPocket(delta)
+                ItemCodex[it.itm]!!.effectWhileInPocket(this, delta)
             }
             else { // equipped
-                ItemCodex[it.itm]!!.effectWhenEquipped(delta)
+                ItemCodex[it.itm]!!.effectWhenEquipped(this, delta)
             }
         }
     }

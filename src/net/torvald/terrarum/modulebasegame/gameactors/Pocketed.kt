@@ -1,10 +1,11 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.ActorValue
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -35,7 +36,7 @@ interface Pocketed {
         // Relevant Actorvalue is NOT being updated on time
         // They're being safely handled by UIItemInventoryElem*.touchDown() and ActorInventory.remove
 
-        item.effectOnUnequip(App.UPDATE_RATE)
+        item.effectOnUnequip(this as ActorWithBody, App.UPDATE_RATE)
     }
 
     fun unequipItem(itemID: ItemID?) {
@@ -66,7 +67,7 @@ interface Pocketed {
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item.dynamicID
-            item.effectWhenEquipped(App.UPDATE_RATE)
+            item.effectWhenEquipped(this as ActorWithBody, App.UPDATE_RATE)
         }
         // else do nothing
     }

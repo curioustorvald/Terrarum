@@ -1,15 +1,11 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
-import net.torvald.terrarum.Point2d
-import net.torvald.terrarum.Point2i
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2019-05-02.
@@ -20,7 +16,7 @@ object BlockBase {
      * @param dontEncaseActors when set to true, blocks won't be placed where Actors are. You will want to set it false
      * for wire items, otherwise you want it to be true.
      */
-    fun blockStartPrimaryUse(gameItem: GameItem, itemID: ItemID, delta: Float): Boolean {
+    fun blockStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, itemID: ItemID, delta: Float) = inInteractableRange(actor) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
@@ -38,7 +34,7 @@ object BlockBase {
                 if (it is ActorWithBody && it.physProp.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
                     ret1 = false // return is not allowed here
             }
-            if (!ret1) return ret1
+            if (!ret1) return@inInteractableRange ret1
         }
 
         // return false if the tile underneath is:
@@ -50,7 +46,7 @@ object BlockBase {
             gameItem.dynamicID == "wall@" + ingame.world.getTileFromWall(mouseTile.x, mouseTile.y) ||
             BlockCodex[ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)].nameKey.contains("ACTORBLOCK_")
         )
-            return false
+            return@inInteractableRange false
 
         // filter passed, do the job
         // FIXME this is only useful for Player
@@ -71,21 +67,21 @@ object BlockBase {
             )
         }
 
-        return true
+        true
     }
 
-    fun blockEffectWhenEquipped(delta: Float) {
+    fun blockEffectWhenEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
-    fun wireStartPrimaryUse(gameItem: GameItem, delta: Float): Boolean {
+    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = inInteractableRange(actor) {
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
         // return false if the tile is already there
         if (ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.searchFor(itemID) != null)
-            return false
+            return@inInteractableRange false
 
         // filter passed, do the job
         ingame.world.setTileWire(
@@ -95,7 +91,7 @@ object BlockBase {
                 false
         )
 
-        return true
+        true
     }
 
     fun wireEffectWhenEquipped(gameItem: GameItem, delta: Float) {
