@@ -133,4 +133,7 @@ object AVKey {
 
     const val __HISTORICAL_BORNTIME = "__borntime" // time_t
     const val __HISTORICAL_DEADTIME = "__deadtime" // time_t, -1 if not dead
+
+    const val BAREHAND_MINHEIGHT = "barehandactionminheight"
+    const val BAREHAND_BASE_DIGSIZE = "basebarehanddiggingsize"
 }

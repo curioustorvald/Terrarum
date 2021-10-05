@@ -16,19 +16,18 @@ import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorID
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.WireActor
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
+import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -483,15 +482,24 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
 
+        // prepare some variables
+
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
         var uiOpened = false
+
+        val canPerformBarehandAction = actor.scale * actor.baseHitboxH >= actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0
 
         // TODO actorsUnderMouse: support ROUNDWORLD
         val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
         if (actorsUnderMouse.size > 1) {
             App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
         }
+
+        ////////////////////////////////
+
+
+        // #1. Try to open a UI under the cursor
         // scan for the one with non-null UI.
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
         if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
@@ -511,18 +519,30 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             }
         }
 
-
+        // #2. If there is no UI under and if I'm holding an item, use it
         // don't want to open the UI and use the item at the same time, would ya?
-        if (!uiOpened) {
-            val consumptionSuccessful = itemOnGrip?.startPrimaryUse(actor, delta) ?: false
+        if (!uiOpened && itemOnGrip != null) {
+            val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
             if (consumptionSuccessful)
-                (actor as Pocketed).inventory.consumeItem(itemOnGrip!!)
+                (actor as Pocketed).inventory.consumeItem(itemOnGrip)
+        }
+        // #3. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
+        else if (itemOnGrip == null && canPerformBarehandAction) {
+            inInteractableRange(actor) {
+                performBarehandAction(actor, delta)
+                true
+            }
         }
     }
 
     override fun worldPrimaryClickEnd(actor: ActorWithBody, delta: Float) {
+        val canPerformBarehandAction = actor.scale * actor.baseHitboxH >= actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0
         val itemOnGrip = (actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
         ItemCodex[itemOnGrip]?.endPrimaryUse(actor, delta)
+
+        if (canPerformBarehandAction) {
+            actor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+        }
     }
 
     // I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
@@ -1098,6 +1118,32 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 j -= 1
             }
             arr[j + 1] = x
+        }
+    }
+
+    fun performBarehandAction(actor: ActorWithBody, delta: Float) {
+//        println("whack!")
+
+        fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
+            val outList = java.util.ArrayList<ActorWithBody>()
+            try {
+                actorsRTree.find(worldX - radius, worldY - radius, worldX + radius, worldY + radius, outList)
+            }
+            catch (e: NullPointerException) {
+            }
+            return outList
+        }
+
+
+        val punchSize = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
+
+        // if there are attackable actor (todo) on the "actor punch hitbox (todo)", attack them (todo)
+        val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(Terrarum.mouseX, Terrarum.mouseY, punchSize / 2.0).filter { true }
+
+        // else, punch a block
+        val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
+        if (punchBlockSize > 0) {
+            PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
         }
     }
 

@@ -29,6 +29,6 @@
 
   "intelligent": true,
   "barehandactionminheight": 40,
-  "basebarehanddiggingsize": 1.0
+  "basebarehanddiggingsize": 16
 
 }

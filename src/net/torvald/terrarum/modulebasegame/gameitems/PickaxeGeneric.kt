@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -19,43 +20,75 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2019-03-10.
  */
 object PickaxeCore {
-    fun startPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem) = inInteractableRange(actor) {
-        val mouseTileX = Terrarum.mouseTileX
-        val mouseTileY = Terrarum.mouseTileY
+    /**
+     * @param mx centre position of the digging
+     * @param my centre position of the digging
+     * @param mw width of the digging
+     * @param mh height of the digging
+     */
+    fun startPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int, dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1) = inInteractableRange(actor) {
+        // un-round the mx
+        val ww = INGAME.world.width
+        val apos = actor.centrePosPoint
+        val mx = if (apos.x < 0.0 && mx >= ww / 2) mx - ww
+                else if (apos.x > 0.0 && mx < ww / 2) mx + ww
+                else mx
+        val wmx = mx * TILE_SIZED
+        val wmy = my * TILE_SIZED
 
-        val mousePoint = Point2d(mouseTileX.toDouble(), mouseTileY.toDouble())
-        val actorvalue = actor.actorValue
+        var xoff = -(mw / 2) // implicit flooring
+        var yoff = -(mh / 2) // implicit flooring
+        // if mw or mh is even number, make it closer toward the actor
+        if (mw % 2 == 0 && apos.x > wmx) xoff += 1
+        if (mh % 2 == 0 && apos.y > wmy) yoff += 1
 
-        item.using = true
+        var usageStatus = false
 
-        // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
-        // return false if hitting actors
-        // ** below is commented out -- don't make actors obstruct the way of digging **
-        /*var ret1 = true
-        INGAME.actorContainerActive.forEach {
-            if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
-                ret1 =  false // return is not allowed here
-        }
-        if (!ret1) return ret1*/
+        for (oy in 0 until mh) for (ox in 0 until mw) {
+            val x = mx + xoff + ox
+            val y = my + yoff + oy
 
-        // return false if here's no tile
-        if (Block.AIR == (INGAME.world).getTileFromTerrain(mouseTileX, mouseTileY))
-            return@inInteractableRange false
+            val mousePoint = Point2d(x.toDouble(), y.toDouble())
+            val actorvalue = actor.actorValue
 
-        // filter passed, do the job
-        val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            item?.using = true
 
-        (INGAME.world).inflictTerrainDamage(
-                mouseTileX, mouseTileY,
-                Calculate.pickaxePower(actor, item.material) * swingDmgToFrameDmg
-        )?.let { tileBroken ->
-            val drop = BlockCodex[tileBroken].drop
-            if (drop.isNotBlank()) {
-                INGAME.addNewActor(DroppedItem(drop, mouseTileX * TILE_SIZE, mouseTileY * TILE_SIZE))
+            // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
+            // return false if hitting actors
+            // ** below is commented out -- don't make actors obstruct the way of digging **
+            /*var ret1 = true
+            INGAME.actorContainerActive.forEach {
+                if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
+                    ret1 =  false // return is not allowed here
             }
+            if (!ret1) return ret1*/
+
+            // return false if here's no tile
+            if (Block.AIR == (INGAME.world).getTileFromTerrain(x, y)) {
+                usageStatus = usageStatus or false
+                continue
+            }
+
+            // filter passed, do the job
+            val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+
+            (INGAME.world).inflictTerrainDamage(
+                    x, y,
+                    Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
+            )?.let { tileBroken ->
+                if (Math.random() < dropProbability) {
+                    val drop = BlockCodex[tileBroken].drop
+                    if (drop.isNotBlank()) {
+                        INGAME.addNewActor(DroppedItem(drop, x * TILE_SIZE, y * TILE_SIZE))
+                    }
+                }
+            }
+
+            usageStatus = usageStatus or true
         }
 
-        true
+
+        usageStatus
     }
 
     fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {
@@ -93,7 +126,7 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
         super.name = "Copper Pickaxe"
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
 
@@ -120,7 +153,7 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
         super.name = "Iron Pickaxe"
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor , delta, this)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
 
@@ -147,6 +180,6 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
         super.name = "Steel Pickaxe"
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }

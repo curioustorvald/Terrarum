@@ -251,25 +251,25 @@ object Terrarum : Disposable {
             return file // TODO TEST CODE
         }
 
-    /** Position of the cursor in the world */
+    /** Position of the cursor in the world, rounded */
     val mouseX: Double
         get() = (WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val mouseY: Double
         get() = (WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble())
-    /** Position of the cursor in the world */
+    /** Position of the cursor in the world, rounded */
     val oldMouseX: Double
         get() = (WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val oldMouseY: Double
         get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
-    /** Position of the cursor in the world */
+    /** Position of the cursor in the world, rounded */
     @JvmStatic val mouseTileX: Int
         get() = (mouseX / TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileY: Int
         get() = (mouseY / TILE_SIZE).floorInt()
-    /** Position of the cursor in the world */
+    /** Position of the cursor in the world, rounded */
     @JvmStatic val oldMouseTileX: Int
         get() = (oldMouseX / TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
