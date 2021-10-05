@@ -1,5 +1,7 @@
 package net.torvald.terrarum
 
+import kotlin.math.roundToInt
+
 class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
 
     companion object {
@@ -21,7 +23,7 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
     var halfwf: Float = 0f; private set
     var halfhf: Float = 0f; private set
     var aspectRatio: Float = 0f; private set
-
+    var chatWidth: Int = 0; private set
 
 
     val tvSafeGraphicsWidth: Int; get() = Math.round(width * TV_SAFE_GRAPHICS)
@@ -43,6 +45,7 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
         halfwf = wf / 2f
         halfhf = hf / 2f
         aspectRatio = wf / hf
+        chatWidth = (width - (width * 0.84375).roundToInt()) and 0x7FFFFFFE
     }
 
 }

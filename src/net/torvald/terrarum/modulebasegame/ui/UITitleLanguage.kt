@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
@@ -32,7 +33,7 @@ class UITitleLanguage : UICanvas() {
     private val textArea1 = UIItemTextButtonList(this,
             textButtonLineHeight,
             localeFirstHalf.map { Lang.getByLocale("MENU_LANGUAGE_THIS", it, true) ?: "!ERR: $it" }.toTypedArray(),
-            (App.scr.width - width) / 2, (App.scr.height - height) / 2,
+            (Toolkit.drawWidth - width) / 2, (App.scr.height - height) / 2,
             width / 2, height,
             textAreaWidth = width / 2,
             readFromLang = false,
@@ -45,7 +46,7 @@ class UITitleLanguage : UICanvas() {
     private val textArea2 = UIItemTextButtonList(this,
             textButtonLineHeight,
             localeSecondHalf.map { Lang.getByLocale("MENU_LANGUAGE_THIS", it, true) ?: "!ERR: $it" }.toTypedArray(),
-            (App.scr.width - width) / 2 + (width / 2), (App.scr.height - height) / 2,
+            (Toolkit.drawWidth - width) / 2 + (width / 2), (App.scr.height - height) / 2,
             width / 2, height,
             textAreaWidth = width / 2,
             readFromLang = false,

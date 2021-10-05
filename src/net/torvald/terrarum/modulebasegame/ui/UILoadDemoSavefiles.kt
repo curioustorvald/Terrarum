@@ -44,7 +44,7 @@ class UILoadDemoSavefiles : UICanvas() {
     }
 
     override var width: Int
-        get() = App.scr.width
+        get() = Toolkit.drawWidth
         set(value) {}
     override var height: Int
         get() = App.scr.height
@@ -107,7 +107,7 @@ class UILoadDemoSavefiles : UICanvas() {
                 // read savegames
                 var savegamesCount = 0
                 App.savegames.forEach { skimmer ->
-                    val x = uiX
+                    val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
                         addUIitem(UIItemDemoSaveCells(this, x, y, skimmer))

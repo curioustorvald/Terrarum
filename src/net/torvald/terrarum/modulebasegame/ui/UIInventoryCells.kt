@@ -10,18 +10,19 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HO
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 
 internal class UIInventoryCells(
         val full: UIInventoryFull
 ) : UICanvas() {
 
-    override var width: Int = App.scr.width
+    override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
     override var openCloseTime: Second = 0.0f
 
@@ -52,7 +53,7 @@ internal class UIInventoryCells(
     private val equipped: UIItemInventoryEquippedView =
             UIItemInventoryEquippedView(
                     full,
-                    internalWidth - UIItemInventoryEquippedView.WIDTH + (App.scr.width - internalWidth) / 2,
+                    internalWidth - UIItemInventoryEquippedView.WIDTH + (width - internalWidth) / 2,
                     INVENTORY_CELLS_OFFSET_Y,
                     { rebuildList() }
             )

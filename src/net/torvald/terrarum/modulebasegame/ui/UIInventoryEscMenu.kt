@@ -9,6 +9,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
 import net.torvald.terrarum.serialise.WriteSavegame
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -17,7 +18,7 @@ import java.io.File
 
 class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
-    override var width: Int = App.scr.width
+    override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
     override var openCloseTime = 0.0f
 
@@ -32,7 +33,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenuListWidth = 400
     private val gameMenuButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, gameMenu,
-            (App.scr.width - gameMenuListWidth) / 2,
+            (width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
@@ -45,7 +46,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
     private val areYouSureMainMenuButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_RETURN_MAIN_QUESTION", "MENU_LABEL_RETURN_MAIN", "MENU_LABEL_CANCEL"),
-            (App.scr.width - gameMenuListWidth) / 2,
+            (width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
             gameMenuListWidth, DEFAULT_LINE_HEIGHT * 3,
             readFromLang = true,
@@ -58,7 +59,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
     private val areYouSureQuitButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_DESKTOP_QUESTION", "MENU_LABEL_DESKTOP", "MENU_LABEL_CANCEL"),
-            (App.scr.width - gameMenuListWidth) / 2,
+            (width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
             gameMenuListWidth, DEFAULT_LINE_HEIGHT * 3,
             readFromLang = true,

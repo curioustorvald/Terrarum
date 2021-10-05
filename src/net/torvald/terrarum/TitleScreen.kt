@@ -321,11 +321,12 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
                 TerrarumAppConfiguration.COPYRIGHT_DATE_NAME,
                 TerrarumAppConfiguration.COPYRIGHT_LICENSE
         )
+        val drawWidth = Toolkit.drawWidth
 
         COPYTING.forEachIndexed { index, s ->
             val textWidth = App.fontGame.getWidth(s)
             App.fontGame.draw(batch, s,
-                    (App.scr.width - textWidth - 1f).toInt().toFloat(),
+                    (drawWidth - textWidth - 1f).toInt().toFloat(),
                     (App.scr.height - App.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
             )
         }
@@ -345,7 +346,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             for (i in 0..2) {
                 val text = Lang.get("GAME_32BIT_WARNING${i+1}", (i != 2))
                 if (i == 2) batch.color = UIItemTextButton.defaultHighlightCol
-                App.fontGame.draw(batch, text, ((App.scr.width - App.fontGame.getWidth(text)) / 2).toFloat(), yoff + imgTxtGap + 64f + linegap + i*(20+linegap))
+                App.fontGame.draw(batch, text, ((drawWidth - App.fontGame.getWidth(text)) / 2).toFloat(), yoff + imgTxtGap + 64f + linegap + i*(20+linegap))
             }
         }
     }

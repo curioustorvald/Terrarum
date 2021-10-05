@@ -40,15 +40,19 @@ object Toolkit : Disposable {
         baloonTile.dispose()
     }
 
+    val drawWidth: Int
+        get() = App.scr.width - if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth else 0
+    val drawWidthf: Float
+        get() = drawWidth.toFloat()
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width
-        val targetW = ui?.width ?: App.scr.width
+        val targetW = ui?.width ?: drawWidth
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }
     fun drawCentered(batch: SpriteBatch, image: TextureRegion, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.regionWidth
-        val targetW = ui?.width ?: App.scr.width
+        val targetW = ui?.width ?: drawWidth
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }
 

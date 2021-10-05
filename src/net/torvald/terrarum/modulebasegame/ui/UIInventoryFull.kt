@@ -11,6 +11,7 @@ import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -28,7 +29,7 @@ class UIInventoryFull(
     val actor: ActorHumanoid
         get() = INGAME.actorNowPlaying!!
 
-    override var width: Int = App.scr.width
+    override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
     override var openCloseTime: Second = 0.0f
 
@@ -48,7 +49,7 @@ class UIInventoryFull(
         val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
         val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
-        val INVENTORY_CELLS_OFFSET_X = 0 + (App.scr.width - internalWidth) / 2
+        val INVENTORY_CELLS_OFFSET_X = 0 + (Toolkit.drawWidth - internalWidth) / 2
         val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (App.scr.height - internalHeight) / 2
 
         val catBarWidth = 330
@@ -148,7 +149,7 @@ class UIInventoryFull(
 
     val catBar = UIItemInventoryCatBar(
             this,
-            (App.scr.width - catBarWidth) / 2,
+            (width - catBarWidth) / 2,
             42 + (App.scr.height - internalHeight) / 2,
             internalWidth,
             catBarWidth,
@@ -162,9 +163,9 @@ class UIInventoryFull(
     private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
             this,
-            (App.scr.width - internalWidth) / 2,
+            (width - internalWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y,
-            App.scr.width,
+            width,
             App.scr.height,
             1f,
             transitionalMinimap, transitionalItemCells, transitionalEscMenu
@@ -213,7 +214,7 @@ class UIInventoryFull(
 
     }
 
-    internal var offsetX = ((App.scr.width - internalWidth) / 2).toFloat()
+    internal var offsetX = ((width - internalWidth) / 2).toFloat()
         private set
     internal var offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
         private set
@@ -234,7 +235,7 @@ class UIInventoryFull(
     //private val gradHeight = 48f
     private val shapeRenderer = ShapeRenderer()
 
-    internal var xEnd = (App.scr.width + internalWidth).div(2).toFloat()
+    internal var xEnd = (width + internalWidth).div(2).toFloat()
         private set
     internal var yEnd = (App.scr.height + internalHeight).div(2).toFloat()
         private set
@@ -299,10 +300,10 @@ class UIInventoryFull(
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
 
-        offsetX = ((App.scr.width - internalWidth) / 2).toFloat()
+        offsetX = ((width - internalWidth) / 2).toFloat()
         offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
 
-        xEnd = (App.scr.width + internalWidth).div(2).toFloat()
+        xEnd = (width + internalWidth).div(2).toFloat()
         yEnd = (App.scr.height + internalHeight).div(2).toFloat()
     }
 }

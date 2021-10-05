@@ -99,7 +99,8 @@ object WorldCamera {
 
 
         val oldX = x.toFloat()
-        val newX1 = (player.hitbox.centeredX).toFloat() - (width / 2)
+        val newX1 = (player.hitbox.centeredX).toFloat() - (width / 2) +
+                    if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
         val newX2 = newX1 + worldWidth
         val newX = if (Math.abs(newX1 - oldX) < Math.abs(newX2 - oldX)) newX1 else newX2
 

@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.Toolkit
 
 /**
  * Must be called by the App Loader
@@ -88,6 +89,7 @@ object PostProcessor : Disposable {
                 drawSafeArea()
             }
 
+
             if (KeyToggler.isOn(Input.Keys.F1)) {
                 batch.color = Color.WHITE
                 batch.inUse {
@@ -150,29 +152,31 @@ object PostProcessor : Disposable {
         val tvSafeArea2W = App.scr.tvSafeActionWidth.toFloat()
         val tvSafeArea2H = App.scr.tvSafeActionHeight.toFloat()
 
+        val scrw = Toolkit.drawWidthf
+
         shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
 
             // centre ind
             shapeRenderer.color = safeAreaCol2
-            shapeRenderer.line(0f, 0f, App.scr.wf, App.scr.hf)
-            shapeRenderer.line(0f, App.scr.hf, App.scr.wf, 0f)
+            shapeRenderer.line(0f, 0f, scrw, App.scr.hf)
+            shapeRenderer.line(0f, App.scr.hf, scrw, 0f)
 
             // safe action area
             shapeRenderer.color = safeAreaCol2
             shapeRenderer.rect(
-                    tvSafeArea2W, tvSafeArea2H, App.scr.width - 2 * tvSafeArea2W, App.scr.height - 2 * tvSafeArea2H
+                    tvSafeArea2W, tvSafeArea2H, scrw - 2 * tvSafeArea2W, App.scr.height - 2 * tvSafeArea2H
             )
 
             // safe graphics area
             shapeRenderer.color = safeAreaCol
             shapeRenderer.rect(
-                    tvSafeAreaW, tvSafeAreaH, App.scr.width - 2 * tvSafeAreaW, App.scr.height - 2 * tvSafeAreaH
+                    tvSafeAreaW, tvSafeAreaH, scrw - 2 * tvSafeAreaW, App.scr.height - 2 * tvSafeAreaH
             )
 
             // default res ind
             shapeRenderer.color = defaultResCol
             shapeRenderer.rect(
-                    (App.scr.width - TerrarumScreenSize.minimumW).div(2).toFloat(),
+                    (scrw - TerrarumScreenSize.minimumW).div(2).toFloat(),
                     (App.scr.height - TerrarumScreenSize.minimumH).div(2).toFloat(),
                     TerrarumScreenSize.minimumW.toFloat(),
                     TerrarumScreenSize.minimumH.toFloat()
@@ -190,14 +194,14 @@ object PostProcessor : Disposable {
                 batch.color = defaultResCol
                 App.fontSmallNumbers.draw(
                         batch, defaultResStr,
-                        (App.scr.width - TerrarumScreenSize.minimumW).div(2).toFloat(),
+                        (scrw - TerrarumScreenSize.minimumW).div(2).toFloat(),
                         (App.scr.height - TerrarumScreenSize.minimumH).div(2).toFloat()
                 )
 
                 batch.color = currentResCol
                 App.fontSmallNumbers.draw(
                         batch, currentResStr,
-                        App.scr.width - 80f,
+                        scrw - 80f,
                         0f
                 )
             }

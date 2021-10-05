@@ -96,6 +96,7 @@ object DefaultConfig {
             "fx_dither" to true,
             "fx_retro" to false,
             "fx_backgroundblur" to true,
+            "fx_streamerslayout" to false,
             //"fx_3dlut" to false,
 
 

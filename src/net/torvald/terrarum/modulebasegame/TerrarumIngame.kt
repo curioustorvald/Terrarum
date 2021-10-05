@@ -37,6 +37,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.*
 import net.torvald.terrarum.tvda.VDUtil
 import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
@@ -391,6 +392,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //consoleHandler = ConsoleWindow()
         //consoleHandler.setPosition(0, 0)
 
+        val drawWidth = Toolkit.drawWidth
 
 
 
@@ -402,11 +404,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // quick bar
         uiQuickBar = UIQuickslotBar()
         uiQuickBar.isVisible = true
-        uiQuickBar.setPosition((App.scr.width - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
+        uiQuickBar.setPosition((drawWidth - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
 
         // pie menu
         uiPieMenu = UIQuickslotPie()
-        uiPieMenu.setPosition(App.scr.halfw, App.scr.halfh)
+        uiPieMenu.setPosition(drawWidth / 2, App.scr.halfh)
 
         // vital metre
         // fill in getter functions by
@@ -425,7 +427,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         uiWatchTierOne = UITierOneWatch()
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
-                ((App.scr.width - App.scr.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                ((drawWidth - App.scr.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
                 App.scr.tvSafeGraphicsHeight + 8
         )
 
@@ -1171,7 +1173,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         IngameRenderer.resize(App.scr.width, App.scr.height)
-
+        val drawWidth = Toolkit.drawWidth
 
         if (gameInitialised) {
             //LightmapRenderer.fireRecalculateEvent()
@@ -1182,8 +1184,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // resize UIs
 
             notifier.setPosition(
-                    (App.scr.width - notifier.width) / 2, App.scr.height - notifier.height)
-            uiQuickBar.setPosition((App.scr.width - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
+                    (drawWidth - notifier.width) / 2, App.scr.height - notifier.height)
+            uiQuickBar.setPosition((drawWidth - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
 
             // inventory
             /*uiInventoryPlayer =
@@ -1195,9 +1197,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // basic watch-style notification bar (temperature, new mail)
-            uiBasicInfo.setPosition(App.scr.width - uiBasicInfo.width, 0)
+            uiBasicInfo.setPosition(drawWidth - uiBasicInfo.width, 0)
             uiWatchTierOne.setPosition(
-                    ((App.scr.width - App.scr.tvSafeGraphicsWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                    ((drawWidth - App.scr.tvSafeGraphicsWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
                     App.scr.tvSafeGraphicsHeight + 8
             )
         }

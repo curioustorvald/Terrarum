@@ -11,6 +11,7 @@ import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.serialise.WriteConfig
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -309,7 +310,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
         val remoConWidth = 160
         fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
-        val menubarOffX: Int; get() = (0.11 * App.scr.width).toInt()
+        val menubarOffX: Int; get() = (0.11 * Toolkit.drawWidth).toInt()
         val menubarOffY: Int; get() = (0.82 * App.scr.height).toInt()
     }
 }

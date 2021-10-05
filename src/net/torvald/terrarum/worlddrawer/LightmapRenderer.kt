@@ -167,8 +167,8 @@ object LightmapRenderer {
 
         for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 3 // same fix as above
-        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 1 + LIGHTMAP_OVERRENDER
-        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 1 + LIGHTMAP_OVERRENDER
+        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3 + LIGHTMAP_OVERRENDER
+        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3 + LIGHTMAP_OVERRENDER
 
         camX = WorldCamera.x / TILE_SIZE
         camY = WorldCamera.y / TILE_SIZE

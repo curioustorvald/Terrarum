@@ -9,13 +9,14 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 
 class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
     private val debugvals = true
 
-    override var width: Int = App.scr.width
+    override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
     override var openCloseTime = 0.0f
 
@@ -115,23 +116,23 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         batch.begin()
 
         if (debugvals) {
-            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", (App.scr.width - MINIMAP_WIDTH) / 2, -10f + INVENTORY_CELLS_OFFSET_Y)
+            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", (width - MINIMAP_WIDTH) / 2, -10f + INVENTORY_CELLS_OFFSET_Y)
         }
 
         batch.projectionMatrix = camera.combined
         // 1px stroke
         batch.color = Color.WHITE
-        batch.fillRect((App.scr.width - MINIMAP_WIDTH) / 2, -1 + INVENTORY_CELLS_OFFSET_Y.toFloat(), MINIMAP_WIDTH, 1f)
-        batch.fillRect((App.scr.width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
-        batch.fillRect(-1 + (App.scr.width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y.toFloat(), 1f, MINIMAP_HEIGHT)
-        batch.fillRect((App.scr.width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, INVENTORY_CELLS_OFFSET_Y.toFloat(), 1f, MINIMAP_HEIGHT)
+        batch.fillRect((width - MINIMAP_WIDTH) / 2, -1 + INVENTORY_CELLS_OFFSET_Y.toFloat(), MINIMAP_WIDTH, 1f)
+        batch.fillRect((width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
+        batch.fillRect(-1 + (width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y.toFloat(), 1f, MINIMAP_HEIGHT)
+        batch.fillRect((width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, INVENTORY_CELLS_OFFSET_Y.toFloat(), 1f, MINIMAP_HEIGHT)
 
         // control hints
         batch.color = Color.WHITE
         App.fontGame.draw(batch, full.minimapControlHelp, full.offsetX, full.yEnd - 20)
 
         // the minimap
-        batch.draw(minimapFBO.colorBufferTexture, (App.scr.width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y.toFloat())
+        batch.draw(minimapFBO.colorBufferTexture, (width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y.toFloat())
     }
 
     override fun doOpening(delta: Float) {}

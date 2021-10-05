@@ -31,7 +31,7 @@ class UIKeyboardControlPanel : UICanvas() {
     override var height = 600
     override var openCloseTime = 0f
 
-    private val drawX = (App.scr.width - width) / 2
+    private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
     internal val kbx = drawX + 61
@@ -128,7 +128,7 @@ class UIKeyboardControlPanel : UICanvas() {
     private val symbolGrapplingHook = labels.get(5,1)
     private val symbolGamemenu = labels.get(6,2)
 
-    private val controlPalette = UIItemControlPaletteBaloon(this, (App.scr.width - 480) / 2, kby + 219)
+    private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 480) / 2, kby + 219)
 
     init {
         keycaps.values.forEach { addUIitem(it) }
