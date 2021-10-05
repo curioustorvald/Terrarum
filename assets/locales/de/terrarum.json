@@ -6,5 +6,8 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Drücke >",
   "MENU_MODULES" : "Modulen",
   "GAME_ACTION_MOVE_VERB" : "Verschieben",
-  "MENU_LABEL_RESET" : "Zurücksetzen"
+  "MENU_LABEL_RESET" : "Zurücksetzen",
+  "GAME_32BIT_WARNING1": "Es sieht so aus, als ob Sie eine 32-Bit-Version von Java verwenden.",
+  "GAME_32BIT_WARNING2": "Bitte laden Sie das neueste 64-Bit Java herunter und installieren Sie es unter:",
+  "GAME_32BIT_WARNING3": "https://www.java.com/de/download/"
 }

@@ -5,5 +5,8 @@
   "APP_WARNING_HEALTH_AND_SAFETY": "VAROITUS-TERVEYS JA TURVALLISUUS",
   "MENU_LABEL_PRESS_START_SYMBOL": "Paina >",
   "MENU_MODULES" : "Moduulit",
-  "MENU_LABEL_RESET" : "Nollaa"
+  "MENU_LABEL_RESET" : "Nollaa",
+  "GAME_32BIT_WARNING1": "Näyttää siltä, että käytössäsi on 32-bittinen Java-versio.",
+  "GAME_32BIT_WARNING2": "Lataa ja asenna uusin 64-bittinen Java osoitteesta:",
+  "GAME_32BIT_WARNING3": "https://www.java.com/fi/download/"
 }

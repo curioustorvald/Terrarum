@@ -6,5 +6,8 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "> ボタンを押す",
   "MENU_MODULES" : "モジュール",
   "GAME_ACTION_MOVE_VERB" : "移動する",
-  "MENU_LABEL_RESET" : "リセット"
+  "MENU_LABEL_RESET" : "リセット",
+  "GAME_32BIT_WARNING1": "32ビットJavaを使用中のようです。",
+  "GAME_32BIT_WARNING2": "下記のリンクから最新64ビットJavaをダウンロードしてインストールしてください。",
+  "GAME_32BIT_WARNING3": "https://www.java.com/ja/download/"
 }

@@ -337,6 +337,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         batch.color = Color.WHITE
 
         if (App.is32BitJVM && uiRemoCon.currentRemoConContents.parent == null) {
+//        if (uiRemoCon.currentRemoConContents.parent == null) {
             val linegap = 4
             val imgTxtGap = 10
             val yoff = App.scr.height - App.scr.tvSafeGraphicsHeight - 64 - (3*(20+linegap)) - imgTxtGap - 9

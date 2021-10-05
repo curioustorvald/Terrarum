@@ -5,5 +5,8 @@
   "APP_WARNING_HEALTH_AND_SAFETY": "ПРЕДУПРЕЖДЕНИЕ-ЗДОРОВЬЕ И БЕЗОПАСНОСТЬ",
   "MENU_LABEL_PRESS_START_SYMBOL": "Нажмите >",
   "MENU_MODULES" : "Модули",
-  "MENU_LABEL_RESET" : "Перезапустить"
+  "MENU_LABEL_RESET" : "Перезапустить",
+  "GAME_32BIT_WARNING1": "Похоже, вы используете 32-разрядную версию Java.",
+  "GAME_32BIT_WARNING2": "Загрузите и установите последнюю 64-разрядную версию Java по:",
+  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/"
 }

@@ -4,5 +4,8 @@
   "COPYRIGHT_GNU_GPL_3": "Distribuito sotto licenza GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "ATTENZIONE-SALUTE E SICUREZZA",
   "MENU_LABEL_PRESS_START_SYMBOL": "Premi >",
-  "MENU_MODULES" : "Moduli"
+  "MENU_MODULES" : "Moduli",
+  "GAME_32BIT_WARNING1": "Sembra che tu stia eseguendo una versione a 32 bit di Java.",
+  "GAME_32BIT_WARNING2": "Si prega di scaricare e installare l'ultima versione di Java a 64 bit all'indirizzo:",
+  "GAME_32BIT_WARNING3": "https://www.java.com/it/download/"
 }

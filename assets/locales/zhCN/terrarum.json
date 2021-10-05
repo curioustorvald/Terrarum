@@ -10,5 +10,8 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "按下 >",
   "MENU_MODULES" : "模块",
   "GAME_ACTION_MOVE_VERB" : "移动",
-  "MENU_LABEL_RESET" : "重置"
+  "MENU_LABEL_RESET" : "重置",
+  "GAME_32BIT_WARNING1": "看起来您正在运行32位版本的Java。",
+  "GAME_32BIT_WARNING2": "请下载并安装最新的64位Java :",
+  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/"
 }
