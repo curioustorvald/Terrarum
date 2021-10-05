@@ -2,15 +2,15 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.jme3.math.FastMath
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
+import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
 import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -66,37 +66,16 @@ open class DroppedItem : ActorWithBody {
         // copy-pasted from ActorWithBody.drawSpriteInGoodPosition()
         if (world == null) return
 
-
-        val leftsidePadding = world!!.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
-        val rightsidePadding = WorldCamera.width.ushr(1)
-
-        val offsetX = hitboxTranslateX * scale
-        val offsetY = (textureRegion?.regionHeight ?: TILE_SIZE) * scale - hitbox.height - hitboxTranslateY * scale - 1
-
         textureRegion?.let {
-            // FIXME test me: this extra IF statement is supposed to not draw actors that's outside of the camera.
-            //                basic code without offsetX/Y DOES work, but obviously offsets are not tested.
-            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                // camera center neg, actor center pos
+            val offsetX = (hitboxTranslateX * scale).toFloat()
+            val offsetY = (it.regionHeight * scale - hitbox.height - hitboxTranslateY * scale - 1).toFloat()
+
+            drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
                 batch.draw(it,
-                        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        TILE_SIZEF * scale.toFloat(), TILE_SIZEF * scale.toFloat()
-                )
-            }
-            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                // camera center pos, actor center neg
-                batch.draw(it,
-                        (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        TILE_SIZEF * scale.toFloat(), TILE_SIZEF * scale.toFloat()
-                )
-            }
-            else {
-                batch.draw(it,
-                        (hitbox.startX - offsetX).toFloat(),
-                        (hitbox.startY - offsetY).toFloat(),
-                        TILE_SIZEF * scale.toFloat(), TILE_SIZEF * scale.toFloat()
+                        FastMath.floor(x - offsetX).toFloat(),
+                        FastMath.floor(y - offsetY).toFloat(),
+                        Math.floor(it.regionWidth * scale).toFloat(),
+                        Math.floor(it.regionHeight * scale).toFloat()
                 )
             }
         }

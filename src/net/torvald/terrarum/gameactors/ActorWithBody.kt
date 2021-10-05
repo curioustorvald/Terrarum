@@ -1651,35 +1651,12 @@ open class ActorWithBody : Actor {
     protected fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
         if (world == null) return
 
-        //val offendingPad = world!!.width.times(TILE_SIZE) - WorldCamera.width - 1
-
         val offsetX = (hitboxTranslateX * scale).toFloat()
         val offsetY = (sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1).toFloat()
 
         drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
             sprite.render(batch, x - offsetX, y - offsetY, scale.toFloat())
         }
-
-        /*
-        sprite.render(batch,
-                (hitbox.startX - offsetX).toFloat(),
-                (hitbox.startY - offsetY).toFloat(),
-                (scale).toFloat()
-        )
-
-        batch.color = Color.BLUE
-        sprite.render(batch,
-                (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZEF,
-                (hitbox.startY - offsetY).toFloat(),
-                (scale).toFloat()
-        )
-
-        batch.color = Color.GREEN
-        sprite.render(batch,
-                (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZEF,
-                (hitbox.startY - offsetY).toFloat(),
-                (scale).toFloat()
-        )*/
     }
 
     override fun onActorValueChange(key: String, value: Any?) {
