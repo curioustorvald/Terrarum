@@ -10,7 +10,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
@@ -199,6 +198,7 @@ class UIInventoryFull(
         this.handler.toggleKeyExtra.add { App.getConfigInt("control_key_gamemenu") }
         this.handler.toggleKeyExtraAction.add {
             if (it.isClosed) {
+                INGAME.setTooltipMessage(null)
                 transitionPanel.forcePosition(2)
                 catBar.setSelectedPanel(2)
                 it.setAsOpen()
@@ -246,6 +246,8 @@ class UIInventoryFull(
         // UI items
         catBar.render(batch, camera)
         transitionPanel.render(batch, camera)
+
+//        if (transitionPanel.currentPosition != 1f) INGAME.setTooltipMessage(null)
     }
 
     fun rebuildList() {

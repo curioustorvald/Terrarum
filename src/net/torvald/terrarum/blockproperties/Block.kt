@@ -118,6 +118,7 @@ object Block {
     const val DAYLIGHT_CAPACITOR = "basegame:258"
 
 
+    const val ACTORBLOCK_TILING_PLACEHOLDER = "basegame:4090"
     const val ACTORBLOCK_NO_COLLISION = "basegame:4091"
     const val ACTORBLOCK_FULL_COLLISION = "basegame:4092"
     const val ACTORBLOCK_ALLOW_MOVE_DOWN = "basegame:4093"
