@@ -24,7 +24,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     override var openCloseTime = 0f
 
     private var remoConTray: UIRemoConElement // this remocon is dynamically generated
-    private var currentRemoConContents = treeRepresentation
+    var currentRemoConContents = treeRepresentation; private set
     private var currentlySelectedRemoConItem = treeRepresentation.data
 
     override var width: Int

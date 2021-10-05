@@ -120,19 +120,21 @@ object Lang {
 
     }
 
-    operator fun get(key: String): String {
-        return get(key, App.GAME_LOCALE) ?: get(key, FALLBACK_LANG_CODE) ?: "$$key"
+    operator fun get(key: String, capitalise: Boolean = true): String {
+        return getByLocale(key, App.GAME_LOCALE, capitalise) ?: getByLocale(key, FALLBACK_LANG_CODE, capitalise) ?: "$$key"
     }
 
-    fun get(key: String, locale: String): String? {
+    fun getByLocale(key: String, locale: String, capitalise: Boolean): String? {
         val ret = langpack["${key}_$locale"] ?: return null
 
+        fun String.CAP() = if (capitalise) this.capitalize() else this
+
         return if (locale.startsWith("bg"))
-            "${App.fontGame.charsetOverrideBulgarian}${ret.capitalize()}${App.fontGame.charsetOverrideDefault}"
+            "${App.fontGame.charsetOverrideBulgarian}${ret.CAP()}${App.fontGame.charsetOverrideDefault}"
         else if (locale.startsWith("sr"))
-            "${App.fontGame.charsetOverrideSerbian}${ret.capitalize()}${App.fontGame.charsetOverrideDefault}"
+            "${App.fontGame.charsetOverrideSerbian}${ret.CAP()}${App.fontGame.charsetOverrideDefault}"
         else
-            ret.capitalize()
+            ret.CAP()
     }
 
     private fun String.getEndTag() = this.split("_").last()

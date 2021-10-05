@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
@@ -42,13 +43,21 @@ object Toolkit : Disposable {
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width
-        val targetW = if (ui == null) App.scr.width else ui.width
-
+        val targetW = ui?.width ?: App.scr.width
+        batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
+    }
+    fun drawCentered(batch: SpriteBatch, image: TextureRegion, screenPosY: Int, ui: UICanvas? = null) {
+        val imageW = image.regionWidth
+        val targetW = ui?.width ?: App.scr.width
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, targetW: Int, offsetX: Int = 0, offsetY: Int = 0) {
         val imageW = image.width
+        batch.draw(image, targetW.minus(imageW).ushr(1).toFloat() + offsetX, screenPosY.toFloat() + offsetY)
+    }
+    fun drawCentered(batch: SpriteBatch, image: TextureRegion, screenPosY: Int, targetW: Int, offsetX: Int = 0, offsetY: Int = 0) {
+        val imageW = image.regionWidth
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat() + offsetX, screenPosY.toFloat() + offsetY)
     }
 

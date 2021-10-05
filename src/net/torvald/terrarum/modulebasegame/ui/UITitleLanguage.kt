@@ -31,7 +31,7 @@ class UITitleLanguage : UICanvas() {
 
     private val textArea1 = UIItemTextButtonList(this,
             textButtonLineHeight,
-            localeFirstHalf.map { Lang.get("MENU_LANGUAGE_THIS", it) ?: "!ERR: $it" }.toTypedArray(),
+            localeFirstHalf.map { Lang.getByLocale("MENU_LANGUAGE_THIS", it, true) ?: "!ERR: $it" }.toTypedArray(),
             (App.scr.width - width) / 2, (App.scr.height - height) / 2,
             width / 2, height,
             textAreaWidth = width / 2,
@@ -44,7 +44,7 @@ class UITitleLanguage : UICanvas() {
     )
     private val textArea2 = UIItemTextButtonList(this,
             textButtonLineHeight,
-            localeSecondHalf.map { Lang.get("MENU_LANGUAGE_THIS", it) ?: "!ERR: $it" }.toTypedArray(),
+            localeSecondHalf.map { Lang.getByLocale("MENU_LANGUAGE_THIS", it, true) ?: "!ERR: $it" }.toTypedArray(),
             (App.scr.width - width) / 2 + (width / 2), (App.scr.height - height) / 2,
             width / 2, height,
             textAreaWidth = width / 2,

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
@@ -20,13 +21,16 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadWorld
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.IOException
@@ -113,10 +117,16 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
     val uiContainer = UIContainer()
-    internal lateinit var uiRemoCon: UICanvas
+    internal lateinit var uiRemoCon: UIRemoCon
     internal lateinit var uiFakeBlurOverlay: UICanvas
 
     private lateinit var worldFBO: FrameBuffer
+
+    private val warning32bitJavaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/32_bit_warning.tga")))
+
+    init {
+        warning32bitJavaIcon.flip(false, true)
+    }
 
     private fun loadThingsWhileIntroIsVisible() {
         printdbg(this, "Intro pre-load")
@@ -322,6 +332,21 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         App.fontGame.draw(batch, PostProcessor.thisIsDebugStr, 5f, App.scr.height - 24f)
 
+
+
+        batch.color = Color.WHITE
+
+        if (App.is32BitJVM && uiRemoCon.currentRemoConContents.parent == null) {
+            val linegap = 4
+            val imgTxtGap = 10
+            val yoff = App.scr.height - App.scr.tvSafeGraphicsHeight - 64 - (3*(20+linegap)) - imgTxtGap - 9
+            Toolkit.drawCentered(batch, warning32bitJavaIcon, yoff)
+            for (i in 0..2) {
+                val text = Lang.get("GAME_32BIT_WARNING${i+1}", (i != 2))
+                if (i == 2) batch.color = UIItemTextButton.defaultHighlightCol
+                App.fontGame.draw(batch, text, ((App.scr.width - App.fontGame.getWidth(text)) / 2).toFloat(), yoff + imgTxtGap + 64f + linegap + i*(20+linegap))
+            }
+        }
     }
 
     override fun pause() {
@@ -356,6 +381,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     override fun dispose() {
         uiRemoCon.dispose()
         demoWorld.dispose()
+        warning32bitJavaIcon.texture.dispose()
     }
 
 

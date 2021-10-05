@@ -7,5 +7,8 @@
   "MENU_MODULES" : "모듈",
   "GAME_ACTION_MOVE_VERB" : "이동하기",
   "GAME_ACTION_ZOOM" : "확대·축소",
-  "MENU_LABEL_RESET" : "재설정"
+  "MENU_LABEL_RESET" : "재설정",
+  "GAME_32BIT_WARNING1": "32비트 버전의 Java를 사용중인 것 같습니다.",
+  "GAME_32BIT_WARNING2": "아래 링크에서 최신 64비트 Java를 내려받아 설치해주세요.",
+  "GAME_32BIT_WARNING3": "https://www.java.com/ko/download/"
 }

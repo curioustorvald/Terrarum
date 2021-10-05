@@ -591,7 +591,7 @@ public class App implements ApplicationListener {
 
         setCameraPosition(0f, 0f);
 
-        int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"));
+        int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true));
         int logoPosX = (scr.getWidth() - logo.getRegionWidth() - safetyTextLen) >>> 1;
         int logoPosY = Math.round(scr.getHeight() / 15f);
         int textY = logoPosY + logo.getRegionHeight() - 16;
@@ -620,7 +620,7 @@ public class App implements ApplicationListener {
 
             logoBatch.draw(logo, logoPosX, logoPosY);
             logoBatch.setColor(new Color(0x282828ff));
-            fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY"),
+            fontGame.draw(logoBatch, Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true),
                     logoPosX + logo.getRegionWidth(),
                     textY
             );
@@ -628,7 +628,7 @@ public class App implements ApplicationListener {
             // some chinese stuff
             if (GAME_LOCALE.contentEquals("zhCN")) {
                 for (int i = 1; i <= 4; i++) {
-                    String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i);
+                    String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i, true);
 
                     fontGame.draw(logoBatch, s,
                             (scr.getWidth() - fontGame.getWidth(s)) >>> 1,

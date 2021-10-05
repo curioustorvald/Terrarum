@@ -8,5 +8,8 @@
   "MENU_CREDIT_GPL_DNT" : "GPL",
   "GAME_ACTION_MOVE_VERB" : "Move",
   "GAME_ACTION_ZOOM" : "Zoom",
-  "MENU_LABEL_RESET" : "Reset"
+  "MENU_LABEL_RESET" : "Reset",
+  "GAME_32BIT_WARNING1": "It looks like you’re running a 32-Bit version of Java.",
+  "GAME_32BIT_WARNING2": "Please download and install the latest 64-Bit Java at:",
+  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/"
 }
