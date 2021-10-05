@@ -7,7 +7,7 @@ The main game directory is composed of following directories:
 ```
 .Terrarum
 + Players
-  - <Player Name Here>, JSON.gz
+  - <Player Name Here>, TVDA { actor JSON, optional textures and sprite defs }
 + Shared
   - <e.g. Disk GUID>, TEVD { * }
   - <this directory can have anything>

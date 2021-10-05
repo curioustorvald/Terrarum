@@ -522,7 +522,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     }
 
     private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {
-        return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
+        return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.pow(scale, 0.25) // positive value
     }
 
     @Transient private var oldMAX_JUMP_LENGTH = -1 // init
@@ -594,8 +594,6 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     /**
      * See ./work_files/Jump power by pressing time.gcx
-     *
-     * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about) -- SCRATCH THAT!
      */
     private fun jump() {
         if (jumping) {// && jumpable) {
