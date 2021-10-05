@@ -929,8 +929,14 @@ public class App implements ApplicationListener {
     public static String operationSystem;
     /** %appdata%/Terrarum, without trailing slash */
     public static String defaultDir;
-    /** defaultDir + "/Saves", without trailing slash */
-    public static String defaultSaveDir;
+    /** For Demo version only. defaultDir + "/Saves", without trailing slash */
+    public static String saveDir;
+    /** For shared materials (e.g. image of a computer disk). defaultDir + "/Shared", without trailing slash */
+    public static String saveSharedDir;
+    /** For the main game where any players can access any world (unless flagged as private). defaultDir + "/Players", without trailing slash */
+    public static String playersDir;
+    /** For the main game. defaultDir + "/Worlds", without trailing slash */
+    public static String worldsDir;
     /** defaultDir + "/config.json" */
     public static String configDir;
     public static RunningEnvironment environment;
@@ -958,8 +964,10 @@ public class App implements ApplicationListener {
             defaultDir = System.getProperty("user.home") + "/.Terrarum";
         }
 
-//        defaultSaveDir = defaultDir + "/Players"; // as per the save format in the game's planning
-        defaultSaveDir = defaultDir + "/Saves"; // for the demo release
+        saveDir = defaultDir + "/Saves"; // for the demo release
+        saveSharedDir = defaultDir + "/Shared";
+        playersDir = defaultDir + "/Players";
+        worldsDir = defaultDir + "/Worlds";
         configDir = defaultDir + "/config.json";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
@@ -969,7 +977,7 @@ public class App implements ApplicationListener {
     }
 
     private static void createDirs() {
-        File[] dirs = {new File(defaultSaveDir)};
+        File[] dirs = {new File(saveDir)};
 
         for (File it : dirs) {
             if (!it.exists())

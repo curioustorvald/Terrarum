@@ -368,23 +368,23 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     fun makeSavegameBackupCopy() {
         try {
             // do not overwrite clean .2 with dirty .1
-            val file2 = File(App.defaultSaveDir, INGAME.savegameNickname+".3")
-            val file1 = File(App.defaultSaveDir, INGAME.savegameNickname+".2")
+            val file2 = File(App.saveDir, INGAME.savegameNickname + ".3")
+            val file1 = File(App.saveDir, INGAME.savegameNickname + ".2")
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
             if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
             // do not overwrite clean .2 with dirty .1
-            val file2 = File(App.defaultSaveDir, INGAME.savegameNickname+".2")
-            val file1 = File(App.defaultSaveDir, INGAME.savegameNickname+".1")
+            val file2 = File(App.saveDir, INGAME.savegameNickname + ".2")
+            val file1 = File(App.saveDir, INGAME.savegameNickname + ".1")
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
             if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
-            File(App.defaultSaveDir, INGAME.savegameNickname).copyTo(
-                    File(App.defaultSaveDir, INGAME.savegameNickname+".1"), // don't use .bak as it's used by the savecracker
+            File(App.saveDir, INGAME.savegameNickname).copyTo(
+                    File(App.saveDir, INGAME.savegameNickname + ".1"), // don't use .bak as it's used by the savecracker
                     true
             )
         } catch (e: NoSuchFileException) {}
@@ -392,7 +392,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
 
 
-    fun getSaveFileMain() = File(App.defaultSaveDir, savegameNickname)
+    fun getSaveFileMain() = File(App.saveDir, savegameNickname)
 
 
 

@@ -22,7 +22,7 @@ object Save : ConsoleCommand {
                 val ingame = Terrarum.ingame!! as TerrarumIngame
                 val savename = args[1].trim()
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
-                val file = File(App.defaultSaveDir + "/${args[1]}")
+                val file = File(App.saveDir + "/${args[1]}")
 
                 WriteSavegame(disk, file, ingame, false)
 

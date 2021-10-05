@@ -36,7 +36,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
-import java.util.logging.Level
 import kotlin.math.absoluteValue
 import kotlin.math.round
 
@@ -244,7 +243,7 @@ object Terrarum : Disposable {
 
     val currentSaveDir: File
         get() {
-            val file = File(defaultSaveDir + "/test")
+            val file = File(saveDir + "/test")
 
             // failsafe?
             if (!file.exists()) file.mkdir()
@@ -683,7 +682,7 @@ class Codex : KVHashMap() {
 
 fun AppUpdateListOfSavegames() {
     App.savegames.clear()
-    File(App.defaultSaveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
+    File(App.saveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
             DiskSkimmer(file, Common.CHARSET, true)
         }
