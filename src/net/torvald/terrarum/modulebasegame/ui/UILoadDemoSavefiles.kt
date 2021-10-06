@@ -283,8 +283,8 @@ class UILoadDemoSavefiles : UICanvas() {
     }
 
     override fun dispose() {
-        shapeRenderer.dispose()
-        sliderFBO.dispose()
+        try { shapeRenderer.dispose() } catch (e: IllegalArgumentException) {}
+        try { sliderFBO.dispose() } catch (e: IllegalArgumentException) {}
     }
 
     override fun resize(width: Int, height: Int) {

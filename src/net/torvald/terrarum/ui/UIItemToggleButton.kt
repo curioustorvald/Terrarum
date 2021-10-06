@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.toInt
@@ -22,23 +23,27 @@ class UIItemToggleButton(
 
     init {
         CommonResourcePool.addToLoadingList("ui_item_toggler_base") {
-            Texture(Gdx.files.internal("./assets/graphics/gui/toggler_back.tga"))
+            val t = TextureRegion(Texture(Gdx.files.internal("./assets/graphics/gui/toggler_back.tga")))
+            t.flip(false, true)
+            t
         }
         CommonResourcePool.addToLoadingList("ui_item_toggler_handle") {
-            Texture(Gdx.files.internal("./assets/graphics/gui/toggler_switch.tga"))
+            val t = TextureRegion(Texture(Gdx.files.internal("./assets/graphics/gui/toggler_switch.tga")))
+            t.flip(false, true)
+            t
         }
         CommonResourcePool.loadAll()
     }
 
     override val width: Int
-        get() = togglerBase.width
+        get() = togglerBase.regionWidth
     override val height: Int
-        get() = togglerBase.height
+        get() = togglerBase.regionHeight
 
-    private var togglerBase = CommonResourcePool.getAsTexture("ui_item_toggler_base")
-    private var togglerHandle = CommonResourcePool.getAsTexture("ui_item_toggler_handle")
+    private var togglerBase = CommonResourcePool.getAsTextureRegion("ui_item_toggler_base")
+    private var togglerHandle = CommonResourcePool.getAsTextureRegion("ui_item_toggler_handle")
 
-    private var handleTravelDist = togglerBase.width - togglerHandle.width
+    private var handleTravelDist = togglerBase.regionWidth - togglerHandle.regionWidth
     private var handlePos = handleTravelDist * status.toInt()
 
     private var animTimer = 0f
@@ -63,6 +68,8 @@ class UIItemToggleButton(
     fun toggle() {
         if (status) setAsFalse() else setAsTrue()
     }
+
+    // define clickOnceListener by yourself!
 
     override fun update(delta: Float) {
         super.update(delta)

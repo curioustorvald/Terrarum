@@ -20,7 +20,7 @@ class UIKeyboardControlPanel : UICanvas() {
 
     init {
         CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
+            TextureRegionPack("assets/graphics/gui/inventory/category.tga", 20, 20)
         }
         CommonResourcePool.loadAll()
     }
