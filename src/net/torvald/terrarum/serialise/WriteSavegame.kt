@@ -170,7 +170,8 @@ object LoadSavegame {
             }
 
 
-//        ModMgr.reloadModules()
+            loadscreen.addMessage("Updating Block Mappings...")
+            world.renumberTilesAfterLoad()
 
 
             Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")

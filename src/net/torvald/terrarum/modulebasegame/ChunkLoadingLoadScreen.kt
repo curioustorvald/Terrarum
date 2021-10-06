@@ -81,9 +81,12 @@ class ChunkLoadingLoadScreen(screenToBeLoaded: IngameInstance, private val world
                 val wx = (world.width.toFloat() / previewWidth * x).roundToInt()
                 val wy = (world.height.toFloat() / previewHeight * y).roundToInt()
 
-                val outCol = if (BlockCodex[world.getTileFromTerrain(wx, wy)].isSolid) WorldgenLoadScreen.COL_TERR
-                else if (BlockCodex[world.getTileFromWall(wx, wy)].isSolid) WorldgenLoadScreen.COL_WALLED
-                else WorldgenLoadScreen.COL_AIR
+                val outCol = try {
+                    if (BlockCodex[world.getTileFromTerrain(wx, wy)].isSolid) WorldgenLoadScreen.COL_TERR
+                    else if (BlockCodex[world.getTileFromWall(wx, wy)].isSolid) WorldgenLoadScreen.COL_WALLED
+                    else WorldgenLoadScreen.COL_AIR
+                }
+                catch (e: NoSuchElementException) { WorldgenLoadScreen.COL_AIR }
 
                 previewPixmap.setColor(outCol)
                 previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y

@@ -157,41 +157,30 @@ open class GameWorld() : Disposable {
     }
 
 
-
-    /**
-     * Load existing world
-     */
-    /*internal constructor(worldIndex: Int, json: JsonObject) {
-        this.worldIndex = worldIndex
-
-        // TODO setup layerTerrain, layerWall, etc. from the json
-
+    fun renumberTilesAfterLoad() {
         // before the renaming, update the name maps
-        tileNumberToNameMap = HashMap<Int, ItemID>()
-        tileNameToNumberMap = HashMap<ItemID, Int>()
-        AppLoader.tileMaker.tags.forEach {
-            tileNumberToNameMap[it.value.tileNumber] = it.key
+        val oldTileNumberToNameMap: Map<Long, ItemID> = tileNumberToNameMap.toMap()
+        tileNumberToNameMap.clear()
+        tileNameToNumberMap.clear()
+        App.tileMaker.tags.forEach {
+            tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }
 
         // perform renaming of tile layers
-        val oldTileNumberToNameMap = /* todo */
         for (y in 0 until layerTerrain.height) {
             for (x in 0 until layerTerrain.width) {
-                layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y)]]!!)
-                layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y)]]!!)
-                // TODO rename fluid map
-                // TODO rename wire map
+                layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]]!!)
+                layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()]]!!)
             }
         }
 
         // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
         tileNumberToNameMap[0] = Block.AIR
-    }*/
-
+    }
+    
     /**
      * Get 2d array data of wire
-
      * @return byte[][] wire layer
      */
     //val wireArray: ByteArray
