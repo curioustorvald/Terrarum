@@ -9,5 +9,6 @@
   "MENU_LABEL_RESET" : "Reiniciar",
   "GAME_32BIT_WARNING1": "Parece que está ejecutando una versión de 32 bits de Java.",
   "GAME_32BIT_WARNING2": "Descargue e instale la última versión de Java de 64 bits en:",
-  "GAME_32BIT_WARNING3": "https://www.java.com/es/download/"
+  "GAME_32BIT_WARNING3": "https://www.java.com/es/download/",
+  "MENU_LABEL_RESTART_REQUIRED": "Es necesario reiniciar"
 }

@@ -9,5 +9,6 @@
   "MENU_LABEL_RESET" : "リセット",
   "GAME_32BIT_WARNING1": "32ビットJavaを使用中のようです。",
   "GAME_32BIT_WARNING2": "下記のリンクから最新64ビットJavaをダウンロードしてインストールしてください。",
-  "GAME_32BIT_WARNING3": "https://www.java.com/ja/download/"
+  "GAME_32BIT_WARNING3": "https://www.java.com/ja/download/",
+  "MENU_LABEL_RESTART_REQUIRED": "再起動が必要"
 }

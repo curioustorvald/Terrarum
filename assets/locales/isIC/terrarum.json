@@ -1,6 +1,6 @@
 {
   "MENU_LABEL_COPYRIGHT": "Höfundarréttur",
-  "COPYRIGHT_ALL_RIGHTS_RESERVED": "Öll réttindi áskilinn",
+  "COPYRIGHT_ALL_RIGHTS_RESERVED": "Allur réttur áskilinn",
   "COPYRIGHT_GNU_GPL_3": "Dreift samkvæmt GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "VIÐVÖRUN-HEILBRIGÐI OG ÖRYGGI",
   "MENU_LABEL_PRESS_START_SYMBOL": "Ýttu >",
@@ -8,5 +8,6 @@
   "GAME_ACTION_MOVE_VERB" : "Hreyfa",
   "GAME_32BIT_WARNING1": "Þú ert að keyra 32-bita útgáfu af Java.",
   "GAME_32BIT_WARNING2": "Sæktu og settu upp nýjasta 64-bita Java á:",
-  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/"
+  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
+  "MENU_LABEL_RESTART_REQUIRED": "Endurræsingar krafist"
 }

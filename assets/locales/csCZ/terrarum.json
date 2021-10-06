@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Šířen pod licencí GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "POZOR-ZDRAVÍ A BEZPEČNOST",
   "MENU_LABEL_PRESS_START_SYMBOL": "Stiskněte >",
-  "MENU_MODULES" : "Moduly"
+  "MENU_MODULES" : "Moduly",
+  "MENU_LABEL_RESTART_REQUIRED": "Vyžaduje se restartování"
 }

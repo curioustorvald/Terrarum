@@ -11,5 +11,6 @@
   "GAME_32BIT_WARNING1": "32비트 버전의 Java를 사용중인 것 같습니다.",
   "GAME_32BIT_WARNING2": "아래 링크에서 최신 64비트 Java를 내려받아 설치해주세요.",
   "GAME_32BIT_WARNING3": "https://www.java.com/ko/download/",
-  "MENU_OPTION_STREAMERS_LAYOUT": "스트리머 채팅창 모드"
+  "MENU_OPTION_STREAMERS_LAYOUT": "스트리머 채팅창 모드",
+  "MENU_LABEL_RESTART_REQUIRED": "다시 시작 필요"
 }

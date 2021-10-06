@@ -4,5 +4,6 @@
   "COPYRIGHT_GNU_GPL_3": "Distribuit sub GNU GPL 3",
   "APP_WARNING_HEALTH_AND_SAFETY": "ATENȚIONARE-SĂNĂTATE ȘI SIGURANȚĂ",
   "MENU_LABEL_PRESS_START_SYMBOL": "Apasă >",
-  "MENU_MODULES" : "Module"
+  "MENU_MODULES" : "Module",
+  "MENU_LABEL_RESTART_REQUIRED": "Repornire necesară"
 }

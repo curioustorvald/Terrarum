@@ -32,7 +32,8 @@ class GraphicsControlPanel : UICanvas() {
     private val options = arrayOf(
             arrayOf("fx_dither", "Dither"),
             arrayOf("fx_backgroundblur", "Blur"),
-            arrayOf("fx_streamerslayout", Lang["MENU_OPTION_STREAMERS_LAYOUT"])
+            arrayOf("fx_streamerslayout", Lang["MENU_OPTION_STREAMERS_LAYOUT"]),
+            arrayOf("usevsync", Lang["MENU_OPTIONS_VSYNC"]+"*")
     )
 
     private val togglers = options.mapIndexed { index, strings ->
@@ -70,6 +71,7 @@ class GraphicsControlPanel : UICanvas() {
             App.fontGame.draw(batch, strings[1], drawX + panelgap.toFloat(), drawY + panelgap + index * (20f + linegap))
         }
         uiItems.forEach { it.render(batch, camera) }
+        App.fontGame.draw(batch, "* ${Lang["MENU_LABEL_RESTART_REQUIRED"]}", drawX + panelgap.toFloat(), drawY + height - panelgap - App.fontGame.lineHeight)
 
         if (App.getConfigBoolean("fx_streamerslayout")) {
             val xstart = App.scr.width - App.scr.chatWidth

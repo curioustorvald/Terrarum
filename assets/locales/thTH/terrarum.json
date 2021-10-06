@@ -5,5 +5,6 @@
   "APP_WARNING_HEALTH_AND_SAFETY": "คำเตือน-อนามัยและความปลอดภัย",
   "MENU_LABEL_PRESS_START_SYMBOL": "กดปุ่ม >",
   "MENU_MODULES" : "โมดูล",
-  "MENU_LABEL_RESET" : "รีเซ็ต"
+  "MENU_LABEL_RESET" : "รีเซ็ต",
+  "MENU_LABEL_RESTART_REQUIRED": "ต้องเริ่มระบบใหม่"
 }

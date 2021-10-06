@@ -8,5 +8,6 @@
   "MENU_LABEL_RESET" : "Нулиране",
   "GAME_32BIT_WARNING1": "Изглежда, че използвате 32-битова версия на Java.",
   "GAME_32BIT_WARNING2": "Моля, изтеглете и инсталирайте най-новата 64-битова Java на:",
-  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/"
+  "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
+  "MENU_LABEL_RESTART_REQUIRED": "Изисква се рестартиране"
 }

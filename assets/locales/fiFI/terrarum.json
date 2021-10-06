@@ -8,5 +8,6 @@
   "MENU_LABEL_RESET" : "Nollaa",
   "GAME_32BIT_WARNING1": "Näyttää siltä, että käytössäsi on 32-bittinen Java-versio.",
   "GAME_32BIT_WARNING2": "Lataa ja asenna uusin 64-bittinen Java osoitteesta:",
-  "GAME_32BIT_WARNING3": "https://www.java.com/fi/download/"
+  "GAME_32BIT_WARNING3": "https://www.java.com/fi/download/",
+  "MENU_LABEL_RESTART_REQUIRED": "Uudelleenkäynnistys tarvitaan"
 }
