@@ -179,9 +179,6 @@ internal object WeatherMixer : RNGConsumer {
 
         if (App.getConfigBoolean("fx_dither")) {
             batch.shader = IngameRenderer.shaderBayer
-            batch.shader.setUniformf("rcount", 64f)
-            batch.shader.setUniformf("gcount", 64f)
-            batch.shader.setUniformf("bcount", 64f)
         }
         else {
             batch.shader = null

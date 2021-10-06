@@ -95,11 +95,6 @@ object IngameRenderer : Disposable {
 
         if (App.getConfigBoolean("fx_dither")) {
             shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
-            shaderBayer.bind()
-            shaderBayer.setUniformf("rcount", 64f)
-            shaderBayer.setUniformf("gcount", 64f)
-            shaderBayer.setUniformf("bcount", 64f)
-
         }
         else {
             shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
