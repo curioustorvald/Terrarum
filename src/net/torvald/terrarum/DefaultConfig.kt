@@ -74,7 +74,7 @@ object DefaultConfig {
             // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
             // so these keys are treated as the same.
             // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
-            "control_key_quickslots" to (Input.Keys.NUM_0..Input.Keys.NUM_9).map { 1.0*it }.toDoubleArray(),
+            "control_key_quickslots" to ((Input.Keys.NUM_1..Input.Keys.NUM_9) + arrayOf(Input.Keys.NUM_0)).map { 1.0*it }.toDoubleArray(),
             "control_key_quickselalt" to intArrayOf(Input.Keys.BACKSPACE, Input.Keys.CONTROL_LEFT, Input.Keys.BACKSLASH).map { 1.0*it }.toDoubleArray(),
 
 
