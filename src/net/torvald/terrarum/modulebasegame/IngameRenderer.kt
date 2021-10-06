@@ -44,8 +44,10 @@ object IngameRenderer : Disposable {
     private lateinit var fboRGB_lightMixed: FrameBuffer
     private lateinit var fboA: FrameBuffer
     private lateinit var fboA_lightMixed: FrameBuffer
+    private lateinit var fboMixedOut: FrameBuffer
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
+    private lateinit var mixedOutTex: TextureRegion
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
 
@@ -93,17 +95,9 @@ object IngameRenderer : Disposable {
         shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
 
 
-        if (App.getConfigBoolean("fx_dither")) {
-            shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag")
-        }
-        else {
-            shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
-        }
-
+        shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag") // always load the shader regardless of config because the config may cange
         shaderAlphaDither = App.loadShaderFromFile("assets/4096.vert", "assets/alphadither.frag")
-
         shaderBlendGlow = App.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
-
         shaderRGBOnly = App.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
         shaderAtoGrey = App.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
 
@@ -223,117 +217,131 @@ object IngameRenderer : Disposable {
 
         ///////////////////////////////////////////////////////////////////////
 
-        // draw sky
-        WeatherMixer.render(camera, batch, world)
-
-        ///////////////////////////////////////////////////////////////////////
-
         // use shader to mix RGB and A
         setCameraPosition(0f, 0f)
 
         rgbTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         aTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-        // normal behaviour
-        if (!KeyToggler.isOn(Input.Keys.F6) &&
-            !KeyToggler.isOn(Input.Keys.F7)
-        ) {
-            debugMode = 0
+        fboMixedOut.inAction(camera, batch) {
+            gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
-            aTex.texture.bind(1)
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+            // draw sky
+            WeatherMixer.render(camera, batch, world)
 
 
-            batch.inUse {
-                blendNormal(batch)
-                batch.shader = shaderBlendGlow
-                shaderBlendGlow.setUniformi("tex1", 1)
-                batch.draw(rgbTex,
-                        -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
-                        -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
-                        rgbTex.regionWidth * zoom,
-                        rgbTex.regionHeight * zoom
-                )
+            // normal behaviour
+            if (!KeyToggler.isOn(Input.Keys.F6) &&
+                !KeyToggler.isOn(Input.Keys.F7)
+            ) {
+                debugMode = 0
+
+                aTex.texture.bind(1)
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
+
+                batch.inUse {
+                    blendNormal(batch)
+                    batch.shader = shaderBlendGlow
+                    shaderBlendGlow.setUniformi("tex1", 1)
+                    batch.draw(rgbTex,
+                            -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
+                            -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
+                            rgbTex.regionWidth * zoom,
+                            rgbTex.regionHeight * zoom
+                    )
+                }
+
+
+                // blending is correct... somewhat. Alpha must be premultiplied
             }
+            // something about RGB
+            else if (KeyToggler.isOn(Input.Keys.F6) &&
+                     !KeyToggler.isOn(Input.Keys.F7)
+            ) {
+                debugMode = 1
+                batch.inUse {
+                    blendNormal(batch)
+                    batch.shader = null
+                    batch.draw(rgbTex,
+                            -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
+                            -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
+                            rgbTex.regionWidth * zoom,
+                            rgbTex.regionHeight * zoom
+                    )
 
+                    // indicator
+                    batch.color = Color.RED
+                    batch.fillRect(0f, 0f, 6f, 10f)
+                    batch.color = Color.LIME
+                    batch.fillRect(6f, 0f, 6f, 10f)
+                    batch.color = Color.ROYAL
+                    batch.fillRect(12f, 0f, 6f, 10f)
+                    batch.color = Color.WHITE
+                }
 
-            // blending is correct... somewhat. Alpha must be premultiplied
-        }
-        // something about RGB
-        else if (KeyToggler.isOn(Input.Keys.F6) &&
-                 !KeyToggler.isOn(Input.Keys.F7)
-        ) {
-            debugMode = 1
-            batch.inUse {
-                blendNormal(batch)
-                batch.shader = null
-                batch.draw(rgbTex,
-                        -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
-                        -0.5f * rgbTex.regionHeight * zoom + 0.5f * rgbTex.regionHeight,
-                        rgbTex.regionWidth * zoom,
-                        rgbTex.regionHeight * zoom
-                )
-
-                // indicator
-                batch.color = Color.RED
-                batch.fillRect(0f, 0f, 6f, 10f)
-                batch.color = Color.LIME
-                batch.fillRect(6f, 0f, 6f, 10f)
-                batch.color = Color.ROYAL
-                batch.fillRect(12f, 0f, 6f, 10f)
-                batch.color = Color.WHITE
+                // works as intended
             }
+            // something about A
+            else if (!KeyToggler.isOn(Input.Keys.F6) &&
+                     KeyToggler.isOn(Input.Keys.F7)
+            ) {
+                debugMode = 2
+                batch.inUse {
+                    blendNormal(batch)
+                    batch.shader = null
+                    batch.draw(aTex,
+                            -0.5f * aTex.regionWidth * zoom + 0.5f * aTex.regionWidth,
+                            -0.5f * aTex.regionHeight * zoom + 0.5f * aTex.regionHeight,
+                            aTex.regionWidth * zoom,
+                            aTex.regionHeight * zoom
+                    )
 
-            // works as intended
-        }
-        // something about A
-        else if (!KeyToggler.isOn(Input.Keys.F6) &&
-                 KeyToggler.isOn(Input.Keys.F7)
-        ) {
-            debugMode = 2
-            batch.inUse {
-                blendNormal(batch)
-                batch.shader = null
-                batch.draw(aTex,
-                        -0.5f * aTex.regionWidth * zoom + 0.5f * aTex.regionWidth,
-                        -0.5f * aTex.regionHeight * zoom + 0.5f * aTex.regionHeight,
-                        aTex.regionWidth * zoom,
-                        aTex.regionHeight * zoom
-                )
+                    // indicator
+                    batch.color = Color.WHITE
+                    batch.fillRect(18f, 0f, 18f, 10f)
+                }
 
-                // indicator
-                batch.color = Color.WHITE
-                batch.fillRect(18f, 0f, 18f, 10f)
-            }
-
-            // works as intended
-        }
-        else {
-            if (debugMode == 1) {
-                KeyToggler.forceSet(Input.Keys.F6, false)
-                KeyToggler.forceSet(Input.Keys.F7, true)
-            }
-            else if (debugMode == 2) {
-                KeyToggler.forceSet(Input.Keys.F6, true)
-                KeyToggler.forceSet(Input.Keys.F7, false)
+                // works as intended
             }
             else {
-                KeyToggler.forceSet(Input.Keys.F6, false)
-                KeyToggler.forceSet(Input.Keys.F7, false)
+                if (debugMode == 1) {
+                    KeyToggler.forceSet(Input.Keys.F6, false)
+                    KeyToggler.forceSet(Input.Keys.F7, true)
+                }
+                else if (debugMode == 2) {
+                    KeyToggler.forceSet(Input.Keys.F6, true)
+                    KeyToggler.forceSet(Input.Keys.F7, false)
+                }
+                else {
+                    KeyToggler.forceSet(Input.Keys.F6, false)
+                    KeyToggler.forceSet(Input.Keys.F7, false)
+                }
+
+                // works as intended
             }
-
-            // works as intended
         }
-
 
         blendNormal(batch)
 
+        batch.inUse {
+            // it's no use applying dithering here: colours are no longer "floats" once they're written to the FBO
+            // proof: disable dithering on skybox and enable dither here -- banding is still visible
+            // it would work if GDX supported HDR, or GL_RGBA32F as a texture format, but alas.
+            // but mixedOutTex is still needed for the screen capturing
+
+            //batch.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
+            batch.shader = null
+            batch.draw(mixedOutTex, 0f, 0f)
+        }
+
+
         ///////////////////////////////////////////////////////////////////////
 
-        if (fboRGBexportRequested) {
-            fboRGBexportRequested = false
+        if (screencapRequested) {
+            screencapRequested = false
             try {
-                fboRGBexportCallback(fboRGB)
+                screencapExportCallback(fboMixedOut)
             }
             catch (e: Throwable) {
                 e.printStackTrace()
@@ -376,9 +384,9 @@ object IngameRenderer : Disposable {
         processBlur(lightmapFboA, lightmapFboB)
     }
 
-    @Volatile internal var fboRGBexportRequested = false
+    @Volatile internal var screencapRequested = false
     @Volatile internal var fboRGBexportedLatch = false
-    @Volatile internal var fboRGBexportCallback: (FrameBuffer) -> Unit = {}
+    @Volatile internal var screencapExportCallback: (FrameBuffer) -> Unit = {}
     @Volatile internal lateinit var fboRGBexport: Pixmap
 
     private fun drawToRGB(
@@ -691,6 +699,7 @@ object IngameRenderer : Disposable {
         fboRGB_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         fboA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         fboA_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        fboMixedOut = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         lightmapFboA = FrameBuffer(
                 Pixmap.Format.RGBA8888,
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
@@ -707,6 +716,7 @@ object IngameRenderer : Disposable {
         aTex = TextureRegion(fboA_lightMixed.colorBufferTexture)
         lightTex = TextureRegion(lightmapFboB.colorBufferTexture)
         blurTex = TextureRegion()
+        mixedOutTex = TextureRegion(fboMixedOut.colorBufferTexture)
 
         BlocksDrawer.resize(width, height)
         LightmapRenderer.resize(width, height)
@@ -726,6 +736,7 @@ object IngameRenderer : Disposable {
         fboA.dispose()
         fboRGB_lightMixed.dispose()
         fboA_lightMixed.dispose()
+        fboMixedOut.dispose()
         lightmapFboA.dispose()
         lightmapFboB.dispose()
 

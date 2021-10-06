@@ -1,6 +1,5 @@
 package net.torvald.terrarum.serialise
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -33,7 +32,7 @@ object WriteSavegame {
 
         Echo("Save queued")
 
-        IngameRenderer.fboRGBexportCallback = {
+        IngameRenderer.screencapExportCallback = {
             Echo("Generating thumbnail...")
 
             val w = 960
@@ -46,7 +45,7 @@ object WriteSavegame {
 
             Echo("Done thumbnail generation")
         }
-        IngameRenderer.fboRGBexportRequested = true
+        IngameRenderer.screencapRequested = true
 
         val savingThread = Thread(GameSavingThread(disk, outFile, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
@@ -73,7 +72,7 @@ object WriteSavegame {
 
         Echo("Quicksave queued")
 
-        IngameRenderer.fboRGBexportCallback = {
+        IngameRenderer.screencapExportCallback = {
             Echo("Generating thumbnail...")
 
             val w = 960
@@ -86,7 +85,7 @@ object WriteSavegame {
 
             Echo("Done thumbnail generation")
         }
-        IngameRenderer.fboRGBexportRequested = true
+        IngameRenderer.screencapRequested = true
 
         val savingThread = Thread(QuickSaveThread(disk, file, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()

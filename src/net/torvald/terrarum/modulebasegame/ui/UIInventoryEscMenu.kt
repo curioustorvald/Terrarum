@@ -34,7 +34,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenuButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, gameMenu,
             (width - gameMenuListWidth) / 2,
-            INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
+            INVENTORY_CELLS_OFFSET_Y() + (INVENTORY_CELLS_UI_HEIGHT - gameMenuListHeight) / 2,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
             textAreaWidth = gameMenuListWidth,
@@ -47,7 +47,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val areYouSureMainMenuButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_RETURN_MAIN_QUESTION", "MENU_LABEL_RETURN_MAIN", "MENU_LABEL_CANCEL"),
             (width - gameMenuListWidth) / 2,
-            INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
+            INVENTORY_CELLS_OFFSET_Y() + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
             gameMenuListWidth, DEFAULT_LINE_HEIGHT * 3,
             readFromLang = true,
             textAreaWidth = gameMenuListWidth,
@@ -60,7 +60,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val areYouSureQuitButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_DESKTOP_QUESTION", "MENU_LABEL_DESKTOP", "MENU_LABEL_CANCEL"),
             (width - gameMenuListWidth) / 2,
-            INVENTORY_CELLS_OFFSET_Y + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
+            INVENTORY_CELLS_OFFSET_Y() + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
             gameMenuListWidth, DEFAULT_LINE_HEIGHT * 3,
             readFromLang = true,
             textAreaWidth = gameMenuListWidth,

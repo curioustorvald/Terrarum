@@ -49,8 +49,8 @@ class UIInventoryFull(
         val itemListHeight: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 
         val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
-        val INVENTORY_CELLS_OFFSET_X = 0 + (Toolkit.drawWidth - internalWidth) / 2
-        val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (App.scr.height - internalHeight) / 2
+        val INVENTORY_CELLS_OFFSET_X = { 0 + (Toolkit.drawWidth - internalWidth) / 2 }
+        val INVENTORY_CELLS_OFFSET_Y = { 107 + (App.scr.height - internalHeight) / 2 }
 
         val catBarWidth = 330
 
@@ -164,7 +164,7 @@ class UIInventoryFull(
     private val transitionPanel = UIItemHorizontalFadeSlide(
             this,
             (width - internalWidth) / 2,
-            INVENTORY_CELLS_OFFSET_Y,
+            INVENTORY_CELLS_OFFSET_Y(),
             width,
             App.scr.height,
             1f,

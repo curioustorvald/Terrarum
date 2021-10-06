@@ -42,11 +42,13 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
+        val cellOffY = INVENTORY_CELLS_OFFSET_Y()
+
 
         // update map panning
         // if left click is down and cursor is in the map area
         if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) &&
-            Terrarum.mouseScreenY in INVENTORY_CELLS_OFFSET_Y..INVENTORY_CELLS_OFFSET_Y + INVENTORY_CELLS_UI_HEIGHT) {
+            Terrarum.mouseScreenY in cellOffY..cellOffY + INVENTORY_CELLS_UI_HEIGHT) {
             minimapPanX += Terrarum.mouseDeltaX * 2f / minimapZoom
             minimapPanY += Terrarum.mouseDeltaY * 2f / minimapZoom
         }
@@ -116,23 +118,23 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         batch.begin()
 
         if (debugvals) {
-            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", (width - MINIMAP_WIDTH) / 2, -10f + INVENTORY_CELLS_OFFSET_Y)
+            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", (width - MINIMAP_WIDTH) / 2, -10f + cellOffY)
         }
 
         batch.projectionMatrix = camera.combined
         // 1px stroke
         batch.color = Color.WHITE
-        batch.fillRect((width - MINIMAP_WIDTH) / 2, -1 + INVENTORY_CELLS_OFFSET_Y.toFloat(), MINIMAP_WIDTH, 1f)
-        batch.fillRect((width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
-        batch.fillRect(-1 + (width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y.toFloat(), 1f, MINIMAP_HEIGHT)
-        batch.fillRect((width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, INVENTORY_CELLS_OFFSET_Y.toFloat(), 1f, MINIMAP_HEIGHT)
+        batch.fillRect((width - MINIMAP_WIDTH) / 2, -1 + cellOffY.toFloat(), MINIMAP_WIDTH, 1f)
+        batch.fillRect((width - MINIMAP_WIDTH) / 2, cellOffY + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
+        batch.fillRect(-1 + (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
+        batch.fillRect((width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
 
         // control hints
         batch.color = Color.WHITE
         App.fontGame.draw(batch, full.minimapControlHelp, full.offsetX, full.yEnd - 20)
 
         // the minimap
-        batch.draw(minimapFBO.colorBufferTexture, (width - MINIMAP_WIDTH) / 2, INVENTORY_CELLS_OFFSET_Y.toFloat())
+        batch.draw(minimapFBO.colorBufferTexture, (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat())
     }
 
     override fun doOpening(delta: Float) {}
