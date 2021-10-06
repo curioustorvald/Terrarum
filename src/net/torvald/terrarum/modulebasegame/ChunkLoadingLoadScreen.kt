@@ -17,8 +17,8 @@ class ChunkLoadingLoadScreen(screenToBeLoaded: IngameInstance, private val world
     private val world: GameWorld // must use Getter, as the field WILL BE redefined by the TerrarumIngame.enterCreateNewWorld() !
         get() = screenToLoad!!.world
 
-    private var previewWidth = (App.scr.width * WorldgenLoadScreen.WIDTH_RATIO).roundToInt()
-    private var previewHeight = (App.scr.width * WorldgenLoadScreen.WIDTH_RATIO * worldheight / worldwidth).roundToInt()
+    private var previewWidth = (Toolkit.drawWidth * WorldgenLoadScreen.WIDTH_RATIO).roundToInt()
+    private var previewHeight = (Toolkit.drawWidth * WorldgenLoadScreen.WIDTH_RATIO * worldheight / worldwidth).roundToInt()
 
     private lateinit var previewPixmap: Pixmap
     private lateinit var previewTexture: Texture
@@ -40,6 +40,7 @@ class ChunkLoadingLoadScreen(screenToBeLoaded: IngameInstance, private val world
     override fun render(delta: Float) {
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
+        val drawWidth = Toolkit.drawWidth
 
         if (worldwidth != -1 && worldheight != -1) {
 
@@ -54,7 +55,7 @@ class ChunkLoadingLoadScreen(screenToBeLoaded: IngameInstance, private val world
 
             App.batch.inUse {
                 it.color = Color.WHITE
-                val previewX = (App.scr.width - previewWidth).div(2f).round()
+                val previewX = (drawWidth - previewWidth).div(2f).round()
                 val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).round()
                 Toolkit.drawBoxBorder(it, previewX.toInt() - 1, previewY.toInt() - 1, previewWidth + 2, previewHeight + 2)
                 it.draw(previewTexture,
@@ -64,7 +65,7 @@ class ChunkLoadingLoadScreen(screenToBeLoaded: IngameInstance, private val world
                 val text = messages.getHeadElem() ?: ""
                 App.fontGame.draw(it,
                         text,
-                        (App.scr.width - App.fontGame.getWidth(text)).div(2f).round(),
+                        (drawWidth - App.fontGame.getWidth(text)).div(2f).round(),
                         previewY + previewHeight + 98 - App.fontGame.lineHeight
                 )
             }

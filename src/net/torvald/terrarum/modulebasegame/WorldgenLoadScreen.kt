@@ -34,8 +34,8 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
         val COL_AIR = Color.BLACK
     }
 
-    private val previewWidth = (App.scr.width * WIDTH_RATIO).roundToInt()
-    private val previewHeight = (App.scr.width * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
+    private val previewWidth = (Toolkit.drawWidth * WIDTH_RATIO).roundToInt()
+    private val previewHeight = (Toolkit.drawWidth * WIDTH_RATIO * worldheight / worldwidth).roundToInt()
 
     private lateinit var previewPixmap: Pixmap
     private lateinit var previewTexture: Texture
@@ -57,6 +57,8 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
     override fun render(delta: Float) {
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
+        val drawWidth = Toolkit.drawWidth
+
         previewRenderCounter += delta
         if (previewRenderCounter >= PREVIEW_UPDATE_RATE) {
             previewRenderCounter -= PREVIEW_UPDATE_RATE
@@ -68,7 +70,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
         App.batch.inUse {
             it.color = Color.WHITE
-            val previewX = (App.scr.width - previewWidth).div(2f).round()
+            val previewX = (drawWidth - previewWidth).div(2f).round()
             val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).round()
             Toolkit.drawBoxBorder(it, previewX.toInt()-1, previewY.toInt()-1, previewWidth+2, previewHeight+2)
             it.draw(previewTexture,
@@ -78,7 +80,7 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
             val text = messages.getHeadElem() ?: ""
             App.fontGame.draw(it,
                     text,
-                    (App.scr.width - App.fontGame.getWidth(text)).div(2f).round(),
+                    (drawWidth - App.fontGame.getWidth(text)).div(2f).round(),
                     previewY + previewHeight + 98 - App.fontGame.lineHeight
             )
         }

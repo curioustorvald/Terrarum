@@ -57,6 +57,7 @@ object IngameRenderer : Disposable {
     val shaderRGBOnly: ShaderProgram
     val shaderAtoGrey: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
+    val shaderAlphaDither: ShaderProgram
 
     private val WIDTH = App.scr.width
     private val HEIGHT = App.scr.height
@@ -98,11 +99,13 @@ object IngameRenderer : Disposable {
             shaderBayer.setUniformf("rcount", 64f)
             shaderBayer.setUniformf("gcount", 64f)
             shaderBayer.setUniformf("bcount", 64f)
+
         }
         else {
             shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag")
         }
 
+        shaderAlphaDither = App.loadShaderFromFile("assets/4096.vert", "assets/alphadither.frag")
 
         shaderBlendGlow = App.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
 
@@ -406,12 +409,16 @@ object IngameRenderer : Disposable {
             batch.inUse {
                 moveCameraToWorldCoord()
                 actorsRenderBehind?.forEach { it.drawBody(batch) }
+            }
+            batch.shader = shaderAlphaDither
+            batch.inUse {
                 particlesContainer?.forEach { it.drawBody(batch) }
             }
 
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
 
+            batch.shader = null
             batch.inUse {
                 /////////////////
                 // draw actors //
@@ -739,6 +746,7 @@ object IngameRenderer : Disposable {
         shaderRGBOnly.dispose()
         shaderAtoGrey.dispose()
         shaderPassthru.dispose()
+        shaderAlphaDither.dispose()
 
         try {
             fboRGBexport.dispose()

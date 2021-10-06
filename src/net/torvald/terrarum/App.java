@@ -32,6 +32,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
 import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.tvda.DiskSkimmer;
+import net.torvald.terrarum.ui.Toolkit;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
@@ -591,8 +592,9 @@ public class App implements ApplicationListener {
 
         setCameraPosition(0f, 0f);
 
+        int drawWidth = Toolkit.INSTANCE.getDrawWidth();
         int safetyTextLen = fontGame.getWidth(Lang.INSTANCE.get("APP_WARNING_HEALTH_AND_SAFETY", true));
-        int logoPosX = (scr.getWidth() - logo.getRegionWidth() - safetyTextLen) >>> 1;
+        int logoPosX = (drawWidth - logo.getRegionWidth() - safetyTextLen) >>> 1;
         int logoPosY = Math.round(scr.getHeight() / 15f);
         int textY = logoPosY + logo.getRegionHeight() - 16;
 
@@ -605,7 +607,7 @@ public class App implements ApplicationListener {
             logoBatch.draw(logo, logoPosX, logoPosY + logo.getRegionHeight());
         }
         else {
-            logoBatch.draw(logo, (scr.getWidth() - logo.getRegionWidth()) / 2f,
+            logoBatch.draw(logo, (drawWidth - logo.getRegionWidth()) / 2f,
                     (scr.getHeight() - logo.getRegionHeight() * 2) / 2f + logo.getRegionHeight()
             );
         }
@@ -631,7 +633,7 @@ public class App implements ApplicationListener {
                     String s = Lang.INSTANCE.get("APP_CHINESE_HEALTHY_GAME_MSG_" + i, true);
 
                     fontGame.draw(logoBatch, s,
-                            (scr.getWidth() - fontGame.getWidth(s)) >>> 1,
+                            (drawWidth - fontGame.getWidth(s)) >>> 1,
                             Math.round(scr.getHeight() * 12f / 15f + fontGame.getLineHeight() * (i - 1))
                     );
                 }
@@ -642,12 +644,12 @@ public class App implements ApplicationListener {
             Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
             int virtualHeight = scr.getHeight() - logoPosY - logo.getRegionHeight() / 4;
             int virtualHeightOffset = scr.getHeight() - virtualHeight;
-            logoBatch.draw(tex1, (scr.getWidth() - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
-            logoBatch.draw(tex2, (scr.getWidth() - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
+            logoBatch.draw(tex1, (drawWidth - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
+            logoBatch.draw(tex2, (drawWidth - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
 
         }
         else {
-            logoBatch.draw(logo, (scr.getWidth() - logo.getRegionWidth()) / 2f,
+            logoBatch.draw(logo, (drawWidth - logo.getRegionWidth()) / 2f,
                     (scr.getHeight() - logo.getRegionHeight() * 2) / 2f
             );
         }

@@ -23,7 +23,7 @@ object Toolkit : Disposable {
     val DEFAULT_BOX_BORDER_COL = Color(1f, 1f, 1f, 0.2f)
 
     private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur2.frag")
-    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
+    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36, flipY = true)
 
 
     init {
