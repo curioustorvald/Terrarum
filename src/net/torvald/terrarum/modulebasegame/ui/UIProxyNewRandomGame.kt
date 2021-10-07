@@ -31,7 +31,6 @@ class UIProxyNewRandomGame : UICanvas() {
     }
 
     override fun doClosing(delta: Float) {
-        TODO("not implemented")
     }
 
     override fun endOpening(delta: Float) {

@@ -31,7 +31,7 @@ object PlayerBuilderTestSubject1 {
 
         p.sprite = SpriteAnimation(p)
         p.spriteGlow = SpriteAnimation(p)
-        p.reassembleSprite(p.sprite!!, p.spriteGlow)
+        p.reassembleSprite(p.sprite, p.animDesc, p.spriteGlow, p.animDescGlow)
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 
         // ingame must teleport the player to the spawn point

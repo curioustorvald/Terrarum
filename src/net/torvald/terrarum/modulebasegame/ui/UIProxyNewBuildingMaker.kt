@@ -28,7 +28,6 @@ class UIProxyNewBuildingMaker : UICanvas() {
     }
 
     override fun doClosing(delta: Float) {
-        TODO("not implemented")
     }
 
     override fun endOpening(delta: Float) {
@@ -40,10 +39,8 @@ class UIProxyNewBuildingMaker : UICanvas() {
     }
 
     override fun endClosing(delta: Float) {
-        TODO("not implemented")
     }
 
     override fun dispose() {
-        TODO("not implemented")
     }
 }

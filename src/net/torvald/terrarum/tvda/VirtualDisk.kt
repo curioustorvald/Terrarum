@@ -124,7 +124,7 @@ class VirtualDisk(
         /** capacity of 0 makes the disk read-only */
         var capacity: Long,
         var diskName: ByteArray = ByteArray(NAME_LENGTH)
-) {
+): SimpleFileSystem {
     var extraInfoBytes = ByteArray(16)
     val entries = HashMap<EntryID, DiskEntry>()
     var isReadOnly: Boolean
@@ -142,6 +142,8 @@ class VirtualDisk(
     internal fun __internalSetFooter__(footer: ByteArray64) {
         extraInfoBytes = footer.toByteArray()
     }
+
+    override fun getFile(id: EntryID) = try { VDUtil.getAsNormalFile(this, id) } catch (e: NullPointerException) { null }
 
     private fun serializeEntriesOnly(): ByteArray64 {
         val buffer = ByteArray64()

@@ -84,7 +84,8 @@ class ArrayListMap<K, V> : MutableMap<K, V> {
     }
 
     override fun clear() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        keysArray.clear()
+        valuesArray.clear()
     }
 
     override fun compute(key: K, remappingFunction: BiFunction<in K, in V?, out V?>): V? {

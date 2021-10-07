@@ -287,7 +287,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private fun postInitForLoadFromSave(codices: Codices) {
         codices.actors.forEach {
             try {
-                val actor = ReadActor(LoadSavegame.getFileReader(codices.disk, it.toLong()))
+                val actor = ReadActor(codices.disk, LoadSavegame.getFileReader(codices.disk, it.toLong()))
                 addNewActor(actor)
             }
             catch (e: NullPointerException) {

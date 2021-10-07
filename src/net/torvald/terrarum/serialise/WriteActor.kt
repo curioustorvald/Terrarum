@@ -2,14 +2,15 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.spriteassembler.ADProperties
 import net.torvald.terrarum.NoSuchActorWithIDException
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.tvda.ByteArray64
-import net.torvald.terrarum.tvda.ByteArray64Writer
+import net.torvald.terrarum.tvda.*
 import java.io.Reader
 
 /**
@@ -42,6 +43,22 @@ object WriteActor {
 
 }
 
+/**
+ * Player-specific [WriteActor].
+ *
+ * Created by minjaesong on 2021-10-07.
+ */
+object WritePlayer {
+    operator fun invoke(player: IngamePlayer, disk: VirtualDisk) {
+        val actorJson = WriteActor.encodeToByteArray64(player)
+        val adl = player.animDesc?.getRawADL() // NULLABLE!
+        val adlGlow = player.animDescGlow?.getRawADL() // NULLABLE!
+    }
+
+    operator fun invoke(player: IngamePlayer, skimmer: DiskSkimmer) {
+
+    }
+}
 
 
 /**
@@ -54,29 +71,37 @@ object WriteActor {
  */
 object ReadActor {
 
-    operator fun invoke(worldDataStream: Reader): Actor =
-            fillInDetails(Common.jsoner.fromJson(null, worldDataStream))
+    operator fun invoke(disk: SimpleFileSystem, worldDataStream: Reader): Actor =
+            fillInDetails(disk, Common.jsoner.fromJson(null, worldDataStream))
 
     fun readActorBare(worldDataStream: Reader): Actor =
             Common.jsoner.fromJson(null, worldDataStream)
 
-    private fun fillInDetails(actor: Actor): Actor {
+    private fun fillInDetails(disk: SimpleFileSystem, actor: Actor): Actor {
         actor.actorValue.actor = actor
 
         if (actor is Pocketed)
             actor.inventory.actor = actor
 
         if (actor is ActorWithBody && actor is HasAssembledSprite) {
+            val animFile = disk.getFile(-2L)
+            val animFileGlow = disk.getFile(-3L)
+
             actor.sprite = SpriteAnimation(actor)
-            if (actor.animDescPathGlow != null) actor.spriteGlow = SpriteAnimation(actor)
-            actor.reassembleSprite(actor.sprite ?: throw InternalError("actor.sprite (type: SpriteAnimation) is null"), actor.spriteGlow)
+            if (animFileGlow != null) actor.spriteGlow = SpriteAnimation(actor)
+            actor.reassembleSprite(
+                    actor.sprite!!,
+                    ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET)),
+                    actor.spriteGlow,
+                    if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
+            )
         }
 
         return actor
     }
 
-    fun readActorAndAddToWorld(ingame: TerrarumIngame, worldDataStream: Reader): Actor {
-        val actor = invoke(worldDataStream)
+    fun readActorAndAddToWorld(ingame: TerrarumIngame, disk: SimpleFileSystem, worldDataStream: Reader): Actor {
+        val actor = invoke(disk, worldDataStream)
 
         // replace existing player
         val oldPlayerID = ingame.actorNowPlaying?.referenceID

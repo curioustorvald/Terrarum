@@ -2,7 +2,9 @@ package net.torvald.spriteassembler
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.linearSearch
+import java.io.InputStream
 
 /**
  * Assembles the single frame of the animation, outputs GDX Pixmap.
@@ -17,10 +19,13 @@ object AssembleSheetPixmap {
         val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
 
+        val fileGetter = { path: String ->
+            Gdx.files.internal(path).read()
+        }
 
         // actually draw
         properties.transforms.forEach { t, _ ->
-            drawThisFrame(t, canvas, properties)
+            drawThisFrame(t, canvas, properties, fileGetter)
         }
 
         return canvas
@@ -28,15 +33,21 @@ object AssembleSheetPixmap {
 
     private fun drawThisFrame(frameName: String,
                               canvas: Pixmap,
-                              properties: ADProperties
+                              properties: ADProperties,
+                              fileGetter: (String) -> InputStream
     ) {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
         val bodypartOrigins = properties.bodyparts
         val bodypartImages = properties.bodyparts.keys.map {
-            val file = Gdx.files.internal("assets/${properties.toFilename(it)}")
-            it to (if (file.exists()) Pixmap(file) else null)
+            try {
+                val bytes = fileGetter("assets/${properties.toFilename(it)}").readAllBytes()
+                it to Pixmap(bytes, 0, bytes.size)
+            }
+            catch (e: GdxRuntimeException) {
+                it to null
+            }
         }.toMap()
         val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
 

@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.tvda.DiskSkimmer
+import net.torvald.terrarum.tvda.SimpleFileSystem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -12,9 +14,9 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 interface HasAssembledSprite {
 
     /** ADL path for main sprite. Necessary. */
-    var animDescPath: String
+    var animDesc: ADProperties?
     /** ADL path for glow sprite. Optional. */
-    var animDescPathGlow: String?
+    var animDescGlow: ADProperties?
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)
 
@@ -28,10 +30,11 @@ interface HasAssembledSprite {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    fun reassembleSprite(sprite: SpriteAnimation, spriteGlow: SpriteAnimation? = null) {
-        _rebuild(ADProperties(Gdx.files.internal(animDescPath)), sprite)
-        if (animDescPathGlow != null && spriteGlow != null)
-            _rebuild(ADProperties(Gdx.files.internal(animDescPathGlow)), spriteGlow)
+    fun reassembleSprite(sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
+        if (anim != null && sprite != null)
+            _rebuild(anim, sprite)
+        if (animGlow != null && spriteGlow != null)
+            _rebuild(animGlow, spriteGlow)
     }
 
     /*fun rebuild(animDescPath: String, spriteAnimation: SpriteAnimation) {
@@ -49,6 +52,8 @@ interface HasAssembledSprite {
 
     private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
+
+        // TODO resolve bodyparts (must read ID-to-bodypartmap.properties first)
 
         val pixmap = AssembleSheetPixmap(ad)
         val texture = Texture(pixmap)

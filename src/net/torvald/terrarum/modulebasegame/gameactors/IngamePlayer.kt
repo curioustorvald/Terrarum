@@ -1,6 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import net.torvald.spriteanimation.HasAssembledSprite
+import net.torvald.spriteassembler.ADProperties
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 
@@ -13,15 +15,15 @@ import net.torvald.terrarum.gameactors.AVKey
 
 class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
-    override var animDescPath = "invalid"
-    override var animDescPathGlow: String? = null
+    override var animDesc: ADProperties? = null
+    override var animDescGlow: ADProperties? = null
     internal var worldCurrentlyPlaying = 0 // only filled up on save and load; DO NOT USE THIS
 
     private constructor()
 
     constructor(animDescPath: String, animDescPathGlow: String?, born: Long) : super(born) {
-        this.animDescPath = animDescPath
-        this.animDescPathGlow = animDescPathGlow
+        animDesc = ADProperties(Gdx.files.internal(animDescPath))
+        if (animDescPathGlow != null) animDescGlow = ADProperties(Gdx.files.internal(animDescPathGlow))
         actorValue[AVKey.__HISTORICAL_BORNTIME] = born
     }
 

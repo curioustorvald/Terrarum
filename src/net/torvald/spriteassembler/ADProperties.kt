@@ -2,6 +2,7 @@ package net.torvald.spriteassembler
 
 import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.linearSearchBy
+import net.torvald.terrarum.serialise.Common
 import java.io.InputStream
 import java.io.Reader
 import java.util.*
@@ -33,6 +34,7 @@ internal data class Transform(val joint: Joint, val translate: ADPropertyObject.
 
 class ADProperties {
     private var fileFrom = ""
+    private var adlString = ""
     private val javaProp = Properties()
 
     /** Every key is CAPITALISED */
@@ -68,28 +70,29 @@ class ADProperties {
     var rows = -1; private set
     var cols = -1; private set
 
+    fun getRawADL() = adlString
+
     companion object {
         const val ALL_JOINT_SELECT_KEY = "ALL"
     }
 
     constructor(gdxFile: FileHandle) {
         fileFrom = gdxFile.path()
+        adlString = gdxFile.readString(Common.CHARSET.name())
         javaProp.load(gdxFile.read())
         continueLoad()
     }
 
     constructor(reader: Reader) {
+        adlString = reader.readText()
         javaProp.load(reader)
         continueLoad()
     }
 
     constructor(inputStream: InputStream) {
+        adlString = inputStream.readAllBytes().toString(Common.CHARSET)
         javaProp.load(inputStream)
         continueLoad()
-    }
-
-    constructor(javaProp: Properties) {
-        this.javaProp.putAll(javaProp.toMap())
     }
 
     private fun continueLoad() {

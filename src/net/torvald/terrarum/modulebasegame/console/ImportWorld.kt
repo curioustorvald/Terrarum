@@ -34,7 +34,7 @@ object ImportWorld : ConsoleCommand {
         Echo("Usage: Importworld filename-without-extension")
     }
 }
-
+/*
 object ImportActor : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
@@ -56,4 +56,4 @@ object ImportActor : ConsoleCommand {
     override fun printUsage() {
         Echo("Usage: Importactor filename-without-extension")
     }
-}
+}*/

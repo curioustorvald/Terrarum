@@ -23,7 +23,7 @@ class DiskSkimmer(
         val diskFile: File,
         val charset: Charset = Charset.defaultCharset(),
         noInit: Boolean = false
-) {
+): SimpleFileSystem {
 
     /*
 
@@ -249,6 +249,8 @@ removefile:
             }
         }
     }
+
+    override fun getFile(id: EntryID) = requestFile(id)?.contents as? EntryFile
 
     /**
      * Try to find a file with given path (which uses '/' as a separator). Is search is failed for whatever reason,
