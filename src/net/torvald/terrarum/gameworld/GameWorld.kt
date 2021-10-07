@@ -14,6 +14,10 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
+import java.util.*
+import kotlin.NoSuchElementException
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
@@ -29,17 +33,8 @@ class GameWorldTitleScreen : GameWorld() {
 open class GameWorld() : Disposable {
 
     var worldName: String = "New World"
-    /** Index start at 1 */
-    var worldIndex: Int = 1234567890
-        set(value) {
-            if (value <= 0)
-                throw Error("World index start at 1; you've entered $value")
-
-            printdbg(this, "Creation of new world with index $value, called by:")
-            printStackTrace(this)
-
-            field = value
-        }
+    var worldIndex: UUID = UUID.randomUUID() // should not be immutable as JSON loader will want to overwrite it
+    var worldCreator: UUID = UUID(0L,0L) // TODO record a value to this
     var width: Int = 999; private set
     var height: Int = 999; private set
 
@@ -120,10 +115,9 @@ open class GameWorld() : Disposable {
     /**
      * Create new world
      */
-    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long): this() {
+    constructor(width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long): this() {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
 
-        this.worldIndex = worldIndex
         this.width = width
         this.height = height
 
@@ -675,7 +669,7 @@ open class GameWorld() : Disposable {
 
         fun makeNullWorld(): GameWorld {
             if (nullWorldInstance == null)
-                nullWorldInstance = GameWorld(1, 1, 1, 0, 0)
+                nullWorldInstance = GameWorld(1, 1, 0, 0)
 
             return nullWorldInstance!!
         }

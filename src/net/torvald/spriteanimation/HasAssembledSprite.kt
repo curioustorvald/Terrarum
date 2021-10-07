@@ -37,25 +37,41 @@ interface HasAssembledSprite {
             _rebuild(animGlow, spriteGlow)
     }
 
-    /*fun rebuild(animDescPath: String, spriteAnimation: SpriteAnimation) {
-        _rebuild(ADProperties(StringReader(animDescPath)), spriteAnimation)
+    fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
+        if (anim != null && sprite != null)
+            _rebuild(disk, anim, sprite)
+        if (animGlow != null && spriteGlow != null)
+            _rebuild(disk, animGlow, spriteGlow)
     }
-
-    fun rebuild(animDesc: FileHandle, spriteAnimation: SpriteAnimation) {
-        _rebuild(ADProperties(animDesc.read()), spriteAnimation)
-    }
-
-    fun rebuild(javaProp: Properties, spriteAnimation: SpriteAnimation) {
-        _rebuild(ADProperties(javaProp), spriteAnimation)
-    }*/
-
 
     private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        // TODO resolve bodyparts (must read ID-to-bodypartmap.properties first)
+        val pixmap = AssembleSheetPixmap.fromAssetsDir(ad)
+        val texture = Texture(pixmap)
+        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        pixmap.dispose()
+        val regionPack = TextureRegionPack(texture, ad.frameWidth, ad.frameHeight)
 
-        val pixmap = AssembleSheetPixmap(ad)
+        val newAnimDelays = FloatArray(ad.animations.size)
+        val newAnimFrames = IntArray(ad.animations.size)
+
+        ad.animations.forEach { t, u ->
+            val index = u.row - 1
+            newAnimDelays[index] = u.delay
+            newAnimFrames[index] = u.frames
+        }
+
+        sprite.setSpriteImage(regionPack)
+        sprite.delays = newAnimDelays
+        sprite.nFrames = newAnimFrames
+        sprite.nRows = newAnimDelays.size
+    }
+
+    private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
+        // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
+
+        val pixmap = AssembleSheetPixmap.fromVirtualDisk(disk, ad)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()

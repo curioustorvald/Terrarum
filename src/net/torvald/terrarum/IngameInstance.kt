@@ -92,7 +92,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             oldWorld.dispose()
         }
     /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
-    var gameworldIndices = ArrayList<Int>()
+    //var gameworldIndices = ArrayList<Int>()
 
     /** The actor the game is currently allowing you to control.
      *

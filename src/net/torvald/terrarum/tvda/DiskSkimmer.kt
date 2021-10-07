@@ -250,6 +250,7 @@ removefile:
         }
     }
 
+    override fun getEntry(id: EntryID) = requestFile(id)
     override fun getFile(id: EntryID) = requestFile(id)?.contents as? EntryFile
 
     /**

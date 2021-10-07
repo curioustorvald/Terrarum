@@ -56,6 +56,10 @@ object WriteSavegame {
 
 
     fun immediate(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
+        return
+
+        // TODO //
+
         savingStatus = 0
 
         Echo("Immediate save fired")
@@ -68,6 +72,10 @@ object WriteSavegame {
     }
 
     fun quick(disk: VirtualDisk, file: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
+        return
+
+        // TODO //
+
         savingStatus = 0
 
         Echo("Quicksave queued")
@@ -111,6 +119,8 @@ object LoadSavegame {
     fun getFileReader(disk: VirtualDisk, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
     operator fun invoke(disk: VirtualDisk) {
+        TODO()
+
         val newIngame = TerrarumIngame(App.batch)
 
         val meta = ReadMeta(disk)
@@ -118,7 +128,7 @@ object LoadSavegame {
         // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
         // you'll inevitably read the player actor twice, and they're separate instances of the player!
         val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
-        val world = ReadWorld(getFileReader(disk, currentWorld.toLong()))
+        val world = ReadWorld(getFileReader(disk, -1-1-1-1-1-1))
 
         // set lateinit vars on the gameworld FIRST
         world.layerTerrain = BlockLayer(world.width, world.height)
@@ -153,7 +163,6 @@ object LoadSavegame {
 
 
             // load all the world blocklayer chunks
-            val worldnum = world.worldIndex.toLong()
             val cw = LandUtil.CHUNK_W
             val ch = LandUtil.CHUNK_H
             val chunkCount = world.width * world.height / (cw * ch)
@@ -162,7 +171,7 @@ object LoadSavegame {
                 for (layer in worldLayer.indices) {
                     loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*worldLayer.size+layer+1}/${chunkCount*2}")
 
-                    val chunkFile = VDUtil.getAsNormalFile(disk, worldnum.shl(32) or layer.toLong().shl(24) or chunk)
+                    val chunkFile = VDUtil.getAsNormalFile(disk, 0x1_0000_0000L or layer.toLong().shl(24) or chunk)
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
                     ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, chunkXY.x, chunkXY.y)

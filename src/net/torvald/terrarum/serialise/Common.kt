@@ -17,6 +17,7 @@ import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
 import java.math.BigInteger
+import java.util.*
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
@@ -170,6 +171,16 @@ object Common {
                     hashMap[key] = json.readValue(GameWorld.WiringSimCell::class.java, obj)
                 }
                 return hashMap
+            }
+        })
+        // UUID
+        jsoner.setSerializer(UUID::class.java, object : Json.Serializer<UUID> {
+            override fun write(json: Json, obj: UUID, knownType: Class<*>?) {
+                json.writeValue(obj.toString())
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): UUID {
+                return UUID.fromString(jsonData.asString())
             }
         })
     }

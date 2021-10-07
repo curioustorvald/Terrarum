@@ -298,7 +298,7 @@ class SpriteAssemblerPreview: Game() {
     }
 
     private fun assembleImage(prop: ADProperties) {
-        image = AssembleSheetPixmap(prop)
+        image = AssembleSheetPixmap.fromAssetsDir(prop)
     }
 
     // TODO rename to requestAssembly

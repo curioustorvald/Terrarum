@@ -143,6 +143,7 @@ class VirtualDisk(
         extraInfoBytes = footer.toByteArray()
     }
 
+    override fun getEntry(id: EntryID) = entries[id]
     override fun getFile(id: EntryID) = try { VDUtil.getAsNormalFile(this, id) } catch (e: NullPointerException) { null }
 
     private fun serializeEntriesOnly(): ByteArray64 {

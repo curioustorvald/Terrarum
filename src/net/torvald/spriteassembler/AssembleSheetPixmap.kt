@@ -4,7 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.linearSearch
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.tvda.ByteArray64InputStream
+import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.tvda.SimpleFileSystem
 import java.io.InputStream
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Assembles the single frame of the animation, outputs GDX Pixmap.
@@ -15,13 +22,9 @@ import java.io.InputStream
  */
 object AssembleSheetPixmap {
 
-    operator fun invoke(properties: ADProperties): Pixmap {
+    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream): Pixmap {
         val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
-
-        val fileGetter = { path: String ->
-            Gdx.files.internal(path).read()
-        }
 
         // actually draw
         properties.transforms.forEach { t, _ ->
@@ -29,6 +32,21 @@ object AssembleSheetPixmap {
         }
 
         return canvas
+    }
+
+    fun fromAssetsDir(properties: ADProperties) = drawAndGetCanvas(properties) { partName: String ->
+        Gdx.files.internal("assets/${properties.toFilename(partName)}").read()
+    }
+
+    fun fromVirtualDisk(disk: SimpleFileSystem, properties: ADProperties): Pixmap {
+        val bodypartMapping = Properties()
+        bodypartMapping.load(ByteArray64Reader(disk.getFile(-1025L)!!.bytes, Common.CHARSET))
+
+        val fileGetter = { partName: String ->
+            ByteArray64InputStream(disk.getFile(bodypartMapping[partName] as Long)!!.bytes)
+        }
+
+        return drawAndGetCanvas(properties, fileGetter)
     }
 
     private fun drawThisFrame(frameName: String,
@@ -42,7 +60,7 @@ object AssembleSheetPixmap {
         val bodypartOrigins = properties.bodyparts
         val bodypartImages = properties.bodyparts.keys.map {
             try {
-                val bytes = fileGetter("assets/${properties.toFilename(it)}").readAllBytes()
+                val bytes = fileGetter(it).readAllBytes()
                 it to Pixmap(bytes, 0, bytes.size)
             }
             catch (e: GdxRuntimeException) {

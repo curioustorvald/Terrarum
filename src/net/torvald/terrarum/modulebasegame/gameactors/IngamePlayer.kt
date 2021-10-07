@@ -5,6 +5,7 @@ import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import java.util.*
 
 
 /**
@@ -15,9 +16,10 @@ import net.torvald.terrarum.gameactors.AVKey
 
 class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
+    var UUID = UUID(0L,0L); private set
+    internal var worldCurrentlyPlaying: UUID = UUID(0L,0L) // only filled up on save and load; DO NOT USE THIS
     override var animDesc: ADProperties? = null
     override var animDescGlow: ADProperties? = null
-    internal var worldCurrentlyPlaying = 0 // only filled up on save and load; DO NOT USE THIS
 
     private constructor()
 
@@ -33,10 +35,10 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
      * **Use PlayerFactory to build player!**
      */
     init {
-        referenceID = Terrarum.PLAYER_REF_ID // forcibly set ID
+        referenceID = Terrarum.PLAYER_REF_ID // TODO assign random ID
         density = BASE_DENSITY
         collisionType = COLLISION_KINEMATIC
-        worldCurrentlyPlaying = Terrarum.ingame?.world?.worldIndex ?: 0
+        worldCurrentlyPlaying = Terrarum.ingame?.world?.worldIndex ?: UUID(0L,0L)
     }
 
 }

@@ -348,9 +348,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             // init map as chosen size
             val timeNow = App.getTIME_T()
-            world = GameWorld(1, worldParams.width, worldParams.height, timeNow, timeNow) // new game, so the creation time is right now
+            world = GameWorld(worldParams.width, worldParams.height, timeNow, timeNow) // new game, so the creation time is right now
             world.generatorSeed = worldParams.worldGenSeed
-            gameworldIndices.add(world.worldIndex)
+            //gameworldIndices.add(world.worldIndex)
             world.extraFields["basegame.economy"] = GameEconomy()
 
             // generate terrain for the map

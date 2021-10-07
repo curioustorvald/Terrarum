@@ -34,6 +34,11 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
 
 
     override fun run() {
+        callback()
+        return
+
+        // TODO //
+
         val skimmer = DiskSkimmer(file, Common.CHARSET)
 
         if (hasThumbnail) {
@@ -82,7 +87,7 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
         // Write World //
         val worldNum = ingame.world.worldIndex
         val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
-        val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
+        val world = DiskEntry(-1-1-1-1-1-1-1, 0, creation_t, time_t, worldMeta)
         addFile(disk, world); skimmer.appendEntryOnly(world)
 
         WriteSavegame.saveProgress += 1f
@@ -101,7 +106,7 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
 //                    println("Chunk xy from number $chunkNumber -> (${chunkXY.x}, ${chunkXY.y})")
 
                         val chunkBytes = WriteWorld.encodeChunk(layer, chunkXY.x, chunkXY.y)
-                        val entryID = worldNum.toLong().shl(32) or layerNum.toLong().shl(24) or chunkNumber.toLong()
+                        val entryID = 0x1_0000_0000L or layerNum.toLong().shl(24) or chunkNumber.toLong()
 
                         val entryContent = EntryFile(chunkBytes)
                         val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)

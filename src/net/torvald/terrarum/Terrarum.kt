@@ -702,7 +702,7 @@ fun AppUpdateListOfSavegames() {
 fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
     try {
         // # check for meta
-        val metaFile = skimmer.requestFile(-1) ?: return true
+        /*val metaFile = skimmer.requestFile(-1) ?: return true
         // # check if The Player is there
         val player = skimmer.requestFile(PLAYER_REF_ID.toLong().and(0xFFFFFFFFL))?.contents ?: return true
         // # check if:
@@ -723,7 +723,7 @@ fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
                 System.err.println("Nonexisting actor $it for savegame ${skimmer.diskFile.absolutePath}")
                 hasMissingActor = true
             }
-        }; if (hasMissingActor) return true
+        }; if (hasMissingActor) return true*/
 
 
         return false

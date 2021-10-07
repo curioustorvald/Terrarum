@@ -140,7 +140,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
-            demoWorld = GameWorld(1, LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
+            demoWorld = GameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
             printdbg(this, "Demo world not found, using empty world")
         }
 
@@ -230,9 +230,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         // load list of savegames
         println("[TitleScreen] update list of savegames")
-        App.updateListOfSavegames()
-
-//        App.savegames.forEach { println(it.diskFile.absolutePath) }
+        // TODO to show "Continue" and "Load" on the titlescreen, uncomment this line
+//        App.updateListOfSavegames()
 
 
         loadThingsWhileIntroIsVisible()

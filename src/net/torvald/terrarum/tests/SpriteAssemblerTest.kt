@@ -11,7 +11,7 @@ class SpriteAssemblerTest {
 
     operator fun invoke() {
         val properties = ADProperties(StringReader(ADLParsingTest().TEST_STR))
-        AssembleSheetPixmap.invoke(properties)
+        AssembleSheetPixmap.fromAssetsDir(properties)
     }
 
 }

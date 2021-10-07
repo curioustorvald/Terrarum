@@ -24,12 +24,11 @@ object WriteMeta {
                 randseed1 = RoguelikeRandomiser.RNG.state1,
                 weatseed0 = WeatherMixer.RNG.state0,
                 weatseed1 = WeatherMixer.RNG.state1,
-                playerid = ingame.actorGamer.referenceID,
                 creation_t = ingame.creationTime,
                 lastplay_t = time_t,
                 playtime_t = ingame.totalPlayTime + currentPlayTime_t,
                 loadorder = ModMgr.loadOrder.toTypedArray(),
-                worlds = ingame.gameworldIndices.toTypedArray()
+                //worlds = ingame.gameworldIndices.toTypedArray()
         )
 
         return Common.jsoner.toJson(meta)
@@ -52,8 +51,8 @@ object WriteMeta {
             val creation_t: Long = 0,
             val lastplay_t: Long = 0,
             val playtime_t: Long = 0,
-            val loadorder: Array<String> = arrayOf(), // do not use list; Could not instantiate instance of class: java.util.Collections$SingletonList
-            val worlds: Array<Int> = arrayOf() // do not use list; Could not instantiate instance of class: java.util.Collections$SingletonList
+            val loadorder: Array<String> = arrayOf() // do not use list; Could not instantiate instance of class: java.util.Collections$SingletonList
+            //val worlds: Array<Int> = arrayOf() // do not use list; Could not instantiate instance of class: java.util.Collections$SingletonList
     ) {
 
         override fun equals(other: Any?): Boolean {

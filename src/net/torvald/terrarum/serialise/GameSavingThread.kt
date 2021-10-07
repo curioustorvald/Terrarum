@@ -29,6 +29,11 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
     private val actorProgressMultiplier = 1f
 
     override fun run() {
+        callback()
+        return
+
+        // TODO //
+
         disk.saveMode = 2 * isAuto.toInt() // no quick
 
         if (hasThumbnail) {
@@ -81,9 +86,9 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
         // Commented out; nothing to write
 
         // Write ItemCodex//
-        val itemCodexContent = EntryFile(Common.zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
-        val items = DiskEntry(-17, 0, creation_t, time_t, itemCodexContent)
-        addFile(disk, items)
+//        val itemCodexContent = EntryFile(Common.zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
+//        val items = DiskEntry(-17, 0, creation_t, time_t, itemCodexContent)
+//        addFile(disk, items)
         // Gotta save dynamicIDs
 
         // Write WireCodex//
@@ -104,15 +109,15 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
 //        addFile(disk, factions)
 
         // Write Apocryphas//
-        val apocryphasContent = EntryFile(Common.zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
-        val apocryphas = DiskEntry(-1024, 0, creation_t, time_t, apocryphasContent)
-        addFile(disk, apocryphas)
+//        val apocryphasContent = EntryFile(Common.zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
+//        val apocryphas = DiskEntry(-1024, 0, creation_t, time_t, apocryphasContent)
+//        addFile(disk, apocryphas)
 
         // Write World //
-        val worldNum = ingame.world.worldIndex
-        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
-        val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
-        addFile(disk, world)
+//        val worldNum = ingame.world.worldIndex
+//        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
+//        val world = DiskEntry(worldNum.toLong(), 0, creation_t, time_t, worldMeta)
+//        addFile(disk, world)
 
         WriteSavegame.saveProgress += 1f
 
@@ -125,7 +130,7 @@ class GameSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Ter
                     Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
 
                     val chunkBytes = WriteWorld.encodeChunk(layers[layer]!!, cx, cy)
-                    val entryID = worldNum.toLong().shl(32) or layer.toLong().shl(24) or chunkNumber
+                    val entryID = 0x1_0000_0000L or layer.toLong().shl(24) or chunkNumber
 
                     val entryContent = EntryFile(chunkBytes)
                     val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)

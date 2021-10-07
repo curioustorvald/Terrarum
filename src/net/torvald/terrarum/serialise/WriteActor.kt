@@ -3,6 +3,8 @@ package net.torvald.terrarum.serialise
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.spriteassembler.ADProperties
+import net.torvald.terrarum.App
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.NoSuchActorWithIDException
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -49,17 +51,53 @@ object WriteActor {
  * Created by minjaesong on 2021-10-07.
  */
 object WritePlayer {
-    operator fun invoke(player: IngamePlayer, disk: VirtualDisk) {
+
+    /**
+     * Will happily overwrite existing entry
+     */
+    private fun addFile(disk: VirtualDisk, file: DiskEntry) {
+        disk.entries[file.entryID] = file
+        file.parentEntryID = 0
+        val dir = VDUtil.getAsDirectory(disk, 0)
+        if (!dir.contains(file.entryID)) dir.add(file.entryID)
+    }
+
+    operator fun invoke(player: IngamePlayer, playerDisk: VirtualDisk) {
+        val time_t = App.getTIME_T()
         val actorJson = WriteActor.encodeToByteArray64(player)
-        val adl = player.animDesc?.getRawADL() // NULLABLE!
+        val adl = player.animDesc!!.getRawADL()
         val adlGlow = player.animDescGlow?.getRawADL() // NULLABLE!
+
+        val jsonContents = EntryFile(actorJson)
+        val jsonCreationDate = playerDisk.getEntry(-1)?.creationDate ?: time_t
+        addFile(playerDisk, DiskEntry(-1L, 0L, jsonCreationDate, time_t, jsonContents))
+
+        val adlContents = EntryFile(ByteArray64.fromByteArray(adl.toByteArray(Common.CHARSET)))
+        val adlCreationDate = playerDisk.getEntry(-2)?.creationDate ?: time_t
+        addFile(playerDisk, DiskEntry(-1L, 0L, adlCreationDate, time_t, adlContents))
+
+        if (adlGlow != null) {
+            val adlGlowContents = EntryFile(ByteArray64.fromByteArray(adlGlow.toByteArray(Common.CHARSET)))
+            val adlGlowCreationDate = playerDisk.getEntry(-3)?.creationDate ?: time_t
+            addFile(playerDisk, DiskEntry(-1L, 0L, adlGlowCreationDate, time_t, adlGlowContents))
+        }
+
+
     }
 
-    operator fun invoke(player: IngamePlayer, skimmer: DiskSkimmer) {
-
-    }
 }
 
+/**
+ * Player-specific [ReadActor].
+ *
+ * Created by minjaesong on 2021-10-07.
+ */
+object ReadPlayer {
+
+    operator fun invoke(disk: SimpleFileSystem, dataStream: Reader): IngamePlayer =
+            ReadActor(disk, dataStream) as IngamePlayer
+
+}
 
 /**
  * Actor's JSON representation is expected to have "class" property on the root object, such as:
@@ -71,8 +109,8 @@ object WritePlayer {
  */
 object ReadActor {
 
-    operator fun invoke(disk: SimpleFileSystem, worldDataStream: Reader): Actor =
-            fillInDetails(disk, Common.jsoner.fromJson(null, worldDataStream))
+    operator fun invoke(disk: SimpleFileSystem, dataStream: Reader): Actor =
+            fillInDetails(disk, Common.jsoner.fromJson(null, dataStream))
 
     fun readActorBare(worldDataStream: Reader): Actor =
             Common.jsoner.fromJson(null, worldDataStream)
@@ -89,19 +127,30 @@ object ReadActor {
 
             actor.sprite = SpriteAnimation(actor)
             if (animFileGlow != null) actor.spriteGlow = SpriteAnimation(actor)
-            actor.reassembleSprite(
-                    actor.sprite!!,
-                    ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET)),
-                    actor.spriteGlow,
-                    if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
-            )
+            val bodypartsFile = disk.getFile(-1025)
+
+            if (bodypartsFile != null)
+                actor.reassembleSprite(
+                        disk,
+                        actor.sprite!!,
+                        ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET)),
+                        actor.spriteGlow,
+                        if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
+                )
+            else
+                actor.reassembleSprite(
+                        actor.sprite!!,
+                        ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET)),
+                        actor.spriteGlow,
+                        if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
+                )
         }
 
         return actor
     }
 
-    fun readActorAndAddToWorld(ingame: TerrarumIngame, disk: SimpleFileSystem, worldDataStream: Reader): Actor {
-        val actor = invoke(disk, worldDataStream)
+    fun readActorAndAddToWorld(ingame: TerrarumIngame, disk: SimpleFileSystem, dataStream: Reader): Actor {
+        val actor = invoke(disk, dataStream)
 
         // replace existing player
         val oldPlayerID = ingame.actorNowPlaying?.referenceID

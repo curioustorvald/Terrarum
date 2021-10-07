@@ -18,6 +18,8 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -154,7 +156,7 @@ object LightmapRenderer {
             return // something's wrong but we'll ignore it like a trustful AK
         }
 
-        if (world.worldIndex == -1) return
+        if (world.worldIndex == UUID(0L,0L)) return
 
 
         for_x_start = WorldCamera.zoomedX / TILE_SIZE // fix for premature lightmap rendering
