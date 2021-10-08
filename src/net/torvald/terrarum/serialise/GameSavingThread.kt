@@ -1,13 +1,16 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.ccG
+import net.torvald.terrarum.ccW
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.PhysicalStatus
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.toInt
 import net.torvald.terrarum.tvda.*
 import java.io.File
 import java.util.zip.GZIPOutputStream
@@ -164,7 +167,13 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
         WriteSavegame.savingStatus = 255
 
 
-        callback()
+        try {
+            callback()
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+            ingame.uiAutosaveNotifier.setAsError()
+        }
     }
 }
 
@@ -183,6 +192,12 @@ class PlayerSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: T
         WritePlayer(ingame.actorGamer, disk)
         VDUtil.dumpToRealMachine(disk, outFile)
 
-        callback()
+        try {
+            callback()
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+            ingame.uiAutosaveNotifier.setAsError()
+        }
     }
 }

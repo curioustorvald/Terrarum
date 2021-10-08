@@ -27,11 +27,26 @@ class UIAutosaveNotifier : UICanvas() {
     private var spinnerFrame = 0
     private val spinnerInterval = 1f / 60f
 
+    private var errorTimer = 0f
+    private var errorMax = App.getConfigInt("notificationshowuptime") / 1000f
+    private var errored = false
+
+    private var normalCol = Color.WHITE
+    private var errorCol = Color(0xFF8888FF.toInt())
+
     override fun updateUI(delta: Float) {
         spinnerTimer += delta
         while (spinnerTimer > spinnerInterval) {
             spinnerFrame = (spinnerFrame + 1) % 32
             spinnerTimer -= spinnerInterval
+        }
+
+        if (errored) {
+            errorTimer += delta
+
+            if (errorTimer >= errorMax) {
+                this.setAsClose()
+            }
         }
     }
 
@@ -40,9 +55,20 @@ class UIAutosaveNotifier : UICanvas() {
         val offX = (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
         val offY = App.scr.tvSafeGraphicsHeight + 9f // +9 to align to quickslot and watch UI
 
-        batch.color = Color.WHITE
-        batch.draw(spin, offX, offY)
-        App.fontGame.draw(batch, Lang["MENU_IO_SAVING"], offX + 30f, offY)
+        val text = if (errored) Lang["ERROR_GENERIC_TEXT"] else Lang["MENU_IO_SAVING"]
+        batch.color = if (errored) errorCol else normalCol
+        if (!errored) batch.draw(spin, offX, offY)// else RED_X_SYMBOL
+        App.fontGame.draw(batch, text, offX + 30f, offY)
+    }
+
+    fun setAsError() {
+        println("ugh, diddums")
+        errored = true
+    }
+
+    override fun setAsOpen() {
+        errored = false
+        super.setAsOpen()
     }
 
     override fun doOpening(delta: Float) {

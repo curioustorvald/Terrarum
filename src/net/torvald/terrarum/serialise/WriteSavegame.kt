@@ -12,7 +12,10 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.Common.getUnzipInputStream
-import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.tvda.ByteArray64
+import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import java.io.File
 import java.io.Reader
 

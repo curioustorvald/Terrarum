@@ -48,9 +48,6 @@ import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 
 /**
@@ -335,13 +332,19 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //  1. lighten the IO burden
         //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
-        WriteSavegame.immediate(WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
-            makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
+        try {
+            WriteSavegame.immediate(WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
+                makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
-        WriteSavegame.immediate(WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
-            makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
-                uiAutosaveNotifier.setAsClose()
+                WriteSavegame.immediate(WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
+                    makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
+                    uiAutosaveNotifier.setAsClose()
+                }
             }
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+            uiAutosaveNotifier.setAsError()
         }
     }
 
