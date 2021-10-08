@@ -24,7 +24,7 @@ object Save : ConsoleCommand {
                 val disk = VDUtil.createNewDisk(1L shl 60, savename, Common.CHARSET)
                 val file = File(App.saveDir + "/${args[1]}")
 
-                WriteSavegame(disk, file, ingame, false)
+//                WriteSavegame(disk, file, ingame, false)
 
             }
             catch (e: IOException) {
@@ -47,9 +47,7 @@ object Quicksave : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
 
-        WriteSavegame.quick(ingame.savegameArchive, ingame.getSaveFileMain(), ingame, false) {
-
-        }
+//        WriteSavegame.quick(ingame.savegameArchive, ingame.getSaveFileMain(), ingame, false) {}
     }
 
     override fun printUsage() {

@@ -23,11 +23,21 @@ import java.io.Reader
  */
 object WriteSavegame {
 
+    enum class SaveMode {
+        META, PLAYER, WORLD, SHARED
+    }
+
     @Volatile var savingStatus = -1 // -1: not started, 0: saving in progress, 255: saving finished
     @Volatile var saveProgress = 0f
     @Volatile var saveProgressMax = 1f
 
-    operator fun invoke(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
+    private fun getSaveThread(mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, callback: () -> Unit = {}) = when (mode) {
+        SaveMode.WORLD -> WorldSavingThread(disk, outFile, ingame, hasThumbnail, isAuto, callback)
+        SaveMode.PLAYER -> PlayerSavingThread(disk, outFile, ingame, hasThumbnail, isAuto, callback)
+        else -> throw IllegalArgumentException("$mode")
+    }
+
+    operator fun invoke(mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
         savingStatus = 0
 
         Echo("Save queued")
@@ -47,7 +57,7 @@ object WriteSavegame {
         }
         IngameRenderer.screencapRequested = true
 
-        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(mode, disk, outFile, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
@@ -55,16 +65,13 @@ object WriteSavegame {
     }
 
 
-    fun immediate(disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
-        return
-
-        // TODO //
+    fun immediate(mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, callback: () -> Unit = {}) {
 
         savingStatus = 0
 
         Echo("Immediate save fired")
 
-        val savingThread = Thread(GameSavingThread(disk, outFile, ingame, false, isAuto, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(mode, disk, outFile, ingame, false, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
@@ -134,7 +141,6 @@ object LoadSavegame {
         world.layerTerrain = BlockLayer(world.width, world.height)
         world.layerWall = BlockLayer(world.width, world.height)
 
-        newIngame.savegameArchive = disk
         newIngame.creationTime = meta.creation_t
         newIngame.lastPlayTime = meta.lastplay_t
         newIngame.totalPlayTime = meta.playtime_t

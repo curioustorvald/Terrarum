@@ -10,6 +10,7 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*
 import net.torvald.util.SortedArrayList
@@ -21,6 +22,18 @@ import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
+
+class PhysicalStatus() {
+    // bottom-center point
+    var position = Point2d()
+    // some actorvalues
+    var scale = 1.0
+
+    constructor(player: IngamePlayer) : this() {
+        this.position = Point2d(player.hitbox.canonicalX, player.hitbox.canonicalY)
+        this.scale = player.avBaseScale
+    }
+}
 
 /**
  * Special version of GameWorld where layer data are not transient
@@ -37,6 +50,8 @@ open class GameWorld() : Disposable {
     var worldCreator: UUID = UUID(0L,0L) // TODO record a value to this
     var width: Int = 999; private set
     var height: Int = 999; private set
+
+    var playersLastStatus = PlayersLastPhysics() // only gets used when the game saves and loads
 
     /** Creation time for this world, NOT the entire savegame */
     internal var creationTime: Long = App.getTIME_T()
@@ -106,8 +121,8 @@ open class GameWorld() : Disposable {
 
     val extraFields = HashMap<String, Any?>()
 
-    internal var genver = -1
-    internal var comp = -1
+    internal var genver = -1 // only gets used when the game saves and loads
+    internal var comp = -1 // only gets used when the game saves and loads
 
     @Deprecated("This value is only used for savegames; DO NOT USE THIS", ReplaceWith("INGAME.actorContainerActive", "net.torvald.terrarum.INGAME"))
     internal val actors = ArrayList<ActorID>() // only filled up on save and load; DO NOT USE THIS

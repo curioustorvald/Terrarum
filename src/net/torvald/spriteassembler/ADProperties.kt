@@ -34,7 +34,7 @@ internal data class Transform(val joint: Joint, val translate: ADPropertyObject.
 
 class ADProperties {
     private var fileFrom = ""
-    private var adlString = ""
+    @Transient private var adlString = ""
     private val javaProp = Properties()
 
     /** Every key is CAPITALISED */
@@ -52,8 +52,8 @@ class ADProperties {
     /** an "animation frame" property (ANIM_RUN_1, ANIM_RUN_2) */
     internal lateinit var transforms: HashMap<String, List<Transform>>; private set
 
-    private val reservedProps = listOf("SPRITESHEET", "EXTENSION", "CONFIG", "BODYPARTS")
-    private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
+    @Transient private val reservedProps = listOf("SPRITESHEET", "EXTENSION", "CONFIG", "BODYPARTS")
+    @Transient private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
 
     lateinit var baseFilename: String; private set
     lateinit var extension: String; private set
@@ -63,9 +63,9 @@ class ADProperties {
     internal val origin: ADPropertyObject.Vector2i
         get() = ADPropertyObject.Vector2i(originX, 0)
 
-    private val animFrameSuffixRegex = Regex("""_[0-9]+""")
+    @Transient private val animFrameSuffixRegex = Regex("""_[0-9]+""")
 
-    private val ALL_JOINT = Joint(ALL_JOINT_SELECT_KEY, ADPropertyObject.Vector2i(0, 0))
+    @Transient private val ALL_JOINT = Joint(ALL_JOINT_SELECT_KEY, ADPropertyObject.Vector2i(0, 0))
 
     var rows = -1; private set
     var cols = -1; private set

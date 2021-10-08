@@ -979,7 +979,7 @@ public class App implements ApplicationListener {
     }
 
     private static void createDirs() {
-        File[] dirs = {new File(saveDir)};
+        File[] dirs = {new File(saveDir), new File(saveSharedDir), new File(playersDir), new File(worldsDir)};
 
         for (File it : dirs) {
             if (!it.exists())

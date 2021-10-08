@@ -7,9 +7,12 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.PhysicalStatus
 import net.torvald.terrarum.tvda.ByteArray64Reader
 import net.torvald.terrarum.serialise.Common
 import java.io.StringReader
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by minjaesong on 2021-08-26.
@@ -22,7 +25,7 @@ class HashedFluidType: HashMap<BlockAddress, FluidType>()
 class HashedWirings: HashMap<BlockAddress, GameWorld.WiringNode>()
 class HashedWiringGraph: HashMap<BlockAddress, WiringGraphMap>()
 class MetaModuleCSVPair: HashMap<String, ZipCodedStr>()
-
+class PlayersLastPhysics: HashMap<UUID, PhysicalStatus>()
 /**
  * @param doc plaintext
  *

@@ -43,6 +43,9 @@ object Common {
 
     // install custom (de)serialiser
     init {
+        jsoner.ignoreUnknownFields = true
+
+
         // BigInteger
         jsoner.setSerializer(BigInteger::class.java, object : Json.Serializer<BigInteger> {
             override fun write(json: Json, obj: BigInteger?, knownType: Class<*>?) {

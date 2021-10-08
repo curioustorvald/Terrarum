@@ -14,7 +14,7 @@ The main game directory is composed of following directories:
   - <e.g. Disk GUID>, TEVD { * }
   - <this directory can have anything>
 + Worlds
-  - <World Name Here>, TVDA { (-1) WriteWorld, (actorID) actors (mainly fixtures) JSON, (0x1_0000_0000 + (layerNumber << 24) + chunkNumber) chunk data, (-2) screenshot.tga.gz taken by the last player }
+  - <World Name Here>, TVDA { (-1) WriteWorld, (actorID) actors (mainly fixtures) JSON, (0x1_0000_0000L or (layerNumber shl 24) or chunkNumber) chunk data, (-2) screenshot.tga.gz taken by the last player }
 ```
 
 (TEVD stands for Terrarum Virtual Disk spec version 3, TVDA stands for spec version 254; both have MAGIC header of `TEVd`)

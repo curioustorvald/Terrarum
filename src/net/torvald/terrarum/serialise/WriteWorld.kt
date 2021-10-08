@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorldTitleScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.tvda.ByteArray64
 import net.torvald.terrarum.tvda.ByteArray64Writer
@@ -22,7 +23,8 @@ object WriteWorld {
     fun actorAcceptable(actor: Actor): Boolean {
         return actor.referenceID !in ReferencingRanges.ACTORS_WIRES &&
                actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER &&
-               actor != (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor)
+               actor != (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor) &&
+               actor !is IngamePlayer // IngamePlayers must not be saved with the world
     }
 
     private fun preWrite(ingame: TerrarumIngame, time_t: Long): GameWorld {

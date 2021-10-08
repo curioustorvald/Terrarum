@@ -8,7 +8,6 @@
   "strengthmult": [90,95,98,100,102,105,110],
 
   "accel": 0.67,
-  "accelbuff": 1.0,
 
   "speed": 6.0,
   "speedmult": [100,100,100,100,100,100,100],
@@ -22,8 +21,8 @@
   "scalemult": [100,100,100,100,100,100,100],
 
   "encumbrance": 10000,
-  "basedefence": 100,
-  "basereach": 180,
+  "defence": 100,
+  "reach": 180,
 
   "toolsize": 40,
 

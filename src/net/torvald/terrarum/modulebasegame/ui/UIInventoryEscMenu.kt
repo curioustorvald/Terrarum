@@ -90,13 +90,13 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     INGAME.makeSavegameBackupCopy()
 
                     // save the game
-                    WriteSavegame(INGAME.savegameArchive, File(App.saveDir, INGAME.savegameNickname), Terrarum.ingame!! as TerrarumIngame, false) {
+                    /*WriteSavegame(INGAME.savegameArchive, File(App.saveDir, INGAME.savegameNickname), Terrarum.ingame!! as TerrarumIngame, false) {
                         // callback:
                         System.gc()
                         screen = 0
                         full.handler.unlockToggle()
                         full.unlockTransition()
-                    }
+                    }*/
                 }
                 2 -> {
                     screen = 4; gameMenuButtons.deselect()

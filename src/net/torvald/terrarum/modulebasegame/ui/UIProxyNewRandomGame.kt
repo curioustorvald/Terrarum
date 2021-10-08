@@ -9,6 +9,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
+import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderTestSubject1
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.RandomWordsName
 
@@ -36,9 +37,11 @@ class UIProxyNewRandomGame : UICanvas() {
     override fun endOpening(delta: Float) {
         printdbg(this, "endOpening")
 
-
         val ingame = TerrarumIngame(App.batch)
-        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong(), RandomWordsName(4))
+        val worldParam = TerrarumIngame.NewGameParams(
+                PlayerBuilderTestSubject1(),
+                TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong(), RandomWordsName(4))
+        )
 //        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, 0x51621D)
 
 //        val worldParam = TerrarumIngame.NewWorldParameters(6030, 1800, HQRNG().nextLong()) // small
@@ -51,7 +54,7 @@ class UIProxyNewRandomGame : UICanvas() {
         Terrarum.setCurrentIngameInstance(ingame)
         //LoadScreen.screenToLoad = ingame
         //AppLoader.setScreen(LoadScreen)
-        val loadScreen = WorldgenLoadScreen(ingame, worldParam.width, worldParam.height)
+        val loadScreen = WorldgenLoadScreen(ingame, worldParam.newWorldParams.width, worldParam.newWorldParams.height)
         App.setLoadScreen(loadScreen)
     }
 

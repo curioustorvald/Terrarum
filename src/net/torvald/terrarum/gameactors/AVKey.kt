@@ -88,12 +88,14 @@ object AVKey {
     /** (unit TBA)
      * base defence point of the species
      */
-    const val BASEDEFENCE = "basedefence"
+    const val DEFENCE = "defence"
+    const val DEFENCEBUFF = "$DEFENCE$BUFF"
 
     /** Pixels
      * base hand reach of the species (only affects the gameplay as the player)
      */
-    const val BASEREACH = "basereach"
+    const val REACH = "reach"
+    const val REACHBUFF = "$REACH$BUFF"
 
     /** (unit TBA)
      * current defence point of worn armour(s)

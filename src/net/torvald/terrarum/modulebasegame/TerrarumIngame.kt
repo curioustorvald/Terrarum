@@ -46,7 +46,11 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 
 /**
@@ -218,7 +222,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
 
         when (gameLoadMode) {
-            GameLoadMode.CREATE_NEW -> enterCreateNewWorld(gameLoadInfoPayload as NewWorldParameters)
+            GameLoadMode.CREATE_NEW -> enterCreateNewWorld(gameLoadInfoPayload as NewGameParams)
             GameLoadMode.LOAD_FROM  -> enterLoadFromSave(gameLoadInfoPayload as Codices)
         }
 
@@ -227,6 +231,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         super.show() // this function sets gameInitialised = true
     }
+
+    data class NewGameParams(
+            val player: IngamePlayer,
+            val newWorldParams: NewWorldParameters
+    )
 
     data class NewWorldParameters(
             val width: Int,
@@ -254,14 +263,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             val actors: List<ActorID>
     )
 
-    private fun setTheRealGamerFirstTime(actor: IngamePlayer) {
-        if (actor.referenceID != Terrarum.PLAYER_REF_ID) {
-            throw Error()
-        }
 
-        actorNowPlaying = actor
-        addNewActor(actorNowPlaying)
-    }
 
     /**
      * Init instance by loading saved world
@@ -308,33 +310,49 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // go to spawn position
         printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
 
-//        setTheRealGamerFirstTime(PlayerBuilderSigrid())
-        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
-//        setTheRealGamerFirstTime(PlayerBuilderWerebeastTest())
+        val worldSavefileName = savegameNickname
+        val playerSavefileName = actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player-${actorGamer.uuid}"
 
-        savegameArchive = VDUtil.createNewDisk(
+        worldDisk = VDUtil.createNewDisk(
                 1L shl 60,
-                savegameNickname,
+                worldSavefileName,
                 Common.CHARSET
         )
 
-        actorNowPlaying!!.setPosition(
+        playerDisk = VDUtil.createNewDisk(
+                1L shl 60,
+                playerSavefileName,
+                Common.CHARSET
+        )
+
+        actorGamer.setPosition(
                 world.spawnX * TILE_SIZED,
                 world.spawnY * TILE_SIZED
         )
 
         // make initial savefile
+        // we're not writing multiple files at one go because:
+        //  1. lighten the IO burden
+        //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
-        WriteSavegame.immediate(savegameArchive, getSaveFileMain(), this, true) {
-            makeSavegameBackupCopy() // don't put it on the postInit() or render(); must be called using callback
-            uiAutosaveNotifier.setAsClose()
+        WriteSavegame.immediate(WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
+            makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
+
+        WriteSavegame.immediate(WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
+            makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
+                uiAutosaveNotifier.setAsClose()
+            }
         }
     }
 
     /**
      * Init instance by creating new world
      */
-    private fun enterCreateNewWorld(worldParams: NewWorldParameters) {
+    private fun enterCreateNewWorld(newGameParams: NewGameParams) {
+
+        val player = newGameParams.player
+        val worldParams = newGameParams.newWorldParams
+
         printdbg(this, "Ingame called")
         printStackTrace(this)
 
@@ -343,6 +361,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         else {
             App.getLoadScreen().addMessage("${App.GAME_NAME} version ${App.getVERSION_STRING()}")
+
             App.getLoadScreen().addMessage("Creating new world")
 
 
@@ -364,6 +383,19 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             historicalFigureIDBucket = ArrayList<Int>()
 
             savegameNickname = worldParams.savegameName
+
+
+
+            player.worldCurrentlyPlaying = UUID.fromString(world.worldIndex.toString())
+            world.worldCreator = UUID.fromString(player.uuid.toString())
+
+            printdbg(this, "new woridIndex: ${world.worldIndex}")
+            printdbg(this, "worldCurrentlyPlaying: ${player.worldCurrentlyPlaying}")
+
+            actorNowPlaying = player
+            actorGamer = player
+            addNewActor(player)
+
         }
 
         KeyToggler.forceSet(Input.Keys.Q, false)
@@ -978,13 +1010,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     fun queueAutosave() {
         val start = System.nanoTime()
 
-        uiAutosaveNotifier.setAsOpen()
+        /*uiAutosaveNotifier.setAsOpen()
         makeSavegameBackupCopy()
         WriteSavegame.quick(savegameArchive, getSaveFileMain(), this, true) {
             uiAutosaveNotifier.setAsClose()
 
             debugTimers.put("Last Autosave Duration", System.nanoTime() - start)
-        }
+        }*/
     }
 
 
@@ -1022,8 +1054,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun removeActor(actor: Actor?) {
         if (actor == null) return
 
-        if (actor.referenceID == actorGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
-            throw ProtectedActorRemovalException("Player")
+//        if (actor.referenceID == actorGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
+//            throw ProtectedActorRemovalException("Player")
 
         forceRemoveActor(actor)
     }

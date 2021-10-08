@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.realestate.LandUtil
@@ -48,8 +49,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
                 }
     }
 
-    lateinit var savegameArchive: VirtualDisk
-        internal set
+    lateinit var worldDisk: VirtualDisk; internal set
+    lateinit var playerDisk: VirtualDisk; internal set
     var savegameNickname: String = "SplinesReticulated"
         internal set
 
@@ -106,8 +107,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     /**
      * The actual gamer
      */
-    val actorGamer: ActorHumanoid
-        get() = getActorByID(Terrarum.PLAYER_REF_ID) as ActorHumanoid
+    open lateinit var actorGamer: IngamePlayer
 
     open var gameInitialised = false
         internal set
@@ -362,29 +362,34 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         }
     }
 
+    fun makeSavegameBackupCopy() {
+        System.err.println("This function is deleteh")
+        printStackTrace(this)
+    }
+
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */
-    fun makeSavegameBackupCopy() {
+    fun makeSavegameBackupCopy(file: File) {
         try {
             // do not overwrite clean .2 with dirty .1
-            val file2 = File(App.saveDir, INGAME.savegameNickname + ".3")
-            val file1 = File(App.saveDir, INGAME.savegameNickname + ".2")
+            val file2 = File("${file.absolutePath}.3")
+            val file1 = File("${file.absolutePath}.2")
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
             if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
             // do not overwrite clean .2 with dirty .1
-            val file2 = File(App.saveDir, INGAME.savegameNickname + ".2")
-            val file1 = File(App.saveDir, INGAME.savegameNickname + ".1")
+            val file2 = File("${file.absolutePath}.2")
+            val file1 = File("${file.absolutePath}.1")
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
             if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
-            File(App.saveDir, INGAME.savegameNickname).copyTo(
-                    File(App.saveDir, INGAME.savegameNickname + ".1"), // don't use .bak as it's used by the savecracker
+            file.copyTo(
+                    File("${file.absolutePath}.1"), // don't use .bak as it's used by the savecracker
                     true
             )
         } catch (e: NoSuchFileException) {}
@@ -392,8 +397,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
 
 
-    fun getSaveFileMain() = File(App.saveDir, savegameNickname)
-
+//    fun getSaveFileMain() = File(App.saveDir, savegameNickname)
+    fun getWorldSaveFiledesc(filename: String) = File(App.worldsDir, filename)
+    fun getPlayerSaveFiledesc(filename: String) = File(App.playersDir, filename)
+    fun getSharedSaveFiledesc(filename: String) = File(App.saveSharedDir, filename)
 
 
     // simple euclidean norm, squared

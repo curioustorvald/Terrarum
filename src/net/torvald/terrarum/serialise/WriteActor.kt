@@ -46,7 +46,7 @@ object WriteActor {
 }
 
 /**
- * Player-specific [WriteActor].
+ * Player-specific [WriteActor]. Will write JSON and Animation Description Languages
  *
  * Created by minjaesong on 2021-10-07.
  */
@@ -74,12 +74,12 @@ object WritePlayer {
 
         val adlContents = EntryFile(ByteArray64.fromByteArray(adl.toByteArray(Common.CHARSET)))
         val adlCreationDate = playerDisk.getEntry(-2)?.creationDate ?: time_t
-        addFile(playerDisk, DiskEntry(-1L, 0L, adlCreationDate, time_t, adlContents))
+        addFile(playerDisk, DiskEntry(-2L, 0L, adlCreationDate, time_t, adlContents))
 
         if (adlGlow != null) {
             val adlGlowContents = EntryFile(ByteArray64.fromByteArray(adlGlow.toByteArray(Common.CHARSET)))
             val adlGlowCreationDate = playerDisk.getEntry(-3)?.creationDate ?: time_t
-            addFile(playerDisk, DiskEntry(-1L, 0L, adlGlowCreationDate, time_t, adlGlowContents))
+            addFile(playerDisk, DiskEntry(-3L, 0L, adlGlowCreationDate, time_t, adlGlowContents))
         }
 
 

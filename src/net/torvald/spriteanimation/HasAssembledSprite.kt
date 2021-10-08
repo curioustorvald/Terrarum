@@ -13,9 +13,9 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 interface HasAssembledSprite {
 
-    /** ADL path for main sprite. Necessary. */
+    /** ADL for main sprite. Necessary. */
     var animDesc: ADProperties?
-    /** ADL path for glow sprite. Optional. */
+    /** ADL for glow sprite. Optional. */
     var animDescGlow: ADProperties?
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)
