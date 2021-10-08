@@ -307,8 +307,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // go to spawn position
         printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
 
-        val worldSavefileName = savegameNickname
-        val playerSavefileName = actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player-${actorGamer.uuid}"
+        val worldSavefileName = "$savegameNickname-${world.worldIndex}"
+        val playerSavefileName = (actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${actorGamer.uuid}"
 
         worldDisk = VDUtil.createNewDisk(
                 1L shl 60,
