@@ -282,6 +282,17 @@ vec4 quantiserDivider = vec4(1.0 / quant);
 vec2 boolean = vec2(0.0, 1.0);
 vec4 halfvec = vec4(0.5);
 
+vec4 nearestColour(vec4 inColor) {
+    return floor(quantiser * inColor + halfvec) * quantiserDivider;
+}
+
+vec4 getDitherredDot(vec4 inColor) {
+    vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
+    int index = int(entry.y) * int(bayerSize) + int(entry.x);
+    vec4 bayerThreshold = vec4(bayerTex[index] / bayerDivider - 0.5);
+    return nearestColour(inColor + bayerThreshold * quantiserDivider);
+}
+
 vec4 gammaIn(vec4 col) {
     return pow(col, vec4(2.2));
 }
@@ -290,18 +301,10 @@ vec4 gammaOut(vec4 col) {
     return pow(col, vec4(1.0 / 2.2));
 }
 
-vec4 nearestColour(vec4 inColor) {
-    return floor(quantiser * inColor + halfvec) * quantiserDivider;
-}
-
 void main(void) {
     // create texture coordinates based on pixelSize //
     vec4 inColor = v_color * (texture2D(u_texture, v_texCoords));
-    vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
-    int index = int(entry.y) * int(bayerSize) + int(entry.x);
-    
-    vec4 bayerThreshold = vec4(bayerTex[index] / bayerDivider - 0.5);
-    vec4 selvec = nearestColour(inColor + bayerThreshold * quantiserDivider);
+    vec4 selvec = getDitherredDot(inColor);
 
     gl_FragColor = selvec * boolean.yyyx + inColor * boolean.xxxy; // use quantised RGB but not the A
 }

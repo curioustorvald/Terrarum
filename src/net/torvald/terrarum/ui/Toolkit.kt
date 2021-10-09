@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
@@ -22,7 +23,9 @@ object Toolkit : Disposable {
 
     val DEFAULT_BOX_BORDER_COL = Color(1f, 1f, 1f, 0.2f)
 
-    private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur2.frag")
+    val shaderBlur: ShaderProgram
+        get() = if (IngameRenderer.isDither()) IngameRenderer.shaderBlurDither else IngameRenderer.shaderBlurRaw
+
     val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36, flipY = true)
 
 

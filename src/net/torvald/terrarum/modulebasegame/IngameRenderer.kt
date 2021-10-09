@@ -17,7 +17,6 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -30,6 +29,11 @@ import kotlin.system.exitProcess
  * This will be rendered to a postprocessor FBO.
  *
  * For the entire render path, see AppLoader.
+ *
+ * NOTE: config "fx_dither" only controls the skybox (which is capable of having more than 256 colours
+ * thanks to the hardware linear intp.) because this dithering shader is somewhat heavy.
+ *
+ * Actors' transparency (and not an UI) still uses its own lightweight ditherrer
  */
 object IngameRenderer : Disposable {
     /** for non-private use, use with care! */
@@ -53,12 +57,26 @@ object IngameRenderer : Disposable {
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
+    inline fun isDither() = App.getConfigBoolean("fx_dither")
+
     val shaderBlur: ShaderProgram
-    val shaderBayer: ShaderProgram
-    val shaderBlendGlow: ShaderProgram
+        get() = if (isDither()) shaderBlurDither else shaderBlurRaw
     val shaderRGBOnly: ShaderProgram
+        get() = if (isDither()) shaderRGBOnlyDither else shaderRGBOnlyRaw
     val shaderAtoGrey: ShaderProgram
+        get() = if (isDither()) shaderAtoGreyDither else shaderAtoGreyRaw
+
+    val shaderBlurDither: ShaderProgram
+    val shaderBlurRaw: ShaderProgram
+    val shaderRGBOnlyDither: ShaderProgram
+    val shaderRGBOnlyRaw: ShaderProgram
+    val shaderAtoGreyDither: ShaderProgram
+    val shaderAtoGreyRaw: ShaderProgram
+
+    val shaderBayer: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
+
+    val shaderBlendGlow: ShaderProgram
     val shaderAlphaDither: ShaderProgram
 
     private val WIDTH = App.scr.width
@@ -70,9 +88,7 @@ object IngameRenderer : Disposable {
 
     private var player: ActorWithBody? = null
 
-    var uiListToDraw: List<UICanvas?> = arrayListOf()
-
-    const val lightmapDownsample = 4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
+    const val lightmapDownsample = 1f//4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
 
     private var debugMode = 0
 
@@ -92,14 +108,18 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-        shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
+        shaderBlurDither = App.loadShaderFromFile("assets/blur.vert", "assets/blur_dither.frag")
+        shaderRGBOnlyDither = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_rgb1.frag")
+        shaderAtoGreyDither = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_aaa1.frag")
+
+        shaderBlurRaw = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
+        shaderRGBOnlyRaw = App.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
+        shaderAtoGreyRaw = App.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
 
 
         shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag") // always load the shader regardless of config because the config may cange
         shaderAlphaDither = App.loadShaderFromFile("assets/4096.vert", "assets/alphadither.frag")
         shaderBlendGlow = App.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
-        shaderRGBOnly = App.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
-        shaderAtoGrey = App.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
 
 
         if (!shaderBlendGlow.isCompiled) {
@@ -108,7 +128,7 @@ object IngameRenderer : Disposable {
         }
 
 
-        if (App.getConfigBoolean("fx_dither")) {
+        if (isDither()) {
             if (!shaderBayer.isCompiled) {
                 Gdx.app.log("shaderBayer", shaderBayer.log)
                 exitProcess(1)
@@ -402,7 +422,7 @@ object IngameRenderer : Disposable {
         fboRGB.inAction(camera, batch) {
 
             batch.inUse {
-                batch.shader = null
+                batch.shader = shaderAlphaDither
                 batch.color = Color.WHITE
             }
 
@@ -421,7 +441,7 @@ object IngameRenderer : Disposable {
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
 
-            batch.shader = null
+            batch.shader = shaderAlphaDither
             batch.inUse {
                 /////////////////
                 // draw actors //
@@ -498,7 +518,7 @@ object IngameRenderer : Disposable {
         fboA.inAction(camera, batch) {
 
             batch.inUse {
-                batch.shader = null
+                batch.shader = shaderAlphaDither
                 batch.color = Color.WHITE
             }
 
@@ -566,7 +586,7 @@ object IngameRenderer : Disposable {
         fboRGB_lightMixed.inAction(camera, batch) {
 
             batch.inUse {
-                batch.shader = null
+                batch.shader = shaderAlphaDither
                 batch.color = Color.WHITE
             }
 
@@ -746,11 +766,16 @@ object IngameRenderer : Disposable {
 
         batch.dispose()
 
-        shaderBlur.dispose()
+
+        shaderBlurDither.dispose()
+        shaderBlurRaw.dispose()
+        shaderRGBOnlyDither.dispose()
+        shaderRGBOnlyRaw.dispose()
+        shaderAtoGreyDither.dispose()
+        shaderAtoGreyRaw.dispose()
+
         shaderBayer.dispose()
         shaderBlendGlow.dispose()
-        shaderRGBOnly.dispose()
-        shaderAtoGrey.dispose()
         shaderPassthru.dispose()
         shaderAlphaDither.dispose()
 

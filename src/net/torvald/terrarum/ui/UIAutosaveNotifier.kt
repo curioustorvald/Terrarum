@@ -55,14 +55,13 @@ class UIAutosaveNotifier : UICanvas() {
         val offX = (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
         val offY = App.scr.tvSafeGraphicsHeight + 9f // +9 to align to quickslot and watch UI
 
-        val text = if (errored) Lang["ERROR_GENERIC_TEXT"] else Lang["MENU_IO_SAVING"]
+        val text = if (errored) Lang["ERROR_GENERIC_TEXT"].replace(".","") else Lang["MENU_IO_SAVING"]
         batch.color = if (errored) errorCol else normalCol
         if (!errored) batch.draw(spin, offX, offY)// else RED_X_SYMBOL
         App.fontGame.draw(batch, text, offX + 30f, offY)
     }
 
     fun setAsError() {
-        println("ugh, diddums")
         errored = true
     }
 

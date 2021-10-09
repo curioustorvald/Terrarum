@@ -2,7 +2,8 @@ varying vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 
+vec2 boolean = vec2(0.0, 1.0);
+
 void main(void) {
-    vec3 color = texture2D(u_texture, v_texCoords).rgb;
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = texture2D(u_texture, v_texCoords).rgba * boolean.yyyx + boolean.xxxy;
 }

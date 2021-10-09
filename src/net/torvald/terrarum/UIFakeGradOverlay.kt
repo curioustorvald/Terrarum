@@ -55,8 +55,6 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
 
     override var openCloseTime: Second = 0f
 
-    private val shaderBlur = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
-
     private val darken = Color(0.5f, 0.5f, 0.5f, 1f)
 
     override fun updateUI(delta: Float) {}
@@ -79,6 +77,5 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
     override fun endOpening(delta: Float) {}
     override fun endClosing(delta: Float) {}
     override fun dispose() {
-        shaderBlur.dispose()
     }
 }
