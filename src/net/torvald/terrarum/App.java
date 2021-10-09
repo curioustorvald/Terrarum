@@ -215,6 +215,7 @@ public class App implements ApplicationListener {
 
 
 
+    public static Texture ditherPattern;
     private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderPassthruRGB;
@@ -405,6 +406,7 @@ public class App implements ApplicationListener {
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
         // set GL graphics constants
+        ditherPattern = new Texture(Gdx.files.internal("assets/LDR_512_RGBA_0.tga"));
         shaderBayerSkyboxFill = loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShaderFromFile("assets/4096.vert", "assets/hicolour.frag");
         shaderPassthruRGB = SpriteBatch.createDefaultShader();
@@ -582,11 +584,13 @@ public class App implements ApplicationListener {
     }
 
     private void drawSplash() {
+        ditherPattern.bind(0);
         shaderBayerSkyboxFill.bind();
         shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
+        shaderBayerSkyboxFill.setUniformi("u_texture", 0);
         shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
-        shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b);
-        shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b);
+        shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b, 1f);
+        shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b, 1f);
         fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
 
 
@@ -706,6 +710,7 @@ public class App implements ApplicationListener {
         //FloatDrawer.INSTANCE.dispose();
 
 
+        ditherPattern.dispose();
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
         shaderPassthruRGB.dispose();

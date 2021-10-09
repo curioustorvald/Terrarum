@@ -14,6 +14,7 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.lwjgl.opengl.GL20
 
 
 /**
@@ -101,12 +102,20 @@ object Toolkit : Disposable {
     }
 
     fun blurEntireScreen(batch: SpriteBatch, camera: OrthographicCamera, blurRadius: Float, x: Int, y: Int, w: Int, h: Int) {
+
+        batch.end()
+
+        IngameRenderer.ditherPattern.bind(1)
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
+        batch.begin()
         for (i in 0 until 6) {
             val scalar = blurRadius * (1 shl i.ushr(1))
 
             batch.shader = shaderBlur
             shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
             shaderBlur.setUniformi("u_texture", 0)
+            shaderBlur.setUniformi("u_pattern", 1)
             shaderBlur.setUniformf("iResolution", w.toFloat(), h.toFloat())
             IngameRenderer.shaderBlur.setUniformf("flip", 1f)
             if (i % 2 == 0)

@@ -55,6 +55,13 @@ object IngameRenderer : Disposable {
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
 
+    val ditherPattern = App.ditherPattern
+
+    init {
+        ditherPattern.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Linear)
+        ditherPattern.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
+    }
+
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
     inline fun isDither() = App.getConfigBoolean("fx_dither")
@@ -469,6 +476,9 @@ object IngameRenderer : Disposable {
 
             gdxSetBlend()
 
+            ditherPattern.bind(1)
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
             batch.inUse {
 
                 blendNormal(batch)
@@ -486,6 +496,7 @@ object IngameRenderer : Disposable {
                     blendMul(batch)
 
                 batch.shader = shaderRGBOnly
+                batch.shader.setUniformi("u_pattern", 1)
                 batch.draw(lightTex,
                         xrem, yrem,
                         lightTex.regionWidth * lightmapDownsample,
@@ -553,6 +564,9 @@ object IngameRenderer : Disposable {
             setCameraPosition(0f, 0f)
             val (xrem, yrem) = worldCamToRenderPos()
 
+            ditherPattern.bind(1)
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
             batch.inUse {
                 // draw world
                 batch.draw(fboA.colorBufferTexture, 0f, 0f)
@@ -567,6 +581,7 @@ object IngameRenderer : Disposable {
                     blendMul(batch)
 
                 batch.shader = shaderAtoGrey
+                batch.shader.setUniformi("u_pattern", 1)
                 batch.draw(lightTex,
                         xrem, yrem,
                         lightTex.regionWidth * lightmapDownsample,
@@ -664,12 +679,15 @@ object IngameRenderer : Disposable {
 
             blurWriteBuffer.inAction(camera, batch) {
 
+
                 blurTex.texture = blurReadBuffer.colorBufferTexture
                 blurTex.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
                 blurTex.texture.bind(0)
+                ditherPattern.bind(1) // order is important!
 
                 shaderBlur.bind()
                 shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
+                shaderBlur.setUniformi("u_pattern", 1)
                 shaderBlur.setUniformi("u_texture", 0)
                 shaderBlur.setUniformf("iResolution",
                         blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())

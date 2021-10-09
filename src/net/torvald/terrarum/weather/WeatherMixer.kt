@@ -20,7 +20,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
-import java.util.*
 
 /**
  *
@@ -177,8 +176,17 @@ internal object WeatherMixer : RNGConsumer {
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
-        IngameRenderer.batch.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
+
+        if (App.getConfigBoolean("fx_dither")) {
+            IngameRenderer.ditherPattern.bind(1)
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+        }
+
         batch.inUse {
+            it.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
+            if (App.getConfigBoolean("fx_dither")) {
+                it.shader.setUniformi("u_pattern", 1)
+            }
             it.draw(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
         }
 

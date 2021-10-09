@@ -7,288 +7,36 @@
 varying vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
+uniform sampler2D u_pattern;
 
 
-uniform vec3 topColor;
-uniform vec3 bottomColor;
+uniform vec4 topColor;
+uniform vec4 bottomColor;
 uniform float parallax = 0.0; // +1.0: all top col, -1.0: all bototm col, 0.0: normal grad
 uniform float parallax_size = 1.0/3.0; // 0: no parallax
 
 // inverted zoom; this value must set to (1f/zoom)
 uniform float zoomInv = 1.0;
 
-vec4 bayerTex[256] = vec4[](
-vec4(205, 111,  82,  65),
-vec4(255,  65, 133,   0),
-vec4( 25,  88,   9, 134),
-vec4(105, 231,  39, 185),
-vec4(161, 152, 139,  66),
-vec4( 91, 170, 203,  35),
-vec4(247,  78,   3, 115),
-vec4( 22, 193,  59, 144),
-vec4(165, 156, 148, 157),
-vec4(114, 131, 233, 245),
-vec4(192, 202, 132,  57),
-vec4( 30, 162,  31,  15),
-vec4(217,  17,  63,  83),
-vec4(147, 189, 214,  39),
-vec4( 71, 168, 106, 129),
-vec4(135,   1, 195, 243),
-vec4(173, 213, 232,  75),
-vec4(122, 175, 161, 233),
-vec4(142,  26, 213, 203),
-vec4(234, 118, 251,  21),
-vec4(  1,   7,  70,  86),
-vec4(218, 222, 113, 162),
-vec4(150, 105, 244, 249),
-vec4(186,  51, 124,  49),
-vec4( 41, 229, 183,  11),
-vec4( 65,   4,  22,  90),
-vec4(252,  43, 115, 186),
-vec4(131, 141, 166, 165),
-vec4( 53, 221, 239, 202),
-vec4( 20,  69,   1, 228),
-vec4(226, 230, 123, 173),
-vec4( 39, 130,  43,  29),
-vec4( 15, 251,  28, 124),
-vec4(216,  79,  90,  98),
-vec4( 47, 137,  53, 145),
-vec4(198, 203, 197, 225),
-vec4( 60, 190,  25,  54),
-vec4(133,  38, 172, 130),
-vec4( 75, 143,  46, 218),
-vec4(124, 243,  97, 105),
-vec4(227, 115, 218, 201),
-vec4( 84,  81,  68, 123),
-vec4(  4,  97, 207,  32),
-vec4(179, 254,  84, 133),
-vec4( 79,  55,  50,  99),
-vec4(160, 119, 184,   9),
-vec4(189,  92, 141, 108),
-vec4( 86,  47, 246, 194),
-vec4(111, 185,  67,  48),
-vec4(157,  14, 147, 170),
-vec4( 70,  54, 122,  12),
-vec4( 98, 235, 105, 110),
-vec4(180,  70, 155, 197),
-vec4( 31,  94,  85, 177),
-vec4(239,  21, 224,   4),
-vec4( 14, 167,  30,  78),
-vec4(106, 183, 162, 172),
-vec4(209, 212,   6, 234),
-vec4(144, 151, 254, 221),
-vec4(235, 178, 103,  73),
-vec4(101,  23, 151, 250),
-vec4(119, 205, 221,  60),
-vec4(248, 154,  13, 156),
-vec4( 59,  31, 168, 217),
-vec4(238, 144, 209, 238),
-vec4(177, 223, 227,  37),
-vec4( 11, 165, 182, 154),
-vec4(249, 108,   5, 254),
-vec4(164, 153, 238,  74),
-vec4(112, 253, 128,  30),
-vec4(201, 126, 190, 239),
-vec4( 49,  59, 145, 139),
-vec4(172,  11,  78,  63),
-vec4(156,  32, 200,  20),
-vec4( 27,  72, 135,  46),
-vec4( 44, 107,  38, 148),
-vec4(196, 192, 193, 180),
-vec4(  9,   6,  72,  24),
-vec4(208, 242,  96, 140),
-vec4(138, 102, 114,  84),
-vec4( 34, 199,  19, 182),
-vec4( 81, 122,  45,  64),
-vec4(128,  91,  79, 208),
-vec4(211,  28,  36,  92),
-vec4( 23,  44, 212, 122),
-vec4( 83, 187,  58,  44),
-vec4(139, 216,  11, 190),
-vec4(223,  85, 241,  96),
-vec4( 92, 198, 117, 159),
-vec4( 58, 232,  55, 113),
-vec4(129, 136, 173, 193),
-vec4(215, 238,  15,  85),
-vec4( 69,  62, 125, 211),
-vec4(166, 129, 243, 118),
-vec4( 26, 172,  54, 242),
-vec4( 95,  73, 179,   6),
-vec4(224,  57, 129, 106),
-vec4(199,   8, 252, 127),
-vec4(145, 247, 164, 227),
-vec4( 43, 209, 201,  18),
-vec4(229, 173, 137, 168),
-vec4(154,   0,  71, 150),
-vec4( 67, 140, 177, 216),
-vec4(  3, 104, 102,  14),
-vec4(194, 160,  41, 206),
-vec4(245, 121, 229, 252),
-vec4(181,  41,  93, 128),
-vec4(110, 164, 236,   1),
-vec4(241,  25, 160, 166),
-vec4(149,  86,  29,  40),
-vec4( 50, 225, 204,  70),
-vec4(183,  40, 143, 198),
-vec4( 64, 159, 231, 163),
-vec4(  2, 179, 104,  26),
-vec4(115, 133,  91,  79),
-vec4( 56,  63,  23, 188),
-vec4( 97, 116, 112,  58),
-vec4(187,  77, 247, 246),
-vec4(254, 226, 158, 114),
-vec4( 37,  50,  18,  82),
-vec4(120, 249, 205,  53),
-vec4( 78,  19, 150,  33),
-vec4( 13,  95, 186, 224),
-vec4( 36, 219,  64, 103),
-vec4( 87, 197, 110,  55),
-vec4(127, 147, 216, 230),
-vec4(213, 114,  87,  95),
-vec4(108, 208,   2, 137),
-vec4(236, 233, 192, 251),
-vec4(169,  20,  57,  50),
-vec4(193,  84, 153, 204),
-vec4(242, 149, 188, 142),
-vec4(125, 240, 225, 101),
-vec4( 19,  36,  48,   8),
-vec4(176, 194,  86, 132),
-vec4(103,  15, 215, 232),
-vec4(162,  67, 121, 181),
-vec4(220, 206,  26, 143),
-vec4(140, 180,  80,  69),
-vec4(171,  74,   7, 171),
-vec4(230,  52, 140, 189),
-vec4(  6, 250,  42, 149),
-vec4( 77,  13, 175, 215),
-vec4(155,  98,  74,  16),
-vec4(136,  68,  34, 176),
-vec4( 21, 195, 217, 116),
-vec4( 88,  48,  14, 241),
-vec4( 33, 220,  66,  38),
-vec4(210, 182, 171, 222),
-vec4( 76,  96,  32, 175),
-vec4(134, 155, 131,  71),
-vec4( 54, 127, 185,  41),
-vec4(206, 171,  61, 158),
-vec4( 24, 145, 248,  91),
-vec4( 99, 112, 167,  22),
-vec4(202,   2, 222, 244),
-vec4( 62, 125, 196,  10),
-vec4(188, 184, 250, 121),
-vec4(253,  35, 120,  34),
-vec4( 40, 139, 157,  88),
-vec4(102, 106, 107, 152),
-vec4( 72, 255, 134,  68),
-vec4(219, 123, 240,   2),
-vec4(151,  30, 118, 160),
-vec4(163,  10, 146,  89),
-vec4(  8, 109,  99, 210),
-vec4(222, 236, 230,  27),
-vec4(237, 214,   0, 196),
-vec4(148,  87, 144, 120),
-vec4( 68,  37, 108, 219),
-vec4(250, 246,  49, 199),
-vec4( 48, 228, 130, 111),
-vec4(132, 158,  98,  80),
-vec4(116,  83,  60, 236),
-vec4( 18, 215,  24,  61),
-vec4(175, 169, 237, 192),
-vec4( 52,   5, 181, 231),
-vec4(244, 157,  47,  97),
-vec4(184,  90,  81, 187),
-vec4(109, 204, 208, 126),
-vec4( 61, 142,  10,  51),
-vec4(190,  53, 255, 109),
-vec4(117,  71,  73, 147),
-vec4( 42,  24, 199, 240),
-vec4( 89, 188,  89,   3),
-vec4( 10,  58, 234,  59),
-vec4(182, 101,  33, 135),
-vec4(158, 135, 211,  47),
-vec4( 29,  27,  12, 155),
-vec4( 93,  64, 149, 207),
-vec4(221, 239,  88, 131),
-vec4(207,  45, 202,  42),
-vec4(123, 132,   4,  13),
-vec4(  7, 227, 165, 138),
-vec4(141,  60,  95, 200),
-vec4( 45, 174, 194, 226),
-vec4(251, 244,  40,  19),
-vec4( 96, 163, 178, 253),
-vec4( 28, 201,  52, 183),
-vec4(197, 120, 163,  77),
-vec4(168, 224,  20, 104),
-vec4(126,  12, 180, 164),
-vec4(107, 166, 154, 248),
-vec4(225, 196,  76, 179),
-vec4(195, 207, 189,  28),
-vec4(143,  93, 170, 100),
-vec4( 82, 117, 228, 167),
-vec4(159, 191,  69, 220),
-vec4( 32,  75, 142, 112),
-vec4(200, 210, 245,  56),
-vec4( 85,  34,  27,  31),
-vec4( 16, 113, 152,  81),
-vec4(130,  80, 219, 169),
-vec4(231,   3, 127,  62),
-vec4(146, 134, 109, 136),
-vec4( 80,  42, 136,  45),
-vec4(243, 148, 210, 205),
-vec4(214, 237,  65,  17),
-vec4( 38,  76, 119,  87),
-vec4( 73,  49, 242, 223),
-vec4(246,   9,  51,  67),
-vec4(  0, 150, 111,   5),
-vec4( 63, 176,  37, 255),
-vec4(233,  22, 126,  76),
-vec4(113, 100,  56, 146),
-vec4(153, 146, 223, 214),
-vec4(228,  16, 116, 247),
-vec4(170, 186,  62, 119),
-vec4(212, 217,  77, 153),
-vec4( 66,  99,  16,   7),
-vec4(178, 252, 226,  94),
-vec4(  5, 177,  35, 229),
-vec4(137,  89, 249, 174),
-vec4( 57, 110, 101, 125),
-vec4( 17, 181,   8,  36),
-vec4(174, 124, 220, 141),
-vec4(121, 218, 138, 195),
-vec4( 46, 234,  17, 117),
-vec4(167,  56, 253, 184),
-vec4(185, 248, 206,  23),
-vec4( 94, 200,  21, 161),
-vec4( 55, 161, 100, 178),
-vec4( 74, 241, 187,  43),
-vec4(191,  46, 169, 102),
-vec4( 35, 128, 235, 235),
-vec4(118,  61,  94, 209),
-vec4( 51,  29, 159, 191),
-vec4(204, 211, 191,  25),
-vec4(100,  18,  83,  72),
-vec4(232,  66,  44, 213),
-vec4(152, 245, 174, 107),
-vec4( 90,  33, 198, 237),
-vec4(203, 103,  92, 151),
-vec4(104,  82, 156,  52),
-vec4(240, 138,  75, 212),
-vec4( 12,  39, 176,  93)
-);
-
-float bayerSize = 16.0;
-float bayerDivider = bayerSize * bayerSize;
 
 float quant = 63.0; // 64 steps -> 63.0; 256 steps -> 255.0
-vec4 quantizer = vec4(quant);
-vec4 quantizerDivider = vec4(1.0 / quant);
+vec4 quantiser = vec4(quant);
+vec4 quantiserDivider = vec4(1.0 / quant);
 
 vec2 boolean = vec2(0.0, 1.0);
 vec4 halfvec = vec4(0.5);
 
+vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
+
 vec4 nearestColour(vec4 inColor) {
-    return floor(quantizer * inColor + halfvec) * quantizerDivider;
+    return floor(quantiser * inColor + halfvec) * quantiserDivider;
 }
+
+vec4 getDitherredDot(vec4 inColor) {
+    vec4 bayerThreshold = vec4(texture2D(u_pattern, gl_FragCoord.xy * patternsize) - 0.5);
+    return nearestColour(inColor + bayerThreshold * quantiserDivider);
+}
+
 
 void main(void) {
     float scale = v_texCoords.y * (1.0 - parallax_size) + (parallax_size / 2.0) + (parallax * parallax_size / 2.0);
@@ -296,17 +44,13 @@ void main(void) {
     float zoomSamplePoint = (1.0 - zoomInv) / 2.0;// will never quite exceed 0.5
 
     // I don't even know if it works, and also not sure if I actually want it
-    vec3 newBottom = mix(bottomColor, topColor, zoomSamplePoint);
-    vec3 newTop = mix(topColor, bottomColor, zoomSamplePoint);
+    vec4 newBottom = mix(bottomColor, topColor, zoomSamplePoint);
+    vec4 newTop = mix(topColor, bottomColor, zoomSamplePoint);
 
-    vec4 inColor = v_color * vec4(mix(newBottom, newTop, scale), 1.0);
-    vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
-    int index = int(entry.y) * int(bayerSize) + int(entry.x);
+    vec4 inColor = v_color * mix(newBottom, newTop, scale);
+    vec4 selvec = getDitherredDot(inColor);
 
-    vec4 bayerThreshold = vec4(bayerTex[index] / bayerDivider - 0.5);
-    vec4 selvec = nearestColour(inColor + bayerThreshold * quantizerDivider);
-
-    gl_FragColor = selvec * boolean.yyyx + inColor * boolean.xxxy; // use quantised RGB but not the A
+    gl_FragColor = selvec;
 }
 
 /*

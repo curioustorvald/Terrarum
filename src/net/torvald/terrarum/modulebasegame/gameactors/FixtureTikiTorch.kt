@@ -3,20 +3,18 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
-import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.*
+import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
-import net.torvald.terrarum.gameparticles.ParticleVanishingText
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import java.util.*
-import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2016-06-17.
@@ -45,7 +43,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32)
         }
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/tiki_smoke.tga"), 10, 10)
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)
         }
         CommonResourcePool.loadAll()
 
@@ -70,7 +68,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
         if (spawnTimer >= nextDelay) {
             (Terrarum.ingame as TerrarumIngame).addParticle(ParticleVanishingSprite(
                     CommonResourcePool.getAsTextureRegionPack("particles-tiki_smoke.tga"),
-                    0.25f, true, hitbox.centeredX, hitbox.startY, false, rng.nextInt(256)
+                    25f, true, hitbox.centeredX, hitbox.startY, false, rng.nextInt(256)
             ))
 
             spawnTimer -= nextDelay
