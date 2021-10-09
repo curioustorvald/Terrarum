@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -65,6 +66,8 @@ object IngameRenderer : Disposable {
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
     inline fun isDither() = App.getConfigBoolean("fx_dither")
+
+    private val rng = HQRNG()
 
     val shaderBlur: ShaderProgram
         get() = if (isDither()) shaderBlurDither else shaderBlurRaw
@@ -496,6 +499,7 @@ object IngameRenderer : Disposable {
                     blendMul(batch)
 
                 batch.shader = shaderRGBOnly
+                batch.shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
                 batch.shader.setUniformi("u_pattern", 1)
                 batch.draw(lightTex,
                         xrem, yrem,
@@ -581,6 +585,7 @@ object IngameRenderer : Disposable {
                     blendMul(batch)
 
                 batch.shader = shaderAtoGrey
+                batch.shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
                 batch.shader.setUniformi("u_pattern", 1)
                 batch.draw(lightTex,
                         xrem, yrem,
@@ -687,6 +692,7 @@ object IngameRenderer : Disposable {
 
                 shaderBlur.bind()
                 shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
+                shaderBlur.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
                 shaderBlur.setUniformi("u_pattern", 1)
                 shaderBlur.setUniformi("u_texture", 0)
                 shaderBlur.setUniformf("iResolution",

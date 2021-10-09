@@ -11,8 +11,9 @@ varying vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
+uniform ivec2 rnd = ivec2(0,0);
 
-float quant = 63.0; // 64 steps -> 63.0; 256 steps -> 255.0
+float quant = 127.0; // 64 steps -> 63.0; 256 steps -> 255.0
 vec4 quantiser = vec4(quant);
 vec4 quantiserDivider = vec4(1.0 / quant);
 
@@ -26,8 +27,8 @@ vec4 nearestColour(vec4 inColor) {
 }
 
 vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = vec4(texture2D(u_pattern, gl_FragCoord.xy * patternsize) - 0.5);
-    return nearestColour(inColor + bayerThreshold * quantiserDivider);
+    vec4 bayerThreshold = vec4(texture2D(u_pattern, (gl_FragCoord.xy + rnd) * patternsize) - 0.5);
+    return nearestColour(bayerThreshold * quantiserDivider + inColor);
 }
 
 

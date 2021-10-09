@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.fillRect
@@ -39,6 +40,7 @@ object Toolkit : Disposable {
         CommonResourcePool.loadAll()
     }
 
+    private val rng = HQRNG()
 
     override fun dispose() {
         baloonTile.dispose()
@@ -114,6 +116,7 @@ object Toolkit : Disposable {
 
             batch.shader = shaderBlur
             shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
+            shaderBlur.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
             shaderBlur.setUniformi("u_texture", 0)
             shaderBlur.setUniformi("u_pattern", 1)
             shaderBlur.setUniformf("iResolution", w.toFloat(), h.toFloat())

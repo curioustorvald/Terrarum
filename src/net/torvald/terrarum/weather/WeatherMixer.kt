@@ -37,6 +37,8 @@ internal object WeatherMixer : RNGConsumer {
 
     override val RNG = HQRNG()
 
+    private val renderng = HQRNG()
+
     var globalLightOverridden = false
 
     var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
@@ -186,6 +188,7 @@ internal object WeatherMixer : RNGConsumer {
             it.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
             if (App.getConfigBoolean("fx_dither")) {
                 it.shader.setUniformi("u_pattern", 1)
+                it.shader.setUniformi("rnd", renderng.nextInt(8192), renderng.nextInt(8192))
             }
             it.draw(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
         }
