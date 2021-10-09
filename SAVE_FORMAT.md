@@ -19,6 +19,16 @@ The main game directory is composed of following directories:
 
 (TEVD stands for Terrarum Virtual Disk spec version 3, TVDA stands for spec version 254; both have MAGIC header of `TEVd`)
 
+## Handling The Player Data ##
+
+Some of the "player assets" are stored to the world, such assets include:
+- Physical Status (last position and size as in scale)
+- Inventory (instance of ActorInventory)
+
+When loading the game, values from the World must be used and discard whatever might be stored in the IngamePlayer.
+
+Making `inventory` transient is impossible as it would render Storage Chests unusable.
+
 ## Prerequisites ##
 
 1. Player ID must not be strictly 9545698 (0x91A7E2)
