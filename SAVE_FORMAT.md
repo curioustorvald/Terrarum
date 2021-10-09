@@ -1,4 +1,4 @@
-## Introduction ##
+## Introduction
 
 On the main game, any player can access any generated worlds, and thus players data and worlds are saved separately.
 
@@ -19,29 +19,43 @@ The main game directory is composed of following directories:
 
 (TEVD stands for Terrarum Virtual Disk spec version 3, TVDA stands for spec version 254; both have MAGIC header of `TEVd`)
 
-## Handling The Player Data ##
+## Handling The Player Data
 
 Some of the "player assets" are stored to the world, such assets include:
 - Physical Status (last position and size as in scale)
 - Inventory (instance of ActorInventory)
+- Actorvalues (only on Multiplayer)
 
-When loading the game, values from the World must be used and discard whatever might be stored in the IngamePlayer.
+### Loading Procedure
+
+1. Load the Actor completely first
+2. Load the World
+3. Overwrite player data with the World's 
+   
+If the World has the Actorvalue, World's value will be used; otherwise use incoming Player's
+
+Multiplayer world will initialise Actorvalue pool using incoming value -- or they may choose to use
+their own Actorvalue called "gamerules" to either implement their own "gamemode" or prevent cheating)
+
+Worlds must overwrite new Actor's position to make them spawn in right place.
+
+### Remarks
 
 Making `inventory` transient is impossible as it would render Storage Chests unusable.
 
-## Prerequisites ##
+## Prerequisites
 
 1. Player ID must not be strictly 9545698 (0x91A7E2)
     1. Use classname `net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer` to check
 2. Each World and Player has to be uniquely identifiable via GUID
 3. `ActorNowPlaying` must be drawn on top of other actors of same RenderOrder
 
-## To-dos After the Initial Implementation ##
+## To-dos After the Initial Implementation
 
 1. Modify Savegame Crackers and Disk Crackers to work with the new scheme
 2. Create Player Creator Tool for avatar-makers
 
-## Goals ##
+## Goals
 
 1. Allow multiple players share the same world
 2. Make multiplayer possible
