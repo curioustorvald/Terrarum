@@ -25,12 +25,26 @@ private fun addFile(disk: VirtualDisk, file: DiskEntry) {
     if (!dir.contains(file.entryID)) dir.add(file.entryID)
 }
 
+abstract class SavingThread(private val ingame: TerrarumIngame) : Runnable {
+    abstract fun save()
+
+    override fun run() {
+        try {
+            save()
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+            ingame.uiAutosaveNotifier.setAsError()
+        }
+    }
+}
+
 /**
  * Created by minjaesong on 2021-09-14.
  */
-class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
+class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
 
-    override fun run() {
+    override fun save() {
 
         disk.saveMode = 2 * isAuto.toInt() // no quick
 
@@ -40,8 +54,10 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
             }
         }
 
-        val playersList: List<IngamePlayer> = listOf(ingame.actorContainerActive, ingame.actorContainerInactive).flatMap{ it.filter { it is IngamePlayer } } as List<IngamePlayer>
-        val actorsList = listOf(ingame.actorContainerActive, ingame.actorContainerInactive).flatMap { it.filter { WriteWorld.actorAcceptable(it) } }
+        val allTheActors = ingame.actorContainerActive.cloneToList() + ingame.actorContainerInactive.cloneToList()
+
+        val playersList: List<IngamePlayer> = allTheActors.filter{ it is IngamePlayer } as List<IngamePlayer>
+        val actorsList = allTheActors.filter { WriteWorld.actorAcceptable(it) }
         val layers = intArrayOf(0,1).map { ingame.world.getLayer(it) }
         val cw = ingame.world.width / LandUtil.CHUNK_W
         val ch = ingame.world.height / LandUtil.CHUNK_H
@@ -182,9 +198,9 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
  *
  * Created by minjaesong on 2021-10-08
  */
-class PlayerSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
+class PlayerSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
 
-    override fun run() {
+    override fun save() {
         disk.saveMode = 2 * isAuto.toInt() // no quick
         disk.capacity = 0L
 

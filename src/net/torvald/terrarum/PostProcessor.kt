@@ -131,6 +131,8 @@ object PostProcessor : Disposable {
         val shader: ShaderProgram? =
                 if (App.getConfigBoolean("fx_retro"))
                     App.shaderHicolour
+                else if (App.getConfigBoolean("fx_differential"))
+                    App.shaderDebugDiff
                 else
                     App.shaderPassthruRGB
 

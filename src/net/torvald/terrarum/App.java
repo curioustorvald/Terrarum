@@ -218,6 +218,7 @@ public class App implements ApplicationListener {
     public static Texture ditherPattern;
     private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
     public static ShaderProgram shaderHicolour;
+    public static ShaderProgram shaderDebugDiff;
     public static ShaderProgram shaderPassthruRGB;
     public static ShaderProgram shaderColLUT;
     public static ShaderProgram shaderReflect;
@@ -409,6 +410,7 @@ public class App implements ApplicationListener {
         ditherPattern = new Texture(Gdx.files.internal("assets/LDR_512_RGBA_0.tga"));
         shaderBayerSkyboxFill = loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShaderFromFile("assets/4096.vert", "assets/hicolour.frag");
+        shaderDebugDiff = loadShaderFromFile("assets/4096.vert", "assets/diff.frag");
         shaderPassthruRGB = SpriteBatch.createDefaultShader();
         shaderColLUT = loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag");
         shaderReflect = loadShaderFromFile("assets/4096.vert", "assets/reflect.frag");
@@ -713,6 +715,7 @@ public class App implements ApplicationListener {
         ditherPattern.dispose();
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
+        shaderDebugDiff.dispose();
         shaderPassthruRGB.dispose();
         shaderColLUT.dispose();
         shaderReflect.dispose();

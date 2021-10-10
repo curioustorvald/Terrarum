@@ -183,7 +183,11 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs
-        CommonResourcePool.addToLoadingList("title_halfgrad") { Texture(Gdx.files.internal("./assets/graphics/halfgrad.png")) }
+        CommonResourcePool.addToLoadingList("title_halfgrad") {
+            val t = Texture(Gdx.files.internal("./assets/graphics/halfgrad.tga"))
+            t.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            t
+        }
         CommonResourcePool.loadAll()
 
 

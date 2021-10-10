@@ -178,15 +178,16 @@ internal object WeatherMixer : RNGConsumer {
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
+        val dither = App.getConfigBoolean("fx_dither")
 
-        if (App.getConfigBoolean("fx_dither")) {
+        if (dither) {
             IngameRenderer.ditherPattern.bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
         }
 
         batch.inUse {
-            it.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
-            if (App.getConfigBoolean("fx_dither")) {
+            it.shader = if (dither) IngameRenderer.shaderBayer else null
+            if (dither) {
                 it.shader.setUniformi("u_pattern", 1)
                 it.shader.setUniformi("rnd", renderng.nextInt(8192), renderng.nextInt(8192))
             }
