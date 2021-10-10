@@ -16,9 +16,6 @@ import net.torvald.terrarum.utils.*
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import java.util.*
-import kotlin.NoSuchElementException
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
@@ -51,7 +48,7 @@ open class GameWorld() : Disposable {
     var width: Int = 999; private set
     var height: Int = 999; private set
 
-    var playersLastStatus = PlayersLastPhysics() // only gets used when the game saves and loads
+    var playersLastStatus = PlayersLastStatus() // only gets used when the game saves and loads
 
     /** Creation time for this world, NOT the entire savegame */
     internal var creationTime: Long = App.getTIME_T()

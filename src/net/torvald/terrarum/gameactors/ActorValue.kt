@@ -10,7 +10,7 @@ class ActorValue : KVHashMap {
     @Transient lateinit var actor: Actor
         internal set
 
-    private constructor()
+    constructor()
 
     constructor(actor: Actor) : this() {
         this.actor = actor
