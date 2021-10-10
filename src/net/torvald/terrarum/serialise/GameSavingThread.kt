@@ -183,13 +183,7 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
         WriteSavegame.savingStatus = 255
 
 
-        try {
-            callback()
-        }
-        catch (e: Throwable) {
-            e.printStackTrace()
-            ingame.uiAutosaveNotifier.setAsError()
-        }
+        callback()
     }
 }
 
@@ -208,12 +202,6 @@ class PlayerSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: T
         WritePlayer(ingame.actorGamer, disk)
         VDUtil.dumpToRealMachine(disk, outFile)
 
-        try {
-            callback()
-        }
-        catch (e: Throwable) {
-            e.printStackTrace()
-            ingame.uiAutosaveNotifier.setAsError()
-        }
+        callback()
     }
 }

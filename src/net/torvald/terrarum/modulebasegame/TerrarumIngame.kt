@@ -332,19 +332,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //  1. lighten the IO burden
         //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
-        try {
-            WriteSavegame.immediate(WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
-                makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
+        WriteSavegame.immediate(WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
+            makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
-                WriteSavegame.immediate(WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
-                    makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
-                    uiAutosaveNotifier.setAsClose()
-                }
+            WriteSavegame.immediate(WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
+                makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
+                uiAutosaveNotifier.setAsClose()
             }
-        }
-        catch (e: Throwable) {
-            e.printStackTrace()
-            uiAutosaveNotifier.setAsError()
         }
     }
 
