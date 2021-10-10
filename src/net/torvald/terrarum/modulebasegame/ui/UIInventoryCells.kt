@@ -144,6 +144,10 @@ internal class UIInventoryCells(
         }
     }
 
+    override fun show() {
+        INGAME.setTooltipMessage(null)
+    }
+
     override fun doOpening(delta: Float) {
     }
 

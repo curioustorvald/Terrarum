@@ -137,6 +137,10 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         batch.draw(minimapFBO.colorBufferTexture, (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat())
     }
 
+    override fun show() {
+        INGAME.setTooltipMessage(null)
+    }
+
     override fun doOpening(delta: Float) {}
 
     override fun doClosing(delta: Float) {}
