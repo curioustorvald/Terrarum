@@ -1,3 +1,5 @@
 Air tile (tile 0,0) must have colour of 0x00000000, NOT 0xFFFFFF00. You can modify the tga file directly to correct bad exporter behaviour.
 
-All TGA must have alpha premultiplied.
+Semitransparency is rendered using dithering, so it is good idea to avoid them.
+
+If you must add semitransparency to the tile, they must have alpha NOT premultiplied.

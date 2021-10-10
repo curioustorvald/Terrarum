@@ -1,4 +1,4 @@
-All the images must be exported as .tga or .tga.gz. All the alpha must be premultiplied.
+All the images must be exported as .tga or .tga.gz. All the alpha must be not premultiplied. (It is good idea to avoid semitransparency alltogether)
 
 It is recommended to use ImageMagick command line tool to convert PSD to TGA directly.
 

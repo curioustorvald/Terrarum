@@ -11,9 +11,9 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -85,7 +85,7 @@ internal object BlocksDrawer {
 
 
     private lateinit var tilesQuad: Mesh
-    private val shader = App.loadShaderFromFile("assets/4096.vert", "assets/tiling.frag")
+    private val shader = App.loadShaderFromFile("assets/4096.vert", "assets/tiling_dither.frag")
 
     init {
 

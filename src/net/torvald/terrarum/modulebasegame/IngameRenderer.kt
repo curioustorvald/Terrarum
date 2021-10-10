@@ -34,6 +34,8 @@ import kotlin.system.exitProcess
  * NOTE: config "fx_dither" only controls the skybox (which is capable of having more than 256 colours
  * thanks to the hardware linear intp.) because this dithering shader is somewhat heavy.
  *
+ * Semitransparency is rendered using dithering, so it is good idea to avoid them.
+ * If you must add semitransparency to the tile, they must have alpha NOT premultiplied.
  * Actors' transparency (and not an UI) still uses its own lightweight ditherrer
  */
 object IngameRenderer : Disposable {
@@ -282,8 +284,6 @@ object IngameRenderer : Disposable {
                     )
                 }
 
-
-                // blending is correct... somewhat. Alpha must be premultiplied
             }
             // something about RGB
             else if (KeyToggler.isOn(Input.Keys.F6) &&
