@@ -181,7 +181,7 @@ internal object WeatherMixer : RNGConsumer {
         val dither = App.getConfigBoolean("fx_dither")
 
         if (dither) {
-            IngameRenderer.ditherPattern.bind(1)
+            App.getCurrentDitherTex().bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
         }
 

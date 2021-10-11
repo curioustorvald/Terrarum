@@ -58,13 +58,6 @@ object IngameRenderer : Disposable {
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
 
-    val ditherPattern = App.ditherPattern
-
-    init {
-        ditherPattern.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Linear)
-        ditherPattern.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
-    }
-
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
     inline fun isDither() = App.getConfigBoolean("fx_dither")
@@ -479,7 +472,7 @@ object IngameRenderer : Disposable {
 
             gdxSetBlend()
 
-            ditherPattern.bind(1)
+            App.getCurrentDitherTex().bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             batch.inUse {
@@ -568,7 +561,7 @@ object IngameRenderer : Disposable {
             setCameraPosition(0f, 0f)
             val (xrem, yrem) = worldCamToRenderPos()
 
-            ditherPattern.bind(1)
+            App.getCurrentDitherTex().bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             batch.inUse {
@@ -688,7 +681,7 @@ object IngameRenderer : Disposable {
                 blurTex.texture = blurReadBuffer.colorBufferTexture
                 blurTex.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
                 blurTex.texture.bind(0)
-                ditherPattern.bind(1) // order is important!
+                App.getCurrentDitherTex().bind(1) // order is important!
 
                 shaderBlur.bind()
                 shaderBlur.setUniformMatrix("u_projTrans", camera.combined)

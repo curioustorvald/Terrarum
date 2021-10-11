@@ -209,7 +209,7 @@ public class App implements ApplicationListener {
 
 
 
-    public static Texture ditherPattern;
+    public static Texture[] ditherPatterns = new Texture[8];
     private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderDebugDiff;
@@ -401,7 +401,13 @@ public class App implements ApplicationListener {
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
         // set GL graphics constants
-        ditherPattern = new Texture(Gdx.files.internal("assets/LDR_512_RGBA_0.tga"));
+        for (int i = 0; i < ditherPatterns.length; i++) {
+            Texture t = new Texture(Gdx.files.internal("assets/dither_512_"+i+".tga"));
+            t.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Linear);
+            t.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            ditherPatterns[i] = t;
+        }
+
         shaderBayerSkyboxFill = loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShaderFromFile("assets/4096.vert", "assets/hicolour.frag");
         shaderDebugDiff = loadShaderFromFile("assets/4096.vert", "assets/diff.frag");
@@ -579,8 +585,21 @@ public class App implements ApplicationListener {
 
     }
 
+    public static Texture getCurrentDitherTex() {
+        int hash = 31 + GLOBAL_RENDER_TIMER + 0x165667B1 + GLOBAL_RENDER_TIMER * 0xC2B2AE3D;
+        hash = Integer.rotateLeft(hash, 17) * 0x27D4EB2F;
+        hash ^= hash >>> 15;
+        hash *= 0x85EBCA77;
+        hash ^= hash >>> 13;
+        hash *= 0xC2B2AE3D;
+        hash ^= hash >>> 16;
+        hash = hash & 0x7FFFFFFF;
+
+        return ditherPatterns[hash % ditherPatterns.length];
+    }
+
     private void drawSplash() {
-        ditherPattern.bind(0);
+        getCurrentDitherTex().bind(0);
         shaderBayerSkyboxFill.bind();
         shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
         shaderBayerSkyboxFill.setUniformi("u_texture", 0);
@@ -707,7 +726,9 @@ public class App implements ApplicationListener {
 
         ThreadExecutor.INSTANCE.killAll();
 
-        ditherPattern.dispose();
+        for (Texture texture : ditherPatterns) {
+            texture.dispose();
+        }
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
         shaderDebugDiff.dispose();
