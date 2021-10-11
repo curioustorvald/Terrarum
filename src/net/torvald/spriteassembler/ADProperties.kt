@@ -5,6 +5,7 @@ import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.serialise.Common
 import java.io.InputStream
 import java.io.Reader
+import java.io.StringReader
 import java.util.*
 
 internal data class Joint(val name: String, val position: ADPropertyObject.Vector2i) {
@@ -79,30 +80,29 @@ class ADProperties {
     constructor(gdxFile: FileHandle) {
         fileFrom = gdxFile.path()
         adlString = gdxFile.readString(Common.CHARSET.name())
-        javaProp.load(gdxFile.read())
         continueLoad()
     }
 
     constructor(reader: Reader) {
         adlString = reader.readText()
-        javaProp.load(reader)
         continueLoad()
     }
 
     constructor(inputStream: InputStream) {
         adlString = inputStream.readAllBytes().toString(Common.CHARSET)
-        javaProp.load(inputStream)
         continueLoad()
     }
 
     private fun continueLoad() {
+        javaProp.load(StringReader(adlString))
+
         // sanity check
         reservedProps.forEach {
             try {
                 javaProp[it]!!
             }
             catch (e: NullPointerException) {
-                throw IllegalArgumentException("Prop '$it' not found from ${fileFrom.ifBlank { "(path unavailable)" }}", e)
+                throw IllegalArgumentException("Prop '$it' not found from ${fileFrom.ifBlank { "'${adlString.substring(0, 1024)}'" }}", e)
             }
         }
 
@@ -210,7 +210,7 @@ class ADProperties {
                 if (it.name.isBlank())
                     throw IllegalArgumentException("Empty Bodypart name on BODYPARTS; try removing trailing semicolon (';')?")
                 else
-                    throw IllegalArgumentException("Bodyparts definition for '${it.name}' not found from ${fileFrom.ifBlank { "(path unavailable)" }}", e)
+                    throw IllegalArgumentException("Bodyparts definition for '${it.name}' not found from ${fileFrom.ifBlank { "'${adlString.substring(0, 1024)}'" }}", e)
             }
         }
 

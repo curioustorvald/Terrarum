@@ -16,6 +16,7 @@ The main game directory is composed of following directories:
     }
     *if file -1025 is not there, read bodyparts from assets directory
     *optionally encrypt the files other than -1
+    *disk name is player's name encoded in UTF-8
 + Shared
   - <e.g. Disk GUID>, TEVD { * }
   - <this directory can have anything>
@@ -26,6 +27,7 @@ The main game directory is composed of following directories:
       [0x1_0000_0000L or (layerNumber shl 24) or chunkNumber] chunk data,
       [-2] screenshot.tga.gz taken by the last player
     }
+    *disk name is world's name encoded in UTF-8
 ```
 
 (TEVD stands for Terrarum Virtual Disk spec version 3, TVDA stands for spec version 254; both have MAGIC header of `TEVd`)

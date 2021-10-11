@@ -333,13 +333,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         worldDisk = VDUtil.createNewDisk(
                 1L shl 60,
-                worldSavefileName,
+                savegameNickname,
                 Common.CHARSET
         )
 
         playerDisk = VDUtil.createNewDisk(
                 1L shl 60,
-                playerSavefileName,
+                actorGamer.actorValue.getAsString(AVKey.NAME) ?: "",
                 Common.CHARSET
         )
 

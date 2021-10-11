@@ -19,6 +19,7 @@ import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
@@ -682,7 +683,9 @@ class Codex : KVHashMap() {
 
 fun AppUpdateListOfSavegames() {
     App.savegamePlayers.clear()
+    App.savegamePlayersName.clear()
     App.savegameWorlds.clear()
+    App.savegameWorldsName.clear()
 
     println("listing savegames...")
 
@@ -692,7 +695,7 @@ fun AppUpdateListOfSavegames() {
             DiskSkimmer(file, Common.CHARSET, true)
         }
         catch (e: Throwable) {
-            System.err.println("Unable to load a savefile ${file.absolutePath}")
+            System.err.println("Unable to load a world file ${file.absolutePath}")
             e.printStackTrace()
             null
         }
@@ -705,9 +708,33 @@ fun AppUpdateListOfSavegames() {
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val worldUUID = UUID.fromString(json.get("worldIndex")!!.asString())
         App.savegameWorlds[worldUUID] = it
+        App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
     }
 
-    // TODO: savegamePlayers
+
+    // create list of players
+    (File(App.playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
+        try {
+            DiskSkimmer(file, Common.CHARSET, true)
+        }
+        catch (e: Throwable) {
+            System.err.println("Unable to load a player file ${file.absolutePath}")
+            e.printStackTrace()
+            null
+        }
+    }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() } as List<DiskSkimmer>).forEach {
+        println(it.diskFile.absolutePath)
+        it.rebuild() // disk skimmer was created without initialisation, so do it now
+
+        // TODO write simple and dumb SAX parser for JSON
+        val jsonFile = it.getFile(-1L)!!
+        val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
+        val playerUUID = UUID.fromString(json.get("uuid")!!.asString())
+        App.savegamePlayers[playerUUID] = it
+//        App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
+        App.savegamePlayersName[playerUUID] = json.get("actorValue")?.getChild(AVKey.NAME)?.asString() ?: ""
+    }
+
 }
 
 /**

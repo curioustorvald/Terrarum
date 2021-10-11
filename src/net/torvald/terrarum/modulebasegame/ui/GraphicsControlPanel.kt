@@ -5,9 +5,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.TIMES
 import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -63,7 +62,7 @@ class GraphicsControlPanel : UICanvas() {
         batch.color = Color.WHITE
         Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 
-        batch.color = CELLCOLOUR_BLACK
+        batch.color = CELL_COL
         Toolkit.fillArea(batch, drawX, drawY, width, height)
 
         batch.color = Color.WHITE

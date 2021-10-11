@@ -101,6 +101,9 @@ object WritePlayer {
 /**
  * Player-specific [ReadActor].
  *
+ * @param disk disk
+ * @param dataStream Reader containing JSON file
+ *
  * Created by minjaesong on 2021-10-07.
  */
 object ReadPlayer {

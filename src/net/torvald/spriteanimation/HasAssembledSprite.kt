@@ -1,10 +1,8 @@
 package net.torvald.spriteanimation
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
-import net.torvald.terrarum.tvda.DiskSkimmer
 import net.torvald.terrarum.tvda.SimpleFileSystem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -71,7 +69,7 @@ interface HasAssembledSprite {
     private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        val pixmap = AssembleSheetPixmap.fromVirtualDisk(disk, ad)
+        val pixmap = if (disk.getEntry(-1025) != null) AssembleSheetPixmap.fromVirtualDisk(disk, ad) else AssembleSheetPixmap.fromAssetsDir(ad)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()

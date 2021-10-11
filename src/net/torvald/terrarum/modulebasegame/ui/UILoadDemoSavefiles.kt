@@ -8,12 +8,18 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.JsonReader
+import com.jme3.math.FastMath
+import net.torvald.EMDASH
 import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
+import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.spriteassembler.ADProperties
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.ReadPlayer
 import net.torvald.terrarum.tvda.ByteArray64InputStream
 import net.torvald.terrarum.tvda.ByteArray64Reader
 import net.torvald.terrarum.tvda.DiskSkimmer
@@ -97,6 +103,15 @@ class UILoadDemoSavefiles : UICanvas() {
 
     private var showSpinner = false
 
+    // used by UIItem*Cells
+    internal var playerDisk: DiskSkimmer? = null
+    internal var worldDisk: DiskSkimmer? = null
+
+    private val worldCells = ArrayList<UIItemWorldCells>()
+    private val playerCells = ArrayList<UIItemPlayerCells>()
+
+    var mode = 0 // 0: show players, 1: show worlds
+
     override fun show() {
         printdbg(this, "savefiles show()")
 
@@ -109,19 +124,31 @@ class UILoadDemoSavefiles : UICanvas() {
             Thread {
                 // read savegames
                 var savegamesCount = 0
-                App.savegameWorlds.forEach { (uuid, skimmer) ->
+                App.savegameWorlds.forEach { (_, skimmer) ->
                     val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
-                        addUIitem(UIItemWorldCells(this, x, y, skimmer))
+                        worldCells.add(UIItemWorldCells(this, x, y, skimmer))
                         savegamesCount += 1
                     }
                     catch (e: Throwable) {
                         System.err.println("[UILoadDemoSavefiles] Error while loading World '${skimmer.diskFile.absolutePath}'")
                         e.printStackTrace()
                     }
+                }
 
-
+                savegamesCount = 0
+                App.savegamePlayers.forEach { (_, skimmer) ->
+                    val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
+                    val y = titleTopGradEnd + cellInterval * savegamesCount
+                    try {
+                        playerCells.add(UIItemPlayerCells(this, x, y, skimmer))
+                        savegamesCount += 1
+                    }
+                    catch (e: Throwable) {
+                        System.err.println("[UILoadDemoSavefiles] Error while loading Player '${skimmer.diskFile.absolutePath}'")
+                        e.printStackTrace()
+                    }
                 }
 
 
@@ -134,9 +161,13 @@ class UILoadDemoSavefiles : UICanvas() {
     }
 
     override fun hide() {
-        uiItems.forEach { it.dispose() }
-        uiItems.clear()
+        worldCells.forEach { it.dispose() }
+        worldCells.clear()
+        playerCells.forEach { it.dispose() }
+        playerCells.clear()
     }
+
+    private fun getCells() = if (mode == 0) playerCells else worldCells
 
     override fun updateUI(delta: Float) {
 
@@ -156,8 +187,10 @@ class UILoadDemoSavefiles : UICanvas() {
             }
         }
 
-        for (index in 0 until uiItems.size) {
-            val it = uiItems[index]
+        val cells = getCells()
+
+        for (index in 0 until cells.size) {
+            val it = cells[index]
             if (index in listScroll - 2 until listScroll + savesVisible + 2) {
                 // re-position
                 it.posY = (it.initialY - uiScroll).roundToInt()
@@ -172,6 +205,8 @@ class UILoadDemoSavefiles : UICanvas() {
 
         batch.end()
 
+        val cells = getCells()
+
         lateinit var savePixmap: Pixmap
         sliderFBO.inAction(camera as OrthographicCamera, batch) {
             gdxClearAndSetBlend(0f,0f,0f,0f)
@@ -179,8 +214,8 @@ class UILoadDemoSavefiles : UICanvas() {
             setCameraPosition(batch, camera, 0f, 0f)
             batch.color = Color.WHITE
             batch.inUse {
-                for (index in 0 until uiItems.size) {
-                    val it = uiItems[index]
+                for (index in 0 until cells.size) {
+                    val it = cells[index]
                     if (index in listScroll - 2 until listScroll + savesVisible + 2) {
                         it.render(batch, camera)
                     }
@@ -240,12 +275,14 @@ class UILoadDemoSavefiles : UICanvas() {
 
     override fun keyDown(keycode: Int): Boolean {
         if (this.isVisible) {
+            val cells = getCells()
+
             if ((keycode == Input.Keys.UP || keycode == App.getConfigInt("control_key_up")) && scrollTarget > 0) {
                 scrollFrom = listScroll
                 scrollTarget -= 1
                 scrollAnimCounter = 0f
             }
-            else if ((keycode == Input.Keys.DOWN || keycode == App.getConfigInt("control_key_down")) && scrollTarget < uiItems.size - savesVisible) {
+            else if ((keycode == Input.Keys.DOWN || keycode == App.getConfigInt("control_key_down")) && scrollTarget < cells.size - savesVisible) {
                 scrollFrom = listScroll
                 scrollTarget += 1
                 scrollAnimCounter = 0f
@@ -256,12 +293,14 @@ class UILoadDemoSavefiles : UICanvas() {
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (this.isVisible) {
+            val cells = getCells()
+
             if (amountY <= -1f && scrollTarget > 0) {
                 scrollFrom = listScroll
                 scrollTarget -= 1
                 scrollAnimCounter = 0f
             }
-            else if (amountY >= 1f && scrollTarget < uiItems.size - savesVisible) {
+            else if (amountY >= 1f && scrollTarget < cells.size - savesVisible) {
                 scrollFrom = listScroll
                 scrollTarget += 1
                 scrollAnimCounter = 0f
@@ -323,9 +362,109 @@ class UIItemPlayerCells(
     override val width = SAVE_CELL_WIDTH
     override val height = SAVE_CELL_HEIGHT
 
+    private var thumbPixmap: Pixmap? = null
+    private var thumb: TextureRegion? = null
 
+    override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
+        parent.playerDisk = skimmer
+    }
+
+    private var playerName: String = "$EMDASH"
+    private var worldName: String = "$EMDASH"
+    private var lastPlayTime: String = "--h--m--s"
+    private var totalPlayTime: String = "--:--:--"
+
+    init {
+        skimmer.getFile(-1L)?.bytes?.let {
+            val json = JsonReader().parse(ByteArray64Reader(it, Common.CHARSET))
+
+            val playerUUID = UUID.fromString(json["uuid"]?.asString())
+            val worldUUID = UUID.fromString(json["worldCurrentlyPlaying"]?.asString())
+
+            App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it }
+            App.savegameWorldsName[worldUUID]?.let { if (it.isNotBlank()) worldName = it }
+            json["lastPlayTime"]?.asString()?.let {
+                lastPlayTime = Instant.ofEpochSecond(it.toLong())
+                        .atZone(TimeZone.getDefault().toZoneId())
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            }
+            json["totalPlayTime"]?.asString()?.let {
+                totalPlayTime = parseDuration(it.toLong())
+            }
+
+        }
+    }
+
+    private fun parseDuration(seconds: Long): String {
+        val s = seconds % 60
+        val m = (seconds / 60) % 60
+        val h = (seconds / 3600) % 24
+        val d = seconds / 86400
+        return if (d == 0L)
+            "${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
+        else
+            "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
+    }
+
+    private var sprite: SpriteAnimation? = null
+
+    internal var hasTexture = false
+        private set
+
+    private val cellCol = CELL_COL
+
+    override fun render(batch: SpriteBatch, camera: Camera) {
+        // try to generate a texture
+        if (skimmer.initialised && !hasTexture) {
+            skimmer.getFile(-1L)?.bytes?.let {
+                val animFile = skimmer.getFile(-2L)!!
+                val p = ReadPlayer(skimmer, ByteArray64Reader(it, Common.CHARSET))
+                val sprite = SpriteAnimation(p)
+                val animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
+                p.reassembleSprite(skimmer, sprite, animDesc)
+                sprite.textureRegion.get(0,0).let {
+                    thumb = it
+                }
+                this.sprite = sprite
+            }
+
+            hasTexture = true
+        }
+
+        val highlightCol = if (mouseUp) UIItemTextButton.defaultActiveCol else Color.WHITE
+        val x = posX.toFloat()
+        val y = posY.toFloat()
+
+        // draw box backgrounds
+        batch.color = cellCol
+        Toolkit.fillArea(batch, posX, posY, 106, height)
+        Toolkit.fillArea(batch, posX + 116, posY + 63, width - 116, 57)
+
+        // draw borders
+        batch.color = highlightCol
+        // avatar border
+        Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, 106 + 2, height + 2)
+        // infocell border
+        Toolkit.drawBoxBorder(batch, posX + 115, posY + 62, width - 114, 59)
+        // infocell divider
+        Toolkit.fillArea(batch, posX + 118, posY + 90, width - 120, 1)
+
+        // player avatar
+        batch.color = Color.WHITE
+        thumb?.let {
+            batch.draw(it, x + FastMath.ceil((106f - it.regionWidth) / 2f), y + FastMath.ceil((height - it.regionHeight) / 2f))
+        }
+        // texts
+        App.fontGame.draw(batch, playerName, x + 120f, y + height - 54f)
+        App.fontGame.draw(batch, worldName, x + 120f, y + height - 24f)
+        App.fontGame.draw(batch, lastPlayTime, x + width - 4f - App.fontGame.getWidth(lastPlayTime), y + height - 54f)
+        App.fontGame.draw(batch, totalPlayTime, x + width - 4f - App.fontGame.getWidth(totalPlayTime), y + height - 24f)
+    }
 
     override fun dispose() {
+        thumb?.texture?.dispose()
+        thumbPixmap?.dispose()
+        sprite?.dispose()
     }
 
 
@@ -398,6 +537,7 @@ class UIItemWorldCells(
 
 
     private val colourBad = Color(0xFF0011FF.toInt())
+    private val cellCol = CELL_COL
 
 
     init {
@@ -405,6 +545,7 @@ class UIItemWorldCells(
     }
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
+        parent.worldDisk = skimmer
         TODO()
     }
 
@@ -435,8 +576,10 @@ class UIItemWorldCells(
         val x = posX.toFloat()
         val y = posY.toFloat()
 
-
-        // TODO draw border
+        // draw background
+        batch.color = cellCol
+        Toolkit.fillArea(batch, posX, posY, width, height)
+        // draw border
         batch.color = highlightCol
         Toolkit.drawBoxBorder(batch, posX-1, posY-1, width+2, height+2)
 

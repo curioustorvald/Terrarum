@@ -13,8 +13,8 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -55,7 +55,7 @@ class UIItemInventoryItemGrid(
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
     override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-    val backColour = CELLCOLOUR_BLACK
+    val backColour = CELL_COL
 
     init {
         CommonResourcePool.addToLoadingList("inventory_walletnumberfont") {

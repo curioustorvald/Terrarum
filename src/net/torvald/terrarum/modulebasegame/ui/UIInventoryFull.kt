@@ -34,6 +34,8 @@ class UIInventoryFull(
     override var openCloseTime: Second = 0.0f
 
     companion object {
+        val CELL_COL = Color(0x28282888)
+
         const val INVEN_DEBUG_MODE = false
 
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8

@@ -119,7 +119,7 @@ class IngamePlayer : ActorHumanoid {
     private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        val pixmap = AssembleSheetPixmap.fromVirtualDisk(disk, ad)
+        val pixmap = if (disk.getEntry(-1025) != null) AssembleSheetPixmap.fromVirtualDisk(disk, ad) else AssembleSheetPixmap.fromAssetsDir(ad)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()

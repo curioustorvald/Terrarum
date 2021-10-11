@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.itemListHeight
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
@@ -43,7 +43,7 @@ class UIItemInventoryEquippedView(
     lateinit var inventorySortList: Array<GameItem?>
     private var rebuildList = true
     
-    val spriteViewBackCol: Color = CELLCOLOUR_BLACK
+    val spriteViewBackCol: Color = CELL_COL
 
     private val equipPosIcon = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val cellToIcon = intArrayOf(0,1,2,3,4,5,6,7,6,7,6,7)
@@ -59,7 +59,7 @@ class UIItemInventoryEquippedView(
                 itemImage = null,
                 mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = CELLCOLOUR_BLACK,
+                backCol = CELL_COL,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 keyDownFun = createInvCellGenericKeyDownFun(),
