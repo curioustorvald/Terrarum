@@ -22,7 +22,7 @@ import javax.swing.text.DefaultCaret
 class VirtualDiskCracker(val sysCharset: Charset = Charsets.UTF_8) : JFrame() {
 
 
-    private val annoyHackers = true // Jar build settings. Intended for Terrarum proj.
+    private val annoyHackers = false // Jar build settings. Intended for Terrarum proj.
 
 
     private val PREVIEW_MAX_BYTES = 4L * 1024 // 4 kBytes

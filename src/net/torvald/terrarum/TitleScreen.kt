@@ -234,8 +234,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
         // load list of savegames
         println("[TitleScreen] update list of savegames")
-        // TODO to show "Continue" and "Load" on the titlescreen, uncomment this line
-//        App.updateListOfSavegames()
+        // to show "Continue" and "Load" on the titlescreen, uncomment this line
+        App.updateListOfSavegames()
 
 
         loadThingsWhileIntroIsVisible()

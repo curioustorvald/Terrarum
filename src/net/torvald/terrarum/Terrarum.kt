@@ -684,6 +684,8 @@ fun AppUpdateListOfSavegames() {
     App.savegamePlayers.clear()
     App.savegameWorlds.clear()
 
+    println("listing savegames...")
+
     // create list of worlds
     (File(App.worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
@@ -695,8 +697,12 @@ fun AppUpdateListOfSavegames() {
             null
         }
     }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() } as List<DiskSkimmer>).forEach {
+        println(it.diskFile.absolutePath)
+        it.rebuild() // disk skimmer was created without initialisation, so do it now
+
         // TODO write simple and dumb SAX parser for JSON
-        val json = JsonReader().parse(ByteArray64Reader(it.getFile(-1L)!!.bytes, Common.CHARSET).readText())
+        val jsonFile = it.getFile(-1L)!!
+        val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val worldUUID = UUID.fromString(json.get("worldIndex")!!.asString())
         App.savegameWorlds[worldUUID] = it
     }

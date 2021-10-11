@@ -1,22 +1,9 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.ELLIPSIS
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ccC
-import net.torvald.terrarum.ccG
-import net.torvald.terrarum.ccR
-import net.torvald.terrarum.console.ConsoleCommand
-import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.serialise.*
-import java.io.File
-import java.io.IOException
-import java.util.logging.Level
-
 /**
  * Created by minjaesong on 2021-08-30.
  */
-object Load : ConsoleCommand {
+/*object Load : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
@@ -43,4 +30,4 @@ object Load : ConsoleCommand {
         Echo("Usage: load <filename>")
     }
 
-}
+}*/

@@ -37,6 +37,7 @@ object UITitleRemoConYaml {
 
 
     operator fun invoke(hasSave: Boolean) =
-            Yaml((if (!hasSave) menuWithSavefile else menuNewGame) + menuBase).parse()
+            //Yaml((if (hasSave) menuWithSavefile else menuNewGame) + menuBase).parse()
+            Yaml((if (true) menuWithSavefile else menuNewGame) + menuBase).parse()
 }
 

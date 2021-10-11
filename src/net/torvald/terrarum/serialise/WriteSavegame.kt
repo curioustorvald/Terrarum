@@ -11,10 +11,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.tvda.ByteArray64
-import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.SimpleFileSystem
-import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.tvda.*
 import java.io.File
 import java.io.Reader
 
@@ -128,12 +125,17 @@ object LoadSavegame {
     fun getFileBytes(disk: SimpleFileSystem, id: Long): ByteArray64 = disk.getFile(id)!!.bytes
     fun getFileReader(disk: SimpleFileSystem, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
-    operator fun invoke(playerDisk: SimpleFileSystem) {
+    /**
+     * @param playerDisk DiskSkimmer representing the Player.
+     * @param worldDisk0 DiskSkimmer representing the World to be loaded.
+     *     If unset, last played world for the Player will be loaded.
+     */
+    operator fun invoke(playerDisk: DiskSkimmer, worldDisk0: DiskSkimmer? = null) {
         val newIngame = TerrarumIngame(App.batch)
         val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer
 
         val currentWorldId = player.worldCurrentlyPlaying
-        val worldDisk = App.savegameWorlds[currentWorldId]!!
+        val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!
         val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(-1L)!!.bytes, Common.CHARSET))
 
         world.layerTerrain = BlockLayer(world.width, world.height)

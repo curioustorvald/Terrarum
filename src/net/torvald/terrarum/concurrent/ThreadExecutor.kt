@@ -72,7 +72,10 @@ object ThreadExecutor {
     }
 
     fun killAll() {
-        executor.shutdownNow()
+        try {
+            executor.shutdownNow()
+        }
+        catch (e: UninitializedPropertyAccessException) {}
     }
 }
 

@@ -188,6 +188,8 @@ removefile:
      * @return DiskEntry if the entry exists on the disk, `null` otherwise.
      */
     fun requestFile(entryID: EntryID): DiskEntry? {
+        if (!initialised) throw IllegalStateException("File entries not built! Initialise the Skimmer by executing rebuild()")
+
         entryToOffsetTable[entryID].let { offset ->
             if (offset == null) {
                 debugPrintln("[DiskSkimmer.requestFile] entry $entryID does not exist on the table")

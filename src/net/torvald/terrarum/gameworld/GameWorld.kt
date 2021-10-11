@@ -40,7 +40,7 @@ class GameWorldTitleScreen : GameWorld() {
 
 open class GameWorld() : Disposable {
 
-    var worldName: String = "New World"
+//    var worldName: String = "New World"
     var worldIndex: UUID = UUID.randomUUID() // should not be immutable as JSON loader will want to overwrite it
     var worldCreator: UUID = UUID(0L,0L) // TODO record a value to this
     var width: Int = 999; private set
@@ -55,14 +55,17 @@ open class GameWorld() : Disposable {
     val randSeeds = LongArray(256) // stores 128 128-bit numbers
 
     /** Creation time for this world, NOT the entire savegame */
-    internal var creationTime: Long = App.getTIME_T()
+    internal var creationTime = -1L
         internal set
     /** Creation time for this world, NOT the entire savegame */
-    internal var lastPlayTime: Long = App.getTIME_T()
+    internal var lastPlayTime = -1L
         internal set // there's a case of save-and-continue-playing
     /** Creation time for this world, NOT the entire savegame */
     internal var totalPlayTime = 0L // cumulative value for this very world
 
+    init {
+        creationTime = App.getTIME_T()
+    }
 
     //layers
     @Transient lateinit open var layerWall: BlockLayer

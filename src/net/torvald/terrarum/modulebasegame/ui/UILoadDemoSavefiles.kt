@@ -14,14 +14,15 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.tvda.ByteArray64InputStream
+import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.tvda.DiskSkimmer
+import net.torvald.terrarum.tvda.EntryFile
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.logging.Level
 import java.util.zip.GZIPInputStream
 import kotlin.math.roundToInt
 
@@ -404,7 +405,7 @@ class UIItemWorldCells(
     }
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
-        LoadSavegame(VDUtil.readDiskArchive(skimmer.diskFile, Level.INFO))
+        TODO()
     }
 
     internal var hasTexture = false
