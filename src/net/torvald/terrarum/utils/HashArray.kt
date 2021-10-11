@@ -24,14 +24,16 @@ class HashedWiringGraph: HashMap<BlockAddress, WiringGraphMap>()
 class MetaModuleCSVPair: HashMap<String, ZipCodedStr>()
 class PlayersLastStatus: HashMap<UUID, PlayerLastStatus>()
 class PlayerLastStatus() {
-    var physics = PhysicalStatus(); private set
-    var inventory = ActorInventory(); private set
-    var actorValue = ActorValue(); private set
+    var physics = PhysicalStatus(); private set // mandatory
+    var inventory: ActorInventory? = null; private set // optional (multiplayer only)
+    var actorValue: ActorValue? = null; private set // optional (multiplayer only)
 
-    constructor(player: IngamePlayer) : this() {
+    constructor(player: IngamePlayer, isMultiplayer: Boolean) : this() {
         physics = PhysicalStatus(player)
-        inventory = player.inventory
-        actorValue = player.actorValue
+        if (isMultiplayer) {
+            inventory = player.inventory
+            actorValue = player.actorValue
+        }
     }
 }
 /**

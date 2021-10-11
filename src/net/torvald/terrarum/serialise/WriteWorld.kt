@@ -10,9 +10,11 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorldTitleScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.tvda.ByteArray64
 import net.torvald.terrarum.tvda.ByteArray64Writer
+import net.torvald.terrarum.weather.WeatherMixer
 import java.io.Reader
 
 /**
@@ -42,6 +44,11 @@ object WriteWorld {
 
         world.actors.clear()
         world.actors.addAll(actorIDbuf.sorted().distinct())
+
+        world.randSeeds[0] = RoguelikeRandomiser.RNG.state0
+        world.randSeeds[1] = RoguelikeRandomiser.RNG.state1
+        world.randSeeds[2] = WeatherMixer.RNG.state0
+        world.randSeeds[3] = WeatherMixer.RNG.state1
 
         return world
     }

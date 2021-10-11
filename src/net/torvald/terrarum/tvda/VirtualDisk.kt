@@ -133,7 +133,7 @@ class VirtualDisk(
     var saveMode: Int
         set(value) { extraInfoBytes[1] = value.toByte() }
         get() = extraInfoBytes[1].toUint()
-    fun getDiskNameString(charset: Charset) = diskName.toCanonicalString(charset)
+    override fun getDiskName(charset: Charset) = diskName.toCanonicalString(charset)
     val root: DiskEntry
         get() = entries[0]!!
 
@@ -207,7 +207,7 @@ class VirtualDisk(
     }
 
     override fun equals(other: Any?) = if (other == null) false else this.hashCode() == other.hashCode()
-    override fun toString() = "VirtualDisk(name: ${getDiskNameString(Charsets.UTF_8)}, capacity: $capacity bytes, crc: ${hashCode().toHex()})"
+    override fun toString() = "VirtualDisk(name: ${getDiskName(Charsets.UTF_8)}, capacity: $capacity bytes, crc: ${hashCode().toHex()})"
 
     companion object {
         val HEADER_SIZE = 300L // according to the spec

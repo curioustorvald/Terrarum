@@ -56,7 +56,7 @@ object VDUtil {
             throw RuntimeException("Invalid Virtual Disk file!")
 
         val diskSize = inbytes.sliceArray64(4L..9L).toInt48Big()
-        val diskName = inbytes.sliceArray64(10L..10L + 31)
+        val diskName = inbytes.sliceArray(10..10 + 31) + inbytes.sliceArray(10+32+22..10+32+22+235)
         val diskCRC = inbytes.sliceArray64(10L + 32..10L + 32 + 3).toIntBig() // to check with completed vdisk
         val diskSpecVersion = inbytes[10L + 32 + 4]
         val footers = inbytes.sliceArray64(10L+32+6..10L+32+21)
@@ -64,7 +64,7 @@ object VDUtil {
         if (diskSpecVersion != specversion)
             throw RuntimeException("Unsupported disk format version: current internal version is $specversion; the file's version is $diskSpecVersion")
 
-        val vdisk = VirtualDisk(diskSize, diskName.toByteArray())
+        val vdisk = VirtualDisk(diskSize, diskName)
 
         vdisk.__internalSetFooter__(footers)
 

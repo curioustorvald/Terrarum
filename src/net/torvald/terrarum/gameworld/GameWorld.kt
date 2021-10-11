@@ -23,12 +23,10 @@ typealias BlockAddress = Long
 class PhysicalStatus() {
     // bottom-center point
     var position = Point2d()
-    // some actorvalues
-    var scale = 1.0
+    // actorvalues are copied separately so don't worry about them here
 
     constructor(player: IngamePlayer) : this() {
         this.position = Point2d(player.hitbox.canonicalX, player.hitbox.canonicalY)
-        this.scale = player.avBaseScale
     }
 }
 
@@ -49,6 +47,12 @@ open class GameWorld() : Disposable {
     var height: Int = 999; private set
 
     var playersLastStatus = PlayersLastStatus() // only gets used when the game saves and loads
+
+    /**
+     * 0,1 - RoguelikeRandomiser
+     * 2,3 - WeatherMixer
+     */
+    val randSeeds = LongArray(256) // stores 128 128-bit numbers
 
     /** Creation time for this world, NOT the entire savegame */
     internal var creationTime: Long = App.getTIME_T()

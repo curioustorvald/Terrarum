@@ -55,13 +55,6 @@ public class App implements ApplicationListener {
 
     public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
 
-    // is this jvm good?
-    static {
-        if (System.getProperty("sun.arch.data.model") == null || System.getProperty("sun.arch.data.model").equals("unknown")) {
-            System.err.println("Error: Your JVM is not supported by the application.\nPlease install the desired version.");
-            System.exit(1);
-        }
-    }
 
     public static final int VERSION_RAW = TerrarumAppConfiguration.VERSION_RAW;
 
@@ -195,7 +188,8 @@ public class App implements ApplicationListener {
     /**
      * Sorted by the lastplaytime, in reverse order (index 0 is the most recent game played)
      */
-    public static ArrayList<DiskSkimmer> savegames = new ArrayList<>();
+    public static TreeMap<UUID, DiskSkimmer> savegameWorlds = new TreeMap<>();
+    public static TreeMap<UUID, DiskSkimmer> savegamePlayers = new TreeMap<>();
 
     public static void updateListOfSavegames() {
         AppUpdateListOfSavegames();
@@ -711,6 +705,7 @@ public class App implements ApplicationListener {
         //MinimapComposer.INSTANCE.dispose();
         //FloatDrawer.INSTANCE.dispose();
 
+        ThreadExecutor.INSTANCE.killAll();
 
         ditherPattern.dispose();
         shaderBayerSkyboxFill.dispose();

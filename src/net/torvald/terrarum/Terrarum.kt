@@ -10,25 +10,24 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
 import net.torvald.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.serialise.*
-import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.tvda.DiskSkimmer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -36,6 +35,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
+import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.round
 
@@ -681,8 +681,11 @@ class Codex : KVHashMap() {
 }
 
 fun AppUpdateListOfSavegames() {
-    App.savegames.clear()
-    File(App.saveDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
+    App.savegamePlayers.clear()
+    App.savegameWorlds.clear()
+
+    // create list of worlds
+    (File(App.worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
         try {
             DiskSkimmer(file, Common.CHARSET, true)
         }
@@ -691,9 +694,14 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() }.forEach {
-        App.savegames.add(it!!)
+    }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() } as List<DiskSkimmer>).forEach {
+        // TODO write simple and dumb SAX parser for JSON
+        val json = JsonReader().parse(ByteArray64Reader(it.getFile(-1L)!!.bytes, Common.CHARSET).readText())
+        val worldUUID = UUID.fromString(json.get("worldIndex")!!.asString())
+        App.savegameWorlds[worldUUID] = it
     }
+
+    // TODO: savegamePlayers
 }
 
 /**
@@ -708,7 +716,7 @@ fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
         // # check if:
         //      the world The Player is at actually exists
         //      all the actors for the world actually exists
-        // TODO might want SAX parser for JSON
+        // TODO SAX parser for JSON -- use JsonReader().parse(<String>) for now...
         val currentWorld = (player as EntryFile).bytes.let {
             (ReadActor.readActorBare(ByteArray64Reader(it, Common.CHARSET)) as? IngamePlayer
              ?: return true).worldCurrentlyPlaying

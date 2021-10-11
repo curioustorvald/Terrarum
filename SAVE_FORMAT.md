@@ -7,7 +7,7 @@ The main game directory is composed of following directories:
 ```
 .Terrarum
 + Players
-  - "${PlayerName}-${UUID}", TVDA { 
+  - "${PlayerName}-${UUID}", TVDA {
       [-1] player JSON,
       [-2] spritedef,
       [-3] optional spritedef-glow,
@@ -30,6 +30,8 @@ The main game directory is composed of following directories:
 
 (TEVD stands for Terrarum Virtual Disk spec version 3, TVDA stands for spec version 254; both have MAGIC header of `TEVd`)
 
+Do not rely on filename to look for a world; players can change the filename
+
 ## Handling The Player Data
 
 Some of the "player assets" are stored to the world, such assets include:
@@ -47,6 +49,8 @@ If the World has the Actorvalue, World's value will be used; otherwise use incom
 
 Multiplayer world will initialise Actorvalue pool using incoming value -- or they may choose to use
 their own Actorvalue called "gamerules" to either implement their own "gamemode" or prevent cheating)
+
+For Singleplayer, only the xy-position is saved to the world for later load.
 
 Worlds must overwrite new Actor's position to make them spawn in right place.
 

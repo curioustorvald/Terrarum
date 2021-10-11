@@ -12,6 +12,7 @@ object UITitleRemoConYaml {
      * The class must be the UICanvas
      */
     private val menuBase = """
+- MENU_LABEL_NEW_GAME : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
 - MENU_OPTIONS
  - MENU_LABEL_GRAPHICS : net.torvald.terrarum.modulebasegame.ui.GraphicsControlPanel
  - MENU_OPTIONS_CONTROLS : net.torvald.terrarum.modulebasegame.ui.UIKeyboardControlPanel
@@ -27,17 +28,15 @@ object UITitleRemoConYaml {
 
     private val menuWithSavefile = """
 - MENU_LABEL_CONTINUE : net.torvald.terrarum.modulebasegame.ui.UIProxyLoadLatestSave
-- MENU_LABEL_NEW_GAME : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
 - MENU_IO_LOAD : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles
- - MENU_LABEL_RETURN
-"""
+ - MENU_LABEL_NEW_WORLD
+ - MENU_LABEL_RETURN"""
 
     private val menuNewGame = """
-- MENU_LABEL_NEW_GAME : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
 """
 
 
     operator fun invoke(hasSave: Boolean) =
-            Yaml((if (hasSave) menuWithSavefile else menuNewGame) + menuBase).parse()
+            Yaml((if (!hasSave) menuWithSavefile else menuNewGame) + menuBase).parse()
 }
 

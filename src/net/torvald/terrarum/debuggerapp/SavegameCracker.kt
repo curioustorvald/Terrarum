@@ -59,7 +59,7 @@ class SavegameCracker(
     private val cc0 = colourCodes[0]
 
     private val prompt: String
-        get() = "$ccConst${disk?.getDiskNameString(charset) ?: ""}$cc0% "
+        get() = "$ccConst${disk?.getDiskName(charset) ?: ""}$cc0% "
 
     private val cmds: HashMap<String, KFunction<*>> = HashMap()
     init {

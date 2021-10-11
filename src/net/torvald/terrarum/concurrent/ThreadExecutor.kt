@@ -71,6 +71,9 @@ object ThreadExecutor {
         allFinished = true
     }
 
+    fun killAll() {
+        executor.shutdownNow()
+    }
 }
 
 /**

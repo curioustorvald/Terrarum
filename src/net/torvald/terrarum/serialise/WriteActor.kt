@@ -3,8 +3,6 @@ package net.torvald.terrarum.serialise
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.spriteassembler.ADProperties
-import net.torvald.terrarum.App
-import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.NoSuchActorWithIDException
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -62,8 +60,21 @@ object WritePlayer {
         if (!dir.contains(file.entryID)) dir.add(file.entryID)
     }
 
-    operator fun invoke(player: IngamePlayer, playerDisk: VirtualDisk) {
-        val time_t = App.getTIME_T()
+    operator fun invoke(player: IngamePlayer, playerDisk: VirtualDisk, ingame: TerrarumIngame, time_t: Long) {
+        player.lastPlayTime = time_t
+        player.totalPlayTime += time_t - ingame.loadedTime_t
+
+
+        // restore player prop backup created on load-time
+        if (ingame.world.playersLastStatus[player.uuid] != null) {
+            player.setPosition(player.unauthorisedPlayerProps.physics.position)
+            if (ingame.isMultiplayer) {
+                player.actorValue = player.unauthorisedPlayerProps.actorValue!!
+                player.inventory = player.unauthorisedPlayerProps.inventory!!
+            }
+        }
+
+
         val actorJson = WriteActor.encodeToByteArray64(player)
         val adl = player.animDesc!!.getRawADL()
         val adlGlow = player.animDescGlow?.getRawADL() // NULLABLE!

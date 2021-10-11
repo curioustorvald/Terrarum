@@ -18,6 +18,12 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
     open var referenceID: ActorID = 0 // in old time this was nullable without initialiser. If you're going to revert to that, add the reason why this should be nullable.
+
+    /**
+     * RenderOrder does not affect ReferenceID "too much" (ID generation will still depend on it, but it's just because of ye olde tradition by now)
+     *
+     * IngameRenderer will only look for RenderOrder and won't look for referenceID, so if you want to change the RenderOrder, just modify this field and not the referenceID.
+     */
     var renderOrder = RenderOrder.MIDDLE
 
     protected constructor()

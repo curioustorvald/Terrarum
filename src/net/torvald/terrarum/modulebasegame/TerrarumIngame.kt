@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -24,7 +23,6 @@ import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
@@ -34,9 +32,12 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.*
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.LoadSavegame
+import net.torvald.terrarum.serialise.ReadActor
+import net.torvald.terrarum.serialise.WriteSavegame
+import net.torvald.terrarum.tvda.DiskSkimmer
 import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
@@ -249,15 +250,17 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     data class Codices(
-            val disk: VirtualDisk,
-            val meta: WriteMeta.WorldMeta,
+            val disk: DiskSkimmer, // WORLD disk
+            val world: GameWorld,
+//            val meta: WriteMeta.WorldMeta,
 //            val block: BlockCodex,
-            val item: ItemCodex,
+//            val item: ItemCodex,
 //            val wire: WireCodex,
 //            val material: MaterialCodex,
 //            val faction: FactionCodex,
-            val apocryphas: Map<String, Any>,
-            val actors: List<ActorID>
+//            val apocryphas: Map<String, Any>,
+            val actors: List<ActorID>,
+            val player: IngamePlayer
     )
 
 
@@ -272,13 +275,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         else {
             printdbg(this, "Ingame setting things up from the savegame")
 
-            RoguelikeRandomiser.loadFromSave(codices.meta.randseed0, codices.meta.randseed1)
-            WeatherMixer.loadFromSave(codices.meta.weatseed0, codices.meta.weatseed1)
+            RoguelikeRandomiser.loadFromSave(codices.world.randSeeds[0], codices.world.randSeeds[1])
+            WeatherMixer.loadFromSave(codices.world.randSeeds[2], codices.world.randSeeds[3])
 
-            Terrarum.itemCodex.loadFromSave(codices.item)
-            Terrarum.apocryphas = HashMap(codices.apocryphas)
+//            Terrarum.itemCodex.loadFromSave(codices.item)
+//            Terrarum.apocryphas = HashMap(codices.apocryphas)
 
-            savegameNickname = codices.disk.getDiskNameString(Common.CHARSET)
+            savegameNickname = codices.disk.getDiskName(Common.CHARSET)
         }
     }
 
@@ -287,18 +290,36 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         codices.actors.forEach {
             try {
                 val actor = ReadActor(codices.disk, LoadSavegame.getFileReader(codices.disk, it.toLong()))
-                addNewActor(actor)
+                if (actor !is IngamePlayer) { // actor list should not contain IngamePlayers (see WriteWorld.preWrite) but just in case...
+                    addNewActor(actor)
+                }
             }
             catch (e: NullPointerException) {
                 System.err.println("Could not read the actor ${it} from the disk")
                 e.printStackTrace()
-                if (it == PLAYER_REF_ID) throw e
-//                throw e // if not player, don't rethrow -- let players play the corrupted world if it loads, they'll be able to cope with their losses even though there will be buncha lone actorblocks lying around...
             }
         }
 
+        // assign new random referenceID for player
+        codices.player.referenceID = Terrarum.generateUniqueReferenceID(Actor.RenderOrder.MIDDLE)
+        addNewActor(codices.player)
+
+
+        // overwrite player's props with world's for multiplayer
+        // see comments on IngamePlayer.unauthorisedPlayerProps to know why this is necessary.
+        codices.player.backupPlayerProps(isMultiplayer) // backup first!
+        world.playersLastStatus[codices.player.uuid]?.let { // if nothing was saved, nothing would happen and we still keep the backup, which WriteActor looks for it
+            codices.player.setPosition(it.physics.position)
+            if (isMultiplayer) {
+                codices.player.actorValue = it.actorValue!!
+                codices.player.inventory = it.inventory!!
+            }
+        }
+
+
         // by doing this, whatever the "possession" the player had will be broken by the game load
-        actorNowPlaying = getActorByID(Terrarum.PLAYER_REF_ID) as IngamePlayer
+        actorNowPlaying = codices.player
+        actorGamer = codices.player
 
         makeSavegameBackupCopy() // don't put it on the postInit() or render(); postInitForNewGame calls this function on the savegamewriter's callback
     }
@@ -332,10 +353,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //  1. lighten the IO burden
         //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
-        WriteSavegame.immediate(WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
+        val saveTime_t = App.getTIME_T()
+        WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
             makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
-            WriteSavegame.immediate(WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
+            WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
                 makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
                 uiAutosaveNotifier.setAsClose()
             }

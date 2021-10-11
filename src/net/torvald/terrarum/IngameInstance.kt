@@ -30,7 +30,7 @@ import java.util.concurrent.locks.Lock
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
  * this instance only stores the stage that is currently being used.
  */
-open class IngameInstance(val batch: SpriteBatch) : Screen {
+open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = false) : Screen {
 
     open protected val actorMBRConverter = object : MBRConverter<ActorWithBody> {
         override fun getDimensions(): Int = 2
@@ -126,10 +126,6 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val wireChangeQueue = ArrayList<BlockChangeQueueItem>() // if 'old' is set and 'new' is blank, it's a wire cutter
 
     val modifiedChunks = Array(16) { TreeSet<Int>() }
-
-    internal var creationTime = App.getTIME_T() // cumulative value for the savegame
-    internal var lastPlayTime = App.getTIME_T() // cumulative value for the savegame
-    internal var totalPlayTime = 0L // cumulative value for the savegame
 
     var loadedTime_t = App.getTIME_T()
         protected set

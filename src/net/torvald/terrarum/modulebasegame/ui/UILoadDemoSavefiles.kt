@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.utils.JsonReader
 import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
@@ -14,8 +15,6 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.serialise.ReadMeta
-import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.tvda.*
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -25,6 +24,9 @@ import java.util.*
 import java.util.logging.Level
 import java.util.zip.GZIPInputStream
 import kotlin.math.roundToInt
+
+val SAVE_CELL_WIDTH = 480
+val SAVE_CELL_HEIGHT = 120
 
 /**
  * Only works if current screen set by the App is [TitleScreen]
@@ -55,13 +57,13 @@ class UILoadDemoSavefiles : UICanvas() {
     private val shapeRenderer = ShapeRenderer()
 
 
-    internal val uiWidth = UIItemDemoSaveCells.WIDTH // 480
+    internal val uiWidth = SAVE_CELL_WIDTH
     internal val uiX = (width - uiWidth) / 2
 
     internal val textH = App.fontGame.lineHeight.toInt()
 
     internal val cellGap = 20
-    internal val cellInterval = cellGap + UIItemDemoSaveCells.HEIGHT
+    internal val cellInterval = cellGap + SAVE_CELL_HEIGHT
     internal val gradAreaHeight = 32
 
     internal val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
@@ -106,15 +108,15 @@ class UILoadDemoSavefiles : UICanvas() {
             Thread {
                 // read savegames
                 var savegamesCount = 0
-                App.savegames.forEach { skimmer ->
+                App.savegameWorlds.forEach { (uuid, skimmer) ->
                     val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
-                        addUIitem(UIItemDemoSaveCells(this, x, y, skimmer))
+                        addUIitem(UIItemWorldCells(this, x, y, skimmer))
                         savegamesCount += 1
                     }
                     catch (e: Throwable) {
-                        System.err.println("[UILoadDemoSavefiles] Savefile '${skimmer.diskFile.absolutePath}' cannot be loaded")
+                        System.err.println("[UILoadDemoSavefiles] Error while loading World '${skimmer.diskFile.absolutePath}'")
                         e.printStackTrace()
                     }
 
@@ -290,7 +292,7 @@ class UILoadDemoSavefiles : UICanvas() {
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         scrollAreaHeight = height - 2 * App.scr.tvSafeGraphicsHeight - 64
-        savesVisible = (scrollAreaHeight + cellInterval) / (cellInterval + UIItemDemoSaveCells.HEIGHT)
+        savesVisible = (scrollAreaHeight + cellInterval) / (cellInterval + SAVE_CELL_HEIGHT)
 
         listScroll = 0
         scrollTarget = 0
@@ -311,49 +313,66 @@ class UILoadDemoSavefiles : UICanvas() {
 
 
 
-
-
-
-class UIItemDemoSaveCells(
+class UIItemPlayerCells(
         parent: UILoadDemoSavefiles,
         initialX: Int,
         initialY: Int,
         val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
 
-    companion object {
-        const val WIDTH = 480
-        const val HEIGHT = 120
+    override val width = SAVE_CELL_WIDTH
+    override val height = SAVE_CELL_HEIGHT
+
+
+
+    override fun dispose() {
     }
 
 
-    private val metaFile: DiskEntry?
+}
+
+
+class UIItemWorldCells(
+        parent: UILoadDemoSavefiles,
+        initialX: Int,
+        initialY: Int,
+        val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
+
+
+    private val metaFile: EntryFile?
     private val saveName: String
     private val saveMode: Int
     private val isQuick: Boolean
     private val isAuto: Boolean
-    private val meta: WriteMeta.WorldMeta?
-    private val saveDamaged: Boolean
+    private var saveDamaged: Boolean = false
     private val lastPlayedTimestamp: String
 
     init {
         printdbg(this, "Rebuilding skimmer for savefile ${skimmer.diskFile.absolutePath}")
         skimmer.rebuild()
 
-        metaFile = skimmer.requestFile(-1)
+        metaFile = skimmer.getFile(-1)
+        if (metaFile == null) saveDamaged = true
+
         saveName = skimmer.getDiskName(Common.CHARSET)
         saveMode = skimmer.getSaveMode()
         isQuick = (saveMode % 2 == 1)
         isAuto = (saveMode.ushr(1) != 0)
-        meta = if (metaFile != null) ReadMeta.fromDiskEntry(metaFile) else null
 
-        saveDamaged = checkForSavegameDamage(skimmer)
+        saveDamaged = saveDamaged or checkForSavegameDamage(skimmer)
 
-        lastPlayedTimestamp = if (meta != null)
-            Instant.ofEpochSecond(meta.lastplay_t)
-                    .atZone(TimeZone.getDefault().toZoneId())
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
-            "/${parseDuration(meta.playtime_t)}"
-        else "--:--:--/--h--m--s"
+        if (metaFile != null) {
+            val worldJson = JsonReader().parse(ByteArray64Reader(metaFile.bytes, Common.CHARSET))
+            val lastplay_t = worldJson["lastPlayTime"].asLong()
+            val playtime_t = worldJson["totalPlayTime"].asLong()
+            lastPlayedTimestamp =
+                    Instant.ofEpochSecond(lastplay_t)
+                            .atZone(TimeZone.getDefault().toZoneId())
+                            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
+                    "/${parseDuration(playtime_t)}"
+        }
+        else {
+            lastPlayedTimestamp = "--:--:--/--h--m--s"
+        }
     }
 
     private fun parseDuration(seconds: Long): String {
@@ -367,8 +386,8 @@ class UIItemDemoSaveCells(
             "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
     }
 
-    override val width: Int = WIDTH
-    override val height: Int = HEIGHT
+    override val width: Int = SAVE_CELL_WIDTH
+    override val height: Int = SAVE_CELL_HEIGHT
 
     private var thumbPixmap: Pixmap? = null
     private var thumb: TextureRegion? = null

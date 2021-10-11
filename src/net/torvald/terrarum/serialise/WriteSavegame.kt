@@ -11,10 +11,9 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.Common.getUnzipInputStream
 import net.torvald.terrarum.tvda.ByteArray64
 import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.SimpleFileSystem
 import net.torvald.terrarum.tvda.VirtualDisk
 import java.io.File
 import java.io.Reader
@@ -27,20 +26,21 @@ import java.io.Reader
 object WriteSavegame {
 
     enum class SaveMode {
-        META, PLAYER, WORLD, SHARED
+        META, PLAYER, WORLD, SHARED, QUICK_PLAYER, QUICK_WORLD
     }
 
     @Volatile var savingStatus = -1 // -1: not started, 0: saving in progress, 255: saving finished
     @Volatile var saveProgress = 0f
     @Volatile var saveProgressMax = 1f
 
-    private fun getSaveThread(mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, callback: () -> Unit = {}) = when (mode) {
-        SaveMode.WORLD -> WorldSavingThread(disk, outFile, ingame, hasThumbnail, isAuto, callback)
-        SaveMode.PLAYER -> PlayerSavingThread(disk, outFile, ingame, hasThumbnail, isAuto, callback)
+    private fun getSaveThread(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, callback: () -> Unit = {}) = when (mode) {
+        SaveMode.WORLD -> WorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback)
+        SaveMode.PLAYER -> PlayerSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback)
+        SaveMode.QUICK_PLAYER -> QuickSingleplayerWorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback)
         else -> throw IllegalArgumentException("$mode")
     }
 
-    operator fun invoke(mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
+    operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
         savingStatus = 0
 
         Echo("Save queued")
@@ -60,7 +60,7 @@ object WriteSavegame {
         }
         IngameRenderer.screencapRequested = true
 
-        val savingThread = Thread(getSaveThread(mode, disk, outFile, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
@@ -68,23 +68,23 @@ object WriteSavegame {
     }
 
 
-    fun immediate(mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, callback: () -> Unit = {}) {
+    fun immediate(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, callback: () -> Unit = {}) {
 
         savingStatus = 0
 
         Echo("Immediate save fired")
 
-        val savingThread = Thread(getSaveThread(mode, disk, outFile, ingame, false, isAuto, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, false, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
         // use field 'savingStatus' to know when the saving is done
     }
 
-    fun quick(disk: VirtualDisk, file: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
-        return
+    fun quick(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit = {}) {
+        if (ingame.isMultiplayer) TODO()
 
-        // TODO //
+        return // TODO //
 
         savingStatus = 0
 
@@ -105,7 +105,7 @@ object WriteSavegame {
         }
         IngameRenderer.screencapRequested = true
 
-        val savingThread = Thread(QuickSaveThread(disk, file, ingame, true, isAuto, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, false, isAuto, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
@@ -125,48 +125,33 @@ object WriteSavegame {
  */
 object LoadSavegame {
 
-    fun getFileBytes(disk: VirtualDisk, id: Long): ByteArray64 = VDUtil.getAsNormalFile(disk, id).getContent()
-    fun getFileReader(disk: VirtualDisk, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
+    fun getFileBytes(disk: SimpleFileSystem, id: Long): ByteArray64 = disk.getFile(id)!!.bytes
+    fun getFileReader(disk: SimpleFileSystem, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
-    operator fun invoke(disk: VirtualDisk) {
-        TODO()
-
+    operator fun invoke(playerDisk: SimpleFileSystem) {
         val newIngame = TerrarumIngame(App.batch)
+        val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer
 
-        val meta = ReadMeta(disk)
+        val currentWorldId = player.worldCurrentlyPlaying
+        val worldDisk = App.savegameWorlds[currentWorldId]!!
+        val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(-1L)!!.bytes, Common.CHARSET))
 
-        // NOTE: do NOT set ingame.actorNowPlaying as one read directly from the disk;
-        // you'll inevitably read the player actor twice, and they're separate instances of the player!
-        val currentWorld = (ReadActor.readActorBare(getFileReader(disk, Terrarum.PLAYER_REF_ID.toLong())) as IngamePlayer).worldCurrentlyPlaying
-        val world = ReadWorld(getFileReader(disk, -1-1-1-1-1-1))
-
-        // set lateinit vars on the gameworld FIRST
         world.layerTerrain = BlockLayer(world.width, world.height)
         world.layerWall = BlockLayer(world.width, world.height)
 
-        newIngame.creationTime = meta.creation_t
-        newIngame.lastPlayTime = meta.lastplay_t
-        newIngame.totalPlayTime = meta.playtime_t
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
 
 
 
         val loadJob = { it: LoadScreenBase ->
             val loadscreen = it as ChunkLoadingLoadScreen
-
             loadscreen.addMessage(Lang["MENU_IO_LOADING"])
 
-            val actors = world.actors.distinct()//.map { ReadActor(getFileReader(disk, it.toLong())) }
-    //        val block = Common.jsoner.fromJson(BlockCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -16)))
-            val item = Common.jsoner.fromJson(ItemCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -17)))
-    //        val wire = Common.jsoner.fromJson(WireCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -18)))
-    //        val material = Common.jsoner.fromJson(MaterialCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -19)))
-    //        val faction = Common.jsoner.fromJson(FactionCodex.javaClass, getUnzipInputStream(getFileBytes(disk, -20)))
-            val apocryphas = Common.jsoner.fromJson(Apocryphas.javaClass, getUnzipInputStream(getFileBytes(disk, -1024)))
+
+            val actors = world.actors.distinct()
+            val worldParam = TerrarumIngame.Codices(worldDisk, world, actors, player)
 
 
-
-            val worldParam = TerrarumIngame.Codices(disk, meta, item, apocryphas, actors)
             newIngame.gameLoadInfoPayload = worldParam
             newIngame.gameLoadMode = TerrarumIngame.GameLoadMode.LOAD_FROM
 
@@ -180,27 +165,25 @@ object LoadSavegame {
                 for (layer in worldLayer.indices) {
                     loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*worldLayer.size+layer+1}/${chunkCount*2}")
 
-                    val chunkFile = VDUtil.getAsNormalFile(disk, 0x1_0000_0000L or layer.toLong().shl(24) or chunk)
+                    val chunkFile = worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
                     ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, chunkXY.x, chunkXY.y)
                 }
             }
 
-
             loadscreen.addMessage("Updating Block Mappings...")
             world.renumberTilesAfterLoad()
 
 
-            Echo("${ccW}Savegame loaded from $ccY${disk.getDiskNameString(Common.CHARSET)}")
-            printdbg(this, "Savegame loaded from ${disk.getDiskNameString(Common.CHARSET)}")
+            Echo("${ccW}World loaded: $ccY${worldDisk.getDiskName(Common.CHARSET)}")
+            printdbg(this, "World loaded: ${worldDisk.getDiskName(Common.CHARSET)}")
         }
+
 
         val loadScreen = ChunkLoadingLoadScreen(newIngame, world.width, world.height, loadJob)
         Terrarum.setCurrentIngameInstance(newIngame)
         App.setLoadScreen(loadScreen)
-
-
     }
 
 }

@@ -2,13 +2,14 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
-import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.tvda.SimpleFileSystem
+import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
@@ -21,7 +22,11 @@ import java.util.*
 
 class IngamePlayer : ActorHumanoid {
 
-    var uuid = UUID.randomUUID(); private set
+    val creationTime = App.getTIME_T()
+    var lastPlayTime = App.getTIME_T() // cumulative value for the savegame
+    var totalPlayTime = 0L // cumulative value for the savegame
+
+    val uuid = UUID.randomUUID()
     var worldCurrentlyPlaying: UUID = UUID(0L,0L) // only filled up on save and load; DO NOT USE THIS
 
     /** ADL for main sprite. Necessary. */
@@ -49,6 +54,17 @@ class IngamePlayer : ActorHumanoid {
         collisionType = COLLISION_KINEMATIC
     }
 
+
+    /** Copy of some of the player's props before get overwritten by the props saved in the world.
+     *
+     * This field is only there for loading multiplayer map on singleplayer instances where the world loader would
+     * permanently changing player's props into multiplayer world's.
+     */
+    @Transient internal lateinit var unauthorisedPlayerProps: PlayerLastStatus
+
+    fun backupPlayerProps(isMultiplayer: Boolean) {
+        unauthorisedPlayerProps = PlayerLastStatus(this, isMultiplayer)
+    }
 
 
 

@@ -8,17 +8,16 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.serialise.WriteActor
-import net.torvald.terrarum.serialise.WriteMeta
 import net.torvald.terrarum.serialise.WriteWorld
 import java.io.IOException
 
 /**
  * Created by minjaesong on 2017-07-18.
  */
-object ExportMeta : ConsoleCommand {
+/*object ExportMeta : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
-            val str = WriteMeta(ingame!! as TerrarumIngame, App.getTIME_T())
+            val str = net.torvald.terrarum.serialise.WriteMeta(ingame!! as TerrarumIngame, App.getTIME_T())
             val writer = java.io.FileWriter(App.defaultDir + "/Exports/savegame.json", false)
             writer.write(str)
             writer.close()
@@ -33,7 +32,7 @@ object ExportMeta : ConsoleCommand {
     override fun printUsage() {
         Echo("Usage: Exportmeta")
     }
-}
+}*/
 
 object ExportWorld : ConsoleCommand {
     override fun execute(args: Array<String>) {

@@ -1,9 +1,7 @@
 package net.torvald.terrarum.tvda
 
-import net.torvald.terrarum.serialise.Common
 import java.io.*
 import java.nio.charset.Charset
-import java.nio.file.NoSuchFileException
 import java.util.*
 import java.util.logging.Level
 import kotlin.experimental.and
@@ -344,7 +342,7 @@ removefile:
         return fa.read()
     }
 
-    fun getDiskName(charset: Charset): String {
+    override fun getDiskName(charset: Charset): String {
         val bytes = ByteArray(268)
         fa.seek(10L)
         fa.read(bytes, 0, 32)

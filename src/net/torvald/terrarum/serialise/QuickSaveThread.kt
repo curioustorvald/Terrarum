@@ -1,22 +1,23 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
-import net.torvald.terrarum.App
 import net.torvald.terrarum.ccG
 import net.torvald.terrarum.ccW
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.utils.PlayerLastStatus
 import java.io.File
 import java.util.zip.GZIPOutputStream
 
 /**
  * Created by minjaesong on 2021-09-29.
  */
-class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
+class QuickSingleplayerWorldSavingThread(val time_t: Long, val disk: VirtualDisk, val file: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
 
     /**
      * Will happily overwrite existing entry
@@ -34,11 +35,6 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
 
 
     override fun run() {
-        callback()
-        return
-
-        // TODO //
-
         val skimmer = DiskSkimmer(file, Common.CHARSET)
 
         if (hasThumbnail) {
@@ -47,7 +43,10 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
             }
         }
 
-        val actorsList = listOf(ingame.actorContainerActive).flatMap { it.filter { WriteWorld.actorAcceptable(it) } }
+        val allTheActors = ingame.actorContainerActive.cloneToList() + ingame.actorContainerInactive.cloneToList()
+
+        val playersList: List<IngamePlayer> = allTheActors.filter{ it is IngamePlayer } as List<IngamePlayer>
+        val actorsList = allTheActors.filter { WriteWorld.actorAcceptable(it) }
         val chunks = ingame.modifiedChunks
 
         val chunkCount = chunks.map { it.size }.sum()
@@ -63,14 +62,8 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
 
         Echo("Writing metadata...")
 
-        val creation_t = ingame.creationTime
-        val time_t = App.getTIME_T()
-        
+        val creation_t = ingame.world.creationTime
 
-        // Write Meta //
-        val metaContent = EntryFile(WriteMeta.encodeToByteArray64(ingame, time_t))
-        val meta = DiskEntry(-1, 0, creation_t, time_t, metaContent)
-        addFile(disk, meta); skimmer.appendEntryOnly(meta)
 
         if (hasThumbnail) {
             PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
@@ -78,16 +71,18 @@ class QuickSaveThread(val disk: VirtualDisk, val file: File, val ingame: Terraru
 
             val thumbContent = EntryFile(tgaout.toByteArray64())
             val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
-            addFile(disk, thumb); skimmer.appendEntryOnly(thumb)
+            addFile(disk, thumb)
         }
 
         WriteSavegame.saveProgress += 1f
 
-
         // Write World //
-        val worldNum = ingame.world.worldIndex
+        // record all player's last position
+        playersList.forEach {
+            ingame.world.playersLastStatus[it.uuid] = PlayerLastStatus(it, ingame.isMultiplayer)
+        }
         val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
-        val world = DiskEntry(-1-1-1-1-1-1-1, 0, creation_t, time_t, worldMeta)
+        val world = DiskEntry(-1L, 0, creation_t, time_t, worldMeta)
         addFile(disk, world); skimmer.appendEntryOnly(world)
 
         WriteSavegame.saveProgress += 1f

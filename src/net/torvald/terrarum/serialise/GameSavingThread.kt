@@ -1,7 +1,6 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
-import net.torvald.terrarum.App
 import net.torvald.terrarum.ccG
 import net.torvald.terrarum.ccW
 import net.torvald.terrarum.console.Echo
@@ -42,7 +41,7 @@ abstract class SavingThread(private val ingame: TerrarumIngame) : Runnable {
 /**
  * Created by minjaesong on 2021-09-14.
  */
-class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
+class WorldSavingThread(val time_t: Long, val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
 
     override fun save() {
 
@@ -71,8 +70,7 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
 
         Echo("Writing metadata...")
 
-        val creation_t = ingame.creationTime
-        val time_t = App.getTIME_T()
+        val creation_t = ingame.world.creationTime
 
 
         if (hasThumbnail) {
@@ -86,45 +84,10 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
 
         WriteSavegame.saveProgress += 1f
 
-
-        // Write BlockCodex//
-//        val blockCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(BlockCodex).toByteArray(Common.CHARSET))))
-//        val blocks = DiskEntry(-16, 0, "blocks".toByteArray(Common.CHARSET), creation_t, time_t, blockCodexContent)
-//        addFile(disk, blocks)
-        // Commented out; nothing to write
-
-        // Write ItemCodex//
-//        val itemCodexContent = EntryFile(Common.zip(ByteArray64.fromByteArray(Common.jsoner.toJson(ItemCodex).toByteArray(Common.CHARSET))))
-//        val items = DiskEntry(-17, 0, creation_t, time_t, itemCodexContent)
-//        addFile(disk, items)
-        // Gotta save dynamicIDs
-
-        // Write WireCodex//
-//        val wireCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(WireCodex).toByteArray(Common.CHARSET))))
-//        val wires = DiskEntry(-18, 0, "wires".toByteArray(Common.CHARSET), creation_t, time_t, wireCodexContent)
-//        addFile(disk, wires)
-        // Commented out; nothing to write
-
-        // Write MaterialCodex//
-//        val materialCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(MaterialCodex).toByteArray(Common.CHARSET))))
-//        val materials = DiskEntry(-19, 0, "materials".toByteArray(Common.CHARSET), creation_t, time_t, materialCodexContent)
-//        addFile(disk, materials)
-        // Commented out; nothing to write
-
-        // Write FactionCodex//
-//        val factionCodexContent = EntryFile(zip(ByteArray64.fromByteArray(Common.jsoner.toJson(FactionCodex).toByteArray(Common.CHARSET))))
-//        val factions = DiskEntry(-20, 0, "factions".toByteArray(Common.CHARSET), creation_t, time_t, factionCodexContent)
-//        addFile(disk, factions)
-
-        // Write Apocryphas//
-//        val apocryphasContent = EntryFile(Common.zip(ByteArray64.fromByteArray(Common.jsoner.toJson(Apocryphas).toByteArray(Common.CHARSET))))
-//        val apocryphas = DiskEntry(-1024, 0, creation_t, time_t, apocryphasContent)
-//        addFile(disk, apocryphas)
-
         // Write World //
         // record all player's last position
         playersList.forEach {
-            ingame.world.playersLastStatus[it.uuid] = PlayerLastStatus(it)
+            ingame.world.playersLastStatus[it.uuid] = PlayerLastStatus(it, ingame.isMultiplayer)
         }
         val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
         val world = DiskEntry(-1L, 0, creation_t, time_t, worldMeta)
@@ -192,14 +155,14 @@ class WorldSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: Te
  *
  * Created by minjaesong on 2021-10-08
  */
-class PlayerSavingThread(val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
+class PlayerSavingThread(val time_t: Long, val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
 
     override fun save() {
         disk.saveMode = 2 * isAuto.toInt() // no quick
         disk.capacity = 0L
 
         Echo("Writing The Player...")
-        WritePlayer(ingame.actorGamer, disk)
+        WritePlayer(ingame.actorGamer, disk, ingame, time_t)
         VDUtil.dumpToRealMachine(disk, outFile)
 
         callback()
