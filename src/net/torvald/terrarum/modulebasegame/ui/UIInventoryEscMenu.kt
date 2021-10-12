@@ -8,8 +8,10 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
+import net.torvald.terrarum.serialise.WriteSavegame
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -87,16 +89,33 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     full.handler.lockToggle()
                     full.lockTransition()
 
-                    INGAME.makeSavegameBackupCopy()
 
                     // save the game
-                    /*WriteSavegame(INGAME.savegameArchive, File(App.saveDir, INGAME.savegameNickname), Terrarum.ingame!! as TerrarumIngame, false) {
-                        // callback:
-                        System.gc()
+                    val onError = { _: Throwable ->
+                        // TODO: show some error indicator
                         screen = 0
                         full.handler.unlockToggle()
                         full.unlockTransition()
-                    }*/
+                    }
+
+                    val saveTime_t = App.getTIME_T()
+                    val playerSavefile = INGAME.getPlayerSaveFiledesc(INGAME.playerSavefileName)
+                    val worldSavefile = INGAME.getWorldSaveFiledesc(INGAME.worldSavefileName)
+
+
+                    INGAME.makeSavegameBackupCopy(playerSavefile)
+                    WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, false, onError) {
+
+                        INGAME.makeSavegameBackupCopy(worldSavefile)
+                        WriteSavegame(saveTime_t, WriteSavegame.SaveMode.WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, false, onError) {
+                            // callback:
+                            System.gc()
+                            screen = 0
+                            full.handler.unlockToggle()
+                            full.unlockTransition()
+                        }
+                    }
+
                 }
                 2 -> {
                     screen = 4; gameMenuButtons.deselect()

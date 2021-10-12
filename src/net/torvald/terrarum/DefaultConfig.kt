@@ -97,6 +97,7 @@ object DefaultConfig {
             "fx_retro" to false,
             "fx_backgroundblur" to true,
             "fx_streamerslayout" to false,
+            "fx_differential" to false,
             //"fx_3dlut" to false,
 
 

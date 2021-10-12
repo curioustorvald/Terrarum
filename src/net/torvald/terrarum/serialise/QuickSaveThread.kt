@@ -17,7 +17,16 @@ import java.util.zip.GZIPOutputStream
 /**
  * Created by minjaesong on 2021-09-29.
  */
-class QuickSingleplayerWorldSavingThread(val time_t: Long, val disk: VirtualDisk, val file: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : Runnable {
+class QuickSingleplayerWorldSavingThread(
+        val time_t: Long,
+        val disk: VirtualDisk,
+        val outFile: File,
+        val ingame: TerrarumIngame,
+        val hasThumbnail: Boolean,
+        val isAuto: Boolean,
+        val callback: () -> Unit,
+        val errorHandler: (Throwable) -> Unit
+) : SavingThread(errorHandler) {
 
     /**
      * Will happily overwrite existing entry
@@ -34,8 +43,8 @@ class QuickSingleplayerWorldSavingThread(val time_t: Long, val disk: VirtualDisk
     private val actorProgressMultiplier = 1f
 
 
-    override fun run() {
-        val skimmer = DiskSkimmer(file, Common.CHARSET)
+    override fun save() {
+        val skimmer = DiskSkimmer(outFile, Common.CHARSET)
 
         if (hasThumbnail) {
             while (!IngameRenderer.fboRGBexportedLatch) {
@@ -133,7 +142,7 @@ class QuickSingleplayerWorldSavingThread(val time_t: Long, val disk: VirtualDisk
         skimmer.injectDiskCRC(disk.hashCode())
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
 
-        Echo ("${ccW}Game saved with size of $ccG${file.length()}$ccW bytes")
+        Echo ("${ccW}Game saved with size of $ccG${outFile.length()}$ccW bytes")
 
 
         if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false

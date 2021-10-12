@@ -24,7 +24,7 @@ private fun addFile(disk: VirtualDisk, file: DiskEntry) {
     if (!dir.contains(file.entryID)) dir.add(file.entryID)
 }
 
-abstract class SavingThread(private val ingame: TerrarumIngame) : Runnable {
+abstract class SavingThread(private val errorHandler: (Throwable) -> Unit) : Runnable {
     abstract fun save()
 
     override fun run() {
@@ -33,7 +33,7 @@ abstract class SavingThread(private val ingame: TerrarumIngame) : Runnable {
         }
         catch (e: Throwable) {
             e.printStackTrace()
-            ingame.uiAutosaveNotifier.setAsError()
+            errorHandler(e)
         }
     }
 }
@@ -41,7 +41,16 @@ abstract class SavingThread(private val ingame: TerrarumIngame) : Runnable {
 /**
  * Created by minjaesong on 2021-09-14.
  */
-class WorldSavingThread(val time_t: Long, val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
+class WorldSavingThread(
+        val time_t: Long,
+        val disk: VirtualDisk,
+        val outFile: File,
+        val ingame: TerrarumIngame,
+        val hasThumbnail: Boolean,
+        val isAuto: Boolean,
+        val callback: () -> Unit,
+        val errorHandler: (Throwable) -> Unit
+) : SavingThread(errorHandler) {
 
     override fun save() {
 
@@ -155,11 +164,22 @@ class WorldSavingThread(val time_t: Long, val disk: VirtualDisk, val outFile: Fi
  *
  * Created by minjaesong on 2021-10-08
  */
-class PlayerSavingThread(val time_t: Long, val disk: VirtualDisk, val outFile: File, val ingame: TerrarumIngame, val hasThumbnail: Boolean, val isAuto: Boolean, val callback: () -> Unit) : SavingThread(ingame) {
+class PlayerSavingThread(
+        val time_t: Long,
+        val disk: VirtualDisk,
+        val outFile: File,
+        val ingame: TerrarumIngame,
+        val hasThumbnail: Boolean,
+        val isAuto: Boolean,
+        val callback: () -> Unit,
+        val errorHandler: (Throwable) -> Unit
+) : SavingThread(errorHandler) {
 
     override fun save() {
         disk.saveMode = 2 * isAuto.toInt() // no quick
         disk.capacity = 0L
+
+        WriteSavegame.saveProgress = 0f
 
         Echo("Writing The Player...")
         WritePlayer(ingame.actorGamer, disk, ingame, time_t)

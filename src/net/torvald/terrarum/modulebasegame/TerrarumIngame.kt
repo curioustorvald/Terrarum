@@ -38,6 +38,7 @@ import net.torvald.terrarum.serialise.ReadActor
 import net.torvald.terrarum.serialise.WriteSavegame
 import net.torvald.terrarum.tvda.DiskSkimmer
 import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
@@ -201,6 +202,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         internal set
 
 
+
     //////////////
     // GDX code //
     //////////////
@@ -328,8 +330,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // go to spawn position
         printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
 
-        val worldSavefileName = "$savegameNickname-${world.worldIndex}"
-        val playerSavefileName = (actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${actorGamer.uuid}"
+        worldSavefileName = "$savegameNickname-${world.worldIndex}"
+        playerSavefileName = (actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${actorGamer.uuid}"
 
         worldDisk = VDUtil.createNewDisk(
                 1L shl 60,
@@ -347,6 +349,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 world.spawnX * TILE_SIZED,
                 world.spawnY * TILE_SIZED
         )
+        actorGamer.backupPlayerProps(isMultiplayer)
+
+        val onError = { e: Throwable -> uiAutosaveNotifier.setAsError() }
 
         // make initial savefile
         // we're not writing multiple files at one go because:
@@ -354,10 +359,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
         val saveTime_t = App.getTIME_T()
-        WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, false, true) {
+        WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, true, onError) {
             makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
-            WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, false, true) {
+            WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, true, onError) {
                 makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
                 uiAutosaveNotifier.setAsClose()
             }

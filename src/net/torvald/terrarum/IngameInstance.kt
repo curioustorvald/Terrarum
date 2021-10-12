@@ -51,8 +51,9 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
 
     lateinit var worldDisk: VirtualDisk; internal set
     lateinit var playerDisk: VirtualDisk; internal set
-    var savegameNickname: String = "SplinesReticulated"
-        internal set
+    lateinit var worldSavefileName: String; internal set
+    lateinit var playerSavefileName: String; internal set
+    var savegameNickname: String = "SplinesReticulated"; internal set
 
     var screenZoom = 1.0f
     val ZOOM_MAXIMUM = 4.0f
