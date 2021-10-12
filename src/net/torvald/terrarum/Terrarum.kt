@@ -706,7 +706,7 @@ fun AppUpdateListOfSavegames() {
         // TODO write simple and dumb SAX parser for JSON
         val jsonFile = it.getFile(-1L)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
-        val worldUUID = UUID.fromString(json.get("worldIndex")!!.asString())
+        val worldUUID = UUID.fromString(json.getString("worldIndex"))
         App.savegameWorlds[worldUUID] = it
         App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
     }
@@ -729,10 +729,10 @@ fun AppUpdateListOfSavegames() {
         // TODO write simple and dumb SAX parser for JSON
         val jsonFile = it.getFile(-1L)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
-        val playerUUID = UUID.fromString(json.get("uuid")!!.asString())
+        val playerUUID = UUID.fromString(json.getString("uuid"))
         App.savegamePlayers[playerUUID] = it
-//        App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
-        App.savegamePlayersName[playerUUID] = json.get("actorValue")?.getChild(AVKey.NAME)?.asString() ?: ""
+        App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
+//        App.savegamePlayersName[playerUUID] = json.get("actorValue")?.get(AVKey.NAME)?.asString() ?: "NULL!"
     }
 
 }

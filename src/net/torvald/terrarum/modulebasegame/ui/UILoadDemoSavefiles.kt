@@ -43,6 +43,9 @@ val SAVE_CELL_HEIGHT = 120
 class UILoadDemoSavefiles : UICanvas() {
 
     init {
+        CommonResourcePool.addToLoadingList("inventory_category") {
+            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
+        }
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
             TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
         }
@@ -371,8 +374,8 @@ class UIItemPlayerCells(
 
     private var playerName: String = "$EMDASH"
     private var worldName: String = "$EMDASH"
-    private var lastPlayTime: String = "--h--m--s"
-    private var totalPlayTime: String = "--:--:--"
+    private var lastPlayTime: String = "????-??-?? --:--:--"
+    private var totalPlayTime: String = "--h--m--s"
 
     init {
         skimmer.getFile(-1L)?.bytes?.let {
@@ -381,7 +384,7 @@ class UIItemPlayerCells(
             val playerUUID = UUID.fromString(json["uuid"]?.asString())
             val worldUUID = UUID.fromString(json["worldCurrentlyPlaying"]?.asString())
 
-            App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it }
+            App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
             App.savegameWorldsName[worldUUID]?.let { if (it.isNotBlank()) worldName = it }
             json["lastPlayTime"]?.asString()?.let {
                 lastPlayTime = Instant.ofEpochSecond(it.toLong())
@@ -413,6 +416,8 @@ class UIItemPlayerCells(
 
     private val cellCol = CELL_COL
 
+    private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         // try to generate a texture
         if (skimmer.initialised && !hasTexture) {
@@ -438,27 +443,35 @@ class UIItemPlayerCells(
         // draw box backgrounds
         batch.color = cellCol
         Toolkit.fillArea(batch, posX, posY, 106, height)
-        Toolkit.fillArea(batch, posX + 116, posY + 63, width - 116, 57)
+        Toolkit.fillArea(batch, posX + 116, posY + 34, width - 116, 86)
 
         // draw borders
         batch.color = highlightCol
         // avatar border
         Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, 106 + 2, height + 2)
         // infocell border
-        Toolkit.drawBoxBorder(batch, posX + 115, posY + 62, width - 114, 59)
+        Toolkit.drawBoxBorder(batch, posX + 115, posY + 33, width - 114, 88)
         // infocell divider
-        Toolkit.fillArea(batch, posX + 118, posY + 90, width - 120, 1)
+        Toolkit.fillArea(batch, posX + 118, posY + 62, width - 120, 1)
+        Toolkit.fillArea(batch, posX + 118, posY + 91, width - 120, 1)
+
+        // texts
+        val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
+        App.fontGame.draw(batch, playerName, x + 146f, y + height - 82f)
+        App.fontGame.draw(batch, worldName, x + 146f, y + height - 53f)
+        App.fontGame.draw(batch, lastPlayTime, x + 146f, y + height - 24f)
+        App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, y + height - 24f)
+        // icons
+        batch.draw(icons.get(24,0), x + 120f, y + height - 82f) // player name
+        batch.draw(icons.get(12,0), x + 119f, y + height - 53f) // world map
+        batch.draw(icons.get(13,0), x + 120f, y + height - 24f) // journal
+        batch.draw(icons.get(23,0), x + width - 5f - playTimeTextLen - 24f, y + height - 24f) // stopwatch
 
         // player avatar
         batch.color = Color.WHITE
         thumb?.let {
             batch.draw(it, x + FastMath.ceil((106f - it.regionWidth) / 2f), y + FastMath.ceil((height - it.regionHeight) / 2f))
         }
-        // texts
-        App.fontGame.draw(batch, playerName, x + 120f, y + height - 54f)
-        App.fontGame.draw(batch, worldName, x + 120f, y + height - 24f)
-        App.fontGame.draw(batch, lastPlayTime, x + width - 4f - App.fontGame.getWidth(lastPlayTime), y + height - 54f)
-        App.fontGame.draw(batch, totalPlayTime, x + width - 4f - App.fontGame.getWidth(totalPlayTime), y + height - 24f)
     }
 
     override fun dispose() {
