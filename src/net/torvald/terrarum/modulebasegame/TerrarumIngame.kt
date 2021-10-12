@@ -283,7 +283,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 //            Terrarum.itemCodex.loadFromSave(codices.item)
 //            Terrarum.apocryphas = HashMap(codices.apocryphas)
 
-            savegameNickname = codices.disk.getDiskName(Common.CHARSET)
         }
     }
 
@@ -310,9 +309,17 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // overwrite player's props with world's for multiplayer
         // see comments on IngamePlayer.unauthorisedPlayerProps to know why this is necessary.
         codices.player.backupPlayerProps(isMultiplayer) // backup first!
+        printdbg(this, "postInitForLoadFromSave")
+        printdbg(this, "Player UUID: ${codices.player.uuid}")
+        printdbg(this, world.playersLastStatus.keys)
+        printdbg(this, world.playersLastStatus[codices.player.uuid])
         world.playersLastStatus[codices.player.uuid].let { // regardless of the null-ness, we still keep the backup, which WriteActor looks for it
             // if the world has some saved values, use them
             if (it != null) {
+
+                printdbg(this, "Found LastStatus mapping for Player ${codices.player.uuid}")
+                printdbg(this, "Changing XY Position (${codices.player.hitbox.canonicalX}, ${codices.player.hitbox.canonicalY}) -> ${it.physics.position}")
+
                 codices.player.setPosition(it.physics.position)
                 if (isMultiplayer) {
                     codices.player.actorValue = it.actorValue!!
@@ -321,6 +328,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             }
             // if not, move player to the spawn point
             else {
+                printdbg(this, "No mapping found")
+                printdbg(this, "Changing XY Position (${codices.player.hitbox.canonicalX},${codices.player.hitbox.canonicalY}) -> (${world.spawnX * TILE_SIZED}, ${world.spawnY * TILE_SIZED})")
+
                 codices.player.setPosition(world.spawnX * TILE_SIZED, world.spawnY * TILE_SIZED)
             }
         }
@@ -337,8 +347,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // go to spawn position
         printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
 
-        worldSavefileName = "$savegameNickname-${world.worldIndex}"
-        playerSavefileName = (actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${actorGamer.uuid}"
+//        worldSavefileName = "$savegameNickname-${world.worldIndex}"
+//        playerSavefileName = (actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${actorGamer.uuid}"
+
+        worldSavefileName = LoadSavegame.getWorldSavefileName(savegameNickname, world)
+        playerSavefileName = LoadSavegame.getPlayerSavefileName(actorGamer)
 
         worldDisk = VDUtil.createNewDisk(
                 1L shl 60,

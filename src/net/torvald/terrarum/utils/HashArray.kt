@@ -22,7 +22,10 @@ class HashedFluidType: HashMap<BlockAddress, FluidType>()
 class HashedWirings: HashMap<BlockAddress, GameWorld.WiringNode>()
 class HashedWiringGraph: HashMap<BlockAddress, WiringGraphMap>()
 class MetaModuleCSVPair: HashMap<String, ZipCodedStr>()
-class PlayersLastStatus: HashMap<UUID, PlayerLastStatus>()
+class PlayersLastStatus: HashMap<String, PlayerLastStatus>() {
+    operator fun get(uuid: UUID) = this[uuid.toString()]
+    operator fun set(uuid: UUID, value: PlayerLastStatus) = this.set(uuid.toString(), value)
+}
 class PlayerLastStatus() {
     var physics = PhysicalStatus(); private set // mandatory
     var inventory: ActorInventory? = null; private set // optional (multiplayer only)

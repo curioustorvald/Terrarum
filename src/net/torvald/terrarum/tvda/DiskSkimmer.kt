@@ -426,7 +426,11 @@ removefile:
      */
     fun sync(): VirtualDisk {
         // rebuild VirtualDisk out of this and use it to write out
-        return VDUtil.readDiskArchive(diskFile, Level.INFO)
+        val disk = VDUtil.readDiskArchive(diskFile, Level.INFO)
+        VDUtil.dumpToRealMachine(disk, diskFile)
+        entryToOffsetTable.clear()
+        rebuild()
+        return disk
     }
 
 

@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.BlockLayer
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ChunkLoadingLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -122,6 +124,10 @@ object WriteSavegame {
  */
 object LoadSavegame {
 
+    fun getSavegameNickname(worldDisk: SimpleFileSystem) = worldDisk.getDiskName(Common.CHARSET)
+    fun getWorldSavefileName(nick: String, world: GameWorld) = "$nick-${world.worldIndex}"
+    fun getPlayerSavefileName(player: IngamePlayer) = (player.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${player.uuid}"
+
     fun getFileBytes(disk: SimpleFileSystem, id: Long): ByteArray64 = disk.getFile(id)!!.bytes
     fun getFileReader(disk: SimpleFileSystem, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
@@ -142,7 +148,11 @@ object LoadSavegame {
         world.layerWall = BlockLayer(world.width, world.height)
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
-
+        newIngame.worldDisk = worldDisk.sync()
+        newIngame.playerDisk = playerDisk.sync()
+        newIngame.savegameNickname = getSavegameNickname(worldDisk)
+        newIngame.worldSavefileName = getWorldSavefileName(newIngame.savegameNickname, world)
+        newIngame.playerSavefileName = getPlayerSavefileName(player)
 
 
         val loadJob = { it: LoadScreenBase ->
