@@ -44,6 +44,8 @@ import net.torvald.terrarum.Terrarum
  * As mentioned in [UICanvas], UIItems must be added to the Canvas to make listeners work without implementing
  * everything by yourself.
  *
+ * PROTIP: if [clickOnceListener] does not seem to work, make sure your parent UI is handling touchDown() and touchUp() events!
+ *
  * @param initialX initial position of the item. Useful for making transition that requires the item to be moved
  * @param initialY initial position of the item. Useful for making transition that requires the item to be moved
  *
@@ -113,7 +115,10 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
     /** Parameters: amountX, amountY */
     open var scrolledListener: ((Float, Float) -> Unit)? = null
-    /** Parameters: relative mouseX, relative mouseY, button */
+    /** Parameters: relative mouseX, relative mouseY, button
+     *
+     * PROTIP: if clickOnceListener does not seem to work, make sure your parent UI is handling touchDown() and touchUp() events!
+     */
     open var clickOnceListener: ((Int, Int, Int) -> Unit)? = null
     open var clickOnceListenerFired = false
 

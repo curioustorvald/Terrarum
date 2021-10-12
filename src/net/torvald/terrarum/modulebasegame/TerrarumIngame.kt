@@ -310,11 +310,18 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // overwrite player's props with world's for multiplayer
         // see comments on IngamePlayer.unauthorisedPlayerProps to know why this is necessary.
         codices.player.backupPlayerProps(isMultiplayer) // backup first!
-        world.playersLastStatus[codices.player.uuid]?.let { // if nothing was saved, nothing would happen and we still keep the backup, which WriteActor looks for it
-            codices.player.setPosition(it.physics.position)
-            if (isMultiplayer) {
-                codices.player.actorValue = it.actorValue!!
-                codices.player.inventory = it.inventory!!
+        world.playersLastStatus[codices.player.uuid].let { // regardless of the null-ness, we still keep the backup, which WriteActor looks for it
+            // if the world has some saved values, use them
+            if (it != null) {
+                codices.player.setPosition(it.physics.position)
+                if (isMultiplayer) {
+                    codices.player.actorValue = it.actorValue!!
+                    codices.player.inventory = it.inventory!!
+                }
+            }
+            // if not, move player to the spawn point
+            else {
+                codices.player.setPosition(world.spawnX * TILE_SIZED, world.spawnY * TILE_SIZED)
             }
         }
 

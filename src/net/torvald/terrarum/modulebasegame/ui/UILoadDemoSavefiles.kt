@@ -19,6 +19,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadPlayer
 import net.torvald.terrarum.tvda.ByteArray64InputStream
 import net.torvald.terrarum.tvda.ByteArray64Reader
@@ -113,11 +114,20 @@ class UILoadDemoSavefiles : UICanvas() {
     private val worldCells = ArrayList<UIItemWorldCells>()
     private val playerCells = ArrayList<UIItemPlayerCells>()
 
-    var mode = 0 // 0: show players, 1: show worlds
+    var mode = 0; private set// 0: show players, 1: show worlds
+
+    fun advanceMode() {
+        mode += 1
+        uiScroll = 0f
+        scrollFrom = 0
+        scrollTarget = 0
+        scrollAnimCounter = 0f
+        loadFired = 0
+
+        println("savelist mode: $mode")
+    }
 
     override fun show() {
-        printdbg(this, "savefiles show()")
-
         try {
             val remoCon = (App.getCurrentScreen() as TitleScreen).uiRemoCon
 
@@ -171,108 +181,122 @@ class UILoadDemoSavefiles : UICanvas() {
     }
 
     private fun getCells() = if (mode == 0) playerCells else worldCells
+    private var loadFired = 0
 
     override fun updateUI(delta: Float) {
 
-        if (scrollTarget != listScroll) {
-            if (scrollAnimCounter < scrollAnimLen) {
-                scrollAnimCounter += delta
-                uiScroll = Movement.fastPullOut(
-                        scrollAnimCounter / scrollAnimLen,
-                        listScroll * cellInterval.toFloat(),
-                        scrollTarget * cellInterval.toFloat()
-                )
+        if (mode < 2) {
+            if (scrollTarget != listScroll) {
+                if (scrollAnimCounter < scrollAnimLen) {
+                    scrollAnimCounter += delta
+                    uiScroll = Movement.fastPullOut(
+                            scrollAnimCounter / scrollAnimLen,
+                            listScroll * cellInterval.toFloat(),
+                            scrollTarget * cellInterval.toFloat()
+                    )
+                }
+                else {
+                    scrollAnimCounter = 0f
+                    listScroll = scrollTarget
+                    uiScroll = cellInterval.toFloat() * scrollTarget
+                }
             }
-            else {
-                scrollAnimCounter = 0f
-                listScroll = scrollTarget
-                uiScroll = cellInterval.toFloat() * scrollTarget
-            }
-        }
 
-        val cells = getCells()
+            val cells = getCells()
 
-        for (index in 0 until cells.size) {
-            val it = cells[index]
-            if (index in listScroll - 2 until listScroll + savesVisible + 2) {
-                // re-position
-                it.posY = (it.initialY - uiScroll).roundToInt()
-                it.update(delta)
+            for (index in 0 until cells.size) {
+
+
+                val it = cells[index]
+                if (index in listScroll - 2 until listScroll + savesVisible + 2) {
+                    // re-position
+                    it.posY = (it.initialY - uiScroll).roundToInt()
+                    it.update(delta)
+                }
             }
         }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
+        if (mode == 2) {
+            loadFired += 1
+            // to hide the "flipped skybox" artefact
+            gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
+            if (loadFired == 2) {
+                LoadSavegame(playerDisk!!, worldDisk)
+            }
+        }
+        else {
+            batch.end()
 
-        batch.end()
+            val cells = getCells()
 
-        val cells = getCells()
+            lateinit var savePixmap: Pixmap
+            sliderFBO.inAction(camera as OrthographicCamera, batch) {
+                gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
-        lateinit var savePixmap: Pixmap
-        sliderFBO.inAction(camera as OrthographicCamera, batch) {
-            gdxClearAndSetBlend(0f,0f,0f,0f)
-
-            setCameraPosition(batch, camera, 0f, 0f)
-            batch.color = Color.WHITE
-            batch.inUse {
-                for (index in 0 until cells.size) {
-                    val it = cells[index]
-                    if (index in listScroll - 2 until listScroll + savesVisible + 2) {
-                        it.render(batch, camera)
+                setCameraPosition(batch, camera, 0f, 0f)
+                batch.color = Color.WHITE
+                batch.inUse {
+                    for (index in 0 until cells.size) {
+                        val it = cells[index]
+                        if (index in listScroll - 2 until listScroll + savesVisible + 2) {
+                            it.render(batch, camera)
+                        }
                     }
                 }
+                savePixmap = Pixmap.createFromFrameBuffer(0, 0, sliderFBO.width, sliderFBO.height)
+                savePixmap.blending = Pixmap.Blending.None
             }
-            savePixmap = Pixmap.createFromFrameBuffer(0, 0, sliderFBO.width, sliderFBO.height)
-            savePixmap.blending = Pixmap.Blending.None
-        }
 
 
-        // implement "wipe-out" by CPU-rendering (*deep exhale*)
-        //savePixmap.setColor(1f,1f,1f,0f)
-        savePixmap.setColor(0f,0f,0f,0f)
-        savePixmap.fillRectangle(0, savePixmap.height - titleTopGradStart, savePixmap.width, titleTopGradStart)
-        // top grad
-        for (y in titleTopGradStart until titleTopGradEnd) {
-            val alpha = (y - titleTopGradStart).toFloat() / gradAreaHeight
-            for (x in 0 until savePixmap.width) {
-                val col = savePixmap.getPixel(x, savePixmap.height - y)
-                val blendAlpha = (col.and(0xFF) * alpha).roundToInt()
-                savePixmap.drawPixel(x, savePixmap.height - y, col.and(0xFFFFFF00.toInt()) or blendAlpha)
+            // implement "wipe-out" by CPU-rendering (*deep exhale*)
+            //savePixmap.setColor(1f,1f,1f,0f)
+            savePixmap.setColor(0f, 0f, 0f, 0f)
+            savePixmap.fillRectangle(0, savePixmap.height - titleTopGradStart, savePixmap.width, titleTopGradStart)
+            // top grad
+            for (y in titleTopGradStart until titleTopGradEnd) {
+                val alpha = (y - titleTopGradStart).toFloat() / gradAreaHeight
+                for (x in 0 until savePixmap.width) {
+                    val col = savePixmap.getPixel(x, savePixmap.height - y)
+                    val blendAlpha = (col.and(0xFF) * alpha).roundToInt()
+                    savePixmap.drawPixel(x, savePixmap.height - y, col.and(0xFFFFFF00.toInt()) or blendAlpha)
+                }
             }
-        }
-        // bottom grad
-        for (y in titleBottomGradStart until titleBottomGradEnd) {
-            val alpha = 1f - ((y - titleBottomGradStart).toFloat() / gradAreaHeight)
-            for (x in 0 until savePixmap.width) {
-                val col = savePixmap.getPixel(x, savePixmap.height - y)
-                val blendAlpha = (col.and(0xFF) * alpha).roundToInt()
-                savePixmap.drawPixel(x, savePixmap.height - y, col.and(0xFFFFFF00.toInt()) or blendAlpha)
+            // bottom grad
+            for (y in titleBottomGradStart until titleBottomGradEnd) {
+                val alpha = 1f - ((y - titleBottomGradStart).toFloat() / gradAreaHeight)
+                for (x in 0 until savePixmap.width) {
+                    val col = savePixmap.getPixel(x, savePixmap.height - y)
+                    val blendAlpha = (col.and(0xFF) * alpha).roundToInt()
+                    savePixmap.drawPixel(x, savePixmap.height - y, col.and(0xFFFFFF00.toInt()) or blendAlpha)
+                }
             }
+            savePixmap.setColor(0f, 0f, 0f, 0f)
+            savePixmap.fillRectangle(0, 0, savePixmap.width, height - titleBottomGradEnd + 1)
+
+
+
+            setCameraPosition(batch, camera, 0f, 0f)
+            val saveTex = Texture(savePixmap)
+            batch.inUse {
+                batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
+
+                // draw texts
+                val loadGameTitleStr = Lang["MENU_IO_LOAD_GAME"]
+                // "Game Load"
+                App.fontGame.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
+                // Control help
+                App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
+            }
+
+            saveTex.dispose()
+            savePixmap.dispose()
+
+            batch.begin()
         }
-        savePixmap.setColor(0f,0f,0f,0f)
-        savePixmap.fillRectangle(0, 0, savePixmap.width, height - titleBottomGradEnd + 1)
-
-
-
-        setCameraPosition(batch, camera, 0f, 0f)
-        val saveTex = Texture(savePixmap)
-        batch.inUse {
-            batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
-
-            // draw texts
-            val loadGameTitleStr = Lang["MENU_IO_LOAD_GAME"]
-            // "Game Load"
-            App.fontGame.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
-            // Control help
-            App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
-        }
-
-        saveTex.dispose()
-        savePixmap.dispose()
-
-        batch.begin()
     }
 
 
@@ -291,6 +315,16 @@ class UILoadDemoSavefiles : UICanvas() {
                 scrollAnimCounter = 0f
             }
         }
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
         return true
     }
 
@@ -370,6 +404,7 @@ class UIItemPlayerCells(
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
         parent.playerDisk = skimmer
+        parent.advanceMode()
     }
 
     private var playerName: String = "$EMDASH"
@@ -559,7 +594,7 @@ class UIItemWorldCells(
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
         parent.worldDisk = skimmer
-        TODO()
+        parent.advanceMode()
     }
 
     internal var hasTexture = false
