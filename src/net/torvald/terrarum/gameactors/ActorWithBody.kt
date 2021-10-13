@@ -390,11 +390,7 @@ open class ActorWithBody : Actor {
      * @param y
      */
     fun setPosition(x: Double, y: Double) {
-        hitbox.setFromWidthHeight(
-                x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
-                y - (baseHitboxH - hitboxTranslateY) * scale,
-                baseHitboxW * scale,
-                baseHitboxH * scale)
+        hitbox.setPositionFromPointed(x, y)
     }
 
     // get() methods are moved to update(), too much stray object being created is definitely not good
