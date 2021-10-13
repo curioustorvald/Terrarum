@@ -3,7 +3,6 @@ package net.torvald.spriteanimation
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
-import net.torvald.terrarum.tvda.SimpleFileSystem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -35,12 +34,12 @@ interface HasAssembledSprite {
             _rebuild(animGlow, spriteGlow)
     }
 
-    fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
+    /*fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
         if (anim != null && sprite != null)
             _rebuild(disk, anim, sprite)
         if (animGlow != null && spriteGlow != null)
             _rebuild(disk, animGlow, spriteGlow)
-    }
+    }*/
 
     private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
@@ -66,7 +65,7 @@ interface HasAssembledSprite {
         sprite.nRows = newAnimDelays.size
     }
 
-    private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
+    /*private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
         val pixmap = if (disk.getEntry(-1025) != null) AssembleSheetPixmap.fromVirtualDisk(disk, ad) else AssembleSheetPixmap.fromAssetsDir(ad)
@@ -88,6 +87,6 @@ interface HasAssembledSprite {
         sprite.delays = newAnimDelays
         sprite.nFrames = newAnimFrames
         sprite.nRows = newAnimDelays.size
-    }
+    }*/
 
 }

@@ -1,7 +1,10 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.tvda.toBigEndian
+import net.torvald.terrarum.utils.PasswordBase32
 
 
 typealias ActorID = Int
@@ -80,6 +83,8 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     abstract fun dispose()
 
+    @Transient val localHash = HQRNG().nextInt()
+    @Transient val localHashStr = PasswordBase32.encode(localHash.toBigEndian()).substringBefore('=')
 }
 
 annotation class Event

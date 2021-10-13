@@ -38,7 +38,6 @@ import net.torvald.terrarum.serialise.ReadActor
 import net.torvald.terrarum.serialise.WriteSavegame
 import net.torvald.terrarum.tvda.DiskSkimmer
 import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
@@ -300,6 +299,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 e.printStackTrace()
             }
         }
+
+        printdbg(this, "Player localhash: ${codices.player.localHashStr}, hasSprite: ${codices.player.sprite != null}")
 
         // assign new random referenceID for player
         codices.player.referenceID = Terrarum.generateUniqueReferenceID(Actor.RenderOrder.MIDDLE)

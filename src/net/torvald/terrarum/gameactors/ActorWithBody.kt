@@ -1714,9 +1714,11 @@ open class ActorWithBody : Actor {
 
         // warnings
         if (sprite == null && isVisible)
-            printdbg(this, "Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
+            printdbg(this, "Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.\n" +
+                           "Actor localhash: ${this.localHashStr}")
         else if (sprite != null && !isVisible)
-            printdbg(this, "Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
+            printdbg(this, "Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.\n" +
+                           "Actor localhash: ${this.localHashStr}")
 
         assertPrinted = true
     }

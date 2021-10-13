@@ -19,7 +19,6 @@ import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
@@ -597,9 +596,12 @@ inline fun printStackTrace(obj: Any) = printStackTrace(obj, System.out) // becau
 
 fun printStackTrace(obj: Any, out: PrintStream = System.out) {
     if (App.IS_DEVELOPMENT_BUILD) {
+        val indentation = " ".repeat(obj.javaClass.simpleName.length + 4)
         Thread.currentThread().stackTrace.forEachIndexed { index, it ->
-            if (index >= 3)
-                out.println("[${obj.javaClass.simpleName}] ... $it")
+            if (index == 3)
+                out.println("[${obj.javaClass.simpleName}]> $it")
+            else if (index > 3)
+                out.println("$indentation$it")
         }
     }
 }

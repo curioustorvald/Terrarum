@@ -140,6 +140,8 @@ object LoadSavegame {
         val newIngame = TerrarumIngame(App.batch)
         val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer
 
+        printdbg(this, "Player localhash: ${player.localHashStr}, hasSprite: ${player.sprite != null}")
+
         val currentWorldId = player.worldCurrentlyPlaying
         val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!
         val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(-1L)!!.bytes, Common.CHARSET))

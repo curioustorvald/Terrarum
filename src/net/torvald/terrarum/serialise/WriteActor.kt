@@ -135,13 +135,13 @@ object ReadActor {
         if (actor is Pocketed)
             actor.inventory.actor = actor
 
-        if (actor is ActorWithBody && actor is HasAssembledSprite) {
+        if (actor is ActorWithBody && actor is IngamePlayer) {
             val animFile = disk.getFile(-2L)
             val animFileGlow = disk.getFile(-3L)
+            val bodypartsFile = disk.getFile(-1025)
 
             actor.sprite = SpriteAnimation(actor)
             if (animFileGlow != null) actor.spriteGlow = SpriteAnimation(actor)
-            val bodypartsFile = disk.getFile(-1025)
 
             if (bodypartsFile != null)
                 actor.reassembleSprite(
@@ -159,6 +159,13 @@ object ReadActor {
                         if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
                 )
         }
+        else if (actor is ActorWithBody && actor is HasAssembledSprite) {
+            if (actor.animDesc != null) actor.sprite = SpriteAnimation(actor)
+            if (actor.animDescGlow != null) actor.spriteGlow = SpriteAnimation(actor)
+
+            actor.reassembleSprite(actor.sprite, actor.animDesc, actor.spriteGlow, actor.animDescGlow)
+        }
+
 
         return actor
     }

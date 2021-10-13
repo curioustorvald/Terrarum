@@ -1227,10 +1227,17 @@ public class App implements ApplicationListener {
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            if (message == null)
+            if (message == null) {
                 System.out.println("[" + out + "] null");
-            else
-                System.out.println("[" + out + "] " + message);
+                return;
+            }
+            else {
+                String indentation = " ".repeat(out.length() + 3);
+                String[] msgLines = message.toString().split("\\n");
+                for (int i = 0; i < msgLines.length; i++) {
+                    System.out.println((i == 0 ? "[" + out + "] " : indentation) + msgLines[i]);
+                }
+            }
         }
     }
 

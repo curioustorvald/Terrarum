@@ -64,7 +64,7 @@ internal class UIInventoryCells(
     }
 
     fun rebuildList() {
-        App.printdbg(this, "rebuilding list")
+//        App.printdbg(this, "rebuilding list")
 
         itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.selectedIcon])
         equipped.rebuild()
