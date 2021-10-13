@@ -10,7 +10,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.tvda.*
-import net.torvald.terrarum.utils.PlayerLastStatus
 import java.io.File
 import java.util.zip.GZIPOutputStream
 
@@ -94,11 +93,8 @@ class WorldSavingThread(
         WriteSavegame.saveProgress += 1f
 
         // Write World //
-        // record all player's last position
-        playersList.forEach {
-            ingame.world.playersLastStatus[it.uuid] = PlayerLastStatus(it, ingame.isMultiplayer)
-        }
-        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
+
+        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t, actorsList, playersList))
         val world = DiskEntry(-1L, 0, creation_t, time_t, worldMeta)
         addFile(disk, world)
 

@@ -1,16 +1,5 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.Terrarum.ingame
-import net.torvald.terrarum.console.ConsoleCommand
-import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.serialise.WriteActor
-import net.torvald.terrarum.serialise.WriteWorld
-import java.io.IOException
-
 /**
  * Created by minjaesong on 2017-07-18.
  */
@@ -34,7 +23,7 @@ import java.io.IOException
     }
 }*/
 
-object ExportWorld : ConsoleCommand {
+/*object ExportWorld : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
@@ -57,9 +46,9 @@ object ExportWorld : ConsoleCommand {
     override fun printUsage() {
         Echo("Usage: Exportworld filename-without-extension")
     }
-}
+}*/
 
-object ExportActor : ConsoleCommand {
+/*object ExportActor : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
@@ -89,4 +78,4 @@ object ExportActor : ConsoleCommand {
         Echo("Usage: exportactor (id) filename-without-extension")
         Echo("blank ID for player")
     }
-}
+}*/

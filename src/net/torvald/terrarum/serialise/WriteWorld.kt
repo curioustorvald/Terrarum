@@ -3,7 +3,6 @@ package net.torvald.terrarum.serialise
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
@@ -14,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.tvda.ByteArray64
 import net.torvald.terrarum.tvda.ByteArray64Writer
+import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarum.weather.WeatherMixer
 import java.io.Reader
 
@@ -29,7 +29,7 @@ object WriteWorld {
                actor !is IngamePlayer // IngamePlayers must not be saved with the world
     }
 
-    private fun preWrite(ingame: TerrarumIngame, time_t: Long): GameWorld {
+    private fun preWrite(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): GameWorld {
         val world = ingame.world
         val currentPlayTime_t = time_t - ingame.loadedTime_t
 
@@ -38,29 +38,30 @@ object WriteWorld {
         world.lastPlayTime = time_t
         world.totalPlayTime += currentPlayTime_t
 
-        val actorIDbuf = ArrayList<ActorID>()
-        ingame.actorContainerActive.cloneToList().filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
-        ingame.actorContainerInactive.cloneToList().filter { actorAcceptable(it) }.forEach { actorIDbuf.add(it.referenceID) }
-
         world.actors.clear()
-        world.actors.addAll(actorIDbuf.sorted().distinct())
+        world.actors.addAll(actorsList.map { it.referenceID }.sorted().distinct())
 
         world.randSeeds[0] = RoguelikeRandomiser.RNG.state0
         world.randSeeds[1] = RoguelikeRandomiser.RNG.state1
         world.randSeeds[2] = WeatherMixer.RNG.state0
         world.randSeeds[3] = WeatherMixer.RNG.state1
 
+        // record all player's last position
+        playersList.forEach {
+            world.playersLastStatus.put(it.uuid.toString(), PlayerLastStatus(it, ingame.isMultiplayer))
+        }
+
         return world
     }
 
-    operator fun invoke(ingame: TerrarumIngame, time_t: Long): String {
-        return Common.jsoner.toJson(preWrite(ingame, time_t))
+    operator fun invoke(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): String {
+        return Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList))
     }
 
-    fun encodeToByteArray64(ingame: TerrarumIngame, time_t: Long): ByteArray64 {
+    fun encodeToByteArray64(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): ByteArray64 {
         val baw = ByteArray64Writer(Common.CHARSET)
 
-        Common.jsoner.toJson(preWrite(ingame, time_t), baw)
+        Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList), baw)
         baw.flush(); baw.close()
 
         return baw.toByteArray64()

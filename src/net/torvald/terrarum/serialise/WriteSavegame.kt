@@ -41,25 +41,27 @@ object WriteSavegame {
 
     operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
         savingStatus = 0
-
+        val hasThumbnail = (mode == SaveMode.WORLD)
         Echo("Save queued")
 
-        IngameRenderer.screencapExportCallback = {
-            Echo("Generating thumbnail...")
+        if (hasThumbnail) {
+            IngameRenderer.screencapExportCallback = {
+                Echo("Generating thumbnail...")
 
-            val w = 960
-            val h = 640
-            val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
-            IngameRenderer.fboRGBexport = p
-            //PixmapIO2._writeTGA(gzout, p, true, true)
-            //p.dispose()
-            IngameRenderer.fboRGBexportedLatch = true
+                val w = 960
+                val h = 640
+                val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
+                IngameRenderer.fboRGBexport = p
+                //PixmapIO2._writeTGA(gzout, p, true, true)
+                //p.dispose()
+                IngameRenderer.fboRGBexportedLatch = true
 
-            Echo("Done thumbnail generation")
+                Echo("Done thumbnail generation")
+            }
+            IngameRenderer.screencapRequested = true
         }
-        IngameRenderer.screencapRequested = true
 
-        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, true, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, hasThumbnail, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up

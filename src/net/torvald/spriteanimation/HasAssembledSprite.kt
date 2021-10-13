@@ -27,11 +27,11 @@ interface HasAssembledSprite {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    fun reassembleSprite(sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
-        if (anim != null && sprite != null)
-            _rebuild(anim, sprite)
-        if (animGlow != null && spriteGlow != null)
-            _rebuild(animGlow, spriteGlow)
+    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
+        if (animDesc != null && sprite != null)
+            _rebuild(animDesc!!, sprite)
+        if (animDescGlow != null && spriteGlow != null)
+            _rebuild(animDescGlow!!, spriteGlow)
     }
 
     /*fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {

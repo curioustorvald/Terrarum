@@ -345,12 +345,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun postInitForNewGame() {
-        // go to spawn position
-        printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
-
-//        worldSavefileName = "$savegameNickname-${world.worldIndex}"
-//        playerSavefileName = (actorGamer.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${actorGamer.uuid}"
-
         worldSavefileName = LoadSavegame.getWorldSavefileName(savegameNickname, world)
         playerSavefileName = LoadSavegame.getPlayerSavefileName(actorGamer)
 
@@ -366,6 +360,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 Common.CHARSET
         )
 
+        // go to spawn position
+        printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
         actorGamer.setPosition(
                 world.spawnX * TILE_SIZED,
                 world.spawnY * TILE_SIZED

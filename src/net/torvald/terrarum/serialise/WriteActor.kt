@@ -65,13 +65,11 @@ object WritePlayer {
         player.totalPlayTime += time_t - ingame.loadedTime_t
 
 
-        // restore player prop backup created on load-time
-        if (ingame.world.playersLastStatus[player.uuid] != null) {
+        // restore player prop backup created on load-time for multiplayer
+        if (ingame.isMultiplayer) {
             player.setPosition(player.unauthorisedPlayerProps.physics.position)
-            if (ingame.isMultiplayer) {
-                player.actorValue = player.unauthorisedPlayerProps.actorValue!!
-                player.inventory = player.unauthorisedPlayerProps.inventory!!
-            }
+            player.actorValue = player.unauthorisedPlayerProps.actorValue!!
+            player.inventory = player.unauthorisedPlayerProps.inventory!!
         }
 
 
@@ -141,29 +139,22 @@ object ReadActor {
             val bodypartsFile = disk.getFile(-1025)
 
             actor.sprite = SpriteAnimation(actor)
-            if (animFileGlow != null) actor.spriteGlow = SpriteAnimation(actor)
+            actor.animDesc = ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET))
+            if (animFileGlow != null) {
+                actor.spriteGlow = SpriteAnimation(actor)
+                actor.animDescGlow = ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
+            }
 
             if (bodypartsFile != null)
-                actor.reassembleSprite(
-                        disk,
-                        actor.sprite!!,
-                        ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET)),
-                        actor.spriteGlow,
-                        if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
-                )
+                actor.reassembleSprite(disk, actor.sprite!!, actor.spriteGlow)
             else
-                actor.reassembleSprite(
-                        actor.sprite!!,
-                        ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET)),
-                        actor.spriteGlow,
-                        if (animFileGlow == null) null else ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
-                )
+                actor.reassembleSprite(actor.sprite!!, actor.spriteGlow)
         }
         else if (actor is ActorWithBody && actor is HasAssembledSprite) {
             if (actor.animDesc != null) actor.sprite = SpriteAnimation(actor)
             if (actor.animDescGlow != null) actor.spriteGlow = SpriteAnimation(actor)
 
-            actor.reassembleSprite(actor.sprite, actor.animDesc, actor.spriteGlow, actor.animDescGlow)
+            actor.reassembleSprite(actor.sprite, actor.spriteGlow)
         }
 
 

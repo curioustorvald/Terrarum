@@ -2,9 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
 /**
  * Created by minjaesong on 2017-02-10.
@@ -31,7 +29,7 @@ object PlayerBuilderTestSubject1 {
 
         p.sprite = SpriteAnimation(p)
         p.spriteGlow = SpriteAnimation(p)
-        p.reassembleSprite(p.sprite, p.animDesc, p.spriteGlow, p.animDescGlow)
+        p.reassembleSprite(p.sprite, p.spriteGlow)
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 
         // ingame must teleport the player to the spawn point

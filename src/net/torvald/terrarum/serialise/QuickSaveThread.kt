@@ -90,7 +90,7 @@ class QuickSingleplayerWorldSavingThread(
         playersList.forEach {
             ingame.world.playersLastStatus[it.uuid] = PlayerLastStatus(it, ingame.isMultiplayer)
         }
-        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t))
+        val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t, actorsList, playersList))
         val world = DiskEntry(-1L, 0, creation_t, time_t, worldMeta)
         addFile(disk, world); skimmer.appendEntryOnly(world)
 

@@ -459,13 +459,13 @@ class UIItemPlayerCells(
             skimmer.getFile(-1L)?.bytes?.let {
                 val animFile = skimmer.getFile(-2L)!!
                 val p = ReadPlayer(skimmer, ByteArray64Reader(it, Common.CHARSET))
-                val sprite = SpriteAnimation(p)
-                val animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
-                p.reassembleSprite(skimmer, sprite, animDesc)
-                sprite.textureRegion.get(0,0).let {
+                p.sprite = SpriteAnimation(p)
+                p.animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
+                p.reassembleSprite(skimmer, p.sprite)
+                p.sprite!!.textureRegion.get(0,0).let {
                     thumb = it
                 }
-                this.sprite = sprite
+                this.sprite = p.sprite
             }
 
             hasTexture = true
