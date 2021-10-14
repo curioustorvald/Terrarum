@@ -882,7 +882,7 @@ open class ActorWithBody : Actor {
                                 )
 
                     // adjust finalDisplacement for honest-to-god staircasing
-                    if (vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
+                    if (physProp.useStairs && vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
                         // remove Y displacement
                         // let original X velocity to pass-thru instead of snapping to tiles coded above
                         // pass-thru values are held by the vectorSum
