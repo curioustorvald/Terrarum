@@ -3,6 +3,7 @@ package net.torvald.spriteassembler
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.GdxRuntimeException
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.tvda.ByteArray64InputStream
@@ -22,7 +23,7 @@ import kotlin.collections.HashMap
  */
 object AssembleSheetPixmap {
 
-    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream): Pixmap {
+    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?): Pixmap {
         val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
 
@@ -35,15 +36,21 @@ object AssembleSheetPixmap {
     }
 
     fun fromAssetsDir(properties: ADProperties) = drawAndGetCanvas(properties) { partName: String ->
-        Gdx.files.internal("assets/${properties.toFilename(partName)}").read()
+        val file = Gdx.files.internal("assets/${properties.toFilename(partName)}")
+        if (file.exists()) file.read() else null
     }
 
-    fun fromVirtualDisk(disk: SimpleFileSystem, properties: ADProperties): Pixmap {
+    fun fromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties): Pixmap {
         val bodypartMapping = Properties()
-        bodypartMapping.load(ByteArray64Reader(disk.getFile(-1025L)!!.bytes, Common.CHARSET))
+        bodypartMapping.load(ByteArray64Reader(disk.getFile(entrynum)!!.bytes, Common.CHARSET))
 
         val fileGetter = { partName: String ->
-            ByteArray64InputStream(disk.getFile(bodypartMapping[partName] as Long)!!.bytes)
+            bodypartMapping.getProperty(partName).let {
+                if (it != null)
+                    ByteArray64InputStream(disk.getFile(bodypartMapping.getProperty(partName).toLong())!!.bytes)
+                else
+                    null
+            }
         }
 
         return drawAndGetCanvas(properties, fileGetter)
@@ -52,19 +59,24 @@ object AssembleSheetPixmap {
     private fun drawThisFrame(frameName: String,
                               canvas: Pixmap,
                               properties: ADProperties,
-                              fileGetter: (String) -> InputStream
+                              fileGetter: (String) -> InputStream?
     ) {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
         val bodypartOrigins = properties.bodyparts
-        val bodypartImages = properties.bodyparts.keys.map {
-            try {
-                val bytes = fileGetter(it).readAllBytes()
-                it to Pixmap(bytes, 0, bytes.size)
-            }
-            catch (e: GdxRuntimeException) {
-                it to null
+        val bodypartImages = properties.bodyparts.keys.map { partname ->
+            fileGetter(partname).let { file ->
+                if (file == null) partname to null
+                else {
+                    try {
+                        val bytes = file.readAllBytes()
+                        partname to Pixmap(bytes, 0, bytes.size)
+                    }
+                    catch (e: GdxRuntimeException) {
+                        partname to null
+                    }
+                }
             }
         }.toMap()
         val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)

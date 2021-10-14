@@ -87,9 +87,9 @@ class IngamePlayer : ActorHumanoid {
 
     fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
         if (animDesc != null && sprite != null)
-            _rebuild(disk, animDesc!!, sprite)
+            _rebuild(disk, -1025L, animDesc!!, sprite)
         if (animDescGlow != null && spriteGlow != null)
-            _rebuild(disk, animDescGlow!!, spriteGlow)
+            _rebuild(disk, -1026L, animDescGlow!!, spriteGlow)
     }
 
     private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation) {
@@ -116,10 +116,10 @@ class IngamePlayer : ActorHumanoid {
         sprite.nRows = newAnimDelays.size
     }
 
-    private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
+    private fun _rebuild(disk: SimpleFileSystem, entrynum: Long, ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        val pixmap = if (disk.getEntry(-1025) != null) AssembleSheetPixmap.fromVirtualDisk(disk, ad) else AssembleSheetPixmap.fromAssetsDir(ad)
+        val pixmap = if (disk.getEntry(entrynum) != null) AssembleSheetPixmap.fromVirtualDisk(disk, entrynum, ad) else AssembleSheetPixmap.fromAssetsDir(ad)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()

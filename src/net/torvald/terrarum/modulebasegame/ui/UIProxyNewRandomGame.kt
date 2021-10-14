@@ -10,6 +10,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderTestSubject1
+import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderWerebeastTest
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.RandomWordsName
 
@@ -39,7 +40,8 @@ class UIProxyNewRandomGame : UICanvas() {
 
         val ingame = TerrarumIngame(App.batch)
         val worldParam = TerrarumIngame.NewGameParams(
-                PlayerBuilderTestSubject1(),
+//                PlayerBuilderTestSubject1(),
+                PlayerBuilderWerebeastTest(),
                 TerrarumIngame.NewWorldParameters(2880, 1350, HQRNG().nextLong(), RandomWordsName(4))
         )
 //        val worldParam = TerrarumIngame.NewWorldParameters(2880, 1350, 0x51621D)

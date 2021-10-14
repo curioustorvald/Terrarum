@@ -12,6 +12,7 @@ The main game directory is composed of following directories:
       [-2] spritedef,
       [-3] optional spritedef-glow,
       [-1025] sprite-bodypart-name-to-entry-number-map.properties,
+      [-1026] spriteglow-bodypart-name-to-entry-number-map.properties,
       [1+] optional bodyparts tga.gz
     }
     *if file -1025 is not there, read bodyparts from assets directory

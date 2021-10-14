@@ -701,7 +701,7 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() } as List<DiskSkimmer>).forEach {
+    }.filter { it != null }.sortedByDescending { it!!.getLastModifiedOfFirstFile() } as List<DiskSkimmer>).forEach {
         println(it.diskFile.absolutePath)
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
@@ -724,7 +724,7 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { it!!.diskFile.lastModified() } as List<DiskSkimmer>).forEach {
+    }.filter { it != null }.sortedByDescending { it!!.getLastModifiedOfFirstFile() } as List<DiskSkimmer>).forEach {
         println(it.diskFile.absolutePath)
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 

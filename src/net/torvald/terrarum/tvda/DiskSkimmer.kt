@@ -69,7 +69,7 @@ removefile:
      */
     private var entryToOffsetTable = HashMap<EntryID, Long>()
 
-    lateinit var fa: RandomAccessFile//RandomAccessFile(diskFile, "rw")
+    val fa: RandomAccessFile = RandomAccessFile(diskFile, "rw")
 
     private fun debugPrintln(s: Any) {
         if (false) println(s.toString())
@@ -87,7 +87,7 @@ removefile:
     fun rebuild() {
         checkFileSanity() // state of the file may have been changed (e.g. file deleted) so we check again
 
-        fa = RandomAccessFile(diskFile, "rw")
+//        fa = RandomAccessFile(diskFile, "rw")
 
         val fis = FileInputStream(diskFile)
         var currentPosition = fis.skip(VirtualDisk.HEADER_SIZE) // skip disk header
@@ -351,6 +351,13 @@ removefile:
         fa.seek(60L)
         fa.read(bytes, 32, 236)
         return bytes.toCanonicalString(charset)
+    }
+
+    fun getLastModifiedOfFirstFile(): Long {
+        val bytes = ByteArray(6)
+        fa.seek(326L)
+        fa.read(bytes)
+        return bytes.toInt48()
     }
 
     ///////////////////////////////////////////////////////

@@ -222,7 +222,15 @@ class UILoadDemoSavefiles : UICanvas() {
         if (mode == 2) {
             loadFired += 1
             // to hide the "flipped skybox" artefact
+            batch.end()
+
             gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
+
+            batch.begin()
+
+            batch.color = Color.WHITE
+            val txt = Lang["MENU_IO_LOADING"]
+            App.fontGame.draw(batch, txt, (App.scr.width - App.fontGame.getWidth(txt)) / 2f, (App.scr.height - App.fontGame.lineHeight) / 2f)
 
             if (loadFired == 2) {
                 LoadSavegame(playerDisk!!, worldDisk)
