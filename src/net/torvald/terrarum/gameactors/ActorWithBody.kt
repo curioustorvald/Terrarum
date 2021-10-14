@@ -897,7 +897,8 @@ open class ActorWithBody : Actor {
                         bounceY = false
 
                         // this will slow down the player, but its main purpose is to hide a bug
-                        // where when player happens to be "walled" (which zeroes the x velo) and keeps moving left/right
+                        // that when player happens to be "walled" (which zeroes the x velo) they can keep
+                        // move left/right as long as "buried depth" <= stairheight
                         // so we also zero the same exact value here for perfect hiding
                         if (controllerV != null) {
                             val stairRatio = stairHeight / hitbox.height

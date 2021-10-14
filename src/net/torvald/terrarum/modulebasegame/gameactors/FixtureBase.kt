@@ -30,8 +30,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     lateinit var blockBox: BlockBox // something like TapestryObject will want to redefine this
     fun blockBoxIndexToPoint2i(it: BlockBoxIndex): Point2i = this.blockBox.width.let { w -> Point2i(it % w, it / w) }
     var blockBoxProps: BlockBoxProps = BlockBoxProps(0)
-    var nameFun: () -> String = { "" }
-    var mainUI: UICanvas? = null
+    @Transient var nameFun: () -> String = { "" }
+    @Transient var mainUI: UICanvas? = null
     var inventory: FixtureInventory? = null
 
     protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)

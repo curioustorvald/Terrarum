@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
@@ -28,7 +29,7 @@ internal class UIInventoryCells(
 
     companion object {
         val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryItemGrid.listGap
-        var encumbBarYPos = 0f
+//        var encumbBarYPos = (App.scr.height + internalHeight).div(2) - 20 + 3f
     }
 
     internal var encumbrancePerc = 0f
@@ -106,7 +107,7 @@ internal class UIInventoryCells(
                             if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
                                 App.fontGame.lineHeight
                             else 0f
-        Companion.encumbBarYPos = encumbBarYPos // q&d hack to share some numbers
+//        Companion.encumbBarYPos = encumbBarYPos // q&d hack to share some numbers
 
         App.fontGame.draw(batch,
                 encumbranceText,

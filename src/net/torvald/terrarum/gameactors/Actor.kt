@@ -1,8 +1,15 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
+import net.torvald.spriteanimation.HasAssembledSprite
+import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.spriteassembler.ADProperties
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.tvda.ByteArray64Reader
 import net.torvald.terrarum.tvda.toBigEndian
 import net.torvald.terrarum.utils.PasswordBase32
 
@@ -73,6 +80,15 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 
+    open fun reload() {
+        /* called when the actor is loaded from the save; one use of this function is to "re-sync" the
+         * Transient variables such as `mainUI` of FixtureBase
+         */
+        actorValue.actor = this
+
+        if (this is Pocketed)
+            inventory.actor = this
+    }
 
     /**
      * ActorValue change event handler

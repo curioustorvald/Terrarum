@@ -126,14 +126,9 @@ object ReadActor {
     operator fun invoke(disk: SimpleFileSystem, dataStream: Reader): Actor =
             fillInDetails(disk, Common.jsoner.fromJson(null, dataStream))
 
-    fun readActorBare(worldDataStream: Reader): Actor =
-            Common.jsoner.fromJson(null, worldDataStream)
-
     private fun fillInDetails(disk: SimpleFileSystem, actor: Actor): Actor {
-        actor.actorValue.actor = actor
+        actor.reload()
 
-        if (actor is Pocketed)
-            actor.inventory.actor = actor
 
         if (actor is ActorWithBody && actor is IngamePlayer) {
             val animFile = disk.getFile(-2L)
@@ -158,24 +153,6 @@ object ReadActor {
 
             actor.reassembleSprite(actor.sprite, actor.spriteGlow)
         }
-
-
-        return actor
-    }
-
-    fun readActorAndAddToWorld(ingame: TerrarumIngame, disk: SimpleFileSystem, dataStream: Reader): Actor {
-        val actor = invoke(disk, dataStream)
-
-        // replace existing player
-        val oldPlayerID = ingame.actorNowPlaying?.referenceID
-        try {
-            ingame.forceRemoveActor(ingame.getActorByID(actor.referenceID))
-        }
-        catch (e: NoSuchActorWithIDException) { /* no actor to delete, you may proceed */ }
-        ingame.addNewActor(actor)
-
-        if (actor.referenceID == oldPlayerID)
-            ingame.actorNowPlaying = actor as ActorHumanoid
 
 
         return actor

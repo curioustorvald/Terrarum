@@ -45,6 +45,19 @@ internal class FixtureStorageChest : FixtureBase {
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = MASS
+
+
+        println("FixtureStorageChest constructor call")
+        printStackTrace(this)
+    }
+
+    override fun reload() {
+        super.reload()
+        // doing this is required as when things are deserialised, constructor is called, THEN the fields are
+        // filled in, thus the initialised mainUI has a stale reference;
+        // we fix it by simply giving a new reference to the mainUI
+        (mainUI as UIStorageChest).chestInventory = this.inventory!!
+        (mainUI as UIStorageChest).chestNameFun = this.nameFun
     }
 
     companion object {
@@ -202,12 +215,13 @@ internal class UIStorageChest : UICanvas(
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+        val chestName = chestNameFun()
+        val chestNameXpos = itemListChest.posX + 6f
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - weightBarWidth
         val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
-        val encumbBarYPos = UIInventoryCells.encumbBarYPos
+        val encumbBarYPos = (App.scr.height + internalHeight).div(2) - 20 + 3f
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-        val chestName = chestNameFun()
 
         // encumbrance bar background
         batch.color = encumbBack
@@ -228,10 +242,14 @@ internal class UIStorageChest : UICanvas(
 
         // chest name text
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, chestName, itemListChest.posX + 6f, encumbBarYPos - 3f)
+        App.fontGame.draw(batch, chestName, chestNameXpos, encumbBarYPos - 3f)
         // encumb text
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
+        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f +
+                if (App.fontGame.getWidth(chestName) + 2 + chestNameXpos >= encumbBarTextXPos)
+                    App.fontGame.lineHeight
+                else 0f
+        )
     }
 
     override fun doOpening(delta: Float) {
@@ -253,6 +271,6 @@ internal class UIStorageChest : UICanvas(
 
 
     override fun dispose() {
-        shapeRenderer.dispose()
+        try { shapeRenderer.dispose() } catch (e: IllegalArgumentException) {}
     }
 }
