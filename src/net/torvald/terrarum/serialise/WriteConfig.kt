@@ -15,6 +15,10 @@ object WriteConfig {
     private val jsoner = Json(JsonWriter.OutputType.json)
 
     init {
+        jsoner.ignoreUnknownFields = true
+        jsoner.setUsePrototypes(false)
+        jsoner.setIgnoreDeprecated(false)
+
         // KVHashMap
         jsoner.setSerializer(KVHashMap::class.java, object : Json.Serializer<KVHashMap> {
             override fun write(json: Json, obj: KVHashMap, knownType: Class<*>?) {

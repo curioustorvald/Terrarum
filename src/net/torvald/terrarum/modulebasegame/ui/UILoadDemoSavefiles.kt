@@ -449,7 +449,11 @@ class UIItemPlayerCells(
     internal var hasTexture = false
         private set
 
+    private val litCol = UIItemTextButton.defaultActiveCol
     private val cellCol = CELL_COL
+    private val defaultCol = Color.WHITE
+    private val hruleCol = Color(1f,1f,1f,0.35f)
+    private val hruleColLit = litCol.cpy().sub(0f,0f,0f,0.65f)
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
@@ -471,7 +475,7 @@ class UIItemPlayerCells(
             hasTexture = true
         }
 
-        val highlightCol = if (mouseUp) UIItemTextButton.defaultActiveCol else Color.WHITE
+        val highlightCol = if (mouseUp) litCol else defaultCol
         val x = posX.toFloat()
         val y = posY.toFloat()
 
@@ -486,9 +490,6 @@ class UIItemPlayerCells(
         Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, 106 + 2, height + 2)
         // infocell border
         Toolkit.drawBoxBorder(batch, posX + 115, posY + 33, width - 114, 88)
-        // infocell divider
-        Toolkit.fillArea(batch, posX + 118, posY + 62, width - 120, 1)
-        Toolkit.fillArea(batch, posX + 118, posY + 91, width - 120, 1)
 
         // texts
         val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
@@ -500,7 +501,12 @@ class UIItemPlayerCells(
         batch.draw(icons.get(24,0), x + 120f, y + height - 82f) // player name
         batch.draw(icons.get(12,0), x + 119f, y + height - 53f) // world map
         batch.draw(icons.get(13,0), x + 120f, y + height - 24f) // journal
-        batch.draw(icons.get(23,0), x + width - 5f - playTimeTextLen - 24f, y + height - 24f) // stopwatch
+        batch.draw(icons.get(23,0), x + width - 4f - playTimeTextLen - 24f, y + height - 24f) // stopwatch
+
+        // infocell divider
+        batch.color = if (mouseUp) hruleColLit else hruleCol
+        Toolkit.fillArea(batch, posX + 118, posY + 62, width - 120, 1)
+        Toolkit.fillArea(batch, posX + 118, posY + 91, width - 120, 1)
 
         // player avatar
         batch.color = Color.WHITE

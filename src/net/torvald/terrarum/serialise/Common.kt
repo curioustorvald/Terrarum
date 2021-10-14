@@ -44,7 +44,8 @@ object Common {
     // install custom (de)serialiser
     init {
         jsoner.ignoreUnknownFields = true
-
+        jsoner.setUsePrototypes(false)
+        jsoner.setIgnoreDeprecated(false)
 
         // BigInteger
         jsoner.setSerializer(BigInteger::class.java, object : Json.Serializer<BigInteger> {

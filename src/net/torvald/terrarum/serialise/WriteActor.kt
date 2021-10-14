@@ -72,6 +72,8 @@ object WritePlayer {
             player.inventory = player.unauthorisedPlayerProps.inventory!!
         }
 
+        player.worldCurrentlyPlaying = ingame.world.worldIndex
+
 
         val actorJson = WriteActor.encodeToByteArray64(player)
         val adl = player.animDesc!!.getRawADL()

@@ -426,8 +426,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             savegameNickname = worldParams.savegameName
 
 
-
-            player.worldCurrentlyPlaying = UUID.fromString(world.worldIndex.toString())
             world.worldCreator = UUID.fromString(player.uuid.toString())
 
             printdbg(this, "new woridIndex: ${world.worldIndex}")
