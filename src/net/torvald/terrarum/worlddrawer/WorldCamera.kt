@@ -1,12 +1,11 @@
 package net.torvald.terrarum.worlddrawer
 
+import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.ceilInt
-import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -98,18 +97,24 @@ object WorldCamera {
         )).floorInt().clampCameraY(world)*/
 
 
-        val oldX = x.toFloat()
-        val newX1 = (player.hitbox.centeredX).toFloat() - (width / 2) +
+        val fpsRatio = App.UPDATE_RATE / Gdx.graphics.deltaTime // if FPS=32 & RATE=64, ratio will be 0.5
+        val oldX = x.toDouble()
+        val oldY = y.toDouble()
+        val newX1 = (player.hitbox.centeredX) - (width / 2) +
                     if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
         val newX2 = newX1 + worldWidth
         val newX = if (Math.abs(newX1 - oldX) < Math.abs(newX2 - oldX)) newX1 else newX2
+        val newY = player.hitbox.centeredY - (height / 2)
 
-        x = FastMath.interpolateLinear(0.49f, oldX, newX).floorInt() fmod worldWidth
-        y = FastMath.interpolateLinear(0.49f, y.toFloat(), FastMath.clamp(
-                (player.hitbox.centeredY).toFloat() - (height / 2),
-                TILE_SIZEF,
-                worldHeight - height - TILE_SIZEF
-        )).floorInt().clampCameraY(world)
+        val pVecMagn = (player.externalV + (player.controllerV ?: nullVec)).magnitude
+        val cVecMagn = Math.sqrt((newX - oldX).sqr() + (newY - oldY).sqr()) * fpsRatio
+
+//        println("$cVecMagn\t$pVecMagn\t${cVecMagn / pVecMagn}")
+
+        val camSpeed = (1.0 - (1.0 / (2.0 * cVecMagn / pVecMagn))).coerceIn(0.5, 1.0).toFloat()
+
+        x = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).floorInt() fmod worldWidth
+        y = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).floorInt().clampCameraY(world)
 
         xEnd = x + width
         yEnd = y + height

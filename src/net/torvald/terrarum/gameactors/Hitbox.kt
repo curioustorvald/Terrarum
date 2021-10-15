@@ -44,21 +44,27 @@ class Hitbox {
         get() = hitboxStart.x
     val startY: Double
         get() = hitboxStart.y
+    val startVec: Vector2
+        get() = hitboxStart.toVector()
 
     val endX: Double
         get() = hitboxStart.x + width
     val endY: Double
         get() = hitboxStart.y + height
+    val endVec: Vector2
+        get() = hitboxEnd.toVector()
 
     val centeredX: Double
         get() = hitboxStart.x + width * 0.5
     val centeredY: Double
         get() = hitboxStart.y + height * 0.5
+    val centerVec: Vector2
+        get() = Vector2(centeredX, centeredY)
 
     /**
      * @return bottom-centered point of hitbox.
      */
-    val canonicalX: Double
+    inline val canonicalX: Double
         get() = centeredX
 
     /**
@@ -66,6 +72,9 @@ class Hitbox {
      */
     inline val canonicalY: Double
         get() = endY
+
+    val canonVec: Vector2
+        get() = Vector2(canonicalX, canonicalY)
 
     /**
      * Set to the point top left

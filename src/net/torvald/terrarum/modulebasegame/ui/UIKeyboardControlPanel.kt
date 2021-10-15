@@ -135,7 +135,7 @@ class UIKeyboardControlPanel : UICanvas() {
         updateKeycaps()
 
         buttonReset.clickOnceListener = { x, y, button ->
-            println("reset keys!")
+//            println("reset keys!")
             resetKeyConfig()
             updateKeycaps()
         }

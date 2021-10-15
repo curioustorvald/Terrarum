@@ -319,7 +319,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             if (it != null) {
 
                 printdbg(this, "Found LastStatus mapping for Player ${codices.player.uuid}")
-                printdbg(this, "Changing XY Position (${codices.player.hitbox.canonicalX}, ${codices.player.hitbox.canonicalY}) -> ${it.physics.position}")
+                printdbg(this, "Changing XY Position ${codices.player.hitbox.canonVec} -> ${it.physics.position}")
 
                 codices.player.setPosition(it.physics.position)
                 if (isMultiplayer) {
@@ -330,7 +330,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             // if not, move player to the spawn point
             else {
                 printdbg(this, "No mapping found")
-                printdbg(this, "Changing XY Position (${codices.player.hitbox.canonicalX},${codices.player.hitbox.canonicalY}) -> (${world.spawnX * TILE_SIZED}, ${world.spawnY * TILE_SIZED})")
+                printdbg(this, "Changing XY Position ${codices.player.hitbox.canonVec} -> (${world.spawnX * TILE_SIZED}, ${world.spawnY * TILE_SIZED})")
 
                 codices.player.setPosition(world.spawnX * TILE_SIZED, world.spawnY * TILE_SIZED)
             }
