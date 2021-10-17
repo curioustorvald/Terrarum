@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -97,7 +95,8 @@ object WorldCamera {
         )).floorInt().clampCameraY(world)*/
 
 
-        val fpsRatio = App.UPDATE_RATE / Gdx.graphics.deltaTime // if FPS=32 & RATE=64, ratio will be 0.5
+//        val fpsRatio = App.UPDATE_RATE / Gdx.graphics.deltaTime // if FPS=32 & RATE=64, ratio will be 0.5
+        val fpsRatio = 64f / Gdx.graphics.framesPerSecond
         val oldX = x.toDouble()
         val oldY = y.toDouble()
         val newX1 = (player.hitbox.centeredX) - (width / 2) +
@@ -111,7 +110,9 @@ object WorldCamera {
 
 //        println("$cVecMagn\t$pVecMagn\t${cVecMagn / pVecMagn}")
 
-        val camSpeed = (1.0 - (1.0 / (2.0 * cVecMagn / pVecMagn))).coerceIn(0.5, 1.0).toFloat()
+
+
+        val camSpeed = (1f - (1f / (2f * fpsRatio))).coerceIn(0.5f, 1f)
 
         x = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).floorInt() fmod worldWidth
         y = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).floorInt().clampCameraY(world)
