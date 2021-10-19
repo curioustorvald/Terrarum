@@ -4,12 +4,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 
 /**
  * TEST ITEM; this item cuts every wire on a cell, and has no durability drop
@@ -41,6 +44,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
 
         wires?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
+            ingame.addNewActor(DroppedItem(it, mouseTile.x * TILE_SIZE, mouseTile.y * TILE_SIZE))
         } ?: return@inInteractableRange false
 
         true

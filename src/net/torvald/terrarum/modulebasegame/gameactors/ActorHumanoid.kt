@@ -188,7 +188,9 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // don't put this into keyPressed; execution order is important!
         updateGamerControlBox()
 
-        processInput(delta)
+        if (!isPickedUp) {
+            processInput(delta)
+        }
 
         updateSprite(delta)
 

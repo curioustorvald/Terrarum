@@ -277,6 +277,8 @@ open class ActorWithBody : Actor {
      */
     var forceDormant = false
 
+    var isPickedUp = false
+
     /**
      * Gravitational Constant G. Load from gameworld.
      * [m / s^2]
