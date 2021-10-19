@@ -16,7 +16,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2021-09-15.
  */
-class UIKeyboardControlPanel : UICanvas() {
+class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     init {
         CommonResourcePool.addToLoadingList("inventory_category") {

@@ -10,7 +10,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
-class UITitleLanguage : UICanvas() {
+class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
 
     val menuLabels = arrayOf(
             "MENU_LABEL_RETURN"

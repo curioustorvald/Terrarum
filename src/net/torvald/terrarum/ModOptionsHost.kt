@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.ui.UICanvas
 
-class ModOptionsHost : UICanvas() {
+class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
 
     override var openCloseTime: Second = 0f
 

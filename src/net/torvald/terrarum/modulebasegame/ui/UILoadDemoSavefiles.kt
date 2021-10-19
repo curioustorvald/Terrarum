@@ -41,7 +41,7 @@ val SAVE_CELL_HEIGHT = 120
  *
  * Created by minjaesong on 2021-09-09.
  */
-class UILoadDemoSavefiles : UICanvas() {
+class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
     init {
         CommonResourcePool.addToLoadingList("inventory_category") {
@@ -129,8 +129,6 @@ class UILoadDemoSavefiles : UICanvas() {
 
     override fun show() {
         try {
-            val remoCon = (App.getCurrentScreen() as TitleScreen).uiRemoCon
-
             remoCon.handler.lockToggle()
             showSpinner = true
 
@@ -181,11 +179,24 @@ class UILoadDemoSavefiles : UICanvas() {
     }
 
     private fun getCells() = if (mode == 0) playerCells else worldCells
+    private val menuTree = arrayOf(UITitleRemoConYaml.injectedMenuSingleCharSel, UITitleRemoConYaml.injectedMenuSingleWorldSel).map { Yaml(it).parse() }
     private var loadFired = 0
+    private var oldMode = -1
+    private val remoConParentNode = remoCon.currentRemoConContents
+
+    private fun modeChangedHandler(mode: Int) {
+        remoCon.setNewRemoConContents(menuTree[mode], remoConParentNode)
+    }
 
     override fun updateUI(delta: Float) {
 
         if (mode < 2) {
+
+            if (oldMode != mode) {
+                modeChangedHandler(mode)
+                oldMode = mode
+            }
+
             if (scrollTarget != listScroll) {
                 if (scrollAnimCounter < scrollAnimLen) {
                     scrollAnimCounter += delta
@@ -293,7 +304,7 @@ class UILoadDemoSavefiles : UICanvas() {
                 batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
 
                 // draw texts
-                val loadGameTitleStr = Lang["MENU_IO_LOAD_GAME"]
+                val loadGameTitleStr = Lang["MENU_IO_LOAD"]
                 // "Game Load"
                 App.fontGame.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
                 // Control help

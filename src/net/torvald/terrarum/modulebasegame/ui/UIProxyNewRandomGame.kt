@@ -17,7 +17,7 @@ import net.torvald.terrarum.utils.RandomWordsName
 /**
  * Created by minjaesong on 2018-12-08.
  */
-class UIProxyNewRandomGame : UICanvas() {
+class UIProxyNewRandomGame(val remoCon: UIRemoCon) : UICanvas() {
 
     override var width: Int = 0
     override var height: Int = 0

@@ -8,7 +8,7 @@ import net.torvald.terrarum.ui.UICanvas
 /**
  * Created by minjaesong on 2021-09-13.
  */
-class UIProxyLoadLatestSave : UICanvas() {
+class UIProxyLoadLatestSave(val remoCon: UIRemoCon) : UICanvas() {
 
     override var width: Int = 0
     override var height: Int = 0

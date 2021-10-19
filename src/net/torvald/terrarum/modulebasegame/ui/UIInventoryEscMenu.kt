@@ -74,7 +74,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
     private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
 
-    private val keyConfigUI = UIKeyboardControlPanel()
+    private val keyConfigUI = UIKeyboardControlPanel(null)
 
     private var oldScreen = 0
     private var screen = 0

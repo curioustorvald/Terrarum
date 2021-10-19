@@ -15,7 +15,7 @@ import net.torvald.terrarum.ui.UIItemToggleButton
 /**
  * Created by minjaesong on 2021-10-06.
  */
-class GraphicsControlPanel : UICanvas() {
+class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
 
     override var width = 400
     override var height = 400

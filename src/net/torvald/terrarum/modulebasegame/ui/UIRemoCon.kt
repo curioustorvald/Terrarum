@@ -59,8 +59,8 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
 
     private fun loadClass(name: String): UICanvas {
         val newClass = Class.forName(name)
-        val newClassConstructor = newClass.getConstructor(/* no args defined */)
-        val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+        val newClassConstructor = newClass.getConstructor(this.javaClass)
+        val newClassInstance = newClassConstructor.newInstance(this)
         return newClassInstance as UICanvas
     }
 
@@ -118,18 +118,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                         //currentRemoConContents.children.forEach { println("- ${it.data}") }
 
                         if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
-
-
-                            val newCurrentRemoConContents = currentRemoConContents.children[selectedIndex!!]
-
-                            // only go deeper if that node has child to navigate
-                            if (currentRemoConContents.children[selectedIndex].children.size != 0) {
-                                remoConTray.consume()
-                                remoConTray = generateNewRemoCon(newCurrentRemoConContents)
-                                currentRemoConContents = newCurrentRemoConContents
-                            }
-
-                            currentlySelectedRemoConItem = newCurrentRemoConContents.data
+                            setNewRemoConContents(currentRemoConContents.children[selectedIndex!!])
                         }
                         else {
                             throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
@@ -163,6 +152,22 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
         if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
             mouseActionAvailable = true
         }
+    }
+
+    fun setNewRemoConContents(newCurrentRemoConContents: QNDTreeNode<String>, forceSetParent: QNDTreeNode<String>? = null) {
+
+        if (forceSetParent != null) {
+            newCurrentRemoConContents.parent = forceSetParent
+        }
+
+        // only go deeper if that node has child to navigate
+        if (newCurrentRemoConContents.children.size != 0) {
+            remoConTray.consume()
+            remoConTray = generateNewRemoCon(newCurrentRemoConContents)
+            currentRemoConContents = newCurrentRemoConContents
+        }
+
+        currentlySelectedRemoConItem = newCurrentRemoConContents.data
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
