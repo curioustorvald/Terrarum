@@ -25,5 +25,6 @@
     <orderEntry type="library" name="TerranVirtualDisk" level="project" />
     <orderEntry type="library" name="graal-sdk-21.1.0-javadoc" level="project" />
     <orderEntry type="library" name="gdx-platform-1.10.0-natives-desktop" level="project" />
+    <orderEntry type="library" name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0" level="project" />
   </component>
 </module>

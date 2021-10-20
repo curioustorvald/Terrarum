@@ -22,6 +22,7 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
+import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
@@ -50,6 +51,10 @@ typealias RGBA8888 = Int
  * LibGDX Version Created by minjaesong on 2017-06-15.
  */
 object Terrarum : Disposable {
+
+    init {
+        IngameController.KEYBOARD_DELAYS[1]
+    }
 
     /**
      * All singleplayer "Player" must have this exact reference ID.
@@ -286,6 +291,8 @@ object Terrarum : Disposable {
     /** Delta converted as it it was a FPS */
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.deltaTime
+    val mouseDown: Boolean
+        get() = Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))
 
     /**
      * Usage:

@@ -133,7 +133,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         }
 
         // primary click
-        if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+        if (Terrarum.mouseDown) {
             // close by clicking close button or out-of-boud
             if (mouseVec.distanceSquared(RADIUS, RADIUS) !in CLOSE_BUTTON_RADIUS.sqr()..RADIUSF.sqr()) {
                 closeGracefully()
@@ -175,7 +175,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             batch.draw(ItemCodex.getItemImage(slotConfig[i]), x - 16, y - 16, 32f, 32f)
 
             // update as well while looping
-            if (i == mouseOnBlocksSlot && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+            if (i == mouseOnBlocksSlot && Terrarum.mouseDown) {
                 parent.setPencilColour(slotConfig[i])
                 closeGracefully()
             }

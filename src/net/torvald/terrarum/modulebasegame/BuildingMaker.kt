@@ -363,7 +363,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         // make pen work HERE
         // when LEFT mouse is down
-        if (!tappedOnUI && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) && !mouseOnUI) {
+        if (!tappedOnUI && Terrarum.mouseDown && !mouseOnUI) {
 
             makePenWork(Terrarum.mouseTileX, Terrarum.mouseTileY)
             // TODO drag support using bresenham's algo

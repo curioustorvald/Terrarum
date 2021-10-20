@@ -4,11 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -223,7 +220,7 @@ class UIItemTextButtonList(
 
         }
 
-        if (!Gdx.input.isButtonPressed(mouseButton)) {
+        if (!Terrarum.mouseDown) {
             clickLatched = false
         }
 

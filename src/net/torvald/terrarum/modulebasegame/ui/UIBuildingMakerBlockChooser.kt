@@ -86,7 +86,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         }
 
         // respond to click
-        if (Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+        if (Terrarum.mouseDown) {
             // scroll bar
             if (relativeMouseX in width - SCROLLBAR_SIZE until width && relativeMouseY in 0 until height) {
                 mouseOnScroll = true

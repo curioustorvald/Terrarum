@@ -59,8 +59,6 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     abstract val width: Int
     abstract val height: Int
 
-    protected val mouseButton = App.getConfigInt("config_mouseprimary")
-
     /** This variable is NOT updated on its own.
      * ```
      * val posXDelta = posX - oldPosX
@@ -92,10 +90,10 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(mouseButton)
+        get() = mouseUp && Terrarum.mouseDown
 
 
-    protected var mouseLatched = Gdx.input.isButtonPressed(mouseButton)
+    protected var mouseLatched = Terrarum.mouseDown
 
     /** UI to call (show up) while mouse is up */
     open val mouseOverCall: UICanvas? = null
@@ -103,12 +101,13 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     // kind of listener implementation
     /** Fired once for every update
-     * Parametre: delta */
+     * Parameter: delta */
     open var updateListener: ((Float) -> Unit)? = null
-    /** Parametre: keycode */
+    /** Parameter: keycode */
     open var keyDownListener: ((Int) -> Unit)? = null
-    /** Parametre: keycode */
+    /** Parameter: keycode */
     open var keyUpListener: ((Int) -> Unit)? = null
+    open var keyTypedListener: ((Char) -> Unit)? = null
     open var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
     /** Parameters: screenX, screenY, pointer, button */
     open var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
@@ -183,6 +182,14 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open fun keyUp(keycode: Int): Boolean {
         if (parentUI.isVisible && keyUpListener != null) {
             keyUpListener!!.invoke(keycode)
+            return true
+        }
+
+        return false
+    }
+    open fun keyTyped(character: Char): Boolean  {
+        if (parentUI.isVisible && keyTypedListener != null) {
+            keyTypedListener!!.invoke(character)
             return true
         }
 

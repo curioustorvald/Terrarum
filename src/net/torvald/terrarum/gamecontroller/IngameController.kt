@@ -10,6 +10,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
@@ -130,7 +131,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
             // the very job.
 
-            if (terrarumIngame.actorNowPlaying != null && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) && !worldPrimaryClickLatched) {
+            if (terrarumIngame.actorNowPlaying != null && Terrarum.mouseDown && !worldPrimaryClickLatched) {
                 terrarumIngame.worldPrimaryClickStart(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 worldPrimaryClickLatched = true
             }
@@ -141,7 +142,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // unlatch when:
             // - not clicking anymore
             // - using any item that is not fixture (blocks, picks)
-            if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary")) ||
+            if (!Terrarum.mouseDown ||
                 GameItem.Category.MISC != ItemCodex.get(terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP))?.inventoryCategory) {
                 worldPrimaryClickLatched = false
             }
@@ -273,162 +274,98 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     }
 
     companion object {
-        const val KEY_DELAY = 0.2f
-        const val KEY_REPEAT = 1f / 40f
-        val KEYCODE_TO_CHAR = hashMapOf<Int, Char>(
-                Keys.NUM_1 to '1',
-                Keys.NUM_2 to '2',
-                Keys.NUM_3 to '3',
-                Keys.NUM_4 to '4',
-                Keys.NUM_5 to '5',
-                Keys.NUM_6 to '6',
-                Keys.NUM_7 to '7',
-                Keys.NUM_8 to '8',
-                Keys.NUM_9 to '9',
-                Keys.NUM_0 to '0',
-
-                Keys.A to 'a',
-                Keys.B to 'b',
-                Keys.C to 'c',
-                Keys.D to 'd',
-                Keys.E to 'e',
-                Keys.F to 'f',
-                Keys.G to 'g',
-                Keys.H to 'h',
-                Keys.I to 'i',
-                Keys.J to 'j',
-                Keys.K to 'k',
-                Keys.L to 'l',
-                Keys.M to 'm',
-                Keys.N to 'n',
-                Keys.O to 'o',
-                Keys.P to 'p',
-                Keys.Q to 'q',
-                Keys.R to 'r',
-                Keys.S to 's',
-                Keys.T to 't',
-                Keys.U to 'u',
-                Keys.V to 'v',
-                Keys.W to 'w',
-                Keys.X to 'x',
-                Keys.Y to 'y',
-                Keys.Z to 'z',
-
-                Keys.GRAVE to '`',
-                Keys.MINUS to '-',
-                Keys.EQUALS to '=',
-                Keys.BACKSPACE to 8.toChar(),
-
-                Keys.LEFT_BRACKET to '[',
-                Keys.RIGHT_BRACKET to ']',
-                Keys.BACKSLASH to '\\',
-
-                Keys.SEMICOLON to ';',
-                Keys.APOSTROPHE to '\'',
-                Keys.ENTER to 10.toChar(),
-
-                Keys.COMMA to ',',
-                Keys.PERIOD to '.',
-                Keys.SLASH to '/',
-
-                Keys.SPACE to ' ',
-
-                Keys.NUMPAD_0 to '0',
-                Keys.NUMPAD_1 to '1',
-                Keys.NUMPAD_2 to '2',
-                Keys.NUMPAD_3 to '3',
-                Keys.NUMPAD_4 to '4',
-                Keys.NUMPAD_5 to '5',
-                Keys.NUMPAD_6 to '6',
-                Keys.NUMPAD_7 to '7',
-                Keys.NUMPAD_8 to '8',
-                Keys.NUMPAD_9 to '9',
-
-                Keys.NUMPAD_DIVIDE to '/',
-                Keys.NUMPAD_MULTIPLY to '*',
-                Keys.NUMPAD_SUBTRACT to '-',
-                Keys.NUMPAD_ADD to '+',
-                Keys.NUMPAD_DOT to '.',
-                Keys.NUMPAD_ENTER to 10.toChar()
+        data class TerrarumKeyboardEvent(
+                val type: Int,
+                val character: String?,
+                val repeatCount: Int,
+                val keycodes: IntArray
         )
-        val KEYCODE_TO_CHAR_SHIFT = hashMapOf<Int, Char>(
-                Keys.NUM_1 to '!',
-                Keys.NUM_2 to '@',
-                Keys.NUM_3 to '#',
-                Keys.NUM_4 to '$',
-                Keys.NUM_5 to '%',
-                Keys.NUM_6 to '^',
-                Keys.NUM_7 to '&',
-                Keys.NUM_8 to '*',
-                Keys.NUM_9 to '(',
-                Keys.NUM_0 to ')',
+        private const val KEY_DOWN = 0
+        private const val KEY_CHANGE = 1
+        const val N_KEY_ROLLOVER = 8
+        var KEYBOARD_DELAYS = floatArrayOf(0.25f, 0.025f)
+        private var stroboTime = 0L
+        private var stroboStatus = 0
+        private var repeatCount = 0
+        private var oldKeys = IntArray(N_KEY_ROLLOVER) { 0 }
+        private var keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
-                Keys.A to 'A',
-                Keys.B to 'B',
-                Keys.C to 'C',
-                Keys.D to 'D',
-                Keys.E to 'E',
-                Keys.F to 'F',
-                Keys.G to 'G',
-                Keys.H to 'H',
-                Keys.I to 'I',
-                Keys.J to 'J',
-                Keys.K to 'K',
-                Keys.L to 'L',
-                Keys.M to 'M',
-                Keys.N to 'N',
-                Keys.O to 'O',
-                Keys.P to 'P',
-                Keys.Q to 'Q',
-                Keys.R to 'R',
-                Keys.S to 'S',
-                Keys.T to 'T',
-                Keys.U to 'U',
-                Keys.V to 'V',
-                Keys.W to 'W',
-                Keys.X to 'X',
-                Keys.Y to 'Y',
-                Keys.Z to 'Z',
+        // code proudly stolen from tsvm's TVDOS.SYS
+        fun withKeyboardEvent(callback: (TerrarumKeyboardEvent) -> Unit) {
+            val keys = strobeKeys()
+            var keyChanged = !arrayEq(keys, oldKeys)
+            val keyDiff = arrayDiff(keys, oldKeys)
 
-                Keys.GRAVE to '~',
-                Keys.MINUS to '_',
-                Keys.EQUALS to '+',
-                Keys.BACKSPACE to 8.toChar(),
+            if (stroboStatus % 2 == 0 && keys[0] != 0) {
+                stroboStatus += 1
+                stroboTime = System.nanoTime()
+                repeatCount += 1
 
-                Keys.LEFT_BRACKET to '{',
-                Keys.RIGHT_BRACKET to '}',
-                Keys.BACKSLASH to '|',
+                val shiftin = keys.contains(Keys.SHIFT_LEFT) || keys.contains(Keys.SHIFT_RIGHT)
+                val keysym0 = keysToStr(keys)
+                val newKeysym0 = keysToStr(keyDiff)
+                val keysym = if (keysym0 == null) null
+                else if (shiftin && keysym0[1]?.isNotBlank() == true) keysym0[1]
+                else keysym0[0]
+                val newKeysym = if (newKeysym0 == null) null
+                else if (shiftin && newKeysym0[1]?.isNotBlank() == true) newKeysym0[1]
+                else newKeysym0[0]
 
-                Keys.SEMICOLON to ':',
-                Keys.APOSTROPHE to '"',
-                Keys.ENTER to 10.toChar(),
+                if (!keyChanged) {
+                    callback(TerrarumKeyboardEvent(KEY_DOWN, keysym, repeatCount, keys))
+                }
+                else if (newKeysym != null) {
+                    callback(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, repeatCount, keys))
+                }
 
-                Keys.COMMA to '<',
-                Keys.PERIOD to '>',
-                Keys.SLASH to '?',
+                oldKeys = keys // don't put this outside of if-cascade
+            }
+            else if (keyChanged || keys[0] == 0) {
+                stroboStatus = 0
+                repeatCount = 0
 
-                Keys.SPACE to ' ',
+                if (keys[0] == 0) keyChanged = false
+            }
+            else if (stroboStatus % 2 == 1 && System.nanoTime() - stroboTime < KEYBOARD_DELAYS[stroboStatus]) {
+                Thread.sleep(1L)
+            }
+            else {
+                stroboStatus += 1
+                if (stroboStatus >= 4)
+                    stroboStatus = 2
+            }
+        }
 
-                Keys.NUMPAD_0 to '0',
-                Keys.NUMPAD_1 to '1',
-                Keys.NUMPAD_2 to '2',
-                Keys.NUMPAD_3 to '3',
-                Keys.NUMPAD_4 to '4',
-                Keys.NUMPAD_5 to '5',
-                Keys.NUMPAD_6 to '6',
-                Keys.NUMPAD_7 to '7',
-                Keys.NUMPAD_8 to '8',
-                Keys.NUMPAD_9 to '9',
+        private fun keysToStr(keys: IntArray): Array<String?>? {
+            val headkey = keys[0]
+            return if (keymap[headkey] == null) null else keymap[headkey]
+        }
 
-                Keys.NUMPAD_DIVIDE to '/',
-                Keys.NUMPAD_MULTIPLY to '*',
-                Keys.NUMPAD_SUBTRACT to '-',
-                Keys.NUMPAD_ADD to '+',
-                Keys.NUMPAD_DOT to '.',
-                Keys.NUMPAD_ENTER to 10.toChar()
-        )
+        private fun strobeKeys(): IntArray {
+            var keysPushed = 0
+            val keyEventBuffers = IntArray(N_KEY_ROLLOVER) { 0 }
+            for (k in 1..254) {
+                if (Gdx.input.isKeyPressed(k)) {
+                    keyEventBuffers[keysPushed] = k
+                    keysPushed += 1
+                }
+
+                if (keysPushed >= N_KEY_ROLLOVER) break
+            }
+            return keyEventBuffers
+        }
+
+        private fun arrayEq(a: IntArray, b: IntArray): Boolean {
+            for (i in 0..a.size) {
+                if (a[i] != b[i]) return false
+            }
+            return true
+        }
+
+        private fun arrayDiff(a: IntArray, b: IntArray): IntArray {
+            return a.filter { !b.contains(it) }.toIntArray()
+        }
     }
 
     private inline fun BitSet.bitCount() = this.cardinality()
-
 }

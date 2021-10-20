@@ -62,6 +62,12 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/TerranVirtualDisk.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/Terrarum_Joise.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/TerrarumSansBitmap.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/graal-sdk-21.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/icu4j-68.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/js-21.1.0-edit.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/js-scriptengine-21.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/truffle-api-21.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/regex-21.1.0-edit.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

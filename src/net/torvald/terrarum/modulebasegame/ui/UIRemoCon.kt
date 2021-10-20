@@ -4,11 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbgerr
-import net.torvald.terrarum.QNDTreeNode
-import net.torvald.terrarum.TitleScreen
-import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -77,7 +74,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     private var openUI: UICanvas? = null
 
     override fun updateUI(delta: Float) {
-        if (mouseActionAvailable && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+        if (mouseActionAvailable && Terrarum.mouseDown) {
             mouseActionAvailable = false
 
             remoConTray.update(delta)
@@ -149,7 +146,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
         openUI?.update(delta)
 
 
-        if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+        if (!Terrarum.mouseDown) {
             mouseActionAvailable = true
         }
     }

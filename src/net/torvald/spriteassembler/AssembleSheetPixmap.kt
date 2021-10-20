@@ -3,7 +3,6 @@ package net.torvald.spriteassembler
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.savegame.ByteArray64InputStream

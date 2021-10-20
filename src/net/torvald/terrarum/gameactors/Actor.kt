@@ -1,15 +1,9 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
-import net.torvald.spriteanimation.HasAssembledSprite
-import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.spriteassembler.ADProperties
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.toBigEndian
 import net.torvald.terrarum.utils.PasswordBase32
 

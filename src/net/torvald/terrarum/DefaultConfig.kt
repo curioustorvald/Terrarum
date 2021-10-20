@@ -100,6 +100,8 @@ object DefaultConfig {
             "fx_differential" to false,
             //"fx_3dlut" to false,
 
+            "basekeyboardlayout" to "us_qwerty"
+
 
             // settings regarding debugger
             /*"buildingmakerfavs" to arrayOf(

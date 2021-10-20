@@ -3,13 +3,10 @@ package net.torvald.terrarum.serialise
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.spriteassembler.ADProperties
-import net.torvald.terrarum.NoSuchActorWithIDException
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.*
 import java.io.Reader
 
