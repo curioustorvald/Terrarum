@@ -28,7 +28,8 @@ class UIItemTextLineInput(
 
     companion object {
         val TEXTINPUT_COL_TEXT = Color.WHITE
-        val TEXTINPUT_COL_GREY = Color.GRAY
+        val TEXTINPUT_COL_BORDER = UIItemTextButton.defaultActiveCol
+        val TEXTINPUT_COL_BORDER_INACTIVE = Color.LIGHT_GRAY
         val TEXTINPUT_COL_BACKGROUND = Color(0x28282888)
         const val CURSOR_BLINK_TIME = 1f / 3f
     }
@@ -38,7 +39,9 @@ class UIItemTextLineInput(
     var isActive = true
     var isGreyedOut = false
 
-    var cursorX = 0 // 1 per code point
+    var cursorX = 0 // 1 per char (not codepoint)
+    var cursorCodepoint = 0
+    var codepointCount = 0
     var cursorDrawX = 0 // pixelwise point
     var cursorBlinkCounter = 0f
     var cursorOn = true
@@ -51,7 +54,7 @@ class UIItemTextLineInput(
         super.update(delta)
 
         if (Terrarum.mouseDown) {
-            //isActive = mouseUp
+            isActive = mouseUp
         }
 
         // process keypresses
@@ -59,19 +62,38 @@ class UIItemTextLineInput(
             IngameController.withKeyboardEvent { (_, char, _, keycodes) ->
                 fboUpdateLatch = true
 
-                if (keycodes.contains(Input.Keys.BACKSPACE) && cursorX > 0) {
-                    cursorX -= 1
-                    val charLen = Character.charCount(keybuf.codePointAt(cursorX))
-                    keybuf.delete(keybuf.length - charLen, keybuf.length)
-                    cursorDrawX = App.fontGame.getWidth("$keybuf")
+                if (cursorX > 0 && keycodes.contains(Input.Keys.BACKSPACE)) {
+                    cursorCodepoint -= 1
+                    val lastCp = keybuf.codePointAt(cursorCodepoint)
+                    val charCount = Character.charCount(lastCp)
+                    cursorX -= charCount
+                    keybuf.delete(cursorX, cursorX + charCount)
+
+                    cursorDrawX -= App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
+                    codepointCount -= 1
+                }
+                else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
+                    cursorCodepoint -= 1
+                    cursorX -= Character.charCount(keybuf.codePointAt(cursorCodepoint))
+                    val lastCp = keybuf.codePointAt(cursorCodepoint)
+                    cursorDrawX -= App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
+                }
+                else if (cursorX < codepointCount && keycodes.contains(Input.Keys.RIGHT)) {
+                    val lastCp = keybuf.codePointAt(cursorCodepoint)
+                    cursorDrawX += App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
+                    cursorX += Character.charCount(lastCp)
+                    cursorCodepoint += 1
                 }
                 // accept:
                 // - literal "<"
                 // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
                 else if (char != null && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                    keybuf.append(char)
-                    cursorDrawX = App.fontGame.getWidth("$keybuf")
-                    cursorX += 1
+                    keybuf.insert(cursorX, char)
+
+                    cursorDrawX += App.fontGame.getWidth(char) - 1
+                    cursorX += char.length
+                    codepointCount += 1
+                    cursorCodepoint += 1
                 }
             }
 
@@ -104,11 +126,13 @@ class UIItemTextLineInput(
         batch.color = TEXTINPUT_COL_BACKGROUND
         Toolkit.fillArea(batch, posX, posY, width, height)
 
-        batch.color = if (isActive) TEXTINPUT_COL_TEXT else TEXTINPUT_COL_GREY
+        batch.color = if (isActive) TEXTINPUT_COL_BORDER else TEXTINPUT_COL_BORDER_INACTIVE
         Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
+
+        batch.color = TEXTINPUT_COL_TEXT
         batch.draw(fbo.colorBufferTexture, posX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
-        if (cursorOn) {
+        if (isActive && cursorOn) {
             val oldBatchCol = batch.color.cpy()
 
             batch.color = batch.color.mul(0.5f,0.5f,0.5f,1f)

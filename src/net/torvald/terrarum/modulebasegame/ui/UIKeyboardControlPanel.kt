@@ -290,7 +290,7 @@ class UIItemKeycap(
     private val borderKeyPressed = UIItemTextButton.defaultHighlightCol
     private val borderKeyPressedAndSelected = Color(0x33FF33FF.toInt())
 
-    private val keycapFill = Color(0x404040_C0)
+    private val keycapFill = Color(0x28282888)
 
     private val keylabelCol = Color(0xFFFFFF40.toInt())
     private val configuredKeyCol = Color.WHITE
