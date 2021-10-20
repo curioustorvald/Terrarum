@@ -11,8 +11,8 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.tvda.ByteArray64
-import net.torvald.terrarum.tvda.ByteArray64Writer
+import net.torvald.terrarum.savegame.ByteArray64
+import net.torvald.terrarum.savegame.ByteArray64Writer
 import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarum.weather.WeatherMixer
 import java.io.Reader

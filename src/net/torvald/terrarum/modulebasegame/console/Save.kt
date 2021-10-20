@@ -7,7 +7,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.WriteSavegame
-import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.savegame.VDUtil
 import java.io.File
 import java.io.IOException
 

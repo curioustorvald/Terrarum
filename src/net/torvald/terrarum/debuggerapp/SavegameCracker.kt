@@ -2,10 +2,10 @@ package net.torvald.terrarum.debuggerapp
 
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.tvda.EntryFile
-import net.torvald.terrarum.tvda.VDUtil
-import net.torvald.terrarum.tvda.VirtualDisk
-import net.torvald.terrarum.tvda.diskIDtoReadableFilename
+import net.torvald.terrarum.savegame.EntryFile
+import net.torvald.terrarum.savegame.VDUtil
+import net.torvald.terrarum.savegame.VirtualDisk
+import net.torvald.terrarum.savegame.diskIDtoReadableFilename
 import java.io.File
 import java.io.PrintStream
 import java.nio.charset.Charset

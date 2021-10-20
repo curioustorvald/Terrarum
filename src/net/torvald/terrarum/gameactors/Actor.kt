@@ -9,8 +9,8 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.toBigEndian
+import net.torvald.terrarum.savegame.ByteArray64Reader
+import net.torvald.terrarum.savegame.toBigEndian
 import net.torvald.terrarum.utils.PasswordBase32
 
 

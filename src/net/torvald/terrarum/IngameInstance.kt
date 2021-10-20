@@ -16,7 +16,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.tvda.VirtualDisk
+import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.*

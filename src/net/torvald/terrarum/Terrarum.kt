@@ -26,8 +26,8 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.DiskSkimmer
+import net.torvald.terrarum.savegame.ByteArray64Reader
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase

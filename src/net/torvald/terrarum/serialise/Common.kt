@@ -7,10 +7,10 @@ import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.tvda.ByteArray64
-import net.torvald.terrarum.tvda.ByteArray64GrowableOutputStream
-import net.torvald.terrarum.tvda.ByteArray64InputStream
-import net.torvald.terrarum.tvda.ByteArray64Reader
+import net.torvald.terrarum.savegame.ByteArray64
+import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
+import net.torvald.terrarum.savegame.ByteArray64InputStream
+import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.InputStream

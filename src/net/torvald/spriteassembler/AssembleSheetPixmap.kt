@@ -6,9 +6,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.tvda.ByteArray64InputStream
-import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.SimpleFileSystem
+import net.torvald.terrarum.savegame.ByteArray64InputStream
+import net.torvald.terrarum.savegame.ByteArray64Reader
+import net.torvald.terrarum.savegame.SimpleFileSystem
 import java.io.InputStream
 import java.util.*
 import kotlin.collections.ArrayList

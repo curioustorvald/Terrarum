@@ -21,10 +21,10 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadPlayer
-import net.torvald.terrarum.tvda.ByteArray64InputStream
-import net.torvald.terrarum.tvda.ByteArray64Reader
-import net.torvald.terrarum.tvda.DiskSkimmer
-import net.torvald.terrarum.tvda.EntryFile
+import net.torvald.terrarum.savegame.ByteArray64InputStream
+import net.torvald.terrarum.savegame.ByteArray64Reader
+import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant

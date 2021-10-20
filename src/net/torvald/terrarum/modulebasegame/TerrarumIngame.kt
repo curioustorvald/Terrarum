@@ -36,8 +36,8 @@ import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadActor
 import net.torvald.terrarum.serialise.WriteSavegame
-import net.torvald.terrarum.tvda.DiskSkimmer
-import net.torvald.terrarum.tvda.VDUtil
+import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas

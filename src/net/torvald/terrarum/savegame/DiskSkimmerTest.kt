@@ -1,4 +1,4 @@
-package net.torvald.terrarum.tvda
+package net.torvald.terrarum.savegame
 
 import java.io.File
 import java.nio.file.Files

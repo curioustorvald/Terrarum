@@ -1,4 +1,4 @@
-package net.torvald.terrarum.tvda.finder
+package net.torvald.terrarum.savegame.finder
 
 import java.awt.BorderLayout
 import java.awt.GridLayout

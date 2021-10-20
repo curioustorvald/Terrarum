@@ -1,6 +1,6 @@
-package net.torvald.terrarum.tvda.finder
+package net.torvald.terrarum.savegame.finder
 
-import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.savegame.*
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.KeyEvent

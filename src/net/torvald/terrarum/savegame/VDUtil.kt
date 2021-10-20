@@ -1,4 +1,4 @@
-package net.torvald.terrarum.tvda
+package net.torvald.terrarum.savegame
 
 import java.io.*
 import java.nio.charset.Charset
@@ -16,12 +16,12 @@ import kotlin.experimental.and
  */
 object VDUtil {
 
-    fun File.writeBytes64(array: net.torvald.terrarum.tvda.ByteArray64) {
+    fun File.writeBytes64(array: net.torvald.terrarum.savegame.ByteArray64) {
         array.writeToFile(this)
     }
 
-    fun File.readBytes64(): net.torvald.terrarum.tvda.ByteArray64 {
-        val inbytes = net.torvald.terrarum.tvda.ByteArray64(this.length())
+    fun File.readBytes64(): net.torvald.terrarum.savegame.ByteArray64 {
+        val inbytes = net.torvald.terrarum.savegame.ByteArray64(this.length())
         val inputStream = BufferedInputStream(FileInputStream(this))
         var readInt = inputStream.read()
         var readInCounter = 0L
@@ -100,7 +100,7 @@ object VDUtil {
             }
 
             if (DEBUG_PRINT_READ) {
-                println("[tvda.VDUtil] == Entry deserialise debugprint for entry ID $entryID (child of $entryParentID)")
+                println("[savegame.VDUtil] == Entry deserialise debugprint for entry ID $entryID (child of $entryParentID)")
                 println("Entry type flag: ${entryTypeFlag and 127}${if (entryTypeFlag < 0) "*" else ""}")
                 println("Entry raw contents bytes: (len: ${entryData.size})")
                 entryData.forEachIndexed { i, it ->
@@ -158,7 +158,7 @@ object VDUtil {
                         (diskEntry.contents as? EntryDirectory)?.forEach {
                             println("entry: ${it.toHex()}")
                         }
-                        println("[tvda.VDUtil] bytes to calculate crc against:")
+                        println("[savegame.VDUtil] bytes to calculate crc against:")
                         testbytes.forEachIndexed { i, it ->
                             if (i % 4 == 0L) print(" ")
                             print(it.toInt().toHex().substring(6))
@@ -175,7 +175,7 @@ object VDUtil {
 
                     if (calculatedCRC != entryCRC) {
 
-                        println("[tvda.VDUtil] CRC failed; entry info:\n$diskEntry")
+                        println("[savegame.VDUtil] CRC failed; entry info:\n$diskEntry")
 
                         if (crcWarnLevel == Level.SEVERE)
                             throw IOException(crcMsg)
@@ -189,7 +189,7 @@ object VDUtil {
             }
             else {
                 if (DEBUG_PRINT_READ) {
-                    println("[tvda.VDUtil] Discarding entry ${entryID.toHex()} (raw type flag: $entryTypeFlag)")
+                    println("[savegame.VDUtil] Discarding entry ${entryID.toHex()} (raw type flag: $entryTypeFlag)")
                 }
             }
         }

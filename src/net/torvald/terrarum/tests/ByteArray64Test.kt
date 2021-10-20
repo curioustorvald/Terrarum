@@ -1,6 +1,6 @@
 package net.torvald.terrarum.tests
 
-import net.torvald.terrarum.tvda.ByteArray64GrowableOutputStream
+import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.serialise.toLittle
 import net.torvald.terrarum.serialise.toULittle48
 import java.util.zip.Deflater

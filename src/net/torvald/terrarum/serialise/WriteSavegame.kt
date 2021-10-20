@@ -13,7 +13,7 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.tvda.*
+import net.torvald.terrarum.savegame.*
 import java.io.File
 import java.io.Reader
 

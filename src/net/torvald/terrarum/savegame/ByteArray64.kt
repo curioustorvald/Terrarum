@@ -1,4 +1,4 @@
-package net.torvald.terrarum.tvda
+package net.torvald.terrarum.savegame
 
 import java.io.*
 import java.nio.channels.ClosedChannelException
