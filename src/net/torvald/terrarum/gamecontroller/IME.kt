@@ -1,11 +1,18 @@
 package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
-import net.torvald.terrarum.App.printdbg
 
-typealias TerrarumKeyLayout = Array<Array<String?>>
+data class TerrarumKeyLayout(
+        val name: String,
+        val symbols: Array<Array<String?>>?,
+        val acceptChar: ((Int) -> String?)? = null
+)
 
 /**
+ * Key Layout File Structure for Low Layer:
+ * - n: Displayed name of the keyboard layout
+ * - t: Key symbols in 256R4C string array (C1: unshifted, C2: Shift, C3: AltGr, C4: Shift-AltGr)
+ *
  * IME consists of two keyboard layers:
  * - Low layer: "english" keyboard (qwerty, colemak, etc), stateless
  * - High layer: chinese/japanese/korean/etc. keyboard, stateful
@@ -36,10 +43,11 @@ object IME {
     private fun parseKeylayoutFile(path: String): TerrarumKeyLayout {
         val file = Gdx.files.internal(path)
         val src = file.readString("UTF-8")
-        val jsval = context.eval("js", src)
+        val jsval = context.eval("js", "let t=$src;Object.freeze(t)")
+        val name = jsval.getMember("n").asString()
         val out = Array(256) { Array<String?>(4) { null } }
         for (keycode in 0L until 256L) {
-            val a = jsval.getArrayElement(keycode)
+            val a = jsval.getMember("t").getArrayElement(keycode)
             if (!a.isNull) {
                 for (layer in 0L until 4L) {
                     if (a.arraySize > layer) {
@@ -52,9 +60,9 @@ object IME {
             }
         }
 
-        //println("[IME] Test Keymap print:"); for (keycode in 0 until 256) { print("$keycode:\t"); println(out[keycode].joinToString("\t")) }
+//        println("[IME] Test Keymap print for $name:"); for (keycode in 0 until 256) { print("$keycode:\t"); println(out[keycode].joinToString("\t")) }
 
-        return out
+        return TerrarumKeyLayout(name, out)
     }
 
 }

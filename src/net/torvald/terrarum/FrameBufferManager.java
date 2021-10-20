@@ -27,4 +27,5 @@ public class FrameBufferManager {
             stack.peek().begin();
         }
     }
+
 }

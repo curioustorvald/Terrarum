@@ -108,7 +108,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
                 // sky background
                 batch.color = MINIMAP_SKYCOL
-                batch.fillRect(0f, 0f, MINIMAP_WIDTH, MINIMAP_HEIGHT)
+                Toolkit.fillArea(batch, 0f, 0f, MINIMAP_WIDTH, MINIMAP_HEIGHT)
                 // the actual image
                 batch.color = Color.WHITE
                 batch.draw(MinimapComposer.tempTex, tx, ty + MinimapComposer.totalHeight * minimapZoom, MinimapComposer.totalWidth * minimapZoom, -MinimapComposer.totalHeight * minimapZoom)
@@ -124,10 +124,10 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         batch.projectionMatrix = camera.combined
         // 1px stroke
         batch.color = Color.WHITE
-        batch.fillRect((width - MINIMAP_WIDTH) / 2, -1 + cellOffY.toFloat(), MINIMAP_WIDTH, 1f)
-        batch.fillRect((width - MINIMAP_WIDTH) / 2, cellOffY + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
-        batch.fillRect(-1 + (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
-        batch.fillRect((width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
+        Toolkit.fillArea(batch, (width - MINIMAP_WIDTH) / 2, -1 + cellOffY.toFloat(), MINIMAP_WIDTH, 1f)
+        Toolkit.fillArea(batch, (width - MINIMAP_WIDTH) / 2, cellOffY + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
+        Toolkit.fillArea(batch, -1 + (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
+        Toolkit.fillArea(batch, (width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
 
         // control hints
         batch.color = Color.WHITE

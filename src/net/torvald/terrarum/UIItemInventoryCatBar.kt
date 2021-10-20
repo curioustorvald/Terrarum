@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.ui.Movement
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemImageButton
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -270,7 +267,7 @@ class UIItemInventoryCatBar(
 
         // underline
         batch.color = underlineColour
-        batch.drawStraightLine(posX.toFloat(), posY + height - 1f, posX + width.toFloat(), 1f, false)
+        Toolkit.drawStraightLine(batch, posX, posY + height - 1, posX + width, 1, false)
 
         // indicator
         if (selectedPanel == 1) {

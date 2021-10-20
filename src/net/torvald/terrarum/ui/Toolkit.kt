@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.opengl.GL20
@@ -30,9 +29,14 @@ object Toolkit : Disposable {
 
     val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36, flipY = true)
 
+    val textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
+    val textureWhiteCircle = Texture(Gdx.files.internal("assets/graphics/circle_512.tga"))
 
     init {
         App.disposables.add(this)
+
+        textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        textureWhiteCircle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
         CommonResourcePool.addToLoadingList("toolkit_box_border") {
             TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/box_border_flat_tileable.tga"), 1, 1)
@@ -44,6 +48,8 @@ object Toolkit : Disposable {
 
     override fun dispose() {
         baloonTile.dispose()
+        textureWhiteSquare.dispose()
+        textureWhiteCircle.dispose()
     }
 
     val drawWidth: Int
@@ -72,7 +78,19 @@ object Toolkit : Disposable {
     }
 
     fun fillArea(batch: SpriteBatch, x: Int, y: Int, w: Int, h: Int) {
-        batch.fillRect(x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat())
+        batch.draw(textureWhiteSquare, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat())
+    }
+    fun fillArea(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) {
+        batch.draw(textureWhiteSquare, x, y, w, h)
+    }
+    fun fillCircle(batch: SpriteBatch, x: Int, y: Int, w: Int, h: Int) {
+        batch.draw(textureWhiteCircle, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat())
+    }
+    fun drawStraightLine(batch: SpriteBatch, x: Int, y: Int, otherEnd: Int, thickness: Int, isVertical: Boolean) {
+        if (!isVertical)
+            fillArea(batch, x, y, otherEnd - x, thickness)
+        else
+            fillArea(batch, x, y, thickness, otherEnd - y)
     }
 
     /**

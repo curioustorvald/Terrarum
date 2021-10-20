@@ -120,13 +120,13 @@ internal class UIInventoryCells(
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
         batch.color = encumbBack
-        batch.fillRect(
+        Toolkit.fillArea(batch, 
                 encumbBarXPos, encumbBarYPos,
                 weightBarWidth, controlHelpHeight - 6f
         )
         // encumbrance bar
         batch.color = encumbCol
-        batch.fillRect(
+        Toolkit.fillArea(batch, 
                 encumbBarXPos, encumbBarYPos,
                 if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                     1f

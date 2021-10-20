@@ -234,9 +234,6 @@ public class App implements ApplicationListener {
     private static Screen currentScreen;
     private static LoadScreenBase currentSetLoadScreen;
 
-    public static Texture textureWhiteSquare;
-    public static Texture textureWhiteCircle;
-
     private void initViewPort(int width, int height) {
         // Set Y to point downwards
         camera.setToOrtho(true, width, height); // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
@@ -748,8 +745,6 @@ public class App implements ApplicationListener {
         fontSmallNumbers.dispose();
         ItemSlotImageFactory.INSTANCE.dispose();
 
-        textureWhiteSquare.dispose();
-        textureWhiteCircle.dispose();
         logo.getTexture().dispose();
 
         disposables.forEach((it) -> {
@@ -829,13 +824,6 @@ public class App implements ApplicationListener {
      */
     private void postInit() {
         Terrarum.initialise();
-
-
-        textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
-        textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-
-        textureWhiteCircle = new Texture(Gdx.files.internal("assets/graphics/circle_512.tga"));
-        textureWhiteCircle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
         fontSmallNumbers = TinyAlphNum.INSTANCE;

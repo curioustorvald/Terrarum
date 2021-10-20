@@ -12,6 +12,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2017-10-20.
@@ -92,16 +93,16 @@ class UIItemInventoryElemSimple(
             if (item!!.maxDurability > 0.0) {
                 // draw durability metre
                 val barFullLen = width
-                val barOffset = posX.toFloat()
+                val barOffset = posX
                 val thickness = UIItemInventoryElemWide.durabilityBarThickness
                 val percentage = item!!.durability / item!!.maxDurability
                 val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
                 val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
                 if (item!!.maxDurability > 0.0) {
                     batch.color = durabilityBack
-                    batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen, thickness, false)
+                    Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + barFullLen, thickness, false)
                     batch.color = durabilityCol
-                    batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen * percentage, thickness, false)
+                    Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + (barFullLen * percentage).roundToInt(), thickness, false)
                 }
             }
             // draw item count when applicable

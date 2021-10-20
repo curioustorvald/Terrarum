@@ -84,17 +84,17 @@ open class UIItemTextButton(
         /*if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode, batch)
             batch.color = highlightBackCol
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else if (mouseUp) {
             BlendMode.resolve(activeBackBlendMode, batch)
             batch.color = activeBackCol
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else {
             batch.color = backgroundCol
             BlendMode.resolve(backgroundBlendMode, batch)
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }*/
 
 

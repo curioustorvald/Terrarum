@@ -217,13 +217,13 @@ package net.torvald.terrarum.modulebasegame.ui
         // background
         blendNormal()
         batch.color = backgroundColour
-        batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, 0f, 0f, width.toFloat(), height.toFloat())
 
 
         // cat bar background
         blendMul()
         batch.color = Color(0xcccccc_ff.toInt())
-        batch.fillRect(0f, 0f, catButtons.width.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, 0f, 0f, catButtons.width.toFloat(), height.toFloat())
 
         catButtons.render(batch, camera)
 
@@ -255,7 +255,7 @@ package net.torvald.terrarum.modulebasegame.ui
             // encumbrance bar background
             blendMul()
             batch.color = Color(0xa0a0a0_ff.toInt())
-            batch.fillRect(
+            Toolkit.fillArea(batch, 
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
                     weightBarWidth,
@@ -264,7 +264,7 @@ package net.torvald.terrarum.modulebasegame.ui
             // encumbrance bar
             blendNormal()
             batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
-            batch.fillRect(
+            Toolkit.fillArea(batch, 
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
                     if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)

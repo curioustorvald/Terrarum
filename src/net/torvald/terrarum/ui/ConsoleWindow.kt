@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.ccE
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.gameactors.AVKey
@@ -73,8 +76,8 @@ class ConsoleWindow : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background
         batch.color = UIColour
-        batch.fillRect(drawOffX, drawOffY, width.toFloat(), height.toFloat())
-        batch.fillRect(drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
+        Toolkit.fillArea(batch, drawOffX, drawOffY, width.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
 
         val input = commandInputPool!!.toString()
         val inputDrawWidth = App.fontGame.getWidth(input)
@@ -85,9 +88,9 @@ class ConsoleWindow : UICanvas() {
         App.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
 
         batch.color = Color(0x7f7f7f_ff)
-        batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight)
+        Toolkit.fillArea(batch, inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight)
         batch.color = Color.WHITE
-        batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 1f, inputDrawHeight - 1)
+        Toolkit.fillArea(batch, inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 1f, inputDrawHeight - 1)
 
 
         // messages

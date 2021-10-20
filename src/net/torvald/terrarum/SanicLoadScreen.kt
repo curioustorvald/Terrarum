@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.ui.Toolkit
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -141,7 +142,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // almost black background
                 it.color = Color(0x181818ff)
-                it.fillRect(0f, 0f, App.scr.wf, App.scr.hf)
+                Toolkit.fillArea(it, 0, 0, App.scr.width, App.scr.height)
 
 
                 it.color = Color.WHITE
@@ -184,7 +185,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, App.scr.wf, 40f + (messages.size) * App.fontGame.lineHeight)
+                Toolkit.fillArea(it, 0, 60, App.scr.width, 40 + (messages.size) * App.fontGame.lineHeight.toInt())
 
                 // log messages
                 it.color = messageForegroundColour
@@ -209,7 +210,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 // message backgrounds
                 it.color = messageBackgroundColour
-                it.fillRect(0f, 60f, App.scr.wf, 40f + (messages.size) * App.fontGame.lineHeight)
+                Toolkit.fillArea(it, 0, 60, App.scr.width, 40 + (messages.size) * App.fontGame.lineHeight.toInt())
 
                 // log messages
                 it.color = messageForegroundColour

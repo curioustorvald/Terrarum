@@ -6,15 +6,15 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2019-02-03.
@@ -75,7 +75,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
         // draw title bar
         batch.color = UINSMenu.DEFAULT_TITLEBACKCOL
         blendNormal(batch)
-        batch.fillRect(0f, 0f, width.toFloat(), LINE_HEIGHT.toFloat())
+        Toolkit.fillArea(batch, 0, 0, width, LINE_HEIGHT)
 
         // draw "Pal."
         batch.color = UINSMenu.DEFAULT_TITLETEXTCOL
@@ -83,7 +83,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
         // draw background
         batch.color = CELLCOLOUR_BLACK
-        batch.fillRect(0f, LINE_HEIGHT.toFloat(), 36f, 48f)
+        Toolkit.fillArea(batch, 0, LINE_HEIGHT, 36, 48)
 
         // draw back and fore selection
         batch.color = Color.WHITE

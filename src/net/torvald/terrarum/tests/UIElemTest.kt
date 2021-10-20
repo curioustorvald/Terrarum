@@ -2,7 +2,7 @@ package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Camera
@@ -11,11 +11,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.jme3.math.FastMath
+import net.torvald.EMDASH
 import net.torvald.terrarum.*
-import net.torvald.terrarum.ui.*
-import kotlin.math.roundToInt
+import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemTextLineInput
+import net.torvald.terrarum.ui.UIItemToggleButton
+import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
  * Created by Torvald on 2019-10-16.
@@ -29,18 +31,66 @@ class UIElemTest : ApplicationAdapter() {
     private lateinit var ui: UICanvas
 
     override fun create() {
+        App.fontGame = GameFontBase(App.FONT_DIR, false, true, false,
+                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
+                256, false, 0.5f, false
+        )
+
         batch = SpriteBatch()
         camera = OrthographicCamera()
-        camera.setToOrtho(false, 800f, 600f)
+        camera.setToOrtho(true, 800f, 600f)
         camera.update()
+        Gdx.gl20.glViewport(0, 0, 800, 600)
+
         ui = DummyTogglePane()
         ui.isVisible = true
+
+        Gdx.input.inputProcessor = object : InputAdapter() {
+            override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                ui.touchUp(screenX, screenY, pointer, button)
+                return true
+            }
+
+            override fun keyTyped(character: Char): Boolean {
+                ui.keyTyped(character)
+                return true
+            }
+
+            override fun scrolled(amountX: Float, amountY: Float): Boolean {
+                ui.scrolled(amountX, amountY)
+                return true
+            }
+
+            override fun keyUp(keycode: Int): Boolean {
+                ui.keyUp(keycode)
+                return true
+            }
+
+            override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+                ui.touchDragged(screenX, screenY, pointer)
+                return true
+            }
+
+            override fun keyDown(keycode: Int): Boolean {
+                ui.keyDown(keycode)
+                return true
+            }
+
+            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                ui.touchDown(screenX, screenY, pointer, button)
+                return true
+            }
+        }
     }
 
 
     override fun render() {
+        gdxClearAndSetBlend(0.1f, 0.1f, 0.1f, 1f)
+
         ui.update(Gdx.graphics.deltaTime)
         ui.render(batch, camera)
+
+        Gdx.graphics.setTitle("Terrarum UIElemTest $EMDASH F: ${Gdx.graphics.framesPerSecond}")
     }
 
 
@@ -51,44 +101,61 @@ class UIElemTest : ApplicationAdapter() {
 }
 
 class DummyTogglePane : UICanvas() {
-    private val button1 = UIItemToggleButton(this, 0, 0)
+    private val button1 = UIItemToggleButton(this, 400, 100)
+    private val textin = UIItemTextLineInput(this, 400, 160, 400)
 
-    private val key1 = UIItemConfigKeycap(this, 0, 20, 4, Input.Keys.A)
-    private val key2 = UIItemConfigKeycap(this, 36, 20, 4, Input.Keys.S)
-    private val key3 = UIItemConfigKeycap(this, 36*2, 20, 4, Input.Keys.D)
-    private val key4 = UIItemConfigKeycap(this, 36*3, 20, 4, Input.Keys.F)
-
-    override var width = 100
-    override var height = 25
+    override var width = 800
+    override var height = 600
 
     override var openCloseTime: Second = 0f
 
     private var timer = 0f
 
     init {
+        button1.clickOnceListener = { _,_,_ ->
+            button1.toggle()
+        }
         uiItems.add(button1)
-        uiItems.add(key1)
-        uiItems.add(key2)
-        uiItems.add(key3)
-        uiItems.add(key4)
+        uiItems.add(textin)
     }
 
     override fun updateUI(delta: Float) {
-        timer += delta
-
-        if (timer >= 1f) {
-            timer -= 1f
-            button1.toggle()
-        }
-
         uiItems.forEach { it.update(delta) }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.inUse {
+            batch.color = Color.CORAL
+            Toolkit.fillArea(batch, 0f, 0f, 800f, 600f)
 
+            batch.color = Color.WHITE
             uiItems.forEach { it.render(batch, camera) }
         }
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        uiItems.forEach { it.keyDown(keycode) }
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        uiItems.forEach { it.keyUp(keycode) }
+        return true
+    }
+
+    override fun keyTyped(character: Char): Boolean {
+        uiItems.forEach { it.keyTyped(character) }
+        return true
     }
 
     override fun doOpening(delta: Float) {
@@ -115,6 +182,8 @@ fun main(args: Array<String>) {
     appConfig.setResizable(false)
     appConfig.setWindowedMode(800, 600)
     appConfig.setForegroundFPS(60)
+    App.scr = TerrarumScreenSize(800, 600)
+
 
     Lwjgl3Application(UIElemTest(), appConfig)
 }

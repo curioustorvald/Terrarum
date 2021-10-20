@@ -171,7 +171,7 @@ class UINSMenu(
             // draw title bar
             batch.color = titleBackCol
             BlendMode.resolve(titleBlendMode, batch)
-            batch.fillRect(it.ui.posX.toFloat(), it.ui.posY.toFloat() - LINE_HEIGHT, it.ui.width.toFloat(), LINE_HEIGHT.toFloat())
+            Toolkit.fillArea(batch, it.ui.posX.toFloat(), it.ui.posY.toFloat() - LINE_HEIGHT, it.ui.width.toFloat(), LINE_HEIGHT.toFloat())
 
             batch.color = titleTextCol
             blendNormal(batch)

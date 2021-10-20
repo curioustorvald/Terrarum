@@ -9,7 +9,6 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryCells.Companion.weightBarWidth
@@ -21,6 +20,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlH
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -225,13 +225,13 @@ internal class UIStorageChest : UICanvas(
 
         // encumbrance bar background
         batch.color = encumbBack
-        batch.fillRect(
+        Toolkit.fillArea(batch,
                 encumbBarXPos, encumbBarYPos,
                 weightBarWidth, controlHelpHeight - 6f
         )
         // encumbrance bar
         batch.color = encumbCol
-        batch.fillRect(
+        Toolkit.fillArea(batch, 
                 encumbBarXPos, encumbBarYPos,
                 if (getPlayerInventory().capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                     1f

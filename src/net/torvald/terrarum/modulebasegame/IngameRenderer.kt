@@ -18,6 +18,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -295,11 +296,11 @@ object IngameRenderer : Disposable {
 
                     // indicator
                     batch.color = Color.RED
-                    batch.fillRect(0f, 0f, 6f, 10f)
+                    Toolkit.fillArea(batch, 0, 0, 6, 10)
                     batch.color = Color.LIME
-                    batch.fillRect(6f, 0f, 6f, 10f)
+                    Toolkit.fillArea(batch, 6, 0, 6, 10)
                     batch.color = Color.ROYAL
-                    batch.fillRect(12f, 0f, 6f, 10f)
+                    Toolkit.fillArea(batch, 12, 0, 6, 10)
                     batch.color = Color.WHITE
                 }
 
@@ -322,7 +323,7 @@ object IngameRenderer : Disposable {
 
                     // indicator
                     batch.color = Color.WHITE
-                    batch.fillRect(18f, 0f, 18f, 10f)
+                    Toolkit.fillArea(batch, 18, 0, 18, 10)
                 }
 
                 // works as intended

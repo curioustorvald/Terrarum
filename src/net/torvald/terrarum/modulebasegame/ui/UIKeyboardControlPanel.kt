@@ -130,6 +130,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 480) / 2, kby + 219)
 
+    private val textInputPanel = UIItemTextLineInput(this, drawX, 360, width)
+
     init {
         keycaps.values.forEach { addUIitem(it) }
         updateKeycaps()
@@ -139,6 +141,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             resetKeyConfig()
             updateKeycaps()
         }
+
+        addUIitem(textInputPanel)
     }
 
     private fun resetKeyConfig() {

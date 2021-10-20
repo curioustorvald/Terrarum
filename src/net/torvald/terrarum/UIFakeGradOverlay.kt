@@ -89,7 +89,7 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
         if (!nodarken) {
             blendMul(batch)
             batch.color = darken
-            batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, 0, 0, width, height)
 
             blendNormal(batch)
         }

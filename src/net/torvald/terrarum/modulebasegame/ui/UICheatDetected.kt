@@ -34,7 +34,7 @@ class UICheatDetected : UICanvas() {
 
         Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, 2f, 0, 0, width, height)
         batch.color = backgroundCol
-        batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, 0f, 0f, width.toFloat(), height.toFloat())
 
         batch.color = Color.WHITE
         val txt = Lang["ERROR_GENERIC_CHEATING"]

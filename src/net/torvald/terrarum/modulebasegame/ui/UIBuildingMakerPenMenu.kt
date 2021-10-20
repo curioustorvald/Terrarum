@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.modulebasegame.BuildingMaker
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -22,18 +23,19 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
     companion object {
         const val SIZE = 330
         const val RADIUS = SIZE / 2.0
+        const val RADIUSI = RADIUS.toInt()
         const val RADIUSF = RADIUS.toFloat()
 
         const val BLOCKS_ROW_RADIUS = 120.0
         const val TOOLS_ROW_RADIUS = 56.0
 
         const val BLOCK_BACK_SIZE = 72
-        const val BLOCK_BACK_RADIUS = BLOCK_BACK_SIZE / 2f
+        const val BLOCK_BACK_RADIUS = BLOCK_BACK_SIZE / 2
 
         const val ICON_SIZE = 38
         const val ICON_SIZEH = ICON_SIZE / 2f
         const val CLOSE_BUTTON_SIZE = 48
-        const val CLOSE_BUTTON_RADIUS = CLOSE_BUTTON_SIZE / 2f
+        const val CLOSE_BUTTON_RADIUS = CLOSE_BUTTON_SIZE / 2
 
         const val PALETTE_SIZE = 10
         const val TOOLS_SIZE = 5
@@ -135,7 +137,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         // primary click
         if (Terrarum.mouseDown) {
             // close by clicking close button or out-of-boud
-            if (mouseVec.distanceSquared(RADIUS, RADIUS) !in CLOSE_BUTTON_RADIUS.sqr()..RADIUSF.sqr()) {
+            if (mouseVec.distanceSquared(RADIUS, RADIUS) !in CLOSE_BUTTON_RADIUS.toFloat().sqr()..RADIUSF.sqr()) {
                 closeGracefully()
             }
         }
@@ -149,7 +151,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw back
         batch.color = backCol
-        batch.fillCircle(0f, 0f, SIZE.toFloat(), SIZE.toFloat())
+        Toolkit.fillCircle(batch,0, 0, SIZE, SIZE)
 
         // draw blocks slot
         batch.color = blockCellCol
@@ -167,12 +169,12 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
                 "wall@" + Block.GLASS_CRUDE
         )//AppLoader.getConfigStringArray("buildingmakerfavs")
         for (i in 0 until PALETTE_SIZE) {
-            val x = blockCellPos[i].x.roundToInt().toFloat()
-            val y = blockCellPos[i].y.roundToInt().toFloat()
+            val x = blockCellPos[i].x.roundToInt()
+            val y = blockCellPos[i].y.roundToInt()
             batch.color = blockCellCol
-            repeat((i == mouseOnBlocksSlot).toInt() + 1) { batch.fillCircle(x - BLOCK_BACK_RADIUS, y - BLOCK_BACK_RADIUS, BLOCK_BACK_SIZE.toFloat(), BLOCK_BACK_SIZE.toFloat()) }
+            repeat((i == mouseOnBlocksSlot).toInt() + 1) { Toolkit.fillCircle(batch, x - BLOCK_BACK_RADIUS, y - BLOCK_BACK_RADIUS, BLOCK_BACK_SIZE, BLOCK_BACK_SIZE) }
             batch.color = Color.WHITE
-            batch.draw(ItemCodex.getItemImage(slotConfig[i]), x - 16, y - 16, 32f, 32f)
+            batch.draw(ItemCodex.getItemImage(slotConfig[i]), x - 16f, y - 16f, 32f, 32f)
 
             // update as well while looping
             if (i == mouseOnBlocksSlot && Terrarum.mouseDown) {
@@ -183,7 +185,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
         // draw close button
         batch.color = blockCellCol
-        repeat(mouseOnCloseButton.toInt() + 1) { batch.fillCircle(RADIUSF - CLOSE_BUTTON_RADIUS, RADIUSF - CLOSE_BUTTON_RADIUS, CLOSE_BUTTON_SIZE.toFloat(), CLOSE_BUTTON_SIZE.toFloat()) }
+        repeat(mouseOnCloseButton.toInt() + 1) { Toolkit.fillCircle(batch, RADIUSI - CLOSE_BUTTON_RADIUS, RADIUSI - CLOSE_BUTTON_RADIUS, CLOSE_BUTTON_SIZE, CLOSE_BUTTON_SIZE) }
 
         batch.color = if (mouseOnCloseButton) toolButtons[0].activeCol else toolButtons[0].inactiveCol
         batch.draw(toolIcons.get(5, 0), RADIUSF - ICON_SIZEH, RADIUSF - ICON_SIZEH)

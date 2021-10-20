@@ -13,6 +13,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
+import kotlin.math.roundToInt
 
 /***
  * Note that the UI will not render if either item or itemImage is null.
@@ -44,7 +45,7 @@ class UIItemInventoryElemWide(
         val height = 48
         val UNIQUE_ITEM_HAS_NO_AMOUNT = -1
 
-        internal val durabilityBarThickness = 3f
+        internal val durabilityBarThickness = 3
     }
 
     override val height = UIItemInventoryElemWide.height
@@ -59,7 +60,7 @@ class UIItemInventoryElemWide(
 
 
 
-    private val durabilityBarOffY = 35f
+    private val durabilityBarOffY = 35
 
 
 
@@ -125,16 +126,16 @@ class UIItemInventoryElemWide(
 
 
             // durability metre
-            val barFullLen = (width - 8f) - textOffsetX
-            val barOffset = posX + textOffsetX
+            val barFullLen = (width - 8) - textOffsetX.toInt()
+            val barOffset = posX + textOffsetX.toInt()
             val percentage = if (item!!.maxDurability < 0.00001f) 0f else item!!.durability / item!!.maxDurability
             val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
             val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
             if (item!!.maxDurability > 0.0) {
                 batch.color = durabilityBack
-                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, durabilityBarThickness, false)
+                Toolkit.drawStraightLine(batch, barOffset, posY + durabilityBarOffY, barOffset + barFullLen, durabilityBarThickness, false)
                 batch.color = durabilityCol
-                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * percentage, durabilityBarThickness, false)
+                Toolkit.drawStraightLine(batch, barOffset, posY + durabilityBarOffY, barOffset + (barFullLen * percentage).roundToInt(), durabilityBarThickness, false)
             }
 
 
@@ -144,7 +145,7 @@ class UIItemInventoryElemWide(
             if (quickslot != null) {
                 val label = quickslot!!.plus(0xE010).toChar()
                 val labelW = App.fontGame.getWidth("$label")
-                App.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+                App.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW.toFloat(), posY + textOffsetY)
             }
 
         }

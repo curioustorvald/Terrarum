@@ -300,7 +300,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val histogramMax = histogram.screen_tiles.toFloat()
 
         batch.color = uiColour
-        batch.fillRect(x.toFloat(), y.toFloat(), w.plus(1), h)
+        Toolkit.fillArea(batch, x.toFloat(), y.toFloat(), w.plus(1), h)
         batch.color = Color.GRAY
         App.fontSmallNumbers.draw(batch, "0", x.toFloat(), y.toFloat() + h + 2)
         App.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8 * 3, y.toFloat() + h + 2)
@@ -322,7 +322,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 val bar_w = 1f
 
                 batch.color = barColour[c]
-                batch.fillRect(bar_x, bar_y, bar_w, -bar_h)
+                Toolkit.fillArea(batch, bar_x, bar_y, bar_w, -bar_h)
             }
         }
         blendNormal(batch)

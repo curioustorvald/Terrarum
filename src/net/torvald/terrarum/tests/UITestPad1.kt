@@ -9,8 +9,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.Yaml
+import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UINSMenu
 
 val UITEST1_WIDTH = 1280
@@ -98,7 +102,7 @@ class UITestPad1 : ScreenAdapter() {
 
         batch.inUse {
             batch.color = bgCol
-            batch.fillRect(0f, 0f, 2048f, 2048f)
+            Toolkit.fillArea(batch, 0, 0, 2048, 2048)
 
             nsMenu.render(batch, camera)
 

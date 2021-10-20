@@ -232,12 +232,12 @@ class UIItemTextButtonList(
         if (kinematic) {
             batch.color = backgroundCol
             BlendMode.resolve(backgroundBlendMode, batch)
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
             batch.color = highlightBackCol
             BlendMode.resolve(highlightBackBlendMode, batch)
             if (highlightY != null) {
-                batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
+                Toolkit.fillArea(batch, posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
             }
         }
 

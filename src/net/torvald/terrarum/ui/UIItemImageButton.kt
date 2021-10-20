@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.fillRect
 
 /**
  * Created by minjaesong on 2017-07-16.
@@ -48,17 +47,17 @@ open class UIItemImageButton(
         if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode, batch)
             batch.color = highlightBackCol
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else if (mouseUp) {
             BlendMode.resolve(activeBackBlendMode, batch)
             batch.color = activeBackCol
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else {
             batch.color = backgroundCol
             BlendMode.resolve(backgroundBlendMode, batch)
-            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
 
 

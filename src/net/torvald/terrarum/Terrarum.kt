@@ -26,9 +26,9 @@ import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -355,21 +355,6 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     camera?.setToOrtho(true, App.scr.wf, App.scr.hf)
     camera?.update()
     batch?.projectionMatrix = camera?.combined
-}
-
-
-// ShapeRenderer alternative for rects
-fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(App.textureWhiteSquare, x, y, w, h)
-}
-fun SpriteBatch.fillCircle(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(App.textureWhiteCircle, x, y, w, h)
-}
-fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
-    if (!isVertical)
-        this.fillRect(x, y, otherEnd - x, thickness)
-    else
-        this.fillRect(x, y, thickness, otherEnd - y)
 }
 
 

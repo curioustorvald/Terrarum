@@ -3,11 +3,16 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
+import net.torvald.terrarum.blendMul
+import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.ui.Toolkit
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2015-12-31.
@@ -58,9 +63,9 @@ object FeaturesDrawer {
         blendMul(batch)
 
         batch.color = ColourTemp(colTemp)
-        batch.fillRect(0f, 0f,
-                App.scr.width * if (zoom < 1) 1f / zoom else zoom,
-                App.scr.height * if (zoom < 1) 1f / zoom else zoom
+        Toolkit.fillArea(batch, 0, 0,
+                (App.scr.width * if (zoom < 1) 1f / zoom else zoom).roundToInt(),
+                (App.scr.height * if (zoom < 1) 1f / zoom else zoom).roundToInt()
         )
 
         blendNormal(batch)

@@ -1,20 +1,20 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_BACKGROUNDCOL
 import kotlin.math.roundToInt
-import net.torvald.terrarum.*
 
 /**
  * Created by minjaesong on 2019-02-14.
@@ -132,15 +132,15 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
         // gaps between tabs and close button
         batch.color = DEFAULT_BACKGROUNDCOL
-        batch.fillRect(0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
+        Toolkit.fillArea(batch, 0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
         // scrollbar back
         batch.color = DEFAULT_BACKGROUNDCOL
-        batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
         batch.color = scrollbarBackCol
-        batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
         // scrollbar
         batch.color = CELLCOLOUR_WHITE
-        batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), scrollBarPos.toFloat(), SCROLLBAR_SIZE.toFloat(), scrollBarHeight)
+        Toolkit.fillArea(batch, width - SCROLLBAR_SIZE.toFloat(), scrollBarPos.toFloat(), SCROLLBAR_SIZE.toFloat(), scrollBarHeight)
 
         // the actual buttons
         tabs.render(batch, camera)

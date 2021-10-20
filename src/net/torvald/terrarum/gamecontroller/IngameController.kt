@@ -283,12 +283,18 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         private const val KEY_DOWN = 0
         private const val KEY_CHANGE = 1
         const val N_KEY_ROLLOVER = 8
-        var KEYBOARD_DELAYS = floatArrayOf(0.25f, 0.025f)
+        var KEYBOARD_DELAYS = longArrayOf(0L,250000000L,0L,25000000L,0L)
         private var stroboTime = 0L
         private var stroboStatus = 0
         private var repeatCount = 0
         private var oldKeys = IntArray(N_KEY_ROLLOVER) { 0 }
+        /** always Low Layer */
         private var keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
+
+        fun resetKeyboardStrobo() {
+            stroboStatus = 0
+            repeatCount = 0
+        }
 
         // code proudly stolen from tsvm's TVDOS.SYS
         fun withKeyboardEvent(callback: (TerrarumKeyboardEvent) -> Unit) {
@@ -337,8 +343,9 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
         private fun keysToStr(keys: IntArray): Array<String?>? {
+            if (keys.size == 0) return null
             val headkey = keys[0]
-            return if (keymap[headkey] == null) null else keymap[headkey]
+            return if (keymap.symbols!![headkey] == null) null else keymap.symbols!![headkey]
         }
 
         private fun strobeKeys(): IntArray {
@@ -356,8 +363,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         }
 
         private fun arrayEq(a: IntArray, b: IntArray): Boolean {
-            for (i in 0..a.size) {
-                if (a[i] != b[i]) return false
+            for (i in 0 until a.size) {
+                if (a[i] != b.getOrNull(i)) return false
             }
             return true
         }
