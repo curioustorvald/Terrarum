@@ -11,7 +11,7 @@ object Clipboard {
     fun fetch(): String =
             Toolkit.getDefaultToolkit().systemClipboard.getData(DataFlavor.stringFlavor) as String
 
-    fun paste(s: String) {
+    fun copy(s: String) {
         val selection = StringSelection(s)
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
         clipboard.setContents(selection, selection)

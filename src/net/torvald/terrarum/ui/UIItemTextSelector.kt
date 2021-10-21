@@ -95,7 +95,7 @@ class UIItemTextSelector(
 
             // text area border
             batch.color = Toolkit.Theme.COL_INACTIVE
-            Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 6 + 2, height + 2)
+            Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
 
             // left button border
             batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT

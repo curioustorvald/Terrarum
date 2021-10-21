@@ -144,7 +144,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
 
 
-    private val keyboardTestPanel = UIItemTextLineInput(this, drawX + (width - 480) / 2 + 3, 480, 474)
+    private val keyboardTestPanel = UIItemTextLineInput(this, drawX + (width - 480) / 2 + 3, 480, 474, enableIMEButton = true, enablePasteButton = true)
 
 
     init {
