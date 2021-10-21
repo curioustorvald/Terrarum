@@ -14,6 +14,32 @@ import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.streams.toList
 
+data class InputLenCap(val count: Int, val unit: CharLenUnit) {
+    enum class CharLenUnit {
+        UTF8_BYTES, UTF16_CHARS, CODEPOINTS
+    }
+
+    fun exceeds(codepoints: CodepointSequence, extra: List<Int> = CodepointSequence()): Boolean {
+        return when (unit) {
+            CharLenUnit.CODEPOINTS -> (codepoints.size + extra.size) > count
+            CharLenUnit.UTF16_CHARS -> {
+                var cnt = 0
+                listOf(codepoints,extra).forEach { it.forEach {
+                    cnt += 1 + (it > 65535).toInt()
+                } }
+                cnt > count
+            }
+            CharLenUnit.UTF8_BYTES -> {
+                var cnt = 0
+                listOf(codepoints,extra).forEach { it.forEach {
+                    cnt += if (it > 65535) 4 else if (it > 2047) 3 else if (it > 127) 2 else 1
+                } }
+                cnt > count
+            }
+        }
+    }
+}
+
 /**
  * @param width width of the text input where the text gets drawn, not the entire item
  * @param height height of the text input where the text gets drawn, not the entire item
@@ -26,7 +52,8 @@ class UIItemTextLineInput(
         override val width: Int,
         var placeholder: () -> String = { "" },
         val enablePasteButton: Boolean = true,
-        val enableIMEButton: Boolean = false
+        val enableIMEButton: Boolean = false,
+        val maxLen: InputLenCap = InputLenCap(1000, InputLenCap.CharLenUnit.CODEPOINTS)
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -44,7 +71,7 @@ class UIItemTextLineInput(
 
     companion object {
         val TEXTINPUT_COL_TEXT = Color.WHITE
-        val TEXTINPUT_COL_TEXT_HALF = Color.WHITE.cpy().mul(1f,1f,1f,0.5f)
+        val TEXTINPUT_COL_TEXT_NOMORE = Color(0xFF8888FF.toInt())
         val TEXTINPUT_COL_TEXT_DISABLED = Toolkit.Theme.COL_DISABLED
         val TEXTINPUT_COL_BACKGROUND = Toolkit.Theme.COL_CELL_FILL
         const val CURSOR_BLINK_TIME = 1f / 3f
@@ -63,6 +90,7 @@ class UIItemTextLineInput(
     var isActive = true
 
     var cursorX = 0
+    var cursorDrawScroll = 0
     var cursorDrawX = 0 // pixelwise point
     var cursorBlinkCounter = 0f
     var cursorOn = true
@@ -126,10 +154,13 @@ class UIItemTextLineInput(
                 // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
                 else if (char != null && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
                     val codepoints = char.toCodePoints()
-                    textbuf.addAll(cursorX, codepoints)
 
-                    cursorX += codepoints.size
-                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                    if (!maxLen.exceeds(textbuf, codepoints)) {
+                        textbuf.addAll(cursorX, codepoints)
+
+                        cursorX += codepoints.size
+                        cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                    }
                 }
             }
 
@@ -166,9 +197,18 @@ class UIItemTextLineInput(
     private fun paste() {
         val codepoints = Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints()
 
-        textbuf.addAll(cursorX, codepoints)
+        val actuallyInserted = arrayListOf(0)
 
-        cursorX += codepoints.size
+        for (c in codepoints) {
+            if (maxLen.exceeds(textbuf, actuallyInserted)) break
+            actuallyInserted.add(c)
+        }
+
+        actuallyInserted.removeAt(0)
+
+        textbuf.addAll(cursorX, actuallyInserted)
+
+        cursorX += actuallyInserted.size
         cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
 
         fboUpdateLatch = true
@@ -192,7 +232,7 @@ class UIItemTextLineInput(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else textbuf, 0f, 0f)
+                App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else textbuf, -1f*cursorDrawScroll, 0f)
             } }
         }
 
@@ -245,11 +285,13 @@ class UIItemTextLineInput(
 
         // draw text cursor
         if (isActive && cursorOn) {
-            batch.color = TEXTINPUT_COL_TEXT_HALF
-            Toolkit.fillArea(batch, posX + cursorDrawX + 3, posY, 2, 24)
+            val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
-            batch.color = TEXTINPUT_COL_TEXT
-            Toolkit.fillArea(batch, posX + cursorDrawX + 3, posY, 1, 23)
+            batch.color = baseCol.cpy().mul(0.5f,0.5f,0.5f,1f)
+            Toolkit.fillArea(batch, posX - cursorDrawScroll + cursorDrawX + 3, posY, 2, 24)
+
+            batch.color = baseCol
+            Toolkit.fillArea(batch, posX - cursorDrawScroll + cursorDrawX + 3, posY, 1, 23)
         }
 
         // draw icon
