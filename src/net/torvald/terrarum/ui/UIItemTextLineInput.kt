@@ -10,7 +10,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.utils.Clipboard
+import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.streams.toList
 
 /**
  * @param width width of the text input where the text gets drawn, not the entire item
@@ -60,18 +62,16 @@ class UIItemTextLineInput(
 
     var isActive = true
 
-    var cursorX = 0 // 1 per char (not codepoint)
-    var cursorCodepoint = 0
-    var codepointCount = 0
+    var cursorX = 0
     var cursorDrawX = 0 // pixelwise point
     var cursorBlinkCounter = 0f
     var cursorOn = true
 
-    private val textbuf = StringBuilder()
+    private val textbuf = CodepointSequence()
 
     private var fboUpdateLatch = true
 
-    private var currentPlaceholderText = placeholder() // the placeholder text may change every time you call it
+    private var currentPlaceholderText = ArrayList<Int>(placeholder().toCodePoints()) // the placeholder text may change every time you call it
 
 
     private val btn1PosX = posX + width - 2*WIDTH_ONEBUTTON - 3
@@ -108,43 +108,33 @@ class UIItemTextLineInput(
                     copyToClipboard()
                 }
                 else if (cursorX > 0 && keycodes.contains(Input.Keys.BACKSPACE)) {
-                    cursorCodepoint -= 1
-                    val lastCp = textbuf.codePointAt(cursorCodepoint)
-                    val charCount = Character.charCount(lastCp)
-                    cursorX -= charCount
-                    textbuf.delete(cursorX, cursorX + charCount)
-
-                    cursorDrawX -= App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
-                    codepointCount -= 1
+                    cursorX -= 1
+                    textbuf.removeAt(cursorX)
+                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
                 }
                 else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
-                    cursorCodepoint -= 1
-                    cursorX -= Character.charCount(textbuf.codePointAt(cursorCodepoint))
-                    val lastCp = textbuf.codePointAt(cursorCodepoint)
-                    cursorDrawX -= App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
+                    cursorX -= 1
+                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
                     if (cursorDrawX < 0) cursorDrawX = 0
                 }
-                else if (cursorX < codepointCount && keycodes.contains(Input.Keys.RIGHT)) {
-                    val lastCp = textbuf.codePointAt(cursorCodepoint)
-                    cursorDrawX += App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
-                    cursorX += Character.charCount(lastCp)
-                    cursorCodepoint += 1
+                else if (cursorX < textbuf.size && keycodes.contains(Input.Keys.RIGHT)) {
+                    cursorX += 1
+                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
                 }
                 // accept:
                 // - literal "<"
                 // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
                 else if (char != null && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                    textbuf.insert(cursorX, char)
+                    val codepoints = char.toCodePoints()
+                    textbuf.addAll(cursorX, codepoints)
 
-                    cursorDrawX += App.fontGame.getWidth(char) - 1
-                    cursorX += char.length
-                    codepointCount += 1
-                    cursorCodepoint += 1
+                    cursorX += codepoints.size
+                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
                 }
             }
 
-            if (cursorCodepoint == 0) {
-                currentPlaceholderText = placeholder()
+            if (textbuf.size == 0) {
+                currentPlaceholderText = ArrayList(placeholder().toCodePoints())
             }
 
             cursorBlinkCounter += delta
@@ -167,27 +157,29 @@ class UIItemTextLineInput(
         if (!mouseDown) mouseLatched = false
     }
 
+    private fun String.toCodePoints() = this.codePoints().toList()
+
     private fun toggleIME() {
         imeOn = !imeOn
     }
 
     private fun paste() {
-        val str = Clipboard.fetch().substringBefore('\n').substringBefore('\t')
-        val strCodepointLen = str.codePoints().count().toInt()
+        val codepoints = Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints()
 
-        textbuf.insert(cursorX, str)
+        textbuf.addAll(cursorX, codepoints)
 
-        cursorDrawX += App.fontGame.getWidth(str) - 1
-        cursorX += str.length
-
-        codepointCount += strCodepointLen
-        cursorCodepoint += strCodepointLen
+        cursorX += codepoints.size
+        cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
 
         fboUpdateLatch = true
     }
 
     private fun copyToClipboard() {
-        Clipboard.copy(textbuf.toString())
+        Clipboard.copy(textbufToString())
+    }
+
+    private fun textbufToString(): String {
+        return ""
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -200,7 +192,7 @@ class UIItemTextLineInput(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else "$textbuf", 0f, 0f)
+                App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else textbuf, 0f, 0f)
             } }
         }
 
@@ -284,7 +276,7 @@ class UIItemTextLineInput(
         super.render(batch, camera)
     }
 
-    fun getText() = textbuf.toString()
+    fun getText() = textbufToString()
     fun getTextOrPlaceholder() = if (textbuf.isEmpty()) currentPlaceholderText else getText()
 
     override fun dispose() {
