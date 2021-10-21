@@ -10,5 +10,7 @@
   "GAME_32BIT_WARNING1": "看起來您正在運行32位版本的Java。",
   "GAME_32BIT_WARNING2": "請下載並安裝最新的64位Java :",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
-  "MENU_LABEL_RESTART_REQUIRED": "需要重新啟動"
+  "MENU_LABEL_RESTART_REQUIRED": "需要重新啟動",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "鍵盤配置",
+  "MENU_LABEL_IME": "輸入法"
 }

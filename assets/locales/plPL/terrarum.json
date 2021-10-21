@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Naciśnij >",
   "MENU_MODULES" : "Moduły",
   "MENU_LABEL_RESET" : "Reset",
-  "MENU_LABEL_RESTART_REQUIRED": "Wymagane ponowne uruchomienie"
+  "MENU_LABEL_RESTART_REQUIRED": "Wymagane ponowne uruchomienie",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Układ klawiatury"
 }

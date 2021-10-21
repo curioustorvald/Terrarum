@@ -35,7 +35,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override var height = 600
     override var openCloseTime = 0f
 
-    private val textSelWidth = 300
+    private val textSelWidth = 280
 
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2

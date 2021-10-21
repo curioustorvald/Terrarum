@@ -5,5 +5,6 @@
   "APP_WARNING_HEALTH_AND_SAFETY": "POZOR-ZDRAVÍ A BEZPEČNOST",
   "MENU_LABEL_PRESS_START_SYMBOL": "Stiskněte >",
   "MENU_MODULES" : "Moduly",
-  "MENU_LABEL_RESTART_REQUIRED": "Vyžaduje se restartování"
+  "MENU_LABEL_RESTART_REQUIRED": "Vyžaduje se restartování",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Rozložení klávesnice"
 }

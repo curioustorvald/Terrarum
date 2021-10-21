@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Trykk >",
   "MENU_MODULES" : "Moduler",
   "MENU_LABEL_RESET" : "Nullstill",
-  "MENU_LABEL_RESTART_REQUIRED": "Omstart kreves"
+  "MENU_LABEL_RESTART_REQUIRED": "Omstart kreves",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturoppsett"
 }

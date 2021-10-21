@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Pressione >",
   "MENU_MODULES" : "Módulos",
   "MENU_LABEL_RESET" : "Reiniciar",
-  "MENU_LABEL_RESTART_REQUIRED": "Reinicialização necessária"
+  "MENU_LABEL_RESTART_REQUIRED": "Reinicialização necessária",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Layout do teclado"
 }

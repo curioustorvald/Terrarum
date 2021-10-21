@@ -8,5 +8,6 @@
   "GAME_32BIT_WARNING1": "Sembra che tu stia eseguendo una versione a 32 bit di Java.",
   "GAME_32BIT_WARNING2": "Si prega di scaricare e installare l'ultima versione di Java a 64 bit all'indirizzo:",
   "GAME_32BIT_WARNING3": "https://www.java.com/it/download/",
-  "MENU_LABEL_RESTART_REQUIRED": "Riavvio necessario"
+  "MENU_LABEL_RESTART_REQUIRED": "Riavvio necessario",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Layout di tastiera"
 }

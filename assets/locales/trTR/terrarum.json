@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "> basınız",
   "MENU_MODULES" : "Modüller",
   "MENU_LABEL_RESET" : "Sıfırla",
-  "MENU_LABEL_RESTART_REQUIRED": "Yeniden başlatma gerekiyor"
+  "MENU_LABEL_RESTART_REQUIRED": "Yeniden başlatma gerekiyor",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Klavye düzeni"
 }

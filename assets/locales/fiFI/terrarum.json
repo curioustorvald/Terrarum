@@ -9,5 +9,7 @@
   "GAME_32BIT_WARNING1": "Näyttää siltä, että käytössäsi on 32-bittinen Java-versio.",
   "GAME_32BIT_WARNING2": "Lataa ja asenna uusin 64-bittinen Java osoitteesta:",
   "GAME_32BIT_WARNING3": "https://www.java.com/fi/download/",
-  "MENU_LABEL_RESTART_REQUIRED": "Uudelleenkäynnistys tarvitaan"
+  "MENU_LABEL_RESTART_REQUIRED": "Uudelleenkäynnistys tarvitaan",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Näppäimistöasettelu",
+  "MENU_LABEL_IME": "Kirjoitustuki"
 }

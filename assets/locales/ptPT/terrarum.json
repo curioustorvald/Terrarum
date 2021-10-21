@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Carrega no >",
   "MENU_MODULES" : "Módulos",
   "MENU_LABEL_RESET" : "Reiniciar",
-  "MENU_LABEL_RESTART_REQUIRED": "Reinício necessário"
+  "MENU_LABEL_RESTART_REQUIRED": "Reinício necessário",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Esquema de teclado"
 }

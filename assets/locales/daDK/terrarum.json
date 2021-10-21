@@ -6,5 +6,6 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Tryk >",
   "MENU_MODULES" : "Moduler",
   "MENU_LABEL_RESET" : "Nulstil",
-  "MENU_LABEL_RESTART_REQUIRED": "Genstart er nødvendig"
+  "MENU_LABEL_RESTART_REQUIRED": "Genstart er nødvendig",
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturlayout"
 }
