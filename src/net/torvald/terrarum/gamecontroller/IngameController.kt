@@ -289,7 +289,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         private var repeatCount = 0
         private var oldKeys = IntArray(N_KEY_ROLLOVER) { 0 }
         /** always Low Layer */
-        private var keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
+//        private var keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
         fun resetKeyboardStrobo() {
             stroboStatus = 0
@@ -301,6 +301,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             val keys = strobeKeys()
             var keyChanged = !arrayEq(keys, oldKeys)
             val keyDiff = arrayDiff(keys, oldKeys)
+            val keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
             if (stroboStatus % 2 == 0 && keys[0] != 0) {
                 stroboStatus += 1
@@ -308,8 +309,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 repeatCount += 1
 
                 val shiftin = keys.contains(Keys.SHIFT_LEFT) || keys.contains(Keys.SHIFT_RIGHT)
-                val keysym0 = keysToStr(keys)
-                val newKeysym0 = keysToStr(keyDiff)
+                val keysym0 = keysToStr(keymap, keys)
+                val newKeysym0 = keysToStr(keymap, keyDiff)
                 val keysym = if (keysym0 == null) null
                 else if (shiftin && keysym0[1]?.isNotBlank() == true) keysym0[1]
                 else keysym0[0]
@@ -342,7 +343,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             }
         }
 
-        private fun keysToStr(keys: IntArray): Array<String?>? {
+        private fun keysToStr(keymap: TerrarumKeyLayout, keys: IntArray): Array<String?>? {
             if (keys.size == 0) return null
             val headkey = keys[0]
             return if (keymap.symbols!![headkey] == null) null else keymap.symbols!![headkey]

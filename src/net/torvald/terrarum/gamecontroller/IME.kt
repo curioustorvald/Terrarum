@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gamecontroller
 
-import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.App.printdbg
+import java.io.File
 
 data class TerrarumKeyLayout(
         val name: String,
@@ -24,9 +25,9 @@ data class TerrarumKeyLayout(
 object IME {
 
     const val KEYLAYOUT_DIR = "assets/keylayout/"
-    const val KEYLAYOUT_EXTENSION = ".key"
+    const val KEYLAYOUT_EXTENSION = "key"
 
-    private val cached = HashMap<String, TerrarumKeyLayout>()
+    private val lowLayers = HashMap<String, TerrarumKeyLayout>()
 
     private val context = org.graalvm.polyglot.Context.newBuilder("js")
             .allowHostAccess(org.graalvm.polyglot.HostAccess.NONE)
@@ -34,16 +35,28 @@ object IME {
             .allowIO(false)
             .build()
 
+    init {
+        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.forEach {
+            printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
+            lowLayers[it.nameWithoutExtension.lowercase()] = parseKeylayoutFile(it)
+        }
+    }
+
+    fun invoke() {}
+
     fun getLowLayerByName(name: String): TerrarumKeyLayout {
-        return cached.getOrPut(name) { parseKeylayoutFile("$KEYLAYOUT_DIR$name$KEYLAYOUT_EXTENSION") }
+        return lowLayers[name.lowercase()]!!
+    }
+
+    fun getAllLowLayers(): List<String> {
+        return lowLayers.keys.toList()
     }
 
 
 
-    private fun parseKeylayoutFile(path: String): TerrarumKeyLayout {
-        val file = Gdx.files.internal(path)
-        val src = file.readString("UTF-8")
-        val jsval = context.eval("js", "let t=$src;Object.freeze(t)")
+    private fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
+        val src = file.readText(Charsets.UTF_8)
+        val jsval = context.eval("js", "Object.freeze($src)")
         val name = jsval.getMember("n").asString()
         val out = Array(256) { Array<String?>(4) { null } }
         for (keycode in 0L until 256L) {

@@ -20,16 +20,17 @@ class UIItemTextLineInput(
         parentUI: UICanvas,
         initialX: Int, initialY: Int,
         override val width: Int,
-        override val height: Int = 24,
-        var placeholder: String? = null,
+        var placeholder: () -> String = { "" },
         val enablePasteButton: Boolean = true,
         val enableLanguageButton: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
+    override val height = 24
+
     companion object {
         val TEXTINPUT_COL_TEXT = Color.WHITE
-        val TEXTINPUT_COL_BORDER = Toolkit.Theme.COL_ACTIVE
-        val TEXTINPUT_COL_BORDER_INACTIVE = Toolkit.Theme.COL_INACTIVE
+        val TEXTINPUT_COL_TEXT_HALF = Color.WHITE.cpy().mul(1f,1f,1f,0.5f)
+        val TEXTINPUT_COL_TEXT_DISABLED = Toolkit.Theme.COL_DISABLED
         val TEXTINPUT_COL_BACKGROUND = Toolkit.Theme.COL_CELL_FILL
         const val CURSOR_BLINK_TIME = 1f / 3f
     }
@@ -37,7 +38,6 @@ class UIItemTextLineInput(
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 4, height - 4, true)
 
     var isActive = true
-    var isGreyedOut = false
 
     var cursorX = 0 // 1 per char (not codepoint)
     var cursorCodepoint = 0
@@ -46,9 +46,11 @@ class UIItemTextLineInput(
     var cursorBlinkCounter = 0f
     var cursorOn = true
 
-    val keybuf = StringBuilder()
+    private val textbuf = StringBuilder()
 
     private var fboUpdateLatch = true
+
+    private var currentPlaceholderText = placeholder() // the placeholder text may change every time you call it
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -64,22 +66,22 @@ class UIItemTextLineInput(
 
                 if (cursorX > 0 && keycodes.contains(Input.Keys.BACKSPACE)) {
                     cursorCodepoint -= 1
-                    val lastCp = keybuf.codePointAt(cursorCodepoint)
+                    val lastCp = textbuf.codePointAt(cursorCodepoint)
                     val charCount = Character.charCount(lastCp)
                     cursorX -= charCount
-                    keybuf.delete(cursorX, cursorX + charCount)
+                    textbuf.delete(cursorX, cursorX + charCount)
 
                     cursorDrawX -= App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
                     codepointCount -= 1
                 }
                 else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
                     cursorCodepoint -= 1
-                    cursorX -= Character.charCount(keybuf.codePointAt(cursorCodepoint))
-                    val lastCp = keybuf.codePointAt(cursorCodepoint)
+                    cursorX -= Character.charCount(textbuf.codePointAt(cursorCodepoint))
+                    val lastCp = textbuf.codePointAt(cursorCodepoint)
                     cursorDrawX -= App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
                 }
                 else if (cursorX < codepointCount && keycodes.contains(Input.Keys.RIGHT)) {
-                    val lastCp = keybuf.codePointAt(cursorCodepoint)
+                    val lastCp = textbuf.codePointAt(cursorCodepoint)
                     cursorDrawX += App.fontGame.getWidth(String(Character.toChars(lastCp))) - 1
                     cursorX += Character.charCount(lastCp)
                     cursorCodepoint += 1
@@ -88,13 +90,17 @@ class UIItemTextLineInput(
                 // - literal "<"
                 // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
                 else if (char != null && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                    keybuf.insert(cursorX, char)
+                    textbuf.insert(cursorX, char)
 
                     cursorDrawX += App.fontGame.getWidth(char) - 1
                     cursorX += char.length
                     codepointCount += 1
                     cursorCodepoint += 1
                 }
+            }
+
+            if (cursorCodepoint == 0) {
+                currentPlaceholderText = placeholder()
             }
 
             cursorBlinkCounter += delta
@@ -117,7 +123,7 @@ class UIItemTextLineInput(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                App.fontGame.draw(it, "$keybuf", 0f, 0f)
+                App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else "$textbuf", 0f, 0f)
             } }
         }
 
@@ -126,25 +132,26 @@ class UIItemTextLineInput(
         batch.color = TEXTINPUT_COL_BACKGROUND
         Toolkit.fillArea(batch, posX, posY, width, height)
 
-        batch.color = if (isActive) TEXTINPUT_COL_BORDER else TEXTINPUT_COL_BORDER_INACTIVE
+        batch.color = if (isActive) Toolkit.Theme.COL_HIGHLIGHT else if (mouseUp) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
 
-        batch.color = TEXTINPUT_COL_TEXT
+        batch.color = if (textbuf.isEmpty()) TEXTINPUT_COL_TEXT_DISABLED else TEXTINPUT_COL_TEXT
         batch.draw(fbo.colorBufferTexture, posX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
         if (isActive && cursorOn) {
-            val oldBatchCol = batch.color.cpy()
-
-            batch.color = batch.color.mul(0.5f,0.5f,0.5f,1f)
+            batch.color = TEXTINPUT_COL_TEXT_HALF
             Toolkit.fillArea(batch, posX + cursorDrawX + 3, posY, 2, 24)
 
-            batch.color = oldBatchCol
+            batch.color = TEXTINPUT_COL_TEXT
             Toolkit.fillArea(batch, posX + cursorDrawX + 3, posY, 1, 23)
         }
 
 
         super.render(batch, camera)
     }
+
+    fun getText() = textbuf.toString()
+    fun getTextOrPlaceholder() = if (textbuf.isEmpty()) currentPlaceholderText else getText()
 
     override fun dispose() {
         fbo.dispose()

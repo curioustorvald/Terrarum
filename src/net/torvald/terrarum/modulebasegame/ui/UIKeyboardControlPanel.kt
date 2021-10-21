@@ -6,11 +6,15 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.EMDASH
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.DefaultConfig
+import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -27,14 +31,16 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
-    override var width = 600
+    override var width = 480
     override var height = 600
     override var openCloseTime = 0f
+
+    private val textSelWidth = 300
 
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    internal val kbx = drawX + 61
+    internal val kbx = drawX + 1
     internal val kby = drawY + 95
 
     private val oneu = 28
@@ -127,9 +133,25 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 480) / 2, kby + 219)
 
-    private val textInputPanel = UIItemTextLineInput(this, drawX, 360, width)
+
+    private val lowLayerCodes = IME.getAllLowLayers()
+    private val lowLayerNames = lowLayerCodes.map { { IME.getLowLayerByName(it).name } }
+    private val keyboardLayoutSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 400, lowLayerNames, lowLayerCodes.linearSearch { it == App.getConfigString("basekeyboardlayout") }!!, textSelWidth)
+
+    private val imeCodes = listOf("null", "ko_kr_2set_standard", "ko_kr_3set_390")
+    private val imeNames = listOf({ "$EMDASH" },{ "표준 두벌식" },{ "세벌식 3-90" })
+    private val imeSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 440, imeNames, 0, textSelWidth)
+
+
+
+    private val keyboardTestPanel = UIItemTextLineInput(this, drawX + (width - 480) / 2 + 3, 480, 474)
+
 
     init {
+        keyboardLayoutSelection.selectionChangeListener = {
+            App.setConfig("basekeyboardlayout", lowLayerCodes[it])
+        }
+
         keycaps.values.forEach { addUIitem(it) }
         updateKeycaps()
 
@@ -139,7 +161,9 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             updateKeycaps()
         }
 
-        addUIitem(textInputPanel)
+        addUIitem(keyboardLayoutSelection)
+        addUIitem(imeSelection)
+        addUIitem(keyboardTestPanel)
     }
 
     private fun resetKeyConfig() {
@@ -210,6 +234,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         if (keycapClicked >= 0 && controlSelected < 0) {
             controlPalette.render(batch, camera)
         }
+        App.fontGame.draw(batch, Lang["MENU_LABEL_KEYBOARD_LAYOUT"], kbx + 1, keyboardLayoutSelection.initialY)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], kbx + 1, imeSelection.initialY)
 
 
         val title = Lang["MENU_CONTROLS_KEYBOARD"]
@@ -282,14 +308,14 @@ class UIItemKeycap(
     var selected = false
 
     private val borderKeyForbidden = Color(0x000000C0)
-    private val borderKeyNormal = Color(0xFFFFFFAA.toInt())
+    private val borderKeyNormal = Toolkit.Theme.COL_INACTIVE
     private val borderMouseUp = Toolkit.Theme.COL_ACTIVE
     private val borderKeyPressed = Toolkit.Theme.COL_HIGHLIGHT
     private val borderKeyPressedAndSelected = Color(0x33FF33FF.toInt())
 
     private val keycapFill = Toolkit.Theme.COL_CELL_FILL
 
-    private val keylabelCol = Color(0xFFFFFF40.toInt())
+    private val keylabelCol = Toolkit.Theme.COL_DISABLED
     private val configuredKeyCol = Color.WHITE
 
     override fun update(delta: Float) {

@@ -87,7 +87,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     /** If mouse is hovering over it */
     open val mouseUp: Boolean
-        get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
+        get() = relativeMouseX in 0 until width && relativeMouseY in 0 until height
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
         get() = mouseUp && Terrarum.mouseDown

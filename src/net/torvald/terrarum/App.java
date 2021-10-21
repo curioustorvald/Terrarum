@@ -23,6 +23,7 @@ import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gameactors.BlockMarkerActor;
+import net.torvald.terrarum.gamecontroller.IME;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
@@ -178,6 +179,7 @@ public class App implements ApplicationListener {
     public static CreateTileAtlas tileMaker;
 
     public static GameFontBase fontGame;
+    public static GameFontBase fontGameFBO;
     public static TinyAlphNum fontSmallNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
@@ -491,20 +493,18 @@ public class App implements ApplicationListener {
             environment = RunningEnvironment.PC;
         }*/
 
-
         fontGame = new GameFontBase(FONT_DIR, false, true, false,
                 Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
                 256, false, 0.5f, false
+        );
+        fontGameFBO = new GameFontBase(FONT_DIR, false, true, false,
+                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
+                64, false, 203f/255f, false
         );
         Lang.invoke();
 
         // make loading list
         CommonResourcePool.INSTANCE.loadAll();
-
-        // create tile atlas
-        printdbg(this, "Making terrain textures...");
-        tileMaker = new CreateTileAtlas();
-        tileMaker.invoke(false);
     }
 
     @Override
@@ -742,6 +742,7 @@ public class App implements ApplicationListener {
         shapeRender.dispose();
 
         fontGame.dispose();
+        fontGameFBO.dispose();
         fontSmallNumbers.dispose();
         ItemSlotImageFactory.INSTANCE.dispose();
 
@@ -823,6 +824,13 @@ public class App implements ApplicationListener {
      * Init stuffs which needs GL context
      */
     private void postInit() {
+        // create tile atlas
+        printdbg(this, "Making terrain textures...");
+        tileMaker = new CreateTileAtlas();
+        tileMaker.invoke(false);
+
+        IME.INSTANCE.invoke();
+
         Terrarum.initialise();
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
