@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.itemList
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
+import net.torvald.terrarum.ui.Toolkit.Theme.COL_INVENTORY_CELL_BORDER
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 
@@ -82,7 +82,7 @@ class UIItemInventoryEquippedView(
         blendNormal(batch)
         batch.color = spriteViewBackCol
         Toolkit.fillArea(batch, posX, posY, width, width)
-        batch.color = DEFAULT_BOX_BORDER_COL
+        batch.color = COL_INVENTORY_CELL_BORDER
         Toolkit.drawBoxBorder(batch, posX, posY, width, width)
 
 

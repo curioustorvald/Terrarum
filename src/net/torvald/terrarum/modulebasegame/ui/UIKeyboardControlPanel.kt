@@ -44,9 +44,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val threeu = 84
     private val spaceu = 188
 
-    private val borderNormal = Color(0xFFFFFF80.toInt())
-    private val fillCol = Color(0x80)
-
     private val keycaps = hashMapOf(
             Input.Keys.GRAVE to UIItemKeycap(this, 1, 1, null, oneu, ""),
             Input.Keys.NUM_1 to UIItemKeycap(this, 33,1,  Input.Keys.NUM_1, oneu, "1,3"),
@@ -286,11 +283,11 @@ class UIItemKeycap(
 
     private val borderKeyForbidden = Color(0x000000C0)
     private val borderKeyNormal = Color(0xFFFFFFAA.toInt())
-    private val borderMouseUp = UIItemTextButton.defaultActiveCol
-    private val borderKeyPressed = UIItemTextButton.defaultHighlightCol
+    private val borderMouseUp = Toolkit.Theme.COL_ACTIVE
+    private val borderKeyPressed = Toolkit.Theme.COL_HIGHLIGHT
     private val borderKeyPressedAndSelected = Color(0x33FF33FF.toInt())
 
-    private val keycapFill = Color(0x28282888)
+    private val keycapFill = Toolkit.Theme.COL_CELL_FILL
 
     private val keylabelCol = Color(0xFFFFFF40.toInt())
     private val configuredKeyCol = Color.WHITE
@@ -346,7 +343,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
-    private val buttonBackground = Color(0x2C2C2CFF)
+    private val buttonBackground = Toolkit.Theme.COL_CELL_FILL.cpy().add(0f,0f,0f,1f)
 
     private val iconButtons = arrayOf(
             // left up right down

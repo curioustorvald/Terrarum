@@ -468,7 +468,7 @@ class UIItemPlayerCells(
     internal var hasTexture = false
         private set
 
-    private val litCol = UIItemTextButton.defaultActiveCol
+    private val litCol = Toolkit.Theme.COL_ACTIVE
     private val cellCol = CELL_COL
     private val defaultCol = Color.WHITE
     private val hruleCol = Color(1f,1f,1f,0.35f)
@@ -645,7 +645,7 @@ class UIItemWorldCells(
             hasTexture = true
         }
 
-        val highlightCol = if (mouseUp) UIItemTextButton.defaultActiveCol else Color.WHITE
+        val highlightCol = if (mouseUp) Toolkit.Theme.COL_ACTIVE else Color.WHITE
         val x = posX.toFloat()
         val y = posY.toFloat()
 

@@ -9,9 +9,8 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.Toolkit.DEFAULT_BOX_BORDER_COL
+import net.torvald.terrarum.ui.Toolkit.Theme.COL_INVENTORY_CELL_BORDER
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextButton
 import kotlin.math.roundToInt
 
 /**
@@ -24,13 +23,13 @@ class UIItemInventoryElemSimple(
         override var item: GameItem?,
         override var amount: Int,
         override var itemImage: TextureRegion?,
-        val mouseOverTextCol: Color = Color(0xfff066_ff.toInt()),
+        val mouseOverTextCol: Color = Toolkit.Theme.COL_ACTIVE,
         val mouseoverBackCol: Color = Color(0),
         val mouseoverBackBlendMode: String = BlendMode.NORMAL,
-        val inactiveTextCol: Color = UIItemTextButton.defaultInactiveCol,
+        val inactiveTextCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
         val backCol: Color = Color(0),
         val backBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        val highlightCol: Color = Toolkit.Theme.COL_HIGHLIGHT,
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
@@ -69,7 +68,7 @@ class UIItemInventoryElemSimple(
             }
             Toolkit.fillArea(batch, posX, posY, width, height)
         }
-        batch.color = DEFAULT_BOX_BORDER_COL
+        batch.color = COL_INVENTORY_CELL_BORDER
         //blendNormal(batch)
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 

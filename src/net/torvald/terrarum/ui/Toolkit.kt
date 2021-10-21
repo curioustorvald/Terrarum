@@ -22,7 +22,17 @@ import org.lwjgl.opengl.GL20
  */
 object Toolkit : Disposable {
 
-    val DEFAULT_BOX_BORDER_COL = Color(1f, 1f, 1f, 0.2f)
+    object Theme {
+        val COL_INVENTORY_CELL_BORDER = Color(1f, 1f, 1f, 0.2f)
+        val COL_CELL_FILL = Color(0x28282888)
+
+        val COL_LIST_DEFAULT = Color.WHITE
+        val COL_INACTIVE = Color.LIGHT_GRAY
+        val COL_ACTIVE = Color(0xfff066_ff.toInt()) // yellow
+        val COL_HIGHLIGHT = Color(0x00f8ff_ff) // cyan
+        val COL_DISABLED = Color(0xaaaaaaff.toInt())
+    }
+
 
     val shaderBlur: ShaderProgram
         get() = if (IngameRenderer.isDither()) IngameRenderer.shaderBlurDither else IngameRenderer.shaderBlurRaw

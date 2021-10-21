@@ -28,9 +28,9 @@ class UIItemTextLineInput(
 
     companion object {
         val TEXTINPUT_COL_TEXT = Color.WHITE
-        val TEXTINPUT_COL_BORDER = UIItemTextButton.defaultActiveCol
-        val TEXTINPUT_COL_BORDER_INACTIVE = Color.LIGHT_GRAY
-        val TEXTINPUT_COL_BACKGROUND = Color(0x28282888)
+        val TEXTINPUT_COL_BORDER = Toolkit.Theme.COL_ACTIVE
+        val TEXTINPUT_COL_BORDER_INACTIVE = Toolkit.Theme.COL_INACTIVE
+        val TEXTINPUT_COL_BACKGROUND = Toolkit.Theme.COL_CELL_FILL
         const val CURSOR_BLINK_TIME = 1f / 3f
     }
 
@@ -48,7 +48,7 @@ class UIItemTextLineInput(
 
     val keybuf = StringBuilder()
 
-    private var fboUpdateLatch = false
+    private var fboUpdateLatch = true
 
     override fun update(delta: Float) {
         super.update(delta)

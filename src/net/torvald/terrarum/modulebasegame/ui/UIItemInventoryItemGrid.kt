@@ -16,10 +16,10 @@ import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
-import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.floor
 
@@ -239,7 +239,7 @@ class UIItemInventoryItemGrid(
                 activeBackCol = Color(0),
                 highlightBackCol = Color(0),
                 activeBackBlendMode = BlendMode.NORMAL,
-                activeCol = defaultActiveCol,
+                activeCol = Toolkit.Theme.COL_ACTIVE,
                 initialX = iconPosX,
                 initialY = getIconPosY(index),
                 highlightable = true
@@ -252,7 +252,7 @@ class UIItemInventoryItemGrid(
             backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = defaultActiveCol,
+            activeCol = Toolkit.Theme.COL_ACTIVE,
             initialX = iconPosX,
             initialY = getIconPosY(2),
             highlightable = false
@@ -264,7 +264,7 @@ class UIItemInventoryItemGrid(
             backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = defaultActiveCol,
+            activeCol = Toolkit.Theme.COL_ACTIVE,
             initialX = iconPosX,
             initialY = getIconPosY(3),
             highlightable = false

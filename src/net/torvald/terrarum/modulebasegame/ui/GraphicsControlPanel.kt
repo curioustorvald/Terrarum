@@ -78,7 +78,7 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
             batch.color = Color(0x00f8ff_40)
             Toolkit.fillArea(batch, xstart + 1, 1, App.scr.chatWidth - 2, App.scr.height - 2)
 
-            batch.color = UIItemTextButton.defaultActiveCol
+            batch.color = Toolkit.Theme.COL_ACTIVE
             Toolkit.drawBoxBorder(batch, xstart + 1, 1, App.scr.chatWidth - 2, App.scr.height - 2)
             val overlayResTxt = "${App.scr.chatWidth}$TIMES${App.scr.height}"
             App.fontGame.draw(batch, overlayResTxt,

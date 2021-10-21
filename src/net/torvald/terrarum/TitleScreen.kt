@@ -348,7 +348,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
             Toolkit.drawCentered(batch, warning32bitJavaIcon, yoff)
             for (i in 0..2) {
                 val text = Lang.get("GAME_32BIT_WARNING${i+1}", (i != 2))
-                if (i == 2) batch.color = UIItemTextButton.defaultHighlightCol
+                if (i == 2) batch.color = Toolkit.Theme.COL_HIGHLIGHT
                 App.fontGame.draw(batch, text, ((drawWidth - App.fontGame.getWidth(text)) / 2).toFloat(), yoff + imgTxtGap + 64f + linegap + i*(20+linegap))
             }
         }

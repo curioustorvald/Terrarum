@@ -26,23 +26,23 @@ class UIItemTextButtonList(
         val textAreaWidth: Int,
         val iconSpriteSheet: TextureRegionPack? = null,
         val iconSpriteSheetIndices: IntArray? = null,
-        val iconCol: Color = UIItemTextButton.defaultInactiveCol,
+        val iconCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
 
         // copied directly from UIItemTextButton
         /** Colour when mouse is over */
-        val activeCol: Color = UIItemTextButton.defaultActiveCol,
+        val activeCol: Color = Toolkit.Theme.COL_ACTIVE,
         /** Colour when mouse is over */
         val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
         /** Colour when mouse is over */
         val activeBackBlendMode: String = BlendMode.NORMAL,
         /** Colour when clicked/selected */
-        val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        val highlightCol: Color = Toolkit.Theme.COL_HIGHLIGHT,
         /** Colour when clicked/selected */
         val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
         /** Colour when clicked/selected */
         val highlightBackBlendMode: String = BlendMode.NORMAL,
         /** Colour on normal status */
-        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
+        val inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
         val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
 

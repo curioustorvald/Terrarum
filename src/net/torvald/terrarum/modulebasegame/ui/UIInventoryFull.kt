@@ -34,7 +34,7 @@ class UIInventoryFull(
     override var openCloseTime: Second = 0.0f
 
     companion object {
-        val CELL_COL = Color(0x28282888)
+        val CELL_COL = Toolkit.Theme.COL_CELL_FILL
 
         const val INVEN_DEBUG_MODE = false
 
