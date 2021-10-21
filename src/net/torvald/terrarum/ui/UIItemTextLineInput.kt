@@ -114,6 +114,23 @@ class UIItemTextLineInput(
 
     private var imeOn = false
 
+    private fun forceLitCursor() {
+        cursorBlinkCounter = 0f
+        cursorOn = true
+    }
+
+    private fun tryCursorBack() {
+        if (cursorDrawX > fbo.width) {
+            val d = cursorDrawX - fbo.width
+            cursorDrawScroll = d
+        }
+    }
+    private fun tryCursorForward() {
+        if (cursorDrawX - cursorDrawScroll < 0) {
+            cursorDrawScroll -= cursorDrawX
+        }
+    }
+
     override fun update(delta: Float) {
         super.update(delta)
         val mouseDown = Terrarum.mouseDown
@@ -128,9 +145,11 @@ class UIItemTextLineInput(
         if (isActive) {
             IngameController.withKeyboardEvent { (_, char, _, keycodes) ->
                 fboUpdateLatch = true
+                forceLitCursor()
 
                 if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
                     paste()
+                    tryCursorBack()
                 }
                 else if (keycodes.contains(Input.Keys.C) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
                     copyToClipboard()
@@ -139,15 +158,17 @@ class UIItemTextLineInput(
                     cursorX -= 1
                     textbuf.removeAt(cursorX)
                     cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                    tryCursorForward()
                 }
                 else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
                     cursorX -= 1
                     cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
-                    if (cursorDrawX < 0) cursorDrawX = 0
-                }
+                    tryCursorForward()
+                                 }
                 else if (cursorX < textbuf.size && keycodes.contains(Input.Keys.RIGHT)) {
                     cursorX += 1
                     cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                    tryCursorBack()
                 }
                 // accept:
                 // - literal "<"
@@ -160,8 +181,13 @@ class UIItemTextLineInput(
 
                         cursorX += codepoints.size
                         cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+
+                        tryCursorBack()
                     }
                 }
+
+                // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
+
             }
 
             if (textbuf.size == 0) {
@@ -210,6 +236,8 @@ class UIItemTextLineInput(
 
         cursorX += actuallyInserted.size
         cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+
+        tryCursorBack()
 
         fboUpdateLatch = true
     }
