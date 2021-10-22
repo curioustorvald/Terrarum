@@ -5,8 +5,16 @@ import java.io.File
 
 data class TerrarumKeyLayout(
         val name: String,
-        val symbols: Array<Array<String?>>?,
-        val acceptChar: ((Int) -> String?)? = null
+        val symbols: Array<Array<String?>>?
+)
+
+data class TerrarumInputMethod(
+        val name: String,
+        // (keycodes, shiftin, altgrin)
+        val acceptChar: (IntArray, Boolean, Boolean) -> Pair<String, String>, // Pair<Display Char, Output Char if any>
+        val endCompose: () -> String,
+        val reset: () -> Unit,
+        val composing: () -> Boolean
 )
 
 /**
@@ -26,8 +34,10 @@ object IME {
 
     const val KEYLAYOUT_DIR = "assets/keylayout/"
     const val KEYLAYOUT_EXTENSION = "key"
+    const val IME_EXTENSION = "ime"
 
     private val lowLayers = HashMap<String, TerrarumKeyLayout>()
+    private val highLayers = HashMap<String, TerrarumInputMethod>()
 
     private val context = org.graalvm.polyglot.Context.newBuilder("js")
             .allowHostAccess(org.graalvm.polyglot.HostAccess.NONE)
@@ -40,6 +50,11 @@ object IME {
             printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
             lowLayers[it.nameWithoutExtension.lowercase()] = parseKeylayoutFile(it)
         }
+
+        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$IME_EXTENSION") }.forEach {
+            printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
+            highLayers[it.nameWithoutExtension.lowercase()] = parseImeFile(it)
+        }
     }
 
     fun invoke() {}
@@ -48,15 +63,22 @@ object IME {
         return lowLayers[name.lowercase()]!!
     }
 
+    fun getHighLayerByName(name: String): TerrarumInputMethod {
+        return highLayers[name.lowercase()]!!
+    }
+
     fun getAllLowLayers(): List<String> {
         return lowLayers.keys.toList()
     }
 
+    fun getAllHighLayers(): List<String> {
+        return highLayers.keys.toList()
+    }
 
 
     private fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
         val src = file.readText(Charsets.UTF_8)
-        val jsval = context.eval("js", "Object.freeze($src)")
+        val jsval = context.eval("js", "'use strict';Object.freeze($src)")
         val name = jsval.getMember("n").asString()
         val out = Array(256) { Array<String?>(4) { null } }
         for (keycode in 0L until 256L) {
@@ -76,6 +98,25 @@ object IME {
 //        println("[IME] Test Keymap print for $name:"); for (keycode in 0 until 256) { print("$keycode:\t"); println(out[keycode].joinToString("\t")) }
 
         return TerrarumKeyLayout(name, out)
+    }
+
+    private fun parseImeFile(file: File): TerrarumInputMethod {
+        val src = file.readText(Charsets.UTF_8)
+        val jsval = context.eval("js", "'use strict';$src")
+        val name = jsval.getMember("n").asString()
+
+
+        return TerrarumInputMethod(name, { it, shifted, alted ->
+            val a = jsval.invokeMember("accept", context.eval("js", "'${it.joinToString(",")}'.split(',')"), shifted, alted)
+            a.getArrayElement(0).asString() to a.getArrayElement(1).asString()
+        }, {
+            jsval.invokeMember("end").asString()
+        }, {
+            jsval.invokeMember("reset")
+        }, {
+            jsval.invokeMember("composing").asBoolean()
+        }
+        )
     }
 
 }

@@ -138,18 +138,28 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val lowLayerNames = lowLayerCodes.map { { IME.getLowLayerByName(it).name } }
     private val keyboardLayoutSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 400, lowLayerNames, lowLayerCodes.linearSearch { it == App.getConfigString("basekeyboardlayout") }!!, textSelWidth)
 
-    private val imeCodes = listOf("null", "ko_kr_2set_standard", "ko_kr_3set_390")
-    private val imeNames = listOf({ "$EMDASH" },{ "표준 두벌식" },{ "세벌식 3-90" })
-    private val imeSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 440, imeNames, 0, textSelWidth)
+    private val imeCodes0 = IME.getAllHighLayers()
+    private val imeCodes = listOf("none") + IME.getAllHighLayers()
+    private val imeNames = listOf({"$EMDASH"}) + imeCodes0.map { { IME.getHighLayerByName(it).name } }
+    private val imeSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 440, imeNames, imeCodes.linearSearch { it == App.getConfigString("inputmethod") }!!, textSelWidth)
 
 
 
     private val keyboardTestPanel = UIItemTextLineInput(this, drawX + (width - 480) / 2 + 3, 480, 474, enableIMEButton = true, enablePasteButton = true)
 
 
+    private val keyboardConfigItems = listOf(
+            keyboardLayoutSelection,
+            imeSelection,
+            keyboardTestPanel
+    )
+
     init {
         keyboardLayoutSelection.selectionChangeListener = {
             App.setConfig("basekeyboardlayout", lowLayerCodes[it])
+        }
+        imeSelection.selectionChangeListener = {
+            App.setConfig("inputmethod", imeCodes[it])
         }
 
         keycaps.values.forEach { addUIitem(it) }
@@ -161,9 +171,9 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             updateKeycaps()
         }
 
-        addUIitem(keyboardLayoutSelection)
-        addUIitem(imeSelection)
-        addUIitem(keyboardTestPanel)
+//        addUIitem(keyboardLayoutSelection)
+//        addUIitem(imeSelection)
+//        addUIitem(keyboardTestPanel)
     }
 
     private fun resetKeyConfig() {
@@ -219,6 +229,9 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         if (keycapClicked >= 0 && controlSelected < 0) {
             controlPalette.update(delta)
         }
+        else  {
+            keyboardConfigItems.forEach { it.update(delta) }
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -231,14 +244,19 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
         batch.color = Color.WHITE
 
-        if (keycapClicked >= 0 && controlSelected < 0) {
-            controlPalette.render(batch, camera)
-        }
         App.fontGame.draw(batch, Lang["MENU_LABEL_KEYBOARD_LAYOUT"], kbx + 1, keyboardLayoutSelection.initialY)
         App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], kbx + 1, imeSelection.initialY)
 
 
+        if (keycapClicked >= 0 && controlSelected < 0) {
+            controlPalette.render(batch, camera)
+        }
+        else {
+            keyboardConfigItems.forEach { it.render(batch, camera) }
+        }
+
         val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        batch.color = Color.WHITE
         App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
     }
@@ -252,11 +270,19 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         buttonReset.touchDown(screenX, screenY, pointer, button)
+        keyboardConfigItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         buttonReset.touchUp(screenX, screenY, pointer, button)
+        keyboardConfigItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        super.scrolled(amountX, amountY)
+        keyboardConfigItems.forEach { it.scrolled(amountX, amountY) }
         return true
     }
 

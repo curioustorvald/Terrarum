@@ -8,10 +8,13 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gamecontroller.IngameController
+import net.torvald.terrarum.gamecontroller.TerrarumInputMethod
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import java.util.ArrayList
 import kotlin.streams.toList
 
 data class InputLenCap(val count: Int, val unit: CharLenUnit) {
@@ -87,7 +90,11 @@ class UIItemTextLineInput(
             true
     )
 
-    var isActive = true
+    var isActive: Boolean = true
+        set(value) {
+            resetIME()
+            field = value
+        }
 
     var cursorX = 0
     var cursorDrawScroll = 0
@@ -113,6 +120,21 @@ class UIItemTextLineInput(
         get() = buttonsShown > 0 && relativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
 
     private var imeOn = false
+    private var composingView = CodepointSequence()
+
+    private fun getIME(): TerrarumInputMethod? {
+        if (!imeOn) return null
+
+        val selectedIME = App.getConfigString("inputmethod")
+
+        if (selectedIME == "none") return null
+        try {
+            return IME.getHighLayerByName(selectedIME)
+        }
+        catch (e: NullPointerException) {
+            return null
+        }
+    }
 
     private fun forceLitCursor() {
         cursorBlinkCounter = 0f
@@ -139,13 +161,14 @@ class UIItemTextLineInput(
             isActive = mouseUp
         }
 
-        // TODO cursorDrawX kerning-aware
+        if (App.getConfigString("inputmethod") == "none") imeOn = false
 
         // process keypresses
         if (isActive) {
             IngameController.withKeyboardEvent { (_, char, _, keycodes) ->
                 fboUpdateLatch = true
                 forceLitCursor()
+                val ime = getIME()
 
                 if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
                     paste()
@@ -154,18 +177,37 @@ class UIItemTextLineInput(
                 else if (keycodes.contains(Input.Keys.C) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
                     copyToClipboard()
                 }
-                else if (cursorX > 0 && keycodes.contains(Input.Keys.BACKSPACE)) {
-                    cursorX -= 1
-                    textbuf.removeAt(cursorX)
-                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
-                    tryCursorForward()
+                else if (keycodes.contains(Input.Keys.BACKSPACE)) {
+                    if (ime != null && composingView.size > 0) {
+                        resetIME()
+                    }
+                    else if (cursorX <= 0) {
+                        cursorX = 0
+                        cursorDrawX = 0
+                        cursorDrawScroll = 0
+                    }
+                    else {
+                        if (cursorX > 0) {
+                            while (true) {
+                                cursorX -= 1
+                                val oldCode = textbuf.removeAt(cursorX)
+                                // continue deleting hangul pieces because of the font...
+                                if (cursorX == 0 || (oldCode !in 0x115F..0x11FF && oldCode !in 0xD7B0..0xD7FF)) break
+                            }
+
+                            cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                            tryCursorForward()
+                        }
+                    }
                 }
                 else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
+                    // TODO IME endComposing()
                     cursorX -= 1
                     cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
                     tryCursorForward()
                                  }
                 else if (cursorX < textbuf.size && keycodes.contains(Input.Keys.RIGHT)) {
+                    // TODO IME endComposing()
                     cursorX += 1
                     cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
                     tryCursorBack()
@@ -174,7 +216,18 @@ class UIItemTextLineInput(
                 // - literal "<"
                 // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
                 else if (char != null && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                    val codepoints = char.toCodePoints()
+                    val shiftin = keycodes.contains(Input.Keys.SHIFT_LEFT) || keycodes.contains(Input.Keys.SHIFT_RIGHT)
+                    val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
+
+                    val codepoints = if (ime != null) {
+                        val newStatus = ime.acceptChar(keycodes, shiftin, altgrin)
+                        composingView = CodepointSequence(newStatus.first.toCodePoints())
+
+                        newStatus.second.toCodePoints()
+                    }
+                    else char.toCodePoints()
+
+                    println("textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
 
                     if (!maxLen.exceeds(textbuf, codepoints)) {
                         textbuf.addAll(cursorX, codepoints)
@@ -191,7 +244,7 @@ class UIItemTextLineInput(
             }
 
             if (textbuf.size == 0) {
-                currentPlaceholderText = ArrayList(placeholder().toCodePoints())
+                currentPlaceholderText = CodepointSequence(placeholder().toCodePoints())
             }
 
             cursorBlinkCounter += delta
@@ -214,13 +267,27 @@ class UIItemTextLineInput(
         if (!mouseDown) mouseLatched = false
     }
 
-    private fun String.toCodePoints() = this.codePoints().toList()
+    private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }
 
     private fun toggleIME() {
+        if (App.getConfigString("inputmethod") == "none") {
+            imeOn = false
+            return
+        }
+
         imeOn = !imeOn
+
+        resetIME()
+    }
+
+    private fun resetIME() {
+        getIME()?.reset?.invoke()
+        composingView = CodepointSequence()
     }
 
     private fun paste() {
+        resetIME()
+
         val codepoints = Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints()
 
         val actuallyInserted = arrayListOf(0)
@@ -306,20 +373,20 @@ class UIItemTextLineInput(
         }
 
 
-
         // draw text
         batch.color = if (textbuf.isEmpty()) TEXTINPUT_COL_TEXT_DISABLED else TEXTINPUT_COL_TEXT
         batch.draw(fbo.colorBufferTexture, posX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
         // draw text cursor
+        val cursorXOnScreen = posX - cursorDrawScroll + cursorDrawX + 3
         if (isActive && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
             batch.color = baseCol.cpy().mul(0.5f,0.5f,0.5f,1f)
-            Toolkit.fillArea(batch, posX - cursorDrawScroll + cursorDrawX + 3, posY, 2, 24)
+            Toolkit.fillArea(batch, cursorXOnScreen, posY, 2, 24)
 
             batch.color = baseCol
-            Toolkit.fillArea(batch, posX - cursorDrawScroll + cursorDrawX + 3, posY, 1, 23)
+            Toolkit.fillArea(batch, cursorXOnScreen, posY, 1, 23)
         }
 
         // draw icon
@@ -343,6 +410,19 @@ class UIItemTextLineInput(
         }
 
 
+        // compose view background
+        if (composingView.size > 0) {
+            val previewTextWidth = App.fontGame.getWidth(composingView)
+            val previewWindowWidth = previewTextWidth.coerceAtLeast(20)
+            batch.color = TEXTINPUT_COL_BACKGROUND
+            Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, previewWindowWidth, 20)
+            // compose view border
+            batch.color = Toolkit.Theme.COL_ACTIVE
+            Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, previewWindowWidth + 2, 22)
+            // compose view text
+            App.fontGame.draw(batch, composingView, cursorXOnScreen + 2 + (previewWindowWidth - previewTextWidth) / 2, posY + 27)
+        }
+
         super.render(batch, camera)
     }
 
@@ -353,5 +433,13 @@ class UIItemTextLineInput(
         fbo.dispose()
     }
 
+    /*private fun CodepointSequence.toJavaString(): String {
+        val sb = StringBuilder()
+        this.forEach {
+            sb.append(Character.toChars(it))
+        }
+        return sb.toString()
+    }*/
 
 }
+

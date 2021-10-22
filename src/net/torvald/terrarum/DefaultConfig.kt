@@ -100,7 +100,8 @@ object DefaultConfig {
             "fx_differential" to false,
             //"fx_3dlut" to false,
 
-            "basekeyboardlayout" to "us_qwerty"
+            "basekeyboardlayout" to "us_qwerty",
+            "inputmethod" to "none"
 
 
             // settings regarding debugger
