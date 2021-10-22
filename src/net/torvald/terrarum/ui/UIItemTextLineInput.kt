@@ -165,7 +165,7 @@ class UIItemTextLineInput(
 
         // process keypresses
         if (isActive) {
-            IngameController.withKeyboardEvent { (_, char, _, keycodes) ->
+            IngameController.withKeyboardEvent { (_, char, headkey, _, keycodes) ->
                 fboUpdateLatch = true
                 forceLitCursor()
                 val ime = getIME()
@@ -195,7 +195,7 @@ class UIItemTextLineInput(
                                 if (cursorX == 0 || (oldCode !in 0x115F..0x11FF && oldCode !in 0xD7B0..0xD7FF)) break
                             }
 
-                            cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
                             tryCursorForward()
                         }
                     }
@@ -203,13 +203,13 @@ class UIItemTextLineInput(
                 else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
                     // TODO IME endComposing()
                     cursorX -= 1
-                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                    cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
                     tryCursorForward()
                                  }
                 else if (cursorX < textbuf.size && keycodes.contains(Input.Keys.RIGHT)) {
                     // TODO IME endComposing()
                     cursorX += 1
-                    cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                    cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
                     tryCursorBack()
                 }
                 // accept:
@@ -220,7 +220,7 @@ class UIItemTextLineInput(
                     val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
 
                     val codepoints = if (ime != null) {
-                        val newStatus = ime.acceptChar(keycodes, shiftin, altgrin)
+                        val newStatus = ime.acceptChar(headkey, shiftin, altgrin)
                         composingView = CodepointSequence(newStatus.first.toCodePoints())
 
                         newStatus.second.toCodePoints()
@@ -233,7 +233,7 @@ class UIItemTextLineInput(
                         textbuf.addAll(cursorX, codepoints)
 
                         cursorX += codepoints.size
-                        cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
 
                         tryCursorBack()
                     }
@@ -302,7 +302,7 @@ class UIItemTextLineInput(
         textbuf.addAll(cursorX, actuallyInserted)
 
         cursorX += actuallyInserted.size
-        cursorDrawX = App.fontGame.getWidth(textbuf.subList(0, cursorX))
+        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
 
         tryCursorBack()
 

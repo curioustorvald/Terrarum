@@ -10,8 +10,8 @@ data class TerrarumKeyLayout(
 
 data class TerrarumInputMethod(
         val name: String,
-        // (keycodes, shiftin, altgrin)
-        val acceptChar: (IntArray, Boolean, Boolean) -> Pair<String, String>, // Pair<Display Char, Output Char if any>
+        // (headkey, shiftin, altgrin)
+        val acceptChar: (Int, Boolean, Boolean) -> Pair<String, String>, // Pair<Display Char, Output Char if any>
         val endCompose: () -> String,
         val reset: () -> Unit,
         val composing: () -> Boolean
@@ -106,8 +106,8 @@ object IME {
         val name = jsval.getMember("n").asString()
 
 
-        return TerrarumInputMethod(name, { it, shifted, alted ->
-            val a = jsval.invokeMember("accept", context.eval("js", "'${it.joinToString(",")}'.split(',')"), shifted, alted)
+        return TerrarumInputMethod(name, { headkey, shifted, alted ->
+            val a = jsval.invokeMember("accept", headkey, shifted, alted)
             a.getArrayElement(0).asString() to a.getArrayElement(1).asString()
         }, {
             jsval.invokeMember("end").asString()

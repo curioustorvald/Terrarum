@@ -276,7 +276,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     companion object {
         data class TerrarumKeyboardEvent(
                 val type: Int,
-                val character: String?,
+                val character: String?, // representative key symbol
+                val headkey: Int, // representative keycode
                 val repeatCount: Int,
                 val keycodes: IntArray
         )
@@ -318,11 +319,15 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 else if (shiftin && newKeysym0[1]?.isNotBlank() == true) newKeysym0[1]
                 else newKeysym0[0]
 
+                val headKeyCode = if (keyDiff.size < 1) keys[0] else keyDiff[0]
+
                 if (!keyChanged) {
-                    callback(TerrarumKeyboardEvent(KEY_DOWN, keysym, repeatCount, keys))
+//                    println("KEY_DOWN '$keysym' ($headKeyCode) $repeatCount; ${keys.joinToString()}")
+                    callback(TerrarumKeyboardEvent(KEY_DOWN, keysym, headKeyCode, repeatCount, keys))
                 }
                 else if (newKeysym != null) {
-                    callback(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, repeatCount, keys))
+//                    println("KEY_DOWC '$newKeysym' ($headKeyCode) $repeatCount; ${keys.joinToString()}")
+                    callback(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, headKeyCode, repeatCount, keys))
                 }
 
                 oldKeys = keys // don't put this outside of if-cascade
@@ -346,7 +351,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         private fun keysToStr(keymap: TerrarumKeyLayout, keys: IntArray): Array<String?>? {
             if (keys.size == 0) return null
             val headkey = keys[0]
-            return if (keymap.symbols!![headkey] == null) null else keymap.symbols!![headkey]
+            return keymap.symbols?.get(headkey)
         }
 
         private fun strobeKeys(): IntArray {

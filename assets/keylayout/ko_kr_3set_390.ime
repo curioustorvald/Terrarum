@@ -282,7 +282,7 @@ let jongseongDigraphsG = {"\u11A8":"\u11A9", "\u11BA":"\u11AA"}
 let jongseongDigraphsN = {"\u11BD":"\u11AC", "\u11C2":"\u11AD"}
 let jongseongDigraphsR = {"\u11A8":"\u11B0", "\u11B7":"\u11B1", "\u11B8":"\u11B2", "\u11BA":"\u11B3", "\u11C0":"\u11B4", "\u11C1":"\u11B5", "\u11C2":"\u11B6"}
 let jongseongDigraphsB = {"\u11BA":"\u11B9"}
-let bufAssemble = () => {
+let bufAssemble = (isPreview) => {
     if (states.buf[0] === undefined && states.buf[1] === undefined && states.buf[2] === undefined)
         return ''
     else if (states.buf[1] === undefined && isHangul(states.buf[0]))
@@ -291,32 +291,42 @@ let bufAssemble = () => {
         return ["\u115F", states.buf[1], states.buf[2]].join('')
     else if (isHangul(states.buf[2]) && states.buf[0] === undefined && states.buf[1] === undefined )
         return ["\u115F", "\u1160", states.buf[2]].join('')
+    else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
+        let i = states.buf[0].charCodeAt(0) - 0x1100
+        let p = states.buf[1].charCodeAt(0) - 0x1161
+        let f = states.buf[2].charCodeAt(0) - 0x11A7
+        return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28) + f)
+    }
+    else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
+        let i = states.buf[0].charCodeAt(0) - 0x1100
+        let p = states.buf[1].charCodeAt(0) - 0x1161
+        return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28))
+    }
+    // TODO normalise Hangul IPF to hangul compats but only when NOT in preview mode
     else
         return states.buf.join('')
 }
 Object.freeze({"n":"세벌식 3-90","states":states,
 // return: [displayed output, composed output]
-"accept":(keycodes,shiftin,altgrin)=>{
+"accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1
 
-    let purekeys = keycodes.filter(it => (
+    /*let purekeys = keycodes.filter(it => (
             inRange(it,7,18) || // numeric
             inRange(it,29,56) || // alph
             it == 62 || // space
             inRange(it,66,76) || // symbols
             inRange(it,144,163) // numpad
     ))
-    let headkey = purekeys[0]
+    let headkey = purekeys[0]*/
 
     let s = states.keylayouts[headkey][layer]
     let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
 
-    console.log(`IME accepting keycodes ${keycodes}`)
-
     if (isHangul(s)) {
-        // ㄲ ㄸ ㅃ ㅆ ㅉ
-        if (0 == bufIndex && isChoseongDigraph(states.buf[0]) && isChoseongDigraph(s)) {
+        // ㄲ ㄸ ㅃ ㅆ ㅉ (only allow when the jung/jongseong is not typed)
+        if (0 == bufIndex && undefined == states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
             states.buf[0] = choseongDigraphs[s]
         }
         // ㅘ ㅙ ㅚ
@@ -352,19 +362,19 @@ Object.freeze({"n":"세벌식 3-90","states":states,
             let sendout = bufAssemble(); reset()
             states.buf[bufIndex] = s
             console.log(`sending out: ${sendout}`)
-            return [bufAssemble(), sendout]
+            return [bufAssemble(1), sendout]
         }
         else {
             states.buf[bufIndex] = s
             console.log(`assembling: ${bufAssemble()}`)
         }
 
-        return [bufAssemble(), ""]
+        return [bufAssemble(1), ""]
     }
     else {
         let sendout = bufAssemble() + s; reset()
         console.log(`sending out: ${sendout}`)
-        return [bufAssemble(), sendout]
+        return [bufAssemble(1), sendout]
     }
 },
 "end":()=>{
