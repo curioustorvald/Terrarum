@@ -14,7 +14,6 @@ import net.torvald.terrarum.gamecontroller.TerrarumInputMethod
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import java.util.ArrayList
 import kotlin.streams.toList
 
 data class InputLenCap(val count: Int, val unit: CharLenUnit) {
@@ -205,7 +204,12 @@ class UIItemTextLineInput(
                     cursorX -= 1
                     cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
                     tryCursorForward()
-                                 }
+                    if (cursorX <= 0) {
+                        cursorX = 0
+                        cursorDrawX = 0
+                        cursorDrawScroll = 0
+                    }
+                }
                 else if (cursorX < textbuf.size && keycodes.contains(Input.Keys.RIGHT)) {
                     // TODO IME endComposing()
                     cursorX += 1

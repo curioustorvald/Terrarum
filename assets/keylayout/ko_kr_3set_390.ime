@@ -379,8 +379,9 @@ Object.freeze({"n":"세벌식 3-90","states":states,
 },
 "end":()=>{
     console.log(`end composing`)
+    let ret = bufAssemble()
     reset()
-    return bufAssemble()
+    return ret
 },
 "reset":()=>{ reset() },
 "composing":()=>(states.code!=0)
