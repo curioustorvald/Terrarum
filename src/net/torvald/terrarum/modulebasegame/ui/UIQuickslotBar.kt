@@ -68,11 +68,11 @@ class UIQuickslotBar : UICanvas() {
 
 
     override fun doOpening(delta: Float) {
-        handler.opacity = handler.openCloseCounter.toFloat() / openCloseTime
+        handler.opacity = handler.openCloseCounter / openCloseTime
     }
 
     override fun doClosing(delta: Float) {
-        handler.opacity = (openCloseTime - handler.openCloseCounter.toFloat()) / openCloseTime
+        handler.opacity = (openCloseTime - handler.openCloseCounter) / openCloseTime
     }
 
     override fun endOpening(delta: Float) {
@@ -81,14 +81,6 @@ class UIQuickslotBar : UICanvas() {
 
     override fun endClosing(delta: Float) {
         handler.opacity = 0f
-    }
-
-    override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        // super.scrolled(amount) // no UIItems here
-
-        selection = selection.plus(if (amountY > 1) 1 else if (amountY < -1) -1 else 0).fmod(SLOT_COUNT)
-
-        return true
     }
 
     override fun dispose() {

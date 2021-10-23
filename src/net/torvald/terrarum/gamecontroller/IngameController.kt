@@ -18,6 +18,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.util.*
 
@@ -244,14 +245,17 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (!terrarumIngame.paused) {
             // quickslot by wheel
-            if (terrarumIngame.actorNowPlaying != null) {
-                terrarumIngame.actorNowPlaying!!.actorValue.set(
-                        AVKey.__PLAYER_QUICKSLOTSEL,
-                        (terrarumIngame.actorNowPlaying!!.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!! - amountY.toInt()) fmod terrarumIngame.actorNowPlaying!!.inventory.quickSlot.size
-                )
+            terrarumIngame.actorNowPlaying?.let {
+                var selection = it.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!!
+
+                if (amountX <= -1 || amountY <= -1)
+                    selection -= 1
+                else if (amountX >= 1 || amountY >= 1)
+                    selection += 1
+
+                it.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, selection fmod UIQuickslotBar.SLOT_COUNT)
             }
         }
-
         terrarumIngame.uiContainer.forEach { it?.scrolled(amountX, amountY) }
         return true
     }

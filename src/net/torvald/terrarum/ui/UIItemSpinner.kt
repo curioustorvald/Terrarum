@@ -53,6 +53,8 @@ class UIItemSpinner(
                     1
                 else if (relativeMouseX in width - buttonW..width && relativeMouseY in 0..height)
                     2
+                else if (relativeMouseX in buttonW + 3..width - buttonW - 3 && relativeMouseY in 0..height)
+                    3
                 else
                     0
 
@@ -93,8 +95,10 @@ class UIItemSpinner(
             Toolkit.fillArea(batch, posX + width - buttonW, posY, buttonW, height)
 
             // text area border
-            batch.color = Toolkit.Theme.COL_INACTIVE
-            Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
+            if (mouseOnButton != 3) {
+                batch.color = Toolkit.Theme.COL_INACTIVE
+                Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
+            }
 
             // left button border
             batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
@@ -105,6 +109,12 @@ class UIItemSpinner(
             batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
             else if (mouseOnButton == 2) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
             Toolkit.drawBoxBorder(batch, posX + width - buttonW - 1, posY - 1, buttonW + 2, height + 2)
+
+            // text area border (again)
+            if (mouseOnButton == 3) {
+                batch.color = Toolkit.Theme.COL_ACTIVE
+                Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 4, height + 2)
+            }
         }
 
         // left button icon
@@ -123,6 +133,22 @@ class UIItemSpinner(
 
 
         super.render(batch, camera)
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        if (mouseUp) {
+            if (amountX <= -1 || amountY <= -1)
+                value = (value - step).coerceIn(min, max)
+            else if (amountX >= 1 || amountY >= 1)
+                value = (value + step).coerceIn(min, max)
+
+            selectionChangeListener(value)
+            fboUpdateLatch = true
+            return true
+        }
+        else {
+            return false
+        }
     }
 
     override fun dispose() {
