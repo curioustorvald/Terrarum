@@ -282,27 +282,56 @@ let jongseongDigraphsG = {"\u11A8":"\u11A9", "\u11BA":"\u11AA"}
 let jongseongDigraphsN = {"\u11BD":"\u11AC", "\u11C2":"\u11AD"}
 let jongseongDigraphsR = {"\u11A8":"\u11B0", "\u11B7":"\u11B1", "\u11B8":"\u11B2", "\u11BA":"\u11B3", "\u11C0":"\u11B4", "\u11C1":"\u11B5", "\u11C2":"\u11B6"}
 let jongseongDigraphsB = {"\u11BA":"\u11B9"}
+let normaliseLUT = {
+// Hangul Jamo Initials → Hangul Compatibility Jamo
+"\u1100":"\u3131","\u1101":"\u3132","\u1102":"\u3134","\u1103":"\u3137","\u1104":"\u3138",
+"\u1105":"\u3139","\u1106":"\u3141","\u1107":"\u3142","\u1108":"\u3143","\u1109":"\u3145",
+"\u110A":"\u3146","\u110B":"\u3147","\u110C":"\u3148","\u110D":"\u3149","\u110E":"\u314A",
+"\u110F":"\u314B","\u1110":"\u314C","\u1111":"\u314D","\u1112":"\u314E",
+// Hangul Jamo Peaks → Hangul Compatibility Jamo
+"\u1161":"\u314F","\u1162":"\u3150","\u1163":"\u3151","\u1164":"\u3152","\u1165":"\u3153",
+"\u1166":"\u3154","\u1167":"\u3155","\u1168":"\u3156","\u1169":"\u3157","\u116A":"\u3158",
+"\u116B":"\u3159","\u116C":"\u315A","\u116D":"\u315B","\u116E":"\u315C","\u116F":"\u315D",
+"\u1170":"\u315E","\u1171":"\u315F","\u1172":"\u3160","\u1173":"\u3161","\u1174":"\u3162",
+"\u1175":"\u3163",
+// Hangul Jamo Finals → Hangul Compatibility Jamo
+"\u11A8":"\u3131","\u11A9":"\u3132","\u11AA":"\u3133","\u11AB":"\u3134","\u11AC":"\u3135",
+"\u11AD":"\u3136","\u11AE":"\u3137","\u11AF":"\u3139","\u11B0":"\u313A","\u11B1":"\u313B",
+"\u11B2":"\u313C","\u11B3":"\u313D","\u11B4":"\u313E","\u11B5":"\u313F","\u11B6":"\u3140",
+"\u11B7":"\u3141","\u11B8":"\u3142","\u11B9":"\u3144","\u11BA":"\u3145","\u11BB":"\u3146",
+"\u11BC":"\u3147","\u11BD":"\u3148","\u11BE":"\u314A","\u11BF":"\u314B","\u11C0":"\u314C",
+"\u11C1":"\u314D","\u11C2":"\u314E"
+}
+let normaliseBuf = (it) => normaliseLUT[it] || it
 let bufAssemble = (isPreview) => {
+    // nothing on the buffer
     if (states.buf[0] === undefined && states.buf[1] === undefined && states.buf[2] === undefined)
         return ''
+    // Normalise unterminated hangul assembly
+    else if (!isPreview)
+        return states.buf.map(it => normaliseBuf(it)).join('')
+    // Hangul: I x F
     else if (states.buf[1] === undefined && isHangul(states.buf[0]))
         return [states.buf[0], "\u1160", states.buf[2]].join('')
+    // Hangul: x P F
     else if (states.buf[0] === undefined && isHangul(states.buf[1]))
         return ["\u115F", states.buf[1], states.buf[2]].join('')
+    // Hangul: x x F
     else if (isHangul(states.buf[2]) && states.buf[0] === undefined && states.buf[1] === undefined )
         return ["\u115F", "\u1160", states.buf[2]].join('')
+    // Hangul: I P F
     else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
         let i = states.buf[0].charCodeAt(0) - 0x1100
         let p = states.buf[1].charCodeAt(0) - 0x1161
         let f = states.buf[2].charCodeAt(0) - 0x11A7
         return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28) + f)
     }
+    // Hangul: I P x
     else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
         let i = states.buf[0].charCodeAt(0) - 0x1100
         let p = states.buf[1].charCodeAt(0) - 0x1161
         return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28))
     }
-    // TODO normalise Hangul IPF to hangul compats but only when NOT in preview mode
     else
         return states.buf.join('')
 }
