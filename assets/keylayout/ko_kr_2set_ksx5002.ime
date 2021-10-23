@@ -30,7 +30,7 @@ let states = {"keylayouts":[[""],[undefined],
 ["\u3160"],
 ["\u314A"],
 ["\u3147"],
-["\u3137"],
+["\u3137","\u3138"],
 ["\u3139"],
 ["\u314E"],
 ["\u3157"],
@@ -281,6 +281,7 @@ let jongseongDigraphsN = {"\u3148":"\u3135", "\u314E":"\u3136"}
 let jongseongDigraphsR = {"\u3131":"\u313A", "\u3141":"\u313B", "\u3142":"\u313C", "\u3145":"\u313D", "\u314C":"\u313E", "\u314D":"\u313F", "\u314E":"\u3140"}
 let jongseongDigraphsB = {"\u3145":"\u3144"}
 let isThisCharJongseongDigraph = (s) => (s === undefined) ? false : ([0x3133, 0x3135, 0x3136, 0x313A, 0x313B, 0x313C, 0x313D, 0x313E, 0x313F, 0x3140, 0x3144].includes(s.charCodeAt(0)))
+let isThisCharJungseongDigraph = (s) => (s === undefined) ? false : ([0x3158, 0x3159, 0x315A, 0x315D, 0x315E, 0x315F, 0x3162].includes(s.charCodeAt(0)))
 let choseongTable = {"\u3131":0,"\u3132":1,"\u3134":2,"\u3137":3,"\u3138":4,"\u3139":5,"\u3141":6,"\u3142":7,"\u3143":8,"\u3145":9,"\u3146":10,"\u3147":11,"\u3148":12,"\u3149":13,"\u314A":14,"\u314B":15,"\u314C":16,"\u314D":17,"\u314E":18}
 let jongseongTable = {"\u3131":0,"\u3132":1,"\u3133":2,"\u3134":3,"\u3135":4,"\u3136":5,"\u3137":6,"\u3139":7,"\u313A":8,"\u313B":9,"\u313C":10,"\u313D":11,"\u313E":12,"\u313F":13,"\u3140":14,"\u3141":15,"\u3142":16,"\u3144":17,"\u3145":18,"\u3146":19,"\u3147":20,"\u3148":21,"\u314A":22,"\u314B":23,"\u314C":24,"\u314D":25,"\u314E":26}
 let detachJongseongDigraph = {
@@ -295,6 +296,15 @@ let detachJongseongDigraph = {
 "\u313F":["\u3139","\u314D"],
 "\u3140":["\u3139","\u314E"],
 "\u3144":["\u3142","\u3145"]
+}
+let detachJungseongDigraph = {
+"\u3158":["\u3157","\u314F"],
+"\u3159":["\u3157","\u3150"],
+"\u315A":["\u3157","\u314E"],
+"\u315D":["\u315C","\u3153"],
+"\u315E":["\u315C","\u3154"],
+"\u315F":["\u315C","\u3163"],
+"\u3162":["\u3161","\u3163"]
 }
 let bufAssemble = (isPreview) => {
     // nothing on the buffer
@@ -414,6 +424,27 @@ return Object.freeze({"n":"두벌식 표준","states":states,
 //        console.log(`sending out: ${oldbufstr} -> ${sendout}`)
         return [bufAssemble(1), sendout]
     }
+},
+"backspace":()=>{
+    // disassemble jung/jongseong digraphs
+//    let oldbufstr = bufDebugStringify(states.buf)
+    let last = states.buf.pop()
+
+    if (last !== undefined) {
+        // detach jongseong
+        if (isThisCharJongseongDigraph(last))
+            states.buf[2] = detachJongseongDigraph[last][0]
+        // detach jungseong
+        else if (isThisCharJungseongDigraph(last))
+            states.buf[1] = detachJungseongDigraph[last][0]
+    }
+
+    if (states.buf.length == 0) reset()
+
+//    let newbufstr = bufDebugStringify(states.buf)
+//    console.log(`popping assembly: ${oldbufstr} -> ${newbufstr}`)
+
+    return bufAssemble(1)
 },
 "end":()=>{
 //    console.log(`end composing`)
