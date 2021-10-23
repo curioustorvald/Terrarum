@@ -14,7 +14,6 @@ import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.ui.*
-import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -136,12 +135,12 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val lowLayerCodes = IME.getAllLowLayers()
     private val lowLayerNames = lowLayerCodes.map { { IME.getLowLayerByName(it).name } }
-    private val keyboardLayoutSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 400, lowLayerNames, lowLayerCodes.linearSearch { it == App.getConfigString("basekeyboardlayout") }!!, textSelWidth)
+    private val keyboardLayoutSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 400, lowLayerNames, lowLayerCodes.linearSearch { it == App.getConfigString("basekeyboardlayout") } ?: throw IME.LayoutNotFound(App.getConfigString("basekeyboardlayout")), textSelWidth)
 
     private val imeCodes0 = IME.getAllHighLayers()
     private val imeCodes = listOf("none") + IME.getAllHighLayers()
     private val imeNames = listOf({"$EMDASH"}) + imeCodes0.map { { IME.getHighLayerByName(it).name } }
-    private val imeSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 440, imeNames, imeCodes.linearSearch { it == App.getConfigString("inputmethod") }!!, textSelWidth)
+    private val imeSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 440, imeNames, imeCodes.linearSearch { it == App.getConfigString("inputmethod") } ?: throw IME.LayoutNotFound(App.getConfigString("inputmethod")), textSelWidth)
 
 
 

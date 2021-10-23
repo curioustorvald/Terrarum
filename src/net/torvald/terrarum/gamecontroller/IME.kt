@@ -33,6 +33,8 @@ data class TerrarumInputMethod(
  */
 object IME {
 
+    class LayoutNotFound(id: String): NullPointerException("Keyboard layout not found: $id")
+
     const val KEYLAYOUT_DIR = "assets/keylayout/"
     const val KEYLAYOUT_EXTENSION = "key"
     const val IME_EXTENSION = "ime"

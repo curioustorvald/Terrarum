@@ -7,20 +7,19 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * @param width width of the text input where the text gets drawn, not the entire item
- * @param height height of the text input where the text gets drawn, not the entire item
- *
- * Created by minjaesong on 2021-10-21.
+ * Created by minjaesong on 2021-10-23.
  */
-class UIItemTextSelector(
+
+class UIItemSpinner(
         parentUI: UICanvas,
         initialX: Int, initialY: Int,
-        val labelfuns: List<() -> String>,
-        intialSelection: Int,
+        initialValue: Int,
+        val min: Int,
+        val max: Int,
+        val step: Int,
         override val width: Int,
         private val drawBorder: Boolean = true
 ) : UIItem(parentUI, initialX, initialY) {
@@ -39,7 +38,7 @@ class UIItemTextSelector(
 
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, true)
 
-    var selection = intialSelection
+    var value = initialValue.coerceIn(min, max)
     private var fboUpdateLatch = true
 
     private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
@@ -59,9 +58,9 @@ class UIItemTextSelector(
 
         if (!mouseLatched && Terrarum.mouseDown && mouseOnButton != 0) {
             mouseLatched = true
-            selection = (selection + (mouseOnButton * 2) - 3) fmod labelfuns.size
+            value = (value + step * ((mouseOnButton * 2) - 3)).coerceIn(min, max)
             fboUpdateLatch = true
-            selectionChangeListener(selection)
+            selectionChangeListener(value)
         }
         else if (!Terrarum.mouseDown) mouseLatched = false
     }
@@ -76,7 +75,7 @@ class UIItemTextSelector(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                val t = labelfuns[selection]()
+                val t = "$value"
                 val tw = App.fontGame.getWidth(t)
                 App.fontGameFBO.draw(it, t, (fbo.width - tw) / 2, 0)
             } }
@@ -111,12 +110,12 @@ class UIItemTextSelector(
         // left button icon
         batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
         else if (mouseOnButton == 1) Toolkit.Theme.COL_ACTIVE else UIItemTextLineInput.TEXTINPUT_COL_TEXT
-        batch.draw(labels.get(16,0), posX + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
+        batch.draw(labels.get(9,2), posX + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // right button icon
         batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
         else if (mouseOnButton == 2) Toolkit.Theme.COL_ACTIVE else UIItemTextLineInput.TEXTINPUT_COL_TEXT
-        batch.draw(labels.get(17,0), posX + width - buttonW + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
+        batch.draw(labels.get(10,2), posX + width - buttonW + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // draw text
         batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
