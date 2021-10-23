@@ -280,7 +280,7 @@ let jongseongDigraphsG = {"\u3145":"\u3133"}
 let jongseongDigraphsN = {"\u3148":"\u3135", "\u314E":"\u3136"}
 let jongseongDigraphsR = {"\u3131":"\u313A", "\u3141":"\u313B", "\u3142":"\u313C", "\u3145":"\u313D", "\u314C":"\u313E", "\u314D":"\u313F", "\u314E":"\u3140"}
 let jongseongDigraphsB = {"\u3145":"\u3144"}
-let isJongseongDigraph = (s) => (s === undefined) ? false : ([0x3133, 0x3135, 0x3136, 0x313A, 0x313B, 0x313C, 0x313D, 0x313E, 0x313F, 0x3140, 0x3144].includes(s.charCodeAt(0)))
+let isThisCharJongseongDigraph = (s) => (s === undefined) ? false : ([0x3133, 0x3135, 0x3136, 0x313A, 0x313B, 0x313C, 0x313D, 0x313E, 0x313F, 0x3140, 0x3144].includes(s.charCodeAt(0)))
 let choseongTable = {"\u3131":0,"\u3132":1,"\u3134":2,"\u3137":3,"\u3138":4,"\u3139":5,"\u3141":6,"\u3142":7,"\u3143":8,"\u3145":9,"\u3146":10,"\u3147":11,"\u3148":12,"\u3149":13,"\u314A":14,"\u314B":15,"\u314C":16,"\u314D":17,"\u314E":18}
 let jongseongTable = {"\u3131":0,"\u3132":1,"\u3133":2,"\u3134":3,"\u3135":4,"\u3136":5,"\u3137":6,"\u3139":7,"\u313A":8,"\u313B":9,"\u313C":10,"\u313D":11,"\u313E":12,"\u313F":13,"\u3140":14,"\u3141":15,"\u3142":16,"\u3144":17,"\u3145":18,"\u3146":19,"\u3147":20,"\u3148":21,"\u314A":22,"\u314B":23,"\u314C":24,"\u314D":25,"\u314E":26}
 let detachJongseongDigraph = {
@@ -375,7 +375,7 @@ return Object.freeze({"n":"두벌식 표준","states":states,
         else if (states.buf[bufIndex] !== undefined) {
             let oldbufstr = bufDebugStringify(states.buf)
             let sendout = ''
-            if (vowelCollision && isJongseongDigraph(states.buf[2])) {
+            if (vowelCollision && isThisCharJongseongDigraph(states.buf[2])) {
                 let digraphs = detachJongseongDigraph[states.buf[2]]
                 let newbuf = [digraphs[1], s]
                 states.buf = [states.buf[0], states.buf[1], digraphs[0]]

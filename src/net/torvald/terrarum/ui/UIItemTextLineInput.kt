@@ -176,8 +176,7 @@ class UIItemTextLineInput(
                 }
                 else if (keycodes.contains(Input.Keys.BACKSPACE)) {
                     if (ime != null && ime.composing()) {
-                        // TODO ime.backspace() instead of resetIME()
-                        resetIME()
+                        composingView = CodepointSequence(ime.backspace().toCodePoints())
                     }
                     else if (cursorX <= 0) {
                         cursorX = 0
@@ -185,6 +184,7 @@ class UIItemTextLineInput(
                         cursorDrawScroll = 0
                     }
                     else {
+                        endComposing()
                         if (cursorX > 0) {
                             while (true) {
                                 cursorX -= 1

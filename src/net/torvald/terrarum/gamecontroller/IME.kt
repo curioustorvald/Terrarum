@@ -12,6 +12,7 @@ data class TerrarumInputMethod(
         val name: String,
         // (headkey, shiftin, altgrin)
         val acceptChar: (Int, Boolean, Boolean) -> Pair<String, String>, // Pair<Display Char, Output Char if any>
+        val backspace: () -> String,
         val endCompose: () -> String,
         val reset: () -> Unit,
         val composing: () -> Boolean
@@ -109,6 +110,8 @@ object IME {
         return TerrarumInputMethod(name, { headkey, shifted, alted ->
             val a = jsval.invokeMember("accept", headkey, shifted, alted)
             a.getArrayElement(0).asString() to a.getArrayElement(1).asString()
+        }, {
+            jsval.invokeMember("backspace").asString()
         }, {
             jsval.invokeMember("end").asString()
         }, {
