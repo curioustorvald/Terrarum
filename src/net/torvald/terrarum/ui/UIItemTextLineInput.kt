@@ -90,10 +90,6 @@ class UIItemTextLineInput(
     )
 
     var isActive: Boolean = true
-        set(value) {
-            resetIME()
-            field = value
-        }
 
     var cursorX = 0
     var cursorDrawScroll = 0
@@ -171,10 +167,11 @@ class UIItemTextLineInput(
                 val ime = getIME()
 
                 if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
-                    paste()
-                    tryCursorBack()
+                    endComposing()
+                    paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
                 }
                 else if (keycodes.contains(Input.Keys.C) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
+                    endComposing()
                     copyToClipboard()
                 }
                 else if (keycodes.contains(Input.Keys.BACKSPACE)) {
@@ -200,22 +197,28 @@ class UIItemTextLineInput(
                         }
                     }
                 }
-                else if (cursorX > 0 && keycodes.contains(Input.Keys.LEFT)) {
-                    // TODO IME endComposing()
-                    cursorX -= 1
-                    cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                    tryCursorForward()
-                    if (cursorX <= 0) {
-                        cursorX = 0
-                        cursorDrawX = 0
-                        cursorDrawScroll = 0
+                else if (keycodes.contains(Input.Keys.LEFT)) {
+                    endComposing()
+
+                    if (cursorX > 0) {
+                        cursorX -= 1
+                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                        tryCursorForward()
+                        if (cursorX <= 0) {
+                            cursorX = 0
+                            cursorDrawX = 0
+                            cursorDrawScroll = 0
+                        }
                     }
                 }
-                else if (cursorX < textbuf.size && keycodes.contains(Input.Keys.RIGHT)) {
-                    // TODO IME endComposing()
-                    cursorX += 1
-                    cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                    tryCursorBack()
+                else if (keycodes.contains(Input.Keys.RIGHT)) {
+                    endComposing()
+
+                    if (cursorX < textbuf.size) {
+                        cursorX += 1
+                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                        tryCursorBack()
+                    }
                 }
                 // accept:
                 // - literal "<"
@@ -232,7 +235,7 @@ class UIItemTextLineInput(
                     }
                     else char.toCodePoints()
 
-                    println("textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
+//                    println("textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
 
                     if (!maxLen.exceeds(textbuf, codepoints)) {
                         textbuf.addAll(cursorX, codepoints)
@@ -243,7 +246,9 @@ class UIItemTextLineInput(
                         tryCursorBack()
                     }
                 }
-                // TODO IME endComposing() on hitting Enter
+                else if (keycodes.contains(Input.Keys.ENTER) || keycodes.contains(Input.Keys.NUMPAD_ENTER)) {
+                    endComposing()
+                }
 
                 // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
 
@@ -260,8 +265,8 @@ class UIItemTextLineInput(
                 cursorOn = !cursorOn
             }
         }
-        else if (oldActive) { // just became disactivated
-            // TODO IME endComposing()
+        else if (oldActive) { // just became deactivated
+            endComposing()
         }
 
         if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton1 || enableIMEButton && !enablePasteButton && mouseUpOnButton2)) {
@@ -269,7 +274,7 @@ class UIItemTextLineInput(
             mouseLatched = true
         }
         else if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton2 || enablePasteButton && !enableIMEButton && mouseUpOnButton2)) {
-            paste()
+            paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
             mouseLatched = true
         }
 
@@ -277,6 +282,15 @@ class UIItemTextLineInput(
     }
 
     private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }
+
+    private fun endComposing() {
+        getIME()?.let {
+            val s = it.endCompose()
+            paste(s.toCodePoints())
+        }
+        fboUpdateLatch = true
+        resetIME()
+    }
 
     private fun toggleIME() {
         if (App.getConfigString("inputmethod") == "none") {
@@ -294,10 +308,8 @@ class UIItemTextLineInput(
         composingView = CodepointSequence()
     }
 
-    private fun paste() {
+    private fun paste(codepoints: List<Int>) {
         resetIME()
-
-        val codepoints = Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints()
 
         val actuallyInserted = arrayListOf(0)
 
