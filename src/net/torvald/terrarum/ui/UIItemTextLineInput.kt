@@ -175,7 +175,8 @@ class UIItemTextLineInput(
                     copyToClipboard()
                 }
                 else if (keycodes.contains(Input.Keys.BACKSPACE)) {
-                    if (ime != null && composingView.size > 0) {
+                    if (ime != null && ime.composing()) {
+                        // TODO ime.backspace() instead of resetIME()
                         resetIME()
                     }
                     else if (cursorX <= 0) {
@@ -274,6 +275,7 @@ class UIItemTextLineInput(
             mouseLatched = true
         }
         else if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton2 || enablePasteButton && !enableIMEButton && mouseUpOnButton2)) {
+            endComposing()
             paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
             mouseLatched = true
         }
@@ -289,18 +291,19 @@ class UIItemTextLineInput(
             paste(s.toCodePoints())
         }
         fboUpdateLatch = true
-        resetIME()
+        composingView = CodepointSequence()
+//        resetIME() // not needed; IME will reset itself
     }
 
     private fun toggleIME() {
+        endComposing()
+
         if (App.getConfigString("inputmethod") == "none") {
             imeOn = false
             return
         }
 
         imeOn = !imeOn
-
-        resetIME()
     }
 
     private fun resetIME() {
@@ -309,8 +312,6 @@ class UIItemTextLineInput(
     }
 
     private fun paste(codepoints: List<Int>) {
-        resetIME()
-
         val actuallyInserted = arrayListOf(0)
 
         for (c in codepoints) {
