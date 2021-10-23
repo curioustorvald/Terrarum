@@ -101,8 +101,8 @@ object IME {
     }
 
     private fun parseImeFile(file: File): TerrarumInputMethod {
-        val src = file.readText(Charsets.UTF_8)
-        val jsval = context.eval("js", "'use strict';$src")
+        val code = file.readText(Charsets.UTF_8)
+        val jsval = context.eval("js", "\"use strict\";(function(){$code})()")
         val name = jsval.getMember("n").asString()
 
 

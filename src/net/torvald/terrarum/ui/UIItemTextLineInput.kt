@@ -155,6 +155,7 @@ class UIItemTextLineInput(
     override fun update(delta: Float) {
         super.update(delta)
         val mouseDown = Terrarum.mouseDown
+        val oldActive = isActive
 
         if (mouseDown) {
             isActive = mouseUp
@@ -242,6 +243,7 @@ class UIItemTextLineInput(
                         tryCursorBack()
                     }
                 }
+                // TODO IME endComposing() on hitting Enter
 
                 // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
 
@@ -257,6 +259,9 @@ class UIItemTextLineInput(
                 cursorBlinkCounter -= CURSOR_BLINK_TIME
                 cursorOn = !cursorOn
             }
+        }
+        else if (oldActive) { // just became disactivated
+            // TODO IME endComposing()
         }
 
         if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton1 || enableIMEButton && !enablePasteButton && mouseUpOnButton2)) {
