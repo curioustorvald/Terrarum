@@ -58,7 +58,7 @@ class UIItemSpinner(
                 else
                     0
 
-        if (!mouseLatched && Terrarum.mouseDown && mouseOnButton != 0) {
+        if (!mouseLatched && Terrarum.mouseDown && mouseOnButton in 1..2) {
             mouseLatched = true
             value = (value + step * ((mouseOnButton * 2) - 3)).coerceIn(min, max)
             fboUpdateLatch = true
