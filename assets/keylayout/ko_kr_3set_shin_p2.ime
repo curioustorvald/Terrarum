@@ -4,16 +4,16 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u110F",")"],
-["\u11C2","\u11BD"],
-["\u11BB","@"],
-["\u11B8","#"],
-["\u116D","$"],
-["\u1172","%"],
-["\u1163","^"],
-["\u1168","&"],
-["\u1174","*"],
-["\u116E","("],
+["0",")"],
+["1","!"],
+["2","@"],
+["3","#"],
+["4","$"],
+["5","%"],
+["6","^"],
+["7","&"],
+["8","*"],
+["9","("],
 ["*"],
 ["#"],
 [undefined],
@@ -26,34 +26,34 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u11BC","\u11AE"],
-["\u116E","!"],
-["\u1166","\u11B1"],
-["\u1175","\u11B0"],
-["\u1167","\u11BF"],
-["\u1161","\u11A9"],
-["\u1173","/"],
-["\u1102","'"],
-["\u1106","8"],
-["\u110B","4"],
-["\u1100","5"],
-["\u110C","6"],
-["\u1112","1"],
-["\u1109","0"],
-["\u110E","9"],
-["\u1111",">"],
-["\u11BA","\u11C1"],
-["\u1162","\u1164"],
-["\u11AB","\u11AD"],
-["\u1165",";"],
-["\u1103","7"],
-["\u1169","\u11B6"],
-["\u11AF","\u11C0"],
-["\u11A8","\u11B9"],
-["\u1105","<"],
-["\u11B7","\u11BE"],
-[",","2"],
-[".","3"],
+["\u11BC","\u1172","\u1172"],
+["\u11BE","\u116E","\u116E"],
+["\u11A8","\u1166","\u1166"],
+["\u11C2","\u1175","\u1175"],
+["\u11B8","\u1162","\u1162"],
+["\u11C1","\u1161","\u1161"],
+["\u11AE","\u1173","\u1173"],
+["\u1102","\u25A1"],
+["\u1106","\u1173","\u1173"],
+["\u110B","'"],
+["\u1100",'"'],
+["\u110C","\u00B7"],
+["\u1112","\u2026"],
+["\u1109","\u2014"],
+["\u110E","\u116E","\u116E"],
+["\u1111",";"],
+["\u11BA","\u1164","\u1164"],
+["\u11C0","\u1165","\u1165"],
+["\u11AB","\u1168","\u1168"],
+["\u11BF","\u1167","\u1167"],
+["\u1103","\u25CB"],
+["\u11BD","\u1169","\u1169"],
+["\u11AF","\u1163","\u1163"],
+["\u11BB","\u116D","\u116D"],
+["\u1105","\u00D7"],
+["\u11B7"],
+[",","<"],
+[".",">"],
 [undefined],
 [undefined],
 [undefined],
@@ -72,8 +72,8 @@ let states = {"keylayouts":[[""],[undefined],
 ["]","}"],
 ["\\","|"],
 ["\u1107",":"],
-["\u1110",'"'],
-["\u1169","?"],
+["\u1110",'/'],
+["\u110F","?","\u1169"],
 [undefined],
 [undefined],
 [undefined],
@@ -255,10 +255,13 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined]
 ],
 "code":0,
-"buf":[]}
+"buf":[],
+"hasDeadkey":false
+}
 let reset = () => {
     states.code = 0
     states.buf = []
+    states.hasDeadkey = false
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
 let isHangul = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1100, 0x11C2)
@@ -284,6 +287,7 @@ let jongseongDigraphsG = {"\u11A8":"\u11A9", "\u11BA":"\u11AA"}
 let jongseongDigraphsN = {"\u11BD":"\u11AC", "\u11C2":"\u11AD"}
 let jongseongDigraphsR = {"\u11A8":"\u11B0", "\u11B7":"\u11B1", "\u11B8":"\u11B2", "\u11BA":"\u11B3", "\u11C0":"\u11B4", "\u11C1":"\u11B5", "\u11C2":"\u11B6"}
 let jongseongDigraphsB = {"\u11BA":"\u11B9"}
+let isJungseongDeadkey = (keynum) => 37 == keynum || 43 == keynum || 76 == keynum
 let detachChoseongDigraph = {
 "\u1101":["\u1100","\u1100"],
 "\u1104":["\u1103","\u1103"],
@@ -369,7 +373,7 @@ let bufAssemble = (isPreview) => {
         return states.buf.join('')
 }
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
-return Object.freeze({"n":"세벌식 3-90","states":states,"c":"CuriousTo\uA75Bvald",
+return Object.freeze({"n":"신세벌식 P2","states":states,"c":"CuriousTo\uA75Bvald",
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
@@ -384,10 +388,30 @@ return Object.freeze({"n":"세벌식 3-90","states":states,"c":"CuriousTo\uA75Bv
     ))
     let headkey = purekeys[0]*/
 
-    let s = states.keylayouts[headkey][layer]
-    let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
 
-    if (isHangul(s)) {
+    let s = states.keylayouts[headkey][layer]
+    let s2 = states.keylayouts[headkey][2]
+    let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
+    let oldDeadkeyStatus = states.hasDeadkey
+    let hangulLayoutAutoShiftin = oldDeadkeyStatus || (isChoseong(states.buf[0]) && undefined == states.buf[1] && s2 != undefined)
+
+    if (hangulLayoutAutoShiftin && isJungseongDeadkey(headkey)) {
+        states.hasDeadkey = true
+    }
+
+    if (isHangul(s) || hangulLayoutAutoShiftin) {
+        // auto-change alternative layer if choseong is in the buffer already
+        // unshift when jungseong is there
+        // Korean threesetters call this feature "Galmadeuri" Input
+        if (hangulLayoutAutoShiftin) {
+            s = s2
+            bufIndex = 1
+
+            if (oldDeadkeyStatus)
+                states.hasDeadkey = false
+        }
+
+
         // ㄲ ㄸ ㅃ ㅆ ㅉ (only allow when the jung/jongseong is not typed)
         if (0 == bufIndex && undefined == states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
             states.buf[0] = choseongDigraphs[s]
