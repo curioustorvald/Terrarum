@@ -7,10 +7,7 @@ import net.torvald.TIMES
 import net.torvald.terrarum.App
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextButton
-import net.torvald.terrarum.ui.UIItemToggleButton
+import net.torvald.terrarum.ui.*
 
 /**
  * Created by minjaesong on 2021-10-06.
@@ -21,6 +18,7 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
     override var height = 400
     override var openCloseTime = 0f
 
+    private val spinnerWidth = 136
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
@@ -29,25 +27,49 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
     private val panelgap = 20
 
     private val options = arrayOf(
-            arrayOf("fx_dither", "Dither"),
-            arrayOf("fx_backgroundblur", "Blur"),
-            arrayOf("fx_streamerslayout", Lang["MENU_OPTION_STREAMERS_LAYOUT"]),
-            arrayOf("usevsync", Lang["MENU_OPTIONS_VSYNC"]+"*")
+            arrayOf("fx_dither", Lang["MENU_OPTIONS_DITHER"], "toggle"),
+            arrayOf("fx_backgroundblur", Lang["MENU_OPTIONS_BLUR"], "toggle"),
+            arrayOf("fx_streamerslayout", Lang["MENU_OPTION_STREAMERS_LAYOUT"], "toggle"),
+            arrayOf("usevsync", Lang["MENU_OPTIONS_VSYNC"]+"*", "toggle"),
+            arrayOf("maxparticles", Lang["MENU_OPTIONS_PARTICLES"], "spinner,256,1024,256")
     )
 
-    private val togglers = options.mapIndexed { index, strings ->
-        UIItemToggleButton(this,
+    private fun makeButton(args: String, x: Int, y: Int, optionName: String): UIItem {
+        return if (args.startsWith("toggle")) {
+            UIItemToggleButton(this, x - 75, y, App.getConfigBoolean(optionName))
+        }
+        else if (args.startsWith("spinner,")) {
+            val arg = args.split(',')
+            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth)
+        }
+        else throw IllegalArgumentException(args)
+    }
+
+    private val optionControllers = options.mapIndexed { index, strings ->
+        makeButton(options[index][2],
+                drawX + width - panelgap,
+                drawY + panelgap - 2 + index * (20 + linegap),
+                options[index][0]
+        )
+        /*UIItemToggleButton(this,
                 drawX + width - panelgap - 75,
                 drawY + panelgap - 2 + index * (20 + linegap),
                 App.getConfigBoolean(options[index][0])
-        )
+        )*/
     }
 
     init {
-        togglers.forEachIndexed { i, it ->
-            it.clickOnceListener = { _,_,_ ->
-                it.toggle()
-                App.setConfig(options[i][0], it.getStatus())
+        optionControllers.forEachIndexed { i, it ->
+            if (it is UIItemToggleButton) {
+                it.clickOnceListener = { _, _, _ ->
+                    it.toggle()
+                    App.setConfig(options[i][0], it.getStatus())
+                }
+            }
+            else if (it is UIItemSpinner) {
+                it.selectionChangeListener = {
+                    App.setConfig(options[i][0], it)
+                }
             }
 
             addUIitem(it)
@@ -59,7 +81,7 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        batch.color = Color.WHITE
+        batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 
         batch.color = CELL_COL

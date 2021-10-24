@@ -14,5 +14,8 @@
   "MENU_OPTION_STREAMERS_LAYOUT": "스트리머 채팅창 모드",
   "MENU_LABEL_RESTART_REQUIRED": "재시작 필요",
   "MENU_LABEL_KEYBOARD_LAYOUT": "자판 배열",
-  "MENU_LABEL_IME": "입력기"
+  "MENU_LABEL_IME": "입력기",
+  "MENU_OPTIONS_DITHER": "디더링",
+  "MENU_OPTIONS_BLUR": "흐림",
+  "MENU_OPTIONS_PARTICLES": "입자 수"
 }
