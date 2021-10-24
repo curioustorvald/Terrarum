@@ -115,7 +115,7 @@ class UIItemTextLineInput(
         get() = buttonsShown > 0 && relativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
 
     private var imeOn = false
-    private var composingView = CodepointSequence()
+    private var candidates: List<CodepointSequence> = listOf()
 
     private fun getIME(): TerrarumInputMethod? {
         if (!imeOn) return null
@@ -176,7 +176,7 @@ class UIItemTextLineInput(
                 }
                 else if (keycodes.contains(Input.Keys.BACKSPACE)) {
                     if (ime != null && ime.composing()) {
-                        composingView = CodepointSequence(ime.backspace().toCodePoints())
+                        candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
                     }
                     else if (cursorX <= 0) {
                         cursorX = 0
@@ -230,7 +230,7 @@ class UIItemTextLineInput(
 
                     val codepoints = if (ime != null) {
                         val newStatus = ime.acceptChar(headkey, shiftin, altgrin)
-                        composingView = CodepointSequence(newStatus.first.toCodePoints())
+                        candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
 
                         newStatus.second.toCodePoints()
                     }
@@ -291,7 +291,7 @@ class UIItemTextLineInput(
             paste(s.toCodePoints())
         }
         fboUpdateLatch = true
-        composingView = CodepointSequence()
+        candidates = listOf()
 //        resetIME() // not needed; IME will reset itself
     }
 
@@ -308,7 +308,7 @@ class UIItemTextLineInput(
 
     private fun resetIME() {
         getIME()?.reset?.invoke()
-        composingView = CodepointSequence()
+        candidates = listOf()
     }
 
     private fun paste(codepoints: List<Int>) {
@@ -432,17 +432,25 @@ class UIItemTextLineInput(
         }
 
 
-        // compose view background
-        if (composingView.size > 0) {
-            val previewTextWidth = App.fontGame.getWidth(composingView)
-            val previewWindowWidth = previewTextWidth.coerceAtLeast(20)
+        // draw candidates view
+        if (candidates.isNotEmpty()) {
+            val textWidths = candidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
+
+            val candidateWinW = (textWidths.maxOrNull() ?: 0).coerceAtLeast(20)
+            val candidateWinH = App.fontGame.lineHeight.toInt() * candidates.size
+
+            // candidate view background
             batch.color = TEXTINPUT_COL_BACKGROUND
-            Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, previewWindowWidth, 20)
-            // compose view border
+            Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, candidateWinW, candidateWinH)
+            // candidate view border
             batch.color = Toolkit.Theme.COL_ACTIVE
-            Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, previewWindowWidth + 2, 22)
-            // compose view text
-            App.fontGame.draw(batch, composingView, cursorXOnScreen + 2 + (previewWindowWidth - previewTextWidth) / 2, posY + 27)
+            Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, candidateWinW + 2, candidateWinH + 2)
+
+            // candidate view text
+            for (i in candidates.indices) {
+                val previewTextWidth = textWidths[i]
+                App.fontGame.draw(batch, candidates[i], cursorXOnScreen + 2 + (candidateWinW - previewTextWidth) / 2, posY + 27 + i * 20)
+            }
         }
 
         super.render(batch, camera)

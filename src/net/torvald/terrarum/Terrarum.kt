@@ -684,7 +684,7 @@ fun AppUpdateListOfSavegames() {
     println("listing savegames...")
 
     // create list of worlds
-    (File(App.worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
+    (File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, Common.CHARSET, true)
         }
@@ -693,7 +693,7 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { it!!.getLastModifiedOfFirstFile() } as List<DiskSkimmer>).forEach {
+    }.sortedByDescending { it.getLastModifiedOfFirstFile() }).forEach {
         println(it.diskFile.absolutePath)
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
@@ -707,7 +707,7 @@ fun AppUpdateListOfSavegames() {
 
 
     // create list of players
-    (File(App.playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.map { file ->
+    (File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, Common.CHARSET, true)
         }
@@ -716,7 +716,7 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.filter { it != null }.sortedByDescending { it!!.getLastModifiedOfFirstFile() } as List<DiskSkimmer>).forEach {
+    }.sortedByDescending { it.getLastModifiedOfFirstFile() }).forEach {
         println(it.diskFile.absolutePath)
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 

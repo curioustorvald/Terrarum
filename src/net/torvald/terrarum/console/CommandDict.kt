@@ -17,7 +17,7 @@ object CommandDict {
         printdbg(this, ModMgr.loadOrder.reversed())
         printdbg(this, ModMgr.loadOrder.reversed().map { ModMgr.moduleInfo[it]?.packageName })
 
-        (listOf("net.torvald.terrarum") + ModMgr.loadOrder.reversed().map { ModMgr.moduleInfo[it]?.packageName }.filter { it != null }).forEach{ packageRoot ->
+        (listOf("net.torvald.terrarum") + ModMgr.loadOrder.reversed().mapNotNull { ModMgr.moduleInfo[it]?.packageName }).forEach{ packageRoot ->
             printdbg(this, packageRoot)
             val packageConsole = "$packageRoot.console"
             val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageConsole.replace('.','/'))

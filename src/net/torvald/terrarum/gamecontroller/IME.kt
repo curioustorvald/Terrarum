@@ -3,6 +3,9 @@ package net.torvald.terrarum.gamecontroller
 import net.torvald.terrarum.App.printdbg
 import java.io.File
 
+typealias IMECanditates = List<String>
+typealias IMEOutput = String
+
 data class TerrarumKeyLayout(
         val name: String,
         val symbols: Array<Array<String?>>?
@@ -11,9 +14,9 @@ data class TerrarumKeyLayout(
 data class TerrarumInputMethod(
         val name: String,
         // (headkey, shiftin, altgrin)
-        val acceptChar: (Int, Boolean, Boolean) -> Pair<String, String>, // Pair<Display Char, Output Char if any>
-        val backspace: () -> String,
-        val endCompose: () -> String,
+        val acceptChar: (Int, Boolean, Boolean) -> Pair<IMECanditates, IMEOutput>,
+        val backspace: () -> IMECanditates,
+        val endCompose: () -> IMEOutput,
         val reset: () -> Unit,
         val composing: () -> Boolean
 )
@@ -103,6 +106,9 @@ object IME {
         return TerrarumKeyLayout(name, out)
     }
 
+    private fun String.toCanditates(): List<String> =
+            this.split(',').mapNotNull { it.ifBlank { null } }
+
     private fun parseImeFile(file: File): TerrarumInputMethod {
         val code = file.readText(Charsets.UTF_8)
         val jsval = context.eval("js", "\"use strict\";(function(){$code})()")
@@ -111,9 +117,9 @@ object IME {
 
         return TerrarumInputMethod(name, { headkey, shifted, alted ->
             val a = jsval.invokeMember("accept", headkey, shifted, alted)
-            a.getArrayElement(0).asString() to a.getArrayElement(1).asString()
+            a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
         }, {
-            jsval.invokeMember("backspace").asString()
+            jsval.invokeMember("backspace").asString().toCanditates()
         }, {
             jsval.invokeMember("end").asString()
         }, {
