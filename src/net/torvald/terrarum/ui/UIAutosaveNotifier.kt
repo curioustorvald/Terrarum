@@ -14,7 +14,7 @@ import kotlin.math.roundToInt
 class UIAutosaveNotifier : UICanvas() {
 
     companion object {
-        const val WIDTH = 240
+        const val WIDTH = 180
         const val HEIGHT = 24
     }
 
@@ -52,8 +52,8 @@ class UIAutosaveNotifier : UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
-        val offX = (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
-        val offY = App.scr.tvSafeGraphicsHeight + 9f // +9 to align to quickslot and watch UI
+        val offX = App.scr.width - WIDTH - (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
+        val offY = App.scr.height - HEIGHT - App.scr.tvSafeGraphicsHeight - 9f // +9 to align to quickslot and watch UI
 
         val text = if (errored) Lang["ERROR_GENERIC_TEXT"].replace(".","") else Lang["MENU_IO_SAVING"]
         if (!errored) {
