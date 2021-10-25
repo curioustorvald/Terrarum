@@ -233,9 +233,13 @@ class BasicDebugInfoWindow : UICanvas() {
         App.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
                 (App.scr.width - 3 - 15 * TinyAlphNum.W).toFloat(), line(2))
         // global render counter
-        App.fontSmallNumbers.draw(batch, "${ccO}${App.GLOBAL_RENDER_TIMER.toString().padStart(10, ' ')}",
+        App.fontSmallNumbers.draw(batch, "${ccO}R${App.GLOBAL_RENDER_TIMER.toString().padStart(9, ' ')}",
                 (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
-
+        (ingame as? TerrarumIngame)?.let {
+            // global update counter (if applicable)
+            App.fontSmallNumbers.draw(batch, "${ccO}U${it.WORLD_UPDATE_TIMER.toString().padStart(9, ' ')}",
+                    (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(2))
+        }
         /**
          * Bottom left
          */
