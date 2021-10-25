@@ -32,12 +32,12 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadActor
 import net.torvald.terrarum.serialise.WriteSavegame
-import net.torvald.terrarum.savegame.DiskSkimmer
-import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
@@ -58,6 +58,8 @@ import java.util.concurrent.locks.ReentrantLock
  */
 
 open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
+
+    var WORLD_UPDATE_TIMER = Random().nextInt(1020) + 1; private set
 
     var historicalFigureIDBucket: ArrayList<Int> = ArrayList<Int>()
 
@@ -671,7 +673,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         // define custom update rate
-        val updateRate = if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else App.UPDATE_RATE
+        val updateRate = App.UPDATE_RATE // if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else App.UPDATE_RATE
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
@@ -776,6 +778,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             }
             oldCamX = WorldCamera.x
 
+
+            WORLD_UPDATE_TIMER += 1
         }
 
         if (!paused || newWorldLoadedLatch) {

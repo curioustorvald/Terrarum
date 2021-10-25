@@ -8,6 +8,7 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import org.dyn4j.geometry.Vector2
@@ -54,8 +55,8 @@ object WorldSimulator {
     /** Bottom-right point */
     var updateYTo = 0
 
-    private val ingame: IngameInstance
-            get() = Terrarum.ingame!!
+    private val ingame: TerrarumIngame
+            get() = Terrarum.ingame!! as TerrarumIngame
     private val world: GameWorld
             get() = ingame.world
 
@@ -85,8 +86,13 @@ object WorldSimulator {
         App.measureDebugTime("WorldSimulator.fallables") {
             displaceFallables(delta)
         }
-        App.measureDebugTime("WorldSimulator.wires") {
-            simulateWires(delta)
+        if (ingame.WORLD_UPDATE_TIMER % 2 == 1) {
+            App.measureDebugTime("WorldSimulator.wires") {
+                simulateWires(delta)
+            }
+        }
+        else {
+            // TODO update logic
         }
         App.measureDebugTime("WorldSimulator.collisionDroppedItem") {
             collideDroppedItems()
