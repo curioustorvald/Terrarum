@@ -10,5 +10,6 @@
   "GAME_INVENTORY_FAVORITES": "Favorites",
   "GAME_INVENTORY_REGISTER": "Register",
   "CONTEXT_ITEM_MAP": "Map",
-  "MENU_LABEL_MENU": "Menu"
+  "MENU_LABEL_MENU": "Menu",
+  "CONTEXT_GENERATOR_SEED": "Seed"
 }

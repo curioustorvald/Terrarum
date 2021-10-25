@@ -53,9 +53,9 @@ class UIItemTextLineInput(
         initialX: Int, initialY: Int,
         override val width: Int,
         var placeholder: () -> String = { "" },
+        val maxLen: InputLenCap = InputLenCap(1000, InputLenCap.CharLenUnit.CODEPOINTS),
         val enablePasteButton: Boolean = true,
-        val enableIMEButton: Boolean = false,
-        val maxLen: InputLenCap = InputLenCap(1000, InputLenCap.CharLenUnit.CODEPOINTS)
+        val enableIMEButton: Boolean = true
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
