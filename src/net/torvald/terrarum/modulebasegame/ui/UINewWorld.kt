@@ -70,15 +70,15 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         tex.forEach { it.flip(false, true) }
 
         goButton.touchDownListener = { _, _, _, _ ->
-            printdbg(this, "generate!")
+            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
         }
         backButton.touchDownListener = { _, _, _, _ ->
             printdbg(this, "back!")
         }
 
         addUIitem(sizeSelector)
-        addUIitem(nameInput)
-        addUIitem(seedInput)
+        addUIitem(seedInput)  // order is important
+        addUIitem(nameInput) // because of the IME candidates overlay
         addUIitem(goButton)
         addUIitem(backButton)
     }

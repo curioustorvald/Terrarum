@@ -1220,7 +1220,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // else, punch a block
         val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
         if (punchBlockSize > 0) {
-            PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
+            PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize, false)
         }
     }
 

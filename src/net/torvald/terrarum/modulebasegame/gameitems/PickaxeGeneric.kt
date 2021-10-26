@@ -26,7 +26,10 @@ object PickaxeCore {
      * @param mw width of the digging
      * @param mh height of the digging
      */
-    fun startPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int, dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1) = inInteractableRange(actor) {
+    fun startPrimaryUse(
+            actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int,
+            dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1, attackActorBlocks: Boolean = true
+    ) = inInteractableRange(actor) {
         // un-round the mx
         val ww = INGAME.world.width
         val apos = actor.centrePosPoint
@@ -50,6 +53,7 @@ object PickaxeCore {
 
             val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
+            val tile = (INGAME.world).getTileFromTerrain(x, y)
 
             item?.using = true
 
@@ -64,7 +68,7 @@ object PickaxeCore {
             if (!ret1) return ret1*/
 
             // return false if here's no tile
-            if (Block.AIR == (INGAME.world).getTileFromTerrain(x, y)) {
+            if (Block.AIR == tile || (!attackActorBlocks && tile in Block.actorblocks)) {
                 usageStatus = usageStatus or false
                 continue
             }

@@ -14,6 +14,7 @@ import net.torvald.terrarum.gamecontroller.TerrarumInputMethod
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.toJavaString
 import kotlin.streams.toList
 
 data class InputLenCap(val count: Int, val unit: CharLenUnit) {
@@ -336,7 +337,7 @@ class UIItemTextLineInput(
     }
 
     private fun textbufToString(): String {
-        return ""
+        return textbuf.toJavaString()
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -457,7 +458,7 @@ class UIItemTextLineInput(
     }
 
     fun getText() = textbufToString()
-    fun getTextOrPlaceholder() = if (textbuf.isEmpty()) currentPlaceholderText else getText()
+    fun getTextOrPlaceholder(): String = if (textbuf.isEmpty()) currentPlaceholderText.toJavaString() else getText()
 
     override fun dispose() {
         fbo.dispose()
