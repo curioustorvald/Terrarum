@@ -245,7 +245,6 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                 readFromLang = true,
                 activeBackCol = Color(0),//Color(1f,0f,.75f,1f),
                 highlightBackCol = Color(0),
-                backgroundCol = Color(0),
                 inactiveCol = Color.WHITE,
                 defaultSelection = null,
                 itemHitboxSize = lineHeight - 2,

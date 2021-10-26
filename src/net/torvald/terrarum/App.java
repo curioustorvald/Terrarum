@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
 import net.torvald.gdx.graphics.PixmapIO2;
@@ -752,7 +753,7 @@ public class App implements ApplicationListener {
             try {
                 it.dispose();
             }
-            catch (NullPointerException | IllegalArgumentException e) { }
+            catch (NullPointerException | IllegalArgumentException | GdxRuntimeException e) { }
         });
 
         ModMgr.INSTANCE.disposeMods();

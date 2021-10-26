@@ -34,6 +34,9 @@ class UIInventoryFull(
     override var openCloseTime: Second = 0.0f
 
     companion object {
+        private var shapeRenderer: ShapeRenderer? = null
+
+
         val CELL_COL = Toolkit.Theme.COL_CELL_FILL
 
         const val INVEN_DEBUG_MODE = false
@@ -62,24 +65,28 @@ class UIInventoryFull(
 
         val controlHelpHeight = App.fontGame.lineHeight
 
-        fun drawBackground(batch: SpriteBatch, shapeRenderer: ShapeRenderer) {
+        fun drawBackground(batch: SpriteBatch) {
             batch.end()
             gdxSetBlendNormal()
+
+            if (shapeRenderer == null) {
+                shapeRenderer = ShapeRenderer()
+                App.disposables.add(shapeRenderer)
+            }
 
 
             val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
             val gradBottomEnd = App.scr.height - gradTopStart
 
-            shapeRenderer.inUse {
+            shapeRenderer!!.inUse {
                 // shaperender starts at bottom-left!
+                it.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-                shapeRenderer.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-                shapeRenderer.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-                shapeRenderer.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
-
-                shapeRenderer.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-                shapeRenderer.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+                it.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+                it.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
             }
 
             batch.begin()
@@ -235,7 +242,6 @@ class UIInventoryFull(
     //private val gradStartCol = Color(0x404040_60)
     //private val gradEndCol   = Color(0x000000_70)
     //private val gradHeight = 48f
-    private val shapeRenderer = ShapeRenderer()
 
     internal var xEnd = (width + internalWidth).div(2).toFloat()
         private set
@@ -244,7 +250,7 @@ class UIInventoryFull(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        drawBackground(batch, shapeRenderer)
+        drawBackground(batch)
 
         // UI items
         catBar.render(batch, camera)
@@ -274,7 +280,6 @@ class UIInventoryFull(
     override fun dispose() {
         catBar.dispose()
         transitionPanel.dispose()
-
     }
 
 

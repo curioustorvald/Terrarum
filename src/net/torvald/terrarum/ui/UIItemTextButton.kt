@@ -36,9 +36,8 @@ open class UIItemTextButton(
         val highlightBackBlendMode: String = BlendMode.NORMAL,
         /** Colour on normal status */
         val inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
-        val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
-        val backgroundBlendMode: String = BlendMode.NORMAL,
 
+        val hasBorder: Boolean = false,
 
         val paddingLeft:  Int = 0,
         val paddingRight: Int = 0,
@@ -51,7 +50,7 @@ open class UIItemTextButton(
 
     companion object {
         val font = App.fontGame
-        val height = font.lineHeight.toInt()
+        val height = 24
 
         enum class Alignment {
             CENTRE, LEFT, RIGHT
@@ -75,6 +74,12 @@ open class UIItemTextButton(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         val textW = font.getWidth(label)
+        val fontX = when (alignment) {
+            Alignment.CENTRE -> posX + width.minus(textW).div(2) + (paddingLeft - paddingRight).div(2)
+            Alignment.LEFT -> posX + paddingLeft
+            Alignment.RIGHT -> width - paddingRight - textW
+        }
+        val fontY = posY + (hitboxSize - font.lineHeight.toInt()) / 2
 
 
         // draw background
@@ -97,21 +102,29 @@ open class UIItemTextButton(
 
         blendNormal(batch)
 
+        if (hasBorder) {
+            batch.color = Toolkit.Theme.COL_CELL_FILL
+            Toolkit.fillArea(batch, posX, posY, width, height)
+        }
+
 
         batch.color = if (highlighted) highlightCol
         else if (mouseUp) activeCol
         else inactiveCol
 
-        font.draw(batch,
-                label,
-//                "$label/H:${highlighted.toInt()}, M:${mouseUp.toInt()}",
-                when (alignment) {
-                    Alignment.CENTRE -> posX.toFloat() + width.minus(textW).div(2) + (paddingLeft - paddingRight).div(2)
-                    Alignment.LEFT -> posX.toFloat() + paddingLeft
-                    Alignment.RIGHT -> width - paddingRight - textW.toFloat()
-                },
-                posY.toFloat() + (hitboxSize - UIItemTextButton.height) / 2f
-        )
+
+        // draw border
+        if (hasBorder) {
+            val c = batch.color.cpy()
+            if (batch.color == inactiveCol) {
+                batch.color = Toolkit.Theme.COL_INACTIVE
+            }
+            Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
+            batch.color = c
+        }
+
+        // draw text
+        font.draw(batch, label, fontX, fontY)
     }
 
     override fun dispose() {

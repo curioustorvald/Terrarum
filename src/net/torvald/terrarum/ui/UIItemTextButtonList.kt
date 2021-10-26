@@ -1,11 +1,12 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -43,11 +44,6 @@ class UIItemTextButtonList(
         val highlightBackBlendMode: String = BlendMode.NORMAL,
         /** Colour on normal status */
         val inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
-        val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
-        val backgroundBlendMode: String = BlendMode.NORMAL,
-
-
-        val kinematic: Boolean = false,
 
         val leftPadding: Int = 0,
         val rightPadding: Int = 0,
@@ -83,7 +79,7 @@ class UIItemTextButtonList(
         val lh = itemHitboxSize
         val vertOff = lineHeight * i
 
-        if (!kinematic) {
+//        if (!kinematic) {
             UIItemTextButton(
                     parentUI, s,
                     initialX = posX,
@@ -97,37 +93,34 @@ class UIItemTextButtonList(
                     highlightBackCol = highlightBackCol,
                     highlightBackBlendMode = highlightBackBlendMode,
                     inactiveCol = inactiveCol,
-                    backgroundCol = backgroundCol,
-                    backgroundBlendMode = backgroundBlendMode,
                     paddingLeft = pregap,
                     paddingRight = postgap,
                     alignment = alignment,
                     hitboxSize = itemHitboxSize,
                     tags = tagsCollection[i]
             )
-        }
-        else {
-            UIItemTextButton(
-                    parentUI, s,
-                    initialX = posX,
-                    initialY = posY + vertOff,
-                    width = width,
-                    readFromLang = readFromLang,
-                    activeCol = activeCol,
-                    activeBackCol = activeBackCol,
-                    activeBackBlendMode = activeBackBlendMode,
-                    highlightCol = highlightCol,
-                    highlightBackCol = activeBackCol, // we are using custom highlighter
-                    highlightBackBlendMode = activeBackBlendMode, // we are using custom highlighter
-                    backgroundCol = Color(0),
-                    inactiveCol = inactiveCol,
-                    paddingLeft = pregap,
-                    paddingRight = postgap,
-                    alignment = alignment,
-                    hitboxSize = itemHitboxSize,
-                    tags = tagsCollection[i]
-            )
-        }
+//        }
+//        else {
+//            UIItemTextButton(
+//                    parentUI, s,
+//                    initialX = posX,
+//                    initialY = posY + vertOff,
+//                    width = width,
+//                    readFromLang = readFromLang,
+//                    activeCol = activeCol,
+//                    activeBackCol = activeBackCol,
+//                    activeBackBlendMode = activeBackBlendMode,
+//                    highlightCol = highlightCol,
+//                    highlightBackCol = activeBackCol, // we are using custom highlighter
+//                    highlightBackBlendMode = activeBackBlendMode, // we are using custom highlighter
+//                    inactiveCol = inactiveCol,
+//                    paddingLeft = pregap,
+//                    paddingRight = postgap,
+//                    alignment = alignment,
+//                    hitboxSize = itemHitboxSize,
+//                    tags = tagsCollection[i]
+//            )
+//        }
     }
 
 
@@ -203,16 +196,16 @@ class UIItemTextButtonList(
             if (!clickLatched && btn.mousePushed && index != selectedIndex) {
                 val oldIndex = selectedIndex
 
-                if (kinematic) {
-                    selectedIndex = index
-                    highlighterYStart = buttons[selectedIndex!!].posY.toFloat()
-                    highlighterMoving = true
-                    highlighterYEnd = buttons[selectedIndex!!].posY.toFloat()
-                }
-                else {
+//                if (kinematic) {
+//                    selectedIndex = index
+//                    highlighterYStart = buttons[selectedIndex!!].posY.toFloat()
+//                    highlighterMoving = true
+//                    highlighterYEnd = buttons[selectedIndex!!].posY.toFloat()
+//                }
+//                else {
                     selectedIndex = index
                     highlightY = buttons[selectedIndex!!].posY.toFloat()
-                }
+//                }
 
                 selectionChangeListener?.invoke(oldIndex, index)
             }
@@ -229,7 +222,7 @@ class UIItemTextButtonList(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
 
-        if (kinematic) {
+        /*if (kinematic) {
             batch.color = backgroundCol
             BlendMode.resolve(backgroundBlendMode, batch)
             Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -239,7 +232,7 @@ class UIItemTextButtonList(
             if (highlightY != null) {
                 Toolkit.fillArea(batch, posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
             }
-        }
+        }*/
 
         buttons.forEach { it.render(batch, camera) }
 
@@ -253,7 +246,7 @@ class UIItemTextButtonList(
             }
         }
 
-        batch.color = backgroundCol
+//        batch.color = backgroundCol
     }
 
     fun select(index: Int) {

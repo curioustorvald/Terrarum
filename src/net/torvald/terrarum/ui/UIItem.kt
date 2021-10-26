@@ -1,10 +1,8 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 
 
@@ -209,7 +207,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         var actionDone = false
 
         if (parentUI.isVisible) {
-            if (touchDownListener != null) {
+            if (touchDownListener != null && mouseUp) {
                 touchDownListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
                 actionDone = true
             }
@@ -225,7 +223,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         clickOnceListenerFired = false
 
-        if (parentUI.isVisible && touchUpListener != null) {
+        if (parentUI.isVisible && touchUpListener != null && mouseUp) {
             touchUpListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
             return true
         }
@@ -233,7 +231,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (parentUI.isVisible && scrolledListener != null) {
+        if (parentUI.isVisible && scrolledListener != null && mouseUp) {
             scrolledListener!!.invoke(amountX, amountY)
             return true
         }

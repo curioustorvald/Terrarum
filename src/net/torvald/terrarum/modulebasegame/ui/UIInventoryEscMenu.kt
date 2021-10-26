@@ -42,7 +42,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             textAreaWidth = gameMenuListWidth,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
-            backgroundCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )
@@ -55,7 +54,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             textAreaWidth = gameMenuListWidth,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
-            backgroundCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )
@@ -68,7 +66,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             textAreaWidth = gameMenuListWidth,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
-            backgroundCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )

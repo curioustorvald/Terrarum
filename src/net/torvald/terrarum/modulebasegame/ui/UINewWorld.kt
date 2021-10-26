@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
@@ -50,23 +52,35 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
                     { Lang["CONTEXT_DESCRIPTION_HUGE"] }
             ))
 
+    private val rng = HQRNG()
+
     private val nameInput = UIItemTextLineInput(this,
             drawX + width - inputWidth, drawY + sizeSelY + 80, inputWidth,
             { RandomWordsName(4) }, InputLenCap(VirtualDisk.NAME_LENGTH, InputLenCap.CharLenUnit.UTF8_BYTES))
 
     private val seedInput = UIItemTextLineInput(this,
             drawX + width - inputWidth, drawY + sizeSelY + 120, inputWidth,
-            { RandomWordsName(4) }, InputLenCap(256, InputLenCap.CharLenUnit.CODEPOINTS))
+            { rng.nextLong().toString() }, InputLenCap(256, InputLenCap.CharLenUnit.CODEPOINTS))
 
+    private val goButtonWidth = 180
+    private val backButton = UIItemTextButton(this, "MENU_LABEL_BACK", drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val goButton = UIItemTextButton(this, "MENU_LABEL_CONFIRM_BUTTON", drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
     init {
         tex.forEach { it.flip(false, true) }
 
-        sizeSelector.selectionChangeListener = {}
+        goButton.touchDownListener = { _, _, _, _ ->
+            printdbg(this, "generate!")
+        }
+        backButton.touchDownListener = { _, _, _, _ ->
+            printdbg(this, "back!")
+        }
 
         addUIitem(sizeSelector)
         addUIitem(nameInput)
         addUIitem(seedInput)
+        addUIitem(goButton)
+        addUIitem(backButton)
     }
 
 

@@ -78,8 +78,6 @@ internal class UIStorageChest : UICanvas(
     override var height = App.scr.height
     override var openCloseTime: Second = 0.0f
 
-    private val shapeRenderer = ShapeRenderer()
-
     private val negotiator = object : InventoryNegotiator() {
         override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Int) {
             player.remove(item, amount)
@@ -201,7 +199,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
-        UIInventoryFull.drawBackground(batch, shapeRenderer)
+        UIInventoryFull.drawBackground(batch)
 
         // UI items
         batch.color = Color.WHITE
@@ -271,6 +269,5 @@ internal class UIStorageChest : UICanvas(
 
 
     override fun dispose() {
-        try { shapeRenderer.dispose() } catch (e: IllegalArgumentException) {}
     }
 }

@@ -39,7 +39,6 @@ class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
             readFromLang = false,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
-            backgroundCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )
@@ -52,7 +51,6 @@ class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
             readFromLang = false,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
-            backgroundCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )
