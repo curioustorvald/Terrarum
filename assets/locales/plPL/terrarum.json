@@ -7,5 +7,9 @@
   "MENU_MODULES" : "Moduły",
   "MENU_LABEL_RESET" : "Reset",
   "MENU_LABEL_RESTART_REQUIRED": "Wymagane ponowne uruchomienie",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Układ klawiatury"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Układ klawiatury",
+  "MENU_OPTIONS_DITHER": "Symulowanie kolorów",
+  "MENU_OPTIONS_BLUR": "Rozmycie",
+  "MENU_OPTIONS_PARTICLES": "Cząsteczka",
+  "MENU_IO_IMPORT": "Importuj"
 }

@@ -7,5 +7,9 @@
   "MENU_MODULES" : "Moduler",
   "MENU_LABEL_RESET" : "Nullstill",
   "MENU_LABEL_RESTART_REQUIRED": "Omstart kreves",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturoppsett"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturoppsett",
+  "MENU_OPTIONS_DITHER": "Rastrering",
+  "MENU_OPTIONS_BLUR": "Uskarp",
+  "MENU_OPTIONS_PARTICLES": "Partikkel",
+  "MENU_IO_IMPORT": "Importer"
 }

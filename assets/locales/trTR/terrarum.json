@@ -7,5 +7,9 @@
   "MENU_MODULES" : "Modüller",
   "MENU_LABEL_RESET" : "Sıfırla",
   "MENU_LABEL_RESTART_REQUIRED": "Yeniden başlatma gerekiyor",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Klavye düzeni"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Klavye düzeni",
+  "MENU_OPTIONS_DITHER": "Titreklik",
+  "MENU_OPTIONS_BLUR": "Bulanıklaştır",
+  "MENU_OPTIONS_PARTICLES": "Parçacık",
+  "MENU_IO_IMPORT": "İçeri Aktar"
 }

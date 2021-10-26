@@ -6,5 +6,9 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Druk op >",
   "MENU_MODULES" : "Modules",
   "MENU_LABEL_RESTART_REQUIRED": "Opnieuw opstarten vereist",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Toetsenbordindeling"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Toetsenbordindeling",
+  "MENU_OPTIONS_DITHER": "Rasteren",
+  "MENU_OPTIONS_BLUR": "Vervagen",
+  "MENU_OPTIONS_PARTICLES": "Partikel",
+  "MENU_IO_IMPORT": "Importeren"
 }

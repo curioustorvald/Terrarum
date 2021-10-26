@@ -6,5 +6,9 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Stiskněte >",
   "MENU_MODULES" : "Moduly",
   "MENU_LABEL_RESTART_REQUIRED": "Vyžaduje se restartování",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Rozložení klávesnice"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Rozložení klávesnice",
+  "MENU_OPTIONS_DITHER": "Tónování",
+  "MENU_OPTIONS_BLUR": "Rozostření",
+  "MENU_OPTIONS_PARTICLES": "Částice",
+  "MENU_IO_IMPORT": "Importovat"
 }

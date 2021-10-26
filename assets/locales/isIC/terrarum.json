@@ -10,5 +10,9 @@
   "GAME_32BIT_WARNING2": "Sæktu og settu upp nýjasta 64-bita Java á:",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
   "MENU_LABEL_RESTART_REQUIRED": "Endurræsingar krafist",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Lyklaborðsskipan"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Lyklaborðsskipan",
+  "MENU_OPTIONS_DITHER": "Dither",
+  "MENU_OPTIONS_BLUR": "Óskýrt",
+  "MENU_OPTIONS_PARTICLES": "Eind",
+  "MENU_IO_IMPORT": "Flytja inn"
 }

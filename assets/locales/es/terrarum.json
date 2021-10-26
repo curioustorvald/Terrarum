@@ -11,5 +11,9 @@
   "GAME_32BIT_WARNING2": "Descargue e instale la última versión de Java de 64 bits en:",
   "GAME_32BIT_WARNING3": "https://www.java.com/es/download/",
   "MENU_LABEL_RESTART_REQUIRED": "Es necesario reiniciar",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Diseño del teclado"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Diseño del teclado",
+  "MENU_OPTIONS_DITHER": "Interpolación de colores",
+  "MENU_OPTIONS_BLUR": "Desenfocar",
+  "MENU_OPTIONS_PARTICLES": "Partícula",
+  "MENU_IO_IMPORT": "Importar"
 }

@@ -6,5 +6,9 @@
   "MENU_LABEL_PRESS_START_SYMBOL": "Apasă >",
   "MENU_MODULES" : "Module",
   "MENU_LABEL_RESTART_REQUIRED": "Repornire necesară",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Structură tastatură"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Structură tastatură",
+  "MENU_OPTIONS_DITHER": "Intercalarea nuanțelor",
+  "MENU_OPTIONS_BLUR": "Pată",
+  "MENU_OPTIONS_PARTICLES": "Particulă",
+  "MENU_IO_IMPORT": "Import"
 }

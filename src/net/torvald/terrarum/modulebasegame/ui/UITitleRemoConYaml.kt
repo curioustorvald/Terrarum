@@ -33,6 +33,7 @@ object UITitleRemoConYaml {
     val menuNewGame = """
 """
 
+    // todo add MENU_IO_IMPORT
     val injectedMenuSingleCharSel = """
 - CONTEXT_CHARACTER_NEW
 - MENU_LABEL_RETURN

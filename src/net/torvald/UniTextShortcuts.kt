@@ -12,6 +12,7 @@ const val TIMES = 0xD7.toChar()
 const val ENDASH = 0x2013.toChar()
 const val EMDASH = 0x2014.toChar()
 const val ELLIPSIS = 0x2026.toChar()
+const val BULLET = 0x2022.toChar()
 
 fun getKeycapPC(c: Char) = when (c.uppercaseChar()) {
     in ' '..'_' -> (0xE000 + c.code - 32).toChar()

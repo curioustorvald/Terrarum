@@ -7,5 +7,9 @@
   "MENU_MODULES" : "Moduler",
   "MENU_LABEL_RESET" : "Nulstil",
   "MENU_LABEL_RESTART_REQUIRED": "Genstart er nødvendig",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturlayout"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturlayout",
+  "MENU_OPTIONS_DITHER": "Simulering",
+  "MENU_OPTIONS_BLUR": "Slør",
+  "MENU_OPTIONS_PARTICLES": "Partikel",
+  "MENU_IO_IMPORT": "Importer"
 }

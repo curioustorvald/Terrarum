@@ -10,5 +10,9 @@
   "GAME_32BIT_WARNING2": "Загрузите и установите последнюю 64-разрядную версию Java по:",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
   "MENU_LABEL_RESTART_REQUIRED": "Требуется перезапуск",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Раскладка клавиатуры"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Раскладка клавиатуры",
+  "MENU_OPTIONS_DITHER": "Сглаживание",
+  "MENU_OPTIONS_BLUR": "Размытие",
+  "MENU_OPTIONS_PARTICLES": "Частица",
+  "MENU_IO_IMPORT": "Импорт"
 }

@@ -1,12 +1,16 @@
 package net.torvald.terrarum
 
+import net.torvald.BULLET
+
 object CreditSingleton {
 
     val credit: List<String>; get() =
             ("Programming, Arts, Directed by CuriousTorvald (minjaesong)\n" +
              "Sound Effects by FreeSound.org and Klankbeeld\n" +
-             "Translation Database by the Polyglot Project\n" +
-            """
+             "Translation Databases:\n" +
+             "$BULLET © 2018 The Polyglot Project. Distributed under CC0.\n" +
+             "$BULLET Entry from the Microsoft Language Portal. © 2018 Microsoft Corporation. All rights reserved.\n" +
+             """
 
 
 Terrarum

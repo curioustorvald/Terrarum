@@ -11,5 +11,9 @@
   "GAME_32BIT_WARNING3": "https://www.java.com/fi/download/",
   "MENU_LABEL_RESTART_REQUIRED": "Uudelleenkäynnistys tarvitaan",
   "MENU_LABEL_KEYBOARD_LAYOUT": "Näppäimistöasettelu",
-  "MENU_LABEL_IME": "Kirjoitustuki"
+  "MENU_LABEL_IME": "Kirjoitustuki",
+  "MENU_OPTIONS_DITHER": "Sekoitussävytys",
+  "MENU_OPTIONS_BLUR": "Sumea",
+  "MENU_OPTIONS_PARTICLES": "Hiukkaset",
+  "MENU_IO_IMPORT": "Tuo"
 }

@@ -7,5 +7,9 @@
   "MENU_MODULES" : "โมดูล",
   "MENU_LABEL_RESET" : "รีเซ็ต",
   "MENU_LABEL_RESTART_REQUIRED": "ต้องเริ่มระบบใหม่",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "รูปแบบแป้นพิมพ์"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "รูปแบบแป้นพิมพ์",
+  "MENU_OPTIONS_DITHER": "ปรับสีให้กลมกลืน",
+  "MENU_OPTIONS_BLUR": "มัว",
+  "MENU_OPTIONS_PARTICLES": "อนุภาค",
+  "MENU_IO_IMPORT": "นำเข้า"
 }

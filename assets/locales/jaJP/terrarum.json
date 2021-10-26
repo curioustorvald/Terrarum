@@ -11,5 +11,9 @@
   "GAME_32BIT_WARNING2": "下記のリンクから最新64ビットJavaをダウンロードしてインストールしてください。",
   "GAME_32BIT_WARNING3": "https://www.java.com/ja/download/",
   "MENU_LABEL_RESTART_REQUIRED": "再起動が必要",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "キーボード レイアウト"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "キーボード レイアウト",
+  "MENU_OPTIONS_DITHER": "ディザリング",
+  "MENU_OPTIONS_BLUR": "ぼかし",
+  "MENU_OPTIONS_PARTICLES": "粒子の数",
+  "MENU_IO_IMPORT": "インポート"
 }

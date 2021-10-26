@@ -10,5 +10,9 @@
   "GAME_32BIT_WARNING2": "Моля, изтеглете и инсталирайте най-новата 64-битова Java на:",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
   "MENU_LABEL_RESTART_REQUIRED": "Изисква се рестартиране",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Клавиатурна подредба"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Клавиатурна подредба",
+  "MENU_OPTIONS_DITHER": "Дитеринг",
+  "MENU_OPTIONS_BLUR": "Замъгляване",
+  "MENU_OPTIONS_PARTICLES": "Частица",
+  "MENU_IO_IMPORT": "Импортиране"
 }

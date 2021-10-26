@@ -8,5 +8,9 @@
   "MENU_LABEL_RESET" : "Visszaállítás",
   "MENU_LABEL_RESTART_REQUIRED": "Újraindítás szükséges",
   "MENU_LABEL_KEYBOARD_LAYOUT": "Billentyűzetkiosztás",
-  "MENU_LABEL_IME": "Írásjegybevivő"
+  "MENU_LABEL_IME": "Írásjegybevivő",
+  "MENU_OPTIONS_DITHER": "Összemosás",
+  "MENU_OPTIONS_BLUR": "Elmosás",
+  "MENU_OPTIONS_PARTICLES": "Részecske",
+  "MENU_IO_IMPORT": "Importálás"
 }

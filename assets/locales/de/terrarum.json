@@ -11,5 +11,9 @@
   "GAME_32BIT_WARNING2": "Bitte laden Sie das neueste 64-Bit Java herunter und installieren Sie es unter:",
   "GAME_32BIT_WARNING3": "https://www.java.com/de/download/",
   "MENU_LABEL_RESTART_REQUIRED": "Neustart erforderlich",
-  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturlayout"
+  "MENU_LABEL_KEYBOARD_LAYOUT": "Tastaturlayout",
+  "MENU_OPTIONS_DITHER": "Farbmischung",
+  "MENU_OPTIONS_BLUR": "Weichzeichnen",
+  "MENU_OPTIONS_PARTICLES": "Partikel",
+  "MENU_IO_IMPORT": "Importieren"
 }
