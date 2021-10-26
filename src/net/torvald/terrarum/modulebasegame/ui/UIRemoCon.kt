@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
@@ -39,13 +40,17 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     init {
         remoConTray = generateNewRemoCon(currentRemoConContents)
 
-        treeRepresentation.traversePreorder { node, _ ->
+        registerUIclasses(treeRepresentation)
+    }
+
+    private fun registerUIclasses(tree: QNDTreeNode<String>) {
+        tree.traversePreorder { node, _ ->
             val splittedNodeName = node.data?.split(yamlSep)
 
             if (splittedNodeName?.size == 2 && node.data != null) {
                 try {
-                    val attachedClass = loadClass(splittedNodeName[1]) // check existance
-                    screenNames[node.data!!] = splittedNodeName[1]
+                    val attachedClass = loadClass(splittedNodeName[1]) // check existence
+                    screenNames[node.data!!] = splittedNodeName[1] // actual loading will by dynamic as some UIs need to be re-initialised as they're called
                 }
                 catch (e: java.lang.ClassNotFoundException) {
                     printdbgerr(this, "class '${splittedNodeName[1]}' was not found, skipping")
@@ -128,6 +133,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                     openUI?.setAsClose()
                     openUI?.dispose()
 
+                    printdbg(this, "$currentlySelectedRemoConItem has screen: ${screenNames.containsKey(currentlySelectedRemoConItem)}")
                     screenNames[currentlySelectedRemoConItem]?.let {
                         val ui = loadClass(it)
                         ui.setPosition(0,0)
@@ -163,6 +169,8 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
             remoConTray = generateNewRemoCon(newCurrentRemoConContents)
             currentRemoConContents = newCurrentRemoConContents
         }
+
+        registerUIclasses(newCurrentRemoConContents)
 
         currentlySelectedRemoConItem = newCurrentRemoConContents.data
     }
