@@ -115,6 +115,33 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : MutableCollecti
         return null // key not found
     }
 
+    /**
+     * e.g.
+     *
+     * 0 2 4 5 7 , find 3
+     *
+     * will return (1, 2), which corresponds value (2, 4) of which input value 3 is in between.
+     */
+    fun <R: Comparable<R>> searchForInterval(searchQuery: R, searchHow: (T) -> R): Pair<Int,Int> {
+        var low: Int = 0
+        var high: Int = this.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1)
+            val midVal = searchHow(get(mid))
+
+            if (searchQuery < midVal)
+                high = mid - 1
+            else if (searchQuery > midVal)
+                low = mid + 1
+            else
+                return Pair(mid, mid)
+        }
+
+        val first = Math.max(high, 0)
+        val second = Math.min(low, this.size - 1)
+        return Pair(first, second)
+    }
     /** Searches the element using given predicate instead of the element itself. Returns the element desired, null when there is no such element.
      * (e.g. search the Actor by its ID rather than the actor instance)
      *

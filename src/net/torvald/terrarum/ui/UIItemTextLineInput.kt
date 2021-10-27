@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gamecontroller.IngameController
@@ -121,6 +122,9 @@ class UIItemTextLineInput(
     private var imeOn = false
     private var candidates: List<CodepointSequence> = listOf()
 
+    private val candidatesBackCol = TEXTINPUT_COL_BACKGROUND.cpy().mul(1f,1f,1f,1.5f)
+    private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
+
     private fun getIME(): TerrarumInputMethod? {
         if (!imeOn) return null
 
@@ -228,7 +232,7 @@ class UIItemTextLineInput(
                 // accept:
                 // - literal "<"
                 // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
-                else if (char != null && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
+                else if (char != null && char.length > 0 && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
                     val shiftin = keycodes.contains(Input.Keys.SHIFT_LEFT) || keycodes.contains(Input.Keys.SHIFT_RIGHT)
                     val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
 
@@ -343,8 +347,6 @@ class UIItemTextLineInput(
         return textbuf.toJavaString()
     }
 
-    private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
-
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         batch.end()
@@ -406,7 +408,7 @@ class UIItemTextLineInput(
         batch.draw(fbo.colorBufferTexture, posX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
         // draw text cursor
-        val cursorXOnScreen = posX - cursorDrawScroll + cursorDrawX + 3
+        val cursorXOnScreen = posX - cursorDrawScroll + cursorDrawX + 2
         if (isActive && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
@@ -441,39 +443,56 @@ class UIItemTextLineInput(
         // draw candidates view
         if (candidates.isNotEmpty()) {
             val textWidths = candidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
-            val candidateWinH = App.fontGame.lineHeight.toInt() * candidates.size
+            val candidatesMax = getIME()!!.maxCandidates()
+            val candidatesCount = minOf(candidatesMax, candidates.size)
+            val halfcount = FastMath.ceil(candidatesCount / 2f)
+            val candidateWinH = App.fontGame.lineHeight.toInt() * halfcount
+            val candidatePosX = cursorXOnScreen + 4
+            val candidatePosY = posY + 2
 
             // candidate view text
-            if (getIME()!!.maxCandidates() > 1) {
-                val candidateWinW = textWidths.maxOrNull()!!.coerceAtLeast(20) + candidateNumberStrWidth
+            if (candidatesMax > 1) {
+                val longestCandidateW = textWidths.maxOrNull()!! + candidateNumberStrWidth
+                val candidateWinW = if (candidatesCount == 1) longestCandidateW else 2*longestCandidateW + 3
 
                 // candidate view background
-                batch.color = TEXTINPUT_COL_BACKGROUND
-                Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, candidateWinW + 4, candidateWinH)
+                batch.color = candidatesBackCol
+                Toolkit.fillArea(batch, candidatePosX, candidatePosY, candidateWinW + 4, candidateWinH)
                 // candidate view border
                 batch.color = Toolkit.Theme.COL_ACTIVE
-                Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, candidateWinW + 6, candidateWinH + 2)
+                Toolkit.drawBoxBorder(batch, candidatePosX - 1, candidatePosY - 1, candidateWinW + 6, candidateWinH + 2)
 
-                for (i in 0..minOf(9, candidates.lastIndex)) {
+                // candidate texts
+                for (i in 0 until candidatesCount) {
                     val candidateNum = listOf(i+48,46,32)
-                    App.fontGame.draw(batch, CodepointSequence(candidateNum + candidates[i]), cursorXOnScreen + 4, posY + 27 + i * 20)
+                    App.fontGame.draw(batch, CodepointSequence(candidateNum + candidates[i]),
+                            candidatePosX + (i / halfcount) * (longestCandidateW + 3) + 2,
+                            candidatePosY + (i % halfcount) * 20
+                    )
+                }
+
+                // candidate view splitter
+                if (candidatesCount > 1) {
+                    batch.color = batch.color.cpy().mul(0.65f,0.65f,0.65f,1f)
+                    Toolkit.fillArea(batch, candidatePosX + longestCandidateW + 2, candidatePosY, 1, candidateWinH)
                 }
             }
             else {
-                val candidateWinW = textWidths.maxOrNull()!!.coerceAtLeast(20)
+                val candidateWinW = textWidths.maxOrNull()!!.coerceAtLeast(6)
 
                 // candidate view background
-                batch.color = TEXTINPUT_COL_BACKGROUND
-                Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, candidateWinW, candidateWinH)
+                batch.color = candidatesBackCol
+                Toolkit.fillArea(batch, candidatePosX, candidatePosY, candidateWinW, candidateWinH)
                 // candidate view border
                 batch.color = Toolkit.Theme.COL_ACTIVE
-                Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, candidateWinW + 2, candidateWinH + 2)
+                Toolkit.drawBoxBorder(batch, candidatePosX - 1, candidatePosY - 1, candidateWinW + 2, candidateWinH + 2)
 
                 val previewTextWidth = textWidths[0]
-                App.fontGame.draw(batch, candidates[0], cursorXOnScreen + 2 + (candidateWinW - previewTextWidth) / 2, posY + 27)
+                App.fontGame.draw(batch, candidates[0], candidatePosX + (candidateWinW - previewTextWidth) / 2, candidatePosY)
             }
         }
 
+        batch.color = Color.WHITE
         super.render(batch, camera)
     }
 

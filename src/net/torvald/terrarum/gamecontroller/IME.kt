@@ -56,12 +56,12 @@ object IME {
     init {
         context.getBindings("js").putMember("IMEProvider", IMEProviderDelegate(this))
 
-        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.forEach {
+        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.sortedBy { it.name }.forEach {
             printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
             lowLayers[it.nameWithoutExtension.lowercase()] = parseKeylayoutFile(it)
         }
 
-        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$IME_EXTENSION") }.forEach {
+        File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$IME_EXTENSION") }.sortedBy { it.name }.forEach {
             printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
             highLayers[it.nameWithoutExtension.lowercase()] = parseImeFile(it)
         }
