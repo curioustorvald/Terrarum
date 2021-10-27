@@ -129,6 +129,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val symbolInventory = labels.get(9,0)
     private val symbolGrapplingHook = labels.get(5,1)
     private val symbolGamemenu = labels.get(6,2)
+    private val symbolIME = labels.get(7,2)
 
     private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 480) / 2, kby + 219)
 
@@ -184,7 +185,9 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 "control_key_zoom",
                 "control_key_inventory",
                 "control_key_movementaux",
-                "control_key_gamemenu").forEach {
+                "control_key_gamemenu",
+                "control_key_toggleime"
+        ).forEach {
 
                     App.setConfig(it, DefaultConfig.hashMap[it]!! as Int)
         }
@@ -204,6 +207,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 //        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = symbolGrapplingHook
 
         keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = symbolGamemenu
+
+        keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = symbolIME
     }
 
     internal var keycapClicked = -13372
@@ -406,10 +411,14 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             UIItemImageButton(parent, icons.get(4,2), initialX = initialX + 50, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // inventory
             UIItemImageButton(parent, icons.get(9,0), initialX = initialX + 50, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // IME
+            UIItemImageButton(parent, icons.get(7,2), initialX = initialX + 50, initialY = initialY + 180, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+
             // zoom
             UIItemImageButton(parent, icons.get(5,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // system menu
             UIItemImageButton(parent, icons.get(6,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+
     )
 
     // close button is just for the cosmetics; the uiitem closes when you click anywhere on the UI
@@ -422,10 +431,13 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
                 1 to "control_key_up",
                 2 to "control_key_right",
                 3 to "control_key_down",
+
                 4 to "control_key_jump",
                 5 to "control_key_inventory",
-                6 to "control_key_zoom",
-                7 to "control_key_gamemenu"
+                6 to "control_key_toggleime",
+
+                7 to "control_key_zoom",
+                8 to "control_key_gamemenu",
         )
     }
 
@@ -450,6 +462,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
         App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], posX + 90f, posY + 100f)
         App.fontGame.draw(batch, Lang["GAME_INVENTORY"], posX + 90f, posY + 140f)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], posX + 90f, posY + 180f)
 
         App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], posX + (width / 2) + 60f, posY + 100f)
         App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], posX + (width / 2) + 60f, posY + 140f)

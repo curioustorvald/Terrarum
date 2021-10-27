@@ -169,12 +169,15 @@ class UIItemTextLineInput(
 
         // process keypresses
         if (isActive) {
-            IngameController.withKeyboardEvent { (_, char, headkey, _, keycodes) ->
+            IngameController.withKeyboardEvent { (_, char, headkey, repeatCount, keycodes) ->
                 fboUpdateLatch = true
                 forceLitCursor()
                 val ime = getIME()
 
-                if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
+                if (keycodes.contains(App.getConfigInt("control_key_toggleime")) && repeatCount == 1) {
+                    toggleIME()
+                }
+                else if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
                     endComposing()
                     paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
                 }
