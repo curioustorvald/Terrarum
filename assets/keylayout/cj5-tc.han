@@ -2967,6 +2967,7 @@ fdmcw,粞
 fdmlk,粳
 fdmq,煒
 fdmtb,糲
+fdmwg,糎
 fdnd,籽
 fdng,粈
 fdnhd,糅
@@ -5476,12 +5477,18 @@ jtcv,褰
 jtcy,寒
 jtge,鼖
 ju,七
+jucsh,兝
 judi,剋
 juhaf,鵷
+juhj,兛
+juhqu,兞
+juj,兙
 jujru,兢
 juks,勀
 juln,剜
 juln,剋
+juma,兡
+jumwg,兣
 jv,安
 jvd,案
 jvhaf,鶈
@@ -5833,6 +5840,7 @@ krje,攲
 krln,剞
 krmnr,哿
 krno,欹
+kromb,嗧
 krrj,癉
 krru,癌
 krse,瘕
@@ -6944,6 +6952,7 @@ mngwc,殰
 mnhaf,殦
 mnhaf,鴷
 mnhbt,殈
+mnhj,瓩
 mnhjd,殊
 mnhk,殀
 mnhne,歿
@@ -7472,6 +7481,7 @@ nfapp,鯤
 nfasm,鰨
 nfawe,鰻
 nfb,弰
+nfbcn,鰂
 nfbgr,鯛
 nfbmr,鮦
 nfbof,鰶
@@ -8892,6 +8902,7 @@ pumb,惴
 pumbc,頓
 pumt,愷
 punl,鄒
+punl,邨
 puog,雛
 puog,慛
 pupu,芻
@@ -9589,6 +9600,7 @@ rgyo,唗
 rhad,嘄
 rhaf,鳴
 rhag,喤
+rhai,啲
 rhaj,嗥
 rhbk,噢
 rhbr,響
@@ -10111,6 +10123,7 @@ rwg,哩
 rwgf,嘿
 rwgg,嚜
 rwim,嘓
+rwgn,嘢
 rwk,咽
 rwkp,嗯
 rwl,呷
@@ -12792,7 +12805,6 @@ xdytj,梓
 xdytu,檤
 xdywv,榱
 xea,沓
-xxea,汩
 xeafc,灝
 xeanr,闊
 xebcr,滘
@@ -13058,6 +13070,7 @@ xpmwd,憟
 xppa,恉
 xpsh,忉
 xpuk,忷
+xpunl,邨
 xpuog,慛
 xpwd,悃
 xqhe,洯
@@ -13076,6 +13089,7 @@ xqsyj,摒
 xqwd,捰
 xqybb,撾
 xqyjj,摙
+xr,。
 xrau,邑
 xrbuc,唄
 xrc,叭
@@ -13224,6 +13238,7 @@ xwpp,毘
 xxavh,鷐
 xxbm,囗
 xxbuo,膗
+xxea,汩
 xxebp,懘
 xxemb,瀜
 xxesm,渥
@@ -13239,6 +13254,7 @@ xxolo,儵
 xxorh,鵨
 xxou,屳
 xxpfm,顈
+xxr,○
 xxsev,婜
 xxsrh,鵘
 xxtgn,莰
@@ -13254,6 +13270,7 @@ xxxip,麀
 xxxmb,鴯
 xxxom,仜
 xxxtw,蘮
+xxxxx,○
 xxxya,鸆
 xxyhm,顪
 xxykh,鳼
@@ -14116,18 +14133,6 @@ yysd,遊
 yytj,遧
 yywm,邅
 yyws,逌
-juj,兙
-juhj,兛
-juhqu,兞
-jucsh,兝
-juma,兡
-jumwg,兣
-kromb,嗧
-mnhj,瓩
-fdmwg,糎
-xr,。
-xxr,○
-xxxxx,○
 yyyaa,「
 yyyab,」
 yyyac,『
@@ -14355,8 +14360,3 @@ zxcv,〝
 zxcw,〞
 zxcx,‵
 zxcy,′
-rhai,啲
-punl,邨
-xpunl,邨
-nfbcn,鰂
-rwgn,嘢
