@@ -1,6 +1,5 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
@@ -295,7 +294,7 @@ abstract class UICanvas(
     // end of handler func aliases
 
     init {
-        if (uiItems.isEmpty()) println("UICanvas '${this.javaClass.name}' has no UIItem registered, just so you know...")
+//        if (uiItems.isEmpty()) println("UICanvas '${this.javaClass.name}' has no UIItem registered, just so you know...")
     }
 
     companion object {

@@ -17,13 +17,13 @@ import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGH
 /**
  * Created by minjaesong on 2018-08-29.
  */
-open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<String>) : UICanvas() {
+open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>) : UICanvas() {
 
     override var openCloseTime = 0f
 
     private var remoConTray: UIRemoConElement // this remocon is dynamically generated
-    var currentRemoConContents = treeRepresentation; private set
-    private var currentlySelectedRemoConItem = treeRepresentation.data
+    var currentRemoConContents = treeRoot; private set
+    private var currentlySelectedRemoConItem = treeRoot.data
 
     override var width: Int
         get() = remoConWidth // somehow NOT making this constant causes a weird issue
@@ -40,7 +40,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
     init {
         remoConTray = generateNewRemoCon(currentRemoConContents)
 
-        registerUIclasses(treeRepresentation)
+        registerUIclasses(treeRoot)
     }
 
     private fun registerUIclasses(tree: QNDTreeNode<String>) {
@@ -49,6 +49,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
 
             if (splittedNodeName?.size == 2 && node.data != null) {
                 try {
+                    val tag = splittedNodeName[0].split(tagSep).getOrNull(1)
                     val attachedClass = loadClass(splittedNodeName[1]) // check existence
                     screenNames[node.data!!] = splittedNodeName[1] // actual loading will by dynamic as some UIs need to be re-initialised as they're called
                 }
@@ -100,6 +101,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                         val tag = it.tags
                         if (tag.contains("WRITETOCONFIG")) WriteConfig()
 
+                        print("[UIRemoCon] Returning from ${currentRemoConContents.data}")
 
                         if (currentRemoConContents.parent != null) {
                             remoConTray.consume()
@@ -109,6 +111,8 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
                             remoConTray = generateNewRemoCon(currentRemoConContents)
 
                             parent.uiFakeBlurOverlay.setAsClose()
+
+                            println(" to ${currentlySelectedRemoConItem}")
                         }
                         else {
                             throw NullPointerException("No parent node to return")
@@ -130,17 +134,7 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
 
                     // do something with the actual selection
                     //printdbg(this, "$currentlySelectedRemoConItem")
-                    openUI?.setAsClose()
-                    openUI?.dispose()
-
-                    printdbg(this, "$currentlySelectedRemoConItem has screen: ${screenNames.containsKey(currentlySelectedRemoConItem)}")
-                    screenNames[currentlySelectedRemoConItem]?.let {
-                        val ui = loadClass(it)
-                        ui.setPosition(0,0)
-                        parent.uiFakeBlurOverlay.setAsOpen()
-                        ui.setAsOpen()
-                        openUI = ui
-                    }
+                    openUI(currentlySelectedRemoConItem)
                 } }
             }
 
@@ -159,9 +153,12 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
 
     fun setNewRemoConContents(newCurrentRemoConContents: QNDTreeNode<String>, forceSetParent: QNDTreeNode<String>? = null) {
 
+        printdbg(this, "setting new remocon contents: ${newCurrentRemoConContents.data}")
+
         if (forceSetParent != null) {
             newCurrentRemoConContents.parent = forceSetParent
         }
+
 
         // only go deeper if that node has child to navigate
         if (newCurrentRemoConContents.children.size != 0) {
@@ -173,6 +170,23 @@ open class UIRemoCon(val parent: TitleScreen, treeRepresentation: QNDTreeNode<St
         registerUIclasses(newCurrentRemoConContents)
 
         currentlySelectedRemoConItem = newCurrentRemoConContents.data
+    }
+
+    fun openUI(menuString: String?) {
+        openUI?.let {
+            it.setAsClose()
+            it.dispose()
+        }
+
+
+        printdbg(this, "$menuString has screen: ${screenNames.containsKey(menuString)}")
+        screenNames[menuString]?.let {
+            val ui = loadClass(it)
+            ui.setPosition(0,0)
+            parent.uiFakeBlurOverlay.setAsOpen()
+            ui.setAsOpen()
+            openUI = ui
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

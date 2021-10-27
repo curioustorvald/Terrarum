@@ -18,14 +18,17 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.serialise.ReadPlayer
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.EntryFile
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.LoadSavegame
+import net.torvald.terrarum.serialise.ReadPlayer
+import net.torvald.terrarum.ui.Movement
+import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -179,13 +182,33 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     private fun getCells() = if (mode == 0) playerCells else worldCells
-    private val menuTree = arrayOf(UITitleRemoConYaml.injectedMenuSingleCharSel, UITitleRemoConYaml.injectedMenuSingleWorldSel).map { Yaml(it).parse() }
     private var loadFired = 0
     private var oldMode = -1
-    private val remoConParentNode = remoCon.currentRemoConContents
+
+    private val mode1Node = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
+    private val mode2Node = Yaml(UITitleRemoConYaml.injectedMenuSingleWorldSel).parse()
+
+    private val menus = listOf(mode1Node, mode2Node)
+
+    init {
+        // this UI will NOT persist; the parent of the mode1Node must be set using an absolute value (e.g. treeRoot, not remoCon.currentRemoConContents)
+
+        //printdbg(this, "UILoadDemoSaveFiles called, from:")
+        //printStackTrace(this)
+
+        mode1Node.parent = remoCon.treeRoot
+        mode2Node.parent = mode1Node
+
+        mode1Node.data = "MENU_MODE_SINGLEPLAYER+NODISPOSE : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
+        mode2Node.data = "MENU_MODE_SINGLEPLAYER+NODISPOSE : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
+
+        printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
+        printdbg(this, "mode1Node data: ${mode1Node.data}")
+        printdbg(this, "mode2Node data: ${mode2Node.data}")
+    }
 
     private fun modeChangedHandler(mode: Int) {
-        remoCon.setNewRemoConContents(menuTree[mode], remoConParentNode)
+        remoCon.setNewRemoConContents(menus[mode])
     }
 
     override fun updateUI(delta: Float) {

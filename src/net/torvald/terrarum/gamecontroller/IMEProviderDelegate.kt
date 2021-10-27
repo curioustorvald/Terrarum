@@ -87,5 +87,5 @@ class IMEDictionary(private val filename: String) {
 
         return if (out.isNotEmpty()) out.substring(1) else ""
     }
-    
+
 }
