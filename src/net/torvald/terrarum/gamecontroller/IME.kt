@@ -47,7 +47,7 @@ object IME {
     private val highLayers = HashMap<String, TerrarumInputMethod>()
 
     private val context = org.graalvm.polyglot.Context.newBuilder("js")
-            .allowHostAccess(org.graalvm.polyglot.HostAccess.ALL)
+            .allowHostAccess(org.graalvm.polyglot.HostAccess.EXPLICIT)
 //            .allowHostClassLookup { it.equals("net.torvald.terrarum.gamecontroller.IMEProviderDelegate") }
             .allowHostClassLookup { false }
             .allowIO(false)

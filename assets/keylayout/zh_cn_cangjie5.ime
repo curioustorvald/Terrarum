@@ -264,7 +264,7 @@ let reset = () => {
     states.candidates = ""
 }
 let getCandidatesUsingBuf = () =>  {
-    states.candidates = states.dict.get(states.buf) // comma-separated values
+    states.candidates = states.dict.getCangjie(states.buf) // comma-separated values
     states.code = 1 + (states.candidates.length == 0)
 //    console.log(`cangjie in, buf: ${states.buf}, candidates: ${states.candidates}`)
     return `${states.buf},${states.candidates}`
