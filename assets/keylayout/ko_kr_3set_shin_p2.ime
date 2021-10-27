@@ -498,5 +498,6 @@ return Object.freeze({"n":"신세벌식 P2","states":states,"c":"CuriousTo\uA75B
     return ret
 },
 "reset":()=>{ reset() },
-"composing":()=>(states.code!=0)
+"composing":()=>(states.code!=0),
+"maxCandidates":()=>1
 })

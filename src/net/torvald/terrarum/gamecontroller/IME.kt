@@ -13,12 +13,13 @@ data class TerrarumKeyLayout(
 
 data class TerrarumInputMethod(
         val name: String,
-        // (headkey, shiftin, altgrin)
-        val acceptChar: (Int, Boolean, Boolean) -> Pair<IMECanditates, IMEOutput>,
+        // (headkey, shiftin, altgrin, lowLayerKeysym)
+        val acceptChar: (Int, Boolean, Boolean, String) -> Pair<IMECanditates, IMEOutput>,
         val backspace: () -> IMECanditates,
         val endCompose: () -> IMEOutput,
         val reset: () -> Unit,
-        val composing: () -> Boolean
+        val composing: () -> Boolean,
+        val maxCandidates: () -> Int
 )
 
 /**
@@ -46,12 +47,15 @@ object IME {
     private val highLayers = HashMap<String, TerrarumInputMethod>()
 
     private val context = org.graalvm.polyglot.Context.newBuilder("js")
-            .allowHostAccess(org.graalvm.polyglot.HostAccess.NONE)
+            .allowHostAccess(org.graalvm.polyglot.HostAccess.ALL)
+//            .allowHostClassLookup { it.equals("net.torvald.terrarum.gamecontroller.IMEProviderDelegate") }
             .allowHostClassLookup { false }
             .allowIO(false)
             .build()
 
     init {
+        context.getBindings("js").putMember("IMEProvider", IMEProviderDelegate(this))
+
         File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.forEach {
             printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
             lowLayers[it.nameWithoutExtension.lowercase()] = parseKeylayoutFile(it)
@@ -115,8 +119,8 @@ object IME {
         val name = jsval.getMember("n").asString()
 
 
-        return TerrarumInputMethod(name, { headkey, shifted, alted ->
-            val a = jsval.invokeMember("accept", headkey, shifted, alted)
+        return TerrarumInputMethod(name, { headkey, shifted, alted, lowLayerKeysym ->
+            val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
             a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
         }, {
             jsval.invokeMember("backspace").asString().toCanditates()
@@ -126,6 +130,8 @@ object IME {
             jsval.invokeMember("reset")
         }, {
             jsval.invokeMember("composing").asBoolean()
+        }, {
+            jsval.invokeMember("maxCandidates").asInt()
         }
         )
     }

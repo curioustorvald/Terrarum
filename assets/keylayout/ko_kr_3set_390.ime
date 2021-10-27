@@ -474,5 +474,6 @@ return Object.freeze({"n":"세벌식 3-90","states":states,"c":"CuriousTo\uA75Bv
     return ret
 },
 "reset":()=>{ reset() },
-"composing":()=>(states.code!=0)
+"composing":()=>(states.code!=0),
+"maxCandidates":()=>1
 })

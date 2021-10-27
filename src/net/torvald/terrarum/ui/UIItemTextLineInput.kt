@@ -44,6 +44,9 @@ data class InputLenCap(val count: Int, val unit: CharLenUnit) {
 }
 
 /**
+ * Protip: if there are multiple TextLineInputs on a same UI, draw bottom one first, otherwise the IME's
+ * candidate window will be hidden by the bottom UIItem if they overlaps.
+ *
  * @param width width of the text input where the text gets drawn, not the entire item
  * @param height height of the text input where the text gets drawn, not the entire item
  *
@@ -230,7 +233,7 @@ class UIItemTextLineInput(
                     val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
 
                     val codepoints = if (ime != null) {
-                        val newStatus = ime.acceptChar(headkey, shiftin, altgrin)
+                        val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
                         candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
 
                         newStatus.second.toCodePoints()
@@ -340,6 +343,8 @@ class UIItemTextLineInput(
         return textbuf.toJavaString()
     }
 
+    private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
+
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         batch.end()
@@ -436,21 +441,36 @@ class UIItemTextLineInput(
         // draw candidates view
         if (candidates.isNotEmpty()) {
             val textWidths = candidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
-
-            val candidateWinW = (textWidths.maxOrNull() ?: 0).coerceAtLeast(20)
             val candidateWinH = App.fontGame.lineHeight.toInt() * candidates.size
 
-            // candidate view background
-            batch.color = TEXTINPUT_COL_BACKGROUND
-            Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, candidateWinW, candidateWinH)
-            // candidate view border
-            batch.color = Toolkit.Theme.COL_ACTIVE
-            Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, candidateWinW + 2, candidateWinH + 2)
-
             // candidate view text
-            for (i in candidates.indices) {
-                val previewTextWidth = textWidths[i]
-                App.fontGame.draw(batch, candidates[i], cursorXOnScreen + 2 + (candidateWinW - previewTextWidth) / 2, posY + 27 + i * 20)
+            if (getIME()!!.maxCandidates() > 1) {
+                val candidateWinW = textWidths.maxOrNull()!!.coerceAtLeast(20) + candidateNumberStrWidth
+
+                // candidate view background
+                batch.color = TEXTINPUT_COL_BACKGROUND
+                Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, candidateWinW + 4, candidateWinH)
+                // candidate view border
+                batch.color = Toolkit.Theme.COL_ACTIVE
+                Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, candidateWinW + 6, candidateWinH + 2)
+
+                for (i in 0..minOf(9, candidates.lastIndex)) {
+                    val candidateNum = listOf(i+48,46,32)
+                    App.fontGame.draw(batch, CodepointSequence(candidateNum + candidates[i]), cursorXOnScreen + 4, posY + 27 + i * 20)
+                }
+            }
+            else {
+                val candidateWinW = textWidths.maxOrNull()!!.coerceAtLeast(20)
+
+                // candidate view background
+                batch.color = TEXTINPUT_COL_BACKGROUND
+                Toolkit.fillArea(batch, cursorXOnScreen + 2, posY + 27, candidateWinW, candidateWinH)
+                // candidate view border
+                batch.color = Toolkit.Theme.COL_ACTIVE
+                Toolkit.drawBoxBorder(batch, cursorXOnScreen + 1, posY + 26, candidateWinW + 2, candidateWinH + 2)
+
+                val previewTextWidth = textWidths[0]
+                App.fontGame.draw(batch, candidates[0], cursorXOnScreen + 2 + (candidateWinW - previewTextWidth) / 2, posY + 27)
             }
         }
 

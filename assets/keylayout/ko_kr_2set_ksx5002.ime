@@ -453,5 +453,6 @@ return Object.freeze({"n":"두벌식 표준","states":states,"c":"CuriousTo\uA75
     return ret
 },
 "reset":()=>{ reset() },
-"composing":()=>(states.code!=0)
+"composing":()=>(states.code!=0),
+"maxCandidates":()=>1
 })
