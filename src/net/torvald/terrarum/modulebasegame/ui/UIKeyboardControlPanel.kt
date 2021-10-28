@@ -118,7 +118,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     ) // end of keycaps
 
-    private val buttonReset = UIItemTextButton(this, "MENU_LABEL_RESET", kbx + 1, kby + 165, 180, true, alignment = UIItemTextButton.Companion.Alignment.LEFT)
+    private val buttonReset = UIItemTextButton(this, "MENU_LABEL_RESET", kbx + 2, kby + 162, 140, true, hasBorder = true, alignment = UIItemTextButton.Companion.Alignment.CENTRE)
 
     private val symbolLeft = labels.get(0,2)
     private val symbolUp = labels.get(1,2)
