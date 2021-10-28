@@ -73,7 +73,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
         }
         backButton.touchDownListener = { _, _, _, _ ->
-            printdbg(this, "back!")
+            remoCon.openUI(UILoadDemoSavefiles(remoCon, 1))
         }
 
         addUIitem(sizeSelector)

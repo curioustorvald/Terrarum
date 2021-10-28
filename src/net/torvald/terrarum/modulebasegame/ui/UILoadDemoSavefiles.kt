@@ -29,6 +29,7 @@ import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -40,11 +41,41 @@ val SAVE_CELL_WIDTH = 480
 val SAVE_CELL_HEIGHT = 120
 
 /**
+ * The pinnacle of the dirty coding! This object exists only because I couldn't make
+ * UILoadDemoSavefiles persistent.
+ *
+ * This objects holds which Player and World has been chosen.
+ *
+ * WARNING: the values are not guaranteed to reset when the selector UI is closed!
+ */
+object UILoadGovernor {
+    var playerDisk: DiskSkimmer? = null
+        set(value) {
+            printdbg(this, "Player selected: ${value?.diskFile?.name}")
+            field = value
+        }
+
+    var worldDisk: DiskSkimmer? = null
+        set(value) {
+            printdbg(this, "World selected: ${value?.diskFile?.name}")
+            field = value
+        }
+
+    fun reset() {
+        printdbg(this, "Resetting player and world selection")
+        playerDisk = null
+        worldDisk = null
+    }
+}
+
+/**
  * Only works if current screen set by the App is [TitleScreen]
  *
  * Created by minjaesong on 2021-09-09.
  */
 class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
+
+    private val hash = RandomWordsName(3)
 
     init {
         CommonResourcePool.addToLoadingList("inventory_category") {
@@ -110,14 +141,14 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
     private var showSpinner = false
 
-    // used by UIItem*Cells
-    internal var playerDisk: DiskSkimmer? = null
-    internal var worldDisk: DiskSkimmer? = null
-
     private val worldCells = ArrayList<UIItemWorldCells>()
     private val playerCells = ArrayList<UIItemPlayerCells>()
 
     var mode = 0; private set// 0: show players, 1: show worlds
+
+    constructor(remoCon: UIRemoCon, mode: Int) : this(remoCon) {
+        this.mode = mode
+    }
 
     fun advanceMode() {
         mode += 1
@@ -189,6 +220,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
     private val mode2Node = Yaml(UITitleRemoConYaml.injectedMenuSingleWorldSel).parse()
 
     private val menus = listOf(mode1Node, mode2Node)
+    private val titles = listOf("CONTEXT_CHARACTER", "MENU_LABEL_WORLD")
 
     init {
         // this UI will NOT persist; the parent of the mode1Node must be set using an absolute value (e.g. treeRoot, not remoCon.currentRemoConContents)
@@ -199,8 +231,8 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
         mode1Node.parent = remoCon.treeRoot
         mode2Node.parent = mode1Node
 
-        mode1Node.data = "MENU_MODE_SINGLEPLAYER+NODISPOSE : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
-        mode2Node.data = "MENU_MODE_SINGLEPLAYER+NODISPOSE : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
+        mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
+        mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
 
         printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
         printdbg(this, "mode1Node data: ${mode1Node.data}")
@@ -267,7 +299,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
             App.fontGame.draw(batch, txt, (App.scr.width - App.fontGame.getWidth(txt)) / 2f, (App.scr.height - App.fontGame.lineHeight) / 2f)
 
             if (loadFired == 2) {
-                LoadSavegame(playerDisk!!, worldDisk)
+                LoadSavegame(UILoadGovernor.playerDisk!!, UILoadGovernor.worldDisk)
             }
         }
         else {
@@ -327,7 +359,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
 
                 // draw texts
-                val loadGameTitleStr = Lang["MENU_IO_LOAD"]
+                val loadGameTitleStr = Lang[titles[mode]] + "$EMDASH$hash"
                 // "Game Load"
                 App.fontGame.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
                 // Control help
@@ -445,7 +477,7 @@ class UIItemPlayerCells(
     private var thumb: TextureRegion? = null
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
-        parent.playerDisk = skimmer
+        UILoadGovernor.playerDisk = skimmer
         parent.advanceMode()
     }
 
@@ -641,7 +673,7 @@ class UIItemWorldCells(
     }
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
-        parent.worldDisk = skimmer
+        UILoadGovernor.worldDisk = skimmer
         parent.advanceMode()
     }
 

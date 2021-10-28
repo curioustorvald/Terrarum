@@ -76,7 +76,7 @@ open class UIItemTransitionContainer(
 
         uis.forEachIndexed { index, ui ->
             if (currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon) {
-                ui.setAsOpen()
+                if (!ui.isOpened && !ui.isOpening) ui.setAsOpen()
                 ui.render(batch, camera)
 
                 if (debugvals) {
@@ -84,7 +84,7 @@ open class UIItemTransitionContainer(
                 }
             }
             else {
-                ui.setAsClose()
+                if (!ui.isClosed && !ui.isClosing) ui.setAsClose()
             }
         }
 

@@ -43,6 +43,8 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         registerUIclasses(treeRoot)
     }
 
+    var currentRemoConLabelCount = 0; private set
+
     private fun registerUIclasses(tree: QNDTreeNode<String>) {
         tree.traversePreorder { node, _ ->
             val splittedNodeName = node.data?.split(yamlSep)
@@ -72,6 +74,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
     private fun generateNewRemoCon(node: QNDTreeNode<String>): UIRemoConElement {
         val labels = Array(node.children.size) { node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep)?.get(0) ?: "(null)" }
         val tags = Array(node.children.size) { arrayOf(node.children[it].data?.split(yamlSep)?.get(0)?.split(tagSep)?.getOrNull(1) ?: "") }
+        currentRemoConLabelCount = labels.size
         return UIRemoConElement(this, labels, tags)
     }
 
@@ -189,6 +192,20 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         }
     }
 
+    fun openUI(external: UICanvas) {
+        openUI?.let {
+            it.setAsClose()
+            it.dispose()
+        }
+
+
+        printdbg(this, "Displaying external UI ${external.javaClass.canonicalName}")
+        external.setPosition(0,0)
+        parent.uiFakeBlurOverlay.setAsOpen()
+        external.setAsOpen()
+        openUI = external
+    }
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         remoConTray.render(batch, camera)
         openUI?.render(batch, camera)
@@ -253,8 +270,10 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
 
     class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>, val tags: Array<Array<String>>) {
 
-        private val lineHeight = 36
-        private val paddingLeft = 48
+        companion object {
+            const val lineHeight = 36
+            const val paddingLeft = 48
+        }
 
         private val menubar = UIItemTextButtonList(
                 uiRemoCon,
