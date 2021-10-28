@@ -57,9 +57,9 @@ class IMEDictionary(private val filename: String) {
         var index = keys.searchForInterval(key) { it }.second
 
         val allRelevantKeys = ArrayList<String>() // oh, oha, ohag, ohbt, ohby, ...
-        for (i in 0 until 400) { // lookahead for length-first sorting, longest lookahead possible is around 300, so I'll give it 400
-            if (index + 1 >= keys.size) break
-            val keysym = keys[index + i]
+        for (k in 0 until 400) { // lookahead for length-first sorting, longest lookahead possible is around 300, so I'll give it 400
+            if (index + k >= keys.size) break
+            val keysym = keys[index + k]
             if (!keysym.startsWith(key)) break
             allRelevantKeys.add(keysym)
         }
