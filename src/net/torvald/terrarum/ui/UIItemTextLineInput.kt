@@ -425,20 +425,20 @@ class UIItemTextLineInput(
         // draw icon
         if (enablePasteButton && enableIMEButton) {
             // IME button
-            batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_HIGHLIGHT else if (mouseUpOnButton1) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
+            batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton1) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
             batch.draw(labels.get(7,2), btn1PosX + 2f, posY + 2f)
             // paste button
-            batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_HIGHLIGHT else if (mouseUpOnButton2) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
+            batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton2) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
             batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
         }
         else if (!enableIMEButton && enablePasteButton) {
             // paste button
-            batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_HIGHLIGHT else if (mouseUpOnButton2) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
+            batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton2) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
             batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
         }
         else if (!enablePasteButton && enableIMEButton) {
             // IME button
-            batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_HIGHLIGHT else if (mouseUpOnButton1) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
+            batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton1) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
             batch.draw(labels.get(7,2), btn2PosX + 2f, posY + 2f)
         }
 
@@ -448,7 +448,8 @@ class UIItemTextLineInput(
             val textWidths = candidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
             val candidatesMax = getIME()!!.maxCandidates()
             val candidatesCount = minOf(candidatesMax, candidates.size)
-            val halfcount = FastMath.ceil(candidatesCount / 2f)
+            val isOnecolumn = (candidatesCount <= 3)
+            val halfcount = if (isOnecolumn) candidatesCount else FastMath.ceil(candidatesCount / 2f)
             val candidateWinH = App.fontGame.lineHeight.toInt() * halfcount
             val candidatePosX = cursorXOnScreen + 4
             val candidatePosY = posY + 2
@@ -456,7 +457,7 @@ class UIItemTextLineInput(
             // candidate view text
             if (candidatesMax > 1) {
                 val longestCandidateW = textWidths.maxOrNull()!! + candidateNumberStrWidth
-                val candidateWinW = if (candidatesCount == 1) longestCandidateW else 2*longestCandidateW + 3
+                val candidateWinW = if (isOnecolumn) longestCandidateW else 2*longestCandidateW + 3
 
                 // candidate view background
                 batch.color = candidatesBackCol
@@ -475,7 +476,7 @@ class UIItemTextLineInput(
                 }
 
                 // candidate view splitter
-                if (candidatesCount > 1) {
+                if (!isOnecolumn) {
                     batch.color = batch.color.cpy().mul(0.65f,0.65f,0.65f,1f)
                     Toolkit.fillArea(batch, candidatePosX + longestCandidateW + 2, candidatePosY, 1, candidateWinH)
                 }
