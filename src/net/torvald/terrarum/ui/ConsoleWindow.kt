@@ -26,9 +26,9 @@ class ConsoleWindow : UICanvas() {
     internal var UIColour = Color(0x404080_80.toInt())
 
     private var inputCursorPos: Int = 0
-    private val MESSAGES_MAX = 5000
+    private val MESSAGES_MAX = 1000
     private val COMMAND_HISTORY_MAX = 100
-    private var messages = Array(MESSAGES_MAX) { "" }
+    private var messages = CircularArray<String>(MESSAGES_MAX, true)
     private var messageDisplayPos: Int = 0
     private var messagesCount: Int = 0
 
@@ -48,6 +48,8 @@ class ConsoleWindow : UICanvas() {
     private var openingTimeCounter = 0f
 
     private var historyIndex = -1
+
+    private var iMadeTheGameToPause = false
 
     init {
         reset()
@@ -94,9 +96,9 @@ class ConsoleWindow : UICanvas() {
 
 
         // messages
-        for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {
-            val message = messages[messageDisplayPos + i]
-            App.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
+        for (i in 0 until MESSAGES_DISPLAY_COUNT) {
+            val message = messages[messageDisplayPos + i] ?: ""
+            App.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT - i)).toFloat() + drawOffY)
         }
     }
 
@@ -167,11 +169,9 @@ class ConsoleWindow : UICanvas() {
     }
 
     fun sendMessage(msg: String) {
-        messages[messagesCount] = msg
+        messages.appendHead(msg)
         messagesCount += 1
-        if (messagesCount > MESSAGES_DISPLAY_COUNT) {
-            messageDisplayPos = messagesCount - MESSAGES_DISPLAY_COUNT
-        }
+
     }
 
     private fun setDisplayPos(change: Int) {
@@ -195,7 +195,7 @@ class ConsoleWindow : UICanvas() {
     }
 
     fun reset() {
-        messages = Array(MESSAGES_MAX) { "" }
+        messages = CircularArray<String>(MESSAGES_MAX, true)
         messageDisplayPos = 0
         messagesCount = 0
         inputCursorPos = 0
@@ -210,7 +210,17 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun doOpening(delta: Float) {
-        Terrarum.ingame?.pause()
+        Terrarum.ingame?.let {
+            println("Game was paused beforehand: ${it.paused}")
+            if (!it.paused) {
+                iMadeTheGameToPause = true
+                it.pause()
+            }
+            else {
+                iMadeTheGameToPause = false
+            }
+            println("I made the game to pause: $iMadeTheGameToPause")
+        }
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 -height.toFloat(), 0f
@@ -218,7 +228,6 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun doClosing(delta: Float) {
-        Terrarum.ingame?.resume()
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 0f, -height.toFloat()
@@ -226,16 +235,20 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
-        Terrarum.ingame?.pause()
         drawOffY = 0f
         openingTimeCounter = 0f
     }
 
     override fun endClosing(delta: Float) {
         Terrarum.ingame?.setTooltipMessage(null)
-        Terrarum.ingame?.resume()
+        println("Close -- I made the game to pause: $iMadeTheGameToPause")
+        if (iMadeTheGameToPause) {
+            Terrarum.ingame?.resume()
+            println("Close -- resume game")
+        }
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
+        iMadeTheGameToPause = false
     }
 
     override fun dispose() {

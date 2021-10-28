@@ -637,6 +637,8 @@ class UIContainer {
     fun contains(element: Any) = data.contains(element)
 
     fun <T> map(transformation: (UICanvas?) -> T) = iterator().asSequence().map(transformation)
+
+    fun filter(predicate: (Any) -> Boolean) = data.filter(predicate)
 }
 
 interface Id_UICanvasNullable {

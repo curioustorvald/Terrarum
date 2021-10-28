@@ -61,7 +61,7 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
 
     open var consoleHandler: ConsoleWindow = ConsoleWindow()
 
-    var paused: Boolean = false
+    var paused: Boolean = false; protected set
     val consoleOpened: Boolean
         get() = consoleHandler.isOpened || consoleHandler.isOpening
 
@@ -70,7 +70,6 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
     /** For in-world text overlays? e.g. cursor on the ore block and tooltip will say "Malachite" or something */
     open var uiTooltip: UITooltip = UITooltip()
     open var notifier: Notification = Notification()
-
 
     init {
         consoleHandler.setPosition(0, 0)
@@ -151,9 +150,11 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
     }
 
     override fun pause() {
+        paused = true
     }
 
     override fun resume() {
+        paused = false
     }
 
     override fun resize(width: Int, height: Int) {

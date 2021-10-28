@@ -6,12 +6,20 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
+import net.torvald.random.XXHash64
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VirtualDisk
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.ReadActor
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 
@@ -71,6 +79,28 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
         goButton.touchDownListener = { _, _, _, _ ->
             printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
+
+            val ingame = TerrarumIngame(App.batch)
+            val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer
+            val seed = try {
+                seedInput.getTextOrPlaceholder().toLong()
+            }
+            catch (e: NumberFormatException) {
+                XXHash64.hash(seedInput.getTextOrPlaceholder().toByteArray(Charsets.UTF_8), 10000)
+            }
+            val (wx, wy) = TerrarumIngame.WORLDSIZE[sizeSelector.selection]
+            val worldParam = TerrarumIngame.NewGameParams(
+                    player, TerrarumIngame.NewWorldParameters(
+                        wx, wy, seed, nameInput.getTextOrPlaceholder()
+                    )
+            )
+            ingame.gameLoadInfoPayload = worldParam
+            ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
+
+            Terrarum.setCurrentIngameInstance(ingame)
+            val loadScreen = WorldgenLoadScreen(ingame, wx, wy)
+            App.setLoadScreen(loadScreen)
+
         }
         backButton.touchDownListener = { _, _, _, _ ->
             remoCon.openUI(UILoadDemoSavefiles(remoCon, 1))

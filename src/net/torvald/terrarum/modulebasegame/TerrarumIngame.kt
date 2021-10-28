@@ -137,6 +137,12 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                  (this.hitbox.endX + world.width >= WorldCamera.x && this.hitbox.startX + world.width <= WorldCamera.xEnd) ||
                  // x: neither
                  (this.hitbox.endX >= WorldCamera.x && this.hitbox.startX <= WorldCamera.xEnd))
+
+        val SIZE_SMALL = Point2i(6030, 1800)
+        val SIZE_NORMAL = Point2i(9000, 2250)
+        val SIZE_LARGE = Point2i(13500, 2970)
+        val SIZE_HUGE = Point2i(22500, 4500)
+        val WORLDSIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
     }
 
 
@@ -1222,14 +1228,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         if (punchBlockSize > 0) {
             PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize, false)
         }
-    }
-
-    override fun pause() {
-        paused = true
-    }
-
-    override fun resume() {
-        paused = false
     }
 
     override fun hide() {
