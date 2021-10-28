@@ -27,13 +27,15 @@ class IMEDictionary(private val filename: String) {
     private fun loadDict() {
         val reader = FileReader(File("assets/keylayout/", filename))
         reader.forEachLine {
-            val (key, value) = it.split(',')
-            if (candidates.containsKey(key)) {
-                candidates[key] += ",$value"
-            }
-            else {
-                candidates[key] = value
-                keys.add(key)
+            if (it.contains(',')) {
+                val (key, value) = it.split(',')
+                if (candidates.containsKey(key)) {
+                    candidates[key] += ",$value"
+                }
+                else {
+                    candidates[key] = value
+                    keys.add(key)
+                }
             }
         }
 
@@ -55,7 +57,7 @@ class IMEDictionary(private val filename: String) {
         var index = keys.searchForInterval(key) { it }.second
 
         val allRelevantKeys = ArrayList<String>() // oh, oha, ohag, ohbt, ohby, ...
-        for (i in 0 until 10) {
+        for (i in 0 until 400) { // lookahead for length-first sorting, longest lookahead possible is around 300, so I'll give it 400
             if (index + 1 >= keys.size) break
             val keysym = keys[index + i]
             if (!keysym.startsWith(key)) break
