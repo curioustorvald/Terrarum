@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.BULLET
+import net.torvald.ENDASH
 
 object CreditSingleton {
 
@@ -8,12 +9,12 @@ object CreditSingleton {
             ("Programming, Arts, Directed by CuriousTorvald (minjaesong)\n" +
              "Sound Effects by FreeSound.org and Klankbeeld\n" +
              "Translation Databases:\n" +
-             "$BULLET © 2018 The Polyglot Project. Distributed under CC0.\n" +
-             "$BULLET Entry from the Microsoft Language Portal. © 2018 Microsoft Corporation. All rights reserved.\n" +
+             "$ENDASH © 2018 The Polyglot Project. Distributed under CC0.\n" +
+             "$ENDASH Entry from the Microsoft Language Portal. © 2018 Microsoft Corporation. All rights reserved.\n" +
              """
 
 
-Terrarum
+$BULLET Terrarum
 
 Copyright (C) 2013-2021 CuriousTorvald (minjaesong)
 
@@ -34,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-Terrarum Sans Bitmap
+$BULLET Terrarum Sans Bitmap
 
 Copyright (c) 2017-2021 Minjae Song ("CuriousTorvald") and the contributors
 
@@ -60,15 +61,7 @@ THE SOFTWARE.
 
 
 
-Simplex Noise Generator, version 2012-03-09 by Stefan Gustavson
-
-Released as public domain
-
-
-
-
-
-Joise
+$BULLET Joise
 
 Copyright (C) 2013 Jason Taylor
 
@@ -111,7 +104,7 @@ Copyright (C) 2011 Joshua Tippetts
 
 
 
-Vector2.java, Epsilon.java
+$BULLET Vector2.java, Epsilon.java
 
 Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
 All rights reserved.
