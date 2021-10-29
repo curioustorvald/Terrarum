@@ -55,8 +55,6 @@ class UIItemInventoryItemGrid(
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
     override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-    val backColour = CELL_COL
-
     init {
         CommonResourcePool.addToLoadingList("inventory_walletnumberfont") {
             TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
@@ -92,11 +90,8 @@ class UIItemInventoryItemGrid(
     var inventorySortList = ArrayList<InventoryPair>()
     private var rebuildList = true
 
-    val defaultTextColour = Color(0xeaeaea_ff.toInt())
-
     private val walletFont = TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
     private var walletText = ""
-
 
 
     companion object {
@@ -179,12 +174,7 @@ class UIItemInventoryItemGrid(
                 item = null,
                 amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
-                mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = backColour,
-                backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
-                inactiveTextCol = defaultTextColour,
                 keyDownFun = keyDownFun,
                 touchDownFun = touchDownFun
         )
@@ -202,12 +192,7 @@ class UIItemInventoryItemGrid(
                 item = null,
                 amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
-                mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = backColour,
-                backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
-                inactiveTextCol = defaultTextColour,
                 keyDownFun = keyDownFun,
                 touchDownFun = touchDownFun
         )
@@ -228,7 +213,7 @@ class UIItemInventoryItemGrid(
         posX - LIST_TO_CONTROL_GAP - catBar.catIcons.tileW + 2
 
     private fun getIconPosY(index: Int) =
-            posY - 2 + (4 + UIItemInventoryElemWide.height - catBar.catIcons.tileH) * index
+            posY - 1 + (4 + UIItemInventoryElemWide.height - catBar.catIcons.tileH) * index
 
     /** Long/compact mode buttons */
     internal val gridModeButtons = Array<UIItemImageButton>(2) { index ->
@@ -350,7 +335,7 @@ class UIItemInventoryItemGrid(
                 batch.draw(
                         walletFont.get(0, it - '0'),
                         gridModeButtons[0].posX.toFloat(), // scroll button size: 20px, font width: 20 px
-                        gridModeButtons[0].posY + height - index * walletFont.tileH.toFloat()
+                        gridModeButtons[0].posY + height - index * walletFont.tileH - 1f
                 )
             }
         }

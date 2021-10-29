@@ -5,13 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.itemListHeight
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.Toolkit.Theme.COL_INVENTORY_CELL_BORDER
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 
@@ -32,7 +29,7 @@ class UIItemInventoryEquippedView(
     companion object {
         val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap
         //val HEIGHT = UIItemInventoryDynamicList.HEIGHT
-        val SPRITE_DRAW_COL = Color(0xddddddff.toInt())
+        val SPRITE_DRAW_COL = Color(0xf2f2f2ff.toInt())
     }
 
     private val listGap = 8
@@ -42,8 +39,6 @@ class UIItemInventoryEquippedView(
 
     lateinit var inventorySortList: Array<GameItem?>
     private var rebuildList = true
-    
-    val spriteViewBackCol: Color = CELL_COL
 
     private val equipPosIcon = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val cellToIcon = intArrayOf(0,1,2,3,4,5,6,7,6,7,6,7)
@@ -57,10 +52,6 @@ class UIItemInventoryEquippedView(
                 item = null,
                 amount = UIItemInventoryElemWide.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
-                mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = CELL_COL,
-                backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 keyDownFun = createInvCellGenericKeyDownFun(),
                 touchDownFun = createInvCellGenericTouchDownFun(inventoryListRebuildFun) // to "unselect" the equipped item and main item grid would "untick" accordingly
@@ -73,16 +64,16 @@ class UIItemInventoryEquippedView(
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+        blendNormal(batch)
+
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
 
-
-
-        // sprite background
-        blendNormal(batch)
-        batch.color = spriteViewBackCol
+        // sprite cell background
+        batch.color = Toolkit.Theme.COL_CELL_FILL
         Toolkit.fillArea(batch, posX, posY, width, width)
-        batch.color = COL_INVENTORY_CELL_BORDER
+        // sprite cell border
+        batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
         Toolkit.drawBoxBorder(batch, posX, posY, width, width)
 
 

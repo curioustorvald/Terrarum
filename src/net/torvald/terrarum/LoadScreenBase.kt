@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.CircularArray
 
@@ -38,7 +39,7 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
                     screenToLoad!!.show()
                 }
                 catch (e: Exception) {
-                    addMessage("$ccR$e")
+                    addMessage("$ccR${Lang["ERROR_SAVE_CORRUPTED"].replace(".","")}: $e")
                     errorTrapped = true
 
                     System.err.println("Error while loading:")

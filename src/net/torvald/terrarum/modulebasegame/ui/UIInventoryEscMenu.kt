@@ -212,6 +212,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     }
 
     override fun endOpening(delta: Float) {
+        INGAME.setTooltipMessage(null)
     }
 
     override fun endClosing(delta: Float) {

@@ -82,115 +82,123 @@ object VDUtil {
             val entryModifyTime = inbytes.sliceArray64(entryOffset + 26..entryOffset + 31).toInt48Big()
             val entryCRC = inbytes.sliceArray64(entryOffset + 32..entryOffset + 35).toIntBig() // to check with completed entry
 
-            val entryData = when (entryTypeFlag and 127) {
-                DiskEntry.NORMAL_FILE -> {
-                    val filesize = inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 5).toInt48Big()
-                    //println("[VDUtil] --> is file; filesize = $filesize")
-                    inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE + 6..entryOffset + DiskEntry.HEADER_SIZE + 5 + filesize)
-                }
-                DiskEntry.DIRECTORY   -> {
-                    val entryCount = inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 3).toIntBig()
-                    //println("[VDUtil] --> is directory; entryCount = $entryCount")
-                    inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE + 4..entryOffset + DiskEntry.HEADER_SIZE + 3 + entryCount * 8)
-                }
-                DiskEntry.SYMLINK     -> {
-                    inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 7)
-                }
-                else -> throw RuntimeException("Unknown entry with type $entryTypeFlag at entryOffset $entryOffset")
-            }
-
-            if (DEBUG_PRINT_READ) {
-                println("[savegame.VDUtil] == Entry deserialise debugprint for entry ID $entryID (child of $entryParentID)")
-                println("Entry type flag: ${entryTypeFlag and 127}${if (entryTypeFlag < 0) "*" else ""}")
-                println("Entry raw contents bytes: (len: ${entryData.size})")
-                entryData.forEachIndexed { i, it ->
-                    if (i > 0 && i % 8 == 0L) print(" ")
-                    else if (i > 0 && i % 4 == 0L) print("_")
-                    print(it.toInt().toHex().substring(6))
-                }; println()
-            }
-
-
-            // update entryOffset so that we can fetch next entry in the binary
-            entryOffset += DiskEntry.HEADER_SIZE + entryData.size + when (entryTypeFlag and 127) {
-                DiskEntry.NORMAL_FILE -> 6      // PLEASE DO REFER TO Spec.md
-                DiskEntry.DIRECTORY   -> 4      // PLEASE DO REFER TO Spec.md
-                DiskEntry.SYMLINK     -> 0      // PLEASE DO REFER TO Spec.md
-                else -> throw RuntimeException("Unknown entry with type $entryTypeFlag")
-            }
-
-
-            // check for the discard bit
-            if (entryTypeFlag > 0) {
-
-                // create entry
-                val diskEntry = DiskEntry(
-                    entryID = entryID,
-                    parentEntryID = entryParentID,
-                    creationDate = entryCreationTime,
-                    modificationDate = entryModifyTime,
-                    contents = if (entryTypeFlag == DiskEntry.NORMAL_FILE) {
-                        EntryFile(entryData)
-                    } else if (entryTypeFlag == DiskEntry.DIRECTORY) {
-
-                        val entryList = ArrayList<EntryID>()
-
-                        (0 until entryData.size / 8).forEach { cnt ->
-                            entryList.add(entryData.sliceArray64(8 * cnt until 8 * (cnt+1)).toLongBig())
-                        }
-
-                        entryList.sort()
-
-                        EntryDirectory(entryList)
-                    } else if (entryTypeFlag == DiskEntry.SYMLINK) {
-                        EntrySymlink(entryData.toLongBig())
-                    } else
-                        throw RuntimeException("Unknown entry with type $entryTypeFlag")
-                )
-
-                // check CRC of entry
-                if (crcWarnLevel == Level.SEVERE || crcWarnLevel == Level.WARNING) {
-
-                    // test print
-                    if (DEBUG_PRINT_READ) {
-                        val testbytez = diskEntry.contents.serialize()
-                        val testbytes = testbytez.array
-                        (diskEntry.contents as? EntryDirectory)?.forEach {
-                            println("entry: ${it.toHex()}")
-                        }
-                        println("[savegame.VDUtil] bytes to calculate crc against:")
-                        testbytes.forEachIndexed { i, it ->
-                            if (i % 4 == 0L) print(" ")
-                            print(it.toInt().toHex().substring(6))
-                        }
-                        println("\nCRC: " + testbytez.getCRC32().toHex())
+            try {
+                val entryData = when (entryTypeFlag and 127) {
+                    DiskEntry.NORMAL_FILE -> {
+                        val filesize = inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 5).toInt48Big()
+                        //println("[VDUtil] --> is file; filesize = $filesize")
+                        inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE + 6..entryOffset + DiskEntry.HEADER_SIZE + 5 + filesize)
                     }
-                    // end of test print
-
-                    val calculatedCRC = diskEntry.contents.serialize().getCRC32()
-
-                    val crcMsg =
-                        "CRC failed: stored value is ${entryCRC.toHex()}, but calculated value is ${calculatedCRC.toHex()}\n" +
-                                "at file \"${diskIDtoReadableFilename(diskEntry.entryID)}\" (entry ID ${diskEntry.entryID})"
-
-                    if (calculatedCRC != entryCRC) {
-
-                        println("[savegame.VDUtil] CRC failed; entry info:\n$diskEntry")
-
-                        if (crcWarnLevel == Level.SEVERE)
-                            throw IOException(crcMsg)
-                        else if (warningFunc != null)
-                            warningFunc(crcMsg)
+                    DiskEntry.DIRECTORY   -> {
+                        val entryCount = inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 3).toIntBig()
+                        //println("[VDUtil] --> is directory; entryCount = $entryCount")
+                        inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE + 4..entryOffset + DiskEntry.HEADER_SIZE + 3 + entryCount * 8)
                     }
+                    DiskEntry.SYMLINK     -> {
+                        inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 7)
+                    }
+                    else                  -> throw RuntimeException("Unknown entry with type $entryTypeFlag at entryOffset $entryOffset")
                 }
 
-                // add entry to disk
-                vdisk.entries[entryID] = diskEntry
-            }
-            else {
                 if (DEBUG_PRINT_READ) {
-                    println("[savegame.VDUtil] Discarding entry ${entryID.toHex()} (raw type flag: $entryTypeFlag)")
+                    println("[savegame.VDUtil] == Entry deserialise debugprint for entry ID $entryID (child of $entryParentID)")
+                    println("Entry type flag: ${entryTypeFlag and 127}${if (entryTypeFlag < 0) "*" else ""}")
+                    println("Entry raw contents bytes: (len: ${entryData.size})")
+                    entryData.forEachIndexed { i, it ->
+                        if (i > 0 && i % 8 == 0L) print(" ")
+                        else if (i > 0 && i % 4 == 0L) print("_")
+                        print(it.toInt().toHex().substring(6))
+                    }; println()
                 }
+
+
+                // update entryOffset so that we can fetch next entry in the binary
+                entryOffset += DiskEntry.HEADER_SIZE + entryData.size + when (entryTypeFlag and 127) {
+                    DiskEntry.NORMAL_FILE -> 6      // PLEASE DO REFER TO Spec.md
+                    DiskEntry.DIRECTORY   -> 4      // PLEASE DO REFER TO Spec.md
+                    DiskEntry.SYMLINK     -> 0      // PLEASE DO REFER TO Spec.md
+                    else -> throw RuntimeException("Unknown entry with type $entryTypeFlag")
+                }
+
+
+                // check for the discard bit
+                if (entryTypeFlag > 0) {
+
+                    // create entry
+                    val diskEntry = DiskEntry(
+                        entryID = entryID,
+                        parentEntryID = entryParentID,
+                        creationDate = entryCreationTime,
+                        modificationDate = entryModifyTime,
+                        contents = if (entryTypeFlag == DiskEntry.NORMAL_FILE) {
+                            EntryFile(entryData)
+                        } else if (entryTypeFlag == DiskEntry.DIRECTORY) {
+
+                            val entryList = ArrayList<EntryID>()
+
+                            (0 until entryData.size / 8).forEach { cnt ->
+                                entryList.add(entryData.sliceArray64(8 * cnt until 8 * (cnt+1)).toLongBig())
+                            }
+
+                            entryList.sort()
+
+                            EntryDirectory(entryList)
+                        } else if (entryTypeFlag == DiskEntry.SYMLINK) {
+                            EntrySymlink(entryData.toLongBig())
+                        } else
+                            throw RuntimeException("Unknown entry with type $entryTypeFlag")
+                    )
+
+                    // check CRC of entry
+                    if (crcWarnLevel == Level.SEVERE || crcWarnLevel == Level.WARNING) {
+
+                        // test print
+                        if (DEBUG_PRINT_READ) {
+                            val testbytez = diskEntry.contents.serialize()
+                            val testbytes = testbytez.array
+                            (diskEntry.contents as? EntryDirectory)?.forEach {
+                                println("entry: ${it.toHex()}")
+                            }
+                            println("[savegame.VDUtil] bytes to calculate crc against:")
+                            testbytes.forEachIndexed { i, it ->
+                                if (i % 4 == 0L) print(" ")
+                                print(it.toInt().toHex().substring(6))
+                            }
+                            println("\nCRC: " + testbytez.getCRC32().toHex())
+                        }
+                        // end of test print
+
+                        val calculatedCRC = diskEntry.contents.serialize().getCRC32()
+
+                        val crcMsg =
+                            "CRC failed: stored value is ${entryCRC.toHex()}, but calculated value is ${calculatedCRC.toHex()}\n" +
+                                    "at file \"${diskIDtoReadableFilename(diskEntry.entryID)}\" (entry ID ${diskEntry.entryID})"
+
+                        if (calculatedCRC != entryCRC) {
+
+                            println("[savegame.VDUtil] CRC failed; entry info:\n$diskEntry")
+
+                            if (crcWarnLevel == Level.SEVERE)
+                                throw IOException(crcMsg)
+                            else if (warningFunc != null)
+                                warningFunc(crcMsg)
+                        }
+                    }
+
+                    // add entry to disk
+                    vdisk.entries[entryID] = diskEntry
+                }
+                else {
+                    if (DEBUG_PRINT_READ) {
+                        println("[savegame.VDUtil] Discarding entry ${entryID.toHex()} (raw type flag: $entryTypeFlag)")
+                    }
+                }
+            }
+            catch (e: ArrayIndexOutOfBoundsException) {
+                System.err.println("An error occurred while reading a file (entryID: $entryID (${diskIDtoReadableFilename(entryID)}), typeFlag: $entryTypeFlag)")
+                System.err.println("Stack trace:")
+                e.printStackTrace()
+                break
             }
         }
 

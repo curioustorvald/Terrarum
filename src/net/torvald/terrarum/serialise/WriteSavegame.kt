@@ -16,6 +16,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
 import java.io.File
 import java.io.Reader
+import java.util.logging.Level
 
 /**
  * It's your responsibility to create a new VirtualDisk if your save is new, and create a backup for modifying existing save.
@@ -152,12 +153,14 @@ object LoadSavegame {
         world.layerWall = BlockLayer(world.width, world.height)
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
-        newIngame.worldDisk = worldDisk.sync()
-        newIngame.playerDisk = playerDisk.sync()
+        newIngame.worldDisk =  VDUtil.readDiskArchive(worldDisk.diskFile, Level.INFO)
+        newIngame.playerDisk = VDUtil.readDiskArchive(playerDisk.diskFile, Level.INFO)
         newIngame.savegameNickname = getSavegameNickname(worldDisk)
         newIngame.worldSavefileName = getWorldSavefileName(newIngame.savegameNickname, world)
         newIngame.playerSavefileName = getPlayerSavefileName(player)
 
+        worldDisk.dispose()
+        playerDisk.dispose()
 
         val loadJob = { it: LoadScreenBase ->
             val loadscreen = it as ChunkLoadingLoadScreen
@@ -165,7 +168,7 @@ object LoadSavegame {
 
 
             val actors = world.actors.distinct()
-            val worldParam = TerrarumIngame.Codices(worldDisk, world, actors, player)
+            val worldParam = TerrarumIngame.Codices(newIngame.worldDisk, world, actors, player)
 
 
             newIngame.gameLoadInfoPayload = worldParam
@@ -181,7 +184,7 @@ object LoadSavegame {
                 for (layer in worldLayer.indices) {
                     loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*worldLayer.size+layer+1}/${chunkCount*2}")
 
-                    val chunkFile = worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
+                    val chunkFile = newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
 
                     ReadWorld.decodeChunkToLayer(chunkFile.getContent(), worldLayer[layer]!!, chunkXY.x, chunkXY.y)
@@ -192,10 +195,9 @@ object LoadSavegame {
             world.renumberTilesAfterLoad()
 
 
-            Echo("${ccW}World loaded: $ccY${worldDisk.getDiskName(Common.CHARSET)}")
-            printdbg(this, "World loaded: ${worldDisk.getDiskName(Common.CHARSET)}")
+            Echo("${ccW}World loaded: $ccY${newIngame.worldDisk.getDiskName(Common.CHARSET)}")
+            printdbg(this, "World loaded: ${newIngame.worldDisk.getDiskName(Common.CHARSET)}")
         }
-
 
         val loadScreen = ChunkLoadingLoadScreen(newIngame, world.width, world.height, loadJob)
         Terrarum.setCurrentIngameInstance(newIngame)

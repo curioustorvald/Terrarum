@@ -34,6 +34,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDUtil
+import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadActor
@@ -259,7 +260,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     data class Codices(
-            val disk: DiskSkimmer, // WORLD disk
+            val disk: VirtualDisk, // WORLD disk
             val world: GameWorld,
 //            val meta: WriteMeta.WorldMeta,
 //            val block: BlockCodex,
@@ -349,7 +350,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         actorNowPlaying = codices.player
         actorGamer = codices.player
 
-        makeSavegameBackupCopy() // don't put it on the postInit() or render(); postInitForNewGame calls this function on the savegamewriter's callback
+        // don't put it on the postInit() or render(); postInitForNewGame calls this function on the savegamewriter's callback
+        makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName))
+        makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
     }
 
     private fun postInitForNewGame() {

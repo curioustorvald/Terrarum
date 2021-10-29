@@ -23,7 +23,7 @@ import org.lwjgl.opengl.GL20
 object Toolkit : Disposable {
 
     object Theme {
-        val COL_INVENTORY_CELL_BORDER = Color(1f, 1f, 1f, 0.2f)
+        val COL_INVENTORY_CELL_BORDER = Color(1f, 1f, 1f, 0.25f)
         val COL_CELL_FILL = Color(0x28282888)
 
         val COL_LIST_DEFAULT = Color.WHITE

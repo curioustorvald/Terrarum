@@ -43,21 +43,21 @@ open class FixtureInventory() {
     }
     open fun add(item: GameItem, count: Int = 1) {
 
-        println("[ActorInventory] add-by-elem $item, $count")
+//        println("[ActorInventory] add-by-elem $item, $count")
 
         // other invalid values
         if (count == 0)
-            throw IllegalArgumentException("Item count is zero.")
+            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
         if (count < 0)
             throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()\n" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
         if (item.originalID == "actor:${Terrarum.PLAYER_REF_ID}" || item.originalID == ("actor:${0x51621D}")) // do not delete this magic
-            throw IllegalArgumentException("Attempted to put human player into the inventory.")
-        if (((Terrarum.ingame as? TerrarumIngame)?.gameFullyLoaded ?: false) &&
+            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Attempted to put human player into the inventory.")
+        if (((Terrarum.ingame as? TerrarumIngame)?.gameFullyLoaded == true) &&
             (item.originalID == "actor:${(Terrarum.ingame as? TerrarumIngame)?.actorNowPlaying?.referenceID}"))
-            throw IllegalArgumentException("Attempted to put active player into the inventory.")
+            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Attempted to put active player into the inventory.")
         if ((!item.stackable || item.dynamicID.startsWith("dyn:")) && count > 1)
-            throw IllegalArgumentException("Attempting to adding stack of item but the item is not stackable; item: $item, count: $count")
+            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Attempted to adding stack of item but the item is not stackable; item: $item, count: $count")
 
 
 
@@ -89,9 +89,9 @@ open class FixtureInventory() {
         println("[ActorInventory] remove $item, $count")
 
         if (count == 0)
-            throw IllegalArgumentException("Item count is zero.")
+            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
         if (count < 0)
-            throw IllegalArgumentException("Item count is negative number. If you intended adding items, use add()" +
+            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is negative number. If you intended adding items, use add()" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
 
 
@@ -101,7 +101,7 @@ open class FixtureInventory() {
             val newCount = existingItem.qty - count
 
             if (newCount < 0) {
-                throw Error("Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
+                throw Error("[${this.javaClass.canonicalName}] Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
             }
             else if (newCount > 0) {
                 // decrement count
@@ -115,7 +115,7 @@ open class FixtureInventory() {
             }
         }
         else {
-            throw Error("Tried to remove $item, but the inventory does not have it.")
+            throw Error("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
         }
     }
     

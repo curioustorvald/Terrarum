@@ -9,7 +9,6 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.Toolkit.Theme.COL_INVENTORY_CELL_BORDER
 import net.torvald.terrarum.ui.UICanvas
 import kotlin.math.roundToInt
 
@@ -23,13 +22,6 @@ class UIItemInventoryElemSimple(
         override var item: GameItem?,
         override var amount: Int,
         override var itemImage: TextureRegion?,
-        val mouseOverTextCol: Color = Toolkit.Theme.COL_ACTIVE,
-        val mouseoverBackCol: Color = Color(0),
-        val mouseoverBackBlendMode: String = BlendMode.NORMAL,
-        val inactiveTextCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
-        val backCol: Color = Color(0),
-        val backBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = Toolkit.Theme.COL_HIGHLIGHT,
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
@@ -54,22 +46,17 @@ class UIItemInventoryElemSimple(
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        // mouseover background
+        blendNormal(batch)
+
+        // cell background
         if (item != null || drawBackOnNull) {
-            // do not highlight even if drawBackOnNull is true
-            if (mouseUp && item != null || equippedSlot != null) { // "equippedSlot != null": also highlight back if equipped
-                BlendMode.resolve(mouseoverBackBlendMode, batch)
-                batch.color = mouseoverBackCol
-            }
-            // if drawBackOnNull, just draw background
-            else {
-                BlendMode.resolve(backBlendMode, batch)
-                batch.color = backCol
-            }
+            batch.color = Toolkit.Theme.COL_CELL_FILL
             Toolkit.fillArea(batch, posX, posY, width, height)
         }
-        batch.color = COL_INVENTORY_CELL_BORDER
-        //blendNormal(batch)
+        // cell border
+        batch.color = if (equippedSlot != null) Toolkit.Theme.COL_HIGHLIGHT
+                else if (mouseUp) Toolkit.Theme.COL_ACTIVE
+                else Toolkit.Theme.COL_INVENTORY_CELL_BORDER
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 
 
@@ -77,15 +64,11 @@ class UIItemInventoryElemSimple(
         // and you can clearly see the quickslot UI anyway
 
         if (item != null && itemImage != null) {
-            blendNormal(batch)
 
             // item image
             batch.color = Color.WHITE
             batch.draw(itemImage, posX + imgOffsetX, posY + imgOffsetY)
 
-            // if mouse is over, text lights up
-            // this one-liner sets color
-            batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
 
 
             // if item has durability, draw that and don't draw count; durability and itemCount cannot coexist
@@ -108,11 +91,13 @@ class UIItemInventoryElemSimple(
             else if (item!!.stackable) {
                 val amountString = amount.toItemCountText()
 
+                // if mouse is over, text lights up
                 // highlight item count (blocks/walls) if the item is equipped
-                if (equippedSlot != null) {
-                    batch.color = highlightCol
-                }
-
+                batch.color = item!!.nameColour mul (
+                        if (equippedSlot != null) Toolkit.Theme.COL_HIGHLIGHT
+                        else if (mouseUp) Toolkit.Theme.COL_ACTIVE
+                        else Color.WHITE
+                                                    )
 
                 App.fontSmallNumbers.draw(batch,
                         amountString,

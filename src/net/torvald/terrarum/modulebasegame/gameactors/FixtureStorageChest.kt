@@ -103,7 +103,73 @@ internal class UIStorageChest : UICanvas(
 
     private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
-    private var initialised = false
+    init {
+        catBar = UIItemInventoryCatBar(
+                this,
+                (App.scr.width - catBarWidth) / 2,
+                42 + (App.scr.height - internalHeight) / 2,
+                internalWidth,
+                catBarWidth,
+                false
+        )
+        catBar.selectionChangeListener = { old, new -> itemListUpdate() }
+        itemListChest = UIItemInventoryItemGrid(
+                this,
+                catBar,
+                { getFixtureInventory() },
+                INVENTORY_CELLS_OFFSET_X() - halfSlotOffset,
+                INVENTORY_CELLS_OFFSET_Y(),
+                6, CELLS_VRT,
+                drawScrollOnRightside = false,
+                drawWallet = false,
+                keyDownFun = { _, _, _ -> Unit },
+                touchDownFun = { gameItem, amount, _ ->
+                    if (gameItem != null) {
+                        negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                    }
+                    itemListUpdate()
+                }
+        )
+        // make grid mode buttons work together
+        itemListChest.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+        itemListChest.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+
+        itemListPlayer = UIItemInventoryItemGrid(
+                this,
+                catBar,
+                { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
+                INVENTORY_CELLS_OFFSET_X() - halfSlotOffset + (listGap + UIItemInventoryElemWide.height) * 7,
+                INVENTORY_CELLS_OFFSET_Y(),
+                6, CELLS_VRT,
+                drawScrollOnRightside = true,
+                drawWallet = false,
+                keyDownFun = { _, _, _ -> Unit },
+                touchDownFun = { gameItem, amount, _ ->
+                    if (gameItem != null) {
+                        negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
+                    }
+                    itemListUpdate()
+                }
+        )
+        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+
+        handler.allowESCtoClose = true
+
+        addUIitem(catBar)
+        addUIitem(itemListChest)
+        addUIitem(itemListPlayer)
+    }
+
+    private var openingClickLatched = false
+
+    override fun show() {
+        itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
+
+        itemListUpdate()
+
+        openingClickLatched = Terrarum.mouseDown
+    }
 
     private fun itemListUpdate() {
         itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
@@ -129,72 +195,19 @@ internal class UIStorageChest : UICanvas(
         itemListUpdate()
     }
 
-    override fun updateUI(delta: Float) {
-        if (!initialised) {
-            initialised = true
-
-            catBar = UIItemInventoryCatBar(
-                    this,
-                    (App.scr.width - catBarWidth) / 2,
-                    42 + (App.scr.height - internalHeight) / 2,
-                    internalWidth,
-                    catBarWidth,
-                    false
-            )
-            catBar.selectionChangeListener = { old, new -> itemListUpdate() }
-            itemListChest = UIItemInventoryItemGrid(
-                    this,
-                    catBar,
-                    { getFixtureInventory() },
-                    INVENTORY_CELLS_OFFSET_X() - halfSlotOffset,
-                    INVENTORY_CELLS_OFFSET_Y(),
-                    6, CELLS_VRT,
-                    drawScrollOnRightside = false,
-                    drawWallet = false,
-                    keyDownFun = { _, _, _ -> Unit },
-                    touchDownFun = { gameItem, amount, _ ->
-                        if (gameItem != null) {
-                            negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
-                        }
-                        itemListUpdate()
-                    }
-            )
-            itemListPlayer = UIItemInventoryItemGrid(
-                    this,
-                    catBar,
-                    { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-                    INVENTORY_CELLS_OFFSET_X() - halfSlotOffset + (listGap + UIItemInventoryElemWide.height) * 7,
-                    INVENTORY_CELLS_OFFSET_Y(),
-                    6, CELLS_VRT,
-                    drawScrollOnRightside = true,
-                    drawWallet = false,
-                    keyDownFun = { _, _, _ -> Unit },
-                    touchDownFun = { gameItem, amount, _ ->
-                        if (gameItem != null) {
-                            negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
-                        }
-                        itemListUpdate()
-                    }
-            )
-
-            handler.allowESCtoClose = true
-
-            // make grid mode buttons work together
-            itemListChest.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-            itemListChest.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
-            itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-            itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
-
-            addUIitem(catBar)
-            addUIitem(itemListChest)
-            addUIitem(itemListPlayer)
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (!openingClickLatched) {
+            return super.touchDown(screenX, screenY, pointer, button)
         }
+        return false
+    }
 
-
-
+    override fun updateUI(delta: Float) {
         catBar.update(delta)
         itemListChest.update(delta)
         itemListPlayer.update(delta)
+
+        if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

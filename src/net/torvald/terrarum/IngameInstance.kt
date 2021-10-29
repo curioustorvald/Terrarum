@@ -23,6 +23,7 @@ import org.khelekore.prtree.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.locks.Lock
 
@@ -360,37 +361,38 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         }
     }
 
-    fun makeSavegameBackupCopy() {
-        System.err.println("This function is deleteh")
-        printStackTrace(this)
-    }
-
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */
     fun makeSavegameBackupCopy(file: File) {
+        if (!file.exists()) {
+            return
+        }
+
+        val file1 = File("${file.absolutePath}.1")
+        val file2 = File("${file.absolutePath}.2")
+        val file3 = File("${file.absolutePath}.3")
+
         try {
             // do not overwrite clean .2 with dirty .1
-            val file2 = File("${file.absolutePath}.3")
-            val file1 = File("${file.absolutePath}.2")
+            val flags3 = FileInputStream(file3).let { it.skip(49L); val r = it.read(); it.close(); r }
+            val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
+            if (!(flags3 == 0 && flags2 != 0) || !file3.exists()) file2.copyTo(file3, true)
+        } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
+        try {
+            // do not overwrite clean .2 with dirty .1
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
             if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
-            // do not overwrite clean .2 with dirty .1
-            val file2 = File("${file.absolutePath}.2")
-            val file1 = File("${file.absolutePath}.1")
-            val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
-            val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
-            if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
-        } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
-        try {
-            file.copyTo(
-                    File("${file.absolutePath}.1"), // don't use .bak as it's used by the savecracker
-                    true
-            )
-        } catch (e: NoSuchFileException) {}
+            if (file2.exists() && !file3.exists())
+                file2.copyTo(file3, true)
+            if (file1.exists() && !file2.exists())
+                file1.copyTo(file2, true)
+
+            file.copyTo(file1, true)
+        } catch (e: IOException) {}
     }
 
 
