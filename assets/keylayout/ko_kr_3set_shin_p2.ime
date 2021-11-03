@@ -41,7 +41,7 @@ let states = {"keylayouts":[[""],[undefined],
 ["\u1112","\u2026"],
 ["\u1109","\u2014"],
 ["\u110E","\u116E","\u116E"],
-["\u1111",";"],
+["\u1111",";","\u119E"],
 ["\u11BA","\u1164","\u1164"],
 ["\u11C0","\u1165","\u1165"],
 ["\u11AB","\u1168","\u1168"],
@@ -51,7 +51,7 @@ let states = {"keylayouts":[[""],[undefined],
 ["\u11AF","\u1163","\u1163"],
 ["\u11BB","\u116D","\u116D"],
 ["\u1105","\u00D7"],
-["\u11B7"],
+["\u11B7","\u119E","\u119E"],
 [",","<"],
 [".",">"],
 [undefined],
@@ -264,17 +264,19 @@ let reset = () => {
     states.hasDeadkey = false
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
-let isHangul = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1100, 0x11C2)
+let isHangul = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1100, 0x11FF)
 let isChoseong = (s) =>  (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1100, 0x1112)
 let isJungseong = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1161, 0x1175)
 let isJongseong = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x11A8, 0x11C2)
+let isJungseongSuper = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x119E, 0x11A2)
 let isChoseongDigraph = (s) => (s === undefined) ? false : ([0x1100, 0x1103, 0x1107, 0x1109, 0x110C].includes(s.charCodeAt(0)))
 let isThisCharChoseongDigraph = (s) => (s === undefined) ? false : ([0x1101, 0x1104, 0x1108, 0x110A, 0x110D].includes(s.charCodeAt(0)))
-let isThisCharJungseongDigraph = (s) => (s === undefined) ? false : ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174].includes(s.charCodeAt(0)))
+let isThisCharJungseongDigraph = (s) => (s === undefined) ? false : ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174, 0x119F, 0x11A0, 0x11A1, 0x11A2].includes(s.charCodeAt(0)))
 let isThisCharJongseongDigraph = (s) => (s === undefined) ? false : ([0x11A9, 0x11AA, 0x11AC, 0x11AD, 0x11B0, 0x11B1, 0x11B2, 0x11B3, 0x11B4, 0x11B5, 0x11B6, 0x11B9].includes(s.charCodeAt(0))) // ㅆ is an exception!
 let isJungseongDigraphO = (s) => (s === undefined) ? false : ([0x1161, 0x1162, 0x1175].includes(s.charCodeAt(0)))
 let isJungseongDigraphU = (s) => (s === undefined) ? false : ([0x1165, 0x1166, 0x1175].includes(s.charCodeAt(0)))
 let isJungseongDigraphEU = (s) => (s === undefined) ? false : ([0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphAA = (s) => (s === undefined) ? false : ([0x1165, 0x116E, 0x1175, 0x119E].includes(s.charCodeAt(0)))
 let isJongseongDigraphG = (s) => (s === undefined) ? false : ([0x11A8, 0x11BA].includes(s.charCodeAt(0)))
 let isJongseongDigraphN = (s) => (s === undefined) ? false : ([0x11BD, 0x11C2].includes(s.charCodeAt(0)))
 let isJongseongDigraphR = (s) => (s === undefined) ? false : ([0x11A8, 0x11B7, 0x11B8, 0x11BA, 0x11C0, 0x11C1, 0x11C2].includes(s.charCodeAt(0)))
@@ -283,11 +285,12 @@ let choseongDigraphs = {"\u1100":"\u1101", "\u1103":"\u1104", "\u1107":"\u1108",
 let jungseongDigraphsO = {"\u1161":"\u116A", "\u1162":"\u116B", "\u1175":"\u116C"}
 let jungseongDigraphsU = {"\u1165":"\u116F", "\u1166":"\u1170", "\u1175":"\u1171"}
 let jungseongDigraphsEU = {"\u1175":"\u1174"}
+let jungseongDigraphsAA = {"\u1165":"\u119F", "\u116E":"\u11A0", "\u1175":"\u11A1", "\u119E":"\u11A2"}
 let jongseongDigraphsG = {"\u11A8":"\u11A9", "\u11BA":"\u11AA"}
 let jongseongDigraphsN = {"\u11BD":"\u11AC", "\u11C2":"\u11AD"}
 let jongseongDigraphsR = {"\u11A8":"\u11B0", "\u11B7":"\u11B1", "\u11B8":"\u11B2", "\u11BA":"\u11B3", "\u11C0":"\u11B4", "\u11C1":"\u11B5", "\u11C2":"\u11B6"}
 let jongseongDigraphsB = {"\u11BA":"\u11B9"}
-let isJungseongDeadkey = (keynum) => 37 == keynum || 43 == keynum || 76 == keynum
+let isJungseongDeadkey = (keynum) => [37,43,44,76].includes(keynum)
 let detachChoseongDigraph = {
 "\u1101":["\u1100","\u1100"],
 "\u1104":["\u1103","\u1103"],
@@ -302,7 +305,11 @@ let detachJungseongDigraph = {
 "\u116F":["\u116E","\u1165"],
 "\u1170":["\u116E","\u1166"],
 "\u1171":["\u116E","\u1175"],
-"\u1174":["\u1173","\u1175"]
+"\u1174":["\u1173","\u1175"],
+"\u119F":["\u119E","\u1165"],
+"\u11A0":["\u119E","\u116E"],
+"\u11A1":["\u119E","\u1175"],
+"\u11A2":["\u119E","\u119E"]
 }
 let detachJongseongDigraph = {
 "\u11A9":["\u11A8","\u11A8"],
@@ -353,21 +360,21 @@ let bufAssemble = (isPreview) => {
     // Hangul: x x F
     else if (isPreview && isHangul(states.buf[2]) && states.buf[0] === undefined && states.buf[1] === undefined )
         return ["\u115F", "\u1160", states.buf[2]].join('')
-    // Hangul: I P F
-    else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
+    // Hangul: I P F → Hangul Syllables (\uAC00..\uD7A3)
+    else if (!isJungseongSuper(states.buf[1]) && isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
         let i = states.buf[0].charCodeAt(0) - 0x1100
         let p = states.buf[1].charCodeAt(0) - 0x1161
         let f = states.buf[2].charCodeAt(0) - 0x11A7
         return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28) + f)
     }
-    // Hangul: I P
-    else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
+    // Hangul: I P → Hangul Syllables (\uAC00..\uD7A3)
+    else if (!isJungseongSuper(states.buf[1]) && isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
         let i = states.buf[0].charCodeAt(0) - 0x1100
         let p = states.buf[1].charCodeAt(0) - 0x1161
         return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28))
     }
     // Normalise unterminated hangul assembly
-    else if (!isPreview)
+    else if (!isPreview && !isJungseongSuper(states.buf[1]))
         return states.buf.map(it => normaliseBuf(it)).join('')
     else
         return states.buf.join('')
@@ -427,6 +434,10 @@ return Object.freeze({"n":"신세벌식 P2","states":states,"c":"CuriousTo\uA75B
         // ㅢ
         else if (1 == bufIndex && "\u1173" == states.buf[1] && isJungseongDigraphEU(s)) {
             states.buf[1] = jungseongDigraphsEU[s]
+        }
+        // ᆟ ᆠ ᆡ ᆢ
+        else if (1 == bufIndex && "\u119E" == states.buf[1] && isJungseongDigraphAA(s)) {
+            states.buf[1] = jungseongDigraphsAA[s]
         }
         // ㄲ ㄳ
         else if (2 == bufIndex && "\u11A8" == states.buf[2] && isJongseongDigraphG(s)) {
