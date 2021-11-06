@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input
 import net.torvald.terrarum.App
 
 /**
+ * BIG WARNING SIGN: since the strober will run on separate thread, ALWAYS BEWARE OF THE [ConcurrentModificationException]!
+ *
  * Created by minjaesong on 2021-11-06.
  */
 object InputStrober {
@@ -26,7 +28,7 @@ object InputStrober {
     } }
 
     init {
-        println("InputStrobe start")
+//        println("InputStrobe start")
         thread.start()
     }
 
