@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -266,7 +267,9 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         return true
     }
 
-
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        openUI?.inputStrobed(e)
+    }
 
     class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>, val tags: Array<Array<String>>) {
 

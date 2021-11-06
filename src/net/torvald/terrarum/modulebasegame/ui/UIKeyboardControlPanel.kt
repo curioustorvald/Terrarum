@@ -11,6 +11,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.DefaultConfig
 import net.torvald.terrarum.gamecontroller.IME
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.ui.*
@@ -174,6 +175,11 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 //        addUIitem(keyboardLayoutSelection)
 //        addUIitem(imeSelection)
 //        addUIitem(keyboardTestPanel)
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        super.inputStrobed(e)
+        keyboardTestPanel.inputStrobed(e)
     }
 
     private fun resetKeyConfig() {

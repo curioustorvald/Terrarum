@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 
 
 /**
@@ -237,6 +238,9 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         }
 
         return false
+    }
+    open fun inputStrobed(e: TerrarumKeyboardEvent) {
+
     }
 
     abstract override fun dispose()

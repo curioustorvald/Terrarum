@@ -53,7 +53,6 @@ typealias RGBA8888 = Int
 object Terrarum : Disposable {
 
     init {
-        IngameController.KEYBOARD_DELAYS[1]
     }
 
     /**

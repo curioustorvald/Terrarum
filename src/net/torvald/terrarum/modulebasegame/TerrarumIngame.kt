@@ -18,6 +18,7 @@ import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitem.GameItem
 import net.torvald.terrarum.gameitem.inInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
@@ -1171,6 +1172,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             actorContainerActive.add(actor)
             if (actor is ActorWithBody) actorToRenderQueue(actor).add(actor)
         }
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        uiContainer.forEach { it?.inputStrobed(e) }
     }
 
     fun activateDormantActor(actor: Actor) {

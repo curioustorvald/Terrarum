@@ -9,9 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gamecontroller.IME
-import net.torvald.terrarum.gamecontroller.IngameController
-import net.torvald.terrarum.gamecontroller.TerrarumInputMethod
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -45,6 +44,8 @@ data class InputLenCap(val count: Int, val unit: CharLenUnit) {
 }
 
 /**
+ * Make sure `inputStrobed()` of the parentUI is up and running.
+ *
  * Protip: if there are multiple TextLineInputs on a same UI, draw bottom one first, otherwise the IME's
  * candidate window will be hidden by the bottom UIItem if they overlaps.
  *
@@ -156,20 +157,15 @@ class UIItemTextLineInput(
         }
     }
 
-    override fun update(delta: Float) {
-        super.update(delta)
-        val mouseDown = Terrarum.mouseDown
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
         val oldActive = isActive
-
-        if (mouseDown) {
-            isActive = mouseUp
-        }
-
-        if (App.getConfigString("inputmethod") == "none") imeOn = false
 
         // process keypresses
         if (isActive) {
-            IngameController.withKeyboardEvent { (_, char, headkey, repeatCount, keycodes) ->
+
+            val (eventType, char, headkey, repeatCount, keycodes) = e
+
+            if (eventType == InputStrober.KEY_DOWN || eventType == InputStrober.KEY_CHANGE) {
                 fboUpdateLatch = true
                 forceLitCursor()
                 val ime = getIME()
@@ -263,22 +259,34 @@ class UIItemTextLineInput(
                 }
 
                 // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
-
             }
 
             if (textbuf.size == 0) {
                 currentPlaceholderText = CodepointSequence(placeholder().toCodePoints())
             }
+        }
+        else if (oldActive) { // just became deactivated
+            endComposing()
+        }
+    }
 
+    override fun update(delta: Float) {
+        super.update(delta)
+        val mouseDown = Terrarum.mouseDown
+
+        if (mouseDown) {
+            isActive = mouseUp
+        }
+
+        if (App.getConfigString("inputmethod") == "none") imeOn = false
+
+        if (isActive) {
             cursorBlinkCounter += delta
 
             while (cursorBlinkCounter >= CURSOR_BLINK_TIME) {
                 cursorBlinkCounter -= CURSOR_BLINK_TIME
                 cursorOn = !cursorOn
             }
-        }
-        else if (oldActive) { // just became deactivated
-            endComposing()
         }
 
         if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton1 || enableIMEButton && !enablePasteButton && mouseUpOnButton2)) {

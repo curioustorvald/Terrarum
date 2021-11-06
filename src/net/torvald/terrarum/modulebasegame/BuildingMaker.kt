@@ -11,6 +11,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -410,6 +411,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     override fun dispose() {
         blockMarkings.dispose()
         uiPenMenu.dispose()
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
     }
 
     private fun makePenWork(x: Int, y: Int) {

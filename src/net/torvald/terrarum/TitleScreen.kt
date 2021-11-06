@@ -18,6 +18,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
@@ -387,6 +388,10 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         uiRemoCon.dispose()
         demoWorld.dispose()
         warning32bitJavaIcon.texture.dispose()
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        uiContainer.forEach { it?.inputStrobed(e) }
     }
 
 

@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitem.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
@@ -31,7 +32,7 @@ import java.util.concurrent.locks.Lock
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
  * this instance only stores the stage that is currently being used.
  */
-open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = false) : Screen {
+open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = false) : TerrarumGamescreen {
 
     open protected val actorMBRConverter = object : MBRConverter<ActorWithBody> {
         override fun getDimensions(): Int = 2
@@ -132,6 +133,9 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         protected set
 
     override fun hide() {
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
     }
 
     override fun show() {

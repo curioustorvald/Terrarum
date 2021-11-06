@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import kotlin.math.roundToInt
 
 
@@ -218,6 +219,12 @@ abstract class UICanvas(
         // TODO process key typing from the virtual keyboard?
 
         return false
+    }
+    open fun inputStrobed(e: TerrarumKeyboardEvent) {
+        if (this.isVisible) {
+            uiItems.forEach { it.inputStrobed(e) }
+            handler.subUIs.forEach { it.inputStrobed(e) }
+        }
     }
 
     open fun resize(width: Int, height: Int) {

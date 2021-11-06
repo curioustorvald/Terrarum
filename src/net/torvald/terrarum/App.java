@@ -25,7 +25,9 @@ import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gameactors.BlockMarkerActor;
 import net.torvald.terrarum.gamecontroller.IME;
+import net.torvald.terrarum.gamecontroller.InputStrober;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.langpack.Lang;
@@ -234,7 +236,7 @@ public class App implements ApplicationListener {
     private static com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
     private static com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
 
-    private static Screen currentScreen;
+    private static TerrarumGamescreen currentScreen;
     private static LoadScreenBase currentSetLoadScreen;
 
     private void initViewPort(int width, int height) {
@@ -283,6 +285,8 @@ public class App implements ApplicationListener {
     public static String[] gamepadWhitelist = {
             "xinput", "xbox", "game", "joy", "pad"
     };
+
+    public static InputStrober inputStrober = InputStrober.INSTANCE; // kinda dummy field
 
     public static Screen getCurrentScreen() {
         return currentScreen;
@@ -709,6 +713,8 @@ public class App implements ApplicationListener {
         resizeReqSize = new Point2i(width, height);
     }
 
+
+
     @Override
     public void dispose() {
         System.out.println("Goodbye !");
@@ -762,6 +768,8 @@ public class App implements ApplicationListener {
 
         Terrarum.INSTANCE.dispose();
 
+        inputStrober.dispose();
+
         deleteTempfiles();
     }
 
@@ -785,15 +793,19 @@ public class App implements ApplicationListener {
     }
 
     public static void setScreen(Screen screen) {
+        if (!(screen instanceof TerrarumGamescreen)) {
+            throw new IllegalArgumentException("Screen must be instance of TerrarumGameScreen: " + screen.getClass().getCanonicalName());
+        }
+        
         if (screen instanceof LoadScreenBase) {
             throw new RuntimeException(
                     "Loadscreen '" + screen.getClass().getSimpleName() + "' must be set with 'setLoadScreen()' method");
         }
 
-        _setScr(screen);
+        _setScr((TerrarumGamescreen) screen);
     }
 
-    private static void _setScr(Screen screen) {
+    private static void _setScr(TerrarumGamescreen screen) {
 
         printdbg("AppLoader-Static", "Changing screen to " + screen.getClass().getCanonicalName());
 
@@ -1304,5 +1316,13 @@ public class App implements ApplicationListener {
 
     public static long getTIME_T() {
         return System.currentTimeMillis() / 1000L;
+    }
+
+    /**
+     * Just an event handler I'm slipping in
+     * @param event
+     */
+    public static void inputStrobed(TerrarumKeyboardEvent event) {
+        currentScreen.inputStrobed(event);
     }
 }

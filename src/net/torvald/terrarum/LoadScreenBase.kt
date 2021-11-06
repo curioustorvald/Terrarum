@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.CircularArray
 
-open class LoadScreenBase : ScreenAdapter(), Disposable {
+open class LoadScreenBase : ScreenAdapter(), Disposable, TerrarumGamescreen {
 
     open var preLoadJob: (LoadScreenBase) -> Unit = {}
     open var screenToLoad: IngameInstance? = null
@@ -81,5 +82,8 @@ open class LoadScreenBase : ScreenAdapter(), Disposable {
 
     override fun resize(width: Int, height: Int) {
         initViewPort(App.scr.width, App.scr.height)
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
     }
 }
