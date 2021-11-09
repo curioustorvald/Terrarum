@@ -88,7 +88,7 @@ object IME {
         }
     }
 
-    fun invoke() {}
+    @JvmStatic fun invoke() {}
 
     fun getLowLayerByName(name: String): TerrarumKeyLayout {
         return lowLayers[name.lowercase()]!!

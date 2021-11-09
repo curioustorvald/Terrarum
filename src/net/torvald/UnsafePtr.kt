@@ -110,8 +110,8 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
         // You may break the glass and use this tool when some fucking incomprehensible bugs ("vittujen vitun bugit")
         // appear (e.g. getting garbage values when it fucking shouldn't)
 
-//        assert(!destroyed) { throw NullPointerException("The pointer is already destroyed ($this)") }
-//        if (index !in 0 until size) throw IndexOutOfBoundsException("Index: $index; alloc size: $size")
+        assert(!destroyed) { throw NullPointerException("The pointer is already destroyed ($this)") }
+        assert(index in 0 until size) { throw IndexOutOfBoundsException("Index: $index; alloc size: $size") }
     }
 
     operator fun get(index: Long): Byte {
