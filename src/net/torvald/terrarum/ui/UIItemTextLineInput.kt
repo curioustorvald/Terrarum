@@ -170,6 +170,7 @@ class UIItemTextLineInput(
                     fboUpdateLatch = true
                     forceLitCursor()
                     val ime = getIME()
+                    val lowLayer = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
                     if (keycodes.contains(App.getConfigInt("control_key_toggleime")) && repeatCount == 1) {
                         toggleIME()
@@ -182,7 +183,7 @@ class UIItemTextLineInput(
                         endComposing()
                         copyToClipboard()
                     }
-                    else if (keycodes.contains(Input.Keys.BACKSPACE)) {
+                    else if (keycodes.contains(Input.Keys.BACKSPACE) || (keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
                         if (ime != null && ime.composing()) {
                             candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
                         }

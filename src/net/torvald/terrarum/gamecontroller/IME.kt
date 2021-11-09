@@ -8,8 +8,13 @@ typealias IMEOutput = String
 
 data class TerrarumKeyLayout(
         val name: String,
+        val capsMode: TerrarumKeyCapsMode,
         val symbols: Array<Array<String?>>?
 )
+
+enum class TerrarumKeyCapsMode {
+    CAPS, SHIFT, BACK
+}
 
 data class TerrarumIME(
         val name: String,
@@ -101,17 +106,25 @@ object IME {
         return highLayers.keys.toList()
     }
 
+    private fun String.toCapsMode() = when (this.lowercase()) {
+        "caps" -> TerrarumKeyCapsMode.CAPS
+        "shift" -> TerrarumKeyCapsMode.SHIFT
+        "back" -> TerrarumKeyCapsMode.BACK
+        else -> throw IllegalArgumentException("Unknown capslock mode: $this")
+    }
+
     private fun String.toViewCount() = when (this.lowercase()) {
         "none" -> TerrarumIMEViewCount.NONE
         "one" -> TerrarumIMEViewCount.ONE
         "many" -> TerrarumIMEViewCount.MANY
-        else -> throw IllegalArgumentException(this)
+        else -> throw IllegalArgumentException("Unknown candidates mode: $this")
     }
 
     private fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
         val src = file.readText(Charsets.UTF_8)
         val jsval = context.eval("js", "'use strict';Object.freeze($src)")
         val name = jsval.getMember("n").asString()
+        val capsmode = jsval.getMember("capslock").asString().toCapsMode()
 
         val out = Array(256) { Array<String?>(4) { null } }
 
@@ -131,7 +144,7 @@ object IME {
 
 //        println("[IME] Test Keymap print for $name:"); for (keycode in 0 until 256) { print("$keycode:\t"); println(out[keycode].joinToString("\t")) }
 
-        return TerrarumKeyLayout(name, out)
+        return TerrarumKeyLayout(name, capsmode, out)
     }
 
     private fun String.toCanditates(): List<String> =
