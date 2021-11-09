@@ -455,12 +455,15 @@ class UIItemTextLineInput(
             batch.draw(labels.get(7,2), btn2PosX + 2f, posY + 2f)
         }
 
+        // state of the candidates are concurrently changing, so we buffer them
+        val localCandidates = ArrayList<CodepointSequence>(); candidates.forEach { localCandidates.add(it) }
 
         // draw candidates view
-        if (candidates.isNotEmpty()) {
-            val textWidths = candidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
+        if (localCandidates.isNotEmpty()) {
+
+            val textWidths = localCandidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
             val candidatesMax = getIME()!!.config.candidates.toInt()
-            val candidatesCount = minOf(candidatesMax, candidates.size)
+            val candidatesCount = minOf(candidatesMax, localCandidates.size)
             val isOnecolumn = (candidatesCount <= 3)
             val halfcount = if (isOnecolumn) candidatesCount else FastMath.ceil(candidatesCount / 2f)
             val candidateWinH = App.fontGame.lineHeight.toInt() * halfcount
@@ -482,7 +485,7 @@ class UIItemTextLineInput(
                 // candidate texts
                 for (i in 0 until candidatesCount) {
                     val candidateNum = listOf(i+48,46,32)
-                    App.fontGame.draw(batch, CodepointSequence(candidateNum + candidates[i]),
+                    App.fontGame.draw(batch, CodepointSequence(candidateNum + localCandidates[i]),
                             candidatePosX + (i / halfcount) * (longestCandidateW + 3) + 2,
                             candidatePosY + (i % halfcount) * 20
                     )
@@ -505,7 +508,7 @@ class UIItemTextLineInput(
                 Toolkit.drawBoxBorder(batch, candidatePosX - 1, candidatePosY - 1, candidateWinW + 2, candidateWinH + 2)
 
                 val previewTextWidth = textWidths[0]
-                App.fontGame.draw(batch, candidates[0], candidatePosX + (candidateWinW - previewTextWidth) / 2, candidatePosY)
+                App.fontGame.draw(batch, localCandidates[0], candidatePosX + (candidateWinW - previewTextWidth) / 2, candidatePosY)
             }
         }
 
