@@ -3,6 +3,7 @@ package net.torvald.terrarum.gamecontroller
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import net.torvald.terrarum.App
+import net.torvald.terrarum.TerrarumAppConfiguration
 
 /**
  * BIG WARNING SIGN: since the strober will run on separate thread, ALWAYS BEWARE OF THE [ConcurrentModificationException]!
@@ -23,9 +24,9 @@ object InputStrober {
     /** always Low Layer */
 //        private var keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
-    private val thread = Thread { while (!Thread.interrupted()) {
-        if (Gdx.input != null) withKeyboardEvent()
-    } }
+    private val thread = Thread({ while (!Thread.interrupted()) {
+        try { if (Gdx.input != null) withKeyboardEvent() } catch (e: InterruptedException) { break }
+    } }, "${TerrarumAppConfiguration.GAME_NAME}${this.javaClass.simpleName}")
 
     init {
 //        println("InputStrobe start")

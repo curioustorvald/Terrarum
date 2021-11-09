@@ -75,7 +75,7 @@ object UILoadGovernor {
  */
 class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
-    private val hash = RandomWordsName(3)
+//    private val hash = RandomWordsName(3)
 
     init {
         CommonResourcePool.addToLoadingList("inventory_category") {
@@ -359,7 +359,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
 
                 // draw texts
-                val loadGameTitleStr = Lang[titles[mode]] + "$EMDASH$hash"
+                val loadGameTitleStr = Lang[titles[mode]]// + "$EMDASH$hash"
                 // "Game Load"
                 App.fontGame.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
                 // Control help

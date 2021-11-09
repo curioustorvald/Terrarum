@@ -11,16 +11,32 @@ data class TerrarumKeyLayout(
         val symbols: Array<Array<String?>>?
 )
 
-data class TerrarumInputMethod(
+data class TerrarumIME(
         val name: String,
+        val config: TerrarumIMEConf,
         // (headkey, shiftin, altgrin, lowLayerKeysym)
         val acceptChar: (Int, Boolean, Boolean, String) -> Pair<IMECanditates, IMEOutput>,
         val backspace: () -> IMECanditates,
         val endCompose: () -> IMEOutput,
         val reset: () -> Unit,
-        val composing: () -> Boolean,
-        val maxCandidates: () -> Int
+        val composing: () -> Boolean
 )
+
+data class TerrarumIMEConf(
+        val name: String,
+        val copying: String,
+        val candidates: TerrarumIMEViewCount
+)
+
+enum class TerrarumIMEViewCount {
+    NONE, ONE, MANY;
+
+    fun toInt() = when (this) {
+        NONE -> 0
+        ONE -> 1
+        MANY -> 10 // an hard-coded config
+    }
+}
 
 /**
  * Key Layout File Structure for Low Layer:
@@ -44,7 +60,7 @@ object IME {
     const val IME_EXTENSION = "ime"
 
     private val lowLayers = HashMap<String, TerrarumKeyLayout>()
-    private val highLayers = HashMap<String, TerrarumInputMethod>()
+    private val highLayers = HashMap<String, TerrarumIME>()
 
     private val context = org.graalvm.polyglot.Context.newBuilder("js")
             .allowHostAccess(org.graalvm.polyglot.HostAccess.EXPLICIT)
@@ -73,7 +89,7 @@ object IME {
         return lowLayers[name.lowercase()]!!
     }
 
-    fun getHighLayerByName(name: String): TerrarumInputMethod {
+    fun getHighLayerByName(name: String): TerrarumIME {
         return highLayers[name.lowercase()]!!
     }
 
@@ -85,12 +101,20 @@ object IME {
         return highLayers.keys.toList()
     }
 
+    private fun String.toViewCount() = when (this.lowercase()) {
+        "none" -> TerrarumIMEViewCount.NONE
+        "one" -> TerrarumIMEViewCount.ONE
+        "many" -> TerrarumIMEViewCount.MANY
+        else -> throw IllegalArgumentException(this)
+    }
 
     private fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
         val src = file.readText(Charsets.UTF_8)
         val jsval = context.eval("js", "'use strict';Object.freeze($src)")
         val name = jsval.getMember("n").asString()
+
         val out = Array(256) { Array<String?>(4) { null } }
+
         for (keycode in 0L until 256L) {
             val a = jsval.getMember("t").getArrayElement(keycode)
             if (!a.isNull) {
@@ -113,26 +137,30 @@ object IME {
     private fun String.toCanditates(): List<String> =
             this.split(',').mapNotNull { it.ifBlank { null } }
 
-    private fun parseImeFile(file: File): TerrarumInputMethod {
+    private fun parseImeFile(file: File): TerrarumIME {
         val code = file.readText(Charsets.UTF_8)
         val jsval = context.eval("js", "\"use strict\";(function(){$code})()")
         val name = jsval.getMember("n").asString()
+        val candidatesCount = jsval.getMember("v").asString().toViewCount()
+        val copying = jsval.getMember("c").asString()
 
-
-        return TerrarumInputMethod(name, { headkey, shifted, alted, lowLayerKeysym ->
-            val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
-            a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
-        }, {
-            jsval.invokeMember("backspace").asString().toCanditates()
-        }, {
-            jsval.invokeMember("end").asString()
-        }, {
-            jsval.invokeMember("reset")
-        }, {
-            jsval.invokeMember("composing").asBoolean()
-        }, {
-            jsval.invokeMember("maxCandidates").asInt()
-        }
+        return TerrarumIME(
+                name,
+                TerrarumIMEConf(
+                        name, copying, candidatesCount
+                ),
+                { headkey, shifted, alted, lowLayerKeysym ->
+                    val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
+                    a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
+                }, {
+                    jsval.invokeMember("backspace").asString().toCanditates()
+                }, {
+                    jsval.invokeMember("end").asString()
+                }, {
+                    jsval.invokeMember("reset")
+                }, {
+                    jsval.invokeMember("composing").asBoolean()
+                }
         )
     }
 

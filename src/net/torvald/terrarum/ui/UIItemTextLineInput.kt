@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
@@ -44,7 +43,8 @@ data class InputLenCap(val count: Int, val unit: CharLenUnit) {
 }
 
 /**
- * Make sure `inputStrobed()` of the parentUI is up and running.
+ * UIItemTextLineInput does not require any GDX's input event handlers, but it does require InputStrober
+ * to be running and `inputStrobed()` of the parentUI is calling the same method on this.
  *
  * Protip: if there are multiple TextLineInputs on a same UI, draw bottom one first, otherwise the IME's
  * candidate window will be hidden by the bottom UIItem if they overlaps.
@@ -126,7 +126,7 @@ class UIItemTextLineInput(
     private val candidatesBackCol = TEXTINPUT_COL_BACKGROUND.cpy().mul(1f,1f,1f,1.5f)
     private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
 
-    private fun getIME(): TerrarumInputMethod? {
+    private fun getIME(): TerrarumIME? {
         if (!imeOn) return null
 
         val selectedIME = App.getConfigString("inputmethod")
@@ -165,100 +165,105 @@ class UIItemTextLineInput(
 
             val (eventType, char, headkey, repeatCount, keycodes) = e
 
-            if (eventType == InputStrober.KEY_DOWN || eventType == InputStrober.KEY_CHANGE) {
-                fboUpdateLatch = true
-                forceLitCursor()
-                val ime = getIME()
+            try {
+                if (eventType == InputStrober.KEY_DOWN || eventType == InputStrober.KEY_CHANGE) {
+                    fboUpdateLatch = true
+                    forceLitCursor()
+                    val ime = getIME()
 
-                if (keycodes.contains(App.getConfigInt("control_key_toggleime")) && repeatCount == 1) {
-                    toggleIME()
-                }
-                else if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
-                    endComposing()
-                    paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
-                }
-                else if (keycodes.contains(Input.Keys.C) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
-                    endComposing()
-                    copyToClipboard()
-                }
-                else if (keycodes.contains(Input.Keys.BACKSPACE)) {
-                    if (ime != null && ime.composing()) {
-                        candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
+                    if (keycodes.contains(App.getConfigInt("control_key_toggleime")) && repeatCount == 1) {
+                        toggleIME()
                     }
-                    else if (cursorX <= 0) {
-                        cursorX = 0
-                        cursorDrawX = 0
-                        cursorDrawScroll = 0
-                    }
-                    else {
+                    else if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
                         endComposing()
-                        if (cursorX > 0) {
-                            while (true) {
-                                cursorX -= 1
-                                val oldCode = textbuf.removeAt(cursorX)
-                                // continue deleting hangul pieces because of the font...
-                                if (cursorX == 0 || (oldCode !in 0x115F..0x11FF && oldCode !in 0xD7B0..0xD7FF)) break
-                            }
-
-                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                            tryCursorForward()
-                        }
+                        paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
                     }
-                }
-                else if (keycodes.contains(Input.Keys.LEFT)) {
-                    endComposing()
-
-                    if (cursorX > 0) {
-                        cursorX -= 1
-                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                        tryCursorForward()
-                        if (cursorX <= 0) {
+                    else if (keycodes.contains(Input.Keys.C) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
+                        endComposing()
+                        copyToClipboard()
+                    }
+                    else if (keycodes.contains(Input.Keys.BACKSPACE)) {
+                        if (ime != null && ime.composing()) {
+                            candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
+                        }
+                        else if (cursorX <= 0) {
                             cursorX = 0
                             cursorDrawX = 0
                             cursorDrawScroll = 0
                         }
-                    }
-                }
-                else if (keycodes.contains(Input.Keys.RIGHT)) {
-                    endComposing()
+                        else {
+                            endComposing()
+                            if (cursorX > 0) {
+                                while (true) {
+                                    cursorX -= 1
+                                    val oldCode = textbuf.removeAt(cursorX)
+                                    // continue deleting hangul pieces because of the font...
+                                    if (cursorX == 0 || (oldCode !in 0x115F..0x11FF && oldCode !in 0xD7B0..0xD7FF)) break
+                                }
 
-                    if (cursorX < textbuf.size) {
-                        cursorX += 1
-                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                        tryCursorBack()
+                                cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                tryCursorForward()
+                            }
+                        }
                     }
-                }
-                // accept:
-                // - literal "<"
-                // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
-                else if (char != null && char.length > 0 && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                    val shiftin = keycodes.contains(Input.Keys.SHIFT_LEFT) || keycodes.contains(Input.Keys.SHIFT_RIGHT)
-                    val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
+                    else if (keycodes.contains(Input.Keys.LEFT)) {
+                        endComposing()
 
-                    val codepoints = if (ime != null) {
-                        val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
-                        candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
-
-                        newStatus.second.toCodePoints()
+                        if (cursorX > 0) {
+                            cursorX -= 1
+                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                            tryCursorForward()
+                            if (cursorX <= 0) {
+                                cursorX = 0
+                                cursorDrawX = 0
+                                cursorDrawScroll = 0
+                            }
+                        }
                     }
-                    else char.toCodePoints()
+                    else if (keycodes.contains(Input.Keys.RIGHT)) {
+                        endComposing()
+
+                        if (cursorX < textbuf.size) {
+                            cursorX += 1
+                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                            tryCursorBack()
+                        }
+                    }
+                    // accept:
+                    // - literal "<"
+                    // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
+                    else if (char != null && char.length > 0 && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
+                        val shiftin = keycodes.contains(Input.Keys.SHIFT_LEFT) || keycodes.contains(Input.Keys.SHIFT_RIGHT)
+                        val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
+
+                        val codepoints = if (ime != null) {
+                            val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
+                            candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
+
+                            newStatus.second.toCodePoints()
+                        }
+                        else char.toCodePoints()
 
 //                    println("textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
 
-                    if (!maxLen.exceeds(textbuf, codepoints)) {
-                        textbuf.addAll(cursorX, codepoints)
+                        if (!maxLen.exceeds(textbuf, codepoints)) {
+                            textbuf.addAll(cursorX, codepoints)
 
-                        cursorX += codepoints.size
-                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                            cursorX += codepoints.size
+                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
 
-                        tryCursorBack()
+                            tryCursorBack()
+                        }
                     }
-                }
-                else if (keycodes.contains(Input.Keys.ENTER) || keycodes.contains(Input.Keys.NUMPAD_ENTER)) {
-                    endComposing()
-                }
+                    else if (keycodes.contains(Input.Keys.ENTER) || keycodes.contains(Input.Keys.NUMPAD_ENTER)) {
+                        endComposing()
+                    }
 
-                // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
+                    // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
+                }
+            }
+            catch (e: NullPointerException) {
+                e.printStackTrace()
             }
 
             if (textbuf.size == 0) {
@@ -454,7 +459,7 @@ class UIItemTextLineInput(
         // draw candidates view
         if (candidates.isNotEmpty()) {
             val textWidths = candidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
-            val candidatesMax = getIME()!!.maxCandidates()
+            val candidatesMax = getIME()!!.config.candidates.toInt()
             val candidatesCount = minOf(candidatesMax, candidates.size)
             val isOnecolumn = (candidatesCount <= 3)
             val halfcount = if (isOnecolumn) candidatesCount else FastMath.ceil(candidatesCount / 2f)
@@ -510,6 +515,17 @@ class UIItemTextLineInput(
 
     fun getText() = textbufToString()
     fun getTextOrPlaceholder(): String = if (textbuf.isEmpty()) currentPlaceholderText.toJavaString() else getText()
+    fun clearText() {
+        resetIME()
+        textbuf.clear()
+        cursorX = 0
+        cursorDrawScroll = 0
+        cursorDrawX = 0
+    }
+    fun setText(s: String) {
+        clearText()
+        textbuf.addAll(s.toCodePoints())
+    }
 
     override fun dispose() {
         fbo.dispose()
