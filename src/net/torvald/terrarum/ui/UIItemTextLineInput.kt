@@ -82,10 +82,15 @@ class UIItemTextLineInput(
         val TEXTINPUT_COL_TEXT_NOMORE = Color(0xFF8888FF.toInt())
         val TEXTINPUT_COL_TEXT_DISABLED = Toolkit.Theme.COL_DISABLED
         val TEXTINPUT_COL_BACKGROUND = Toolkit.Theme.COL_CELL_FILL
+        val TEXTINPUT_COL_BACKGROUND2 = Toolkit.Theme.COL_CELL_FILL.cpy()
         const val CURSOR_BLINK_TIME = 1f / 3f
 
         private const val UI_TEXT_MARGIN = 2
         private const val WIDTH_ONEBUTTON = 24
+
+        init {
+            TEXTINPUT_COL_BACKGROUND2.a = 1f - (1f - TEXTINPUT_COL_BACKGROUND2.a) * (1f - TEXTINPUT_COL_BACKGROUND2.a)
+        }
     }
 
     private val fbo = FrameBuffer(

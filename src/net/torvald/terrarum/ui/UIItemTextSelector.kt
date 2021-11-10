@@ -20,9 +20,10 @@ class UIItemTextSelector(
         parentUI: UICanvas,
         initialX: Int, initialY: Int,
         val labelfuns: List<() -> String>,
-        intialSelection: Int,
+        initialSelection: Int,
         override val width: Int,
-        private val drawBorder: Boolean = true
+        private val drawBorder: Boolean = true,
+        private val clickToShowPalette: Boolean = true
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -39,12 +40,15 @@ class UIItemTextSelector(
 
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, true)
 
-    var selection = intialSelection
+    var selection = initialSelection
     private var fboUpdateLatch = true
 
-    private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
+    private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right, 3: middle
 
     var selectionChangeListener: (Int) -> Unit = {}
+
+    private var paletteShowing = false
+//    private var paletteScrollUnit = initialSelection
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -59,16 +63,35 @@ class UIItemTextSelector(
                 else
                     0
 
-        if (!mouseLatched && Terrarum.mouseDown && mouseOnButton in 1..2) {
+        if (!mouseLatched && Terrarum.mouseDown) {
+            if (mouseOnButton in 1..2) {
+                selection = (selection + (mouseOnButton * 2) - 3) fmod labelfuns.size
+                fboUpdateLatch = true
+                selectionChangeListener(selection)
+
+                paletteShowing = false
+            }
+            else if (mouseOnButton == 3 && clickToShowPalette) {
+                if (!paletteShowing) {
+                    paletteShowing = true
+                }
+                else {
+                    paletteShowing = false
+                    selectionChangeListener(selection)
+                }
+            }
+            else {
+                paletteShowing = false
+            }
+
             mouseLatched = true
-            selection = (selection + (mouseOnButton * 2) - 3) fmod labelfuns.size
-            fboUpdateLatch = true
-            selectionChangeListener(selection)
         }
         else if (!Terrarum.mouseDown) mouseLatched = false
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+        val labelCache = labelfuns.map { it() }
+
 
         batch.end()
 
@@ -78,7 +101,7 @@ class UIItemTextSelector(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                val t = labelfuns[selection]()
+                val t = labelCache[selection]
                 val tw = App.fontGame.getWidth(t)
                 App.fontGameFBO.draw(it, t, (fbo.width - tw) / 2, 0)
             } }
@@ -96,7 +119,7 @@ class UIItemTextSelector(
             Toolkit.fillArea(batch, posX + width - buttonW, posY, buttonW, height)
 
             // text area border
-            if (mouseOnButton != 3) {
+            if (!paletteShowing && mouseOnButton != 3) {
                 batch.color = Toolkit.Theme.COL_INACTIVE
                 Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
             }
@@ -112,7 +135,7 @@ class UIItemTextSelector(
             Toolkit.drawBoxBorder(batch, posX + width - buttonW - 1, posY - 1, buttonW + 2, height + 2)
 
             // text area border (again)
-            if (mouseOnButton == 3) {
+            if (!paletteShowing && mouseOnButton == 3) {
                 batch.color = Toolkit.Theme.COL_ACTIVE
                 Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 4, height + 2)
             }
@@ -129,12 +152,49 @@ class UIItemTextSelector(
         batch.draw(labels.get(17,0), posX + width - buttonW + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // draw text
-        batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
-        batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
+        if (!paletteShowing) {
+            batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
+            batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
+        }
+        // palette
+        else {
+            val palX = posX + buttonW + 3
+            val palY = posY - palCellHeight * selection - palCursorGap
+            val palW = width - 2*buttonW - 6
+            val palH = palCellHeight * labelCache.size + 2*palCursorGap
 
+            // palette background
+            batch.color = Color(128)
+            Toolkit.fillArea(batch, palX-1, palY-1, palW+2, palH+2)
+            batch.color = UIItemTextLineInput.TEXTINPUT_COL_BACKGROUND
+            Toolkit.fillArea(batch, palX, palY, palW, palH)
+
+            // cursor
+            batch.color = palCursorCol
+            Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 4, height + 2)
+            // palette border
+            batch.color = Toolkit.Theme.COL_ACTIVE
+            Toolkit.drawBoxBorder(batch, palX - 1, palY - 1, palW + 2, palH + 2)
+
+            // palette items
+            labelCache.forEachIndexed { index, s ->
+                batch.color = if (index == selection) Toolkit.Theme.COL_HIGHLIGHT else UIItemTextLineInput.TEXTINPUT_COL_TEXT
+                val t = labelCache[index]
+                val tw = App.fontGame.getWidth(t)
+                App.fontGame.draw(batch, t,
+                        palX + (palW - tw) / 2,
+                        palY + 2 + palCellHeight * index +
+                        (if (index > selection) 1 else if (index == selection) 0 else -1) * palCursorGap + palCursorGap
+                )
+            }
+        }
 
         super.render(batch, camera)
     }
+
+    private val palCursorCol = Toolkit.Theme.COL_INACTIVE.cpy().mul(1f,1f,1f,0.5f)
+    private val palCellHeight = height // must be same as the text area height
+    private val palCursorGap = 6 // preferably multiple of 3
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (mouseUp) {

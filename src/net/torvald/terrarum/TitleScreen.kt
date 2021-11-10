@@ -31,7 +31,6 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.IOException

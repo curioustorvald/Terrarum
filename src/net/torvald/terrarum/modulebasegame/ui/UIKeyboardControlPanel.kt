@@ -6,14 +6,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.EMDASH
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.DefaultConfig
-import net.torvald.terrarum.gamecontroller.IME
-import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -35,7 +31,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override var height = 600
     override var openCloseTime = 0f
 
-    private val textSelWidth = 280
 
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
@@ -119,7 +114,16 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     ) // end of keycaps
 
-    private val buttonReset = UIItemTextButton(this, "MENU_LABEL_RESET", kbx + 2, kby + 162, 140, true, hasBorder = true, alignment = UIItemTextButton.Companion.Alignment.CENTRE)
+    private val resetButtonWidth = 140
+    private val buttonReset = UIItemTextButton(this,
+            "MENU_LABEL_RESET",
+            kbx + (width - resetButtonWidth) / 2,
+            kby + 162 + 12,
+            resetButtonWidth,
+            readFromLang = true,
+            hasBorder = true,
+            alignment = UIItemTextButton.Companion.Alignment.CENTRE
+    )
 
     private val symbolLeft = labels.get(0,2)
     private val symbolUp = labels.get(1,2)
@@ -134,34 +138,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 480) / 2, kby + 219)
 
-
-    private val lowLayerCodes = IME.getAllLowLayers()
-    private val lowLayerNames = lowLayerCodes.map { { IME.getLowLayerByName(it).name } }
-    private val keyboardLayoutSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 400, lowLayerNames, lowLayerCodes.linearSearch { it == App.getConfigString("basekeyboardlayout") } ?: throw IME.LayoutNotFound(App.getConfigString("basekeyboardlayout")), textSelWidth)
-
-    private val imeCodes0 = IME.getAllHighLayers()
-    private val imeCodes = listOf("none") + IME.getAllHighLayers()
-    private val imeNames = listOf({"$EMDASH"}) + imeCodes0.map { { IME.getHighLayerByName(it).name } }
-    private val imeSelection = UIItemTextSelector(this, drawX + width - textSelWidth - 3, 440, imeNames, imeCodes.linearSearch { it == App.getConfigString("inputmethod") } ?: throw IME.LayoutNotFound(App.getConfigString("inputmethod")), textSelWidth)
-
-
-
-    private val keyboardTestPanel = UIItemTextLineInput(this, drawX + (width - 480) / 2 + 3, 480, 474, enableIMEButton = true, enablePasteButton = true)
-
-
-    private val keyboardConfigItems = listOf(
-            keyboardLayoutSelection,
-            imeSelection,
-            keyboardTestPanel
-    )
-
     init {
-        keyboardLayoutSelection.selectionChangeListener = {
-            App.setConfig("basekeyboardlayout", lowLayerCodes[it])
-        }
-        imeSelection.selectionChangeListener = {
-            App.setConfig("inputmethod", imeCodes[it])
-        }
 
         keycaps.values.forEach { addUIitem(it) }
         updateKeycaps()
@@ -175,11 +152,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 //        addUIitem(keyboardLayoutSelection)
 //        addUIitem(imeSelection)
 //        addUIitem(keyboardTestPanel)
-    }
-
-    override fun inputStrobed(e: TerrarumKeyboardEvent) {
-        super.inputStrobed(e)
-        keyboardTestPanel.inputStrobed(e)
     }
 
     private fun resetKeyConfig() {
@@ -236,12 +208,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
         buttonReset.update(delta)
 
-        if (keycapClicked >= 0 && controlSelected < 0) {
-            controlPalette.update(delta)
-        }
-        else  {
-            keyboardConfigItems.forEach { it.update(delta) }
-        }
+        controlPalette.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -254,18 +221,12 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
         batch.color = Color.WHITE
 
-        App.fontGame.draw(batch, Lang["MENU_LABEL_KEYBOARD_LAYOUT"], kbx + 1, keyboardLayoutSelection.initialY)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], kbx + 1, imeSelection.initialY)
-
-
         if (keycapClicked >= 0 && controlSelected < 0) {
             controlPalette.render(batch, camera)
         }
-        else {
-            keyboardConfigItems.forEach { it.render(batch, camera) }
-        }
 
-        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        // title
+        val title = Lang["MENU_OPTIONS_CONTROLS"]
         batch.color = Color.WHITE
         App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
@@ -276,24 +237,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             App.setConfig(UIItemControlPaletteBaloon.indexToConfigKey[control]!!, key)
         }
         updateKeycaps()
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        buttonReset.touchDown(screenX, screenY, pointer, button)
-        keyboardConfigItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
-        return true
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        buttonReset.touchUp(screenX, screenY, pointer, button)
-        keyboardConfigItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
-        return true
-    }
-
-    override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        super.scrolled(amountX, amountY)
-        keyboardConfigItems.forEach { it.scrolled(amountX, amountY) }
-        return true
     }
 
     override fun doOpening(delta: Float) {
@@ -319,8 +262,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 /**
  * @param key LibGDX keycode. Set it to `null` to "disable" the key. Also see [com.badlogic.gdx.Input.Keys]
  */
-class UIItemKeycap(
-        parent: UIKeyboardControlPanel,
+private class UIItemKeycap(
+        parent: UICanvas,
         initialX: Int,
         initialY: Int,
         val key: Int?,
@@ -330,8 +273,14 @@ class UIItemKeycap(
 ) : UIItem(parent, initialX, initialY) {
 
     init {
-        this.posX = initialX + parent.kbx
-        this.posY = initialY + parent.kby
+        if (parent is UIKeyboardControlPanel ) {
+            this.posX = initialX + parent.kbx
+            this.posY = initialY + parent.kby
+        }
+        else if (parent is UIKeyboardInputPanel) {
+            this.posX = initialX + parent.kbx
+            this.posY = initialY + parent.kby
+        }
     }
 
     override val height = 28

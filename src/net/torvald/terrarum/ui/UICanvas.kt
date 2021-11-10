@@ -151,7 +151,7 @@ abstract class UICanvas(
     abstract override fun dispose()
 
     fun addUIitem(uiItem: UIItem) {
-        uiItems.add(uiItem)
+        if (!uiItems.contains(uiItem)) uiItems.add(uiItem)
     }
 
     fun mouseInScreen(x: Int, y: Int) = x in 0 until App.scr.width && y in 0 until App.scr.height

@@ -22,7 +22,6 @@ import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
-import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
@@ -589,9 +588,9 @@ fun printStackTrace(obj: Any, out: PrintStream = System.out) {
     if (App.IS_DEVELOPMENT_BUILD) {
         val indentation = " ".repeat(obj.javaClass.simpleName.length + 4)
         Thread.currentThread().stackTrace.forEachIndexed { index, it ->
-            if (index == 3)
+            if (index == 1)
                 out.println("[${obj.javaClass.simpleName}]> $it")
-            else if (index > 3)
+            else if (index > 1)
                 out.println("$indentation$it")
         }
     }
@@ -602,8 +601,9 @@ class UIContainer {
     fun add(vararg things: Any) {
         things.forEach {
             if (it is UICanvas || it is Id_UICanvasNullable)
-                data.add(it)
-            else throw IllegalArgumentException(it.javaClass.name) }
+                if (!data.contains(it)) data.add(it)
+            else throw IllegalArgumentException(it.javaClass.name)
+        }
     }
 
     fun iterator() = object : Iterator<UICanvas?> {
