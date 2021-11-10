@@ -175,11 +175,11 @@ class UIItemTextLineInput(
                     if (keycodes.contains(App.getConfigInt("control_key_toggleime")) && repeatCount == 1) {
                         toggleIME()
                     }
-                    else if (keycodes.contains(Input.Keys.V) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
+                    else if (keycodes.contains(Input.Keys.V) && keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT)) {
                         endComposing()
                         paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
                     }
-                    else if (keycodes.contains(Input.Keys.C) && (keycodes.contains(Input.Keys.CONTROL_LEFT) || keycodes.contains(Input.Keys.CONTROL_RIGHT))) {
+                    else if (keycodes.contains(Input.Keys.C) && (keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT))) {
                         endComposing()
                         copyToClipboard()
                     }
@@ -234,8 +234,8 @@ class UIItemTextLineInput(
                     // - literal "<"
                     // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
                     else if (char != null && char.length > 0 && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                        val shiftin = keycodes.contains(Input.Keys.SHIFT_LEFT) || keycodes.contains(Input.Keys.SHIFT_RIGHT)
-                        val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT)
+                        val shiftin = keycodes.containsSome(Input.Keys.SHIFT_LEFT, Input.Keys.SHIFT_RIGHT)
+                        val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT) || keycodes.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
 
                         val codepoints = if (ime != null) {
                             val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
@@ -256,7 +256,7 @@ class UIItemTextLineInput(
                             tryCursorBack()
                         }
                     }
-                    else if (keycodes.contains(Input.Keys.ENTER) || keycodes.contains(Input.Keys.NUMPAD_ENTER)) {
+                    else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
                         endComposing()
                     }
 

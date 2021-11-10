@@ -56,8 +56,8 @@ object InputStrober {
             stroboTime = System.nanoTime()
             repeatCount += 1
 
-            val shiftin = keys.contains(Input.Keys.SHIFT_LEFT) || keys.contains(Input.Keys.SHIFT_RIGHT)
-            val altgrin = keys.contains(Input.Keys.ALT_RIGHT)
+            val shiftin = keys.containsSome(Input.Keys.SHIFT_LEFT, Input.Keys.SHIFT_RIGHT)
+            val altgrin = keys.contains(Input.Keys.ALT_RIGHT) || keys.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
             val keysym0 = keysToStr(keymap, keys)
             val newKeysym0 = keysToStr(keymap, keyDiff)
             val keysym =
@@ -144,3 +144,18 @@ data class TerrarumKeyboardEvent(
         val repeatCount: Int,
         val keycodes: IntArray
 )
+
+
+fun IntArray.containsAll(vararg keys: Int): Boolean {
+    keys.forEach {
+        if (!this.contains(it)) return false
+    }
+    return true
+}
+
+fun IntArray.containsSome(vararg keys: Int): Boolean {
+    keys.forEach {
+        if (this.contains(it)) return true
+    }
+    return false
+}

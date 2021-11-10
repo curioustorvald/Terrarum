@@ -65,12 +65,12 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 ["\n"],
 ["\x08"],
-["`","~"],
+["¤","~"],
 ["-","_"],
 ["=","+"],
 ["[","{"],
 ["]","}"],
-["\\","|"],
+["\\","₩"],
 [";",":"],
 ["'",'"'],
 ["/","?"],
@@ -261,20 +261,20 @@ let reset = () => {
     states.buf = []
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
-let isHangul = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x3131, 0x318E)
-let isConsonant = (s) =>  (s === undefined) ? false : inRange(s.charCodeAt(0), 0x3131, 0x314E)
-let isVowel = (s) => (s === undefined) ? false : (inRange(s.charCodeAt(0), 0x314F, 0x3163) || inRange(s.charCodeAt(0), 0x318D, 0x318E))
-let isVowelSuper = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x318D, 0x318E)
-let isJongseongConsonant = (s) =>  (s === undefined) ? false : (inRange(s.charCodeAt(0), 0x3131, 0x314E) && !([0x3138, 0x3143, 0x3149].includes(s.charCodeAt(0))))
-let isJungseongDigraph1 = (s) => (s === undefined) ? false : ([0x3157, 0x315C].includes(s.charCodeAt(0)))
-let isJungseongDigraphO = (s) => (s === undefined) ? false : ([0x314F, 0x3150, 0x3163].includes(s.charCodeAt(0)))
-let isJungseongDigraphU = (s) => (s === undefined) ? false : ([0x3153, 0x3154, 0x3163].includes(s.charCodeAt(0)))
-let isJungseongDigraphEU = (s) => (s === undefined) ? false : ([0x3163].includes(s.charCodeAt(0)))
-let isJungseongDigraphAA = (s) => (s === undefined) ? false : ([0x3163].includes(s.charCodeAt(0)))
-let isJongseongDigraphG = (s) => (s === undefined) ? false : ([0x3145].includes(s.charCodeAt(0)))
-let isJongseongDigraphN = (s) => (s === undefined) ? false : ([0x3148, 0x314E].includes(s.charCodeAt(0)))
-let isJongseongDigraphR = (s) => (s === undefined) ? false : ([0x3131, 0x3141, 0x3142, 0x3145, 0x314C, 0x314D, 0x314E].includes(s.charCodeAt(0)))
-let isJongseongDigraphB = (s) => (s === undefined) ? false : ([0x3145].includes(s.charCodeAt(0)))
+let isHangul = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x3131, 0x318E)
+let isConsonant = (s) =>  s !== undefined && inRange(s.charCodeAt(0), 0x3131, 0x314E)
+let isVowel = (s) => s !== undefined && (inRange(s.charCodeAt(0), 0x314F, 0x3163) || inRange(s.charCodeAt(0), 0x318D, 0x318E))
+let isVowelSuper = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x318D, 0x318E)
+let isJongseongConsonant = (s) =>  s !== undefined && (inRange(s.charCodeAt(0), 0x3131, 0x314E) && !([0x3138, 0x3143, 0x3149].includes(s.charCodeAt(0))))
+let isJungseongDigraph1 = (s) => s !== undefined && ([0x3157, 0x315C].includes(s.charCodeAt(0)))
+let isJungseongDigraphO = (s) => s !== undefined && ([0x314F, 0x3150, 0x3163].includes(s.charCodeAt(0)))
+let isJungseongDigraphU = (s) => s !== undefined && ([0x3153, 0x3154, 0x3163].includes(s.charCodeAt(0)))
+let isJungseongDigraphEU = (s) => s !== undefined && ([0x3163].includes(s.charCodeAt(0)))
+let isJungseongDigraphAA = (s) => s !== undefined && ([0x3163].includes(s.charCodeAt(0)))
+let isJongseongDigraphG = (s) => s !== undefined && ([0x3145].includes(s.charCodeAt(0)))
+let isJongseongDigraphN = (s) => s !== undefined && ([0x3148, 0x314E].includes(s.charCodeAt(0)))
+let isJongseongDigraphR = (s) => s !== undefined && ([0x3131, 0x3141, 0x3142, 0x3145, 0x314C, 0x314D, 0x314E].includes(s.charCodeAt(0)))
+let isJongseongDigraphB = (s) => s !== undefined && ([0x3145].includes(s.charCodeAt(0)))
 let jungseongDigraphsO = {"\u314F":"\u3158", "\u3150":"\u3159", "\u3163":"\u315A"}
 let jungseongDigraphsU = {"\u3153":"\u315D", "\u3154":"\u315E", "\u3163":"\u315F"}
 let jungseongDigraphsEU = {"\u3163":"\u3162"}
@@ -283,8 +283,8 @@ let jongseongDigraphsG = {"\u3145":"\u3133"}
 let jongseongDigraphsN = {"\u3148":"\u3135", "\u314E":"\u3136"}
 let jongseongDigraphsR = {"\u3131":"\u313A", "\u3141":"\u313B", "\u3142":"\u313C", "\u3145":"\u313D", "\u314C":"\u313E", "\u314D":"\u313F", "\u314E":"\u3140"}
 let jongseongDigraphsB = {"\u3145":"\u3144"}
-let isThisCharJongseongDigraph = (s) => (s === undefined) ? false : ([0x3133, 0x3135, 0x3136, 0x313A, 0x313B, 0x313C, 0x313D, 0x313E, 0x313F, 0x3140, 0x3144].includes(s.charCodeAt(0)))
-let isThisCharJungseongDigraph = (s) => (s === undefined) ? false : ([0x3158, 0x3159, 0x315A, 0x315D, 0x315E, 0x315F, 0x3162, 0x318E].includes(s.charCodeAt(0)))
+let isThisCharJongseongDigraph = (s) => s !== undefined && ([0x3133, 0x3135, 0x3136, 0x313A, 0x313B, 0x313C, 0x313D, 0x313E, 0x313F, 0x3140, 0x3144].includes(s.charCodeAt(0)))
+let isThisCharJungseongDigraph = (s) => s !== undefined && ([0x3158, 0x3159, 0x315A, 0x315D, 0x315E, 0x315F, 0x3162, 0x318E].includes(s.charCodeAt(0)))
 let choseongTable = {"\u3131":0,"\u3132":1,"\u3134":2,"\u3137":3,"\u3138":4,"\u3139":5,"\u3141":6,"\u3142":7,"\u3143":8,"\u3145":9,"\u3146":10,"\u3147":11,"\u3148":12,"\u3149":13,"\u314A":14,"\u314B":15,"\u314C":16,"\u314D":17,"\u314E":18}
 let jongseongTable = {"\u3131":0,"\u3132":1,"\u3133":2,"\u3134":3,"\u3135":4,"\u3136":5,"\u3137":6,"\u3139":7,"\u313A":8,"\u313B":9,"\u313C":10,"\u313D":11,"\u313E":12,"\u313F":13,"\u3140":14,"\u3141":15,"\u3142":16,"\u3144":17,"\u3145":18,"\u3146":19,"\u3147":20,"\u3148":21,"\u314A":22,"\u314B":23,"\u314C":24,"\u314D":25,"\u314E":26}
 let detachJongseongDigraph = {

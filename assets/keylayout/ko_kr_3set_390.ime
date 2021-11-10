@@ -65,12 +65,12 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 ["\n"],
 ["\x08"],
-["`","~"],
+["¤","~"],
 ["-","_"],
 ["=","+"],
 ["[","{"],
 ["]","}"],
-["\\","|"],
+["\\","₩"],
 ["\u1107",":"],
 ["\u1110",'"'],
 ["\u1169","?"],
@@ -261,21 +261,21 @@ let reset = () => {
     states.buf = []
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
-let isHangul = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1100, 0x11C2)
-let isChoseong = (s) =>  (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1100, 0x1112)
-let isJungseong = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x1161, 0x1175)
-let isJongseong = (s) => (s === undefined) ? false : inRange(s.charCodeAt(0), 0x11A8, 0x11C2)
-let isChoseongDigraph = (s) => (s === undefined) ? false : ([0x1100, 0x1103, 0x1107, 0x1109, 0x110C].includes(s.charCodeAt(0)))
-let isThisCharChoseongDigraph = (s) => (s === undefined) ? false : ([0x1101, 0x1104, 0x1108, 0x110A, 0x110D].includes(s.charCodeAt(0)))
-let isThisCharJungseongDigraph = (s) => (s === undefined) ? false : ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174].includes(s.charCodeAt(0)))
-let isThisCharJongseongDigraph = (s) => (s === undefined) ? false : ([0x11A9, 0x11AA, 0x11AC, 0x11AD, 0x11B0, 0x11B1, 0x11B2, 0x11B3, 0x11B4, 0x11B5, 0x11B6, 0x11B9].includes(s.charCodeAt(0))) // ㅆ is an exception!
-let isJungseongDigraphO = (s) => (s === undefined) ? false : ([0x1161, 0x1162, 0x1175].includes(s.charCodeAt(0)))
-let isJungseongDigraphU = (s) => (s === undefined) ? false : ([0x1165, 0x1166, 0x1175].includes(s.charCodeAt(0)))
-let isJungseongDigraphEU = (s) => (s === undefined) ? false : ([0x1175].includes(s.charCodeAt(0)))
-let isJongseongDigraphG = (s) => (s === undefined) ? false : ([0x11A8, 0x11BA].includes(s.charCodeAt(0)))
-let isJongseongDigraphN = (s) => (s === undefined) ? false : ([0x11BD, 0x11C2].includes(s.charCodeAt(0)))
-let isJongseongDigraphR = (s) => (s === undefined) ? false : ([0x11A8, 0x11B7, 0x11B8, 0x11BA, 0x11C0, 0x11C1, 0x11C2].includes(s.charCodeAt(0)))
-let isJongseongDigraphB = (s) => (s === undefined) ? false : ([0x11BA].includes(s.charCodeAt(0)))
+let isHangul = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x11C2)
+let isChoseong = (s) =>  s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x1112)
+let isJungseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1161, 0x1175)
+let isJongseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x11A8, 0x11C2)
+let isChoseongDigraph = (s) => s !== undefined && ([0x1100, 0x1103, 0x1107, 0x1109, 0x110C].includes(s.charCodeAt(0)))
+let isThisCharChoseongDigraph = (s) => s !== undefined && ([0x1101, 0x1104, 0x1108, 0x110A, 0x110D].includes(s.charCodeAt(0)))
+let isThisCharJungseongDigraph = (s) => s !== undefined && ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174].includes(s.charCodeAt(0)))
+let isThisCharJongseongDigraph = (s) => s !== undefined && ([0x11A9, 0x11AA, 0x11AC, 0x11AD, 0x11B0, 0x11B1, 0x11B2, 0x11B3, 0x11B4, 0x11B5, 0x11B6, 0x11B9].includes(s.charCodeAt(0))) // ㅆ is an exception!
+let isJungseongDigraphO = (s) => s !== undefined && ([0x1161, 0x1162, 0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphU = (s) => s !== undefined && ([0x1165, 0x1166, 0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphEU = (s) => s !== undefined && ([0x1175].includes(s.charCodeAt(0)))
+let isJongseongDigraphG = (s) => s !== undefined && ([0x11A8, 0x11BA].includes(s.charCodeAt(0)))
+let isJongseongDigraphN = (s) => s !== undefined && ([0x11BD, 0x11C2].includes(s.charCodeAt(0)))
+let isJongseongDigraphR = (s) => s !== undefined && ([0x11A8, 0x11B7, 0x11B8, 0x11BA, 0x11C0, 0x11C1, 0x11C2].includes(s.charCodeAt(0)))
+let isJongseongDigraphB = (s) => s !== undefined && ([0x11BA].includes(s.charCodeAt(0)))
 let choseongDigraphs = {"\u1100":"\u1101", "\u1103":"\u1104", "\u1107":"\u1108", "\u1109":"\u110A", "\u110C":"\u110D"}
 let jungseongDigraphsO = {"\u1161":"\u116A", "\u1162":"\u116B", "\u1175":"\u116C"}
 let jungseongDigraphsU = {"\u1165":"\u116F", "\u1166":"\u1170", "\u1175":"\u1171"}
