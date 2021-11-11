@@ -24,7 +24,7 @@ object Toolkit : Disposable {
 
     object Theme {
         val COL_INVENTORY_CELL_BORDER = Color(1f, 1f, 1f, 0.25f)
-        val COL_CELL_FILL = Color(0x28282888)
+        val COL_CELL_FILL = Color(0x282828C8)
 
         val COL_LIST_DEFAULT = Color.WHITE
         val COL_INACTIVE = Color.LIGHT_GRAY

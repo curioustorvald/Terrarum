@@ -5,11 +5,13 @@ import java.io.File
 
 typealias IMECanditates = List<String>
 typealias IMEOutput = String
+typealias Keysyms = Array<Array<String?>>
+
 
 data class TerrarumKeyLayout(
         val name: String,
         val capsMode: TerrarumKeyCapsMode,
-        val symbols: Array<Array<String?>>?
+        val symbols: Keysyms
 )
 
 enum class TerrarumKeyCapsMode {
@@ -30,7 +32,8 @@ data class TerrarumIME(
 data class TerrarumIMEConf(
         val name: String,
         val copying: String,
-        val candidates: TerrarumIMEViewCount
+        val candidates: TerrarumIMEViewCount,
+        val symbols: Keysyms
 )
 
 enum class TerrarumIMEViewCount {
@@ -156,12 +159,25 @@ object IME {
         val name = jsval.getMember("n").asString()
         val candidatesCount = jsval.getMember("v").asString().toViewCount()
         val copying = jsval.getMember("c").asString()
+        val keysyms = Array(256) { Array<String?>(4) { null } }
+
+        for (keycode in 0L until 256L) {
+            val a = jsval.getMember("t").getArrayElement(keycode)
+            if (!a.isNull) {
+                for (layer in 0L until 4L) {
+                    if (a.arraySize > layer) {
+                        val b = a.getArrayElement(layer)
+                        if (!b.isNull) {
+                            keysyms[keycode.toInt()][layer.toInt()] = b.asString()
+                        }
+                    }
+                }
+            }
+        }
 
         return TerrarumIME(
                 name,
-                TerrarumIMEConf(
-                        name, copying, candidatesCount
-                ),
+                TerrarumIMEConf(name, copying, candidatesCount, keysyms),
                 { headkey, shifted, alted, lowLayerKeysym ->
                     val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
                     a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()

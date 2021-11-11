@@ -107,7 +107,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             -2 to UIItemKeycap(this, 49,129,  null, oneu, ""),
             Input.Keys.ALT_LEFT to UIItemKeycap(this, 81,129,  Input.Keys.ALT_LEFT, onehalfu, "22,3"),
             Input.Keys.SPACE to UIItemKeycap(this, 129,129,  Input.Keys.SPACE, spaceu, ""),
-            Input.Keys.ALT_RIGHT to UIItemKeycap(this, 321,129,  Input.Keys.ALT_RIGHT, onehalfu, "22,3"),
+            Input.Keys.ALT_RIGHT to UIItemKeycap(this, 321,129,  Input.Keys.ALT_RIGHT, onehalfu, "23,2"),
             -3 to UIItemKeycap(this, 369,129,  null, oneu, ""),
             -4 to UIItemKeycap(this, 401,129,  null, oneu, ""),
             Input.Keys.CONTROL_RIGHT to UIItemKeycap(this, 433,129,  Input.Keys.CONTROL_RIGHT, onehalfu, "21,3"),
@@ -277,7 +277,7 @@ private class UIItemKeycap(
             this.posX = initialX + parent.kbx
             this.posY = initialY + parent.kby
         }
-        else if (parent is UIKeyboardInputPanel) {
+        else if (parent is UIKeyboardInputConfig) {
             this.posX = initialX + parent.kbx
             this.posY = initialY + parent.kby
         }

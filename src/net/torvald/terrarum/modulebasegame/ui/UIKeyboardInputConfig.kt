@@ -9,6 +9,9 @@ import net.torvald.EMDASH
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.gamecontroller.IME
+import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gamecontroller.TerrarumIME
+import net.torvald.terrarum.gamecontroller.TerrarumKeyCapsMode
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.ui.*
@@ -16,7 +19,7 @@ import net.torvald.terrarum.ui.*
 /**
  * Created by minjaesong on 2021-11-10.
  */
-class UIKeyboardInputPanel(remoCon: UIRemoCon?) : UICanvas() {
+class UIKeyboardInputConfig(remoCon: UIRemoCon?) : UICanvas() {
 
     override var width = 480
     override var height = 600
@@ -113,7 +116,6 @@ class UIKeyboardInputPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val y1 = 400
     private val y2 = y1 + 40
-    private val y3 = y2 + 48
 
     private val lowLayerCodes = IME.getAllLowLayers().sorted()
     private val lowLayerNames = lowLayerCodes.map { { IME.getLowLayerByName(it).name } }
@@ -140,7 +142,7 @@ class UIKeyboardInputPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val keyboardTestPanel = UIItemTextLineInput(this,
             drawX + (width - 480) / 2 + 3,
-            y3,
+            height - 40,
             474
     )
 
@@ -162,12 +164,16 @@ class UIKeyboardInputPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     override fun updateUI(delta: Float) {
+        keyboardTestPanel.mouseoverUpdateLatch =
+                (!keyboardLayoutSelection.paletteShowing &&
+                 !imeSelection.paletteShowing)
+
         uiItems.forEach { it.update(delta) }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
-        
+
         val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT"]; val tw1 = App.fontGame.getWidth(txt1)
         App.fontGame.draw(batch, txt1, selDrawX + (halfselw - tw1) / 2, y1)
 
@@ -180,6 +186,28 @@ class UIKeyboardInputPanel(remoCon: UIRemoCon?) : UICanvas() {
         App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
         uiItems.forEach { it.render(batch, camera) }
+
+        shiftin = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
+        altgrin = Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT) || (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))
+        lowlayer = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
+        highlayer = getIME()
+    }
+
+    internal var shiftin = false; private set
+    internal var altgrin = false; private set
+    internal var lowlayer = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout")); private set
+    internal var highlayer: TerrarumIME? = null
+
+    private fun getIME(): TerrarumIME? {
+        val selectedIME = App.getConfigString("inputmethod")
+
+        if (selectedIME == "none") return null
+        try {
+            return IME.getHighLayerByName(selectedIME)
+        }
+        catch (e: NullPointerException) {
+            return null
+        }
     }
 
     override fun doOpening(delta: Float) {
@@ -204,7 +232,7 @@ class UIKeyboardInputPanel(remoCon: UIRemoCon?) : UICanvas() {
  * @param key LibGDX keycode. Set it to `null` to "disable" the key. Also see [com.badlogic.gdx.Input.Keys]
  */
 private class UIItemInputKeycap(
-        parent: UICanvas,
+        val parent: UIKeyboardInputConfig,
         initialX: Int,
         initialY: Int,
         val key: Int?,
@@ -213,14 +241,8 @@ private class UIItemInputKeycap(
 ) : UIItem(parent, initialX, initialY) {
 
     init {
-        if (parent is UIKeyboardControlPanel ) {
-            this.posX = initialX + parent.kbx
-            this.posY = initialY + parent.kby
-        }
-        else if (parent is UIKeyboardInputPanel) {
-            this.posX = initialX + parent.kbx
-            this.posY = initialY + parent.kby
-        }
+        this.posX = initialX + parent.kbx
+        this.posY = initialY + parent.kby
     }
 
     override val height = 28
@@ -273,20 +295,45 @@ private class UIItemInputKeycap(
         // keysym
         if (key == Input.Keys.CONTROL_LEFT || key == Input.Keys.CONTROL_RIGHT)
             batch.draw(labels.get(21,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
-        else if (key == Input.Keys.ALT_LEFT || key == Input.Keys.ALT_RIGHT)
+        else if (key == Input.Keys.ALT_LEFT)
             batch.draw(labels.get(22,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+        else if (key == Input.Keys.ALT_RIGHT)
+            batch.draw(labels.get(23,2), (posX + (width - 20) / 2).toFloat(), posY + 4f)
         else if (key == Input.Keys.SHIFT_LEFT || key == Input.Keys.SHIFT_RIGHT)
             batch.draw(labels.get(23,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
         else if (key == Input.Keys.TAB)
             batch.draw(labels.get(23,5), (posX + (width - 20) / 2).toFloat(), posY + 4f)
         else if (key == Input.Keys.BACKSPACE)
             batch.draw(labels.get(24,5), (posX + (width - 20) / 2).toFloat(), posY + 4f)
-        else if (key == Input.Keys.CAPS_LOCK)
-            batch.draw(labels.get(24,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+        else if (key == Input.Keys.CAPS_LOCK) {
+            if (parent.lowlayer.capsMode == TerrarumKeyCapsMode.CAPS)
+                batch.draw(labels.get(24,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+            else if (parent.lowlayer.capsMode == TerrarumKeyCapsMode.SHIFT)
+                batch.draw(labels.get(24,2), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+            else if (parent.lowlayer.capsMode == TerrarumKeyCapsMode.BACK)
+                batch.draw(labels.get(24,5), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+        }
         else if (key == Input.Keys.ENTER)
             batch.draw(labels.get(17,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
-        else {
-            // the real keysym
+        else if (key != null) {
+            val keysym0 = if (KeyToggler.isOn(App.getConfigInt("control_key_toggleime")))
+                parent.highlayer?.config?.symbols?.get(key) ?: parent.lowlayer.symbols[key]
+            else
+                parent.lowlayer.symbols[key]
+            val keysym =
+                    (if (parent.shiftin && parent.altgrin && keysym0[3]?.isNotEmpty() == true) keysym0[3]
+                    else if (parent.altgrin && keysym0[2]?.isNotEmpty() == true) keysym0[2]
+                    else if (parent.shiftin && keysym0[1]?.isNotEmpty() == true) keysym0[1]
+                    else keysym0[0]) ?: ""
+
+            if (keysym[0].code == 0xA0)
+                batch.draw(labels.get(22, 2), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+            else if (keysym[0].code == 0x20)
+                batch.draw(labels.get(21,2), (posX + (width - 20) / 2).toFloat(), posY + 4f)
+            else {
+                val keysymw = App.fontGame.getWidth(keysym)
+                App.fontGame.draw(batch, keysym, posX + (width - keysymw) / 2, posY + 4)
+            }
         }
 
     }

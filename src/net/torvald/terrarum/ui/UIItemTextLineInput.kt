@@ -118,12 +118,24 @@ class UIItemTextLineInput(
     private val btn1PosX = posX + width - 2*WIDTH_ONEBUTTON - 3
     private val btn2PosX = posX + width - WIDTH_ONEBUTTON
 
+    var mouseoverUpdateLatch = false
+        set(value) {
+            field = value
+            if (!value) {
+                mouseLatched = false
+                fboUpdateLatch = false
+                isActive = false
+                cursorOn = false
+                cursorBlinkCounter = 0f
+            }
+        }
+
     private val mouseUpOnTextArea: Boolean
-        get() = relativeMouseX in 0 until fbo.width + 2* UI_TEXT_MARGIN && relativeMouseY in 0 until height
+        get() = mouseoverUpdateLatch && relativeMouseX in 0 until fbo.width + 2* UI_TEXT_MARGIN && relativeMouseY in 0 until height
     private val mouseUpOnButton1
-        get() = buttonsShown > 1 && relativeMouseX in btn1PosX - posX until btn1PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
+        get() = mouseoverUpdateLatch && buttonsShown > 1 && relativeMouseX in btn1PosX - posX until btn1PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
     private val mouseUpOnButton2
-        get() = buttonsShown > 0 && relativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
+        get() = mouseoverUpdateLatch && buttonsShown > 0 && relativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
 
     private var imeOn = false
     private var candidates: List<CodepointSequence> = listOf()
@@ -177,10 +189,7 @@ class UIItemTextLineInput(
                     val ime = getIME()
                     val lowLayer = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
-                    if (keycodes.contains(App.getConfigInt("control_key_toggleime")) && repeatCount == 1) {
-                        toggleIME()
-                    }
-                    else if (keycodes.contains(Input.Keys.V) && keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT)) {
+                    if (keycodes.contains(Input.Keys.V) && keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT)) {
                         endComposing()
                         paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
                     }
@@ -282,35 +291,39 @@ class UIItemTextLineInput(
     }
 
     override fun update(delta: Float) {
-        super.update(delta)
-        val mouseDown = Terrarum.mouseDown
+        if (mouseoverUpdateLatch) {
+            super.update(delta)
+            val mouseDown = Terrarum.mouseDown
 
-        if (mouseDown) {
-            isActive = mouseUp
-        }
-
-        if (App.getConfigString("inputmethod") == "none") imeOn = false
-
-        if (isActive) {
-            cursorBlinkCounter += delta
-
-            while (cursorBlinkCounter >= CURSOR_BLINK_TIME) {
-                cursorBlinkCounter -= CURSOR_BLINK_TIME
-                cursorOn = !cursorOn
+            if (mouseDown) {
+                isActive = mouseUp
             }
-        }
 
-        if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton1 || enableIMEButton && !enablePasteButton && mouseUpOnButton2)) {
-            toggleIME()
-            mouseLatched = true
-        }
-        else if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton2 || enablePasteButton && !enableIMEButton && mouseUpOnButton2)) {
-            endComposing()
-            paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
-            mouseLatched = true
-        }
+            if (App.getConfigString("inputmethod") == "none") imeOn = false
 
-        if (!mouseDown) mouseLatched = false
+            if (isActive) {
+                cursorBlinkCounter += delta
+
+                while (cursorBlinkCounter >= CURSOR_BLINK_TIME) {
+                    cursorBlinkCounter -= CURSOR_BLINK_TIME
+                    cursorOn = !cursorOn
+                }
+            }
+
+            if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton1 || enableIMEButton && !enablePasteButton && mouseUpOnButton2)) {
+                toggleIME()
+                mouseLatched = true
+            }
+            else if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton2 || enablePasteButton && !enableIMEButton && mouseUpOnButton2)) {
+                endComposing()
+                paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
+                mouseLatched = true
+            }
+
+            if (!mouseDown) mouseLatched = false
+
+            imeOn = KeyToggler.isOn(App.getConfigInt("control_key_toggleime"))
+        }
     }
 
     private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }
@@ -328,12 +341,8 @@ class UIItemTextLineInput(
     private fun toggleIME() {
         endComposing()
 
-        if (App.getConfigString("inputmethod") == "none") {
-            imeOn = false
-            return
-        }
-
         imeOn = !imeOn
+        KeyToggler.forceSet(App.getConfigInt("control_key_toggleime"), imeOn)
     }
 
     private fun resetIME() {

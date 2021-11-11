@@ -33,6 +33,12 @@ class UIItemTextSelector(
         CommonResourcePool.loadAll()
     }
 
+    override val mouseUp: Boolean
+        get() = (relativeMouseX in 0 until width && relativeMouseY in 0 until height) or (if (paletteShowing)
+            (relativeMouseX in buttonW+3 until buttonW+3 + palW &&
+             relativeMouseY in palY - posY until palY + palH - posY)
+        else false)
+
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     override val height = 24
@@ -47,8 +53,17 @@ class UIItemTextSelector(
 
     var selectionChangeListener: (Int) -> Unit = {}
 
-    private var paletteShowing = false
-//    private var paletteScrollUnit = initialSelection
+
+
+    var paletteShowing = false; private set
+    private val palCursorCol = Toolkit.Theme.COL_INACTIVE.cpy().mul(1f,1f,1f,0.5f)
+    private val palCellHeight = height // must be same as the text area height
+    private val palCursorGap = 6 // preferably multiple of 3
+    private var palX = posX + buttonW + 3
+    private var palY = posY - palCellHeight * selection - palCursorGap
+    private var palW = width - 2*buttonW - 6
+    private var palH = palCellHeight * labelfuns.size + 2*palCursorGap
+
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -64,6 +79,7 @@ class UIItemTextSelector(
                     0
 
         if (!mouseLatched && Terrarum.mouseDown) {
+            // TODO if (mouse on palette items)
             if (mouseOnButton in 1..2) {
                 selection = (selection + (mouseOnButton * 2) - 3) fmod labelfuns.size
                 fboUpdateLatch = true
@@ -158,15 +174,13 @@ class UIItemTextSelector(
         }
         // palette
         else {
-            val palX = posX + buttonW + 3
-            val palY = posY - palCellHeight * selection - palCursorGap
-            val palW = width - 2*buttonW - 6
-            val palH = palCellHeight * labelCache.size + 2*palCursorGap
+            palX = posX + buttonW + 3
+            palY = posY - palCellHeight * selection - palCursorGap
+            palH = palCellHeight * labelCache.size + 2*palCursorGap
 
             // palette background
-            batch.color = Color(128)
-            Toolkit.fillArea(batch, palX-1, palY-1, palW+2, palH+2)
             batch.color = UIItemTextLineInput.TEXTINPUT_COL_BACKGROUND
+            Toolkit.fillArea(batch, palX, palY, palW, palH)
             Toolkit.fillArea(batch, palX, palY, palW, palH)
 
             // cursor
@@ -174,7 +188,7 @@ class UIItemTextSelector(
             Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 4, height + 2)
             // palette border
             batch.color = Toolkit.Theme.COL_ACTIVE
-            Toolkit.drawBoxBorder(batch, palX - 1, palY - 1, palW + 2, palH + 2)
+            Toolkit.drawBoxBorder(batch, palX, palY, palW, palH)
 
             // palette items
             labelCache.forEachIndexed { index, s ->
@@ -190,11 +204,9 @@ class UIItemTextSelector(
         }
 
         super.render(batch, camera)
+
     }
 
-    private val palCursorCol = Toolkit.Theme.COL_INACTIVE.cpy().mul(1f,1f,1f,0.5f)
-    private val palCellHeight = height // must be same as the text area height
-    private val palCursorGap = 6 // preferably multiple of 3
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (mouseUp) {

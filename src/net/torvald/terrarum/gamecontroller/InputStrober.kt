@@ -62,15 +62,15 @@ object InputStrober {
             val newKeysym0 = keysToStr(keymap, keyDiff)
             val keysym =
                     if (keysym0 == null) null
-                    else if (shiftin && altgrin && keysym0[3]?.isNotBlank() == true) keysym0[3]
-                    else if (altgrin && keysym0[2]?.isNotBlank() == true) keysym0[2]
-                    else if (shiftin && keysym0[1]?.isNotBlank() == true) keysym0[1]
+                    else if (shiftin && altgrin && keysym0[3]?.isNotEmpty() == true) keysym0[3]
+                    else if (altgrin && keysym0[2]?.isNotEmpty() == true) keysym0[2]
+                    else if (shiftin && keysym0[1]?.isNotEmpty() == true) keysym0[1]
                     else keysym0[0]
             val newKeysym =
                     if (newKeysym0 == null) null
-                    else if (shiftin && altgrin && newKeysym0[3]?.isNotBlank() == true) newKeysym0[3]
-                    else if (altgrin && newKeysym0[2]?.isNotBlank() == true) newKeysym0[2]
-                    else if (shiftin && newKeysym0[1]?.isNotBlank() == true) newKeysym0[1]
+                    else if (shiftin && altgrin && newKeysym0[3]?.isNotEmpty() == true) newKeysym0[3]
+                    else if (altgrin && newKeysym0[2]?.isNotEmpty() == true) newKeysym0[2]
+                    else if (shiftin && newKeysym0[1]?.isNotEmpty() == true) newKeysym0[1]
                     else newKeysym0[0]
 
             val headKeyCode = if (keyDiff.size < 1) keys[0] else keyDiff[0]
