@@ -34,14 +34,14 @@ let states = {"keylayouts":[[""],[undefined],
 ["\u11C1","\u1161","\u1161"],
 ["\u11AE","\u1173","\u1173"],
 ["\u1102","₩"],
-["\u1106","\u1173","\u1173"],
+["\u1106","\u1173","\u1173"], // combining EU
 ["\u110B","'"],
 ["\u1100",'"'],
 ["\u110C","\u00B7"],
 ["\u1112","\u2026"],
 ["\u1109","\u2014"],
-["\u110E","\u116E","\u116E"],
-["\u1111",";","\u119E"],
+["\u110E","\u116E","\u116E"], // combining U
+["\u1111",";","\u119E"],        // AREA-A
 ["\u11BA","\u1164","\u1164"],
 ["\u11C0","\u1165","\u1165"],
 ["\u11AB","\u1168","\u1168"],
@@ -73,7 +73,7 @@ let states = {"keylayouts":[[""],[undefined],
 ["\\","|"],
 ["\u1107",":"],
 ["\u1110",'/'],
-["\u110F","?","\u1169"],
+["\u110F","?","\u1169"], // combining O
 [undefined],
 [undefined],
 [undefined],
@@ -400,28 +400,29 @@ return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald",
     let s = states.keylayouts[headkey][layer]
     let s2 = states.keylayouts[headkey][2]
     let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
-    let oldDeadkeyStatus = states.hasDeadkey
-    let hangulLayoutAutoShiftin = oldDeadkeyStatus || (isChoseong(states.buf[0]) && undefined == states.buf[1] && s2 != undefined)
 
-    if (hangulLayoutAutoShiftin && isJungseongDeadkey(headkey)) {
-        states.hasDeadkey = true
-    }
+    let isDeadkey = isJungseongDeadkey(headkey)
+    let hasChoseong = isChoseong(states.buf[0])
+    let hasJungseong = isJungseong(states.buf[1])
+    let deadkeyAcceptable = !states.hasDeadkey && hasChoseong && !hasJungseong && isDeadkey
 
-    if (isHangul(s) || hangulLayoutAutoShiftin) {
+    if (isHangul(s) || deadkeyAcceptable) {
         // auto-change alternative layer if choseong is in the buffer already
         // unshift when jungseong is there
         // Korean threesetters call this feature "Galmadeuri" Input
-        if (hangulLayoutAutoShiftin) {
+
+        // if deadkey? -OR- (notdeadkey? -AND- (A as in GA -OR- A as in GWA))
+        if (deadkeyAcceptable || (!isDeadkey && (hasChoseong && !hasJungseong || states.hasDeadkey)))  {
             s = s2
             bufIndex = 1
-
-            if (oldDeadkeyStatus)
-                states.hasDeadkey = false
+            states.hasDeadkey = deadkeyAcceptable
+        }
+        else {
+            states.hasDeadkey = false
         }
 
-
         // ㄲ ㄸ ㅃ ㅆ ㅉ (only allow when the jung/jongseong is not typed)
-        if (0 == bufIndex && undefined == states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
+        if (0 == bufIndex && !states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
             states.buf[0] = choseongDigraphs[s]
         }
         // ㅘ ㅙ ㅚ
