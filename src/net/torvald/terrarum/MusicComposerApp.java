@@ -5,7 +5,7 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Texture;
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap;
 
 import java.io.File;
 
@@ -15,7 +15,7 @@ import java.io.File;
 public class MusicComposerApp extends ApplicationAdapter {
 
     public static Lwjgl3ApplicationConfiguration appConfig;
-    public static GameFontBase fontGame;
+    public static TerrarumSansBitmap fontGame;
 
     public MusicComposerApp(Lwjgl3ApplicationConfiguration appConfig) {
         this.appConfig = appConfig;
@@ -34,7 +34,7 @@ public class MusicComposerApp extends ApplicationAdapter {
 
     @Override
     public void create() {
-        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true, false);
+        fontGame = new TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap", false, true, false);
     }
 
     @Override

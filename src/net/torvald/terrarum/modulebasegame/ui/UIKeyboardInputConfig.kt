@@ -266,6 +266,9 @@ private class UIItemInputKeycap(
         super.update(delta)
     }
 
+    private fun isDiacritic(c: Int) = c in 0x300..0x36F || c in 0x1AB0..0x1AFF ||
+            c in 0x1DC0..0x1DFF || c in 0x20D0..0x20FF || c in 0xFE20..0xFE2F
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         super.render(batch, camera)
 
@@ -320,11 +323,13 @@ private class UIItemInputKeycap(
                 parent.highlayer?.config?.symbols?.get(key) ?: parent.lowlayer.symbols[key]
             else
                 parent.lowlayer.symbols[key]
-            val keysym =
+            var keysym =
                     (if (parent.shiftin && parent.altgrin && keysym0[3]?.isNotEmpty() == true) keysym0[3]
                     else if (parent.altgrin && keysym0[2]?.isNotEmpty() == true) keysym0[2]
                     else if (parent.shiftin && keysym0[1]?.isNotEmpty() == true) keysym0[1]
                     else keysym0[0]) ?: ""
+            if (isDiacritic(keysym[0].code))
+                keysym = "ɔ$keysym"
 
             if (keysym[0].code == 0xA0)
                 batch.draw(labels.get(22, 2), (posX + (width - 20) / 2).toFloat(), posY + 4f)

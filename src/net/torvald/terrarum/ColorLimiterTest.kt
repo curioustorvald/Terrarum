@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.EMDASH
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 /**
  * Created by minjaesong on 2017-07-05.
@@ -33,7 +33,7 @@ object ColorLimiterTest : ApplicationAdapter() {
     lateinit var batch: SpriteBatch
     lateinit var shapeRenderer: ShapeRenderer
 
-    lateinit var font: GameFontBase
+    lateinit var font: TerrarumSansBitmap
 
     override fun create() {
         ShaderProgram.pedantic = false
@@ -50,7 +50,7 @@ object ColorLimiterTest : ApplicationAdapter() {
         batch = SpriteBatch()
         shapeRenderer = ShapeRenderer()
 
-        font = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
+        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
 
 
         if (!shader4096.isCompiled) {

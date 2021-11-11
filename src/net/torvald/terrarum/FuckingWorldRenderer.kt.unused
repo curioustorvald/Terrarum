@@ -949,7 +949,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                         }*/
 
                         // velocity
-                        batch.color = Color.CHARTREUSE//GameFontBase.codeToCol["g"]
+                        batch.color = Color.CHARTREUSE//TerrarumSansBitmap.codeToCol["g"]
                         AppLoader.fontSmallNumbers.draw(batch,
                                 "${0x7F.toChar()}X ${actor.externalForce.x}",
                                 actor.hitbox.startX.toFloat(),

@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.Color
 import net.torvald.EMDASH
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 
 /**
@@ -50,7 +50,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
 
         img = Texture("assets/test_texture.tga")
 
-        gameFont = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap")
+        gameFont = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
         //gameFont = BitmapFont()
 
 

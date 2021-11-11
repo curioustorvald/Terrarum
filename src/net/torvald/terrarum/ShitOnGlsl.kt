@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.EMDASH
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 /**
  * Created by minjaesong on 2017-08-11.
@@ -24,7 +24,7 @@ fun main(args: Array<String>) { // LWJGL 3 won't work? java.lang.VerifyError
 object ShitOnGlsl : ApplicationAdapter() {
 
     lateinit var shader: ShaderProgram
-    lateinit var font: GameFontBase
+    lateinit var font: TerrarumSansBitmap
 
     lateinit var fullscreenQuad: Mesh
 
@@ -42,7 +42,7 @@ object ShitOnGlsl : ApplicationAdapter() {
         shader = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/crt.frag"))
 
 
-        font = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
+        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
 
 
         if (!shader.isCompiled) {

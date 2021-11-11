@@ -8,7 +8,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import net.torvald.EMDASH
@@ -17,7 +16,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextLineInput
 import net.torvald.terrarum.ui.UIItemToggleButton
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 /**
  * Created by Torvald on 2019-10-16.
@@ -31,8 +30,8 @@ class UIElemTest : ApplicationAdapter() {
     private lateinit var ui: UICanvas
 
     override fun create() {
-        App.fontGame = GameFontBase(App.FONT_DIR, false, true, false,
-                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
+        App.fontGame = TerrarumSansBitmap(App.FONT_DIR, false, true, false,
+                 false,
                 256, false, 0.5f, false
         )
 

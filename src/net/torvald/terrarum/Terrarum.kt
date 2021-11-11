@@ -30,7 +30,7 @@ import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
 import java.io.File
@@ -492,24 +492,24 @@ fun MutableList<Any>.shuffle() {
 }
 
 
-val ccW = GameFontBase.toColorCode(0xFFFF)
-val ccY = GameFontBase.toColorCode(0xFFE8)
-val ccO = GameFontBase.toColorCode(0xFFB2)
-val ccR = GameFontBase.toColorCode(0xFF88)
-val ccF = GameFontBase.toColorCode(0xFFAE)
-val ccM = GameFontBase.toColorCode(0xFEAF)
-val ccB = GameFontBase.toColorCode(0xF88F)
-val ccC = GameFontBase.toColorCode(0xF8FF)
-val ccG = GameFontBase.toColorCode(0xF8F8)
-val ccV = GameFontBase.toColorCode(0xF080)
-val ccX = GameFontBase.toColorCode(0xF853)
-val ccK = GameFontBase.toColorCode(0xF888)
-val ccE = GameFontBase.toColorCode(0xFBBB)
+val ccW = TerrarumSansBitmap.toColorCode(0xFFFF)
+val ccY = TerrarumSansBitmap.toColorCode(0xFFE8)
+val ccO = TerrarumSansBitmap.toColorCode(0xFFB2)
+val ccR = TerrarumSansBitmap.toColorCode(0xFF88)
+val ccF = TerrarumSansBitmap.toColorCode(0xFFAE)
+val ccM = TerrarumSansBitmap.toColorCode(0xFEAF)
+val ccB = TerrarumSansBitmap.toColorCode(0xF88F)
+val ccC = TerrarumSansBitmap.toColorCode(0xF8FF)
+val ccG = TerrarumSansBitmap.toColorCode(0xF8F8)
+val ccV = TerrarumSansBitmap.toColorCode(0xF080)
+val ccX = TerrarumSansBitmap.toColorCode(0xF853)
+val ccK = TerrarumSansBitmap.toColorCode(0xF888)
+val ccE = TerrarumSansBitmap.toColorCode(0xFBBB)
 
 // Zelda-esque text colour emphasis
-val emphRed = GameFontBase.toColorCode(0xFF88)
-val emphObj = GameFontBase.toColorCode(0xF0FF)
-val emphVerb = GameFontBase.toColorCode(0xFFF6)
+val emphRed = TerrarumSansBitmap.toColorCode(0xFF88)
+val emphObj = TerrarumSansBitmap.toColorCode(0xF0FF)
+val emphVerb = TerrarumSansBitmap.toColorCode(0xFFF6)
 
 
 typealias Second = Float

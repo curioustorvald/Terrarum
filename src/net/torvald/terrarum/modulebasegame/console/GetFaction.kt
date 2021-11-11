@@ -6,8 +6,6 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameactors.Factionable
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
  * Created by minjaesong on 2016-02-17.

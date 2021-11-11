@@ -39,7 +39,7 @@ import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.ui.Toolkit;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.DebugTimers;
 
@@ -181,8 +181,8 @@ public class App implements ApplicationListener {
 
     public static CreateTileAtlas tileMaker;
 
-    public static GameFontBase fontGame;
-    public static GameFontBase fontGameFBO;
+    public static TerrarumSansBitmap fontGame;
+    public static TerrarumSansBitmap fontGameFBO;
     public static TinyAlphNum fontSmallNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
@@ -498,12 +498,12 @@ public class App implements ApplicationListener {
             environment = RunningEnvironment.PC;
         }*/
 
-        fontGame = new GameFontBase(FONT_DIR, false, true, false,
-                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
+        fontGame = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+                false,
                 256, false, 0.5f, false
         );
-        fontGameFBO = new GameFontBase(FONT_DIR, false, true, false,
-                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false,
+        fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+                false,
                 64, false, 203f/255f, false
         );
         Lang.invoke();
