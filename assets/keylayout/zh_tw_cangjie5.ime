@@ -264,12 +264,12 @@ let reset = () => {
     states.candidates = ""
 }
 let getCandidatesUsingBuf = () =>  {
-    states.candidates = states.dict.getCangjie(states.buf) // comma-separated values
+    states.candidates = states.dict.getCangjie(states.buf) // \x1E-separated values
     states.code = 1 + (states.candidates.length == 0)
 //    console.log(`cangjie in, buf: ${states.buf}, candidates: ${states.candidates}`)
-    return `${states.buf},${states.candidates}`
+    return `${states.buf}\u001E${states.candidates}`
 }
-return Object.freeze({"n":"五倉正體 Qwerty","v":"many","c":"CuriousTo\uA75Bvald, 倉頡之友 。馬來西亞  http://www.chinesecj.com",
+return Object.freeze({"n":"五倉正體 Qwerty","v":"many","c":"CuriousTo\uA75Bvald, 倉頡之友 。馬來西亞  http://www.chinesecj.com","m":"candidates",
 "t":states.keylayouts.map(it => [(it[2]||it[0]),it[1]]),
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
@@ -280,7 +280,7 @@ return Object.freeze({"n":"五倉正體 Qwerty","v":"many","c":"CuriousTo\uA75Bv
 
     if (states.code == 1 && 48 <= cjkeyAsc && cjkeyAsc <= 57) {
         let raw = ''+states.buf
-        let selection = states.candidates.split(',')[cjkeyAsc - 49]
+        let selection = states.candidates.split('\u001E')[cjkeyAsc - 49]
         reset()
         return ['', selection || raw]
     }

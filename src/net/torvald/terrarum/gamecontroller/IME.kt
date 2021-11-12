@@ -3,7 +3,7 @@ package net.torvald.terrarum.gamecontroller
 import net.torvald.terrarum.App.printdbg
 import java.io.File
 
-typealias IMECanditates = List<String>
+typealias IMECandidates = List<String>
 typealias IMEOutput = String
 typealias Keysyms = Array<Array<String?>>
 
@@ -22,8 +22,8 @@ data class TerrarumIME(
         val name: String,
         val config: TerrarumIMEConf,
         // (headkey, shiftin, altgrin, lowLayerKeysym)
-        val acceptChar: (Int, Boolean, Boolean, String) -> Pair<IMECanditates, IMEOutput>,
-        val backspace: () -> IMECanditates,
+        val acceptChar: (Int, Boolean, Boolean, String) -> Pair<IMECandidates, IMEOutput>,
+        val backspace: () -> IMECandidates,
         val endCompose: () -> IMEOutput,
         val reset: () -> Unit,
         val composing: () -> Boolean

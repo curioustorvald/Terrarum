@@ -19,6 +19,10 @@ class IMEProviderDelegate(val ime: IME) {
 
 class IMEDictionary(private val filename: String) {
 
+    companion object {
+        const val CAND_DELIM = '\u001E'
+    }
+
     private val candidates = HashMap<String, String>(16384)
     private val keys = SortedArrayList<String>(16384) // keys on the .han file are absofreakinlutely not sorted
 
@@ -30,7 +34,7 @@ class IMEDictionary(private val filename: String) {
             if (it.contains(',')) {
                 val (key, value) = it.split(',')
                 if (candidates.containsKey(key)) {
-                    candidates[key] += ",$value"
+                    candidates[key] += "$CAND_DELIM$value"
                 }
                 else {
                     candidates[key] = value
@@ -80,8 +84,8 @@ class IMEDictionary(private val filename: String) {
             val keysym = allRelevantKeys[index]
             if (!keysym.startsWith(key)) break
 
-            val outstr = ",${candidates[keysym]}"
-            outsize += outstr.count { it == ',' }
+            val outstr = "$CAND_DELIM${candidates[keysym]}"
+            outsize += outstr.count { it == CAND_DELIM }
             out.append(outstr)
 
             index += 1
