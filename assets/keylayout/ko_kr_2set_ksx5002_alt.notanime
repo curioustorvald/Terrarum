@@ -310,7 +310,7 @@ let detachJungseongDigraph = {
 "\u3162":["\u3161","\u3163"],
 "\u318E":["\u318D","\u3163"]
 }
-let bufAssemble = () => {
+let bufAssemble = (isPreview) => {
     // nothing on the buffer
     if (states.buf[0] === undefined && states.buf[1] === undefined && states.buf[2] === undefined)
         return ''
@@ -343,12 +343,21 @@ let bufAssemble = () => {
 }
 //let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `${buf[i]}`).join(' ')
-return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
+return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA75Bvald","m":"candidates",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1
+
+    /*let purekeys = keycodes.filter(it => (
+            inRange(it,7,18) || // numeric
+            inRange(it,29,56) || // alph
+            it == 62 || // space
+            inRange(it,66,76) || // symbols
+            inRange(it,144,163) // numpad
+    ))
+    let headkey = purekeys[0]*/
 
     let s = states.keylayouts[headkey][layer]
 
@@ -402,16 +411,12 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA7
                 states.buf = [states.buf[0], states.buf[1], digraphs[0]]
                 sendout = bufAssemble()
                 states.buf = newbuf
-
-                return ["0", bufAssemble()]
             }
             else if (vowelCollision) {
                 let newbuf = [states.buf[2], s]
                 states.buf = [states.buf[0], states.buf[1]]
                 sendout = bufAssemble()
                 states.buf = newbuf
-
-                return ["0", bufAssemble()]
             }
             else {
                 sendout = bufAssemble()
@@ -420,29 +425,24 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA7
                     states.buf[0] = s
                 else
                     states.buf[bufIndex] = s
-
-                return ["0", bufAssemble()]
             }
+            let newbufstr = bufDebugStringify(states.buf)
+//            console.log(`sending out: ${oldbufstr} -> ${sendout} ; ${newbufstr}`)
+            return [bufAssemble(1), sendout]
         }
         else {
-            let bufferEmpty = (states.buf[0] === undefined)
             states.buf[bufIndex] = s
-
-            if (bufferEmpty) {
-//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
-                return ["0", bufAssemble()]
-            }
-            else {
-//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
-                return ["1", bufAssemble()]
-            }
+//            console.log(`assembling: ${bufDebugStringify(states.buf)} -> ${bufAssemble()}`)
         }
+
+        return [bufAssemble(1), ""]
     }
     else {
-        reset()
-        // directly print out the character without using the buffer
-//        console.log(`sending1 out: ${s}`)
-        return ["0", s]
+//        console.log(`accepting char '${s}'`)
+        let oldbufstr = bufDebugStringify(states.buf)
+        let sendout = bufAssemble() + (s || ''); reset()
+//        console.log(`sending out: ${oldbufstr} -> ${sendout}`)
+        return [bufAssemble(1), sendout]
     }
 },
 "backspace":()=>{
@@ -464,7 +464,7 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA7
 //    let newbufstr = bufDebugStringify(states.buf)
 //    console.log(`popping assembly: ${oldbufstr} -> ${newbufstr}`)
 
-    return bufAssemble()
+    return bufAssemble(1)
 },
 "end":()=>{
 //    console.log(`end composing`)
