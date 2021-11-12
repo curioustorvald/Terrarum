@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
@@ -175,37 +174,17 @@ class UIItemTextLineInput(
         }
     }
 
+    private fun Int.toCharInfo() = "U+${this.toString(16).uppercase()} '${String(intArrayOf(this), 0, if (this > 65535) 2 else 1)}'"
+
     private fun inputBackspaceOnce(dbgprn: Int = 0) {
         if (cursorX > 0) {
 
-            var characterTrailersDeleted = 0
-
             while (cursorX > 0) {
-                val charToDelet = textbuf.lastOrNull()
+                cursorX -= 1
+                val charDeleted = textbuf.removeAt(cursorX)
+//                printdbg(this, "$dbgprn)charDeleted=${charDeleted.toCharInfo()}")
 
-                if (charToDelet != null) {
-                    if (dbgprn > 0) {
-                        printdbg(this, "$dbgprn)charToDelet=U+${charToDelet.toString(16).uppercase()} '${String(intArrayOf(charToDelet), 0, if (charToDelet > 65535) 2 else 1)}', characterTrailersDeleted=${characterTrailersDeleted}")
-                    }
-
-                    // continue deleting hangul pieces because of the font...
-                    if (characterTrailersDeleted >= 2 && charToDelet in 0x1160..0x11A7) {
-                        break
-                    }
-                    else if (charToDelet in 0x1100..0x11A7) { // TODO diacritics, unicode ZWJ shits
-                        characterTrailersDeleted += 1
-                        cursorX -= 1
-                        textbuf.removeAt(cursorX)
-                    }
-                    else if (characterTrailersDeleted > 0) {
-                        break
-                    }
-                    else {
-                        cursorX -= 1
-                        textbuf.removeAt(cursorX)
-                        break
-                    }
-                }
+                if (charDeleted !in 0x1160..0x11FF) break
             }
 
             cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
@@ -238,7 +217,7 @@ class UIItemTextLineInput(
                     }
                     else if (keycodes.contains(Input.Keys.BACKSPACE) || (keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
 
-                        printdbg(this, "BACKSPACE hit; ime.composing=${ime?.composing?.invoke()}; buflen=${textbuf.size}")
+//                        printdbg(this, "BACKSPACE hit; ime.composing=${ime?.composing?.invoke()}; buflen=${textbuf.size}")
 
                         if (ime != null && ime.composing()) {
                             if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
