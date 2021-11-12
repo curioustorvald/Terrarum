@@ -266,7 +266,7 @@ let reset = () => {
 let inRange = (s,a,b) => (a <= s && s <= b)
 let isHangul = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x11FF)
 let isChoseong = (s) =>  s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x1112)
-let isJungseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1161, 0x1175)
+let isJungseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1161, 0x11A7)
 let isJongseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x11A8, 0x11C2)
 let isJungseongSuper = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x119E, 0x11A2)
 let isChoseongDigraph = (s) => s !== undefined && ([0x1100, 0x1103, 0x1107, 0x1109, 0x110C].includes(s.charCodeAt(0)))
@@ -380,22 +380,12 @@ let bufAssemble = (isPreview) => {
         return states.buf.join('')
 }
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
-return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald",
+return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald","m":"candidates",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1
-
-    /*let purekeys = keycodes.filter(it => (
-            inRange(it,7,18) || // numeric
-            inRange(it,29,56) || // alph
-            it == 62 || // space
-            inRange(it,66,76) || // symbols
-            inRange(it,144,163) // numpad
-    ))
-    let headkey = purekeys[0]*/
-
 
     let s = states.keylayouts[headkey][layer]
     let s2 = states.keylayouts[headkey][2]
@@ -404,15 +394,17 @@ return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald",
     let isDeadkey = isJungseongDeadkey(headkey)
     let hasChoseong = isChoseong(states.buf[0])
     let hasJungseong = isJungseong(states.buf[1])
-    let deadkeyAcceptable = !states.hasDeadkey && hasChoseong && !hasJungseong && isDeadkey
+    let shiftForJungseong = hasChoseong && !hasJungseong
+    let deadkeyAcceptable = isDeadkey && !states.hasDeadkey && shiftForJungseong
 
-    if (isHangul(s) || deadkeyAcceptable) {
+    if (isHangul(s)) {
         // auto-change alternative layer if choseong is in the buffer already
         // unshift when jungseong is there
         // Korean threesetters call this feature "Galmadeuri" Input
 
-        // if deadkey? -OR- (notdeadkey? -AND- (A as in GA -OR- A as in GWA))
-        if (deadkeyAcceptable || (!isDeadkey && (hasChoseong && !hasJungseong || states.hasDeadkey)))  {
+        // if deadkeyAcceptable? -OR- shiftForJungseong? -OR- (notdeadkey? -AND- A as in GWA)
+        if (deadkeyAcceptable || shiftForJungseong || (!isDeadkey && states.hasDeadkey))  {
+//            console.log(`Shiftin--keycode=${headkey}, isDeadkey=${isDeadkey}, hasChoseong=${hasChoseong}, hasJungseong=${hasJungseong}; deadkeyAcceptable=${deadkeyAcceptable}, shiftForJungseong=${shiftForJungseong}, (!isDeadkey && states.hasDeadkey)=${(!isDeadkey && states.hasDeadkey)}`)
             s = s2
             bufIndex = 1
             states.hasDeadkey = deadkeyAcceptable
