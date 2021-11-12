@@ -177,17 +177,35 @@ class UIItemTextLineInput(
 
     private fun inputBackspaceOnce(dbgprn: Int = 0) {
         if (cursorX > 0) {
-            while (true) {
-                cursorX -= 1
 
-//                val oldlen = textbuf.size
-                val oldChar = textbuf.removeAt(cursorX)
-                val charFore = textbuf.lastOrNull()
-//                val newlen = textbuf.size
+            var characterTrailersDeleted = 0
 
-//                if (dbgprn > 0) printdbg(this, "${dbgprn}del char U+${oldChar.toString(16)} '${String(intArrayOf(oldChar), 0, if (oldChar > 65535) 2 else 1)}'; length: $oldlen -> $newlen")
-                // continue deleting hangul pieces because of the font...
-                if (cursorX == 0 || (charFore !in 0x1100..0x11A7 && charFore !in 0xA960..0xA97F && charFore !in 0xD7B0..0xD7CA)) break
+            while (cursorX > 0) {
+                val charToDelet = textbuf.lastOrNull()
+
+                if (charToDelet != null) {
+                    if (dbgprn > 0) {
+                        printdbg(this, "$dbgprn)charToDelet=U+${charToDelet.toString(16).uppercase()} '${String(intArrayOf(charToDelet), 0, if (charToDelet > 65535) 2 else 1)}', characterTrailersDeleted=${characterTrailersDeleted}")
+                    }
+
+                    // continue deleting hangul pieces because of the font...
+                    if (characterTrailersDeleted >= 2 && charToDelet in 0x1160..0x11A7) {
+                        break
+                    }
+                    else if (charToDelet in 0x1100..0x11A7) { // TODO diacritics, unicode ZWJ shits
+                        characterTrailersDeleted += 1
+                        cursorX -= 1
+                        textbuf.removeAt(cursorX)
+                    }
+                    else if (characterTrailersDeleted > 0) {
+                        break
+                    }
+                    else {
+                        cursorX -= 1
+                        textbuf.removeAt(cursorX)
+                        break
+                    }
+                }
             }
 
             cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
@@ -302,7 +320,7 @@ class UIItemTextLineInput(
                                 repeat(op.first[0].toInt()) {
                                     if (textbuf.isNotEmpty()) {
 //                                        printdbg(this, "<del 1>")
-                                        inputBackspaceOnce()
+                                        inputBackspaceOnce(3)
                                     }
                                 }
 
@@ -385,8 +403,10 @@ class UIItemTextLineInput(
 
     private fun endComposing() {
         getIME()?.let {
-            val s = it.endCompose()
-            paste(s.toCodePoints())
+            if (it.config.mode != TerrarumIMEMode.REWRITE) {
+                val s = it.endCompose()
+                paste(s.toCodePoints())
+            }
         }
         fboUpdateLatch = true
         candidates = listOf()
