@@ -843,6 +843,11 @@ public class App implements ApplicationListener {
         tileMaker.invoke(false);
 
         IME.invoke();
+        // check if selected IME is accessible; if not, set selected IME to none
+        String selectedIME = getConfigString("inputmethod");
+        if (!selectedIME.equals("none") && !IME.INSTANCE.getAllHighLayers().contains(selectedIME)) {
+            setConfig("inputmethod", "none");
+        }
 
         Terrarum.initialise();
 
