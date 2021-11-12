@@ -4,16 +4,16 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u110F",")"],
-["\u11C2","\u11BD"],
-["\u11BB","@"],
-["\u11B8","#"],
-["\u116D","$"],
-["\u1172","%"],
-["\u1163","^"],
-["\u1168","&"],
-["\u1174","*"],
-["\u116E","("],
+["0",")"],
+["1","!"],
+["2","@"],
+["3","#"],
+["4","$"],
+["5","%"],
+["6","^"],
+["7","&"],
+["8","*"],
+["9","("],
 ["*"],
 ["#"],
 [undefined],
@@ -26,34 +26,34 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u11BC","\u11AE"],
-["\u116E","!"],
-["\u1166","\u11B1"],
-["\u1175","\u11B0"],
-["\u1167","\u11BF"],
-["\u1161","\u11A9"],
-["\u1173","/"],
-["\u1102","'"],
-["\u1106","8"],
-["\u110B","4"],
-["\u1100","5"],
-["\u110C","6"],
-["\u1112","1"],
-["\u1109","0"],
-["\u110E","9"],
-["\u1111",">"],
-["\u11BA","\u11C1"],
-["\u1162","\u1164"],
-["\u11AB","\u11AD"],
-["\u1165",";"],
-["\u1103","7"],
-["\u1169","\u11B6"],
-["\u11AF","\u11C0"],
-["\u11A8","\u11B9"],
-["\u1105","<"],
-["\u11B7","\u11BE"],
-[",","2"],
-[".","3"],
+["\u11BC","\u1172","\u1172"],
+["\u11BE","\u116E","\u116E"],
+["\u11A8","\u1166","\u1166"],
+["\u11C2","\u1175","\u1175"],
+["\u11B8","\u1162","\u1162"],
+["\u11C1","\u1161","\u1161"],
+["\u11AE","\u1173","\u1173"],
+["\u1102","₩"],
+["\u1106","\u1173","\u1173"], // combining EU
+["\u110B","'"],
+["\u1100",'"'],
+["\u110C","\u00B7"],
+["\u1112","\u2026"],
+["\u1109","\u2014"],
+["\u110E","\u116E","\u116E"], // combining U
+["\u1111",";","\u119E"],        // AREA-A
+["\u11BA","\u1164","\u1164"],
+["\u11C0","\u1165","\u1165"],
+["\u11AB","\u1168","\u1168"],
+["\u11BF","\u1167","\u1167"],
+["\u1103","¤"],
+["\u11BD","\u1169","\u1169"],
+["\u11AF","\u1163","\u1163"],
+["\u11BB","\u116D","\u116D"],
+["\u1105","\u00D7"],
+["\u11B7","\u119E","\u119E"],
+[",","<"],
+[".",">"],
 [undefined],
 [undefined],
 [undefined],
@@ -70,10 +70,10 @@ let states = {"keylayouts":[[""],[undefined],
 ["=","+"],
 ["[","{"],
 ["]","}"],
-["\\","₩"],
+["\\","|"],
 ["\u1107",":"],
-["\u1110",'"'],
-["\u1169","?"],
+["\u1110",'/'],
+["\u110F","?","\u1169"], // combining O
 [undefined],
 [undefined],
 [undefined],
@@ -255,23 +255,28 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined]
 ],
 "code":0,
-"buf":[]}
+"buf":[],
+"hasDeadkey":false
+}
 let reset = () => {
     states.code = 0
     states.buf = []
+    states.hasDeadkey = false
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
-let isHangul = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x11C2)
+let isHangul = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x11FF)
 let isChoseong = (s) =>  s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x1112)
-let isJungseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1161, 0x1175)
+let isJungseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1161, 0x11A7)
 let isJongseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x11A8, 0x11C2)
+let isJungseongSuper = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x119E, 0x11A2)
 let isChoseongDigraph = (s) => s !== undefined && ([0x1100, 0x1103, 0x1107, 0x1109, 0x110C].includes(s.charCodeAt(0)))
 let isThisCharChoseongDigraph = (s) => s !== undefined && ([0x1101, 0x1104, 0x1108, 0x110A, 0x110D].includes(s.charCodeAt(0)))
-let isThisCharJungseongDigraph = (s) => s !== undefined && ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174].includes(s.charCodeAt(0)))
+let isThisCharJungseongDigraph = (s) => s !== undefined && ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174, 0x119F, 0x11A0, 0x11A1, 0x11A2].includes(s.charCodeAt(0)))
 let isThisCharJongseongDigraph = (s) => s !== undefined && ([0x11A9, 0x11AA, 0x11AC, 0x11AD, 0x11B0, 0x11B1, 0x11B2, 0x11B3, 0x11B4, 0x11B5, 0x11B6, 0x11B9].includes(s.charCodeAt(0))) // ㅆ is an exception!
 let isJungseongDigraphO = (s) => s !== undefined && ([0x1161, 0x1162, 0x1175].includes(s.charCodeAt(0)))
 let isJungseongDigraphU = (s) => s !== undefined && ([0x1165, 0x1166, 0x1175].includes(s.charCodeAt(0)))
 let isJungseongDigraphEU = (s) => s !== undefined && ([0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphAA = (s) => s !== undefined && ([0x1165, 0x116E, 0x1175, 0x119E].includes(s.charCodeAt(0)))
 let isJongseongDigraphG = (s) => s !== undefined && ([0x11A8, 0x11BA].includes(s.charCodeAt(0)))
 let isJongseongDigraphN = (s) => s !== undefined && ([0x11BD, 0x11C2].includes(s.charCodeAt(0)))
 let isJongseongDigraphR = (s) => s !== undefined && ([0x11A8, 0x11B7, 0x11B8, 0x11BA, 0x11C0, 0x11C1, 0x11C2].includes(s.charCodeAt(0)))
@@ -280,10 +285,12 @@ let choseongDigraphs = {"\u1100":"\u1101", "\u1103":"\u1104", "\u1107":"\u1108",
 let jungseongDigraphsO = {"\u1161":"\u116A", "\u1162":"\u116B", "\u1175":"\u116C"}
 let jungseongDigraphsU = {"\u1165":"\u116F", "\u1166":"\u1170", "\u1175":"\u1171"}
 let jungseongDigraphsEU = {"\u1175":"\u1174"}
+let jungseongDigraphsAA = {"\u1165":"\u119F", "\u116E":"\u11A0", "\u1175":"\u11A1", "\u119E":"\u11A2"}
 let jongseongDigraphsG = {"\u11A8":"\u11A9", "\u11BA":"\u11AA"}
 let jongseongDigraphsN = {"\u11BD":"\u11AC", "\u11C2":"\u11AD"}
 let jongseongDigraphsR = {"\u11A8":"\u11B0", "\u11B7":"\u11B1", "\u11B8":"\u11B2", "\u11BA":"\u11B3", "\u11C0":"\u11B4", "\u11C1":"\u11B5", "\u11C2":"\u11B6"}
 let jongseongDigraphsB = {"\u11BA":"\u11B9"}
+let isJungseongDeadkey = (keynum) => [37,43,44,76].includes(keynum)
 let detachChoseongDigraph = {
 "\u1101":["\u1100","\u1100"],
 "\u1104":["\u1103","\u1103"],
@@ -298,7 +305,11 @@ let detachJungseongDigraph = {
 "\u116F":["\u116E","\u1165"],
 "\u1170":["\u116E","\u1166"],
 "\u1171":["\u116E","\u1175"],
-"\u1174":["\u1173","\u1175"]
+"\u1174":["\u1173","\u1175"],
+"\u119F":["\u119E","\u1165"],
+"\u11A0":["\u119E","\u116E"],
+"\u11A1":["\u119E","\u1175"],
+"\u11A2":["\u119E","\u119E"]
 }
 let detachJongseongDigraph = {
 "\u11A9":["\u11A8","\u11A8"],
@@ -336,61 +347,71 @@ let normaliseLUT = {
 "\u11C1":"\u314D","\u11C2":"\u314E"
 }
 let normaliseBuf = (it) => normaliseLUT[it] || it
-let bufAssemble = (isPreview) => {
+let bufAssemble = () => {
     // nothing on the buffer
     if (states.buf[0] === undefined && states.buf[1] === undefined && states.buf[2] === undefined)
         return ''
     // Hangul: I x F
-    else if (isPreview && states.buf[1] === undefined && isHangul(states.buf[0]))
+    else if (states.buf[1] === undefined && isHangul(states.buf[0]))
         return [states.buf[0], "\u1160", states.buf[2]].join('')
     // Hangul: x P F
-    else if (isPreview && states.buf[0] === undefined && isHangul(states.buf[1]))
+    else if (states.buf[0] === undefined && isHangul(states.buf[1]))
         return ["\u115F", states.buf[1], states.buf[2]].join('')
     // Hangul: x x F
-    else if (isPreview && isHangul(states.buf[2]) && states.buf[0] === undefined && states.buf[1] === undefined )
+    else if (isHangul(states.buf[2]) && states.buf[0] === undefined && states.buf[1] === undefined )
         return ["\u115F", "\u1160", states.buf[2]].join('')
-    // Hangul: I P F
-    else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
+    // Hangul: I P F → Hangul Syllables (\uAC00..\uD7A3)
+    else if (!isJungseongSuper(states.buf[1]) && isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
         let i = states.buf[0].charCodeAt(0) - 0x1100
         let p = states.buf[1].charCodeAt(0) - 0x1161
         let f = states.buf[2].charCodeAt(0) - 0x11A7
         return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28) + f)
     }
-    // Hangul: I P
-    else if (isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
+    // Hangul: I P → Hangul Syllables (\uAC00..\uD7A3)
+    else if (!isJungseongSuper(states.buf[1]) && isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
         let i = states.buf[0].charCodeAt(0) - 0x1100
         let p = states.buf[1].charCodeAt(0) - 0x1161
         return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28))
     }
-    // Normalise unterminated hangul assembly
-    else if (!isPreview)
-        return states.buf.map(it => normaliseBuf(it)).join('')
     else
         return states.buf.join('')
 }
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
-return Object.freeze({"n":"세벌식 3-90","v":"one","c":"CuriousTo\uA75Bvald","m":"candidates",
+return Object.freeze({"n":"SR Shin P2","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1
 
-    /*let purekeys = keycodes.filter(it => (
-            inRange(it,7,18) || // numeric
-            inRange(it,29,56) || // alph
-            it == 62 || // space
-            inRange(it,66,76) || // symbols
-            inRange(it,144,163) // numpad
-    ))
-    let headkey = purekeys[0]*/
-
     let s = states.keylayouts[headkey][layer]
+    let s2 = states.keylayouts[headkey][2]
     let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
 
+    let isDeadkey = isJungseongDeadkey(headkey)
+    let hasChoseong = isChoseong(states.buf[0])
+    let hasJungseong = isJungseong(states.buf[1])
+    let shiftForJungseong = hasChoseong && !hasJungseong
+    let deadkeyAcceptable = isDeadkey && !states.hasDeadkey && shiftForJungseong
+
     if (isHangul(s)) {
+        // auto-change alternative layer if choseong is in the buffer already
+        // unshift when jungseong is there
+        // Korean threesetters call this feature "Galmadeuri" Input
+
+        // if deadkeyAcceptable? -OR- shiftForJungseong? -OR- (notdeadkey? -AND- A as in GWA)
+        if (deadkeyAcceptable || shiftForJungseong || (!isDeadkey && states.hasDeadkey))  {
+//            console.log(`Shiftin--keycode=${headkey}, isDeadkey=${isDeadkey}, hasChoseong=${hasChoseong}, hasJungseong=${hasJungseong}; deadkeyAcceptable=${deadkeyAcceptable}, shiftForJungseong=${shiftForJungseong}, (!isDeadkey && states.hasDeadkey)=${(!isDeadkey && states.hasDeadkey)}`)
+            s = s2
+            bufIndex = 1
+            states.hasDeadkey = deadkeyAcceptable
+        }
+        else {
+            states.hasDeadkey = false
+        }
+
         // ㄲ ㄸ ㅃ ㅆ ㅉ (only allow when the jung/jongseong is not typed)
-        if (0 == bufIndex && undefined == states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
+        if (0 == bufIndex && !states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
             states.buf[0] = choseongDigraphs[s]
         }
         // ㅘ ㅙ ㅚ
@@ -404,6 +425,10 @@ return Object.freeze({"n":"세벌식 3-90","v":"one","c":"CuriousTo\uA75Bvald","
         // ㅢ
         else if (1 == bufIndex && "\u1173" == states.buf[1] && isJungseongDigraphEU(s)) {
             states.buf[1] = jungseongDigraphsEU[s]
+        }
+        // ᆟ ᆠ ᆡ ᆢ
+        else if (1 == bufIndex && "\u119E" == states.buf[1] && isJungseongDigraphAA(s)) {
+            states.buf[1] = jungseongDigraphsAA[s]
         }
         // ㄲ ㄳ
         else if (2 == bufIndex && "\u11A8" == states.buf[2] && isJongseongDigraphG(s)) {
@@ -423,25 +448,33 @@ return Object.freeze({"n":"세벌식 3-90","v":"one","c":"CuriousTo\uA75Bvald","
         }
         // key inputs that bufIndex collides (end compose and accept incoming char as a new char state)
         else if (states.buf[bufIndex] !== undefined) {
-//            let oldbufstr = bufDebugStringify(states.buf)
-            let sendout = bufAssemble(); reset()
+            reset()
             states.buf[bufIndex] = s
 //            let newbufstr = bufDebugStringify(states.buf)
-//            console.log(`sending out: ${oldbufstr} -> ${sendout} ; ${newbufstr}`)
-            return [bufAssemble(1), sendout]
+//            console.log(`sending out: ${newbufstr}`)
+            return ["0", bufAssemble()]
         }
         else {
+            let bufferEmpty = (states.buf[0] === undefined)
             states.buf[bufIndex] = s
-//            console.log(`assembling: ${bufDebugStringify(states.buf)} -> ${bufAssemble()}`)
+
+            if (bufferEmpty) {
+//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
+                return ["0", bufAssemble()]
+            }
+            else {
+//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
+                return ["1", bufAssemble()]
+            }
         }
 
-        return [bufAssemble(1), ""]
+        return ["1", bufAssemble()]
     }
     else {
-//        let oldbufstr = bufDebugStringify(states.buf)
-        let sendout = bufAssemble() + (s || ''); reset()
-//        console.log(`sending out: ${oldbufstr} -> ${sendout}`)
-        return [bufAssemble(1), sendout]
+        reset()
+        // directly print out the character without using the buffer
+//        console.log(`sending1 out: ${s}`)
+        return ["0", s]
     }
 },
 "backspace":()=>{
@@ -464,9 +497,9 @@ return Object.freeze({"n":"세벌식 3-90","v":"one","c":"CuriousTo\uA75Bvald","
     if (states.buf.length == 0) reset()
 
 //    let newbufstr = bufDebugStringify(states.buf)
-//    console.log(`popping assembly: ${oldbufstr} -> ${newbufstr}`)
+//    console.log(`popping assembly: ${oldbufstr} -> 1,${newbufstr}`)
 
-    return bufAssemble(1)
+    return bufAssemble()
 },
 "end":()=>{
 //    console.log(`end composing`)

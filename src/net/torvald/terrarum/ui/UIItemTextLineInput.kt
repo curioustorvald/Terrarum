@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
@@ -174,6 +175,26 @@ class UIItemTextLineInput(
         }
     }
 
+    private fun inputBackspaceOnce(dbgprn: Int = 0) {
+        if (cursorX > 0) {
+            while (true) {
+                cursorX -= 1
+
+//                val oldlen = textbuf.size
+                val oldChar = textbuf.removeAt(cursorX)
+                val charFore = textbuf.lastOrNull()
+//                val newlen = textbuf.size
+
+//                if (dbgprn > 0) printdbg(this, "${dbgprn}del char U+${oldChar.toString(16)} '${String(intArrayOf(oldChar), 0, if (oldChar > 65535) 2 else 1)}'; length: $oldlen -> $newlen")
+                // continue deleting hangul pieces because of the font...
+                if (cursorX == 0 || (charFore !in 0x1100..0x11A7 && charFore !in 0xA960..0xA97F && charFore !in 0xD7B0..0xD7CA)) break
+            }
+
+            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+            tryCursorForward()
+        }
+    }
+
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
         val oldActive = isActive
 
@@ -198,8 +219,32 @@ class UIItemTextLineInput(
                         copyToClipboard()
                     }
                     else if (keycodes.contains(Input.Keys.BACKSPACE) || (keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
+
+                        printdbg(this, "BACKSPACE hit; ime.composing=${ime?.composing?.invoke()}; buflen=${textbuf.size}")
+
                         if (ime != null && ime.composing()) {
-                            candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
+                            if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
+                                candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
+                            }
+                            else if (ime.config.mode == TerrarumIMEMode.REWRITE) {
+                                candidates = listOf()
+                                val op = ime.backspace()
+                                if (textbuf.isNotEmpty()) {
+                                    inputBackspaceOnce(1)
+                                }
+
+                                if (op.size > 0) {
+                                    val codepoints = op[0].toCodePoints()
+                                    if (!maxLen.exceeds(textbuf, codepoints)) {
+                                        textbuf.addAll(cursorX, codepoints)
+
+                                        cursorX += codepoints.size
+                                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+
+                                        tryCursorBack()
+                                    }
+                                }
+                            }
                         }
                         else if (cursorX <= 0) {
                             cursorX = 0
@@ -208,17 +253,7 @@ class UIItemTextLineInput(
                         }
                         else {
                             endComposing()
-                            if (cursorX > 0) {
-                                while (true) {
-                                    cursorX -= 1
-                                    val oldCode = textbuf.removeAt(cursorX)
-                                    // continue deleting hangul pieces because of the font...
-                                    if (cursorX == 0 || (oldCode !in 0x115F..0x11FF && oldCode !in 0xD7B0..0xD7FF)) break
-                                }
-
-                                cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                tryCursorForward()
-                            }
+                            inputBackspaceOnce(2)
                         }
                     }
                     else if (keycodes.contains(Input.Keys.LEFT)) {
@@ -252,14 +287,32 @@ class UIItemTextLineInput(
                         val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT) || keycodes.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
 
                         val codepoints = if (ime != null) {
-                            val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
-                            candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
+                            if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
+                                val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
+                                candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
 
-                            newStatus.second.toCodePoints()
+                                newStatus.second.toCodePoints()
+                            }
+                            else if (ime.config.mode == TerrarumIMEMode.REWRITE) {
+                                candidates = listOf()
+                                val op = ime.acceptChar(headkey, shiftin, altgrin, char)
+
+//                                printdbg(this, "delcount: ${op.first[0].toInt()}, rewrite: '${op.second}'")
+
+                                repeat(op.first[0].toInt()) {
+                                    if (textbuf.isNotEmpty()) {
+//                                        printdbg(this, "<del 1>")
+                                        inputBackspaceOnce()
+                                    }
+                                }
+
+                                op.second.toCodePoints()
+                            }
+                            else throw IllegalArgumentException("Unknown IME Operation mode: ${ime.config.mode}")
                         }
                         else char.toCodePoints()
 
-//                    println("textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
+//                        printdbg(this, "textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
 
                         if (!maxLen.exceeds(textbuf, codepoints)) {
                             textbuf.addAll(cursorX, codepoints)
@@ -288,6 +341,8 @@ class UIItemTextLineInput(
         else if (oldActive) { // just became deactivated
             endComposing()
         }
+
+        fboUpdateLatch = true
     }
 
     override fun update(delta: Float) {
@@ -326,7 +381,7 @@ class UIItemTextLineInput(
         }
     }
 
-    private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }
+    private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }.toList()
 
     private fun endComposing() {
         getIME()?.let {
@@ -382,7 +437,7 @@ class UIItemTextLineInput(
 
         batch.end()
 
-        if (fboUpdateLatch) {
+        if (true || fboUpdateLatch) {
             fboUpdateLatch = false
             fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)

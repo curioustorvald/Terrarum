@@ -33,7 +33,8 @@ data class TerrarumIMEConf(
         val name: String,
         val copying: String,
         val candidates: TerrarumIMEViewCount,
-        val symbols: Keysyms
+        val symbols: Keysyms,
+        val mode: TerrarumIMEMode
 )
 
 enum class TerrarumIMEViewCount {
@@ -44,6 +45,10 @@ enum class TerrarumIMEViewCount {
         ONE -> 1
         MANY -> 10 // an hard-coded config
     }
+}
+
+enum class TerrarumIMEMode {
+    CANDIDATES, REWRITE
 }
 
 /**
@@ -151,7 +156,13 @@ object IME {
     }
 
     private fun String.toCanditates(): List<String> =
-            this.split(',').mapNotNull { it.ifBlank { null } }
+            this.split(IMEDictionary.CAND_DELIM).mapNotNull { it.ifBlank { null } }
+    private fun String.toIMEMode(): TerrarumIMEMode =
+            when (this.lowercase()) {
+                "rewrite" -> TerrarumIMEMode.REWRITE
+                "candidates" -> TerrarumIMEMode.CANDIDATES
+                else -> throw IllegalArgumentException("Unknown operation mode: $this")
+            }
 
     private fun parseImeFile(file: File): TerrarumIME {
         val code = file.readText(Charsets.UTF_8)
@@ -160,6 +171,7 @@ object IME {
         val candidatesCount = jsval.getMember("v").asString().toViewCount()
         val copying = jsval.getMember("c").asString()
         val keysyms = Array(256) { Array<String?>(4) { null } }
+        val mode = jsval.getMember("m").asString().toIMEMode()
 
         for (keycode in 0L until 256L) {
             val a = jsval.getMember("t").getArrayElement(keycode)
@@ -177,7 +189,7 @@ object IME {
 
         return TerrarumIME(
                 name,
-                TerrarumIMEConf(name, copying, candidatesCount, keysyms),
+                TerrarumIMEConf(name, copying, candidatesCount, keysyms, mode),
                 { headkey, shifted, alted, lowLayerKeysym ->
                     val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
                     a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
