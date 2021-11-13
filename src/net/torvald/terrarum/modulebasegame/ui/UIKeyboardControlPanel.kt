@@ -226,9 +226,10 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
 
         // title
-        val title = Lang["MENU_OPTIONS_CONTROLS"]
-        batch.color = Color.WHITE
-        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+        // TODO display window "title" using text spinner ONLY WHEN gamepad config is also supported
+//        val title = Lang["MENU_OPTIONS_CONTROLS"]
+//        batch.color = Color.WHITE
+//        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
     }
 

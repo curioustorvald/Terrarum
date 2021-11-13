@@ -181,10 +181,11 @@ class UIKeyboardInputConfig(remoCon: UIRemoCon?) : UICanvas() {
         App.fontGame.draw(batch, txt2, selDrawX + halfselw + (halfselw - tw2) / 2, y1)
 
         // title
-        val title = Lang["MENU_CONTROLS_KEYBOARD"]
-        batch.color = Color.WHITE
-        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+        // TODO only when text input using gamepad is supported, and even then, use text spinner
+//        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+//        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
+        batch.color = Color.WHITE
         uiItems.forEach { it.render(batch, camera) }
 
         shiftin = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
