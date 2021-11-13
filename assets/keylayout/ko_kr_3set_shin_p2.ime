@@ -468,6 +468,7 @@ return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald",
             }
         }
 
+//        console.log(`assem-digraph: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
         return ["1", bufAssemble()]
     }
     else {

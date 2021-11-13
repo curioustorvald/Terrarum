@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
@@ -182,7 +183,7 @@ class UIItemTextLineInput(
             while (cursorX > 0) {
                 cursorX -= 1
                 val charDeleted = textbuf.removeAt(cursorX)
-//                printdbg(this, "$dbgprn)charDeleted=${charDeleted.toCharInfo()}")
+                printdbg(this, "$dbgprn)charDeleted=${charDeleted.toCharInfo()}")
 
                 if (charDeleted !in 0x1160..0x11FF) break
             }
@@ -382,8 +383,8 @@ class UIItemTextLineInput(
 
     private fun endComposing() {
         getIME()?.let {
+            val s = it.endCompose()
             if (it.config.mode != TerrarumIMEMode.REWRITE) {
-                val s = it.endCompose()
                 paste(s.toCodePoints())
             }
         }

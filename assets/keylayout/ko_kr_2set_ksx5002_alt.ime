@@ -396,6 +396,7 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA7
         else if (states.buf[bufIndex] !== undefined) {
             let oldbufstr = bufDebugStringify(states.buf)
             let sendout = ''
+            // e.g. 닳 -> 달해
             if (vowelCollision && isThisCharJongseongDigraph(states.buf[2])) {
                 let digraphs = detachJongseongDigraph[states.buf[2]]
                 let newbuf = [digraphs[1], s]
@@ -403,24 +404,34 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA7
                 sendout = bufAssemble()
                 states.buf = newbuf
 
-                return ["0", bufAssemble()]
+//                console.log(`rearr1: ${bufDebugStringify(states.buf)} -> 1,${sendout}${bufAssemble()}`)
+                return ["1", sendout + bufAssemble()]
             }
-            else if (vowelCollision) {
+            // e.g. 둣 -> 두사
+            else if (vowelCollision && states.buf[2]) {
                 let newbuf = [states.buf[2], s]
                 states.buf = [states.buf[0], states.buf[1]]
                 sendout = bufAssemble()
                 states.buf = newbuf
 
-                return ["0", bufAssemble()]
+//                console.log(`rearr2: ${bufDebugStringify(states.buf)} -> 1,${sendout}${bufAssemble()}`)
+                return ["1", sendout + bufAssemble()]
             }
+            // e.g. 가 -> 가ㅏ (error; buf: ㄱ ㅏ · -> · ㅏ ·, that illegally allows C ㅏ · if any choseong is directly followed)
+            else if (vowelCollision) {
+                reset()
+//                console.log(`rearr4: 0,${s}`)
+                return ["0", s]
+            }
+            // Choseong after finalised IPK-syllable (ㅇ as in 밥이)
             else {
-                sendout = bufAssemble()
                 reset()
                 if (bufIndex == 2)
                     states.buf[0] = s
                 else
                     states.buf[bufIndex] = s
 
+//                console.log(`rearr3: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
                 return ["0", bufAssemble()]
             }
         }
@@ -428,20 +439,33 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA7
             let bufferEmpty = (states.buf[0] === undefined)
             states.buf[bufIndex] = s
 
-            if (bufferEmpty) {
-//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
+            // e.g. 2nd ㅏ as in 가ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ
+            // this merely cuts the "loop" where 4,6,8...th ㅏ are also inflicted
+            //
+            if (isVowel(states.buf[0]) && isVowel(states.buf[1])) {
+                reset()
+//                console.log(`assem0: 0,${s}`)
+                return ["0", s]
+            }
+            // e.g. ㅁ and ㅂ as in 물과␣백두산
+            else if (bufferEmpty) {
+//                console.log(`assem1: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
                 return ["0", bufAssemble()]
             }
+            // e.g. ㅜ ㄹ ㅐ ㄱ ㅜ ㅏ ㄴ as in 물과␣백두산
             else {
-//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
+//                console.log(`assem2: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
                 return ["1", bufAssemble()]
             }
         }
+
+//        console.log(`assem-digraph: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
+        return ["1", bufAssemble()]
     }
     else {
         reset()
         // directly print out the character without using the buffer
-//        console.log(`sending1 out: ${s}`)
+//        console.log(`sending1 out: 0,${s}`)
         return ["0", s]
     }
 },
