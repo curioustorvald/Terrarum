@@ -1,0 +1,525 @@
+let states = {"keylayouts":[[""],[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+["0",")"],
+["1","!"],
+["2","@"],
+["3","#"],
+["4","$"],
+["5","%"],
+["6","^"],
+["7","&"],
+["8","*"],
+["9","("],
+["*"],
+["#"],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+["\u11BC","\u1172","\u1172"],
+["\u11BF","\u116E","\u116E"],
+["\u11BE","\u1166","\u1166"],
+["\u11AE","\u1175","\u1175"],
+["\u11B8","\u1167","\u1167"],
+["\u11BB","\u1161","\u1161"],
+["\u11BD","\u1173","\u1173"],
+["\u1102","‘"],
+["\u1106","\u1174","\u1174"],
+["\u110B","’"],
+["\u1100",';'],
+["\u110C","'"],
+["\u1112","/"],
+["\u1109","·"],
+["\u110E","\u116E","\u116E"], // combining U
+["\u1111","\u1169","\u1169"], // combining O
+["\u11BA","\u1164","\u1164"],
+["\u11C0","\u1162","\u1162"],
+["\u11AB","\u1168","\u1168"],
+["\u11C1","\u1165","\u1165"],
+["\u1103","”"],
+["\u11C2","\u1169","\u1169"],
+["\u11AF","\u1163","\u1163"],
+["\u11A8","\u116D","\u116D"],
+["\u1105","“"],
+["\u11B7","¤"],
+[",","<"],
+[".",">"],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[" "],
+[undefined],
+[undefined],
+[undefined],
+["\n"],
+["\x08"],
+["¤","~"],
+["-","_"],
+["=","+"],
+["[","{"],
+["]","}"],
+["\\","|"],
+["\u1107",":"],
+["\u1110",'/'],
+["\u110F","?","\u1169"], // combining O
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+["0"],
+["1"],
+["2"],
+["3"],
+["4"],
+["5"],
+["6"],
+["7"],
+["8"],
+["9"],
+["/"],
+["*"],
+["-"],
+["+"],
+["."],
+["."],
+["\n"],
+["="],
+["("],
+[")"],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined],
+[undefined]
+],
+"code":0,
+"buf":[],
+"hasDeadkey":false
+}
+let reset = () => {
+    states.code = 0
+    states.buf = []
+    states.hasDeadkey = false
+}
+let inRange = (s,a,b) => (a <= s && s <= b)
+let isHangul = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x11FF)
+let isChoseong = (s) =>  s !== undefined && inRange(s.charCodeAt(0), 0x1100, 0x1112)
+let isJungseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x1161, 0x11A7)
+let isJongseong = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x11A8, 0x11C2)
+let isJungseongSuper = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x119E, 0x11A2)
+let isChoseongDigraph = (s) => s !== undefined && ([0x1100, 0x1103, 0x1107, 0x1109, 0x110C].includes(s.charCodeAt(0)))
+let isThisCharChoseongDigraph = (s) => s !== undefined && ([0x1101, 0x1104, 0x1108, 0x110A, 0x110D].includes(s.charCodeAt(0)))
+let isThisCharJungseongDigraph = (s) => s !== undefined && ([0x116A, 0x116B, 0x116C, 0x116F, 0x1170, 0x1171, 0x1174, 0x119F, 0x11A0, 0x11A1, 0x11A2].includes(s.charCodeAt(0)))
+let isThisCharJongseongDigraph = (s) => s !== undefined && ([0x11A9, 0x11AA, 0x11AC, 0x11AD, 0x11B0, 0x11B1, 0x11B2, 0x11B3, 0x11B4, 0x11B5, 0x11B6, 0x11B9].includes(s.charCodeAt(0))) // ㅆ is an exception!
+let isJungseongDigraphO = (s) => s !== undefined && ([0x1161, 0x1162, 0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphU = (s) => s !== undefined && ([0x1165, 0x1166, 0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphEU = (s) => s !== undefined && ([0x1175].includes(s.charCodeAt(0)))
+let isJungseongDigraphAA = (s) => s !== undefined && ([0x1165, 0x116E, 0x1175, 0x119E].includes(s.charCodeAt(0)))
+let isJongseongDigraphG = (s) => s !== undefined && ([0x11A8, 0x11BA].includes(s.charCodeAt(0)))
+let isJongseongDigraphN = (s) => s !== undefined && ([0x11BD, 0x11C2].includes(s.charCodeAt(0)))
+let isJongseongDigraphR = (s) => s !== undefined && ([0x11A8, 0x11B7, 0x11B8, 0x11BA, 0x11C0, 0x11C1, 0x11C2].includes(s.charCodeAt(0)))
+let isJongseongDigraphB = (s) => s !== undefined && ([0x11BA].includes(s.charCodeAt(0)))
+let choseongDigraphs = {"\u1100":"\u1101", "\u1103":"\u1104", "\u1107":"\u1108", "\u1109":"\u110A", "\u110C":"\u110D"}
+let jungseongDigraphsO = {"\u1161":"\u116A", "\u1162":"\u116B", "\u1175":"\u116C"}
+let jungseongDigraphsU = {"\u1165":"\u116F", "\u1166":"\u1170", "\u1175":"\u1171"}
+let jungseongDigraphsEU = {"\u1175":"\u1174"}
+let jungseongDigraphsAA = {"\u1165":"\u119F", "\u116E":"\u11A0", "\u1175":"\u11A1", "\u119E":"\u11A2"}
+let jongseongDigraphsG = {"\u11A8":"\u11A9", "\u11BA":"\u11AA"}
+let jongseongDigraphsN = {"\u11BD":"\u11AC", "\u11C2":"\u11AD"}
+let jongseongDigraphsR = {"\u11A8":"\u11B0", "\u11B7":"\u11B1", "\u11B8":"\u11B2", "\u11BA":"\u11B3", "\u11C0":"\u11B4", "\u11C1":"\u11B5", "\u11C2":"\u11B6"}
+let jongseongDigraphsB = {"\u11BA":"\u11B9"}
+let isJungseongDeadkey = (keynum) => [43,44,76].includes(keynum)
+let detachChoseongDigraph = {
+"\u1101":["\u1100","\u1100"],
+"\u1104":["\u1103","\u1103"],
+"\u1108":["\u1107","\u1107"],
+"\u110A":["\u1109","\u1109"],
+"\u110D":["\u110C","\u110C"]
+}
+let detachJungseongDigraph = {
+"\u116A":["\u1169","\u1161"],
+"\u116B":["\u1169","\u1162"],
+"\u116C":["\u1169","\u1175"],
+"\u116F":["\u116E","\u1165"],
+"\u1170":["\u116E","\u1166"],
+"\u1171":["\u116E","\u1175"],
+"\u1174":["\u1173","\u1175"],
+"\u119F":["\u119E","\u1165"],
+"\u11A0":["\u119E","\u116E"],
+"\u11A1":["\u119E","\u1175"],
+"\u11A2":["\u119E","\u119E"]
+}
+let detachJongseongDigraph = {
+"\u11A9":["\u11A8","\u11A8"],
+"\u11AA":["\u11A8","\u11BA"],
+"\u11AC":["\u11AB","\u11BD"],
+"\u11AD":["\u11AB","\u11C2"],
+"\u11B0":["\u11AF","\u11A8"],
+"\u11B1":["\u11AF","\u11B7"],
+"\u11B2":["\u11AF","\u11B8"],
+"\u11B3":["\u11AF","\u11BA"],
+"\u11B4":["\u11AF","\u11C0"],
+"\u11B5":["\u11AF","\u11C1"],
+"\u11B6":["\u11AF","\u11C2"],
+"\u11B9":["\u11B8","\u11BA"],
+"\u11BB":["\u11BA","\u11BA"]
+}
+let normaliseLUT = {
+// Hangul Jamo Initials → Hangul Compatibility Jamo
+"\u1100":"\u3131","\u1101":"\u3132","\u1102":"\u3134","\u1103":"\u3137","\u1104":"\u3138",
+"\u1105":"\u3139","\u1106":"\u3141","\u1107":"\u3142","\u1108":"\u3143","\u1109":"\u3145",
+"\u110A":"\u3146","\u110B":"\u3147","\u110C":"\u3148","\u110D":"\u3149","\u110E":"\u314A",
+"\u110F":"\u314B","\u1110":"\u314C","\u1111":"\u314D","\u1112":"\u314E",
+// Hangul Jamo Peaks → Hangul Compatibility Jamo
+"\u1161":"\u314F","\u1162":"\u3150","\u1163":"\u3151","\u1164":"\u3152","\u1165":"\u3153",
+"\u1166":"\u3154","\u1167":"\u3155","\u1168":"\u3156","\u1169":"\u3157","\u116A":"\u3158",
+"\u116B":"\u3159","\u116C":"\u315A","\u116D":"\u315B","\u116E":"\u315C","\u116F":"\u315D",
+"\u1170":"\u315E","\u1171":"\u315F","\u1172":"\u3160","\u1173":"\u3161","\u1174":"\u3162",
+"\u1175":"\u3163",
+// Hangul Jamo Finals → Hangul Compatibility Jamo
+"\u11A8":"\u3131","\u11A9":"\u3132","\u11AA":"\u3133","\u11AB":"\u3134","\u11AC":"\u3135",
+"\u11AD":"\u3136","\u11AE":"\u3137","\u11AF":"\u3139","\u11B0":"\u313A","\u11B1":"\u313B",
+"\u11B2":"\u313C","\u11B3":"\u313D","\u11B4":"\u313E","\u11B5":"\u313F","\u11B6":"\u3140",
+"\u11B7":"\u3141","\u11B8":"\u3142","\u11B9":"\u3144","\u11BA":"\u3145","\u11BB":"\u3146",
+"\u11BC":"\u3147","\u11BD":"\u3148","\u11BE":"\u314A","\u11BF":"\u314B","\u11C0":"\u314C",
+"\u11C1":"\u314D","\u11C2":"\u314E"
+}
+let normaliseBuf = (it) => normaliseLUT[it] || it
+let bufAssemble = (normalise) => {
+    // nothing on the buffer
+    if (states.buf[0] === undefined && states.buf[1] === undefined && states.buf[2] === undefined)
+        return ''
+    // Hangul: I x F
+    else if (!normalise && states.buf[1] === undefined && isHangul(states.buf[0]))
+        return [states.buf[0], "\u1160", states.buf[2]].join('')
+    // Hangul: x P F
+    else if (!normalise && states.buf[0] === undefined && isHangul(states.buf[1]))
+        return ["\u115F", states.buf[1], states.buf[2]].join('')
+    // Hangul: x x F
+    else if (!normalise && isHangul(states.buf[2]) && states.buf[0] === undefined && states.buf[1] === undefined )
+        return ["\u115F", "\u1160", states.buf[2]].join('')
+    // Hangul: I P F → Hangul Syllables (\uAC00..\uD7A3)
+    else if (!isJungseongSuper(states.buf[1]) && isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && isJongseong(states.buf[2])) {
+        let i = states.buf[0].charCodeAt(0) - 0x1100
+        let p = states.buf[1].charCodeAt(0) - 0x1161
+        let f = states.buf[2].charCodeAt(0) - 0x11A7
+        return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28) + f)
+    }
+    // Hangul: I P → Hangul Syllables (\uAC00..\uD7A3)
+    else if (!isJungseongSuper(states.buf[1]) && isChoseong(states.buf[0]) && isJungseong(states.buf[1]) && undefined == states.buf[2]) {
+        let i = states.buf[0].charCodeAt(0) - 0x1100
+        let p = states.buf[1].charCodeAt(0) - 0x1161
+        return String.fromCodePoint(0xAC00 + (i * 588) + (p * 28))
+    }
+    // Normalise unterminated hangul assembly
+    else if (normalise && !isJungseongSuper(states.buf[1]))
+        return states.buf.map(it => normaliseBuf(it)).join('')
+    else
+        return states.buf.join('')
+}
+let isBufferEmpty = (buf) => buf[0] === undefined && buf[1] === undefined && buf[2] === undefined
+let isBufferNotEmpty = (buf) => buf[0] !== undefined || buf[1] !== undefined || buf[2] !== undefined
+let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
+return Object.freeze({"n":"신세벌식 ’03","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
+"t":states.keylayouts.map(it => [it[0],it[1]]),
+// return: [displayed output, composed output]
+"accept":(headkey,shiftin,altgrin)=>{
+    let layer = 1*shiftin// + 2*altgrin
+    states.code = 1
+
+    let s = states.keylayouts[headkey][layer]
+    let s2 = states.keylayouts[headkey][2]
+    let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
+
+    let isDeadkey = isJungseongDeadkey(headkey)
+    let hasChoseong = isChoseong(states.buf[0])
+    let hasJungseong = isJungseong(states.buf[1])
+    let shiftForJungseong = hasChoseong && !hasJungseong && s2 != undefined
+    let deadkeyAcceptable = isDeadkey && !states.hasDeadkey && shiftForJungseong
+
+    if (isHangul(s)) {
+        // auto-change alternative layer if choseong is in the buffer already
+        // unshift when jungseong is there
+        // Korean threesetters call this feature "Galmadeuri" Input
+        let autoshifted = false
+        // if deadkeyAcceptable? -OR- shiftForJungseong? -OR- (notdeadkey? -AND- A as in GWA)
+        if (deadkeyAcceptable || shiftForJungseong || (!isDeadkey && states.hasDeadkey))  {
+//            console.log(`Shiftin--keycode=${headkey}, isDeadkey=${isDeadkey}, shiftForJungseong=${shiftForJungseong}, hasChoseong=${hasChoseong}, hasJungseong=${hasJungseong}; deadkeyAcceptable=${deadkeyAcceptable}, shiftForJungseong=${shiftForJungseong}, (!isDeadkey && states.hasDeadkey)=${(!isDeadkey && states.hasDeadkey)}`)
+            s = s2
+            bufIndex = 1
+            autoshifted = true
+            states.hasDeadkey = deadkeyAcceptable
+        }
+        else {
+            states.hasDeadkey = false
+        }
+
+//        console.log(`accepting hangul '${s}' at buf[${bufIndex}], autoshifted=${autoshifted}, states.hasDeadkey=${states.hasDeadkey}`)
+
+        // ㄲ ㄸ ㅃ ㅆ ㅉ (only allow when the jung/jongseong is not typed)
+        if (0 == bufIndex && !states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
+            states.buf[0] = choseongDigraphs[s]
+        }
+        // ㅘ ㅙ ㅚ
+        else if (1 == bufIndex && "\u1169" == states.buf[1] && isJungseongDigraphO(s)) {
+            states.buf[1] = jungseongDigraphsO[s]
+        }
+        // ㅝ ㅞ ㅟ
+        else if (1 == bufIndex && "\u116E" == states.buf[1] && isJungseongDigraphU(s)) {
+            states.buf[1] = jungseongDigraphsU[s]
+        }
+        // ㅢ
+        else if (1 == bufIndex && "\u1173" == states.buf[1] && isJungseongDigraphEU(s)) {
+            states.buf[1] = jungseongDigraphsEU[s]
+        }
+        // ᆟ ᆠ ᆡ ᆢ
+        else if (1 == bufIndex && "\u119E" == states.buf[1] && isJungseongDigraphAA(s)) {
+            states.buf[1] = jungseongDigraphsAA[s]
+        }
+        // ㄲ ㄳ
+        else if (2 == bufIndex && "\u11A8" == states.buf[2] && isJongseongDigraphG(s)) {
+            states.buf[2] = jongseongDigraphsG[s]
+        }
+        // ㄵ ㄶ
+        else if (2 == bufIndex && "\u11AB" == states.buf[2] && isJongseongDigraphN(s)) {
+            states.buf[2] = jongseongDigraphsN[s]
+        }
+        // ㄺ ㄻ ㄼ ㄽ ㄾ ㄿ ㅀ
+        else if (2 == bufIndex && "\u11AF" == states.buf[2] && isJongseongDigraphR(s)) {
+            states.buf[2] = jongseongDigraphsR[s]
+        }
+        // ㅄ
+        else if (2 == bufIndex && "\u11B8" == states.buf[2] && isJongseongDigraphB(s)) {
+            states.buf[2] = jongseongDigraphsB[s]
+        }
+        // key inputs that bufIndex collides (end compose and accept incoming char as a new char state)
+        else if (states.buf[bufIndex] !== undefined) {
+            let oldstr = bufAssemble(1)
+            reset()
+            states.buf[bufIndex] = s
+//            console.log(`sending bufout: 1,${oldstr} ${bufDebugStringify(states.buf)}`)
+            return ["1", oldstr + bufAssemble()]
+        }
+        else {
+            let bufferEmpty = isBufferEmpty(states.buf)
+            states.buf[bufIndex] = s
+
+            if (bufferEmpty) {
+//                console.log(`assem0: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
+                return ["0", bufAssemble()]
+            }
+            else {
+//                console.log(`assem1: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
+                return ["1", bufAssemble()]
+            }
+        }
+
+//        console.log(`assem-digraph: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
+        return ["1", bufAssemble()]
+    }
+    else if (isBufferNotEmpty(states.buf)) {
+        let oldstr = bufAssemble(1)
+        reset()
+//        console.log(`sending1 out: 1,${oldstr}${s}`)
+        return ["1", oldstr + s]
+    }
+    else {
+//        console.log(`sending0 out: 0,${s}`)
+        return ["0", s]
+    }
+},
+"backspace":()=>{
+    // disassemble jung/jongseong digraphs
+//    let oldbufstr = bufDebugStringify(states.buf)
+    let last = states.buf.pop()
+
+    if (last !== undefined) {
+        // detach jongseong
+        if (isThisCharJongseongDigraph(last))
+            states.buf[2] = detachJongseongDigraph[last][0]
+        // detach jungseong
+        else if (isThisCharJungseongDigraph(last))
+            states.buf[1] = detachJungseongDigraph[last][0]
+        // detach choseong
+        else if (isThisCharChoseongDigraph(last))
+            states.buf[0] = detachChoseongDigraph[last][0]
+    }
+
+    if (states.buf.length == 0) reset()
+
+//    let newbufstr = bufDebugStringify(states.buf)
+//    console.log(`popping assembly: ${oldbufstr} -> 1,${newbufstr}`)
+
+    return bufAssemble()
+},
+"end":()=>{
+//    console.log(`end composing`)
+    let ret = bufAssemble(1)
+    reset()
+    return ret
+},
+"reset":()=>{ reset() },
+"composing":()=>(states.code!=0)
+})
