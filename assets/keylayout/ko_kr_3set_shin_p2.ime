@@ -391,24 +391,27 @@ return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald",
     let isDeadkey = isJungseongDeadkey(headkey)
     let hasChoseong = isChoseong(states.buf[0])
     let hasJungseong = isJungseong(states.buf[1])
-    let shiftForJungseong = hasChoseong && !hasJungseong
+    let shiftForJungseong = hasChoseong && !hasJungseong && s2 != undefined
     let deadkeyAcceptable = isDeadkey && !states.hasDeadkey && shiftForJungseong
 
     if (isHangul(s)) {
         // auto-change alternative layer if choseong is in the buffer already
         // unshift when jungseong is there
         // Korean threesetters call this feature "Galmadeuri" Input
-
+        let autoshifted = false
         // if deadkeyAcceptable? -OR- shiftForJungseong? -OR- (notdeadkey? -AND- A as in GWA)
         if (deadkeyAcceptable || shiftForJungseong || (!isDeadkey && states.hasDeadkey))  {
-//            console.log(`Shiftin--keycode=${headkey}, isDeadkey=${isDeadkey}, hasChoseong=${hasChoseong}, hasJungseong=${hasJungseong}; deadkeyAcceptable=${deadkeyAcceptable}, shiftForJungseong=${shiftForJungseong}, (!isDeadkey && states.hasDeadkey)=${(!isDeadkey && states.hasDeadkey)}`)
+//            console.log(`Shiftin--keycode=${headkey}, isDeadkey=${isDeadkey}, shiftForJungseong=${shiftForJungseong}, hasChoseong=${hasChoseong}, hasJungseong=${hasJungseong}; deadkeyAcceptable=${deadkeyAcceptable}, shiftForJungseong=${shiftForJungseong}, (!isDeadkey && states.hasDeadkey)=${(!isDeadkey && states.hasDeadkey)}`)
             s = s2
             bufIndex = 1
+            autoshifted = true
             states.hasDeadkey = deadkeyAcceptable
         }
         else {
             states.hasDeadkey = false
         }
+
+//        console.log(`accepting hangul '${s}' at buf[${bufIndex}], autoshifted=${autoshifted}, states.hasDeadkey=${states.hasDeadkey}`)
 
         // ㄲ ㄸ ㅃ ㅆ ㅉ (only allow when the jung/jongseong is not typed)
         if (0 == bufIndex && !states.buf[1] && isChoseongDigraph(states.buf[0]) && states.buf[0] == s) {
@@ -459,11 +462,11 @@ return Object.freeze({"n":"신세벌식 P2","v":"one","c":"CuriousTo\uA75Bvald",
             states.buf[bufIndex] = s
 
             if (bufferEmpty) {
-//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
+//                console.log(`assem0: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
                 return ["0", bufAssemble()]
             }
             else {
-//                console.log(`assembling: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
+//                console.log(`assem1: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
                 return ["1", bufAssemble()]
             }
         }
