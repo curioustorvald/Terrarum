@@ -183,7 +183,7 @@ class UIItemTextLineInput(
             while (cursorX > 0) {
                 cursorX -= 1
                 val charDeleted = textbuf.removeAt(cursorX)
-                printdbg(this, "$dbgprn)charDeleted=${charDeleted.toCharInfo()}")
+//                printdbg(this, "$dbgprn)charDeleted=${charDeleted.toCharInfo()}")
 
                 if (charDeleted !in 0x1160..0x11FF) break
             }
@@ -384,7 +384,10 @@ class UIItemTextLineInput(
     private fun endComposing() {
         getIME()?.let {
             val s = it.endCompose()
-            if (it.config.mode != TerrarumIMEMode.REWRITE) {
+            if (s.isNotEmpty()) {
+                if (it.config.mode == TerrarumIMEMode.REWRITE) {
+                    inputBackspaceOnce(9)
+                }
                 paste(s.toCodePoints())
             }
         }
