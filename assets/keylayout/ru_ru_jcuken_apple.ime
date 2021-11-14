@@ -4,16 +4,16 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["0",")","]","}"],
-["1","!","÷","≈"],
-["2",'"',"¤","∞"],
-["3","¤","§","₴"],
-["4",";","$","€"],
-["5","%","°",""],
-["6",":","<","≤"],
-["7","?",">","≥"],
-["8","₽","•","×"],
-["9","(","[","{"],
+["0",")","}","`"],
+["1","!","!","|"],
+["2",'"',"@",'"'],
+["3","¤","#","£"],
+["4","%","$","€"],
+["5",":","%","∞"],
+["6",",","^","¬"],
+["7",".","&","¶"],
+["8",";","*","√"],
+["9","(","{","'"],
 ["*"],
 ["#"],
 [undefined],
@@ -26,34 +26,34 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["ф","Ф","ҩ","Ҩ"],
-["и","И","\u0335","\u0321"], // strikethru, hook below
-["с","С","ҽ","Ҽ"],
-["в","В","ү","Ү"],
-["у","У","ў","Ў"],
-["а","А","ҟ","Ҟ"],
-["п","П","ҡ","Ҡ"],
-["р","Р","ғ","Ғ"],
-["ш","Ш","ѓ","Ѓ"],
-["о","О","ө","Ө"],
+["ф","Ф","ƒ","ƒ"],
+["и","И"],
+["с","С","≠","≠"],
+["в","В","ћ","Ћ"],
+["у","У","ќ","Ќ"],
+["а","А","÷","÷"],
+["п","П","©","©"],
+["р","Р","₽","₽"],
+["ш","Ш","ѕ","Ѕ"],
+["о","О","°","•"],
 ["л","Л","љ","Љ"],
-["д","Д","ђ","Ђ"],
-["ь","Ь","ҧ","Ҧ"],
-["т","Т","ћ","Ћ"],
-["щ","Щ","ӡ","Ӡ"],
-["з","З","ѕ","Ѕ"],
+["д","Д","Δ","Δ"],
+["ь","Ь","~","~"],
+["т","Т","™","™"],
+["щ","Щ","ў","Ў"],
+["з","З","‘","‘"],
 ["й","Й","ј","Ј"],
-["к","К","ќ","Ќ"],
-["ы","Ы","і","І"],
-["е","Е","ҝ","Ҝ"],
-["г","Г","ґ","Ґ"],
-["м","М","\u0329","\u0301"], // "descender", acute
-["ц","Ц","ҵ","Ҵ"],
-["ч","Ч","һ","Һ"],
+["к","К","®","®"],
+["ы","Ы","¤","¤"],
+["е","Е","†","†"],
+["г","Г","ѓ","Ѓ"],
+["м","М","µ","µ"],
+["ц","Ц","џ","Џ"],
+["ч","Ч","≈","≈"],
 ["н","Н","њ","Њ"],
-["я","Я","ә","Ә"],
-["б","Б","«","„"],
-["ю","Ю","»","“"],
+["я","Я","ђ","Ђ"],
+["б","Б","≤","<"],
+["ю","Ю","≥",">"],
 [undefined],
 [undefined],
 [undefined],
@@ -65,15 +65,15 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 ["\n"],
 ["\x08"],
-["ё","Ё","ӏ","Ӏ"],
+[">","<","]","["],
 ["-","_","—","–"],
-["=","+","≠","±"],
-["х","Х","ҳ","Ҳ"],
-["ъ","Ъ","ї","Ї"],
-["/","\\","\u0308","\u0306"], // diaresis, breve
-["ж","Ж","џ","Џ"],
-["э",'Э',"є","Є"],
-[".",",","/","…"],
+["=","+","»","«"],
+["х","Х","“","“"],
+["ъ","Ъ"],
+["ё","Ё"],
+["ж","Ж","…","…"],
+["э",'Э'],
+["/","?","„","„"],
 [undefined],
 [undefined],
 [undefined],
@@ -254,153 +254,27 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined]
 ],
-"code":""} // practically unused as long as there are no diacritics on the keyboard
+"code":0} // practically unused as long as there are no diacritics on the keyboard
 let reset = () => {
     states.code = 0
 }
-let diacriticsAcute = {
-"Е":"Ѐ",
-"Г":"Ѓ",
-"К":"Ќ",
-"И":"Ѝ",
-
-"е":"ѐ",
-"г":"ѓ",
-"к":"ќ",
-"и":"ѝ"
-}
-let diacriticsDescender = {
-"Ж":"Җ",
-"З":"Ҙ",
-"К":"Қ",
-"Н":"Ң",
-"С":"Ҫ",
-"Т":"Ҭ",
-"Х":"Ҳ",
-"Ч":"Ҷ",
-"Ҽ":"Ҿ",
-"Г":"Ӷ",
-"Ғ":"Ӻ",
-"П":"Ԥ",
-"Һ":"Ԧ",
-
-"ж":"җ",
-"з":"ҙ",
-"к":"қ",
-"н":"ң",
-"с":"ҫ",
-"т":"ҭ",
-"х":"ҳ",
-"ч":"ҷ",
-"ҽ":"ҿ",
-"г":"ӷ",
-"ғ":"ӻ",
-"п":"ԥ",
-"һ":"ԧ"
-}
-let diacriticsStrikethru = {
-"Г":"Ғ",
-"К":"Ҟ",
-"Ү":"Ұ",
-"Х":"Ӿ",
-
-"г":"ғ",
-"к":"ҟ",
-"ү":"ұ",
-"х":"ӿ"
-}
-let diacriticsHookBelow = {
-"Г":"Ҕ",
-"П":"Ҧ",
-"К":"Ӄ",
-"Н":"Ӈ",
-"Ғ":"Ӻ",
-"Х":"Ӽ",
-
-"г":"ҕ",
-"п":"ҧ",
-"к":"ӄ",
-"н":"ӈ",
-"ғ":"ӻ",
-"х":"ӽ"
-}
-let diacriticsDiaresis = {
-"А":"Ӓ",
-"Ә":"Ӛ",
-"Ж":"Ӝ",
-"З":"Ӟ",
-"И":"Ӥ",
-"О":"Ӧ",
-"Ө":"Ӫ",
-"Э":"Ӭ",
-"У":"Ӱ",
-"Ч":"Ӵ",
-"Ы":"Ӹ",
-
-"а":"ӓ",
-"ә":"ӛ",
-"ж":"ӝ",
-"з":"ӟ",
-"и":"ӥ",
-"о":"ӧ",
-"ө":"ӫ",
-"э":"ӭ",
-"у":"ӱ",
-"ч":"ӵ",
-"ы":"ӹ"
-}
-let diacriticsBreve = {
-"Ж":"Ӂ",
-"А":"Ӑ",
-"Е":"Ӗ",
-"И":"Ӣ",
-"У":"Ӯ",
-
-"ж":"ӂ",
-"а":"ӑ",
-"е":"ӗ",
-"и":"ӣ",
-"у":"ӯ"
-}
-let diacriticsMapping = {
-"\u0329":diacriticsDescender,
-"\u0301":diacriticsAcute,
-"\u0308":diacriticsDiaresis,
-"\u0306":diacriticsBreve,
-"\u0335":diacriticsStrikethru,
-"\u0321":diacriticsHookBelow
-}
 let inRange = (s,a,b) => (a <= s && s <= b)
 let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
-return Object.freeze({"n":"ЙЦУКЕН Многоязычна","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
+return Object.freeze({"n":"ЙЦУКЕН (Рус. Apple)","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts,
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin + 2*altgrin
+    states.code = 1
 
     let s = states.keylayouts[headkey][layer]
 
-    // typing seq for diacritics: diacritics THEN a character
     if (isDiacritics(s)) {
-        states.code = s
-        return ['0', ' '+s] // todo: insert diacritics placeholder char
+        return ['1', '']
     }
     else {
-        // has diacritecs
-        if (states.code != '') {
-            if (diacriticsMapping[states.code] == undefined) {
-                reset()
-                return ['0','']
-            }
-            let composed = diacriticsMapping[states.code][s]
-            reset()
-            return ['2', composed || s]
-        }
-        // nope!
-        else {
-            reset()
-            return ['0', s]
-        }
+        reset()
+        return ['0', s]
     }
 },
 "backspace":()=>{
@@ -412,5 +286,5 @@ return Object.freeze({"n":"ЙЦУКЕН Многоязычна","v":"none","c":"
     return ''
 },
 "reset":()=>{ reset() },
-"composing":()=>(states.code!='')
+"composing":()=>(states.code!=0)
 })
