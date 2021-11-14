@@ -1,0 +1,60 @@
+let states = {"layouttable":{
+"[":"ю",
+"]":"щ",
+"{":"Ю",
+"}":"Щ",
+"$":'"',
+"%":":",
+"`":"ё",
+"~":"Ё",
+"\\":"э",
+"|":"Э",
+"=":"ъ",
+"+":"Ъ",
+"'":"ж",
+'"':"Ж",
+";":"ь",
+":":"Ь",
+" ":" "
+},
+"code":0} // practically unused as long as there are no diacritics on the keyboard
+;(function(){
+    let s = "АБЦДЕФГЧИЙКЛМНОПЯРСТУВШХЫЗ"
+    for (let i=0;i<s.length;i++) {
+        states.layouttable[String.fromCodePoint(i+65)] = String.fromCodePoint(s.codePointAt(i))
+        states.layouttable[String.fromCodePoint(i+97)] = String.fromCodePoint(s.codePointAt(i)+32)
+    }
+})();
+let reset = () => {
+    states.code = 0
+}
+let inRange = (s,a,b) => (a <= s && s <= b)
+let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
+return Object.freeze({"n":"Рус. Фонетическая","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
+"tf":states.layouttable,
+// return: [displayed output, composed output]
+"accept":(headkey,shiftin,altgrin,lowlayerkey)=>{
+    let layer = 1*shiftin// + 2*altgrin
+    states.code = 1
+
+    let s = states.layouttable[lowlayerkey] || lowlayerkey
+
+    if (isDiacritics(s)) {
+        return ['1', '']
+    }
+    else {
+
+        return ['0', s]
+    }
+},
+"backspace":()=>{
+    reset()
+    return ''
+},
+"end":()=>{
+    reset()
+    return ''
+},
+"reset":()=>{ reset() },
+"composing":()=>(states.code!=0)
+})

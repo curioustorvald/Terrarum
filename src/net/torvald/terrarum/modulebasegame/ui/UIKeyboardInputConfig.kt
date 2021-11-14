@@ -320,15 +320,36 @@ private class UIItemInputKeycap(
         else if (key == Input.Keys.ENTER)
             batch.draw(labels.get(17,3), (posX + (width - 20) / 2).toFloat(), posY + 4f)
         else if (key != null) {
-            val keysym0 = if (KeyToggler.isOn(App.getConfigInt("control_key_toggleime")))
-                parent.highlayer?.config?.symbols?.get(key) ?: parent.lowlayer.symbols[key]
+            val keysymsLow = parent.lowlayer.symbols[key]
+            val keysymLow =
+                    (if (parent.shiftin && parent.altgrin && keysymsLow[3]?.isNotEmpty() == true) keysymsLow[3]
+                    else if (parent.altgrin && keysymsLow[2]?.isNotEmpty() == true) keysymsLow[2]
+                    else if (parent.shiftin && keysymsLow[1]?.isNotEmpty() == true) keysymsLow[1]
+                    else keysymsLow[0]) ?: ""
+
+            val keysym0: Array<String?> = if (KeyToggler.isOn(App.getConfigInt("control_key_toggleime"))) {
+                if (parent.highlayer == null) arrayOf(keysymLow,keysymLow,keysymLow,keysymLow)
+                else {
+                    val keysyms = parent.highlayer!!.config.symbols
+                    val keysymfun = parent.highlayer!!.config.symbolsfun
+
+                    if (keysymfun != null) {
+                        val ksym = keysymfun[keysymLow]
+                        arrayOf(ksym,ksym,ksym,ksym)
+                    }
+                    else {
+                        keysyms!!.get(key)
+                    }
+                }
+            }
             else
                 parent.lowlayer.symbols[key]
+
             var keysym =
                     (if (parent.shiftin && parent.altgrin && keysym0[3]?.isNotEmpty() == true) keysym0[3]
                     else if (parent.altgrin && keysym0[2]?.isNotEmpty() == true) keysym0[2]
                     else if (parent.shiftin && keysym0[1]?.isNotEmpty() == true) keysym0[1]
-                    else keysym0[0]) ?: ""
+                    else keysym0[0]) ?: keysymLow
             if (isDiacritic(keysym[0].code))
                 keysym = "ɔ$keysym"
 

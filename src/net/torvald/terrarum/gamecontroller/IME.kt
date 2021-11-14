@@ -6,6 +6,7 @@ import java.io.File
 typealias IMECandidates = List<String>
 typealias IMEOutput = String
 typealias Keysyms = Array<Array<String?>>
+typealias Keysymfun = Map<String, String>
 
 
 data class TerrarumKeyLayout(
@@ -33,7 +34,8 @@ data class TerrarumIMEConf(
         val name: String,
         val copying: String,
         val candidates: TerrarumIMEViewCount,
-        val symbols: Keysyms,
+        val symbols: Keysyms?,
+        val symbolsfun: Keysymfun?,
         val mode: TerrarumIMEMode
 )
 
@@ -171,25 +173,38 @@ object IME {
         val candidatesCount = jsval.getMember("v").asString().toViewCount()
         val copying = jsval.getMember("c").asString()
         val keysyms = Array(256) { Array<String?>(4) { null } }
+        var keysymtable: Keysymfun? = null
         val mode = jsval.getMember("m").asString().toIMEMode()
 
-        for (keycode in 0L until 256L) {
-            val a = jsval.getMember("t").getArrayElement(keycode)
-            if (!a.isNull) {
-                for (layer in 0L until 4L) {
-                    if (a.arraySize > layer) {
-                        val b = a.getArrayElement(layer)
-                        if (!b.isNull) {
-                            keysyms[keycode.toInt()][layer.toInt()] = b.asString()
+        // keylayout is static (not affected by the Low Layout)
+        if (jsval.hasMember("t")) {
+            for (keycode in 0L until 256L) {
+                val a = jsval.getMember("t").getArrayElement(keycode)
+                if (!a.isNull) {
+                    for (layer in 0L until 4L) {
+                        if (a.arraySize > layer) {
+                            val b = a.getArrayElement(layer)
+                            if (!b.isNull) {
+                                keysyms[keycode.toInt()][layer.toInt()] = b.asString()
+                            }
                         }
                     }
                 }
             }
         }
+        // keylayout is dynamic (does affected by the Low Layout)
+        else if (jsval.hasMember("tf")) {
+            keysymtable = HashMap()
+            val tf = jsval.getMember("tf")
+            tf.memberKeys.forEach {
+                println("[IME] keeb $name; tf[$it] = ?")
+                keysymtable[it] = tf.getMember(it).asString()
+            }
+        }
 
         return TerrarumIME(
                 name,
-                TerrarumIMEConf(name, copying, candidatesCount, keysyms, mode),
+                TerrarumIMEConf(name, copying, candidatesCount, if (keysymtable == null) keysyms else null, if (keysymtable == null) null else keysymtable, mode),
                 { headkey, shifted, alted, lowLayerKeysym ->
                     val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
                     a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()

@@ -260,7 +260,7 @@ let reset = () => {
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
 let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
-return Object.freeze({"n":"Русс. ЙЦУКЕН","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
+return Object.freeze({"n":"Рус. ЙЦУКЕН (MS)","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
