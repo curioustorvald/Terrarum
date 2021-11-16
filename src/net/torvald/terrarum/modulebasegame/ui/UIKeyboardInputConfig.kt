@@ -269,7 +269,7 @@ private class UIItemInputKeycap(
 
     private fun isDiacritic(c: Int) = c in 0x300..0x36F || c in 0x1AB0..0x1AFF ||
             c in 0x1DC0..0x1DFF || c in 0x20D0..0x20FF || c in 0xFE20..0xFE2F ||
-            c == 0xE31 || c in 0xE34..0xE3A || c in 0xE47..0xE4E
+            c == 0xE31 || c in 0xE33..0xE3A || c in 0xE47..0xE4E
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         super.render(batch, camera)
