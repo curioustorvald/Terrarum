@@ -1,0 +1,101 @@
+let states = {"layouttable":{
+"q":";", // believe or not, \u003B IS the preferred character
+"Q":":",
+"w":"ς",
+":":"\u0308", // combining diaresis
+";":"\u0301", // greek tonos
+"W":"\u0308\u0301", // greek dialytika tonos
+" ":" "
+},
+"code":0} // practically unused as long as there are no diacritics on the keyboard
+;(function(){
+    let s = "ΑΒΨΔΕΦΓΗΙΞΚΛΜΝΟΠ_ΡΣΤΘΩ_ΧΥΖ"
+    for (let i=0;i<s.length;i++) {
+        if (i != 16 && i != 22) {
+            states.layouttable[String.fromCodePoint(i+65)] = String.fromCodePoint(s.codePointAt(i))
+            states.layouttable[String.fromCodePoint(i+97)] = String.fromCodePoint(s.codePointAt(i)+32)
+        }
+    }
+})();
+let reset = () => {
+    states.code = 0
+}
+let dialytika = {
+"Ι":"Ϊ",
+"Υ":"Ϋ",
+
+"ι":"ϊ",
+"υ":"ϋ"
+}
+let dialytikaTonos = {
+"ι":"ΐ",
+"υ":"ΰ"
+}
+let tonos = {
+"Α":"Ά",
+"Ε":"Έ",
+"Η":"Ή",
+"Ι":"Ί",
+"Ο":"Ό",
+"Υ":"Ύ",
+"Ω":"Ώ",
+
+"α":"ά",
+"ε":"έ",
+"η":"ή",
+"ι":"ί",
+"ο":"ό",
+"υ":"ύ",
+"ω":"ώ"
+}
+let diacriticsMapping = {
+"\u0308":dialytika,
+"\u0301":tonos,
+"\u0308\u0301":dialytikaTonos
+}
+let inRange = (s,a,b) => (a <= s && s <= b)
+let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
+return Object.freeze({"n":"Ελ. Φωνητικό","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
+"tf":states.layouttable,
+"l":"elGR",
+// return: [displayed output, composed output]
+"accept":(headkey,shiftin,altgrin,lowlayerkey)=>{
+    let layer = 1*shiftin + 2*altgrin
+
+    let s = states.layouttable[lowlayerkey] || lowlayerkey
+
+    // typing seq for diacritics: diacritics THEN a character
+    if (isDiacritics(s)) {
+        states.code = s
+        return ['0', ' '+s] // todo: insert diacritics placeholder char
+    }
+    else {
+        // has diacritecs
+        if (states.code != '') {
+            if (diacriticsMapping[states.code] == undefined) {
+                reset()
+                return ['0','']
+            }
+            let diacriticsLength = states.code.length // dialytika-tonos is two characters internally
+            let composed = diacriticsMapping[states.code][s]
+            reset()
+            return [''+(1+diacriticsLength), composed || s]
+        }
+        // nope!
+        else {
+            reset()
+            return ['0', s]
+        }
+    }
+},
+"backspace":()=>{
+    reset()
+    return ''
+},
+"end":()=>{
+    reset()
+    return ''
+},
+"reset":()=>{ reset() },
+"composing":()=>(states.code!=0)
+})
