@@ -11,7 +11,7 @@ let states = {"layouttable":{
 ;(function(){
     let s = "ΑΒΨΔΕΦΓΗΙΞΚΛΜΝΟΠ_ΡΣΤΘΩ_ΧΥΖ"
     for (let i=0;i<s.length;i++) {
-        if (i != 16 && i != 22) {
+        if (s[i] != '_') {
             states.layouttable[String.fromCodePoint(i+65)] = String.fromCodePoint(s.codePointAt(i))
             states.layouttable[String.fromCodePoint(i+97)] = String.fromCodePoint(s.codePointAt(i)+32)
         }
