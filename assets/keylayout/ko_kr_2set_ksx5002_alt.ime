@@ -345,6 +345,7 @@ let bufAssemble = () => {
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `${buf[i]}`).join(' ')
 return Object.freeze({"n":"두벌식 수정 표준","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
+"l":"koKR",
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin

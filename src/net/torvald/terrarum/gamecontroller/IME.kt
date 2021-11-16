@@ -1,6 +1,11 @@
 package net.torvald.terrarum.gamecontroller
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.File
 
 typealias IMECandidates = List<String>
@@ -33,6 +38,7 @@ data class TerrarumIME(
 data class TerrarumIMEConf(
         val name: String,
         val copying: String,
+        val lang: String,
         val candidates: TerrarumIMEViewCount,
         val symbols: Keysyms?,
         val symbolsfun: Keysymfun?,
@@ -84,6 +90,8 @@ object IME {
             .allowIO(false)
             .build()
 
+    val icons = HashMap<String, TextureRegion>()
+
     init {
         context.getBindings("js").putMember("IMEProvider", IMEProviderDelegate(this))
 
@@ -96,6 +104,36 @@ object IME {
             printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
             highLayers[it.nameWithoutExtension.lowercase()] = parseImeFile(it)
         }
+
+
+        val iconSheet = TextureRegionPack("assets/graphics/gui/ime_icons_by_language.tga", 20, 20)
+        val iconPixmap = Pixmap(Gdx.files.internal("assets/graphics/gui/ime_icons_by_language.tga"))
+        for (k in 0 until iconPixmap.height step 20) {
+            val langCode = StringBuilder()
+            for (c in 0 until 4) {
+                val x = c
+                var charnum = 0
+                for (b in 0 until 7) {
+                    val y = k + b
+                    if (iconPixmap.getPixel(x, y) and 255 != 0) {
+                        charnum = charnum or (1 shl b)
+                    }
+                }
+                if (charnum != 0) langCode.append(charnum.toChar())
+            }
+
+            if (langCode.isNotEmpty()) {
+                printdbg(this, "Icon order #${(k+1) / 20} - icons[\"$langCode\"] = iconSheet.get(1, ${k/20})")
+                iconSheet.get(1, k / 20).let {
+                    it.flip(false, true)
+                    icons["$langCode"] = it
+                }
+
+            }
+        }
+
+        App.disposables.add(iconSheet)
+        iconPixmap.dispose()
     }
 
     @JvmStatic fun invoke() {}
@@ -175,6 +213,7 @@ object IME {
         val keysyms = Array(256) { Array<String?>(4) { null } }
         var keysymtable: Keysymfun? = null
         val mode = jsval.getMember("m").asString().toIMEMode()
+        val lang = jsval.getMember("l").asString()
 
         // keylayout is static (not affected by the Low Layout)
         if (jsval.hasMember("t")) {
@@ -197,14 +236,13 @@ object IME {
             keysymtable = HashMap()
             val tf = jsval.getMember("tf")
             tf.memberKeys.forEach {
-                println("[IME] keeb $name; tf[$it] = ?")
                 keysymtable[it] = tf.getMember(it).asString()
             }
         }
 
         return TerrarumIME(
                 name,
-                TerrarumIMEConf(name, copying, candidatesCount, if (keysymtable == null) keysyms else null, if (keysymtable == null) null else keysymtable, mode),
+                TerrarumIMEConf(name, copying, lang, candidatesCount, if (keysymtable == null) keysyms else null, if (keysymtable == null) null else keysymtable, mode),
                 { headkey, shifted, alted, lowLayerKeysym ->
                     val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
                     a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()

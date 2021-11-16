@@ -121,9 +121,8 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
         // ui title
-        val titlestr = Lang["CONTEXT_WORLD_NEW"]
-        // "Game Load"
-        App.fontGame.draw(batch, titlestr, drawX + (width - App.fontGame.getWidth(titlestr)).div(2).toFloat(), titleTextPosY.toFloat())
+//        val titlestr = Lang["CONTEXT_WORLD_NEW"]
+//        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontGame.getWidth(titlestr)).div(2).toFloat(), titleTextPosY.toFloat())
 
         // draw size previews
         val texture = tex[sizeSelector.selection]

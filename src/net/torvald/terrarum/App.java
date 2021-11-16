@@ -183,6 +183,7 @@ public class App implements ApplicationListener {
 
     public static TerrarumSansBitmap fontGame;
     public static TerrarumSansBitmap fontGameFBO;
+    public static TerrarumSansBitmap fontUITitle;
     public static TinyAlphNum fontSmallNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
@@ -286,7 +287,7 @@ public class App implements ApplicationListener {
             "xinput", "xbox", "game", "joy", "pad"
     };
 
-    public static InputStrober inputStrober = InputStrober.INSTANCE; // kinda dummy field
+    public static InputStrober inputStrober;
 
     public static Screen getCurrentScreen() {
         return currentScreen;
@@ -502,6 +503,11 @@ public class App implements ApplicationListener {
                 false,
                 256, false, 0.5f, false
         );
+        fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+                false,
+                64, false, 0.5f, false
+        );
+        fontUITitle.setInterchar(2);
         fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
                 false,
                 64, false, 203f/255f, false
@@ -843,6 +849,8 @@ public class App implements ApplicationListener {
         tileMaker.invoke(false);
 
         IME.invoke();
+        inputStrober = InputStrober.INSTANCE;
+
         // check if selected IME is accessible; if not, set selected IME to none
         String selectedIME = getConfigString("inputmethod");
         if (!selectedIME.equals("none") && !IME.INSTANCE.getAllHighLayers().contains(selectedIME)) {

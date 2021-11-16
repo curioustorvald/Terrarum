@@ -252,12 +252,14 @@ class ConsoleWindow : UICanvas() {
                 0f, -height.toFloat()
         )*/
         textinput.isActive = false
+        textinput.mouseoverUpdateLatch = false
     }
 
     override fun endOpening(delta: Float) {
         drawOffY = 0f
         openingTimeCounter = 0f
         textinput.isActive = true
+        textinput.mouseoverUpdateLatch = true
     }
 
     override fun endClosing(delta: Float) {

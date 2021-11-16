@@ -50,6 +50,8 @@ data class InputLenCap(val count: Int, val unit: CharLenUnit) {
  * Protip: if there are multiple TextLineInputs on a same UI, draw bottom one first, otherwise the IME's
  * candidate window will be hidden by the bottom UIItem if they overlaps.
  *
+ * Note: mouseoverUpdateLatch must be latched to make buttons work
+ *
  * @param width width of the text input where the text gets drawn, not the entire item
  * @param height height of the text input where the text gets drawn, not the entire item
  *
@@ -101,7 +103,11 @@ class UIItemTextLineInput(
             true
     )
 
-    var isActive: Boolean = true
+    var isActive: Boolean = false // keep it false by default!
+        set(value) {
+            if (field && !value) endComposing(true)
+            field = value
+        }
 
     var cursorX = 0
     var cursorDrawScroll = 0
@@ -119,7 +125,7 @@ class UIItemTextLineInput(
     private val btn1PosX = posX + width - 2*WIDTH_ONEBUTTON - 3
     private val btn2PosX = posX + width - WIDTH_ONEBUTTON
 
-    var mouseoverUpdateLatch = false
+    var mouseoverUpdateLatch = true // keep it true by default!
         set(value) {
             field = value
             if (!value) {
@@ -144,8 +150,8 @@ class UIItemTextLineInput(
     private val candidatesBackCol = TEXTINPUT_COL_BACKGROUND.cpy().mul(1f,1f,1f,1.5f)
     private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
 
-    private fun getIME(): TerrarumIME? {
-        if (!imeOn) return null
+    private fun getIME(ignoreOnOff: Boolean = false): TerrarumIME? {
+        if (!imeOn && !ignoreOnOff) return null
 
         val selectedIME = App.getConfigString("inputmethod")
 
@@ -381,8 +387,8 @@ class UIItemTextLineInput(
 
     private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }.toList()
 
-    private fun endComposing() {
-        getIME()?.let {
+    private fun endComposing(force: Boolean = false) {
+        getIME(force)?.let {
             val s = it.endCompose()
             if (s.isNotEmpty()) {
                 if (it.config.mode == TerrarumIMEMode.REWRITE) {
@@ -437,6 +443,8 @@ class UIItemTextLineInput(
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+
+        val ime = getIME(true)
 
         batch.end()
 
@@ -508,11 +516,13 @@ class UIItemTextLineInput(
             Toolkit.fillArea(batch, cursorXOnScreen, posY, 1, 23)
         }
 
+        val imeButton = IME.icons[ime?.config?.lang] ?: labels.get(7, 2)
+
         // draw icon
         if (enablePasteButton && enableIMEButton) {
             // IME button
             batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton1) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
-            batch.draw(labels.get(7,2), btn1PosX + 2f, posY + 2f)
+            batch.draw(imeButton, btn1PosX + 2f, posY + 2f)
             // paste button
             batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton2) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
             batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
@@ -525,17 +535,17 @@ class UIItemTextLineInput(
         else if (!enablePasteButton && enableIMEButton) {
             // IME button
             batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton1) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
-            batch.draw(labels.get(7,2), btn2PosX + 2f, posY + 2f)
+            batch.draw(imeButton, btn2PosX + 2f, posY + 2f)
         }
 
         // state of the candidates are concurrently changing, so we buffer them
         val localCandidates = ArrayList<CodepointSequence>(); candidates.forEach { localCandidates.add(it) }
 
         // draw candidates view
-        if (localCandidates.isNotEmpty()) {
+        if (localCandidates.isNotEmpty() && ime != null) {
 
             val textWidths = localCandidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
-            val candidatesMax = getIME()!!.config.candidates.toInt()
+            val candidatesMax = ime.config.candidates.toInt()
             val candidatesCount = minOf(candidatesMax, localCandidates.size)
             val isOnecolumn = (candidatesCount <= 3)
             val halfcount = if (isOnecolumn) candidatesCount else FastMath.ceil(candidatesCount / 2f)
