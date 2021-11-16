@@ -73,7 +73,7 @@ let states = {"keylayouts":[[""],[undefined],
 [":","\\"],
 ["\u1107","4"],
 ["\u1110",'·'],
-["\u1169","?"],
+["\u1169","!"],
 [undefined],
 [undefined],
 [undefined],
@@ -369,6 +369,8 @@ let bufAssemble = (normalise) => {
     else
         return states.buf.join('')
 }
+let isBufferEmpty = (buf) => buf[0] === undefined && buf[1] === undefined && buf[2] === undefined
+let isBufferNotEmpty = (buf) => buf[0] !== undefined || buf[1] !== undefined || buf[2] !== undefined
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
 return Object.freeze({"n":"세벌식 공자판","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
@@ -413,22 +415,24 @@ return Object.freeze({"n":"세벌식 공자판","v":"one","c":"CuriousTo\uA75Bva
         else if (2 == bufIndex && "\u11B8" == states.buf[2] && isJongseongDigraphB(s)) {
             states.buf[2] = jongseongDigraphsB[s]
         }
-        // key inputs that bufIndex collides (end compose and accept incoming char as a new char state)
+        // sending out assembled syllable and accepting new hangul character
         else if (states.buf[bufIndex] !== undefined) {
             let oldstr = bufAssemble(1)
             reset()
             states.buf[bufIndex] = s
 //            console.log(`sending bufout: 1,${oldstr} ${bufDebugStringify(states.buf)}`)
-            return ["1", oldstr + bufAssemble()]
+            return ["1", oldstr + bufAssemble(1)]
         }
         else {
-            let bufferEmpty = (!states.buf[0] && !states.buf[1] && !states.buf[2])
+            let bufferEmpty = isBufferEmpty(states.buf)
             states.buf[bufIndex] = s
 
+            // head of the word after the non-hangul
             if (bufferEmpty) {
 //                console.log(`assem0: ${bufDebugStringify(states.buf)} -> 0,${bufAssemble()}`)
-                return ["0", bufAssemble()]
+                return ["0", bufAssemble(1)]
             }
+            // not head of the word
             else {
 //                console.log(`assem1: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
                 return ["1", bufAssemble()]
@@ -436,14 +440,16 @@ return Object.freeze({"n":"세벌식 공자판","v":"one","c":"CuriousTo\uA75Bva
         }
 
 //        console.log(`assem-digraph: ${bufDebugStringify(states.buf)} -> 1,${bufAssemble()}`)
-        return ["1", bufAssemble()]
+        return ["1", bufAssemble(1)]
     }
-    else if (states.buf[0]) {
+    // sending out assembled syllable and accepting new non-hangul character
+    else if (isBufferNotEmpty(states.buf)) {
         let oldstr = bufAssemble(1)
         reset()
 //        console.log(`sending1 out: 1,${oldstr}${s}`)
         return ["1", oldstr + s]
     }
+    // non-hangul
     else {
 //        console.log(`sending0 out: 0,${s}`)
         return ["0", s]
@@ -469,13 +475,13 @@ return Object.freeze({"n":"세벌식 공자판","v":"one","c":"CuriousTo\uA75Bva
     if (states.buf.length == 0) reset()
 
 //    let newbufstr = bufDebugStringify(states.buf)
-//    console.log(`popping assembly: ${oldbufstr} -> ${newbufstr}`)
+//    console.log(`popping assembly: ${oldbufstr} -> 1,${newbufstr}`)
 
-    return bufAssemble()
+    return bufAssemble(1)
 },
 "end":()=>{
 //    console.log(`end composing`)
-    let ret = bufAssemble()
+    let ret = bufAssemble(1)
     reset()
     return ret
 },
