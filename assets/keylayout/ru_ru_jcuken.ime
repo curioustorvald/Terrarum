@@ -384,7 +384,7 @@ return Object.freeze({"n":"ЙЦУКЕН Многоязычна","v":"none","c":"
     // typing seq for diacritics: diacritics THEN a character
     if (isDiacritics(s)) {
         states.code = s
-        return ['0', ' '+s] // todo: insert diacritics placeholder char
+        return ['0', '\uDBBF\uDE01'+s]
     }
     else {
         // has diacritecs
@@ -395,7 +395,7 @@ return Object.freeze({"n":"ЙЦУКЕН Многоязычна","v":"none","c":"
             }
             let composed = diacriticsMapping[states.code][s]
             reset()
-            return ['2', composed || s]
+            return ['3', composed || s]
         }
         // nope!
         else {

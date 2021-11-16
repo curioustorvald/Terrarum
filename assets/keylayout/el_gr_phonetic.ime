@@ -67,7 +67,7 @@ return Object.freeze({"n":"Ελ. Φωνητικό","v":"none","c":"CuriousTo\uA7
     // typing seq for diacritics: diacritics THEN a character
     if (isDiacritics(s)) {
         states.code = s
-        return ['0', ' '+s] // todo: insert diacritics placeholder char
+        return ['0', '\uDBBF\uDE01'+s]
     }
     else {
         // has diacritecs
@@ -79,7 +79,7 @@ return Object.freeze({"n":"Ελ. Φωνητικό","v":"none","c":"CuriousTo\uA7
             let diacriticsLength = states.code.length // dialytika-tonos is two characters internally
             let composed = diacriticsMapping[states.code][s]
             reset()
-            return [''+(1+diacriticsLength), composed || s]
+            return [''+(2+diacriticsLength), composed || s]
         }
         // nope!
         else {

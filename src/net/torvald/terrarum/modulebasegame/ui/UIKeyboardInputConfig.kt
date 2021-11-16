@@ -352,7 +352,7 @@ private class UIItemInputKeycap(
                     else if (parent.shiftin && keysym0[1]?.isNotEmpty() == true) keysym0[1]
                     else keysym0[0]) ?: keysymLow
             if (isDiacritic(keysym[0].code))
-                keysym = "ɔ$keysym"
+                keysym = "\uDBBF\uDE01$keysym"
 
             if (keysym[0].code == 0xA0)
                 batch.draw(labels.get(22, 2), (posX + (width - 20) / 2).toFloat(), posY + 4f)
