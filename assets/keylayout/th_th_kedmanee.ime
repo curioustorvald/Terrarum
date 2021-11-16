@@ -4,16 +4,16 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["๐",")","0",")"],
-["=","+","1","!"],
-["๒",'"',"2","@"],
-["๓","/","3","#"],
-["๔",",","4","$"],
-["๕","?","5","%"],
-["\u0E39","\u0E38","6","^"],
-["๗","_","7","&"],
-["๘",".","8","*"],
-["๙","(","9","("],
+["\u0E08","\u0E57","0",")"],
+["\u0E45","+","1","!"],
+["/","\u0E51","2","@"],
+["-","\u0E52","3","#"],
+["\u0E20","\u0E53","4","$"],
+["\u0E16","\u0E54","5","%"],
+["\u0E38","\u0E39","6","^"],
+["\u0E36","\u0E3F","7","&"],
+["\u0E04","\u0E55","8","*"],
+["\u0E15","\u0E56","9","("],
 ["*"],
 ["#"],
 [undefined],
@@ -26,34 +26,34 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u0E49","\u0E4B"],// A
-["\u0E34","\u0E31"],// B
-["\u0E25","\u0E10"],// C
-["\u0E07","\u0E33"],// D
-["\u0E22","\u0E46"],// E
-["\u0E01","\u0E13"],// F
-["\u0E31","\u0E4C"],// G
-["\u0E35","\u0E37"],// H
-["\u0E21","\u0E0B"],// I
-["\u0E32","\u0E1C"],// J
-["\u0E19","\u0E0A"],// K
-["\u0E40","\u0E42"],// L
-["\u0E2A","\u0E2E"],// M
-["\u0E04","\u0E28"],// N
-["\u0E27","\u0E16"],// O
-["\u0E41","\u0E12"],// P
-["\u0E47","\u0E4A"],// Q
-["\u0E2D","\u0E0D"],// R
-["\u0E17","\u0E18"],// S
-["\u0E23","\u0E29"],// T
-["\u0E14","\u0E1D"],// U
-["\u0E2B","\u0E20"],// V
-["\u0E15","\u0E24"],// W
-["\u0E1B","\u0E0F"],// X
-["\u0E48","\u0E36"],// Y
-["\u0E1A","\u0E0E"],// Z
-["\u0E30","\u0E1F","\u0E5A","\u0E5A"],// <
-["\u0E08","\u0E09","\u0E4F","\u0E4F"],// >
+["\u0E1F","\u0E24"],// A
+["\u0E34","\u0E3A"],// B
+["\u0E41","\u0E09"],// C
+["\u0E01","\u0E0F"],// D
+["\u0E33","\u0E0E"],// E
+["\u0E14","\u0E42"],// F
+["\u0E40","\u0E0C"],// G
+["\u0E49","\u0E47"],// H
+["\u0E23","\u0E13"],// I
+["\u0E48","\u0E4B"],// J
+["\u0E32","\u0E29"],// K
+["\u0E2A","\u0E28"],// L
+["\u0E17","?"],// M
+["\u0E37","\u0E4C"],// N
+["\u0E19","\u0E2F"],// O
+["\u0E22","\u0E0D"],// P
+["\u0E46","\u0E50"],// Q
+["\u0E1E","\u0E11"],// R
+["\u0E2B","\u0E06"],// S
+["\u0E30","\u0E18"],// T
+["\u0E35","\u0E4A"],// U
+["\u0E2D","\u0E2E"],// V
+["\u0E44",'"'],// W
+["\u0E1B",")"],// X
+["\u0E31","\u0E4D"],// Y
+["\u0E1C","("],// Z
+["\u0E21","\u0E12","\u0E5A","\u0E5A"],// <
+["\u0E43","\u0E2C","\u0E4F","\u0E4F"],// >
 [undefined],
 [undefined],
 [undefined],
@@ -65,15 +65,15 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 ["\n"],
 ["\x08"],
-["_","฿","¤","¤"],// ~
-["๑","-"],// -
-["๖","%"],// =
-["\u0E43","\u0E2F"],// [
-["\u0E0C","\u0E26"],// ]
-["\u0E4E","\u0E4D"],// \
-["\u0E44","\u0E06"],// ;
-["\u0E02","\u0E11"],// '
-["\u0E1E","\u0E2C","\u0E5B","\u0E5B"],// ?
+["_","%","¤","¤"],// ~
+["\u0E02","\u0E58"],// -
+["\u0E0A","\u0E59"],// =
+["\u0E1A","\u0E10"],// [
+["\u0E25",","],// ]
+["\u0E03","\u0E05"],// \
+["\u0E27","\u0E0B"],// ;
+["\u0E07",'.'],// '
+["\u0E1D","\u0E26","\u0E5B","\u0E5B"],// ?
 [undefined],
 [undefined],
 [undefined],
@@ -263,8 +263,8 @@ let diacriticsMapping = {
 
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
-let isDiacritics = (s) => s !== undefined && (inRange(s.charCodeAt(0), 0x0E31, 0x0E31) || inRange(s.charCodeAt(0), 0x0E34, 0x0E3A) || inRange(s.charCodeAt(0), 0x0E47, 0x0E4E))
-return Object.freeze({"n":"แป้นพิมพ์ปัตตะโชติ","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
+let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
+return Object.freeze({"n":"แป้นพิมพ์เกษมณี","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts,
 "l":"thTH",
 // return: [displayed output, composed output]
