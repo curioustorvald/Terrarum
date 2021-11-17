@@ -260,7 +260,7 @@ private class UIItemInputKeycap(
 
     private val keycapFill = Toolkit.Theme.COL_CELL_FILL
 
-    private val keylabelCol = Toolkit.Theme.COL_DISABLED
+    private val keylabelCol = Color(0xddddddff.toInt())
     private val configuredKeyCol = Color.WHITE
 
     override fun update(delta: Float) {
@@ -280,12 +280,8 @@ private class UIItemInputKeycap(
 
         batch.color = if (key == null)
             borderKeyForbidden
-        else if (Gdx.input.isKeyPressed(key) && selected)
-            borderKeyPressedAndSelected
-        else if (Gdx.input.isKeyPressed(key) || selected)
+        else if (Gdx.input.isKeyPressed(key))
             borderKeyPressed
-        else if (mouseUp)
-            borderMouseUp
         else
             borderKeyNormal
 
