@@ -501,16 +501,16 @@ public class App implements ApplicationListener {
 
         fontGame = new TerrarumSansBitmap(FONT_DIR, false, true, false,
                 false,
-                256, false, 0.5f, false, true
+                256, false, 0.5f, false
         );
         fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, true, false,
                 false,
-                64, false, 0.5f, false, true
+                64, false, 0.5f, false
         );
         fontUITitle.setInterchar(2);
         fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
                 false,
-                64, false, 203f/255f, false, true
+                64, false, 203f/255f, false
         );
         Lang.invoke();
 
