@@ -49,11 +49,11 @@ class UIItemSpinner(
         super.update(delta)
 
         mouseOnButton =
-                if (relativeMouseX in 0 until buttonW && relativeMouseY in 0 until height)
+                if (itemRelativeMouseX in 0 until buttonW && itemRelativeMouseY in 0 until height)
                     1
-                else if (relativeMouseX in width - buttonW until width && relativeMouseY in 0 until height)
+                else if (itemRelativeMouseX in width - buttonW until width && itemRelativeMouseY in 0 until height)
                     2
-                else if (relativeMouseX in buttonW + 3 until width - buttonW - 3 && relativeMouseY in 0 until height)
+                else if (itemRelativeMouseX in buttonW + 3 until width - buttonW - 3 && itemRelativeMouseY in 0 until height)
                     3
                 else
                     0

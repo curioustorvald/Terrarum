@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
@@ -138,11 +137,11 @@ class UIItemTextLineInput(
         }
 
     private val mouseUpOnTextArea: Boolean
-        get() = mouseoverUpdateLatch && relativeMouseX in 0 until fbo.width + 2* UI_TEXT_MARGIN && relativeMouseY in 0 until height
+        get() = mouseoverUpdateLatch && itemRelativeMouseX in 0 until fbo.width + 2 * UI_TEXT_MARGIN && itemRelativeMouseY in 0 until height
     private val mouseUpOnButton1
-        get() = mouseoverUpdateLatch && buttonsShown > 1 && relativeMouseX in btn1PosX - posX until btn1PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
+        get() = mouseoverUpdateLatch && buttonsShown > 1 && itemRelativeMouseX in btn1PosX - posX until btn1PosX - posX + WIDTH_ONEBUTTON && itemRelativeMouseY in 0 until height
     private val mouseUpOnButton2
-        get() = mouseoverUpdateLatch && buttonsShown > 0 && relativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && relativeMouseY in 0 until height
+        get() = mouseoverUpdateLatch && buttonsShown > 0 && itemRelativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && itemRelativeMouseY in 0 until height
 
     private var imeOn = false
     private var candidates: List<CodepointSequence> = listOf()

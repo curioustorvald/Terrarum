@@ -78,15 +78,15 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     protected var oldPosY: Int = initialY
 
     /** Position of mouse relative to this item */
-    protected val relativeMouseX: Int
+    protected val itemRelativeMouseX: Int
         get() = (Terrarum.mouseScreenX - (parentUI.posX) - this.posX)
     /** Position of mouse relative to this item */
-    protected val relativeMouseY: Int
+    protected val itemRelativeMouseY: Int
         get() = (Terrarum.mouseScreenY - (parentUI.posY) - this.posY)
 
     /** If mouse is hovering over it */
     open val mouseUp: Boolean
-        get() = relativeMouseX in 0 until width && relativeMouseY in 0 until height
+        get() = itemRelativeMouseX in 0 until width && itemRelativeMouseY in 0 until height
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
         get() = mouseUp && Terrarum.mouseDown
@@ -198,7 +198,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     // mouse controlled
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (parentUI.isVisible && touchDraggedListener != null) {
-            touchDraggedListener!!.invoke(relativeMouseX, relativeMouseY, pointer)
+            touchDraggedListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer)
             return true
         }
 
@@ -209,12 +209,12 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
         if (parentUI.isVisible) {
             if (touchDownListener != null && mouseUp) {
-                touchDownListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
+                touchDownListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
                 actionDone = true
             }
 
             if (clickOnceListener != null && !clickOnceListenerFired && mouseUp) {
-                clickOnceListener!!.invoke(relativeMouseX, relativeMouseY, button)
+                clickOnceListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, button)
                 actionDone = true
             }
         }
@@ -225,7 +225,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         clickOnceListenerFired = false
 
         if (parentUI.isVisible && touchUpListener != null && mouseUp) {
-            touchUpListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
+            touchUpListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
             return true
         }
 

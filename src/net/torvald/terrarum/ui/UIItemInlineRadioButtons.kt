@@ -30,8 +30,8 @@ class UIItemInlineRadioButtons(
     private fun getCellX(i: Int) = posX - 3 + cellWidth * i + 3 * (i + 1)
 
     override fun update(delta: Float) {
-        val mx = relativeMouseX
-        val my = relativeMouseY
+        val mx = itemRelativeMouseX
+        val my = itemRelativeMouseY
         mouseOnSelection = -1
         val oldSelection = selection
         if (my in 0 until height) {
