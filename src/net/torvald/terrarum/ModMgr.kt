@@ -11,14 +11,17 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
-import net.torvald.terrarum.savegame.ByteArray64OutputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.PrintStream
+import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.FileSystems
@@ -128,17 +131,18 @@ object ModMgr {
                         // that does not contain entry "basegame:0"
 
                         // for modules that has JAR defined
-//                        if (jar.isNotBlank()) {
-//                            val child = URLClassLoader(arrayOf<URL>(File("$modDir/$moduleName/$jar").toURI().toURL()),
-//                                    this.javaClass.classLoader
-//                            )
-//                            moduleClassloader[moduleName] = child
-//                            newClass = Class.forName(entryPoint, true, child)
-//                        }
+                        if (jar.isNotBlank()) {
+//                            val urls = arrayOf<URL>()
+
+//                            val cl = JarFileLoader(urls)
+//                            cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
+//                            moduleClassloader[moduleName] = cl
+//                            newClass = cl.loadClass(entryPoint)
+                        }
                         // for modules that are not (meant to be used by the "basegame" kind of modules)
-//                        else {
+                        else {
                             newClass = Class.forName(entryPoint)
-//                        }
+                        }
                     }
                     catch (e: Throwable) {
                         printdbgerr(this, "$moduleName failed to load, skipping...")
@@ -151,18 +155,23 @@ object ModMgr {
                         moduleInfo.remove(moduleName)
                     }
 
-                    newClass?.let {
+                    if (newClass != null) {
                         val newClassConstructor = newClass.getConstructor(/* no args defined */)
                         val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
 
                         entryPointClasses.add(newClassInstance as ModuleEntryPoint)
                         (newClassInstance as ModuleEntryPoint).invoke()
+
+                        printdbg(this, "$moduleName loaded successfully")
+                    }
+                    else {
+                        moduleInfo.remove(moduleName)
+                        printdbg(this, "$moduleName did not load...")
                     }
 
                 }
 
-
-                printdbg(this, "$moduleName loaded successfully")
+                printdbg(this, "Module $moduleName processed")
             }
             catch (noSuchModule: FileNotFoundException) {
                 printdbgerr(this, "No such module: $moduleName, skipping...")
@@ -339,14 +348,22 @@ object ModMgr {
 
                 printdbg(this, "Reading item  ${itemName} <<- internal #$internalID with className $className")
 
-                val loadedClass = if (moduleClassloader[module] != null)
-                    Class.forName(className, true, moduleClassloader[module])
-                else
-                    Class.forName(className)
-                val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
-                val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
+                moduleClassloader[module].let {
+                    if (it == null) {
+                        val loadedClass = Class.forName(className)
+                        val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
+                        val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
 
-                ItemCodex[itemName] = loadedClassInstance as GameItem
+                        ItemCodex[itemName] = loadedClassInstance as GameItem
+                    }
+                    else {
+                        val loadedClass = it.loadClass(className)
+                        val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
+                        val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
+
+                        ItemCodex[itemName] = loadedClassInstance as GameItem
+                    }
+                }
             }
         }
     }
@@ -365,5 +382,13 @@ object ModMgr {
         @JvmStatic operator fun invoke(module: String) {
             Terrarum.materialCodex = MaterialCodex(module, matePath + "materials.csv")
         }
+    }
+}
+
+private class JarFileLoader(urls: Array<URL>) : URLClassLoader(urls) {
+    @Throws(MalformedURLException::class)
+    fun addFile(path: String) {
+        val urlPath = "jar:file://$path!/"
+        addURL(URL(urlPath))
     }
 }
