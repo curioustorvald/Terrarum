@@ -22,5 +22,6 @@
     <orderEntry type="library" name="jxinput-1.0.0" level="project" />
     <orderEntry type="library" name="gdx-platform-1.10.0-natives-desktop" level="project" />
     <orderEntry type="library" name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
   </component>
 </module>

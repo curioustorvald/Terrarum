@@ -5,6 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
@@ -17,9 +21,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulecomputers.tsvmperipheral.WorldRadar
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.tsvm.PeripheralEntry
-import net.torvald.tsvm.TheRealWorld
-import net.torvald.tsvm.VM
+import net.torvald.tsvm.*
 import net.torvald.tsvm.peripheral.ExtDisp
 import net.torvald.tsvm.peripheral.VMProgramRom
 
@@ -41,11 +43,13 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
     override var baseToolSize: Double? = baseMass
 
 
-    val vm = VM(32768, TheRealWorld(), arrayOf(
+    private val vm = VM(32768, TheRealWorld(), arrayOf(
             VMProgramRom(ModMgr.getPath("dwarventech", "bios/pipboot.rom")),
             VMProgramRom(ModMgr.getPath("dwarventech", "bios/pipcode.bas"))
     ))
-    val ui = WearableWorldRadarUI(vm)
+    private val vmRunner: VMRunner
+    private val coroutineJob: Job
+    private val ui = WearableWorldRadarUI(vm)
 
     init {
         super.equipPosition = EquipPosition.HAND_GRIP
@@ -55,8 +59,22 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
             ExtDisp(vm, 160, 140), 32768, 1, 0
         )
 
-        App.disposables.add(Disposable { vm.dispose() })
+        vm.getPrintStream = { System.out }
+        vm.getErrorStream = { System.err }
+        vm.getInputStream = { System.`in` }
+
+        vmRunner = VMRunnerFactory(vm, "js")
+        coroutineJob = GlobalScope.launch {
+            vmRunner.executeCommand(vm.roms[0]!!.readAll())
+        }
+
+        App.disposables.add(Disposable {
+            vmRunner.close()
+            coroutineJob.cancel("item disposal")
+            vm.dispose()
+        })
         App.disposables.add(ui)
+
     }
 
     override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
@@ -79,11 +97,14 @@ class WearableWorldRadarUI(val device: VM) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        batch.end()
+
         batch.color = Color.WHITE
         (device.peripheralTable[1].peripheral as? ExtDisp)?.render(batch, posX.toFloat(), posY.toFloat())
 
+        batch.begin()
         batch.color = Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, posX-1, posY-1, width+2, height+2)
+        Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
     }
 
     override fun doOpening(delta: Float) {

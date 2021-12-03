@@ -168,15 +168,17 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     private var uiFixture: UICanvas? = null
         set(value) {
             printdbg(this, "uiFixture change: $uiFixture -> $value")
-            field?.let { it.setAsClose() }
+            field?.setAsClose()
             value?.let { uiFixturesHistory.add(it) }
             field = value
         }
 
     var wearableDeviceUI: UICanvas? = null
         set(value) {
+            field?.setAsClose()
+            value?.setAsOpen()
+            value?.setPosition(App.scr.tvSafeGraphicsWidth/2, App.scr.tvSafeActionHeight/2)
             field = value
-            value?.setPosition(100, 100) // TODO
         }
 
     val getUIFixture = object : Id_UICanvasNullable { // quick workaround for the type erasure (you can't use lambda...)
