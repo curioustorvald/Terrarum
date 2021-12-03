@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulecomputers.tsvmperipheral
 
-import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -15,8 +14,8 @@ import java.io.ByteArrayOutputStream
  */
 class WorldRadar : BlockTransferInterface(false, true) {
 
-    private val W = 162
-    private val H = 142
+    private val W = 160
+    private val H = 140
 
     private val AIR_OUT = 0.toByte()
     private val GRASS_OUT = 2.toByte()
@@ -96,22 +95,26 @@ class WorldRadar : BlockTransferInterface(false, true) {
                 val px = it.intTilewiseHitbox.canonicalX.toInt()
                 val py = it.intTilewiseHitbox.canonicalY.toInt()
 
-                for (y in 1..H - 2) {
-                    for (x in 1..W - 2) {
-                        val yx = (y - 1).shl(8) or x
-                        val nearby = getNearbyTilesPos(px, py).map { ingame.world.getTileFromTerrain(it.x, it.y) } // up, left, right, down
-                        val block = ingame.world.getTileFromTerrain(px, py)
+                for (yy in 1..H) {
+                    for (xx in 1..W) {
+                        val tx = px - (W/2) + xx
+                        val ty = py - (H/2) + yy
+
+                        val yx = (yy - 1).shl(8) or xx
+                        val nearby = getNearbyTilesPos(tx, ty).map { ingame.world.getTileFromTerrain(it.x, it.y) } // up, left, right, down
+                        val block = ingame.world.getTileFromTerrain(tx, ty)
                         val blockprop = Terrarum.blockCodex[block]
 
                         if (blockprop.isSolid) {
                             // TODO create extension function nearby.contains { predicate :: ItemID -> Boolean }
-                            if (blockprop.material == "GRSS" && nearby.contains(Block.AIR)) {
+                            // for some reason I can't use material?
+                            if (block == Block.GRASS && nearby.contains(Block.AIR)) {
                                 cmdbuf[yx] = GRASS_OUT
                             }
-                            else if (blockprop.material == "DIRT" && nearby.contains(Block.AIR)) {
+                            else if (block == Block.DIRT && nearby.contains(Block.AIR)) {
                                 cmdbuf[yx] = DIRT_OUT
                             }
-                            else if (blockprop.material == "ROCK" && (nearby.contains(Block.AIR) || nearby.contains(Block.GRASS) || nearby.contains(Block.DIRT))) {
+                            else if (block == Block.STONE && (nearby.contains(Block.AIR) || nearby.contains(Block.GRASS) || nearby.contains(Block.DIRT))) {
                                 cmdbuf[yx] = STONE_OUT
                             }
                         }

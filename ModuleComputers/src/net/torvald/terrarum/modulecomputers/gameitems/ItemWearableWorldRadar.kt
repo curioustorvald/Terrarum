@@ -43,7 +43,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
     override var baseToolSize: Double? = baseMass
 
 
-    private val vm = VM(32768, TheRealWorld(), arrayOf(
+    private val vm = VM(73728, TheRealWorld(), arrayOf(
             VMProgramRom(ModMgr.getPath("dwarventech", "bios/pipboot.rom")),
             VMProgramRom(ModMgr.getPath("dwarventech", "bios/pipcode.bas"))
     ))
@@ -59,6 +59,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
             ExtDisp(vm, 160, 140), 32768, 1, 0
         )
 
+        // MMIO stops working when somethingStream is not defined
         vm.getPrintStream = { System.out }
         vm.getErrorStream = { System.err }
         vm.getInputStream = { System.`in` }
@@ -100,7 +101,7 @@ class WearableWorldRadarUI(val device: VM) : UICanvas() {
         batch.end()
 
         batch.color = Color.WHITE
-        (device.peripheralTable[1].peripheral as? ExtDisp)?.render(batch, posX.toFloat(), posY.toFloat())
+        (device.peripheralTable[1].peripheral as? ExtDisp)?.render(batch, posX.toFloat(), posY.toFloat(), true)
 
         batch.begin()
         batch.color = Toolkit.Theme.COL_INACTIVE
