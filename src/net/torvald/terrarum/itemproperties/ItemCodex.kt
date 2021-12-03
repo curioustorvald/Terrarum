@@ -8,8 +8,8 @@ import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.worlddrawer.BlocksDrawer

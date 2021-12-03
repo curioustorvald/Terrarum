@@ -12,7 +12,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid

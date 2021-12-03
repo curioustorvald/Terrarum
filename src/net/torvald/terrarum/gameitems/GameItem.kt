@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gameitem
+package net.torvald.terrarum.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion

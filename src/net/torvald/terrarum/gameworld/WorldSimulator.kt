@@ -7,7 +7,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Controllable
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*

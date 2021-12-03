@@ -2,8 +2,8 @@ package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.csv.CSVRecord

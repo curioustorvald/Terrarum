@@ -6,8 +6,8 @@ import net.torvald.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.BlockMarkerActor
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {

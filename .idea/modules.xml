@@ -5,7 +5,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ingamemodule_basegame/ingamemodule_basegame.iml" filepath="$PROJECT_DIR$/ingamemodule_basegame/ingamemodule_basegame.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ModuleComputers/ModuleComputers.iml" filepath="$PROJECT_DIR$/ModuleComputers/ModuleComputers.iml" />
       <module fileurl="file://$PROJECT_DIR$/terrarum.terrarum.iml" filepath="$PROJECT_DIR$/terrarum.terrarum.iml" />
     </modules>
   </component>

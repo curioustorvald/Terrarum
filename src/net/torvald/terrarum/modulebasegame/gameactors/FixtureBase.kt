@@ -7,7 +7,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2

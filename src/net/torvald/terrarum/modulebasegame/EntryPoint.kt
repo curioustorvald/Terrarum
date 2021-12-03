@@ -5,7 +5,7 @@ import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack

@@ -2,8 +2,8 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import net.torvald.random.Fudge3
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import kotlin.math.pow
 

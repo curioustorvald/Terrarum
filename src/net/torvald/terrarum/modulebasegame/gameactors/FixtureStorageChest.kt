@@ -3,11 +3,10 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_COUNT
 import net.torvald.terrarum.modulebasegame.ui.*

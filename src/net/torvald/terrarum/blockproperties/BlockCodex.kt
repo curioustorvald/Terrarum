@@ -5,7 +5,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printmsg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.CSVFetcher

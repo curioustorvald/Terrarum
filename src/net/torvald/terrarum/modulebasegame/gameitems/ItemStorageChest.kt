@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameitem.inInteractableRange
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.inInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch

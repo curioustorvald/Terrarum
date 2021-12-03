@@ -1,7 +1,7 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.Codex
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 
 /**
  * Created by minjaesong on 2021-07-28.

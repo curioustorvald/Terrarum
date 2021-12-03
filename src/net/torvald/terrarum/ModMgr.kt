@@ -5,21 +5,26 @@ import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
+import net.torvald.terrarum.savegame.ByteArray64OutputStream
+import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
+import java.io.*
+import java.net.URL
+import java.net.URLClassLoader
 import java.nio.file.FileSystems
 import java.util.*
+
+
 
 
 
@@ -48,14 +53,14 @@ object ModMgr {
             val entryPoint: String,
             val releaseDate: String,
             val version: String,
-            val libraries: Array<String>,
+            val jar: String,
             val dependencies: Array<String>
     ) {
         override fun toString() =
                 "\tModule #$order -- $properName | $version | $author\n" +
                 "\t$description | $releaseDate\n" +
                 "\tEntry point: $entryPoint\n" +
-                "\tExternal libraries: ${libraries.joinToString(", ")}\n" +
+                "\tJarfile: $jar\n" +
                 "\tDependencies: ${dependencies.joinToString("\n\t")}"
     }
     const val modDir = "./assets/mods"
@@ -63,6 +68,8 @@ object ModMgr {
     /** Module name (directory name), ModuleMetadata */
     val moduleInfo = HashMap<String, ModuleMetadata>()
     val entryPointClasses = ArrayList<ModuleEntryPoint>()
+
+    val moduleClassloader = HashMap<String, URLClassLoader>()
 
     val loadOrder = ArrayList<String>()
 
@@ -102,10 +109,10 @@ object ModMgr {
                 val entryPoint = modMetadata.getProperty("entrypoint")
                 val releaseDate = modMetadata.getProperty("releasedate")
                 val version = modMetadata.getProperty("version")
-                val libs = modMetadata.getProperty("libraries").split(Regex(""";[ ]*""")).toTypedArray()
+                val jar = modMetadata.getProperty("jar")
                 val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
                 val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, packageName, entryPoint, releaseDate, version, libs, dependency)
+                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
 
                 printdbg(this, moduleInfo[moduleName])
 
@@ -114,21 +121,44 @@ object ModMgr {
                 if (entryPoint.isNotBlank()) {
                     var newClass: Class<*>? = null
                     try {
-                        newClass = Class.forName(entryPoint)
+
+                        // FIXME creating new classloader somehow messes up with the default classloader??!!?
+                        // if CommandDict fails with NullPointerException, it means it's trying to use a wrong classloader
+                        // bypassing only reveals further issues related to the classloader, such as loading wrong copy if ItemCodex
+                        // that does not contain entry "basegame:0"
+
+                        // for modules that has JAR defined
+//                        if (jar.isNotBlank()) {
+//                            val child = URLClassLoader(arrayOf<URL>(File("$modDir/$moduleName/$jar").toURI().toURL()),
+//                                    this.javaClass.classLoader
+//                            )
+//                            moduleClassloader[moduleName] = child
+//                            newClass = Class.forName(entryPoint, true, child)
+//                        }
+                        // for modules that are not (meant to be used by the "basegame" kind of modules)
+//                        else {
+                            newClass = Class.forName(entryPoint)
+//                        }
                     }
-                    catch (e: ClassNotFoundException) {
-                        printdbgerr(this, "$moduleName has nonexisting entry point, skipping...")
+                    catch (e: Throwable) {
+                        printdbgerr(this, "$moduleName failed to load, skipping...")
                         printdbgerr(this, "\t$e")
+                        val ba = ByteArray64GrowableOutputStream()
+                        val sw = PrintStream(ba, true)
+                        e.printStackTrace(sw)
+                        val bw = ByteArray64Reader(ba.toByteArray64(), Charsets.UTF_8)
+                        printdbgerr(this, bw.readText())
                         moduleInfo.remove(moduleName)
                     }
 
                     newClass?.let {
-                        val newClassConstructor = newClass!!.getConstructor(/* no args defined */)
+                        val newClassConstructor = newClass.getConstructor(/* no args defined */)
                         val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
 
                         entryPointClasses.add(newClassInstance as ModuleEntryPoint)
                         (newClassInstance as ModuleEntryPoint).invoke()
                     }
+
                 }
 
 
@@ -150,7 +180,7 @@ object ModMgr {
 
     operator fun invoke() { }
 
-    fun reloadModules() {
+    /*fun reloadModules() {
         loadOrder.forEach {
             val moduleName = it
 
@@ -196,7 +226,7 @@ object ModMgr {
                 moduleInfo.remove(moduleName)
             }
         }
-    }
+    }*/
 
     private fun checkExistence(module: String) {
         if (!moduleInfo.containsKey(module))
@@ -309,7 +339,10 @@ object ModMgr {
 
                 printdbg(this, "Reading item  ${itemName} <<- internal #$internalID with className $className")
 
-                val loadedClass = Class.forName(className)
+                val loadedClass = if (moduleClassloader[module] != null)
+                    Class.forName(className, true, moduleClassloader[module])
+                else
+                    Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                 val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
 

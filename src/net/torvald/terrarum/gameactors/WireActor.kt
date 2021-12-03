@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 
 /**
  * FIXME Constructor is super expensive

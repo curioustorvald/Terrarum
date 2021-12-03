@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameactors.PhysProperties
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 
 /**
  * Created by minjaesong on 2016-04-26.

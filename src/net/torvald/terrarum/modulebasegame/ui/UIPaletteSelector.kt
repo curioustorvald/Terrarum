@@ -9,7 +9,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.ui.Toolkit

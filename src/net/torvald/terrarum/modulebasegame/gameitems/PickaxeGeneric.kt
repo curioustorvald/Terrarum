@@ -7,9 +7,9 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameitem.inInteractableRange
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.inInteractableRange
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE

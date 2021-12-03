@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ai.ActorAI
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.Material
 
 /**

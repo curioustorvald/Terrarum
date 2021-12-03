@@ -11,7 +11,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.roundToInt
 

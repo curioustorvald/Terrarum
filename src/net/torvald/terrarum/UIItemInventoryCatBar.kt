@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt

@@ -4,8 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.gameactors.ActorID

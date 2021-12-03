@@ -2,7 +2,7 @@ package net.torvald.terrarum.utils
 
 
 import net.torvald.terrarum.gameactors.ActorValue
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld

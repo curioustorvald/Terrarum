@@ -19,8 +19,8 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.inInteractableRange
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.inInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
@@ -33,7 +33,6 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
@@ -174,9 +173,20 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             field = value
         }
 
+    var wearableDeviceUI: UICanvas? = null
+        set(value) {
+            field = value
+            value?.setPosition(100, 100) // TODO
+        }
+
     val getUIFixture = object : Id_UICanvasNullable { // quick workaround for the type erasure (you can't use lambda...)
         override fun get(): UICanvas? {
             return uiFixture
+        }
+    }
+    val getWearableDeviceUI = object : Id_UICanvasNullable { // quick workaround for the type erasure (you can't use lambda...)
+        override fun get(): UICanvas? {
+            return wearableDeviceUI
         }
     }
 
@@ -537,6 +547,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 uiQuickBar,
 //                uiBasicInfo, // temporarily commenting out: wouldn't make sense for v 0.3 release
                 uiWatchTierOne,
+                getWearableDeviceUI,
                 UIScreenZoom(),
                 uiAutosaveNotifier,
                 uiInventoryPlayer,

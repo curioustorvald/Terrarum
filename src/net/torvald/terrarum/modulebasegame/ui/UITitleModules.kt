@@ -15,7 +15,7 @@ import net.torvald.terrarum.ui.UIItemModuleInfoCell
 /**
  * Created by minjaesong on 2017-08-01.
  */
-class UITitleModules : UICanvas() {
+class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
 
     override var openCloseTime: Second = 0f
 

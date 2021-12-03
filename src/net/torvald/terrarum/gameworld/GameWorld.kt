@@ -9,7 +9,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.WireActor
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*

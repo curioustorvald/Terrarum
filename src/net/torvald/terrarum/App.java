@@ -259,6 +259,14 @@ public class App implements ApplicationListener {
     private static FrameBuffer renderFBO;
 
     public static HashSet<File> tempFilePool = new HashSet<>();
+
+    /**
+     * <p>If your object is not Disposable, try following code:</p>
+     *
+     * <code>
+     *     App.disposables.add(Disposable { vm.dispose() })
+     * </code>
+     */
     public static HashSet<Disposable> disposables = new HashSet<>();
 
     public static char gamepadLabelStart = 0xE000; // lateinit

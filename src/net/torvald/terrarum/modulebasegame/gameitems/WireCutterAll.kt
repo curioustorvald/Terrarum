@@ -5,11 +5,10 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
-import net.torvald.terrarum.gameitem.inInteractableRange
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.inInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem

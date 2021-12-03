@@ -6,7 +6,7 @@ import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 

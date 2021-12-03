@@ -1,6 +1,5 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -9,7 +8,7 @@ import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid

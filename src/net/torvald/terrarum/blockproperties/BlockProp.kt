@@ -3,7 +3,7 @@ package net.torvald.terrarum.blockproperties
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.XXHash32
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 
 /**

@@ -8,7 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import org.dyn4j.geometry.Vector2

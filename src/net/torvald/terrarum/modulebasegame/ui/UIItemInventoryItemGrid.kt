@@ -7,14 +7,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -395,7 +393,7 @@ class UIItemInventoryItemGrid(
 
         // filter items
         getInventory().forEach {
-            if ((filter.contains(ItemCodex[it.itm]!!.inventoryCategory) || filter[0] == CAT_ALL))
+            if ((filter.contains((ItemCodex[it.itm]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${it.itm}"))) || filter[0] == CAT_ALL))
                 inventorySortList.add(it)
         }
 

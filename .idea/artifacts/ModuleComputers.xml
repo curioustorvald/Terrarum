@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ModuleComputers">
+    <output-path>$PROJECT_DIR$/assets/mods/dwarventech</output-path>
+    <root id="archive" name="ModuleComputers.jar">
+      <element id="module-output" name="ModuleComputers" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/ModuleComputers/lib/TerrarumTSVM.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/ModuleComputers/lib/TerranVirtualDisk.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

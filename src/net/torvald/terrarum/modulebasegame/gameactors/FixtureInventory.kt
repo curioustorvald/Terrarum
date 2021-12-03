@@ -2,8 +2,8 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.gameitem.ItemID
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import java.math.BigInteger

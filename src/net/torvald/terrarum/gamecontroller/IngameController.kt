@@ -2,7 +2,6 @@ package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.utils.GdxRuntimeException
@@ -15,7 +14,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameitem.GameItem
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar

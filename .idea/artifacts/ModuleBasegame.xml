@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="ModuleBasegame">
-    <output-path>$PROJECT_DIR$/out/artifacts/ModuleBasegame</output-path>
-    <root id="archive" name="ModuleBasegame.jar">
-      <element id="module-output" name="ingamemodule_basegame" />
-    </root>
-  </artifact>
-</component>

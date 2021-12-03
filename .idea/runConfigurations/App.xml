@@ -12,6 +12,9 @@
     </extension>
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="BuildArtifacts" enabled="true">
+        <artifact name="ModuleComputers" />
+      </option>
     </method>
   </configuration>
 </component>

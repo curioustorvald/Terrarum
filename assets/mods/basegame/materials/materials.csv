@@ -1,5 +1,7 @@
 "idst";"tens";"impf";"dsty";"fmod";"endurance";"tcond";"comments"
 "ROCK";  "15"; "210";"3000";   "1";     "0.42";  "1.0";"data is that of marble"
+"OORE";  "15"; "210";"3000";   "1";     "0.42";  "1.0";"data is that of marble"
+"OGEM";  "15"; "210";"3000";   "1";     "0.42";  "1.0";"data is that of marble"
 "CUPR"; "210"; "770";"8960";   "2";     "1.00";"401.0";"copper"
 "EGLS";  "33";"1000";"2325";   "4";     "0.82";  "1.0";"elven glass/moldavite"
 "IRON"; "350";"1085";"7874";   "5";     "1.42";  "1.0";"not wrought iron; just natural iron"

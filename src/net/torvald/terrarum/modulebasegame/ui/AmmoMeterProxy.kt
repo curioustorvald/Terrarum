@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import net.torvald.terrarum.gameitem.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.*
 
