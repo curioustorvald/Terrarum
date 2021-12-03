@@ -1,13 +1,12 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
+import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.*
-import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
 import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 /**
@@ -21,6 +20,9 @@ internal object Inventory : ConsoleCommand {
         if (args.size == 1) {
             printUsage()
         }
+        else if (args[1] == "target") {
+            targetID = if (args[2].lowercase() == "player") PLAYER_REF_ID else args[2].toInt()
+        }
         else {
             val actor = getActor()
             if (actor != null) {
@@ -28,7 +30,6 @@ internal object Inventory : ConsoleCommand {
                     "list"   -> listInventory(actor)
                     "add"    -> if (args.size > 3) addItem(actor, args[2], args[3].toInt()) else addItem(actor, args[2])
                     "remove" -> if (args.size > 3) removeItem(actor, args[2], args[3].toInt()) else removeItem(actor, args[2])
-                    "target" -> targetID = if (args[2].lowercase() == "player") PLAYER_REF_ID else args[2].toInt()
                     "equip"  -> equipItem(actor, args[2])
                     "unequip"-> unequipItem(actor, args[2])
                     else     -> printUsage()

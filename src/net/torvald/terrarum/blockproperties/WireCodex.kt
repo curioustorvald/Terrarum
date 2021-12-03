@@ -38,7 +38,7 @@ class WireCodex {
      * @param module name of the module
      * @param path to the "wires" directory, not path to the CSV; must end with a slash!
      */
-    internal constructor(module: String, path: String) : this() {
+    fun fromModule(module: String, path: String) {
         App.printmsg(this, "Building wire properties table for module $module")
         try {
             register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"))

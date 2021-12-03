@@ -1,11 +1,13 @@
 package net.torvald.terrarum.itemproperties
 
+import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printmsg
 import net.torvald.terrarum.Codex
 import net.torvald.terrarum.blockproperties.floatVal
 import net.torvald.terrarum.blockproperties.intVal
 import net.torvald.terrarum.utils.CSVFetcher
 import org.apache.commons.csv.CSVRecord
+import java.io.IOException
 
 /**
  * To be used with items AND TILES (electricity resistance, thermal conductivity)
@@ -39,8 +41,12 @@ class MaterialCodex {
 
     internal constructor()
 
-    internal constructor(module: String, path: String) : this() {
-        register(CSVFetcher.readFromModule(module, path))
+    fun fromModule(module: String, path: String) {
+        App.printmsg(this, "Building material properties table")
+        try {
+            register(CSVFetcher.readFromModule(module, path))
+        }
+        catch (e: IOException) { e.printStackTrace() }
     }
 
     fun fromCSV(module: String, csvString: String) {

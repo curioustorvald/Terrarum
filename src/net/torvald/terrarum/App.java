@@ -28,6 +28,7 @@ import net.torvald.terrarum.gamecontroller.IME;
 import net.torvald.terrarum.gamecontroller.InputStrober;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent;
+import net.torvald.terrarum.gameitems.GameItem;
 import net.torvald.terrarum.gameworld.GameWorld;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.langpack.Lang;
@@ -851,6 +852,15 @@ public class App implements ApplicationListener {
      * Init stuffs which needs GL context
      */
     private void postInit() {
+        ModMgr.INSTANCE.invoke(); // invoke Module Manager
+        printdbg(this, "all modules loaded successfully");
+
+
+        // test print
+        System.out.println("[App] Test printing every registered item");
+        Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach(System.out::println);
+
+
         // create tile atlas
         printdbg(this, "Making terrain textures...");
         tileMaker = new CreateTileAtlas();
@@ -878,14 +888,13 @@ public class App implements ApplicationListener {
             System.err.println("[AppLoader] failed to create audio device: Audio device occupied by Exclusive Mode Device? (e.g. ASIO4all)");
         }
 
+        CommonResourcePool.INSTANCE.loadAll();
+
         // if there is a predefined screen, open that screen after my init process
         if (injectScreen != null) {
             setScreen(injectScreen);
         }
         else {
-            ModMgr.INSTANCE.invoke(); // invoke Module Manager
-            CommonResourcePool.INSTANCE.loadAll();
-            printdbg(this, "all modules loaded successfully");
             IngameRenderer.initialise();
         }
 

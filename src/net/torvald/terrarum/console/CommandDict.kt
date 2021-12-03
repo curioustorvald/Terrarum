@@ -17,46 +17,50 @@ object CommandDict {
         printdbg(this, ModMgr.loadOrder.reversed())
         printdbg(this, ModMgr.loadOrder.reversed().map { ModMgr.moduleInfo[it]?.packageName })
 
-        (listOf("net.torvald.terrarum") + ModMgr.loadOrder.reversed().mapNotNull { ModMgr.moduleInfo[it]?.packageName }).forEach{ packageRoot ->
+        (listOf("net.torvald.terrarum") + ModMgr.loadOrder.reversed().mapNotNull { ModMgr.moduleInfo[it]?.packageName }).forEach { packageRoot ->
             printdbg(this, packageRoot)
             val packageConsole = "$packageRoot.console"
-            val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageConsole.replace('.','/'))
-            val reader = BufferedReader(InputStreamReader(stream))
+            val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageConsole.replace('.', '/'))
 
-            reader.lines()
-                    .filter{ it.endsWith(".class") && !it.contains('$') }
-                    .map { Class.forName("$packageConsole.${it.substring(0, it.lastIndexOf('.'))}") }
-                    .forEach {
+            if (stream != null) { // not all modules have extra console commands
 
-                        printdbg(this, "> Trying to instantiate ${it.canonicalName}")
+                val reader = BufferedReader(InputStreamReader(stream))
 
-                        try {
-                            val instance = it.kotlin.objectInstance ?: it.kotlin.java.newInstance()
+                reader.lines()
+                        .filter { it.endsWith(".class") && !it.contains('$') }
+                        .map { Class.forName("$packageConsole.${it.substring(0, it.lastIndexOf('.'))}") }
+                        .forEach {
 
-                            val aliases = instance.javaClass.getAnnotation(ConsoleAlias::class.java)?.aliasesCSV?.split(',')?.map { it.trim() }
-                            val noexport = instance.javaClass.getAnnotation(ConsoleNoExport::class.java)
+                            printdbg(this, "> Trying to instantiate ${it.canonicalName}")
 
-                            if (noexport == null) {
+                            try {
+                                val instance = it.kotlin.objectInstance ?: it.kotlin.java.newInstance()
 
-                                dict[instance.javaClass.simpleName.lowercase()] = instance as ConsoleCommand
-                                aliases?.forEach {
-                                    dict[it] = instance as ConsoleCommand
+                                val aliases = instance.javaClass.getAnnotation(ConsoleAlias::class.java)?.aliasesCSV?.split(',')?.map { it.trim() }
+                                val noexport = instance.javaClass.getAnnotation(ConsoleNoExport::class.java)
+
+                                if (noexport == null) {
+
+                                    dict[instance.javaClass.simpleName.lowercase()] = instance as ConsoleCommand
+                                    aliases?.forEach {
+                                        dict[it] = instance as ConsoleCommand
+                                    }
+
+                                    printdbg(this, "Class instantiated: ${instance.javaClass.simpleName}")
+                                    if (aliases != null)
+                                        printdbg(this, "  Annotations: $aliases")
                                 }
-
-                                printdbg(this, "Class instantiated: ${instance.javaClass.simpleName}")
-                                if (aliases != null)
-                                    printdbg(this, "  Annotations: $aliases")
+                            }
+                            catch (e: ClassCastException) {
+                                printdbgerr(this, "${it.canonicalName} is not a ConsoleCommand")
+                            }
+                            catch (e: InstantiationException) {
+                                printdbgerr(this, "Could not instantiate ${it.canonicalName}")
+                                e.printStackTrace(System.err)
                             }
                         }
-                        catch (e: ClassCastException) {
-                            printdbgerr(this, "${it.canonicalName} is not a ConsoleCommand")
-                        }
-                        catch (e: InstantiationException) {
-                            printdbgerr(this, "Could not instantiate ${it.canonicalName}")
-                            e.printStackTrace(System.err)
-                        }
-                    }
 
+            }
         }
 
 

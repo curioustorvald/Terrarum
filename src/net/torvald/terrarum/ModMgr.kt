@@ -10,8 +10,6 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
-import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
@@ -20,7 +18,6 @@ import org.apache.commons.csv.CSVRecord
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.PrintStream
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLClassLoader
@@ -132,12 +129,12 @@ object ModMgr {
 
                         // for modules that has JAR defined
                         if (jar.isNotBlank()) {
-//                            val urls = arrayOf<URL>()
+                            val urls = arrayOf<URL>()
 
-//                            val cl = JarFileLoader(urls)
-//                            cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
-//                            moduleClassloader[moduleName] = cl
-//                            newClass = cl.loadClass(entryPoint)
+                            val cl = JarFileLoader(urls)
+                            cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
+                            moduleClassloader[moduleName] = cl
+                            newClass = cl.loadClass(entryPoint)
                         }
                         // for modules that are not (meant to be used by the "basegame" kind of modules)
                         else {
@@ -147,11 +144,7 @@ object ModMgr {
                     catch (e: Throwable) {
                         printdbgerr(this, "$moduleName failed to load, skipping...")
                         printdbgerr(this, "\t$e")
-                        val ba = ByteArray64GrowableOutputStream()
-                        val sw = PrintStream(ba, true)
-                        e.printStackTrace(sw)
-                        val bw = ByteArray64Reader(ba.toByteArray64(), Charsets.UTF_8)
-                        printdbgerr(this, bw.readText())
+                        print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
                         moduleInfo.remove(moduleName)
                     }
 
@@ -182,6 +175,9 @@ object ModMgr {
                 printdbgerr(this, "\t$e")
                 print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
                 moduleInfo.remove(moduleName)
+            }
+            finally {
+
             }
         }
 
@@ -315,14 +311,23 @@ object ModMgr {
 
 
     object GameBlockLoader {
+        init {
+            Terrarum.blockCodex = BlockCodex()
+            Terrarum.wireCodex = WireCodex()
+        }
+
         @JvmStatic operator fun invoke(module: String) {
-            Terrarum.blockCodex = BlockCodex(module, "blocks/blocks.csv")
-            Terrarum.wireCodex = WireCodex(module, "wires/")
+            Terrarum.blockCodex.fromModule(module, "blocks/blocks.csv")
+            Terrarum.wireCodex.fromModule(module, "wires/")
         }
     }
 
     object GameItemLoader {
         val itemPath = "items/"
+
+        init {
+            Terrarum.itemCodex = ItemCodex()
+        }
 
         @JvmStatic operator fun invoke(module: String) {
             register(module, CSVFetcher.readFromModule(module, itemPath + "itemid.csv"))
@@ -339,8 +344,6 @@ object ModMgr {
         }
 
         private fun register(module: String, csv: List<CSVRecord>) {
-            Terrarum.itemCodex = ItemCodex()
-
             csv.forEach {
                 val className: String = it["classname"].toString()
                 val internalID: Int = it["id"].toInt()
@@ -353,14 +356,12 @@ object ModMgr {
                         val loadedClass = Class.forName(className)
                         val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                         val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
-
                         ItemCodex[itemName] = loadedClassInstance as GameItem
                     }
                     else {
                         val loadedClass = it.loadClass(className)
                         val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                         val loadedClassInstance = loadedClassConstructor.newInstance(itemName)
-
                         ItemCodex[itemName] = loadedClassInstance as GameItem
                     }
                 }
@@ -379,8 +380,12 @@ object ModMgr {
     object GameMaterialLoader {
         val matePath = "materials/"
 
+        init {
+            Terrarum.materialCodex = MaterialCodex()
+        }
+
         @JvmStatic operator fun invoke(module: String) {
-            Terrarum.materialCodex = MaterialCodex(module, matePath + "materials.csv")
+            Terrarum.materialCodex.fromModule(module, matePath + "materials.csv")
         }
     }
 }

@@ -58,7 +58,7 @@ class BlockCodex {
     /**
      * Later entry (possible from other modules) will replace older ones
      */
-    internal constructor(module: String, path: String) : this() {
+    fun fromModule(module: String, path: String) {
         App.printmsg(this, "Building block properties table")
         try {
             register(module, CSVFetcher.readFromModule(module, path))

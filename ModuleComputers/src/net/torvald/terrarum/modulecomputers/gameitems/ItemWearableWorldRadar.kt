@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -45,6 +48,8 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
     val ui = WearableWorldRadarUI(vm)
 
     init {
+        super.equipPosition = EquipPosition.HAND_GRIP
+
         vm.getIO().blockTransferPorts[1].attachDevice(WorldRadar())
         vm.peripheralTable[1] = PeripheralEntry(
             ExtDisp(vm, 160, 140), 32768, 1, 0
