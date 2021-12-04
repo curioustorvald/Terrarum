@@ -62,7 +62,7 @@ class ConsoleWindow : UICanvas() {
     init {
         reset()
         addUIitem(textinput)
-        textinput.isActive = false
+        textinput.isActive = true
     }
 
     private val lb = ArrayList<String>()
@@ -96,6 +96,8 @@ class ConsoleWindow : UICanvas() {
         if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
             clickLatched = false
         }
+
+        textinput.isActive = (isOpened && !isClosing)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
