@@ -2,10 +2,10 @@ package net.torvald.terrarum.modulecomputers.gameactors
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -92,42 +92,48 @@ internal class UIHomeComputer : UICanvas(
     private val drawOffX = (width - 560).div(2).toFloat()
     private val drawOffY = (height - 448).div(2).toFloat()
 
-    private lateinit var batch: SpriteBatch
-    private lateinit var camera: OrthographicCamera
+    private var batch: SpriteBatch
+    private var camera: OrthographicCamera
 
     internal lateinit var vm: VM
 
     init {
         batch = SpriteBatch()
-        camera = OrthographicCamera(width.toFloat(), height.toFloat())
-        camera.setToOrtho(false)
-        camera.update()
+        camera = OrthographicCamera(560f, 448f)
+        //val m = Matrix4()
+        //m.setToOrtho2D(0f, 0f, width.toFloat(), height.toFloat())
         batch.projectionMatrix = camera.combined
     }
+
+    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, 560, 448, true)
 
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(otherBatch: SpriteBatch, camera: Camera) {
+    override fun renderUI(otherBatch: SpriteBatch, otherCamera: Camera) {
         otherBatch.end()
 
-        setCameraPosition(0f, 0f)
-        (vm.peripheralTable[1].peripheral as? GraphicsAdapter)?.let { gpu ->
-            val clearCol = gpu.getBackgroundColour()
-            Gdx.gl.glClearColor(clearCol.r, clearCol.g, clearCol.b, clearCol.a)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            gpu.render(Gdx.graphics.deltaTime, batch, posX + drawOffX, posY + drawOffY)
+        fbo.inAction(otherCamera as OrthographicCamera, otherBatch) {
+            (vm.peripheralTable[1].peripheral as? GraphicsAdapter)?.let { gpu ->
+                val clearCol = gpu.getBackgroundColour()
+                Gdx.gl.glClearColor(0f,0f,0f,0f)
+                //Gdx.gl.glClearColor(clearCol.r, clearCol.g, clearCol.b, clearCol.a)
+                //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+                gpu.render(Gdx.graphics.deltaTime, otherBatch, 0f, 0f, true)
+            }
         }
 
         otherBatch.begin()
+        otherBatch.color = Color.WHITE
+        otherBatch.draw(fbo.colorBufferTexture, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         otherBatch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(otherBatch, posX - 1, posY - 1, width + 2, height + 2)
     }
 
     private fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + width / 2), (-newY + height / 2), 0f) // deliberate integer division
-        camera.update()
-        batch.projectionMatrix = camera.combined
+//        camera.position.set((-newX + width / 2), (-newY + height / 2), 0f) // deliberate integer division
+//        camera.update()
+//        batch.projectionMatrix = camera.combined
     }
 
     override fun doOpening(delta: Float) {
@@ -143,6 +149,7 @@ internal class UIHomeComputer : UICanvas(
     }
 
     override fun dispose() {
+        fbo.dispose()
     }
 
 }

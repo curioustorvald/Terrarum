@@ -241,10 +241,7 @@ class UIItemTextLineInput(
                                     if (!maxLen.exceeds(textbuf, codepoints)) {
                                         textbuf.addAll(cursorX, codepoints)
 
-                                        cursorX += codepoints.size
-                                        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-
-                                        tryCursorBack()
+                                        moveCursorToEnd(codepoints.size)
                                     }
                                 }
                             }
@@ -320,10 +317,7 @@ class UIItemTextLineInput(
                         if (!maxLen.exceeds(textbuf, codepoints)) {
                             textbuf.addAll(cursorX, codepoints)
 
-                            cursorX += codepoints.size
-                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-
-                            tryCursorBack()
+                            moveCursorToEnd(codepoints.size)
                         }
                     }
                     else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
@@ -423,10 +417,7 @@ class UIItemTextLineInput(
 
         actuallyInserted.removeAt(0)
 
-        textbuf.addAll(cursorX, actuallyInserted)
-
-        cursorX += actuallyInserted.size
-        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+        moveCursorToEnd(actuallyInserted.size)
 
         tryCursorBack()
 
@@ -439,6 +430,13 @@ class UIItemTextLineInput(
 
     private fun textbufToString(): String {
         return textbuf.toJavaString()
+    }
+
+    private fun moveCursorToEnd(stride: Int) {
+        cursorX += stride
+        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+
+        tryCursorBack()
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -609,10 +607,12 @@ class UIItemTextLineInput(
     }
     fun setText(s: String) {
         clearText()
-        textbuf.addAll(s.toCodePoints())
+        appendText(s)
     }
     fun appendText(s: String) {
-        textbuf.addAll(s.toCodePoints())
+        val c = s.toCodePoints()
+        textbuf.addAll(c)
+        moveCursorToEnd(c.size)
     }
     override fun dispose() {
         fbo.dispose()
