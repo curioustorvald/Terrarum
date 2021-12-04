@@ -56,8 +56,8 @@ open class ActorWithBody : Actor {
         get() = Terrarum.ingame?.world
 
 
-    @Transient internal var sprite: SpriteAnimation? = null
-    @Transient internal var spriteGlow: SpriteAnimation? = null
+    @Transient var sprite: SpriteAnimation? = null
+    @Transient var spriteGlow: SpriteAnimation? = null
 
     var drawMode = BlendMode.NORMAL
 

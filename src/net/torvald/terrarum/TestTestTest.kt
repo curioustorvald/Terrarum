@@ -196,7 +196,7 @@ object TestTestMain : ApplicationAdapter() {
 
     override fun create() {
         ShaderProgram.pedantic = false
-        blurShader = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
+        blurShader = ShaderProgram(Gdx.files.internal("assets/shaders/blur.vert"), Gdx.files.internal("assets/shaders/blur.frag"))
 
 
         batch = SpriteBatch()

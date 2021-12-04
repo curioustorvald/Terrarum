@@ -63,6 +63,19 @@ object ModMgr {
                 "\tJarfile: $jar\n" +
                 "\tDependencies: ${dependencies.joinToString("\n\t")}"
     }
+
+    data class ModuleErrorInfo(
+            val type: LoadErrorType,
+            val moduleName: String,
+            val cause: Throwable? = null,
+    )
+
+    enum class LoadErrorType {
+        YOUR_FAULT,
+        MY_FAULT,
+        NOT_EVEN_THERE
+    }
+
     const val modDir = "./assets/mods"
 
     /** Module name (directory name), ModuleMetadata */
@@ -72,6 +85,12 @@ object ModMgr {
     val moduleClassloader = HashMap<String, URLClassLoader>()
 
     val loadOrder = ArrayList<String>()
+
+    val errorLogs = ArrayList<ModuleErrorInfo>()
+
+    fun logError(type: LoadErrorType, moduleName: String, cause: Throwable? = null) {
+        errorLogs.add(ModuleErrorInfo(type, moduleName, cause))
+    }
 
     init {
         // load modules
@@ -139,6 +158,9 @@ object ModMgr {
                         printdbgerr(this, "$moduleName failed to load, skipping...")
                         printdbgerr(this, "\t$e")
                         print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
+
+                        logError(LoadErrorType.YOUR_FAULT, moduleName, e)
+
                         moduleInfo.remove(moduleName)
                     }
 
@@ -162,12 +184,18 @@ object ModMgr {
             }
             catch (noSuchModule: FileNotFoundException) {
                 printdbgerr(this, "No such module: $moduleName, skipping...")
+
+                logError(LoadErrorType.NOT_EVEN_THERE, moduleName)
+
                 moduleInfo.remove(moduleName)
             }
             catch (e: Throwable) {
                 printdbgerr(this, "There was an error while loading module $moduleName")
                 printdbgerr(this, "\t$e")
                 print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
+
+                logError(LoadErrorType.YOUR_FAULT, moduleName, e)
+
                 moduleInfo.remove(moduleName)
             }
             finally {

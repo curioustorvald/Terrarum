@@ -21,6 +21,7 @@ object UITitleRemoConYaml {
  - MENU_MODULES : net.torvald.terrarum.ModOptionsHost
  - MENU_LABEL_RETURN+WRITETOCONFIG
 - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
+ - MENU_LABEL_RETURN
 - MENU_LABEL_CREDITS
  - MENU_LABEL_COPYRIGHT : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
  - MENU_CREDIT_GPL_DNT : net.torvald.terrarum.modulebasegame.ui.UITitleGPL3

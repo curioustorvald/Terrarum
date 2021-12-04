@@ -611,7 +611,9 @@ class UIItemTextLineInput(
         clearText()
         textbuf.addAll(s.toCodePoints())
     }
-
+    fun appendText(s: String) {
+        textbuf.addAll(s.toCodePoints())
+    }
     override fun dispose() {
         fbo.dispose()
     }

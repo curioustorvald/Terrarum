@@ -114,18 +114,18 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-        shaderBlurDither = App.loadShaderFromFile("assets/blur.vert", "assets/blur_dither.frag")
-        shaderRGBOnlyDither = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_rgb1.frag")
-        shaderAtoGreyDither = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_aaa1.frag")
+        shaderBlurDither = App.loadShaderFromFile("assets/shaders/blur.vert", "assets/shaders/blur_dither.frag")
+        shaderRGBOnlyDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_rgb1.frag")
+        shaderAtoGreyDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_aaa1.frag")
 
-        shaderBlurRaw = App.loadShaderFromFile("assets/blur.vert", "assets/blur.frag")
-        shaderRGBOnlyRaw = App.loadShaderFromFile("assets/4096.vert", "assets/rgbonly.frag")
-        shaderAtoGreyRaw = App.loadShaderFromFile("assets/4096.vert", "assets/aonly.frag")
+        shaderBlurRaw = App.loadShaderFromFile("assets/shaders/blur.vert", "assets/shaders/blur.frag")
+        shaderRGBOnlyRaw = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/rgbonly.frag")
+        shaderAtoGreyRaw = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/aonly.frag")
 
 
-        shaderBayer = App.loadShaderFromFile("assets/4096.vert", "assets/4096_bayer.frag") // always load the shader regardless of config because the config may cange
-        shaderAlphaDither = App.loadShaderFromFile("assets/4096.vert", "assets/alphadither.frag")
-        shaderBlendGlow = App.loadShaderFromFile("assets/blendGlow.vert", "assets/blendGlow.frag")
+        shaderBayer = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag") // always load the shader regardless of config because the config may cange
+        shaderAlphaDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/alphadither.frag")
+        shaderBlendGlow = App.loadShaderFromFile("assets/shaders/blendGlow.vert", "assets/shaders/blendGlow.frag")
 
 
         if (!shaderBlendGlow.isCompiled) {

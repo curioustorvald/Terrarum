@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
@@ -56,6 +57,8 @@ class ConsoleWindow : UICanvas() {
 
     private val textinput = UIItemTextLineInput(this, 0, 0, this.width)
 
+    private var clickLatched = false
+
     init {
         reset()
         addUIitem(textinput)
@@ -75,6 +78,12 @@ class ConsoleWindow : UICanvas() {
                 }
 
                 it.setTooltipMessage(if (lb.size > 0) lb.joinToString("\n") else null)
+
+                // click to enter the actor's reference ID
+                if (lb.size > 0 && !clickLatched && Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+                    clickLatched = true
+                    textinput.appendText(lb.first().substringBefore(' '))
+                }
             }
             else {
                 it.setTooltipMessage(null)
@@ -82,6 +91,11 @@ class ConsoleWindow : UICanvas() {
         }
 
         uiItems.forEach { it.update(delta) }
+
+
+        if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+            clickLatched = false
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

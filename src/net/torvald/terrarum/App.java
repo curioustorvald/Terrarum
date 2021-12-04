@@ -418,18 +418,18 @@ public class App implements ApplicationListener {
 
         // set GL graphics constants
         for (int i = 0; i < ditherPatterns.length; i++) {
-            Texture t = new Texture(Gdx.files.internal("assets/dither_512_"+i+".tga"));
+            Texture t = new Texture(Gdx.files.internal("assets/shaders/dither_512_"+i+".tga"));
             t.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Linear);
             t.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             ditherPatterns[i] = t;
         }
 
-        shaderBayerSkyboxFill = loadShaderFromFile("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
-        shaderHicolour = loadShaderFromFile("assets/4096.vert", "assets/hicolour.frag");
-        shaderDebugDiff = loadShaderFromFile("assets/4096.vert", "assets/diff.frag");
+        shaderBayerSkyboxFill = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_skyboxfill.frag");
+        shaderHicolour = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/hicolour.frag");
+        shaderDebugDiff = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/diff.frag");
         shaderPassthruRGB = SpriteBatch.createDefaultShader();
-        shaderColLUT = loadShaderFromFile("assets/4096.vert", "assets/passthrurgb.frag");
-        shaderReflect = loadShaderFromFile("assets/4096.vert", "assets/reflect.frag");
+        shaderColLUT = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/passthrurgb.frag");
+        shaderReflect = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/reflect.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -858,7 +858,8 @@ public class App implements ApplicationListener {
 
         // test print
         System.out.println("[App] Test printing every registered item");
-        Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach(System.out::println);
+        Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach((String s) -> System.out.print(s+" "));
+        System.out.println();
 
 
         // create tile atlas

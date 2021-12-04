@@ -64,7 +64,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
         vm.getErrorStream = { System.err }
         vm.getInputStream = { System.`in` }
 
-        vmRunner = VMRunnerFactory(vm, "js")
+        vmRunner = VMRunnerFactory(ModMgr.getPath("dwarventech", "bios"), vm, "js")
         coroutineJob = GlobalScope.launch {
             vmRunner.executeCommand(vm.roms[0]!!.readAll())
         }
