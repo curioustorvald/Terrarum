@@ -121,12 +121,6 @@ object ModMgr {
                 if (entryPoint.isNotBlank()) {
                     var newClass: Class<*>? = null
                     try {
-
-                        // FIXME creating new classloader somehow messes up with the default classloader??!!?
-                        // if CommandDict fails with NullPointerException, it means it's trying to use a wrong classloader
-                        // bypassing only reveals further issues related to the classloader, such as loading wrong copy if ItemCodex
-                        // that does not contain entry "basegame:0"
-
                         // for modules that has JAR defined
                         if (jar.isNotBlank()) {
                             val urls = arrayOf<URL>()
