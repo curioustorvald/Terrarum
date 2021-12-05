@@ -99,13 +99,13 @@ internal class UIHomeComputer : UICanvas(
 
     init {
         batch = SpriteBatch()
-        camera = OrthographicCamera(560f, 448f)
+        camera = OrthographicCamera(width.toFloat(), height.toFloat())
         //val m = Matrix4()
         //m.setToOrtho2D(0f, 0f, width.toFloat(), height.toFloat())
         batch.projectionMatrix = camera.combined
     }
 
-    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, 560, 448, true)
+    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
 
     override fun updateUI(delta: Float) {
     }
@@ -113,27 +113,23 @@ internal class UIHomeComputer : UICanvas(
     override fun renderUI(otherBatch: SpriteBatch, otherCamera: Camera) {
         otherBatch.end()
 
-        fbo.inAction(otherCamera as OrthographicCamera, otherBatch) {
+        fbo.inAction(camera, batch) {
             (vm.peripheralTable[1].peripheral as? GraphicsAdapter)?.let { gpu ->
                 val clearCol = gpu.getBackgroundColour()
-                Gdx.gl.glClearColor(0f,0f,0f,0f)
-                //Gdx.gl.glClearColor(clearCol.r, clearCol.g, clearCol.b, clearCol.a)
-                //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-                gpu.render(Gdx.graphics.deltaTime, otherBatch, 0f, 0f, true)
+                Gdx.gl.glClearColor(clearCol.r, clearCol.g, clearCol.b, clearCol.a)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+                gpu.render(Gdx.graphics.deltaTime, batch, drawOffX, drawOffY, true, fbo) // gpu.render will internally end() the fbo then begin() again before using the batch I've fed in
             }
         }
 
         otherBatch.begin()
+        otherBatch.shader = null
+        blendNormal(otherBatch)
         otherBatch.color = Color.WHITE
         otherBatch.draw(fbo.colorBufferTexture, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         otherBatch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(otherBatch, posX - 1, posY - 1, width + 2, height + 2)
-    }
-
-    private fun setCameraPosition(newX: Float, newY: Float) {
-//        camera.position.set((-newX + width / 2), (-newY + height / 2), 0f) // deliberate integer division
-//        camera.update()
-//        batch.projectionMatrix = camera.combined
     }
 
     override fun doOpening(delta: Float) {
