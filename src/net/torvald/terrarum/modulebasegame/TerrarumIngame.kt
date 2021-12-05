@@ -602,18 +602,22 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
         if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
             for (kk in actorsUnderMouse.indices) {
-                actorsUnderMouse[kk].mainUI?.let {
-                    uiOpened = true
+                if (inInteractableRange(actor) {
+                    actorsUnderMouse[kk].mainUI?.let {
+                        uiOpened = true
 
-                    // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
-                    // when it's not null, the UI will be updated and rendered
-                    // when the UI is closed, it'll be replaced with a null value
-                    uiFixture = it
-
-                    it.setPosition(0, 0)
-                    it.setAsOpen()
-                }
-                break
+                        // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                        // when it's not null, the UI will be updated and rendered
+                        // when the UI is closed, it'll be replaced with a null value
+                        uiFixture = it
+                        it.setPosition(
+                                (Toolkit.drawWidth - it.width) / 4,
+                                (App.scr.height - it.height) / 4 // what the fuck?
+                        )
+                        it.setAsOpen()
+                    }
+                    true
+                }) break
             }
         }
 

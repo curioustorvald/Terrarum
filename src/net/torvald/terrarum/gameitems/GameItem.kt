@@ -323,6 +323,11 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         }
     }
 }
+
+/**
+ * @param actor actor to check the reach
+ * @param action returns true if the action was successfully performed
+ */
 fun inInteractableRange(actor: ActorWithBody, action: () -> Boolean): Boolean {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
     val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
