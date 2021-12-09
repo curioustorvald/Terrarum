@@ -78,7 +78,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         tex.forEach { it.flip(false, true) }
 
         goButton.touchDownListener = { _, _, _, _ ->
-            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
+//            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
             val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer

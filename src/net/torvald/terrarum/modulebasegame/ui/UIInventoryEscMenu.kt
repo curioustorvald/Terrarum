@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
+import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TitleScreen
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -96,8 +98,8 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     }
 
                     val saveTime_t = App.getTIME_T()
-                    val playerSavefile = INGAME.getPlayerSaveFiledesc(INGAME.playerSavefileName)
-                    val worldSavefile = INGAME.getWorldSaveFiledesc(INGAME.worldSavefileName)
+                    val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
+                    val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
 
 
                     INGAME.makeSavegameBackupCopy(playerSavefile)

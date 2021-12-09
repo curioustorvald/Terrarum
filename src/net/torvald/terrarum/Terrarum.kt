@@ -321,6 +321,13 @@ object Terrarum : Disposable {
         } while (hasCollision(ret)) // check for collision
         return ret
     }
+
+
+
+    fun getWorldSaveFiledesc(filename: String) = File(App.worldsDir, filename)
+    fun getPlayerSaveFiledesc(filename: String) = File(App.playersDir, filename)
+    fun getSharedSaveFiledesc(filename: String) = File(App.saveSharedDir, filename)
+
 }
 
 inline fun SpriteBatch.inUse(action: (SpriteBatch) -> Unit) {

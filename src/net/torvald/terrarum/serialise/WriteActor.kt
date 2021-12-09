@@ -9,6 +9,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.*
 import java.io.Reader
+import java.util.*
 
 /**
  * Created by minjaesong on 2021-08-24.
@@ -57,19 +58,19 @@ object WritePlayer {
         if (!dir.contains(file.entryID)) dir.add(file.entryID)
     }
 
-    operator fun invoke(player: IngamePlayer, playerDisk: VirtualDisk, ingame: TerrarumIngame, time_t: Long) {
+    operator fun invoke(player: IngamePlayer, playerDisk: VirtualDisk, ingame: TerrarumIngame?, time_t: Long) {
         player.lastPlayTime = time_t
-        player.totalPlayTime += time_t - ingame.loadedTime_t
+        player.totalPlayTime += time_t - (ingame?.loadedTime_t ?: time_t)
 
 
         // restore player prop backup created on load-time for multiplayer
-        if (ingame.isMultiplayer) {
+        if (ingame?.isMultiplayer == true) {
             player.setPosition(player.unauthorisedPlayerProps.physics.position)
             player.actorValue = player.unauthorisedPlayerProps.actorValue!!
             player.inventory = player.unauthorisedPlayerProps.inventory!!
         }
 
-        player.worldCurrentlyPlaying = ingame.world.worldIndex
+        player.worldCurrentlyPlaying = ingame?.world?.worldIndex ?: UUID(0L,0L)
 
 
         val actorJson = WriteActor.encodeToByteArray64(player)

@@ -38,7 +38,7 @@ object UITitleRemoConYaml {
 
     // todo add MENU_IO_IMPORT
     val injectedMenuSingleCharSel = """
-- CONTEXT_CHARACTER_NEW
+- CONTEXT_CHARACTER_NEW : net.torvald.terrarum.modulebasegame.ui.UINewCharacter
 - MENU_LABEL_RETURN
 """
 

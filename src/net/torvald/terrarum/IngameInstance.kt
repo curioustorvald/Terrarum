@@ -400,12 +400,6 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
 
 
 
-//    fun getSaveFileMain() = File(App.saveDir, savegameNickname)
-    fun getWorldSaveFiledesc(filename: String) = File(App.worldsDir, filename)
-    fun getPlayerSaveFiledesc(filename: String) = File(App.playersDir, filename)
-    fun getSharedSaveFiledesc(filename: String) = File(App.saveSharedDir, filename)
-
-
     // simple euclidean norm, squared
     private val actorDistanceCalculator = DistanceCalculator<ActorWithBody> { t: ActorWithBody, p: PointND ->
         val dist1 = (p.getOrd(0) - t.hitbox.centeredX).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
