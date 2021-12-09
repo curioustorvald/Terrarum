@@ -62,8 +62,8 @@ class UIItemTextLineInput(
         override val width: Int,
         var placeholder: () -> String = { "" },
         val maxLen: InputLenCap = InputLenCap(1000, InputLenCap.CharLenUnit.CODEPOINTS),
-        val enablePasteButton: Boolean = true,
-        val enableIMEButton: Boolean = true
+//        val enablePasteButton: Boolean = true,
+//        val enableIMEButton: Boolean = true
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -77,7 +77,7 @@ class UIItemTextLineInput(
 
     override val height = 24
 
-    private val buttonsShown = enableIMEButton.toInt() + enablePasteButton.toInt()
+//    private val buttonsShown = enableIMEButton.toInt() + enablePasteButton.toInt()
 
     companion object {
         val TEXTINPUT_COL_TEXT = Color.WHITE
@@ -97,7 +97,7 @@ class UIItemTextLineInput(
 
     private val fbo = FrameBuffer(
             Pixmap.Format.RGBA8888,
-            width - 2 * UI_TEXT_MARGIN - buttonsShown * (WIDTH_ONEBUTTON + 3),
+            width - 2 * UI_TEXT_MARGIN - 2 * (WIDTH_ONEBUTTON + 3),
             height - 2 * UI_TEXT_MARGIN,
             true
     )
@@ -121,8 +121,9 @@ class UIItemTextLineInput(
     private var currentPlaceholderText = ArrayList<Int>(placeholder().toCodePoints()) // the placeholder text may change every time you call it
 
 
-    private val btn1PosX = posX + width - 2*WIDTH_ONEBUTTON - 3
+    private val btn1PosX = posX
     private val btn2PosX = posX + width - WIDTH_ONEBUTTON
+    private val inputPosX = posX + WIDTH_ONEBUTTON + 3
 
     var mouseoverUpdateLatch = true // keep it true by default!
         set(value) {
@@ -138,10 +139,10 @@ class UIItemTextLineInput(
 
     private val mouseUpOnTextArea: Boolean
         get() = mouseoverUpdateLatch && itemRelativeMouseX in 0 until fbo.width + 2 * UI_TEXT_MARGIN && itemRelativeMouseY in 0 until height
-    private val mouseUpOnButton1
-        get() = mouseoverUpdateLatch && buttonsShown > 1 && itemRelativeMouseX in btn1PosX - posX until btn1PosX - posX + WIDTH_ONEBUTTON && itemRelativeMouseY in 0 until height
-    private val mouseUpOnButton2
-        get() = mouseoverUpdateLatch && buttonsShown > 0 && itemRelativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && itemRelativeMouseY in 0 until height
+    private val mouseUpOnIMEButton
+        get() = mouseoverUpdateLatch && itemRelativeMouseX in btn1PosX - posX until btn1PosX - posX + WIDTH_ONEBUTTON && itemRelativeMouseY in 0 until height
+    private val mouseUpOnPasteButton
+        get() = mouseoverUpdateLatch && itemRelativeMouseX in btn2PosX - posX until btn2PosX - posX + WIDTH_ONEBUTTON && itemRelativeMouseY in 0 until height
 
     private var imeOn = false
     private var candidates: List<CodepointSequence> = listOf()
@@ -362,11 +363,11 @@ class UIItemTextLineInput(
                 }
             }
 
-            if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton1 || enableIMEButton && !enablePasteButton && mouseUpOnButton2)) {
+            if (mouseDown && !mouseLatched && mouseUpOnIMEButton) {
                 toggleIME()
                 mouseLatched = true
             }
-            else if (mouseDown && !mouseLatched && (enablePasteButton && enableIMEButton && mouseUpOnButton2 || enablePasteButton && !enableIMEButton && mouseUpOnButton2)) {
+            else if (mouseDown && !mouseLatched && mouseUpOnPasteButton) {
                 endComposing()
                 paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
                 mouseLatched = true
@@ -433,10 +434,13 @@ class UIItemTextLineInput(
     }
 
     private fun moveCursorToEnd(stride: Int) {
-        cursorX += stride
-        cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+        try {
+            cursorX += stride
+            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
 
-        tryCursorBack()
+            tryCursorBack()
+        }
+        catch (e: Throwable) {}
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -461,48 +465,44 @@ class UIItemTextLineInput(
 
         // text area cell back
         batch.color = TEXTINPUT_COL_BACKGROUND
-        Toolkit.fillArea(batch, posX, posY, fbo.width + 2 * UI_TEXT_MARGIN, height)
-        // rightmost button cell back
-        if (buttonsShown > 0)
-            Toolkit.fillArea(batch, btn2PosX, posY, WIDTH_ONEBUTTON, height)
-        if (buttonsShown > 1)
-            Toolkit.fillArea(batch, btn1PosX, posY, WIDTH_ONEBUTTON, height)
+        Toolkit.fillArea(batch, inputPosX, posY, fbo.width + 2 * UI_TEXT_MARGIN, height)
+        // button cell back
+        Toolkit.fillArea(batch, btn2PosX, posY, WIDTH_ONEBUTTON, height)
+        Toolkit.fillArea(batch, btn1PosX, posY, WIDTH_ONEBUTTON, height)
 
         // text area border (base)
         batch.color = Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
-        if (buttonsShown > 0)
-            Toolkit.drawBoxBorder(batch, btn2PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
-        if (buttonsShown > 1)
-            Toolkit.drawBoxBorder(batch, btn1PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
+        Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2) // this is a full border, not a text area
+        Toolkit.drawBoxBorder(batch, btn2PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
+        Toolkit.drawBoxBorder(batch, btn1PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
 
         // text area border (pop-up for isActive)
         if (isActive) {
             batch.color = Toolkit.Theme.COL_HIGHLIGHT
-            Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
+            Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2) // this is a full border, not a text area
         }
 
         // button border
-        if (mouseUpOnButton2) {
+        if (mouseUpOnPasteButton) {
             batch.color = if (mouseDown) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_ACTIVE
             Toolkit.drawBoxBorder(batch, btn2PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
         }
-        else if (mouseUpOnButton1) {
+        else if (mouseUpOnIMEButton) {
             batch.color = if (mouseDown) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_ACTIVE
             Toolkit.drawBoxBorder(batch, btn1PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
         }
         else if (mouseUpOnTextArea && !isActive) {
             batch.color = Toolkit.Theme.COL_ACTIVE
-            Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, fbo.width + 2 * UI_TEXT_MARGIN+ 2, height + 2)
+            Toolkit.drawBoxBorder(batch, inputPosX - 1, posY - 1, fbo.width + 2 * UI_TEXT_MARGIN+ 2, height + 2)
         }
 
 
         // draw text
         batch.color = if (textbuf.isEmpty()) TEXTINPUT_COL_TEXT_DISABLED else TEXTINPUT_COL_TEXT
-        batch.draw(fbo.colorBufferTexture, posX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
+        batch.draw(fbo.colorBufferTexture, inputPosX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
         // draw text cursor
-        val cursorXOnScreen = posX - cursorDrawScroll + cursorDrawX + 2
+        val cursorXOnScreen = inputPosX - cursorDrawScroll + cursorDrawX + 2
         if (isActive && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
@@ -516,24 +516,12 @@ class UIItemTextLineInput(
         val imeButton = IME.icons[ime?.config?.lang] ?: labels.get(7, 2)
 
         // draw icon
-        if (enablePasteButton && enableIMEButton) {
-            // IME button
-            batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton1) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
-            batch.draw(imeButton, btn1PosX + 2f, posY + 2f)
-            // paste button
-            batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton2) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
-            batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
-        }
-        else if (!enableIMEButton && enablePasteButton) {
-            // paste button
-            batch.color = if (mouseUpOnButton2 && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton2) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
-            batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
-        }
-        else if (!enablePasteButton && enableIMEButton) {
-            // IME button
-            batch.color = if (mouseUpOnButton1 && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnButton1) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
-            batch.draw(imeButton, btn2PosX + 2f, posY + 2f)
-        }
+        // IME button
+        batch.color = if (mouseUpOnIMEButton && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnIMEButton) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
+        batch.draw(imeButton, btn1PosX + 2f, posY + 2f)
+        // paste button
+        batch.color = if (mouseUpOnPasteButton && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnPasteButton) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
+        batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
 
         // state of the candidates are concurrently changing, so we buffer them
         val localCandidates = ArrayList<CodepointSequence>(); candidates.forEach { localCandidates.add(it) }
