@@ -423,16 +423,7 @@ object IngameRenderer : Disposable {
 
 //        processBlur(lightmapFboA, lightmapFboB)
         processKawaseBlur(lightmapFboB)
-
-        /*lightmapFboB.inAction(camera, batch) {
-            val texture = LightmapRenderer.draw()
-            texture.bind(0)
-
-            shaderPassthru.bind()
-            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
-            shaderPassthru.setUniformi("u_texture", 0)
-            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
-        }*/
+//        processNoBlur()
 
 
         blendNormal(batch)
@@ -733,6 +724,18 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", 1f / fboBlurHalf.width, 1f / fboBlurHalf.height)
             blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+        }
+    }
+
+    fun processNoBlur() {
+        lightmapFboB.inAction(camera, batch) {
+            val texture = LightmapRenderer.draw()
+            texture.bind(0)
+
+            shaderPassthru.bind()
+            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
+            shaderPassthru.setUniformi("u_texture", 0)
+            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
         }
     }
 
