@@ -45,6 +45,8 @@ object IngameRenderer : Disposable {
     private lateinit var camera: OrthographicCamera
 
     private lateinit var blurWriteQuad: Mesh
+    private lateinit var blurWriteQuad2: Mesh
+    private lateinit var blurWriteQuad4: Mesh
 
     private lateinit var lightmapFboA: FrameBuffer
     private lateinit var lightmapFboB: FrameBuffer
@@ -58,6 +60,9 @@ object IngameRenderer : Disposable {
     private lateinit var mixedOutTex: TextureRegion
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
+
+    private lateinit var fboBlurHalf: FrameBuffer
+    private lateinit var fboBlurQuarter: FrameBuffer
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
@@ -79,6 +84,9 @@ object IngameRenderer : Disposable {
     val shaderAtoGreyDither: ShaderProgram
     val shaderAtoGreyRaw: ShaderProgram
 
+    val shaderKawaseDown: ShaderProgram
+    val shaderKawaseUp: ShaderProgram
+
     val shaderBayer: ShaderProgram
     val shaderPassthru = SpriteBatch.createDefaultShader()
 
@@ -94,7 +102,8 @@ object IngameRenderer : Disposable {
 
     private var player: ActorWithBody? = null
 
-    const val lightmapDownsample = 1f//4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
+    /** lower value = greater lozenge artefact from linear intp */
+    const val lightmapDownsample = 2f // still has choppy look when the camera moves but unnoticeable when blurred
 
     private var debugMode = 0
 
@@ -128,11 +137,18 @@ object IngameRenderer : Disposable {
         shaderBlendGlow = App.loadShaderFromFile("assets/shaders/blendGlow.vert", "assets/shaders/blendGlow.frag")
 
 
+        shaderKawaseDown = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/kawasedown.frag")
+        shaderKawaseUp = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/kawaseup.frag")
+
         if (!shaderBlendGlow.isCompiled) {
             Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
             exitProcess(1)
         }
 
+        if (!shaderKawaseDown.isCompiled) {
+            Gdx.app.log("shaderKawaseDown", shaderKawaseDown.log)
+            exitProcess(1)
+        }
 
         if (isDither()) {
             if (!shaderBayer.isCompiled) {
@@ -405,7 +421,21 @@ object IngameRenderer : Disposable {
             Gdx.gl.glDisable(GL20.GL_BLEND)
         }
 
-        processBlur(lightmapFboA, lightmapFboB)
+//        processBlur(lightmapFboA, lightmapFboB)
+        processKawaseBlur(lightmapFboB)
+
+        /*lightmapFboB.inAction(camera, batch) {
+            val texture = LightmapRenderer.draw()
+            texture.bind(0)
+
+            shaderPassthru.bind()
+            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
+            shaderPassthru.setUniformi("u_texture", 0)
+            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
+        }*/
+
+
+        blendNormal(batch)
     }
 
     @Volatile internal var screencapRequested = false
@@ -653,6 +683,59 @@ object IngameRenderer : Disposable {
         batch.projectionMatrix = camera.combined
     }
 
+    fun processKawaseBlur(outFbo: FrameBuffer) {
+
+        // initialise readBuffer with untreated lightmap
+        outFbo.inAction(camera, batch) {
+            val texture = LightmapRenderer.draw()
+            texture.bind(0)
+            shaderPassthru.bind()
+            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
+            shaderPassthru.setUniformi("u_texture", 0)
+            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
+        }
+
+        fboBlurHalf.inAction(camera, batch) {
+            val texture = outFbo.colorBufferTexture
+            texture.bind(0)
+            shaderKawaseDown.bind()
+            shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
+            shaderKawaseDown.setUniformi("u_texture", 0)
+            shaderKawaseDown.setUniformf("halfpixel", 1f / fboBlurHalf.width, 1f / fboBlurHalf.height)
+            blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+        }
+
+        fboBlurQuarter.inAction(camera, batch) {
+            val texture = fboBlurHalf.colorBufferTexture
+            texture.bind(0)
+            shaderKawaseDown.bind()
+            shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
+            shaderKawaseDown.setUniformi("u_texture", 0)
+            shaderKawaseDown.setUniformf("halfpixel", 1f / fboBlurQuarter.width, 1f / fboBlurQuarter.height)
+            blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+        }
+
+        fboBlurHalf.inAction(camera, batch) {
+            val texture = fboBlurQuarter.colorBufferTexture
+            texture.bind(0)
+            shaderKawaseUp.bind()
+            shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
+            shaderKawaseUp.setUniformi("u_texture", 0)
+            shaderKawaseUp.setUniformf("halfpixel", 1f / fboBlurQuarter.width, 1f / fboBlurQuarter.height)
+            blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+        }
+
+        outFbo.inAction(camera, batch) {
+            val texture = fboBlurHalf.colorBufferTexture
+            texture.bind(0)
+            shaderKawaseUp.bind()
+            shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
+            shaderKawaseUp.setUniformi("u_texture", 0)
+            shaderKawaseUp.setUniformf("halfpixel", 1f / fboBlurHalf.width, 1f / fboBlurHalf.height)
+            blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+        }
+    }
+
     fun processBlur(lightmapFboA: FrameBuffer, lightmapFboB: FrameBuffer) {
         var blurWriteBuffer = lightmapFboA
         var blurReadBuffer = lightmapFboB
@@ -721,7 +804,18 @@ object IngameRenderer : Disposable {
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
             )
-
+            blurWriteQuad2 = Mesh(
+                    true, 4, 6,
+                    VertexAttribute.Position(),
+                    VertexAttribute.ColorUnpacked(),
+                    VertexAttribute.TexCoords(0)
+            )
+            blurWriteQuad4 = Mesh(
+                    true, 4, 6,
+                    VertexAttribute.Position(),
+                    VertexAttribute.ColorUnpacked(),
+                    VertexAttribute.TexCoords(0)
+            )
             init = true
         }
         else {
@@ -731,6 +825,9 @@ object IngameRenderer : Disposable {
             fboA_lightMixed.dispose()
             lightmapFboA.dispose()
             lightmapFboB.dispose()
+
+            fboBlurHalf.dispose()
+            fboBlurQuarter.dispose()
         }
 
         fboRGB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
@@ -756,6 +853,20 @@ object IngameRenderer : Disposable {
         blurTex = TextureRegion()
         mixedOutTex = TextureRegion(fboMixedOut.colorBufferTexture)
 
+        fboBlurHalf = FrameBuffer(
+                Pixmap.Format.RGBA8888,
+        LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
+        LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
+        true
+        )
+
+        fboBlurQuarter = FrameBuffer(
+                Pixmap.Format.RGBA8888,
+                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
+                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
+                true
+        )
+
         BlocksDrawer.resize(width, height)
         LightmapRenderer.resize(width, height)
 
@@ -767,9 +878,26 @@ object IngameRenderer : Disposable {
                 0f,lightmapFboA.height.toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
         blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
+        blurWriteQuad2.setVertices(floatArrayOf(
+                0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
+                lightmapFboA.width.div(2).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
+                lightmapFboA.width.div(2).toFloat(),lightmapFboA.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
+                0f,lightmapFboA.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
+        blurWriteQuad2.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+
+        blurWriteQuad4.setVertices(floatArrayOf(
+                0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
+                lightmapFboA.width.div(4).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
+                lightmapFboA.width.div(4).toFloat(),lightmapFboA.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
+                0f,lightmapFboA.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
+        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
     }
 
     override fun dispose() {
+        blurWriteQuad.dispose()
+        blurWriteQuad2.dispose()
+        blurWriteQuad4.dispose()
+
         fboRGB.dispose()
         fboA.dispose()
         fboRGB_lightMixed.dispose()
@@ -777,6 +905,9 @@ object IngameRenderer : Disposable {
         fboMixedOut.dispose()
         lightmapFboA.dispose()
         lightmapFboB.dispose()
+
+        fboBlurHalf.dispose()
+        fboBlurQuarter.dispose()
 
         LightmapRenderer.dispose()
         BlocksDrawer.dispose()
@@ -796,6 +927,9 @@ object IngameRenderer : Disposable {
         shaderBlendGlow.dispose()
         shaderPassthru.dispose()
         shaderAlphaDither.dispose()
+
+        shaderKawaseDown.dispose()
+        shaderKawaseUp.dispose()
 
         try {
             fboRGBexport.dispose()

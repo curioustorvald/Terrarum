@@ -19,7 +19,6 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -578,13 +577,13 @@ object LightmapRenderer {
         return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) 1.2f else 1f
     }
 
-    var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
+    var lightBuffer: Pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888) // must not be too small
 
     private val colourNull = Cvec(0)
     private val gdxColorNull = Color(0)
     const val epsilon = 1f/1024f
 
-    private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+    private var _lightBufferAsTex: Texture = Texture(64, 64, Pixmap.Format.RGBA8888) // must not be too small
 
     internal fun draw(): Texture {
 
