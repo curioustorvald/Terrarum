@@ -68,7 +68,7 @@ object LightmapRenderer {
 
     const val overscan_open: Int = 40
     const val overscan_opaque: Int = 10
-    const val LIGHTMAP_OVERRENDER = 40
+    const val LIGHTMAP_OVERRENDER = 20
 
     private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
     private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
@@ -169,8 +169,8 @@ object LightmapRenderer {
 
         for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 3 // same fix as above
-        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3 + LIGHTMAP_OVERRENDER
-        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3 + LIGHTMAP_OVERRENDER
+        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3 + 2*LIGHTMAP_OVERRENDER
+        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3 + 2*LIGHTMAP_OVERRENDER
 
         camX = WorldCamera.x / TILE_SIZE
         camY = WorldCamera.y / TILE_SIZE
@@ -611,7 +611,7 @@ object LightmapRenderer {
 
                 for (x in this_x_start..this_x_end) {
 
-                    val solidMultMagic = isSolid(x, y)
+                    val solidMultMagic = isSolid(x, y) // one of {1.2f, 1f, null}
 
                     val arrayX = x.convX()
                     val arrayY = y.convY()
@@ -628,7 +628,7 @@ object LightmapRenderer {
                     val uvlwg = (uvl.sqrt() - 1f) * (1f / 10f)
                     val uvlwb = (uvl.sqrt() - 1f) * (1f / 8f)
 
-                    val color = if (solidMultMagic == null)
+                    if (solidMultMagic == null)
                         lightBuffer.drawPixel(
                             x - this_x_start,
                             lightBuffer.height - 1 - y + this_y_start, // flip Y
