@@ -280,6 +280,11 @@ class UIItemTextLineInput(
                             tryCursorBack()
                         }
                     }
+                    else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
+                        endComposing()
+
+                        println("END COMPOSING!!")
+                    }
                     // accept:
                     // - literal "<"
                     // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
@@ -321,12 +326,12 @@ class UIItemTextLineInput(
                             moveCursorToEnd(codepoints.size)
                         }
                     }
-                    else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
-                        endComposing()
-                    }
 
                     // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
                 }
+            }
+            catch (e: IndexOutOfBoundsException) {
+                e.printStackTrace()
             }
             catch (e: NullPointerException) {
                 e.printStackTrace()
@@ -341,6 +346,7 @@ class UIItemTextLineInput(
         }
 
         fboUpdateLatch = true
+
     }
 
     override fun update(delta: Float) {
@@ -418,6 +424,7 @@ class UIItemTextLineInput(
 
         actuallyInserted.removeAt(0)
 
+        textbuf.addAll(actuallyInserted)
         moveCursorToEnd(actuallyInserted.size)
 
         tryCursorBack()
