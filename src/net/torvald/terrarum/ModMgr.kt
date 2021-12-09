@@ -46,6 +46,7 @@ object ModMgr {
     data class ModuleMetadata(
             val order: Int,
             val isDir: Boolean,
+            val iconFile: FileHandle,
             val properName: String,
             val description: String,
             val author: String,
@@ -131,7 +132,7 @@ object ModMgr {
                 val jar = modMetadata.getProperty("jar")
                 val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
                 val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
+                moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
 
                 printdbg(this, moduleInfo[moduleName])
 
