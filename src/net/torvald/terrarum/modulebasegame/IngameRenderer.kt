@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -718,6 +719,7 @@ object IngameRenderer : Disposable {
             blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
         }
 
+        // TODO apply dithering on this specific draw call
         outFbo.inAction(camera, batch) {
             val texture = fboBlurHalf.colorBufferTexture
             texture.bind(0)
@@ -727,6 +729,7 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.setUniformf("halfpixel", KAWASE_POWER / fboBlurHalf.width, KAWASE_POWER / fboBlurHalf.height)
             blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
         }
+
     }
 
     fun processNoBlur() {

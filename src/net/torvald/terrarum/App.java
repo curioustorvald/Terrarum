@@ -720,6 +720,8 @@ public class App implements ApplicationListener {
             );
         }
 
+        Toolkit.INSTANCE.resize();
+
         printdbg(this, "Resize end");
     }
 

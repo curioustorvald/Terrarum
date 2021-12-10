@@ -26,7 +26,7 @@ class UICheatDetected : UICanvas() {
 
 
 
-    private val backgroundCol = Color(0x181818C0)
+    private val backgroundCol = Color(0x00000080)
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         Terrarum.ingame?.consoleHandler?.setAsClose()
@@ -45,6 +45,7 @@ class UICheatDetected : UICanvas() {
     }
 
     override fun updateUI(delta: Float) {
+        INGAME.pause()
     }
 
     override fun doOpening(delta: Float) {
