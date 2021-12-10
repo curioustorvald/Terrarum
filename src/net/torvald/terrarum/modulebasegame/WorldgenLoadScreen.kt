@@ -95,13 +95,16 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
                 val wx = (world.width.toFloat() / previewWidth * x).roundToInt()
                 val wy = (world.height.toFloat() / previewHeight * y).roundToInt()
 
-                try { // q&d solution for the dangling pointer; i'm doing this only because it's this fucking load screen that's fucking the dead pointer
-                    val outCol = if (BlockCodex[world.getTileFromTerrain(wx, wy)].isSolid) COL_TERR
-                    else if (BlockCodex[world.getTileFromWall(wx, wy)].isSolid) COL_WALLED
-                    else COL_AIR
+                try {
+                    // q&d solution for the dangling pointer; i'm doing this only because it's this fucking load screen that's fucking the dead pointer
+                    if (!world.layerTerrain.ptrDestroyed) {
+                        val outCol = if (BlockCodex[world.getTileFromTerrain(wx, wy)].isSolid) COL_TERR
+                        else if (BlockCodex[world.getTileFromWall(wx, wy)].isSolid) COL_WALLED
+                        else COL_AIR
 
-                    previewPixmap.setColor(outCol)
-                    previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y
+                        previewPixmap.setColor(outCol)
+                        previewPixmap.drawPixel(x, previewHeight - 1 - y) // this flips Y
+                    }
                 }
                 catch (e: NoSuchElementException) {}
             }
