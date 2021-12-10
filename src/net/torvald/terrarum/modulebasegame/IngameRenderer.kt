@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -677,12 +677,22 @@ object IngameRenderer : Disposable {
 
     private const val KAWASE_POWER = 0.667f
 
+    private var blurtex0 = Texture(16, 16, Pixmap.Format.RGBA8888)
+    private var blurtex1 = Texture(16, 16, Pixmap.Format.RGBA8888)
+    private var blurtex2 = Texture(16, 16, Pixmap.Format.RGBA8888)
+    private var blurtex3 = Texture(16, 16, Pixmap.Format.RGBA8888)
+    private var blurtex4 = Texture(16, 16, Pixmap.Format.RGBA8888)
+
+
     fun processKawaseBlur(outFbo: FrameBuffer) {
+
+        blurtex0.dispose()
 
         // initialise readBuffer with untreated lightmap
         outFbo.inAction(camera, batch) {
-            val texture = LightmapRenderer.draw()
-            texture.bind(0)
+            blurtex0 = LightmapRenderer.draw()
+            blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex0.bind(0)
             shaderPassthru.bind()
             shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
             shaderPassthru.setUniformi("u_texture", 0)
@@ -690,8 +700,9 @@ object IngameRenderer : Disposable {
         }
 
         fboBlurHalf.inAction(camera, batch) {
-            val texture = outFbo.colorBufferTexture
-            texture.bind(0)
+            blurtex1 = outFbo.colorBufferTexture
+            blurtex1.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex1.bind(0)
             shaderKawaseDown.bind()
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
@@ -700,8 +711,9 @@ object IngameRenderer : Disposable {
         }
 
         fboBlurQuarter.inAction(camera, batch) {
-            val texture = fboBlurHalf.colorBufferTexture
-            texture.bind(0)
+            blurtex2 = fboBlurHalf.colorBufferTexture
+            blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex2.bind(0)
             shaderKawaseDown.bind()
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
@@ -710,8 +722,9 @@ object IngameRenderer : Disposable {
         }
 
         fboBlurHalf.inAction(camera, batch) {
-            val texture = fboBlurQuarter.colorBufferTexture
-            texture.bind(0)
+            blurtex3 = fboBlurQuarter.colorBufferTexture
+            blurtex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex3.bind(0)
             shaderKawaseUp.bind()
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
@@ -721,8 +734,8 @@ object IngameRenderer : Disposable {
 
         // TODO apply dithering on this specific draw call
         outFbo.inAction(camera, batch) {
-            val texture = fboBlurHalf.colorBufferTexture
-            texture.bind(0)
+            blurtex4 = fboBlurHalf.colorBufferTexture
+            blurtex4.bind(0)
             shaderKawaseUp.bind()
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
@@ -730,76 +743,6 @@ object IngameRenderer : Disposable {
             blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
         }
 
-    }
-
-    fun processNoBlur() {
-        lightmapFboB.inAction(camera, batch) {
-            val texture = LightmapRenderer.draw()
-            texture.bind(0)
-
-            shaderPassthru.bind()
-            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
-            shaderPassthru.setUniformi("u_texture", 0)
-            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
-        }
-    }
-
-    fun processBlur(lightmapFboA: FrameBuffer, lightmapFboB: FrameBuffer) {
-        var blurWriteBuffer = lightmapFboA
-        var blurReadBuffer = lightmapFboB
-
-
-        // buffers must be cleared beforehand
-
-
-        // initialise readBuffer with untreated lightmap
-        blurReadBuffer.inAction(camera, batch) {
-            val texture = LightmapRenderer.draw()
-            texture.bind(0)
-
-            shaderPassthru.bind()
-            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
-            shaderPassthru.setUniformi("u_texture", 0)
-            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
-        }
-
-        // do blurring
-        for (i in 0 until 4) {
-            val blurRadius = (4f / lightmapDownsample) * (1 shl i.ushr(1))
-
-            blurWriteBuffer.inAction(camera, batch) {
-
-
-                blurTex.texture = blurReadBuffer.colorBufferTexture
-                blurTex.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-                blurTex.texture.bind(0)
-                App.getCurrentDitherTex().bind(1) // order is important!
-
-                shaderBlur.bind()
-                shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
-                shaderBlur.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
-                shaderBlur.setUniformi("u_pattern", 1)
-                shaderBlur.setUniformi("u_texture", 0)
-                shaderBlur.setUniformf("iResolution",
-                        blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
-                shaderBlur.setUniformf("flip", 1f)
-                if (i % 2 == 0)
-                    shaderBlur.setUniformf("direction", blurRadius, 0f)
-                else
-                    shaderBlur.setUniformf("direction", 0f, blurRadius)
-                blurWriteQuad.render(shaderBlur, GL20.GL_TRIANGLES)
-
-
-                // swap
-                val t = blurWriteBuffer
-                blurWriteBuffer = blurReadBuffer
-                blurReadBuffer = t
-            }
-        }
-
-
-
-        blendNormal(batch)
     }
 
     private var init = false
@@ -913,6 +856,12 @@ object IngameRenderer : Disposable {
         fboMixedOut.dispose()
         lightmapFboA.dispose()
         lightmapFboB.dispose()
+
+        try { blurtex0.dispose() } catch (e: GdxRuntimeException) {}
+//        try { blurtex1.dispose() } catch (e: GdxRuntimeException) {}
+//        try { blurtex2.dispose() } catch (e: GdxRuntimeException) {}
+//        try { blurtex3.dispose() } catch (e: GdxRuntimeException) {}
+//        try { blurtex4.dispose() } catch (e: GdxRuntimeException) {}
 
         fboBlurHalf.dispose()
         fboBlurQuarter.dispose()
