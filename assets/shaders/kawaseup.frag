@@ -7,6 +7,8 @@ varying vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 
+// recommended value: n / vec2(fbo_width, fbo_height) where n is something like {0.5, 1, 2, 4, ... }
+// that, or simply 0.5, depending on how your uv coord works
 uniform vec2 halfpixel = vec2(0.0, 0.0);
 
 vec2 doublex = vec2(2.0, 0.0);

@@ -674,6 +674,8 @@ object IngameRenderer : Disposable {
         batch.projectionMatrix = camera.combined
     }
 
+    private const val KAWASE_POWER = 0.667f
+
     fun processKawaseBlur(outFbo: FrameBuffer) {
 
         // initialise readBuffer with untreated lightmap
@@ -692,7 +694,7 @@ object IngameRenderer : Disposable {
             shaderKawaseDown.bind()
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
-            shaderKawaseDown.setUniformf("halfpixel", 1f / fboBlurHalf.width, 1f / fboBlurHalf.height)
+            shaderKawaseDown.setUniformf("halfpixel", KAWASE_POWER / fboBlurHalf.width, KAWASE_POWER / fboBlurHalf.height)
             blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
         }
 
@@ -702,7 +704,7 @@ object IngameRenderer : Disposable {
             shaderKawaseDown.bind()
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
-            shaderKawaseDown.setUniformf("halfpixel", 1f / fboBlurQuarter.width, 1f / fboBlurQuarter.height)
+            shaderKawaseDown.setUniformf("halfpixel", KAWASE_POWER / fboBlurQuarter.width, KAWASE_POWER / fboBlurQuarter.height)
             blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLES)
         }
 
@@ -712,7 +714,7 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.bind()
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
-            shaderKawaseUp.setUniformf("halfpixel", 1f / fboBlurQuarter.width, 1f / fboBlurQuarter.height)
+            shaderKawaseUp.setUniformf("halfpixel", KAWASE_POWER / fboBlurQuarter.width, KAWASE_POWER / fboBlurQuarter.height)
             blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
         }
 
@@ -722,7 +724,7 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.bind()
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
-            shaderKawaseUp.setUniformf("halfpixel", 1f / fboBlurHalf.width, 1f / fboBlurHalf.height)
+            shaderKawaseUp.setUniformf("halfpixel", KAWASE_POWER / fboBlurHalf.width, KAWASE_POWER / fboBlurHalf.height)
             blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
         }
     }
