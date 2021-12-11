@@ -158,15 +158,17 @@ open class GameWorld() : Disposable {
         lastPlayTime = lastPlayTIME_T
 
 
-        App.tileMaker.tags.forEach {
-            printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+        if (App.tileMaker != null) {
+            App.tileMaker.tags.forEach {
+                printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
-            tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
-            tileNameToNumberMap[it.key] = it.value.tileNumber
+                tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
+                tileNameToNumberMap[it.key] = it.value.tileNumber
+            }
+
+            // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
+            tileNumberToNameMap[0] = Block.AIR
         }
-
-        // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
-        tileNumberToNameMap[0] = Block.AIR
     }
 
 

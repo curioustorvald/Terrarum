@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
@@ -18,6 +19,10 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class EntryPoint : ModuleEntryPoint() {
 
     private val moduleName = "basegame"
+
+    override fun getTitleScreen(batch: SpriteBatch): IngameInstance? {
+        return TitleScreen(batch)
+    }
 
     override fun invoke() {
 

@@ -31,7 +31,6 @@ import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
@@ -191,41 +190,6 @@ object Terrarum : Disposable {
 
         printdbg(this, "Accepting new ingame instance '${ingame.javaClass.canonicalName}', called by:")
         printStackTrace(this)
-    }
-
-    private fun showxxx() {
-
-        testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
-
-
-        // resize fullscreen quad?
-
-
-        TextureRegionPack.globalFlipY = true // !! TO MAKE LEGACY CODE RENDER ON ITS POSITION !!
-        Gdx.graphics.isContinuousRendering = true
-
-        //batch = SpriteBatch()
-        //shapeRender = ShapeRenderer()
-
-
-        App.GAME_LOCALE = getConfigString("language")
-        printdbg(this, "locale = ${App.GAME_LOCALE}")
-
-
-
-
-        // jump straight into the ingame
-        /*val ingame = Ingame(batch)
-        ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-        ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
-        LoadScreen.screenToLoad = ingame
-        this.ingame = ingame
-        setScreen(LoadScreen)*/
-
-
-
-        // title screen
-        App.setScreen(TitleScreen(batch))
     }
 
     /** Don't call this! Call AppLoader.dispose() */

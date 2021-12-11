@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
@@ -31,6 +32,7 @@ import java.util.*
 /**
  * Modules (or Mods) Resource Manager
  *
+ * The very first mod on the load set must have a title screen
  *
  * NOTE!!: Usage of Groovy is only temporary; if Kotlin's "JSR 223" is no longer experimental and
  *         is readily available, ditch that Groovy.
@@ -92,6 +94,11 @@ object ModMgr {
     fun logError(type: LoadErrorType, moduleName: String, cause: Throwable? = null) {
         errorLogs.add(ModuleErrorInfo(type, moduleName, cause))
     }
+
+    /**
+     * Try to create an instance of a "titlescreen" from the current load order set.
+     */
+    fun getTitleScreen(batch: SpriteBatch): IngameInstance? = entryPointClasses.getOrNull(0)?.getTitleScreen(batch)
 
     init {
         // load modules

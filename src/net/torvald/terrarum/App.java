@@ -342,6 +342,7 @@ public class App implements ApplicationListener {
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
+            appConfig.useOpenGL3(true, 3, 0);
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
             appConfig.setWindowedMode(width, height);
@@ -555,11 +556,16 @@ public class App implements ApplicationListener {
                 // hand over the scene control to this single class; Terrarum must call
                 // 'AppLoader.getINSTANCE().screen.render(delta)', this is not redundant at all!
 
-                printdbg(this, "!! Force set current screen and ingame instance to TitleScreen !!");
+                IngameInstance title = ModMgr.INSTANCE.getTitleScreen(batch);
 
-                IngameInstance title = new TitleScreen(batch);
-                Terrarum.INSTANCE.setCurrentIngameInstance(title);
-                setScreen(title);
+                if (title != null) {
+                    Terrarum.INSTANCE.setCurrentIngameInstance(title);
+                    setScreen(title);
+                }
+                else {
+                    IngameInstance notitle = new NoModuleDefaultTitlescreen(batch);
+                    setScreen(notitle);
+                }
             }
         }
         // draw the screen
@@ -570,7 +576,7 @@ public class App implements ApplicationListener {
         KeyToggler.INSTANCE.update(currentScreen instanceof TerrarumIngame);
 
         // nested FBOs are just not a thing in GL!
-        net.torvald.terrarum.FrameBufferManager.end();
+        FrameBufferManager.end();
 
         PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
 
@@ -855,6 +861,34 @@ public class App implements ApplicationListener {
      */
     private void postInit() {
         ModMgr.INSTANCE.invoke(); // invoke Module Manager
+
+
+        TextureRegionPack.Companion.setGlobalFlipY(true);
+        fontSmallNumbers = TinyAlphNum.INSTANCE;
+
+        IME.invoke();
+        inputStrober = InputStrober.INSTANCE;
+
+        try {
+            audioDevice = Gdx.audio.newAudioDevice(48000, false);
+        }
+        catch (NullPointerException deviceInUse) {
+            deviceInUse.printStackTrace();
+            System.err.println("[AppLoader] failed to create audio device: Audio device occupied by Exclusive Mode Device? (e.g. ASIO4all)");
+        }
+
+        CommonResourcePool.INSTANCE.loadAll();
+
+
+        if (ModMgr.INSTANCE.getModuleInfo().isEmpty()) {
+
+
+
+            return;
+        }
+
+
+
         printdbg(this, "all modules loaded successfully");
 
 
@@ -869,8 +903,6 @@ public class App implements ApplicationListener {
         tileMaker = new CreateTileAtlas();
         tileMaker.invoke(false);
 
-        IME.invoke();
-        inputStrober = InputStrober.INSTANCE;
 
         // check if selected IME is accessible; if not, set selected IME to none
         String selectedIME = getConfigString("inputmethod");
@@ -880,18 +912,6 @@ public class App implements ApplicationListener {
 
         Terrarum.initialise();
 
-        TextureRegionPack.Companion.setGlobalFlipY(true);
-        fontSmallNumbers = TinyAlphNum.INSTANCE;
-
-        try {
-            audioDevice = Gdx.audio.newAudioDevice(48000, false);
-        }
-        catch (NullPointerException deviceInUse) {
-            deviceInUse.printStackTrace();
-            System.err.println("[AppLoader] failed to create audio device: Audio device occupied by Exclusive Mode Device? (e.g. ASIO4all)");
-        }
-
-        CommonResourcePool.INSTANCE.loadAll();
 
         // if there is a predefined screen, open that screen after my init process
         if (injectScreen != null) {

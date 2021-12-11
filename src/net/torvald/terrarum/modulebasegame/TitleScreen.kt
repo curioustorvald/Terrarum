@@ -1,4 +1,4 @@
-package net.torvald.terrarum
+package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
@@ -23,8 +24,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.IngameRenderer
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.realestate.LandUtil

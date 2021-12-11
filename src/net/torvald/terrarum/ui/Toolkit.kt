@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
@@ -34,9 +34,9 @@ object Toolkit : Disposable {
     private val shaderKawaseDown = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/boxdown.frag")
     private val shaderKawaseUp = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/boxup.frag")
 
-    private lateinit var fboBlur: FrameBuffer
-    private lateinit var fboBlurHalf: FrameBuffer
-    private lateinit var fboBlurQuarter: FrameBuffer
+    private lateinit var fboBlur: FloatFrameBuffer
+    private lateinit var fboBlurHalf: FloatFrameBuffer
+    private lateinit var fboBlurQuarter: FloatFrameBuffer
     private lateinit var blurWriteQuad: Mesh
     private lateinit var blurWriteQuad2: Mesh
     private lateinit var blurWriteQuad4: Mesh
@@ -302,20 +302,17 @@ object Toolkit : Disposable {
         val fw = App.scr.width//MathUtils.nextPowerOfTwo(App.scr.width)
         val fh = App.scr.height//MathUtils.nextPowerOfTwo(App.scr.height)
 
-        fboBlur = FrameBuffer(
-                Pixmap.Format.RGBA8888,
+        fboBlur = FloatFrameBuffer(
                 fw,
                 fh,
                 true
         )
-        fboBlurHalf = FrameBuffer(
-                Pixmap.Format.RGBA8888,
+        fboBlurHalf = FloatFrameBuffer(
                 fw / 2,
                 fh / 2,
                 true
         )
-        fboBlurQuarter = FrameBuffer(
-                Pixmap.Format.RGBA8888,
+        fboBlurQuarter = FloatFrameBuffer(
                 fw / 4,
                 fh / 4,
                 true
