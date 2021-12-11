@@ -342,8 +342,8 @@ infix fun Color.mulAndAssign(other: Color): Color {
 fun blendMul(batch: SpriteBatch) {
     // will break if the colour image contains semitransparency
     batch.enableBlending()
-//    batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
-    batch.setBlendFunctionSeparate(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_DST_ALPHA, GL20.GL_SRC_ALPHA)
+    batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+//    batch.setBlendFunctionSeparate(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_DST_ALPHA, GL20.GL_SRC_ALPHA)
 }
 
 fun blendScreen(batch: SpriteBatch) {
@@ -358,7 +358,8 @@ fun blendDisable(batch: SpriteBatch) {
 
 fun blendNormal(batch: SpriteBatch) {
     batch.enableBlending()
-    batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE)
+//    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
     // ALPHA *MUST BE* PREMULTIPLIED //
 
@@ -392,8 +393,8 @@ fun gdxSetBlend() {
 
 fun gdxSetBlendNormal() {
     gdxSetBlend()
-    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE)
-//    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+//    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
     // ALPHA *MUST BE* PREMULTIPLIED //
 

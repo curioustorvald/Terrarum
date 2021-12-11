@@ -4,11 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
@@ -119,7 +118,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     internal lateinit var uiRemoCon: UIRemoCon
     internal lateinit var uiFakeBlurOverlay: UICanvas
 
-    private lateinit var worldFBO: FrameBuffer
+    private lateinit var worldFBO: FloatFrameBuffer
 
     private val warning32bitJavaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/32_bit_warning.tga")))
 
@@ -229,7 +228,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         Gdx.input.inputProcessor = TitleScreenController(this)
 
 
-        worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, App.scr.width, App.scr.height, false)
+        worldFBO = FloatFrameBuffer(App.scr.width, App.scr.height, false)
 
         // load list of savegames
         println("[TitleScreen] update list of savegames")

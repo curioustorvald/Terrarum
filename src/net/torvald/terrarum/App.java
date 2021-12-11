@@ -10,7 +10,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
@@ -257,7 +257,7 @@ public class App implements ApplicationListener {
     private static float loadTimer = 0f;
     private static final float showupTime = 100f / 1000f;
 
-    private static FrameBuffer renderFBO;
+    private static FloatFrameBuffer renderFBO;
 
     public static HashSet<File> tempFilePool = new HashSet<>();
 
@@ -718,8 +718,7 @@ public class App implements ApplicationListener {
                 (renderFBO.getWidth() != scr.getWidth() ||
                         renderFBO.getHeight() != scr.getHeight())
         ) {
-            renderFBO = new FrameBuffer(
-                    Pixmap.Format.RGBA8888,
+            renderFBO = new FloatFrameBuffer(
                     scr.getWidth(),
                     scr.getHeight(),
                     false

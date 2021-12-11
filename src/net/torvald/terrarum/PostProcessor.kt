@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
@@ -42,6 +43,8 @@ object PostProcessor : Disposable {
 
     private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
+    private val shaderBayer = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag") // always load the shader regardless of config because the config may cange
+
     init {
         App.disposables.add(this)
     }
@@ -54,6 +57,7 @@ object PostProcessor : Disposable {
             lutTex.dispose()
         }
         catch (e: UninitializedPropertyAccessException) { }
+        shaderBayer.dispose()
     }
 
     fun draw(projMat: Matrix4, fbo: FrameBuffer) {
@@ -126,21 +130,19 @@ object PostProcessor : Disposable {
             }
         }
     }
+    private val rng = HQRNG()
 
     private fun postShader(projMat: Matrix4, fbo: FrameBuffer) {
-        val shader: ShaderProgram? =
-                if (App.getConfigBoolean("fx_retro"))
-                    App.shaderHicolour
-                else if (App.getConfigBoolean("fx_differential"))
-                    App.shaderDebugDiff
-                else
-                    App.shaderPassthruRGB
+        val shader: ShaderProgram = shaderBayer
 
+        App.getCurrentDitherTex().bind(1)
         fbo.colorBufferTexture.bind(0)
 
-        shader?.bind()
-        shader?.setUniformMatrix("u_projTrans", projMat)
-        shader?.setUniformi("u_texture", 0)
+        shader.bind()
+        shader.setUniformMatrix("u_projTrans", projMat)
+        shader.setUniformi("u_texture", 0)
+        shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
+        shader.setUniformi("u_pattern", 1)
         App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
 
 

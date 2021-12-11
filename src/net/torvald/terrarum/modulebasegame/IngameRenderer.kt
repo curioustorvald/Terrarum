@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
@@ -49,21 +50,21 @@ object IngameRenderer : Disposable {
     private lateinit var blurWriteQuad2: Mesh
     private lateinit var blurWriteQuad4: Mesh
 
-    private lateinit var lightmapFboA: FrameBuffer
-    private lateinit var lightmapFboB: FrameBuffer
-    private lateinit var fboRGB: FrameBuffer
-    private lateinit var fboRGB_lightMixed: FrameBuffer
-    private lateinit var fboA: FrameBuffer
-    private lateinit var fboA_lightMixed: FrameBuffer
-    private lateinit var fboMixedOut: FrameBuffer
+    private lateinit var lightmapFboA: FloatFrameBuffer
+    private lateinit var lightmapFboB: FloatFrameBuffer
+    private lateinit var fboRGB: FloatFrameBuffer
+    private lateinit var fboRGB_lightMixed: FloatFrameBuffer
+    private lateinit var fboA: FloatFrameBuffer
+    private lateinit var fboA_lightMixed: FloatFrameBuffer
+    private lateinit var fboMixedOut: FloatFrameBuffer
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
     private lateinit var mixedOutTex: TextureRegion
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
 
-    private lateinit var fboBlurHalf: FrameBuffer
-    private lateinit var fboBlurQuarter: FrameBuffer
+    private lateinit var fboBlurHalf: FloatFrameBuffer
+    private lateinit var fboBlurQuarter: FloatFrameBuffer
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
@@ -495,7 +496,7 @@ object IngameRenderer : Disposable {
 
             gdxSetBlend()
 
-            App.getCurrentDitherTex().bind(1)
+//            App.getCurrentDitherTex().bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             batch.inUse {
@@ -584,7 +585,7 @@ object IngameRenderer : Disposable {
             setCameraPosition(0f, 0f)
             val (xrem, yrem) = worldCamToRenderPos()
 
-            App.getCurrentDitherTex().bind(1)
+//            App.getCurrentDitherTex().bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             batch.inUse {
@@ -684,7 +685,7 @@ object IngameRenderer : Disposable {
     private var blurtex4 = Texture(16, 16, Pixmap.Format.RGBA8888)
 
 
-    fun processKawaseBlur(outFbo: FrameBuffer) {
+    fun processKawaseBlur(outFbo: FloatFrameBuffer) {
 
         blurtex0.dispose()
 
@@ -781,19 +782,17 @@ object IngameRenderer : Disposable {
             fboBlurQuarter.dispose()
         }
 
-        fboRGB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        fboRGB_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        fboA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        fboA_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        fboMixedOut = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
-        lightmapFboA = FrameBuffer(
-                Pixmap.Format.RGBA8888,
+        fboRGB = FloatFrameBuffer(width, height, true)
+        fboRGB_lightMixed = FloatFrameBuffer(width, height, true)
+        fboA = FloatFrameBuffer(width, height, true)
+        fboA_lightMixed = FloatFrameBuffer(width, height, true)
+        fboMixedOut = FloatFrameBuffer(width, height, true)
+        lightmapFboA = FloatFrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 true
         )
-        lightmapFboB = FrameBuffer(
-                Pixmap.Format.RGBA8888,
+        lightmapFboB = FloatFrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 true
@@ -804,15 +803,13 @@ object IngameRenderer : Disposable {
         blurTex = TextureRegion()
         mixedOutTex = TextureRegion(fboMixedOut.colorBufferTexture)
 
-        fboBlurHalf = FrameBuffer(
-                Pixmap.Format.RGBA8888,
-        LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
-        LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
-        true
+        fboBlurHalf = FloatFrameBuffer(
+                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
+                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
+                true
         )
 
-        fboBlurQuarter = FrameBuffer(
-                Pixmap.Format.RGBA8888,
+        fboBlurQuarter = FloatFrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
                 true

@@ -13,7 +13,6 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
@@ -178,19 +177,9 @@ internal object WeatherMixer : RNGConsumer {
         skyboxTexture.dispose()
         skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
-        val dither = App.getConfigBoolean("fx_dither")
-
-        if (dither) {
-            App.getCurrentDitherTex().bind(1)
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-        }
 
         batch.inUse {
-            it.shader = if (dither) IngameRenderer.shaderBayer else null
-            if (dither) {
-                it.shader.setUniformi("u_pattern", 1)
-                it.shader.setUniformi("rnd", renderng.nextInt(8192), renderng.nextInt(8192))
-            }
+            it.shader = null
             it.draw(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
         }
 
