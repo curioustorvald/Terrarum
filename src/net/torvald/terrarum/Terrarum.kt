@@ -374,6 +374,7 @@ fun blendNormal(batch: SpriteBatch) {
     // helpful links:
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
+    // - https://stackoverflow.com/questions/45781683/how-to-get-correct-sourceover-alpha-compositing-in-sdl-with-opengl
 }
 
 fun gdxClearAndSetBlend(color: Color) {
@@ -409,6 +410,7 @@ fun gdxSetBlendNormal() {
     // helpful links:
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
+    // - https://stackoverflow.com/questions/45781683/how-to-get-correct-sourceover-alpha-compositing-in-sdl-with-opengl
 }
 
 fun gdxSetBlendMul() {
