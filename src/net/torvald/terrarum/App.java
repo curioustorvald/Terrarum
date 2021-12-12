@@ -895,6 +895,11 @@ public class App implements ApplicationListener {
 
         CommonResourcePool.INSTANCE.loadAll();
 
+        // check if selected IME is accessible; if not, set selected IME to none
+        String selectedIME = getConfigString("inputmethod");
+        if (!selectedIME.equals("none") && !IME.INSTANCE.getAllHighLayers().contains(selectedIME)) {
+            setConfig("inputmethod", "none");
+        }
 
         if (ModMgr.INSTANCE.getModuleInfo().isEmpty()) {
 
@@ -910,21 +915,21 @@ public class App implements ApplicationListener {
 
         // test print
         System.out.println("[App] Test printing every registered item");
-        Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach((String s) -> System.out.print(s+" "));
+        Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach(
+                (String s) -> System.out.print(s + " "));
         System.out.println();
 
 
-        // create tile atlas
-        printdbg(this, "Making terrain textures...");
-        tileMaker = new CreateTileAtlas();
-        tileMaker.invoke(false);
-
-
-        // check if selected IME is accessible; if not, set selected IME to none
-        String selectedIME = getConfigString("inputmethod");
-        if (!selectedIME.equals("none") && !IME.INSTANCE.getAllHighLayers().contains(selectedIME)) {
-            setConfig("inputmethod", "none");
+        try {
+            // create tile atlas
+            printdbg(this, "Making terrain textures...");
+            tileMaker = new CreateTileAtlas();
+            tileMaker.invoke(false);
         }
+        catch (NullPointerException e) {
+            throw new Error("TileMaker failed to load", e);
+        }
+
 
         Terrarum.initialise();
 
