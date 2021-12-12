@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -13,12 +12,16 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.modulebasegame.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameactors.BlockBox
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.tsvm.*
-import net.torvald.tsvm.peripheral.*
+import net.torvald.tsvm.peripheral.GraphicsAdapter
+import net.torvald.tsvm.peripheral.ReferenceGraphicsAdapter
+import net.torvald.tsvm.peripheral.VMProgramRom
 
 /**
  * Created by minjaesong on 2021-12-04.
@@ -105,7 +108,7 @@ internal class UIHomeComputer : UICanvas(
         batch.projectionMatrix = camera.combined
     }
 
-    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
 
     override fun updateUI(delta: Float) {
     }
