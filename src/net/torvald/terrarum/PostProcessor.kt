@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
@@ -43,7 +42,6 @@ object PostProcessor : Disposable {
 
     private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
-    private val shaderBayer = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag") // always load the shader regardless of config because the config may cange
 
     init {
         App.disposables.add(this)
@@ -57,7 +55,6 @@ object PostProcessor : Disposable {
             lutTex.dispose()
         }
         catch (e: UninitializedPropertyAccessException) { }
-        shaderBayer.dispose()
     }
 
     fun draw(projMat: Matrix4, fbo: FrameBuffer) {
@@ -133,17 +130,26 @@ object PostProcessor : Disposable {
     private val rng = HQRNG()
 
     private fun postShader(projMat: Matrix4, fbo: FrameBuffer) {
-        val shader: ShaderProgram = shaderBayer
 
-        App.getCurrentDitherTex().bind(1)
-        fbo.colorBufferTexture.bind(0)
+        if (App.getConfigBoolean("fx_dither")) {
+            App.getCurrentDitherTex().bind(1)
+            fbo.colorBufferTexture.bind(0)
 
-        shader.bind()
-        shader.setUniformMatrix("u_projTrans", projMat)
-        shader.setUniformi("u_texture", 0)
-        shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
-        shader.setUniformi("u_pattern", 1)
-        App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
+            App.shaderDitherRGBA.bind()
+            App.shaderDitherRGBA.setUniformMatrix("u_projTrans", projMat)
+            App.shaderDitherRGBA.setUniformi("u_texture", 0)
+            App.shaderDitherRGBA.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
+            App.shaderDitherRGBA.setUniformi("u_pattern", 1)
+            App.fullscreenQuad.render(App.shaderDitherRGBA, GL20.GL_TRIANGLES)
+        }
+        else {
+            fbo.colorBufferTexture.bind(0)
+
+            App.shaderPassthruRGBA.bind()
+            App.shaderPassthruRGBA.setUniformMatrix("u_projTrans", projMat)
+            App.shaderPassthruRGBA.setUniformi("u_texture", 0)
+            App.fullscreenQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLES)
+        }
 
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it

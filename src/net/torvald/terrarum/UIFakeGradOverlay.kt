@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 
@@ -47,7 +46,7 @@ class UIFakeGradOverlay : UICanvas() {
 
         batch.begin()
 
-        batch.shader = if (dither) IngameRenderer.shaderBayer else null
+        batch.shader = null
         if (dither) {
             batch.shader.setUniformi("u_pattern", 1)
             batch.shader.setUniformi("rnd", renderng.nextInt(8192), renderng.nextInt(8192))

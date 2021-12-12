@@ -28,4 +28,7 @@ public class FrameBufferManager {
         }
     }
 
+    public static FrameBuffer peek() {
+        return (stack.size() > 0) ? stack.peek() : null;
+    }
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer;
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
@@ -46,6 +47,7 @@ import net.torvald.util.DebugTimers;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import static net.torvald.terrarum.TerrarumKt.*;
@@ -222,7 +224,8 @@ public class App implements ApplicationListener {
     private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderDebugDiff;
-    public static ShaderProgram shaderPassthruRGB;
+    public static ShaderProgram shaderPassthruRGBA;
+    public static ShaderProgram shaderDitherRGBA;
     public static ShaderProgram shaderColLUT;
     public static ShaderProgram shaderReflect;
 
@@ -428,7 +431,8 @@ public class App implements ApplicationListener {
         shaderBayerSkyboxFill = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/hicolour.frag");
         shaderDebugDiff = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/diff.frag");
-        shaderPassthruRGB = SpriteBatch.createDefaultShader();
+        shaderPassthruRGBA = SpriteBatch.createDefaultShader();
+        shaderDitherRGBA = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag"); // always load the shader regardless of config because the config may cange
         shaderColLUT = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/passthrurgb.frag");
         shaderReflect = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/reflect.frag");
 
@@ -723,6 +727,19 @@ public class App implements ApplicationListener {
                     scr.getHeight(),
                     false
             );
+
+
+            if (IS_DEVELOPMENT_BUILD) {
+                try {
+                    Field field = GLFrameBuffer.class.getDeclaredField("framebufferHandle");
+                    field.setAccessible(true);
+                    System.out.println("Attachment ID for renderFBO: " + field.get(renderFBO));
+                }
+                catch (NoSuchFieldException | IllegalAccessException e) {
+                    System.err.println("Attachment ID for renderFBO: X_x");
+                    e.printStackTrace();
+                }
+            }
         }
 
         Toolkit.INSTANCE.resize();
@@ -760,7 +777,7 @@ public class App implements ApplicationListener {
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
         shaderDebugDiff.dispose();
-        shaderPassthruRGB.dispose();
+        shaderPassthruRGBA.dispose();
         shaderColLUT.dispose();
         shaderReflect.dispose();
 

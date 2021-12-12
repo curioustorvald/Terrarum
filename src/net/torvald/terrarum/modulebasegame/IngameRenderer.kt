@@ -68,29 +68,20 @@ object IngameRenderer : Disposable {
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
-    inline fun isDither() = App.getConfigBoolean("fx_dither")
+//    inline fun isDither() = App.getConfigBoolean("fx_dither")
 
     private val rng = HQRNG()
 
-    val shaderBlur: ShaderProgram
-        get() = if (isDither()) shaderBlurDither else shaderBlurRaw
-    val shaderRGBOnly: ShaderProgram
-        get() = if (isDither()) shaderRGBOnlyDither else shaderRGBOnlyRaw
-    val shaderAtoGrey: ShaderProgram
-        get() = if (isDither()) shaderAtoGreyDither else shaderAtoGreyRaw
 
-    val shaderBlurDither: ShaderProgram
-    val shaderBlurRaw: ShaderProgram
-    val shaderRGBOnlyDither: ShaderProgram
-    val shaderRGBOnlyRaw: ShaderProgram
-    val shaderAtoGreyDither: ShaderProgram
-    val shaderAtoGreyRaw: ShaderProgram
+//    val shaderBlurDither: ShaderProgram
+//    val shaderRGBOnlyDither: ShaderProgram
+//    val shaderAtoGreyDither: ShaderProgram
+    val shaderBlur: ShaderProgram
+    val shaderRGBOnly: ShaderProgram
+    val shaderAtoGrey: ShaderProgram
 
     val shaderKawaseDown: ShaderProgram
     val shaderKawaseUp: ShaderProgram
-
-    val shaderBayer: ShaderProgram
-    val shaderPassthru = SpriteBatch.createDefaultShader()
 
     val shaderBlendGlow: ShaderProgram
     val shaderAlphaDither: ShaderProgram
@@ -125,16 +116,15 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-        shaderBlurDither = App.loadShaderFromFile("assets/shaders/blur.vert", "assets/shaders/blur_dither.frag")
-        shaderRGBOnlyDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_rgb1.frag")
-        shaderAtoGreyDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_aaa1.frag")
+//        shaderBlurDither = App.loadShaderFromFile("assets/shaders/blur.vert", "assets/shaders/blur_dither.frag")
+//        shaderRGBOnlyDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_rgb1.frag")
+//        shaderAtoGreyDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_aaa1.frag")
 
-        shaderBlurRaw = App.loadShaderFromFile("assets/shaders/blur.vert", "assets/shaders/blur.frag")
-        shaderRGBOnlyRaw = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/rgbonly.frag")
-        shaderAtoGreyRaw = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/aonly.frag")
+        shaderBlur = App.loadShaderFromFile("assets/shaders/blur.vert", "assets/shaders/blur.frag")
+        shaderRGBOnly = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/rgbonly.frag")
+        shaderAtoGrey = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/aonly.frag")
 
 
-        shaderBayer = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag") // always load the shader regardless of config because the config may cange
         shaderAlphaDither = App.loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/alphadither.frag")
         shaderBlendGlow = App.loadShaderFromFile("assets/shaders/blendGlow.vert", "assets/shaders/blendGlow.frag")
 
@@ -152,12 +142,6 @@ object IngameRenderer : Disposable {
             exitProcess(1)
         }
 
-        if (isDither()) {
-            if (!shaderBayer.isCompiled) {
-                Gdx.app.log("shaderBayer", shaderBayer.log)
-                exitProcess(1)
-            }
-        }
 
         initialise()
     }
@@ -694,10 +678,10 @@ object IngameRenderer : Disposable {
             blurtex0 = LightmapRenderer.draw()
             blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex0.bind(0)
-            shaderPassthru.bind()
-            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
-            shaderPassthru.setUniformi("u_texture", 0)
-            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
+            App.shaderPassthruRGBA.bind()
+            App.shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined)
+            App.shaderPassthruRGBA.setUniformi("u_texture", 0)
+            blurWriteQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLES)
         }
 
         fboBlurHalf.inAction(camera, batch) {
@@ -870,20 +854,15 @@ object IngameRenderer : Disposable {
         batch.dispose()
 
 
-        shaderBlurDither.dispose()
-        shaderBlurRaw.dispose()
-        shaderRGBOnlyDither.dispose()
-        shaderRGBOnlyRaw.dispose()
-        shaderAtoGreyDither.dispose()
-        shaderAtoGreyRaw.dispose()
-
-        shaderBayer.dispose()
-        shaderBlendGlow.dispose()
-        shaderPassthru.dispose()
-        shaderAlphaDither.dispose()
+        shaderBlur.dispose()
+        shaderRGBOnly.dispose()
+        shaderAtoGrey.dispose()
 
         shaderKawaseDown.dispose()
         shaderKawaseUp.dispose()
+
+        shaderBlendGlow.dispose()
+        shaderAlphaDither.dispose()
 
         try {
             fboRGBexport.dispose()
