@@ -83,6 +83,7 @@ object ModMgr {
 
     /** Module name (directory name), ModuleMetadata */
     val moduleInfo = HashMap<String, ModuleMetadata>()
+    val moduleInfoErrored = HashMap<String, ModuleMetadata>()
     val entryPointClasses = ArrayList<ModuleEntryPoint>()
 
     val moduleClassloader = HashMap<String, URLClassLoader>()
@@ -169,7 +170,7 @@ object ModMgr {
 
                         logError(LoadErrorType.YOUR_FAULT, moduleName, e)
 
-                        moduleInfo.remove(moduleName)
+                        moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
                     }
 
                     if (newClass != null) {
@@ -182,7 +183,7 @@ object ModMgr {
                         printdbg(this, "$moduleName loaded successfully")
                     }
                     else {
-                        moduleInfo.remove(moduleName)
+                        moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
                         printdbg(this, "$moduleName did not load...")
                     }
 
@@ -195,7 +196,7 @@ object ModMgr {
 
                 logError(LoadErrorType.NOT_EVEN_THERE, moduleName)
 
-                moduleInfo.remove(moduleName)
+                moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
             }
             catch (e: Throwable) {
                 printdbgerr(this, "There was an error while loading module $moduleName")
@@ -204,7 +205,7 @@ object ModMgr {
 
                 logError(LoadErrorType.YOUR_FAULT, moduleName, e)
 
-                moduleInfo.remove(moduleName)
+                moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
             }
             finally {
 

@@ -2,83 +2,84 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.floor
+import net.torvald.terrarum.modulebasegame.ui.MODULEINFO_CELL_HEIGHT
+import net.torvald.terrarum.modulebasegame.ui.MODULEINFO_CELL_WIDTH
 
 class UIItemModuleInfoCell(
         parent: UICanvas,
-        var moduleName: String,
-        override val width: Int,
+        var order: Int,
         initialX: Int,
         initialY: Int
 ) : UIItem(parent, initialX, initialY) {
 
-    override val height: Int = App.fontGame.lineHeight.toInt() * 2
+    override val width = MODULEINFO_CELL_WIDTH
+    override val height = MODULEINFO_CELL_HEIGHT
 
-    private val numberAreaWidth = App.fontSmallNumbers.W * 3 + 4
+    private val modName = ModMgr.loadOrder[order]
+
+    private val modProp = ModMgr.moduleInfo[modName] ?: ModMgr.moduleInfoErrored[modName]!!
+
+    private val modErrored = (ModMgr.moduleInfo[modName] == null)
+
+    private val modIcon = TextureRegion(Texture(modProp.iconFile))
+    private val modVer = modProp.version
+    private val modDate = modProp.releaseDate
+    private val modAuthor = modProp.author
+
+    init {
+        modIcon.flip(false, true)
+
+        CommonResourcePool.addToLoadingList("basegame_errored_icon32") {
+            val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/modwitherror.tga")))
+            t.flip(false, true)
+            t
+        }
+        CommonResourcePool.loadAll()
+    }
+
+    private val ccZero = App.fontGame.toColorCode(15,15,15)
+    private val ccZero2 = App.fontGame.toColorCode(12,12,12)
+    private val ccNum = App.fontGame.toColorCode(15,14,6)
+    private val ccNum2 = App.fontGame.toColorCode(12,11,4)
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
 
-        if (ModMgr.moduleInfo.containsKey(moduleName)) {
-            val modInfo = ModMgr.moduleInfo[moduleName]!!
+        batch.color = Toolkit.Theme.COL_CELL_FILL
+        Toolkit.fillArea(batch, initialX, initialY, 32, 48)
+        Toolkit.fillArea(batch, initialX + 35, initialY, 48, 48)
+        Toolkit.fillArea(batch, initialX + 86, initialY, width - 86, 48)
 
-            // print load order index
-            batch.color = Color(0xccccccff.toInt())
-            var strlen = App.fontSmallNumbers.getWidth(modInfo.order.toString())
-            App.fontSmallNumbers.draw(batch,
-                    modInfo.order.toString(),
-                    posX + (numberAreaWidth - strlen).div(2f).floor(),
-                    posY + (height - App.fontSmallNumbers.H).div(2f).floor()
-            )
+        batch.color = Toolkit.Theme.COL_INACTIVE
+        Toolkit.drawBoxBorder(batch, initialX - 1, initialY - 1, width + 2, height + 2)
+        Toolkit.fillArea(batch, initialX + 33, initialY, 1, 48)
+        Toolkit.fillArea(batch, initialX + 84, initialY, 1, 48)
 
-            // print module name
-            batch.color = Color.WHITE
-            App.fontGame.draw(batch,
-                    "${modInfo.properName} (${modInfo.version})",
-                    posX + numberAreaWidth.toFloat(),
-                    posY.toFloat()
-            )
+        if (order < 9)
+            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 13f, initialY + 18f)
+        else if (order < 99)
+            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 9f, initialY + 18f)
+        else
+            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 6f, initialY + 18f)
 
-            // print author name
-            strlen = App.fontGame.getWidth(modInfo.author)
-            App.fontGame.draw(batch,
-                    modInfo.author,
-                    posX + width - strlen.toFloat(),
-                    posY.toFloat()
-            )
+        batch.color = Color.WHITE
+        batch.draw(modIcon, initialX + 35f, initialY.toFloat())
+        App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 6f, initialY + 2f)
+        App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 6f, initialY + 26f)
 
-            // print description
-            App.fontGame.draw(batch,
-                    modInfo.description,
-                    posX + numberAreaWidth.toFloat(),
-                    posY + App.fontGame.lineHeight
-            )
-
-            // print releasedate
-            strlen = App.fontGame.getWidth(modInfo.releaseDate)
-            App.fontGame.draw(batch,
-                    modInfo.releaseDate,
-                    posX + width - strlen.toFloat(),
-                    posY + App.fontGame.lineHeight
-            )
-
-        }
-        else {
-            batch.color = Color(0xff8080_ff.toInt())
-            val str = "InternalError: no such module: '$moduleName'"
-            val strlen = App.fontSmallNumbers.getWidth(str)
-            App.fontSmallNumbers.draw(batch,
-                    str,
-                    posX + (width - numberAreaWidth - strlen).div(2f).floor() + numberAreaWidth,
-                    posY + (height - App.fontSmallNumbers.H).div(2f).floor()
-            )
+        if (modErrored) {
+            batch.draw(CommonResourcePool.getAsTextureRegion("basegame_errored_icon32"), initialX + width - 40f, initialY + 8f)
         }
     }
 
     override fun dispose() {
+        modIcon.texture.dispose()
     }
 }
