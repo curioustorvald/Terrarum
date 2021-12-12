@@ -1,18 +1,15 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 
-class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
+class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, { FixtureLogicSignalEmitter() }) {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
@@ -27,28 +24,16 @@ class ItemLogicSignalEmitter(originalID: ItemID) : GameItem(originalID) {
     override var baseToolSize: Double? = baseMass
 
     init {
-        CommonResourcePool.addToLoadingList("basegame-sprites-fixtures-signal_source.tga") {
-            val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "sprites/fixtures/signal_source.tga")))
-            t.flip(false, true)
-            /*return*/t
-        }
-        CommonResourcePool.loadAll()
-
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
-        val item = FixtureLogicSignalEmitter()
-
-        return item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY)
-        // return true when placed, false when cannot be placed
-    }
-
     override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+        super.effectWhenEquipped(actor, delta)
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
     }
 
     override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
+        super.effectOnUnequip(actor, delta)
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 

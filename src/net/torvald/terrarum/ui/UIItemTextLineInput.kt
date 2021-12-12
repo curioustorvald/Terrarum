@@ -67,10 +67,6 @@ class UIItemTextLineInput(
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
-        CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("assets/graphics/gui/inventory/category.tga", 20, 20)
-        }
-        CommonResourcePool.loadAll()
     }
 
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")

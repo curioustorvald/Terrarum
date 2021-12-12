@@ -19,10 +19,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     init {
-        CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("assets/graphics/gui/inventory/category.tga", 20, 20)
-        }
-        CommonResourcePool.loadAll()
     }
 
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")

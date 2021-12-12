@@ -14,7 +14,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-10-21.
@@ -112,10 +111,6 @@ class UIInventoryFull(
 
     init {
         handler.allowESCtoClose = true
-        CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
-        }
-        CommonResourcePool.loadAll()
     }
 
     private val SP = "\u3000 "

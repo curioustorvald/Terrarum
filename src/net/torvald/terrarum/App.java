@@ -882,7 +882,6 @@ public class App implements ApplicationListener {
         ModMgr.INSTANCE.invoke(); // invoke Module Manager
 
 
-        TextureRegionPack.Companion.setGlobalFlipY(true);
         fontSmallNumbers = TinyAlphNum.INSTANCE;
 
         IME.invoke();

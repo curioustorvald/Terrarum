@@ -2,33 +2,14 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2019-05-16.
  */
-class ItemTikiTorch(originalID: ItemID) : GameItem(originalID) {
-
-    companion object {
-        private val ghostTorch = FixtureTikiTorch()
-    }
-
-    init {
-        CommonResourcePool.addToLoadingList("sprites-fixtures-tiki_torch.tga") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32, flipY = true)
-        }
-        CommonResourcePool.loadAll()
-    }
+class ItemTikiTorch(originalID: ItemID) : FixtureItemBase(originalID, { FixtureTikiTorch() }) {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_TIKI_TORCH"
@@ -44,32 +25,6 @@ class ItemTikiTorch(originalID: ItemID) : GameItem(originalID) {
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
-    }
-
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
-        (INGAME as TerrarumIngame).blockMarkingActor.let {
-            it.setGhost(ghostTorch)
-            it.isVisible = true
-            it.update(delta)
-            it.setGhostColourBlock()
-            mouseInInteractableRange(actor) { it.setGhostColourAllow(); true }
-        }
-    }
-
-    override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
-        (INGAME as TerrarumIngame).blockMarkingActor.let {
-            it.unsetGhost()
-            it.isVisible = false
-            it.setGhostColourNone()
-        }
-    }
-
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
-        val item = FixtureTikiTorch()
-
-        item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
-        // return true when placed, false when cannot be placed
-
     }
 
 }

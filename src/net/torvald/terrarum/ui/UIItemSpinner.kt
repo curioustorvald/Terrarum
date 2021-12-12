@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2021-10-23.
@@ -25,10 +24,6 @@ class UIItemSpinner(
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
-        CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("assets/graphics/gui/inventory/category.tga", 20, 20)
-        }
-        CommonResourcePool.loadAll()
     }
 
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")

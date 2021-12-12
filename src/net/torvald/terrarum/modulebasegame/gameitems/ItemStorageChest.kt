@@ -2,11 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
@@ -14,7 +10,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 /**
  * Created by minjaesong on 2019-07-08.
  */
-class ItemStorageChest(originalID: ItemID) : GameItem(originalID) {
+class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, { FixtureStorageChest() }) {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_STORAGE_CHEST"
@@ -30,13 +26,6 @@ class ItemStorageChest(originalID: ItemID) : GameItem(originalID) {
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
-    }
-
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
-        val item = FixtureStorageChest()
-
-        item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
-        // return true when placed, false when cannot be placed
     }
 
 }

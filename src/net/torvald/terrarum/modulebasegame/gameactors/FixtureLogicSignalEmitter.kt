@@ -1,6 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
@@ -20,7 +23,13 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
     )
 
     init {
-        println("INIT AGAIN FixtureLogicSignalEmitter")
+        CommonResourcePool.addToLoadingList("basegame-sprites-fixtures-signal_source.tga") {
+            val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "sprites/fixtures/signal_source.tga")))
+            t.flip(false, false)
+            /*return*/t
+        }
+        CommonResourcePool.loadAll()
+
 
         density = 1400.0
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)

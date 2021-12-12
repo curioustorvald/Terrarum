@@ -77,9 +77,6 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 //    private val hash = RandomWordsName(3)
 
     init {
-        CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
-        }
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
             TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
         }

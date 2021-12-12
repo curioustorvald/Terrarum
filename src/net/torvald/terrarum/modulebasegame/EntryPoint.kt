@@ -28,14 +28,6 @@ class EntryPoint : ModuleEntryPoint() {
 
         printdbg(this, "Hello, world!")
 
-        // the order of invocation is important! Material should be the first as blocks and items are depend on it.
-        ModMgr.GameMaterialLoader.invoke(moduleName)
-        ModMgr.GameItemLoader.invoke(moduleName)
-        ModMgr.GameBlockLoader.invoke(moduleName)
-        ModMgr.GameLanguageLoader.invoke(moduleName)
-
-
-
         // load common resources to the AssetsManager
         CommonResourcePool.addToLoadingList("$moduleName.items16") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16, flipY = true)
@@ -46,6 +38,17 @@ class EntryPoint : ModuleEntryPoint() {
         CommonResourcePool.addToLoadingList("$moduleName.items48") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48, flipY = true)
         }
+        CommonResourcePool.addToLoadingList("inventory_category") {
+            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, flipY = true)
+        }
+        CommonResourcePool.loadAll()
+
+
+        // the order of invocation is important! Material should be the first as blocks and items are depend on it.
+        ModMgr.GameMaterialLoader.invoke(moduleName)
+        ModMgr.GameItemLoader.invoke(moduleName)
+        ModMgr.GameBlockLoader.invoke(moduleName)
+        ModMgr.GameLanguageLoader.invoke(moduleName)
 
 
         /////////////////////////////////
