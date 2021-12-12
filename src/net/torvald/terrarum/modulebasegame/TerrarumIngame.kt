@@ -22,7 +22,7 @@ import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.gameitems.inInteractableRange
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
@@ -604,7 +604,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
         if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
             for (kk in actorsUnderMouse.indices) {
-                if (inInteractableRange(actor) {
+                if (mouseInInteractableRange(actor) {
                     actorsUnderMouse[kk].mainUI?.let {
                         uiOpened = true
 
@@ -632,7 +632,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         // #3. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
         else if (itemOnGrip == null && canPerformBarehandAction) {
-            inInteractableRange(actor) {
+            mouseInInteractableRange(actor) {
                 performBarehandAction(actor, delta)
                 true
             }

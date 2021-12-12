@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.inInteractableRange
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
@@ -32,7 +32,7 @@ class ItemStorageChest(originalID: ItemID) : GameItem(originalID) {
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = inInteractableRange(actor) {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
         val item = FixtureStorageChest()
 
         item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)

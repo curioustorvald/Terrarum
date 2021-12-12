@@ -238,6 +238,9 @@ object IngameRenderer : Disposable {
             drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
             drawOverlayActors(actorsRenderOverlay)
         }
+
+        batch.color = Color.WHITE
+
         // clear main or whatever super-FBO being used
         //clearBuffer()
         gdxClearAndSetBlend(.64f, .754f, .84f, 0f)

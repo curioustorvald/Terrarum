@@ -40,7 +40,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
 
         // loading textures
         CommonResourcePool.addToLoadingList("sprites-fixtures-tiki_torch.tga") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32)
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32, flipY = true)
         }
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)

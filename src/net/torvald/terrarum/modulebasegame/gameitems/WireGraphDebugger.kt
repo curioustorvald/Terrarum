@@ -34,8 +34,8 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
 
-        blockMarker.shape = 3
-        blockMarker.color = Color.YELLOW
+        blockMarker.markerShape = 3
+        blockMarker.markerColour = Color.YELLOW
         blockMarker.isVisible = true
         blockMarker.update(delta)
 

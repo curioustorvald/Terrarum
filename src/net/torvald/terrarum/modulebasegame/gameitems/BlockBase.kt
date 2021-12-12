@@ -4,7 +4,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.inInteractableRange
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
@@ -16,7 +16,7 @@ object BlockBase {
      * @param dontEncaseActors when set to true, blocks won't be placed where Actors are. You will want to set it false
      * for wire items, otherwise you want it to be true.
      */
-    fun blockStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, itemID: ItemID, delta: Float) = inInteractableRange(actor) {
+    fun blockStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, itemID: ItemID, delta: Float) = mouseInInteractableRange(actor) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
@@ -34,7 +34,7 @@ object BlockBase {
                 if (it is ActorWithBody && it.physProp.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
                     ret1 = false // return is not allowed here
             }
-            if (!ret1) return@inInteractableRange ret1
+            if (!ret1) return@mouseInInteractableRange ret1
         }
 
         // return false if the tile underneath is:
@@ -46,7 +46,7 @@ object BlockBase {
             gameItem.dynamicID == "wall@" + ingame.world.getTileFromWall(mouseTile.x, mouseTile.y) ||
             BlockCodex[ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)].nameKey.contains("ACTORBLOCK_")
         )
-            return@inInteractableRange false
+            return@mouseInInteractableRange false
 
         // filter passed, do the job
         // FIXME this is only useful for Player
@@ -74,14 +74,14 @@ object BlockBase {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
-    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = inInteractableRange(actor) {
+    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) {
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
 
         // return false if the tile is already there
         if (ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.searchFor(itemID) != null)
-            return@inInteractableRange false
+            return@mouseInInteractableRange false
 
         // filter passed, do the job
         ingame.world.setTileWire(

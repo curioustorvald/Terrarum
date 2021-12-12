@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.inInteractableRange
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
@@ -29,7 +29,7 @@ object PickaxeCore {
     fun startPrimaryUse(
             actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int,
             dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1, attackActorBlocks: Boolean = true
-    ) = inInteractableRange(actor) {
+    ) = mouseInInteractableRange(actor) {
         // un-round the mx
         val ww = INGAME.world.width
         val apos = actor.centrePosPoint

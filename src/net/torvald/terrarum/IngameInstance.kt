@@ -131,6 +131,9 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
     var loadedTime_t = App.getTIME_T()
         protected set
 
+    val blockMarkingActor: BlockMarkerActor
+        get() = CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor
+
     override fun hide() {
     }
 
@@ -145,7 +148,6 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
             it.isVisible = false // make sure the actor is invisible on new instance
             try { addNewActor(it) } catch (e: ReferencedActorAlreadyExistsException) {}
         }
-
 
         gameInitialised = true
     }

@@ -8,7 +8,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.inInteractableRange
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
@@ -36,7 +36,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = inInteractableRange(actor) {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
         val wires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.cloneToList()
@@ -44,7 +44,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         wires?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
             ingame.addNewActor(DroppedItem(it, mouseTile.x * TILE_SIZE, mouseTile.y * TILE_SIZE))
-        } ?: return@inInteractableRange false
+        } ?: return@mouseInInteractableRange false
 
         true
     }

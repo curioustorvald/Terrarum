@@ -228,6 +228,7 @@ public class App implements ApplicationListener {
     public static ShaderProgram shaderDitherRGBA;
     public static ShaderProgram shaderColLUT;
     public static ShaderProgram shaderReflect;
+    public static ShaderProgram shaderGhastlyWhite;
 
     public static Mesh fullscreenQuad;
     private static OrthographicCamera camera;
@@ -435,6 +436,7 @@ public class App implements ApplicationListener {
         shaderDitherRGBA = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag"); // always load the shader regardless of config because the config may cange
         shaderColLUT = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/passthrurgb.frag");
         shaderReflect = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/reflect.frag");
+        shaderGhastlyWhite = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/ghastlywhite.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -780,6 +782,7 @@ public class App implements ApplicationListener {
         shaderPassthruRGBA.dispose();
         shaderColLUT.dispose();
         shaderReflect.dispose();
+        shaderGhastlyWhite.dispose();
 
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
@@ -794,13 +797,6 @@ public class App implements ApplicationListener {
 
         logo.getTexture().dispose();
 
-        disposables.forEach((it) -> {
-            try {
-                it.dispose();
-            }
-            catch (NullPointerException | IllegalArgumentException | GdxRuntimeException e) { }
-        });
-
         ModMgr.INSTANCE.disposeMods();
 
         GameWorld.Companion.makeNullWorld().dispose();
@@ -810,6 +806,13 @@ public class App implements ApplicationListener {
         inputStrober.dispose();
 
         deleteTempfiles();
+
+        disposables.forEach((it) -> {
+            try {
+                it.dispose();
+            }
+            catch (NullPointerException | IllegalArgumentException | GdxRuntimeException | ConcurrentModificationException e) { }
+        });
     }
 
     @Override
