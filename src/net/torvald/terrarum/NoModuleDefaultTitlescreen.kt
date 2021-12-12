@@ -45,7 +45,7 @@ Veuillez reconfigurer votre ordre de chargement sur :
 
     private val maxtw = wot.maxOf { App.fontGameFBO.getWidth(it) }
 
-    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, App.scr.width, App.scr.height, true)
+    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, App.scr.width, App.scr.height, false)
 
     private var init = false
 

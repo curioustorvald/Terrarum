@@ -298,17 +298,17 @@ object Toolkit : Disposable {
         fboBlur = FloatFrameBuffer(
                 fw,
                 fh,
-                true
+                false
         )
         fboBlurHalf = FloatFrameBuffer(
                 fw / 2,
                 fh / 2,
-                true
+                false
         )
         fboBlurQuarter = FloatFrameBuffer(
                 fw / 4,
                 fh / 4,
-                true
+                false
         )
 
         blurWriteQuad.setVertices(floatArrayOf(

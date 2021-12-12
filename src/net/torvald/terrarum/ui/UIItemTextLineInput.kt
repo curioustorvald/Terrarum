@@ -99,7 +99,7 @@ class UIItemTextLineInput(
             Pixmap.Format.RGBA8888,
             width - 2 * UI_TEXT_MARGIN - 2 * (WIDTH_ONEBUTTON + 3),
             height - 2 * UI_TEXT_MARGIN,
-            true
+            false
     )
 
     var isActive: Boolean = false // keep it false by default!
@@ -283,7 +283,7 @@ class UIItemTextLineInput(
                     else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
                         endComposing()
 
-                        println("END COMPOSING!!")
+//                        println("END COMPOSING!!")
                     }
                     // accept:
                     // - literal "<"

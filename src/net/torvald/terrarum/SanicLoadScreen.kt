@@ -51,7 +51,7 @@ object SanicLoadScreen : LoadScreenBase() {
                         App.fontGame.getWidth(Lang["ERROR_GENERIC_TEXT"])
                 ),
                 App.fontGame.lineHeight.toInt(),
-                true
+                false
         )
 
         arrowObjTex = Texture(Gdx.files.internal("assets/graphics/test_loading_arrow_atlas.tga"))

@@ -29,7 +29,6 @@ import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -137,7 +136,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
     private var scrollAnimCounter = 0f
     private val scrollAnimLen = 0.1f
 
-    private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
+    private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, false)
 
     private var showSpinner = false
 
@@ -450,7 +449,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
         uiScroll = 0f
 
         sliderFBO.dispose()
-        sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
+        sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, false)
     }
 
     private fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {

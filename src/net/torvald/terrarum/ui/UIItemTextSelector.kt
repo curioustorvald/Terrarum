@@ -44,7 +44,7 @@ class UIItemTextSelector(
     override val height = 24
     private val buttonW = 30
 
-    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, true)
+    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
 
     var selection = initialSelection
     private var fboUpdateLatch = true

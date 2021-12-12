@@ -125,7 +125,7 @@ object IME {
             if (langCode.isNotEmpty()) {
                 printdbg(this, "Icon order #${(k+1) / 20} - icons[\"$langCode\"] = iconSheet.get(1, ${k/20})")
                 iconSheet.get(1, k / 20).let {
-                    it.flip(false, true)
+                    it.flip(false, false)
                     icons["$langCode"] = it
                 }
 

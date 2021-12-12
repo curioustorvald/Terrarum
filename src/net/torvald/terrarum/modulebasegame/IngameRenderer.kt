@@ -48,10 +48,9 @@ object IngameRenderer : Disposable {
 
     private lateinit var blurWriteQuad: Mesh
     private lateinit var blurWriteQuad2: Mesh
-    private lateinit var blurWriteQuad4: Mesh
+//    private lateinit var blurWriteQuad4: Mesh
 
-    private lateinit var lightmapFboA: FloatFrameBuffer
-    private lateinit var lightmapFboB: FloatFrameBuffer
+    private lateinit var lightmapFbo: FloatFrameBuffer
     private lateinit var fboRGB: FloatFrameBuffer
     private lateinit var fboRGB_lightMixed: FloatFrameBuffer
     private lateinit var fboA: FloatFrameBuffer
@@ -64,7 +63,7 @@ object IngameRenderer : Disposable {
     private lateinit var blurTex: TextureRegion
 
     private lateinit var fboBlurHalf: FloatFrameBuffer
-    private lateinit var fboBlurQuarter: FloatFrameBuffer
+//    private lateinit var fboBlurQuarter: FloatFrameBuffer
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
@@ -398,17 +397,13 @@ object IngameRenderer : Disposable {
 
 
     private fun prepLightmapRGBA() {
-        lightmapFboA.inAction(null, null) {
-            clearBuffer()
-            Gdx.gl.glDisable(GL20.GL_BLEND)
-        }
-        lightmapFboB.inAction(null, null) {
+        lightmapFbo.inAction(null, null) {
             clearBuffer()
             Gdx.gl.glDisable(GL20.GL_BLEND)
         }
 
 //        processBlur(lightmapFboA, lightmapFboB)
-        processKawaseBlur(lightmapFboB)
+        processKawaseBlur(lightmapFbo)
 //        processNoBlur()
 
 
@@ -660,18 +655,19 @@ object IngameRenderer : Disposable {
         batch.projectionMatrix = camera.combined
     }
 
-    private const val KAWASE_POWER = 0.667f
 
     private var blurtex0 = Texture(16, 16, Pixmap.Format.RGBA8888)
-    private var blurtex1 = Texture(16, 16, Pixmap.Format.RGBA8888)
-    private var blurtex2 = Texture(16, 16, Pixmap.Format.RGBA8888)
-    private var blurtex3 = Texture(16, 16, Pixmap.Format.RGBA8888)
-    private var blurtex4 = Texture(16, 16, Pixmap.Format.RGBA8888)
+    private lateinit var blurtex1: Texture
+    private lateinit var blurtex2: Texture
+    private lateinit var blurtex3: Texture
+    private lateinit var blurtex4: Texture
 
+    private const val KAWASE_POWER = 1.5f
 
     fun processKawaseBlur(outFbo: FloatFrameBuffer) {
 
         blurtex0.dispose()
+
 
         // initialise readBuffer with untreated lightmap
         outFbo.inAction(camera, batch) {
@@ -695,7 +691,7 @@ object IngameRenderer : Disposable {
             blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
         }
 
-        fboBlurQuarter.inAction(camera, batch) {
+        /*fboBlurQuarter.inAction(camera, batch) {
             blurtex2 = fboBlurHalf.colorBufferTexture
             blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex2.bind(0)
@@ -715,11 +711,11 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", KAWASE_POWER / fboBlurQuarter.width, KAWASE_POWER / fboBlurQuarter.height)
             blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
-        }
+        }*/
 
-        // TODO apply dithering on this specific draw call
         outFbo.inAction(camera, batch) {
             blurtex4 = fboBlurHalf.colorBufferTexture
+            blurtex4.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex4.bind(0)
             shaderKawaseUp.bind()
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
@@ -746,12 +742,12 @@ object IngameRenderer : Disposable {
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
             )
-            blurWriteQuad4 = Mesh(
+            /*blurWriteQuad4 = Mesh(
                     true, 4, 6,
                     VertexAttribute.Position(),
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
-            )
+            )*/
             init = true
         }
         else {
@@ -759,45 +755,39 @@ object IngameRenderer : Disposable {
             fboRGB_lightMixed.dispose()
             fboA.dispose()
             fboA_lightMixed.dispose()
-            lightmapFboA.dispose()
-            lightmapFboB.dispose()
+            lightmapFbo.dispose()
 
             fboBlurHalf.dispose()
-            fboBlurQuarter.dispose()
+            //fboBlurQuarter.dispose()
         }
 
-        fboRGB = FloatFrameBuffer(width, height, true)
-        fboRGB_lightMixed = FloatFrameBuffer(width, height, true)
-        fboA = FloatFrameBuffer(width, height, true)
-        fboA_lightMixed = FloatFrameBuffer(width, height, true)
-        fboMixedOut = FloatFrameBuffer(width, height, true)
-        lightmapFboA = FloatFrameBuffer(
+        fboRGB = FloatFrameBuffer(width, height, false)
+        fboRGB_lightMixed = FloatFrameBuffer(width, height, false)
+        fboA = FloatFrameBuffer(width, height, false)
+        fboA_lightMixed = FloatFrameBuffer(width, height, false)
+        fboMixedOut = FloatFrameBuffer(width, height, false)
+        lightmapFbo = FloatFrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                true
-        )
-        lightmapFboB = FloatFrameBuffer(
-                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                true
+                false
         )
         rgbTex = TextureRegion(fboRGB_lightMixed.colorBufferTexture)
         aTex = TextureRegion(fboA_lightMixed.colorBufferTexture)
-        lightTex = TextureRegion(lightmapFboB.colorBufferTexture)
+        lightTex = TextureRegion(lightmapFbo.colorBufferTexture)
         blurTex = TextureRegion()
         mixedOutTex = TextureRegion(fboMixedOut.colorBufferTexture)
 
         fboBlurHalf = FloatFrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
-                true
+                false
         )
 
-        fboBlurQuarter = FloatFrameBuffer(
+        /*fboBlurQuarter = FloatFrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
-                true
-        )
+                false
+        )*/
 
         BlocksDrawer.resize(width, height)
         LightmapRenderer.resize(width, height)
@@ -805,47 +795,42 @@ object IngameRenderer : Disposable {
 
         blurWriteQuad.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
-                lightmapFboA.width.toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
-                lightmapFboA.width.toFloat(),lightmapFboA.height.toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
-                0f,lightmapFboA.height.toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
+                lightmapFbo.width.toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
+                lightmapFbo.width.toFloat(),lightmapFbo.height.toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
+                0f,lightmapFbo.height.toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
         blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
         blurWriteQuad2.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
-                lightmapFboA.width.div(2).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
-                lightmapFboA.width.div(2).toFloat(),lightmapFboA.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
-                0f,lightmapFboA.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
+                lightmapFbo.width.div(2).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
+                lightmapFbo.width.div(2).toFloat(),lightmapFbo.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
+                0f,lightmapFbo.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
         blurWriteQuad2.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
-        blurWriteQuad4.setVertices(floatArrayOf(
+        /*blurWriteQuad4.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
-                lightmapFboA.width.div(4).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
-                lightmapFboA.width.div(4).toFloat(),lightmapFboA.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
-                0f,lightmapFboA.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+                lightmapFbo.width.div(4).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
+                lightmapFbo.width.div(4).toFloat(),lightmapFbo.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
+                0f,lightmapFbo.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
+        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))*/
     }
 
     override fun dispose() {
         blurWriteQuad.dispose()
         blurWriteQuad2.dispose()
-        blurWriteQuad4.dispose()
+        //blurWriteQuad4.dispose()
 
         fboRGB.dispose()
         fboA.dispose()
         fboRGB_lightMixed.dispose()
         fboA_lightMixed.dispose()
         fboMixedOut.dispose()
-        lightmapFboA.dispose()
-        lightmapFboB.dispose()
+        lightmapFbo.dispose()
 
         try { blurtex0.dispose() } catch (e: GdxRuntimeException) {}
-//        try { blurtex1.dispose() } catch (e: GdxRuntimeException) {}
-//        try { blurtex2.dispose() } catch (e: GdxRuntimeException) {}
-//        try { blurtex3.dispose() } catch (e: GdxRuntimeException) {}
-//        try { blurtex4.dispose() } catch (e: GdxRuntimeException) {}
 
         fboBlurHalf.dispose()
-        fboBlurQuarter.dispose()
+        //fboBlurQuarter.dispose()
 
         LightmapRenderer.dispose()
         BlocksDrawer.dispose()
