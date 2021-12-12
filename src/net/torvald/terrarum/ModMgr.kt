@@ -102,116 +102,119 @@ object ModMgr {
     fun getTitleScreen(batch: SpriteBatch): IngameInstance? = entryPointClasses.getOrNull(0)?.getTitleScreen(batch)
 
     init {
-        // load modules
-        val loadOrderCSVparser = CSVParser.parse(
-                FileSystems.getDefault().getPath("$modDir/LoadOrder.csv").toFile(),
-                Charsets.UTF_8,
-                CSVFormat.DEFAULT.withCommentMarker('#')
-        )
-        val loadOrder = loadOrderCSVparser.records
-        loadOrderCSVparser.close()
+        val loadOrderFile = FileSystems.getDefault().getPath("$modDir/LoadOrder.csv").toFile()
+        if (loadOrderFile.exists()) {
+
+            // load modules
+            val loadOrderCSVparser = CSVParser.parse(
+                    loadOrderFile,
+                    Charsets.UTF_8,
+                    CSVFormat.DEFAULT.withCommentMarker('#')
+            )
+            val loadOrder = loadOrderCSVparser.records
+            loadOrderCSVparser.close()
 
 
-        loadOrder.forEachIndexed { index, it ->
-            val moduleName = it[0]
-            this.loadOrder.add(moduleName)
-            printmsg(this, "Loading module $moduleName")
+            loadOrder.forEachIndexed { index, it ->
+                val moduleName = it[0]
+                this.loadOrder.add(moduleName)
+                printmsg(this, "Loading module $moduleName")
 
-            try {
-                val modMetadata = Properties()
-                modMetadata.load(FileInputStream("$modDir/$moduleName/$metaFilename"))
+                try {
+                    val modMetadata = Properties()
+                    modMetadata.load(FileInputStream("$modDir/$moduleName/$metaFilename"))
 
-                if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
-                    val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
-                    // read config and store it to the game
+                    if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
+                        val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
+                        // read config and store it to the game
 
-                    // write to user's config file
-                }
-
-
-
-                val properName = modMetadata.getProperty("propername")
-                val description = modMetadata.getProperty("description")
-                val author = modMetadata.getProperty("author")
-                val packageName = modMetadata.getProperty("package")
-                val entryPoint = modMetadata.getProperty("entrypoint")
-                val releaseDate = modMetadata.getProperty("releasedate")
-                val version = modMetadata.getProperty("version")
-                val jar = modMetadata.getProperty("jar")
-                val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
-                val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-                moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
-
-                printdbg(this, moduleInfo[moduleName])
+                        // write to user's config file
+                    }
 
 
-                // run entry script in entry point
-                if (entryPoint.isNotBlank()) {
-                    var newClass: Class<*>? = null
-                    try {
-                        // for modules that has JAR defined
-                        if (jar.isNotBlank()) {
-                            val urls = arrayOf<URL>()
 
-                            val cl = JarFileLoader(urls)
-                            cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
-                            moduleClassloader[moduleName] = cl
-                            newClass = cl.loadClass(entryPoint)
+                    val properName = modMetadata.getProperty("propername")
+                    val description = modMetadata.getProperty("description")
+                    val author = modMetadata.getProperty("author")
+                    val packageName = modMetadata.getProperty("package")
+                    val entryPoint = modMetadata.getProperty("entrypoint")
+                    val releaseDate = modMetadata.getProperty("releasedate")
+                    val version = modMetadata.getProperty("version")
+                    val jar = modMetadata.getProperty("jar")
+                    val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
+                    val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
+                    moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
+
+                    printdbg(this, moduleInfo[moduleName])
+
+
+                    // run entry script in entry point
+                    if (entryPoint.isNotBlank()) {
+                        var newClass: Class<*>? = null
+                        try {
+                            // for modules that has JAR defined
+                            if (jar.isNotBlank()) {
+                                val urls = arrayOf<URL>()
+
+                                val cl = JarFileLoader(urls)
+                                cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
+                                moduleClassloader[moduleName] = cl
+                                newClass = cl.loadClass(entryPoint)
+                            }
+                            // for modules that are not (meant to be used by the "basegame" kind of modules)
+                            else {
+                                newClass = Class.forName(entryPoint)
+                            }
                         }
-                        // for modules that are not (meant to be used by the "basegame" kind of modules)
+                        catch (e: Throwable) {
+                            printdbgerr(this, "$moduleName failed to load, skipping...")
+                            printdbgerr(this, "\t$e")
+                            print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
+
+                            logError(LoadErrorType.YOUR_FAULT, moduleName, e)
+
+                            moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                        }
+
+                        if (newClass != null) {
+                            val newClassConstructor = newClass.getConstructor(/* no args defined */)
+                            val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+
+                            entryPointClasses.add(newClassInstance as ModuleEntryPoint)
+                            (newClassInstance as ModuleEntryPoint).invoke()
+
+                            printdbg(this, "$moduleName loaded successfully")
+                        }
                         else {
-                            newClass = Class.forName(entryPoint)
+                            moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                            printdbg(this, "$moduleName did not load...")
                         }
-                    }
-                    catch (e: Throwable) {
-                        printdbgerr(this, "$moduleName failed to load, skipping...")
-                        printdbgerr(this, "\t$e")
-                        print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
 
-                        logError(LoadErrorType.YOUR_FAULT, moduleName, e)
-
-                        moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
                     }
 
-                    if (newClass != null) {
-                        val newClassConstructor = newClass.getConstructor(/* no args defined */)
-                        val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+                    printdbg(this, "Module $moduleName processed")
+                }
+                catch (noSuchModule: FileNotFoundException) {
+                    printdbgerr(this, "No such module: $moduleName, skipping...")
 
-                        entryPointClasses.add(newClassInstance as ModuleEntryPoint)
-                        (newClassInstance as ModuleEntryPoint).invoke()
+                    logError(LoadErrorType.NOT_EVEN_THERE, moduleName)
 
-                        printdbg(this, "$moduleName loaded successfully")
-                    }
-                    else {
-                        moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
-                        printdbg(this, "$moduleName did not load...")
-                    }
+                    moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                }
+                catch (e: Throwable) {
+                    printdbgerr(this, "There was an error while loading module $moduleName")
+                    printdbgerr(this, "\t$e")
+                    print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
+
+                    logError(LoadErrorType.YOUR_FAULT, moduleName, e)
+
+                    moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                }
+                finally {
 
                 }
-
-                printdbg(this, "Module $moduleName processed")
-            }
-            catch (noSuchModule: FileNotFoundException) {
-                printdbgerr(this, "No such module: $moduleName, skipping...")
-
-                logError(LoadErrorType.NOT_EVEN_THERE, moduleName)
-
-                moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
-            }
-            catch (e: Throwable) {
-                printdbgerr(this, "There was an error while loading module $moduleName")
-                printdbgerr(this, "\t$e")
-                print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
-
-                logError(LoadErrorType.YOUR_FAULT, moduleName, e)
-
-                moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
-            }
-            finally {
-
             }
         }
-
     }
 
     operator fun invoke() { }
