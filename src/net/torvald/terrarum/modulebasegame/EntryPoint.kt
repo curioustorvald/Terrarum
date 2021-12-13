@@ -38,9 +38,6 @@ class EntryPoint : ModuleEntryPoint() {
         CommonResourcePool.addToLoadingList("$moduleName.items48") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48, flipY = true)
         }
-        CommonResourcePool.addToLoadingList("inventory_category") {
-            TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, flipY = true)
-        }
         CommonResourcePool.loadAll()
 
 

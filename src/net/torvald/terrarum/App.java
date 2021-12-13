@@ -397,10 +397,13 @@ public class App implements ApplicationListener {
 
         glInfo.create();
 
-        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, true));
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
-        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
-        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, true));
+        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, true));
+        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, true));
+        CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
+        CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
         newTempFile("wenquanyi.tga"); // temp file required by the font
 
@@ -417,9 +420,6 @@ public class App implements ApplicationListener {
         // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
         logo.flip(false, true);
-
-        CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
-        CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
         // set GL graphics constants
         for (int i = 0; i < ditherPatterns.length; i++) {

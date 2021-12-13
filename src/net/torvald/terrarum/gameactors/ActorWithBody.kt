@@ -1650,11 +1650,11 @@ open class ActorWithBody : Actor {
     protected fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
         if (world == null) return
 
-        val offsetX = (hitboxTranslateX * scale).toFloat()
-        val offsetY = (sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1).toFloat()
+        val offsetX = 0f
+        val offsetY = 1f // plant to the ground
 
         drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
-            sprite.render(batch, x - offsetX, y - offsetY, scale.toFloat())
+            sprite.render(batch, x + offsetX, y + offsetY, scale.toFloat())
         }
     }
 

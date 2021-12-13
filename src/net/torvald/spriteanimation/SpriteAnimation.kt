@@ -131,36 +131,37 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
             val region = textureRegion.get(currentFrame, currentRow)
 //            batch.color = colorFilter
 
-            //val scale = parentActor.scale.toFloat() // wtf?
 
-            if (flipHorizontal && flipVertical) {
+//            val realTY = (parentActor.hitboxTranslateY + (cellHeight - parentActor.baseHitboxH)) * scale
+
+            if (flipHorizontal && !flipVertical) {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * scale + parentActor.hitbox.width.toFloat()),
-                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * scale + parentActor.hitbox.height.toFloat()),
+                        FastMath.floor(posX).toFloat() + (parentActor.hitboxTranslateX + parentActor.baseHitboxW) * scale,
+                        FastMath.floor(posY).toFloat() + (parentActor.hitboxTranslateY + parentActor.baseHitboxH) * scale,
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         -FastMath.floor(cellHeight * scale).toFloat()
                 )
             }
-            else if (flipHorizontal) {
+            else if (flipHorizontal && flipVertical) {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * scale + parentActor.hitbox.width.toFloat()),
-                        FastMath.floor(posY).toFloat(),
+                        FastMath.floor(posX).toFloat() + (parentActor.hitboxTranslateX + parentActor.baseHitboxW) * scale,
+                        FastMath.floor(posY).toFloat() - (parentActor.hitboxTranslateY) * scale,
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         FastMath.floor(cellHeight * scale).toFloat()
                 )
             }
-            else if (flipVertical) {
+            else if (!flipHorizontal && !flipVertical) {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat(),
-                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * scale + parentActor.hitbox.height.toFloat()),
+                        FastMath.floor(posX).toFloat() - (parentActor.hitboxTranslateX) * scale,
+                        FastMath.floor(posY).toFloat() + (parentActor.hitboxTranslateY + parentActor.baseHitboxH) * scale,
                         FastMath.floor(cellWidth * scale).toFloat(),
                         -FastMath.floor(cellHeight * scale).toFloat()
                 )
             }
             else {
                 batch.draw(region,
-                        FastMath.floor(posX).toFloat(),
-                        FastMath.floor(posY).toFloat(),
+                        FastMath.floor(posX).toFloat() - (parentActor.hitboxTranslateX) * scale,
+                        FastMath.floor(posY).toFloat() - (parentActor.hitboxTranslateY) * scale,
                         FastMath.floor(cellWidth * scale).toFloat(),
                         FastMath.floor(cellHeight * scale).toFloat()
                 )

@@ -25,7 +25,7 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
     init {
         CommonResourcePool.addToLoadingList("basegame-sprites-fixtures-signal_source.tga") {
             val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "sprites/fixtures/signal_source.tga")))
-            t.flip(false, false)
+            t.flip(false, true)
             /*return*/t
         }
         CommonResourcePool.loadAll()

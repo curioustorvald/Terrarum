@@ -39,7 +39,7 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
         if (index >= 0) {
             val sx = index % circleSheet.horizontalCount
             val sy = index / circleSheet.horizontalCount
-            batch.draw(circleSheet.get(sx, sy), (posX + (width - circleSheet.tileW) / 2).toFloat(), posY + height.toFloat(), circleSheet.tileW.toFloat(), circleSheet.tileH * -1f)
+            batch.draw(circleSheet.get(sx, sy), (posX + (width - circleSheet.tileW) / 2).toFloat(), posY.toFloat())
         }
     }
 
