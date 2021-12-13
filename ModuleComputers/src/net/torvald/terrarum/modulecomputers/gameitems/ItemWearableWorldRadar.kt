@@ -101,7 +101,7 @@ class WearableWorldRadarUI(val device: VM) : UICanvas() {
         batch.end()
 
         batch.color = Color.WHITE
-        (device.peripheralTable[1].peripheral as? ExtDisp)?.render(batch, posX.toFloat(), posY.toFloat(), true)
+        (device.peripheralTable[1].peripheral as? ExtDisp)?.render(batch, posX.toFloat(), posY.toFloat())
 
         batch.begin()
         batch.color = Toolkit.Theme.COL_INACTIVE
