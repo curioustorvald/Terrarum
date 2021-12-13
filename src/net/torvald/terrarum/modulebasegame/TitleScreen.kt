@@ -123,7 +123,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
     private val warning32bitJavaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/32_bit_warning.tga")))
 
     init {
-        warning32bitJavaIcon.flip(false, true)
+        warning32bitJavaIcon.flip(false, false)
     }
 
     private fun loadThingsWhileIntroIsVisible() {

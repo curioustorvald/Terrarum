@@ -34,11 +34,11 @@ class UIItemModuleInfoCell(
     private val modAuthor = modProp.author
 
     init {
-        modIcon.flip(false, true)
+        modIcon.flip(false, false)
 
         CommonResourcePool.addToLoadingList("basegame_errored_icon32") {
             val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/modwitherror.tga")))
-            t.flip(false, true)
+            t.flip(false, false)
             t
         }
         CommonResourcePool.loadAll()

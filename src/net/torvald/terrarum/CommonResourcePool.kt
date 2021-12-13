@@ -23,27 +23,27 @@ object CommonResourcePool {
     init {
         addToLoadingList("itemplaceholder_16") {
             val t = TextureRegion(Texture("assets/item_kari_16.tga"))
-            t.flip(false, true)
+            t.flip(false, false)
             /*return*/t
         }
         addToLoadingList("itemplaceholder_24") {
             val t = TextureRegion(Texture("assets/item_kari_24.tga"))
-            t.flip(false, true)
+            t.flip(false, false)
             /*return*/t
         }
         addToLoadingList("itemplaceholder_32") {
             val t = TextureRegion(Texture("assets/item_kari_32.tga"))
-            t.flip(false, true)
+            t.flip(false, false)
             /*return*/t
         }
         addToLoadingList("itemplaceholder_48") {
             val t = TextureRegion(Texture("assets/item_kari_48.tga"))
-            t.flip(false, true)
+            t.flip(false, false)
             /*return*/t
         }
         addToLoadingList("test_texture") {
             val t = TextureRegion(Texture("assets/test_texture.tga"))
-            t.flip(false, true)
+            t.flip(false, false)
             /*return*/t
         }
         loadAll()

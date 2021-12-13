@@ -326,6 +326,27 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     batch?.projectionMatrix = camera?.combined
 }
 
+/**
+ * Vertically flipped version of [FrameBuffer.inAction]
+ */
+inline fun FrameBuffer.inActionF(camera: OrthographicCamera?, batch: SpriteBatch?, action: (FrameBuffer) -> Unit) {
+    //this.begin()
+    FrameBufferManager.begin(this)
+
+    camera?.setToOrtho(false, this.width.toFloat(), this.height.toFloat())
+    camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
+    camera?.update()
+    batch?.projectionMatrix = camera?.combined
+
+    action(this)
+
+    //this.end()
+    FrameBufferManager.end()
+
+    camera?.setToOrtho(true, App.scr.wf, App.scr.hf)
+    camera?.update()
+    batch?.projectionMatrix = camera?.combined
+}
 
 
 infix fun Color.mul(other: Color): Color = this.cpy().mul(other)

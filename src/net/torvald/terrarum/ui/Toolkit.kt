@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.FrameBufferManager
-import net.torvald.terrarum.inAction
+import net.torvald.terrarum.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 
@@ -43,7 +40,7 @@ object Toolkit : Disposable {
     private lateinit var blurWriteQuad2: Mesh
     private lateinit var blurWriteQuad4: Mesh
 
-    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36, flipY = true)
+    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36, flipY = false)
 
     val textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
     val textureWhiteCircle = Texture(Gdx.files.internal("assets/graphics/circle_512.tga"))
@@ -235,7 +232,7 @@ object Toolkit : Disposable {
 
         batch.begin()
         batch.shader = null
-        batch.draw(fboBlur.colorBufferTexture, x.toFloat(), y.toFloat())
+        (batch as FlippingSpriteBatch).drawFlipped(fboBlur.colorBufferTexture, x.toFloat(), y.toFloat())
     }
 
     fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) {

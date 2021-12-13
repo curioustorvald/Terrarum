@@ -3,7 +3,6 @@ package net.torvald.terrarum.weather
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -121,7 +120,7 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
-    internal fun render(camera: Camera, batch: SpriteBatch, world: GameWorld) {
+    internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3f) * 0.8888f
         val parallaxDomainSize = world.height / 4f
 
@@ -179,8 +178,8 @@ internal object WeatherMixer : RNGConsumer {
 
 
         batch.inUse {
-            it.shader = null
-            it.draw(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
+            batch.shader = null
+            batch.drawFlipped(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
         }
 
         // don't use shader to just fill the whole screen... frag shader will be called a million times and it's best to not burden it

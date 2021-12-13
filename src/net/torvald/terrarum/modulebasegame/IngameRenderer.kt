@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -43,7 +42,7 @@ import kotlin.system.exitProcess
  */
 object IngameRenderer : Disposable {
     /** for non-private use, use with care! */
-    lateinit var batch: SpriteBatch
+    lateinit var batch: FlippingSpriteBatch
     private lateinit var camera: OrthographicCamera
 
     private lateinit var blurWriteQuad: Mesh
@@ -234,8 +233,8 @@ object IngameRenderer : Disposable {
 
             prepLightmapRGBA()
             BlocksDrawer.renderData()
-            drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
-            drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
+            drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
+            drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, actorsRenderOverlay, particlesContainer)
             drawOverlayActors(actorsRenderOverlay)
         }
 
@@ -360,7 +359,7 @@ object IngameRenderer : Disposable {
 
             //batch.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
             batch.shader = null
-            batch.draw(mixedOutTex, 0f, 0f)
+            batch.drawFlipped(mixedOutTex, 0f, 0f)
         }
 
 
@@ -423,6 +422,7 @@ object IngameRenderer : Disposable {
             actorsRenderMiddle: List<ActorWithBody>?,
             actorsRenderMidTop: List<ActorWithBody>?,
             actorsRenderFront : List<ActorWithBody>?,
+            actorsOverlay : List<ActorWithBody>?,
             particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboRGB.inAction(null, null) { clearBuffer() }
@@ -466,6 +466,7 @@ object IngameRenderer : Disposable {
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawFront(batch.projectionMatrix) // blue coloured filter of water, etc.
 
+            batch.shader = null
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)
             }
@@ -520,6 +521,7 @@ object IngameRenderer : Disposable {
             actorsRenderMiddle: List<ActorWithBody>?,
             actorsRenderMidTop: List<ActorWithBody>?,
             actorsRenderFront : List<ActorWithBody>?,
+            actorsOverlay : List<ActorWithBody>?,
             particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboA.inAction(null, null) {
@@ -591,6 +593,8 @@ object IngameRenderer : Disposable {
                         lightTex.regionWidth * lightmapDownsample,
                         lightTex.regionHeight * lightmapDownsample
                 )
+
+
             }
 
 
@@ -602,7 +606,7 @@ object IngameRenderer : Disposable {
     }
 
     private fun drawOverlayActors(actors: List<ActorWithBody>?) {
-        fboRGB_lightMixed.inAction(camera, batch) {
+        fboRGB_lightMixed.inActionF(camera, batch) {
 
             batch.inUse {
                 batch.shader = shaderAlphaDither
@@ -625,12 +629,11 @@ object IngameRenderer : Disposable {
 
     private fun invokeInit() {
         if (!initDone) {
-            batch = SpriteBatch()
+            batch = FlippingSpriteBatch()
             camera = OrthographicCamera(WIDTHF, HEIGHTF)
 
             camera.setToOrtho(true, WIDTHF, HEIGHTF)
             camera.update()
-            Gdx.gl20.glViewport(0, 0, WIDTH, HEIGHT)
 
             resize(WIDTH, HEIGHT)
 
@@ -862,9 +865,9 @@ object IngameRenderer : Disposable {
     private fun worldCamToRenderPos(): Pair<Float, Float> {
         // for some reason it does not like integer. No, really; it breaks (jitter when you move) when you try to "fix" that.
         val xoff = (WorldCamera.x / TILE_SIZE) - LightmapRenderer.camX
-        val yoff = (WorldCamera.y / TILE_SIZE) - LightmapRenderer.camY
+        val yoff = (WorldCamera.y / TILE_SIZE) - LightmapRenderer.camY - 1
         val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF) - (xoff * TILE_SIZEF)
-        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF) - (yoff * TILE_SIZEF)
+        val yrem = +(WorldCamera.y.toFloat() fmod TILE_SIZEF) + (yoff * TILE_SIZEF)
 
         return (xrem - LightmapRenderer.LIGHTMAP_OVERRENDER * TILE_SIZEF) to (yrem - LightmapRenderer.LIGHTMAP_OVERRENDER * TILE_SIZEF)
     }

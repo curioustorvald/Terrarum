@@ -62,7 +62,7 @@ object MegaRainGovernor {
 
             // return composed (mega)pixmap
             val region = TextureRegion(Texture(pixmap))
-            region.flip(false, true)
+            region.flip(false, false)
 
             /*return*/region
         }

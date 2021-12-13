@@ -78,10 +78,11 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
     init {
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
-            TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
+            val t = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
+            t.flip(false, false); t
         }
         CommonResourcePool.addToLoadingList("savegame_status_icon") {
-            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)
+            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24, flipY = false)
         }
         CommonResourcePool.loadAll()
     }
@@ -350,7 +351,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
 
             setCameraPosition(batch, camera, 0f, 0f)
-            val saveTex = Texture(savePixmap)
+            val saveTex = TextureRegion(Texture(savePixmap)); saveTex.flip(false, true)
             batch.inUse {
                 batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
 
@@ -362,7 +363,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
             }
 
-            saveTex.dispose()
+            saveTex.texture.dispose()
             savePixmap.dispose()
 
             batch.begin()
@@ -538,6 +539,7 @@ class UIItemPlayerCells(
                 p.reassembleSprite(skimmer, p.sprite)
                 p.sprite!!.textureRegion.get(0,0).let {
                     thumb = it
+                    thumb!!.flip(false, false)
                 }
                 this.sprite = p.sprite
             }
@@ -710,7 +712,7 @@ class UIItemWorldCells(
         // draw thumbnail
         batch.color = Color.WHITE
         blendNormal(batch)
-        batch.draw(thumb ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb"), x, y + height, width.toFloat(), -height.toFloat())
+        batch.draw(thumb ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb"), x, y, width.toFloat(), height.toFloat())
         // draw gradient
         blendMul(batch)
         batch.draw(grad, x + width.toFloat(), y, -width.toFloat(), height.toFloat())

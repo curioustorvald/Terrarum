@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
@@ -21,7 +20,7 @@ import net.torvald.terrarum.ui.Toolkit
  */
 object PostProcessor : Disposable {
 
-    private lateinit var batch: SpriteBatch // not nulling to save some lines of code
+    private lateinit var batch: FlippingSpriteBatch // not nulling to save some lines of code
     private lateinit var shapeRenderer: ShapeRenderer
     private lateinit var camera: OrthographicCamera
 
@@ -65,7 +64,7 @@ object PostProcessor : Disposable {
 
             debugUI.setPosition(0, 0)
 
-            batch = SpriteBatch()
+            batch = FlippingSpriteBatch()
             camera = OrthographicCamera(App.scr.wf, App.scr.hf)
             camera.setToOrtho(true)
 

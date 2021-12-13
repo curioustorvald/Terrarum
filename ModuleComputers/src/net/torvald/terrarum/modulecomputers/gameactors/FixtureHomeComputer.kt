@@ -29,7 +29,7 @@ import net.torvald.tsvm.peripheral.VMProgramRom
 class FixtureHomeComputer : FixtureBase {
 
     private val vm = VM(0x200000, TheRealWorld(), arrayOf(
-            VMProgramRom(ModMgr.getPath("dwarventech", "bios/tsvmbios.rom"))
+            VMProgramRom(ModMgr.getPath("dwarventech", "bios/tsvmbios.js"))
     ))
     private val vmRunner: VMRunner
     private val coroutineJob: Job
@@ -95,13 +95,13 @@ internal class UIHomeComputer : UICanvas(
     private val drawOffX = (width - 560).div(2).toFloat()
     private val drawOffY = (height - 448).div(2).toFloat()
 
-    private var batch: SpriteBatch
+    private var batch: FlippingSpriteBatch
     private var camera: OrthographicCamera
 
     internal lateinit var vm: VM
 
     init {
-        batch = SpriteBatch()
+        batch = FlippingSpriteBatch()
         camera = OrthographicCamera(width.toFloat(), height.toFloat())
         //val m = Matrix4()
         //m.setToOrtho2D(0f, 0f, width.toFloat(), height.toFloat())

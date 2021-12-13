@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.getKeycapConsole
@@ -179,7 +180,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
 
 
         setCameraPosition(batch, camera, 0f, 0f)
-        val saveTex = Texture(savePixmap)
+        val saveTex = TextureRegion(Texture(savePixmap)); saveTex.flip(false, true)
         batch.inUse {
             batch.color = Color.WHITE
             batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
@@ -191,7 +192,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
             App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
         }
 
-        saveTex.dispose()
+        saveTex.texture.dispose()
         savePixmap.dispose()
 
         batch.begin()

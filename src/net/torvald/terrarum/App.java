@@ -184,8 +184,11 @@ public class App implements ApplicationListener {
 
     public static CreateTileAtlas tileMaker;
 
+    /** Vanilla */
     public static TerrarumSansBitmap fontGame;
+    /** Vertically flipped */
     public static TerrarumSansBitmap fontGameFBO;
+    /** Big interchar */
     public static TerrarumSansBitmap fontUITitle;
     public static TinyAlphNum fontSmallNumbers;
 
@@ -232,11 +235,11 @@ public class App implements ApplicationListener {
 
     public static Mesh fullscreenQuad;
     private static OrthographicCamera camera;
-    private static SpriteBatch logoBatch;
+    private static FlippingSpriteBatch logoBatch;
     public static TextureRegion logo;
     public static AudioDevice audioDevice;
 
-    public static SpriteBatch batch;
+    public static FlippingSpriteBatch batch;
     public static ShapeRenderer shapeRender;
 
     private static com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
@@ -397,11 +400,11 @@ public class App implements ApplicationListener {
 
         glInfo.create();
 
-        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, true));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
-        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, true));
-        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, true));
-        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, true));
+        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
 
@@ -409,17 +412,17 @@ public class App implements ApplicationListener {
 
 
         // set basis of draw
-        logoBatch = new SpriteBatch();
+        logoBatch = new FlippingSpriteBatch();
         camera = new OrthographicCamera((scr.getWf()), (scr.getHf()));
 
-        batch = new SpriteBatch();
+        batch = new FlippingSpriteBatch();
         shapeRender = new ShapeRenderer();
 
         initViewPort(scr.getWidth(), scr.getHeight());
 
         // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
-        logo.flip(false, true);
+        logo.flip(false, false);
 
         // set GL graphics constants
         for (int i = 0; i < ditherPatterns.length; i++) {
@@ -515,11 +518,11 @@ public class App implements ApplicationListener {
             environment = RunningEnvironment.PC;
         }*/
 
-        fontGame = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+        fontGame = new TerrarumSansBitmap(FONT_DIR, false, false, false,
                 false,
                 256, false, 0.5f, false
         );
-        fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+        fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, false, false,
                 false,
                 64, false, 0.5f, false
         );
@@ -694,8 +697,8 @@ public class App implements ApplicationListener {
             Texture tex2 = CommonResourcePool.INSTANCE.getAsTexture("title_health2");
             int virtualHeight = scr.getHeight() - logoPosY - logo.getRegionHeight() / 4;
             int virtualHeightOffset = scr.getHeight() - virtualHeight;
-            logoBatch.draw(tex1, (drawWidth - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
-            logoBatch.draw(tex2, (drawWidth - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
+            logoBatch.drawFlipped(tex1, (drawWidth - tex1.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) - 16, tex1.getWidth(), -tex1.getHeight());
+            logoBatch.drawFlipped(tex2, (drawWidth - tex2.getWidth()) >>> 1, virtualHeightOffset + (virtualHeight >>> 1) + 16 + tex2.getHeight(), tex2.getWidth(), -tex2.getHeight());
 
         }
         else {

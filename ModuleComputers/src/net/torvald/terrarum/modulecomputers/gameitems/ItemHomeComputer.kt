@@ -34,7 +34,7 @@ class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
         CommonResourcePool.addToLoadingList("dwarventech-sprites-fixtures-desktop_computer.tga") {
 //            val t = TextureRegion(Texture(ModMgr.getGdxFile("dwarventech", "nonexisting_file!!!")))
             val t = TextureRegion(Texture(ModMgr.getGdxFile("dwarventech", "sprites/fixtures/desktop_computer.tga")))
-            t.flip(false, true)
+            t.flip(false, false)
             /*return*/t
         }
         CommonResourcePool.loadAll()
