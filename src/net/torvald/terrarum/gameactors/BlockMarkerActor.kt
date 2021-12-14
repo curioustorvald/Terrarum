@@ -5,16 +5,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.floor
 
 class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT) {
 
     private val defaultSize = 16.0
 
-    override var referenceID: ActorID = ReferencingRanges.ACTORS_OVERLAY.last // custom refID
-    override val hitbox = Hitbox(0.0, 0.0, 16.0, 16.0)
+    override var referenceID: ActorID = 2147483647 // custom refID
+    override val hitbox = Hitbox(0.0, 0.0, TILE_SIZED, TILE_SIZED)
 
     var markerColour = Color.YELLOW
     var markerShape = 0
@@ -63,8 +64,8 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
     override fun update(delta: Float) {
         if (isVisible) {
             hitbox.setPosition(
-                    Terrarum.mouseTileX * 16.0,
-                    Terrarum.mouseTileY * 16.0
+                    Terrarum.mouseTileX * TILE_SIZED,
+                    (Terrarum.mouseTileY - floor((hitbox.height - 0.5) / TILE_SIZED)) * TILE_SIZED
             )
         }
     }
@@ -75,12 +76,14 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
     fun setGhost(actor: ActorWithBody) {
         ghost = actor.sprite
         hasGhost = true
+        hitbox.setDimension(actor.baseHitboxW.toDouble(), actor.baseHitboxH.toDouble())
     }
 
     fun unsetGhost() {
         ghost = null
         hasGhost = false
         setGhostColourNone()
+        hitbox.setDimension(TILE_SIZED, TILE_SIZED)
     }
 
     fun setGhostColourNone() { ghostColour = Color.WHITE }

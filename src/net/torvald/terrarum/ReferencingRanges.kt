@@ -19,15 +19,16 @@ object ReferencingRanges {
     val ACTORS_MIDTOP  = 0x5000_0000..0x5FFE_FFFF // Special (e.g. weapon swung, bullets, dropped item, particles)
     val ACTORS_FRONT   = 0x6000_0000..0x6FFE_FFFF // Rendered front (e.g. fake tile)
 
+    val ACTORS_OVERLAY = 0x7001_0000..0x7FFE_FFFF // Rendered as screen overlay, not affected by light nor environment overlays
+
     // IDs doesn't effect the render order at all, but we're kinda enforcing these ID ranging.
     // However, these two wire-related actor will break the rule. But as we want them to render on top of others
     // in the same render orders, we're giveng them relatively high IDs for them.
     val ACTORS_WIRES   = 0x7FFF_C000..0x7FFF_EFFF // Rendered front--wires
-    val ACTORS_WIRES_HELPER = 0x7FFF_F000..0x7FFF_FF00 // Rendered overlay--wiring port icons and logic gates
+    val ACTORS_WIRES_HELPER = 0x7FFF_F000..0x7FFF_FEFF // Rendered overlay--wiring port icons and logic gates
 
-    val ACTORS_OVERLAY = 0x7001_0000..0x7FFE_FFFF // Rendered as screen overlay, not affected by light nor environment overlays
+    val ACTORS_INTERNAL_USE = 0x7FFF_FF00..0x7FFF_FFFF // Actor ID 0x7FFF_FFFF is pre-assigned to the block cursor!
 
-    // Actor ID 0x7FFF_FFFF is pre-assigned to the block cursor!
 
     val PREFIX_DYNAMICITEM = "dyn"
     val PREFIX_ACTORITEM = "actor"

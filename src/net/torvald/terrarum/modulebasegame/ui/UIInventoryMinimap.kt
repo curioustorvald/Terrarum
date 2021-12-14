@@ -89,7 +89,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
         MinimapComposer.renderToBackground()
 
-        minimapFBO.inAction(minimapCamera, batch) {
+        minimapFBO.inActionF(minimapCamera, batch) {
             // whatever.
             MinimapComposer.tempTex.dispose()
             MinimapComposer.tempTex = Texture(MinimapComposer.minimap)
@@ -111,7 +111,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                 Toolkit.fillArea(batch, 0f, 0f, MINIMAP_WIDTH, MINIMAP_HEIGHT)
                 // the actual image
                 batch.color = Color.WHITE
-                batch.draw(MinimapComposer.tempTex, tx, ty + MinimapComposer.totalHeight * minimapZoom, MinimapComposer.totalWidth * minimapZoom, -MinimapComposer.totalHeight * minimapZoom)
+                batch.draw(MinimapComposer.tempTex, tx, ty, MinimapComposer.totalWidth * minimapZoom, MinimapComposer.totalHeight * minimapZoom)
 
             }
         }
