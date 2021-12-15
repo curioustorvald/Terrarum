@@ -294,7 +294,7 @@ class UIInventoryFull(
 
     override fun endClosing(delta: Float) {
         INGAME.setTooltipMessage(null) // required!
-        MinimapComposer.revalidateAll()
+//        MinimapComposer.revalidateAll()
     }
 
 
