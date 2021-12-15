@@ -14,20 +14,24 @@ import net.torvald.terrarum.ui.UICanvas
 
 class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
+    companion object {
+        const val MINIMAP_WIDTH = 720f
+        const val MINIMAP_HEIGHT = 480f
+        const val MINIMAP_ZOOM_MIN = 1f
+        const val MINIMAP_ZOOM_MAX = 8f
+
+        val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
+    }
+
     private val debugvals = true
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
     override var openCloseTime = 0.0f
 
-    private val MINIMAP_WIDTH = 800f
-    private val MINIMAP_HEIGHT = INVENTORY_CELLS_UI_HEIGHT.toFloat()
-    private val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
     private var minimapZoom = 1f
     private var minimapPanX = -MinimapComposer.totalWidth / 2f
     private var minimapPanY = -MinimapComposer.totalHeight / 2f
-    private val MINIMAP_ZOOM_MIN = 0.5f
-    private val MINIMAP_ZOOM_MAX = 8f
     private val minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, MINIMAP_WIDTH.toInt(), MINIMAP_HEIGHT.toInt(), false)
     private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
@@ -121,20 +125,18 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
             App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", (width - MINIMAP_WIDTH) / 2, -10f + cellOffY)
         }
 
+        val minimapDrawX = (width - MINIMAP_WIDTH) / 2
+        val minimapDrawY = (height - cellOffY - App.scr.tvSafeGraphicsHeight - MINIMAP_HEIGHT - 72) / 2 + cellOffY * 1f
+
+        batch.color = Color.WHITE
         batch.projectionMatrix = camera.combined
-        // 1px stroke
-        batch.color = Color.WHITE
-        Toolkit.fillArea(batch, (width - MINIMAP_WIDTH) / 2, -1 + cellOffY.toFloat(), MINIMAP_WIDTH, 1f)
-        Toolkit.fillArea(batch, (width - MINIMAP_WIDTH) / 2, cellOffY + MINIMAP_HEIGHT, MINIMAP_WIDTH, 1f)
-        Toolkit.fillArea(batch, -1 + (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
-        Toolkit.fillArea(batch, (width - MINIMAP_WIDTH) / 2 + MINIMAP_WIDTH, cellOffY.toFloat(), 1f, MINIMAP_HEIGHT)
 
+        // border
+        Toolkit.drawBoxBorder(batch, minimapDrawX.toInt() - 1, minimapDrawY.toInt() - 1, MINIMAP_WIDTH.toInt() + 2, MINIMAP_HEIGHT.toInt() + 2)
         // control hints
-        batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.minimapControlHelp, full.offsetX, full.yEnd - 20)
-
+        App.fontGame.draw(batch, full.minimapControlHelp, minimapDrawX, minimapDrawY + MINIMAP_HEIGHT + 12)
         // the minimap
-        batch.draw(minimapFBO.colorBufferTexture, (width - MINIMAP_WIDTH) / 2, cellOffY.toFloat())
+        batch.draw(minimapFBO.colorBufferTexture, minimapDrawX, minimapDrawY)
     }
 
     override fun show() {
