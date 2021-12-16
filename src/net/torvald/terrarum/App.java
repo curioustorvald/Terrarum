@@ -134,7 +134,7 @@ public class App implements ApplicationListener {
     public static String renderer = "(a super-fancy virtual photoradiator)";
     public static String rendererVendor = "(aperture science psychovisualcomputation laboratory)";
 
-    public static int THREAD_COUNT = ThreadExecutor.INSTANCE.getThreadCount();
+    public static int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
     public static boolean MULTITHREAD;
 
     public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
@@ -773,8 +773,6 @@ public class App implements ApplicationListener {
         //PostProcessor.INSTANCE.dispose();
         //MinimapComposer.INSTANCE.dispose();
         //FloatDrawer.INSTANCE.dispose();
-
-        ThreadExecutor.INSTANCE.killAll();
 
         for (Texture texture : ditherPatterns) {
             texture.dispose();

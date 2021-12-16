@@ -1,5 +1,7 @@
 package net.torvald.terrarum.concurrent
 
+import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.App
 import java.util.concurrent.*
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -9,14 +11,19 @@ typealias RunnableFun = () -> Unit
 typealias ThreadableFun = (Int) -> Unit
 
 
-object ThreadExecutor {
-    val threadCount = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
+class ThreadExecutor(
+    val threadCount: Int = Runtime.getRuntime().availableProcessors() // not using (logicalCores + 1) method; it's often better idea to reserve one extra thread for other jobs in the app
+) {
     private lateinit var executor: ExecutorService// = Executors.newFixedThreadPool(threadCount)
     val futures = ArrayList<Future<*>>()
     private var isOpen = true
 
     var allFinished = true
         private set
+
+    init {
+        App.disposables.add(Disposable { this.killAll() })
+    }
 
     private fun checkShutdown() {
         try {

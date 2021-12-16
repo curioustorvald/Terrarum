@@ -11,6 +11,7 @@ import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -19,15 +20,17 @@ import kotlin.math.sin
  */
 class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private val genSlices = maxOf(ThreadExecutor.threadCount, world.width / 8)
+    private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
+
+    private val genSlices = maxOf(threadExecutor.threadCount, world.width / 8)
 
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
 
     override fun getDone() {
-        ThreadExecutor.renew()
+        threadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).map { xs ->
-            ThreadExecutor.submit {
+            threadExecutor.submit {
                 val localJoise = getGenerator(seed, params as BiomegenParams)
                 for (x in xs) {
                     for (y in 0 until world.height) {
@@ -45,7 +48,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             }
         }
 
-        ThreadExecutor.join()
+        threadExecutor.join()
 
         App.printdbg(this, "Waking up Worldgen")
     }

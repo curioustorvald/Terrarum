@@ -45,7 +45,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
     private var minimapRerenderTimer = 0f
-    private val minimapRerenderInterval = 5f // seconds
+    private val minimapRerenderInterval = 0.5f // seconds
 
     private var dragStatus = 0
 
@@ -69,16 +69,14 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
             val mdx = Terrarum.mouseDeltaX * 2f / minimapZoom
             val mdy = Terrarum.mouseDeltaY * 2f / minimapZoom
 
-            minimapPanX += mdx
-            minimapPanY += mdy
+            minimapPanX -= mdx
+            minimapPanY -= mdy
             minimapTranslateX += mdx
             minimapTranslateY += mdy
 
             dragStatus = 1
         }
-        else if (dragStatus == 1 && !Terrarum.mouseDown) {
-            dragStatus = 2
-        }
+
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) {
@@ -109,7 +107,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         // render minimap
         batch.end()
 
-        if (dragStatus == 2 || minimapRerenderTimer >= minimapRerenderInterval) {
+        if (!Terrarum.mouseDown && (dragStatus == 1 || minimapRerenderTimer >= minimapRerenderInterval)) {
             dragStatus = 0
             minimapRerenderTimer = 0f
 
@@ -121,6 +119,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
 
         minimapFBO.inActionF(minimapCamera, batch) {
+            gdxClearAndSetBlend(MINIMAP_SKYCOL)
+
             batch.inUse {
 
                 // [  1  0 0 ]   [  s   0  0 ]   [  s  0 0 ]
@@ -130,17 +130,16 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                 // https://www.wolframalpha.com/input/?i=%7B%7B1,0,0%7D,%7B0,1,0%7D,%7Bp_x,p_y,1%7D%7D+*+%7B%7Bs,0,0%7D,%7B0,s,0%7D,%7Bw%2F2,h%2F2,1%7D%7D
 
                 // sky background
-                batch.color = MINIMAP_SKYCOL
-                Toolkit.fillArea(batch, 0f, 0f, MINIMAP_WIDTH, MINIMAP_HEIGHT)
+                batch.color = Color.WHITE
 
                 MinimapComposer.pixmaps.forEachIndexed { index, pixmap ->
-                    renderTextures[index].dispose()
-                    renderTextures[index] = Texture(pixmap)
+                    renderTextures[MinimapComposer.pixmaps.lastIndex - index].dispose()
+                    renderTextures[MinimapComposer.pixmaps.lastIndex - index] = Texture(pixmap)
 
                     val ix = index % 3; val iy = index / 3
 
-                    val ox = (ix - 1) * MINIMAP_TILE_WIDTH
-                    val oy = (iy - 1) * MINIMAP_TILE_HEIGHT
+                    val ox = (ix - 0.5f) * MINIMAP_TILE_WIDTH
+                    val oy = (iy - 0.5f) * MINIMAP_TILE_HEIGHT
 
                     val tx = (minimapTranslateX - ox) * minimapZoom + 0.5f * MINIMAP_WIDTH
                     val ty = (minimapTranslateY - oy) * minimapZoom + 0.5f * MINIMAP_HEIGHT
@@ -156,7 +155,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         val minimapDrawY = (height - cellOffY - App.scr.tvSafeGraphicsHeight - MINIMAP_HEIGHT - 72) / 2 + cellOffY * 1f
 
         if (debugvals) {
-            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", minimapDrawX, minimapDrawY - 16f)
+            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; $minimapTranslateX, $minimapTranslateY; x$minimapZoom", minimapDrawX, minimapDrawY - 16f)
         }
 
         batch.color = Color.WHITE

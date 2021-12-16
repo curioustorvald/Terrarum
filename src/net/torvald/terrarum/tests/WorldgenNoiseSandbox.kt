@@ -38,6 +38,8 @@ const val TWO_PI = Math.PI * 2
  */
 class WorldgenNoiseSandbox : ApplicationAdapter() {
 
+    private val threadExecutor = ThreadExecutor()
+
     private lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
     private lateinit var font: BitmapFont
@@ -70,7 +72,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testTex.blending = Pixmap.Blending.None
         tempTex = Texture(1, 1, Pixmap.Format.RGBA8888)
 
-        genSlices = maxOf(ThreadExecutor.threadCount, testTex.width / 8)
+        genSlices = maxOf(threadExecutor.threadCount, testTex.width / 8)
 
         println("Init done")
     }
@@ -234,12 +236,12 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         } }
 
 
-        ThreadExecutor.renew()
+        threadExecutor.renew()
         runnables.forEach {
-            ThreadExecutor.submit(it)
+            threadExecutor.submit(it)
         }
 
-        ThreadExecutor.join()
+        threadExecutor.join()
 
         initialGenDone = true
     }

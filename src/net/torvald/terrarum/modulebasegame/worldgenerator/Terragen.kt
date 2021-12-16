@@ -8,6 +8,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -16,7 +17,9 @@ import kotlin.math.sin
  */
 class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, params) {
 
-    private val genSlices = maxOf(ThreadExecutor.threadCount, world.width / 8)
+    private val threadExecutor = TerrarumIngame.worldgenThreadExecutor
+
+    private val genSlices = maxOf(threadExecutor.threadCount, world.width / 8)
 
     private val YHEIGHT_MAGIC = 2800.0 / 3.0
     private val YHEIGHT_DIVISOR = 2.0 / 7.0
@@ -25,9 +28,9 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     private val stoneSlateDitherSize = 4
 
     override fun getDone() {
-        ThreadExecutor.renew()
+        threadExecutor.renew()
         (0 until world.width).sliceEvenly(genSlices).mapIndexed { i, xs ->
-            ThreadExecutor.submit {
+            threadExecutor.submit {
                 val localJoise = getGenerator(seed, params as TerragenParams)
                 for (x in xs) {
                     val sampleTheta = (x.toDouble() / world.width) * TWO_PI
@@ -37,7 +40,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             }
         }
 
-        ThreadExecutor.join()
+        threadExecutor.join()
 
         printdbg(this, "Waking up Worldgen")
     }

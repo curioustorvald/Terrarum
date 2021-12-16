@@ -14,6 +14,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.blockstats.MinimapComposer
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
@@ -146,6 +147,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         val SIZE_LARGE = Point2i(13500, 2970)
         val SIZE_HUGE = Point2i(22500, 4500)
         val WORLDSIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
+
+        val worldgenThreadExecutor = ThreadExecutor()
     }
 
 

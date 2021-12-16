@@ -31,6 +31,8 @@ import kotlin.math.roundToInt
  */
 class NoiseGenerator : ScreenAdapter() {
 
+    private val threadExecutor = ThreadExecutor()
+
     lateinit var batch: SpriteBatch
     lateinit var camera: OrthographicCamera
     lateinit var pixmap: Pixmap
@@ -109,13 +111,13 @@ class NoiseGenerator : ScreenAdapter() {
 
 
         // regen
-        if (timerFired && ThreadExecutor.allFinished) {
+        if (timerFired && threadExecutor.allFinished) {
             timerFired = false
 
             totalTestsDone += 1
         }
 
-        if (regenerate && ThreadExecutor.allFinished) {
+        if (regenerate && threadExecutor.allFinished) {
             //printdbg(this, "Reticulating splines...")
 
             regenerate = false
@@ -126,9 +128,9 @@ class NoiseGenerator : ScreenAdapter() {
 
             val seed = RNG.nextLong()
             val jobs = List(jobsCount) { makeGenFun(seed, it) }
-            ThreadExecutor.renew()
-            ThreadExecutor.submitAll(jobs)
-            ThreadExecutor.join()
+            threadExecutor.renew()
+            threadExecutor.submitAll(jobs)
+            threadExecutor.join()
         }
 
 
@@ -195,7 +197,7 @@ class NoiseGenerator : ScreenAdapter() {
             System.exit(0)
         }
         // time to construct a new test
-        if (totalTestsDone % samplingCount == 0 && ThreadExecutor.allFinished) {
+        if (totalTestsDone % samplingCount == 0 && threadExecutor.allFinished) {
             pixelsInSingleJob = (IMAGE_SIZE * IMAGE_SIZE) / testSets[totalTestsDone / samplingCount]
 
 
@@ -216,7 +218,7 @@ class NoiseGenerator : ScreenAdapter() {
         }
 
         // auto-press SPACE
-        if (ThreadExecutor.allFinished) {
+        if (threadExecutor.allFinished) {
             regenerate = true
             constructOnce = false
         }
