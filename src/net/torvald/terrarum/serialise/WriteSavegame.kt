@@ -51,7 +51,11 @@ object WriteSavegame {
 
                 val w = 960
                 val h = 640
-                val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
+
+                val x = (it.width - w).ushr(2).shl(1) // force the even-numbered position
+                val y = (it.height - h).ushr(2).shl(1) // force the even-numbered position
+
+                val p = Pixmap.createFromFrameBuffer(x, y, w, h)
                 IngameRenderer.fboRGBexport = p
                 //PixmapIO2._writeTGA(gzout, p, true, true)
                 //p.dispose()

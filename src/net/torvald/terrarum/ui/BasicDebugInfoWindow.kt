@@ -155,18 +155,23 @@ class BasicDebugInfoWindow : UICanvas() {
                    else "$rawR $rawG $rawB $rawA"
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
-        if (ingame != null) {
-            val wallNum = ingame!!.world.getTileFromWall(mouseTileX, mouseTileY)
-            val tileNum = ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY)
-            val wires = ingame!!.world.getAllWiresFrom(mouseTileX, mouseTileY)
-            val fluid = ingame!!.world.getFluid(mouseTileX, mouseTileY)
+        try {
+            world?.let {
+                val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
+                val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
+                val wires = it.getAllWiresFrom(mouseTileX, mouseTileY)
+                val fluid = it.getFluid(mouseTileX, mouseTileY)
 
-            val wireCount = wires?.size?.toString() ?: "no"
+                val wireCount = wires?.size?.toString() ?: "no"
 
-            printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG($wireCount wires) $ccY($mtX,$mtY;$ccO${LandUtil.getBlockAddr(ingame!!.world, mouseTileX, mouseTileY)}$ccY)")
-            printLine(batch, 10, "fluid@cursor ${ccO}Type $ccG${fluid.type.value} ${ccO}Fill $ccG${fluid.amount}f")
+                printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG($wireCount wires) $ccY($mtX,$mtY;$ccO${LandUtil.getBlockAddr(it, mouseTileX, mouseTileY)}$ccY)")
+                printLine(batch, 10, "fluid@cursor ${ccO}Type $ccG${fluid.type.value} ${ccO}Fill $ccG${fluid.amount}f")
 
+                printLineColumn(batch, 2, 5, "Time $ccG${it.worldTime.todaySeconds.toString().padStart(5, '0')}" +
+                                             " (${it.worldTime.getFormattedTime()})")
+            }
         }
+        catch (e: NullPointerException) {}
 
 
         // print time
@@ -183,11 +188,6 @@ class BasicDebugInfoWindow : UICanvas() {
 
         //printLineColumn(batch, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
-
-        if (world != null) {
-            printLineColumn(batch, 2, 5, "Time $ccG${world?.worldTime?.todaySeconds.toString().padStart(5, '0')}" +
-                                         " (${world?.worldTime?.getFormattedTime()})")
-        }
 
         if (player != null) {
             printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
