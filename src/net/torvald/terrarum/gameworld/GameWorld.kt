@@ -171,6 +171,8 @@ open class GameWorld() : Disposable {
         }
     }
 
+    fun coordInWorld(x: Int, y: Int) = y in 0 until height // ROUNDWORLD implementation
+    fun coordInWorldStrict(x: Int, y: Int) = x in 0 until width && y in 0 until height // ROUNDWORLD implementation
 
     fun renumberTilesAfterLoad() {
         // before the renaming, update the name maps

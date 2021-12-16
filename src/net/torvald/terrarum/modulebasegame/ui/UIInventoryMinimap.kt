@@ -45,7 +45,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
     private var minimapRerenderTimer = 0f
-    private val minimapRerenderInterval = 0.5f // seconds
+    private var minimapRerenderInterval = 5f // seconds
 
     private var dragStatus = 0
 
@@ -66,8 +66,15 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         // if left click is down and cursor is in the map area
         if (Terrarum.mouseDown &&
             Terrarum.mouseScreenY in cellOffY..cellOffY + INVENTORY_CELLS_UI_HEIGHT) {
-            val mdx = Terrarum.mouseDeltaX * 2f / minimapZoom
-            val mdy = Terrarum.mouseDeltaY * 2f / minimapZoom
+            val mdx = Terrarum.mouseDeltaX * 3f / minimapZoom
+            var mdy = Terrarum.mouseDeltaY * 3f / minimapZoom
+
+            val ymin = 0//-MINIMAP_HEIGHT / 2
+            val ymax = INGAME.world.height// - MINIMAP_HEIGHT
+            val my = minimapPanY + mdy
+
+            if (my < ymin) mdy += my - ymin
+            else if (my > ymax) mdy += my - ymax
 
             minimapPanX -= mdx
             minimapPanY -= mdy
@@ -89,6 +96,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
             minimapZoom = 1f
             minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.toFloat() ?: (INGAME.world.width / 2f)
             minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.toFloat() ?: (INGAME.world.height / 2f)
+            dragStatus = 1
         }
 
 
@@ -136,10 +144,10 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                     renderTextures[MinimapComposer.pixmaps.lastIndex - index].dispose()
                     renderTextures[MinimapComposer.pixmaps.lastIndex - index] = Texture(pixmap)
 
-                    val ix = index % 3; val iy = index / 3
+                    val ix = index % MinimapComposer.SQUARE_SIZE; val iy = index / MinimapComposer.SQUARE_SIZE
 
-                    val ox = (ix - 0.5f) * MINIMAP_TILE_WIDTH
-                    val oy = (iy - 0.5f) * MINIMAP_TILE_HEIGHT
+                    val ox = (ix - (MinimapComposer.SQUARE_SIZE / 2) + 0.5f) * MINIMAP_TILE_WIDTH
+                    val oy = (iy - (MinimapComposer.SQUARE_SIZE / 2) + 0.5f) * MINIMAP_TILE_HEIGHT
 
                     val tx = (minimapTranslateX - ox) * minimapZoom + 0.5f * MINIMAP_WIDTH
                     val ty = (minimapTranslateY - oy) * minimapZoom + 0.5f * MINIMAP_HEIGHT
@@ -177,7 +185,12 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
     override fun doClosing(delta: Float) {}
 
-    override fun endOpening(delta: Float) {}
+    override fun endOpening(delta: Float) {
+        minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.toFloat() ?: (INGAME.world.width / 2f)
+        minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.toFloat() ?: (INGAME.world.height / 2f)
+
+        minimapRerenderInterval = 0.25f
+    }
 
     override fun endClosing(delta: Float) {}
 
