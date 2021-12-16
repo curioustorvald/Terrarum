@@ -130,7 +130,7 @@ class UIInventoryFull(
     val minimapControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${0xe006.toChar()} ${Lang["GAME_ACTION_MOVE_VERB"]}"
+            "${0xe006.toChar()}${0xe009.toChar()} ${Lang["GAME_ACTION_MOVE_VERB"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelRStick ${Lang["GAME_ACTION_MOVE_VERB"]}$SP" +
