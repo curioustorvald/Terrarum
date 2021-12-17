@@ -32,7 +32,7 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
     override fun render(batch: SpriteBatch, camera: Camera) {
         val t = Lang["MENU_IO_SAVING"]
         val tlen = App.fontGame.getWidth(t)
-        App.fontGame.draw(batch, t, (posX + (width - tlen) / 2).toFloat(), posY.toFloat())
+        App.fontGame.draw(batch, t, (posX + (width - tlen) / 2).toFloat(), posY - 32f)
 
         // -1..63
         val index = ((WriteSavegame.saveProgress / WriteSavegame.saveProgressMax) * circles).roundToInt() - 1
