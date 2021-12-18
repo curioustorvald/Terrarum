@@ -37,7 +37,9 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
 
 
     internal val uiWidth = MODULEINFO_CELL_WIDTH
-    internal val uiX = (width - uiWidth) / 2
+    internal val uiX: Int
+        get() = (App.scr.width - uiWidth) / 2
+    internal val uiXdiffChatOverlay = App.scr.chatWidth / 2
 
     internal val textH = App.fontGame.lineHeight.toInt()
 
@@ -83,7 +85,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
             // read savegames
             var savegamesCount = 0
             ModMgr.loadOrder.forEachIndexed { index, s ->
-                val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
+                val x = uiX
                 val y = titleTopGradEnd + cellInterval * savegamesCount
                 try {
                     moduleCells.add(UIItemModuleInfoCell(this, index, x, y))
@@ -120,7 +122,14 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
             if (index in listScroll - 2 until listScroll + savesVisible + 2) {
                 // re-position
                 it.posY = (it.initialY - uiScroll).roundToInt()
+
+                if (App.getConfigBoolean("fx_streamerslayout"))
+                    it.posX -= uiXdiffChatOverlay
+
                 it.update(delta)
+
+                if (App.getConfigBoolean("fx_streamerslayout"))
+                    it.posX += uiXdiffChatOverlay
             }
         }
     }

@@ -59,11 +59,14 @@ object Lang {
         localesDir.listFiles().filter { it.isDirectory }.forEach { languageList.add(it.name) }
 
         // temporary filter
-        languageList.remove("jakanaJP")
+        languageList.remove("jaJPysi")
 
         for (lang in languageList) {
+            printdbg(this, "Loading langpack from $localesDir/$lang/")
+
             val langFileListFiles = File("$localesDir/$lang/").listFiles()
-            langFileListFiles.forEach {
+
+            langFileListFiles?.forEach {
                 // not a polyglot
                 if (!it.name.startsWith("Polyglot") && it.name.endsWith(".json")) {
                     processRegularLangfile(it, lang)

@@ -100,7 +100,9 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
 
     internal val uiWidth = SAVE_CELL_WIDTH
-    internal val uiX = (width - uiWidth) / 2
+    internal val uiX: Int
+        get() = (Toolkit.drawWidth - uiWidth) / 2
+    internal val uiXdiffChatOverlay = App.scr.chatWidth / 2
 
     internal val textH = App.fontGame.lineHeight.toInt()
 
@@ -167,7 +169,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 // read savegames
                 var savegamesCount = 0
                 App.savegameWorlds.forEach { (_, skimmer) ->
-                    val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
+                    val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
                         worldCells.add(UIItemWorldCells(this, x, y, skimmer))
@@ -181,7 +183,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
                 savegamesCount = 0
                 App.savegamePlayers.forEach { (_, skimmer) ->
-                    val x = uiX + if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth / 2 else 0
+                    val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
                         playerCells.add(UIItemPlayerCells(this, x, y, skimmer))
@@ -313,9 +315,15 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 batch.inUse {
                     for (index in 0 until cells.size) {
                         val it = cells[index]
-                        if (index in listScroll - 2 until listScroll + savesVisible + 2) {
+
+                        if (App.getConfigBoolean("fx_streamerslayout"))
+                            it.posX += uiXdiffChatOverlay
+
+                        if (index in listScroll - 2 until listScroll + savesVisible + 2)
                             it.render(batch, camera)
-                        }
+
+                        if (App.getConfigBoolean("fx_streamerslayout"))
+                            it.posX -= uiXdiffChatOverlay
                     }
                 }
                 savePixmap = Pixmap.createFromFrameBuffer(0, 0, sliderFBO.width, sliderFBO.height)
@@ -528,6 +536,13 @@ class UIItemPlayerCells(
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
+    private var highlightCol: Color = defaultCol
+
+    override fun update(delta: Float) {
+        super.update(delta)
+        highlightCol = if (mouseUp) litCol else defaultCol
+    }
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         // try to generate a texture
         if (skimmer.initialised && !hasTexture) {
@@ -547,7 +562,6 @@ class UIItemPlayerCells(
             hasTexture = true
         }
 
-        val highlightCol = if (mouseUp) litCol else defaultCol
         val x = posX.toFloat()
         val y = posY.toFloat()
 
@@ -665,10 +679,7 @@ class UIItemWorldCells(
     private val colourBad = Color(0xFF0011FF.toInt())
     private val cellCol = CELL_COL
 
-
-    init {
-
-    }
+    private var highlightCol: Color = Color.WHITE
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
         UILoadGovernor.worldDisk = skimmer
@@ -677,6 +688,11 @@ class UIItemWorldCells(
 
     internal var hasTexture = false
         private set
+
+    override fun update(delta: Float) {
+        super.update(delta)
+        highlightCol = if (mouseUp) Toolkit.Theme.COL_ACTIVE else Color.WHITE
+    }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         // try to generate a texture
@@ -698,7 +714,6 @@ class UIItemWorldCells(
             hasTexture = true
         }
 
-        val highlightCol = if (mouseUp) Toolkit.Theme.COL_ACTIVE else Color.WHITE
         val x = posX.toFloat()
         val y = posY.toFloat()
 
