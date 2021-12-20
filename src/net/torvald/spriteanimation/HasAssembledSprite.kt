@@ -1,6 +1,7 @@
 package net.torvald.spriteanimation
 
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -14,6 +15,8 @@ interface HasAssembledSprite {
     var animDesc: ADProperties?
     /** ADL for glow sprite. Optional. */
     var animDescGlow: ADProperties?
+
+    var spriteHeadTexture: TextureRegion?
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)
 

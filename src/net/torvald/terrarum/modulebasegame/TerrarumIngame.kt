@@ -737,6 +737,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private var worldWidth: Double = 0.0
     private var oldCamX = 0
+    private var oldPlayerX = 0.0
 
     /**
      * Ingame (world) related updates; UI update must go to renderGame()
@@ -798,17 +799,19 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 BlockStats.update()
             }
             // fill up visibleActorsRenderFront for wires, if:
-            // 0. Camera wrapped
+            // 0. Camera or player x position wrapped
             // 1. new world has been loaded
             // 2. something is cued on the wire change queue
             // 3. wire renderclass changed
-            if (Math.abs(WorldCamera.x - oldCamX) >= worldWidth * 0.85 ||
+            if (Math.abs(WorldCamera.x - oldCamX) >= worldWidth * 0.5 ||
+                Math.abs((actorNowPlaying?.hitbox?.canonicalX ?: 0.0) - oldPlayerX) >= worldWidth * 0.5 ||
                 newWorldLoadedLatch || wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
                 measureDebugTime("Ingame.FillUpWiresBuffer") {
                     fillUpWiresBuffer()
                 }
             }
             oldCamX = WorldCamera.x
+            oldPlayerX = actorNowPlaying?.hitbox?.canonicalX ?: 0.0
 
 
             WORLD_UPDATE_TIMER += 1

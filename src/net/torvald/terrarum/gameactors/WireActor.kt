@@ -64,7 +64,6 @@ class WireActor : ActorWithBody {
             }
         }
         sprite!!.currentFrame = ret
-        sprite!!.flipVertical = true // turns out the sprites are rendered upside-down by default :(
     }
 
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {

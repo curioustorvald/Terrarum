@@ -129,6 +129,13 @@ class ConsoleWindow : UICanvas() {
         }
 
         uiItems.forEach { it.render(batch, camera) }
+
+        Terrarum.ingame?.let {
+            batch.color = Color.WHITE
+            it.actorNowPlaying?.getSpriteHead()!!.let {
+                batch.draw(it, drawOffX + 10f, drawOffY + height + 4f)
+            }
+        }
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
@@ -279,15 +286,15 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun endClosing(delta: Float) {
-        Terrarum.ingame?.setTooltipMessage(null)
         println("Close -- I made the game to pause: $iMadeTheGameToPause")
         if (iMadeTheGameToPause) {
             Terrarum.ingame?.resume()
             println("Close -- resume game")
         }
+        iMadeTheGameToPause = false
+        Terrarum.ingame?.setTooltipMessage(null)
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
-        iMadeTheGameToPause = false
     }
 
     override fun dispose() {

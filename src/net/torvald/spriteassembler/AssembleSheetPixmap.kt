@@ -2,16 +2,17 @@ package net.torvald.spriteassembler
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.linearSearch
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.SimpleFileSystem
+import net.torvald.terrarum.serialise.Common
+import java.io.FileNotFoundException
 import java.io.InputStream
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Assembles the single frame of the animation, outputs GDX Pixmap.
@@ -21,6 +22,27 @@ import kotlin.collections.HashMap
  * Created by minjaesong on 2019-01-06.
  */
 object AssembleSheetPixmap {
+
+    /**
+     * The name of the Bodypart here may or may not be case-sensitive (depends on your actual filesystem -- NTFS, APFS, Ext4, ...)
+     */
+    fun getAssetsDirFileGetter(properties: ADProperties): (String) -> InputStream? = { partName: String ->
+        val file = Gdx.files.internal("assets/${properties.toFilename(partName)}")
+        if (file.exists()) file.read() else null
+    }
+
+    /**
+     * The name of the Bodypart is CASE-SENSITIVE!
+     */
+    fun getVirtualDiskFileGetter(bodypartMapping: Properties, disk: SimpleFileSystem): (String) -> InputStream? = { partName: String ->
+        bodypartMapping.getProperty(partName).let {
+            if (it != null)
+                ByteArray64InputStream(disk.getFile(bodypartMapping.getProperty(partName).toLong())!!.bytes)
+            else
+                null
+        }
+    }
+
 
     private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?): Pixmap {
         val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
@@ -34,25 +56,37 @@ object AssembleSheetPixmap {
         return canvas
     }
 
-    fun fromAssetsDir(properties: ADProperties) = drawAndGetCanvas(properties) { partName: String ->
-        val file = Gdx.files.internal("assets/${properties.toFilename(partName)}")
-        if (file.exists()) file.read() else null
-    }
+    fun fromAssetsDir(properties: ADProperties) = drawAndGetCanvas(properties, getAssetsDirFileGetter(properties))
 
     fun fromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties): Pixmap {
         val bodypartMapping = Properties()
         bodypartMapping.load(ByteArray64Reader(disk.getFile(entrynum)!!.bytes, Common.CHARSET))
 
-        val fileGetter = { partName: String ->
-            bodypartMapping.getProperty(partName).let {
-                if (it != null)
-                    ByteArray64InputStream(disk.getFile(bodypartMapping.getProperty(partName).toLong())!!.bytes)
-                else
-                    null
-            }
-        }
+        return drawAndGetCanvas(properties, getVirtualDiskFileGetter(bodypartMapping, disk))
+    }
 
-        return drawAndGetCanvas(properties, fileGetter)
+    fun getPartTex(getFile: (String) -> InputStream?, partName: String): TextureRegion? {
+        (getFile(partName) ?: throw FileNotFoundException("file for '$partName' is not found")).let {
+            val bytes = it.readAllBytes()
+            val pixmap = Pixmap(bytes, 0, bytes.size)
+            val tr = TextureRegion(Texture(pixmap))
+            pixmap.dispose()
+            return tr
+
+        }
+        return null
+    }
+
+    fun getHeadFromAssetsDir(properties: ADProperties): TextureRegion? {
+        // TODO assemble from HAIR_FORE (optional), HAIR (optional) then HEAD (mandatory)
+        return getPartTex(getAssetsDirFileGetter(properties), "HEAD")
+    }
+
+    fun getHeadFromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties): TextureRegion? {
+        // TODO assemble from HAIR_FORE (optional), HAIR (optional) then HEAD (mandatory)
+        val bodypartMapping = Properties()
+        bodypartMapping.load(ByteArray64Reader(disk.getFile(entrynum)!!.bytes, Common.CHARSET))
+        return getPartTex(getVirtualDiskFileGetter(bodypartMapping, disk), "HEAD")
     }
 
     private fun drawThisFrame(frameName: String,
@@ -63,8 +97,8 @@ object AssembleSheetPixmap {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
-        val bodypartOrigins = properties.bodyparts
-        val bodypartImages = properties.bodyparts.keys.map { partname ->
+        val bodypartOrigins = properties.bodypartJoints
+        val bodypartImages = properties.bodypartJoints.keys.map { partname ->
             fileGetter(partname).let { file ->
                 if (file == null) partname to null
                 else {

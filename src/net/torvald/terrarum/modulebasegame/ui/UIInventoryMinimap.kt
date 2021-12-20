@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_HEIGHT
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_WIDTH
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
 import net.torvald.terrarum.ui.Toolkit
@@ -154,6 +154,11 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
                     batch.color = Color.WHITE
                     batch.draw(renderTextures[index], tx, ty, MINIMAP_TILE_WIDTH * minimapZoom, MINIMAP_TILE_HEIGHT * minimapZoom)
+                }
+
+
+                ((INGAME.actorContainerInactive + INGAME.actorContainerActive).filter { it is IngamePlayer } as List<IngamePlayer>).forEach {
+                    // it.getSpriteHead()
                 }
             }
         }

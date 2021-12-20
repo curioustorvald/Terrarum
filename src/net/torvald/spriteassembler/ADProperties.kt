@@ -47,7 +47,7 @@ class ADProperties {
     /** properties that are being used as skeletons (SKELETON_STAND) */
     internal lateinit var skeletons: HashMap<String, Skeleton>; private set
     /** properties that defines position of joint of the bodypart */
-    internal val bodyparts = HashMap<String, ADPropertyObject.Vector2i>()
+    internal val bodypartJoints = HashMap<String, ADPropertyObject.Vector2i>()
     /** properties that are recognised as animations (ANIM_RUN, ANIM)IDLE) */
     internal lateinit var animations: HashMap<String, Animation>; private set
     /** an "animation frame" property (ANIM_RUN_1, ANIM_RUN_2) */
@@ -204,7 +204,7 @@ class ADProperties {
 
         get("BODYPARTS").forEach {
             try {
-                this.bodyparts[it.name] = (it.input as ADPropertyObject.Vector2i)
+                this.bodypartJoints[it.name] = (it.input as ADPropertyObject.Vector2i)
             }
             catch (e: NullPointerException) {
                 if (it.name.isBlank())
@@ -216,7 +216,7 @@ class ADProperties {
 
         this.skeletons = skeletons
         this.animations = animations
-        this.bodypartFiles = this.bodyparts.keys.map { toFilename(it) }
+        this.bodypartFiles = this.bodypartJoints.keys.map { toFilename(it) }
         this.transforms = transforms
 
         cols = maxColFinder

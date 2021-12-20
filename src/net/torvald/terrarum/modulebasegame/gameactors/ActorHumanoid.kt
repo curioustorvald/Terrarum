@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.HasAssembledSprite
@@ -655,6 +656,13 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
     }
 
+    override fun getSpriteHead(): TextureRegion? {
+        return if (this is IngamePlayer)
+            this.spriteHeadTexture
+        else if (this is HasAssembledSprite)
+            this.spriteHeadTexture
+        else super.getSpriteHead()
+    }
 
     fun Float.abs() = FastMath.abs(this)
 

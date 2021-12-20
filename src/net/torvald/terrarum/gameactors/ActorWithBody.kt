@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -1726,6 +1727,10 @@ open class ActorWithBody : Actor {
         flagDespawn = true
     }
 
+    open fun getSpriteHead(): TextureRegion? {
+        return sprite?.textureRegion?.get(0,0)
+    }
+
 
     private fun forEachOccupyingTileNum(consumer: (ItemID?) -> Unit) {
         if (world == null) return
@@ -1908,12 +1913,15 @@ inline fun drawBodyInGoodPosition(startX: Float, startY: Float, drawFun: (x: Flo
     val offendingPad2 = WorldCamera.width + 1
 
     if (WorldCamera.x >= offendingPad && startX < WorldCamera.width) {
+//        App.batch.color = Color.RED
         drawFun(startX + INGAME.world.width * TILE_SIZEF, startY)
     }
-//    else if (WorldCamera.x <= offendingPad2 && startX > offendingPad) {
-//        drawFun(startX - INGAME.world.width * TILE_SIZEF, startY)
-//    }
+    else if (WorldCamera.x <= offendingPad2 && startX > offendingPad) {
+//        App.batch.color = Color.BLUE
+        drawFun(startX - INGAME.world.width * TILE_SIZEF, startY)
+    }
     else {
+//        App.batch.color = Color.WHITE
         drawFun(startX , startY)
     }
 }

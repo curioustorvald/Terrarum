@@ -160,7 +160,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                         (panelAnimationsList.model as DefaultListModel).addElement("${it.value}")
                     }
                     // populate bodyparts view
-                    adProperties.bodyparts.toSortedMap().forEach { part ->
+                    adProperties.bodypartJoints.toSortedMap().forEach { part ->
                         (panelBodypartsList.model as DefaultListModel).addElement("${part.key}: ${part.value}")
                     }
                     // populate image file list view

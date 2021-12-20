@@ -40,10 +40,7 @@ internal object CommandInterpreter {
 
             var commandObj: ConsoleCommand? = null
             try {
-                if (single_command.name.toLowerCase().startsWith("qqq")) {
-                    commandObj = CommandDict["QuitApp"]
-                }
-                else if (commandsNoAuth.contains(single_command.name.toLowerCase())) {
+                if (commandsNoAuth.contains(single_command.name.toLowerCase())) {
                     commandObj = CommandDict[single_command.name.toLowerCase()]
                 }
                 else {

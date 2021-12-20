@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
@@ -28,6 +29,9 @@ class IngamePlayer : ActorHumanoid {
 
     val uuid = UUID.randomUUID()
     var worldCurrentlyPlaying: UUID = UUID(0L,0L) // only filled up on save and load; DO NOT USE THIS
+
+    var spriteHeadTexture: TextureRegion? = null
+
 
     /** ADL for main sprite. Necessary. */
     @Transient var animDesc: ADProperties? = null
@@ -79,15 +83,24 @@ class IngamePlayer : ActorHumanoid {
      * ```
      */
     fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
-        if (animDesc != null && sprite != null)
+        if (animDesc != null && sprite != null) {
             _rebuild(animDesc!!, sprite)
+            spriteHeadTexture = AssembleSheetPixmap.getHeadFromAssetsDir(animDesc!!)
+        }
         if (animDescGlow != null && spriteGlow != null)
             _rebuild(animDescGlow!!, spriteGlow)
+
     }
 
     fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
-        if (animDesc != null && sprite != null)
+        if (animDesc != null && sprite != null) {
             _rebuild(disk, -1025L, animDesc!!, sprite)
+
+            if (disk.getEntry(-1025L) != null)
+                spriteHeadTexture = AssembleSheetPixmap.getHeadFromVirtualDisk(disk, -1025L, animDesc!!)
+            else
+                spriteHeadTexture = AssembleSheetPixmap.getHeadFromAssetsDir(animDesc!!)
+        }
         if (animDescGlow != null && spriteGlow != null)
             _rebuild(disk, -1026L, animDescGlow!!, spriteGlow)
     }
@@ -140,5 +153,7 @@ class IngamePlayer : ActorHumanoid {
         sprite.nRows = newAnimDelays.size
     }
 
-
+    override fun getSpriteHead(): TextureRegion? {
+        return spriteHeadTexture
+    }
 }
