@@ -85,7 +85,7 @@ class IngamePlayer : ActorHumanoid {
     fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
         if (animDesc != null && sprite != null) {
             _rebuild(animDesc!!, sprite)
-            spriteHeadTexture = AssembleSheetPixmap.getHeadFromAssetsDir(animDesc!!)
+            spriteHeadTexture = AssembleSheetPixmap.getMugshotFromAssetsDir(animDesc!!)
         }
         if (animDescGlow != null && spriteGlow != null)
             _rebuild(animDescGlow!!, spriteGlow)
@@ -97,9 +97,9 @@ class IngamePlayer : ActorHumanoid {
             _rebuild(disk, -1025L, animDesc!!, sprite)
 
             if (disk.getEntry(-1025L) != null)
-                spriteHeadTexture = AssembleSheetPixmap.getHeadFromVirtualDisk(disk, -1025L, animDesc!!)
+                spriteHeadTexture = AssembleSheetPixmap.getMugshotFromVirtualDisk(disk, -1025L, animDesc!!)
             else
-                spriteHeadTexture = AssembleSheetPixmap.getHeadFromAssetsDir(animDesc!!)
+                spriteHeadTexture = AssembleSheetPixmap.getMugshotFromAssetsDir(animDesc!!)
         }
         if (animDescGlow != null && spriteGlow != null)
             _rebuild(disk, -1026L, animDescGlow!!, spriteGlow)

@@ -23,6 +23,9 @@ import java.util.*
  */
 object AssembleSheetPixmap {
 
+    const val MUGSHOT_PIXMAP_W = 48
+    const val MUGSHOT_PIXMAP_H = 48
+
     /**
      * The name of the Bodypart here may or may not be case-sensitive (depends on your actual filesystem -- NTFS, APFS, Ext4, ...)
      */
@@ -65,28 +68,64 @@ object AssembleSheetPixmap {
         return drawAndGetCanvas(properties, getVirtualDiskFileGetter(bodypartMapping, disk))
     }
 
-    fun getPartTex(getFile: (String) -> InputStream?, partName: String): TextureRegion? {
-        (getFile(partName) ?: throw FileNotFoundException("file for '$partName' is not found")).let {
+    fun getPartPixmap(getFile: (String) -> InputStream?, partName: String): Pixmap? {
+        getFile(partName)?.let {
             val bytes = it.readAllBytes()
-            val pixmap = Pixmap(bytes, 0, bytes.size)
-            val tr = TextureRegion(Texture(pixmap))
-            pixmap.dispose()
-            return tr
-
+            return Pixmap(bytes, 0, bytes.size)
         }
         return null
     }
 
-    fun getHeadFromAssetsDir(properties: ADProperties): TextureRegion? {
+    fun getMugshotFromAssetsDir(properties: ADProperties): TextureRegion? {
         // TODO assemble from HAIR_FORE (optional), HAIR (optional) then HEAD (mandatory)
-        return getPartTex(getAssetsDirFileGetter(properties), "HEAD")
+        val getter = getAssetsDirFileGetter(properties)
+        val headPixmap = getPartPixmap(getter, "HEAD")
+        val hairPixmap = getPartPixmap(getter, "HAIR")
+        val hair2Pixmap = getPartPixmap(getter, "HAIR_FORE")
+
+        if (headPixmap == null) throw FileNotFoundException("Bodyparts file of HEAD is not found!")
+        return composeMugshot(properties, headPixmap, hairPixmap, hair2Pixmap)
     }
 
-    fun getHeadFromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties): TextureRegion? {
+    fun getMugshotFromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties): TextureRegion? {
         // TODO assemble from HAIR_FORE (optional), HAIR (optional) then HEAD (mandatory)
         val bodypartMapping = Properties()
         bodypartMapping.load(ByteArray64Reader(disk.getFile(entrynum)!!.bytes, Common.CHARSET))
-        return getPartTex(getVirtualDiskFileGetter(bodypartMapping, disk), "HEAD")
+        val getter = getVirtualDiskFileGetter(bodypartMapping, disk)
+        val headPixmap = getPartPixmap(getter, "HEAD")
+        val hairPixmap = getPartPixmap(getter, "HAIR")
+        val hair2Pixmap = getPartPixmap(getter, "HAIR_FORE")
+
+        if (headPixmap == null) throw FileNotFoundException("Bodyparts file of HEAD is not found!")
+        return composeMugshot(properties, headPixmap, hairPixmap, hair2Pixmap)
+    }
+
+    private fun composeMugshot(properties: ADProperties, head: Pixmap, hair: Pixmap?, hair2: Pixmap?): TextureRegion {
+        val canvas = Pixmap(MUGSHOT_PIXMAP_W, MUGSHOT_PIXMAP_H, Pixmap.Format.RGBA8888)
+        val drawX = (canvas.width - head.width) / 2
+        val drawY = (canvas.height - head.height) / 2
+        val headOffset = properties.bodypartJoints["HEAD"]!!
+
+        // TODO shift drawing pos using the properties BODYPARTS
+
+        canvas.drawPixmap(head, drawX, drawY)
+        hair?.let {
+            val offset = properties.bodypartJoints["HAIR"]!! - headOffset
+            canvas.drawPixmap(it, drawX - offset.x, drawY - offset.y)
+        }
+        hair2?.let {
+            val offset = properties.bodypartJoints["HAIR_FORE"]!! - headOffset
+            canvas.drawPixmap(it, drawX - offset.x, drawY - offset.y)
+        }
+
+        val tr = TextureRegion(Texture(canvas))
+
+        canvas.dispose()
+        head.dispose()
+        hair?.dispose()
+        hair2?.dispose()
+
+        return tr
     }
 
     private fun drawThisFrame(frameName: String,
