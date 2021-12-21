@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_HEIGHT
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_WIDTH
@@ -161,19 +162,25 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                     it.getSpriteHead()?.let { t ->
                         val ox = 0.5f * MINIMAP_TILE_WIDTH
                         val oy = 0.5f * MINIMAP_TILE_HEIGHT
+                        val tx = (minimapTranslateX - ox) * minimapZoom + 0.5f * MINIMAP_WIDTH
+                        val ty = (minimapTranslateY - oy) * minimapZoom + 0.5f * MINIMAP_HEIGHT
                         val worldPos = it.intTilewiseHitbox
                         val cw = it.scale.toFloat() * t.regionWidth
                         val ch = it.scale.toFloat() * t.regionHeight
-                        val cx = worldPos.canonicalX.toFloat() - (cw / 2)
-                        val cy = worldPos.canonicalY.toFloat() - (ch / 2)
+                        val cx = worldPos.centeredX.toFloat() + cw / 2
+                        val cy = worldPos.startY.toFloat() + (((it.baseHitboxH - 6) * it.scale) / TILE_SIZE).toFloat()// - (ch / 2)
+                        val dx = cx - minimapPanX
+                        val dy = cy - minimapPanY
 
-                        val dx = minimapTranslateX + (-ox + cx - minimapPanX ) * minimapZoom + 0.5f * MINIMAP_WIDTH
-                        val dy = minimapTranslateY + (-oy + cy - minimapPanY ) * minimapZoom + 0.5f * MINIMAP_HEIGHT
+                        val x = tx + dx
+                        val y = ty + dy
 
+                        printdbg(this, "map pan: ($minimapPanX,$minimapPanY);draw pos: ($x,$y)")
 
-                        printdbg(this, "minimap pan: ($minimapPanX,$minimapPanY); centre head: ($dx,$dy)")
-
-                        batch.draw(t, dx, dy, cw, ch)
+                        if (it.sprite?.flipHorizontal == false)
+                            batch.draw(t, x, y, cw, ch)
+                        else
+                            batch.draw(t, x + cw, y, -cw, ch)
                     }
                 }
             }
