@@ -1,3 +1,5 @@
+// TODO: implement the automata as per https://www.nectec.or.th/it-standards/keyboard_layout/thai-key.html
+
 let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],

@@ -1,3 +1,5 @@
+// TODO: implement the automata as per https://www.nectec.or.th/it-standards/keyboard_layout/thai-key.html
+
 let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
@@ -70,7 +72,7 @@ let states = {"keylayouts":[[""],[undefined],
 ["๖","%"],// =
 ["\u0E43","\u0E2F"],// [
 ["\u0E0C","\u0E26"],// ]
-["\u0E3A","\u0E4D"],// \
+["\u0E3A","\u0E4D"],// \ // the placement of PHINTHU on unshifted place is not an arbitrary choice; it's Microsoft who screwed it up
 ["\u0E44","\u0E06"],// ;
 ["\u0E02","\u0E11"],// '
 ["\u0E1E","\u0E2C","\u0E5B","\u0E5B"],// ?
