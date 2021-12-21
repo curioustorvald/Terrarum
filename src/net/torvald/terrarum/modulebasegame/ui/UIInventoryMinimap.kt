@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_HEIGHT
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_WIDTH
@@ -61,13 +62,15 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         blendNormal(batch)
         val cellOffY = INVENTORY_CELLS_OFFSET_Y()
 
+        var mdx = 0f
+        var mdy = 0f
 
         // update map panning
         // if left click is down and cursor is in the map area
         if (Terrarum.mouseDown &&
             Terrarum.mouseScreenY in cellOffY..cellOffY + INVENTORY_CELLS_UI_HEIGHT) {
-            val mdx = Terrarum.mouseDeltaX * 3f / minimapZoom
-            var mdy = Terrarum.mouseDeltaY * 3f / minimapZoom
+            mdx = Terrarum.mouseDeltaX * 3f / minimapZoom
+            mdy = Terrarum.mouseDeltaY * 3f / minimapZoom
 
             val ymin = 0//-MINIMAP_HEIGHT / 2
             val ymax = INGAME.world.height// - MINIMAP_HEIGHT
@@ -145,20 +148,33 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                     renderTextures[MinimapComposer.pixmaps.lastIndex - index] = Texture(pixmap)
 
                     val ix = index % MinimapComposer.SQUARE_SIZE; val iy = index / MinimapComposer.SQUARE_SIZE
-
                     val ox = (ix - (MinimapComposer.SQUARE_SIZE / 2) + 0.5f) * MINIMAP_TILE_WIDTH
                     val oy = (iy - (MinimapComposer.SQUARE_SIZE / 2) + 0.5f) * MINIMAP_TILE_HEIGHT
-
                     val tx = (minimapTranslateX - ox) * minimapZoom + 0.5f * MINIMAP_WIDTH
                     val ty = (minimapTranslateY - oy) * minimapZoom + 0.5f * MINIMAP_HEIGHT
 
-                    batch.color = Color.WHITE
                     batch.draw(renderTextures[index], tx, ty, MINIMAP_TILE_WIDTH * minimapZoom, MINIMAP_TILE_HEIGHT * minimapZoom)
                 }
 
 
                 ((INGAME.actorContainerInactive + INGAME.actorContainerActive).filter { it is IngamePlayer } as List<IngamePlayer>).forEach {
-                    // it.getSpriteHead()
+                    it.getSpriteHead()?.let { t ->
+                        val ox = 0.5f * MINIMAP_TILE_WIDTH
+                        val oy = 0.5f * MINIMAP_TILE_HEIGHT
+                        val worldPos = it.intTilewiseHitbox
+                        val cw = it.scale.toFloat() * t.regionWidth
+                        val ch = it.scale.toFloat() * t.regionHeight
+                        val cx = worldPos.canonicalX.toFloat() - (cw / 2)
+                        val cy = worldPos.canonicalY.toFloat() - (ch / 2)
+
+                        val dx = minimapTranslateX + (-ox + cx - minimapPanX ) * minimapZoom + 0.5f * MINIMAP_WIDTH
+                        val dy = minimapTranslateY + (-oy + cy - minimapPanY ) * minimapZoom + 0.5f * MINIMAP_HEIGHT
+
+
+                        printdbg(this, "minimap pan: ($minimapPanX,$minimapPanY); centre head: ($dx,$dy)")
+
+                        batch.draw(t, dx, dy, cw, ch)
+                    }
                 }
             }
         }
