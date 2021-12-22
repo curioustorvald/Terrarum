@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Disposable
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.roundToInt
 
 
 /**
@@ -118,6 +119,9 @@ object Toolkit : Disposable {
         else
             fillArea(batch, x, y, thickness, otherEnd - y)
     }
+
+    fun drawBoxBorder(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) =
+            drawBoxBorder(batch, x.roundToInt(), y.roundToInt(), w.roundToInt(), h.roundToInt())
 
     /**
      * Parameters are THAT OF THE BOX, the border will be drawn OUTSIDE of the params you specified!

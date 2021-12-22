@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_HEIGHT
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_WIDTH
@@ -33,7 +34,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
     }
 
-    private val debugvals = true
+//    private val debugvals = true
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
@@ -68,6 +69,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
         val cellOffY = INVENTORY_CELLS_OFFSET_Y()
+        val worldWidth = INGAME.world.width
 
         var mdx = 0f
         var mdy = 0f
@@ -93,7 +95,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
             minimapDrawOffX += mdx
             minimapDrawOffY += mdy
 
-            minimapPanX = minimapPanX fmod INGAME.world.width.toFloat()
+            minimapPanX = minimapPanX fmod worldWidth.toFloat()
 
             dragStatus = 1
         }
@@ -173,45 +175,68 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                 }
 
 
-                ((INGAME.actorContainerInactive + INGAME.actorContainerActive).filter { it is IngamePlayer } as List<IngamePlayer>).forEach {
+                ((INGAME.actorContainerInactive + INGAME.actorContainerActive + listOf(INGAME.actorNowPlaying)).filterIsInstance<IngamePlayer>()).forEach {
                     it.getSpriteHead()?.let { t ->
-                        val ox = 0.5f * MINIMAP_TILE_WIDTH
-                        val oy = 0.5f * MINIMAP_TILE_HEIGHT
+                        val sf = it.scale.toFloat()
+                        val headHeight = 6
+                        val ox = MINIMAP_TILE_WIDTH / 2f
+                        val oy = MINIMAP_TILE_HEIGHT / 2f
                         val tx = (minimapDrawOffX - ox)
                         val ty = (minimapDrawOffY - oy)
-                        val worldPos = it.intTilewiseHitbox
-                        val cw = it.scale.toFloat() * t.regionWidth
-                        val ch = it.scale.toFloat() * t.regionHeight
-                        val cx = worldPos.centeredX.round().toFloat()
-                        val cy = worldPos.startY.round().toFloat()
+                        val worldPos = it.hitbox
+                        val cw = t.regionWidth * sf
+                        val ch = t.regionHeight * sf
+                        val cx = worldPos.centeredX.div(TILE_SIZEF).round().toFloat()
+                        val cy = worldPos.startY.plus(headHeight * sf).div(TILE_SIZEF).round().toFloat()
                         val dx = cx - oldPanX
                         val dy = cy - oldPanY
 
-                        // tx/ty corresponds to world coord minimapPanXY
+                        // drawing "crosshair"
+                        val x1 = (tx + dx + MINIMAP_TILE_WIDTH / 2f) * minimapZoom + MINIMAP_HALFW
+                        val x2 = (tx + dx + worldWidth + MINIMAP_TILE_WIDTH / 2f) * minimapZoom + MINIMAP_HALFW
+                        val x3 = (tx + dx - worldWidth + MINIMAP_TILE_WIDTH / 2f) * minimapZoom + MINIMAP_HALFW
+                        val y = (ty + dy + MINIMAP_TILE_HEIGHT / 2f) * minimapZoom + MINIMAP_HALFH
 
-                        val x = (tx + dx) * minimapZoom + MINIMAP_HALFW
-                        val y = (ty + dy) * minimapZoom + MINIMAP_HALFH
+                        // how do I actually centre the head?
+                        val doffx = -cw / 2f
+                        val doffy = -ch / 2f
 
-                        printdbg(this, "map pan: ($minimapPanX,$minimapPanY);draw pos: ($x,$y)")
+                        // throwing three static images instead of one won't hurt anything
+                        if (it.sprite?.flipHorizontal == false) {
+                            batch.draw(t, x1 + doffx, y + doffy, cw, ch)
+                            batch.draw(t, x2 + doffx, y + doffy, cw, ch)
+                            batch.draw(t, x3 + doffx, y + doffy, cw, ch)
+                        }
+                        else {
+                            batch.draw(t, x1 + doffx + cw, y + doffy, -cw, ch)
+                            batch.draw(t, x2 + doffx + cw, y + doffy, -cw, ch)
+                            batch.draw(t, x3 + doffx + cw, y + doffy, -cw, ch)
+                        }
 
-                        if (it.sprite?.flipHorizontal == false)
-                            batch.draw(CommonResourcePool.getAsTextureRegion("test_texture"), x, y, cw, ch)
-                        else
-                            batch.draw(CommonResourcePool.getAsTextureRegion("test_texture"), x + cw, y, -cw, ch)
+                        /*
+                        val xi = x.roundToInt()
+                        val yi = y.roundToInt()
+                        batch.color = Color.LIME
+                        Toolkit.drawBoxBorder(batch, x + doffx, y + doffy, cw, ch)
+                        batch.color = Color.CORAL
+                        Toolkit.drawStraightLine(batch, xi-10, yi, xi+10, 1, false)
+                        Toolkit.drawStraightLine(batch, xi, yi-10, yi+10, 1, true)
+                        */
                     }
                 }
             }
         }
         batch.begin()
 
+        batch.color = Color.WHITE
+
         val minimapDrawX = (width - MINIMAP_WIDTH) / 2
         val minimapDrawY = (height - cellOffY - App.scr.tvSafeGraphicsHeight - MINIMAP_HEIGHT - 72) / 2 + cellOffY * 1f
 
-        if (debugvals) {
+        if (App.IS_DEVELOPMENT_BUILD) {
             App.fontSmallNumbers.draw(batch, "Pan: ($minimapPanX,$minimapPanY) old ($oldPanX,$oldPanY); Trans: ($minimapDrawOffX,$minimapDrawOffY); x$minimapZoom", minimapDrawX, minimapDrawY - 16f)
         }
 
-        batch.color = Color.WHITE
         batch.projectionMatrix = camera.combined
 
         // border

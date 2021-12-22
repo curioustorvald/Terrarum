@@ -110,8 +110,6 @@ object MinimapComposer : Disposable {
             val tlx = x - (MINIMAP_TILE_WIDTH / 2)
             val tly = y - (MINIMAP_TILE_HEIGHT / 2)
 
-//        printdbg(this, "queue render - c($x,$y), tl($tlx,$tlx)")
-
             // make the queueing work
             // enqueue first
             spiralIndices.forEachIndexed { index, i ->
@@ -123,27 +121,6 @@ object MinimapComposer : Disposable {
                 updaterQueue[index] = Callable { createUpdater(tx, ty, pixmap, i).run() }
 //                printdbg(this, "Queueing tilemap update ($tx,$ty) from queue[$i]")
             }
-
-            // consume the queue
-            /*for (k in currentThreads.indices) {
-                if (currentThreads[k].state == Thread.State.TERMINATED && !updaterQueue.isEmpty) {
-                    currentThreads[k] = Thread(updaterQueue.removeFirst(), "MinimapLivetilePainter")
-                    printdbg(this, "Consuming from queue; queue size now: ${updaterQueue.size}")
-                }
-                if (currentThreads[k].state == Thread.State.NEW) {
-                    currentThreads[k].start()
-                }
-            }*/
-
-
-            /*updaterQueue.forEachIndexed { k, runnable ->
-                if (runnable != null) {
-                    currentThreads[k] = Thread(runnable, "MinimapLivetilePainter")
-                    printdbg(this, "Consuming from queue[$k]")
-                    currentThreads[k].start()
-                }
-            }*/
-
 
             threadExecutor.renew()
             threadExecutor.submitAll(updaterQueue.filterNotNull())
@@ -180,8 +157,8 @@ object MinimapComposer : Disposable {
                         oobColBtm
                     else if (colTerr.a > 0.1f) colTerr else colWall
 
-                    if (index % 2 == 1) outCol.lerp(Color.BLACK, 0.2f)
-                    else if (index != (SQUARE_SIZE.sqr() - 1) / 2) outCol.lerp(Color.FIREBRICK, 0.12f)
+//                    if (index % 2 == 1) outCol.lerp(Color.BLACK, 0.2f)
+//                    else if (index != (SQUARE_SIZE.sqr() - 1) / 2) outCol.lerp(Color.FIREBRICK, 0.12f)
 
                     pixmap.blending = Pixmap.Blending.None
                     pixmap.setColor(outCol)
