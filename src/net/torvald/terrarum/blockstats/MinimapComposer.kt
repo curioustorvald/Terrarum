@@ -146,7 +146,6 @@ object MinimapComposer : Disposable {
 
 
             threadExecutor.renew()
-            // TODO submit in spiral index
             threadExecutor.submitAll(updaterQueue.filterNotNull())
             Thread { threadExecutor.join() }.start()
 
@@ -175,14 +174,18 @@ object MinimapComposer : Disposable {
                     val colTerr = App.tileMaker.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
                     val colWall = App.tileMaker.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(App.tileMaker.wallOverlayColour)
 
-                    val outCol = if (y < 0)
+                    var outCol = if (y < 0)
                         oobColTop
                     else if (y >= world.height)
                         oobColBtm
                     else if (colTerr.a > 0.1f) colTerr else colWall
 
+                    if (index % 2 == 1) outCol.lerp(Color.BLACK, 0.2f)
+                    else if (index != (SQUARE_SIZE.sqr() - 1) / 2) outCol.lerp(Color.FIREBRICK, 0.12f)
+
                     pixmap.blending = Pixmap.Blending.None
                     pixmap.setColor(outCol)
+
                     pixmap.drawPixel(x - tx, y - ty)
                 }
             }

@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_HEIGHT
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_WIDTH
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
@@ -27,6 +27,9 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         const val MINIMAP_ZOOM_MIN = 1f
         const val MINIMAP_ZOOM_MAX = 8f
 
+        const val MINIMAP_HALFW = MINIMAP_WIDTH / 2f
+        const val MINIMAP_HALFH = MINIMAP_HEIGHT / 2f
+
         val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
     }
 
@@ -40,8 +43,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     private var minimapPanX: Float = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.toFloat() ?: (INGAME.world.width / 2f)
     private var minimapPanY: Float = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.toFloat() ?: (INGAME.world.height / 2f)
 
-    private var minimapTranslateX: Float = 0f
-    private var minimapTranslateY: Float = 0f
+    private var minimapDrawOffX: Float = 0f
+    private var minimapDrawOffY: Float = 0f
 
     private val minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, MINIMAP_WIDTH.toInt(), MINIMAP_HEIGHT.toInt(), false)
     private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
@@ -52,6 +55,9 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     private var dragStatus = 0
 
     private var renderTextures = Array(MinimapComposer.pixmaps.size) { Texture(16, 16, Pixmap.Format.RGBA8888) }
+
+    private var oldPanX = minimapPanX
+    private var oldPanY = minimapPanY
 
     override fun updateUI(delta: Float) {
         MinimapComposer.setWorld(INGAME.world)
@@ -65,6 +71,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
         var mdx = 0f
         var mdy = 0f
+
+
 
         // update map panning
         // if left click is down and cursor is in the map area
@@ -82,8 +90,10 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
             minimapPanX -= mdx
             minimapPanY -= mdy
-            minimapTranslateX += mdx
-            minimapTranslateY += mdy
+            minimapDrawOffX += mdx
+            minimapDrawOffY += mdy
+
+            minimapPanX = minimapPanX fmod INGAME.world.width.toFloat()
 
             dragStatus = 1
         }
@@ -98,8 +108,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) {
             minimapZoom = 1f
-            minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.toFloat() ?: (INGAME.world.width / 2f)
-            minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.toFloat() ?: (INGAME.world.height / 2f)
+            minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.round()?.toFloat() ?: (INGAME.world.width / 2f)
+            minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.round()?.toFloat() ?: (INGAME.world.height / 2f)
             dragStatus = 1
         }
 
@@ -125,8 +135,10 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
             MinimapComposer.queueRender(minimapPanX.roundToInt(), minimapPanY.roundToInt())
 
-            minimapTranslateX = 0f
-            minimapTranslateY = 0f
+            minimapDrawOffX = 0f
+            minimapDrawOffY = 0f
+            oldPanX = minimapPanX
+            oldPanY = minimapPanY
         }
 
 
@@ -138,8 +150,11 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                 // [  1  0 0 ]   [  s   0  0 ]   [  s  0 0 ]
                 // [  0  1 0 ] x [  0   s  0 ] = [  0  s 0 ]
                 // [ px py 1 ]   [ w/2 h/2 1 ]   [ tx ty 1 ]
-                //
                 // https://www.wolframalpha.com/input/?i=%7B%7B1,0,0%7D,%7B0,1,0%7D,%7Bp_x,p_y,1%7D%7D+*+%7B%7Bs,0,0%7D,%7B0,s,0%7D,%7Bw%2F2,h%2F2,1%7D%7D
+                //
+                // therefore,
+                //  tx = px * s + w/2
+                //  ty = py * s + h/w
 
                 // sky background
                 batch.color = Color.WHITE
@@ -151,8 +166,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                     val ix = index % MinimapComposer.SQUARE_SIZE; val iy = index / MinimapComposer.SQUARE_SIZE
                     val ox = (ix - (MinimapComposer.SQUARE_SIZE / 2) + 0.5f) * MINIMAP_TILE_WIDTH
                     val oy = (iy - (MinimapComposer.SQUARE_SIZE / 2) + 0.5f) * MINIMAP_TILE_HEIGHT
-                    val tx = (minimapTranslateX - ox) * minimapZoom + 0.5f * MINIMAP_WIDTH
-                    val ty = (minimapTranslateY - oy) * minimapZoom + 0.5f * MINIMAP_HEIGHT
+                    val tx = (minimapDrawOffX - ox) * minimapZoom + MINIMAP_HALFW
+                    val ty = (minimapDrawOffY - oy) * minimapZoom + MINIMAP_HALFH
 
                     batch.draw(renderTextures[index], tx, ty, MINIMAP_TILE_WIDTH * minimapZoom, MINIMAP_TILE_HEIGHT * minimapZoom)
                 }
@@ -162,25 +177,27 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                     it.getSpriteHead()?.let { t ->
                         val ox = 0.5f * MINIMAP_TILE_WIDTH
                         val oy = 0.5f * MINIMAP_TILE_HEIGHT
-                        val tx = (minimapTranslateX - ox) * minimapZoom + 0.5f * MINIMAP_WIDTH
-                        val ty = (minimapTranslateY - oy) * minimapZoom + 0.5f * MINIMAP_HEIGHT
+                        val tx = (minimapDrawOffX - ox)
+                        val ty = (minimapDrawOffY - oy)
                         val worldPos = it.intTilewiseHitbox
                         val cw = it.scale.toFloat() * t.regionWidth
                         val ch = it.scale.toFloat() * t.regionHeight
-                        val cx = worldPos.centeredX.toFloat() + cw / 2
-                        val cy = worldPos.startY.toFloat() + (((it.baseHitboxH - 6) * it.scale) / TILE_SIZE).toFloat()// - (ch / 2)
-                        val dx = cx - minimapPanX
-                        val dy = cy - minimapPanY
+                        val cx = worldPos.centeredX.round().toFloat()
+                        val cy = worldPos.startY.round().toFloat()
+                        val dx = cx - oldPanX
+                        val dy = cy - oldPanY
 
-                        val x = tx + dx
-                        val y = ty + dy
+                        // tx/ty corresponds to world coord minimapPanXY
+
+                        val x = (tx + dx) * minimapZoom + MINIMAP_HALFW
+                        val y = (ty + dy) * minimapZoom + MINIMAP_HALFH
 
                         printdbg(this, "map pan: ($minimapPanX,$minimapPanY);draw pos: ($x,$y)")
 
                         if (it.sprite?.flipHorizontal == false)
-                            batch.draw(t, x, y, cw, ch)
+                            batch.draw(CommonResourcePool.getAsTextureRegion("test_texture"), x, y, cw, ch)
                         else
-                            batch.draw(t, x + cw, y, -cw, ch)
+                            batch.draw(CommonResourcePool.getAsTextureRegion("test_texture"), x + cw, y, -cw, ch)
                     }
                 }
             }
@@ -191,7 +208,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         val minimapDrawY = (height - cellOffY - App.scr.tvSafeGraphicsHeight - MINIMAP_HEIGHT - 72) / 2 + cellOffY * 1f
 
         if (debugvals) {
-            App.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; $minimapTranslateX, $minimapTranslateY; x$minimapZoom", minimapDrawX, minimapDrawY - 16f)
+            App.fontSmallNumbers.draw(batch, "Pan: ($minimapPanX,$minimapPanY) old ($oldPanX,$oldPanY); Trans: ($minimapDrawOffX,$minimapDrawOffY); x$minimapZoom", minimapDrawX, minimapDrawY - 16f)
         }
 
         batch.color = Color.WHITE
@@ -214,8 +231,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     override fun doClosing(delta: Float) {}
 
     override fun endOpening(delta: Float) {
-        minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.toFloat() ?: (INGAME.world.width / 2f)
-        minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.toFloat() ?: (INGAME.world.height / 2f)
+        minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.round()?.toFloat() ?: (INGAME.world.width / 2f)
+        minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.round()?.toFloat() ?: (INGAME.world.height / 2f)
 
         minimapRerenderInterval = 0.25f
     }
