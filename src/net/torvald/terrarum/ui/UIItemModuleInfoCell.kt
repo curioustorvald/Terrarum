@@ -42,6 +42,8 @@ class UIItemModuleInfoCell(
             t
         }
         CommonResourcePool.loadAll()
+
+
     }
 
     private val ccZero = App.fontGame.toColorCode(15,15,15)
@@ -70,7 +72,13 @@ class UIItemModuleInfoCell(
             App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 6f, initialY + 18f)
 
         batch.color = Color.WHITE
+        if (modErrored) {
+            batch.shader = App.shaderGhastlyWhite
+            batch.color = Color.LIGHT_GRAY
+        }
         batch.draw(modIcon, initialX + 35f, initialY.toFloat())
+        batch.shader = null
+        batch.color = Color.WHITE
         App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 6f, initialY + 2f)
         App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 6f, initialY + 26f)
 

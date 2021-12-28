@@ -11,7 +11,6 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.DefaultConfig
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2021-09-15.
@@ -361,20 +360,20 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             UIItemImageButton(parent, Keebsym.DOWN, initialX = col0, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             UIItemImageButton(parent, Keebsym.RIGHT, initialX = col0 + 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
-            // IME
-            UIItemImageButton(parent, Keebsym.IME, initialX = col1, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-
             // jump
-            UIItemImageButton(parent, Keebsym.JUMP, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // inventory
-            UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // hook
-            UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.JUMP, initialX = col1, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
+            // inventory
+            UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // hook
+            UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // quicksel
-            UIItemImageButton(parent, Keebsym.PIE, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+
             // zoom
-            UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // IME
+            UIItemImageButton(parent, Keebsym.IME, initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // system menu
             UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
@@ -392,14 +391,14 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
                 2 to "control_key_down",
                 3 to "control_key_right",
 
-                4 to "control_key_toggleime",
+                4 to "control_key_jump",
 
-                5 to "control_key_jump",
-                6 to "control_key_inventory",
-                7 to "control_key_movementaux",
+                5 to "control_key_inventory",
+                6 to "control_key_movementaux",
+                7 to "control_key_quicksel",
 
-                8 to "control_key_quicksel",
-                9 to "control_key_zoom",
+                8 to "control_key_zoom",
+                9 to "control_key_toggleime",
                 10 to "control_key_gamemenu",
         )
     }
@@ -423,14 +422,14 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         // texts
         batch.color = Color.WHITE
         App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], col0 + 72, posY + 43)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], col1 + 40, posY + 43)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col1 + 40, posY + 43)
 
-        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col0 + 40, row1)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row2)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row1)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row3)
 
-        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col1 + 40, row1)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], col1 + 40, row2)
         App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3)
     }
 
