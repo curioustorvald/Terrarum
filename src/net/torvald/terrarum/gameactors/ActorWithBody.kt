@@ -318,17 +318,17 @@ open class ActorWithBody : Actor {
     //@Transient private val CCD_TRY_MAX = 12800
 
     // just some trivial magic numbers
-    @Transient private val A_PIXEL = 1.0
-    @Transient private val HALF_PIXEL = 0.5
+    @Transient val A_PIXEL = 1.0
+    @Transient val HALF_PIXEL = 0.5
 
-    @Transient private val COLLIDING_LEFT = 1
-    @Transient private val COLLIDING_BOTTOM = 2
-    @Transient private val COLLIDING_RIGHT = 4
-    @Transient private val COLLIDING_TOP = 8
+    @Transient val COLLIDING_LEFT = 1
+    @Transient val COLLIDING_BOTTOM = 2
+    @Transient val COLLIDING_RIGHT = 4
+    @Transient val COLLIDING_TOP = 8
 
-    @Transient private val COLLIDING_UD = 10
-    @Transient private val COLLIDING_LR = 5
-    @Transient private val COLLIDING_ALLSIDE = 15
+    @Transient val COLLIDING_UD = 10
+    @Transient val COLLIDING_LR = 5
+    @Transient val COLLIDING_ALLSIDE = 15
     //@Transient private val COLLIDING_LEFT_EXTRA = 7
     //@Transient private val COLLIDING_RIGHT_EXTRA = 7
 
@@ -1051,7 +1051,7 @@ open class ActorWithBody : Actor {
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg
      */
-    private fun isWalled(hitbox: Hitbox, option: Int): Boolean {
+    fun isWalled(hitbox: Hitbox, option: Int): Boolean {
         val x1: Double
         val x2: Double
         val y1: Double

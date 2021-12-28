@@ -67,7 +67,7 @@ object LightmapRenderer {
 
     const val overscan_open: Int = 40
     const val overscan_opaque: Int = 10
-    const val LIGHTMAP_OVERRENDER = 20
+    const val LIGHTMAP_OVERRENDER = 10
 
     private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
     private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
@@ -166,10 +166,10 @@ object LightmapRenderer {
         if (WorldCamera.x < 0) for_draw_x_start -= 1 // edge case fix that light shift 1 tile to the left when WorldCamera.x < 0
         //if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_draw_x_start -= 1 // another edge-case fix; we don't need this anymore?
 
-        for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 3
-        for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 3 // same fix as above
-        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 3 + 2*LIGHTMAP_OVERRENDER
-        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 3 + 2*LIGHTMAP_OVERRENDER
+        for_x_end = for_x_start + WorldCamera.zoomedWidth / TILE_SIZE + 1
+        for_y_end = for_y_start + WorldCamera.zoomedHeight / TILE_SIZE + 1
+        for_draw_x_end = for_draw_x_start + WorldCamera.width / TILE_SIZE + 1 + 2*LIGHTMAP_OVERRENDER
+        for_draw_y_end = for_draw_y_start + WorldCamera.height / TILE_SIZE + 1 + 2*LIGHTMAP_OVERRENDER
 
         camX = WorldCamera.x / TILE_SIZE
         camY = WorldCamera.y / TILE_SIZE

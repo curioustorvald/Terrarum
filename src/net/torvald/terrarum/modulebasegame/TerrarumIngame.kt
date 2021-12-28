@@ -48,6 +48,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer.LIGHTMAP_OVERRENDER
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
@@ -798,15 +799,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             measureDebugTime("BlockStats.update") {
                 BlockStats.update()
             }
-            // fill up visibleActorsRenderFront for wires, if:
-            // 0. Camera or player x position wrapped
-            // 1. new world has been loaded
-            // 2. something is cued on the wire change queue
-            // 3. wire renderclass changed
-            if (Math.abs(WorldCamera.x - oldCamX) >= worldWidth * 0.5 ||
-                Math.abs((actorNowPlaying?.hitbox?.canonicalX ?: 0.0) - oldPlayerX) >= worldWidth * 0.5 ||
-                newWorldLoadedLatch || wireChangeQueue.isNotEmpty() || selectedWireRenderClass != oldSelectedWireRenderClass) {
-                measureDebugTime("Ingame.FillUpWiresBuffer") {
+            // fill up visibleActorsRenderFront for wires but not on every update
+            measureDebugTime("Ingame.FillUpWiresBuffer*") {
+                if (WORLD_UPDATE_TIMER % 2 == 1) {
                     fillUpWiresBuffer()
                 }
             }
@@ -894,11 +889,11 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     } }
 
     private fun fillUpWiresBuffer() {
-        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
-        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt() - LIGHTMAP_OVERRENDER
+        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical + 2*LIGHTMAP_OVERRENDER
 
-        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
-        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt() - LIGHTMAP_OVERRENDER
+        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal + 2*LIGHTMAP_OVERRENDER
 
         var wiringCounter = 0
         for (y in for_y_start..for_y_end) {

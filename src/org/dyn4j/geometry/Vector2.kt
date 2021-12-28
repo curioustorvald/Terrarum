@@ -288,6 +288,12 @@ class Vector2 {
         this.y = y
     }
 
+    fun setPolar(magnitude: Double, direction: Double) {
+        this.x = Math.cos(direction) * magnitude
+        this.y = Math.sin(direction) * magnitude
+    }
+
+
     /**
      * Returns the x component of this [Vector2].
      * @return [Vector2]

@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -55,6 +56,16 @@ open class DroppedItem : ActorWithBody {
         )
 
         setPosition(topLeftX + (hitbox.width / 2.0), topLeftY + hitbox.height)
+
+        // random horizontal movement
+        val magn = Math.random() * 1.3
+        externalV.x = if (isWalled(hitbox, COLLIDING_LEFT))
+            Math.cos(Math.random() * Math.PI / 2) * magn
+        else if (isWalled(hitbox, COLLIDING_RIGHT))
+            Math.cos(Math.random() * Math.PI / 2 + Math.PI / 2) * magn
+        else
+            Math.cos(Math.random() * Math.PI) * magn
+
     }
 
     override fun drawBody(batch: SpriteBatch) {
@@ -86,5 +97,6 @@ open class DroppedItem : ActorWithBody {
 
         timeSinceSpawned += delta
         // TODO merge into the already existing droppeditem with isStationary==true if one is detected
+
     }
 }
