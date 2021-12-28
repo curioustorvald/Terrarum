@@ -12,5 +12,7 @@
   "GAME_INVENTORY_REGISTER": "ﾧￚﾷﾩￌﾡﾾￂﾡￜ",
   "MENU_LABEL_MENU": "ﾱￇﾤￗ",
   "CONTEXT_ITEM_MAP": "ﾸￜﾧￌ",
-  "CONTEXT_GENERATOR_SEED": "ﾵￜﾧￚ"
+  "CONTEXT_GENERATOR_SEED": "ﾵￜﾧￚ",
+  "GAME_ACTION_GRAPPLE": "ﾱￃﾧￂﾩﾩￜﾡￜ",
+  "GAME_ACTION_QUICKSEL": "ﾳￂﾩￚﾤ ﾵￆﾤﾼￃﾡ"
 }

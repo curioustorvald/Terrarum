@@ -68,7 +68,7 @@ object DefaultConfig {
             "control_key_zoom" to Input.Keys.Z,
 
             "control_key_gamemenu" to Input.Keys.TAB,
-            "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because GDX does not read CapsLock
+            "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
             "control_mouse_quicksel" to Input.Buttons.MIDDLE, // middle click to open pie menu
 
             // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command

@@ -11,5 +11,7 @@
   "GAME_INVENTORY_REGISTER": "Register",
   "CONTEXT_ITEM_MAP": "Map",
   "MENU_LABEL_MENU": "Menu",
-  "CONTEXT_GENERATOR_SEED": "Seed"
+  "CONTEXT_GENERATOR_SEED": "Seed",
+  "GAME_ACTION_GRAPPLE": "Grapple",
+  "GAME_ACTION_QUICKSEL": "Quick Select"
 }

@@ -18,10 +18,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
-    init {
-    }
-
-    private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     override var width = 480
     override var height = 600
@@ -72,7 +68,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             Input.Keys.RIGHT_BRACKET to UIItemKeycap(this, 401,33,  Input.Keys.RIGHT_BRACKET, oneu, "13,3"),
             Input.Keys.BACKSLASH to UIItemKeycap(this, 433,33,  Input.Keys.BACKSLASH, onehalfu, "20,3"),
 
-            Input.Keys.CAPS_LOCK to UIItemKeycap(this, 1,65,  Input.Keys.CAPS_LOCK, twou, "24,3"),
+            -5 to UIItemKeycap(this, 1,65,  null, twou, "24,3"),
             Input.Keys.A to UIItemKeycap(this, 57,65,  Input.Keys.A, oneu, "0,4"),
             Input.Keys.S to UIItemKeycap(this, 89,65,  Input.Keys.S, oneu, "18,4"),
             Input.Keys.D to UIItemKeycap(this, 121,65,  Input.Keys.D, oneu, "3,4"),
@@ -121,18 +117,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
 
-    private val symbolLeft = labels.get(0,2)
-    private val symbolUp = labels.get(1,2)
-    private val symbolRight = labels.get(2,2)
-    private val symbolDown = labels.get(3,2)
-    private val symbolJump = labels.get(4,2)
-    private val symbolZoom = labels.get(5,2)
-    private val symbolInventory = labels.get(9,0)
-    private val symbolGrapplingHook = labels.get(5,1)
-    private val symbolGamemenu = labels.get(6,2)
-    private val symbolIME = labels.get(7,2)
-
-    private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 480) / 2, kby + 219)
+    private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 500) / 2, kby + 219)
 
     init {
 
@@ -140,7 +125,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         updateKeycaps()
 
         buttonReset.clickOnceListener = { x, y, button ->
-//            println("reset keys!")
             resetKeyConfig()
             updateKeycaps()
         }
@@ -151,38 +135,36 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     private fun resetKeyConfig() {
-        listOf("control_key_up",
+        listOf("control_key_up", // order of item is irrelevant
                 "control_key_left",
                 "control_key_down",
                 "control_key_right",
                 "control_key_jump",
                 "control_key_zoom",
                 "control_key_inventory",
-                "control_key_movementaux",
                 "control_key_gamemenu",
-                "control_key_toggleime"
+                "control_key_toggleime",
+                "control_key_movementaux",
+                "control_key_quicksel",
         ).forEach {
-
                     App.setConfig(it, DefaultConfig.hashMap[it]!! as Int)
         }
     }
 
     private fun updateKeycaps() {
         keycaps.values.forEach { it.symbolControl = null }
-        // read config and put icons
-        keycaps[App.getConfigInt("control_key_up")]?.symbolControl = symbolUp
-        keycaps[App.getConfigInt("control_key_left")]?.symbolControl = symbolLeft
-        keycaps[App.getConfigInt("control_key_down")]?.symbolControl = symbolDown
-        keycaps[App.getConfigInt("control_key_right")]?.symbolControl = symbolRight
-
-        keycaps[App.getConfigInt("control_key_jump")]?.symbolControl = symbolJump
-        keycaps[App.getConfigInt("control_key_zoom")]?.symbolControl = symbolZoom
-        keycaps[App.getConfigInt("control_key_inventory")]?.symbolControl = symbolInventory
-//        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = symbolGrapplingHook
-
-        keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = symbolGamemenu
-
-        keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = symbolIME
+        // read config and put icons. Item order irrelevant
+        keycaps[App.getConfigInt("control_key_up")]?.symbolControl = Keebsym.UP
+        keycaps[App.getConfigInt("control_key_left")]?.symbolControl = Keebsym.LEFT
+        keycaps[App.getConfigInt("control_key_down")]?.symbolControl = Keebsym.DOWN
+        keycaps[App.getConfigInt("control_key_right")]?.symbolControl = Keebsym.RIGHT
+        keycaps[App.getConfigInt("control_key_jump")]?.symbolControl = Keebsym.JUMP
+        keycaps[App.getConfigInt("control_key_zoom")]?.symbolControl = Keebsym.ZOOM
+        keycaps[App.getConfigInt("control_key_inventory")]?.symbolControl = Keebsym.INVENTORY
+        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = Keebsym.HOOK
+        keycaps[App.getConfigInt("control_key_quicksel")]?.symbolControl = Keebsym.PIE
+        keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = Keebsym.MENU
+        keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = Keebsym.IME
     }
 
     internal var keycapClicked = -13372
@@ -234,6 +216,18 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             App.setConfig(UIItemControlPaletteBaloon.indexToConfigKey[control]!!, key)
         }
         updateKeycaps()
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchDown(screenX, screenY, pointer, button)
+        buttonReset.touchDown(screenX, screenY, pointer, button)
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchUp(screenX, screenY, pointer, button)
+        buttonReset.touchUp(screenX, screenY, pointer, button)
+        return true
     }
 
     override fun doOpening(delta: Float) {
@@ -345,51 +339,68 @@ private class UIItemKeycap(
 }
 
 class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: Int, initialY: Int) : UIItem(parent, initialX, initialY) {
-    override val width = 480
-    override val height = 230
+    override val width = 500
+    override val height = 226
     override fun dispose() {}
-
-    private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     private val buttonBackground = Toolkit.Theme.COL_CELL_FILL.cpy().add(0f,0f,0f,1f)
 
+    private val col0 = initialX + 60
+    private val col1 =  initialX + (width / 2) + 30
+    
+    private val row1 = initialY + 100
+    private val row2 = row1 + 40
+    private val row3 = row2 + 40
+
+
+    // TEXT IS MANUALLY PRINTED ON render() !!
     private val iconButtons = arrayOf(
             // left up right down
-            UIItemImageButton(parent, icons.get(0,2), initialX = initialX + 154, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, icons.get(1,2), initialX = initialX + 188, initialY = initialY + 23, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, icons.get(2,2), initialX = initialX + 222, initialY = initialY + 40, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, icons.get(3,2), initialX = initialX + 188, initialY = initialY + 57, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // jump
-            UIItemImageButton(parent, icons.get(4,2), initialX = initialX + 50, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // inventory
-            UIItemImageButton(parent, icons.get(9,0), initialX = initialX + 50, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // IME
-            UIItemImageButton(parent, icons.get(7,2), initialX = initialX + 50, initialY = initialY + 180, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.LEFT, initialX = col0 - 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.UP, initialX = col0, initialY = initialY + 26, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.DOWN, initialX = col0, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.RIGHT, initialX = col0 + 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
+            // IME
+            UIItemImageButton(parent, Keebsym.IME, initialX = col1, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+
+            // jump
+            UIItemImageButton(parent, Keebsym.JUMP, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // inventory
+            UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // hook
+            UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+
+            // quicksel
+            UIItemImageButton(parent, Keebsym.PIE, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // zoom
-            UIItemImageButton(parent, icons.get(5,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 100, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // system menu
-            UIItemImageButton(parent, icons.get(6,2), initialX = initialX + (width / 2) + 20, initialY = initialY + 140, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
     )
 
     // close button is just for the cosmetics; the uiitem closes when you click anywhere on the UI
-    private val closeButton =
-            UIItemImageButton(parent, icons.get(22,0), initialX = initialX + width - 20, initialY = initialY, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0))
+    private val closeButton2 = UIItemImageButton(parent, Keebsym.CLOSE, initialX = initialX + width - 20, initialY = initialY, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0))
+    private val closeButton1 = UIItemImageButton(parent, Keebsym.CLOSE, initialX = initialX + 1, initialY = initialY, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0))
 
+    // indices must correspond with what's on the UIItemControlPaletteBaloon.iconButtons
     companion object {
         val indexToConfigKey = hashMapOf(
                 0 to "control_key_left",
                 1 to "control_key_up",
-                2 to "control_key_right",
-                3 to "control_key_down",
+                2 to "control_key_down",
+                3 to "control_key_right",
 
-                4 to "control_key_jump",
-                5 to "control_key_inventory",
-                6 to "control_key_toggleime",
+                4 to "control_key_toggleime",
 
-                7 to "control_key_zoom",
-                8 to "control_key_gamemenu",
+                5 to "control_key_jump",
+                6 to "control_key_inventory",
+                7 to "control_key_movementaux",
+
+                8 to "control_key_quicksel",
+                9 to "control_key_zoom",
+                10 to "control_key_gamemenu",
         )
     }
 
@@ -406,18 +417,21 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             Toolkit.drawBoxBorder(batch, it.posX-4, it.posY-4, 28, 28)
         }
 
-        closeButton.render(batch, camera)
+        closeButton1.render(batch, camera)
+        closeButton2.render(batch, camera)
 
         // texts
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], posX + 262f, posY + 40f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], col0 + 72, posY + 43)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], col1 + 40, posY + 43)
 
-        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], posX + 90f, posY + 100f)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], posX + 90f, posY + 140f)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], posX + 90f, posY + 180f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col0 + 40, row1)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3)
 
-        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], posX + (width / 2) + 60f, posY + 100f)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], posX + (width / 2) + 60f, posY + 140f)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col1 + 40, row1)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row2)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3)
     }
 
 
@@ -432,7 +446,8 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             }
         }
 
-        closeButton.update(delta)
+        closeButton1.update(delta)
+        closeButton2.update(delta)
 
         // close
         if (!mouseLatched && mousePushed) {
@@ -441,4 +456,20 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             parent.keycapClicked = -13372
         }
     }
+}
+
+private object Keebsym {
+    private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+    val CLOSE = labels.get(22,0)
+    val LEFT = labels.get(0,2)
+    val UP = labels.get(1,2)
+    val RIGHT = labels.get(2,2)
+    val DOWN = labels.get(3,2)
+    val JUMP = labels.get(4,2)
+    val ZOOM = labels.get(5,2)
+    val INVENTORY = labels.get(9,0)
+    val HOOK = labels.get(5,1)
+    val PIE = labels.get(8,1)
+    val MENU = labels.get(6,2)
+    val IME = labels.get(7,2)
 }
