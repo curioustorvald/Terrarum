@@ -71,7 +71,7 @@ Veuillez reconfigurer votre ordre de chargement sur :
                 gdxClearAndSetBlend(.094f, .094f, .094f, 1f)
                 batch.inUse {
                     batch.color = Color.WHITE
-                    wot.forEachIndexed { index, s ->
+                    wot.reversed().forEachIndexed { index, s ->
                         if (s.startsWith('\\')) {
                             val tagsSplit = s.indexOfFirst { it == ' ' }
                             val tagsBulk = s.substring(0, tagsSplit)
