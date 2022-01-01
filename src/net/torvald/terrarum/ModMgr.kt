@@ -101,6 +101,12 @@ object ModMgr {
      */
     fun getTitleScreen(batch: SpriteBatch): IngameInstance? = entryPointClasses.getOrNull(0)?.getTitleScreen(batch)
 
+    private fun List<String>.toVersionNumber() = 0L or
+            (this[0].replaceFirst('*','0').removeSuffix("+").toLong().shl(24)) or
+            (this.getOrElse(1) {"0"}.replaceFirst('*','0').removeSuffix("+").toLong().shl(16)) or
+            (this.getOrElse(2) {"0"}.replaceFirst('*','0').removeSuffix("+").toLong().coerceAtMost(65535))
+
+
     init {
         val loadOrderFile = FileSystems.getDefault().getPath("$modDir/LoadOrder.csv").toFile()
         if (loadOrderFile.exists()) {
@@ -143,6 +149,25 @@ object ModMgr {
                     val jar = modMetadata.getProperty("jar")
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
                     val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
+
+
+                    val versionNumeral = version.split('.')
+                    val versionNumber = versionNumeral.toVersionNumber()
+
+                    dependency.forEach {
+                        val (moduleName, moduleVersionStr) = it.split(' ')
+                        val numbers = moduleVersionStr.split('.')
+                        val checkVersionNumber = numbers.toVersionNumber() // version number required
+                        var operator = numbers.last().last() // can be '+', '*', or a number
+
+                        val checkAgainst = moduleInfo[moduleName]?.version // version number of what's installed
+                                           ?: throw ModuleDependencyNotSatisfied(it, "(module not installed)")
+
+                        // TODO make version number check here (hint: use moduleInfo)
+
+                    }
+
+
                     moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
 
                     printdbg(this, moduleInfo[moduleName])
@@ -202,6 +227,9 @@ object ModMgr {
                     moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
                 }
                 catch (e: Throwable) {
+                    // TODO: Instead of skipping module with error, just display the error message onto the face?
+
+
                     printdbgerr(this, "There was an error while loading module $moduleName")
                     printdbgerr(this, "\t$e")
                     print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
@@ -216,6 +244,9 @@ object ModMgr {
             }
         }
     }
+
+    private class ModuleDependencyNotSatisfied(want: String, have: String) :
+            RuntimeException("Required: $want, Installed: $have")
 
     operator fun invoke() { }
 

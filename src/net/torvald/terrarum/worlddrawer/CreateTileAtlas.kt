@@ -123,12 +123,6 @@ class CreateTileAtlas {
                 System.err.println("Couldn't load file $filehandle from $modname, skipping...")
             }
         }
-        // hard-coding shits
-        tags["basegame:4090"] = RenderTag(
-                tags["basegame:4090"]!!.tileNumber,
-                RenderTag.CONNECT_MUTUAL,
-                RenderTag.MASK_NA
-        )
 
         // test print
         //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), atlas, false)

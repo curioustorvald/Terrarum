@@ -822,27 +822,27 @@ object IngameRenderer : Disposable {
     }
 
     override fun dispose() {
-        blurWriteQuad.dispose()
-        blurWriteQuad2.dispose()
-        //blurWriteQuad4.dispose()
+        try { blurWriteQuad.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        try { blurWriteQuad2.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        //try { blurWriteQuad4.dispose() } catch (e: UninitializedPropertyAccessException) {}
 
-        fboRGB.dispose()
-        fboA.dispose()
-        fboRGB_lightMixed.dispose()
-        fboA_lightMixed.dispose()
-        fboMixedOut.dispose()
-        lightmapFbo.dispose()
+        try { fboRGB.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        try { fboA.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        try { fboRGB_lightMixed.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        try { fboA_lightMixed.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        try { fboMixedOut.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        try { lightmapFbo.dispose() } catch (e: UninitializedPropertyAccessException) {}
 
         try { blurtex0.dispose() } catch (e: GdxRuntimeException) {}
 
-        fboBlurHalf.dispose()
-        //fboBlurQuarter.dispose()
+        try { fboBlurHalf.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        //try { fboBlurQuarter.dispose() } catch (e: UninitializedPropertyAccessException) {}
 
         LightmapRenderer.dispose()
         BlocksDrawer.dispose()
         WeatherMixer.dispose()
 
-        batch.dispose()
+        try { batch.dispose() } catch (e: UninitializedPropertyAccessException) {}
 
 
         shaderBlur.dispose()

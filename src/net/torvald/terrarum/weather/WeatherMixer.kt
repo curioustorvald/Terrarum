@@ -58,10 +58,11 @@ internal object WeatherMixer : RNGConsumer {
     init {
         weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
 
+
         // read weather descriptions from assets/weather (modular weather)
         val weatherRawValidList = ArrayList<File>()
-        val weatherRaws = ModMgr.getFiles("basegame", "weathers")
-        weatherRaws.forEach {
+        val weatherRaws = ModMgr.getFilesFromEveryMod("weathers")
+        weatherRaws.forEach { (modname, it) ->
             if (!it.isDirectory && it.name.endsWith(".json"))
                 weatherRawValidList.add(it)
         }
@@ -79,8 +80,20 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // initialise
-        currentWeather = weatherList[WEATHER_GENERIC]!![0]
-        nextWeather = getRandomWeather(WEATHER_GENERIC)
+        try {
+            currentWeather = weatherList[WEATHER_GENERIC]!![0]
+            nextWeather = getRandomWeather(WEATHER_GENERIC)
+        }
+        catch (e: NullPointerException) {
+            val defaultWeather = BaseModularWeather(
+                    GdxColorMap(Color(0x55aaffff), Color(0xaaffffff.toInt())),
+                    "default",
+                    ArrayList<Texture>()
+            )
+
+            currentWeather = defaultWeather
+            nextWeather = defaultWeather
+        }
     }
 
     /**

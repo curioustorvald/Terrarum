@@ -721,7 +721,7 @@ internal object BlocksDrawer {
         tilesFluid.dispose()
         tilesBuffer.dispose()
         _tilesBufferAsTex.dispose()
-        tilesQuad.dispose()
+        try { tilesQuad.dispose() } catch (e: UninitializedPropertyAccessException) {}
         shader.dispose()
 
         App.tileMaker.dispose()

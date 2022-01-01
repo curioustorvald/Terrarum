@@ -47,7 +47,6 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameLanguageLoader.invoke(moduleName)
 
-
         /////////////////////////////////
         // load customised item loader //
         /////////////////////////////////
@@ -66,8 +65,6 @@ class EntryPoint : ModuleEntryPoint() {
                 if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
             }
         }
-
-
 
         println("[Basegame.EntryPoint] Welcome back!")
     }
