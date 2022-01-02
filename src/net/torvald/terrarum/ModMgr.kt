@@ -147,24 +147,26 @@ object ModMgr {
                     val releaseDate = modMetadata.getProperty("releasedate")
                     val version = modMetadata.getProperty("version")
                     val jar = modMetadata.getProperty("jar")
-                    val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
+                    val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
                     val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
 
                     val versionNumeral = version.split('.')
                     val versionNumber = versionNumeral.toVersionNumber()
 
-                    dependency.forEach {
-                        val (moduleName, moduleVersionStr) = it.split(' ')
+                    dependency.forEach { nameAndVersionStr ->
+                        val (moduleName, moduleVersionStr) = nameAndVersionStr.split(' ')
                         val numbers = moduleVersionStr.split('.')
                         val checkVersionNumber = numbers.toVersionNumber() // version number required
                         var operator = numbers.last().last() // can be '+', '*', or a number
 
-                        val checkAgainst = moduleInfo[moduleName]?.version // version number of what's installed
-                                           ?: throw ModuleDependencyNotSatisfied(it, "(module not installed)")
+                        val checkAgainstStr = moduleInfo[moduleName]?.version ?: throw ModuleDependencyNotSatisfied(nameAndVersionStr, "(module not installed)")
+                        val checkAgainst =checkAgainstStr.split('.').toVersionNumber() // version number of what's installed
 
-                        // TODO make version number check here (hint: use moduleInfo)
-
+                        when (operator) {
+                            '+', '*' -> if (checkVersionNumber > checkAgainst) throw ModuleDependencyNotSatisfied(nameAndVersionStr, "$moduleName $checkAgainstStr")
+                            else -> if (checkVersionNumber != checkAgainst) throw ModuleDependencyNotSatisfied(nameAndVersionStr, "$moduleName $checkAgainstStr")
+                        }
                     }
 
 
