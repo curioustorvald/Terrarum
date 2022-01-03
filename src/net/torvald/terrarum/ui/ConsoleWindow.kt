@@ -129,13 +129,6 @@ class ConsoleWindow : UICanvas() {
         }
 
         uiItems.forEach { it.render(batch, camera) }
-
-        Terrarum.ingame?.let {
-            batch.color = Color.WHITE
-            it.actorNowPlaying?.getSpriteHead()!!.let {
-                batch.draw(it, drawOffX + 10f, drawOffY + height + 4f)
-            }
-        }
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {

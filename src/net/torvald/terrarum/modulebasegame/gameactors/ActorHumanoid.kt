@@ -197,6 +197,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
         if (isNoClip) {
             //grounded = true
+            platformsToIgnore = null
         }
 
         // reset control box of AI
@@ -498,6 +499,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
 
         isWalkingV = true
+
+
+
+        // TODO do something to the ActorWithBody.platformsToIgnore
     }
 
     private fun applyAccel(x: Int): Double {
