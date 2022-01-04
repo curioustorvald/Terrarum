@@ -503,6 +503,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
 
         // TODO do something to the ActorWithBody.platformsToIgnore
+        
     }
 
     private fun applyAccel(x: Int): Double {
@@ -527,6 +528,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     private fun walkVStop() {
         walkCounterY = 0
         isWalkingV = false
+        platformsToIgnore = null
     }
 
     private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {

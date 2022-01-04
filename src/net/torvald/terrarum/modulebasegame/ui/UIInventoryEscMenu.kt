@@ -31,7 +31,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             "MENU_LABEL_GRAPHICS",
             "MENU_OPTIONS_CONTROLS",
             "MENU_LABEL_MAINMENU",
-            "MENU_LABEL_QUIT",
+//            "MENU_LABEL_QUIT",
     )
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
@@ -59,7 +59,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             inactiveCol = Color.WHITE,
             defaultSelection = null
     )
-    private val areYouSureQuitButtons = UIItemTextButtonList(
+    /*private val areYouSureQuitButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_DESKTOP_QUESTION", "MENU_LABEL_DESKTOP", "MENU_LABEL_CANCEL"),
             (width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y() + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
@@ -70,7 +70,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             highlightBackCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
-    )
+    )*/
     private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
 
     private val keyConfigUI = UIKeyboardControlPanel(null)
@@ -122,9 +122,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 3 -> {
                     screen = 2; gameMenuButtons.deselect()
                 }
-                4 -> {
+                /*4 -> {
                     screen = 1; gameMenuButtons.deselect()
-                }
+                }*/
             }
         }
         areYouSureMainMenuButtons.selectionChangeListener = { _, new ->
@@ -138,18 +138,18 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 }
             }
         }
-        areYouSureQuitButtons.selectionChangeListener = { _, new ->
+        /*areYouSureQuitButtons.selectionChangeListener = { _, new ->
             when (new) {
-                1 -> Gdx.app.exit()
-                2 -> {
+                2 -> Gdx.app.exit()
+                3 -> {
                     screen = 0; areYouSureQuitButtons.deselect()
                 }
             }
-        }
+        }*/
     }
 
     private val screens = arrayOf(
-            gameMenuButtons, areYouSureQuitButtons, areYouSureMainMenuButtons, savingUI, keyConfigUI
+            gameMenuButtons, null, areYouSureMainMenuButtons, savingUI, keyConfigUI
     )
 
 
@@ -165,7 +165,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
 
-                areYouSureQuitButtons.render(batch, camera)
+//                areYouSureQuitButtons.render(batch, camera)
             },
             { batch: SpriteBatch, camera: Camera ->
                 // control hints

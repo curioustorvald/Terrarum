@@ -52,13 +52,13 @@ class GdxColorMap {
         is2D = false
     }
 
-    constructor(gradStart: Color, gradEnd: Color) {
-        dataRaw = intArrayOf(gradStart.toIntBits(), gradEnd.toIntBits())
+    constructor(width: Int, height: Int, vararg colours: Color) {
+        dataRaw = colours.map { it.toIntBits() }.toIntArray()
         dataGdxColor = dataRaw.map { Color(it) }.toTypedArray()
         dataCvec = dataRaw.map { Cvec(it) }.toTypedArray()
-        width = 1
-        height = 2
-        is2D = true
+        this.width = width
+        this.height = height
+        is2D = (height > 1)
     }
 
     private val dataRaw: IntArray

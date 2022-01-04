@@ -7,6 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -18,6 +19,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
+import java.io.FileFilter
 
 /**
  *
@@ -61,10 +63,13 @@ internal object WeatherMixer : RNGConsumer {
 
         // read weather descriptions from assets/weather (modular weather)
         val weatherRawValidList = ArrayList<File>()
-        val weatherRaws = ModMgr.getFilesFromEveryMod("weathers")
-        weatherRaws.forEach { (modname, it) ->
-            if (!it.isDirectory && it.name.endsWith(".json"))
+        val weatherRawsDir = ModMgr.getFilesFromEveryMod("weathers")
+        weatherRawsDir.forEach { (modname, parentdir) ->
+            printdbg(this, "Scanning dir $parentdir")
+            parentdir.listFiles(FileFilter { !it.isDirectory && it.name.endsWith(".json") })?.forEach {
                 weatherRawValidList.add(it)
+                printdbg(this, "Registering weather '$it' from module $modname")
+            }
         }
         // --> read from directory and store file that looks like RAW
         for (raw in weatherRawValidList) {
@@ -85,8 +90,10 @@ internal object WeatherMixer : RNGConsumer {
             nextWeather = getRandomWeather(WEATHER_GENERIC)
         }
         catch (e: NullPointerException) {
+            e.printStackTrace()
+
             val defaultWeather = BaseModularWeather(
-                    GdxColorMap(Color(0x55aaffff), Color(0xaaffffff.toInt())),
+                    GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
                     "default",
                     ArrayList<Texture>()
             )
@@ -102,7 +109,7 @@ internal object WeatherMixer : RNGConsumer {
     fun update(delta: Float, player: ActorWithBody?, world: GameWorld) {
         if (player == null) return
 
-        currentWeather = weatherList[WEATHER_GENERIC]!![0]
+//        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
 
 
         // test rain toggled by F2
@@ -237,8 +244,8 @@ internal object WeatherMixer : RNGConsumer {
         val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
         val phaseNext: Int = (phaseThis + 1) % colorMap.width
 
-        val colourThis = colorMap.get(phaseThis, row)
-        val colourNext = colorMap.get(phaseNext, row)
+        val colourThis = colorMap.get(phaseThis % colorMap.width, row)
+        val colourNext = colorMap.get(phaseNext % colorMap.width, row)
 
         // interpolate R, G, B and A
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
