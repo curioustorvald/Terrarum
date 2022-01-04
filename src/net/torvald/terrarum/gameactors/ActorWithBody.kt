@@ -1285,12 +1285,12 @@ open class ActorWithBody : Actor {
             (BlockCodex[tile].isSolid)
 
     // the location and size of the platform in world coord
-    protected var platformsToIgnore: Hitbox? = null
+    protected var platformToIgnore: Hitbox? = null
 
-    private fun standingOnIgnoredPlatform(): Boolean = platformsToIgnore.let {
+    private fun standingOnIgnoredPlatform(): Boolean = platformToIgnore.let {
         return if (it != null)
-            hitbox.startX >= it.startX && hitbox.endX <= it.endX - PHYS_EPSILON_DIST &&
-            it.startY <= hitbox.endY && hitbox.endY <= it.endY - PHYS_EPSILON_DIST
+            hitbox.startX >= it.startX && hitbox.endX < it.endX - PHYS_EPSILON_DIST &&
+            it.startY <= hitbox.endY && hitbox.endY < it.endY - PHYS_EPSILON_DIST
         else false
     }
 
@@ -1303,17 +1303,15 @@ open class ActorWithBody : Actor {
             // regular solid block
             (BlockCodex[tile].isSolid) ||
             // or platforms that are not on the "ignored list" (the list is updated on the update())
-            (this is ActorHumanoid && BlockCodex[tile].isPlatform && !standingOnIgnoredPlatform())
-
-    /*
-    // platforms, moving downward AND not "going down"
-    (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
-    externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
-    !this.isDownDown && this.axisY <= 0f) ||
-    // platforms, moving downward
-    (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
-    externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
-     */
+            // THIS IS NOT A CAUSE OF THE "OSCILLATING PLATFORM" BUG
+            //(this is ActorHumanoid && BlockCodex[tile].isPlatform && !standingOnIgnoredPlatform())
+            // platforms, moving downward AND not "going down"
+            (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
+            externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
+            !this.isDownDown && this.axisY <= 0f) ||
+            // platforms, moving downward
+            (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
+            externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
     // TODO: as for the platform, only apply it when it's a feet tile
 
 
@@ -1747,7 +1745,7 @@ open class ActorWithBody : Actor {
     }
 
 
-    private fun forEachOccupyingTileNum(consumer: (ItemID?) -> Unit) {
+    fun forEachOccupyingTileNum(consumer: (ItemID?) -> Unit) {
         if (world == null) return
 
 
@@ -1761,7 +1759,7 @@ open class ActorWithBody : Actor {
         return tiles.forEach(consumer)
     }
 
-    private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
+    fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
         if (world == null) return
 
 
@@ -1775,7 +1773,7 @@ open class ActorWithBody : Actor {
         return tileProps.forEach(consumer)
     }
 
-    private fun forEachOccupyingFluid(consumer: (GameWorld.FluidInfo?) -> Unit) {
+    fun forEachOccupyingFluid(consumer: (GameWorld.FluidInfo?) -> Unit) {
         if (world == null) return
 
 
@@ -1790,7 +1788,7 @@ open class ActorWithBody : Actor {
         return fluids.forEach(consumer)
     }
 
-    private fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
+    fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
         if (world == null) return
 
 
@@ -1812,7 +1810,7 @@ open class ActorWithBody : Actor {
         return tilePosList.forEach(consumer)
     }
 
-    private fun forEachFeetTileNum(consumer: (ItemID?) -> Unit) {
+    fun forEachFeetTileNum(consumer: (ItemID?) -> Unit) {
         if (world == null) return
 
 
@@ -1828,7 +1826,7 @@ open class ActorWithBody : Actor {
         return tiles.forEach(consumer)
     }
 
-    private fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
+    fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
         if (world == null) return
 
 

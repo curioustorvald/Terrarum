@@ -7,6 +7,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitems.GameItem
@@ -197,7 +198,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
         if (isNoClip) {
             //grounded = true
-            platformsToIgnore = null
+            platformToIgnore = null
         }
 
         // reset control box of AI
@@ -474,7 +475,6 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
-        if (up && walledTop || !up && walledBottom) return
 
 
         if (avAcceleration.isNaN()) {
@@ -482,6 +482,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
 
 
+//        if (up && walledTop || !up && walledBottom) return
         readonly_totalY =
                 if (absAxisVal == AXIS_KEYBOARD)
                     avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f)
@@ -501,9 +502,31 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         isWalkingV = true
 
 
+        // determine a platform to ignore
+        world?.let { world ->
+            var hasPlatformOnTheFeet = false
+            forEachFeetTile { if (it?.isPlatform == true) hasPlatformOnTheFeet = true }
 
-        // TODO do something to the ActorWithBody.platformsToIgnore
-        
+            if (hasPlatformOnTheFeet) {
+                // equation copied verbatim from the ActorWthBody.forEachFeetTile
+                val y = hitbox.endY.plus(1.0).div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
+                var wxStart = hIntTilewiseHitbox.startX.toInt()
+                var wxEnd = wxStart
+                // scan to the left
+                while (BlockCodex[world.getTileFromTerrain(wxStart, y)].isPlatform) wxStart -= 1
+                // scan to the right
+                while (BlockCodex[world.getTileFromTerrain(wxEnd, y)].isPlatform) wxEnd += 1
+
+                platformToIgnore = Hitbox.fromTwoPoints(
+                        (wxStart+1) * TILE_SIZED,
+                        y * TILE_SIZED,
+                        wxEnd * TILE_SIZED,
+                        (y+1) * TILE_SIZED,
+                        true
+                )
+            }
+
+        }
     }
 
     private fun applyAccel(x: Int): Double {
@@ -528,7 +551,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     private fun walkVStop() {
         walkCounterY = 0
         isWalkingV = false
-        platformsToIgnore = null
+        platformToIgnore = null
     }
 
     private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {
