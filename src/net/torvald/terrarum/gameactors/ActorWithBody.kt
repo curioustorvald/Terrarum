@@ -564,7 +564,7 @@ open class ActorWithBody : Actor {
         /**
          * Area
          */
-        val A: Double = (scale * baseHitboxW / METER) * (scale * baseHitboxW / METER)
+        val A: Double = (scale.sqrt() * baseHitboxW / METER).sqr() // this is not physically accurate but it's needed to make large playable characters more controllable
         /**
          * Drag of atmosphere
          * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
