@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.linearSearch
+import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.SimpleFileSystem
@@ -175,12 +176,41 @@ object AssembleSheetPixmap {
     ) {
         val tmpFrame = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888)
 
-        transformList.forEach { (name, pos) ->
-            bodypartImages[name]?.let { image ->
-                val imgCentre = bodypartOrigins[name]!!.invertX()
-                val drawPos = props.origin + pos + imgCentre
+        transformList.forEach { (name, bodypartPos) ->
+            if (name == "HELD_ITEM") {
+                injectedItem?.itemImage?.let { textureRegion ->
+                    // TODO FIXME tiles are not being drawn
+                    val texdata = textureRegion.texture.textureData
+                    texdata.prepare()
+                    val imageSheet = texdata.consumePixmap()
 
-                tmpFrame.drawPixmap(image, drawPos.x, props.frameHeight - drawPos.y - 1)
+                    val drawPos = props.origin + bodypartPos
+
+                    val pu = (textureRegion.u * texdata.width).toInt()
+                    val pv = (textureRegion.v * texdata.height).toInt()
+                    val pu2 = (textureRegion.u2 * texdata.width).toInt()
+                    val pv2 = (textureRegion.v2 * texdata.height).toInt()
+                    val imageHeight = textureRegion.regionHeight
+
+                    for (y in pv until pv2) { for (x in pu until pu2) {
+                        val pixel = imageSheet.getPixel(x, y)
+                        tmpFrame.drawPixel(
+                                drawPos.x + x - pu,
+                                (props.frameHeight - drawPos.y - 1) + y - pv - imageHeight,
+                                pixel
+                        )
+                    } }
+
+                    imageSheet.dispose()
+                }
+            }
+            else {
+                bodypartImages[name]?.let { image ->
+                    val imgCentre = bodypartOrigins[name]!!.invertX()
+                    val drawPos = props.origin + bodypartPos + imgCentre
+
+                    tmpFrame.drawPixmap(image, drawPos.x, props.frameHeight - drawPos.y - 1)
+                }
             }
         }
 
@@ -190,7 +220,6 @@ object AssembleSheetPixmap {
                 (row - 1) * props.frameHeight
         )
 
-        // TODO use injectedItem
 
         tmpFrame.dispose()
 
