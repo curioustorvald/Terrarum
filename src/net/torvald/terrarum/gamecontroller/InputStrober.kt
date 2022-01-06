@@ -30,6 +30,7 @@ object InputStrober {
 
     init {
 //        println("InputStrobe start")
+        thread.priority = 10
         thread.start()
     }
 

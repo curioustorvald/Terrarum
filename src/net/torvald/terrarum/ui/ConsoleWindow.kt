@@ -174,7 +174,7 @@ class ConsoleWindow : UICanvas() {
             }
         }
         catch (e: ConcurrentModificationException) {
-            System.err.println("[ConsoleWindow] ConcurrentModificationException")
+            System.err.println("[ConsoleWindow.keyDown] ConcurrentModificationException with key ${Input.Keys.toString(key)}")
         }
 
 
