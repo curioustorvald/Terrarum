@@ -163,8 +163,8 @@ object LoadSavegame {
         newIngame.worldSavefileName = getWorldSavefileName(newIngame.savegameNickname, world)
         newIngame.playerSavefileName = getPlayerSavefileName(player)
 
-        worldDisk.dispose()
-        playerDisk.dispose()
+//        worldDisk.dispose()
+//        playerDisk.dispose()
 
         val loadJob = { it: LoadScreenBase ->
             val loadscreen = it as ChunkLoadingLoadScreen

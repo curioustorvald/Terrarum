@@ -441,9 +441,9 @@ removefile:
     }
 
 
-    fun dispose() {
-        fa.close()
-    }
+//    fun dispose() {
+//        fa.close()
+//    }
 
 
     companion object {

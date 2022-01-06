@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -30,11 +31,11 @@ interface HasAssembledSprite {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
+    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null, item: GameItem?) {
         if (animDesc != null && sprite != null)
-            _rebuild(animDesc!!, sprite)
+            _rebuild(animDesc!!, sprite, null)
         if (animDescGlow != null && spriteGlow != null)
-            _rebuild(animDescGlow!!, spriteGlow)
+            _rebuild(animDescGlow!!, spriteGlow, null)
     }
 
     /*fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
@@ -44,10 +45,10 @@ interface HasAssembledSprite {
             _rebuild(disk, animGlow, spriteGlow)
     }*/
 
-    private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation) {
+    private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        val pixmap = AssembleSheetPixmap.fromAssetsDir(ad)
+        val pixmap = AssembleSheetPixmap.fromAssetsDir(ad, item)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()

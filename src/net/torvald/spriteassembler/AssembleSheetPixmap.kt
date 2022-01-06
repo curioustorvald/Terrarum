@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
@@ -47,25 +48,25 @@ object AssembleSheetPixmap {
     }
 
 
-    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?): Pixmap {
+    private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?, injectedItem: GameItem?): Pixmap {
         val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
 
         // actually draw
         properties.transforms.forEach { t, _ ->
-            drawThisFrame(t, canvas, properties, fileGetter)
+            drawThisFrame(t, canvas, properties, fileGetter, injectedItem)
         }
 
         return canvas
     }
 
-    fun fromAssetsDir(properties: ADProperties) = drawAndGetCanvas(properties, getAssetsDirFileGetter(properties))
+    fun fromAssetsDir(properties: ADProperties, injectedItem: GameItem?) = drawAndGetCanvas(properties, getAssetsDirFileGetter(properties), injectedItem)
 
-    fun fromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties): Pixmap {
+    fun fromVirtualDisk(disk: SimpleFileSystem, entrynum: Long, properties: ADProperties, injectedItem: GameItem?): Pixmap {
         val bodypartMapping = Properties()
         bodypartMapping.load(ByteArray64Reader(disk.getFile(entrynum)!!.bytes, Common.CHARSET))
 
-        return drawAndGetCanvas(properties, getVirtualDiskFileGetter(bodypartMapping, disk))
+        return drawAndGetCanvas(properties, getVirtualDiskFileGetter(bodypartMapping, disk), injectedItem)
     }
 
     fun getPartPixmap(getFile: (String) -> InputStream?, partName: String): Pixmap? {
@@ -131,7 +132,8 @@ object AssembleSheetPixmap {
     private fun drawThisFrame(frameName: String,
                               canvas: Pixmap,
                               properties: ADProperties,
-                              fileGetter: (String) -> InputStream?
+                              fileGetter: (String) -> InputStream?,
+                              injectedItem: GameItem?
     ) {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
@@ -158,7 +160,7 @@ object AssembleSheetPixmap {
 
 //        AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
-        drawFrame(animRow, animFrame, canvas, properties, bodypartOrigins, bodypartImages, transformList)
+        drawFrame(animRow, animFrame, canvas, properties, bodypartOrigins, bodypartImages, transformList, injectedItem)
 
         bodypartImages.values.forEach { it?.dispose() }
     }
@@ -168,7 +170,8 @@ object AssembleSheetPixmap {
                           props: ADProperties,
                           bodypartOrigins: HashMap<String, ADPropertyObject.Vector2i>,
                           bodypartImages: Map<String, Pixmap?>,
-                          transformList: List<Pair<String, ADPropertyObject.Vector2i>>
+                          transformList: List<Pair<String, ADPropertyObject.Vector2i>>,
+                          injectedItem: GameItem?
     ) {
         val tmpFrame = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888)
 
@@ -186,6 +189,8 @@ object AssembleSheetPixmap {
                 (column - 1) * props.frameWidth,
                 (row - 1) * props.frameHeight
         )
+
+        // TODO use injectedItem
 
         tmpFrame.dispose()
 

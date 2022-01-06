@@ -3,8 +3,10 @@ package net.torvald.terrarum.serialise
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.spriteassembler.ADProperties
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.*
@@ -140,16 +142,18 @@ object ReadActor {
                 actor.animDescGlow = ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
             }
 
+            val heldItem = ItemCodex[actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]]
+
             if (bodypartsFile != null)
-                actor.reassembleSprite(disk, actor.sprite!!, actor.spriteGlow)
+                actor.reassembleSpriteFromDisk(disk, actor.sprite!!, actor.spriteGlow, heldItem)
             else
-                actor.reassembleSprite(actor.sprite!!, actor.spriteGlow)
+                actor.reassembleSprite(actor.sprite!!, actor.spriteGlow, heldItem)
         }
         else if (actor is ActorWithBody && actor is HasAssembledSprite) {
             if (actor.animDesc != null) actor.sprite = SpriteAnimation(actor)
             if (actor.animDescGlow != null) actor.spriteGlow = SpriteAnimation(actor)
 
-            actor.reassembleSprite(actor.sprite, actor.spriteGlow)
+            actor.reassembleSprite(actor.sprite, actor.spriteGlow, null)
         }
 
 

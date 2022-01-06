@@ -551,7 +551,7 @@ class UIItemPlayerCells(
                 val p = ReadPlayer(skimmer, ByteArray64Reader(it, Common.CHARSET))
                 p.sprite = SpriteAnimation(p)
                 p.animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
-                p.reassembleSprite(skimmer, p.sprite)
+                p.reassembleSpriteFromDisk(skimmer, p.sprite, null, null)
                 p.sprite!!.textureRegion.get(0,0).let {
                     thumb = it
                     thumb!!.flip(false, false)

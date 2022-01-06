@@ -30,7 +30,7 @@ object PlayerBuilderWerebeastTest {
 
         p.sprite = SpriteAnimation(p)
         p.spriteGlow = SpriteAnimation(p)
-        p.reassembleSprite(p.sprite, p.spriteGlow)
+        p.reassembleSprite(p.sprite, p.spriteGlow, null)
         p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 30, 0)
 
         p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)

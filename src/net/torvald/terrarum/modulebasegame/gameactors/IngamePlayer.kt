@@ -9,6 +9,7 @@ import net.torvald.spriteassembler.AssembleSheetPixmap
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.savegame.SimpleFileSystem
 import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -71,6 +72,12 @@ class IngamePlayer : ActorHumanoid {
     }
 
 
+    /** To be used later by the game to rebuild the sprite.
+     * Which `_rebuild` function to use is determined at the load time.
+     */
+    private lateinit var rebuildfun: (item: GameItem?) -> Unit
+    private lateinit var rebuildfunGlow: (item: GameItem?) -> Unit
+
 
     /**
      * Example usage:
@@ -82,19 +89,19 @@ class IngamePlayer : ActorHumanoid {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
+    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
         if (animDesc != null && sprite != null) {
-            _rebuild(animDesc!!, sprite)
+            rebuildfun = { item: GameItem? -> _rebuild(animDesc!!, sprite, item) }; rebuildfun(heldItem)
             spriteHeadTexture = AssembleSheetPixmap.getMugshotFromAssetsDir(animDesc!!)
         }
         if (animDescGlow != null && spriteGlow != null)
-            _rebuild(animDescGlow!!, spriteGlow)
+            rebuildfunGlow = { item: GameItem? -> _rebuild(animDescGlow!!, spriteGlow, item) }; rebuildfunGlow(heldItem)
 
     }
 
-    fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null) {
+    fun reassembleSpriteFromDisk(disk: SimpleFileSystem, sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
         if (animDesc != null && sprite != null) {
-            _rebuild(disk, -1025L, animDesc!!, sprite)
+            rebuildfun = { item: GameItem? -> _rebuild(disk, -1025L, animDesc!!, sprite, item) }; rebuildfun(heldItem)
 
             if (disk.getEntry(-1025L) != null)
                 spriteHeadTexture = AssembleSheetPixmap.getMugshotFromVirtualDisk(disk, -1025L, animDesc!!)
@@ -102,13 +109,13 @@ class IngamePlayer : ActorHumanoid {
                 spriteHeadTexture = AssembleSheetPixmap.getMugshotFromAssetsDir(animDesc!!)
         }
         if (animDescGlow != null && spriteGlow != null)
-            _rebuild(disk, -1026L, animDescGlow!!, spriteGlow)
+            rebuildfunGlow = { item: GameItem? -> _rebuild(disk, -1026L, animDescGlow!!, spriteGlow, item) }; rebuildfunGlow(heldItem)
     }
 
-    private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation) {
+    private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        val pixmap = AssembleSheetPixmap.fromAssetsDir(ad)
+        val pixmap = AssembleSheetPixmap.fromAssetsDir(ad, item)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()
@@ -129,10 +136,10 @@ class IngamePlayer : ActorHumanoid {
         sprite.nRows = newAnimDelays.size
     }
 
-    private fun _rebuild(disk: SimpleFileSystem, entrynum: Long, ad: ADProperties, sprite: SpriteAnimation) {
+    private fun _rebuild(disk: SimpleFileSystem, entrynum: Long, ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
-        val pixmap = if (disk.getEntry(entrynum) != null) AssembleSheetPixmap.fromVirtualDisk(disk, entrynum, ad) else AssembleSheetPixmap.fromAssetsDir(ad)
+        val pixmap = if (disk.getEntry(entrynum) != null) AssembleSheetPixmap.fromVirtualDisk(disk, entrynum, ad, item) else AssembleSheetPixmap.fromAssetsDir(ad, item)
         val texture = Texture(pixmap)
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         pixmap.dispose()
@@ -155,5 +162,25 @@ class IngamePlayer : ActorHumanoid {
 
     override fun getSpriteHead(): TextureRegion? {
         return spriteHeadTexture
+    }
+
+    override fun equipItem(item: GameItem) {
+        super.equipItem(item)
+
+        // TODO redraw sprite with held item sprite (use sprite joint "HELD_ITEM")
+        if (item.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
+            rebuildfun(item)
+            animDescGlow?.let { rebuildfunGlow(item) }
+        }
+    }
+
+    override fun unequipItem(item: GameItem?) {
+        super.unequipItem(item)
+
+        // redraw sprite without held item sprite (use sprite joint "HELD_ITEM")
+        item?.let { item -> if (item.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
+            rebuildfun(null)
+            animDescGlow?.let { rebuildfunGlow(null) }
+        } }
     }
 }
