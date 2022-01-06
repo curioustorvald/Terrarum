@@ -70,7 +70,7 @@ class FixtureHomeComputer : FixtureBase {
             vmRunner.executeCommand(vm.roms[0]!!.readAll())
         }
 
-        App.disposables.add(Disposable {
+        INGAME.disposables.add(Disposable {
             vmRunner.close()
             coroutineJob.cancel("fixture disposal")
             vm.dispose()

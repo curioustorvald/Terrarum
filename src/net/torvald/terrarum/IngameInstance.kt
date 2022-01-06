@@ -1,6 +1,8 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.Actor
@@ -26,6 +28,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.locks.Lock
+import java.util.function.Consumer
 
 /**
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
@@ -49,6 +52,8 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
                     else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
                 }
     }
+
+    val disposables = HashSet<Disposable>()
 
     lateinit var worldDisk: VirtualDisk; internal set
     lateinit var playerDisk: VirtualDisk; internal set
@@ -179,6 +184,14 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         actorContainerActive.forEach { it.dispose() }
         actorContainerInactive.forEach { it.dispose() }
         world.dispose()
+
+        disposables.forEach(Consumer {
+            try { it.dispose() }
+            catch (_: NullPointerException) { }
+            catch (_: IllegalArgumentException) { }
+            catch (_: GdxRuntimeException) { }
+            catch (_: ConcurrentModificationException) { }
+        })
     }
 
     ////////////

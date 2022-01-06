@@ -9,10 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -51,6 +48,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
     private val coroutineJob: Job
     private val ui = WearableWorldRadarUI(vm)
 
+    // FIXME initialise computer stuff when the Item is first used, not when it's registered by the Modmgr
     init {
         super.equipPosition = EquipPosition.HAND_GRIP
 
@@ -69,7 +67,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
             vmRunner.executeCommand(vm.roms[0]!!.readAll())
         }
 
-        App.disposables.add(Disposable {
+        INGAME.disposables.add(Disposable {
             vmRunner.close()
             coroutineJob.cancel("item disposal")
             vm.dispose()
