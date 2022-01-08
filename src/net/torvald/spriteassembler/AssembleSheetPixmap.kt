@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
+import net.torvald.terrarum.App
+import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.linearSearch
-import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.SimpleFileSystem
@@ -177,31 +179,40 @@ object AssembleSheetPixmap {
         val tmpFrame = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888)
 
         transformList.forEach { (name, bodypartPos) ->
-            if (name == "HELD_ITEM") {
-                injectedItem?.itemImage?.let { textureRegion ->
-                    // TODO FIXME tiles are not being drawn
+            if (name == "HELD_ITEM" && injectedItem != null) {
+//                printdbg(this, "ID of the held item: ${injectedItem.originalID}")
+
+                ItemCodex.getItemImage(injectedItem)?.let { textureRegion ->
+//                    printdbg(this, "and it did have a textureregion")
+
                     val texdata = textureRegion.texture.textureData
-                    texdata.prepare()
-                    val imageSheet = texdata.consumePixmap()
+                    val textureBackedByPixmap = texdata.isPrepared // texture backed by pixmap is always prepared without ordering it to prepare
+                    if (!textureBackedByPixmap) texdata.prepare()
+
+                    val imageSheet = if
+                            (injectedItem.originalID.startsWith("${ReferencingRanges.PREFIX_DYNAMICITEM}:") ||
+                             injectedItem.originalID.startsWith("item@") ||
+                             injectedItem.originalID.startsWith("wire@"))
+                        texdata.consumePixmap()
+                    // super dirty and ugly hack because for some reason it just won't work
+                    else if (injectedItem.originalID.startsWith("wall@"))
+                        App.tileMaker.itemWallPixmap
+                    else
+                        App.tileMaker.itemTerrainPixmap
+
 
                     val drawPos = props.origin + bodypartPos
 
                     val pu = (textureRegion.u * texdata.width).toInt()
                     val pv = (textureRegion.v * texdata.height).toInt()
-                    val pu2 = (textureRegion.u2 * texdata.width).toInt()
-                    val pv2 = (textureRegion.v2 * texdata.height).toInt()
+                    val imageWidth = textureRegion.regionWidth
                     val imageHeight = textureRegion.regionHeight
 
-                    for (y in pv until pv2) { for (x in pu until pu2) {
-                        val pixel = imageSheet.getPixel(x, y)
-                        tmpFrame.drawPixel(
-                                drawPos.x + x - pu,
-                                (props.frameHeight - drawPos.y - 1) + y - pv - imageHeight,
-                                pixel
-                        )
-                    } }
+//                    printdbg(this, "uv: ($pu,$pv) uv2: ($pu2,$pv2) dim: ($imageWidth,$imageHeight) atlasdim: (${texdata.width},${texdata.height})")
 
-                    imageSheet.dispose()
+                    tmpFrame.drawPixmap(imageSheet, drawPos.x, props.frameHeight - drawPos.y - 1 - imageHeight, pu, pv, imageWidth, imageHeight)
+
+                    if (!textureBackedByPixmap) imageSheet.dispose()
                 }
             }
             else {

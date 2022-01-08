@@ -115,10 +115,17 @@ internal object BlocksDrawer {
 
 
         // test print
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/terrainitem.tga"), itemTerrainPixmap, false)
 
         tileItemTerrain = TextureRegionPack(App.tileMaker.itemTerrainTexture, TILE_SIZE, TILE_SIZE)
         tileItemWall = TextureRegionPack(App.tileMaker.itemWallTexture, TILE_SIZE, TILE_SIZE)
+
+
+//        val texdata = tileItemTerrain.texture.textureData
+//        val textureBackedByPixmap = texdata.isPrepared
+//        if (!textureBackedByPixmap) texdata.prepare()
+//        val imageSheet = texdata.consumePixmap()
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/terrainitem.tga"), imageSheet, false)
+//        if (!textureBackedByPixmap) imageSheet.dispose()
 
 
 

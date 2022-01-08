@@ -65,6 +65,10 @@ class CreateTileAtlas {
     private val atlasInit = "./assets/graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
+    internal val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+    internal val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+
+
     /**
      * Must be called AFTER mods' loading so that all the block props are loaded
      */
@@ -148,8 +152,8 @@ class CreateTileAtlas {
             else -> 0
         }
 
-        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+//        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+//        val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         tags.toMap().forEach { id, tag ->
             val tilePosFromAtlas = tag.tileNumber + maskTypetoTileIDForItemImage(tag.maskType)
@@ -199,8 +203,8 @@ class CreateTileAtlas {
 
         itemTerrainTexture = Texture(itemTerrainPixmap)
         itemWallTexture = Texture(itemWallPixmap)
-        itemTerrainPixmap.dispose()
-        itemWallPixmap.dispose()
+//        itemTerrainPixmap.dispose()
+//        itemWallPixmap.dispose()
         initPixmap.dispose()
 
         initialised = true
@@ -385,6 +389,8 @@ class CreateTileAtlas {
         atlasGlow.dispose()
         //itemTerrainTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
         //itemWallTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemWall (TextureRegionPack)'
+        itemTerrainPixmap.dispose()
+        itemWallPixmap.dispose()
 
         nullTile.dispose()
     }

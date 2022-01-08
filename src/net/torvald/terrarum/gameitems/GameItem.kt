@@ -98,8 +98,32 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     abstract val material: Material
 
     /**
+     * DO NOT READ FROM THIS VALUE: USE `ItemCodex.getItemImage(item)`;
+     * this hack is needed to avoid the unsolvable issue regarding the ItemImage of the tiles, of which they
+     * cannot be assigned because of this old note:
+     *
      * Don't assign! Create getter -- there's inevitable execution order fuckup on ModMgr,
      * where it simultaneously wanted to be called before and after the Mod's EntryPoint if you assign value to it on init block.
+     *
+     *
+     * Note to future adventurers:
+     *
+     * the following code did not solved the issue
+     *
+     * file: net.torvald.terrarum.modulebasegame.EntryPoint
+     *
+     * ```
+     * override val itemImage: TextureRegion
+     *     get() {
+     *         val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(originalID)
+     *         val bucket =  if (isWall) BlocksDrawer.tileItemWall else BlocksDrawer.tileItemTerrain
+     *         return bucket.get(
+     *                 itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
+     *                 itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
+     *         )
+     *     }
+     * ```
+     *
      */
     @Transient open val itemImage: TextureRegion? = null
 

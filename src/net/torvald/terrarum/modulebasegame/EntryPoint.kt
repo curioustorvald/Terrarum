@@ -80,6 +80,15 @@ class EntryPoint : ModuleEntryPoint() {
         override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
         override var isDynamic = false
         override val material = MaterialCodex.getOrDefault(tile.material)
+//        override val itemImage: TextureRegion
+//            get() {
+//                val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(originalID)
+//                val bucket =  if (isWall) BlocksDrawer.tileItemWall else BlocksDrawer.tileItemTerrain
+//                return bucket.get(
+//                        itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
+//                        itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
+//                )
+//            }
 
         init {
             equipPosition = EquipPosition.HAND_GRIP
