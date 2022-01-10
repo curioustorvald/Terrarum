@@ -1,3 +1,18 @@
 {
-  "ITEM_STORAGE_CHEST": "Storage Chest"
+  "ACTORBLOCK_ALLOW_MOVE_DOWN": "Urist Arôlcustith",
+  "ACTORBLOCK_FULL_COLLISION": "Urist Berdanrifot",
+  "ACTORBLOCK_NO_COLLISION": "Urist Zafal",
+  "ACTORBLOCK_NO_PASS_RIGHT": "Urist McPassLeft",
+  "ACTORBLOCK_NO_PASS_LEFT": "Urist McPassRight",
+  "ACTORBLOCK_TILING_PLACEHOLDER": "Urist Berdanurdim",
+
+  "BLOCK_STONE_DEEP": "Deepstone",
+  "BLOCK_SCAFFOLDING_NORMAL": "Scaffolding",
+  "BLOCK_STONE_MARBLE": "Marble",
+
+  "ITEM_STORAGE_CHEST": "Storage Chest",
+  "ITEM_WIRE": "Wire",
+  "ITEM_WIRE_CUTTER": "Wire Cutter",
+  "ITEM_LOGIC_SIGNAL_EMITTER": "Logic Signal Emitter",
+  "ITEM_TIKI_TORCH": "Tiki Torch"
 }
