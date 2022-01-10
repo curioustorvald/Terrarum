@@ -27,8 +27,8 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, {
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
-        super.effectWhenEquipped(actor, delta)
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        super.effectWhileEquipped(actor, delta)
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "signal"
     }
 

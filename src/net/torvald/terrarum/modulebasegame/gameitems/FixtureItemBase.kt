@@ -31,7 +31,7 @@ open class FixtureItemBase(originalID: ItemID, val makeFixture: () -> FixtureBas
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_32")
     override var baseToolSize: Double? = baseMass
 
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.setGhost(ghostItem)
             it.isVisible = true

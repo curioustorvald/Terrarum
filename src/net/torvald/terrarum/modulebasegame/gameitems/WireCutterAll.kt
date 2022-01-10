@@ -49,7 +49,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         true
     }
 
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
     }
 

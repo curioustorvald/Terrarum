@@ -27,9 +27,14 @@ class ActorInventory() : FixtureInventory() {
 
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
+     *
+     * The ItemID must be `dynamicID`
      */
     val itemEquipped = Array<ItemID?>(GameItem.EquipPosition.INDEX_MAX) { null }
 
+    /**
+     * The ItemID must be `dynamicID`
+     */
     val quickSlot = Array<ItemID?>(UIQuickslotBar.SLOT_COUNT) { null } // 0: Slot 1, 9: Slot 10
 
 

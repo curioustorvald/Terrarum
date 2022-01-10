@@ -76,7 +76,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
 
     }
 
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).wearableDeviceUI = ui
     }
 

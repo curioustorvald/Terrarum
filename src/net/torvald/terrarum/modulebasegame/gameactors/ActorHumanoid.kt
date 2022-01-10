@@ -220,7 +220,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 ItemCodex[it.itm]!!.effectWhileInPocket(this, delta)
             }
             else { // equipped
-                ItemCodex[it.itm]!!.effectWhenEquipped(this, delta)
+                ItemCodex[it.itm]!!.effectWhileEquipped(this, delta)
             }
         }
     }

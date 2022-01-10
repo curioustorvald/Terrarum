@@ -57,17 +57,21 @@ interface Pocketed {
      * Equips an item. If the item is not in the inventory, adds the item first.
      */
     fun equipItem(item: GameItem) {
+        val oldItemID = inventory.itemEquipped[item.equipPosition]
+
         if (!inventory.contains(item)) {
             println("[Pocketed] Item does not exist; adding one before equipped")
             inventory.add(item)
         }
 
         // unequip item that's already there
-        unequipSlot(item.equipPosition)
+        if (item.dynamicID != oldItemID) {
+            unequipSlot(item.equipPosition) // also fires effectOnUnequip unconditionally
+        }
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item.dynamicID
-            item.effectWhenEquipped(this as ActorWithBody, App.UPDATE_RATE)
+            item.effectWhileEquipped(this as ActorWithBody, App.UPDATE_RATE)
         }
         // else do nothing
     }

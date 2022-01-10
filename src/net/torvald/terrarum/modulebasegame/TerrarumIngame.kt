@@ -1048,7 +1048,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                         it.inventory.forEach { inventoryEntry ->
                             ItemCodex[inventoryEntry.itm]!!.effectWhileInPocket(it as ActorWithBody, delta) // kind of an error checking because all Pocketed must be ActorWithBody
                             if (it.equipped(inventoryEntry.itm)) {
-                                ItemCodex[inventoryEntry.itm]!!.effectWhenEquipped(it as ActorWithBody, delta)
+                                ItemCodex[inventoryEntry.itm]!!.effectWhileEquipped(it as ActorWithBody, delta)
                             }
                         }
                     }

@@ -18,6 +18,7 @@ object DefaultConfig {
 
             "language" to App.getSysLang(),
             "notificationshowuptime" to 4096, // 4s
+            "selecteditemnameshowuptime" to 4096, // 4s
             "autosaveinterval" to 262144, // 4m22s
             "multithread" to true,
 

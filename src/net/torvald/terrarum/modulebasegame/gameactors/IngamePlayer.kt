@@ -164,23 +164,40 @@ class IngamePlayer : ActorHumanoid {
         return spriteHeadTexture
     }
 
-    override fun equipItem(item: GameItem) {
-        super.equipItem(item)
+    private var unequipNoSpriteUpdate = false
 
-        // TODO redraw sprite with held item sprite (use sprite joint "HELD_ITEM")
-        if (item.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
+    override fun equipItem(item: GameItem) {
+        val oldItemID = inventory.itemEquipped[item.equipPosition]
+
+        unequipNoSpriteUpdate = true
+        super.equipItem(item) // also calls unequipItem internally
+
+        // redraw sprite with held item sprite (use sprite joint "HELD_ITEM")
+        if (item.dynamicID != oldItemID && item.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
             rebuildfun(item)
             animDescGlow?.let { rebuildfunGlow(item) }
         }
+
+        unequipNoSpriteUpdate = false
+
+//        println("IngamePlayer.equipItem")
+//        printStackTrace(this)
     }
 
     override fun unequipItem(item: GameItem?) {
         super.unequipItem(item)
 
         // redraw sprite without held item sprite (use sprite joint "HELD_ITEM")
-        item?.let { item -> if (item.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
-            rebuildfun(null)
-            animDescGlow?.let { rebuildfunGlow(null) }
-        } }
+        if (!unequipNoSpriteUpdate) {
+            item?.let { item ->
+                if (item.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
+                    rebuildfun(null)
+                    animDescGlow?.let { rebuildfunGlow(null) }
+                }
+            }
+        }
+
+//        println("IngamePlayer.unequipItem")
+//        printStackTrace(this)
     }
 }

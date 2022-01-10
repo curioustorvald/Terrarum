@@ -31,7 +31,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     private val sb = StringBuilder()
     private val blockMarker = CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor
 
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"
 
         blockMarker.markerShape = 3

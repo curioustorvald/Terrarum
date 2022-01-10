@@ -46,6 +46,11 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     var newName: String = "I AM VITUN PLACEHOLDER"
         private set
 
+    /**
+     * If custom name is configured, its name (`newName`) is returned; otherwise the `originalName` is returned.
+     *
+     * Assigning value to this field will set the `newName`
+     */
     var name: String
         set(value) {
             newName = value
@@ -180,9 +185,9 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     open fun effectWhileInPocket(actor: ActorWithBody, delta: Float) { }
 
     /**
-     * Effects applied immediately only once if picked up
+     * Effects applied immediately only once when picked up
      */
-    open fun effectWhenPickedUp(actor: ActorWithBody, delta: Float) { }
+    open fun effectOnPickup(actor: ActorWithBody, delta: Float) { }
 
     /**
      * Apply effects (continuously or not) while primary button is down.
@@ -217,17 +222,17 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     //open fun startSecondaryUse(delta: Float): Boolean = false
 
     open fun endPrimaryUse(actor: ActorWithBody, delta: Float): Boolean = false
-    open fun endSecondaryUse(actor: ActorWithBody, delta: Float): Boolean = false
+    //open fun endSecondaryUse(actor: ActorWithBody, delta: Float): Boolean = false
 
     /**
-     * Effects applied immediately only once if thrown (discarded) from pocket
+     * Effects applied immediately only once when thrown (discarded) from pocket
      */
-    open fun effectWhenThrown(actor: ActorWithBody, delta: Float) { }
+    open fun effectOnThrow(actor: ActorWithBody, delta: Float) { }
 
     /**
-     * Effects applied (continuously or not) when equipped (drawn/pulled out)
+     * Effects applied (continuously or not) while being equipped (drawn/pulled out)
      */
-    open fun effectWhenEquipped(actor: ActorWithBody, delta: Float) { }
+    open fun effectWhileEquipped(actor: ActorWithBody, delta: Float) { }
 
     /**
      * Effects applied only once when unequipped

@@ -98,7 +98,7 @@ class EntryPoint : ModuleEntryPoint() {
             return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)
         }
 
-        override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+        override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
             BlockBase.blockEffectWhenEquipped(actor, delta)
         }
     }

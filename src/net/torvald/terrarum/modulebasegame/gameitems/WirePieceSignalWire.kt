@@ -34,7 +34,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
         return BlockBase.wireStartPrimaryUse(actor,this, delta)
     }
 
-    override fun effectWhenEquipped(actor: ActorWithBody, delta: Float) {
+    override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         BlockBase.wireEffectWhenEquipped(this, delta)
     }
 
