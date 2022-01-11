@@ -3,11 +3,9 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderTestSubject1
@@ -17,8 +15,6 @@ import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.WritePlayer
-import net.torvald.terrarum.serialise.WriteSavegame
-import net.torvald.terrarum.toInt
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 
