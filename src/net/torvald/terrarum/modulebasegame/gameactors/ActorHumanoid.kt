@@ -696,7 +696,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     fun Float.abs() = FastMath.abs(this)
 
-    private fun updateSprite(delta: Float) {
+    open fun updateSprite(delta: Float) {
         sprite?.update(delta)
         spriteGlow?.update(delta)
 
@@ -706,11 +706,24 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             spriteGlow?.switchRow(SPRITE_ROW_WALK)
 
             // set anim frame delay
-            // 4f of the divider is a magic number, empirically decided
             if (this is HasAssembledSprite) {
-                sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerV?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
-                spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerV?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+                try {
+                    val baseDelay = animDesc!!.getAnimByFrameName("ANIM_RUN").delay
+                    val moveSpeedMult = (controllerV?.x ?: 0.0).abs().coerceAtLeast(PHYS_EPSILON_VELO).toFloat() / 4f // FIXME empirical value
+                    val stride = scale.toFloat()
+                    val maxMoveSpeed = scale.sqrt().toFloat() // ActorWithBody uses scale.sqrt() for determining walk acceleration
+                    val scaleCompensation = stride / maxMoveSpeed
 
+                    val finalDelay = baseDelay * (scaleCompensation / moveSpeedMult)
+
+                    sprite?.delays?.set(SPRITE_ROW_WALK, finalDelay)
+                    spriteGlow?.delays?.set(SPRITE_ROW_WALK, finalDelay)
+                }
+                catch (e: NullPointerException) {
+                    println(animDesc!!.animations.keys.joinToString())
+
+                    throw e
+                }
             }
 
             // flipping the sprite

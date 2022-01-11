@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
@@ -22,7 +23,7 @@ import java.util.*
  * Created by minjaesong on 2015-12-31.
  */
 
-class IngamePlayer : ActorHumanoid {
+class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
     val creationTime = App.getTIME_T()
     var lastPlayTime = App.getTIME_T() // cumulative value for the savegame
@@ -31,13 +32,13 @@ class IngamePlayer : ActorHumanoid {
     val uuid = UUID.randomUUID()
     var worldCurrentlyPlaying: UUID = UUID(0L,0L) // only filled up on save and load; DO NOT USE THIS
 
-    var spriteHeadTexture: TextureRegion? = null
+    @Transient override var spriteHeadTexture: TextureRegion? = null
 
 
     /** ADL for main sprite. Necessary. */
-    @Transient var animDesc: ADProperties? = null
+    @Transient override var animDesc: ADProperties? = null
     /** ADL for glow sprite. Optional. */
-    @Transient var animDescGlow: ADProperties? = null
+    @Transient override var animDescGlow: ADProperties? = null
 
 
     private constructor()
@@ -75,8 +76,8 @@ class IngamePlayer : ActorHumanoid {
     /** To be used later by the game to rebuild the sprite.
      * Which `_rebuild` function to use is determined at the load time.
      */
-    private lateinit var rebuildfun: (item: GameItem?) -> Unit
-    private lateinit var rebuildfunGlow: (item: GameItem?) -> Unit
+    @Transient private lateinit var rebuildfun: (item: GameItem?) -> Unit
+    @Transient private lateinit var rebuildfunGlow: (item: GameItem?) -> Unit
 
 
     /**
@@ -89,7 +90,7 @@ class IngamePlayer : ActorHumanoid {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
+    override fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
         if (animDesc != null && sprite != null) {
             rebuildfun = { item: GameItem? -> _rebuild(animDesc!!, sprite, item) }; rebuildfun(heldItem)
             spriteHeadTexture = AssembleSheetPixmap.getMugshotFromAssetsDir(animDesc!!)
@@ -164,7 +165,7 @@ class IngamePlayer : ActorHumanoid {
         return spriteHeadTexture
     }
 
-    private var unequipNoSpriteUpdate = false
+    @Transient private var unequipNoSpriteUpdate = false
 
     override fun equipItem(item: GameItem) {
         val oldItemID = inventory.itemEquipped[item.equipPosition]

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.spriteassembler
 
 import com.badlogic.gdx.files.FileHandle
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.serialise.Common
 import java.io.InputStream
@@ -238,7 +239,16 @@ class ADProperties {
     internal fun getSkeleton(name: String) = skeletons[name]!!
     internal fun getTransform(name: String) = transforms[name]!!
 
-    private fun getAnimNameFromFrame(s: String) = s.substring(0 until s.lastIndexOf('_'))
+    /**
+     * Removes number suffix from the animation name
+     */
+    private fun getAnimNameFromFrame(s: String): String {
+        val ret = if (s.matches(reAnimWithNumber)) s.substringBeforeLast('_') else s
+//        printdbg(this, "getAnimNameFromFrame $s -> $ret")
+        return ret
+    }
+
+    private val reAnimWithNumber = Regex("""ANIM_[A-Z]+_[0-9]+""")
 
     private fun List<ADPropertyObject>.toJoints() = List(this.size) {
         Joint(this[it].name.toUpperCase(), this[it].input!! as ADPropertyObject.Vector2i)

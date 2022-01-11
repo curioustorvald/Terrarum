@@ -14,6 +14,7 @@ interface HasAssembledSprite {
 
     /** ADL for main sprite. Necessary. */
     var animDesc: ADProperties?
+
     /** ADL for glow sprite. Optional. */
     var animDescGlow: ADProperties?
 

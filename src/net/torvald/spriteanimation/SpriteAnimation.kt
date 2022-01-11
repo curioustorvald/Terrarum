@@ -28,7 +28,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
         internal set
 
     private val currentDelay: Second
-        get() = delays[currentRow]
+        get() = delays[currentRow].coerceAtLeast(1f / 16f) // animation delay cannot be too short
 
     /**
      * Sets delays for each rows. Array size must be the same as the rows of the sheet
