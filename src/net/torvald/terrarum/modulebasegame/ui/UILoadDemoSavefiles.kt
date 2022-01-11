@@ -13,7 +13,7 @@ import net.torvald.EMDASH
 import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang

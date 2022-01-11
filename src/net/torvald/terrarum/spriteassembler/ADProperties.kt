@@ -1,4 +1,4 @@
-package net.torvald.spriteassembler
+package net.torvald.terrarum.spriteassembler
 
 import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.linearSearchBy
@@ -259,10 +259,10 @@ class ADPropertyObject(propertyRaw: String) {
     val name: String
     val input: Any?
         get() = when (type) {
-            ADPropertyType.IVEC2 -> field!! as Vector2i
-            ADPropertyType.FLOAT -> field!! as Float
+            ADPropertyType.IVEC2       -> field!! as Vector2i
+            ADPropertyType.FLOAT       -> field!! as Float
             ADPropertyType.STRING_PAIR -> field!! as String
-            else -> null
+            else                       -> null
         }
     val type: ADPropertyType
 

@@ -2,7 +2,7 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody

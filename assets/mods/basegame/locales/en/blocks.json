@@ -1,4 +1,6 @@
 {
+  "BLOCK_WALL_NAME_TEMPLATE": "%1$s Wall",
+
   "BLOCK_AIR": "Air",
 
   "BLOCK_STONE": "Stone",

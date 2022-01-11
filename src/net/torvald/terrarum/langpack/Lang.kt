@@ -123,10 +123,37 @@ object Lang {
 
     }
 
+    private val bindOp = ">>="
+
+    /**
+     * Syntax example:
+     *
+     * - `BLOCK_AIR` – Prints out `Lang.get("BLOCK_AIR")`
+     * - `BLOCK_AIR>>=BLOCK_WALL_NAME_TEMPLATE` – Prints out `Formatter().format(Lang.get("BLOCK_WALL_NAME_TEMPLATE"), Lang.get("BLOCK_AIR")).toString()`
+     */
     operator fun get(key: String, capitalise: Boolean = true): String {
-        return getByLocale(key, App.GAME_LOCALE, capitalise) ?: getByLocale(key, FALLBACK_LANG_CODE, capitalise) ?: "$$key"
+        fun getstr(s: String) = getByLocale(s, App.GAME_LOCALE, capitalise) ?: getByLocale(s, FALLBACK_LANG_CODE, capitalise) ?: "$$s"
+
+
+        val args = key.split(bindOp).filter { it.isNotBlank() }.map { it.trim() }
+        if (args.isEmpty()) return ""
+
+        val sb = StringBuilder()
+        val formatter = Formatter(sb)
+
+        sb.append(getstr(args[0]))
+        args.subList(1, args.size).forEach {
+            val oldstr = sb.toString()
+            sb.clear()
+            formatter.format(getstr(it), oldstr)
+        }
+
+        return sb.toString()
     }
 
+    /**
+     * Does NOT parse the operators
+     */
     fun getByLocale(key: String, locale: String, capitalise: Boolean): String? {
         val ret = langpack["${key}_$locale"] ?: return null
 

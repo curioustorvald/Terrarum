@@ -2,8 +2,8 @@ package net.torvald.spriteanimation
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.spriteassembler.ADProperties
-import net.torvald.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 

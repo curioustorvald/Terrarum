@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.spriteassembler.ADProperties
-import net.torvald.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey

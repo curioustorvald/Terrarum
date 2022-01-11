@@ -1,4 +1,4 @@
-package net.torvald.spriteassembler
+package net.torvald.terrarum.spriteassembler
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap

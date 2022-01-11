@@ -1,6 +1,6 @@
 package net.torvald.terrarum.tests
 
-import net.torvald.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.ADProperties
 import java.io.StringReader
 
 /**

@@ -1,4 +1,4 @@
-package net.torvald.spriteassembler
+package net.torvald.terrarum.spriteassembler
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx

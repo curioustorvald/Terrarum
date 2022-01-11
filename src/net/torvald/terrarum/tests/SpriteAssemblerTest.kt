@@ -1,7 +1,7 @@
 package net.torvald.terrarum.tests
 
-import net.torvald.spriteassembler.ADProperties
-import net.torvald.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import java.io.StringReader
 
 /**

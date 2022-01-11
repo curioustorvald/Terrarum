@@ -39,6 +39,11 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     
     /**
      * OriginalName is always read from Language files.
+     *
+     * Syntax example:
+     *
+     * - `BLOCK_AIR` – Prints out `Lang.get("BLOCK_AIR")`
+     * - `BLOCK_AIR>>=BLOCK_WALL_NAME_TEMPLATE` – Prints out `Formatter().format(Lang.get("BLOCK_WALL_NAME_TEMPLATE"), Lang.get("BLOCK_AIR")).toString()`
      */
     abstract val originalName: String
 

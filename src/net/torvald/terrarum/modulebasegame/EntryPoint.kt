@@ -75,7 +75,7 @@ class EntryPoint : ModuleEntryPoint() {
         override val isUnique: Boolean = false
         override var baseMass: Double = tile.density / 1000.0
         override var baseToolSize: Double? = null
-        override val originalName = tile.nameKey
+        override val originalName = if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE" else tile.nameKey
         override var stackable = true
         override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
         override var isDynamic = false
