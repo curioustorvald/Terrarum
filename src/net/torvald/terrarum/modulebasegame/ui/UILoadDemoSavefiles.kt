@@ -168,7 +168,8 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
             Thread {
                 // read savegames
                 var savegamesCount = 0
-                App.savegameWorlds.forEach { (_, skimmer) ->
+                App.sortedSavegameWorlds.forEach { uuid ->
+                    val skimmer = App.savegameWorlds[uuid]!!
                     val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
@@ -182,7 +183,8 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 }
 
                 savegamesCount = 0
-                App.savegamePlayers.forEach { (_, skimmer) ->
+                App.sortedPlayers.forEach { uuid ->
+                    val skimmer = App.savegamePlayers[uuid]!!
                     val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {

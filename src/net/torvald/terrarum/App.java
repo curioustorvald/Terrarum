@@ -200,10 +200,13 @@ public class App implements ApplicationListener {
     /**
      * Sorted by the lastplaytime, in reverse order (index 0 is the most recent game played)
      */
-    public static TreeMap<UUID, DiskSkimmer> savegameWorlds = new TreeMap<>();
-    public static TreeMap<UUID, String> savegameWorldsName = new TreeMap<>();
-    public static TreeMap<UUID, DiskSkimmer> savegamePlayers = new TreeMap<>();
-    public static TreeMap<UUID, String> savegamePlayersName = new TreeMap<>();
+    public static ArrayList<UUID> sortedSavegameWorlds = new ArrayList();
+    public static HashMap<UUID, DiskSkimmer> savegameWorlds = new HashMap<>(); // UNSORTED even with the TreeMap
+    public static HashMap<UUID, String> savegameWorldsName = new HashMap<>();
+
+    public static ArrayList<UUID> sortedPlayers = new ArrayList();
+    public static HashMap<UUID, DiskSkimmer> savegamePlayers = new HashMap<>();
+    public static HashMap<UUID, String> savegamePlayersName = new HashMap<>();
 
     public static void updateListOfSavegames() {
         AppUpdateListOfSavegames();

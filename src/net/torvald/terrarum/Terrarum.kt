@@ -672,10 +672,12 @@ class Codex : KVHashMap() {
 }
 
 fun AppUpdateListOfSavegames() {
-    App.savegamePlayers.clear()
-    App.savegamePlayersName.clear()
+    App.sortedSavegameWorlds.clear()
     App.savegameWorlds.clear()
     App.savegameWorldsName.clear()
+    App.sortedPlayers.clear()
+    App.savegamePlayers.clear()
+    App.savegamePlayersName.clear()
 
     println("Listing saved worlds...")
 
@@ -699,7 +701,9 @@ fun AppUpdateListOfSavegames() {
         val worldUUID = UUID.fromString(json.getString("worldIndex"))
         App.savegameWorlds[worldUUID] = it
         App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
+        App.sortedSavegameWorlds.add(worldUUID)
     }
+
 
 
     println("Listing saved players...")
@@ -724,6 +728,7 @@ fun AppUpdateListOfSavegames() {
         val playerUUID = UUID.fromString(json.getString("uuid"))
         App.savegamePlayers[playerUUID] = it
         App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
+        App.sortedPlayers.add(playerUUID)
     }
 
 }
