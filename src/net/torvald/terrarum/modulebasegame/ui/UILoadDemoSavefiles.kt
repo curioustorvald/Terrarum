@@ -500,11 +500,14 @@ class UIItemPlayerCells(
 
             App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
             App.savegameWorldsName[worldUUID]?.let { if (it.isNotBlank()) worldName = it }
-            json["lastPlayTime"]?.asString()?.let {
+            /*json["lastPlayTime"]?.asString()?.let {
                 lastPlayTime = Instant.ofEpochSecond(it.toLong())
                         .atZone(TimeZone.getDefault().toZoneId())
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            }
+            }*/
+            lastPlayTime = Instant.ofEpochSecond(skimmer.getLastModifiedTime())
+                    .atZone(TimeZone.getDefault().toZoneId())
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
             json["totalPlayTime"]?.asString()?.let {
                 totalPlayTime = parseDuration(it.toLong())
             }
@@ -642,7 +645,7 @@ class UIItemWorldCells(
 
         if (metaFile != null) {
             val worldJson = JsonReader().parse(ByteArray64Reader(metaFile.bytes, Common.CHARSET))
-            val lastplay_t = worldJson["lastPlayTime"].asLong()
+            val lastplay_t = skimmer.getLastModifiedTime()//worldJson["lastPlayTime"].asLong()
             val playtime_t = worldJson["totalPlayTime"].asLong()
             lastPlayedTimestamp =
                     Instant.ofEpochSecond(lastplay_t)

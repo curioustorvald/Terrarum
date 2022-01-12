@@ -677,10 +677,10 @@ fun AppUpdateListOfSavegames() {
     App.savegameWorlds.clear()
     App.savegameWorldsName.clear()
 
-    println("listing savegames...")
+    println("Listing saved worlds...")
 
     // create list of worlds
-    (File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
+    File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, Common.CHARSET, true)
         }
@@ -689,8 +689,8 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.sortedByDescending { it.getLastModifiedOfFirstFile() }).forEach {
-        println(it.diskFile.absolutePath)
+    }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
+        println("${index+1}.\t${it.diskFile.absolutePath}")
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
         // TODO write simple and dumb SAX parser for JSON
@@ -702,8 +702,10 @@ fun AppUpdateListOfSavegames() {
     }
 
 
+    println("Listing saved players...")
+
     // create list of players
-    (File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
+    File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, Common.CHARSET, true)
         }
@@ -712,8 +714,8 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.sortedByDescending { it.getLastModifiedOfFirstFile() }).forEach {
-        println(it.diskFile.absolutePath)
+    }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
+        println("${index+1}.\t${it.diskFile.absolutePath}")
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
         // TODO write simple and dumb SAX parser for JSON
@@ -722,7 +724,6 @@ fun AppUpdateListOfSavegames() {
         val playerUUID = UUID.fromString(json.getString("uuid"))
         App.savegamePlayers[playerUUID] = it
         App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
-//        App.savegamePlayersName[playerUUID] = json.get("actorValue")?.get(AVKey.NAME)?.asString() ?: "NULL!"
     }
 
 }

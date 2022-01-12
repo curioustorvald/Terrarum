@@ -92,7 +92,7 @@ removefile:
         val fis = FileInputStream(diskFile)
         var currentPosition = fis.skip(VirtualDisk.HEADER_SIZE) // skip disk header
 
-        println("[DiskSkimmer] loading the diskfile ${diskFile.canonicalPath}")
+//        println("[DiskSkimmer] loading the diskfile ${diskFile.canonicalPath}")
 
         fun skipRead(bytes: Long) {
             currentPosition += fis.skip(bytes)
@@ -353,11 +353,42 @@ removefile:
         return bytes.toCanonicalString(charset)
     }
 
-    fun getLastModifiedOfFirstFile(): Long {
+    /**
+     * @return creation time of the root directory
+     */
+    fun getCreationTime(): Long {
+        val bytes = ByteArray(6)
+        fa.seek(320L)
+        fa.read(bytes)
+        return bytes.toInt48()
+    }
+
+    /**
+     * @return last modified time of the root directory
+     */
+    fun getLastModifiedTime(): Long {
         val bytes = ByteArray(6)
         fa.seek(326L)
         fa.read(bytes)
         return bytes.toInt48()
+    }
+
+    /**
+     * redefines creation time of the root directory
+     */
+    fun setCreationTime(time_t: Long) {
+        val bytes = ByteArray(6)
+        fa.seek(320L)
+        fa.write(time_t.toInt48())
+    }
+
+    /**
+     * redefines last modified time of the root directory
+     */
+    fun setLastModifiedTime(time_t: Long) {
+        val bytes = ByteArray(6)
+        fa.seek(326L)
+        fa.write(time_t.toInt48())
     }
 
     ///////////////////////////////////////////////////////

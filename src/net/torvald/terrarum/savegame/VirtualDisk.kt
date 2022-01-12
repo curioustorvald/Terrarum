@@ -148,9 +148,15 @@ class VirtualDisk(
 
     private fun serializeEntriesOnly(): ByteArray64 {
         val buffer = ByteArray64()
+
+        // make sure to write root directory first
+        entries[0L]!!.let { rootDir ->
+            rootDir.serialize().forEach { buffer.add(it) }
+        }
         entries.forEach {
-            val serialised = it.value.serialize()
-            serialised.forEach { buffer.add(it) }
+            if (it.key != 0L) {
+                it.value.serialize().forEach { buffer.add(it) }
+            }
         }
 
         return buffer
