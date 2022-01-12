@@ -17,7 +17,7 @@ object Calculate {
      * TODO Newtons as unit?
      */
     @JvmStatic fun pickaxePower(actor: ActorWithBody, material: Material?): Float {
-        return (4.0 * (material?.forceMod?.toDouble() ?: 1.0).sqrt() * (actor.avStrength / 1000.0)).toFloat()
+        return (16.0 * (material?.forceMod?.toDouble() ?: 1.0).sqrt() * (actor.avStrength / 1000.0)).toFloat()
     }
 
 

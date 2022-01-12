@@ -24,7 +24,7 @@
 # dsty: density (grams per litre)
 #
 # fmod: forcemod -- related to attack points
-#       Attack points = `4 * forcemod.sqrt()` for each strike
+#       Attack points = `16 * forcemod.sqrt()` for each strike
 #
 # endurance: multiplier, using copper as reference; determines durability of tools/weapons/armours/etc.
 #            the base value for endurance differes to tool to tool. When integer is used, resulting value must be ROUNDED.
