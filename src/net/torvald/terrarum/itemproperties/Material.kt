@@ -28,6 +28,8 @@ class Material {
 
     var identifier: String = "Name not set"
 
+    var toolReach: Int = 6
+
     /**
      * Mainly intended to be used by third-party modules
      */
@@ -68,6 +70,7 @@ class MaterialCodex {
             prop.enduranceMod = it.floatVal("endurance")
             prop.thermalConductivity = it.floatVal("tcond")
             prop.identifier = it.get("idst").toUpperCase()
+            prop.toolReach = it.intVal("reach")
 
             materialProps[prop.identifier] = prop
 
