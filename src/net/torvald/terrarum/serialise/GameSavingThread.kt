@@ -136,7 +136,6 @@ class WorldSavingThread(
 
         Echo("Writing file to disk...")
 
-        disk.entries[0]!!.creationDate = creation_t
         disk.entries[0]!!.modificationDate = time_t
         // entry zero MUST NOT be used to get lastPlayDate, but we'll update it anyway
         // use entry -1 for that purpose!
@@ -180,6 +179,7 @@ class PlayerSavingThread(
 
         Echo("Writing The Player...")
         WritePlayer(ingame.actorGamer, disk, ingame, time_t)
+        disk.entries[0]!!.modificationDate = time_t
         VDUtil.dumpToRealMachine(disk, outFile)
 
         callback()

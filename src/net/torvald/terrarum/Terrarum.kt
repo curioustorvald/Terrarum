@@ -167,13 +167,11 @@ object Terrarum : Disposable {
 
     val RENDER_FPS = getConfigInt("displayfps")
     val USE_VSYNC = getConfigBoolean("usevsync")
-    var VSYNC = USE_VSYNC
     val VSYNC_TRIGGER_THRESHOLD = 56
     val GL_VERSION: Int
         get() = Gdx.graphics.glVersion.majorVersion * 100 +
                 Gdx.graphics.glVersion.minorVersion * 10 +
                 Gdx.graphics.glVersion.releaseVersion
-    val MINIMAL_GL_VERSION = 210
     /*val GL_MAX_TEXTURE_SIZE: Int
         get() {
             val intBuffer = BufferUtils.createIntBuffer(16) // size must be at least 16, or else LWJGL complains
@@ -695,7 +693,6 @@ fun AppUpdateListOfSavegames() {
         println("${index+1}.\t${it.diskFile.absolutePath}")
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
-        // TODO write simple and dumb SAX parser for JSON
         val jsonFile = it.getFile(-1L)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val worldUUID = UUID.fromString(json.getString("worldIndex"))
@@ -722,7 +719,6 @@ fun AppUpdateListOfSavegames() {
         println("${index+1}.\t${it.diskFile.absolutePath}")
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
-        // TODO write simple and dumb SAX parser for JSON
         val jsonFile = it.getFile(-1L)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val playerUUID = UUID.fromString(json.getString("uuid"))

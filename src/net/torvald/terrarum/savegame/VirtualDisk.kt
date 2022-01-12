@@ -1,5 +1,7 @@
 package net.torvald.terrarum.savegame
 
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.serialise.Common
 import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
@@ -152,6 +154,9 @@ class VirtualDisk(
         // make sure to write root directory first
         entries[0L]!!.let { rootDir ->
             rootDir.serialize().forEach { buffer.add(it) }
+
+            printdbg(this, "Writing disk ${getDiskName(Common.CHARSET)}")
+            printdbg(this, "Root creation: ${rootDir.creationDate}, modified: ${rootDir.modificationDate}")
         }
         entries.forEach {
             if (it.key != 0L) {
