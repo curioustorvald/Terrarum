@@ -21,7 +21,7 @@ open class DroppedItem : ActorWithBody {
 
     companion object {
         const val NO_PICKUP_TIME = 1f
-        const val MERGER_RANGE = 8.0 * TILE_SIZED
+        const val MERGER_RANGE = 8.0 * TILE_SIZED // the wanted distance, squared
     }
 
     var itemID: ItemID = ""; private set
