@@ -4,14 +4,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -20,6 +21,7 @@ open class DroppedItem : ActorWithBody {
 
     companion object {
         const val NO_PICKUP_TIME = 1f
+        const val MERGER_RANGE = 8.0 * TILE_SIZED
     }
 
     var itemID: ItemID = ""; private set
@@ -32,7 +34,7 @@ open class DroppedItem : ActorWithBody {
 
     private var timeSinceSpawned = 0f
 
-    fun canBePickedUp() = timeSinceSpawned > NO_PICKUP_TIME
+    fun canBePickedUp() = timeSinceSpawned > NO_PICKUP_TIME && !flagDespawn
 
     constructor(itemID: ItemID, topLeftX: Int, topLeftY: Int) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
         this.itemID = itemID
@@ -96,7 +98,15 @@ open class DroppedItem : ActorWithBody {
         super.update(delta)
 
         timeSinceSpawned += delta
-        // TODO merge into the already existing droppeditem with isStationary==true if one is detected
 
+        // merge into the already existing droppeditem with isStationary==true if one is detected
+        if (!this.isStationary) {
+            INGAME.findNearestActor(this) { it is DroppedItem && it.itemID == this.itemID && it.isStationary }?.let {
+                if (it.distance <= MERGER_RANGE) {
+                    (it.get() as DroppedItem).itemCount += this.itemCount
+                    this.flagDespawn()
+                }
+            }
+        }
     }
 }

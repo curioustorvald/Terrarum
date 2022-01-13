@@ -64,8 +64,6 @@ import java.util.concurrent.locks.ReentrantLock
 
 open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
-    var WORLD_UPDATE_TIMER = Random().nextInt(1020) + 1; private set
-
     var historicalFigureIDBucket: ArrayList<Int> = ArrayList<Int>()
 
 

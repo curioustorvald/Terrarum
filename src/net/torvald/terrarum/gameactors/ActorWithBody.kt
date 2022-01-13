@@ -1726,7 +1726,7 @@ open class ActorWithBody : Actor {
             throw Error("Hitbox dimension was not set. (don't modify hitbox directly -- use 'setHitboxDimension()')")
 
         // warnings
-        if (sprite == null && isVisible)
+        if (sprite == null && isVisible && this.javaClass.simpleName != "DroppedItem")
             printdbg(this, "Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.\n" +
                            "Actor localhash: ${this.localHashStr}")
         else if (sprite != null && !isVisible)

@@ -36,6 +36,8 @@ import java.util.function.Consumer
  */
 open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = false) : TerrarumGamescreen {
 
+    var WORLD_UPDATE_TIMER = Random().nextInt(1020) + 1; protected set
+
     open protected val actorMBRConverter = object : MBRConverter<ActorWithBody> {
         override fun getDimensions(): Int = 2
         override fun getMin(axis: Int, t: ActorWithBody): Double =
