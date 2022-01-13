@@ -1137,8 +1137,8 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
             val indexToDelete = actorContainer.searchForIndex(actor.referenceID) { it.referenceID }
             if (indexToDelete != null) {
-                printdbg(this, "Removing actor $actor")
-                printStackTrace(this)
+//                printdbg(this, "Removing actor $actor")
+//                printStackTrace(this)
 
                 actor.dispose()
                 actorContainer.removeAt(indexToDelete)
@@ -1180,13 +1180,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun addNewActor(actor: Actor?) {
         if (actor == null) return
 
-        if (App.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID)) {
+        if (theGameHasActor(actor.referenceID)) {
             throw ReferencedActorAlreadyExistsException(actor)
         }
         else {
             if (actor.referenceID !in ReferencingRanges.ACTORS_WIRES && actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER) {
-                printdbg(this, "Adding actor $actor")
-                printStackTrace(this)
+//                printdbg(this, "Adding actor $actor")
+//                printStackTrace(this)
             }
 
             actorContainerActive.add(actor)
@@ -1199,7 +1199,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     fun activateDormantActor(actor: Actor) {
-        if (App.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID)) {
+        if (!isInactive(actor.referenceID)) {
             /*if (isActive(actor.referenceID))
                 throw Error("The actor $actor is already activated")
             else
@@ -1306,7 +1306,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
 
-        println("[Ingame] Resize event")
+        printdbg(this, "Resize event")
     }
 
     override fun dispose() {

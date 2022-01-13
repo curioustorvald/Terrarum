@@ -1,7 +1,6 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printmsg
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Codex
 import net.torvald.terrarum.blockproperties.floatVal
 import net.torvald.terrarum.blockproperties.intVal
@@ -44,7 +43,7 @@ class MaterialCodex {
     internal constructor()
 
     fun fromModule(module: String, path: String) {
-        App.printmsg(this, "Building material properties table")
+        printdbg(this, "Building material properties table")
         try {
             register(CSVFetcher.readFromModule(module, path))
         }
@@ -74,7 +73,7 @@ class MaterialCodex {
 
             materialProps[prop.identifier] = prop
 
-            printmsg(this, "${prop.identifier}\t${prop.strength}\t${prop.density}\t${prop.forceMod}\t${prop.enduranceMod}")
+            printdbg(this, "${prop.identifier}\t${prop.strength}\t${prop.density}\t${prop.forceMod}\t${prop.enduranceMod}")
         }
     }
 

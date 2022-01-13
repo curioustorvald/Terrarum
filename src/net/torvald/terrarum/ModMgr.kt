@@ -219,10 +219,10 @@ object ModMgr {
 
                     }
 
-                    printdbg(this, "Module $moduleName processed")
+                    printmsg(this, "Module $moduleName processed")
                 }
                 catch (noSuchModule: FileNotFoundException) {
-                    printdbgerr(this, "No such module: $moduleName, skipping...")
+                    printmsgerr(this, "No such module: $moduleName, skipping...")
 
                     logError(LoadErrorType.NOT_EVEN_THERE, moduleName)
 
@@ -232,8 +232,8 @@ object ModMgr {
                     // TODO: Instead of skipping module with error, just display the error message onto the face?
 
 
-                    printdbgerr(this, "There was an error while loading module $moduleName")
-                    printdbgerr(this, "\t$e")
+                    printmsgerr(this, "There was an error while loading module $moduleName")
+                    printmsgerr(this, "\t$e")
                     print(App.csiR); e.printStackTrace(System.out); print(App.csi0)
 
                     logError(LoadErrorType.YOUR_FAULT, moduleName, e)

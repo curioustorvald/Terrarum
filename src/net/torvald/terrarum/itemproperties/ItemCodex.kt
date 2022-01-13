@@ -58,9 +58,7 @@ class ItemCodex {
      * @param: dynamicID string of "dyn:<random id>"
      */
     fun registerNewDynamicItem(dynamicID: ItemID, item: GameItem) {
-        if (App.IS_DEVELOPMENT_BUILD) {
-            printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
-        }
+        printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
         dynamicItemDescription[dynamicID] = item
         dynamicToStaticTable[dynamicID] = item.originalID
     }

@@ -3,7 +3,6 @@ package net.torvald.terrarum.blockproperties
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.App.printmsg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.FluidType
@@ -59,7 +58,7 @@ class BlockCodex {
      * Later entry (possible from other modules) will replace older ones
      */
     fun fromModule(module: String, path: String) {
-        App.printmsg(this, "Building block properties table")
+        printdbg(this, "Building block properties table")
         try {
             register(module, CSVFetcher.readFromModule(module, path))
         }
@@ -67,7 +66,7 @@ class BlockCodex {
     }
 
     fun fromCSV(module: String, csvString: String) {
-        App.printmsg(this, "Building wire properties table for module $module")
+        printdbg(this, "Building wire properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csvString,
@@ -211,7 +210,7 @@ class BlockCodex {
 
         blockProps[prop.id] = prop
 
-        printmsg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}\tsolid:${prop.isSolid}")
+        printdbg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}\tsolid:${prop.isSolid}")
     }
 }
 

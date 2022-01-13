@@ -231,7 +231,7 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         worldFBO = FloatFrameBuffer(App.scr.width, App.scr.height, false)
 
         // load list of savegames
-        println("[TitleScreen] update list of savegames")
+        printdbg(this, "update list of savegames")
         // to show "Continue" and "Load" on the titlescreen, uncomment this line
         App.updateListOfSavegames()
 

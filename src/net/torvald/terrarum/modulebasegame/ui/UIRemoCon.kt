@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.App.printdbgerr
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Yaml
@@ -109,7 +108,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
                         val tag = it.tags
                         if (tag.contains("WRITETOCONFIG")) WriteConfig()
 
-                        print("[UIRemoCon] Returning from ${currentRemoConContents.data}")
+                        if (IS_DEVELOPMENT_BUILD) print("[UIRemoCon] Returning from ${currentRemoConContents.data}")
 
                         if (currentRemoConContents.parent != null) {
                             remoConTray.consume()
@@ -120,7 +119,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
 
                             parent.uiFakeBlurOverlay.setAsClose()
 
-                            println(" to ${currentlySelectedRemoConItem}")
+                            if (IS_DEVELOPMENT_BUILD) println(" to ${currentlySelectedRemoConItem}")
                         }
                         else {
                             throw NullPointerException("No parent node to return")
@@ -128,8 +127,10 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
                     }
                     else {
                         // check if target exists
-                        //println("current node: ${currentRemoConContents.data}")
-                        //currentRemoConContents.children.forEach { println("- ${it.data}") }
+                        if (IS_DEVELOPMENT_BUILD) {
+                            //println("current node: ${currentRemoConContents.data}")
+                            //currentRemoConContents.children.forEach { println("- ${it.data}") }
+                        }
 
                         if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
                             setNewRemoConContents(currentRemoConContents.children[selectedIndex!!])

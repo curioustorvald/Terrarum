@@ -46,7 +46,6 @@ internal class FixtureStorageChest : FixtureBase {
         actorValue[AVKey.BASEMASS] = MASS
 
 
-        println("FixtureStorageChest constructor call")
         printStackTrace(this)
     }
 

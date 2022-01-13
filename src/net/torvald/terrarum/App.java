@@ -72,8 +72,13 @@ public class App implements ApplicationListener {
     /**
      * when FALSE, some assertion and print code will not execute
      */
-    public static boolean IS_DEVELOPMENT_BUILD = true;
+    public static boolean IS_DEVELOPMENT_BUILD = false;
 
+    {
+        // if -ea flag is set, turn on all the debug prints
+        try { assert (false); }
+        catch (AssertionError e) { IS_DEVELOPMENT_BUILD = true; }
+    }
 
     /**
      * Singleton instance
@@ -377,8 +382,6 @@ public class App implements ApplicationListener {
 
             Object[] iconPathsTemp = appIconPaths.toArray();
             appConfig.setWindowIcon(Arrays.copyOf(iconPathsTemp, iconPathsTemp.length, String[].class));
-
-            IS_DEVELOPMENT_BUILD = true;
 
             // set some more configuration vars
             MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
@@ -920,10 +923,12 @@ public class App implements ApplicationListener {
 
 
         // test print
-        System.out.println("[App] Test printing every registered item");
-        Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach(
-                (String s) -> System.out.print(s + " "));
-        System.out.println();
+        if (IS_DEVELOPMENT_BUILD) {
+            System.out.println("[App] Test printing every registered item");
+            Terrarum.INSTANCE.getItemCodex().getItemCodex().values().stream().map(GameItem::getOriginalID).forEach(
+                    (String s) -> System.out.print(s + " "));
+            System.out.println();
+        }
 
 
         try {
@@ -1348,6 +1353,14 @@ public class App implements ApplicationListener {
             System.out.println("[" + out + "] " + message);
     }
 
+    public static void printmsgerr(Object obj, Object message) {
+        String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+        if (message == null)
+            System.out.println(csiR + "[" + out + "] null" + csi0);
+        else
+            System.out.println(csiR + "[" + out + "] " + message + csi0);
+    }
+
     public static ShaderProgram loadShaderFromFile(String vert, String frag) {
         ShaderProgram s = new ShaderProgram(Gdx.files.internal(vert), Gdx.files.internal(frag));
 
@@ -1369,29 +1382,23 @@ public class App implements ApplicationListener {
     }
 
     public static void measureDebugTime(String name, kotlin.jvm.functions.Function0<kotlin.Unit> block) {
-        if (IS_DEVELOPMENT_BUILD) {
             //debugTimers.put(name, kotlin.system.TimingKt.measureNanoTime(block));
 
-            long start = System.nanoTime();
-            block.invoke();
-            debugTimers.put(name, System.nanoTime() - start);
-        }
+        long start = System.nanoTime();
+        block.invoke();
+        debugTimers.put(name, System.nanoTime() - start);
     }
 
     public static void setDebugTime(String name, long value) {
-        if (IS_DEVELOPMENT_BUILD) {
-            debugTimers.put(name, value);
-        }
+        debugTimers.put(name, value);
     }
 
     public static void addDebugTime(String target, String... targets) {
-        if (IS_DEVELOPMENT_BUILD) {
-            long l = 0L;
-            for (String s : targets) {
-                l += ((long) debugTimers.get(s));
-            }
-            debugTimers.put(target, l);
+        long l = 0L;
+        for (String s : targets) {
+            l += ((long) debugTimers.get(s));
         }
+        debugTimers.put(target, l);
     }
 
     public static long getTIME_T() {

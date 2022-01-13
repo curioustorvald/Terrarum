@@ -1,6 +1,7 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -39,7 +40,7 @@ class WireCodex {
      * @param path to the "wires" directory, not path to the CSV; must end with a slash!
      */
     fun fromModule(module: String, path: String) {
-        App.printmsg(this, "Building wire properties table for module $module")
+        printdbg(this, "Building wire properties table for module $module")
         try {
             register(module, path, CSVFetcher.readFromModule(module, path + "wires.csv"))
         }
@@ -47,7 +48,7 @@ class WireCodex {
     }
 
     fun fromCSV(module: String, path: String, csvString: String) {
-        App.printmsg(this, "Building wire properties table for module $module")
+        printdbg(this, "Building wire properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csvString,
@@ -64,7 +65,7 @@ class WireCodex {
             setProp(module, it.intVal("id"), it)
         }
 
-        App.printmsg(this, "Registering wire textures into the resource pool")
+        printdbg(this, "Registering wire textures into the resource pool")
         wireProps.keys.forEach { id ->
             val wireid = id.split(':').last().toInt()
 
@@ -148,6 +149,6 @@ class WireCodex {
         val loadedClassInstance = loadedClassConstructor.newInstance(prop.id, invImgSheet, invImgX, invImgY)
         ItemCodex[prop.id] = loadedClassInstance as GameItem
 
-        App.printmsg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}")
+        printdbg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}")
     }
 }

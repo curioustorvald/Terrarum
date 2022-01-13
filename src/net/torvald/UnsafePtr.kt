@@ -90,7 +90,7 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
 
     fun destroy() {
         if (!destroyed) {
-            println("[UnsafePtr] Destroying pointer $this; called from:")
+            printdbg(this, "Destroying pointer $this; called from:")
             printStackTrace(this)
 
             UnsafeHelper.unsafe.freeMemory(ptr)
@@ -100,7 +100,7 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
             UnsafeHelper.unsafeAllocatedSize -= size
         }
         else {
-            println("[UnsafePtr] Destroy() is called but the pointer $this is already been destroyed; called from:")
+            printdbg(this, "Destroy() is called but the pointer $this is already been destroyed; called from:")
             printStackTrace(this)
         }
     }

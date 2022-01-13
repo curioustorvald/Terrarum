@@ -371,6 +371,20 @@ fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Boolean): Boole
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale // perform some error checking here
     if (dist <= distMax.sqr()) return action() else return false
 }
+fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMultiplierInTiles: (Int) -> Double = { it.toDouble() }, action: () -> Boolean): Boolean {
+    if (item == null) return false
+    val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+    val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
+    val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
+    val actorPos = actor.centrePosVector
+    val dist = minOf(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2), actorPos.distanceSquared(mousePos3))
+
+    val reachBonus = (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale
+    val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * reachBonus // perform some error checking here
+    val toolDistMax = (TILE_SIZED * reachMultiplierInTiles(item.material.toolReach)) * reachBonus
+
+    if (dist <= minOf(toolDistMax, distMax).sqr()) return action() else return false
+}
 fun IntRange.pickRandom() = HQRNG().nextInt(this.endInclusive - this.start + 1) + this.start // count() on 200 million entries? Se on vitun hyvää idea
 fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
 fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]

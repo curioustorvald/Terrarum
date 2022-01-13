@@ -157,7 +157,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
         scrollAnimCounter = 0f
         loadFired = 0
 
-        println("savelist mode: $mode")
+        printdbg(this, "savelist mode: $mode")
     }
 
     override fun show() {
