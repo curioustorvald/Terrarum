@@ -1231,7 +1231,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     fun performBarehandAction(actor: ActorWithBody, delta: Float) {
-//        println("whack!")
 
         fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
             val outList = java.util.ArrayList<ActorWithBody>()
@@ -1252,6 +1251,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // else, punch a block
         val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
         if (punchBlockSize > 0) {
+//            println("whack!")
             PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize, false)
         }
     }
