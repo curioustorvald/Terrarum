@@ -48,7 +48,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
      * e.g. 0x02010034 will be translated as 2.1.52
      *
      */
-    const val VERSION_RAW = 0x000206D3
+    const val VERSION_RAW = 0x00030001
+    // Commit counts up to the Release 0.3: 2251 (plz update!)
 
     //////////////////////////////////////////////////////////
     //             CONFIGURATION FOR TILE MAKER             //

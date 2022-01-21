@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
 
@@ -158,7 +157,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      */
     open fun despawn() {
         if (canBeDespawned) {
-            printdbg(this, "despawn ${nameFun()}")
+            printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
 
             // remove filler block
             forEachBlockbox { x, y ->
@@ -176,8 +175,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 wireConsumption.clear()
             }
 
-            val drop = ItemCodex.fixtureToItemID(this)
-            INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
+            if (flagDespawn) {
+                val drop = ItemCodex.fixtureToItemID(this)
+                INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
+            }
         }
         else {
             printdbg(this, "cannot despawn a fixture with non-empty inventory")
@@ -195,7 +196,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         }
         if (!canBeDespawned) flagDespawn = false
-        else if (flagDespawn) despawn()
+        if (canBeDespawned && flagDespawn) despawn()
         // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
         super.update(delta)
     }

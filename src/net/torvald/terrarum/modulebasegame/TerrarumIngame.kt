@@ -1235,7 +1235,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         if (fixturesUnderHand.size > 0 && fixturesUnderHand[0].canBeDespawned) {
             val fixture = fixturesUnderHand[0]
             val fixtureItem = ItemCodex.fixtureToItemID(fixture)
-            printdbg(this, "Fixture pickup: ${fixture.javaClass.canonicalName} -> $fixtureItem")
+            printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
             // 1. put the fixture to the inventory
             fixture.flagDespawn()
             // 2. register this item(fixture) to the quickslot
