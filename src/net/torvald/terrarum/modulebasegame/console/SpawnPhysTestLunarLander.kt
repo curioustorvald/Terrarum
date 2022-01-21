@@ -17,7 +17,7 @@ internal object SpawnPhysTestLunarLander : ConsoleCommand {
 
         lander.setPosition(mouseX, mouseY)
 
-        INGAME.addNewActor(lander)
+        INGAME.queueActorAddition(lander)
     }
 
     override fun printUsage() {

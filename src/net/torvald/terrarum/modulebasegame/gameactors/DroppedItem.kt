@@ -36,7 +36,11 @@ open class DroppedItem : ActorWithBody {
 
     fun canBePickedUp() = timeSinceSpawned > NO_PICKUP_TIME && !flagDespawn
 
-    constructor(itemID: ItemID, topLeftX: Int, topLeftY: Int) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+    /**
+     * @param topLeftX world-wise coord
+     * @param topLeftY world-wise coord
+     */
+    constructor(itemID: ItemID, topLeftX: Double, topLeftY: Double) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
         this.itemID = itemID
 
         if (itemID.startsWith("actor@"))

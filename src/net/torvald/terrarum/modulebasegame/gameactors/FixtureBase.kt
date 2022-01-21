@@ -66,7 +66,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         private set
 
     fun forEachBlockbox(action: (Int, Int) -> Unit) {
-        worldBlockPos!!.let { (posX, posY) ->
+        worldBlockPos?.let { (posX, posY) ->
             for (y in posY until posY + blockBox.height) {
                 for (x in posX until posX + blockBox.width) {
                     action(x, y)
@@ -76,20 +76,20 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     override fun updateForTerrainChange(cue: IngameInstance.BlockChangeQueueItem) {
-
+        fillFillerBlock()
     }
 
-    private fun fillFillerBlock(bypassEvent: Boolean = false) {
+    private fun fillFillerBlock() {
         forEachBlockbox { x, y ->
             //printdbg(this, "fillerblock ${blockBox.collisionType} at ($x, $y)")
             if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
                 // if the collision type is allow_move_down, only the top surface tile should be "the platform"
                 // lower part must not have such property (think of the table!)
                 // TODO does this ACTUALLY work ?!
-                world!!.setTileTerrain(x, y, if (y == worldBlockPos!!.y) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, bypassEvent)
+                world!!.setTileTerrain(x, y, if (y == worldBlockPos!!.y) BlockBox.ALLOW_MOVE_DOWN else BlockBox.NO_COLLISION, true)
             }
             else
-                world!!.setTileTerrain(x, y, blockBox.collisionType, bypassEvent)
+                world!!.setTileTerrain(x, y, blockBox.collisionType, true)
         }
     }
 
@@ -144,38 +144,45 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         this.hitbox.setFromWidthHeight(posX * TILE_SIZED, posY * TILE_SIZED, blockBox.width * TILE_SIZED, blockBox.height * TILE_SIZED)
 
         // actually add this actor into the world
-        INGAME.addNewActor(this)
+        INGAME.queueActorAddition(this)
 
 
         return true
 
     }
 
+    val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
+
     /**
      * Removes this instance of the fixture from the world
      */
     open fun despawn() {
-        printdbg(this, "despawn ${nameFun()}")
+        if (canBeDespawned) {
+            printdbg(this, "despawn ${nameFun()}")
 
-        // remove filler block
-        forEachBlockbox { x, y ->
-            world!!.setTileTerrain(x, y, Block.AIR, true)
+            // remove filler block
+            forEachBlockbox { x, y ->
+                world!!.setTileTerrain(x, y, Block.AIR, true)
+            }
+
+            worldBlockPos = null
+            mainUI?.dispose()
+
+            this.isVisible = false
+
+            if (this is Electric) {
+                wireEmitterTypes.clear()
+                wireEmission.clear()
+                wireConsumption.clear()
+            }
+
+            val drop = ItemCodex.fixtureToItemID(this)
+            INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
         }
-
-        worldBlockPos = null
-        mainUI?.dispose()
-
-        this.isVisible = false
-
-        if (this is Electric) {
-            wireEmitterTypes.clear()
-            wireEmission.clear()
-            wireConsumption.clear()
+        else {
+            printdbg(this, "cannot despawn a fixture with non-empty inventory")
         }
-
-        // TODO drop self as an item (instance of DroppedItem)
     }
-
     override fun update(delta: Float) {
         // if not flagged to despawn and not actually despawned (which sets worldBlockPos as null), always fill up fillerBlock
         if (!flagDespawn && worldBlockPos != null) {
@@ -187,11 +194,15 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             }
 
         }
-        if (flagDespawn) despawn()
+        if (!canBeDespawned) flagDespawn = false
+        else if (flagDespawn) despawn()
         // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
         super.update(delta)
     }
 
+    override fun flagDespawn() {
+        if (canBeDespawned) flagDespawn = true
+    }
 }
 
 interface CuedByTerrainChange {

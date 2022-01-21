@@ -27,7 +27,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             ball.elasticity = elasticity
             ball.applyForce(Vector2(xvel, yvel))
 
-            INGAME.addNewActor(ball)
+            INGAME.queueActorAddition(ball)
         }
         else if (args.size == 2) {
             val elasticity = args[1].toDouble()
@@ -36,7 +36,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             ball.setPosition(mouseX, mouseY)
             ball.elasticity = elasticity
 
-            INGAME.addNewActor(ball)
+            INGAME.queueActorAddition(ball)
         }
         else {
             printUsage()

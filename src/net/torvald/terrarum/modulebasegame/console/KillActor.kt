@@ -16,7 +16,7 @@ internal object KillActor : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val actorid = args[1].toInt()
-                INGAME.removeActor(actorid)
+                INGAME.queueActorRemoval(actorid)
             }
             catch (e: NumberFormatException) {
                 EchoError("Wrong number input.")

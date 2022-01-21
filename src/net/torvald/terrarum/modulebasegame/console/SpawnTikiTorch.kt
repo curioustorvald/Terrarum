@@ -16,7 +16,7 @@ internal object SpawnTikiTorch : ConsoleCommand {
         val torch = FixtureTikiTorch()
         torch.setPosition(Terrarum.mouseX, Terrarum.mouseY)
 
-        INGAME.addNewActor(torch)
+        INGAME.queueActorAddition(torch)
     }
 
     override fun printUsage() {

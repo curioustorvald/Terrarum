@@ -316,7 +316,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             try {
                 val actor = ReadActor(codices.disk, LoadSavegame.getFileReader(codices.disk, it.toLong()))
                 if (actor !is IngamePlayer) { // actor list should not contain IngamePlayers (see WriteWorld.preWrite) but just in case...
-                    addNewActor(actor)
+                    forceAddActor(actor)
                 }
             }
             catch (e: NullPointerException) {
@@ -329,7 +329,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // assign new random referenceID for player
         codices.player.referenceID = Terrarum.generateUniqueReferenceID(Actor.RenderOrder.MIDDLE)
-        addNewActor(codices.player)
+        forceAddActor(codices.player)
 
 
         // overwrite player's props with world's for multiplayer
@@ -460,7 +460,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             actorNowPlaying = player
             actorGamer = player
-            addNewActor(player)
+            forceAddActor(player)
 
         }
 
@@ -767,12 +767,19 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             ///////////////////////////
             repossessActor()
 
+            // process actor addition requests
+            actorAdditionQueue.forEach { forceAddActor(it) }
+            actorAdditionQueue.clear()
             // determine whether the inactive actor should be activated
             wakeDormantActors()
             // update NOW; allow one last update for the actors flagged to despawn
             updateActors(delta)
             // determine whether the actor should keep being activated or be dormant
             killOrKnockdownActors()
+            // process actor removal requests
+            actorRemovalQueue.forEach { forceRemoveActor(it) }
+            actorRemovalQueue.clear()
+            // update particles
             particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
             // TODO thread pool(?)
             CollisionSolver.process()
@@ -880,7 +887,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.endInclusive - ReferencingRanges.ACTORS_WIRES.first + 1
     private val wireActorsContainer = Array(maxRenderableWires) { WireActor(ReferencingRanges.ACTORS_WIRES.first + it).let {
-        addNewActor(it)
+        forceAddActor(it)
         /*^let*/ it
     } }
 
@@ -949,12 +956,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     internal fun changePossession(newActor: ActorHumanoid) {
-        if (!theGameHasActor(actorNowPlaying)) {
-            throw NoSuchActorWithRefException(newActor)
-        }
+        if (!theGameHasActor(actorNowPlaying)) { throw NoSuchActorWithRefException(newActor) }
 
         actorNowPlaying = newActor
-        //WorldSimulator(actorNowPlaying, AppLoader.getSmoothDelta().toFloat())
     }
 
     internal fun changePossession(refid: Int) {
@@ -994,7 +998,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
             val actorIndex = i
             // kill actors flagged to despawn
             if (actor.flagDespawn) {
-                removeActor(actor)
+                queueActorRemoval(actor)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
@@ -1111,23 +1115,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    override fun removeActor(ID: Int) = removeActor(getActorByID(ID))
-    /**
-     * get index of the actor and delete by the index.
-     * we can do this as the list is guaranteed to be sorted
-     * and only contains unique values.
-     *
-     * Any values behind the index will be automatically pushed to front.
-     * This is how remove function of [java.util.ArrayList] is defined.
-     */
-    override fun removeActor(actor: Actor?) {
-        if (actor == null) return
-
-//        if (actor.referenceID == actorGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
-//            throw ProtectedActorRemovalException("Player")
-
-        forceRemoveActor(actor)
-    }
 
     override fun forceRemoveActor(actor: Actor) {
         arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
@@ -1173,18 +1160,13 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Check for duplicates, append actor and sort the list
      */
-    override fun addNewActor(actor: Actor?) {
+    override fun forceAddActor(actor: Actor?) {
         if (actor == null) return
 
         if (theGameHasActor(actor.referenceID)) {
             throw ReferencedActorAlreadyExistsException(actor)
         }
         else {
-            if (actor.referenceID !in ReferencingRanges.ACTORS_WIRES && actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER) {
-//                printdbg(this, "Adding actor $actor")
-//                printStackTrace(this)
-            }
-
             actorContainerActive.add(actor)
             if (actor is ActorWithBody) actorToRenderQueue(actor).add(actor)
         }
@@ -1250,7 +1232,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         // pickup a fixture
-        if (fixturesUnderHand.size > 0) {
+        if (fixturesUnderHand.size > 0 && fixturesUnderHand[0].canBeDespawned) {
             val fixture = fixturesUnderHand[0]
             val fixtureItem = ItemCodex.fixtureToItemID(fixture)
             printdbg(this, "Fixture pickup: ${fixture.javaClass.canonicalName} -> $fixtureItem")

@@ -54,7 +54,7 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
             try {
                 // place the actor to the world
                 this@HumanoidNPC.setPosition(Terrarum.mouseX, Terrarum.mouseY)
-                INGAME.addNewActor(this@HumanoidNPC)
+                INGAME.queueActorAddition(this@HumanoidNPC)
                 // successful
                 return true
             }

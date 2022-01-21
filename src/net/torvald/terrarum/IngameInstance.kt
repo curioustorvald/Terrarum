@@ -126,6 +126,9 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
+    val actorAdditionQueue = ArrayList<Actor>()
+    val actorRemovalQueue = ArrayList<Actor>()
+
     /**
      * ## BIG NOTE: Calculated actor distance is the **Euclidean distance SQUARED**
      *
@@ -158,7 +161,7 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         // add blockmarking_actor into the actorlist
         (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor).let {
             it.isVisible = false // make sure the actor is invisible on new instance
-            try { addNewActor(it) } catch (e: ReferencedActorAlreadyExistsException) {}
+            if (actorContainerActive.searchFor(it.referenceID) { it.referenceID } != null) actorContainerActive.add(it)
         }
 
         gameInitialised = true
@@ -300,7 +303,7 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
     //fun SortedArrayList<*>.binarySearch(actor: Actor) = this.toArrayList().binarySearch(actor.referenceID)
     //fun SortedArrayList<*>.binarySearch(ID: Int) = this.toArrayList().binarySearch(ID)
 
-    open fun removeActor(ID: Int) = removeActor(getActorByID(ID))
+    open fun queueActorRemoval(ID: Int) = queueActorRemoval(getActorByID(ID))
     /**
      * get index of the actor and delete by the index.
      * we can do this as the list is guaranteed to be sorted
@@ -309,13 +312,12 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
      * Any values behind the index will be automatically pushed to front.
      * This is how remove function of [java.util.ArrayList] is defined.
      */
-    open fun removeActor(actor: Actor?) {
+    open fun queueActorRemoval(actor: Actor?) {
         if (actor == null) return
-
-        forceRemoveActor(actor)
+        actorRemovalQueue.add(actor)
     }
 
-    open fun forceRemoveActor(actor: Actor) {
+    protected open fun forceRemoveActor(actor: Actor) {
         arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
             val indexToDelete = actorContainer.searchFor(actor.referenceID) { it.referenceID }
             if (indexToDelete != null) {
@@ -325,18 +327,23 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         }
     }
 
-    /**
-     * Check for duplicates, append actor and sort the list
-     */
-    open fun addNewActor(actor: Actor?) {
+    protected open fun forceAddActor(actor: Actor?) {
         if (actor == null) return
 
         if (theGameHasActor(actor.referenceID)) {
             throw ReferencedActorAlreadyExistsException(actor)
         }
         else {
-            actorContainerActive.add(actor)
+            actorAdditionQueue.add(actor)
         }
+    }
+
+    /**
+     * Check for duplicates, append actor and sort the list
+     */
+    open fun queueActorAddition(actor: Actor?) {
+        if (actor == null) return
+        actorAdditionQueue.add(actor)
     }
 
     fun isActive(ID: Int): Boolean =

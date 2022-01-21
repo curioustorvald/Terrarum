@@ -5,6 +5,7 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -43,7 +44,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
 
         wires?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
-            ingame.addNewActor(DroppedItem(it, mouseTile.x * TILE_SIZE, mouseTile.y * TILE_SIZE))
+            ingame.queueActorAddition(DroppedItem(it, mouseTile.x * TILE_SIZED, mouseTile.y * TILE_SIZED))
         } ?: return@mouseInInteractableRange false
 
         true

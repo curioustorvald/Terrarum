@@ -223,7 +223,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     internal fun addBlockMarker(x: Int, y: Int) {
         try {
             val a = generateNewBlockMarkerVisible(x, y)
-            addNewActor(a)
+            queueActorAddition(a)
             actorsRenderOverlay.add(a)
             selection.add(Point2i(x, y))
         }
@@ -233,7 +233,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     internal fun removeBlockMarker(x: Int, y: Int) {
         try {
             val a = getActorByID(blockPosToRefID(x, y))
-            removeActor(a)
+            queueActorAddition(a)
             actorsRenderOverlay.remove(a)
             selection.remove(Point2i(x, y))
         }

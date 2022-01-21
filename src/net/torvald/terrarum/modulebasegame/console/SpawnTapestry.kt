@@ -17,7 +17,7 @@ internal object SpawnTapestry : ConsoleCommand {
         }
 
         val tapestry = DecodeTapestry(File(args[1]))
-        INGAME.addNewActor(tapestry)
+        INGAME.queueActorAddition(tapestry)
     }
 
     override fun printUsage() {

@@ -34,7 +34,10 @@ open class FixtureInventory() {
      */
     val itemList = ArrayList<InventoryPair>()
     var wallet = BigInteger("0") // unified currency for whole civs; Dwarf Fortress approach seems too complicated
-    
+
+    fun isEmpty() = getTotalCount() == 0
+    fun isNotEmpty() = getTotalCount() > 0
+
     open fun add(itemID: ItemID, count: Int = 1) {
         if (ItemCodex[itemID] == null)
             throw NullPointerException("Item not found: $itemID")
@@ -136,12 +139,12 @@ open class FixtureInventory() {
         else
             getTotalCount().toDouble()
 
-    fun getTotalWeight(): Double = itemList.map { ItemCodex[it.itm]!!.mass * it.qty }.sum()
+    fun getTotalWeight(): Double = itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
 
     /**
      * Real amount
      */
-    fun getTotalCount(): Int = itemList.map { it.qty }.sum()
+    fun getTotalCount(): Int = itemList.sumOf { it.qty }
 
     /**
      * Unique amount, multiple items are calculated as one

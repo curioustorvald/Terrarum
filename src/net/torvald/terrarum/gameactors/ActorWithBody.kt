@@ -1736,7 +1736,7 @@ open class ActorWithBody : Actor {
         assertPrinted = true
     }
 
-    internal fun flagDespawn() {
+    internal open fun flagDespawn() {
         flagDespawn = true
     }
 
