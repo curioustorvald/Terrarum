@@ -82,7 +82,7 @@ class UIQuickslotBar : UICanvas() {
 
         (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.let { actor ->
             for (i in 0..SLOT_COUNT - 1) {
-                val item = ItemCodex[actor.inventory.getQuickslot(i)?.itm]
+                val item = ItemCodex[actor.inventory.getQuickslotItem(i)?.itm]
 
                 val image = if (i == selection)
                     ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)
@@ -101,7 +101,7 @@ class UIQuickslotBar : UICanvas() {
 
             if (nameShowupAlpha > 0f) {
                 val selection = actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: return
-                actor.inventory.getQuickslot(selection)?.let {
+                actor.inventory.getQuickslotItem(selection)?.let {
                     val item = ItemCodex[it.itm]
                     val quantity = it.qty
                     val text = "${item?.name}" + (if (item?.isUnique == true) "" else  " ($quantity)")

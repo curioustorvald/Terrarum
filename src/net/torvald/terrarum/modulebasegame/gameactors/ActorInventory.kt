@@ -47,16 +47,22 @@ class ActorInventory() : FixtureInventory() {
             actor.unequipItem(existingItem.itm)
             // also unequip on the quickslot
             actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                setQuickBar(it, null)
+                setQuickslotItem(it, null)
             }
         }
     }
 
-    fun setQuickBar(slot: Int, dynamicID: ItemID?) {
+    fun setQuickslotItem(slot: Int, dynamicID: ItemID?) {
         quickSlot[slot] = dynamicID
     }
 
-    fun getQuickslot(slot: Int): InventoryPair? = invSearchByDynamicID(quickSlot[slot])
+    fun setQuickslotItemAtSelected(dynamicID: ItemID?) {
+        actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+            setQuickslotItem(it, dynamicID)
+        }
+    }
+
+    fun getQuickslotItem(slot: Int): InventoryPair? = invSearchByDynamicID(quickSlot[slot])
 
     fun consumeItem(item: GameItem) {
         val actor = this.actor as Actor
@@ -85,7 +91,7 @@ class ActorInventory() : FixtureInventory() {
 
                 // update quickslot designation as the item is being unpacked (e.g. using fresh new pickaxe)
                 actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                    setQuickBar(it, newItem.dynamicID)
+                    setQuickslotItem(it, newItem.dynamicID)
                 }
 
                 // FIXME now damage meter (vital) is broken

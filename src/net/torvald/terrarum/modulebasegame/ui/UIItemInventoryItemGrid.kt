@@ -106,10 +106,10 @@ class UIItemInventoryItemGrid(
                     if (player != null) {
                         val inventory = player.inventory
                         val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
-                        val currentSlotItem = inventory.getQuickslot(slot)
+                        val currentSlotItem = inventory.getQuickslotItem(slot)
 
 
-                        inventory.setQuickBar(
+                        inventory.setQuickslotItem(
                                 slot,
                                 if (currentSlotItem?.itm != item.dynamicID)
                                     item.dynamicID // register
@@ -120,8 +120,8 @@ class UIItemInventoryItemGrid(
                         // search for duplicates in the quickbar, except mine
                         // if there is, unregister the other
                         (0..9).minus(slot).forEach {
-                            if (inventory.getQuickslot(it)?.itm == item.dynamicID) {
-                                inventory.setQuickBar(it, null)
+                            if (inventory.getQuickslotItem(it)?.itm == item.dynamicID) {
+                                inventory.setQuickslotItem(it, null)
                             }
                         }
                     }
@@ -145,7 +145,7 @@ class UIItemInventoryItemGrid(
 
                             // also equip on the quickslot
                             player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                                player.inventory.setQuickBar(it, item.dynamicID)
+                                player.inventory.setQuickslotItem(it, item.dynamicID)
                             }
                         }
                         else { // if not, unequip it
@@ -153,7 +153,7 @@ class UIItemInventoryItemGrid(
 
                             // also unequip on the quickslot
                             player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                                player.inventory.setQuickBar(it, null)
+                                player.inventory.setQuickslotItem(it, null)
                             }
                         }
                     }
@@ -415,7 +415,7 @@ class UIItemInventoryItemGrid(
                     val ainv = getInventory() as ActorInventory
 
                     for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
-                        if (sortListItem.itm == ainv.getQuickslot(qs - 1)?.itm) {
+                        if (sortListItem.itm == ainv.getQuickslotItem(qs - 1)?.itm) {
                             items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }

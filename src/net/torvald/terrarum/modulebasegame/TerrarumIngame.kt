@@ -53,7 +53,6 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 
 
 /**
@@ -590,8 +589,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
         var uiOpened = false
 
-        val canPerformBarehandAction = actor.scale * actor.baseHitboxH >= actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0
-
         // TODO actorsUnderMouse: support ROUNDWORLD
         val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
         if (actorsUnderMouse.size > 1) {
@@ -633,7 +630,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
                 (actor as Pocketed).inventory.consumeItem(itemOnGrip)
         }
         // #3. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
-        else if (itemOnGrip == null && canPerformBarehandAction) {
+        else if (itemOnGrip == null) {
             mouseInInteractableRange(actor) {
                 performBarehandAction(actor, delta)
                 true
@@ -772,9 +769,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
             // determine whether the inactive actor should be activated
             wakeDormantActors()
+            // update NOW; allow one last update for the actors flagged to despawn
+            updateActors(delta)
             // determine whether the actor should keep being activated or be dormant
             killOrKnockdownActors()
-            updateActors(delta)
             particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
             // TODO thread pool(?)
             CollisionSolver.process()
@@ -1218,19 +1216,10 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesContainer.appendHead(particle)
     }
 
-    private fun insertionSortLastElemAV(arr: ArrayList<ActorWithBody>) { // out-projection doesn't work, duh
-        ReentrantLock().lock {
-            var j = arr.lastIndex - 1
-            val x = arr.last()
-            while (j >= 0 && arr[j] > x) {
-                arr[j + 1] = arr[j]
-                j -= 1
-            }
-            arr[j + 1] = x
-        }
-    }
-
     fun performBarehandAction(actor: ActorWithBody, delta: Float) {
+
+        val canAttackOrDig = actor.scale * actor.baseHitboxH >= actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0
+
 
         fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
             val outList = java.util.ArrayList<ActorWithBody>()
@@ -1245,14 +1234,50 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         val punchSize = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
 
-        // if there are attackable actor (todo) on the "actor punch hitbox (todo)", attack them (todo)
-        val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(Terrarum.mouseX, Terrarum.mouseY, punchSize / 2.0).filter { true }
+        // if there are attackable actor or fixtures
+        val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(Terrarum.mouseX, Terrarum.mouseY, punchSize / 2.0).sortedBy {
+            (Terrarum.mouseX - it.hitbox.centeredX).sqr() + (Terrarum.mouseY - it.hitbox.centeredY).sqr()
+        } // sorted by the distance from the mouse
 
+        // prioritise actors
+        val fixturesUnderHand = ArrayList<FixtureBase>()
+        val mobsUnderHand = ArrayList<ActorWithBody>()
+        actorsUnderMouse.forEach {
+            if (it is FixtureBase && it.mainUI == null)
+                fixturesUnderHand.add(it)
+            else if (it is ActorWithBody)
+                mobsUnderHand.add(it)
+        }
+
+        // pickup a fixture
+        if (fixturesUnderHand.size > 0) {
+            val fixture = fixturesUnderHand[0]
+            val fixtureItem = ItemCodex.fixtureToItemID(fixture)
+            printdbg(this, "Fixture pickup: ${fixture.javaClass.canonicalName} -> $fixtureItem")
+            // 1. put the fixture to the inventory
+            fixture.flagDespawn()
+            // 2. register this item(fixture) to the quickslot
+            if (actor is Pocketed) {
+                actor.inventory.add(fixtureItem)
+                actor.equipItem(fixtureItem)
+                actor.inventory.setQuickslotItemAtSelected(fixtureItem)
+                // 2-1. unregister if other slot has the same item
+                for (k in 0..9) {
+                    if (actor.inventory.getQuickslotItem(k)?.itm == fixtureItem && k != actor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)) {
+                        actor.inventory.setQuickslotItem(k, null)
+                    }
+                }
+            }
+        }
+        // TODO attack a mob
+//        else if (mobsUnderHand.size > 0 && canAttackOrDig) {
+//        }
         // else, punch a block
-        val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
-        if (punchBlockSize > 0) {
-//            println("whack!")
-            PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize, false)
+        else if (canAttackOrDig) {
+            val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
+            if (punchBlockSize > 0) {
+                PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize, false)
+            }
         }
     }
 

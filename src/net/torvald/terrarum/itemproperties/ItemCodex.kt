@@ -12,8 +12,10 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * ItemCodex holds information of every item in the game, including blocks despite the 'item' naming
@@ -33,6 +35,11 @@ class ItemCodex {
     @Transient val ACTORID_MIN = ReferencingRanges.ACTORS.first
 
     internal constructor()
+
+    /**
+     * Pair of <Fully Qualified class name for the Fixture, Corresponding ItemID of the spawner Item>
+     */
+    @Transient val fixtureToSpawnerItemID = HashMap<String, ItemID>()
 
     fun clear() {
         itemCodex.clear()
@@ -84,6 +91,7 @@ class ItemCodex {
     }
 
     fun dynamicToStaticID(dynamicID: ItemID) = dynamicToStaticTable[dynamicID]!!
+    fun fixtureToItemID(fixture: FixtureBase) = fixtureToSpawnerItemID[fixture.javaClass.canonicalName]!!
 
     /**
      * Mainly used by GameItemLoader

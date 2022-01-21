@@ -126,6 +126,11 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
+    /**
+     * ## BIG NOTE: Calculated actor distance is the **Euclidean distance SQUARED**
+     *
+     * But when a function does not take the distance (e.g. `actorsRTree.find()`) you must not square the numbers
+     */
     var actorsRTree: PRTree<ActorWithBody> = PRTree(actorMBRConverter, 24) // no lateinit!
         protected set
 
@@ -450,7 +455,7 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
 
     /** Will use centre point of the actors
      * HOPEFULLY sorted by the distance...?
-     * @return List of DistanceResult, list may be empty */
+     * @return List of DistanceResult (the actor and the distance SQUARED from the actor), list may be empty */
     fun findKNearestActors(from: ActorWithBody, maxHits: Int, nodeFilter: (ActorWithBody) -> Boolean): List<DistanceResult<ActorWithBody>> {
         return actorsRTree.nearestNeighbour(actorDistanceCalculator, nodeFilter, maxHits, object : PointND {
             override fun getDimensions(): Int = 2
@@ -462,7 +467,7 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         })
     }
     /** Will use centre point of the actors
-     * @return Pair of: the actor, distance from the actor; null if none found */
+     * @return Pair of: the actor, distance SQUARED from the actor; null if none found */
     fun findNearestActor(from: ActorWithBody, nodeFilter: (ActorWithBody) -> Boolean): DistanceResult<ActorWithBody>? {
         val t = findKNearestActors(from, 1, nodeFilter)
         return if (t.isNotEmpty())

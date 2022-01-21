@@ -9,7 +9,7 @@ import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 
-class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, { FixtureLogicSignalEmitter() }) {
+class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter") {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_LOGIC_SIGNAL_EMITTER"

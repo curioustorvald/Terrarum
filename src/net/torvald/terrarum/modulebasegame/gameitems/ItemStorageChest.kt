@@ -10,7 +10,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 /**
  * Created by minjaesong on 2019-07-08.
  */
-class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, { FixtureStorageChest() }) {
+class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureStorageChest") {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_STORAGE_CHEST"

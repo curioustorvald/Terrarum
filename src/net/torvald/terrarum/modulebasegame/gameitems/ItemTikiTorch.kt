@@ -9,7 +9,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 /**
  * Created by minjaesong on 2019-05-16.
  */
-class ItemTikiTorch(originalID: ItemID) : FixtureItemBase(originalID, { FixtureTikiTorch() }) {
+class ItemTikiTorch(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch") {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_TIKI_TORCH"

@@ -665,7 +665,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // make quickslot work
         if (key == AVKey.__PLAYER_QUICKSLOTSEL && value != null) {
             // ONLY FOR HAND_GRIPs!!
-            val quickBarItem = ItemCodex[inventory.getQuickslot(actorValue.getAsInt(key)!!)?.itm]
+            val quickBarItem = ItemCodex[inventory.getQuickslotItem(actorValue.getAsInt(key)!!)?.itm]
 
             if (quickBarItem != null && quickBarItem.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
                 equipItem(quickBarItem)

@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -15,7 +16,15 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 /**
  * Created by minjaesong on 2021-12-13.
  */
-open class FixtureItemBase(originalID: ItemID, val makeFixture: () -> FixtureBase) : GameItem(originalID) {
+open class FixtureItemBase(originalID: ItemID, fixtureClassName: String) : GameItem(originalID) {
+
+    private val makeFixture: () -> FixtureBase = {
+        Class.forName(fixtureClassName).getDeclaredConstructor().newInstance() as FixtureBase
+    }
+
+    init {
+        ItemCodex.fixtureToSpawnerItemID[fixtureClassName] = originalID
+    }
 
     protected val ghostItem = makeFixture()
 

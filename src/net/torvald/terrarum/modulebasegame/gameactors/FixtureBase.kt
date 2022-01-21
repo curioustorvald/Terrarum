@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
 
@@ -36,7 +37,9 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
 
-    constructor(blockBox0: BlockBox,
+
+    constructor(
+                blockBox0: BlockBox,
                 blockBoxProps: BlockBoxProps = BlockBoxProps(0),
                 renderOrder: RenderOrder = RenderOrder.MIDDLE,
                 nameFun: () -> String,
@@ -54,6 +57,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         if (mainUI != null)
             App.disposables.add(mainUI)
     }
+
 
     /**
      * Tile-wise position of this fixture when it's placed on the world, top-left origin. Null if it's not on the world
@@ -151,11 +155,11 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * Removes this instance of the fixture from the world
      */
     open fun despawn() {
-        println("${this.javaClass.simpleName} dispose")
+        printdbg(this, "despawn ${nameFun()}")
 
         // remove filler block
         forEachBlockbox { x, y ->
-            world!!.setTileTerrain(x, y, Block.AIR, false)
+            world!!.setTileTerrain(x, y, Block.AIR, true)
         }
 
         worldBlockPos = null
@@ -173,7 +177,6 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     override fun update(delta: Float) {
-        super.update(delta)
         // if not flagged to despawn and not actually despawned (which sets worldBlockPos as null), always fill up fillerBlock
         if (!flagDespawn && worldBlockPos != null) {
             // for removal-by-player because player is removing the filler block by pick
@@ -183,9 +186,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 }
             }
 
-            if (flagDespawn) despawn()
         }
-        // actual actor removal is performed by the TerrarumIngame
+        if (flagDespawn) despawn()
+        // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
+        super.update(delta)
     }
 
 }
