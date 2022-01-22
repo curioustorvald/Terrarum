@@ -371,6 +371,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
     }
 
+    private val autosaveOnErrorAction = { e: Throwable -> uiAutosaveNotifier.setAsError() }
+
+
     private fun postInitForNewGame() {
         worldSavefileName = LoadSavegame.getWorldSavefileName(savegameNickname, world)
         playerSavefileName = LoadSavegame.getPlayerSavefileName(actorGamer)
@@ -395,18 +398,16 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         )
         actorGamer.backupPlayerProps(isMultiplayer)
 
-        val onError = { e: Throwable -> uiAutosaveNotifier.setAsError() }
-
         // make initial savefile
         // we're not writing multiple files at one go because:
         //  1. lighten the IO burden
         //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
         val saveTime_t = App.getTIME_T()
-        WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, true, onError) {
+        WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, true, autosaveOnErrorAction) {
             makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
-            WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, true, onError) {
+            WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, true, autosaveOnErrorAction) {
                 makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
                 uiAutosaveNotifier.setAsClose()
             }
@@ -1083,13 +1084,31 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     fun queueAutosave() {
         val start = System.nanoTime()
 
-        /*uiAutosaveNotifier.setAsOpen()
-        makeSavegameBackupCopy()
-        WriteSavegame.quick(savegameArchive, getSaveFileMain(), this, true) {
-            uiAutosaveNotifier.setAsClose()
+        uiAutosaveNotifier.setAsOpen()
 
-            debugTimers.put("Last Autosave Duration", System.nanoTime() - start)
-        }*/
+        val saveTime_t = App.getTIME_T()
+        val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
+        val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
+
+        INGAME.makeSavegameBackupCopy(playerSavefile)
+        WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, true, autosaveOnErrorAction) {
+
+            INGAME.makeSavegameBackupCopy(worldSavefile)
+            WriteSavegame(saveTime_t, WriteSavegame.SaveMode.QUICK_WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, true, autosaveOnErrorAction) {
+                // callback:
+                // rebuild the disk skimmers
+                INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
+                    printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
+                    it.rebuildingDiskSkimmer?.rebuild()
+                }
+
+                // return to normal state
+                uiAutosaveNotifier.setAsClose()
+
+                debugTimers.put("Last Autosave Duration", System.nanoTime() - start)
+            }
+        }
+
     }
 
 

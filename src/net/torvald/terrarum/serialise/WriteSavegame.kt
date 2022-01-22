@@ -26,7 +26,7 @@ import java.util.logging.Level
 object WriteSavegame {
 
     enum class SaveMode {
-        META, PLAYER, WORLD, SHARED, QUICK_PLAYER, QUICK_WORLD
+        META, PLAYER, WORLD, SHARED, QUICK_WORLD
     }
 
     @Volatile var savingStatus = -1 // -1: not started, 0: saving in progress, 255: saving finished
@@ -36,13 +36,13 @@ object WriteSavegame {
     private fun getSaveThread(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) = when (mode) {
         SaveMode.WORLD -> WorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
         SaveMode.PLAYER -> PlayerSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
-        SaveMode.QUICK_PLAYER -> QuickSingleplayerWorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
+        SaveMode.QUICK_WORLD -> QuickSingleplayerWorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
         else -> throw IllegalArgumentException("$mode")
     }
 
     operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
         savingStatus = 0
-        val hasThumbnail = (mode == SaveMode.WORLD)
+        val hasThumbnail = (mode == SaveMode.WORLD || mode == SaveMode.QUICK_WORLD)
         printdbg(this, "Save queued")
 
         if (hasThumbnail) {
@@ -70,7 +70,7 @@ object WriteSavegame {
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
-        // use field 'savingStatus' to know when the saving is done
+        // use callback to fire the after-the-saving-progress job
     }
 
 
@@ -84,39 +84,9 @@ object WriteSavegame {
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
-        // use field 'savingStatus' to know when the saving is done
+        // use callback to fire the after-the-saving-progress job
     }
 
-    fun quick(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, callback: () -> Unit, errorHandler: (Throwable) -> Unit) {
-        if (ingame.isMultiplayer) TODO()
-
-        return // TODO //
-
-        savingStatus = 0
-
-        printdbg(this, "Quicksave queued")
-
-        IngameRenderer.screencapExportCallback = {
-            printdbg(this, "Generating thumbnail...")
-
-            val w = 960
-            val h = 640
-            val p = Pixmap.createFromFrameBuffer((it.width - w).ushr(1), (it.height - h).ushr(1), w, h)
-            IngameRenderer.fboRGBexport = p
-            //PixmapIO2._writeTGA(gzout, p, true, true)
-            //p.dispose()
-            IngameRenderer.fboRGBexportedLatch = true
-
-            printdbg(this, "Done thumbnail generation")
-        }
-        IngameRenderer.screencapRequested = true
-
-        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, false, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
-        savingThread.start()
-
-        // it is caller's job to keep the game paused or keep a "save in progress" ui up
-        // use field 'savingStatus' to know when the saving is done
-    }
 }
 
 
