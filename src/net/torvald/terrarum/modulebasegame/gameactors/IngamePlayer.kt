@@ -11,6 +11,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.SimpleFileSystem
 import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -78,7 +79,7 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
      */
     @Transient private lateinit var rebuildfun: (item: GameItem?) -> Unit
     @Transient private lateinit var rebuildfunGlow: (item: GameItem?) -> Unit
-
+    @Transient internal var rebuildingDiskSkimmer: DiskSkimmer? = null
 
     /**
      * Example usage:
@@ -103,6 +104,7 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
     fun reassembleSpriteFromDisk(disk: SimpleFileSystem, sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
         if (animDesc != null && sprite != null) {
             rebuildfun = { item: GameItem? -> _rebuild(disk, -1025L, animDesc!!, sprite, item) }; rebuildfun(heldItem)
+            if (disk is DiskSkimmer) rebuildingDiskSkimmer = disk
 
             if (disk.getEntry(-1025L) != null)
                 spriteHeadTexture = AssembleSheetPixmap.getMugshotFromVirtualDisk(disk, -1025L, animDesc!!)

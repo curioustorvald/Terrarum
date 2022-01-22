@@ -1,9 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
-import net.torvald.terrarum.ccG
-import net.torvald.terrarum.ccW
-import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -76,7 +74,7 @@ class WorldSavingThread(
         val tgaout = ByteArray64GrowableOutputStream()
         val gzout = GZIPOutputStream(tgaout)
 
-        Echo("Writing metadata...")
+        printdbg(this, "Writing metadata...")
 
         val creation_t = ingame.world.creationTime
 
@@ -106,7 +104,7 @@ class WorldSavingThread(
                 for (cy in 0 until ch) {
                     val chunkNumber = LandUtil.chunkXYtoChunkNum(ingame.world, cx, cy).toLong()
 
-                    Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
+//                    Echo("Writing chunks... ${(cw*ch*layer) + chunkNumber + 1}/${cw*ch*layers.size}")
 
                     val chunkBytes = WriteWorld.encodeChunk(layers[layer]!!, cx, cy)
                     val entryID = 0x1_0000_0000L or layer.toLong().shl(24) or chunkNumber
@@ -124,7 +122,7 @@ class WorldSavingThread(
 
         // Write Actors //
         actorsList.forEachIndexed { count, it ->
-            Echo("Writing actors... ${count+1}/${actorsList.size}")
+//            Echo("Writing actors... ${count+1}/${actorsList.size}")
 
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
             val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
@@ -134,7 +132,7 @@ class WorldSavingThread(
         }
 
 
-        Echo("Writing file to disk...")
+//        Echo("Writing file to disk...")
 
         disk.entries[0]!!.modificationDate = time_t
         // entry zero MUST NOT be used to get lastPlayDate, but we'll update it anyway
@@ -144,7 +142,7 @@ class WorldSavingThread(
 
 
 
-        Echo ("${ccW}Game saved with size of $ccG${outFile.length()}$ccW bytes")
+        printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 
 
         if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false
@@ -177,7 +175,7 @@ class PlayerSavingThread(
 
         WriteSavegame.saveProgress = 0f
 
-        Echo("Writing The Player...")
+        printdbg(this, "Writing The Player...")
         WritePlayer(ingame.actorGamer, disk, ingame, time_t)
         disk.entries[0]!!.modificationDate = time_t
         VDUtil.dumpToRealMachine(disk, outFile)

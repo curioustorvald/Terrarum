@@ -1,9 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
-import net.torvald.terrarum.ccG
-import net.torvald.terrarum.ccW
-import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -69,7 +67,7 @@ class QuickSingleplayerWorldSavingThread(
         val tgaout = ByteArray64GrowableOutputStream()
         val gzout = GZIPOutputStream(tgaout)
 
-        Echo("Writing metadata...")
+        printdbg(this, "Writing metadata...")
 
         val creation_t = ingame.world.creationTime
 
@@ -103,7 +101,7 @@ class QuickSingleplayerWorldSavingThread(
                 ingame.world.getLayer(layerNum)?.let { layer ->
                     chunks.forEach { chunkNumber ->
 
-                        Echo("Writing chunks... $chunksWrote/$chunkCount")
+//                        Echo("Writing chunks... $chunksWrote/$chunkCount")
 
                         val chunkXY = LandUtil.chunkNumToChunkXY(ingame.world, chunkNumber)
 
@@ -128,7 +126,7 @@ class QuickSingleplayerWorldSavingThread(
 
         // Write Actors //
         actorsList.forEachIndexed { count, it ->
-            Echo("Writing actors... ${count+1}/${actorsList.size}")
+            printdbg(this, "Writing actors... ${count+1}/${actorsList.size}")
 
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
             val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
@@ -142,7 +140,7 @@ class QuickSingleplayerWorldSavingThread(
         skimmer.injectDiskCRC(disk.hashCode())
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
 
-        Echo ("${ccW}Game saved with size of $ccG${outFile.length()}$ccW bytes")
+        printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 
 
         if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false

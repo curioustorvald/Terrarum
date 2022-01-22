@@ -43,11 +43,11 @@ object WriteSavegame {
     operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
         savingStatus = 0
         val hasThumbnail = (mode == SaveMode.WORLD)
-        Echo("Save queued")
+        printdbg(this, "Save queued")
 
         if (hasThumbnail) {
             IngameRenderer.screencapExportCallback = {
-                Echo("Generating thumbnail...")
+                printdbg(this, "Generating thumbnail...")
 
                 val w = 960
                 val h = 640
@@ -61,7 +61,7 @@ object WriteSavegame {
                 //p.dispose()
                 IngameRenderer.fboRGBexportedLatch = true
 
-                Echo("Done thumbnail generation")
+                printdbg(this, "Done thumbnail generation")
             }
             IngameRenderer.screencapRequested = true
         }
@@ -94,10 +94,10 @@ object WriteSavegame {
 
         savingStatus = 0
 
-        Echo("Quicksave queued")
+        printdbg(this, "Quicksave queued")
 
         IngameRenderer.screencapExportCallback = {
-            Echo("Generating thumbnail...")
+            printdbg(this, "Generating thumbnail...")
 
             val w = 960
             val h = 640
@@ -107,7 +107,7 @@ object WriteSavegame {
             //p.dispose()
             IngameRenderer.fboRGBexportedLatch = true
 
-            Echo("Done thumbnail generation")
+            printdbg(this, "Done thumbnail generation")
         }
         IngameRenderer.screencapRequested = true
 

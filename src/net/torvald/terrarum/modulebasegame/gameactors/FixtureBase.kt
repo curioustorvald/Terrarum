@@ -140,7 +140,12 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
 
         this.isVisible = true
-        this.hitbox.setFromWidthHeight(posX * TILE_SIZED, posY * TILE_SIZED, blockBox.width * TILE_SIZED, blockBox.height * TILE_SIZED)
+        this.hitbox.setFromWidthHeight(
+                posX * TILE_SIZED,
+                posY * TILE_SIZED,
+                blockBox.width * TILE_SIZED,
+                blockBox.height * TILE_SIZED
+        )
 
         // actually add this actor into the world
         INGAME.queueActorAddition(this)
@@ -174,29 +179,34 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 wireEmission.clear()
                 wireConsumption.clear()
             }
-
-            if (flagDespawn) {
-                val drop = ItemCodex.fixtureToItemID(this)
-                INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
-            }
         }
         else {
             printdbg(this, "cannot despawn a fixture with non-empty inventory")
         }
     }
+
+    private fun dropSelfAsAnItem() {
+        val drop = ItemCodex.fixtureToItemID(this)
+        INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
+    }
+
+    private var dropItem = false
+
     override fun update(delta: Float) {
-        // if not flagged to despawn and not actually despawned (which sets worldBlockPos as null), always fill up fillerBlock
         if (!flagDespawn && worldBlockPos != null) {
-            // for removal-by-player because player is removing the filler block by pick
+            // removal-by-player because player is removing the filler block by pick
+            // no-flagDespawn check is there to prevent item dropping when externally despawned
+            // (e.g. picked the fixture up in which case the fixture must not drop itself to the world; it must go into the actor's inventory)
             forEachBlockbox { x, y ->
                 if (world!!.getTileFromTerrain(x, y) != blockBox.collisionType) {
                     flagDespawn = true
+                    dropItem = true
                 }
             }
-
         }
         if (!canBeDespawned) flagDespawn = false
         if (canBeDespawned && flagDespawn) despawn()
+        if (canBeDespawned && dropItem) dropSelfAsAnItem()
         // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
         super.update(delta)
     }
@@ -229,8 +239,10 @@ interface CuedByWireChange {
  * Standard 32-bit binary flags.
  *
  * (LSB)
- * - 0: fluid resist - when FALSE, the fixture will break itself to item/nothing. For example, crops has this flag FALSE.
- * - 1: don't drop item when broken - when TRUE, the fixture will simply disappear instead of dropping itself. For example, crop has this flag TRUE.
+ * - 0: fluid resist - when FALSE, the fixture will break itself to item/nothing.
+ *       For example, crops has this flag FALSE.
+ * - 1: don't drop item when broken - when TRUE, the fixture will simply disappear instead of
+ *       dropping itself. For example, crop has this flag TRUE.
  *
  * (MSB)
  *
@@ -243,7 +255,8 @@ inline class BlockBoxProps(val flags: Int) {
 /**
  * To not define the blockbox, simply use BlockBox.NULL
  *
- * Null blockbox means the fixture won't bar any block placement. Fixtures like paintings will want to have such feature. (e.g. torch placed on top; buried)
+ * Null blockbox means the fixture won't bar any block placement.
+ * Fixtures like paintings will want to have such feature. (e.g. torch placed on top; buried)
  *
  * @param collisionType Collision type defined in BlockBox.Companion
  * @param width Width of the block box, tile-wise

@@ -5,12 +5,15 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TitleScreen
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
 import net.torvald.terrarum.serialise.WriteSavegame
@@ -108,6 +111,13 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                         INGAME.makeSavegameBackupCopy(worldSavefile)
                         WriteSavegame(saveTime_t, WriteSavegame.SaveMode.WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, false, onError) {
                             // callback:
+                            // rebuild the disk skimmers
+                            INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
+                                printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
+                                it.rebuildingDiskSkimmer?.rebuild()
+                            }
+
+                            // return to normal state
                             System.gc()
                             screen = 0
                             full.handler.unlockToggle()
