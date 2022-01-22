@@ -395,7 +395,7 @@ return Object.freeze({"n":"\uDBBF\uDFC1Бъл. Многоезична\uDBBF\uDFC
             }
             let composed = diacriticsMapping[states.code][s]
             reset()
-            return ['3', composed || s]
+            return ['2', composed || s]
         }
         // nope!
         else {
