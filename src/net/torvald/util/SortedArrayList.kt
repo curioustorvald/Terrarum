@@ -158,11 +158,7 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : MutableCollecti
     inline fun forEachIndexed(action: (Int, T) -> Unit) = arrayList.forEachIndexed(action)
 
     fun cloneToList(): List<T> {
-        val ret = ArrayList<T>()
-        forEach {
-            ret.add(it)
-        }
-        return ret
+        return arrayList.toList()
     }
 
 
