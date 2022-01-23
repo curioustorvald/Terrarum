@@ -62,7 +62,7 @@ class ConsoleWindow : UICanvas() {
     init {
         reset()
         addUIitem(textinput)
-        textinput.isActive = true
+        textinput.isActive = false
     }
 
     private val lb = ArrayList<String>()
