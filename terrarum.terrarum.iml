@@ -16,13 +16,11 @@
     <orderEntry type="library" name="TerrarumSansBitmap" level="project" />
     <orderEntry type="library" name="commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-csv:1.8" level="project" />
-    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="gdx-controllers-core-2.2.1" level="project" />
     <orderEntry type="library" name="gdx-controllers-desktop-2.2.1" level="project" />
     <orderEntry type="library" name="jxinput-1.0.0" level="project" />
     <orderEntry type="library" name="gdx-platform-1.10.0-natives-desktop" level="project" />
     <orderEntry type="library" name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0" level="project" />
-    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
-    <orderEntry type="library" name="ibm.icu.icu4j" level="project" />
+    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
   </component>
 </module>

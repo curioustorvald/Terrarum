@@ -12,7 +12,7 @@ class EntryPoint : ModuleEntryPoint() {
 
     override fun invoke() {
         ModMgr.GameItemLoader.invoke(moduleName)
-        println("[${moduleName[0].uppercase()}${moduleName.substring(1)}] Dirtboard(tm) go drrrrr")
+        println("[${moduleName[0].toUpperCase()}${moduleName.substring(1)}] Dirtboard(tm) go drrrrr")
     }
 
     override fun dispose() {

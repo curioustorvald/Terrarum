@@ -1,11 +1,15 @@
 module terrarum.terrarum {
     // java
+    requires java.base;
     requires java.desktop;
     requires java.logging;
     requires jdk.unsupported; // sun.misc.Unsafe
 
     // kotlin
+    requires kotlin.stdlib;
     requires kotlin.test;
+    requires kotlin.reflect;
+    requires kotlin.stdlib.jdk8;
 
     // gdx
     requires gdx;
@@ -16,15 +20,16 @@ module terrarum.terrarum {
 
     // terrarum
     requires TerrarumSansBitmap;
-    requires TerranVirtualDisk;
     requires Terrarum.Joise;
 
     // etc
     requires GetCpuName;
-    requires kotlinx.serialization.core.jvm;
-    requires kotlinx.serialization.json;
-    requires kotlinx.serialization.json.jvm;
     requires org.apache.commons.codec;
     requires commons.csv;
     requires jxinput;
+    requires org.graalvm.sdk;
+    requires com.ibm.icu;
+    requires org.lwjgl.opengl;
+
+    exports net.torvald.terrarum;
 }

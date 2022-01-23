@@ -6,7 +6,6 @@ import java.util.*
 import java.util.logging.Level
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
-import javax.naming.OperationNotSupportedException
 import kotlin.experimental.and
 
 /**
@@ -499,7 +498,7 @@ object VDUtil {
     }
     fun ByteArray64.toIntBig(): Int {
         if (this.size != 4L)
-            throw OperationNotSupportedException("ByteArray is not Int")
+            throw UnsupportedOperationException("ByteArray is not Int")
 
         var i = 0
         var c = 0
@@ -508,7 +507,7 @@ object VDUtil {
     }
     fun ByteArray64.toLongBig(): Long {
         if (this.size != 8L)
-            throw OperationNotSupportedException("ByteArray is not Long")
+            throw UnsupportedOperationException("ByteArray is not Long")
 
         var i = 0L
         var c = 0
@@ -517,7 +516,7 @@ object VDUtil {
     }
     fun ByteArray64.toInt48Big(): Long {
         if (this.size != 6L)
-            throw OperationNotSupportedException("ByteArray is not Long")
+            throw UnsupportedOperationException("ByteArray is not Long")
 
         var i = 0L
         var c = 0
@@ -526,7 +525,7 @@ object VDUtil {
     }
     fun ByteArray64.toShortBig(): Short {
         if (this.size != 2L)
-            throw OperationNotSupportedException("ByteArray is not Short")
+            throw UnsupportedOperationException("ByteArray is not Short")
 
         return (this[0].toUint().shl(256) + this[1].toUint()).toShort()
     }

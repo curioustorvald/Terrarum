@@ -1,11 +1,11 @@
 package net.torvald.terrarum.debuggerapp
 
 import net.torvald.terrarum.TerrarumAppConfiguration
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.savegame.diskIDtoReadableFilename
+import net.torvald.terrarum.serialise.Common
 import java.io.File
 import java.io.PrintStream
 import java.nio.charset.Charset
@@ -110,7 +110,7 @@ class SavegameCracker(
                             it.call(this, args)
                     }
                     catch (e: Throwable) {
-                        val error = e.cause ?: e
+                        val error = (e.cause ?: e) as java.lang.Throwable
                         printerrln("Error -- ${error}")
                         error.printStackTrace(stderr)
                         printerrln("Error -- ${error}")

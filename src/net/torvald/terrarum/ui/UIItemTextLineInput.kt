@@ -13,7 +13,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.toJavaString
 import kotlin.streams.toList
 
@@ -382,7 +381,7 @@ class UIItemTextLineInput(
         }
     }
 
-    private fun String.toCodePoints() = this.codePoints().toList().filter { it > 0 }.toList()
+    private fun String.toCodePoints() = (this as java.lang.CharSequence).codePoints().toList().filter { it > 0 }.toList()
 
     private fun endComposing(force: Boolean = false) {
         getIME(force)?.let {
