@@ -78,7 +78,7 @@ object WriteSavegame {
 
         savingStatus = 0
 
-        Echo("Immediate save fired")
+        printdbg(this, "Immediate save fired")
 
         val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, false, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
