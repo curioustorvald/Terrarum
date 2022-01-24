@@ -59,9 +59,9 @@ import static net.torvald.terrarum.TerrarumKt.*;
  */
 public class App implements ApplicationListener {
 
+    public static final long startupTime = System.currentTimeMillis() / 1000L;
+
     public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
-
-
     public static final int VERSION_RAW = TerrarumAppConfiguration.VERSION_RAW;
 
     public static final String getVERSION_STRING() {

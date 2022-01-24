@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Gdx
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -58,6 +59,24 @@ class GameCrashHandler(e: Throwable) : JFrame() {
         this.add(border, BorderLayout.CENTER)
         this.title = TerrarumAppConfiguration.GAME_NAME
 
+        val uptime = App.getTIME_T() - App.startupTime
+
+        // print out device info
+        printStream.println("== System Info ==")
+        printStream.println("Uptime: ${uptime / 3600}h${(uptime % 3600) / 60}m${uptime % 60}s")
+        printStream.println("Java version: ${System.getProperty("java.version")}")
+        printStream.println("OS Name: ${App.OSName}")
+        printStream.println("OS Version: ${App.OSVersion}")
+        printStream.println("System architecture: ${App.systemArch}")
+        printStream.println("Processor: ${App.processor} x${Runtime.getRuntime().availableProcessors()} (${App.processorVendor})")
+
+        printStream.println()
+
+        printStream.println("== OpenGL Info ==")
+        printStream.println(Gdx.graphics.glVersion.debugVersionString)
+
+        printStream.println()
+        printStream.println("== The Error Info ==")
 
         e.printStackTrace(printStream)
         e.printStackTrace()
