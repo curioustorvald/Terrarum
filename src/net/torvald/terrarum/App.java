@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
 import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
-import net.torvald.terrarum.concurrent.ThreadExecutor;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
@@ -718,8 +717,10 @@ public class App implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        printdbg(this, "Resize called");
+        printdbg(this, "Resize called: "+width+","+height);
         printStackTrace(this);
+
+        if (width < 2 || height < 2) return;
 
         //initViewPort(width, height);
 
