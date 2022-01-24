@@ -855,9 +855,8 @@ object IngameRenderer : Disposable {
         shaderBlendGlow.dispose()
         shaderAlphaDither.dispose()
 
-        try {
-            fboRGBexport.dispose()
-        }
+        try { fboRGBexport.dispose() }
+        catch (e: GdxRuntimeException) {}
         catch (e: UninitializedPropertyAccessException) {}
         catch (e: Throwable) { e.printStackTrace(System.out) }
     }

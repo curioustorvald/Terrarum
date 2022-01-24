@@ -30,7 +30,6 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
         }
         CommonResourcePool.loadAll()
 
-
         density = 1400.0
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
 
@@ -38,9 +37,14 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = MASS
+    }
 
+    override fun update(delta: Float) {
+        // the values does not get preserved on save reload??
         wireEmitterTypes["digital_bit"] = 0
         wireEmission[0] = Vector2(1.0, 0.0)
+
+        super.update(delta)
     }
 
     override fun dispose() { }

@@ -676,7 +676,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private var updateAkku = 0f
-    private var autosaveTimer = 0f
+    internal var autosaveTimer = 0f
 
     override fun render(`_`: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context

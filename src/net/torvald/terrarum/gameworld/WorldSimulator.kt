@@ -469,9 +469,9 @@ object WorldSimulator {
      * @return List of FixtureBases, safe to cast into Electric
      */
     private fun wiresimGetSourceBlocks(): List<FixtureBase> =
-            INGAME.actorContainerActive.filter {
-                it is FixtureBase && it is Electric && it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
-            } as List<FixtureBase>
+            INGAME.actorContainerActive.filterIsInstance<FixtureBase>().filter {
+                it is Electric && it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
+            }
 
     private val wireSimMarked = HashSet<Long>()
     private val wireSimPoints = Queue<WireGraphCursor>()

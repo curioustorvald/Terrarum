@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -122,6 +121,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                             screen = 0
                             full.handler.unlockToggle()
                             full.unlockTransition()
+                            (INGAME as TerrarumIngame).autosaveTimer = 0f
                         }
                     }
 
