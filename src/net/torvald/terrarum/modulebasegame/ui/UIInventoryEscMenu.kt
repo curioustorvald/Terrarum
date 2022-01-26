@@ -80,6 +80,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private var oldScreen = 0
     private var screen = 0
 
+    fun toInitScreen() {
+        screen = 0
+    }
+
     init {
         uiItems.add(gameMenuButtons)
 
@@ -187,6 +191,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 savingUI.render(batch, camera)
             },
             { batch: SpriteBatch, camera: Camera ->
+                // control hints
+                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
+
                 keyConfigUI.render(batch, camera)
             },
     )
@@ -198,10 +205,21 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     override fun updateUI(delta: Float) {
         val yeet = screens[screen]
         if (oldScreen != screen) {
+            val yeOlde = screens[oldScreen]
+
+            if (yeOlde is UIItem)
+                yeOlde.hide()
+            else if (yeOlde is UICanvas) {
+                yeOlde.setAsClose()
+            }
+
             if (yeet is UIItem)
                 yeet.show()
-            else if (yeet is UICanvas)
+            else if (yeet is UICanvas) {
                 yeet.show()
+                yeet.setPosition(0,42)
+                yeet.setAsOpen()
+            }
             oldScreen = screen
         }
         if (yeet is UIItem)
