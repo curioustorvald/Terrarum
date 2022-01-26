@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11
 class TerrarumGLinfo {
     private var _initialised = false
 
-    val MINIMAL_GL_VERSION = 430
+    val MINIMAL_GL_VERSION = 320
 
     var GL_VERSION = -1; private set
         get() = if (_initialised) field else throw UninitializedPropertyAccessException()
