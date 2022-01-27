@@ -18,6 +18,8 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     private inline fun toAddr(x: Int, y: Int) = 16L * (y * width + x)
 
+    fun isDestroyed() = array.destroyed
+
     init {
         zerofill()
     }

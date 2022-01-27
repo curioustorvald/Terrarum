@@ -3,9 +3,11 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import net.torvald.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
@@ -19,6 +21,8 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -50,6 +54,7 @@ object LightmapRenderer {
                 printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
 
                 lightmap.zerofill()
+                _lightmap.zerofill()
                 _mapLightLevelThis.zerofill()
                 _mapThisTileOpacity.zerofill()
                 _mapThisTileOpacity2.zerofill()
@@ -60,8 +65,6 @@ object LightmapRenderer {
         }
         finally {
             this.world = world
-
-            //fireRecalculateEvent()
         }
     }
 
@@ -82,14 +85,10 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     private var lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+    private var _lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapLightLevelThis = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
-
-    init {
-        LightmapHDRMap.invoke()
-        printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
-    }
 
     private const val AIR = Block.AIR
 
@@ -141,7 +140,67 @@ object LightmapRenderer {
         }
     }
 
-    fun fireRecalculateEvent(vararg actorContainers: List<ActorWithBody>?) {
+
+    internal var rendererStatus = AtomicInteger(2) // 0: processing queued, 1: processing, 2: done
+    private var lightmapPrepared = AtomicBoolean(false)
+
+    private val runnerLock = java.lang.Object()
+    private val runner = Runnable { while (!Thread.interrupted()) {
+        if (rendererStatus.get() == 0) {
+            measureDebugTime("Renderer.LightCalcThread") {
+                rendererStatus.incrementAndGet() // 0 -> 1
+
+                val unlock = lightmapPrepared.get()
+
+                if (unlock) {
+                    try {
+                        printdbg(this, "Recalculate!") // should recalculate once on request, not every f'ing frame
+                        recalculate(actorsGetter(), _lightmap)
+
+                        // dispatch _lightmap to lightmap
+                        UnsafeHelper.memcpy(_lightmap.ptr, lightmap.ptr, lightmap.TOTAL_SIZE_IN_BYTES)
+                        // visuals being "jittery" means you're not dispatching the lightmap correctly
+
+                    }
+                    catch (e: NullPointerException) {
+                        System.err.println("NPE; lightmapPrepared = $unlock")
+                        throw e
+                    }
+                }
+
+                rendererStatus.incrementAndGet() // 1 -> 2
+            }
+        }
+        else {
+//            Thread.sleep(1L)
+            synchronized(runnerLock) { runnerLock.wait() }
+        }
+    } }
+
+    private val lightCalcThread = Thread(runner, "LightCalcThread")
+
+    init {
+        LightmapHDRMap.invoke()
+        printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
+        lightCalcThread.start()
+    }
+
+
+    /**
+     * Request recalculation of the light. When it's not a tick to recalculate, or recalculation is ongoing,
+     * the request will be silently disregarded.
+     */
+    fun requestRecalculation(actorContainers: () -> List<ActorWithBody>) {
+        if (rendererStatus.get() == 2) {
+            actorsGetter = actorContainers
+            rendererStatus.set(0)
+            synchronized(runnerLock) { runnerLock.notifyAll() }
+        }
+    }
+
+    private var actorsGetter: () -> List<ActorWithBody> = { listOf() }
+
+    private fun recalculate(actorContainers: List<ActorWithBody>, lightmap: UnsafeCvecArray) {
         try {
             world.getTileFromTerrain(0, 0) // test inquiry
         }
@@ -149,7 +208,7 @@ object LightmapRenderer {
             return // quit prematurely
         }
         catch (e: NullPointerException) {
-            System.err.println("[LightmapRendererNew.fireRecalculateEvent] Attempted to refer destroyed unsafe array " +
+            System.err.println("[LightmapRendererNew.recalculate] Attempted to refer destroyed unsafe array " +
                                "(${world.layerTerrain.ptr})")
             e.printStackTrace()
             return // something's wrong but we'll ignore it like a trustful AK
@@ -205,27 +264,29 @@ object LightmapRenderer {
 
         // 'NEWLIGHT2' LIGHT SWIPER
         // O((8*2)n) where n is a size of the map.
-        /* - */fun r1() {
+        /* - */fun r1(lightmap: UnsafeCvecArray) {
             swipeDiag = false
             for (line in 1 until LIGHTMAP_HEIGHT - 1) {
                 swipeLight(
                         1, line,
                         LIGHTMAP_WIDTH - 2, line,
-                        1, 0
+                        1, 0,
+                        lightmap
                 )
             }
         }
-        /* | */fun r2() {
+        /* | */fun r2(lightmap: UnsafeCvecArray) {
             swipeDiag = false
             for (line in 1 until LIGHTMAP_WIDTH - 1) {
                 swipeLight(
                         line, 1,
                         line, LIGHTMAP_HEIGHT - 2,
-                        0, 1
+                        0, 1,
+                        lightmap
                 )
             }
         }
-        /* \ */fun r3() {
+        /* \ */fun r3(lightmap: UnsafeCvecArray) {
             swipeDiag = true
             /* construct indices such that:
                   56789ABC
@@ -258,11 +319,12 @@ object LightmapRenderer {
                 swipeLight(
                         maxOf(1, i - LIGHTMAP_HEIGHT + 4), maxOf(1, LIGHTMAP_HEIGHT - 2 - i),
                         minOf(LIGHTMAP_WIDTH - 2, i + 1), minOf(LIGHTMAP_HEIGHT - 2, (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) - i),
-                        1, 1
+                        1, 1,
+                        lightmap
                 )
             }
         }
-        /* / */fun r4() {
+        /* / */fun r4(lightmap: UnsafeCvecArray) {
             swipeDiag = true
             /*
                 1       w-2
@@ -291,7 +353,8 @@ object LightmapRenderer {
                 swipeLight(
                         maxOf(1, i - LIGHTMAP_HEIGHT + 4), minOf(LIGHTMAP_HEIGHT - 2, i + 1),
                         minOf(LIGHTMAP_WIDTH - 2, i + 1), maxOf(1, (LIGHTMAP_HEIGHT - 2) - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6) + i),
-                        1, -1
+                        1, -1,
+                        lightmap
                 )
             }
         }
@@ -313,34 +376,33 @@ object LightmapRenderer {
             //      why dark spots appear in the first place)
             // - Multithreading? I have absolutely no idea.
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
-
-            r1();r2();r3();r4()
-            r1();r2();r3();r4() // two looks better than one
+            r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
+            r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap) // two looks better than one
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
         }
 
     }
 
-    private fun buildLanternmap(actorContainers: Array<out List<ActorWithBody>?>) {
+    private fun buildLanternmap(actorContainer: List<ActorWithBody>) {
         lanternMap.clear()
-        actorContainers.forEach { actorContainer ->
-            actorContainer?.forEach {
-                if (it is Luminous) {
-                    // put lanterns to the area the luminantBox is occupying
-                    for (lightBox in it.lightBoxList) {
-                        val lightBoxX = it.hitbox.startX + lightBox.startX
-                        val lightBoxY = it.hitbox.startY + lightBox.startY
-                        val lightBoxW = lightBox.width
-                        val lightBoxH = lightBox.height
-                        for (y in lightBoxY.div(TILE_SIZE).floorInt()
-                                ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
-                            for (x in lightBoxX.div(TILE_SIZE).floorInt()
-                                    ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+        actorContainer.forEach {
+            if (it is Luminous) {
+                val lightBoxCopy = it.lightBoxList.subList(0, it.lightBoxList.size) // make copy to prevent ConcurrentModificationException
 
-                                val normalisedCvec = it.color//.cpy().mul(DIV_FLOAT)
+                // put lanterns to the area the luminantBox is occupying
+                for (lightBox in lightBoxCopy) {
+                    val lightBoxX = it.hitbox.startX + lightBox.startX
+                    val lightBoxY = it.hitbox.startY + lightBox.startY
+                    val lightBoxW = lightBox.width
+                    val lightBoxH = lightBox.height
+                    for (y in lightBoxY.div(TILE_SIZE).floorInt()
+                            ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
+                        for (x in lightBoxX.div(TILE_SIZE).floorInt()
+                                ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                                lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedCvec
-                            }
+                            val normalisedCvec = it.color//.cpy().mul(DIV_FLOAT)
+
+                            lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedCvec
                         }
                     }
                 }
@@ -522,7 +584,7 @@ object LightmapRenderer {
     private var swipeX = -1
     private var swipeY = -1
     private var swipeDiag = false
-    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int) {
+    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
         _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
@@ -535,25 +597,25 @@ object LightmapRenderer {
             _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
             _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
             _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity))
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
         }
         else {
             _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
             _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
             _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
             _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2))
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
         }
 
         _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
         lightmap.setVec(x, y, _ambientAccumulator)
     }
-    private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int) {
+    private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, lightmap: UnsafeCvecArray) {
         swipeX = sx; swipeY = sy
         while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
             // conduct the task #1
             // spread towards the end
-            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy)
+            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap)
 
             swipeX += dx
             swipeY += dy
@@ -563,7 +625,7 @@ object LightmapRenderer {
         while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
-            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy)
+            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap)
 
             swipeX -= dx
             swipeY -= dy
@@ -662,9 +724,13 @@ object LightmapRenderer {
     }
 
     fun dispose() {
+        lightCalcThread.interrupt()
+
         LightmapHDRMap.dispose()
         _lightBufferAsTex.dispose()
         lightBuffer.dispose()
+
+        lightmapPrepared.set(false)
 
         lightmap.destroy()
         _mapLightLevelThis.destroy()
@@ -682,7 +748,7 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    fun darkenColoured(x: Int, y: Int, darken: Cvec): Cvec {
+    internal fun darkenColoured(x: Int, y: Int, darken: Cvec, lightmap: UnsafeCvecArray): Cvec {
         // use equation with magic number 8.0
         // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 
@@ -736,10 +802,13 @@ object LightmapRenderer {
     private var _init = false
 
     fun resize(screenW: Int, screenH: Int) {
+        lightmapPrepared.set(false)
+/*
         // make sure the BlocksDrawer is resized first!
 
         // copied from BlocksDrawer, duh!
         // FIXME 'lightBuffer' is not zoomable in this way
+
         val tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilInt() + 1 + LIGHTMAP_OVERRENDER * 2
         val tilesInVertical = (App.scr.hf / TILE_SIZE).ceilInt() + 1 + LIGHTMAP_OVERRENDER * 2
 
@@ -754,14 +823,19 @@ object LightmapRenderer {
         }
         lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
 
+
         lightmap.destroy()
+        _lightmap.destroy()
         _mapLightLevelThis.destroy()
         _mapThisTileOpacity.destroy()
         _mapThisTileOpacity2.destroy()
         lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        _lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
         _mapLightLevelThis = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
         _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
-        _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
+        _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)*/
+
+        lightmapPrepared.set(true)
 
         printdbg(this, "Resize event")
     }

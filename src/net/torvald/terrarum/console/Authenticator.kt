@@ -33,8 +33,11 @@ internal object Authenticator : ConsoleCommand {
             val pwd = args[1]
             val hashedPwd = DigestUtils.sha256Hex(pwd)
 
-            if ("65b9aa150332ed7096134efb20220e5ebec04d4dbe1c537ff3816f68c2391c1c".equals(hashedPwd, ignoreCase = true)) {
-                // aryll
+            println("auth passwd: '$pwd'")
+            println("hash: $hashedPwd")
+
+            if ("09ccf5067db6f58265b004829e33e715e819ba0984f1e1fcef49c36fcd5f745f".equals(hashedPwd, ignoreCase = true)) {
+                // beedle
                 val msg = if (a) "Locked" else "Authenticated"
                 Echo(msg)
                 println("[Authenticator] " + msg)

@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -196,22 +197,20 @@ object IngameRenderer : Disposable {
     operator fun invoke(
             gamePaused: Boolean,
             zoom: Float = 1f,
-            actorsRenderBehind : List<ActorWithBody>? = null,
-            actorsRenderMiddle : List<ActorWithBody>? = null,
-            actorsRenderMidTop : List<ActorWithBody>? = null,
-            actorsRenderFront  : List<ActorWithBody>? = null,
-            actorsRenderOverlay: List<ActorWithBody>? = null,
-            particlesContainer : CircularArray<ParticleBase>? = null,
+            actorsRenderBehind : List<ActorWithBody>,
+            actorsRenderMiddle : List<ActorWithBody>,
+            actorsRenderMidTop : List<ActorWithBody>,
+            actorsRenderFront  : List<ActorWithBody>,
+            actorsRenderOverlay: List<ActorWithBody>,
+            particlesContainer : CircularArray<ParticleBase>,
             player: ActorWithBody? = null,
             uiContainer: UIContainer? = null
     ) {
-        renderingActorsCount = (actorsRenderBehind?.size ?: 0) +
-                               (actorsRenderMiddle?.size ?: 0) +
-                               (actorsRenderMidTop?.size ?: 0) +
-                               (actorsRenderFront?.size ?: 0) +
-                               (actorsRenderOverlay?.size ?: 0)
-        //renderingParticleCount = particlesContainer?.size ?: 0
-        //renderingParticleCount = (particlesContainer?.buffer?.map { (!it.flagDespawn).toInt() } ?: listOf(0)).sum()
+        renderingActorsCount = (actorsRenderBehind.size) +
+                               (actorsRenderMiddle.size) +
+                               (actorsRenderMidTop.size) +
+                               (actorsRenderFront.size) +
+                               (actorsRenderOverlay.size)
         renderingUIsCount = uiContainer?.countVisible() ?: 0
 
         invokeInit()
@@ -225,8 +224,9 @@ object IngameRenderer : Disposable {
         if (!gamePaused || newWorldLoadedLatch) {
             measureDebugTime("Renderer.LightRun*") {
                 // recalculate for even frames, or if the sign of the cam-x changed
-                if (App.GLOBAL_RENDER_TIMER % 3 == 0 || Math.abs(WorldCamera.x - oldCamX) >= world.width * 0.85f * TILE_SIZEF || newWorldLoadedLatch) {
-                    LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
+                if (App.GLOBAL_RENDER_TIMER % 80 == 0 || Math.abs(WorldCamera.x - oldCamX) >= world.width * 0.85f * TILE_SIZEF || newWorldLoadedLatch) {
+                    printdbg(this, "LightmapRenderer requestRecalculation")
+                    LightmapRenderer.requestRecalculation { actorsRenderBehind + actorsRenderFront + actorsRenderMidTop + actorsRenderMiddle + actorsRenderOverlay }
                 }
                 oldCamX = WorldCamera.x
             }

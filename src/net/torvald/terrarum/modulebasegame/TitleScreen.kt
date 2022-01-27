@@ -19,6 +19,7 @@ import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
+import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
@@ -31,6 +32,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.util.CircularArray
 import java.io.IOException
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -285,6 +287,8 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
         uiContainer.forEach { it?.update(delta) }
     }
 
+    private val particles = CircularArray<ParticleBase>(16, true)
+
     fun renderScreen() {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
@@ -296,7 +300,17 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
-            IngameRenderer.invoke(gamePaused = false, uiContainer = uiContainer)
+            IngameRenderer.invoke(
+                    false,
+                    1f,
+                    listOf(),
+                    listOf(),
+                    listOf(),
+                    listOf(),
+                    listOf(),
+                    particles,
+                    uiContainer = uiContainer
+            )
         }
         else {
             printdbgerr(this, "Demoworld is already been destroyed")

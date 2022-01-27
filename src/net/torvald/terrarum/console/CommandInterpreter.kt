@@ -1,5 +1,6 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ccG
 import net.torvald.terrarum.ccW
 import net.torvald.terrarum.ccY
@@ -32,8 +33,6 @@ internal object CommandInterpreter {
     internal fun execute(command: String) {
         val cmd: Array<CommandInput?> = parse(command)
 
-        val error = Error()
-
         for (single_command in cmd) {
 
             if (single_command == null || single_command.argsCount == 0) continue
@@ -65,6 +64,7 @@ internal object CommandInterpreter {
                 }
             }
             catch (e: NullPointerException) {
+                e.printStackTrace()
                 echoUnknownCmd(single_command.name)
             }
         }

@@ -13,6 +13,7 @@ import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
@@ -22,6 +23,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.util.CircularArray
 
 /**
  * Created by minjaesong on 2018-07-06.
@@ -385,10 +387,21 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         BlockPropUtil.dynamicLumFuncTickClock()
     }
 
+    private val particles = CircularArray<ParticleBase>(16, true)
+
     private fun renderGame() {
         _testMarkerDrawCalls = 0L
 
-        IngameRenderer.invoke(false, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uiContainer = uiContainer)
+        IngameRenderer.invoke(false,
+                1f,
+                listOf(),
+                listOf(),
+                listOf(),
+                listOf(),
+                if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays,
+                particles,
+                uiContainer = uiContainer
+        )
 
         App.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
     }

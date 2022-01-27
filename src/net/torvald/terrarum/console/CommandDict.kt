@@ -13,14 +13,41 @@ object CommandDict {
 
     internal val dict = hashMapOf<String, ConsoleCommand>()
 
+    private val engineCommandList = listOf(
+            "ActorsList",
+            "Authenticator",
+            "AVTracker",
+            "Batch",
+            "Echo",
+            "EchoConsole",
+            "EchoError",
+            "Pause",
+            "QuitApp",
+            "ResizeScreen",
+            "ScreencapNogui",
+            "SetGlobalLightOverride",
+            "SetLocale",
+            "TakeScreenshot",
+            "Unpause",
+            "Version"
+    )
+
     init {
         printdbg(this, ModMgr.loadOrder.reversed())
         printdbg(this, ModMgr.loadOrder.reversed().map { ModMgr.moduleInfo[it]?.packageName })
 
-        (listOf("net.torvald.terrarum") + ModMgr.loadOrder.reversed().mapNotNull { ModMgr.moduleInfo[it]?.packageName }).forEach { packageRoot ->
-            printdbg(this, packageRoot)
+        ((listOf("$" to "net.torvald.terrarum")) + ModMgr.loadOrder.reversed().map { it to ModMgr.moduleInfo[it]?.packageName }).forEach { (modName, packageRoot) ->
+            val commandsList = if (modName == "$") engineCommandList else ModMgr.getFile(modName, "commands.csv").readLines()
             val packageConsole = "$packageRoot.console"
+
+            printdbg(this, "Loading console commands from '${packageConsole}'")
+
+
+            // TODO load commands using commandsList
+
+
             val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageConsole.replace('.', '/'))
+
 
             if (stream != null) { // not all modules have extra console commands
 
