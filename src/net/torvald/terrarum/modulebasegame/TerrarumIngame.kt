@@ -152,6 +152,9 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
     init {
+        particlesContainer.overwritingPolicy = {
+            it.dispose()
+        }
     }
 
 
@@ -1299,10 +1302,6 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.resize(App.scr.width, App.scr.height)
         val drawWidth = Toolkit.drawWidth
-
-        if (gameInitialised) {
-            //LightmapRenderer.fireRecalculateEvent()
-        }
 
 
         if (gameFullyLoaded) {
