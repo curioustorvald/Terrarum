@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.Reader
 import java.util.logging.Level
@@ -46,14 +47,17 @@ object WriteSavegame {
         printdbg(this, "Save queued")
 
         if (hasThumbnail) {
-            IngameRenderer.screencapExportCallback = {
+            IngameRenderer.screencapExportCallback = { fb ->
                 printdbg(this, "Generating thumbnail...")
 
                 val w = 960
                 val h = 640
 
-                val x = (it.width - w).ushr(2).shl(1) // force the even-numbered position
-                val y = (it.height - h).ushr(2).shl(1) // force the even-numbered position
+                val cx = WorldCamera.x % 2
+                val cy = WorldCamera.y % 2
+
+                val x = (fb.width - w) - cx // force the even-numbered position
+                val y = (fb.height - h) - cy // force the even-numbered position
 
                 val p = Pixmap.createFromFrameBuffer(x, y, w, h)
                 IngameRenderer.fboRGBexport = p
