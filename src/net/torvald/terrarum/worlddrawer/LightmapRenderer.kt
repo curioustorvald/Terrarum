@@ -3,11 +3,9 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import net.torvald.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
@@ -21,8 +19,6 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -54,7 +50,6 @@ object LightmapRenderer {
                 printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
 
                 lightmap.zerofill()
-                _lightmap.zerofill()
                 _mapLightLevelThis.zerofill()
                 _mapThisTileOpacity.zerofill()
                 _mapThisTileOpacity2.zerofill()
@@ -85,7 +80,6 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     private var lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
-    private var _lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapLightLevelThis = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
     private var _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
@@ -140,67 +134,14 @@ object LightmapRenderer {
         }
     }
 
-
-    internal var rendererStatus = AtomicInteger(2) // 0: processing queued, 1: processing, 2: done
-    private var lightmapPrepared = AtomicBoolean(false)
-
-    private val runnerLock = java.lang.Object()
-    private val runner = Runnable { while (!Thread.interrupted()) {
-        if (rendererStatus.get() == 0) {
-            measureDebugTime("Renderer.LightCalcThread") {
-                rendererStatus.incrementAndGet() // 0 -> 1
-
-                val unlock = lightmapPrepared.get()
-
-                if (unlock) {
-                    try {
-                        printdbg(this, "Recalculate!") // should recalculate once on request, not every f'ing frame
-                        recalculate(actorsGetter(), _lightmap)
-
-                        // dispatch _lightmap to lightmap
-                        UnsafeHelper.memcpy(_lightmap.ptr, lightmap.ptr, lightmap.TOTAL_SIZE_IN_BYTES)
-                        // visuals being "jittery" means you're not dispatching the lightmap correctly
-
-                    }
-                    catch (e: NullPointerException) {
-                        System.err.println("NPE; lightmapPrepared = $unlock")
-                        throw e
-                    }
-                }
-
-                rendererStatus.incrementAndGet() // 1 -> 2
-            }
-        }
-        else {
-//            Thread.sleep(1L)
-            synchronized(runnerLock) { runnerLock.wait() }
-        }
-    } }
-
-    private val lightCalcThread = Thread(runner, "LightCalcThread")
-
     init {
         LightmapHDRMap.invoke()
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
-        lightCalcThread.start()
     }
 
+    fun recalculate(actorContainer: List<ActorWithBody>) = _recalculate(actorContainer, lightmap)
 
-    /**
-     * Request recalculation of the light. When it's not a tick to recalculate, or recalculation is ongoing,
-     * the request will be silently disregarded.
-     */
-    fun requestRecalculation(actorContainers: () -> List<ActorWithBody>) {
-        if (rendererStatus.get() == 2) {
-            actorsGetter = actorContainers
-            rendererStatus.set(0)
-            synchronized(runnerLock) { runnerLock.notifyAll() }
-        }
-    }
-
-    private var actorsGetter: () -> List<ActorWithBody> = { listOf() }
-
-    private fun recalculate(actorContainers: List<ActorWithBody>, lightmap: UnsafeCvecArray) {
+    private fun _recalculate(actorContainer: List<ActorWithBody>, lightmap: UnsafeCvecArray) {
         try {
             world.getTileFromTerrain(0, 0) // test inquiry
         }
@@ -236,7 +177,7 @@ object LightmapRenderer {
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
         App.measureDebugTime("Renderer.Lanterns") {
-            buildLanternmap(actorContainers)
+            buildLanternmap(actorContainer)
         } // usually takes 3000 ns
 
         // set sunlight
@@ -724,13 +665,9 @@ object LightmapRenderer {
     }
 
     fun dispose() {
-        lightCalcThread.interrupt()
-
         LightmapHDRMap.dispose()
         _lightBufferAsTex.dispose()
         lightBuffer.dispose()
-
-        lightmapPrepared.set(false)
 
         lightmap.destroy()
         _mapLightLevelThis.destroy()
@@ -802,8 +739,6 @@ object LightmapRenderer {
     private var _init = false
 
     fun resize(screenW: Int, screenH: Int) {
-        lightmapPrepared.set(false)
-/*
         // make sure the BlocksDrawer is resized first!
 
         // copied from BlocksDrawer, duh!
@@ -825,17 +760,13 @@ object LightmapRenderer {
 
 
         lightmap.destroy()
-        _lightmap.destroy()
         _mapLightLevelThis.destroy()
         _mapThisTileOpacity.destroy()
         _mapThisTileOpacity2.destroy()
         lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
-        _lightmap = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
         _mapLightLevelThis = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
         _mapThisTileOpacity = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
-        _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)*/
-
-        lightmapPrepared.set(true)
+        _mapThisTileOpacity2 = UnsafeCvecArray(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT)
 
         printdbg(this, "Resize event")
     }
