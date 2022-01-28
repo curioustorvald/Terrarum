@@ -1,6 +1,7 @@
 package net.torvald.terrarum;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.AudioDevice;
@@ -370,17 +371,17 @@ public class App implements ApplicationListener {
             //appConfig.samples = 4; // force the AA on, if the graphics driver didn't do already
 
             // load app icon
-            int[] appIconSizes = new int[]{256, 128, 64, 32, 16};
-            ArrayList<String> appIconPaths = new ArrayList<>();
-            for (int size : appIconSizes) {
-                String name = "assets/appicon" + size + ".png";
-                if (new File("./" + name).exists()) {
-                    appIconPaths.add("./" + name);
-                }
-            }
-
-            Object[] iconPathsTemp = appIconPaths.toArray();
-            appConfig.setWindowIcon(Arrays.copyOf(iconPathsTemp, iconPathsTemp.length, String[].class));
+            appConfig.setWindowIcon(Files.FileType.Classpath,
+                    "res/appicon512.png",
+                    "res/appicon256.png",
+                    "res/appicon144.png",
+                    "res/appicon128.png",
+                    "res/appicon96.png",
+                    "res/appicon64.png",
+                    "res/appicon48.png",
+                    "res/appicon32.png",
+                    "res/appicon16.png"
+            );
 
             // set some more configuration vars
             MULTITHREAD = THREAD_COUNT >= 3 && getConfigBoolean("multithread");
@@ -431,20 +432,20 @@ public class App implements ApplicationListener {
 
         // set GL graphics constants
         for (int i = 0; i < ditherPatterns.length; i++) {
-            Texture t = new Texture(Gdx.files.internal("assets/shaders/dither_512_"+i+".tga"));
+            Texture t = new Texture(Gdx.files.classpath("shaders/dither_512_"+i+".tga"));
             t.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Linear);
             t.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             ditherPatterns[i] = t;
         }
 
-        shaderBayerSkyboxFill = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer_skyboxfill.frag");
-        shaderHicolour = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/hicolour.frag");
-        shaderDebugDiff = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/diff.frag");
+        shaderBayerSkyboxFill = loadShaderFromClasspath("shaders/4096.vert", "shaders/4096_bayer_skyboxfill.frag");
+        shaderHicolour = loadShaderFromClasspath("shaders/4096.vert", "shaders/hicolour.frag");
+        shaderDebugDiff = loadShaderFromClasspath("shaders/4096.vert", "shaders/diff.frag");
         shaderPassthruRGBA = SpriteBatch.createDefaultShader();
-        shaderDitherRGBA = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/4096_bayer.frag"); // always load the shader regardless of config because the config may cange
-        shaderColLUT = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/passthrurgb.frag");
-        shaderReflect = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/reflect.frag");
-        shaderGhastlyWhite = loadShaderFromFile("assets/shaders/4096.vert", "assets/shaders/ghastlywhite.frag");
+        shaderDitherRGBA = loadShaderFromClasspath("shaders/4096.vert", "shaders/4096_bayer.frag"); // always load the shader regardless of config because the config may cange
+        shaderColLUT = loadShaderFromClasspath("shaders/4096.vert", "shaders/passthrurgb.frag");
+        shaderReflect = loadShaderFromClasspath("shaders/4096.vert", "shaders/reflect.frag");
+        shaderGhastlyWhite = loadShaderFromClasspath("shaders/4096.vert", "shaders/ghastlywhite.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -1360,6 +1361,16 @@ public class App implements ApplicationListener {
             System.out.println(csiR + "[" + out + "] null" + csi0);
         else
             System.out.println(csiR + "[" + out + "] " + message + csi0);
+    }
+
+    public static ShaderProgram loadShaderFromClasspath(String vert, String frag) {
+        ShaderProgram s = new ShaderProgram(Gdx.files.classpath(vert), Gdx.files.classpath(frag));
+
+        if (s.getLog().toLowerCase().contains("error")) {
+            throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
+        }
+
+        return s;
     }
 
     public static ShaderProgram loadShaderFromFile(String vert, String frag) {
