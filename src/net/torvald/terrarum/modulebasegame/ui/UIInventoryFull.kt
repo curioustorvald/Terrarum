@@ -8,6 +8,7 @@ import net.torvald.ENDASH
 import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
@@ -276,8 +277,6 @@ class UIInventoryFull(
         catBar.dispose()
         transitionPanel.dispose()
     }
-
-
 
     override fun doOpening(delta: Float) {
         INGAME.pause()

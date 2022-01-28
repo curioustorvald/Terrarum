@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.EMDASH
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.gamecontroller.IME
-import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gamecontroller.TerrarumIME
-import net.torvald.terrarum.gamecontroller.TerrarumKeyCapsMode
+import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.linearSearch
 import net.torvald.terrarum.ui.*

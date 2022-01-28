@@ -10,6 +10,7 @@ import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TitleScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -30,10 +31,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     private val gameMenu = arrayOf(
             "MENU_IO_SAVE_GAME",
-            "MENU_LABEL_GRAPHICS",
             "MENU_OPTIONS_CONTROLS",
+            "MENU_CONTROLS_KEYBOARD",
+            "MENU_LABEL_LANGUAGE",
             "MENU_LABEL_MAINMENU",
-//            "MENU_LABEL_QUIT",
     )
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
@@ -74,8 +75,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             defaultSelection = null
     )*/
     private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
-
     private val keyConfigUI = UIKeyboardControlPanel(null)
+    private val languageUI = UITitleLanguage(null)
+    private val keyboardSetupUI = UIKeyboardInputConfig(null)
 
     private var oldScreen = 0
     private var screen = 0
@@ -87,6 +89,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     init {
         uiItems.add(gameMenuButtons)
 
+        // `gameMenu` order
         gameMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
                 0 -> {
@@ -130,15 +133,18 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     }
 
                 }
-                2 -> {
+                1 -> {
                     screen = 4; gameMenuButtons.deselect()
                 }
+                2 -> {
+                    screen = 1; gameMenuButtons.deselect()
+                }
                 3 -> {
+                    screen = 5; gameMenuButtons.deselect()
+                }
+                4 -> {
                     screen = 2; gameMenuButtons.deselect()
                 }
-                /*4 -> {
-                    screen = 1; gameMenuButtons.deselect()
-                }*/
             }
         }
         areYouSureMainMenuButtons.selectionChangeListener = { _, new ->
@@ -152,39 +158,29 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 }
             }
         }
-        /*areYouSureQuitButtons.selectionChangeListener = { _, new ->
-            when (new) {
-                2 -> Gdx.app.exit()
-                3 -> {
-                    screen = 0; areYouSureQuitButtons.deselect()
-                }
-            }
-        }*/
     }
 
+    // Completely unrelated to the gameMenuButtons order
     private val screens = arrayOf(
-            gameMenuButtons, null, areYouSureMainMenuButtons, savingUI, keyConfigUI
+            gameMenuButtons, keyboardSetupUI, areYouSureMainMenuButtons, savingUI, keyConfigUI, languageUI
     )
 
-
+    // `screens` order
     private val screenRenders = arrayOf(
             { batch: SpriteBatch, camera: Camera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-
                 // text buttons
                 gameMenuButtons.render(batch, camera)
             },
             { batch: SpriteBatch, camera: Camera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-
-//                areYouSureQuitButtons.render(batch, camera)
+                keyboardSetupUI.render(batch, camera)
             },
             { batch: SpriteBatch, camera: Camera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-
                 areYouSureMainMenuButtons.render(batch, camera)
             },
             { batch: SpriteBatch, camera: Camera ->
@@ -193,29 +189,53 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             { batch: SpriteBatch, camera: Camera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-
                 keyConfigUI.render(batch, camera)
+            },
+            { batch: SpriteBatch, camera: Camera ->
+                // control hints
+                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
+                languageUI.render(batch, camera)
             },
     )
 
+    // `screens` order
     private val screenTouchDowns = arrayOf(
-        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-        { screenX: Int, screenY: Int, pointer: Int, button: Int ->
-            keyConfigUI.touchDown(screenX, screenY, pointer, button)
-        }
-    )
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+                keyboardSetupUI.touchDown(screenX, screenY, pointer, button)
+            },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+                keyConfigUI.touchDown(screenX, screenY, pointer, button)
+            },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        )
 
+    // `screens` order
     private val screenTouchUps = arrayOf(
             { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+                keyboardSetupUI.touchUp(screenX, screenY, pointer, button)
+            },
             { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
             { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
             { screenX: Int, screenY: Int, pointer: Int, button: Int ->
                 keyConfigUI.touchUp(screenX, screenY, pointer, button)
-            }
+            },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        )
+
+    // `screens` order
+    private val screenScrolls = arrayOf(
+            { amountX: Float, amountY: Float ->  },
+            { amountX: Float, amountY: Float ->
+                keyboardSetupUI.scrolled(amountX, amountY)
+            },
+            { amountX: Float, amountY: Float ->  },
+            { amountX: Float, amountY: Float ->  },
+            { amountX: Float, amountY: Float ->  },
+            { amountX: Float, amountY: Float ->  },
     )
 
     override fun show() {
@@ -237,7 +257,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                 yeet.show()
             else if (yeet is UICanvas) {
                 yeet.show()
-                yeet.setPosition(0,42)
+                yeet.setPosition(0,0)
                 yeet.setAsOpen()
             }
             oldScreen = screen
@@ -264,6 +284,18 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         super.touchUp(screenX, screenY, pointer, button)
         screenTouchUps[screen](screenX, screenY, pointer, button)
         return true
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        super.scrolled(amountX, amountY)
+        screenScrolls[screen](amountX, amountY)
+        return true
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        if (screens[screen] == keyboardSetupUI) {
+            keyboardSetupUI.inputStrobed(e)
+        }
     }
 
     override fun doOpening(delta: Float) {

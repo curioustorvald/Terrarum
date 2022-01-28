@@ -12,7 +12,7 @@ import net.torvald.terrarum.ui.*
 /**
  * Created by minjaesong on 2021-10-06.
  */
-class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
+class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     override var width = 400
     override var height = 400
@@ -27,11 +27,11 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
     private val panelgap = 20
 
     private val options = arrayOf(
-            arrayOf("fx_dither", Lang["MENU_OPTIONS_DITHER"], "toggle"),
-            arrayOf("fx_backgroundblur", Lang["MENU_OPTIONS_BLUR"], "toggle"),
-            arrayOf("fx_streamerslayout", Lang["MENU_OPTION_STREAMERS_LAYOUT"], "toggle"),
-            arrayOf("usevsync", Lang["MENU_OPTIONS_VSYNC"]+"*", "toggle"),
-            arrayOf("maxparticles", Lang["MENU_OPTIONS_PARTICLES"], "spinner,256,1024,256")
+            arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
+            arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
+            arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
+            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
+            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256")
     )
 
     private fun makeButton(args: String, x: Int, y: Int, optionName: String): UIItem {
@@ -46,10 +46,10 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     private val optionControllers = options.mapIndexed { index, strings ->
-        makeButton(options[index][2],
+        makeButton(options[index][2] as String,
                 drawX + width - panelgap,
                 drawY + panelgap - 2 + index * (20 + linegap),
-                options[index][0]
+                options[index][0] as String
         )
         /*UIItemToggleButton(this,
                 drawX + width - panelgap - 75,
@@ -63,12 +63,12 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
             if (it is UIItemToggleButton) {
                 it.clickOnceListener = { _, _, _ ->
                     it.toggle()
-                    App.setConfig(options[i][0], it.getStatus())
+                    App.setConfig(options[i][0] as String, it.getStatus())
                 }
             }
             else if (it is UIItemSpinner) {
                 it.selectionChangeListener = {
-                    App.setConfig(options[i][0], it)
+                    App.setConfig(options[i][0] as String, it)
                 }
             }
 
@@ -89,7 +89,7 @@ class GraphicsControlPanel(val remoCon: UIRemoCon) : UICanvas() {
 
         batch.color = Color.WHITE
         options.forEachIndexed { index, strings ->
-            App.fontGame.draw(batch, strings[1], drawX + panelgap.toFloat(), drawY + panelgap + index * (20f + linegap))
+            App.fontGame.draw(batch, (strings[1] as () -> String).invoke(), drawX + panelgap.toFloat(), drawY + panelgap + index * (20f + linegap))
         }
         uiItems.forEach { it.render(batch, camera) }
         App.fontGame.draw(batch, "* ${Lang["MENU_LABEL_RESTART_REQUIRED"]}", drawX + panelgap.toFloat(), drawY + height - panelgap - App.fontGame.lineHeight)

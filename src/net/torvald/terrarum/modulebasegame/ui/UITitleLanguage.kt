@@ -5,12 +5,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
-class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
+class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
     val menuLabels = arrayOf(
             "MENU_LABEL_RETURN"
@@ -55,6 +56,7 @@ class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
             defaultSelection = null
     )
 
+    private var initialMouseBlock = true
 
     init {
 
@@ -93,10 +95,14 @@ class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     override fun updateUI(delta: Float) {
-        textArea1.update(delta)
-        textArea2.update(delta)
+        if (initialMouseBlock && !Terrarum.mouseDown) {
+            initialMouseBlock = false
+        }
 
-        //AppLoader.printdbg(this, "should be printing indefinitely")
+        if (!initialMouseBlock) {
+            textArea1.update(delta)
+            textArea2.update(delta)
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -104,6 +110,14 @@ class UITitleLanguage(val remoCon: UIRemoCon) : UICanvas() {
         batch.color = Color.WHITE
         textArea1.render(batch, camera)
         textArea2.render(batch, camera)
+    }
+
+    override fun show() {
+        initialMouseBlock = true
+    }
+
+    override fun hide() {
+        initialMouseBlock = true
     }
 
     override fun doOpening(delta: Float) {
