@@ -41,55 +41,42 @@ object CommandDict {
             val packageConsole = "$packageRoot.console"
 
             printdbg(this, "Loading console commands from '${packageConsole}'")
+//            printdbg(this, commandsList.joinToString())
 
+            commandsList.forEach { commandName ->
+                val canonicalName = "$packageConsole.$commandName"
+                val it = Class.forName(canonicalName)
 
-            // TODO load commands using commandsList
+                printdbg(this, "> Trying to instantiate ${it.canonicalName}")
 
+                try {
+                    val instance = it.kotlin.objectInstance ?: it.kotlin.java.newInstance()
 
-            val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageConsole.replace('.', '/'))
+                    val aliases = instance.javaClass.getAnnotation(ConsoleAlias::class.java)?.aliasesCSV?.split(',')?.map { it.trim() }
+                    val noexport = instance.javaClass.getAnnotation(ConsoleNoExport::class.java)
 
+                    if (noexport == null) {
 
-            if (stream != null) { // not all modules have extra console commands
-
-                val reader = BufferedReader(InputStreamReader(stream))
-
-                reader.lines()
-                        .filter { it.endsWith(".class") && !it.contains('$') }
-                        .map { Class.forName("$packageConsole.${it.substring(0, it.lastIndexOf('.'))}") }
-                        .forEach {
-
-                            printdbg(this, "> Trying to instantiate ${it.canonicalName}")
-
-                            try {
-                                val instance = it.kotlin.objectInstance ?: it.kotlin.java.newInstance()
-
-                                val aliases = instance.javaClass.getAnnotation(ConsoleAlias::class.java)?.aliasesCSV?.split(',')?.map { it.trim() }
-                                val noexport = instance.javaClass.getAnnotation(ConsoleNoExport::class.java)
-
-                                if (noexport == null) {
-
-                                    dict[instance.javaClass.simpleName.lowercase()] = instance as ConsoleCommand
-                                    aliases?.forEach {
-                                        dict[it] = instance as ConsoleCommand
-                                    }
-
-                                    printdbg(this, "Class instantiated: ${instance.javaClass.simpleName}")
-                                    if (aliases != null)
-                                        printdbg(this, "  Annotations: $aliases")
-                                }
-                            }
-                            catch (e: ClassCastException) {
-                                printdbgerr(this, "${it.canonicalName} is not a ConsoleCommand")
-                            }
-                            catch (e: InstantiationException) {
-                                printdbgerr(this, "Could not instantiate ${it.canonicalName}")
-                                e.printStackTrace(System.err)
-                            }
+                        dict[instance.javaClass.simpleName.lowercase()] = instance as ConsoleCommand
+                        aliases?.forEach {
+                            dict[it] = instance as ConsoleCommand
                         }
 
+                        printdbg(this, "Class instantiated: ${instance.javaClass.simpleName}")
+                        if (aliases != null)
+                            printdbg(this, "  Annotations: $aliases")
+                    }
+                }
+                catch (e: ClassCastException) {
+                    printdbgerr(this, "${it.canonicalName} is not a ConsoleCommand")
+                }
+                catch (e: InstantiationException) {
+                    printdbgerr(this, "Could not instantiate ${it.canonicalName}")
+                    e.printStackTrace(System.err)
+                }
             }
-        }
 
+        }
 
 
     }

@@ -64,7 +64,6 @@ internal object CommandInterpreter {
                 }
             }
             catch (e: NullPointerException) {
-                e.printStackTrace()
                 echoUnknownCmd(single_command.name)
             }
         }

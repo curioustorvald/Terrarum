@@ -55,7 +55,9 @@ class ConsoleWindow : UICanvas() {
 
     private var iMadeTheGameToPause = false
 
-    private val textinput = UIItemTextLineInput(this, 0, 0, this.width)
+    private val textinput = UIItemTextLineInput(this, 0, 0, this.width, keyFilter = { e ->
+        !e.keycodes.contains(Input.Keys.GRAVE)
+    })
 
     private var clickLatched = false
 

@@ -64,6 +64,7 @@ class UIItemTextLineInput(
         val maxLen: InputLenCap = InputLenCap(1000, InputLenCap.CharLenUnit.CODEPOINTS),
 //        val enablePasteButton: Boolean = true,
 //        val enableIMEButton: Boolean = true
+        var keyFilter: (TerrarumKeyboardEvent) -> Boolean = { true }
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -203,138 +204,140 @@ class UIItemTextLineInput(
 
             val (eventType, char, headkey, repeatCount, keycodes) = e
 
-            try {
-                if (eventType == InputStrober.KEY_DOWN || eventType == InputStrober.KEY_CHANGE) {
-                    fboUpdateLatch = true
-                    forceLitCursor()
-                    val ime = getIME()
-                    val lowLayer = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
+            if (keyFilter(e)) {
+                try {
+                    if (eventType == InputStrober.KEY_DOWN || eventType == InputStrober.KEY_CHANGE) {
+                        fboUpdateLatch = true
+                        forceLitCursor()
+                        val ime = getIME()
+                        val lowLayer = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
-                    if (keycodes.contains(Input.Keys.V) && keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT)) {
-                        endComposing()
-                        paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
-                    }
-                    else if (keycodes.contains(Input.Keys.C) && (keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT))) {
-                        endComposing()
-                        copyToClipboard()
-                    }
-                    else if (keycodes.contains(Input.Keys.BACKSPACE) || (keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
+                        if (keycodes.contains(Input.Keys.V) && keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT)) {
+                            endComposing()
+                            paste(Clipboard.fetch().substringBefore('\n').substringBefore('\t').toCodePoints())
+                        }
+                        else if (keycodes.contains(Input.Keys.C) && (keycodes.containsSome(Input.Keys.CONTROL_LEFT, Input.Keys.CONTROL_RIGHT))) {
+                            endComposing()
+                            copyToClipboard()
+                        }
+                        else if (keycodes.contains(Input.Keys.BACKSPACE) || (keycodes.contains(Input.Keys.CAPS_LOCK) && lowLayer.capsMode == TerrarumKeyCapsMode.BACK)) {
 
-//                        printdbg(this, "BACKSPACE hit; ime.composing=${ime?.composing?.invoke()}; buflen=${textbuf.size}")
+    //                        printdbg(this, "BACKSPACE hit; ime.composing=${ime?.composing?.invoke()}; buflen=${textbuf.size}")
 
-                        if (ime != null && ime.composing()) {
-                            if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
-                                candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
-                            }
-                            else if (ime.config.mode == TerrarumIMEMode.REWRITE) {
-                                candidates = listOf()
-                                val op = ime.backspace()
-                                if (textbuf.isNotEmpty()) {
-                                    inputBackspaceOnce(1)
+                            if (ime != null && ime.composing()) {
+                                if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
+                                    candidates = ime.backspace().map { CodepointSequence(it.toCodePoints()) }
                                 }
+                                else if (ime.config.mode == TerrarumIMEMode.REWRITE) {
+                                    candidates = listOf()
+                                    val op = ime.backspace()
+                                    if (textbuf.isNotEmpty()) {
+                                        inputBackspaceOnce(1)
+                                    }
 
-                                if (op.size > 0) {
-                                    val codepoints = op[0].toCodePoints()
-                                    if (!maxLen.exceeds(textbuf, codepoints)) {
-                                        textbuf.addAll(cursorX, codepoints)
+                                    if (op.size > 0) {
+                                        val codepoints = op[0].toCodePoints()
+                                        if (!maxLen.exceeds(textbuf, codepoints)) {
+                                            textbuf.addAll(cursorX, codepoints)
 
-                                        moveCursorToEnd(codepoints.size)
+                                            moveCursorToEnd(codepoints.size)
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else if (cursorX <= 0) {
-                            cursorX = 0
-                            cursorDrawX = 0
-                            cursorDrawScroll = 0
-                        }
-                        else {
-                            endComposing()
-                            inputBackspaceOnce(2)
-                        }
-                    }
-                    else if (keycodes.contains(Input.Keys.LEFT)) {
-                        endComposing()
-
-                        if (cursorX > 0) {
-                            cursorX -= 1
-                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                            tryCursorForward()
-                            if (cursorX <= 0) {
+                            else if (cursorX <= 0) {
                                 cursorX = 0
                                 cursorDrawX = 0
                                 cursorDrawScroll = 0
                             }
-                        }
-                    }
-                    else if (keycodes.contains(Input.Keys.RIGHT)) {
-                        endComposing()
-
-                        if (cursorX < textbuf.size) {
-                            cursorX += 1
-                            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                            tryCursorBack()
-                        }
-                    }
-                    else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
-                        endComposing()
-
-//                        println("END COMPOSING!!")
-                    }
-                    // accept:
-                    // - literal "<"
-                    // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
-                    else if (char != null && char.length > 0 && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
-                        val shiftin = keycodes.containsSome(Input.Keys.SHIFT_LEFT, Input.Keys.SHIFT_RIGHT)
-                        val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT) || keycodes.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
-
-                        val codepoints = if (ime != null) {
-                            if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
-                                val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
-                                candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
-
-                                newStatus.second.toCodePoints()
+                            else {
+                                endComposing()
+                                inputBackspaceOnce(2)
                             }
-                            else if (ime.config.mode == TerrarumIMEMode.REWRITE) {
-                                candidates = listOf()
-                                val op = ime.acceptChar(headkey, shiftin, altgrin, char)
+                        }
+                        else if (keycodes.contains(Input.Keys.LEFT)) {
+                            endComposing()
 
-//                                printdbg(this, "delcount: ${op.first[0].toInt()}, rewrite: '${op.second}'")
-
-                                repeat(op.first[0].toInt()) {
-                                    if (textbuf.isNotEmpty()) {
-//                                        printdbg(this, "<del 1>")
-                                        inputBackspaceOnce(3)
-                                    }
+                            if (cursorX > 0) {
+                                cursorX -= 1
+                                cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                tryCursorForward()
+                                if (cursorX <= 0) {
+                                    cursorX = 0
+                                    cursorDrawX = 0
+                                    cursorDrawScroll = 0
                                 }
-
-                                op.second.toCodePoints()
                             }
-                            else throw IllegalArgumentException("Unknown IME Operation mode: ${ime.config.mode}")
                         }
-                        else char.toCodePoints()
+                        else if (keycodes.contains(Input.Keys.RIGHT)) {
+                            endComposing()
 
-//                        printdbg(this, "textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
-
-                        if (!maxLen.exceeds(textbuf, codepoints)) {
-                            textbuf.addAll(cursorX, codepoints)
-
-                            moveCursorToEnd(codepoints.size)
+                            if (cursorX < textbuf.size) {
+                                cursorX += 1
+                                cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                tryCursorBack()
+                            }
                         }
+                        else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
+                            endComposing()
+
+    //                        println("END COMPOSING!!")
+                        }
+                        // accept:
+                        // - literal "<"
+                        // - keysymbol that does not start with "<" (not always has length of 1 because UTF-16)
+                        else if (char != null && char.length > 0 && char[0].code >= 32 && (char == "<" || !char.startsWith("<"))) {
+                            val shiftin = keycodes.containsSome(Input.Keys.SHIFT_LEFT, Input.Keys.SHIFT_RIGHT)
+                            val altgrin = keycodes.contains(Input.Keys.ALT_RIGHT) || keycodes.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
+
+                            val codepoints = if (ime != null) {
+                                if (ime.config.mode == TerrarumIMEMode.CANDIDATES) {
+                                    val newStatus = ime.acceptChar(headkey, shiftin, altgrin, char)
+                                    candidates = newStatus.first.map { CodepointSequence(it.toCodePoints()) }
+
+                                    newStatus.second.toCodePoints()
+                                }
+                                else if (ime.config.mode == TerrarumIMEMode.REWRITE) {
+                                    candidates = listOf()
+                                    val op = ime.acceptChar(headkey, shiftin, altgrin, char)
+
+    //                                printdbg(this, "delcount: ${op.first[0].toInt()}, rewrite: '${op.second}'")
+
+                                    repeat(op.first[0].toInt()) {
+                                        if (textbuf.isNotEmpty()) {
+    //                                        printdbg(this, "<del 1>")
+                                            inputBackspaceOnce(3)
+                                        }
+                                    }
+
+                                    op.second.toCodePoints()
+                                }
+                                else throw IllegalArgumentException("Unknown IME Operation mode: ${ime.config.mode}")
+                            }
+                            else char.toCodePoints()
+
+    //                        printdbg(this, "textinput codepoints: ${codepoints.map { it.toString(16) }.joinToString()}")
+
+                            if (!maxLen.exceeds(textbuf, codepoints)) {
+                                textbuf.addAll(cursorX, codepoints)
+
+                                moveCursorToEnd(codepoints.size)
+                            }
+                        }
+
+                        // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
                     }
-
-                    // don't put innards of tryCursorBack/Forward here -- you absolutely don't want that behaviour
                 }
-            }
-            catch (e: IndexOutOfBoundsException) {
-                e.printStackTrace()
-            }
-            catch (e: NullPointerException) {
-                e.printStackTrace()
-            }
+                catch (e: IndexOutOfBoundsException) {
+                    e.printStackTrace()
+                }
+                catch (e: NullPointerException) {
+                    e.printStackTrace()
+                }
 
-            if (textbuf.size == 0) {
-                currentPlaceholderText = CodepointSequence(placeholder().toCodePoints())
+                if (textbuf.size == 0) {
+                    currentPlaceholderText = CodepointSequence(placeholder().toCodePoints())
+                }
             }
         }
         else if (oldActive) { // just became deactivated
