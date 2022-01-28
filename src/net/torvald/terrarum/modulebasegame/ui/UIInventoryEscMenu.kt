@@ -198,6 +198,26 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             },
     )
 
+    private val screenTouchDowns = arrayOf(
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+            keyConfigUI.touchDown(screenX, screenY, pointer, button)
+        }
+    )
+
+    private val screenTouchUps = arrayOf(
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+                keyConfigUI.touchUp(screenX, screenY, pointer, button)
+            }
+    )
+
     override fun show() {
         INGAME.setTooltipMessage(null)
     }
@@ -232,6 +252,18 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         blendNormal(batch)
         batch.color = Color.WHITE
         screenRenders[screen](batch, camera)
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchDown(screenX, screenY, pointer, button)
+        screenTouchDowns[screen](screenX, screenY, pointer, button)
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchUp(screenX, screenY, pointer, button)
+        screenTouchUps[screen](screenX, screenY, pointer, button)
+        return true
     }
 
     override fun doOpening(delta: Float) {
