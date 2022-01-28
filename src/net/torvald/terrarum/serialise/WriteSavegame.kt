@@ -53,8 +53,8 @@ object WriteSavegame {
                 val w = 960
                 val h = 640
 
-                val cx = WorldCamera.x % 2
-                val cy = WorldCamera.y % 2
+                val cx = (1 - WorldCamera.x % 2)
+                val cy = (1 - WorldCamera.y % 2)
 
                 val x = (fb.width - w) - cx // force the even-numbered position
                 val y = (fb.height - h) - cy // force the even-numbered position
