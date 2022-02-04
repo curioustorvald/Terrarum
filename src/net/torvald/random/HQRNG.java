@@ -11,12 +11,12 @@ import java.util.Random;
  */
 public class HQRNG extends Random {
 
-    private static final long DOUBLE_MASK = (1L << 53) - 1;
-    private static final double NORM_53 = 1. / (1L << 53);
-    private static final long FLOAT_MASK = (1L << 24) - 1;
-    private static final double NORM_24 = 1. / (1L << 24);
+    transient private static final long DOUBLE_MASK = (1L << 53) - 1;
+    transient private static final double NORM_53 = 1. / (1L << 53);
+    transient private static final long FLOAT_MASK = (1L << 24) - 1;
+    transient private static final double NORM_24 = 1. / (1L << 24);
 
-    private static final long serialVersionUID = 1018744536171610262L;
+    transient private static final long serialVersionUID = 1018744536171610262L;
 
     private long state0, state1;
 

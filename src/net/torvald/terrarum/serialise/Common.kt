@@ -3,6 +3,7 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
@@ -185,6 +186,19 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): UUID {
                 return UUID.fromString(jsonData.asString())
+            }
+        })
+        // HQRNG
+        jsoner.setSerializer(HQRNG::class.java, object : Json.Serializer<HQRNG> {
+            override fun write(json: Json, obj: HQRNG, knownType: Class<*>?) {
+                json.writeValue("${obj.state0.toString()},${obj.state1.toString()}")
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HQRNG {
+                val rng = HQRNG()
+                val seedstr = jsonData.asString().split(',')
+                rng.setSeed(seedstr[0].toLong(), seedstr[1].toLong())
+                return rng
             }
         })
     }

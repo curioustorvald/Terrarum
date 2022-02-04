@@ -402,9 +402,10 @@ object IngameRenderer : Disposable {
             Gdx.gl.glDisable(GL20.GL_BLEND)
         }
 
-//        processBlur(lightmapFboA, lightmapFboB)
-        processKawaseBlur(lightmapFbo)
-//        processNoBlur()
+        if (KeyToggler.isOn(Input.Keys.F5))
+            processNoBlur(lightmapFbo)
+        else
+            processKawaseBlur(lightmapFbo)
 
 
         blendNormal(batch)
@@ -667,6 +668,22 @@ object IngameRenderer : Disposable {
     private lateinit var blurtex4: Texture
 
     private const val KAWASE_POWER = 1.5f
+
+    fun processNoBlur(outFbo: FloatFrameBuffer) {
+
+        blurtex0.dispose()
+
+
+        outFbo.inAction(camera, batch) {
+            blurtex0 = LightmapRenderer.draw()
+            blurtex0.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+            blurtex0.bind(0)
+            App.shaderPassthruRGBA.bind()
+            App.shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined)
+            App.shaderPassthruRGBA.setUniformi("u_texture", 0)
+            blurWriteQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLES)
+        }
+    }
 
     fun processKawaseBlur(outFbo: FloatFrameBuffer) {
 
