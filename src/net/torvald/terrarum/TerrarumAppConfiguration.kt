@@ -49,7 +49,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
      *
      */
     const val VERSION_RAW = 0x00030001
-    // Commit counts up to the Release 0.3: 2259 (plz update!)
+    // Commit counts up to the Release 0.3.0: 2259 (plz update!)
 
     //////////////////////////////////////////////////////////
     //             CONFIGURATION FOR TILE MAKER             //

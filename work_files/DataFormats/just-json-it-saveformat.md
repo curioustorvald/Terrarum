@@ -44,7 +44,7 @@ Following code is an example Savegame JSON files.
 ```
 {
     savename: "Test World 1",
-    genver: 4, /* generator version in integer */
+    genver: 0x00030001, /* generator version in integer; always use TerrarumAppConfiguration.VERSION_RAW */
     terrseed: "84088805e145b555",
     randseed: "19b25856e1c150ca834cffc8b59b23ad",
     weatseed: "e5e72beb4e3c6926d3dc9e3e2ef7833b",

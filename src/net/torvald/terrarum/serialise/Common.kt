@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
@@ -27,7 +28,7 @@ import java.util.zip.GZIPOutputStream
  */
 object Common {
 
-    const val GENVER = 4
+    const val GENVER = TerrarumAppConfiguration.VERSION_RAW
     const val COMP_NONE = 0
     const val COMP_GZIP = 1
     const val COMP_LZMA = 2
