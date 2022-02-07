@@ -52,11 +52,11 @@ object AssembleSheetPixmap {
 
 
     private fun drawAndGetCanvas(properties: ADProperties, fileGetter: (String) -> InputStream?, injectedItem: GameItem?): Pixmap {
-        val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
+        val canvas = Pixmap(properties.cols * (properties.frameWidth), properties.rows * (properties.frameHeight), Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
 
         // actually draw
-        properties.transforms.forEach { t, _ ->
+        properties.transforms.forEach { (t, _) ->
             drawThisFrame(t, canvas, properties, fileGetter, injectedItem)
         }
 

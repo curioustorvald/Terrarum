@@ -21,7 +21,7 @@ class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, "net.to
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_32")
+        get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_48")
     override var baseToolSize: Double? = baseMass
 
     init {

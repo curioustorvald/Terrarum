@@ -76,6 +76,8 @@ class ADProperties {
 
     companion object {
         const val ALL_JOINT_SELECT_KEY = "ALL"
+        const val EXTRA_HEADROOM_X = 32
+        const val EXTRA_HEADROOM_Y = 16
     }
 
     constructor(gdxFile: FileHandle) {
@@ -118,8 +120,8 @@ class ADProperties {
         baseFilename = get("SPRITESHEET")[0].name
         extension = get("EXTENSION")[0].name
         val frameSizeVec = get("CONFIG").linearSearchBy { it.name == "SIZE" }!!.input as ADPropertyObject.Vector2i
-        frameWidth = frameSizeVec.x
-        frameHeight = frameSizeVec.y
+        frameWidth = frameSizeVec.x + EXTRA_HEADROOM_X
+        frameHeight = frameSizeVec.y + EXTRA_HEADROOM_Y
         originX = (get("CONFIG").linearSearchBy { it.name == "ORIGINX" }!!.input as Float).toInt()
 
         var maxColFinder = -1

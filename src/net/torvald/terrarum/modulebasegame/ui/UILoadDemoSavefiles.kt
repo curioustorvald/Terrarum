@@ -25,6 +25,8 @@ import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadPlayer
+import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
+import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -602,7 +604,10 @@ class UIItemPlayerCells(
         // player avatar
         batch.color = Color.WHITE
         thumb?.let {
-            batch.draw(it, x + FastMath.ceil((106f - it.regionWidth) / 2f), y + FastMath.ceil((height - it.regionHeight) / 2f))
+            batch.draw(it,
+                    x + FastMath.ceil((106f - it.regionWidth) / 2f) + EXTRA_HEADROOM_X / 2,
+                    y + FastMath.ceil((height - it.regionHeight) / 2f) - EXTRA_HEADROOM_Y / 2
+            )
         }
     }
 
