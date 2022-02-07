@@ -384,6 +384,6 @@ fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMu
 
     if (dist <= minOf(toolDistMax, distMax).sqr()) return action() else return false
 }
-fun IntRange.pickRandom() = HQRNG().nextInt(this.endInclusive - this.start + 1) + this.start // count() on 200 million entries? Se on vitun hyvää idea
+fun IntRange.pickRandom() = HQRNG().nextInt(this.last - this.first + 1) + this.first // count() on 200 million entries? Se on vitun hyvää idea
 fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
 fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]

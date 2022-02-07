@@ -160,8 +160,8 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
 
         // add blockmarking_actor into the actorlist
         (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor).let {
-            it.isVisible = false // make sure the actor is invisible on new instance
-            if (actorContainerActive.searchFor(it.referenceID) { it.referenceID } != null) actorContainerActive.add(it)
+            forceRemoveActor(it)
+            forceAddActor(it)
         }
 
         gameInitialised = true
@@ -190,6 +190,8 @@ open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = f
         printdbg(this, "Thank you for properly disposing the world!")
         printdbg(this, "dispose called by")
         printStackTrace(this)
+
+        blockMarkingActor.isVisible = false
 
         actorContainerActive.forEach { it.dispose() }
         actorContainerInactive.forEach { it.dispose() }

@@ -889,7 +889,7 @@ open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
         )
     }
 
-    private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.endInclusive - ReferencingRanges.ACTORS_WIRES.first + 1
+    private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.last - ReferencingRanges.ACTORS_WIRES.first + 1
     private val wireActorsContainer = Array(maxRenderableWires) { WireActor(ReferencingRanges.ACTORS_WIRES.first + it).let {
         forceAddActor(it)
         /*^let*/ it

@@ -10,6 +10,9 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.floor
 
+/**
+ * Used as construction markers and fixture ghost images
+ */
 class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT) {
 
     private val defaultSize = 16.0

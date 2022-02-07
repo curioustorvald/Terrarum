@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -617,7 +618,9 @@ object IngameRenderer : Disposable {
 
             batch.inUse {
                 moveCameraToWorldCoord()
-                actors?.forEach { it.drawBody(batch) }
+                actors?.forEach {
+                    it.drawBody(batch)
+                }
             }
 
             setCameraPosition(0f, 0f)
