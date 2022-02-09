@@ -33,19 +33,18 @@ object PickaxeCore {
     ) = mouseInInteractableRangeTools(actor, item) {
         // un-round the mx
         val ww = INGAME.world.width
+        val hpww = ww * TILE_SIZE / 2
         val apos = actor.centrePosPoint
-        val mx = if (apos.x < 0.0 && mx >= ww / 2) mx - ww
-                else if (apos.x > 0.0 && mx < ww / 2) mx + ww
+        val mx = if (apos.x - mx * TILE_SIZE< -hpww) mx - ww
+                else if (apos.x - mx * TILE_SIZE >= hpww) mx + ww
                 else mx
-        val wmx = mx * TILE_SIZED
-        val wmy = my * TILE_SIZED
 
         var xoff = -(mw / 2) // implicit flooring
         var yoff = -(mh / 2) // implicit flooring
         // if mw or mh is even number, make it closer toward the actor
-        if (mw % 2 == 0 && apos.x > wmx) xoff += 1
-        if (mh % 2 == 0 && apos.y > wmy) yoff += 1
-
+        if (mw % 2 == 0 && apos.x > mx * TILE_SIZE) xoff += 1
+        if (mh % 2 == 0 && apos.y > my * TILE_SIZE) yoff += 1
+        
         var usageStatus = false
 
         for (oy in 0 until mh) for (ox in 0 until mw) {
