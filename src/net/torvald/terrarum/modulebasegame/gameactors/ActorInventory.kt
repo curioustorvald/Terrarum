@@ -19,7 +19,7 @@ class ActorInventory() : FixtureInventory() {
     @Transient lateinit var actor: Pocketed
         internal set
 
-    constructor(actor: Pocketed, maxCapacity: Int, capacityMode: Int) : this() {
+    constructor(actor: Pocketed, maxCapacity: Long, capacityMode: Int) : this() {
         this.actor = actor
         this.maxCapacity = maxCapacity
         this.capacityMode = capacityMode
@@ -38,10 +38,10 @@ class ActorInventory() : FixtureInventory() {
     val quickSlot = Array<ItemID?>(UIQuickslotBar.SLOT_COUNT) { null } // 0: Slot 1, 9: Slot 10
 
 
-    override fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID]!!, count)
+    override fun remove(itemID: ItemID, count: Long) = remove(ItemCodex[itemID]!!, count)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
-    override fun remove(item: GameItem, count: Int) {
+    override fun remove(item: GameItem, count: Long) {
         super.remove(item, count) { existingItem ->
             // unequip, if applicable
             actor.unequipItem(existingItem.itm)

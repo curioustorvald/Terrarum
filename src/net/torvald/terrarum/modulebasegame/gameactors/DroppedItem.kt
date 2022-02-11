@@ -28,7 +28,7 @@ open class DroppedItem : ActorWithBody {
 
     @Transient private var textureRegion: TextureRegion? = null // deserialiser won't call setter of the fields
 
-    var itemCount = 1
+    var itemCount = 1L
 
     protected constructor()
 

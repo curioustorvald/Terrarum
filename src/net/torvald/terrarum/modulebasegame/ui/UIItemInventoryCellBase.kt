@@ -10,6 +10,7 @@ import net.torvald.terrarum.abs
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 /**
@@ -22,12 +23,12 @@ abstract class UIItemInventoryCellBase(
         initialX: Int,
         initialY: Int,
         open var item: GameItem?,
-        open var amount: Int,
+        open var amount: Long,
         open var itemImage: TextureRegion?,
         open var quickslot: Int? = null,
         open var equippedSlot: Int? = null,
-        val keyDownFun: (GameItem?, Int, Int) -> Unit,
-        val touchDownFun: (GameItem?, Int, Int) -> Unit
+        val keyDownFun: (GameItem?, Long, Int) -> Unit, // Item, Amount, Keycode
+        val touchDownFun: (GameItem?, Long, Int) -> Unit // Item, Amount, Button
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(batch: SpriteBatch, camera: Camera)
@@ -64,7 +65,7 @@ object UIItemInventoryCellCommonRes {
     
     fun getHealthMeterColour(value: Int, start: Int, end: Int) = getHealthMeterColour(value.toFloat(), start.toFloat(), end.toFloat())
 
-    fun Int.toItemCountText() = (if (this < 0) "-" else "") + when (this.abs()) {
+    fun Long.toItemCountText() = (if (this < 0) "-" else "") + when (this.absoluteValue) {
         in 0..999999 -> "$this"
         in 1_000_000..999_999_999 -> "${this / 1_000_000}.${this.rem(1_000_000) / 10_000}M"
         else -> "${this / 1_000_000_000}.${this.rem(1_000_000_000) / 10_000_000}B"

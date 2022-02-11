@@ -28,8 +28,8 @@ internal object Inventory : ConsoleCommand {
             if (actor != null) {
                 when (args[1]) {
                     "list"   -> listInventory(actor)
-                    "add"    -> if (args.size > 3) addItem(actor, args[2], args[3].toInt()) else addItem(actor, args[2])
-                    "remove" -> if (args.size > 3) removeItem(actor, args[2], args[3].toInt()) else removeItem(actor, args[2])
+                    "add"    -> if (args.size > 3) addItem(actor, args[2], args[3].toLong()) else addItem(actor, args[2])
+                    "remove" -> if (args.size > 3) removeItem(actor, args[2], args[3].toLong()) else removeItem(actor, args[2])
                     "equip"  -> equipItem(actor, args[2])
                     "unequip"-> unequipItem(actor, args[2])
                     else     -> printUsage()
@@ -44,12 +44,12 @@ internal object Inventory : ConsoleCommand {
     private fun getActor() = Terrarum.ingame?.getActorByID(targetID) as? Pocketed
 
     private fun listInventory(actor: Pocketed) {
-        if (actor.inventory.getTotalUniqueCount() == 0) {
+        if (actor.inventory.getTotalUniqueCount() == 0L) {
             Echo("(inventory empty)")
         }
         else {
             actor.inventory.forEach { val (item, amount) = it
-                if (amount == 0) {
+                if (amount == 0L) {
                     EchoError("Unexpected zero-amounted item: ID $item")
                 }
                 Echo("${ccW}ID $ccY$item${if (amount > 1) "$ccW ($ccG$amount$ccW)" else ""}")
@@ -57,7 +57,7 @@ internal object Inventory : ConsoleCommand {
         }
     }
 
-    private fun addItem(actor: Pocketed, refId: ItemID, amount: Int = 1) {
+    private fun addItem(actor: Pocketed, refId: ItemID, amount: Long = 1L) {
         val item = ItemCodex[refId]
         if (item != null) {
             actor.addItem(item, amount)
@@ -66,7 +66,7 @@ internal object Inventory : ConsoleCommand {
         else EchoError("No such item: $refId")
     }
 
-    private fun removeItem(actor: Pocketed, refId: ItemID, amount: Int = 1) {
+    private fun removeItem(actor: Pocketed, refId: ItemID, amount: Long = 1L) {
         val item = ItemCodex[refId]
         if (item != null) {
             actor.removeItem(item, amount)

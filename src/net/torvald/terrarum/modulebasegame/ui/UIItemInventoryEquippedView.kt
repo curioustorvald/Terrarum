@@ -8,6 +8,8 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.itemListHeight
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
+import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
+import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -85,8 +87,8 @@ class UIItemInventoryEquippedView(
             batch.color = SPRITE_DRAW_COL
             batch.draw(
                     it.textureRegion.get(0, 0),
-                    posX + (width - it.cellWidth).div(2).toFloat(),
-                    posY + (width - it.cellHeight).div(2).toFloat()
+                    posX + (width - it.cellWidth + EXTRA_HEADROOM_X).div(2).toFloat(),
+                    posY + (width - it.cellHeight - EXTRA_HEADROOM_Y).div(2).toFloat()
             )
 
         }

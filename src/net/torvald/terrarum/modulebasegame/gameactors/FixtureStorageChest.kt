@@ -77,12 +77,12 @@ internal class UIStorageChest : UICanvas(
     override var openCloseTime: Second = 0.0f
 
     private val negotiator = object : InventoryNegotiator() {
-        override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Int) {
+        override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Long) {
             player.remove(item, amount)
             fixture.add(item, amount)
         }
 
-        override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Int) {
+        override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
             fixture.remove(item, amount)
             player.add(item, amount)
         }

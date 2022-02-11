@@ -24,18 +24,18 @@ class UIItemInventoryElemWide(
         initialY: Int,
         override val width: Int,
         override var item: GameItem?,
-        override var amount: Int,
+        override var amount: Long,
         override var itemImage: TextureRegion?,
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
-        keyDownFun: (GameItem?, Int, Int) -> Unit,
-        touchDownFun: (GameItem?, Int, Int) -> Unit
+        keyDownFun: (GameItem?, Long, Int) -> Unit, // Item, Amount, Keycode
+        touchDownFun: (GameItem?, Long, Int) -> Unit // Item, Amount, Button
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun) {
 
     companion object {
         val height = 48
-        val UNIQUE_ITEM_HAS_NO_AMOUNT = -1
+        val UNIQUE_ITEM_HAS_NO_AMOUNT = -1L
 
         internal val durabilityBarThickness = 3
     }
@@ -100,7 +100,7 @@ class UIItemInventoryElemWide(
             if (INVEN_DEBUG_MODE) {
                 App.fontGame.draw(batch,
                         // print static id, dynamic id, and count
-                        "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
+                        "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1L) "$fwsp!!$amountString!!" else ""),
                         posX + textOffsetX,
                         posY + textOffsetY
                 )
@@ -108,7 +108,7 @@ class UIItemInventoryElemWide(
             else {
                 App.fontGame.draw(batch,
                         // print name and amount in parens
-                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1) "$fwsp!!$amountString!!" else ""),
+                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1L) "$fwsp!!$amountString!!" else ""),
 
                         posX + textOffsetX,
                         posY + textOffsetY

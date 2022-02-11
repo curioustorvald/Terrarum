@@ -15,10 +15,10 @@ import java.util.concurrent.locks.ReentrantLock
 
 open class FixtureInventory() {
 
-    var maxCapacity = 100
+    var maxCapacity = 100L
     var capacityMode = CAPACITY_MODE_COUNT
 
-    constructor(maxCapacity: Int, capacityMode: Int) : this() {
+    constructor(maxCapacity: Long, capacityMode: Int) : this() {
         this.maxCapacity = maxCapacity
         this.capacityMode = capacityMode
     }
@@ -35,23 +35,23 @@ open class FixtureInventory() {
     val itemList = ArrayList<InventoryPair>()
     var wallet = BigInteger("0") // unified currency for whole civs; Dwarf Fortress approach seems too complicated
 
-    fun isEmpty() = getTotalCount() == 0
+    fun isEmpty() = getTotalCount() == 0L
     fun isNotEmpty() = getTotalCount() > 0
 
-    open fun add(itemID: ItemID, count: Int = 1) {
+    open fun add(itemID: ItemID, count: Long = 1) {
         if (ItemCodex[itemID] == null)
             throw NullPointerException("Item not found: $itemID")
         else
             add(ItemCodex[itemID]!!, count)
     }
-    open fun add(item: GameItem, count: Int = 1) {
+    open fun add(item: GameItem, count: Long = 1L) {
 
 //        println("[ActorInventory] add-by-elem $item, $count")
 
         // other invalid values
-        if (count == 0)
+        if (count == 0L)
             throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
-        if (count < 0)
+        if (count < 0L)
             throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()\n" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
         if (item.originalID == "actor:${Terrarum.PLAYER_REF_ID}" || item.originalID == ("actor:${0x51621D}")) // do not delete this magic
@@ -71,7 +71,10 @@ open class FixtureInventory() {
         // if the item already exists
         if (existingItem != null) {
             // increment count
-            existingItem.qty += count
+            if (existingItem.qty + count < 0L) // check numeric overflow
+                existingItem.qty = Long.MAX_VALUE
+            else
+                existingItem.qty += count
         }
         // new item
         else {
@@ -80,20 +83,20 @@ open class FixtureInventory() {
         insertionSortLastElem(itemList)
     }
 
-    open fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID]!!, count) {}
-    open fun remove(item: GameItem, count: Int = 1) = remove(item, count) {}
+    open fun remove(itemID: ItemID, count: Long) = remove(ItemCodex[itemID]!!, count) {}
+    open fun remove(item: GameItem, count: Long = 1L) = remove(item, count) {}
 
-    open fun remove(itemID: ItemID, count: Int, unequipFun: (InventoryPair) -> Unit) =
+    open fun remove(itemID: ItemID, count: Long, unequipFun: (InventoryPair) -> Unit) =
             remove(ItemCodex[itemID]!!, count, unequipFun)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
-    open fun remove(item: GameItem, count: Int = 1, unequipFun: (InventoryPair) -> Unit) {
+    open fun remove(item: GameItem, count: Long = 1, unequipFun: (InventoryPair) -> Unit) {
 
         println("[ActorInventory] remove $item, $count")
 
-        if (count == 0)
+        if (count == 0L)
             throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
-        if (count < 0)
+        if (count < 0L)
             throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is negative number. If you intended adding items, use add()" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
 
@@ -144,12 +147,12 @@ open class FixtureInventory() {
     /**
      * Real amount
      */
-    fun getTotalCount(): Int = itemList.sumOf { it.qty }
+    fun getTotalCount(): Long = itemList.sumOf { it.qty }
 
     /**
      * Unique amount, multiple items are calculated as one
      */
-    fun getTotalUniqueCount(): Int = itemList.size
+    fun getTotalUniqueCount(): Long = itemList.size.toLong()
 
     /**
      * Check whether the itemList contains too many items
@@ -229,11 +232,11 @@ open class FixtureInventory() {
 class InventoryPair {
 
     var itm: ItemID = ""; private set
-    var qty: Int = 0
+    var qty: Long = 0
 
     private constructor()
 
-    constructor(item: ItemID, quantity: Int) : this() {
+    constructor(item: ItemID, quantity: Long) : this() {
         itm = item
         qty = quantity
     }

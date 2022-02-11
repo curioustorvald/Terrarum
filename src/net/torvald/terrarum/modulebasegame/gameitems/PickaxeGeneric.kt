@@ -44,7 +44,7 @@ object PickaxeCore {
         // if mw or mh is even number, make it closer toward the actor
         if (mw % 2 == 0 && apos.x > mx * TILE_SIZE) xoff += 1
         if (mh % 2 == 0 && apos.y > my * TILE_SIZE) yoff += 1
-        
+
         var usageStatus = false
 
         for (oy in 0 until mh) for (ox in 0 until mw) {
