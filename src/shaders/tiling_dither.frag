@@ -2,11 +2,10 @@
 
 */
 
-#version 120
+#version 130
 #ifdef GL_ES
 precision mediump float;
 #endif
-#extension GL_EXT_gpu_shader4 : enable
 
 varying vec4 v_color;
 varying vec2 v_texCoords;

@@ -2,7 +2,7 @@
  * Blue Noise texture created by Christoph Peters, released under CC0
  * http://momentsingraphics.de/BlueNoise.html
  */
-#version 120
+#version 130
 #ifdef GL_ES
     precision mediump float;
 #endif

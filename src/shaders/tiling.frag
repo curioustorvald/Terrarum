@@ -2,11 +2,10 @@
 
 */
 
-#version 120
+#version 130
 #ifdef GL_ES
 precision mediump float;
 #endif
-#extension GL_EXT_gpu_shader4 : enable
 
 //layout(origin_upper_left) in vec4 gl_FragCoord; // commented; requires #version 150 or later
 // gl_FragCoord is origin to bottom-left

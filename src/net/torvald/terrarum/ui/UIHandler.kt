@@ -36,7 +36,7 @@ class UIHandler(//var UI: UICanvas,
 
     companion object {
         private val SHADER_PROG_FRAG = """
-#version 120
+#version 130
 #ifdef GL_ES
     precision mediump float;
 #endif
