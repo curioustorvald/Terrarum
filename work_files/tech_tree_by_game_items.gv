@@ -1,5 +1,5 @@
 digraph g {
-	concentrate=true
+	concentrate=tru
 	dpi=192
 	{rank=same; copper iron steel}
 
@@ -34,11 +34,12 @@ digraph g {
 	kinetic [shape=component]
 	information [shape=component]
 	"sequential logic" [shape=component] /* implies electronic memory */
-	telecommunication [shape=component] /* implies radio transmission */
+	radio [shape=component]
+	telecommunication [shape=component]
 	teleportation [shape=component]
 	optics [shape=component]
 	"quantum mechanics" [shape=component]
-	"computer network" [shape=component]
+	networking [shape=component]
 	"haute couture" [shape=component]
 	"world portal" [shape=component]
 	/* useable items */
@@ -51,6 +52,7 @@ digraph g {
 	furnitures [shape=box,style=filled,fillcolor=khaki]
 	office [shape=box,style=filled,fillcolor=khaki]
 	"logic gate" [shape=box,style=filled,fillcolor=khaki]
+	"wireless circuit" [shape=box,style=filled,fillcolor=khaki]
 	wire [shape=box,style=filled,fillcolor=khaki]
 	typewriter [shape=box,style=filled,fillcolor=khaki]
 	teletype [shape=box,style=filled,fillcolor=khaki]
@@ -118,15 +120,17 @@ digraph g {
 	iron -> typewriter -> teletype
 	wire -> "logic gate"
 	
-	electricity -> telecommunication
-	quartz -> telecommunication
-	information -> telecommunication -> "computer network"
+	electricity -> radio
+	quartz -> radio -> "wireless circuit"
+	radio -> telecommunication
+	information -> telecommunication -> networking
+	"wireless circuit" -> networking
 	telecommunication -> teletype -> rtty
 	"logic gate" -> rtty
 
 	quartz -> "sequential logic"
 	"logic gate" -> "sequential logic" -> "computing unit"
-	machines -> "computing unit" -> "computer network"
+	machines -> "computing unit" -> networking
 		
 	quartz -> optics
 	optics -> "quantum mechanics" -> teleportation -> "world portal" /* to not make quartz useless */
