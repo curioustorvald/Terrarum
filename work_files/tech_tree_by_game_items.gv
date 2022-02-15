@@ -1,0 +1,157 @@
+digraph g {
+	concentrate=true
+	dpi=192
+	{rank=same; copper iron steel}
+
+	subgraph cluster_legend {
+		label=Legend
+		"raw materials" [style=filled,fillcolor=mistyrose]
+		"manufactured materials" [shape=box,style=filled,fillcolor=lightsteelblue]
+		concepts [shape=component]
+		"useable items" [shape=box,style=filled,fillcolor=khaki]
+		"ingredient only" [shape=box,style=filled]
+		{rank=source; "raw materials" "manufactured materials"}
+		{rank=same; concepts "useable items" "ingredient only"}
+	}
+
+	/* raw materials */
+	wood [style=filled,fillcolor=mistyrose]
+	stone [style=filled,fillcolor=mistyrose]
+	malachite [style=filled,fillcolor=mistyrose]
+	hematite [style=filled,fillcolor=mistyrose]
+	coal [style=filled,fillcolor=mistyrose]
+	quartz [style=filled,fillcolor=mistyrose]
+	ilmenite [style=filled,fillcolor=mistyrose]
+	gold [style=filled,fillcolor=mistyrose]
+	/* manufactured materials */
+	steel [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+	iron [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+	copper [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+	titanium [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+	/* concepts */
+	thermal [shape=component]
+	electricity [shape=component]
+	kinetic [shape=component]
+	information [shape=component]
+	"sequential logic" [shape=component] /* implies electronic memory */
+	telecommunication [shape=component] /* implies radio transmission */
+	teleportation [shape=component]
+	optics [shape=component]
+	"quantum mechanics" [shape=component]
+	"computer network" [shape=component]
+	"haute couture" [shape=component]
+	"world portal" [shape=component]
+	/* useable items */
+	furnace [shape=box,style=filled,fillcolor=khaki]
+	torch [shape=box,style=filled,fillcolor=khaki]
+	"light fixture" [shape=box,style=filled,fillcolor=khaki] /* Both lamps and blinkenlight(s) */
+	machines [shape=box,style=filled,fillcolor=khaki]
+	"hand tools" [shape=box,style=filled,fillcolor=khaki] /* pickaxe, axe, etc. */
+	"motorised tools" [shape=box,style=filled,fillcolor=khaki] /* drill, chainsaw, etc. */
+	furnitures [shape=box,style=filled,fillcolor=khaki]
+	office [shape=box,style=filled,fillcolor=khaki]
+	"logic gate" [shape=box,style=filled,fillcolor=khaki]
+	wire [shape=box,style=filled,fillcolor=khaki]
+	typewriter [shape=box,style=filled,fillcolor=khaki]
+	teletype [shape=box,style=filled,fillcolor=khaki]
+	rtty [shape=box,style=filled,fillcolor=khaki]
+	"weapons&armours" [shape=box,style=filled,fillcolor=khaki]
+	"digital billboard" [shape=box,style=filled,fillcolor=khaki]
+	"CRT display" [shape=box,style=filled,fillcolor=khaki]
+	"personal computer" [shape=box,style=filled,fillcolor=khaki] /* small computer with single integrated */
+	mainframe [shape=box,style=filled,fillcolor=khaki] /* big computer that can have multiple terminals */
+	/* ingredient items */
+	engine [shape=box,style=filled]
+	LED [shape=box,style=filled]
+	"computing unit" [shape=box,style=filled,fillcolor=khaki]
+
+	
+	stone -> furnace -> thermal
+	coal -> thermal
+	
+	thermal -> iron
+	hematite -> iron
+	thermal -> copper
+	malachite -> copper
+	
+	iron -> steel
+	coal -> steel
+	thermal -> steel
+	
+	iron -> engine
+	copper -> electricity
+	thermal -> engine -> electricity
+	copper -> wire
+	wire -> electricity
+	engine -> kinetic
+	
+	electricity -> machines
+	steel -> machines
+	
+	wood -> furnitures
+	wood -> "hand tools"
+	iron -> "hand tools"
+	copper -> "hand tools"
+	steel -> "hand tools"
+	copper -> "weapons&armours"
+	iron -> "weapons&armours"
+	steel -> "weapons&armours"
+	ilmenite -> titanium
+	iron -> titanium -> "weapons&armours"
+	
+	furnitures -> office
+	office -> information
+	
+	electricity -> "motorised tools"
+	titanium -> "motorised tools"
+	steel -> "motorised tools"
+
+ 	wood -> torch
+	coal -> torch
+	torch -> "light fixture"
+	iron -> "light fixture"
+	copper -> "light fixture"
+	
+	information -> typewriter
+	information -> "logic gate"
+	gold -> "logic gate"
+	iron -> typewriter -> teletype
+	wire -> "logic gate"
+	
+	electricity -> telecommunication
+	quartz -> telecommunication
+	information -> telecommunication -> "computer network"
+	telecommunication -> teletype -> rtty
+	"logic gate" -> rtty
+
+	quartz -> "sequential logic"
+	"logic gate" -> "sequential logic" -> "computing unit"
+	machines -> "computing unit" -> "computer network"
+		
+	quartz -> optics
+	optics -> "quantum mechanics" -> teleportation -> "world portal" /* to not make quartz useless */
+	"computing unit" -> "world portal"
+	rtty -> "world portal"
+	
+	electricity -> "CRT display"
+	quartz -> "CRT display"
+	"logic gate" -> "CRT display"
+	
+	electricity -> LED
+	optics -> LED
+	"logic gate" -> LED
+	
+	LED -> "digital billboard"
+	"sequential logic" -> "digital billboard"
+	LED -> "light fixture"
+	
+	"computing unit" -> "personal computer"
+	"CRT display" -> "personal computer"
+	LED -> "personal computer"
+	"computing unit" -> mainframe
+	teletype -> mainframe
+	
+	gold -> "haute couture"
+	furnitures -> "haute couture"
+	
+}
