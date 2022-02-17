@@ -42,13 +42,14 @@ digraph g {
 	networking [shape=component]
 	"haute couture" [shape=component]
 	"world portal" [shape=component]
+	"hand tools" [shape=component] /* pickaxe, axe, etc. */
+	"weapons&armours" [shape=component]
+	"motorised tools" [shape=component] /* drill, chainsaw, etc. */
 	/* useable items */
 	furnace [shape=box,style=filled,fillcolor=khaki]
 	torch [shape=box,style=filled,fillcolor=khaki]
 	"light fixture" [shape=box,style=filled,fillcolor=khaki] /* Both lamps and blinkenlight(s) */
 	machines [shape=box,style=filled,fillcolor=khaki]
-	"hand tools" [shape=box,style=filled,fillcolor=khaki] /* pickaxe, axe, etc. */
-	"motorised tools" [shape=box,style=filled,fillcolor=khaki] /* drill, chainsaw, etc. */
 	furnitures [shape=box,style=filled,fillcolor=khaki]
 	office [shape=box,style=filled,fillcolor=khaki]
 	"logic gate" [shape=box,style=filled,fillcolor=khaki]
@@ -57,11 +58,21 @@ digraph g {
 	typewriter [shape=box,style=filled,fillcolor=khaki]
 	teletype [shape=box,style=filled,fillcolor=khaki]
 	rtty [shape=box,style=filled,fillcolor=khaki]
-	"weapons&armours" [shape=box,style=filled,fillcolor=khaki]
 	"digital billboard" [shape=box,style=filled,fillcolor=khaki]
 	"CRT display" [shape=box,style=filled,fillcolor=khaki]
 	"personal computer" [shape=box,style=filled,fillcolor=khaki] /* small computer with single integrated */
 	mainframe [shape=box,style=filled,fillcolor=khaki] /* big computer that can have multiple terminals */
+	pickaxe [shape=box,style=filled,fillcolor=khaki]
+	hatchet [shape=box,style=filled,fillcolor=khaki]
+	sledgehammer [shape=box,style=filled,fillcolor=khaki]
+	"mining drill" [shape=box,style=filled,fillcolor=khaki]
+	chainsaw [shape=box,style=filled,fillcolor=khaki]
+	"arming sword" [shape=box,style=filled,fillcolor=khaki]
+	greatsword [shape=box,style=filled,fillcolor=khaki]
+	headgear [shape=box,style=filled,fillcolor=khaki]
+	breastplate [shape=box,style=filled,fillcolor=khaki]
+	leggings [shape=box,style=filled,fillcolor=khaki]
+	boots [shape=box,style=filled,fillcolor=khaki]
 	/* ingredient items */
 	engine [shape=box,style=filled]
 	LED [shape=box,style=filled]
@@ -158,4 +169,17 @@ digraph g {
 	gold -> "haute couture"
 	furnitures -> "haute couture"
 	
+	"hand tools" -> pickaxe
+	"hand tools" -> hatchet
+	"hand tools" -> sledgehammer
+	
+	"weapons&armours" -> "arming sword"
+	"weapons&armours" -> greatsword
+	"weapons&armours" -> headgear
+	"weapons&armours" -> breastplate
+	"weapons&armours" -> leggings
+	"weapons&armours" -> boots
+	
+	"motorised tools" -> "mining drill"
+	"motorised tools" -> chainsaw
 }
