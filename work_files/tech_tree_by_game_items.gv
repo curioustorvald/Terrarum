@@ -1,8 +1,9 @@
 digraph g {
-	concentrate=tru
+	concentrate=false
 	dpi=192
-	{rank=same; copper iron steel}
-
+	{rank=same; copper iron}
+     graph [compound=true]
+     
 	subgraph cluster_legend {
 		label=Legend
 		"raw materials" [style=filled,fillcolor=mistyrose]
@@ -12,6 +13,30 @@ digraph g {
 		"ingredient only" [shape=box,style=filled]
 		{rank=source; "raw materials" "manufactured materials"}
 		{rank=same; concepts "useable items" "ingredient only"}
+	}
+	
+	subgraph cluster_weaponarmour {
+		"arming sword" [shape=box,style=filled,fillcolor=khaki]
+		greatsword [shape=box,style=filled,fillcolor=khaki]
+		headgear [shape=box,style=filled,fillcolor=khaki]
+		breastplate [shape=box,style=filled,fillcolor=khaki]
+		leggings [shape=box,style=filled,fillcolor=khaki]
+		boots [shape=box,style=filled,fillcolor=khaki]
+		{rank=source; "arming sword" greatsword}
+		{rank=same; headgear breastplate leggings boots}
+	}
+	subgraph cluster_handtools {
+		pickaxe [shape=box,style=filled,fillcolor=khaki]
+		hatchet [shape=box,style=filled,fillcolor=khaki]
+		sledgehammer [shape=box,style=filled,fillcolor=khaki]
+		"grappling hook" [shape=box,style=filled,fillcolor=khaki]
+		{rank=source; pickaxe hatchet sledgehammer}
+	}
+	subgraph cluster_electrictools {
+		"mining drill" [shape=box,style=filled,fillcolor=khaki]
+		chainsaw [shape=box,style=filled,fillcolor=khaki]
+		breaker [shape=box,style=filled,fillcolor=khaki]
+		{rank=same; "mining drill" chainsaw breaker}
 	}
 
 	/* raw materials */
@@ -23,11 +48,13 @@ digraph g {
 	quartz [style=filled,fillcolor=mistyrose]
 	ilmenite [style=filled,fillcolor=mistyrose]
 	gold [style=filled,fillcolor=mistyrose]
+	sand [style=filled,fillcolor=mistyrose]
 	/* manufactured materials */
 	steel [shape=trapezium,style=filled,fillcolor=lightsteelblue]
 	iron [shape=trapezium,style=filled,fillcolor=lightsteelblue]
 	copper [shape=trapezium,style=filled,fillcolor=lightsteelblue]
 	titanium [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+	glass [shape=trapezium,style=filled,fillcolor=lightsteelblue]
 	/* concepts */
 	thermal [shape=component]
 	electricity [shape=component]
@@ -45,11 +72,12 @@ digraph g {
 	"hand tools" [shape=component] /* pickaxe, axe, etc. */
 	"weapons&armours" [shape=component]
 	"motorised tools" [shape=component] /* drill, chainsaw, etc. */
+	machines [shape=component] /* electric machines */
+	"nonelectric machines" [shape=component]
 	/* useable items */
 	furnace [shape=box,style=filled,fillcolor=khaki]
 	torch [shape=box,style=filled,fillcolor=khaki]
 	"light fixture" [shape=box,style=filled,fillcolor=khaki] /* Both lamps and blinkenlight(s) */
-	machines [shape=box,style=filled,fillcolor=khaki]
 	furnitures [shape=box,style=filled,fillcolor=khaki]
 	office [shape=box,style=filled,fillcolor=khaki]
 	"logic gate" [shape=box,style=filled,fillcolor=khaki]
@@ -62,25 +90,19 @@ digraph g {
 	"CRT display" [shape=box,style=filled,fillcolor=khaki]
 	"personal computer" [shape=box,style=filled,fillcolor=khaki] /* small computer with single integrated */
 	mainframe [shape=box,style=filled,fillcolor=khaki] /* big computer that can have multiple terminals */
-	pickaxe [shape=box,style=filled,fillcolor=khaki]
-	hatchet [shape=box,style=filled,fillcolor=khaki]
-	sledgehammer [shape=box,style=filled,fillcolor=khaki]
-	"mining drill" [shape=box,style=filled,fillcolor=khaki]
-	chainsaw [shape=box,style=filled,fillcolor=khaki]
-	"arming sword" [shape=box,style=filled,fillcolor=khaki]
-	greatsword [shape=box,style=filled,fillcolor=khaki]
-	headgear [shape=box,style=filled,fillcolor=khaki]
-	breastplate [shape=box,style=filled,fillcolor=khaki]
-	leggings [shape=box,style=filled,fillcolor=khaki]
-	boots [shape=box,style=filled,fillcolor=khaki]
 	/* ingredient items */
 	engine [shape=box,style=filled]
 	LED [shape=box,style=filled]
-	"computing unit" [shape=box,style=filled,fillcolor=khaki]
+	"computing unit" [shape=box,style=filled] /* motherboard+cpu+ram+powersupply combined */
+	"quartz oscillator" [shape=box,style=filled]
+	"quartz lens" [shape=box,style=filled]
 
 	
 	stone -> furnace -> thermal
 	coal -> thermal
+	
+	sand -> glass
+	thermal -> glass -> furnitures
 	
 	thermal -> iron
 	hematite -> iron
@@ -109,6 +131,8 @@ digraph g {
 	copper -> "weapons&armours"
 	iron -> "weapons&armours"
 	steel -> "weapons&armours"
+	
+	thermal -> titanium
 	ilmenite -> titanium
 	iron -> titanium -> "weapons&armours"
 	
@@ -124,6 +148,7 @@ digraph g {
 	torch -> "light fixture"
 	iron -> "light fixture"
 	copper -> "light fixture"
+	glass -> "light fixture"
 	
 	information -> typewriter
 	information -> "logic gate"
@@ -132,24 +157,24 @@ digraph g {
 	wire -> "logic gate"
 	
 	electricity -> radio
-	quartz -> radio -> "wireless circuit"
+	quartz -> "quartz oscillator" -> radio -> "wireless circuit"
 	radio -> telecommunication
 	information -> telecommunication -> networking
 	"wireless circuit" -> networking
 	telecommunication -> teletype -> rtty
 	"logic gate" -> rtty
 
-	quartz -> "sequential logic"
+	"quartz oscillator" -> "sequential logic"
 	"logic gate" -> "sequential logic" -> "computing unit"
 	machines -> "computing unit" -> networking
 		
-	quartz -> optics
+	quartz -> "quartz lens" -> optics
 	optics -> "quantum mechanics" -> teleportation -> "world portal" /* to not make quartz useless */
 	"computing unit" -> "world portal"
 	rtty -> "world portal"
 	
 	electricity -> "CRT display"
-	quartz -> "CRT display"
+	glass -> "CRT display"
 	"logic gate" -> "CRT display"
 	
 	electricity -> LED
@@ -169,17 +194,10 @@ digraph g {
 	gold -> "haute couture"
 	furnitures -> "haute couture"
 	
-	"hand tools" -> pickaxe
-	"hand tools" -> hatchet
-	"hand tools" -> sledgehammer
-	
-	"weapons&armours" -> "arming sword"
-	"weapons&armours" -> greatsword
-	"weapons&armours" -> headgear
-	"weapons&armours" -> breastplate
-	"weapons&armours" -> leggings
-	"weapons&armours" -> boots
-	
-	"motorised tools" -> "mining drill"
-	"motorised tools" -> chainsaw
+	"hand tools" -> "grappling hook" [lhead=cluster_handtools]
+	"weapons&armours" -> "arming sword" [lhead=cluster_weaponarmour]
+	"motorised tools" -> breaker [lhead=cluster_electrictools]
+
+	kinetic -> "nonelectric machines"
+	steel -> "nonelectric machines"
 }
