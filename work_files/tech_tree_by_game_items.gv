@@ -23,7 +23,8 @@ digraph g {
 		leggings [shape=box,style=filled,fillcolor=khaki]
 		boots [shape=box,style=filled,fillcolor=khaki]
 		{rank=source; "arming sword" greatsword}
-		{rank=same; headgear breastplate leggings boots}
+		{rank=same; headgear breastplate}
+		{rank=sink; leggings boots}
 	}
 	subgraph cluster_handtools {
 		pickaxe [shape=box,style=filled,fillcolor=khaki]
@@ -36,7 +37,25 @@ digraph g {
 		"mining drill" [shape=box,style=filled,fillcolor=khaki]
 		chainsaw [shape=box,style=filled,fillcolor=khaki]
 		breaker [shape=box,style=filled,fillcolor=khaki]
-		{rank=same; "mining drill" chainsaw breaker}
+		{rank=source; "mining drill"}
+		{rank=same; breaker}
+		{rank=sink; chainsaw}
+	}
+	subgraph cluster_hautecouture {
+		"victorian furniture set" [shape=box,style=filled,fillcolor=khaki]
+		"provence furniture set" [shape=box,style=filled,fillcolor=khaki]
+		"ikea-esque furniture set" [shape=box,style=filled,fillcolor=khaki]
+		{rank=source; "victorian furniture set"}
+		{rank=same; "provence furniture set"}
+		{rank=sink; "ikea-esque furniture set"}
+	}
+	subgraph cluster_furnishings {
+		"iron furniture set" [shape=box,style=filled,fillcolor=khaki] // basic
+		"steel furniture set" [shape=box,style=filled,fillcolor=khaki] // fancier iron with a tint of diesel-punk
+		"glass furniture set" [shape=box,style=filled,fillcolor=khaki]
+		"cupric furniture set" [shape=box,style=filled,fillcolor=khaki] // copper-coloured rustic
+		{rank=source; "iron furniture set" "cupric furniture set"}
+		{rank=sink; "glass furniture set" "steel furniture set"}
 	}
 
 	/* raw materials */
@@ -90,6 +109,7 @@ digraph g {
 	"CRT display" [shape=box,style=filled,fillcolor=khaki]
 	"personal computer" [shape=box,style=filled,fillcolor=khaki] /* small computer with single integrated */
 	mainframe [shape=box,style=filled,fillcolor=khaki] /* big computer that can have multiple terminals */
+
 	/* ingredient items */
 	engine [shape=box,style=filled]
 	LED [shape=box,style=filled]
@@ -193,6 +213,9 @@ digraph g {
 	
 	gold -> "haute couture"
 	furnitures -> "haute couture"
+	furnitures -> "iron furniture set" [lhead=cluster_furnishings]
+	"haute couture" -> "victorian furniture set" [lhead=cluster_hautecouture]
+
 	
 	"hand tools" -> "grappling hook" [lhead=cluster_handtools]
 	"weapons&armours" -> "arming sword" [lhead=cluster_weaponarmour]
