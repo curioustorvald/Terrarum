@@ -92,6 +92,8 @@ class BlockProp {
 
     var material: String = ""
 
+    var reflectance = 0f // the exact colour of the reflected light depends on the texture
+
     @Transient var rngBase0 = Math.random().toFloat() // initial cycle phase (xxxxFuncX)
     @Transient var rngBase1 = Math.random().toFloat() // flicker P0, etc
     @Transient var rngBase2 = Math.random().toFloat() // flicker P1, etc

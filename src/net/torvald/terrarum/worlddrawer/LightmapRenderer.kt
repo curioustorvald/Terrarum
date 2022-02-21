@@ -73,6 +73,7 @@ object LightmapRenderer {
     //private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val giMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
     /**
      * Float value, 1.0 for 1023
      *
@@ -180,7 +181,7 @@ object LightmapRenderer {
             buildLanternmap(actorContainer)
         } // usually takes 3000 ns
 
-        // set sunlight
+        // copy current world's globalLight into this
         sunLight.set(world.globalLight)
 
         // set no-op mask from solidity of the block
@@ -190,9 +191,11 @@ object LightmapRenderer {
         }*/
 
         // wipe out lightmap
-        App.measureDebugTime("Renderer.LightPrecalc") {
+        App.measureDebugTime("Renderer.Precalculate1") {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
+
+            giMap.clear()
 
             _mapLightLevelThis.zerofill()
 
@@ -308,7 +311,7 @@ object LightmapRenderer {
         //
         // multithreading - forget about it; overhead is way too big and for some reason i was not able to
         //      resolve the 'noisy shit' artefact
-        App.measureDebugTime("Renderer.LightRuns") {
+        App.measureDebugTime("Renderer.LightRuns1") {
 
             // To save you from pains:
             // - Per-channel light updating is actually slower
@@ -318,10 +321,21 @@ object LightmapRenderer {
             // - Multithreading? I have absolutely no idea.
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
             r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
+        }
+
+        App.measureDebugTime("Renderer.Precalculate2") {
+            // populate GImap and perform precalculation again
+            for (y in for_y_start - overscan_open + 1..for_y_end + overscan_open - 1) {
+                for (x in for_x_start - overscan_open + 1..for_x_end + overscan_open - 1) {
+                    precalculate2(lightmap, x, y)
+                }
+            }
+        }
+
+        App.measureDebugTime("Renderer.LightRuns2") {
             r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap) // two looks better than one
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
         }
-
     }
 
     private fun buildLanternmap(actorContainer: List<ActorWithBody>) {
@@ -395,6 +409,7 @@ object LightmapRenderer {
     private var _thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
     private var _thisWall = 0
     private val _ambientAccumulator = Cvec(0)
+    private val _reflectanceAccumulator = Cvec(0)
     private val _thisTileOpacity = Cvec(0)
     private val _thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
     private val _fluidAmountToCol = Cvec(0)
@@ -403,16 +418,15 @@ object LightmapRenderer {
     private var _thisWallProp: BlockProp = BlockProp()
     private var _thisFluidProp: BlockProp = BlockProp()
 
-    fun precalculate(rawx: Int, rawy: Int) {
+    private fun precalculate(rawx: Int, rawy: Int) {
         val lx = rawx.convX(); val ly = rawy.convY()
         val (worldX, worldY) = world.coerceXY(rawx, rawy)
 
         //printdbg(this, "precalculate ($rawx, $rawy) -> ($lx, $ly) | ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
 
-        if (lx !in 0..LIGHTMAP_WIDTH || ly !in 0..LIGHTMAP_HEIGHT) {
-            println("[LightmapRendererNew.precalculate] Out of range: ($lx, $ly) for size ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
-            exitProcess(1)
-        }
+//        if (lx !in 0..LIGHTMAP_WIDTH || ly !in 0..LIGHTMAP_HEIGHT) {
+//            throw IllegalArgumentException("[LightmapRendererNew.precalculate] Out of range: ($lx, $ly) for size ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
+//        }
 
 
         _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
@@ -477,52 +491,34 @@ object LightmapRenderer {
         ))
     }
 
-    /*private val inNoopMaskp = Point2i(0,0)
+    private fun precalculate2(lightmap: UnsafeCvecArray, rawx: Int, rawy: Int) {
+        val lx = rawx.convX(); val ly = rawy.convY()
+        val (worldX, worldY) = world.coerceXY(rawx, rawy)
 
-    private fun inNoopMask(x: Int, y: Int): Boolean {
-        if (x in for_x_start..for_x_end) {
-            // if it's in the top flange
-            inNoopMaskp.set(x, for_y_start)
-            if (y < for_y_start - overscan_opaque && noopMask.contains(inNoopMaskp)) return true
-            // if it's in the bottom flange
-            inNoopMaskp.y = for_y_end
-            return (y > for_y_end + overscan_opaque && noopMask.contains(inNoopMaskp))
-        }
-        else if (y in for_y_start..for_y_end) {
-            // if it's in the left flange
-            inNoopMaskp.set(for_x_start, y)
-            if (x < for_x_start - overscan_opaque && noopMask.contains(inNoopMaskp)) return true
-            // if it's in the right flange
-            inNoopMaskp.set(for_x_end, y)
-            return (x > for_x_end + overscan_opaque && noopMask.contains(inNoopMaskp))
-        }
-        // top-left corner
-        else if (x < for_x_start && y < for_y_start) {
-            inNoopMaskp.set(for_x_start, for_y_start)
-            return (x < for_x_start - overscan_opaque && y < for_y_start - overscan_opaque && noopMask.contains(inNoopMaskp))
-        }
-        // top-right corner
-        else if (x > for_x_end && y < for_y_start) {
-            inNoopMaskp.set(for_x_end, for_y_start)
-            return (x > for_x_end + overscan_opaque && y < for_y_start - overscan_opaque && noopMask.contains(inNoopMaskp))
-        }
-        // bottom-left corner
-        else if (x < for_x_start && y > for_y_end) {
-            inNoopMaskp.set(for_x_start, for_y_end)
-            return (x < for_x_start - overscan_opaque && y > for_y_end + overscan_opaque && noopMask.contains(inNoopMaskp))
-        }
-        // bottom-right corner
-        else if (x > for_x_end && y > for_y_end) {
-            inNoopMaskp.set(for_x_end, for_y_end)
-            return (x > for_x_end + overscan_opaque && y > for_y_end + overscan_opaque && noopMask.contains(inNoopMaskp))
-        }
-        else
-            return false
+        //printdbg(this, "precalculate2 ($rawx, $rawy) -> ($lx, $ly) | ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
 
-        // if your IDE error out that you need return statement, AND it's "fixed" by removing 'else' before 'return false',
-        // you're doing it wrong, the IF and return statements must be inclusive.
-    }*/
+//        if (lx !in 0..LIGHTMAP_WIDTH || ly !in 0..LIGHTMAP_HEIGHT) {
+//            throw IllegalArgumentException("[LightmapRendererNew.precalculate2] Out of range: ($lx, $ly) for size ($LIGHTMAP_WIDTH, $LIGHTMAP_HEIGHT)")
+//        }
 
+        // blend nearby 4 lights to get intensity
+        _ambientAccumulator.set(0)
+                .maxAndAssign(lightmap.getVec(lx - 1, ly))
+                .maxAndAssign(lightmap.getVec(lx + 1, ly))
+                .maxAndAssign(lightmap.getVec(lx, ly - 1))
+                .maxAndAssign(lightmap.getVec(lx, ly + 1))
+
+        _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
+        _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain.toLong()]]
+
+        _reflectanceAccumulator.set(App.tileMaker.terrainTileColourMap[_thisTerrainProp.id]!!)
+        _reflectanceAccumulator.a = 0f // temporarily disabled
+        _reflectanceAccumulator.mul(_thisTerrainProp.reflectance).mul(giScale)
+
+        _mapLightLevelThis.max(lx, ly, _reflectanceAccumulator)
+    }
+
+    private val giScale = 0.35f
     private var swipeX = -1
     private var swipeY = -1
     private var swipeDiag = false

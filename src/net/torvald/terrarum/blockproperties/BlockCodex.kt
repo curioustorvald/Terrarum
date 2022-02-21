@@ -208,6 +208,8 @@ class BlockCodex {
 
         prop.dynamicLuminosityFunction = record.intVal("dlfn")
 
+        prop.reflectance = record.floatVal("refl")
+
         blockProps[prop.id] = prop
 
         printdbg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}\tsolid:${prop.isSolid}")
