@@ -13,7 +13,6 @@ import net.torvald.EMDASH
 import net.torvald.getKeycapConsole
 import net.torvald.getKeycapPC
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
@@ -25,6 +24,8 @@ import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.ReadPlayer
+import net.torvald.terrarum.serialise.SaveLoadError
+import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y
 import net.torvald.terrarum.ui.Movement
@@ -554,16 +555,21 @@ class UIItemPlayerCells(
         // try to generate a texture
         if (skimmer.initialised && !hasTexture) {
             skimmer.getFile(-1L)?.bytes?.let {
-                val animFile = skimmer.getFile(-2L)!!
-                val p = ReadPlayer(skimmer, ByteArray64Reader(it, Common.CHARSET))
-                p.sprite = SpriteAnimation(p)
-                p.animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
-                p.reassembleSpriteFromDisk(skimmer, p.sprite, null, null)
-                p.sprite!!.textureRegion.get(0,0).let {
-                    thumb = it
-                    thumb!!.flip(false, false)
+                try {
+                    val animFile = skimmer.getFile(-2L)!!
+                    val p = ReadPlayer(skimmer, ByteArray64Reader(it, Common.CHARSET))
+                    p.sprite = SpriteAnimation(p)
+                    p.animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
+                    p.reassembleSpriteFromDisk(skimmer, p.sprite, null, null)
+                    p.sprite!!.textureRegion.get(0,0).let {
+                        thumb = it
+                        thumb!!.flip(false, false)
+                    }
+                    this.sprite = p.sprite
                 }
-                this.sprite = p.sprite
+                catch (e: Throwable) {
+                    throw SaveLoadError(skimmer.diskFile, e)
+                }
             }
 
             hasTexture = true

@@ -15,6 +15,7 @@ import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
 import org.apache.commons.codec.digest.DigestUtils
+import java.io.File
 import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
@@ -327,3 +328,5 @@ object Common {
     }
 
 }
+
+class SaveLoadError(file: File, cause: Throwable) : RuntimeException("An error occured while loading save file '${file.absolutePath}'", cause)
