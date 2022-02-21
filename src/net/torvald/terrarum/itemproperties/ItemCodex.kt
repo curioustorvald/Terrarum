@@ -14,8 +14,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * ItemCodex holds information of every item in the game, including blocks despite the 'item' naming
@@ -129,16 +127,16 @@ class ItemCodex {
         else if (itemID.startsWith("wall@")) {
             val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
             return BlocksDrawer.tileItemWall.get(
-                    itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
-                    itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
+                    itemSheetNumber % App.tileMaker.TILES_IN_X,
+                    itemSheetNumber / App.tileMaker.TILES_IN_X
             )
         }
         // terrain
         else {
             val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
             return BlocksDrawer.tileItemTerrain.get(
-                    itemSheetNumber % App.tileMaker.ITEM_ATLAS_TILES_X,
-                    itemSheetNumber / App.tileMaker.ITEM_ATLAS_TILES_X
+                    itemSheetNumber % App.tileMaker.TILES_IN_X,
+                    itemSheetNumber / App.tileMaker.TILES_IN_X
             )
         }
 

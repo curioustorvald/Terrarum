@@ -33,8 +33,6 @@ class CreateTileAtlas {
 
     val SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
 
-    val ITEM_ATLAS_TILES_X = 16
-
     private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
     val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
@@ -65,8 +63,8 @@ class CreateTileAtlas {
     private val atlasInit = "./assets/graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
-    internal val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-    internal val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+    internal val itemTerrainPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+    internal val itemWallPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
 
     /**
@@ -160,8 +158,8 @@ class CreateTileAtlas {
             val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
             val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
             val t = tileIDtoItemSheetNumber(id)
-            val destX = (t % ITEM_ATLAS_TILES_X) * TILE_SIZE
-            val destY = (t / ITEM_ATLAS_TILES_X) * TILE_SIZE
+            val destX = (t % TILES_IN_X) * TILE_SIZE
+            val destY = (t / TILES_IN_X) * TILE_SIZE
             itemTerrainPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
             itemWallPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
         }
@@ -179,8 +177,8 @@ class CreateTileAtlas {
         val pxCount = TILE_SIZE * TILE_SIZE
         for (id in itemSheetNumbers) {
             val tilenum = id.value
-            val tx = (tilenum % ITEM_ATLAS_TILES_X) * TILE_SIZE
-            val ty = (tilenum / ITEM_ATLAS_TILES_X) * TILE_SIZE
+            val tx = (tilenum % TILES_IN_X) * TILE_SIZE
+            val ty = (tilenum / TILES_IN_X) * TILE_SIZE
             var r = 0f; var g = 0f; var b = 0f; var a = 0f
             // average out the whole block
             for (y in ty until ty + TILE_SIZE) {
