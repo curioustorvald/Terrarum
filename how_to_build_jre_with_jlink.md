@@ -19,17 +19,24 @@ Create an output directory; its contents shall be:
 
 ```
 +assets
-+runtime-linux-aarch64
-+runtime-linux-amd64
-+runtime-osx-amd64
-+runtime-osx-aarch64
-+runtime-windows-amd64
-start_game_linux.sh
-start_game_mac.sh
++runtimes
+`+runtime-linux-aarch64
+`+runtime-linux-amd64
+`+runtime-osx-amd64
+`+runtime-osx-aarch64
+`+runtime-windows-amd64
+`TerrarumBuild.jar
+start_game_linux_aarch64.sh
+start_game_linux_x86_64.sh
+start_game_mac_aarch64.sh
+start_game_mac_x86_64.sh
 start_game_windows.bat
-TerrarumBuild.jar
 ```
 
 whereas `runtime-*` are runtime directories generated from the commands above, `TerrarumBuild.jar` is the artifact built using the TerrarumBuild.
 
 `start_game_*` files are on the root directory of the project; you only need to simply copy them over.
+
+Hide the `.jar` within the subdirectory; users will think this file is the main executable and will try to execute it using whatever JVM they may (or may not) have.
+
+And yes, I'm totally aware that `.sh` file says `x86_64` but the runtimes says `amd64`.
