@@ -1,0 +1,17 @@
+{
+  "CONTEXT_WORLD_NEW": "नयी दुनिया",
+  "MENU_LABEL_DELETE_WORLD": "दुनिया हटाओ",
+  "CONTEXT_WORLD_COUNT": "Worlds: ",
+  "GAME_INVENTORY_INGREDIENTS": "Ingredients",
+  "GAME_INVENTORY_POTIONS": "Potions",
+  "GAME_INVENTORY_BLOCKS": "Blocks",
+  "GAME_INVENTORY_WALLS": "Walls",
+  "CONTEXT_ITEM_TOOL_PLURAL": "Tools",
+  "GAME_INVENTORY_FAVORITES": "Favorites",
+  "GAME_INVENTORY_REGISTER": "Register",
+  "CONTEXT_ITEM_MAP": "नक्शा",
+  "MENU_LABEL_MENU": "मेन्यू",
+  "CONTEXT_GENERATOR_SEED": "बीज",
+  "GAME_ACTION_GRAPPLE": "ग्रेपल",
+  "GAME_ACTION_QUICKSEL": "तुरंत चयन"
+}

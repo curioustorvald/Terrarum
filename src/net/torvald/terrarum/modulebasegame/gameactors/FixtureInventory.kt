@@ -212,6 +212,10 @@ open class FixtureInventory() {
         }
         return -(low + 1)  // key not found
     }
+
+    open fun nuke() {
+        itemList.clear()
+    }
 }
 
 class InventoryPair : Comparable<InventoryPair> {

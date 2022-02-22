@@ -119,5 +119,11 @@ class ActorInventory() : FixtureInventory() {
             //println("[ActorInventory] consumed; ${item.durability}")
         }
     }
+
+    override fun nuke() {
+        super.nuke()
+        itemEquipped.fill(null)
+        quickSlot.fill(null)
+    }
 }
 
