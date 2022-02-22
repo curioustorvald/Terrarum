@@ -142,11 +142,13 @@ class SortedArrayList<T: Comparable<T>>(initialSize: Int = 10) : MutableCollecti
         val second = Math.min(low, this.size - 1)
         return Pair(first, second)
     }
-    /** Searches the element using given predicate instead of the element itself. Returns the element desired, null when there is no such element.
+    /** Searches the element using given predicate instead of the element itself
      * (e.g. search the Actor by its ID rather than the actor instance)
      *
      * @param searchQuery what exactly are we looking for?
      * @param searchHow and where or how can it be found?
+     *
+     * @return The element you're searching; null when there is no such element.
      */
     fun <R: Comparable<R>> searchFor(searchQuery: R, searchHow: (T) -> R = { it as R }): T? = getOrNull(searchForIndex(searchQuery, searchHow))
 

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
@@ -97,23 +96,13 @@ class UIItemInventoryElemWide(
             )
 
             // draw name of the item
-            if (INVEN_DEBUG_MODE) {
-                App.fontGame.draw(batch,
-                        // print static id, dynamic id, and count
-                        "${item!!.originalID}/${item!!.dynamicID}" + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1L) "$fwsp!!$amountString!!" else ""),
-                        posX + textOffsetX,
-                        posY + textOffsetY
-                )
-            }
-            else {
-                App.fontGame.draw(batch,
-                        // print name and amount in parens
-                        item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1L) "$fwsp!!$amountString!!" else ""),
+            App.fontGame.draw(batch,
+                    // print name and amount in parens
+                    item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amountString)" else if (amount != 1L) "$fwsp!!$amountString!!" else ""),
 
-                        posX + textOffsetX,
-                        posY + textOffsetY
-                )
-            }
+                    posX + textOffsetX,
+                    posY + textOffsetY
+            )
 
 
             // durability metre

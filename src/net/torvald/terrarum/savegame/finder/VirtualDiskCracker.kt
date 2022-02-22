@@ -1,6 +1,7 @@
 package net.torvald.terrarum.savegame.finder
 
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.serialise.Common
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.KeyEvent
@@ -676,5 +677,5 @@ ${String(file.contents.bytes.sliceArray64(0L..minOf(PREVIEW_MAX_BYTES, file.cont
 }
 
 fun main(args: Array<String>) {
-    VirtualDiskCracker(Charset.forName("CP437"))
+    VirtualDiskCracker(Common.CHARSET)
 }

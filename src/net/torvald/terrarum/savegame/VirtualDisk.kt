@@ -2,6 +2,7 @@ package net.torvald.terrarum.savegame
 
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.serialise.Common
+import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
@@ -125,8 +126,12 @@ val specversion = 254.toByte()
 class VirtualDisk(
         /** capacity of 0 makes the disk read-only */
         var capacity: Long,
-        var diskName: ByteArray = ByteArray(NAME_LENGTH)
+        var diskName: ByteArray = ByteArray(NAME_LENGTH),
+        var origin: File? = null
 ): SimpleFileSystem {
+
+    override fun getBackingFile() = origin
+
     var extraInfoBytes = ByteArray(16)
     val entries = HashMap<EntryID, DiskEntry>()
     var isReadOnly: Boolean

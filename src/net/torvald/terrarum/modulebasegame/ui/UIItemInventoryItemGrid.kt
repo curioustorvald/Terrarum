@@ -13,7 +13,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -162,6 +161,9 @@ class UIItemInventoryItemGrid(
                 listRebuildFun()
             }
         }
+
+        // COMMON variables because more than one instance of this can be up on the screen
+        private val tooltipShowing = HashMap<UIItemInventoryItemGrid, Boolean>()
     }
 
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -347,8 +349,8 @@ class UIItemInventoryItemGrid(
     override fun update(delta: Float) {
         super.update(delta)
 
-        var tooltipSet = false
 
+        tooltipShowing[this] = false
 
 
         items.forEach {
@@ -356,20 +358,21 @@ class UIItemInventoryItemGrid(
 
 
             // set tooltip accordingly
-            if (isCompactMode && it.item != null && it.mouseUp && !tooltipSet) {
+            if ((App.IS_DEVELOPMENT_BUILD || isCompactMode) && it.item != null && it.mouseUp && tooltipShowing[this] != true) {
                 INGAME.setTooltipMessage(
-                        if (INVEN_DEBUG_MODE) {
-                            it.item?.name + " (${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
+                        if (App.IS_DEVELOPMENT_BUILD) {
+                            it.item?.name + "\n(${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
                         }
                         else {
                             it.item?.name
                         }
                 )
-                tooltipSet = true
+
+                tooltipShowing[this] = true
             }
         }
 
-        if (!tooltipSet) {
+        if (tooltipShowing.values.all { !it }) {
             INGAME.setTooltipMessage(null)
         }
 
@@ -461,7 +464,11 @@ class UIItemInventoryItemGrid(
     }
 
     override fun dispose() {
+        tooltipShowing.remove(this)
+    }
 
+    override fun hide() {
+        tooltipShowing.remove(this)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

@@ -329,4 +329,4 @@ object Common {
 
 }
 
-class SaveLoadError(file: File, cause: Throwable) : RuntimeException("An error occured while loading save file '${file.absolutePath}'", cause)
+class SaveLoadError(file: File?, cause: Throwable) : RuntimeException("An error occured while loading save file '${file?.absolutePath}'", cause)

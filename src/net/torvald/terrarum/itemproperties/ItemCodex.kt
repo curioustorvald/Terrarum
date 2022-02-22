@@ -13,7 +13,13 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.serialise.SaveLoadError
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import java.io.File
+import java.io.InvalidObjectException
+
+typealias ItemRemapTable = java.util.HashMap<ItemID, ItemID>
+typealias ItemTable = java.util.HashMap<ItemID, GameItem>
 
 /**
  * ItemCodex holds information of every item in the game, including blocks despite the 'item' naming
@@ -26,9 +32,9 @@ class ItemCodex {
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
-    @Transient val itemCodex = HashMap<ItemID, GameItem>()
-    @Transient var dynamicItemDescription = HashMap<ItemID, GameItem>(); private set
-    var dynamicToStaticTable = HashMap<ItemID, ItemID>(); private set
+    @Transient val itemCodex = ItemTable()
+    val dynamicItemInventory = ItemTable()
+    val dynamicToStaticTable = ItemRemapTable()
 
     @Transient val ACTORID_MIN = ReferencingRanges.ACTORS.first
 
@@ -41,18 +47,33 @@ class ItemCodex {
 
     fun clear() {
         itemCodex.clear()
-        dynamicItemDescription.clear()
+        dynamicItemInventory.clear()
         dynamicToStaticTable.clear()
     }
 
     /**
      * This method does not alter already-been-loaded itemCodex; only filles up dynamicitem-related fields
+     *
+     * Normally, the player's dynamicToStaticTable is what gets loaded first.
      */
-    fun loadFromSave(other: ItemCodex) {
-        this.dynamicToStaticTable = other.dynamicToStaticTable
-        dynamicToStaticTable.forEach { dynid, itemid ->
+    fun loadFromSave(savefile: File?, otherDynamicToStaticTable: ItemRemapTable, otherDynamicItemInventory: ItemTable) {
+        otherDynamicToStaticTable.forEach { dynid, itemid ->
             printdbg(this, "Loadfromsave dynid $dynid ->> $itemid")
-            dynamicItemDescription[dynid] = itemCodex[itemid]!!
+            dynamicToStaticTable[dynid]?.let {
+                if (it != itemid) {
+                    throw SaveLoadError(savefile, InvalidObjectException("Discrepancy detected -- currently loaded $dynid is mapped to $it, but ${savefile?.name} indicates it should map to $itemid"))
+                }
+            }
+            dynamicToStaticTable[dynid] = itemid
+        }
+        otherDynamicItemInventory.forEach { dynid, item ->
+            printdbg(this, "Loadfromsave dynitem $dynid ->> $item")
+            dynamicItemInventory[dynid]?.let {
+                if (it != item) {
+                    throw SaveLoadError(savefile, InvalidObjectException("Discrepancy detected -- currently loaded $dynid is mapped to $it, but ${savefile?.name} indicates it should map to $item"))
+                }
+            }
+            dynamicItemInventory[dynid] = item
         }
     }
 
@@ -64,7 +85,7 @@ class ItemCodex {
      */
     fun registerNewDynamicItem(dynamicID: ItemID, item: GameItem) {
         printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
-        dynamicItemDescription[dynamicID] = item
+        dynamicItemInventory[dynamicID] = item
         dynamicToStaticTable[dynamicID] = item.originalID
     }
 
@@ -76,7 +97,7 @@ class ItemCodex {
         if (code == null) return null
 
         if (code.startsWith("$PREFIX_DYNAMICITEM:"))
-            return dynamicItemDescription[code] ?: throw NullPointerException("No ItemProp with id $code")
+            return dynamicItemInventory[code] ?: throw NullPointerException("No ItemProp with id $code")
         else if (code.startsWith("$PREFIX_ACTORITEM:")) {
             val a = (Terrarum.ingame!! as TerrarumIngame).getActorByID(code.substring(6).toInt()) // actor item
             if (a is CanBeAnItem) return a.itemData
@@ -142,5 +163,5 @@ class ItemCodex {
 
     }
 
-    fun hasItem(itemID: ItemID): Boolean = dynamicItemDescription.containsKey(itemID)
+    fun hasItem(itemID: ItemID): Boolean = dynamicItemInventory.containsKey(itemID)
 }

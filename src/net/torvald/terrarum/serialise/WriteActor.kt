@@ -4,9 +4,12 @@ import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.*
@@ -73,6 +76,17 @@ object WritePlayer {
         }
 
         player.worldCurrentlyPlaying = ingame?.world?.worldIndex ?: UUID(0L,0L)
+
+        // Write subset of Ingame.ItemCodex
+        // The existing ItemCodex must be rewritten to clear out obsolete records
+        player.dynamicToStaticTable.clear()
+        player.dynamicItemInventory.clear()
+        player.inventory.forEach { (itemid, _) ->
+            if (itemid.startsWith("$PREFIX_DYNAMICITEM:")) {
+                player.dynamicToStaticTable[itemid] = ItemCodex.dynamicToStaticID(itemid)
+                player.dynamicItemInventory[itemid] = ItemCodex[itemid]!!
+            }
+        }
 
 
         val actorJson = WriteActor.encodeToByteArray64(player)
@@ -141,6 +155,8 @@ object ReadActor {
                 actor.spriteGlow = SpriteAnimation(actor)
                 actor.animDescGlow = ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
             }
+
+            ItemCodex.loadFromSave(disk.getBackingFile(), actor.dynamicToStaticTable, actor.dynamicItemInventory)
 
             val heldItem = ItemCodex[actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]]
 

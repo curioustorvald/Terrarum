@@ -63,7 +63,7 @@ object VDUtil {
         if (diskSpecVersion != specversion)
             throw RuntimeException("Unsupported disk format version: current internal version is $specversion; the file's version is $diskSpecVersion")
 
-        val vdisk = VirtualDisk(diskSize, diskName)
+        val vdisk = VirtualDisk(diskSize, diskName, infile)
 
         vdisk.__internalSetFooter__(footers)
 

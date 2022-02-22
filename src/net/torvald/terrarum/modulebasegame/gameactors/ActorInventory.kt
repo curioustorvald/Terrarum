@@ -28,6 +28,8 @@ class ActorInventory() : FixtureInventory() {
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
      *
+     * It's your responsibility to make sure currently equipped item also exists in the `super.itemList`
+     *
      * The ItemID must be `dynamicID`
      */
     val itemEquipped = Array<ItemID?>(GameItem.EquipPosition.INDEX_MAX) { null }
@@ -62,7 +64,7 @@ class ActorInventory() : FixtureInventory() {
         }
     }
 
-    fun getQuickslotItem(slot: Int): InventoryPair? = invSearchByDynamicID(quickSlot[slot])
+    fun getQuickslotItem(slot: Int): InventoryPair? = searchByID(quickSlot[slot])
 
     fun consumeItem(item: GameItem) {
         val actor = this.actor as Actor

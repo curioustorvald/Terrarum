@@ -10,9 +10,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HO
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_X
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVEN_DEBUG_MODE
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.controlHelpHeight
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericKeyDownFun
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
@@ -136,7 +134,7 @@ internal class UIInventoryCells(
         )
         // debug text
         batch.color = Color.LIGHT_GRAY
-        if (INVEN_DEBUG_MODE) {
+        if (App.IS_DEVELOPMENT_BUILD) {
             App.fontSmallNumbers.draw(batch,
                     "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
                     encumbBarTextXPos,

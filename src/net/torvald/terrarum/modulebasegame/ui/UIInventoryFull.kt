@@ -38,8 +38,6 @@ class UIInventoryFull(
 
         val CELL_COL = Toolkit.Theme.COL_CELL_FILL
 
-        const val INVEN_DEBUG_MODE = false
-
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
         const val CELLS_HOR = 10
         val CELLS_VRT: Int; get() = (App.scr.height - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number

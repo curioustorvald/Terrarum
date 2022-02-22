@@ -23,6 +23,8 @@ class DiskSkimmer(
         noInit: Boolean = false
 ): SimpleFileSystem {
 
+    override fun getBackingFile() = diskFile
+
     /*
 
 init:

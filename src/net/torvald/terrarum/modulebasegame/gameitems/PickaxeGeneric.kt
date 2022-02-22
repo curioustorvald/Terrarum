@@ -111,6 +111,7 @@ object PickaxeCore {
  * Created by minjaesong on 2017-07-17.
  */
 class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
 
     override val originalName = "PACKAGED_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
@@ -138,6 +139,7 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
  * Created by minjaesong on 2019-03-10.
  */
 class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
 
     override val originalName = "PACKAGED_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
@@ -165,6 +167,7 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
  * Created by minjaesong on 2019-03-10.
  */
 class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
 
     override val originalName = "PACKAGED_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE

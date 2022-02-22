@@ -4,10 +4,9 @@ import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.util.SortedArrayList
 import java.math.BigInteger
-import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Created by minjaesong on 2021-03-16.
@@ -32,7 +31,7 @@ open class FixtureInventory() {
     /**
      * Sorted by referenceID.
      */
-    val itemList = ArrayList<InventoryPair>()
+    val itemList = SortedArrayList<InventoryPair>()
     var wallet = BigInteger("0") // unified currency for whole civs; Dwarf Fortress approach seems too complicated
 
     fun isEmpty() = getTotalCount() == 0L
@@ -66,7 +65,7 @@ open class FixtureInventory() {
 
         // If we already have the item, increment the amount
         // If not, add item with specified amount
-        val existingItem = invSearchByDynamicID(item.dynamicID)
+        val existingItem = searchByID(item.dynamicID)
 
         // if the item already exists
         if (existingItem != null) {
@@ -80,7 +79,7 @@ open class FixtureInventory() {
         else {
             itemList.add(InventoryPair(item.dynamicID, count))
         }
-        insertionSortLastElem(itemList)
+//        insertionSortLastElem(itemList)
     }
 
     open fun remove(itemID: ItemID, count: Long) = remove(ItemCodex[itemID]!!, count) {}
@@ -102,7 +101,7 @@ open class FixtureInventory() {
 
 
 
-        val existingItem = invSearchByDynamicID(item.dynamicID)
+        val existingItem = searchByID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
             val newCount = existingItem.qty - count
 
@@ -171,28 +170,14 @@ open class FixtureInventory() {
             if (itemList.size == 0)
                 false
             else
-                itemList.binarySearch(id, DYNAMIC_ID) >= 0
-    fun invSearchByDynamicID(id: ItemID?): InventoryPair? {
+                itemList.contains(InventoryPair(id, 1))
+    fun searchByID(id: ItemID?): InventoryPair? {
         if (itemList.size == 0 || id == null)
             return null
 
-        val index = itemList.binarySearch(id, DYNAMIC_ID)
-        if (index < 0)
-            return null
-        else
-            return itemList[index]
+        return itemList.searchFor(id) { it.itm }
     }
-    protected fun invSearchByStaticID(id: ItemID?): InventoryPair? {
-        if (itemList.size == 0 || id == null)
-            return null
-
-        val index = itemList.binarySearch(id, STATIC_ID)
-        if (index < 0)
-            return null
-        else
-            return itemList[index]
-    }
-    protected fun insertionSortLastElem(arr: ArrayList<InventoryPair>) {
+    /*protected fun insertionSortLastElem(arr: ArrayList<InventoryPair>) {
         ReentrantLock().lock {
             var j = arr.lastIndex - 1
             val x = arr.last()
@@ -202,7 +187,7 @@ open class FixtureInventory() {
             }
             arr[j + 1] = x
         }
-    }
+    }*/
     @Transient private val STATIC_ID = 41324534
     @Transient private val DYNAMIC_ID = 181643953
     protected fun ArrayList<InventoryPair>.binarySearch(ID: ItemID, searchMode: Int): Int {
@@ -229,7 +214,7 @@ open class FixtureInventory() {
     }
 }
 
-class InventoryPair {
+class InventoryPair : Comparable<InventoryPair> {
 
     var itm: ItemID = ""; private set
     var qty: Long = 0
@@ -244,4 +229,5 @@ class InventoryPair {
     operator fun component1() = itm
     operator fun component2() = qty
 
+    override fun compareTo(other: InventoryPair) = this.itm.compareTo(other.itm)
 }

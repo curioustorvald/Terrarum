@@ -66,6 +66,7 @@ object Terrarum : Disposable {
 
 
     var blockCodex = BlockCodex(); internal set
+    /** The actual contents of the ItemCodex is sum of Player's Codex and the World's Codex */
     var itemCodex = ItemCodex(); internal set
     var wireCodex = WireCodex(); internal set
     var materialCodex = MaterialCodex(); internal set

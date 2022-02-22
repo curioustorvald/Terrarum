@@ -133,9 +133,10 @@ class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         try {
-            val reader = java.io.FileReader(ModMgr.getFile("basegame", "demoworld"))
+            val file = ModMgr.getFile("basegame", "demoworld")
+            val reader = java.io.FileReader(file)
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
-            val world = ReadWorld.readLayerFormat(reader)
+            val world = ReadWorld.readLayerFormat(reader, file)
             demoWorld = world
             printdbg(this, "Demo world loaded")
         }

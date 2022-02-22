@@ -10,6 +10,8 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.ItemRemapTable
+import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*
@@ -127,6 +129,9 @@ open class GameWorld() : Disposable {
 
     internal var genver = -1 // only gets used when the game saves and loads
     internal var comp = -1 // only gets used when the game saves and loads
+
+    internal val dynamicItemInventory = ItemTable()
+    internal val dynamicToStaticTable = ItemRemapTable()
 
     @Deprecated("This value is only used for savegames; DO NOT USE THIS", ReplaceWith("INGAME.actorContainerActive", "net.torvald.terrarum.INGAME"))
     internal val actors = ArrayList<ActorID>() // only filled up on save and load; DO NOT USE THIS

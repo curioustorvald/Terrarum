@@ -11,6 +11,9 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.ItemRemapTable
+import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.SimpleFileSystem
 import net.torvald.terrarum.utils.PlayerLastStatus
@@ -32,6 +35,9 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
     val uuid = UUID.randomUUID()
     var worldCurrentlyPlaying: UUID = UUID(0L,0L) // only filled up on save and load; DO NOT USE THIS
+
+    internal val dynamicItemInventory = ItemTable()
+    internal val dynamicToStaticTable = ItemRemapTable()
 
     @Transient override var spriteHeadTexture: TextureRegion? = null
 

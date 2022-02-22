@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.BlockMarkerActor
@@ -15,6 +16,7 @@ import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64Writer
 import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarum.weather.WeatherMixer
+import java.io.File
 import java.io.Reader
 
 /**
@@ -90,22 +92,24 @@ object WriteWorld {
  */
 object ReadWorld {
 
-    fun readLayerFormat(worldDataStream: Reader): GameWorld =
-            fillInDetails(Common.jsoner.fromJson(GameWorldTitleScreen::class.java, worldDataStream))
+    fun readLayerFormat(worldDataStream: Reader, origin: File?): GameWorld =
+            fillInDetails(Common.jsoner.fromJson(GameWorldTitleScreen::class.java, worldDataStream), origin)
 
-    operator fun invoke(worldDataStream: Reader): GameWorld =
-            fillInDetails(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream))
+    operator fun invoke(worldDataStream: Reader, origin: File?): GameWorld =
+            fillInDetails(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream), origin)
 
-    private fun fillInDetails(world: GameWorld): GameWorld {
+    private fun fillInDetails(world: GameWorld, origin: File?): GameWorld {
         world.tileNumberToNameMap.forEach { l, s ->
             world.tileNameToNumberMap[s] = l.toInt()
         }
 
+        ItemCodex.loadFromSave(origin, world.dynamicToStaticTable, world.dynamicItemInventory)
+
         return world
     }
 
-    fun readWorldAndSetNewWorld(ingame: TerrarumIngame, worldDataStream: Reader): GameWorld {
-        val world = readLayerFormat(worldDataStream)
+    fun readWorldAndSetNewWorld(ingame: TerrarumIngame, worldDataStream: Reader, origin: File?): GameWorld {
+        val world = readLayerFormat(worldDataStream, origin)
         ingame.world = world
         return world
     }

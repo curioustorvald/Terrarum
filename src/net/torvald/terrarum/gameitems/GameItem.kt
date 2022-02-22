@@ -24,6 +24,8 @@ typealias ItemID = String
  */
 abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneable {
 
+    constructor() : this("-uninitialised-")
+
     open var dynamicID: ItemID = originalID
     /**
      * if the ID is a Actor range, it's an actor contained in a pocket.

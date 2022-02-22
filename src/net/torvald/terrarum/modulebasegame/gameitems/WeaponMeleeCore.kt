@@ -26,5 +26,8 @@ object WeaponMeleeCore {
 }
 
 abstract class WeaponMeleeBase(originalID: ItemID) : GameItem(originalID) {
+
+    internal constructor() : this("-uninitialised-")
+
     abstract val velocityMod: Double
 }
