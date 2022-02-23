@@ -4,6 +4,8 @@ bin/*
 build/*
 .gradle/*
 TerrarumBuild.jar
+buildapp/out/Terrarum*
+assets/mods/dwarventech/ModuleComputers.jar
 
 # Java native errors
 hs_err_pid*

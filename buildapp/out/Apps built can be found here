@@ -1,0 +1,9 @@
+You should be able to find following files here:
+
+TerrarumMac.x86.app (a directory)
+TerrarumMac.arm.app (a directory)
+TerrarumLinux.x86.AppImage (an ELF executable)
+TerrarumLinux.arm.AppImage (an ELF executable)
+TerrarumWindows.x86.exe (a Windows executable)
+
+NOTE: Mac apps won't run unless you disable the Gatekeeper by running `sudo spctl --master-disable` on Terminal (to be honest, doing so also opens a gaping hole called "security hazard"); signing a code requires both Apple Developer Connection (costs 99 USD/year) and a working Mac (cost a fortune) of which I'm not willing to shell out. So, if you're one of those unlucky Mac user try this game on your own risk, or get a Windows machine.
