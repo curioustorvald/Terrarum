@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>Terrarum.sh</string>
-</dict>
-</plist>
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>Terrarum.sh</string>
+<key>CFBundleDisplayName</key><string>Terrarum</string>
+<key>CFBundleName</key><string>Terrarum</string>
+</dict></plist>
