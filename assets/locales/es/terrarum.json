@@ -16,5 +16,7 @@
   "MENU_OPTIONS_DITHER": "Interpolación de colores",
   "MENU_OPTIONS_BLUR": "Desenfocar",
   "MENU_OPTIONS_PARTICLES": "Partícula",
-  "MENU_IO_IMPORT": "Importar"
+  "MENU_IO_IMPORT": "Importar",
+  "APP_NOMODULE_1": "Actualmente no hay ningún módulo cargado.",
+  "APP_NOMODULE_2": "Vuelva a configurar su orden de carga en:"
 }

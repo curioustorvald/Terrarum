@@ -29,7 +29,7 @@ class UIBasicInfo() : UICanvas() {
     private var ELon = false
 
     private var watchFont = WatchFont
-    private var atlas = TextureRegionPack(ModMgr.getPath("basegame", "gui/basic_info1.tga"), width, height)
+    private var atlas = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/basic_info1.tga"), width, height)
 
     private var font = Watch7SegSmall
 

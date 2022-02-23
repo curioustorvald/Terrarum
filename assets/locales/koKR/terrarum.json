@@ -19,5 +19,7 @@
   "MENU_OPTIONS_DITHER": "디더링",
   "MENU_OPTIONS_BLUR": "흐림",
   "MENU_OPTIONS_PARTICLES": "입자 수",
-  "MENU_IO_IMPORT": "가져오기"
+  "MENU_IO_IMPORT": "가져오기",
+  "APP_NOMODULE_1": "현재 불러와진 모듈이 없습니다.",
+  "APP_NOMODULE_2": "다음의 파일에서 불러오기 순서를 재설정하십시오."
 }

@@ -17,5 +17,7 @@
   "MENU_OPTIONS_DITHER": "Tramage",
   "MENU_OPTIONS_BLUR": "Flou",
   "MENU_OPTIONS_PARTICLES": "Particules",
-  "MENU_IO_IMPORT": "Importer"
+  "MENU_IO_IMPORT": "Importer",
+  "APP_NOMODULE_1": "Aucun module n’est actuellement chargé.",
+  "APP_NOMODULE_2": "Veuillez reconfigurer votre ordre de chargement sur :"
 }

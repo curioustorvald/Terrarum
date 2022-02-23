@@ -34,7 +34,7 @@ import java.util.function.Consumer
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
  * this instance only stores the stage that is currently being used.
  */
-open class IngameInstance(val batch: SpriteBatch, val isMultiplayer: Boolean = false) : TerrarumGamescreen {
+open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boolean = false) : TerrarumGamescreen {
 
     var WORLD_UPDATE_TIMER = Random().nextInt(1020) + 1; protected set
 

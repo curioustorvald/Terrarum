@@ -61,7 +61,7 @@ import java.util.*
  * Created by minjaesong on 2017-06-16.
  */
 
-open class TerrarumIngame(batch: SpriteBatch) : IngameInstance(batch) {
+open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     var historicalFigureIDBucket: ArrayList<Int> = ArrayList<Int>()
 

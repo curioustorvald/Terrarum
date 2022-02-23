@@ -16,5 +16,7 @@
   "MENU_OPTIONS_DITHER": "Sekoitussävytys",
   "MENU_OPTIONS_BLUR": "Sumea",
   "MENU_OPTIONS_PARTICLES": "Hiukkaset",
-  "MENU_IO_IMPORT": "Tuo"
+  "MENU_IO_IMPORT": "Tuo",
+  "APP_NOMODULE_1": "Moduulia ei ole ladattu tällä hetkellä.",
+  "APP_NOMODULE_2": "Määritä lataustilauksesi uudelleen:"
 }

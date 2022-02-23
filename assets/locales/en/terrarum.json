@@ -20,5 +20,7 @@
   "MENU_OPTIONS_DITHER": "Dithering",
   "MENU_OPTIONS_BLUR": "Blur",
   "MENU_OPTIONS_PARTICLES": "Particles",
-  "MENU_IO_IMPORT": "Import"
+  "MENU_IO_IMPORT": "Import",
+  "APP_NOMODULE_1": "No Module is currently loaded.",
+  "APP_NOMODULE_2": "Please reconfigure your Load Order on:"
 }

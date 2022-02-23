@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
@@ -28,7 +29,12 @@ class UIItemModuleInfoCell(
 
     private val modErrored = (ModMgr.moduleInfo[modName] == null)
 
-    private val modIcon = TextureRegion(Texture(modProp.iconFile))
+    private val modIcon = try {
+        TextureRegion(Texture(modProp.iconFile))
+    }
+    catch (_: GdxRuntimeException) {
+        CommonResourcePool.getAsTextureRegion("itemplaceholder_48")
+    }
     private val modVer = modProp.version
     private val modDate = modProp.releaseDate
     private val modAuthor = modProp.author

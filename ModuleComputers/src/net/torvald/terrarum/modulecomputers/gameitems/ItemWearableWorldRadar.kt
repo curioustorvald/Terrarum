@@ -41,8 +41,8 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
 
 
     private val vm = VM(73728, TheRealWorld(), arrayOf(
-            VMProgramRom(ModMgr.getPath("dwarventech", "bios/pipboot.rom")),
-            VMProgramRom(ModMgr.getPath("dwarventech", "bios/pipcode.bas"))
+            VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/pipboot.rom").path()),
+            VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/pipcode.bas").path())
     ))
     private val vmRunner: VMRunner
     private val coroutineJob: Job
@@ -62,7 +62,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
         vm.getErrorStream = { System.err }
         vm.getInputStream = { System.`in` }
 
-        vmRunner = VMRunnerFactory(ModMgr.getPath("dwarventech", "bios"), vm, "js")
+        vmRunner = VMRunnerFactory(ModMgr.getGdxFile("dwarventech", "bios").path(), vm, "js")
         coroutineJob = GlobalScope.launch {
             vmRunner.executeCommand(vm.roms[0]!!.readAll())
         }

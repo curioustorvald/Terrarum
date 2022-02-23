@@ -107,8 +107,11 @@ class CreateTileAtlas {
 
             // filter files that do not exist on the blockcodex
             dir.list().filter { tgaFile -> !tgaFile.isDirectory && (BlockCodex.getOrNull("$modname:${tgaFile.nameWithoutExtension()}") != null) }
-                    .sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile -> // toInt() to sort by the number, not lexicographically
-                        tgaList.add(modname to tgaFile)
+                    .sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile: FileHandle -> // toInt() to sort by the number, not lexicographically
+                        // tgaFile be like: ./assets/mods/basegame/blocks/32.tga (which is not always .tga)
+                        val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
+                        tgaList.add(modname to newFile)
+//                        printdbg(this, "modname = $modname, file = $newFile")
                     }
         }
 
@@ -225,7 +228,7 @@ class CreateTileAtlas {
     private fun fileToAtlantes(modname: String, matte: FileHandle, glow: FileHandle?) {
         val tilesPixmap = Pixmap(matte)
         val tilesGlowPixmap = if (glow != null) Pixmap(glow) else nullTile
-        val blockName = matte.nameWithoutExtension().toInt() // basically a filename
+        val blockName = matte.nameWithoutExtension().split('-').last().toInt() // basically a filename
         val blockID = "$modname:$blockName"
 
         // determine the type of the block (populate tags list)

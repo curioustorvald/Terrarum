@@ -46,6 +46,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import net.torvald.util.DebugTimers;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -1050,6 +1051,7 @@ public class App implements ApplicationListener {
 
     public static String OSName = System.getProperty("os.name");
     public static String OSVersion = System.getProperty("os.version");
+    private static String tempDir = System.getProperty("java.io.tmpdir");
     public static String operationSystem;
     /** %appdata%/Terrarum, without trailing slash */
     public static String defaultDir;
@@ -1063,6 +1065,9 @@ public class App implements ApplicationListener {
     public static String worldsDir;
     /** defaultDir + "/config.json" */
     public static String configDir;
+    /** defaultDir + "/LoadOrder.txt" */
+    public static String loadOrderDir;
+
     public static RunningEnvironment environment;
 
     private static void getDefaultDirectory() {
@@ -1093,6 +1098,7 @@ public class App implements ApplicationListener {
         playersDir = defaultDir + "/Players";
         worldsDir = defaultDir + "/Worlds";
         configDir = defaultDir + "/config.json";
+        loadOrderDir = defaultDir + "/LoadOrder.txt";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));
@@ -1101,18 +1107,30 @@ public class App implements ApplicationListener {
     }
 
     private static void createDirs() {
-        File[] dirs = {new File(saveDir), new File(saveSharedDir), new File(playersDir), new File(worldsDir)};
+        File[] dirs = {
+                new File(saveDir),
+                new File(saveSharedDir),
+                new File(playersDir),
+                new File(worldsDir)
+        };
 
         for (File it : dirs) {
             if (!it.exists())
                 it.mkdirs();
         }
 
+        try {
+            createLoadOrderFile();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //dirs.forEach { if (!it.exists()) it.mkdirs() }
     }
 
     public static File newTempFile(String filename) {
-        File tempfile = new File("./tmp_" + filename);
+        File tempfile = new File(tempDir, filename);
         tempFilePool.add(tempfile);
         return tempfile;
     }
@@ -1126,6 +1144,16 @@ public class App implements ApplicationListener {
     // CONFIG //
 
     public static KVHashMap gameConfig = new KVHashMap();
+
+    private static void createLoadOrderFile() throws IOException {
+        File loadOrderFile = new File(loadOrderDir);
+
+        if (!loadOrderFile.exists() || loadOrderFile.length() == 0L) {
+            var writer = new FileWriter(loadOrderFile);
+            writer.write(TerrarumAppConfiguration.DEFAULT_LOADORDER_FILE);
+            writer.flush(); writer.close();
+        }
+    }
 
     private static void createConfigJson() throws IOException {
         File configFile = new File(configDir);

@@ -70,7 +70,7 @@ class WireCodex {
             val wireid = id.split(':').last().toInt()
 
             CommonResourcePool.addToLoadingList(id) {
-                val t = TextureRegionPack(ModMgr.getPath(module, "$path$wireid.tga"), TILE_SIZE, TILE_SIZE)
+                val t = TextureRegionPack(ModMgr.getGdxFile(module, "$path$wireid.tga"), TILE_SIZE, TILE_SIZE)
                 /*return*/t
             }
         }

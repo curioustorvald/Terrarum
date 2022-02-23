@@ -1,6 +1,0 @@
-# Load Order
-# Modules are loaded from top to bottom.
-# You can disable basegame, but we don't recommend.
-
-basegame
-#dwarventech

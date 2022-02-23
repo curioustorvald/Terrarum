@@ -15,5 +15,7 @@
   "MENU_OPTIONS_DITHER": "Сглаживание",
   "MENU_OPTIONS_BLUR": "Размытие",
   "MENU_OPTIONS_PARTICLES": "Частица",
-  "MENU_IO_IMPORT": "Импорт"
+  "MENU_IO_IMPORT": "Импорт",
+  "APP_NOMODULE_1": "В настоящее время модуль не загружен.",
+  "APP_NOMODULE_2": "Измените конфигурацию вашего порядка загрузки на:"
 }

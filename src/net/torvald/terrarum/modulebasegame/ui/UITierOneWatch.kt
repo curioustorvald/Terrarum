@@ -23,10 +23,10 @@ class UITierOneWatch() : UICanvas() {
     private val ELuptime = 4f
     private var ELon = false
 
-    private var atlas = TextureRegionPack(ModMgr.getPath("basegame", "gui/watchface_atlas.tga"), width, height)
+    private var atlas = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/watchface_atlas.tga"), width, height)
 
     private var watchFont = WatchFont
-    private var moonDial = TextureRegionPack(ModMgr.getPath("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
+    private var moonDial = TextureRegionPack(ModMgr.getGdxFile("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
     private var moonDialCount = moonDial.horizontalCount
 
     private val drawCol = Color(1f, 1f, 1f, UIQuickslotBar.DISPLAY_OPACITY)

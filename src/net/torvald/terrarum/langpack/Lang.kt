@@ -44,16 +44,14 @@ object Lang {
 
     init {
         // load base langs
-        load("./assets/locales/")
+        load(File("./assets/locales/"))
     }
 
 
     @JvmStatic operator fun invoke() { /* dummy method for manual initialisation */ }
 
-    fun load(localesDir: String) {
+    fun load(localesDir: File) {
         printdbg(this, "Loading languages from $localesDir")
-
-        val localesDir = File(localesDir)
 
         // get all of the languages installed
         localesDir.listFiles().filter { it.isDirectory }.forEach { languageList.add(it.name) }

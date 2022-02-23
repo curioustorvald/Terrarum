@@ -37,45 +37,46 @@ object CommandDict {
         printdbg(this, ModMgr.loadOrder.reversed().map { ModMgr.moduleInfo[it]?.packageName })
 
         ((listOf("$" to "net.torvald.terrarum")) + ModMgr.loadOrder.reversed().map { it to ModMgr.moduleInfo[it]?.packageName }).forEach { (modName, packageRoot) ->
-            val commandsList = if (modName == "$") engineCommandList else ModMgr.getFile(modName, "commands.csv").readLines()
-            val packageConsole = "$packageRoot.console"
+            if (modName != "$" && ModMgr.hasFile(modName, "commands.csv")) {
+                val commandsList = if (modName == "$") engineCommandList else ModMgr.getFile(modName, "commands.csv").readLines()
+                val packageConsole = "$packageRoot.console"
 
-            printdbg(this, "Loading console commands from '${packageConsole}'")
+                printdbg(this, "Loading console commands from '${packageConsole}'")
 //            printdbg(this, commandsList.joinToString())
 
-            commandsList.forEach { commandName ->
-                val canonicalName = "$packageConsole.$commandName"
-                val it = Class.forName(canonicalName)
+                commandsList.forEach { commandName ->
+                    val canonicalName = "$packageConsole.$commandName"
+                    val it = Class.forName(canonicalName)
 
-                printdbg(this, "> Trying to instantiate ${it.canonicalName}")
+                    printdbg(this, "> Trying to instantiate ${it.canonicalName}")
 
-                try {
-                    val instance = it.kotlin.objectInstance ?: it.kotlin.java.newInstance()
+                    try {
+                        val instance = it.kotlin.objectInstance ?: it.kotlin.java.newInstance()
 
-                    val aliases = instance.javaClass.getAnnotation(ConsoleAlias::class.java)?.aliasesCSV?.split(',')?.map { it.trim() }
-                    val noexport = instance.javaClass.getAnnotation(ConsoleNoExport::class.java)
+                        val aliases = instance.javaClass.getAnnotation(ConsoleAlias::class.java)?.aliasesCSV?.split(',')?.map { it.trim() }
+                        val noexport = instance.javaClass.getAnnotation(ConsoleNoExport::class.java)
 
-                    if (noexport == null) {
+                        if (noexport == null) {
 
-                        dict[instance.javaClass.simpleName.lowercase()] = instance as ConsoleCommand
-                        aliases?.forEach {
-                            dict[it] = instance as ConsoleCommand
+                            dict[instance.javaClass.simpleName.lowercase()] = instance as ConsoleCommand
+                            aliases?.forEach {
+                                dict[it] = instance as ConsoleCommand
+                            }
+
+                            printdbg(this, "Class instantiated: ${instance.javaClass.simpleName}")
+                            if (aliases != null)
+                                printdbg(this, "  Annotations: $aliases")
                         }
-
-                        printdbg(this, "Class instantiated: ${instance.javaClass.simpleName}")
-                        if (aliases != null)
-                            printdbg(this, "  Annotations: $aliases")
+                    }
+                    catch (e: ClassCastException) {
+                        printdbgerr(this, "${it.canonicalName} is not a ConsoleCommand")
+                    }
+                    catch (e: InstantiationException) {
+                        printdbgerr(this, "Could not instantiate ${it.canonicalName}")
+                        e.printStackTrace(System.err)
                     }
                 }
-                catch (e: ClassCastException) {
-                    printdbgerr(this, "${it.canonicalName} is not a ConsoleCommand")
-                }
-                catch (e: InstantiationException) {
-                    printdbgerr(this, "Could not instantiate ${it.canonicalName}")
-                    e.printStackTrace(System.err)
-                }
             }
-
         }
 
 

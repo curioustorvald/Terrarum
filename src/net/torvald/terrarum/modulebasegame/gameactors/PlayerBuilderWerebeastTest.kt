@@ -11,8 +11,8 @@ import net.torvald.terrarum.gameactors.AVKey
 object PlayerBuilderWerebeastTest {
     operator fun invoke(): IngamePlayer {
         val p: IngamePlayer = IngamePlayer(
-                ModMgr.getPath("basegame", "sprites/taimu.properties"),
-                ModMgr.getPath("basegame", "sprites/taimu_glow.properties"),
+                ModMgr.getGdxFile("basegame", "sprites/taimu.properties").path(),
+                ModMgr.getGdxFile("basegame", "sprites/taimu_glow.properties").path(),
                 -589141658L // random value thrown
         )
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureWerebeastBase.json")

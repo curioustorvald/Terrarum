@@ -22,5 +22,7 @@
   "MENU_OPTIONS_DITHER": "递色",
   "MENU_OPTIONS_BLUR": "模糊",
   "MENU_OPTIONS_PARTICLES": "微粒数",
-  "MENU_IO_IMPORT": "匯入"
+  "MENU_IO_IMPORT": "匯入",
+  "APP_NOMODULE_1": "当前未加载任何模块。",
+  "APP_NOMODULE_2": "请重新配置您的加载顺序："
 }

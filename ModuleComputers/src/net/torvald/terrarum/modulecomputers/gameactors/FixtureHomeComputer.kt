@@ -29,7 +29,7 @@ import net.torvald.tsvm.peripheral.VMProgramRom
 class FixtureHomeComputer : FixtureBase {
 
     private val vm = VM(0x200000, TheRealWorld(), arrayOf(
-            VMProgramRom(ModMgr.getPath("dwarventech", "bios/tsvmbios.js"))
+            VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/tsvmbios.js").path())
     ))
     private val vmRunner: VMRunner
     private val coroutineJob: Job
@@ -49,7 +49,7 @@ class FixtureHomeComputer : FixtureBase {
         actorValue[AVKey.BASEMASS] = 20.0
 
 
-        val gpu = ReferenceGraphicsAdapter(ModMgr.getPath("dwarventech", "gui"), vm)
+        val gpu = ReferenceGraphicsAdapter(ModMgr.getGdxFile("dwarventech", "gui").path(), vm)
 //        vm.getIO().blockTransferPorts[0].attachDevice(TestDiskDrive(vm, 0, ...))
 
         vm.peripheralTable[1] = PeripheralEntry(
@@ -65,7 +65,7 @@ class FixtureHomeComputer : FixtureBase {
 
         (mainUI as UIHomeComputer).vm = vm
 
-        vmRunner = VMRunnerFactory(ModMgr.getPath("dwarventech", "bios"), vm, "js")
+        vmRunner = VMRunnerFactory(ModMgr.getGdxFile("dwarventech", "bios").path(), vm, "js")
         coroutineJob = GlobalScope.launch {
             vmRunner.executeCommand(vm.roms[0]!!.readAll())
         }

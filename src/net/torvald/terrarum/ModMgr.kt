@@ -17,8 +17,10 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
 import java.io.File
+import java.io.FileFilter
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.FilenameFilter
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLClassLoader
@@ -79,7 +81,8 @@ object ModMgr {
         NOT_EVEN_THERE
     }
 
-    const val modDir = "./assets/mods"
+    const val modDirInternal = "./assets/mods"
+    val modDirExternal = "${App.defaultDir}/Modules"
 
     /** Module name (directory name), ModuleMetadata */
     val moduleInfo = HashMap<String, ModuleMetadata>()
@@ -99,7 +102,7 @@ object ModMgr {
     /**
      * Try to create an instance of a "titlescreen" from the current load order set.
      */
-    fun getTitleScreen(batch: SpriteBatch): IngameInstance? = entryPointClasses.getOrNull(0)?.getTitleScreen(batch)
+    fun getTitleScreen(batch: FlippingSpriteBatch): IngameInstance? = entryPointClasses.getOrNull(0)?.getTitleScreen(batch)
 
     private fun List<String>.toVersionNumber() = 0L or
             (this[0].replaceFirst('*','0').removeSuffix("+").toLong().shl(24)) or
@@ -108,7 +111,7 @@ object ModMgr {
 
 
     init {
-        val loadOrderFile = FileSystems.getDefault().getPath("$modDir/LoadOrder.csv").toFile()
+        val loadOrderFile = FileSystems.getDefault().getPath("${App.defaultDir}/LoadOrder.txt").toFile()
         if (loadOrderFile.exists()) {
 
             // load modules
@@ -128,10 +131,10 @@ object ModMgr {
 
                 try {
                     val modMetadata = Properties()
-                    modMetadata.load(FileInputStream("$modDir/$moduleName/$metaFilename"))
+                    modMetadata.load(FileInputStream("$modDirInternal/$moduleName/$metaFilename"))
 
-                    if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
-                        val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
+                    if (File("$modDirInternal/$moduleName/$defaultConfigFilename").exists()) {
+                        val defaultConfig = JsonFetcher("$modDirInternal/$moduleName/$defaultConfigFilename")
                         // read config and store it to the game
 
                         // write to user's config file
@@ -148,7 +151,7 @@ object ModMgr {
                     val version = modMetadata.getProperty("version")
                     val jar = modMetadata.getProperty("jar")
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
-                    val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
+                    val isDir = FileSystems.getDefault().getPath("$modDirInternal/$moduleName").toFile().isDirectory
 
 
                     val versionNumeral = version.split('.')
@@ -170,10 +173,15 @@ object ModMgr {
                     }
 
 
-                    moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
+                    moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDirInternal/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
 
                     printdbg(this, moduleInfo[moduleName])
 
+                    // do retexturing if retextures directory exists
+                    if (hasFile(moduleName, "retextures")) {
+                        printdbg(this, "Trying to load Retextures on ${moduleName}")
+                        GameRetextureLoader(moduleName)
+                    }
 
                     // run entry script in entry point
                     if (entryPoint.isNotBlank()) {
@@ -184,7 +192,7 @@ object ModMgr {
                                 val urls = arrayOf<URL>()
 
                                 val cl = JarFileLoader(urls)
-                                cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
+                                cl.addFile("${File(modDirInternal).absolutePath}/$moduleName/$jar")
                                 moduleClassloader[moduleName] = cl
                                 newClass = cl.loadClass(entryPoint)
                             }
@@ -310,21 +318,31 @@ object ModMgr {
 
 
 
-    fun getPath(module: String, path: String): String {
+    /*fun getPath(module: String, path: String): String {
         checkExistence(module)
-        return "$modDir/$module/${path.sanitisePath()}"
-    }
+        return "$modDirInternal/$module/${path.sanitisePath()}"
+    }*/
     /** Returning files are read-only */
     fun getGdxFile(module: String, path: String): FileHandle {
-        return Gdx.files.internal(getPath(module, path))
+        checkExistence(module)
+        return if (true) // TODO if module is internal...
+            Gdx.files.internal("$modDirInternal/$module/$path")
+        else
+            Gdx.files.absolute("$modDirExternal/$module/$path")
     }
     fun getFile(module: String, path: String): File {
         checkExistence(module)
-        return FileSystems.getDefault().getPath(getPath(module, path)).toFile()
+        return if (true) // TODO if module is internal...
+            FileSystems.getDefault().getPath("$modDirInternal/$module/$path").toFile()
+        else
+            FileSystems.getDefault().getPath("$modDirExternal/$module/$path").toFile()
+    }
+    fun hasFile(module: String, path: String): Boolean {
+        return getFile(module, path).exists()
     }
     fun getFiles(module: String, path: String): Array<File> {
         checkExistence(module)
-        val dir = FileSystems.getDefault().getPath(getPath(module, path)).toFile()
+        val dir = getFile(module, path)
         if (!dir.isDirectory) {
             throw FileNotFoundException("The path is not a directory")
         }
@@ -344,8 +362,7 @@ object ModMgr {
 
         val filesList = ArrayList<Pair<String, File>>()
         moduleNames.forEach {
-            val file = File(getPath(it, path))
-
+            val file = getFile(it, path)
             if (file.exists()) filesList.add(it to file)
         }
 
@@ -364,8 +381,7 @@ object ModMgr {
 
         val filesList = ArrayList<Pair<String, FileHandle>>()
         moduleNames.forEach {
-            val file = Gdx.files.internal(getPath(it, path))
-
+            val file = getGdxFile(it, path)
             if (file.exists()) filesList.add(it to file)
         }
 
@@ -440,7 +456,7 @@ object ModMgr {
         val langPath = "locales/"
 
         @JvmStatic operator fun invoke(module: String) {
-            Lang.load(getPath(module, langPath))
+            Lang.load(getFile(module, langPath))
         }
     }
 
@@ -455,6 +471,58 @@ object ModMgr {
             Terrarum.materialCodex.fromModule(module, matePath + "materials.csv")
         }
     }
+
+    /**
+     * A sugar-library for easy texture pack creation
+     */
+    object GameRetextureLoader {
+        val retexturesPath = "retextures/"
+        val retexables = listOf("blocks","wires")
+        val altFilePaths = HashMap<String, FileHandle>()
+        val retexableCallbacks = HashMap<String, () -> Unit>()
+
+        init {
+            retexableCallbacks["blocks"] = {
+                App.tileMaker(true)
+            }
+
+        }
+
+        @JvmStatic operator fun invoke(module: String) {
+            val targetModNames = getFiles(module, retexturesPath).filter { it.isDirectory }
+            targetModNames.forEach { baseTargetModDir ->
+                // modules/<module>/retextures/basegame
+//                printdbg(this, "baseTargetModDir = $baseTargetModDir")
+
+                retexables.forEach { category ->
+                    val dir = File(baseTargetModDir, category)
+                    // modules/<module>/retextures/basegame/blocks
+
+//                    printdbg(this, "cats: ${dir.path}")
+
+                    if (dir.isDirectory && dir.exists()) {
+                        dir.listFiles { it: File ->
+                                it?.name?.contains('-') == true
+                        }.forEach {
+                            // <other modname>-<hopefully a number>.tga or .png
+                            val tokens = it.name.split('-')
+                            if (tokens.size > 1) {
+                                val modname = tokens[0]
+                                val filename = tokens.tail().joinToString("-")
+                                altFilePaths["$modDirInternal/$modname/$category/$filename"] = getGdxFile(module, "$retexturesPath${baseTargetModDir.name}/$category/${it.name}")
+                            }
+                        }
+                    }
+
+//                    retexableCallbacks[category]?.invoke()
+                }
+            }
+
+            printdbg(this, "ALT FILE PATHS")
+            altFilePaths.forEach { (k, v) -> printdbg(this, "$k -> $v") }
+        }
+    }
+
 }
 
 private class JarFileLoader(urls: Array<URL>) : URLClassLoader(urls) {

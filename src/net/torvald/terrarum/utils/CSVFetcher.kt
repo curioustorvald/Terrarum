@@ -36,7 +36,7 @@ object CSVFetcher {
         return csvRecordList
     }
 
-    fun readFromModule(module: String, path: String) = net.torvald.terrarum.utils.CSVFetcher.readFromFile(ModMgr.getPath(module, path))
+    fun readFromModule(module: String, path: String) = net.torvald.terrarum.utils.CSVFetcher.readFromFile(ModMgr.getGdxFile(module, path).path())
 
     fun readFromString(csv: String): List<org.apache.commons.csv.CSVRecord> {
         val csvParser = org.apache.commons.csv.CSVParser.parse(

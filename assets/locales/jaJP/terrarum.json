@@ -16,5 +16,7 @@
   "MENU_OPTIONS_DITHER": "ディザリング",
   "MENU_OPTIONS_BLUR": "ぼかし",
   "MENU_OPTIONS_PARTICLES": "粒子の数",
-  "MENU_IO_IMPORT": "インポート"
+  "MENU_IO_IMPORT": "インポート",
+  "APP_NOMODULE_1": "現在ロードされたモジュールがありません。",
+  "APP_NOMODULE_2": "次のファイルでロードオーダーを再設定してください。"
 }

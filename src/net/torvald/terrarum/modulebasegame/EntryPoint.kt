@@ -20,7 +20,7 @@ class EntryPoint : ModuleEntryPoint() {
 
     private val moduleName = "basegame"
 
-    override fun getTitleScreen(batch: SpriteBatch): IngameInstance? {
+    override fun getTitleScreen(batch: FlippingSpriteBatch): IngameInstance? {
         return TitleScreen(batch)
     }
 

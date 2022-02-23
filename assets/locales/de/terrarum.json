@@ -16,5 +16,7 @@
   "MENU_OPTIONS_DITHER": "Farbmischung",
   "MENU_OPTIONS_BLUR": "Weichzeichnen",
   "MENU_OPTIONS_PARTICLES": "Partikel",
-  "MENU_IO_IMPORT": "Importieren"
+  "MENU_IO_IMPORT": "Importieren",
+  "APP_NOMODULE_1": "Derzeit ist kein Modul geladen.",
+  "APP_NOMODULE_2": "Bitte konfigurieren Sie Ihren Ladeauftrag neu auf:"
 }

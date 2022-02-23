@@ -41,7 +41,7 @@ import kotlin.math.sin
 /**
  * Created by minjaesong on 2017-09-02.
  */
-class TitleScreen(batch: SpriteBatch) : IngameInstance(batch) {
+class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     // todo register titlescreen as the ingame, similar in a way that the buildingmaker did
 

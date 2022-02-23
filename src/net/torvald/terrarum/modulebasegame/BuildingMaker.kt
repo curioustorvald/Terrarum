@@ -28,7 +28,7 @@ import net.torvald.util.CircularArray
 /**
  * Created by minjaesong on 2018-07-06.
  */
-class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
+class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val menuYaml = Yaml("""
 - File
