@@ -350,6 +350,7 @@ object ModMgr {
             FileSystems.getDefault().getPath("$modDirExternal/$module/$path").toFile()
     }
     fun hasFile(module: String, path: String): Boolean {
+        if (!moduleInfo.containsKey(module)) return false
         return getFile(module, path).exists()
     }
     fun getFiles(module: String, path: String): Array<File> {

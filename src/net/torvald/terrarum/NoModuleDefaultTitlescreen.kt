@@ -87,7 +87,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
                 App.fontGame.draw(it, pathText, pathButtonX, pathButtonY)
             }
 
-            if (Gdx.input.isKeyPressed(Keys.ESCAPE)) gamemode = 1
+//            if (Gdx.input.isKeyPressed(Keys.ESCAPE)) gamemode = 1
         }
         else if (gamemode == 1) {
 

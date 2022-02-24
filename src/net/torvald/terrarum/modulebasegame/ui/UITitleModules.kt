@@ -16,8 +16,8 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemModuleInfoCell
 import kotlin.math.roundToInt
 
-val MODULEINFO_CELL_WIDTH = 480
-val MODULEINFO_CELL_HEIGHT = 48
+val MODULEINFO_CELL_WIDTH = 540
+val MODULEINFO_CELL_HEIGHT = 24*3
 
 /**
  * Created by minjaesong on 2017-08-01.

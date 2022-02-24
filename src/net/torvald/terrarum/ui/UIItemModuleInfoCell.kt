@@ -38,6 +38,7 @@ class UIItemModuleInfoCell(
     private val modVer = modProp.version
     private val modDate = modProp.releaseDate
     private val modAuthor = modProp.author
+    private val modDesc = modProp.description
 
     init {
         modIcon.flip(false, false)
@@ -56,40 +57,42 @@ class UIItemModuleInfoCell(
     private val ccZero2 = App.fontGame.toColorCode(12,12,12)
     private val ccNum = App.fontGame.toColorCode(15,14,6)
     private val ccNum2 = App.fontGame.toColorCode(12,11,4)
+    private val ccDesc = App.fontGame.toColorCode(13,13,13)
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
 
         batch.color = Toolkit.Theme.COL_CELL_FILL
-        Toolkit.fillArea(batch, initialX, initialY, 32, 48)
-        Toolkit.fillArea(batch, initialX + 35, initialY, 48, 48)
-        Toolkit.fillArea(batch, initialX + 86, initialY, width - 86, 48)
+        Toolkit.fillArea(batch, initialX, initialY, 32, height)
+        Toolkit.fillArea(batch, initialX + 35, initialY, 48, height)
+        Toolkit.fillArea(batch, initialX + 86, initialY, width - 86, height)
 
         batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, initialX - 1, initialY - 1, width + 2, height + 2)
-        Toolkit.fillArea(batch, initialX + 33, initialY, 1, 48)
-        Toolkit.fillArea(batch, initialX + 84, initialY, 1, 48)
+        Toolkit.fillArea(batch, initialX + 33, initialY, 1, height)
+        Toolkit.fillArea(batch, initialX + 84, initialY, 1, height)
 
         if (order < 9)
-            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 13f, initialY + 18f)
+            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 13f, initialY + 18f + 12f)
         else if (order < 99)
-            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 9f, initialY + 18f)
+            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 9f, initialY + 18f + 12f)
         else
-            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 6f, initialY + 18f)
+            App.fontSmallNumbers.draw(batch, "${order+1}", initialX + 6f, initialY + 18f + 12f)
 
         batch.color = Color.WHITE
         if (modErrored) {
             batch.shader = App.shaderGhastlyWhite
             batch.color = Color.LIGHT_GRAY
         }
-        batch.draw(modIcon, initialX + 35f, initialY.toFloat())
+        batch.draw(modIcon, initialX + 35f, initialY + 12f)
         batch.shader = null
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 6f, initialY + 2f)
-        App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 6f, initialY + 26f)
+        App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 3f, initialY + 2f)
+        App.fontGame.draw(batch, "$ccDesc$modDesc", initialX + 86f + 3f, initialY + 26f)
+        App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 3f, initialY + 50f)
 
         if (modErrored) {
-            batch.draw(CommonResourcePool.getAsTextureRegion("basegame_errored_icon32"), initialX + width - 40f, initialY + 8f)
+            batch.draw(CommonResourcePool.getAsTextureRegion("basegame_errored_icon32"), initialX + width - 40f, initialY + 8f + 12f)
         }
     }
 

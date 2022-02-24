@@ -44,17 +44,26 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/pipboot.rom").path()),
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/pipcode.bas").path())
     ))
-    private val vmRunner: VMRunner
-    private val coroutineJob: Job
     private val ui = WearableWorldRadarUI(vm)
 
     // FIXME initialise computer stuff when the Item is first used, not when it's registered by the Modmgr
     init {
         super.equipPosition = EquipPosition.HAND_GRIP
+    }
 
+    private var booted = false
+    private var disposed = false
+    private lateinit var vmRunner: VMRunner
+    private lateinit var coroutineJob: Job
+
+    init {
+        App.disposables.add(ui)
+    }
+
+    private fun boot() {
         vm.getIO().blockTransferPorts[1].attachDevice(WorldRadar())
         vm.peripheralTable[1] = PeripheralEntry(
-            ExtDisp(vm, 160, 140), 32768, 1, 0
+                ExtDisp(vm, 160, 140), 32768, 1, 0
         )
 
         // MMIO stops working when somethingStream is not defined
@@ -68,20 +77,32 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
         }
 
         INGAME.disposables.add(Disposable {
+            closeVM()
+        })
+        booted = true
+    }
+
+    private fun closeVM() {
+        if (!disposed) {
             vmRunner.close()
             coroutineJob.cancel("item disposal")
             vm.dispose()
-        })
-        App.disposables.add(ui)
-
+        }
+        disposed = true
+        booted = false
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        if (!booted) {
+            booted = true
+            boot()
+        }
         (Terrarum.ingame!! as TerrarumIngame).wearableDeviceUI = ui
     }
 
     override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).wearableDeviceUI = null
+        closeVM()
     }
 }
 
