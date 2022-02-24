@@ -22,5 +22,5 @@
   "MENU_OPTIONS_PARTICLES": "Particles",
   "MENU_IO_IMPORT": "Import",
   "APP_NOMODULE_1": "No Module is currently loaded.",
-  "APP_NOMODULE_2": "Please reconfigure your Load Order on:"
+  "APP_NOMODULE_2": "Please configure your Load Order and restart:"
 }

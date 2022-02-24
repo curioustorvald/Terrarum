@@ -18,5 +18,5 @@
   "MENU_OPTIONS_PARTICLES": "Partícula",
   "MENU_IO_IMPORT": "Importar",
   "APP_NOMODULE_1": "Actualmente no hay ningún módulo cargado.",
-  "APP_NOMODULE_2": "Vuelva a configurar su orden de carga en:"
+  "APP_NOMODULE_2": "Configure su orden de carga y reinicie:"
 }

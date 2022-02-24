@@ -18,5 +18,5 @@
   "MENU_OPTIONS_PARTICLES": "Partikel",
   "MENU_IO_IMPORT": "Importieren",
   "APP_NOMODULE_1": "Derzeit ist kein Modul geladen.",
-  "APP_NOMODULE_2": "Bitte konfigurieren Sie Ihren Ladeauftrag neu auf:"
+  "APP_NOMODULE_2": "Bitte konfigurieren Sie Ihre Ladereihenfolge und starten Sie neu:"
 }

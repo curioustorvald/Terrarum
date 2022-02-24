@@ -18,5 +18,5 @@
   "MENU_OPTIONS_PARTICLES": "粒子の数",
   "MENU_IO_IMPORT": "インポート",
   "APP_NOMODULE_1": "現在ロードされたモジュールがありません。",
-  "APP_NOMODULE_2": "次のファイルでロードオーダーを再設定してください。"
+  "APP_NOMODULE_2": "次のファイルでロードオーダーを設定してゲームを再起動してください。"
 }

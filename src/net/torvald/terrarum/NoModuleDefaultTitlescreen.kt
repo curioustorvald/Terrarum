@@ -1,11 +1,16 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
+import java.awt.Desktop
+import java.io.File
 
 /**
  * Created by minjaesong on 2021-12-11.
@@ -21,6 +26,15 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
     private var init = false
 
     private val pathText = App.loadOrderDir
+    private val pathFile = File(App.loadOrderDir)//.parentFile
+    private val pathButtonW = App.fontGameFBO.getWidth(pathText)
+    private val pathButtonH = 20
+    private var pathButtonX = 0f
+    private var pathButtonY = 0f
+
+    private var gamemode = 0
+
+    private val fbatch = SpriteBatch()
 
     override fun render(updateRate: Float) {
         gdxClearAndSetBlend(0f, 0f, 0f, 0f)
@@ -46,8 +60,8 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
                     batch.color = Color.WHITE
                     wot.reversed().forEachIndexed { index, s ->
                         if (index == 0) {
-                            batch.color = Toolkit.Theme.COL_HIGHLIGHT
-                            App.fontGameFBO.draw(batch, pathText, (Toolkit.drawWidth - App.fontGameFBO.getWidth(pathText)) / 2f, heights[index] + centering)
+                            pathButtonX = (Toolkit.drawWidth - pathButtonW) / 2f
+                            pathButtonY = heights[index] + centering
                         }
                         else {
                             batch.color = Color.WHITE
@@ -58,14 +72,31 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
             }
         }
 
-        batch.inUse {
-            batch.color = Color.WHITE
-            batch.draw(fbo.colorBufferTexture, 0f, 0f)
+        if (gamemode == 0) {
+            val mouseOnLink = (Gdx.input.x.toFloat() in pathButtonX - 48..pathButtonX + 48 + pathButtonW &&
+                    App.scr.hf - Gdx.input.y in pathButtonY - 12..pathButtonY + pathButtonH + 12)
+
+            if (mouseOnLink && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                Desktop.getDesktop().open(pathFile)
+            }
+
+            fbatch.inUse {
+                it.color = Color.WHITE
+                it.draw(fbo.colorBufferTexture, 0f, fbo.height.toFloat(), fbo.width.toFloat(), -fbo.height.toFloat())
+                it.color = if (mouseOnLink) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_ACTIVE
+                App.fontGame.draw(it, pathText, pathButtonX, pathButtonY)
+            }
+
+            if (Gdx.input.isKeyPressed(Keys.ESCAPE)) gamemode = 1
+        }
+        else if (gamemode == 1) {
+
         }
     }
 
     override fun dispose() {
         super.dispose()
+        fbatch.dispose()
 
         fbo.dispose()
     }

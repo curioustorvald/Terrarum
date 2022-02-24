@@ -20,5 +20,5 @@
   "MENU_OPTIONS_PARTICLES": "粒子数",
   "MENU_IO_IMPORT": "Import",
   "APP_NOMODULE_1": "當前未加載任何模塊。",
-  "APP_NOMODULE_2": "請重新配置您的加載順序："
+  "APP_NOMODULE_2": "請配置您的加載順序並重新啟動："
 }
