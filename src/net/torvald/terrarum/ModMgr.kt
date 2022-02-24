@@ -59,7 +59,8 @@ object ModMgr {
             val releaseDate: String,
             val version: String,
             val jar: String,
-            val dependencies: Array<String>
+            val dependencies: Array<String>,
+            val isInternal: Boolean
     ) {
         override fun toString() =
                 "\tModule #$order -- $properName | $version | $author\n" +
@@ -131,10 +132,21 @@ object ModMgr {
 
                 try {
                     val modMetadata = Properties()
-                    modMetadata.load(FileInputStream("$modDirInternal/$moduleName/$metaFilename"))
 
-                    if (File("$modDirInternal/$moduleName/$defaultConfigFilename").exists()) {
-                        val defaultConfig = JsonFetcher("$modDirInternal/$moduleName/$defaultConfigFilename")
+                    val _internalFile = File("$modDirInternal/$moduleName/$metaFilename")
+                    val _externalFile = File("$modDirExternal/$moduleName/$metaFilename")
+
+                    // external mod has precedence over the internal
+                    val isInternal = if (_externalFile.exists()) false else if (_internalFile.exists()) true else throw FileNotFoundException()
+                    val file = if (isInternal) _internalFile else _externalFile
+                    val modDir = if (isInternal) modDirInternal else modDirExternal
+
+                    fun getGdxFile(path: String) = if (isInternal) Gdx.files.internal(path) else Gdx.files.absolute(path)
+
+                    modMetadata.load(FileInputStream(file))
+
+                    if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
+                        val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
                         // read config and store it to the game
 
                         // write to user's config file
@@ -151,7 +163,7 @@ object ModMgr {
                     val version = modMetadata.getProperty("version")
                     val jar = modMetadata.getProperty("jar")
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
-                    val isDir = FileSystems.getDefault().getPath("$modDirInternal/$moduleName").toFile().isDirectory
+                    val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
 
                     val versionNumeral = version.split('.')
@@ -173,7 +185,7 @@ object ModMgr {
                     }
 
 
-                    moduleInfo[moduleName] = ModuleMetadata(index, isDir, Gdx.files.internal("$modDirInternal/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency)
+                    moduleInfo[moduleName] = ModuleMetadata(index, isDir, getGdxFile("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal)
 
                     printdbg(this, moduleInfo[moduleName])
 
@@ -192,7 +204,7 @@ object ModMgr {
                                 val urls = arrayOf<URL>()
 
                                 val cl = JarFileLoader(urls)
-                                cl.addFile("${File(modDirInternal).absolutePath}/$moduleName/$jar")
+                                cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
                                 moduleClassloader[moduleName] = cl
                                 newClass = cl.loadClass(entryPoint)
                             }
@@ -325,14 +337,14 @@ object ModMgr {
     /** Returning files are read-only */
     fun getGdxFile(module: String, path: String): FileHandle {
         checkExistence(module)
-        return if (true) // TODO if module is internal...
+        return if (moduleInfo[module]!!.isInternal)
             Gdx.files.internal("$modDirInternal/$module/$path")
         else
             Gdx.files.absolute("$modDirExternal/$module/$path")
     }
     fun getFile(module: String, path: String): File {
         checkExistence(module)
-        return if (true) // TODO if module is internal...
+        return if (moduleInfo[module]!!.isInternal)
             FileSystems.getDefault().getPath("$modDirInternal/$module/$path").toFile()
         else
             FileSystems.getDefault().getPath("$modDirExternal/$module/$path").toFile()

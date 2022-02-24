@@ -39,7 +39,10 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
         if (index >= 0) {
             val sx = index % circleSheet.horizontalCount
             val sy = index / circleSheet.horizontalCount
-            batch.draw(circleSheet.get(sx, sy), (posX + (width - circleSheet.tileW) / 2).toFloat(), posY.toFloat())
+            // q&d fix for ArrayIndexOutOfBoundsException caused when saving huge world... wut?
+            if (sx in 0 until circleSheet.horizontalCount && sy in 0 until circleSheet.horizontalCount) {
+                batch.draw(circleSheet.get(sx, sy), (posX + (width - circleSheet.tileW) / 2).toFloat(), posY.toFloat())
+            }
         }
     }
 

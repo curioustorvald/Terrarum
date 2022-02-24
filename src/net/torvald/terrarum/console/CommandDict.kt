@@ -37,7 +37,7 @@ object CommandDict {
         printdbg(this, ModMgr.loadOrder.reversed().map { ModMgr.moduleInfo[it]?.packageName })
 
         ((listOf("$" to "net.torvald.terrarum")) + ModMgr.loadOrder.reversed().map { it to ModMgr.moduleInfo[it]?.packageName }).forEach { (modName, packageRoot) ->
-            if (modName != "$" && ModMgr.hasFile(modName, "commands.csv")) {
+            if (modName == "$" || modName != "$" && ModMgr.hasFile(modName, "commands.csv")) {
                 val commandsList = if (modName == "$") engineCommandList else ModMgr.getFile(modName, "commands.csv").readLines()
                 val packageConsole = "$packageRoot.console"
 
