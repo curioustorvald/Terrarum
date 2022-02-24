@@ -610,7 +610,7 @@ public class App implements ApplicationListener {
 
             try {
                 Pixmap p = Pixmap.createFromFrameBuffer(0, 0, scr.getWidth(), scr.getHeight());
-                PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".tga"), p, true);
+                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
                 p.dispose();
 
                 Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
