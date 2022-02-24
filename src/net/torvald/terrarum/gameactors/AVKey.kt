@@ -58,6 +58,10 @@ object AVKey {
     const val LUMG = "luminositygreen"
     const val LUMB = "luminosityblue"
     const val LUMA = "luminosityuv"
+    const val OPAR = "opacityred"
+    const val OPAG = "opacitygreen"
+    const val OPAB = "opacityblue"
+    const val OPAA = "opacityuv"
     const val DRAGCOEFF = "dragcoeff"
     const val FALLDAMPENMULT = "falldampenmult"
 

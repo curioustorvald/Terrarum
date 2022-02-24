@@ -10,6 +10,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameparticles.ParticleVanishingSprite
 import net.torvald.terrarum.langpack.Lang
@@ -25,13 +26,14 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
     private val rndHash1 = rng.nextInt()
     private val rndHash2 = rng.nextInt()
 
-    override var color: Cvec
+    private var color: Cvec
         get() = BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)
         set(value) {
             throw UnsupportedOperationException()
         }
 
-    override val lightBoxList: ArrayList<Hitbox> = ArrayList(1)
+    override val lightBoxList: ArrayList<Lightbox> = ArrayList(1)
+    override val shadeBoxList: ArrayList<Lightbox> = ArrayList(1)
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 2),
@@ -51,7 +53,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
 
         setHitboxDimension(16, 32, 0, 0)
 
-        lightBoxList.add(Hitbox(6.0, 5.0, 4.0, 3.0))
+        lightBoxList.add(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0)) { color })
 
         makeNewSprite(CommonResourcePool.getAsTextureRegionPack("sprites-fixtures-tiki_torch.tga"))
         sprite!!.setRowsAndFrames(1, 2)

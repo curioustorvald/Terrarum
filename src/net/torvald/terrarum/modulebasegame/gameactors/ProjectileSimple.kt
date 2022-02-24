@@ -7,13 +7,10 @@ import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gameactors.PhysProperties
 import org.dyn4j.geometry.Vector2
 import java.util.*
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.*
 
 /**
  * Simplest projectile.
@@ -31,7 +28,7 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
     var speed: Int = 0
 
 
-    override var color: Cvec
+    private var color: Cvec
         get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Cvec).cpy()
         set(value) {
         }
@@ -41,7 +38,8 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    override val lightBoxList = ArrayList<Hitbox>()
+    override val lightBoxList = ArrayList<Lightbox>()
+    override val shadeBoxList = ArrayList<Lightbox>()
 
     private val lifetimeMax = 2500
     private var lifetimeCounter = 0f
@@ -60,7 +58,7 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
         setPosition(fromPoint.x, fromPoint.y)
         posPre = Point2d(fromPoint.x, fromPoint.y)
         // lightbox sized 8x8 centered to the bullet
-        lightBoxList.add(Hitbox(-4.0, -4.0, 8.0, 8.0))
+        lightBoxList.add(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0)) { color })
         //this.externalV.set(velocity)
 
         damage = bulletDatabase[type][OFFSET_DAMAGE] as Int

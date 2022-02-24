@@ -20,7 +20,6 @@ import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import java.util.*
 import kotlin.math.roundToInt
-import kotlin.system.exitProcess
 
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
@@ -73,6 +72,7 @@ object LightmapRenderer {
     //private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val shadowMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
     private val giMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
     /**
      * Float value, 1.0 for 1023
@@ -340,12 +340,14 @@ object LightmapRenderer {
 
     private fun buildLanternmap(actorContainer: List<ActorWithBody>) {
         lanternMap.clear()
+        shadowMap.clear()
         actorContainer.forEach {
             if (it is Luminous) {
                 val lightBoxCopy = it.lightBoxList.subList(0, it.lightBoxList.size) // make copy to prevent ConcurrentModificationException
+                val shadeBoxCopy = it.shadeBoxList.subList(0, it.shadeBoxList.size) // make copy to prevent ConcurrentModificationException
 
                 // put lanterns to the area the luminantBox is occupying
-                for (lightBox in lightBoxCopy) {
+                lightBoxCopy.forEach { (lightBox, colour) ->
                     val lightBoxX = it.hitbox.startX + lightBox.startX
                     val lightBoxY = it.hitbox.startY + lightBox.startY
                     val lightBoxW = lightBox.width
@@ -356,9 +358,28 @@ object LightmapRenderer {
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
                             val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
-                            val actorLight = it.color
+                            val actorLight = colour()
 
                             lanternMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
+                        }
+                    }
+                }
+
+                // put shades to the area the luminantBox is occupying
+                shadeBoxCopy.forEach { (shadeBox, colour) ->
+                    val lightBoxX = it.hitbox.startX + shadeBox.startX
+                    val lightBoxY = it.hitbox.startY + shadeBox.startY
+                    val lightBoxW = shadeBox.width
+                    val lightBoxH = shadeBox.height
+                    for (y in lightBoxY.div(TILE_SIZE).floorInt()
+                            ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
+                        for (x in lightBoxX.div(TILE_SIZE).floorInt()
+                                ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+
+                            val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
+                            val actorLight = colour()
+
+                            shadowMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
                         }
                     }
                 }
@@ -464,14 +485,17 @@ object LightmapRenderer {
             _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
 
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
-            _thisTileLuminosity.maxAndAssign(_thisFluidProp.getLumCol(worldX, worldY).mul(_fluidAmountToCol)) // already been div by four
+            _thisTileLuminosity.maxAndAssign(_thisFluidProp.getLumCol(worldX, worldY).mul(_fluidAmountToCol))
             _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
-            _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.mul(_fluidAmountToCol))// already been div by four
+            _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.mul(_fluidAmountToCol))
         }
         else {
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
             _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
         }
+
+        // blend shade
+        _mapThisTileOpacity.max(lx, ly, shadowMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull)
 
         _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
         _mapThisTileOpacity2.setG(lx, ly, _mapThisTileOpacity.getG(lx, ly) * 1.41421356f)

@@ -64,7 +64,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         if (houseDesignation != null) houseDesignation!!.clear()
     }
 
-    override var color: Cvec
+    var actorValueColour: Cvec
         get() = Cvec(
                 (actorValue.getAsFloat(AVKey.LUMR) ?: 0f),
                 (actorValue.getAsFloat(AVKey.LUMG) ?: 0f),
@@ -78,14 +78,32 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             actorValue[AVKey.LUMA] = value.a
         }
 
+    var actorValueShade: Cvec
+        get() = Cvec(
+                (actorValue.getAsFloat(AVKey.OPAR) ?: 0f),
+                (actorValue.getAsFloat(AVKey.OPAG) ?: 0f),
+                (actorValue.getAsFloat(AVKey.OPAB) ?: 0f),
+                (actorValue.getAsFloat(AVKey.OPAA) ?: 0f)
+        )
+        set(value) {
+            actorValue[AVKey.OPAR] = value.r
+            actorValue[AVKey.OPAG] = value.g
+            actorValue[AVKey.OPAB] = value.b
+            actorValue[AVKey.OPAA] = value.a
+        }
+
     /**
      * Arguments:
      *
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    override val lightBoxList: List<Hitbox>
-        get() = arrayOf(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3)).toList() // things are asymmetric!!
+    override val lightBoxList: List<Lightbox>
+        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3)) { actorValueColour }).toList() // things are asymmetric!!
+        // use getter; dimension of the player may change by time.
+
+    override val shadeBoxList: List<Lightbox>
+        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3)) { actorValueShade }).toList() // things are asymmetric!!
         // use getter; dimension of the player may change by time.
 
     @Transient val BASE_DENSITY = 980.0

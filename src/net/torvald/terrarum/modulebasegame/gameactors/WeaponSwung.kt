@@ -1,10 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gameactors.PhysProperties
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.ItemID
 
 /**
@@ -32,7 +29,7 @@ class WeaponSwung : ActorWithBody, Luminous {
     actorValue[AVKey.LUMINOSITY] = value
     }
      */
-    override var color: Cvec
+    private var color: Cvec
         get() = throw UnsupportedOperationException()
         set(value) {
         }
@@ -42,7 +39,9 @@ class WeaponSwung : ActorWithBody, Luminous {
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    override val lightBoxList: List<Hitbox>
+    override val lightBoxList: List<Lightbox>
+        get() = throw UnsupportedOperationException()
+    override val shadeBoxList: List<Lightbox>
         get() = throw UnsupportedOperationException()
 
     init {
