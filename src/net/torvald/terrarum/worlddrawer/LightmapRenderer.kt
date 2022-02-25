@@ -178,7 +178,7 @@ object LightmapRenderer {
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
         App.measureDebugTime("Renderer.Lanterns") {
-            buildLanternmap(actorContainer)
+            buildLanternAndShadowMap(actorContainer)
         } // usually takes 3000 ns
 
         // copy current world's globalLight into this
@@ -338,20 +338,21 @@ object LightmapRenderer {
         }
     }
 
-    private fun buildLanternmap(actorContainer: List<ActorWithBody>) {
+    private fun buildLanternAndShadowMap(actorContainer: List<ActorWithBody>) {
         lanternMap.clear()
         shadowMap.clear()
         actorContainer.forEach {
             if (it is Luminous) {
                 val lightBoxCopy = it.lightBoxList.subList(0, it.lightBoxList.size) // make copy to prevent ConcurrentModificationException
                 val shadeBoxCopy = it.shadeBoxList.subList(0, it.shadeBoxList.size) // make copy to prevent ConcurrentModificationException
+                val scale = it.scale
 
                 // put lanterns to the area the luminantBox is occupying
                 lightBoxCopy.forEach { (lightBox, colour) ->
-                    val lightBoxX = it.hitbox.startX + (lightBox.startX * it.scale)
-                    val lightBoxY = it.hitbox.startY + (lightBox.startY * it.scale)
-                    val lightBoxW = lightBox.width * it.scale
-                    val lightBoxH = lightBox.height * it.scale
+                    val lightBoxX = it.hitbox.startX + (lightBox.startX * scale)
+                    val lightBoxY = it.hitbox.startY + (lightBox.startY * scale)
+                    val lightBoxW = lightBox.width * scale
+                    val lightBoxH = lightBox.height * scale
                     for (y in lightBoxY.div(TILE_SIZE).floorInt()
                             ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
                         for (x in lightBoxX.div(TILE_SIZE).floorInt()
@@ -367,10 +368,10 @@ object LightmapRenderer {
 
                 // put shades to the area the luminantBox is occupying
                 shadeBoxCopy.forEach { (shadeBox, colour) ->
-                    val lightBoxX = it.hitbox.startX + (shadeBox.startX * it.scale)
-                    val lightBoxY = it.hitbox.startY + (shadeBox.startY * it.scale)
-                    val lightBoxW = shadeBox.width * it.scale
-                    val lightBoxH = shadeBox.height * it.scale
+                    val lightBoxX = it.hitbox.startX + (shadeBox.startX * scale)
+                    val lightBoxY = it.hitbox.startY + (shadeBox.startY * scale)
+                    val lightBoxW = shadeBox.width * scale
+                    val lightBoxH = shadeBox.height * scale
                     for (y in lightBoxY.div(TILE_SIZE).floorInt()
                             ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
                         for (x in lightBoxX.div(TILE_SIZE).floorInt()
