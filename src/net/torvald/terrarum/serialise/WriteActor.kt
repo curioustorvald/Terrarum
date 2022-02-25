@@ -21,16 +21,17 @@ import java.util.*
  */
 object WriteActor {
 
+    // genver must be found on fixed location of the JSON string
     operator fun invoke(actor: Actor): String {
         val s = Common.jsoner.toJson(actor, actor.javaClass)
-        return """{"class":"${actor.javaClass.canonicalName}",${s.substring(1)}"""
+        return """{"genver":${Common.GENVER},"class":"${actor.javaClass.canonicalName}",${s.substring(1)}"""
     }
 
     fun encodeToByteArray64(actor: Actor): ByteArray64 {
         val baw = ByteArray64Writer(Common.CHARSET)
 
-        val classDef = """{"class":"${actor.javaClass.canonicalName}""""
-        baw.write(classDef)
+        val header = """{"genver":${Common.GENVER},"class":"${actor.javaClass.canonicalName}""""
+        baw.write(header)
         Common.jsoner.toJson(actor, actor.javaClass, baw)
         baw.flush(); baw.close()
         // by this moment, contents of the baw will be:
@@ -39,7 +40,7 @@ object WriteActor {
         // and we want to turn it into this:
         //  {"class":"some.class.Name","actorValue":{},......}
         val ba = baw.toByteArray64()
-        ba[classDef.toByteArray(Common.CHARSET).size.toLong()] = ','.code.toByte()
+        ba[header.toByteArray(Common.CHARSET).size.toLong()] = ','.code.toByte()
 
         return ba
     }
@@ -90,6 +91,7 @@ object WritePlayer {
 
 
         val actorJson = WriteActor.encodeToByteArray64(player)
+
         val adl = player.animDesc!!.getRawADL()
         val adlGlow = player.animDescGlow?.getRawADL() // NULLABLE!
 

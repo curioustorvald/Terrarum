@@ -38,8 +38,8 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    override val lightBoxList = ArrayList<Lightbox>()
-    override val shadeBoxList = ArrayList<Lightbox>()
+    @Transient override val lightBoxList = ArrayList<Lightbox>()
+    @Transient override val shadeBoxList = ArrayList<Lightbox>()
 
     private val lifetimeMax = 2500
     private var lifetimeCounter = 0f
@@ -58,7 +58,7 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
         setPosition(fromPoint.x, fromPoint.y)
         posPre = Point2d(fromPoint.x, fromPoint.y)
         // lightbox sized 8x8 centered to the bullet
-        lightBoxList.add(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0)) { color })
+        lightBoxList.add(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0), color))
         //this.externalV.set(velocity)
 
         damage = bulletDatabase[type][OFFSET_DAMAGE] as Int

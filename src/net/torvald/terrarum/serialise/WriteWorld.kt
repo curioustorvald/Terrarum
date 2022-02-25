@@ -35,7 +35,7 @@ object WriteWorld {
         val world = ingame.world
         val currentPlayTime_t = time_t - ingame.loadedTime_t
 
-        world.genver = Common.GENVER
+//        world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
         world.lastPlayTime = time_t
         world.totalPlayTime += currentPlayTime_t
@@ -56,17 +56,28 @@ object WriteWorld {
         return world
     }
 
+    // genver must be found on fixed location of the JSON string
     operator fun invoke(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): String {
-        return Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList))
+        val s = Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList))
+        return """{"genver":${Common.GENVER},${s.substring(1)}"""
     }
 
     fun encodeToByteArray64(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): ByteArray64 {
         val baw = ByteArray64Writer(Common.CHARSET)
 
+        val header = """{"genver":${Common.GENVER}"""
+        baw.write(header)
         Common.jsoner.toJson(preWrite(ingame, time_t, actorsList, playersList), baw)
         baw.flush(); baw.close()
+        // by this moment, contents of the baw will be:
+        //  {"genver":123456{"actorValue":{},......}
+        //  (note that first bracket is not closed, and another open bracket after "genver" property)
+        // and we want to turn it into this:
+        //  {"genver":123456,"actorValue":{},......}
+        val ba = baw.toByteArray64()
+        ba[header.toByteArray(Common.CHARSET).size.toLong()] = ','.code.toByte()
 
-        return baw.toByteArray64()
+        return ba
     }
 
     /**

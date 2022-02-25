@@ -2,7 +2,18 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.gdx.graphics.Cvec
 
-data class Lightbox(val hitbox: Hitbox, val getLight: () -> Cvec)
+class Lightbox() {
+    var hitbox: Hitbox = Hitbox(0.0,0.0,0.0,0.0)
+    var light: Cvec = Cvec()
+
+    constructor(hitbox: Hitbox, light: Cvec) : this() {
+        this.hitbox = hitbox
+        this.light = light
+    }
+
+    operator fun component1() = hitbox
+    operator fun component2() = light
+}
 
 /**
  * For actors that either emits or blocks lights
@@ -16,6 +27,8 @@ interface Luminous {
      *
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
+     *
+     * NOTE: MUST NOT SERIALISE (use `@Transient`)
      */
     val lightBoxList: List<Lightbox>
 
@@ -24,6 +37,8 @@ interface Luminous {
      *
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
+     *
+     * NOTE: MUST NOT SERIALISE (use `@Transient`)
      */
     val shadeBoxList: List<Lightbox>
 }

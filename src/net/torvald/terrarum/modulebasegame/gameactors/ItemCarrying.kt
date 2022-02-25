@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameitems.ItemID
 /**
  * Created by minjaesong on 2016-04-26.
  */
-class WeaponSwung : ActorWithBody, Luminous {
+class ItemCarrying : ActorWithBody, Luminous {
 
     var itemID: ItemID = ""; private set
 

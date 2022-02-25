@@ -46,7 +46,7 @@ object Common {
 
     // install custom (de)serialiser
     init {
-//        jsoner.ignoreUnknownFields = true
+        jsoner.ignoreUnknownFields = true
         jsoner.setUsePrototypes(false)
         jsoner.setIgnoreDeprecated(false)
 

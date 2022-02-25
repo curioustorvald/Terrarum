@@ -99,11 +99,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * (Use ArrayList for normal circumstances)
      */
     override val lightBoxList: List<Lightbox>
-        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3)) { actorValueColour }).toList() // things are asymmetric!!
+        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3), actorValueColour)).toList() // things are asymmetric!!
         // use getter; dimension of the player may change by time.
 
     override val shadeBoxList: List<Lightbox>
-        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3)) { actorValueShade }).toList() // things are asymmetric!!
+        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3), actorValueShade)).toList() // things are asymmetric!!
         // use getter; dimension of the player may change by time.
 
     @Transient val BASE_DENSITY = 980.0

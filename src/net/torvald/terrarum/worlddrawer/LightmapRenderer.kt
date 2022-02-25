@@ -358,7 +358,7 @@ object LightmapRenderer {
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
                             val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
-                            val actorLight = colour()
+                            val actorLight = colour
 
                             lanternMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
                         }
@@ -377,7 +377,7 @@ object LightmapRenderer {
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
                             val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
-                            val actorLight = colour()
+                            val actorLight = colour
 
                             shadowMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
                         }

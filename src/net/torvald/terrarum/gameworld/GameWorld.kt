@@ -127,7 +127,7 @@ open class GameWorld() : Disposable {
 
     val extraFields = HashMap<String, Any?>()
 
-    internal var genver = -1 // only gets used when the game saves and loads
+//    internal var genver = -1 // only gets used when the game saves and loads
     internal var comp = -1 // only gets used when the game saves and loads
 
     internal val dynamicItemInventory = ItemTable()

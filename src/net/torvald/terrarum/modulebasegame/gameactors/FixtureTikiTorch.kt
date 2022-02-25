@@ -27,13 +27,13 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
     private val rndHash2 = rng.nextInt()
 
     private var color: Cvec
-        get() = BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)
+        get() = try { BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2) } catch (e: NullPointerException) { Cvec() }
         set(value) {
             throw UnsupportedOperationException()
         }
 
-    override val lightBoxList: ArrayList<Lightbox> = ArrayList(1)
-    override val shadeBoxList: ArrayList<Lightbox> = ArrayList(1)
+    @Transient override val lightBoxList: ArrayList<Lightbox> = ArrayList(1)
+    @Transient override val shadeBoxList: ArrayList<Lightbox> = ArrayList(1)
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 2),
@@ -53,7 +53,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
 
         setHitboxDimension(16, 32, 0, 0)
 
-        lightBoxList.add(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0)) { color })
+        lightBoxList.add(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0), color))
 
         makeNewSprite(CommonResourcePool.getAsTextureRegionPack("sprites-fixtures-tiki_torch.tga"))
         sprite!!.setRowsAndFrames(1, 2)
