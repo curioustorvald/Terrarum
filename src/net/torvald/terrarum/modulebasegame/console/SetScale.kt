@@ -16,17 +16,16 @@ internal object SetScale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2 || args.size == 3) {
             try {
-                val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
-                if (player == null) return
+                val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying ?: return
 
 
-                val targetID = if (args.size == 3) args[1].toInt() else player.referenceID
-                val scale = args[if (args.size == 3) 2 else 1].toDouble()
+                val targetID = if (args.size == 3) args[2].toInt() else player.referenceID
+                val scale = args[1].toDouble()
 
                 val target = INGAME.getActorByID(targetID)
 
                 if (target !is ActorWithBody) {
-                    EchoError("Target is not ActorWBMovable")
+                    EchoError("Target is not ActorWithBody")
                 }
                 else {
                     target.actorValue[AVKey.SCALE] = scale
@@ -41,6 +40,6 @@ internal object SetScale : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo("Usage: setscale scale | setscale actorID scale")
+        Echo("Usage: setscale scale | setscale scale actorID")
     }
 }
