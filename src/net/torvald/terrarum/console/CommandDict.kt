@@ -3,8 +3,6 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.ModMgr
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -46,7 +44,12 @@ object CommandDict {
 
                 commandsList.forEach { commandName ->
                     val canonicalName = "$packageConsole.$commandName"
-                    val it = Class.forName(canonicalName)
+                    val it = ModMgr.moduleClassloader[modName].let {
+                        if (it != null)
+                            it.loadClass(canonicalName)
+                        else
+                            Class.forName(canonicalName)
+                    }
 
                     printdbg(this, "> Trying to instantiate ${it.canonicalName}")
 

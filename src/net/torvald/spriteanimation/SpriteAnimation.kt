@@ -17,7 +17,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
 
-    lateinit var textureRegion: TextureRegionPack; private set
+    internal lateinit var textureRegion: TextureRegionPack; private set
 
     var currentFrame = 0
     var currentRow = 0
