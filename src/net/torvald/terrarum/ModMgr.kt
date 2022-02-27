@@ -209,8 +209,6 @@ object ModMgr {
 
                                 // check for module-info.java
                                 val moduleInfoPath = cl.getResources("module-info.class").toList().filter { it.toString().contains("$moduleName/$jar!/module-info.class") && it.toString().endsWith("module-info.class")}
-                                println("moduleinfo: ${cl.getResources("module-info.class").toList().joinToString()}")
-                                println(moduleInfoPath.joinToString())
                                 if (moduleInfoPath.size == 0) {
                                     throw IllegalStateException("module-info not found on $moduleName")
                                 }
