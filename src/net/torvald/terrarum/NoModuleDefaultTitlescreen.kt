@@ -2,7 +2,6 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -36,6 +35,20 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
 
     private val fbatch = SpriteBatch()
 
+    private val genericBackdrop = Toolkit.Theme.COL_CELL_FILL.cpy().add(0f,0f,0f,1f)
+    private val winTenBackdrop = Color(0x1070AAFF)
+    private val winSevenBackdrop = Color(0x000080FF)
+    private val osxBackdrop = Color(0x222222FF)
+
+    private val backdrop = if (App.operationSystem == "WINDOWS" && App.OSVersion.substringBefore('.').toInt() > 7)
+        winTenBackdrop
+    else if (App.operationSystem == "WINDOWS")
+        winSevenBackdrop
+    else if (App.operationSystem == "OSX")
+        osxBackdrop
+    else
+        genericBackdrop
+
     override fun render(updateRate: Float) {
         gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
@@ -55,7 +68,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
             val centering = (App.scr.hf - heights.last() - App.fontGameFBO.lineHeight) / 2f
 
             fbo.inAction(null, null) {
-                gdxClearAndSetBlend(.094f, .094f, .094f, 1f)
+                gdxClearAndSetBlend(backdrop)
                 batch.inUse {
                     batch.color = Color.WHITE
                     wot.reversed().forEachIndexed { index, s ->
