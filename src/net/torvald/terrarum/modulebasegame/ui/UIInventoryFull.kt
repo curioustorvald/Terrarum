@@ -4,16 +4,15 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import net.torvald.ENDASH
-import net.torvald.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
-import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
+import net.torvald.unicode.ENDASH
+import net.torvald.unicode.getKeycapPC
 
 /**
  * Created by minjaesong on 2017-10-21.

@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
-import net.torvald.BULLET
-import net.torvald.ENDASH
+import net.torvald.unicode.BULLET
+import net.torvald.unicode.ENDASH
 
 object CreditSingleton {
 

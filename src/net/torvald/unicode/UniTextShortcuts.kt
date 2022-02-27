@@ -1,4 +1,4 @@
-package net.torvald
+package net.torvald.unicode
 
 import net.torvald.terrarum.savegame.ByteArray64
 

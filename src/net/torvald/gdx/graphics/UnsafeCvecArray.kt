@@ -1,6 +1,6 @@
 package net.torvald.gdx.graphics
 
-import net.torvald.UnsafeHelper
+import net.torvald.unsafe.UnsafeHelper
 
 /**
  * Basically just a FloatArray. You may need to re-write the entire code to actually store the Vectors,

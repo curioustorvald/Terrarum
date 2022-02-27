@@ -206,6 +206,15 @@ object ModMgr {
                                 val cl = JarFileLoader(urls)
                                 cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
                                 moduleClassloader[moduleName] = cl
+
+                                // check for module-info.java
+                                val moduleInfoPath = cl.getResources("module-info.class").toList().filter { it.toString().contains("$moduleName/$jar!/module-info.class") && it.toString().endsWith("module-info.class")}
+                                println("moduleinfo: ${cl.getResources("module-info.class").toList().joinToString()}")
+                                println(moduleInfoPath.joinToString())
+                                if (moduleInfoPath.size == 0) {
+                                    throw IllegalStateException("module-info not found on $moduleName")
+                                }
+
                                 newClass = cl.loadClass(entryPoint)
                             }
                             // for modules that are not (meant to be used by the "basegame" kind of modules)

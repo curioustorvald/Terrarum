@@ -1,14 +1,14 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.UnsafeHelper
-import net.torvald.UnsafePtr
 import net.torvald.terrarum.App.printdbg
+import net.torvald.unsafe.UnsafeHelper
+import net.torvald.unsafe.UnsafePtr
 
 /**
  * Memory layout:
  * ```
- *  a7 a6 a5 a4 a3 a2 a1 a0 | xx xx xx xx aB aA a9 a8 ||
+ *  a7 a6 a5 a4 a3 a2 a1 a0 | aF aE aD aC aB aA a9 a8 ||
  * ```
  * where a_n is a tile number
  *

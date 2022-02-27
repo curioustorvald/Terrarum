@@ -1,6 +1,6 @@
 package net.torvald.random;
 
-import net.torvald.UnsafeHelper;
+import net.torvald.unsafe.UnsafeHelper;
 
 /**
  * Code from https://richardstartin.github.io/posts/xxhash

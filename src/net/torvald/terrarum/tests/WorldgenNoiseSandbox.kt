@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.UnsafePtr
+import net.torvald.unsafe.UnsafeHelper
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.concurrent.*
 import net.torvald.terrarum.gameworld.fmod

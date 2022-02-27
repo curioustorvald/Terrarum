@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.colourutil.*
 import net.torvald.parametricsky.datasets.DatasetCIEXYZ
 import net.torvald.parametricsky.datasets.DatasetRGB

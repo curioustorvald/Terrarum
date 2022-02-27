@@ -1,7 +1,7 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.UnsafeHelper
+import net.torvald.unsafe.UnsafeHelper
 
 /**
  * As the fast access to this LUT is critical for the performance because of the way light calculation work,

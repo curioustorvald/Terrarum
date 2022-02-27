@@ -7,7 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 /**

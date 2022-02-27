@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
-import net.torvald.EMDASH
-import net.torvald.getKeycapConsole
-import net.torvald.getKeycapPC
+import net.torvald.unicode.EMDASH
+import net.torvald.unicode.getKeycapConsole
+import net.torvald.unicode.getKeycapPC
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg

@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.debuggerapp
 
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.console.Echo

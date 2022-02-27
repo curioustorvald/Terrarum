@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
-import net.torvald.UnsafeHelper
+import net.torvald.unsafe.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.*

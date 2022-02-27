@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.gdxClearAndSetBlend
 import net.torvald.terrarum.inUse

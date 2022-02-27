@@ -3,14 +3,13 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.EMDASH
-import net.torvald.getKeycapPC
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TerrarumScreenSize
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.unicode.EMDASH
+import net.torvald.unicode.getKeycapPC
 import kotlin.math.roundToInt
 
 /**

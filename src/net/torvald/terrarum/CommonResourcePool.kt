@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Queue
-import net.torvald.UnsafePtr
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unsafe.UnsafePtr
 
 /**
  * Created by minjaesong on 2019-03-10.
@@ -127,8 +127,8 @@ object CommonResourcePool {
                     u is Disposable -> u.dispose()
                     u is Texture -> u.dispose()
                     u is TextureRegion -> u.texture.dispose()
-                    u is UnsafePtr -> u.destroy()
-                    else -> poolKillFun[name]?.invoke(u)
+                    u is UnsafePtr     -> u.destroy()
+                    else               -> poolKillFun[name]?.invoke(u)
                 }
             }
             catch (e: Throwable) {

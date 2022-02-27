@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.inUse

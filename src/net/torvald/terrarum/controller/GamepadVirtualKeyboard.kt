@@ -1,8 +1,8 @@
 package net.torvald.terrarum.controller
 
-import net.torvald.CURRENCY
-import net.torvald.EMDASH
-import net.torvald.MIDDOT
+import net.torvald.unicode.CURRENCY
+import net.torvald.unicode.EMDASH
+import net.torvald.unicode.MIDDOT
 
 /**
  * Created by minjaesong on 2019-04-10.

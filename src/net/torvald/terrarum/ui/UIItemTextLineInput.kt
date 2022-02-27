@@ -13,7 +13,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
-import net.torvald.toJavaString
+import net.torvald.unicode.toJavaString
 import kotlin.streams.toList
 
 data class InputLenCap(val count: Int, val unit: CharLenUnit) {

@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.ccC
 import net.torvald.terrarum.ccW
 import net.torvald.terrarum.gameworld.toUint

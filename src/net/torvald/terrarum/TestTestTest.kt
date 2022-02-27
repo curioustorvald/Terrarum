@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.Color
-import net.torvald.EMDASH
+import net.torvald.unicode.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 

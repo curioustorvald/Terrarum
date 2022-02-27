@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import net.torvald.EMDASH
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
+import net.torvald.unicode.EMDASH
 
 /**
  * Created by minjaesong on 2017-07-05.

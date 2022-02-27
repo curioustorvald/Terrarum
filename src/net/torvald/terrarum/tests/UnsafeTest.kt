@@ -1,6 +1,6 @@
 package net.torvald.terrarum.tests
 
-import net.torvald.UnsafeHelper
+import net.torvald.unsafe.UnsafeHelper
 import net.torvald.terrarum.gameworld.toUint
 import sun.misc.Unsafe
 

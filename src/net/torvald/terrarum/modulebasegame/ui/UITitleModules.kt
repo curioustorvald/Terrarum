@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import net.torvald.getKeycapConsole
-import net.torvald.getKeycapPC
+import net.torvald.unicode.getKeycapConsole
+import net.torvald.unicode.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Movement
