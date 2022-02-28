@@ -203,6 +203,16 @@ object Common {
                 return rng
             }
         })
+        // kotlin.ByteArray
+        jsoner.setSerializer(ByteArray::class.java, object : Json.Serializer<ByteArray> {
+            override fun write(json: Json, obj: ByteArray, knownType: Class<*>?) {
+                json.writeValue(bytesToZipdStr(obj.iterator()))
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ByteArray {
+                return strToBytes(StringReader(jsonData.asString())).toByteArray()
+            }
+        })
     }
 
     private data class LayerInfo(val h: String, val b: String, val x: Int, val y: Int)

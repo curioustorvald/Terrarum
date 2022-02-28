@@ -115,6 +115,11 @@ object CommonResourcePool {
         return pool[identifier]!!
     }
 
+    fun getOrNull(identifier: String) = pool[identifier]
+    fun getOrDefault(identifier: String, defaultValue: Any) = pool.getOrDefault(identifier, defaultValue)
+    fun getOrPut(identifier: String, defaultValue: () -> Any) = pool.getOrPut(identifier, defaultValue)
+    fun getOrElse(identifier: String, defaultValue: () -> Any) = pool.getOrElse(identifier, defaultValue)
+
     inline fun <reified T> getAs(identifier: String) = get(identifier) as T
     fun getAsTextureRegionPack(identifier: String) = getAs<TextureRegionPack>(identifier)
     fun getAsTextureRegion(identifier: String) = getAs<TextureRegion>(identifier)

@@ -109,12 +109,10 @@ object DecodeTapestry {
     val FORMAT_16 = 1
     val FORMAT_64 = 2
 
-    operator fun invoke(fileObj: File): TapestryObject {
+    operator fun invoke(file: ByteArray): TapestryInfo {
         fun magicMismatch(magic: ByteArray, array: ByteArray): Boolean {
             return !Arrays.equals(array.sliceArray(0..magic.lastIndex), magic)
         }
-
-        val file = fileObj.readBytes()
 
         val magic = file.copyOfRange(0, 4)
 
@@ -174,6 +172,8 @@ object DecodeTapestry {
             readCounter++
         }
 
-        return TapestryObject(outImageData, artName, authorName) { "$ccW$authorName, $ccC$artName" }
+        return TapestryInfo(outImageData, artName, authorName)
     }
 }
+
+data class TapestryInfo(val pixmap: Pixmap, val artName: String, val authorName: String)

@@ -37,6 +37,7 @@ import java.io.PrintStream
 import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.round
+import kotlin.math.roundToInt
 
 
 
@@ -347,6 +348,20 @@ inline fun FrameBuffer.inActionF(camera: OrthographicCamera?, batch: SpriteBatch
     batch?.projectionMatrix = camera?.combined
 }
 
+
+private val rgbMultLUT = Array(256) { y -> IntArray(256) { x ->
+    val i = (x % 256) / 255f
+    val j = (y / 256) / 255f
+    (i * j).times(255f).roundToInt()
+} }
+
+infix fun Int.rgbamul(other: Int): Int {
+    val r = rgbMultLUT[this.ushr(24).and(255)][other.ushr(24).and(255)]
+    val g = rgbMultLUT[this.ushr(16).and(255)][other.ushr(16).and(255)]
+    val b = rgbMultLUT[this.ushr(8).and(255)][other.ushr(8).and(255)]
+    val a = rgbMultLUT[this.ushr(0).and(255)][other.ushr(0).and(255)]
+    return r.shl(24) or g.shl(16) or b.shl(8) or a
+}
 
 infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 infix fun Color.mulAndAssign(other: Color): Color {
