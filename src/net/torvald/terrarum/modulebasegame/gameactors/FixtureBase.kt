@@ -130,7 +130,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             }
         }
 
-        if (hasCollision) return false
+        if (hasCollision) {
+            printdbg(this, "cannot spawn fixture ${nameFun()}, has tile collision; tilewise dim: (${blockBox.width}, ${blockBox.height}) ")
+            return false
+        }
 
         printdbg(this, "spawn fixture ${nameFun()}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
 
