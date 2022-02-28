@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ItemCodex
@@ -30,7 +29,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     protected var ghostItem: FixtureBase? = null
         get() {
             if (field == null)
-                ghostItem = makeFixture()
+                field = makeFixture()
             return field
         }
 

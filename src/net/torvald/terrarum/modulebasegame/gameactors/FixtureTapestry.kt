@@ -1,9 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
@@ -68,12 +66,9 @@ internal class FixtureTapestry : FixtureBase {
 
         // blend canvas texture
         for (y in 0 until pixmap.height) { for (x in 0 until pixmap.width) {
-            val srcCol = canvas.getPixel(x % pixmap.width, y % pixmap.height)
+            val srcCol = canvas.getPixel(x % canvas.width, y % canvas.height)
             val dstCol = pixmap.getPixel(x, y)
-//            pixmap.drawPixel(x, y, dstCol rgbamul srcCol)
-            val col = Color(dstCol) mul Color(srcCol)
-            pixmap.setColor(col)
-            pixmap.drawPixel(x, y)
+            pixmap.drawPixel(x, y, dstCol rgbamul srcCol)
         } }
 
         // draw frame

@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
@@ -66,7 +65,7 @@ class EntryPoint : ModuleEntryPoint() {
             }
         }
 
-        println("[Basegame.EntryPoint] Welcome back!")
+        println("\n[Basegame.EntryPoint] Welcome back!")
     }
 
     private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(

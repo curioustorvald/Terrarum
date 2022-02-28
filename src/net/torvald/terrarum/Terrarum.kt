@@ -350,8 +350,8 @@ inline fun FrameBuffer.inActionF(camera: OrthographicCamera?, batch: SpriteBatch
 
 
 private val rgbMultLUT = Array(256) { y -> IntArray(256) { x ->
-    val i = (x % 256) / 255f
-    val j = (y / 256) / 255f
+    val i = x / 255f
+    val j = y / 255f
     (i * j).times(255f).roundToInt()
 } }
 
