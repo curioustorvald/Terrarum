@@ -727,7 +727,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         /** RENDER CODE GOES HERE */
         measureDebugTime("Ingame.Render") { renderGame() }
 
-        val autosaveInterval = App.getConfigInt("autosaveinterval") / 1000f
+        val autosaveInterval = App.getConfigInt("autosaveinterval").coerceAtLeast(60000) / 1000f
         if (autosaveTimer >= autosaveInterval) {
             queueAutosave()
             autosaveTimer -= autosaveInterval

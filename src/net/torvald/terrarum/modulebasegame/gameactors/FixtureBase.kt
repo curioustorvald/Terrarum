@@ -23,6 +23,8 @@ interface Electric {
 /**
  * Protip: do not make child classes take any argument, especially no function (function "classes" have no zero-arg constructor)
  *
+ * Initialising Fixture after deserialisation: override `reload()`
+ *
  * Created by minjaesong on 2016-06-17.
  */
 open class FixtureBase : ActorWithBody, CuedByTerrainChange {
@@ -34,7 +36,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     @Transient var mainUI: UICanvas? = null
     var inventory: FixtureInventory? = null
 
-    protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
+    private constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
 
 
     constructor(
@@ -130,7 +132,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         if (hasCollision) return false
 
-        printdbg(this, "spawn ${nameFun()}")
+        printdbg(this, "spawn fixture ${nameFun()}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
 
         // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
@@ -161,8 +163,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * Removes this instance of the fixture from the world
      */
     open fun despawn() {
-        if (canBeDespawned) {
+
+        if (this !is FixtureTapestry && canBeDespawned) {
             printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
+            printStackTrace(this)
 
             // remove filler block
             forEachBlockbox { x, y ->
@@ -181,6 +185,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             }
         }
         else {
+//            printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
             printdbg(this, "cannot despawn a fixture with non-empty inventory")
         }
     }

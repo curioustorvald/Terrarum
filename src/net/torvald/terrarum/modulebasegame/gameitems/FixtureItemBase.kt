@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ItemCodex
@@ -16,9 +17,9 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 /**
  * Created by minjaesong on 2021-12-13.
  */
-open class FixtureItemBase(originalID: ItemID, fixtureClassName: String) : GameItem(originalID) {
+open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : GameItem(originalID) {
 
-    private val makeFixture: () -> FixtureBase = {
+    protected open val makeFixture: () -> FixtureBase = {
         Class.forName(fixtureClassName).getDeclaredConstructor().newInstance() as FixtureBase
     }
 
@@ -26,7 +27,12 @@ open class FixtureItemBase(originalID: ItemID, fixtureClassName: String) : GameI
         ItemCodex.fixtureToSpawnerItemID[fixtureClassName] = originalID
     }
 
-    protected val ghostItem = makeFixture()
+    protected var ghostItem: FixtureBase? = null
+        get() {
+            if (field == null)
+                ghostItem = makeFixture()
+            return field
+        }
 
     override var dynamicID: ItemID = originalID
     override val originalName = "FIXTUREBASE"
@@ -42,7 +48,7 @@ open class FixtureItemBase(originalID: ItemID, fixtureClassName: String) : GameI
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (INGAME as TerrarumIngame).blockMarkingActor.let {
-            it.setGhost(ghostItem)
+            it.setGhost(ghostItem!!)
             it.isVisible = true
             it.update(delta)
             it.setGhostColourBlock()
@@ -59,7 +65,7 @@ open class FixtureItemBase(originalID: ItemID, fixtureClassName: String) : GameI
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
-        val item = makeFixture()
+        val item = ghostItem!!//makeFixture()
 
         item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
         // return true when placed, false when cannot be placed

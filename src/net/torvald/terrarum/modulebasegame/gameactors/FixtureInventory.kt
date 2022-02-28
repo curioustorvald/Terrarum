@@ -105,10 +105,10 @@ open class FixtureInventory() {
         if (existingItem != null) { // if the item already exists
             val newCount = existingItem.qty - count
 
-            if (newCount < 0) {
+            /*if (newCount < 0) {
                 throw Error("[${this.javaClass.canonicalName}] Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
             }
-            else if (newCount > 0) {
+            else*/ if (newCount > 0) {
                 // decrement count
                 existingItem.qty = newCount
             }
@@ -120,7 +120,7 @@ open class FixtureInventory() {
             }
         }
         else {
-            throw Error("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
+//            throw Error("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
         }
     }
     

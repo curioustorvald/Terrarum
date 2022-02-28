@@ -14,14 +14,14 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
  */
 internal object Inventory : ConsoleCommand {
 
-    private var targetID: ActorID = PLAYER_REF_ID
+    private var targetID: ActorID = INGAME.actorNowPlaying?.referenceID ?: PLAYER_REF_ID
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
             printUsage()
         }
         else if (args[1] == "target") {
-            targetID = if (args[2].lowercase() == "player") PLAYER_REF_ID else args[2].toInt()
+            targetID = if (args[2].lowercase() == "player") (INGAME.actorNowPlaying?.referenceID ?: PLAYER_REF_ID) else args[2].toInt()
         }
         else {
             val actor = getActor()

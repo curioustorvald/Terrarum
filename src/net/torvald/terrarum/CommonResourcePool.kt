@@ -115,10 +115,14 @@ object CommonResourcePool {
         return pool[identifier]!!
     }
 
-    fun getOrNull(identifier: String) = pool[identifier]
-    fun getOrDefault(identifier: String, defaultValue: Any) = pool.getOrDefault(identifier, defaultValue)
-    fun getOrPut(identifier: String, defaultValue: () -> Any) = pool.getOrPut(identifier, defaultValue)
-    fun getOrElse(identifier: String, defaultValue: () -> Any) = pool.getOrElse(identifier, defaultValue)
+    fun getOrNull(name: String) = pool[name]
+    fun getOrPut(name: String, loadfun: () -> Any) = CommonResourcePool.getOrPut(name, loadfun, null)
+        fun getOrPut(name: String, loadfun: () -> Any, killfun: ((Any) -> Unit)?): Any {
+        if (pool.containsKey(name)) return pool[name]!!
+        pool[name] = loadfun.invoke()
+        poolKillFun[name] = killfun
+        return pool[name]!!
+    }
 
     inline fun <reified T> getAs(identifier: String) = get(identifier) as T
     fun getAsTextureRegionPack(identifier: String) = getAs<TextureRegionPack>(identifier)
