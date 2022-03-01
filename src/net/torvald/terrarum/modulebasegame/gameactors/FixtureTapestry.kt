@@ -57,7 +57,7 @@ internal class FixtureTapestry : FixtureBase {
         val frame = CommonResourcePool.getOrPut("tapestries-common-frame_$tileFilename.tga") {
             Pixmap(ModMgr.getGdxFilesFromEveryMod("tapestries/common/frame_$tileFilename.tga").last().second)
         } as Pixmap
-        val canvas = CommonResourcePool.getOrPut("tapestries-common-canvas") {
+        val canvas = CommonResourcePool.getOrPut("tapestries-common-canvas.tga") {
             Pixmap(ModMgr.getGdxFilesFromEveryMod("tapestries/common/canvas.tga").last().second)
         } as Pixmap
 

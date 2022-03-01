@@ -1,10 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -12,6 +10,7 @@ import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2021-12-13.
@@ -70,4 +69,24 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         // return true when placed, false when cannot be placed
     }
 
+    /**
+     * Also see: [net.torvald.terrarum.modulebasegame.gameactors.FixtureBase.Companion]
+     */
+    companion object {
+        /** Always use with Getter! */
+        fun getItemImageFromSheet(module: String, path: String, tileW: Int, tileH: Int): TextureRegion {
+            val id = "$module/${path.replace('\\','/')}"
+            return (CommonResourcePool.getOrPut(id) {
+                TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH, flipY = false)
+            } as TextureRegionPack).get(0,0)
+        }
+
+        /** Always use with Getter! */
+        fun getItemImageFromSingleImage(module: String, path: String): TextureRegion {
+            val id = "$module/${path.replace('\\','/')}"
+            return CommonResourcePool.getOrPut(id) {
+                TextureRegion(Texture(ModMgr.getGdxFile(module, path)))
+            } as TextureRegion
+        }
+    }
 }

@@ -11,13 +11,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBox
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.tsvm.*
 import net.torvald.tsvm.peripheral.GraphicsAdapter
 import net.torvald.tsvm.peripheral.ReferenceGraphicsAdapter
@@ -43,7 +43,7 @@ class FixtureHomeComputer : FixtureBase {
         density = 1400.0
         setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, -1)
 
-        makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("dwarventech-sprites-fixtures-desktop_computer.tga").texture, TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE))
+        makeNewSprite(FixtureBase.getSpritesheet("dwarventech", "sprites/fixtures/desktop_computer.tga", TILE_SIZE, TILE_SIZE))
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = 20.0

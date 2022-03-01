@@ -41,9 +41,6 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
     ) {
 
         // loading textures
-        CommonResourcePool.addToLoadingList("sprites-fixtures-tiki_torch.tga") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 16, 32, flipY = false)
-        }
         CommonResourcePool.addToLoadingList("particles-tiki_smoke.tga") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "particles/bigger_smoke.tga"), 16, 16)
         }
@@ -55,7 +52,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
 
         lightBoxList.add(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0), color))
 
-        makeNewSprite(CommonResourcePool.getAsTextureRegionPack("sprites-fixtures-tiki_torch.tga"))
+        makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32))
         sprite!!.setRowsAndFrames(1, 2)
 
         actorValue[AVKey.BASEMASS] = MASS

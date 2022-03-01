@@ -1,15 +1,14 @@
 package net.torvald.terrarum.modulecomputers.gameitems
 
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
+import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulecomputers.gameactors.FixtureHomeComputer
 
 /**
@@ -26,19 +25,11 @@ class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("dwarventech-sprites-fixtures-desktop_computer.tga")
+        get() = FixtureItemBase.getItemImageFromSheet("dwarventech", "sprites/fixtures/desktop_computer.tga", TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)
     override var baseToolSize: Double? = baseMass
 
 
     init {
-        CommonResourcePool.addToLoadingList("dwarventech-sprites-fixtures-desktop_computer.tga") {
-//            val t = TextureRegion(Texture(ModMgr.getGdxFile("dwarventech", "nonexisting_file!!!")))
-            val t = TextureRegion(Texture(ModMgr.getGdxFile("dwarventech", "sprites/fixtures/desktop_computer.tga")))
-            t.flip(false, false)
-            /*return*/t
-        }
-        CommonResourcePool.loadAll()
-
         equipPosition = EquipPosition.HAND_GRIP
     }
 

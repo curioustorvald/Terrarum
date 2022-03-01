@@ -7,7 +7,7 @@ digraph g {
 	subgraph cluster_legend {
 		label=Legend
 		"raw materials" [style=filled,fillcolor=mistyrose]
-		"manufactured materials" [shape=box,style=filled,fillcolor=lightsteelblue]
+		"manufactured materials" [shape=trapezium,style=filled,fillcolor=lightsteelblue]
 		concepts [shape=component]
 		"useable items" [shape=box,style=filled,fillcolor=khaki]
 		"ingredient only" [shape=box,style=filled]
@@ -59,27 +59,32 @@ digraph g {
 	}
 
 	/* raw materials */
-	wood [style=filled,fillcolor=mistyrose]
-	stone [style=filled,fillcolor=mistyrose]
-	malachite [style=filled,fillcolor=mistyrose]
-	hematite [style=filled,fillcolor=mistyrose]
-	coal [style=filled,fillcolor=mistyrose]
+	wood [style=filled,fillcolor="#d5bc89"]
+	stone [style=filled,fillcolor="#babfc5"]
+	coal [style=filled,fillcolor="#606060",fontcolor=white]
 	quartz [style=filled,fillcolor=mistyrose]
-	ilmenite [style=filled,fillcolor=mistyrose]
-	gold [style=filled,fillcolor=mistyrose]
-	sand [style=filled,fillcolor=mistyrose]
+	sand [style=filled,fillcolor="#f0ecca"]
+	
+	malachite [style=filled,fillcolor="#54b295",fontcolor=white]
+	hematite [style=filled,fillcolor="#cb8c6d",fontcolor=white]
+	ilmenite [style=filled,fillcolor="#df6e88",fontcolor=white] // kinda fake colour for playability
+	gold [style=filled,fillcolor="#dbba5e"]
+	sphalerite [style=filled,fillcolor="#5c9abb",fontcolor=white] // fluoresces lead-oxide yellow
+
 	/* manufactured materials */
-	steel [shape=trapezium,style=filled,fillcolor=lightsteelblue]
-	iron [shape=trapezium,style=filled,fillcolor=lightsteelblue]
-	copper [shape=trapezium,style=filled,fillcolor=lightsteelblue]
-	titanium [shape=trapezium,style=filled,fillcolor=lightsteelblue]
-	glass [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+	steel [shape=trapezium,style=filled,fillcolor="#4e5152",fontcolor=white]
+	iron [shape=trapezium,style=filled,fillcolor="#a08778",fontcolor=white]
+	copper [shape=trapezium,style=filled,fillcolor="#d69544",fontcolor=white]
+	titanium [shape=trapezium,style=filled,fillcolor="#daddd9"]
+	glass [shape=trapezium,style=filled,fillcolor="#79b883",fontcolor=white]
+	zinc [shape=trapezium,style=filled,fillcolor="#8a8d8e",fontcolor=white]
+	brass [shape=trapezium,style=filled,fillcolor="#d6af44"]
 	/* concepts */
 	thermal [shape=component]
 	electricity [shape=component]
 	kinetic [shape=component]
 	information [shape=component]
-	"sequential logic" [shape=component] /* implies electronic memory */
+	"sequential logic" [shape=component] // implies electronic memory
 	radio [shape=component]
 	telecommunication [shape=component]
 	teleportation [shape=component]
@@ -88,15 +93,16 @@ digraph g {
 	networking [shape=component]
 	"haute couture" [shape=component]
 	"world portal" [shape=component]
-	"hand tools" [shape=component] /* pickaxe, axe, etc. */
+	"hand tools" [shape=component] // pickaxe, axe, etc.
 	"weapons&armours" [shape=component]
-	"motorised tools" [shape=component] /* drill, chainsaw, etc. */
-	machines [shape=component] /* electric machines */
-	"nonelectric machines" [shape=component]
+	"motorised tools" [shape=component] // drill, chainsaw, etc.
+	machines [shape=component] // electric machines
+	"rotating machines" [shape=component] // machines whose main method of operaton is spinning (e.g. macerator, powder mixer, grindstone, gristmill)
+	"electromechanical components" [shape=component] // e.g. signal-controlled clutch
 	/* useable items */
 	furnace [shape=box,style=filled,fillcolor=khaki]
 	torch [shape=box,style=filled,fillcolor=khaki]
-	"light fixture" [shape=box,style=filled,fillcolor=khaki] /* Both lamps and blinkenlight(s) */
+	"light fixture" [shape=box,style=filled,fillcolor=khaki] // Both lamps and blinkenlight(s)
 	furnitures [shape=box,style=filled,fillcolor=khaki]
 	office [shape=box,style=filled,fillcolor=khaki]
 	"logic gate" [shape=box,style=filled,fillcolor=khaki]
@@ -107,13 +113,19 @@ digraph g {
 	rtty [shape=box,style=filled,fillcolor=khaki]
 	"digital billboard" [shape=box,style=filled,fillcolor=khaki]
 	"CRT display" [shape=box,style=filled,fillcolor=khaki]
-	"personal computer" [shape=box,style=filled,fillcolor=khaki] /* small computer with single integrated */
-	mainframe [shape=box,style=filled,fillcolor=khaki] /* big computer that can have multiple terminals */
-
+	"personal computer" [shape=box,style=filled,fillcolor=khaki] // small computer with single integrated
+	mainframe [shape=box,style=filled,fillcolor=khaki] // big computer that can have multiple terminals
+	windmill [shape=box,style=filled,fillcolor=khaki]
+	engine [shape=box,style=filled,fillcolor=khaki]
+	motor [shape=box,style=filled,fillcolor=khaki]
+	clutch [shape=box,style=filled,fillcolor=khaki]
+	gear [shape=box,style=filled,fillcolor=khaki]
+	shaft [shape=box,style=filled,fillcolor=khaki]
+	belt [shape=box,style=filled,fillcolor=khaki]
+	
 	/* ingredient items */
-	engine [shape=box,style=filled]
 	LED [shape=box,style=filled]
-	"computing unit" [shape=box,style=filled] /* motherboard+cpu+ram+powersupply combined */
+	"computing unit" [shape=box,style=filled] // motherboard+cpu+ram+powersupply combined
 	"quartz oscillator" [shape=box,style=filled]
 	"quartz lens" [shape=box,style=filled]
 
@@ -143,6 +155,7 @@ digraph g {
 	electricity -> machines
 	steel -> machines
 	
+	brass -> furnitures
 	wood -> furnitures
 	wood -> "hand tools"
 	iron -> "hand tools"
@@ -221,6 +234,20 @@ digraph g {
 	"weapons&armours" -> "arming sword" [lhead=cluster_weaponarmour]
 	"motorised tools" -> breaker [lhead=cluster_electrictools]
 
-	kinetic -> "nonelectric machines"
-	steel -> "nonelectric machines"
+	kinetic -> "rotating machines"
+	steel -> "rotating machines"
+	
+	wood -> windmill -> kinetic
+	electricity -> motor -> kinetic
+	
+	kinetic -> shaft
+	kinetic -> gear
+	kinetic -> belt
+	kinetic -> clutch
+	
+	electricity -> "electromechanical components"
+	kinetic -> "electromechanical components"
+	
+	copper -> brass
+	sphalerite -> zinc -> brass
 }

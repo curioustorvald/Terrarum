@@ -1,9 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.ItemID
@@ -22,11 +19,8 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
     override val isDynamic = false
     override val material = Material()
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getOrPut("basegame-sprites-fixtures-signal_source.tga") {
-            val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "sprites/fixtures/signal_source.tga")))
-            t.flip(false, false)
-            /*return*/t
-        } as TextureRegion
+        get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
+
     override var baseToolSize: Double? = baseMass
 
     init {

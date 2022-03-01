@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.PhysProperties
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
 typealias BlockBoxIndex = Int
@@ -221,6 +222,18 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     override fun flagDespawn() {
         if (canBeDespawned) flagDespawn = true
+    }
+
+    /**
+     * Also see: [net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase.Companion]
+     */
+    companion object {
+        fun getSpritesheet(module: String, path: String, tileW: Int, tileH: Int): TextureRegionPack {
+            val id = "$module/${path.replace('\\','/')}"
+            return (CommonResourcePool.getOrPut(id) {
+                TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH, flipY = false)
+            } as TextureRegionPack)
+        }
     }
 }
 
