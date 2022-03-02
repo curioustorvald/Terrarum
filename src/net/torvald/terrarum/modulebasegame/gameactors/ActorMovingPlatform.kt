@@ -1,16 +1,24 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.PhysProperties
 
 /**
  * Created by minjaesong on 2022-02-28.
  */
-class ActorMovingPlatform() : ActorWithBody() {
+open class ActorMovingPlatform() : ActorWithBody() {
 
-    private val tilewiseLength = 3
+    protected var tilewiseWidth = 3
+    protected val actorsRiding = ArrayList<ActorID>() // saving actorID due to serialisation issues
 
-    private val actorsRiding = ArrayList<ActorID>() // saving actorID due to serialisation issues
+    init {
+        physProp = PhysProperties.PHYSICS_OBJECT
+
+        setHitboxDimension(TILE_SIZE * tilewiseWidth, TILE_SIZE, 0, 0)
+    }
+
 
     /**
      * Make the actor its externalV controlled by this platform
