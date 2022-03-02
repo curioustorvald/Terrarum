@@ -26,13 +26,6 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
     init {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
 
-        CommonResourcePool.addToLoadingList("basegame-sprites-fixtures-signal_source.tga") {
-            val t = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "sprites/fixtures/signal_source.tga")))
-            t.flip(false, false)
-            /*return*/t
-        }
-        CommonResourcePool.loadAll()
-
         density = 1400.0
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
 

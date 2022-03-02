@@ -40,6 +40,11 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     private constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
 
 
+    /**
+     * Making the sprite: do not address the CommonResourcePool directly; just do it like this snippet:
+     *
+     * ```makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32))```
+     */
     constructor(
                 blockBox0: BlockBox,
                 blockBoxProps: BlockBoxProps = BlockBoxProps(0),

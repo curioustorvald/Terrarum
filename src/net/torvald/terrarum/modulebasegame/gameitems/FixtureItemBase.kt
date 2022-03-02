@@ -40,8 +40,15 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     override val isUnique = false
     override val isDynamic = false
     override val material = Material()
+
+    /**
+     * Do not address the CommonResourcePool directly; just do it like this snippet:
+     *
+     * ```get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")```
+     */
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_32")
+
     override var baseToolSize: Double? = baseMass
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {

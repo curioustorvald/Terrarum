@@ -15,6 +15,7 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulecomputers.tsvmperipheral.WorldRadar
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -36,7 +37,8 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
     override val isDynamic = true
     override val material = Material()
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegion("basegame-sprites-fixtures-signal_source.tga")
+        get() = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
+
     override var baseToolSize: Double? = baseMass
 
 
