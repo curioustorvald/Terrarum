@@ -99,6 +99,7 @@ digraph g {
 	machines [shape=component] // electric machines
 	"rotating machines" [shape=component] // machines whose main method of operaton is spinning (e.g. macerator, powder mixer, grindstone, gristmill)
 	"electromechanical components" [shape=component] // e.g. signal-controlled clutch
+	galvanisation [shape=component] // iron plates/blocks/etc that won't rust
 	/* useable items */
 	furnace [shape=box,style=filled,fillcolor=khaki]
 	torch [shape=box,style=filled,fillcolor=khaki]
@@ -122,6 +123,7 @@ digraph g {
 	gear [shape=box,style=filled,fillcolor=khaki]
 	shaft [shape=box,style=filled,fillcolor=khaki]
 	belt [shape=box,style=filled,fillcolor=khaki]
+	battery [shape=box,style=filled,fillcolor=khaki]
 	
 	/* ingredient items */
 	LED [shape=box,style=filled]
@@ -250,4 +252,11 @@ digraph g {
 	
 	copper -> brass
 	sphalerite -> zinc -> brass
+	
+	zinc -> galvanisation
+	iron -> galvanisation
+	
+	coal -> battery
+	zinc -> battery // zinc-carbon battery
+	battery -> electricity
 }
