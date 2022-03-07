@@ -1,17 +1,18 @@
 digraph g {
-	concentrate=false
+	concentrate=true
 	dpi=192
-	{rank=same; copper iron}
+	rankdir=LR
+	//{rank=same; copper iron}
      graph [compound=true]
      
 	subgraph cluster_legend {
 		label=Legend
 		"raw materials" [style=filled,fillcolor=mistyrose]
-		"manufactured materials" [shape=trapezium,style=filled,fillcolor=lightsteelblue]
+		"artificial\nmaterials" [shape=trapezium,style=filled,fillcolor=lightsteelblue]
 		concepts [shape=component]
 		"useable items" [shape=box,style=filled,fillcolor=khaki]
 		"ingredient only" [shape=box,style=filled]
-		{rank=source; "raw materials" "manufactured materials"}
+		{rank=source; "raw materials" "artificial\nmaterials"}
 		{rank=same; concepts "useable items" "ingredient only"}
 	}
 	
@@ -22,16 +23,15 @@ digraph g {
 		breastplate [shape=box,style=filled,fillcolor=khaki]
 		leggings [shape=box,style=filled,fillcolor=khaki]
 		boots [shape=box,style=filled,fillcolor=khaki]
-		{rank=source; "arming sword" greatsword}
-		{rank=same; headgear breastplate}
-		{rank=sink; leggings boots}
+		{rank=source; "arming sword" greatsword headgear}
+		{rank=sink; breastplate leggings boots}
 	}
 	subgraph cluster_handtools {
 		pickaxe [shape=box,style=filled,fillcolor=khaki]
 		hatchet [shape=box,style=filled,fillcolor=khaki]
 		sledgehammer [shape=box,style=filled,fillcolor=khaki]
 		"grappling hook" [shape=box,style=filled,fillcolor=khaki]
-		{rank=source; pickaxe hatchet sledgehammer}
+		{rank=source; pickaxe hatchet}
 	}
 	subgraph cluster_electrictools {
 		"mining drill" [shape=box,style=filled,fillcolor=khaki]
@@ -45,9 +45,9 @@ digraph g {
 		"victorian furniture set" [shape=box,style=filled,fillcolor=khaki]
 		"provence furniture set" [shape=box,style=filled,fillcolor=khaki]
 		"ikea-esque furniture set" [shape=box,style=filled,fillcolor=khaki]
-		{rank=source; "victorian furniture set"}
-		{rank=same; "provence furniture set"}
-		{rank=sink; "ikea-esque furniture set"}
+		//{rank=source; "victorian furniture set"}
+		//{rank=same; "provence furniture set"}
+		//{rank=sink; "ikea-esque furniture set"}
 	}
 	subgraph cluster_furnishings {
 		"iron furniture set" [shape=box,style=filled,fillcolor=khaki] // basic
@@ -56,6 +56,21 @@ digraph g {
 		"cupric furniture set" [shape=box,style=filled,fillcolor=khaki] // copper-coloured rustic
 		{rank=source; "iron furniture set" "cupric furniture set"}
 		{rank=sink; "glass furniture set" "steel furniture set"}
+	}
+	subgraph cluster_kineticcomponents {
+		clutch [shape=box,style=filled,fillcolor=khaki]
+		gear [shape=box,style=filled,fillcolor=khaki]
+		shaft [shape=box,style=filled,fillcolor=khaki]
+		belt [shape=box,style=filled,fillcolor=khaki]
+		//{rank=source; gear belt}
+	}
+	subgraph cluster_machineries {
+		press [shape=box,style=filled,fillcolor=khaki]
+		crusher [shape=box,style=filled,fillcolor=khaki]
+		saw [shape=box,style=filled,fillcolor=khaki] // cuts rocks AND chops trees
+		crafter [shape=box,style=filled,fillcolor=khaki]
+		harvester [shape=box,style=filled,fillcolor=khaki]
+		// no drill; mining is easier in 2D world
 	}
 
 	/* raw materials */
@@ -67,7 +82,7 @@ digraph g {
 	
 	malachite [style=filled,fillcolor="#54b295",fontcolor=white]
 	hematite [style=filled,fillcolor="#cb8c6d",fontcolor=white]
-	ilmenite [style=filled,fillcolor="#df6e88",fontcolor=white] // kinda fake colour for playability
+	rutile [style=filled,fillcolor="#df6e88",fontcolor=white] // kinda fake colour for playability
 	gold [style=filled,fillcolor="#dbba5e"]
 	sphalerite [style=filled,fillcolor="#5c9abb",fontcolor=white] // fluoresces lead-oxide yellow
 
@@ -95,10 +110,9 @@ digraph g {
 	"world portal" [shape=component]
 	"hand tools" [shape=component] // pickaxe, axe, etc.
 	"weapons&armours" [shape=component]
-	"motorised tools" [shape=component] // drill, chainsaw, etc.
-	machines [shape=component] // electric machines
-	"rotating machines" [shape=component] // machines whose main method of operaton is spinning (e.g. macerator, powder mixer, grindstone, gristmill)
-	"electromechanical components" [shape=component] // e.g. signal-controlled clutch
+	"motorised tools" [shape=component] // DISABLED: TOO OP; drill, chainsaw, etc.
+	"traditional machinery" [shape=component] // big fscking grinding wheels
+	"electromechanical\nmachinery" [shape=component] // e.g. signal-controlled clutch
 	galvanisation [shape=component] // iron plates/blocks/etc that won't rust
 	/* useable items */
 	furnace [shape=box,style=filled,fillcolor=khaki]
@@ -111,7 +125,7 @@ digraph g {
 	wire [shape=box,style=filled,fillcolor=khaki]
 	typewriter [shape=box,style=filled,fillcolor=khaki]
 	teletype [shape=box,style=filled,fillcolor=khaki]
-	rtty [shape=box,style=filled,fillcolor=khaki]
+	//rtty [shape=box,style=filled,fillcolor=khaki]
 	"digital billboard" [shape=box,style=filled,fillcolor=khaki]
 	"CRT display" [shape=box,style=filled,fillcolor=khaki]
 	"personal computer" [shape=box,style=filled,fillcolor=khaki] // small computer with single integrated
@@ -119,14 +133,12 @@ digraph g {
 	windmill [shape=box,style=filled,fillcolor=khaki]
 	engine [shape=box,style=filled,fillcolor=khaki]
 	motor [shape=box,style=filled,fillcolor=khaki]
-	clutch [shape=box,style=filled,fillcolor=khaki]
-	gear [shape=box,style=filled,fillcolor=khaki]
-	shaft [shape=box,style=filled,fillcolor=khaki]
-	belt [shape=box,style=filled,fillcolor=khaki]
 	battery [shape=box,style=filled,fillcolor=khaki]
 	
 	/* ingredient items */
 	LED [shape=box,style=filled]
+	dyes [shape=box,style=filled]
+	"steel casing" [shape=box,style=filled]
 	"computing unit" [shape=box,style=filled] // motherboard+cpu+ram+powersupply combined
 	"quartz oscillator" [shape=box,style=filled]
 	"quartz lens" [shape=box,style=filled]
@@ -153,10 +165,7 @@ digraph g {
 	copper -> wire
 	wire -> electricity
 	engine -> kinetic
-	
-	electricity -> machines
-	steel -> machines
-	
+
 	brass -> furnitures
 	wood -> furnitures
 	wood -> "hand tools"
@@ -168,15 +177,15 @@ digraph g {
 	steel -> "weapons&armours"
 	
 	thermal -> titanium
-	ilmenite -> titanium
+	rutile -> titanium
 	iron -> titanium -> "weapons&armours"
-	
+
 	furnitures -> office
 	office -> information
 	
-	electricity -> "motorised tools"
-	titanium -> "motorised tools"
-	steel -> "motorised tools"
+	//electricity -> "motorised tools"
+	//titanium -> "motorised tools"
+	//steel -> "motorised tools"
 
  	wood -> torch
 	coal -> torch
@@ -190,23 +199,23 @@ digraph g {
 	gold -> "logic gate"
 	iron -> typewriter -> teletype
 	wire -> "logic gate"
+	zinc -> typewriter
 	
 	electricity -> radio
 	quartz -> "quartz oscillator" -> radio -> "wireless circuit"
 	radio -> telecommunication
 	information -> telecommunication -> networking
 	"wireless circuit" -> networking
-	telecommunication -> teletype -> rtty
-	"logic gate" -> rtty
+	telecommunication -> teletype -> "world portal"
+	networking -> "world portal"
 
 	"quartz oscillator" -> "sequential logic"
 	"logic gate" -> "sequential logic" -> "computing unit"
-	machines -> "computing unit" -> networking
+	"computing unit" -> networking
 		
 	quartz -> "quartz lens" -> optics
 	optics -> "quantum mechanics" -> teleportation -> "world portal" /* to not make quartz useless */
 	"computing unit" -> "world portal"
-	rtty -> "world portal"
 	
 	electricity -> "CRT display"
 	glass -> "CRT display"
@@ -220,36 +229,40 @@ digraph g {
 	"sequential logic" -> "digital billboard"
 	LED -> "light fixture"
 	
+
+	steel -> "steel casing" -> "computing unit"
 	"computing unit" -> "personal computer"
 	"CRT display" -> "personal computer"
 	LED -> "personal computer"
 	"computing unit" -> mainframe
 	teletype -> mainframe
-	
+
 	gold -> "haute couture"
 	furnitures -> "haute couture"
 	furnitures -> "iron furniture set" [lhead=cluster_furnishings]
 	"haute couture" -> "victorian furniture set" [lhead=cluster_hautecouture]
 
+	"steel casing" -> teletype
+	"steel casing" -> "CRT display"
+	"steel casing" -> "digital billboard"
 	
-	"hand tools" -> "grappling hook" [lhead=cluster_handtools]
+	"hand tools" -> pickaxe [lhead=cluster_handtools]
 	"weapons&armours" -> "arming sword" [lhead=cluster_weaponarmour]
 	"motorised tools" -> breaker [lhead=cluster_electrictools]
 
-	kinetic -> "rotating machines"
-	steel -> "rotating machines"
-	
 	wood -> windmill -> kinetic
 	electricity -> motor -> kinetic
 	
-	kinetic -> shaft
-	kinetic -> gear
-	kinetic -> belt
-	kinetic -> clutch
+	kinetic -> gear [lhead=cluster_kineticcomponents]
 	
-	electricity -> "electromechanical components"
-	kinetic -> "electromechanical components"
-	
+	brass -> "traditional machinery"
+	kinetic -> "traditional machinery"
+
+	"traditional machinery" -> "electromechanical\nmachinery"
+	electricity -> "electromechanical\nmachinery"
+
+	"traditional machinery" -> crusher [lhead=cluster_machineries]
+
 	copper -> brass
 	sphalerite -> zinc -> brass
 	
@@ -259,4 +272,7 @@ digraph g {
 	coal -> battery
 	zinc -> battery // zinc-carbon battery
 	battery -> electricity
+
+	titanium -> dyes
+	coal -> dyes
 }
