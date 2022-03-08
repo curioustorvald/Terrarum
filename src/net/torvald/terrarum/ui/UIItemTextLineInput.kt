@@ -107,7 +107,9 @@ class UIItemTextLineInput(
 
     var cursorX = 0
     var cursorDrawScroll = 0
-    var cursorDrawX = 0 // pixelwise point
+    var cursorDrawX = 0 // pixelwise point. Cursor's position on screen relative to the fbo's position (should not be affected by cursorDrawScroll)
+    private var oldTextLenPx = 0
+    private var currentTextLenPx = 0
     var cursorBlinkCounter = 0f
     var cursorOn = true
 
@@ -166,17 +168,38 @@ class UIItemTextLineInput(
         cursorOn = true
     }
 
-    private fun tryCursorBack() {
+    private fun moveCursorBack(delta: Int) {
+        cursorDrawX -= delta
+        if (cursorDrawX < 0) {
+            val stride = -cursorDrawX + minOf(256, fbo.width * 40 / 100) // + lookbehind term
+            cursorDrawX += stride
+            cursorDrawScroll -= stride
+        }
+        // make sure to not scroll past the line head
+        if (cursorDrawScroll < 0) {
+            cursorDrawX += cursorDrawScroll
+            cursorDrawScroll = 0
+        }
+    }
+
+    private fun moveCursorForward(delta: Int) {
+        cursorDrawX += delta
         if (cursorDrawX > fbo.width) {
-            val d = cursorDrawX - fbo.width
-            cursorDrawScroll = d
+            val stride = cursorDrawX - fbo.width
+            cursorDrawX -= stride // -cursorDrawX + width
+            cursorDrawScroll += stride
         }
     }
-    private fun tryCursorForward() {
-        if (cursorDrawX - cursorDrawScroll < 0) {
-            cursorDrawScroll -= cursorDrawX
+
+    /*private fun moveCursorToEnd(stride: Int) {
+        try {
+            cursorX += stride
+            currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+            moveCursorForward(currentTextLenPx - oldTextLenPx)
+            oldTextLenPx = currentTextLenPx
         }
-    }
+        catch (e: Throwable) {}
+    }*/
 
     private fun Int.toCharInfo() = "U+${this.toString(16).uppercase()} '${String(intArrayOf(this), 0, if (this > 65535) 2 else 1)}'"
 
@@ -191,8 +214,9 @@ class UIItemTextLineInput(
                 if (charDeleted !in 0x1160..0x11FF) break
             }
 
-            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-            tryCursorForward()
+            currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+            moveCursorBack(oldTextLenPx - currentTextLenPx)
+            oldTextLenPx = currentTextLenPx
         }
     }
 
@@ -239,8 +263,10 @@ class UIItemTextLineInput(
                                         val codepoints = op[0].toCodePoints()
                                         if (!maxLen.exceeds(textbuf, codepoints)) {
                                             textbuf.addAll(cursorX, codepoints)
-
-                                            moveCursorToEnd(codepoints.size)
+                                            cursorX += codepoints.size
+                                            currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                            moveCursorForward(currentTextLenPx - oldTextLenPx)
+                                            oldTextLenPx = currentTextLenPx
                                         }
                                     }
                                 }
@@ -260,13 +286,9 @@ class UIItemTextLineInput(
 
                             if (cursorX > 0) {
                                 cursorX -= 1
-                                cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                tryCursorForward()
-                                if (cursorX <= 0) {
-                                    cursorX = 0
-                                    cursorDrawX = 0
-                                    cursorDrawScroll = 0
-                                }
+                                currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                moveCursorBack(oldTextLenPx - currentTextLenPx)
+                                oldTextLenPx = currentTextLenPx
                             }
                         }
                         else if (keycodes.contains(Input.Keys.RIGHT)) {
@@ -274,8 +296,9 @@ class UIItemTextLineInput(
 
                             if (cursorX < textbuf.size) {
                                 cursorX += 1
-                                cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                tryCursorBack()
+                                currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                moveCursorForward(currentTextLenPx - oldTextLenPx)
+                                oldTextLenPx = currentTextLenPx
                             }
                         }
                         else if (keycodes.containsSome(Input.Keys.ENTER, Input.Keys.NUMPAD_ENTER)) {
@@ -320,8 +343,11 @@ class UIItemTextLineInput(
 
                             if (!maxLen.exceeds(textbuf, codepoints)) {
                                 textbuf.addAll(cursorX, codepoints)
-
-                                moveCursorToEnd(codepoints.size)
+                                cursorX += codepoints.size
+                                currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+                                println("cursorX now: $cursorX; w: $currentTextLenPx; wOld: $oldTextLenPx")
+                                moveCursorForward(currentTextLenPx - oldTextLenPx)
+                                oldTextLenPx = currentTextLenPx
                             }
                         }
 
@@ -424,9 +450,10 @@ class UIItemTextLineInput(
         actuallyInserted.removeAt(0)
 
         textbuf.addAll(actuallyInserted)
-        moveCursorToEnd(actuallyInserted.size)
-
-        tryCursorBack()
+        cursorX += codepoints.size
+        currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+        moveCursorForward(currentTextLenPx - oldTextLenPx)
+        oldTextLenPx = currentTextLenPx
 
         fboUpdateLatch = true
     }
@@ -440,16 +467,6 @@ class UIItemTextLineInput(
     }
 
     private fun String.toUnicodeNFC() = Normalizer2.getNFCInstance().normalize(this)
-
-    private fun moveCursorToEnd(stride: Int) {
-        try {
-            cursorX += stride
-            cursorDrawX = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-
-            tryCursorBack()
-        }
-        catch (e: Throwable) {}
-    }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
 
@@ -510,7 +527,7 @@ class UIItemTextLineInput(
         batch.draw(fbo.colorBufferTexture, inputPosX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
         // draw text cursor
-        val cursorXOnScreen = inputPosX - cursorDrawScroll + cursorDrawX + 2
+        val cursorXOnScreen = inputPosX + cursorDrawX + 2
         if (isActive && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
@@ -606,9 +623,12 @@ class UIItemTextLineInput(
         appendText(s)
     }
     fun appendText(s: String) {
-        val c = s.toCodePoints()
-        textbuf.addAll(c)
-        moveCursorToEnd(c.size)
+        val codepoints = s.toCodePoints()
+        textbuf.addAll(codepoints)
+        cursorX += codepoints.size
+        currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
+        moveCursorForward(currentTextLenPx - oldTextLenPx)
+        oldTextLenPx = currentTextLenPx
     }
     override fun dispose() {
         fbo.dispose()
