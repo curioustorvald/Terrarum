@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.ui.MODULEINFO_CELL_HEIGHT
 import net.torvald.terrarum.modulebasegame.ui.MODULEINFO_CELL_WIDTH
 
@@ -27,6 +24,7 @@ class UIItemModuleInfoCell(
 
     private val modProp = ModMgr.moduleInfo[modName] ?: ModMgr.moduleInfoErrored[modName]!!
 
+    private val modErrors = ModMgr.errorLogs.filter { it.moduleName == modName }
     private val modErrored = (ModMgr.moduleInfo[modName] == null)
 
     private val modIcon = try {
@@ -88,7 +86,10 @@ class UIItemModuleInfoCell(
         batch.shader = null
         batch.color = Color.WHITE
         App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 3f, initialY + 2f)
-        App.fontGame.draw(batch, "$ccDesc$modDesc", initialX + 86f + 3f, initialY + 26f)
+        if (modErrored)
+            App.fontGame.draw(batch, "$emphRed${modErrors.first().cause?.message}", initialX + 86f + 3f, initialY + 26f)
+        else
+            App.fontGame.draw(batch, "$ccDesc$modDesc", initialX + 86f + 3f, initialY + 26f)
         App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 3f, initialY + 50f)
 
         if (modErrored) {

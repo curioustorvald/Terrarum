@@ -11,8 +11,10 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
@@ -100,6 +102,8 @@ object ModMgr {
         errorLogs.add(ModuleErrorInfo(type, moduleName, cause))
     }
 
+    private val digester = DigestUtils.getSha256Digest()
+
     /**
      * Try to create an instance of a "titlescreen" from the current load order set.
      */
@@ -162,6 +166,7 @@ object ModMgr {
                     val releaseDate = modMetadata.getProperty("releasedate")
                     val version = modMetadata.getProperty("version")
                     val jar = modMetadata.getProperty("jar")
+                    val jarHash = modMetadata.getProperty("jarhash").uppercase()
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
                     val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
@@ -203,9 +208,19 @@ object ModMgr {
                             if (jar.isNotBlank()) {
                                 val urls = arrayOf<URL>()
 
+                                val jarFilePath = "${File(modDir).absolutePath}/$moduleName/$jar"
                                 val cl = JarFileLoader(urls)
-                                cl.addFile("${File(modDir).absolutePath}/$moduleName/$jar")
+                                cl.addFile(jarFilePath)
                                 moduleClassloader[moduleName] = cl
+
+                                // check for hash
+                                digester.reset()
+                                val hash = digester.digest(File(jarFilePath).readBytes()).joinToString("","","") { it.toInt().and(255).toString(16).uppercase().padStart(2,'0') }
+
+                                if (jarHash != hash) {
+                                    println("Hash expected: $jarHash, got: $hash")
+                                    throw IllegalStateException("Module Jarfile hash mismatch")
+                                }
 
                                 // check for module-info.java
                                 val moduleInfoPath = cl.getResources("module-info.class").toList().filter { it.toString().contains("$moduleName/$jar!/module-info.class") && it.toString().endsWith("module-info.class")}
