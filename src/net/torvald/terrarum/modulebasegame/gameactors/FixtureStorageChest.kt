@@ -92,9 +92,9 @@ internal class UIStorageChest : UICanvas(
     override fun getFixtureInventory(): FixtureInventory = chestInventory
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
-    private lateinit var catBar: UIItemInventoryCatBar
-    private lateinit var itemListChest: UIItemInventoryItemGrid
-    private lateinit var itemListPlayer: UIItemInventoryItemGrid
+    private val catBar: UIItemInventoryCatBar
+    private val itemListChest: UIItemInventoryItemGrid
+    private val itemListPlayer: UIItemInventoryItemGrid
 
     private var encumbrancePerc = 0f
     private var isEncumbered = false
@@ -138,7 +138,7 @@ internal class UIStorageChest : UICanvas(
                 { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
                 INVENTORY_CELLS_OFFSET_X() - halfSlotOffset + (listGap + UIItemInventoryElemWide.height) * 7,
                 INVENTORY_CELLS_OFFSET_Y(),
-                6, CELLS_VRT,
+                6, CELLS_VRT - 1,
                 drawScrollOnRightside = true,
                 drawWallet = false,
                 keyDownFun = { _, _, _ -> Unit },
