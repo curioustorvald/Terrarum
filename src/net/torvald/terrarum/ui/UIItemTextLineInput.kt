@@ -345,7 +345,6 @@ class UIItemTextLineInput(
                                 textbuf.addAll(cursorX, codepoints)
                                 cursorX += codepoints.size
                                 currentTextLenPx = App.fontGame.getWidth(CodepointSequence(textbuf.subList(0, cursorX)))
-                                println("cursorX now: $cursorX; w: $currentTextLenPx; wOld: $oldTextLenPx")
                                 moveCursorForward(currentTextLenPx - oldTextLenPx)
                                 oldTextLenPx = currentTextLenPx
                             }
