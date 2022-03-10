@@ -105,7 +105,7 @@ internal class UIStorageChest : UICanvas(
         catBar = UIItemInventoryCatBar(
                 this,
                 (App.scr.width - catBarWidth) / 2,
-                42 + (App.scr.height - internalHeight) / 2,
+                42 - UIInventoryFull.YPOS_CORRECTION + (App.scr.height - internalHeight) / 2,
                 internalWidth,
                 catBarWidth,
                 false
@@ -228,7 +228,8 @@ internal class UIStorageChest : UICanvas(
         val chestNameXpos = itemListChest.posX + 6f
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - weightBarWidth
         val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
-        val encumbBarYPos = (App.scr.height + internalHeight).div(2) - 20 + 3f
+        val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat() // directly copied from UIInventoryFull.yEnd
+        val encumbBarYPos = yEnd - 20 + 3 // dunno why but extra 3 px is needed
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
 

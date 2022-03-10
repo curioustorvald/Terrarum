@@ -37,6 +37,8 @@ class UIInventoryFull(
 
         val CELL_COL = Toolkit.Theme.COL_CELL_FILL
 
+        const val YPOS_CORRECTION = 16 // another hard-coding. X_X
+
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
         const val CELLS_HOR = 10
         val CELLS_VRT: Int; get() = (App.scr.height - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
@@ -51,7 +53,7 @@ class UIInventoryFull(
 
         val INVENTORY_CELLS_UI_HEIGHT: Int = CELLS_VRT * UIItemInventoryElemSimple.height + (CELLS_VRT - 1) * UIItemInventoryItemGrid.listGap
         val INVENTORY_CELLS_OFFSET_X = { 0 + (Toolkit.drawWidth - internalWidth) / 2 }
-        val INVENTORY_CELLS_OFFSET_Y = { 107 + (App.scr.height - internalHeight) / 2 }
+        val INVENTORY_CELLS_OFFSET_Y = { -YPOS_CORRECTION + 107 + (App.scr.height - internalHeight) / 2 }
 
         val catBarWidth = 330
 
@@ -71,7 +73,7 @@ class UIInventoryFull(
             }
 
 
-            val gradTopStart = (App.scr.height - internalHeight).div(2).toFloat()
+            val gradTopStart = -YPOS_CORRECTION + (App.scr.height - internalHeight).div(2).toFloat()
             val gradBottomEnd = App.scr.height - gradTopStart
 
             shapeRenderer!!.inUse {
@@ -79,7 +81,7 @@ class UIInventoryFull(
                 it.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
                 it.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-                it.rect(0f, gradTopStart + gradHeight, App.scr.wf, internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradTopStart + gradHeight, App.scr.wf, 2*YPOS_CORRECTION + internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
                 it.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
                 it.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
@@ -151,7 +153,7 @@ class UIInventoryFull(
     val catBar = UIItemInventoryCatBar(
             this,
             (width - catBarWidth) / 2,
-            42 + (App.scr.height - internalHeight) / 2,
+            42 - YPOS_CORRECTION + (App.scr.height - internalHeight) / 2,
             internalWidth,
             catBarWidth,
             true,
@@ -238,7 +240,7 @@ class UIInventoryFull(
 
     internal var xEnd = (width + internalWidth).div(2).toFloat()
         private set
-    internal var yEnd = (App.scr.height + internalHeight).div(2).toFloat()
+    internal var yEnd = -YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat()
         private set
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -302,7 +304,7 @@ class UIInventoryFull(
         offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
 
         xEnd = (width + internalWidth).div(2).toFloat()
-        yEnd = (App.scr.height + internalHeight).div(2).toFloat()
+        yEnd = -YPOS_CORRECTION + (scr.height + internalHeight).div(2).toFloat()
     }
 }
 

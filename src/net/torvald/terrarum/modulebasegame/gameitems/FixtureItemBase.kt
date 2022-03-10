@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.utils.RandomWordsName
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -17,20 +18,22 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : GameItem(originalID) {
 
+    private val hash = RandomWordsName(4)
+
+
     protected open val makeFixture: () -> FixtureBase = {
         Class.forName(fixtureClassName).getDeclaredConstructor().newInstance() as FixtureBase
     }
 
     init {
         ItemCodex.fixtureToSpawnerItemID[fixtureClassName] = originalID
+
+
+        println("FixtureItemBase init: $hash")
     }
 
-    protected var ghostItem: FixtureBase? = null
-        get() {
-            if (field == null)
-                field = makeFixture()
-            return field
-        }
+//    private var _ghostItem: FixtureBase? = null
+    private var ghostItem: FixtureBase? = null
 
     override var dynamicID: ItemID = originalID
     override val originalName = "FIXTUREBASE"
@@ -51,7 +54,15 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
     override var baseToolSize: Double? = baseMass
 
+    private var ghostInit = false
+    
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
+        println("ghost: ${ghostItem}; ghostInit = $ghostInit; instance: $hash")
+        if (!ghostInit) {
+            ghostInit = true
+            ghostItem = makeFixture()
+        }
+
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.setGhost(ghostItem!!)
             it.isVisible = true
@@ -62,6 +73,8 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     }
 
     override fun effectOnUnequip(actor: ActorWithBody, delta: Float) {
+//        ghostInit = false
+
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.unsetGhost()
             it.isVisible = false
