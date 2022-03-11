@@ -146,6 +146,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 "control_key_toggleime",
                 "control_key_movementaux",
                 "control_key_quicksel",
+                "control_key_crafting"
         ).forEach {
                     App.setConfig(it, DefaultConfig.hashMap[it]!! as Int)
         }
@@ -165,6 +166,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         keycaps[App.getConfigInt("control_key_quicksel")]?.symbolControl = Keebsym.PIE
         keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = Keebsym.MENU
         keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = Keebsym.IME
+        keycaps[App.getConfigInt("control_key_crafting")]?.symbolControl = Keebsym.CRAFTING
     }
 
     internal var keycapClicked = -13372
@@ -340,7 +342,7 @@ private class UIItemKeycap(
 
 class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: Int, initialY: Int) : UIItem(parent, initialX, initialY) {
     override val width = 500
-    override val height = 226
+    override val height = 266
     override fun dispose() {}
 
     private val buttonBackground = Toolkit.Theme.COL_CELL_FILL.cpy().add(0f,0f,0f,1f)
@@ -351,6 +353,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
     private val row1 = initialY + 100
     private val row2 = row1 + 40
     private val row3 = row2 + 40
+    private val row4 = row3 + 40
 
 
     // TEXT IS MANUALLY PRINTED ON render() !!
@@ -366,10 +369,12 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
             // inventory
             UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            // crafting
+            UIItemImageButton(parent, Keebsym.CRAFTING, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // hook
-            UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // quicksel
-            UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row4, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
             // zoom
             UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
@@ -395,12 +400,13 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
                 4 to "control_key_jump",
 
                 5 to "control_key_inventory",
-                6 to "control_key_movementaux",
-                7 to "control_key_quicksel",
+                6 to "control_key_crafting",
+                7 to "control_key_movementaux",
+                8 to "control_key_quicksel",
 
-                8 to "control_key_zoom",
-                9 to "control_key_toggleime",
-                10 to "control_key_gamemenu",
+                9 to "control_key_zoom",
+                10 to "control_key_toggleime",
+                11 to "control_key_gamemenu",
         )
     }
 
@@ -420,14 +426,15 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         closeButton1.render(batch, camera)
         closeButton2.render(batch, camera)
 
-        // texts
+        // texts. Sorted in the same way as UIItemControlPaletteBaloon.iconButtons
         batch.color = Color.WHITE
         App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], col0 + 72, posY + 43)
         App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col1 + 40, posY + 43)
 
         App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row1)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row2)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row3)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_CRAFTING"], col0 + 40, row2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row4)
 
         App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1)
         App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], col1 + 40, row2)
@@ -472,4 +479,5 @@ private object Keebsym {
     val PIE = labels.get(8,1)
     val MENU = labels.get(6,2)
     val IME = labels.get(7,2)
+    val CRAFTING = labels.get(9,1)
 }
