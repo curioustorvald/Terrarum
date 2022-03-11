@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.*
@@ -18,59 +19,57 @@ import net.torvald.terrarum.ui.UIItemTextButton
  *
  * Created by minjaesong on 2022-03-10.
  */
-class UICrafting : UICanvas(
+class UICrafting(val full: UIInventoryFull) : UICanvas(
         toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
         toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
 ), HasInventory {
+
+    private val catBar: UIItemInventoryCatBar
+        get() = full.catBar
 
     override var width = App.scr.width
     override var height = App.scr.height
     override var openCloseTime: Second = 0.0f
 
-    private val catBar: UIItemInventoryCatBar
     private val itemListPlayer: UIItemInventoryItemGrid
     private val itemListCraftable: UIItemInventoryItemGrid
     private val buttonCraft: UIItemTextButton
     private val buttonCancel: UIItemTextButton
 
+    private val fakeInventory = FixtureInventory()
+
     private val negotiator = object : InventoryNegotiator() {
         override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Long) {
-            TODO()
+//            TODO()
         }
 
         override fun reject(fixture: FixtureInventory, player: FixtureInventory, item: GameItem, amount: Long) {
-            TODO()
+//            TODO()
         }
     }
 
     override fun getNegotiator() = negotiator
-    override fun getFixtureInventory(): FixtureInventory = TODO()
+    override fun getFixtureInventory(): FixtureInventory = fakeInventory
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
-    private var halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
+    private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
-
+    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset
+    private val thisOffsetX2 = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 7
+    private val thisXend = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 13 - listGap
+    private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
 
     init {
-        catBar = UIItemInventoryCatBar(
-                this,
-                (App.scr.width - UIInventoryFull.catBarWidth) / 2,
-                42 - UIInventoryFull.YPOS_CORRECTION + (App.scr.height - UIInventoryFull.internalHeight) / 2,
-                UIInventoryFull.internalWidth,
-                UIInventoryFull.catBarWidth,
-                false
-        )
-        catBar.selectionChangeListener = { old, new -> itemListUpdate() }
-        val craftableX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
-        val craftableY = UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
-        val craftButtonsY = craftableY + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
-        val gridWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
-        val buttonWidth = (gridWidth - listGap) / 2
+        val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
+        val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
+
+        // crafting list to the left
         itemListCraftable = UIItemInventoryItemGrid(
                 this,
                 catBar,
                 { getFixtureInventory() },
-                craftableX, craftableY,
+                thisOffsetX,
+                thisOffsetY,
                 6, UIInventoryFull.CELLS_VRT - 1, // decrease the internal height so that craft/cancel button would fit in
                 drawScrollOnRightside = false,
                 drawWallet = false,
@@ -83,26 +82,27 @@ class UICrafting : UICanvas(
                 }
         )
 
-        buttonCraft = UIItemTextButton(this, "MENU_LABEL_CRAFT", craftableX, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        buttonCancel = UIItemTextButton(this, "MENU_LABEL_CANCEL", craftableX + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        buttonCancel = UIItemTextButton(this, "MENU_LABEL_CANCEL", thisOffsetX + 1, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        buttonCraft = UIItemTextButton(this, "MENU_LABEL_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
         buttonCraft.touchDownListener = { _,_,_,_ ->
-            TODO()
+            printdbg(this, "Craft!")
         }
         buttonCancel.touchDownListener = { _,_,_,_ ->
-            TODO()
+            printdbg(this, "Cancel!")
         }
 
         // make grid mode buttons work together
         itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
         itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
+        // player inventory to the right
         itemListPlayer = UIItemInventoryItemGrid(
                 this,
                 catBar,
                 { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-                UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset,
-                craftableY,
+                thisOffsetX2,
+                thisOffsetY,
                 6, UIInventoryFull.CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
@@ -119,11 +119,16 @@ class UICrafting : UICanvas(
 
         handler.allowESCtoClose = true
 
-        addUIitem(catBar)
         addUIitem(itemListCraftable)
         addUIitem(itemListPlayer)
+        addUIitem(buttonCancel)
+        addUIitem(buttonCraft)
     }
 
+    // reset whatever player has selected to null and bring UI to its initial state
+    fun resetUI() {
+
+    }
 
     private var openingClickLatched = false
 
@@ -135,9 +140,14 @@ class UICrafting : UICanvas(
         openingClickLatched = Terrarum.mouseDown
     }
 
+    private var encumbrancePerc = 0f
+
     private fun itemListUpdate() {
         itemListCraftable.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        encumbrancePerc = getPlayerInventory().let {
+            it.capacity.toFloat() / it.maxCapacity
+        }
     }
 
     private fun setCompact(yes: Boolean) {
@@ -172,15 +182,62 @@ class UICrafting : UICanvas(
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        // background fill
-        UIInventoryFull.drawBackground(batch)
+        // NO super.render due to an infinite recursion
+        this.uiItems.forEach { it.render(batch, camera) }
 
-        // UI items
         batch.color = Color.WHITE
 
-        catBar.render(batch, camera)
-        itemListCraftable.render(batch, camera)
-        itemListPlayer.render(batch, camera)
+        // text label for two inventory grids
+        App.fontGame.draw(batch, Lang["GAME_CRAFTABLE_ITEMS"], thisOffsetX + 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - 30)
+
+
+        // control hints
+        val controlHintXPos = thisOffsetX.toFloat()
+        blendNormal(batch)
+        App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)
+
+        
+
+        //draw player encumb
+        // encumbrance meter
+        val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+        // encumbrance bar will go one row down if control help message is too long
+        val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth
+        val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
+        val encumbBarYPos = full.yEnd-20 + 3f +
+                            if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
+                                App.fontGame.lineHeight
+                            else 0f
+        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
+        // encumbrance bar background
+        blendNormal(batch)
+        val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
+        val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+        batch.color = encumbBack
+        Toolkit.fillArea(batch,
+                encumbBarXPos, encumbBarYPos,
+                UIInventoryCells.weightBarWidth, UIInventoryFull.controlHelpHeight - 6f
+        )
+        // encumbrance bar
+        batch.color = encumbCol
+        Toolkit.fillArea(batch,
+                encumbBarXPos, encumbBarYPos,
+                if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
+                    1f
+                else // make sure 1px is always be seen
+                    minOf(UIInventoryCells.weightBarWidth, maxOf(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
+                UIInventoryFull.controlHelpHeight - 6f
+        )
+        // debug text
+        batch.color = Color.LIGHT_GRAY
+        if (App.IS_DEVELOPMENT_BUILD) {
+            App.fontSmallNumbers.draw(batch,
+                    "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
+                    encumbBarTextXPos,
+                    encumbBarYPos + UIInventoryFull.controlHelpHeight - 4f
+            )
+        }
 
 
         blendNormal(batch)

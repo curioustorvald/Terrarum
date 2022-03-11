@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.UICrafting
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
@@ -161,7 +162,8 @@ class UIInventoryFull(
     )
 
 
-    private val transitionalMinimap = UIInventoryMinimap(this) // PLACEHOLDER
+//    private val transitionalMinimap = UIInventoryMinimap(this) // PLACEHOLDER
+    private val transitionalCraftingUI = UICrafting(this) // PLACEHOLDER
     private val transitionalItemCells = UIInventoryCells(this)
     private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
@@ -171,7 +173,7 @@ class UIInventoryFull(
             width,
             App.scr.height,
             1f,
-            transitionalMinimap, transitionalItemCells, transitionalEscMenu
+            transitionalCraftingUI, transitionalItemCells, transitionalEscMenu
     )
 
 
@@ -198,7 +200,7 @@ class UIInventoryFull(
                 setAsClose()
         }
 
-        // allow "control_key_gamemenu" to open this UI
+        // allow "control_key_gamemenu" to open this UI and bring system menu immediately
         this.handler.toggleKeyExtra.add { App.getConfigInt("control_key_gamemenu") }
         this.handler.toggleKeyExtraAction.add {
             if (it.isClosed) {
@@ -212,9 +214,22 @@ class UIInventoryFull(
                 setAsClose()
         }
 
+        // allow "control_key_crafting" to open this UI and bring system menu immediately
+        this.handler.toggleKeyExtra.add { App.getConfigInt("control_key_crafting") }
+        this.handler.toggleKeyExtraAction.add {
+            if (it.isClosed) {
+                INGAME.setTooltipMessage(null)
+                transitionPanel.forcePosition(0)
+                catBar.setSelectedPanel(0)
+                transitionalCraftingUI.resetUI()
+                it.setAsOpen()
+            }
+            else if (it.isOpened)
+                setAsClose()
+        }
+
 
         rebuildList()
-
 
     }
 

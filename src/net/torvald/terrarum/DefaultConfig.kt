@@ -69,6 +69,7 @@ object DefaultConfig {
             "control_key_zoom" to Input.Keys.Z,
 
             "control_key_gamemenu" to Input.Keys.TAB,
+            "control_key_crafting" to Input.Keys.W,
             "control_key_quicksel" to Input.Keys.SHIFT_LEFT, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
             "control_mouse_quicksel" to Input.Buttons.MIDDLE, // middle click to open pie menu
 

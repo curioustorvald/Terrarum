@@ -84,7 +84,12 @@ class UIItemInventoryCatBar(
         //  determine gaps: hacky way exploiting that we already know the catbar is always at the c of the ui
         val relativeStartX = posX - (uiInternalWidth - width) / 2
         val sideButtonsGap = (((uiInternalWidth - width) / 2) - 2f * catIcons.tileW) / 3f
-        val iconIndex = arrayOf(12, 16, 17, 13)
+        val iconIndex = arrayOf(
+                catIcons.get(9,1),
+                catIcons.get(16,0),
+                catIcons.get(17,0),
+                catIcons.get(13,0)
+        )
 
 
         //println("[UIItemInventoryCatBar] relativeStartX: $relativeStartX")
@@ -99,7 +104,7 @@ class UIItemInventoryCatBar(
 
             UIItemImageButton(
                     inventoryUI,
-                    catIcons.get(iconIndex[index], 0),
+                    iconIndex[index],
                     activeBackCol = Color(0),
                     backgroundCol = Color(0),
                     highlightBackCol = Color(0),

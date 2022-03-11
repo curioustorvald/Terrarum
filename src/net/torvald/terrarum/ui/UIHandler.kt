@@ -204,7 +204,7 @@ void main() {
 
             toggleKeyExtra.forEachIndexed { index, getKey ->
                 if (Gdx.input.isKeyJustPressed(getKey())) {
-                    toggleKeyExtraAction[0].invoke(this)
+                    toggleKeyExtraAction[index].invoke(this)
                 }
             }
 

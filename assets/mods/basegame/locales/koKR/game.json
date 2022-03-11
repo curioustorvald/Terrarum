@@ -14,5 +14,8 @@
   "CONTEXT_ITEM_MAP": "지도",
   "CONTEXT_GENERATOR_SEED": "시드",
   "GAME_ACTION_GRAPPLE": "매달리기",
-  "GAME_ACTION_QUICKSEL": "빠른 선택"
+  "GAME_ACTION_QUICKSEL": "빠른 선택",
+  "MENU_LABEL_CRAFT": "제작하기",
+  "MENU_LABEL_CRAFTING": "제작",
+  "GAME_CRAFTABLE_ITEMS": "제작 가능한 아이템"
 }

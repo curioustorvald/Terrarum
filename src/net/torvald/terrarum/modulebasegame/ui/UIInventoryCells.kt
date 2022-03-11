@@ -107,11 +107,7 @@ internal class UIInventoryCells(
                             else 0f
 //        Companion.encumbBarYPos = encumbBarYPos // q&d hack to share some numbers
 
-        App.fontGame.draw(batch,
-                encumbranceText,
-                encumbBarTextXPos,
-                encumbBarYPos - 3f
-        )
+        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
 
         // encumbrance bar background
         blendNormal(batch)

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.INGAME
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -40,5 +41,6 @@ class UIItemHorizontalFadeSlide(
             it.posY = it.initialY
             it.opacity = getOpacity(index)
         }
+        INGAME.setTooltipMessage(null)
     }
 }
