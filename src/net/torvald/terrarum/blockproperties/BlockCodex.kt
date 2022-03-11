@@ -210,6 +210,9 @@ class BlockCodex {
 
         prop.reflectance = record.floatVal("refl")
 
+        prop.tags = record.get("tags").split(',').map { it.trim() }.toHashSet()
+        prop.material = record.get("mate")
+
         blockProps[prop.id] = prop
 
         printdbg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}\tsolid:${prop.isSolid}")
@@ -221,12 +224,9 @@ fun CSVRecord.str16ToInt(s: String): Int {
     try {
         ret = this.get(s).toLong(16).toInt()
     }
-    catch (e: NumberFormatException) {
-    }
-    catch (e1: IllegalStateException) {
-    }
-    catch (e2: NullPointerException) {
-    }
+    catch (e: NumberFormatException) { }
+    catch (e1: IllegalStateException) { }
+    catch (e2: NullPointerException) { }
 
     return ret
 }
@@ -236,12 +236,9 @@ fun CSVRecord.intVal(s: String): Int {
     try {
         ret = this.get(s).toInt()
     }
-    catch (e: NumberFormatException) {
-    }
-    catch (e1: IllegalStateException) {
-    }
-    catch (e2: NullPointerException) {
-    }
+    catch (e: NumberFormatException) { }
+    catch (e1: IllegalStateException) { }
+    catch (e2: NullPointerException) { }
 
     return ret
 }
@@ -251,12 +248,9 @@ fun CSVRecord.floatVal(s: String): Float {
     try {
         ret = this.get(s).toFloat()
     }
-    catch (e: NumberFormatException) {
-    }
-    catch (e1: IllegalStateException) {
-    }
-    catch (e2: NullPointerException) {
-    }
+    catch (e: NumberFormatException) { }
+    catch (e1: IllegalStateException) { }
+    catch (e2: NullPointerException) { }
 
     return ret
 }

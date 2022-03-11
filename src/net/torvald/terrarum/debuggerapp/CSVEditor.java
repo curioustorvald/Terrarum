@@ -28,12 +28,12 @@ import java.util.Properties;
 public class CSVEditor extends JFrame {
 
     /** Default columns. When you open existing csv, it should overwrite this. */
-    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl"};
+    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
     private final int FOUR_DIGIT = 42;
     private final int SIX_DIGIT = 50;
     private final int TWO_DIGIT = 30;
     private final int ARBITRARY = 240;
-    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT, SIX_DIGIT};
+    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT, SIX_DIGIT, ARBITRARY};
 
     private final int UNDO_BUFFER_SIZE = 10;
 
