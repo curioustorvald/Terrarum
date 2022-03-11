@@ -83,7 +83,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         )
 
         buttonCancel = UIItemTextButton(this, "MENU_LABEL_CANCEL", thisOffsetX + 1, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        buttonCraft = UIItemTextButton(this, "MENU_LABEL_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
         buttonCraft.touchDownListener = { _,_,_,_ ->
             printdbg(this, "Craft!")
@@ -188,7 +188,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         batch.color = Color.WHITE
 
         // text label for two inventory grids
-        App.fontGame.draw(batch, Lang["GAME_CRAFTABLE_ITEMS"], thisOffsetX + 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], thisOffsetX + 2, thisOffsetY - 30)
         App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - 30)
 
 

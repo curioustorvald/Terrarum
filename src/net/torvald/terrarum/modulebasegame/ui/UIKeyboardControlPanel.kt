@@ -432,7 +432,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col1 + 40, posY + 43)
 
         App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row1)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_CRAFTING"], col0 + 40, row2)
+        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], col0 + 40, row2)
         App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3)
         App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row4)
 

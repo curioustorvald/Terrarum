@@ -14,7 +14,7 @@
   "CONTEXT_GENERATOR_SEED": "Seed",
   "GAME_ACTION_GRAPPLE": "Grapple",
   "GAME_ACTION_QUICKSEL": "Quick Select",
-  "MENU_LABEL_CRAFT": "Craft",
-  "MENU_LABEL_CRAFTING": "Crafting",
+  "GAME_ACTION_CRAFT": "Craft",
+  "GAME_CRAFTING": "Crafting",
   "GAME_CRAFTABLE_ITEMS": "Craftable Items"
 }
