@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
@@ -48,6 +49,8 @@ class UIItemInventoryItemGrid(
     // deal with the moving position
     //override var oldPosX = posX
     //override var oldPosY = posY
+
+    private val hash = System.nanoTime()
 
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
     override val height = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
@@ -163,7 +166,8 @@ class UIItemInventoryItemGrid(
         }
 
         // COMMON variables because more than one instance of this can be up on the screen
-        private val tooltipShowing = HashMap<UIItemInventoryItemGrid, Boolean>()
+        // This variable must be emptied out when the parent UI hides/closes
+        val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
     }
 
     private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
@@ -350,15 +354,17 @@ class UIItemInventoryItemGrid(
         super.update(delta)
 
 
-        tooltipShowing[this] = false
+        tooltipShowing[hash] = false
 
+//        printdbg(this, tooltipShowing.entries)
 
         items.forEach {
             it.update(delta)
 
 
             // set tooltip accordingly
-            if ((App.IS_DEVELOPMENT_BUILD || isCompactMode) && it.item != null && it.mouseUp && tooltipShowing[this] != true) {
+            if ((App.IS_DEVELOPMENT_BUILD || isCompactMode) && tooltipShowing[hash] != true && it.item != null && it.mouseUp) {
+//                printdbg(this, "calling INGAME.setTooltipMessage by $hash")
                 INGAME.setTooltipMessage(
                         if (App.IS_DEVELOPMENT_BUILD) {
                             it.item?.name + "\n(${it.item?.originalID}${if (it.item?.originalID == it.item?.dynamicID) "" else "/${it.item?.dynamicID}"})"
@@ -368,7 +374,8 @@ class UIItemInventoryItemGrid(
                         }
                 )
 
-                tooltipShowing[this] = true
+                tooltipShowing[hash] = true
+//                printdbg(this, tooltipShowing.entries)
             }
         }
 
@@ -464,11 +471,11 @@ class UIItemInventoryItemGrid(
     }
 
     override fun dispose() {
-        tooltipShowing.remove(this)
+        tooltipShowing.remove(hash)
     }
 
     override fun hide() {
-        tooltipShowing.remove(this)
+        tooltipShowing.remove(hash)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

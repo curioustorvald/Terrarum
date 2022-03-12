@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryCells
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemSpinner
 import net.torvald.terrarum.ui.UIItemTextButton
 
 /**
@@ -34,7 +35,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     private val itemListPlayer: UIItemInventoryItemGrid
     private val itemListCraftable: UIItemInventoryItemGrid
     private val buttonCraft: UIItemTextButton
-    private val buttonCancel: UIItemTextButton
+    private val spinnerCraftCount: UIItemSpinner
 
     private val fakeInventory = FixtureInventory()
 
@@ -82,14 +83,11 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 }
         )
 
-        buttonCancel = UIItemTextButton(this, "MENU_LABEL_CANCEL", thisOffsetX + 1, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
         buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth)
 
         buttonCraft.touchDownListener = { _,_,_,_ ->
             printdbg(this, "Craft!")
-        }
-        buttonCancel.touchDownListener = { _,_,_,_ ->
-            printdbg(this, "Cancel!")
         }
 
         // make grid mode buttons work together
@@ -121,7 +119,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
 
         addUIitem(itemListCraftable)
         addUIitem(itemListPlayer)
-        addUIitem(buttonCancel)
+        addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
     }
 
@@ -134,10 +132,15 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
 
     override fun show() {
         itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
-
         itemListUpdate()
 
         openingClickLatched = Terrarum.mouseDown
+
+        spinnerCraftCount.value = 1
+        spinnerCraftCount.fboUpdateLatch = true
+
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null)
     }
 
     private var encumbrancePerc = 0f
@@ -174,9 +177,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     }
 
     override fun updateUI(delta: Float) {
-        catBar.update(delta)
-        itemListCraftable.update(delta)
-        itemListPlayer.update(delta)
+        // NO super.update due to an infinite recursion
+        this.uiItems.forEach { it.update(delta) }
 
         if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
@@ -257,6 +259,11 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     }
 
     override fun endClosing(delta: Float) {
+
+        spinnerCraftCount.value = 1 // hide() is required as show() is not called unless the parent's panel number has changed (?)
+        spinnerCraftCount.fboUpdateLatch = true
+
+        UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

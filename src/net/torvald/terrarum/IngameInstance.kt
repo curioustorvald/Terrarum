@@ -392,6 +392,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
                 uiTooltip.setAsOpen()
             }
             uiTooltip.message = message
+
+//            printStackTrace(this)
         }
     }
 

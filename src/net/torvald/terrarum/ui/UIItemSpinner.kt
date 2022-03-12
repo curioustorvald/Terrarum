@@ -34,7 +34,7 @@ class UIItemSpinner(
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
 
     var value = initialValue.coerceIn(min, max)
-    private var fboUpdateLatch = true
+    var fboUpdateLatch = true
 
     private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
 

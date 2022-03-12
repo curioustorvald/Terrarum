@@ -124,6 +124,14 @@ open class UIItemTransitionContainer(
         return true
     }
 
+    override fun show() {
+        uis.forEach { it.show() }
+    }
+
+    override fun hide() {
+        uis.forEach { it.hide() }
+    }
+
     override fun dispose() {
         uis.forEach { it.dispose() }
     }

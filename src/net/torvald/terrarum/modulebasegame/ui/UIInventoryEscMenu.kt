@@ -239,8 +239,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     )
 
     override fun show() {
+        UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
+
 
     override fun updateUI(delta: Float) {
         val yeet = screens[screen]
@@ -311,6 +313,8 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     override fun endClosing(delta: Float) {
         screen = 0
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null)
     }
 
     override fun dispose() {

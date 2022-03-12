@@ -167,6 +167,9 @@ internal class UIStorageChest : UICanvas(
         itemListUpdate()
 
         openingClickLatched = Terrarum.mouseDown
+
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null)
     }
 
     private fun itemListUpdate() {
@@ -276,6 +279,7 @@ internal class UIStorageChest : UICanvas(
     }
 
     override fun endClosing(delta: Float) {
+        UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 

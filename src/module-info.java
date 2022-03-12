@@ -30,6 +30,7 @@ module Terrarum {
     requires org.graalvm.sdk;
     requires com.ibm.icu;
     requires org.lwjgl.opengl;
+    requires prtree;
 
 
     exports net.torvald.colourutil;

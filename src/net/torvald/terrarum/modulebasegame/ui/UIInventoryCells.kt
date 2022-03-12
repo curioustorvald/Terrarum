@@ -140,6 +140,7 @@ internal class UIInventoryCells(
     }
 
     override fun show() {
+        UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
 
@@ -153,6 +154,8 @@ internal class UIInventoryCells(
     }
 
     override fun endClosing(delta: Float) {
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null)
     }
 
     override fun dispose() {

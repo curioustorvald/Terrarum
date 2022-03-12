@@ -34,6 +34,26 @@ import kotlin.math.roundToInt
  *
  * PosX/Y and relativeMouseX/Y are explained in ```work_files/terrarum_ui_elements_coord_explained.png```
  *
+ * ## Show/Hide/Opening/Closing Timeline
+ *
+ * The functions `show`, `doOpening`, `doClosing`, `hide`, `endOpening`, `endClosing` are called sequentially in this order:
+ *
+ * ```
+ * (open has triggered)
+ * show()
+ * doOpening()
+ * doOpening()
+ * ...
+ * endOpening()
+ * ...
+ * (close has triggered)
+ * hide()
+ * doClosing()
+ * doClosing()
+ * ...
+ * endClosing()
+ * ```
+ *
  * Created by minjaesong on 2015-12-31.
  */
 abstract class UICanvas(

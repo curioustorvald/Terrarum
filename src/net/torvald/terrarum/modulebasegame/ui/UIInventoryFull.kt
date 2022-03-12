@@ -233,6 +233,16 @@ class UIInventoryFull(
 
     }
 
+    override fun show() {
+        transitionPanel.show()
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null)
+    }
+
+    override fun hide() {
+        transitionPanel.hide()
+    }
+
     internal var offsetX = ((width - internalWidth) / 2).toFloat()
         private set
     internal var offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
@@ -308,6 +318,10 @@ class UIInventoryFull(
     override fun endClosing(delta: Float) {
         INGAME.setTooltipMessage(null) // required!
 //        MinimapComposer.revalidateAll()
+
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+
+//        printdbg(this, "Clearing out tooltipShowing")
     }
 
 
