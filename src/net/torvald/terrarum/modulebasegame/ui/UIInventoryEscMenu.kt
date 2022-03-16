@@ -32,7 +32,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val gameMenu = arrayOf(
             "MENU_IO_SAVE_GAME",
             "MENU_OPTIONS_CONTROLS",
-            "MENU_CONTROLS_KEYBOARD",
+            "MENU_LABEL_IME",
             "MENU_LABEL_LANGUAGE",
             "MENU_LABEL_QUIT",
     )
@@ -77,7 +77,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val savingUI = UIItemSaving(this, (width - UIItemSaving.WIDTH) / 2, (height - UIItemSaving.HEIGHT) / 2)
     private val keyConfigUI = UIKeyboardControlPanel(null)
     private val languageUI = UITitleLanguage(null)
-    private val keyboardSetupUI = UIKeyboardInputConfig(null)
+    private val keyboardSetupUI = UIIMEConfig(null)
 
     private var oldScreen = 0
     private var screen = 0

@@ -16,7 +16,7 @@ import net.torvald.terrarum.ui.*
 /**
  * Created by minjaesong on 2021-11-10.
  */
-class UIKeyboardInputConfig(remoCon: UIRemoCon?) : UICanvas() {
+class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
 
     override var width = 480
     override var height = 600
@@ -179,7 +179,7 @@ class UIKeyboardInputConfig(remoCon: UIRemoCon?) : UICanvas() {
 
         // title
         // TODO only when text input using gamepad is supported, and even then, use text spinner
-//        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+//        val title = Lang["MENU_LABEL_IME"]
 //        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
         batch.color = Color.WHITE
@@ -230,7 +230,7 @@ class UIKeyboardInputConfig(remoCon: UIRemoCon?) : UICanvas() {
  * @param key LibGDX keycode. Set it to `null` to "disable" the key. Also see [com.badlogic.gdx.Input.Keys]
  */
 private class UIItemInputKeycap(
-        val parent: UIKeyboardInputConfig,
+        val parent: UIIMEConfig,
         initialX: Int,
         initialY: Int,
         val key: Int?,

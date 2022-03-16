@@ -42,7 +42,7 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
     override var baseToolSize: Double? = baseMass
 
 
-    private val vm = VM(73728, TheRealWorld(), arrayOf(
+    private val vm = VM(ModMgr.getGdxFile("dwarventech", "bios").path(), 73728, TheRealWorld(), arrayOf(
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/pipboot.rom").path()),
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/pipcode.bas").path())
     ))

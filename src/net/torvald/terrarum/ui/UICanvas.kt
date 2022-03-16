@@ -53,6 +53,7 @@ import kotlin.math.roundToInt
  * ...
  * endClosing()
  * ```
+ * NOTE: show/hide is a UICanvas function, while do/endSomething() is UIHandler function.
  *
  * Created by minjaesong on 2015-12-31.
  */

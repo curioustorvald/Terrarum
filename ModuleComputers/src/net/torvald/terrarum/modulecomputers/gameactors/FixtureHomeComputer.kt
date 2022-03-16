@@ -19,6 +19,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.tsvm.*
+import net.torvald.tsvm.peripheral.AdapterConfig
 import net.torvald.tsvm.peripheral.GraphicsAdapter
 import net.torvald.tsvm.peripheral.ReferenceGraphicsAdapter
 import net.torvald.tsvm.peripheral.VMProgramRom
@@ -28,11 +29,15 @@ import net.torvald.tsvm.peripheral.VMProgramRom
  */
 class FixtureHomeComputer : FixtureBase {
 
-    private val vm = VM(0x200000, TheRealWorld(), arrayOf(
+    // TODO: write serialiser for TSVM && allow mods to have their own serialiser
+    private val vm = VM(ModMgr.getGdxFile("dwarventech", "bios").path(), 0x200000, TheRealWorld(), arrayOf(
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/tsvmbios.js").path())
     ))
-    private val vmRunner: VMRunner
-    private val coroutineJob: Job
+    @Transient private lateinit var vmRunner: VMRunner
+    @Transient private lateinit var coroutineJob: Job
+
+    @Transient private var vmStarted = false
+    @Transient private lateinit var disposableObj: Disposable
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
@@ -49,7 +54,7 @@ class FixtureHomeComputer : FixtureBase {
         actorValue[AVKey.BASEMASS] = 20.0
 
 
-        val gpu = ReferenceGraphicsAdapter(ModMgr.getGdxFile("dwarventech", "gui").path(), vm)
+        val gpu = GraphicsAdapter(ModMgr.getGdxFile("dwarventech", "gui").path(), vm, GRAPHICSCONFIG)
 //        vm.getIO().blockTransferPorts[0].attachDevice(TestDiskDrive(vm, 0, ...))
 
         vm.peripheralTable[1] = PeripheralEntry(
@@ -64,23 +69,66 @@ class FixtureHomeComputer : FixtureBase {
         vm.getInputStream = { gpu.getInputStream() }
 
         (mainUI as UIHomeComputer).vm = vm
-
+        (mainUI as UIHomeComputer).fixture = this
         vmRunner = VMRunnerFactory(ModMgr.getGdxFile("dwarventech", "bios").path(), vm, "js")
-        coroutineJob = GlobalScope.launch {
-            vmRunner.executeCommand(vm.roms[0]!!.readAll())
-        }
+    }
 
-        INGAME.disposables.add(Disposable {
+    fun startVM() {
+        if (!vmStarted) {
+            vmStarted = true
+
+            coroutineJob = GlobalScope.launch {
+                vmRunner.executeCommand(vm.roms[0]!!.readAll())
+            }
+
+            disposableObj = Disposable {
+                vmRunner.close()
+                coroutineJob.cancel("fixture disposal")
+                vm.dispose()
+            }
+            INGAME.disposables.add(disposableObj)
+        }
+    }
+
+    fun stopVM() {
+        if (vmStarted) {
+            vmStarted = false
+
             vmRunner.close()
             coroutineJob.cancel("fixture disposal")
             vm.dispose()
-        })
+
+            INGAME.disposables.remove(disposableObj)
+        }
     }
 
     override fun reload() {
         super.reload()
 
+        val gpu = GraphicsAdapter(ModMgr.getGdxFile("dwarventech", "gui").path(), vm, GRAPHICSCONFIG)
+//        vm.getIO().blockTransferPorts[0].attachDevice(TestDiskDrive(vm, 0, ...))
+
+        vm.peripheralTable[1] = PeripheralEntry(
+                gpu,
+                GraphicsAdapter.VRAM_SIZE,
+                16,
+                0
+        )
+
+        vm.getPrintStream = { gpu.getPrintStream() }
+        vm.getErrorStream = { gpu.getErrorStream() }
+        vm.getInputStream = { gpu.getInputStream() }
+
         (mainUI as UIHomeComputer).vm = vm
+        (mainUI as UIHomeComputer).fixture = this
+        vmRunner = VMRunnerFactory(ModMgr.getGdxFile("dwarventech", "bios").path(), vm, "js")
+    }
+
+    companion object {
+        val GRAPHICSCONFIG = AdapterConfig(
+                "crt_color",
+                560, 448, 80, 32, 253, 255, 256 shl 10, "FontROM7x14.tga", 0.0f, GraphicsAdapter.TEXT_TILING_SHADER_COLOUR
+        )
     }
 }
 
@@ -99,6 +147,7 @@ internal class UIHomeComputer : UICanvas(
     private var camera: OrthographicCamera
 
     internal lateinit var vm: VM
+    internal lateinit var fixture: FixtureHomeComputer
 
     init {
         batch = FlippingSpriteBatch()
@@ -138,6 +187,7 @@ internal class UIHomeComputer : UICanvas(
     }
 
     override fun doOpening(delta: Float) {
+        fixture.startVM()
     }
 
     override fun doClosing(delta: Float) {

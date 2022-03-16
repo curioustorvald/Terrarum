@@ -44,7 +44,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val radioCellWidth = 100
     private val inputWidth = 340
-    private val radioX = (width - (radioCellWidth * 4 + 9)) / 2
+    private val radioX = (width - (radioCellWidth * (if (App.IS_DEVELOPMENT_BUILD) 5 else 4) + 9)) / 2
     private val inputX = width - inputWidth
 
     private val sizeSelY = 186 + 40
@@ -53,12 +53,22 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val sizeSelector = UIItemInlineRadioButtons(this,
             drawX + radioX, drawY + sizeSelY, radioCellWidth,
-            listOf(
-                    { Lang["CONTEXT_DESCRIPTION_SMALL"] },
-                    { Lang["MENU_SETTING_MEDIUM"] }, // ;p
-                    { Lang["CONTEXT_DESCRIPTION_BIG"] },
-                    { Lang["CONTEXT_DESCRIPTION_HUGE"] }
-            ))
+            if (App.IS_DEVELOPMENT_BUILD)
+                listOf(
+                        { Lang["CONTEXT_DESCRIPTION_TINY"] },
+                        { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+                        { Lang["MENU_SETTING_MEDIUM"] }, // ;p
+                        { Lang["CONTEXT_DESCRIPTION_BIG"] },
+                        { Lang["CONTEXT_DESCRIPTION_HUGE"] }
+                )
+            else
+                listOf(
+                        { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+                        { Lang["MENU_SETTING_MEDIUM"] }, // ;p
+                        { Lang["CONTEXT_DESCRIPTION_BIG"] },
+                        { Lang["CONTEXT_DESCRIPTION_HUGE"] }
+                )
+    )
 
     private val rng = HQRNG()
 
@@ -125,7 +135,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 //        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontGame.getWidth(titlestr)).div(2).toFloat(), titleTextPosY.toFloat())
 
         // draw size previews
-        val texture = tex[sizeSelector.selection]
+        val texture = tex[sizeSelector.selection.coerceAtMost(tex.lastIndex)]
         val tx = drawX + (width - texture.regionWidth) / 2
         val ty = drawY + (160 - texture.regionHeight) / 2
         batch.draw(texture, tx.toFloat(), ty.toFloat())

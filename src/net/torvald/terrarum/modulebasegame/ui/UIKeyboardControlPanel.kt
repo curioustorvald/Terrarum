@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.DefaultConfig
-import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 
@@ -270,7 +269,7 @@ private class UIItemKeycap(
             this.posX = initialX + parent.kbx
             this.posY = initialY + parent.kby
         }
-        else if (parent is UIKeyboardInputConfig) {
+        else if (parent is UIIMEConfig) {
             this.posX = initialX + parent.kbx
             this.posY = initialY + parent.kby
         }

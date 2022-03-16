@@ -218,7 +218,7 @@ object ModMgr {
                                 val hash = digester.digest(File(jarFilePath).readBytes()).joinToString("","","") { it.toInt().and(255).toString(16).uppercase().padStart(2,'0') }
 
                                 if (jarHash != hash) {
-                                    println("Hash expected: $jarHash, got: $hash")
+                                    printdbg(this, "Hash expected: $jarHash, got: $hash")
                                     throw IllegalStateException("Module Jarfile hash mismatch")
                                 }
 

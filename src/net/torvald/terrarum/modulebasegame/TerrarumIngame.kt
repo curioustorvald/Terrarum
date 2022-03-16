@@ -144,7 +144,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val SIZE_NORMAL = Point2i(9000, 2250)
         val SIZE_LARGE = Point2i(13500, 2970)
         val SIZE_HUGE = Point2i(22500, 4500)
-        val WORLDSIZE = arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
+        val WORLDSIZE = if (App.IS_DEVELOPMENT_BUILD)
+            arrayOf(Point2i(2880, 1350), SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
+        else
+            arrayOf(SIZE_SMALL, SIZE_NORMAL, SIZE_LARGE, SIZE_HUGE)
 
         val worldgenThreadExecutor = ThreadExecutor()
     }
