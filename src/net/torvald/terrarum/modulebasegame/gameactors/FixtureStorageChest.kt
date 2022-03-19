@@ -138,7 +138,7 @@ internal class UIStorageChest : UICanvas(
                 { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
                 INVENTORY_CELLS_OFFSET_X() - halfSlotOffset + (listGap + UIItemInventoryElemWide.height) * 7,
                 INVENTORY_CELLS_OFFSET_Y(),
-                6, CELLS_VRT - 1,
+                6, CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
                 keyDownFun = { _, _, _ -> Unit },
@@ -211,6 +211,10 @@ internal class UIStorageChest : UICanvas(
         if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
+    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset
+    private val thisOffsetX2 = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 7
+    private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
         UIInventoryFull.drawBackground(batch)
@@ -255,7 +259,9 @@ internal class UIStorageChest : UICanvas(
 
         // chest name text
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, chestName, chestNameXpos, encumbBarYPos - 3f)
+        App.fontGame.draw(batch, chestName, thisOffsetX + 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - 30)
+
         // encumb text
         batch.color = Color.WHITE
         App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f +

@@ -8,7 +8,6 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.*
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryCells
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -246,12 +245,12 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     }
 
     override fun doOpening(delta: Float) {
-        INGAME.pause()
+//        INGAME.pause()
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
-        INGAME.resume()
+//        INGAME.resume()
         INGAME.setTooltipMessage(null)
     }
 
