@@ -84,6 +84,7 @@ class BlockProp {
     //fun getLum(channel: Int) = lumCol.getElem(channel)
 
     var drop: ItemID = ""
+    var world: ItemID = ""
 
     var maxSupport: Int = -1 // couldn't use NULL at all...
 

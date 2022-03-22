@@ -9,8 +9,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -28,12 +27,12 @@ import java.util.Properties;
 public class CSVEditor extends JFrame {
 
     /** Default columns. When you open existing csv, it should overwrite this. */
-    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
+    private String[] columns = new String[]{"id", "drop", "world", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
     private final int FOUR_DIGIT = 42;
     private final int SIX_DIGIT = 50;
     private final int TWO_DIGIT = 30;
     private final int ARBITRARY = 240;
-    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT, SIX_DIGIT, ARBITRARY};
+    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT, SIX_DIGIT, ARBITRARY};
 
     private final int UNDO_BUFFER_SIZE = 10;
 
@@ -70,6 +69,8 @@ public class CSVEditor extends JFrame {
         }
 
         // setup layout //
+
+        panelWorking.setDividerLocation(0.85);
 
         this.setLayout(new BorderLayout());
         panelSpreadSheet.setLayout(new BorderLayout());
@@ -155,6 +156,8 @@ public class CSVEditor extends JFrame {
                                         ((DefaultTableModel) spreadsheet.getModel()).addRow(newRow);
                                     }
 
+                                    addEventListenersToSpreadsheet();
+
                                     // then add the comments
                                     // since the Commons CSV simply ignores the comments, we have to read them on our own.
                                     try {
@@ -230,6 +233,7 @@ public class CSVEditor extends JFrame {
 
                                 // then add some columns
                                 ((DefaultTableModel) spreadsheet.getModel()).setRowCount(rows);
+                                addEventListenersToSpreadsheet();
 
                                 // notify the user as well
                                 statBar.setText(lang.getProperty("STAT_NEW_FILE"));
@@ -254,6 +258,8 @@ public class CSVEditor extends JFrame {
                             DefaultTableModel tableModel = (DefaultTableModel) spreadsheet.getModel();
                             tableModel.setRowCount(tableModel.getRowCount() + rows);
                         }
+
+                        addEventListenersToSpreadsheet();
                     }
                 });
                 add("New column...");
@@ -335,28 +341,8 @@ public class CSVEditor extends JFrame {
             spreadsheet.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
         // make tables do things
-        spreadsheet.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
 
-            }
-        });
-        // make tables do things
-        spreadsheet.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                // make caption line working
-                JTable table = ((JTable) e.getSource());
-                int col = table.getSelectedColumn();
-                String colName = table.getColumnName(col);
-                String captionText = props.getProperty(colName);
-
-                caption.setText("<span style=\"font:sans-serif;\"><b>" + colName + "</b><span style=\"color:#404040;\">" +
-                        ((captionText == null) ? "" : ": " + captionText) +
-                        "</span></span>"
-                );
-            }
-        });
+        addEventListenersToSpreadsheet();
 
 
         statBar.setText(lang.getProperty("STAT_INIT"));
@@ -367,6 +353,53 @@ public class CSVEditor extends JFrame {
 
     public static void main(String[] args) {
         new CSVEditor();
+    }
+
+    private void actuallyShowCaption(AWTEvent e) {
+        // make caption line working
+        JTable table = ((JTable) e.getSource());
+        int col = table.getSelectedColumn();
+        String colName = table.getColumnName(col);
+        String captionText = props.getProperty(colName);
+
+        caption.setText("<span style=\"font:sans-serif;\"><b>" + colName + "</b><span style=\"color:#404040;\">" +
+                ((captionText == null) ? "" : ": " + captionText) +
+                "</span></span>"
+        );
+    }
+
+    private void actuallyShowCaption(AWTEvent e, int offset) {
+        // make caption line working
+        JTable table = ((JTable) e.getSource());
+        int col = table.getSelectedColumn() + offset;
+        if (col >= table.getColumnCount()) col = table.getColumnCount() - 1;
+        else if (col < 0) col = 0;
+        String colName = table.getColumnName(col);
+        String captionText = props.getProperty(colName);
+
+        caption.setText("<span style=\"font:sans-serif;\"><b>" + colName + "</b><span style=\"color:#404040;\">" +
+                ((captionText == null) ? "" : ": " + captionText) +
+                "</span></span>"
+        );
+    }
+
+    private void addEventListenersToSpreadsheet() {
+        // make tables do things
+        spreadsheet.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                actuallyShowCaption(e);
+            }
+        });
+        spreadsheet.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                actuallyShowCaption(e,
+                        (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_KP_RIGHT || e.getKeyCode() == KeyEvent.VK_TAB) ? 1 :
+                        (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_KP_LEFT) ? -1 : 0
+                );
+            }
+        });
     }
 
     private String toCSV() {
@@ -480,16 +513,17 @@ public class CSVEditor extends JFrame {
     private String captionProperties =
             "" + // dummy string to make IDE happy with the auto indent
                     "id=ID of this block\n" +
-                    "drop=ID of the block this very block should drop when mined\n" +
+                    "drop=Which item the DroppedItem actually adds to your inventory\n" +
+                    "world=Which item the DroppedItem should impersonate when spawned\n" +
                     "name=String identifier of the block\n" +
-                    "shdr=Shade Red (light absorption). Valid range 0.0-4.0\n" +
-                    "shdg=Shade Green (light absorption). Valid range 0.0-4.0\n" +
-                    "shdb=Shade Blue (light absorption). Valid range 0.0-4.0\n" +
-                    "shduv=Shade UV (light absorbtion). Valid range 0.0-4.0\n" +
-                    "lumr=Luminosity Red (light intensity). Valid range 0.0-4.0\n" +
-                    "lumg=Luminosity Green (light intensity). Valid range 0.0-4.0\n" +
-                    "lumb=Luminosity Blue (light intensity). Valid range 0.0-4.0\n" +
-                    "lumuv=Luminosity UV (light intensity). Valid range 0.0-4.0\n" +
+                    "shdr=Shade Red (light absorption). Valid range 0.0–1.0+\n" +
+                    "shdg=Shade Green (light absorption). Valid range 0.0–1.0+\n" +
+                    "shdb=Shade Blue (light absorption). Valid range 0.0–1.0+\n" +
+                    "shduv=Shade UV (light absorbtion). Valid range 0.0–1.0+\n" +
+                    "lumr=Luminosity Red (light intensity). Valid range 0.0–1.0+\n" +
+                    "lumg=Luminosity Green (light intensity). Valid range 0.0–1.0+\n" +
+                    "lumb=Luminosity Blue (light intensity). Valid range 0.0–1.0+\n" +
+                    "lumuv=Luminosity UV (light intensity). Valid range 0.0–1.0+\n" +
                     "str=Strength of the block\n" +
                     "dsty=Density of the block. Water have 1000 in the in-game scale\n" +
                     "mate=Material of the block\n" +
@@ -502,7 +536,8 @@ public class CSVEditor extends JFrame {
                     "fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky\n" +
                     "colour=[Fluids] Colour of the block in hexadecimal RGBA.\n" +
                     "vscs=[Fluids] Viscocity of the block. 16 for water.\n" +
-                    "refl=[NOT Fluids] Reflectance of the block, used by the light calculation. Valid range 0.0-1.0\n";
+                    "refl=[NOT Fluids] Reflectance of the block, used by the light calculation. Valid range 0.0–1.0\n" +
+                    "tags=Tags used by the crafting system\n";
 
     /**
      * ¤ is used as a \n marker

@@ -177,7 +177,12 @@ class BlockCodex {
 
         prop.id = "$modname:$key"
         prop.numericID = key
-        prop.drop = "$modname:${record.intVal("drop")}"
+        // drop and world should be interpreted as:
+        //   "N/A" -> empty string
+        //   otherModname:id -> as-is
+        //   id -> thisModname:id
+        prop.drop = record.get("drop").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
+        prop.world = record.get("world").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
 
         prop.shadeColR = record.floatVal("shdr")
         prop.shadeColG = record.floatVal("shdg")
