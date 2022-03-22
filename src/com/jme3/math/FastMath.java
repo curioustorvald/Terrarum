@@ -895,4 +895,30 @@ final public class FastMath {
         for (int i = 1; i < f.length; i++) max = (f[i] > max) ? f[i] : max;
         return max;
     }
+
+    public static int getGCD(int a, int b) {
+        while (a != b) {
+            if (a > b) a = a-b;
+            else b = b-a;
+        }
+        return a;
+    }
+
+    public static long getGCD(long a, long b) {
+        while (a != b) {
+            if (a > b) a = a-b;
+            else b = b-a;
+        }
+        return a;
+    }
+
+    public static int[] getRatioOf(int a, int b) {
+        int factor = getGCD(a, b);
+        return new int[]{a / factor, b / factor};
+    }
+
+    public static long[] getRatioOf(long a, long b) {
+        long factor = getGCD(a, b);
+        return new long[]{a / factor, b / factor};
+    }
 }
