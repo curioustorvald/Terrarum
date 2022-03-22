@@ -510,52 +510,51 @@ public class CSVEditor extends JFrame {
         }
     }
 
-    private String captionProperties =
-            "" + // dummy string to make IDE happy with the auto indent
-                    "id=ID of this block\n" +
-                    "drop=Which item the DroppedItem actually adds to your inventory\n" +
-                    "world=Which item the DroppedItem should impersonate when spawned\n" +
-                    "name=String identifier of the block\n" +
-                    "shdr=Shade Red (light absorption). Valid range 0.0–1.0+\n" +
-                    "shdg=Shade Green (light absorption). Valid range 0.0–1.0+\n" +
-                    "shdb=Shade Blue (light absorption). Valid range 0.0–1.0+\n" +
-                    "shduv=Shade UV (light absorbtion). Valid range 0.0–1.0+\n" +
-                    "lumr=Luminosity Red (light intensity). Valid range 0.0–1.0+\n" +
-                    "lumg=Luminosity Green (light intensity). Valid range 0.0–1.0+\n" +
-                    "lumb=Luminosity Blue (light intensity). Valid range 0.0–1.0+\n" +
-                    "lumuv=Luminosity UV (light intensity). Valid range 0.0–1.0+\n" +
-                    "str=Strength of the block\n" +
-                    "dsty=Density of the block. Water have 1000 in the in-game scale\n" +
-                    "mate=Material of the block\n" +
-                    "solid=Whether the file has full collision\n" +
-                    "plat=Whether the block should behave like a platform\n" +
-                    "wall=Whether the block can be used as a wall\n" +
-                    "grav=Whether the block should fall through the empty space. N/A to not make it fall; 0 to fall immediately (e.g. Sand), nonzero to indicate that number of floating blocks can be supported (e.g. Scaffolding)\n" +
-                    "dlfn=Dynamic Light Function. 0=Static. Please see <strong>notes</strong>\n" +
-                    "fv=Vertical friction when player slide on the cliff. 0 means not slide-able\n" +
-                    "fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky\n" +
-                    "colour=[Fluids] Colour of the block in hexadecimal RGBA.\n" +
-                    "vscs=[Fluids] Viscocity of the block. 16 for water.\n" +
-                    "refl=[NOT Fluids] Reflectance of the block, used by the light calculation. Valid range 0.0–1.0\n" +
-                    "tags=Tags used by the crafting system\n";
+    // dummy string to make IDE happy with the auto indent
+    private String captionProperties = """
+            id=ID of this block
+            drop=Which item the DroppedItem actually adds to your inventory
+            world=Which item the DroppedItem should impersonate when spawned
+            name=String identifier of the block
+            shdr=Shade Red (light absorption). Valid range 0.0–1.0+
+            shdg=Shade Green (light absorption). Valid range 0.0–1.0+
+            shdb=Shade Blue (light absorption). Valid range 0.0–1.0+
+            shduv=Shade UV (light absorbtion). Valid range 0.0–1.0+
+            lumr=Luminosity Red (light intensity). Valid range 0.0–1.0+
+            lumg=Luminosity Green (light intensity). Valid range 0.0–1.0+
+            lumb=Luminosity Blue (light intensity). Valid range 0.0–1.0+
+            lumuv=Luminosity UV (light intensity). Valid range 0.0–1.0+
+            str=Strength of the block
+            dsty=Density of the block. Water have 1000 in the in-game scale
+            mate=Material of the block
+            solid=Whether the file has full collision
+            plat=Whether the block should behave like a platform
+            wall=Whether the block can be used as a wall
+            grav=Whether the block should fall through the empty space. N/A to not make it fall; 0 to fall immediately (e.g. Sand), nonzero to indicate that number of floating blocks can be supported (e.g. Scaffolding)
+            dlfn=Dynamic Light Function. 0=Static. Please see <strong>notes</strong>
+            fv=Vertical friction when player slide on the cliff. 0 means not slide-able
+            fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky
+            colour=[Fluids] Colour of the block in hexadecimal RGBA.
+            vscs=[Fluids] Viscocity of the block. 16 for water.
+            refl=[NOT Fluids] Reflectance of the block, used by the light calculation. Valid range 0.0–1.0
+            tags=Tags used by the crafting system""";
 
     /**
      * ¤ is used as a \n marker
      */
-    private String translations =
-            "" +
-                    "WARNING_CONTINUE=Continue?\n" +
-                    "WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost.\n" +
-                    "OPERATION_CANCELLED=Operation cancelled.\n" +
-                    "NO_SUCH_FILE=No such file exists, operation cancelled.\n" +
-                    "NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows later.\n" +
-                    "ADD_ROWS=Enter the number of rows to add:\n" +
-                    "WRITE_FAIL=Writing to file has failed:\n" +
-                    "STAT_INIT=Creating a new CSV. You can still open existing file.\n" +
-                    "STAT_SAVE_SUCCESSFUL=File saved successfully.\n" +
-                    "STAT_NEW_FILE=New CSV created.\n" +
-                    "STAT_LOAD_SUCCESSFUL=File loaded successfully.\n" +
-                    "ERROR_INTERNAL=Something went wrong.\n";
+    private String translations = """
+            WARNING_CONTINUE=Continue?
+            WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost.
+            OPERATION_CANCELLED=Operation cancelled.
+            NO_SUCH_FILE=No such file exists, operation cancelled.
+            NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows later.
+            ADD_ROWS=Enter the number of rows to add:
+            WRITE_FAIL=Writing to file has failed:
+            STAT_INIT=Creating a new CSV. You can still open existing file.
+            STAT_SAVE_SUCCESSFUL=File saved successfully.
+            STAT_NEW_FILE=New CSV created.
+            STAT_LOAD_SUCCESSFUL=File loaded successfully.
+            ERROR_INTERNAL=Something went wrong.""";
 }
 
 class OptionSize {
