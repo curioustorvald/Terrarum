@@ -1,6 +1,5 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App.printdbg
@@ -126,8 +125,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     val actorContainerActive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = SortedArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
-    val actorAdditionQueue = ArrayList<Actor>()
-    val actorRemovalQueue = ArrayList<Actor>()
+    val actorAdditionQueue = ArrayList<Pair<Actor, Throwable>>()
+    val actorRemovalQueue = ArrayList<Pair<Actor, Throwable>>()
 
     /**
      * ## BIG NOTE: Calculated actor distance is the **Euclidean distance SQUARED**
@@ -316,10 +315,10 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
      */
     open fun queueActorRemoval(actor: Actor?) {
         if (actor == null) return
-        actorRemovalQueue.add(actor)
+        actorRemovalQueue.add(actor to StackTraceRecorder())
     }
 
-    protected open fun forceRemoveActor(actor: Actor) {
+    protected open fun forceRemoveActor(actor: Actor, caller: Throwable = StackTraceRecorder()) {
         arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
             val indexToDelete = actorContainer.searchFor(actor.referenceID) { it.referenceID }
             if (indexToDelete != null) {
@@ -329,14 +328,14 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         }
     }
 
-    protected open fun forceAddActor(actor: Actor?) {
+    protected open fun forceAddActor(actor: Actor?, caller: Throwable = StackTraceRecorder()) {
         if (actor == null) return
 
         if (theGameHasActor(actor.referenceID)) {
-            throw ReferencedActorAlreadyExistsException(actor)
+            throw ReferencedActorAlreadyExistsException(actor, caller)
         }
         else {
-            actorAdditionQueue.add(actor)
+            actorAdditionQueue.add(actor to StackTraceRecorder())
         }
     }
 
@@ -345,7 +344,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
      */
     open fun queueActorAddition(actor: Actor?) {
         if (actor == null) return
-        actorAdditionQueue.add(actor)
+        actorAdditionQueue.add(actor to StackTraceRecorder())
     }
 
     fun isActive(ID: Int): Boolean =
@@ -498,10 +497,11 @@ inline fun Lock.lock(body: () -> Unit) {
     }
 }
 
+class StackTraceRecorder() : Exception("(I'm here to just record the stack trace, move along)")
 class NoSuchActorWithIDException(id: ActorID) : Exception("Actor with ID $id does not exist.")
 class NoSuchActorWithRefException(actor: Actor) : Exception("No such actor in the game: $actor")
-class ReferencedActorAlreadyExistsException(actor: Actor) : Exception("The actor $actor already exists in the game")
-class ProtectedActorRemovalException(whatisit: String) : Exception("Attempted to removed protected actor '$whatisit'")
+class ReferencedActorAlreadyExistsException(actor: Actor, caller: Throwable) : Exception("The actor $actor already exists in the game", caller)
+class ProtectedActorRemovalException(whatisit: String, caller: Throwable) : Exception("Attempted to removed protected actor '$whatisit'", caller)
 
 val INGAME: IngameInstance
     get() = Terrarum.ingame!!

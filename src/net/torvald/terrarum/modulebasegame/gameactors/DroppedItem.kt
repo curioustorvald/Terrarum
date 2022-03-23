@@ -26,6 +26,8 @@ open class DroppedItem : ActorWithBody {
 
     var itemID: ItemID = ""; private set
 
+    @Transient private var visualItemID = ""
+
     @Transient private var textureRegion: TextureRegion? = null // deserialiser won't call setter of the fields
 
     var itemCount = 1L
@@ -76,8 +78,11 @@ open class DroppedItem : ActorWithBody {
 
     override fun drawBody(batch: SpriteBatch) {
         // deserialiser won't call setter of the fields
+        if (visualItemID == "") {
+            visualItemID = BlockCodex.getOrNull(itemID)?.world ?: itemID
+        }
         if (textureRegion == null) {
-            textureRegion = ItemCodex.getItemImage(itemID)!!
+            textureRegion = ItemCodex.getItemImage(visualItemID)!!
         }
 
         // copy-pasted from ActorWithBody.drawSpriteInGoodPosition()

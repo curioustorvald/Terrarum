@@ -87,7 +87,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
-        val item = ghostItem.get()//makeFixture()
+        val item = ghostItem.getAndSet(makeFixture()) // renew the "ghost" otherwise you'll be spawning exactly the same fixture again; old ghost will be returned
 
         item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)
         // return true when placed, false when cannot be placed

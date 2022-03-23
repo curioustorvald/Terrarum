@@ -775,7 +775,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             repossessActor()
 
             // process actor addition requests
-            actorAdditionQueue.forEach { forceAddActor(it) }
+            actorAdditionQueue.forEach { forceAddActor(it.first, it.second) }
             actorAdditionQueue.clear()
             // determine whether the inactive actor should be activated
             wakeDormantActors()
@@ -784,7 +784,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // determine whether the actor should keep being activated or be dormant
             killOrKnockdownActors()
             // process actor removal requests
-            actorRemovalQueue.forEach { forceRemoveActor(it) }
+            actorRemovalQueue.forEach { forceRemoveActor(it.first, it.second) }
             actorRemovalQueue.clear()
             // update particles
             particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
@@ -1141,7 +1141,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
 
-    override fun forceRemoveActor(actor: Actor) {
+    override fun forceRemoveActor(actor: Actor, caller: Throwable) {
         arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
             val indexToDelete = actorContainer.searchForIndex(actor.referenceID) { it.referenceID }
             if (indexToDelete != null) {
@@ -1185,11 +1185,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     /**
      * Check for duplicates, append actor and sort the list
      */
-    override fun forceAddActor(actor: Actor?) {
+    override fun forceAddActor(actor: Actor?, caller: Throwable) {
         if (actor == null) return
 
         if (theGameHasActor(actor.referenceID)) {
-            throw ReferencedActorAlreadyExistsException(actor)
+            throw ReferencedActorAlreadyExistsException(actor, caller)
         }
         else {
             actorContainerActive.add(actor)
