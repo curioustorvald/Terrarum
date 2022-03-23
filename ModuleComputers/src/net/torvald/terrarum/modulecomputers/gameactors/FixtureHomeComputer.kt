@@ -48,8 +48,9 @@ class FixtureHomeComputer : FixtureBase {
         density = 1400.0
         setHitboxDimension(TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE, 0, -1)
 
-        makeNewSprite(FixtureBase.getSpritesheet("dwarventech", "sprites/fixtures/desktop_computer.tga", TILE_SIZE, TILE_SIZE))
-        sprite!!.setRowsAndFrames(1, 1)
+        makeNewSprite(FixtureBase.getSpritesheet("dwarventech", "sprites/fixtures/desktop_computer.tga", TILE_SIZE, TILE_SIZE)).let {
+            it.setRowsAndFrames(1,1)
+        }
 
         actorValue[AVKey.BASEMASS] = 20.0
 

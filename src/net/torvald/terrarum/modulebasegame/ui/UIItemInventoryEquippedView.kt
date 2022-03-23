@@ -3,6 +3,8 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.spriteanimation.AssembledSpriteAnimation
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.itemListHeight
@@ -85,11 +87,17 @@ class UIItemInventoryEquippedView(
             blendNormal(batch)
 
             batch.color = SPRITE_DRAW_COL
-            batch.draw(
-                    it.textureRegion.get(0, 0),
-                    posX + (width - it.cellWidth + EXTRA_HEADROOM_X).div(2).toFloat(),
-                    posY + (width - it.cellHeight - EXTRA_HEADROOM_Y).div(2).toFloat()
-            )
+
+            if (it is SheetSpriteAnimation) {
+                batch.draw(
+                        it.textureRegion.get(0, 0),
+                        posX + (width - it.cellWidth + EXTRA_HEADROOM_X).div(2).toFloat(),
+                        posY + (width - it.cellHeight - EXTRA_HEADROOM_Y).div(2).toFloat()
+                )
+            }
+            else if (it is AssembledSpriteAnimation) {
+                // TODO
+            }
 
         }
 

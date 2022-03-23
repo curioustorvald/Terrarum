@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -28,9 +29,9 @@ object PlayerBuilderWerebeastTest {
         p.sprite!!.delays = floatArrayOf(2f, 1f/12f) // second value does nothing -- overridden by ActorHumanoid.updateSprite(float)
         p.sprite!!.setRowsAndFrames(2, 4)*/
 
-        p.sprite = SpriteAnimation(p)
-        p.spriteGlow = SpriteAnimation(p)
-        p.reassembleSprite(p.sprite, p.spriteGlow, null)
+        p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p) }
+        p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p) }
+        //p.reassembleSprite(p.sprite, p.spriteGlow, null)
         p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 30, 0)
 
         p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)

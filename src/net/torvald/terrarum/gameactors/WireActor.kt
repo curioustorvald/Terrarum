@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameitems.ItemID
@@ -42,11 +43,12 @@ class WireActor : ActorWithBody {
 
         if (wireID != itemID) {
             if (sprite == null) {
-                makeNewSprite(CommonResourcePool.getAsTextureRegionPack(itemID))
-                sprite!!.delays = floatArrayOf(1f,1f)
-                sprite!!.setRowsAndFrames(2, 16)
+                makeNewSprite(CommonResourcePool.getAsTextureRegionPack(itemID)).let {
+                    it.delays = floatArrayOf(1f,1f)
+                    it.setRowsAndFrames(2, 16)
+                }
             }
-            else sprite!!.setSpriteImage(CommonResourcePool.getAsTextureRegionPack(itemID))
+            else (sprite as SheetSpriteAnimation).setSpriteImage(CommonResourcePool.getAsTextureRegionPack(itemID))
 
             wireID = itemID
         }
@@ -54,7 +56,7 @@ class WireActor : ActorWithBody {
         this.worldY = worldY
         setPosition((worldX + 0.5) * TILE_SIZE, (worldY + 1.0) * TILE_SIZE - 1.0) // what the fuck?
 
-        sprite!!.currentRow = 0
+        (sprite as SheetSpriteAnimation).currentRow = 0
 
         val nearbyTiles = getNearbyTilesPos(worldX, worldY).map { world!!.getAllWiresFrom(it.x, it.y) }
         var ret = 0
@@ -63,7 +65,7 @@ class WireActor : ActorWithBody {
                 ret = ret or (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
-        sprite!!.currentFrame = ret
+        (sprite as SheetSpriteAnimation).currentFrame = ret
     }
 
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
@@ -88,10 +90,10 @@ class WireActor : ActorWithBody {
                     val itemID = rootID + it
                     row = row or ((world?.getWireEmitStateOf(worldX, worldY, itemID)?.isNotZero == true).toInt() shl index)
                 }
-                sprite?.currentRow = row
+                (sprite as SheetSpriteAnimation).currentRow = row
             }
             else {
-                sprite?.currentRow = (world?.getWireEmitStateOf(worldX, worldY, wireID)?.isNotZero == true).toInt()
+                (sprite as SheetSpriteAnimation).currentRow = (world?.getWireEmitStateOf(worldX, worldY, wireID)?.isNotZero == true).toInt()
             }
 
             BlendMode.resolve(drawMode, batch)

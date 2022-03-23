@@ -1,10 +1,5 @@
-/* Original code author: Sean Laurvick
- * This code is based on the original author's code written in Lua.
- */
-
 package net.torvald.spriteanimation
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
@@ -14,8 +9,31 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * This class should not be serialised; save its Animation Description Language instead.
+ *
+ * Created by minjaesong on 2022-03-23.
  */
-class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
+abstract class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
+    protected abstract val currentDelay: Second
+    abstract fun update(delta: Float)
+    abstract fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f)
+
+    var flipHorizontal = false
+    var flipVertical = false
+
+    open fun flip(horizontal: Boolean, vertical: Boolean) {
+        flipHorizontal = horizontal
+        flipVertical = vertical
+    }
+}
+
+/* Original code author: Sean Laurvick
+ * This code is based on the original author's code written in Lua.
+ */
+
+/**
+ * This class should not be serialised; save its Animation Description Language instead.
+ */
+class SheetSpriteAnimation(parentActor: ActorWithBody) : SpriteAnimation(parentActor) {
 
     internal lateinit var textureRegion: TextureRegionPack; private set
 
@@ -27,7 +45,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
     var nRows: Int = 1
         internal set
 
-    private val currentDelay: Second
+    override val currentDelay: Second
         get() = delays[currentRow].coerceAtLeast(1f / 16f) // animation delay cannot be too short
 
     /**
@@ -46,8 +64,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
 
     var looping = true
     private var animationRunning = true
-    var flipHorizontal = false
-    var flipVertical = false
+
     private val visible: Boolean
         get() = parentActor.isVisible
 
@@ -56,8 +73,6 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
 
     var cellWidth: Int = 0
     var cellHeight: Int = 0
-
-    var colorFilter = Color.WHITE
 
     fun setSpriteImage(regionPack: TextureRegionPack) {
         textureRegion = regionPack
@@ -86,7 +101,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
         nFrames = framesCount
     }
 
-    fun update(delta: Float) {
+    override fun update(delta: Float) {
         if (animationRunning) {
             //skip this if animation is stopped
             this.delta += delta
@@ -122,7 +137,7 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
      * *
      * @param scale
      */
-    fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f) {
+    override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
         assert(cellWidth > 0 || cellHeight > 0) {
             "Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor"
         }
@@ -204,11 +219,6 @@ class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disposable {
         animationRunning = false
 
         currentFrame = selectFrame
-    }
-
-    fun flip(horizontal: Boolean, vertical: Boolean) {
-        flipHorizontal = horizontal
-        flipVertical = vertical
     }
 
     override fun dispose() {

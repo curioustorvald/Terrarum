@@ -120,7 +120,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                             // rebuild the disk skimmers
                             INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
                                 printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
-                                it.rebuildingDiskSkimmer?.rebuild()
+//                                it.rebuildingDiskSkimmer?.rebuild()
                             }
 
                             // return to normal state

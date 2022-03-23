@@ -34,6 +34,10 @@ internal data class Transform(val joint: Joint, val translate: ADPropertyObject.
     override fun toString() = "$joint transform: $translate"
 }
 
+/**
+ * If this class is held by a IngamePlayer, this won't get serialised (will be read from a file on loading);
+ * if this class is held by a non-player, this will get serialised.
+ */
 class ADProperties {
     private var fileFrom = ""
     @Transient private var adlString = ""
@@ -43,7 +47,8 @@ class ADProperties {
     private val propTable = HashMap<String, List<ADPropertyObject>>()
 
     /** list of bodyparts used by all the skeletons (HEAD, UPPER_TORSO, LOWER_TORSO) */
-//    lateinit var bodyparts: List<String>; private set
+    lateinit var bodyparts: List<String>; private set
+    /** [bodyparts] but in a full file path */
     lateinit var bodypartFiles: List<String>; private set
     /** properties that are being used as skeletons (SKELETON_STAND) */
     internal lateinit var skeletons: HashMap<String, Skeleton>; private set
@@ -219,6 +224,7 @@ class ADProperties {
 
         this.skeletons = skeletons
         this.animations = animations
+        this.bodyparts = this.bodypartJoints.keys.toList()
         this.bodypartFiles = this.bodypartJoints.keys.map { toFilename(it) }
         this.transforms = transforms
 
@@ -238,8 +244,8 @@ class ADProperties {
     internal fun getAnimByFrameName(frameName: String) = animations[getAnimNameFromFrame(frameName)]!!
     internal fun getFrameNumberFromName(frameName: String) = frameName.substring(frameName.lastIndexOf('_') + 1 until frameName.length).toInt()
 
-    internal fun getSkeleton(name: String) = skeletons[name]!!
-    internal fun getTransform(name: String) = transforms[name]!!
+    internal fun getSkeleton(name: String) = skeletons[name] ?: throw NullPointerException("No skeleton with name '$name'")
+    internal fun getTransform(name: String) = transforms[name] ?: throw NullPointerException("No tranform with name '$name'")
 
     /**
      * Removes number suffix from the animation name
@@ -327,7 +333,7 @@ class ADPropertyObject(propertyRaw: String) {
         fun isADstring(property: String) = !isADvariable(property)
     }
 
-    internal data class Vector2i(var x: Int, var y: Int) {
+    data class Vector2i(var x: Int, var y: Int) {
         override fun toString() = "($x, $y)"
 
         operator fun plus(other: Vector2i) = Vector2i(this.x + other.x, this.y + other.y)

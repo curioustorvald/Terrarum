@@ -10,7 +10,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2016-03-25.
  */
-object PlayerBuilderCynthia {
+/*object PlayerBuilderCynthia {
 
     operator fun invoke(): ActorWithBody {
         //val p: IngamePlayer = IngamePlayer(GameDate(100, 143)) // random value thrown
@@ -44,4 +44,4 @@ object PlayerBuilderCynthia {
     }
 
 
-}
+}*/

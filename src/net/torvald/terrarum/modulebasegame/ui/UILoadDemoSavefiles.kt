@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
 import net.torvald.unicode.EMDASH
@@ -28,6 +29,8 @@ import net.torvald.terrarum.serialise.SaveLoadError
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y
+import net.torvald.terrarum.spriteassembler.AssembleFrameBase
+import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -531,7 +534,7 @@ class UIItemPlayerCells(
             "${d}d${h.toString().padStart(2,'0')}h${m.toString().padStart(2,'0')}m${s.toString().padStart(2,'0')}s"
     }
 
-    private var sprite: SpriteAnimation? = null
+    private var sprite: TextureRegion? = null
 
     internal var hasTexture = false
         private set
@@ -556,16 +559,47 @@ class UIItemPlayerCells(
         if (skimmer.initialised && !hasTexture) {
             skimmer.getFile(-1L)?.bytes?.let {
                 try {
+                    val frameName = "ANIM_IDLE_1"
                     val animFile = skimmer.getFile(-2L)!!
-                    val p = ReadPlayer(skimmer, ByteArray64Reader(it, Common.CHARSET))
-                    p.sprite = SpriteAnimation(p)
-                    p.animDesc = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
-                    p.reassembleSpriteFromDisk(skimmer, p.sprite, null, null)
-                    p.sprite!!.textureRegion.get(0,0).let {
-                        thumb = it
-                        thumb!!.flip(false, false)
-                    }
-                    this.sprite = p.sprite
+                    val properties = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
+
+                    val imagesSelfContained = skimmer.hasEntry(-1025L)
+                    val bodypartMapping = Properties().also { if (imagesSelfContained) it.load(ByteArray64Reader(skimmer.getFile(-1025L)!!.bytes, Common.CHARSET)) }
+
+                    val fileGetter = if (imagesSelfContained)
+                        AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, skimmer)
+                    else
+                        AssembleSheetPixmap.getAssetsDirFileGetter(properties)
+
+//                    println(properties.transforms.keys)
+
+                    val canvas = Pixmap(properties.cols * (properties.frameWidth), properties.rows * (properties.frameHeight), Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.SourceOver }
+                    val theAnim = properties.getAnimByFrameName(frameName)
+                    val skeleton = theAnim.skeleton.joints.reversed()
+                    val transforms = properties.getTransform(frameName)
+                    val bodypartOrigins = properties.bodypartJoints
+                    val bodypartImages = properties.bodypartJoints.keys.map { partname ->
+                        fileGetter(partname).let { file ->
+                            if (file == null) partname to null
+                            else {
+                                try {
+                                    val bytes = file.readAllBytes()
+                                    partname to Pixmap(bytes, 0, bytes.size)
+                                }
+                                catch (e: GdxRuntimeException) {
+                                    partname to null
+                                }
+                            }
+                        }
+                    }.toMap()
+                    val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
+
+                    // manually draw 0th frame of ANIM_IDLE
+                    AssembleSheetPixmap.drawFrame(0, 0, canvas, properties, bodypartOrigins, bodypartImages, transformList, null)
+
+                    bodypartImages.values.forEach { it?.dispose() }
+
+                    this.sprite = TextureRegion(Texture(canvas))
                 }
                 catch (e: Throwable) {
                     throw SaveLoadError(skimmer.diskFile, e)
@@ -620,7 +654,7 @@ class UIItemPlayerCells(
     override fun dispose() {
         thumb?.texture?.dispose()
         thumbPixmap?.dispose()
-        sprite?.dispose()
+        sprite?.texture?.dispose()
     }
 
 

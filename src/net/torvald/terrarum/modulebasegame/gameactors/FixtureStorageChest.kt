@@ -40,8 +40,9 @@ internal class FixtureStorageChest : FixtureBase {
 
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
 
-        makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16))
-        sprite!!.setRowsAndFrames(1, 1)
+        makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16)).let {
+            it.setRowsAndFrames(1,1)
+        }
 
         actorValue[AVKey.BASEMASS] = MASS
 

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.spriteassembler.ADProperties
@@ -12,6 +13,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.savegame.*
 import java.io.Reader
 import java.util.*
@@ -151,27 +153,27 @@ object ReadActor {
             val animFileGlow = disk.getFile(-3L)
             val bodypartsFile = disk.getFile(-1025)
 
-            actor.sprite = SpriteAnimation(actor)
             actor.animDesc = ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET))
+            actor.sprite = AssembledSpriteAnimation(actor.animDesc!!, actor, if (bodypartsFile != null) disk else null, if (bodypartsFile != null) -1025 else null)
             if (animFileGlow != null) {
-                actor.spriteGlow = SpriteAnimation(actor)
                 actor.animDescGlow = ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
+                actor.spriteGlow = AssembledSpriteAnimation(actor.animDescGlow!!, actor, if (bodypartsFile != null) disk else null, if (bodypartsFile != null) -1025 else null)
             }
 
             ItemCodex.loadFromSave(disk.getBackingFile(), actor.dynamicToStaticTable, actor.dynamicItemInventory)
 
-            val heldItem = ItemCodex[actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]]
+//            val heldItem = ItemCodex[actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]]
 
-            if (bodypartsFile != null)
+            /*if (bodypartsFile != null)
                 actor.reassembleSpriteFromDisk(disk, actor.sprite!!, actor.spriteGlow, heldItem)
             else
-                actor.reassembleSprite(actor.sprite!!, actor.spriteGlow, heldItem)
+                actor.reassembleSprite(actor.sprite!!, actor.spriteGlow, heldItem)*/
         }
         else if (actor is ActorWithBody && actor is HasAssembledSprite) {
-            if (actor.animDesc != null) actor.sprite = SpriteAnimation(actor)
-            if (actor.animDescGlow != null) actor.spriteGlow = SpriteAnimation(actor)
+            if (actor.animDesc != null) actor.sprite = AssembledSpriteAnimation(actor.animDesc!!, actor)
+            if (actor.animDescGlow != null) actor.spriteGlow = AssembledSpriteAnimation(actor.animDescGlow!!, actor)
 
-            actor.reassembleSprite(actor.sprite, actor.spriteGlow, null)
+            //actor.reassembleSprite(actor.sprite, actor.spriteGlow, null)
         }
 
 

@@ -132,7 +132,7 @@ object AssembleSheetPixmap {
         return tr
     }
 
-    private fun drawThisFrame(frameName: String,
+    fun drawThisFrame(frameName: String,
                               canvas: Pixmap,
                               properties: ADProperties,
                               fileGetter: (String) -> InputStream?,
@@ -168,7 +168,7 @@ object AssembleSheetPixmap {
         bodypartImages.values.forEach { it?.dispose() }
     }
 
-    private fun drawFrame(row: Int, column: Int,
+    fun drawFrame(row: Int, column: Int,
                           canvas: Pixmap,
                           props: ADProperties,
                           bodypartOrigins: HashMap<String, ADPropertyObject.Vector2i>,

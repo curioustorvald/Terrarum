@@ -375,6 +375,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // don't put it on the postInit() or render(); postInitForNewGame calls this function on the savegamewriter's callback
         makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName))
         makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
+
+        printdbg(this, "postInitForLoadFromSave exit")
     }
 
     private val autosaveOnErrorAction = { e: Throwable -> uiAutosaveNotifier.setAsError() }
@@ -703,7 +705,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             gameFullyLoaded = true
         }
 
-
         ingameController.update()
 
 
@@ -724,8 +725,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             i += 1
         }
         setDebugTime("Ingame.UpdateCounter", i)
-
-
 
         /** RENDER CODE GOES HERE */
         measureDebugTime("Ingame.Render") { renderGame() }
@@ -767,7 +766,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // camera-related updates //
             ////////////////////////////
             FeaturesDrawer.update(delta)
-
 
             ///////////////////////////
             // actor-related updates //
@@ -822,6 +820,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             WORLD_UPDATE_TIMER += 1
         }
 
+
         if (!paused || newWorldLoadedLatch) {
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
@@ -830,7 +829,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             oldSelectedWireRenderClass = selectedWireRenderClass
         }
-
 
         ////////////////////////
         // ui-related updates //
@@ -1105,7 +1103,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 // rebuild the disk skimmers
                 INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
                     printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
-                    it.rebuildingDiskSkimmer?.rebuild()
+//                    it.rebuildingDiskSkimmer?.rebuild()
                 }
 
                 // return to normal state

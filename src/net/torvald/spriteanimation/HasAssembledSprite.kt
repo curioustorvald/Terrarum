@@ -32,12 +32,12 @@ interface HasAssembledSprite {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null, item: GameItem?) {
+    /*fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation? = null, item: GameItem?) {
         if (animDesc != null && sprite != null)
             _rebuild(animDesc!!, sprite, null)
         if (animDescGlow != null && spriteGlow != null)
             _rebuild(animDescGlow!!, spriteGlow, null)
-    }
+    }*/
 
     /*fun reassembleSprite(disk: SimpleFileSystem, sprite: SpriteAnimation?, anim: ADProperties?, spriteGlow: SpriteAnimation? = null, animGlow: ADProperties? = null) {
         if (anim != null && sprite != null)
@@ -46,7 +46,7 @@ interface HasAssembledSprite {
             _rebuild(disk, animGlow, spriteGlow)
     }*/
 
-    private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
+    /*private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
         val pixmap = AssembleSheetPixmap.fromAssetsDir(ad, item)
@@ -70,7 +70,7 @@ interface HasAssembledSprite {
         sprite.nRows = newAnimDelays.size
     }
 
-    /*private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
+    private fun _rebuild(disk: SimpleFileSystem, ad: ADProperties, sprite: SpriteAnimation) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
         val pixmap = if (disk.getEntry(-1025) != null) AssembleSheetPixmap.fromVirtualDisk(disk, ad) else AssembleSheetPixmap.fromAssetsDir(ad)

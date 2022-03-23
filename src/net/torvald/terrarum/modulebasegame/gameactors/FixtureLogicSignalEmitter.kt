@@ -29,8 +29,9 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
         density = 1400.0
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
 
-        makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE, TILE_SIZE))
-        sprite!!.setRowsAndFrames(1, 1)
+        makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE, TILE_SIZE)).let {
+            it.setRowsAndFrames(1,1)
+        }
 
         actorValue[AVKey.BASEMASS] = MASS
     }

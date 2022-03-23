@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.spriteanimation.HasAssembledSprite
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
@@ -722,8 +724,14 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
         if (walledBottom && controllerV?.x != 0.0) {
             //switch row
-            sprite?.switchRow(SPRITE_ROW_WALK)
-            spriteGlow?.switchRow(SPRITE_ROW_WALK)
+            if (this is HasAssembledSprite) {
+                (sprite as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_RUN"
+                (spriteGlow as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_RUN"
+            }
+            else {
+                (sprite as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_WALK)
+                (spriteGlow as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_WALK)
+            }
 
             // set anim frame delay
             if (this is HasAssembledSprite) {
@@ -736,8 +744,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
                     val finalDelay = baseDelay * (scaleCompensation / moveSpeedMult)
 
-                    sprite?.delays?.set(SPRITE_ROW_WALK, finalDelay)
-                    spriteGlow?.delays?.set(SPRITE_ROW_WALK, finalDelay)
+                    (sprite as? AssembledSpriteAnimation)?.overrideDelay = finalDelay
+                    (spriteGlow as? AssembledSpriteAnimation)?.overrideDelay = finalDelay
                 }
                 catch (e: NullPointerException) {
                     println(animDesc!!.animations.keys.joinToString())
@@ -757,8 +765,17 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             }
         }
         else {
-            sprite?.switchRow(SPRITE_ROW_IDLE)
-            spriteGlow?.switchRow(SPRITE_ROW_IDLE)
+
+            if (this is HasAssembledSprite) {
+                (sprite as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_IDLE"
+                (spriteGlow as? AssembledSpriteAnimation)?.currentAnimation = "ANIM_IDLE"
+                (sprite as? AssembledSpriteAnimation)?.overrideDelay = 0f
+                (spriteGlow as? AssembledSpriteAnimation)?.overrideDelay = 0f
+            }
+            else {
+                (sprite as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
+                (spriteGlow as? SheetSpriteAnimation)?.switchRow(SPRITE_ROW_IDLE)
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -355,14 +356,18 @@ open class ActorWithBody : Actor {
         // some initialiser goes here...
     }
 
-    fun makeNewSprite(textureRegionPack: TextureRegionPack) {
-        sprite = SpriteAnimation(this)
-        sprite!!.setSpriteImage(textureRegionPack)
+    fun makeNewSprite(textureRegionPack: TextureRegionPack): SheetSpriteAnimation {
+        sprite = SheetSpriteAnimation(this).also {
+            it.setSpriteImage(textureRegionPack)
+        }
+        return sprite as SheetSpriteAnimation
     }
 
-    fun makeNewSpriteGlow(textureRegionPack: TextureRegionPack) {
-        spriteGlow = SpriteAnimation(this)
-        spriteGlow!!.setSpriteImage(textureRegionPack)
+    fun makeNewSpriteGlow(textureRegionPack: TextureRegionPack): SheetSpriteAnimation {
+        spriteGlow = SheetSpriteAnimation(this).also {
+            it.setSpriteImage(textureRegionPack)
+        }
+        return spriteGlow as SheetSpriteAnimation
     }
 
     /**
@@ -1741,7 +1746,8 @@ open class ActorWithBody : Actor {
     }
 
     open fun getSpriteHead(): TextureRegion? {
-        return sprite?.textureRegion?.get(0,0)
+        return CommonResourcePool.getAsTextureRegion("placeholder_16")
+        //return sprite?.textureRegion?.get(0,0)
     }
 
 

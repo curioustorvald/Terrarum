@@ -83,9 +83,9 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
     /** To be used later by the game to rebuild the sprite.
      * Which `_rebuild` function to use is determined at the load time.
      */
-    @Transient private lateinit var rebuildfun: (item: GameItem?) -> Unit
-    @Transient private lateinit var rebuildfunGlow: (item: GameItem?) -> Unit
-    @Transient internal var rebuildingDiskSkimmer: DiskSkimmer? = null
+//    @Transient private lateinit var rebuildfun: (item: GameItem?) -> Unit
+//    @Transient private lateinit var rebuildfunGlow: (item: GameItem?) -> Unit
+//    @Transient internal var rebuildingDiskSkimmer: DiskSkimmer? = null
 
     /**
      * Example usage:
@@ -97,7 +97,7 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
      * reassembleSprite(this.sprite, this.spriteGlow)
      * ```
      */
-    override fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
+    /*override fun reassembleSprite(sprite: SpriteAnimation?, spriteGlow: SpriteAnimation?, heldItem: GameItem?) {
         if (animDesc != null && sprite != null) {
             rebuildfun = { item: GameItem? -> _rebuild(animDesc!!, sprite, item) }; rebuildfun(heldItem)
             spriteHeadTexture = AssembleSheetPixmap.getMugshotFromAssetsDir(animDesc!!)
@@ -119,9 +119,9 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
         }
         if (animDescGlow != null && spriteGlow != null)
             rebuildfunGlow = { item: GameItem? -> _rebuild(disk, -1026L, animDescGlow!!, spriteGlow, item) }; rebuildfunGlow(heldItem)
-    }
+    }*/
 
-    private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
+    /*private fun _rebuild(ad: ADProperties, sprite: SpriteAnimation, item: GameItem?) {
         // TODO injecting held item/armour pictures? Would it be AssembleSheetPixmap's job?
 
         val pixmap = AssembleSheetPixmap.fromAssetsDir(ad, item)
@@ -167,15 +167,15 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
         sprite.delays = newAnimDelays
         sprite.nFrames = newAnimFrames
         sprite.nRows = newAnimDelays.size
-    }
+    }*/
 
-    override fun getSpriteHead(): TextureRegion? {
+    /*override fun getSpriteHead(): TextureRegion? {
         return spriteHeadTexture
-    }
+    }*/
 
     @Transient private var unequipNoSpriteUpdate = false
 
-    override fun equipItem(item: GameItem) {
+    /*override fun equipItem(item: GameItem) {
         val oldItemID = inventory.itemEquipped[item.equipPosition]
 
         unequipNoSpriteUpdate = true
@@ -208,5 +208,5 @@ class IngamePlayer : ActorHumanoid, HasAssembledSprite {
 
 //        println("IngamePlayer.unequipItem")
 //        printStackTrace(this)
-    }
+    }*/
 }

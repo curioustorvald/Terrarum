@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ModMgr
@@ -52,8 +53,9 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
 
         lightBoxList.add(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0), color))
 
-        makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32))
-        sprite!!.setRowsAndFrames(1, 2)
+        makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32)).let {
+            it.setRowsAndFrames(1,2)
+        }
 
         actorValue[AVKey.BASEMASS] = MASS
     }
@@ -73,7 +75,7 @@ internal class FixtureTikiTorch : FixtureBase, Luminous {
             spawnTimer -= nextDelay
             nextDelay = rng.nextFloat() * 0.25f + 0.25f
 
-            sprite?.delays?.set(0, rng.nextFloat() * 0.4f + 0.1f)
+            (sprite as? SheetSpriteAnimation)?.delays?.set(0, rng.nextFloat() * 0.4f + 0.1f)
         }
 
         spawnTimer += delta
