@@ -1,17 +1,17 @@
-"idst";"tens";"impf";"dsty";"fmod";"endurance";"tcond";"reach";"comments"
-"ROCK";  "15"; "210";"3000";   "1";     "0.42";  "1.0";    "5";"data is that of marble"
-"OORE";  "15"; "210";"3000";   "1";     "0.42";  "1.0";    "5";"data is that of marble"
-"OGEM";  "15"; "210";"3000";   "1";     "0.42";  "1.0";    "5";"data is that of marble"
-"CUPR"; "210"; "770";"8960";   "2";     "1.00";"401.0";    "5";"copper"
-"EGLS";  "33";"1000";"2325";   "4";     "0.82";  "1.0";    "6";"elven glass/moldavite"
-"IRON"; "350";"1085";"7874";   "5";     "1.42";  "1.0";    "6";"not wrought iron; just natural iron"
-"ARGN"; "170"; "595";"10490";  "9";     "0.91";  "1.0";    "6";"argentum/silver"
-"STAL"; "531";"2520";"7874";  "14";     "1.73";  "1.0";    "7";"steel"
-"EAUR"; "768";   "0";"8192";  "21";     "1.36";  "1.0";    "7";"elven aurichalcum"
-"TIAL"; "900";   "0";"4420";  "33";     "2.16";  "1.0";    "8";"titanium alloy (Ti6Al4V)"
-"ADMT";"2000";"4090";"2700";  "71";     "3.42";  "1.0";    "8";"adamant"
-"OOZE";  "20";   "0";"1000";   "1";     "0.08";  "0.5";    "0";"genetic ooze; data is about human skin"
-"BONE"; "130";   "0";"2000";   "1";     "0.23"; "0.55";    "4";"data is that of bovine bone"
+idst;tens;impf;dsty;fmod;endurance;tcond;reach;comments
+ROCK;15;210;3000;1;0.42;1.0;5;data is that of marble
+OORE;15;210;3000;1;0.42;1.0;5;data is that of marble
+OGEM;15;210;3000;1;0.42;1.0;5;data is that of marble
+CUPR;210;770;8960;2;1.00;401.0;5;copper
+EGLS;33;1000;2325;4;0.82;1.0;6;elven glass/moldavite
+IRON;350;1085;7874;5;1.42;1.0;6;not wrought iron,just natural iron
+ARGN;170;595;10490;9;0.91;1.0;6;argentum/silver
+STAL;531;2520;7874;14;1.73;1.0;7;steel
+EAUR;768;0;8192;21;1.36;1.0;7;elven aurichalcum
+TIAL;900;0;4420;33;2.16;1.0;8;titanium alloy (Ti6Al4V)
+ADMT;2000;4090;2700;71;3.42;1.0;8;adamant
+OOZE;20;0;1000;1;0.08;0.5;0;genetic ooze,data is about human skin
+BONE;130;0;2000;1;0.23;0.55;4;data is that of bovine bone
 
 # idst: ID_STRING, ALL CAPS
 #
@@ -26,14 +26,14 @@
 # fmod: forcemod -- related to attack points
 #       Attack points = `16 * forcemod.sqrt()` for each strike
 #
-# endurance: multiplier, using copper as reference; determines durability of tools/weapons/armours/etc.
+# endurance: multiplier, using copper as reference;determines durability of tools/weapons/armours/etc.
 #            the base value for endurance differes to tool to tool. When integer is used, resulting value must be ROUNDED.
 #
 # tcond: thermal conductivity
 #
 # reach: Tool Reach in blocks. Default is 6 (iron)
 #
-# Comments: do nothing; do not parse
+# Comments: do nothing;do not parse
 #
 
 ## These values are being used by the phys simulator (blocks) and for attack power calculation (items)

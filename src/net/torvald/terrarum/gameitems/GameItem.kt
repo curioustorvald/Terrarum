@@ -352,7 +352,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         fun generateUniqueDynamicID(inventory: ActorInventory): Int {
             var ret: Int
             do {
-                ret = (1..2147483647).pickRandom()
+                ret = (1..2147483647).random()
             } while (inventory.contains("$PREFIX_DYNAMICITEM:$ret"))
 
             return ret
@@ -386,6 +386,6 @@ fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMu
 
     if (dist <= minOf(toolDistMax, distMax).sqr()) return action() else return false
 }
-fun IntRange.pickRandom() = HQRNG().nextInt(this.last - this.first + 1) + this.first // count() on 200 million entries? Se on vitun hyvää idea
-fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
-fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]
+//fun IntRange.pickRandom() = HQRNG().nextInt(this.last - this.first + 1) + this.first // count() on 200 million entries? Se on vitun hyvää idea
+//fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
+//fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]
