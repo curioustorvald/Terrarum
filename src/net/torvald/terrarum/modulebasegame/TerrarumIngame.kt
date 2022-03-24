@@ -372,10 +372,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         actorNowPlaying = codices.player
         actorGamer = codices.player
 
-        // don't put it on the postInit() or render(); postInitForNewGame calls this function on the savegamewriter's callback
-        makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName))
-        makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
-
         printdbg(this, "postInitForLoadFromSave exit")
     }
 
