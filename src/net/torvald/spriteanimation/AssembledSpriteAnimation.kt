@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.floor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.savegame.ByteArray64Reader
@@ -15,6 +16,7 @@ import net.torvald.terrarum.savegame.EntryID
 import net.torvald.terrarum.savegame.SimpleFileSystem
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.spriteassembler.ADProperties
+import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.spriteassembler.AssembleFrameBase
 import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import java.io.InputStream
@@ -86,56 +88,47 @@ class AssembledSpriteAnimation(
         if (parentActor.isVisible) {
 
             val tx = (parentActor.hitboxTranslateX) * scale
-            val txF = (parentActor.hitboxTranslateX + parentActor.baseHitboxW) * scale
-            val ty = (parentActor.hitboxTranslateY + (adp.frameHeight - parentActor.baseHitboxH)) * scale
-            val tyF = (parentActor.hitboxTranslateY + parentActor.baseHitboxH) * scale
+            val txFlp = -(parentActor.hitboxTranslateX) * scale
+            // flipping will not be symmetrical if baseHitboxWidth is odd number
+            val ty = (parentActor.hitboxTranslateY - parentActor.baseHitboxH) * scale
+            val tyFlp = (parentActor.hitboxTranslateY) * scale
 
             adp.animations[currentAnimation]!!.let { theAnim ->
                 val skeleton = theAnim.skeleton.joints.reversed()
                 val transforms = adp.getTransform("${currentAnimation}_${1+currentFrame}")
                 val bodypartOrigins = adp.bodypartJoints
 
-                AssembleFrameBase.makeTransformList(skeleton, transforms).forEach { (name, bodypartPos) ->
+                AssembleFrameBase.makeTransformList(skeleton, transforms).forEach { (name, bodypartPos0) ->
                     if (false) { // inject item's image
 
                     }
                     else {
                         res[name]?.let { image ->
-                            val imgCentre = bodypartOrigins[name]!!.invertX()
-                            val drawPos = adp.origin + bodypartPos + imgCentre
+                            var bodypartPos = bodypartPos0.invertY()
+                            if (flipVertical) bodypartPos = bodypartPos.invertY()
+                            if (flipHorizontal) bodypartPos = bodypartPos.invertX()
+                            bodypartPos += ADPropertyObject.Vector2i(1,0)
 
-                            if (flipHorizontal && flipVertical) {
-                                batch.draw(image,
-                                        FastMath.floor(posX).toFloat() + txF + drawPos.x,
-                                        FastMath.floor(posY).toFloat() + tyF + drawPos.y,
-                                        -FastMath.floor(adp.frameWidth * scale).toFloat(),
-                                        -FastMath.floor(adp.frameHeight * scale).toFloat()
-                                )
-                            }
-                            else if (flipHorizontal && !flipVertical) {
-                                batch.draw(image,
-                                        FastMath.floor(posX).toFloat() + txF + drawPos.x,
-                                        FastMath.floor(posY).toFloat() - ty + drawPos.y,
-                                        -FastMath.floor(adp.frameWidth * scale).toFloat(),
-                                        FastMath.floor(adp.frameHeight * scale).toFloat()
-                                )
-                            }
-                            else if (!flipHorizontal && flipVertical) {
-                                batch.draw(image,
-                                        FastMath.floor(posX).toFloat() - tx + drawPos.x,
-                                        FastMath.floor(posY).toFloat() + tyF + drawPos.y,
-                                        FastMath.floor(adp.frameWidth * scale).toFloat(),
-                                        -FastMath.floor(adp.frameHeight * scale).toFloat()
-                                )
-                            }
-                            else {
-                                batch.draw(image,
-                                        FastMath.floor(posX).toFloat() - tx + drawPos.x,
-                                        FastMath.floor(posY).toFloat() - ty + drawPos.y,
-                                        FastMath.floor(adp.frameWidth * scale).toFloat(),
-                                        FastMath.floor(adp.frameHeight * scale).toFloat()
-                                )
-                            }
+                            var imgCentre = bodypartOrigins[name]!!
+                            if (flipVertical) imgCentre = imgCentre.invertY()
+                            if (flipHorizontal) imgCentre = imgCentre.invertX()
+
+                            val drawPos = adp.origin + bodypartPos - imgCentre
+
+                            val w = (image.regionWidth * scale).floor()
+                            val h = (image.regionHeight * scale).floor()
+                            val fposX = posX.floor() + drawPos.x * scale
+                            val fposY = posY.floor() + drawPos.y * scale
+
+                            if (flipHorizontal && flipVertical)
+                                batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
+                            else if (flipHorizontal && !flipVertical)
+                                batch.draw(image, fposX + txFlp, fposY - ty, -w, h)
+                            else if (!flipHorizontal && flipVertical)
+                                batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
+                            else
+                                batch.draw(image, fposX - tx, fposY - ty, w, h)
+
                         }
                     }
                 }
