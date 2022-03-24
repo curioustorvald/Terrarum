@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.*
+import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.floor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
@@ -19,7 +21,6 @@ import net.torvald.terrarum.spriteassembler.AssembleFrameBase
 import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import java.io.InputStream
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * This class should not be serialised; save its Animation Description Language instead.
@@ -36,16 +37,23 @@ class AssembledSpriteAnimation(
     constructor(adp: ADProperties, parentActor: ActorWithBody) : this(adp, parentActor, null, null)
 
     var currentFrame = 0 // while this number is zero-based, the frame number on the ADP is one-based
+        private set
     var currentAnimation = "" // e.g. ANIM_IDLE ANIM_RUN (no frame numbers!)
         set(value) {
+            if (field != value) {
+                currentFrame = 0
+                currentAnimationMaxFrames = adp.animations[value]?.frames ?: 1
+                currentAnimationBaseDelay = adp.animations[value]?.delay ?: 0.5f
+            }
             field = value
-            currentFrame = 0
         }
+    private var currentAnimationMaxFrames = 1
+    private var currentAnimationBaseDelay = 0.0625f
 
 //    @Transient var init = false
 
     override val currentDelay: Second
-        get() = (if (overrideDelay > 0f) overrideDelay else adp.animations[currentAnimation]?.delay ?: 1f).coerceAtLeast(1f / 16f)
+        get() = (if (overrideDelay > 0f) overrideDelay else currentAnimationBaseDelay).coerceAtLeast(0.0625f)
 
     var overrideDelay = 0f // set to 0f to not use this field
 
@@ -75,11 +83,11 @@ class AssembledSpriteAnimation(
         //check if it's time to advance the frame
         while (this.delta >= currentDelay) {
             // advance frame
-            currentFrame = (currentFrame + 1) % (adp.animations[currentAnimation]?.frames ?: 2)
+            currentFrame = (currentFrame + 1) % currentAnimationMaxFrames
 
             // discount counter
             this.delta -= currentDelay
-        }    
+        }
     }
 
 
