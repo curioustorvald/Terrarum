@@ -5,12 +5,10 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
-import com.jme3.math.FastMath
-import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.floor
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.printStackTrace
+import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.EntryID
 import net.torvald.terrarum.savegame.SimpleFileSystem
@@ -84,6 +82,7 @@ class AssembledSpriteAnimation(
         }    
     }
 
+
     override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
         if (parentActor.isVisible) {
 
@@ -93,30 +92,48 @@ class AssembledSpriteAnimation(
             val ty = (parentActor.hitboxTranslateY - parentActor.baseHitboxH) * scale
             val tyFlp = (parentActor.hitboxTranslateY) * scale
 
+
             adp.animations[currentAnimation]!!.let { theAnim ->
                 val skeleton = theAnim.skeleton.joints.reversed()
                 val transforms = adp.getTransform("${currentAnimation}_${1+currentFrame}")
                 val bodypartOrigins = adp.bodypartJoints
 
                 AssembleFrameBase.makeTransformList(skeleton, transforms).forEach { (name, bodypartPos0) ->
-                    if (false) { // inject item's image
+                    var bodypartPos = bodypartPos0.invertY()
+                    if (flipVertical) bodypartPos = bodypartPos.invertY()
+                    if (flipHorizontal) bodypartPos = bodypartPos.invertX()
+                    bodypartPos += ADPropertyObject.Vector2i(1,0)
 
+                    if (name == "HELD_ITEM") { // inject item's image
+                        ItemCodex[(parentActor as? Pocketed)?.inventory?.itemEquipped?.get(jointNameToEquipPos[name]!!)]?.let { item ->
+                            ItemCodex.getItemImage(item)?.let { image ->
+                                val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
+                                val w = image.regionWidth * scale
+                                val h = image.regionHeight * scale
+                                val fposX = posX.floor() + drawPos.x * scale
+                                val fposY = posY.floor() + drawPos.y * scale - h
+
+                                // draw
+                                if (flipHorizontal && flipVertical)
+                                    batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
+                                else if (flipHorizontal && !flipVertical)
+                                    batch.draw(image, fposX + txFlp, fposY - ty, -w, h)
+                                else if (!flipHorizontal && flipVertical)
+                                    batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
+                                else
+                                    batch.draw(image, fposX - tx, fposY - ty, w, h)
+                            }
+                        }
                     }
                     else {
                         res[name]?.let { image ->
-                            var bodypartPos = bodypartPos0.invertY()
-                            if (flipVertical) bodypartPos = bodypartPos.invertY()
-                            if (flipHorizontal) bodypartPos = bodypartPos.invertX()
-                            bodypartPos += ADPropertyObject.Vector2i(1,0)
-
                             var imgCentre = bodypartOrigins[name]!!
                             if (flipVertical) imgCentre = imgCentre.invertY()
                             if (flipHorizontal) imgCentre = imgCentre.invertX()
 
                             val drawPos = adp.origin + bodypartPos - imgCentre
-
-                            val w = (image.regionWidth * scale).floor()
-                            val h = (image.regionHeight * scale).floor()
+                            val w = image.regionWidth * scale
+                            val h = image.regionHeight * scale
                             val fposX = posX.floor() + drawPos.x * scale
                             val fposY = posY.floor() + drawPos.y * scale
 
@@ -144,6 +161,11 @@ class AssembledSpriteAnimation(
     }
 
     companion object {
+        val jointNameToEquipPos = hashMapOf(
+                "HELD_ITEM" to GameItem.EquipPosition.HAND_GRIP
+                // TODO fill in with armours/etc
+        )
+
         private fun getPartTexture(getFile: (String) -> InputStream?, partName: String): TextureRegion? {
             getFile(partName)?.let {
                 val bytes = it.readAllBytes()
