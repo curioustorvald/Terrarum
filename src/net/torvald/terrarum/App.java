@@ -19,7 +19,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.strikerx3.jxinput.XInputDevice;
-import net.torvald.gdx.graphics.PixmapIO2;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
@@ -439,14 +438,16 @@ public class App implements ApplicationListener {
             ditherPatterns[i] = t;
         }
 
-        shaderBayerSkyboxFill = loadShaderFromClasspath("shaders/4096.vert", "shaders/4096_bayer_skyboxfill.frag");
-        shaderHicolour = loadShaderFromClasspath("shaders/4096.vert", "shaders/hicolour.frag");
-        shaderDebugDiff = loadShaderFromClasspath("shaders/4096.vert", "shaders/diff.frag");
+        shaderBayerSkyboxFill = loadShaderFromClasspath("shaders/default.vert",
+                "shaders/float_to_disp_dither_static.frag"
+        );
+        shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
+        shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
         shaderPassthruRGBA = SpriteBatch.createDefaultShader();
-        shaderDitherRGBA = loadShaderFromClasspath("shaders/4096.vert", "shaders/4096_bayer.frag"); // always load the shader regardless of config because the config may cange
-        shaderColLUT = loadShaderFromClasspath("shaders/4096.vert", "shaders/passthrurgb.frag");
-        shaderReflect = loadShaderFromClasspath("shaders/4096.vert", "shaders/reflect.frag");
-        shaderGhastlyWhite = loadShaderFromClasspath("shaders/4096.vert", "shaders/ghastlywhite.frag");
+        shaderDitherRGBA = loadShaderFromClasspath("shaders/default.vert", "shaders/float_to_disp_dither.frag"); // always load the shader regardless of config because the config may cange
+        shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
+        shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
+        shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,

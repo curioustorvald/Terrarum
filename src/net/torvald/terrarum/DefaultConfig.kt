@@ -11,6 +11,7 @@ object DefaultConfig {
 
     val hashMap = hashMapOf<String, Any>(
             "displayfps" to 0, // 0: no limit, non-zero: limit
+            "displaycolourdepth" to 8,
             "usevsync" to false,
             "screenwidth" to TerrarumScreenSize.defaultW,
             "screenheight" to TerrarumScreenSize.defaultH,

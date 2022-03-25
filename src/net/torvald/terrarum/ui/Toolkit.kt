@@ -29,10 +29,10 @@ object Toolkit : Disposable {
     }
 
 
-    private val shaderKawaseDown = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/kawasedown.frag")
-    private val shaderKawaseUp = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/kawaseup.frag")
-    private val shaderBoxDown = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/boxdown.frag")
-    private val shaderBoxUp = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/boxup.frag")
+    private val shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
+    private val shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
+    private val shaderBoxDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/boxdown.frag")
+    private val shaderBoxUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/boxup.frag")
 
     private lateinit var fboBlur: FloatFrameBuffer
     private lateinit var fboBlurHalf: FloatFrameBuffer

@@ -39,7 +39,7 @@ object ShitOnGlsl : ApplicationAdapter() {
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(Gdx.files.internal("assets/shaders/4096.vert"), Gdx.files.internal("assets/shaders/crt.frag"))
+        shader = ShaderProgram(Gdx.files.internal("assets/shaders/default.vert"), Gdx.files.internal("assets/shaders/crt.frag"))
 
 
         font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)

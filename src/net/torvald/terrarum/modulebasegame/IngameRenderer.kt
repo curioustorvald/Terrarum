@@ -115,21 +115,17 @@ object IngameRenderer : Disposable {
     // these codes will run regardless of the invocation of the "initialise()" function
     // the "initialise()" function will also be called
     init {
-//        shaderBlurDither = App.loadShaderFromClasspath("shaders/blur.vert", "shaders/blur_dither.frag")
-//        shaderRGBOnlyDither = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/4096_bayer_rgb1.frag")
-//        shaderAtoGreyDither = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/4096_bayer_aaa1.frag")
-
         shaderBlur = App.loadShaderFromClasspath("shaders/blur.vert", "shaders/blur.frag")
-        shaderRGBOnly = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/rgbonly.frag")
-        shaderAtoGrey = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/aonly.frag")
+        shaderRGBOnly = App.loadShaderFromClasspath("shaders/default.vert", "shaders/rgbonly.frag")
+        shaderAtoGrey = App.loadShaderFromClasspath("shaders/default.vert", "shaders/aonly.frag")
 
 
-        shaderAlphaDither = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/alphadither.frag")
+        shaderAlphaDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/alphadither.frag")
         shaderBlendGlow = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlow.frag")
 
 
-        shaderKawaseDown = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/kawasedown.frag")
-        shaderKawaseUp = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/kawaseup.frag")
+        shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
+        shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
 
         if (!shaderBlendGlow.isCompiled) {
             Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)

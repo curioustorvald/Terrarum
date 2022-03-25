@@ -85,7 +85,7 @@ internal object BlocksDrawer {
 
 
     private lateinit var tilesQuad: Mesh
-    private val shader = App.loadShaderFromClasspath("shaders/4096.vert", "shaders/tiling_dither.frag")
+    private val shader = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling_dither.frag")
 
     init {
 

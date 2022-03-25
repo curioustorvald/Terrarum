@@ -579,17 +579,17 @@ class UIItemPlayerCells(
                     val bodypartImages = props.bodypartJoints.keys.associate { partname ->
                         fileGetter(partname).let { file ->
                             if (file == null) {
-                                printdbg(this, "   Partname $partname points to a null file!")
+//                                printdbg(this, "   Partname $partname points to a null file!")
                                 partname to null
                             }
                             else {
                                 try {
-                                    printdbg(this, "   Partname $partname successfully retrieved")
+//                                    printdbg(this, "   Partname $partname successfully retrieved")
                                     val bytes = file.readAllBytes()
                                     partname to Pixmap(bytes, 0, bytes.size)
                                 }
                                 catch (e: GdxRuntimeException) {
-                                    printdbg(this, "   Partname $partname failed to load: ${e.message}")
+//                                    printdbg(this, "   Partname $partname failed to load: ${e.message}")
                                     partname to null
                                 }
                             }

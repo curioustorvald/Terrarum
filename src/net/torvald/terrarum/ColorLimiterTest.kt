@@ -38,7 +38,7 @@ object ColorLimiterTest : ApplicationAdapter() {
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader4096 = ShaderProgram(Gdx.files.internal("assets/shaders/4096.vert"), Gdx.files.internal("assets/shaders/4096_bayer.frag"))
+        shader4096 = ShaderProgram(Gdx.files.internal("assets/shaders/default.vert"), Gdx.files.internal("assets/shaders/float_to_disp_dither.frag"))
         shader4096.bind()
         shader4096.setUniformf("rcount", 4f)
         shader4096.setUniformf("gcount", 4f)

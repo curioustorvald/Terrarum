@@ -41,6 +41,14 @@ object PostProcessor : Disposable {
 
     private val functionRowHelper = Texture(Gdx.files.internal("assets/graphics/function_row_help.png"))
 
+    private val shaderQuant = mapOf(
+            8 to 255f,
+            10 to 1023f,
+            12 to 4095f,
+            14 to 16383f,
+            15 to 32767f,
+            16 to 65535f
+    )
 
     init {
         App.disposables.add(this)
@@ -139,6 +147,7 @@ object PostProcessor : Disposable {
             App.shaderDitherRGBA.setUniformi("u_texture", 0)
             App.shaderDitherRGBA.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
             App.shaderDitherRGBA.setUniformi("u_pattern", 1)
+            App.shaderDitherRGBA.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
             App.fullscreenQuad.render(App.shaderDitherRGBA, GL20.GL_TRIANGLES)
         }
         else {

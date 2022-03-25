@@ -19,7 +19,7 @@ uniform float parallax_size = 1.0/3.0; // 0: no parallax
 uniform float zoomInv = 1.0;
 
 
-float quant = 63.0; // 64 steps -> 63.0; 256 steps -> 255.0
+float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 vec4 quantiser = vec4(quant);
 vec4 quantiserDivider = vec4(1.0 / quant);
 
