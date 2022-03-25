@@ -13,7 +13,6 @@ import com.jme3.math.FastMath
 import net.torvald.unicode.EMDASH
 import net.torvald.unicode.getKeycapConsole
 import net.torvald.unicode.getKeycapPC
-import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
@@ -24,7 +23,6 @@ import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.serialise.ReadPlayer
 import net.torvald.terrarum.serialise.SaveLoadError
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
@@ -241,9 +239,9 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
         mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
         mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
 
-        printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
-        printdbg(this, "mode1Node data: ${mode1Node.data}")
-        printdbg(this, "mode2Node data: ${mode2Node.data}")
+//        printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
+//        printdbg(this, "mode1Node data: ${mode1Node.data}")
+//        printdbg(this, "mode2Node data: ${mode2Node.data}")
     }
 
     private fun modeChangedHandler(mode: Int) {
@@ -486,9 +484,6 @@ class UIItemPlayerCells(
     override val width = SAVE_CELL_WIDTH
     override val height = SAVE_CELL_HEIGHT
 
-    private var thumbPixmap: Pixmap? = null
-    private var thumb: TextureRegion? = null
-
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
         UILoadGovernor.playerDisk = skimmer
         parent.advanceMode()
@@ -499,11 +494,13 @@ class UIItemPlayerCells(
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
 
+    private var playerUUID: UUID? = null
+
     init {
         skimmer.getFile(-1L)?.bytes?.let {
             val json = JsonReader().parse(ByteArray64Reader(it, Common.CHARSET))
 
-            val playerUUID = UUID.fromString(json["uuid"]?.asString())
+            playerUUID = UUID.fromString(json["uuid"]?.asString())
             val worldUUID = UUID.fromString(json["worldCurrentlyPlaying"]?.asString())
 
             App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
@@ -559,9 +556,10 @@ class UIItemPlayerCells(
         if (skimmer.initialised && !hasTexture) {
             skimmer.getFile(-1L)?.bytes?.let {
                 try {
+                    printdbg(this, "Generating portrait for $playerName")
                     val frameName = "ANIM_IDLE_1"
                     val animFile = skimmer.getFile(-2L)!!
-                    val properties = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
+                    val props = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
 
                     val imagesSelfContained = skimmer.hasEntry(-1025L)
                     val bodypartMapping = Properties().also { if (imagesSelfContained) it.load(ByteArray64Reader(skimmer.getFile(-1025L)!!.bytes, Common.CHARSET)) }
@@ -569,35 +567,50 @@ class UIItemPlayerCells(
                     val fileGetter = if (imagesSelfContained)
                         AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, skimmer)
                     else
-                        AssembleSheetPixmap.getAssetsDirFileGetter(properties)
+                        AssembleSheetPixmap.getAssetsDirFileGetter(props)
 
 //                    println(properties.transforms.keys)
 
-                    val canvas = Pixmap(properties.cols * (properties.frameWidth), properties.rows * (properties.frameHeight), Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.SourceOver }
-                    val theAnim = properties.getAnimByFrameName(frameName)
+                    val canvas = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.SourceOver }
+                    val theAnim = props.getAnimByFrameName(frameName)
                     val skeleton = theAnim.skeleton.joints.reversed()
-                    val transforms = properties.getTransform(frameName)
-                    val bodypartOrigins = properties.bodypartJoints
-                    val bodypartImages = properties.bodypartJoints.keys.map { partname ->
+                    val transforms = props.getTransform(frameName)
+                    val bodypartOrigins = props.bodypartJoints
+                    val bodypartImages = props.bodypartJoints.keys.associate { partname ->
                         fileGetter(partname).let { file ->
-                            if (file == null) partname to null
+                            if (file == null) {
+                                printdbg(this, "   Partname $partname points to a null file!")
+                                partname to null
+                            }
                             else {
                                 try {
+                                    printdbg(this, "   Partname $partname successfully retrieved")
                                     val bytes = file.readAllBytes()
                                     partname to Pixmap(bytes, 0, bytes.size)
                                 }
                                 catch (e: GdxRuntimeException) {
+                                    printdbg(this, "   Partname $partname failed to load: ${e.message}")
                                     partname to null
                                 }
                             }
                         }
-                    }.toMap()
+                    }
                     val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
 
                     // manually draw 0th frame of ANIM_IDLE
-                    AssembleSheetPixmap.drawFrame(0, 0, canvas, properties, bodypartOrigins, bodypartImages, transformList, null)
+                    transformList.forEach { (name, bodypartPos) ->
+                        bodypartImages[name]?.let { image ->
+                            val imgCentre = bodypartOrigins[name]!!.invertX()
+                            val drawPos = props.origin + bodypartPos + imgCentre
 
+                            canvas.drawPixmap(image, drawPos.x, props.frameHeight - drawPos.y - 1)
+                        }
+                    }
+
+                    // dispose of temporary resources
                     bodypartImages.values.forEach { it?.dispose() }
+
+//                    PixmapIO.writePNG(Gdx.files.absolute("${App.defaultDir}/Exports/Portrait-$playerName.tga"), canvas)
 
                     this.sprite = TextureRegion(Texture(canvas))
                 }
@@ -643,7 +656,7 @@ class UIItemPlayerCells(
 
         // player avatar
         batch.color = Color.WHITE
-        thumb?.let {
+        this.sprite?.let {
             batch.draw(it,
                     x + FastMath.ceil((106f - it.regionWidth) / 2f) + EXTRA_HEADROOM_X / 2,
                     y + FastMath.ceil((height - it.regionHeight) / 2f) - EXTRA_HEADROOM_Y / 2
@@ -652,8 +665,6 @@ class UIItemPlayerCells(
     }
 
     override fun dispose() {
-        thumb?.texture?.dispose()
-        thumbPixmap?.dispose()
         sprite?.texture?.dispose()
     }
 

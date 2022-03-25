@@ -112,7 +112,7 @@ class AssembledSpriteAnimation(
                     if (flipHorizontal) bodypartPos = bodypartPos.invertX()
                     bodypartPos += ADPropertyObject.Vector2i(1,0)
 
-                    if (name == "HELD_ITEM") { // inject item's image
+                    if (name in jointNameToEquipPos) {
                         ItemCodex[(parentActor as? Pocketed)?.inventory?.itemEquipped?.get(jointNameToEquipPos[name]!!)]?.let { item ->
                             ItemCodex.getItemImage(item)?.let { image ->
                                 val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
