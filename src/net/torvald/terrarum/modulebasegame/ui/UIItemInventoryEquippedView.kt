@@ -82,23 +82,28 @@ class UIItemInventoryEquippedView(
 
 
         // sprite
-        val sprite = INGAME.actorNowPlaying?.sprite
-        sprite?.let {
-            blendNormal(batch)
+        INGAME.actorNowPlaying?.let { actor ->
+            actor.sprite?.let {
+                blendNormal(batch)
 
-            batch.color = SPRITE_DRAW_COL
+                batch.color = SPRITE_DRAW_COL
 
-            if (it is SheetSpriteAnimation) {
-                batch.draw(
-                        it.textureRegion.get(0, 0),
-                        posX + (width - it.cellWidth + EXTRA_HEADROOM_X).div(2).toFloat(),
-                        posY + (width - it.cellHeight - EXTRA_HEADROOM_Y).div(2).toFloat()
-                )
+                if (it is SheetSpriteAnimation) {
+                    batch.draw(
+                            it.textureRegion.get(0, 0),
+                            posX + (width - it.cellWidth + EXTRA_HEADROOM_X).div(2).toFloat(),
+                            posY + (width - it.cellHeight - EXTRA_HEADROOM_Y).div(2).toFloat()
+                    )
+                }
+                else if (it is AssembledSpriteAnimation) {
+                    it.renderThisAnimation(batch,
+                            posX + ((width - actor.baseHitboxW) / 2).toFloat(),
+                            posY + ((width - actor.baseHitboxH) / 2).toFloat(),
+                            1f, "ANIM_IDLE_1"
+                    )
+                }
+
             }
-            else if (it is AssembledSpriteAnimation) {
-                // TODO
-            }
-
         }
 
         // slot image on each cells

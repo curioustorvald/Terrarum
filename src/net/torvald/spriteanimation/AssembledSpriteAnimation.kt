@@ -90,61 +90,37 @@ class AssembledSpriteAnimation(
         }
     }
 
+    fun renderThisAnimation(batch: SpriteBatch, posX: Float, posY: Float, scale: Float, animName: String) {
+        val animNameRoot = animName.substring(0, animName.indexOfLast { it == '_' })
 
-    override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
-        if (parentActor.isVisible) {
-
-            val tx = (parentActor.hitboxTranslateX) * scale
-            val txFlp = -(parentActor.hitboxTranslateX) * scale
-            // flipping will not be symmetrical if baseHitboxWidth is odd number
-            val ty = (parentActor.hitboxTranslateY - parentActor.baseHitboxH) * scale
-            val tyFlp = (parentActor.hitboxTranslateY) * scale
+        val tx = (parentActor.hitboxTranslateX) * scale
+        val txFlp = -(parentActor.hitboxTranslateX) * scale
+        // flipping will not be symmetrical if baseHitboxWidth is odd number
+        val ty = (parentActor.hitboxTranslateY - parentActor.baseHitboxH) * scale
+        val tyFlp = (parentActor.hitboxTranslateY) * scale
 
 
-            adp.animations[currentAnimation]!!.let { theAnim ->
-                val skeleton = theAnim.skeleton.joints.reversed()
-                val transforms = adp.getTransform("${currentAnimation}_${1+currentFrame}")
-                val bodypartOrigins = adp.bodypartJoints
+        adp.animations[animNameRoot]!!.let { theAnim ->
+            val skeleton = theAnim.skeleton.joints.reversed()
+            val transforms = adp.getTransform(animName)
+            val bodypartOrigins = adp.bodypartJoints
 
-                AssembleFrameBase.makeTransformList(skeleton, transforms).forEach { (name, bodypartPos0) ->
-                    var bodypartPos = bodypartPos0.invertY()
-                    if (flipVertical) bodypartPos = bodypartPos.invertY()
-                    if (flipHorizontal) bodypartPos = bodypartPos.invertX()
-                    bodypartPos += ADPropertyObject.Vector2i(1,0)
+            AssembleFrameBase.makeTransformList(skeleton, transforms).forEach { (name, bodypartPos0) ->
+                var bodypartPos = bodypartPos0.invertY()
+                if (flipVertical) bodypartPos = bodypartPos.invertY()
+                if (flipHorizontal) bodypartPos = bodypartPos.invertX()
+                bodypartPos += ADPropertyObject.Vector2i(1,0)
 
-                    if (name in jointNameToEquipPos) {
-                        ItemCodex[(parentActor as? Pocketed)?.inventory?.itemEquipped?.get(jointNameToEquipPos[name]!!)]?.let { item ->
-                            ItemCodex.getItemImage(item)?.let { image ->
-                                val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
-                                val w = image.regionWidth * scale
-                                val h = image.regionHeight * scale
-                                val fposX = posX.floor() + drawPos.x * scale
-                                val fposY = posY.floor() + drawPos.y * scale - h
-
-                                // draw
-                                if (flipHorizontal && flipVertical)
-                                    batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
-                                else if (flipHorizontal && !flipVertical)
-                                    batch.draw(image, fposX + txFlp, fposY - ty, -w, h)
-                                else if (!flipHorizontal && flipVertical)
-                                    batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
-                                else
-                                    batch.draw(image, fposX - tx, fposY - ty, w, h)
-                            }
-                        }
-                    }
-                    else {
-                        res[name]?.let { image ->
-                            var imgCentre = bodypartOrigins[name]!!
-                            if (flipVertical) imgCentre = imgCentre.invertY()
-                            if (flipHorizontal) imgCentre = imgCentre.invertX()
-
-                            val drawPos = adp.origin + bodypartPos - imgCentre
+                if (name in jointNameToEquipPos) {
+                    ItemCodex[(parentActor as? Pocketed)?.inventory?.itemEquipped?.get(jointNameToEquipPos[name]!!)]?.let { item ->
+                        ItemCodex.getItemImage(item)?.let { image ->
+                            val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
                             val w = image.regionWidth * scale
                             val h = image.regionHeight * scale
                             val fposX = posX.floor() + drawPos.x * scale
-                            val fposY = posY.floor() + drawPos.y * scale
+                            val fposY = posY.floor() + drawPos.y * scale - h
 
+                            // draw
                             if (flipHorizontal && flipVertical)
                                 batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
                             else if (flipHorizontal && !flipVertical)
@@ -153,14 +129,39 @@ class AssembledSpriteAnimation(
                                 batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
                             else
                                 batch.draw(image, fposX - tx, fposY - ty, w, h)
-
                         }
                     }
                 }
+                else {
+                    res[name]?.let { image ->
+                        var imgCentre = bodypartOrigins[name]!!
+                        if (flipVertical) imgCentre = imgCentre.invertY()
+                        if (flipHorizontal) imgCentre = imgCentre.invertX()
 
+                        val drawPos = adp.origin + bodypartPos - imgCentre
+                        val w = image.regionWidth * scale
+                        val h = image.regionHeight * scale
+                        val fposX = posX.floor() + drawPos.x * scale
+                        val fposY = posY.floor() + drawPos.y * scale
 
+                        if (flipHorizontal && flipVertical)
+                            batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)
+                        else if (flipHorizontal && !flipVertical)
+                            batch.draw(image, fposX + txFlp, fposY - ty, -w, h)
+                        else if (!flipHorizontal && flipVertical)
+                            batch.draw(image, fposX - tx, fposY + tyFlp, w, -h)
+                        else
+                            batch.draw(image, fposX - tx, fposY - ty, w, h)
+
+                    }
+                }
             }
+        }
+    }
 
+    override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
+        if (parentActor.isVisible) {
+            renderThisAnimation(batch, posX, posY, scale, "${currentAnimation}_${1+currentFrame}")
         }
     }
 
