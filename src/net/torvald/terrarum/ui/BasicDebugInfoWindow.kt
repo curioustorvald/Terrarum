@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
@@ -43,7 +44,7 @@ class BasicDebugInfoWindow : UICanvas() {
         get() = Terrarum.ingame?.world
 
     private val icons = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/debug_window_symbols.tga"), 21, 26)
-
+    private val back = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background.tga"))
 
     private val ARROW_RIGHT = 0xC0.toChar()
     private val ARROW_LEFT = 0xC1.toChar()
@@ -104,15 +105,21 @@ class BasicDebugInfoWindow : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val player = ingame?.actorNowPlaying
 
-        batch.color = Color(0xFFEE88FF.toInt())
 
         val hitbox = player?.hitbox
 
         val updateCount = maxOf(1L, (App.debugTimers["Ingame.UpdateCounter"] ?: 1L) as Long)
 
         /**
-         * First column
+         * Top Left
          */
+
+        batch.color = Color(1f, 1f, 1f, 0.65f)
+        batch.draw(back, gap - 5f, gap - 5f)
+
+
+
+        batch.color = Color(0xFFEE88FF.toInt())
 
         player?.let { player -> hitbox?.let { hitbox ->
 
@@ -214,9 +221,9 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // print time
-        var dbgCnt = 9
+        var dbgCnt = 10
         App.debugTimers.forEach { t, u ->
-            printLine(batch, dbgCnt, "$ccO$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
+//            printLine(batch, dbgCnt, "$ccO$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
             dbgCnt++
         }
 
@@ -391,5 +398,6 @@ class BasicDebugInfoWindow : UICanvas() {
 
     override fun dispose() {
         icons.dispose()
+        back.dispose()
     }
 }
