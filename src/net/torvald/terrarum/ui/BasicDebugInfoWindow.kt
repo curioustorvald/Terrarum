@@ -4,11 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -19,6 +17,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unicode.EMDASH
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -93,6 +92,15 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val gap = 14f
 
+    private val pxyX = 4; private val pxyY = 0
+    private val cxyX = 18; private val cxyY = 0
+    private val jX = 30; private val jY = 0
+
+
+    private val cvX = 0; private val cvY = 2
+    private val evX = 14; private val evY = 2
+    private val mvX = 28; private val mvY = 2
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val player = ingame?.actorNowPlaying
 
@@ -118,45 +126,51 @@ class BasicDebugInfoWindow : UICanvas() {
             val (mvyInt, mvyFrac) = (ydelta / updateCount).toIntAndFrac(4)
 
             // TODO draw player head
-            App.fontSmallNumbers.draw(batch, "X$ccG$pxInt.$pxFrac", gap + 7f*4f, line(0))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$pyInt.$pyFrac", gap + 7f*4f, line(1))
-            batch.draw(icons.get(0,1), gap + 7f*17, line(0))
+            App.fontSmallNumbers.draw(batch, "X$ccG$pxInt.$pxFrac", gap + 7f*pxyX, line(pxyY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$pyInt.$pyFrac", gap + 7f*pxyX, line(pxyY+1))
+            batch.draw(icons.get(0,1), gap + 7f*(cxyX - 1), line(pxyY))
+
+            // camera info
+
+            batch.draw(icons.get(0,1), gap + 7f*(jX - 1), line(jY))
+
+            batch.draw(icons.get(1,0), gap + 7f*jX, line(0))
+            App.fontSmallNumbers.draw(batch, "${if (player.walledLeft) "$ccG" else "$ccK"}$ARROW_LEFT", gap + 7f*(jX + 3), line(jY) + 7)
+            App.fontSmallNumbers.draw(batch, "${if (player.walledTop) "$ccG" else "$ccK"}$ARROW_UP", gap + 7f*(jX + 4), line(jY))
+            App.fontSmallNumbers.draw(batch, "${if (player.walledBottom) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*(jX + 4), line(jY+1))
+            App.fontSmallNumbers.draw(batch, "${if (player.walledRight) "$ccG" else "$ccK"}$ARROW_RIGHT", gap + 7f*(jX + 5), line(jY) + 7)
+            App.fontSmallNumbers.draw(batch, "${if (player.colliding) "$ccG" else "$ccK"}$FULLBODY", gap + 7f*(jX + 6), line(jY) + 7)
+
+            App.fontSmallNumbers.draw(batch, "${if (player.jumping) "$ccG" else "$ccK"}JM", gap + 7f*(jX + 8), line(jY))
+            App.fontSmallNumbers.draw(batch, "${if (player.isJumpDown) "$ccG" else "$ccK"}KY", gap + 7f*(jX + 8), line(jY+1))
+
+            App.fontSmallNumbers.draw(batch, "VI", gap + 7f*(jX + 11), line(0))
+            App.fontSmallNumbers.draw(batch, "RT", gap + 7f*(jX + 11), line(1))
+            App.fontSmallNumbers.draw(batch, "${if (player.downDownVirtually) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*(jX + 13), line(jY+1))
 
 
-            batch.draw(icons.get(3,0), gap, line(2))
-            App.fontSmallNumbers.draw(batch, "X$ccG$cvxInt.$cvxFrac", gap + 21f, line(2))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$cvyInt.$cvyFrac", gap + 21f, line(3))
 
-            batch.draw(icons.get(0,1), gap + 7f*14, line(2))
+            batch.draw(icons.get(3,0), gap + 7f*cvX, line(cvY))
+            App.fontSmallNumbers.draw(batch, "X$ccG$cvxInt.$cvxFrac", gap + 7f*(cvX + 3), line(cvY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$cvyInt.$cvyFrac", gap + 7f*(cvX + 3), line(cvY + 1))
 
-            batch.draw(icons.get(2,0), gap + 7f*15, line(2))
-            App.fontSmallNumbers.draw(batch, "X$ccG$evxInt.$evxFrac", gap + 7f*18, line(2))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$evyInt.$evyFrac", gap + 7f*18, line(3))
+            batch.draw(icons.get(0,1), gap + 7f*(evX - 1), line(evY))
 
-            batch.draw(icons.get(0,1), gap + 7f*28, line(2))
+            batch.draw(icons.get(2,0), gap + 7f*evX, line(evY))
+            App.fontSmallNumbers.draw(batch, "X$ccG$evxInt.$evxFrac", gap + 7f*(evX + 3), line(evY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$evyInt.$evyFrac", gap + 7f*(evX + 3), line(evY + 1))
 
-            batch.draw(icons.get(5,0), gap + 7f*29, line(2))
-            App.fontSmallNumbers.draw(batch, "X$ccG$mvxInt.$mvxFrac", gap + 7f*32, line(2))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$mvyInt.$mvyFrac", gap + 7f*32, line(3))
+            batch.draw(icons.get(0,1), gap + 7f*(mvX - 1), line(mvY))
 
-            batch.draw(icons.get(1,0), gap, line(4))
-            App.fontSmallNumbers.draw(batch, "${if (player.walledLeft) "$ccG" else "$ccK"}$ARROW_LEFT", gap + 7f*3, line(4) + 7)
-            App.fontSmallNumbers.draw(batch, "${if (player.walledTop) "$ccG" else "$ccK"}$ARROW_UP", gap + 7f*4, line(4))
-            App.fontSmallNumbers.draw(batch, "${if (player.walledBottom) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*4, line(5))
-            App.fontSmallNumbers.draw(batch, "${if (player.walledRight) "$ccG" else "$ccK"}$ARROW_RIGHT", gap + 7f*5, line(4) + 7)
-            App.fontSmallNumbers.draw(batch, "${if (player.colliding) "$ccG" else "$ccK"}$FULLBODY", gap + 7f*6, line(4) + 7)
+            batch.draw(icons.get(5,0), gap + 7f*mvX, line(mvY))
+            App.fontSmallNumbers.draw(batch, "X$ccG$mvxInt.$mvxFrac", gap + 7f*(mvX + 3), line(mvY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$mvyInt.$mvyFrac", gap + 7f*(mvX + 3), line(mvY + 1))
 
-            App.fontSmallNumbers.draw(batch, "${if (player.jumping) "$ccG" else "$ccK"}JM", gap + 7f*8, line(4))
-            App.fontSmallNumbers.draw(batch, "${if (player.isJumpDown) "$ccG" else "$ccK"}KY", gap + 7f*8, line(5))
-
-            App.fontSmallNumbers.draw(batch, "VI", gap + 7f*11, line(4))
-            App.fontSmallNumbers.draw(batch, "RT", gap + 7f*11, line(5))
-            App.fontSmallNumbers.draw(batch, "${if (player.downDownVirtually) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*13, line(5))
         }}
 
-        batch.draw(icons.get(0,0), gap + 7f*18, line(0))
-        App.fontSmallNumbers.draw(batch, "X$ccG${WorldCamera.x.toString().padStart(7)}", gap + 7f*21f, line(0))
-        App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.y.toString().padStart(7)}", gap + 7f*21f, line(1))
+        batch.draw(icons.get(0,0), gap + 7f*cxyX, line(cxyY))
+        App.fontSmallNumbers.draw(batch, "X$ccG${WorldCamera.x.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY))
+        App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.y.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY+1))
 
 
         //printLine(batch, 7, "jump $ccG${player.jumpAcc}")
