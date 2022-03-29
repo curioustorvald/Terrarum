@@ -191,8 +191,8 @@ class BasicDebugInfoWindow : UICanvas() {
 
         if (player != null) {
             printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
-
             printLineColumn(batch, 2, 7, "noClip $ccG${player.isNoClip}")
+            printLineColumn(batch, 2, 8, "${0x1F.toChar()}DownVirt $ccG${player.downDownVirtually}")
         }
 
         /*drawHistogram(batch, LightmapRenderer.histogram,

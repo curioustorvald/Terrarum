@@ -179,6 +179,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     var isUpDown = false; protected set
     var isDownDown = false; protected set
+    var downDownVirtually = false; internal set
     var isLeftDown = false; protected set
     var isRightDown = false; protected set
     var isJumpDown = false; protected set
@@ -220,7 +221,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
         if (isNoClip) {
             //grounded = true
-            platformToIgnore = null
+//            platformToIgnore = null
+            downDownVirtually = false
         }
 
         // reset control box of AI
@@ -258,8 +260,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             val gamepad = App.gamepad
 
             if (gamepad != null) {
-                axisX =  gamepad.getAxis(App.getConfigInt("control_gamepad_axislx"))
-                axisY =  gamepad.getAxis(App.getConfigInt("control_gamepad_axisly"))
+                axisX = gamepad.getAxis(App.getConfigInt("control_gamepad_axislx"))
+                axisY = gamepad.getAxis(App.getConfigInt("control_gamepad_axisly"))
                 axisRX = gamepad.getAxis(App.getConfigInt("control_gamepad_axisrx"))
                 axisRY = gamepad.getAxis(App.getConfigInt("control_gamepad_axisry"))
 
@@ -284,6 +286,18 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             isDownDown = axisY > 0f
             isLeftDown = axisX < 0f
             isRightDown = axisX > 0f
+        }
+
+        // platform-related hacks
+        // allow latching down downDownVirtually only when standing on a platform AND not jumping upwards
+        val occupyingTileHasPlatform = bodyTiles.filterNotNull().any { it.isPlatform }
+        val feetTileIsAllPlatform = feetTiles.filterNotNull().all { it.isPlatform }
+        if (isDownDown && feetTileIsAllPlatform && (controllerV?.y ?: 0.0) >= 0.0 ||
+            occupyingTileHasPlatform && !feetTileIsAllPlatform) { // FIXME this does not account for reverse gravity
+            downDownVirtually = true
+        }
+        if (downDownVirtually && !occupyingTileHasPlatform && !feetTileIsAllPlatform) {
+            downDownVirtually = false
         }
     }
 
@@ -525,7 +539,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
 
         // determine a platform to ignore
-        world?.let { world ->
+        /*world?.let { world ->
             var hasPlatformOnTheFeet = false
             forEachFeetTile { if (it?.isPlatform == true) hasPlatformOnTheFeet = true }
 
@@ -548,7 +562,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 )
             }
 
-        }
+        }*/
     }
 
     private fun applyAccel(x: Int): Double {
@@ -573,7 +587,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     private fun walkVStop() {
         walkCounterY = 0
         isWalkingV = false
-        platformToIgnore = null
+//        platformToIgnore = null
     }
 
     private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {

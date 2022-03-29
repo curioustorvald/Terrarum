@@ -344,6 +344,8 @@ open class ActorWithBody : Actor {
     internal var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
     internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
     internal var colliding = false
+    @Transient internal var feetTiles = Array<BlockProp?>(160) { null }
+    @Transient internal var bodyTiles = Array<BlockProp?>(2400) { null }
 
     var isWalkingH = false
     var isWalkingV = false
@@ -528,6 +530,22 @@ open class ActorWithBody : Actor {
             walledTop = isWalled(hitbox, COLLIDING_TOP)
             walledBottom = isWalled(hitbox, COLLIDING_BOTTOM)
             colliding = isColliding(hitbox)
+            var ptrFeet = 0
+            var ptrBody = 0
+            forEachFeetTile {
+                if (ptrFeet < feetTiles.size) {
+                    feetTiles[ptrFeet] = it
+                    ptrFeet += 1
+                }
+            }
+            forEachOccupyingTile {
+                if (ptrBody < bodyTiles.size) {
+                    bodyTiles[ptrBody] = it
+                    ptrBody += 1
+                }
+            }
+            feetTiles.fill(null, ptrFeet)
+            bodyTiles.fill(null, ptrBody)
             if (isNoCollideWorld) {
                 walledLeft = false
                 walledRight = false
@@ -965,6 +983,9 @@ open class ActorWithBody : Actor {
 
 
                 // grounded = true
+
+                // another platform-related hacks
+                if (this is ActorHumanoid) downDownVirtually = false
             }// end of collision not detected
 
 
@@ -1285,26 +1306,26 @@ open class ActorWithBody : Actor {
      *
      * Very straightforward for the actual solid tiles, not so much for the platforms
      */
-    private fun shouldICollideWithThis(tile: ItemID) =
+    protected fun shouldICollideWithThis(tile: ItemID) =
             // regular solid block
             (BlockCodex[tile].isSolid)
 
     // the location and size of the platform in world coord
-    protected var platformToIgnore: Hitbox? = null
+    /*protected var platformToIgnore: Hitbox? = null
 
     private fun standingOnIgnoredPlatform(): Boolean = platformToIgnore.let {
         return if (it != null)
             hitbox.startX >= it.startX && hitbox.endX < it.endX - PHYS_EPSILON_DIST &&
             it.startY <= hitbox.endY && hitbox.endY < it.endY - PHYS_EPSILON_DIST
         else false
-    }
+    }*/
 
     /**
      * If this tile should be treated as "collidable"
      *
      * Just like "shouldICollideWithThis" but it's intended to work with feet tiles
      */
-    private fun shouldICollideWithThisFeet(tile: ItemID) =
+    protected fun shouldICollideWithThisFeet(tile: ItemID) =
             // regular solid block
             (BlockCodex[tile].isSolid) ||
             // or platforms that are not on the "ignored list" (the list is updated on the update())
@@ -1313,8 +1334,8 @@ open class ActorWithBody : Actor {
             // platforms, moving downward AND not "going down"
             (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
             externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
-            !this.isDownDown && this.axisY <= 0f) ||
-            // platforms, moving downward
+            !downDownVirtually && !this.isDownDown && this.axisY <= 0f) ||
+            // platforms, moving downward, for the case of NOT ActorHumanoid
             (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
             externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
     // TODO: as for the platform, only apply it when it's a feet tile
@@ -1548,7 +1569,7 @@ open class ActorWithBody : Actor {
     /**
      * Get highest tile density from occupying tiles, fluid only
      */
-    private inline val tileDensityFluid: Int
+    /*private inline val tileDensityFluid: Int
         get() {
             var density = 0
             forEachOccupyingFluid {
@@ -1559,13 +1580,13 @@ open class ActorWithBody : Actor {
             }
 
             return density
-        }
+        }*/
 
     /**
      * Get highest density (specific gravity) value from tiles that the body occupies.
      * @return
      */
-    private inline val tileDensity: Int
+    /*private inline val tileDensity: Int
         get() {
             var density = 0
             forEachOccupyingTile {
@@ -1576,7 +1597,7 @@ open class ActorWithBody : Actor {
             }
 
             return density
-        }
+        }*/
 
     private fun clampHitbox() {
         if (world == null) return
