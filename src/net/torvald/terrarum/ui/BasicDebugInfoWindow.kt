@@ -18,6 +18,9 @@ import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -40,6 +43,20 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val world: GameWorld?
         get() = Terrarum.ingame?.world
+
+    private val icons = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/debug_window_symbols.tga"), 21, 26)
+
+
+    private val ARROW_RIGHT = 0xC0.toChar()
+    private val ARROW_LEFT = 0xC1.toChar()
+    private val ARROW_UP = 0xCE.toChar()
+    private val ARROW_DOWN = 0xCF.toChar()
+    private val FULLBODY = 0xB8.toChar()
+    private val LIQUID = 0xD0.toChar()
+    private val BEAKER = 0xD1.toChar()
+    private val TERRAIN = 0xD2.toChar()
+    private val WALL = 0xD3.toChar()
+    private val WIRE = 0xD4.toChar()
 
 
     override fun updateUI(delta: Float) {
@@ -70,6 +87,12 @@ class BasicDebugInfoWindow : UICanvas() {
         return sb.reverse().toString()
     }
 
+    private fun Double.toIntAndFrac(textLen: Int): Pair<String,String> =
+            (this.floorInt().toString().padStart(textLen)) to
+                    (this.absoluteValue.times(10000.0).roundToInt() % 10000).toString().padEnd(4)
+
+    private val gap = 14f
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val player = ingame?.actorNowPlaying
 
@@ -83,61 +106,57 @@ class BasicDebugInfoWindow : UICanvas() {
          * First column
          */
 
-        if (player != null) {
+        player?.let { player -> hitbox?.let { hitbox ->
 
-            printLineColumn(batch, 1, 1, "startX "
-                                         + ccG
-                                         + "${hitbox?.startX}"
-                                         + " ("
-                                         + "${(hitbox?.startX?.div(TILE_SIZE))?.toInt()}"
-                                         + ")")
-            printLineColumn(batch, 2, 1, "endX "
-                                         + ccG
-                                         + "${hitbox?.endX}"
-                                         + " ("
-                                         + "${(hitbox?.endX?.div(TILE_SIZE))?.toInt()}"
-                                         + ")")
-            printLineColumn(batch, 3, 1, "camX "
-                                         + ccG
-                                         + "${WorldCamera.x}")
-            printLineColumn(batch, 1, 2, "startY "
-                                         + ccG
-                                         + "${hitbox?.startY}"
-                                         + " ("
-                                         + "${(hitbox?.startY?.div(TILE_SIZE))?.toInt()}"
-                                         + ")")
-            printLineColumn(batch, 2, 2, "endY "
-                                         + ccG
-                                         + "${hitbox?.endY}"
-                                         + " ("
-                                         + "${(hitbox?.endY?.div(TILE_SIZE))?.toInt()}"
-                                         + ")")
-            printLineColumn(batch, 3, 2, "camY "
-                                         + ccG
-                                         + "${WorldCamera.y}")
+            val (pxInt, pxFrac) = hitbox.canonicalX.toIntAndFrac(7)
+            val (pyInt, pyFrac) = hitbox.canonicalY.toIntAndFrac(7)
+            val (evxInt, evxFrac) = player.externalV.x.toIntAndFrac(4)
+            val (evyInt, evyFrac) = player.externalV.y.toIntAndFrac(4)
+            val (cvxInt, cvxFrac) = (player.controllerV?.x ?: 0.0).toIntAndFrac(4)
+            val (cvyInt, cvyFrac) = (player.controllerV?.y ?: 0.0).toIntAndFrac(4)
+            val (mvxInt, mvxFrac) = (xdelta / updateCount).toIntAndFrac(4)
+            val (mvyInt, mvyFrac) = (ydelta / updateCount).toIntAndFrac(4)
 
-            printLine(batch, 3, "veloX external $ccG${player.externalV.x}")
-            printLine(batch, 4, "veloY external $ccG${player.externalV.y}")
+            // TODO draw player head
+            App.fontSmallNumbers.draw(batch, "X$ccG$pxInt.$pxFrac", gap + 7f*4f, line(0))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$pyInt.$pyFrac", gap + 7f*4f, line(1))
+            batch.draw(icons.get(0,1), gap + 7f*17, line(0))
 
-            printLine(batch, 5, "veloX control $ccG${player.controllerV?.x}")
-            printLine(batch, 6, "veloY control $ccG${player.controllerV?.y}")
 
-            printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta / updateCount}")
-            printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta / updateCount}")
+            batch.draw(icons.get(3,0), gap, line(2))
+            App.fontSmallNumbers.draw(batch, "X$ccG$cvxInt.$cvxFrac", gap + 21f, line(2))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$cvyInt.$cvyFrac", gap + 21f, line(3))
 
-            printLineColumn(batch, 1, 7,
-                    "walled " +
-                    "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
-                    "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
-                    "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
-                    "${if (player.walledRight) "$ccR" else "$ccG"}R" +
-                    "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}  " +
-                    "${if (player.jumping) "$ccG" else "$ccK"}JMP" +
-                    "${if (player.isJumpDown) "$ccG" else "$ccK"}KEY" +
-                    "${if (player.isJumpJustDown) "$ccO" else "$ccK"}${0x0F.toChar()}"
-            )
-        }
+            batch.draw(icons.get(0,1), gap + 7f*14, line(2))
 
+            batch.draw(icons.get(2,0), gap + 7f*15, line(2))
+            App.fontSmallNumbers.draw(batch, "X$ccG$evxInt.$evxFrac", gap + 7f*18, line(2))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$evyInt.$evyFrac", gap + 7f*18, line(3))
+
+            batch.draw(icons.get(0,1), gap + 7f*28, line(2))
+
+            batch.draw(icons.get(5,0), gap + 7f*29, line(2))
+            App.fontSmallNumbers.draw(batch, "X$ccG$mvxInt.$mvxFrac", gap + 7f*32, line(2))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$mvyInt.$mvyFrac", gap + 7f*32, line(3))
+
+            batch.draw(icons.get(1,0), gap, line(4))
+            App.fontSmallNumbers.draw(batch, "${if (player.walledLeft) "$ccG" else "$ccK"}$ARROW_LEFT", gap + 7f*3, line(4) + 7)
+            App.fontSmallNumbers.draw(batch, "${if (player.walledTop) "$ccG" else "$ccK"}$ARROW_UP", gap + 7f*4, line(4))
+            App.fontSmallNumbers.draw(batch, "${if (player.walledBottom) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*4, line(5))
+            App.fontSmallNumbers.draw(batch, "${if (player.walledRight) "$ccG" else "$ccK"}$ARROW_RIGHT", gap + 7f*5, line(4) + 7)
+            App.fontSmallNumbers.draw(batch, "${if (player.colliding) "$ccG" else "$ccK"}$FULLBODY", gap + 7f*6, line(4) + 7)
+
+            App.fontSmallNumbers.draw(batch, "${if (player.jumping) "$ccG" else "$ccK"}JM", gap + 7f*8, line(4))
+            App.fontSmallNumbers.draw(batch, "${if (player.isJumpDown) "$ccG" else "$ccK"}KY", gap + 7f*8, line(5))
+
+            App.fontSmallNumbers.draw(batch, "VI", gap + 7f*11, line(4))
+            App.fontSmallNumbers.draw(batch, "RT", gap + 7f*11, line(5))
+            App.fontSmallNumbers.draw(batch, "${if (player.downDownVirtually) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*13, line(5))
+        }}
+
+        batch.draw(icons.get(0,0), gap + 7f*18, line(0))
+        App.fontSmallNumbers.draw(batch, "X$ccG${WorldCamera.x.toString().padStart(7)}", gap + 7f*21f, line(0))
+        App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.y.toString().padStart(7)}", gap + 7f*21f, line(1))
 
 
         //printLine(batch, 7, "jump $ccG${player.jumpAcc}")
@@ -164,8 +183,8 @@ class BasicDebugInfoWindow : UICanvas() {
 
                 val wireCount = wires?.size?.toString() ?: "no"
 
-                printLine(batch, 9, "tile@cursor ${ccO}W$ccG$wallNum ${ccO}T$ccG$tileNum ${ccO}C$ccG($wireCount wires) $ccY($mtX,$mtY;$ccO${LandUtil.getBlockAddr(it, mouseTileX, mouseTileY)}$ccY)")
-                printLine(batch, 10, "fluid@cursor ${ccO}Type $ccG${fluid.type.value} ${ccO}Fill $ccG${fluid.amount}f")
+                printLine(batch, 9, "tile@cursor $ccO$TERRAIN$ccG$tileNum $ccO$WALL$ccG$wallNum $ccO$WIRE$ccG($wireCount wires) $ccY($mtX,$mtY;$ccO${LandUtil.getBlockAddr(it, mouseTileX, mouseTileY)}$ccY)")
+                printLine(batch, 10, "fluid@cursor $ccO$LIQUID$ccG${fluid.type.value} $ccO$BEAKER$ccG${fluid.amount}f")
 
                 printLineColumn(batch, 2, 5, "Time $ccG${it.worldTime.todaySeconds.toString().padStart(5, '0')}" +
                                              " (${it.worldTime.getFormattedTime()})")
@@ -192,7 +211,6 @@ class BasicDebugInfoWindow : UICanvas() {
         if (player != null) {
             printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
             printLineColumn(batch, 2, 7, "noClip $ccG${player.isNoClip}")
-            printLineColumn(batch, 2, 8, "${0x1F.toChar()}DownVirt $ccG${player.downDownVirtually}")
         }
 
         /*drawHistogram(batch, LightmapRenderer.histogram,
@@ -277,15 +295,16 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private fun printLine(batch: SpriteBatch, l: Int, s: String) {
         App.fontSmallNumbers.draw(batch,
-                s, TinyAlphNum.W * 2f, line(l)
+                s, gap, line(l)
         )
     }
 
     private fun printLineColumn(batch: SpriteBatch, col: Int, row: Int, s: String) {
         App.fontSmallNumbers.draw(batch,
-                s, (TinyAlphNum.W * 2f + column(col)), line(row)
+                s, column(col), line(row)
         )
     }
+
 
     val histogramW = 256
     val histogramH = 256
@@ -364,9 +383,8 @@ class BasicDebugInfoWindow : UICanvas() {
 
     }
 
-    private fun line(i: Int): Float = i * TinyAlphNum.H.toFloat()
-
-    private fun column(i: Int): Float = 300f * (i - 1)
+    private fun line(i: Int): Float = gap + i * TinyAlphNum.H.toFloat()
+    private fun column(i: Int): Float = gap + 300f * (i - 1)
 
     override fun doOpening(delta: Float) {
     }
@@ -381,5 +399,6 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     override fun dispose() {
+        icons.dispose()
     }
 }
