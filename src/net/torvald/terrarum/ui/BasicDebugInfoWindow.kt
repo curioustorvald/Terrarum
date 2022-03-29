@@ -7,17 +7,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import net.torvald.unicode.EMDASH
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -92,14 +91,15 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val gap = 14f
 
-    private val pxyX = 4; private val pxyY = 0
-    private val cxyX = 18; private val cxyY = 0
-    private val jX = 30; private val jY = 0
-
+    private val pxyX = 0; private val pxyY = 0
+    private val cxyX = 23; private val cxyY = 0
+    private val jX = 35; private val jY = 0
 
     private val cvX = 0; private val cvY = 2
     private val evX = 14; private val evY = 2
     private val mvX = 28; private val mvY = 2
+
+    private val tileCursX = 0; private val tileCursY = 4
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val player = ingame?.actorNowPlaying
@@ -126,15 +126,15 @@ class BasicDebugInfoWindow : UICanvas() {
             val (mvyInt, mvyFrac) = (ydelta / updateCount).toIntAndFrac(4)
 
             // TODO draw player head
-            App.fontSmallNumbers.draw(batch, "X$ccG$pxInt.$pxFrac", gap + 7f*pxyX, line(pxyY))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$pyInt.$pyFrac", gap + 7f*pxyX, line(pxyY+1))
+            App.fontSmallNumbers.draw(batch, "X$ccO${hitbox.canonicalX.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$pxInt.$pxFrac", gap + 7f*(pxyX + 3), line(pxyY))
+            App.fontSmallNumbers.draw(batch, "Y$ccO${hitbox.canonicalY.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$pyInt.$pyFrac", gap + 7f*(pxyX + 3), line(pxyY+1))
             batch.draw(icons.get(0,1), gap + 7f*(cxyX - 1), line(pxyY))
 
             // camera info
 
             batch.draw(icons.get(0,1), gap + 7f*(jX - 1), line(jY))
 
-            batch.draw(icons.get(1,0), gap + 7f*jX, line(0))
+            batch.draw(icons.get(1,0), gap + 7f*jX, line(jY))
             App.fontSmallNumbers.draw(batch, "${if (player.walledLeft) "$ccG" else "$ccK"}$ARROW_LEFT", gap + 7f*(jX + 3), line(jY) + 7)
             App.fontSmallNumbers.draw(batch, "${if (player.walledTop) "$ccG" else "$ccK"}$ARROW_UP", gap + 7f*(jX + 4), line(jY))
             App.fontSmallNumbers.draw(batch, "${if (player.walledBottom) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*(jX + 4), line(jY+1))
@@ -173,64 +173,33 @@ class BasicDebugInfoWindow : UICanvas() {
         App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.y.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY+1))
 
 
-        //printLine(batch, 7, "jump $ccG${player.jumpAcc}")
 
-        val lightVal: String
-        val mtX = mouseTileX.toString()
-        val mtY = mouseTileY.toString()
-        val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
-        val rawR = valRaw?.r?.times(100f)?.round()?.div(100f)
-        val rawG = valRaw?.g?.times(100f)?.round()?.div(100f)
-        val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)
-        val rawA = valRaw?.a?.times(100f)?.round()?.div(100f)
-
-        lightVal = if (valRaw == null) "$EMDASH"
-                   else "$rawR $rawG $rawB $rawA"
-        printLine(batch, 8, "light@cursor $ccG$lightVal")
 
         try {
             world?.let {
+                val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
+                val rawR = valRaw?.r?.times(100f)?.round()?.div(100f)
+                val rawG = valRaw?.g?.times(100f)?.round()?.div(100f)
+                val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)
+                val rawA = valRaw?.a?.times(100f)?.round()?.div(100f)
+
                 val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
                 val wires = it.getAllWiresFrom(mouseTileX, mouseTileY)
                 val fluid = it.getFluid(mouseTileX, mouseTileY)
-
                 val wireCount = wires?.size?.toString() ?: "no"
 
-                printLine(batch, 9, "tile@cursor $ccO$TERRAIN$ccG$tileNum $ccO$WALL$ccG$wallNum $ccO$WIRE$ccG($wireCount wires) $ccY($mtX,$mtY;$ccO${LandUtil.getBlockAddr(it, mouseTileX, mouseTileY)}$ccY)")
-                printLine(batch, 10, "fluid@cursor $ccO$LIQUID$ccG${fluid.type.value} $ccO$BEAKER$ccG${fluid.amount}f")
+                App.fontSmallNumbers.draw(batch, "$ccO$TERRAIN$ccG$tileNum", gap + 7f*(tileCursX + 3), line(tileCursY))
+                App.fontSmallNumbers.draw(batch, "$ccO$WALL$ccG$wallNum", gap + 7f*(tileCursX + 3), line(tileCursY + 1))
+                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.value} $ccO$BEAKER$ccG${fluid.amount}f", gap + 7f*(tileCursX + 3), line(tileCursY + 2))
+                App.fontSmallNumbers.draw(batch, "$ccO$WIRE$ccG$wireCount", gap + 7f*(tileCursX + 3), line(tileCursY + 3))
+                App.fontSmallNumbers.draw(batch, "$ccR$rawR $ccG$rawG $ccB$rawB $ccW$rawA", gap + 7f*(tileCursX + 3), line(tileCursY + 4))
 
-                printLineColumn(batch, 2, 5, "Time $ccG${it.worldTime.todaySeconds.toString().padStart(5, '0')}" +
-                                             " (${it.worldTime.getFormattedTime()})")
+                batch.draw(icons.get(4,0), gap + 7f*tileCursX, line(tileCursY + 1) + 7)
             }
         }
         catch (e: NullPointerException) {}
 
-
-        // print time
-        var dbgCnt = 12
-        App.debugTimers.forEach { t, u ->
-            printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
-            dbgCnt++
-        }
-
-
-        /**
-         * Second column
-         */
-
-        //printLineColumn(batch, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
-        //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
-
-        if (player != null) {
-            printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
-            printLineColumn(batch, 2, 7, "noClip $ccG${player.isNoClip}")
-        }
-
-        /*drawHistogram(batch, LightmapRenderer.histogram,
-                AppLoader.terrarumAppConfig.screenW - histogramW - TinyAlphNum.W * 2,
-                AppLoader.terrarumAppConfig.screenH - histogramH - TinyAlphNum.H * 4
-        )*/ // histogram building is currently bugged
 
         batch.color = Color.WHITE
 
@@ -244,33 +213,41 @@ class BasicDebugInfoWindow : UICanvas() {
             )
         }
 
+        // print time
+        var dbgCnt = 9
+        App.debugTimers.forEach { t, u ->
+            printLine(batch, dbgCnt, "$ccO$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
+            dbgCnt++
+        }
+
+
         /**
          * Top right
          */
 
         // memory pressure
-        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (App.scr.width - 23 * TinyAlphNum.W - 2).toFloat(), line(1))
+        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (App.scr.width - 23 * TinyAlphNum.W - 2).toFloat(), line(0))
         // thread count
         App.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (App.MULTITHREAD) ccG else ccR}${App.THREAD_COUNT.toString().padStart(2, ' ')}",
-                (App.scr.width - 2 - 8 * TinyAlphNum.W).toFloat(), line(2))
+                (App.scr.width - 2 - 8 * TinyAlphNum.W).toFloat(), line(1))
 
         // memory texts
         App.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
-                (App.scr.width - 19 * TinyAlphNum.W - 2).toFloat(), line(1))
+                (App.scr.width - 19 * TinyAlphNum.W - 2).toFloat(), line(0))
         App.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
-                (App.scr.width - 14 * TinyAlphNum.W - 2).toFloat(), line(1))
+                (App.scr.width - 14 * TinyAlphNum.W - 2).toFloat(), line(0))
         App.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
-                (App.scr.width - 7 * TinyAlphNum.W - 2).toFloat(), line(1))
+                (App.scr.width - 7 * TinyAlphNum.W - 2).toFloat(), line(0))
         // FPS count
         App.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
-                (App.scr.width - 3 - 15 * TinyAlphNum.W).toFloat(), line(2))
+                (App.scr.width - 3 - 15 * TinyAlphNum.W).toFloat(), line(1))
         // global render counter
         App.fontSmallNumbers.draw(batch, "${ccO}R${App.GLOBAL_RENDER_TIMER.toString().padStart(9, ' ')}",
-                (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
+                (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(0))
         (ingame as? TerrarumIngame)?.let {
             // global update counter (if applicable)
             App.fontSmallNumbers.draw(batch, "${ccO}U${it.WORLD_UPDATE_TIMER.toString().padStart(9, ' ')}",
-                    (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(2))
+                    (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
         }
         /**
          * Bottom left
