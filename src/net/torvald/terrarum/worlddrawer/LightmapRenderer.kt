@@ -15,6 +15,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
@@ -119,12 +120,18 @@ object LightmapRenderer {
      * @param y world tile coord
      */
     internal fun getLight(x: Int, y: Int): Cvec? {
+        var y = y
+        var x = if (for_x_start - overscan_open + LIGHTMAP_WIDTH >= world.width && x - for_x_start + overscan_open < 0)
+            x + world.width
+        else if (for_x_start - overscan_open + LIGHTMAP_WIDTH < 0 && x - for_x_start + overscan_open >= world.width)
+            x - world.width else x
+
         return if (!inBounds(x, y)) {
             null
         }
         else {
-            val x = x.convX()
-            val y = y.convY()
+            x = x.convX()
+            y = y.convY()
 
             Cvec(
                     lightmap.getR(x, y),

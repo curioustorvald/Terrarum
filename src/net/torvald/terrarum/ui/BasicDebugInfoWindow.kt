@@ -20,6 +20,7 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -56,6 +57,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private val TERRAIN = 0xD2.toChar()
     private val WALL = 0xD3.toChar()
     private val WIRE = 0xD4.toChar()
+    private val MASS = 0xD5.toChar()
+    private val HEIGHT = 0xC7.toChar()
 
 
     override fun updateUI(delta: Float) {
@@ -88,8 +91,9 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private infix fun Double.pow(b: Double) = Math.pow(this, b)
 
-    private fun Double.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
-            "${this.toInt().toString().padStart(intLen)}." +
+    private fun Double?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
+            if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this.sign >= 0) '+' else '-'}Inf" else
+                "${this.toInt().toString().padStart(intLen)}." +
             (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padEnd(fracLen) }
 
     private val gap = 14f
@@ -105,11 +109,9 @@ class BasicDebugInfoWindow : UICanvas() {
     private val tileCursX = 0; private val tileCursY = 4
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        val windowWidth = Toolkit.drawWidth
         val player = ingame?.actorNowPlaying
-
-
         val hitbox = player?.hitbox
-
         val updateCount = maxOf(1L, (App.debugTimers["Ingame.UpdateCounter"] ?: 1L) as Long)
 
         /**
@@ -153,9 +155,10 @@ class BasicDebugInfoWindow : UICanvas() {
             App.fontSmallNumbers.draw(batch, "${if (player.jumping) "$ccG" else "$ccK"}JM", gap + 7f*(jX + 8), line(jY))
             App.fontSmallNumbers.draw(batch, "${if (player.isJumpDown) "$ccG" else "$ccK"}KY", gap + 7f*(jX + 8), line(jY+1))
 
-            App.fontSmallNumbers.draw(batch, "VI", gap + 7f*(jX + 11), line(0))
-            App.fontSmallNumbers.draw(batch, "RT", gap + 7f*(jX + 11), line(1))
-            App.fontSmallNumbers.draw(batch, "${if (player.downDownVirtually) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*(jX + 13), line(jY+1))
+            App.fontSmallNumbers.draw(batch, "${if (player.downDownVirtually) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*(jX + 11), line(jY+1))
+
+            App.fontSmallNumbers.draw(batch, "$HEIGHT$ccG${player.hitbox.width.toString().padEnd(5).substring(0,5).trim()}$ccY${0xF9.toChar()}$ccG${player.hitbox.height.toString().padEnd(5).substring(0,5)}", gap + 7f*(jX + 13), line(jY))
+            App.fontSmallNumbers.draw(batch, "$MASS$ccG${player.mass.toString().padEnd(8).substring(0,8)}", gap + 7f*(jX + 13), line(jY+1))
 
 
 
@@ -187,10 +190,10 @@ class BasicDebugInfoWindow : UICanvas() {
         try {
             world?.let {
                 val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
-                val rawR = valRaw?.r?.toDouble()?.toIntAndFrac(1,3) ?: "null"
-                val rawG = valRaw?.g?.toDouble()?.toIntAndFrac(1,3) ?: "null"
-                val rawB = valRaw?.b?.toDouble()?.toIntAndFrac(1,3) ?: "null"
-                val rawA = valRaw?.a?.toDouble()?.toIntAndFrac(1,3) ?: "null"
+                val rawR = valRaw?.r?.toDouble().toIntAndFrac(1,3)
+                val rawG = valRaw?.g?.toDouble().toIntAndFrac(1,3)
+                val rawB = valRaw?.b?.toDouble().toIntAndFrac(1,3)
+                val rawA = valRaw?.a?.toDouble().toIntAndFrac(1,3)
 
                 val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
@@ -217,7 +220,7 @@ class BasicDebugInfoWindow : UICanvas() {
             drawGamepadAxis(gamepad, batch,
                     gamepad.getAxis(App.getConfigInt("control_gamepad_axislx")),
                     gamepad.getAxis(App.getConfigInt("control_gamepad_axisly")),
-                    App.scr.width - 128 - TinyAlphNum.W * 2,
+                    windowWidth - 128 - TinyAlphNum.W * 2,
                     line(3).toInt()
             )
         }
@@ -235,28 +238,28 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         // memory pressure
-        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (App.scr.width - 23 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (windowWidth - 23 * TinyAlphNum.W - 2).toFloat(), line(0))
         // thread count
         App.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (App.MULTITHREAD) ccG else ccR}${App.THREAD_COUNT.toString().padStart(2, ' ')}",
-                (App.scr.width - 2 - 8 * TinyAlphNum.W).toFloat(), line(1))
+                (windowWidth - 2 - 8 * TinyAlphNum.W).toFloat(), line(1))
 
         // memory texts
         App.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
-                (App.scr.width - 19 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 19 * TinyAlphNum.W - 2).toFloat(), line(0))
         App.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
-                (App.scr.width - 14 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 14 * TinyAlphNum.W - 2).toFloat(), line(0))
         App.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
-                (App.scr.width - 7 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 7 * TinyAlphNum.W - 2).toFloat(), line(0))
         // FPS count
         App.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
-                (App.scr.width - 3 - 15 * TinyAlphNum.W).toFloat(), line(1))
+                (windowWidth - 3 - 15 * TinyAlphNum.W).toFloat(), line(1))
         // global render counter
         App.fontSmallNumbers.draw(batch, "${ccO}R${App.GLOBAL_RENDER_TIMER.toString().padStart(9, ' ')}",
-                (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 35 * TinyAlphNum.W - 2).toFloat(), line(0))
         (ingame as? TerrarumIngame)?.let {
             // global update counter (if applicable)
             App.fontSmallNumbers.draw(batch, "${ccO}U${it.WORLD_UPDATE_TIMER.toString().padStart(9, ' ')}",
-                    (App.scr.width - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
+                    (windowWidth - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
         }
         /**
          * Bottom left
@@ -286,7 +289,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // processor and renderer
         App.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
-                (App.scr.width - (totalHardwareName.length + 2) * TinyAlphNum.W).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+                (windowWidth - (totalHardwareName.length + 2) * TinyAlphNum.W).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""
@@ -379,7 +382,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
         batch.begin()
 
-        App.fontSmallNumbers.draw(batch, gamepad.getName(), App.scr.width - (gamepad.getName().length + 2f) * TinyAlphNum.W, uiY.toFloat() + h + 2)
+        App.fontSmallNumbers.draw(batch, gamepad.getName(), Toolkit.drawWidth - (gamepad.getName().length + 2f) * TinyAlphNum.W, uiY.toFloat() + h + 2)
 
     }
 
