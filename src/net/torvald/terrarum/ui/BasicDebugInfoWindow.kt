@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -60,6 +61,9 @@ class BasicDebugInfoWindow : UICanvas() {
     private val MASS = 0xD5.toChar()
     private val HEIGHT = 0xC7.toChar()
 
+    private val KEY_TIMERS = Input.Keys.U
+
+    private var showTimers = false
 
     override fun updateUI(delta: Float) {
         val player = ingame?.actorNowPlaying
@@ -121,7 +125,7 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = Color(1f, 1f, 1f, 0.65f)
         batch.draw(back, gap - 5f, gap - 5f)
 
-
+        showTimers = showTimers xor Gdx.input.isKeyJustPressed(KEY_TIMERS)
 
         batch.color = Color(0xFFEE88FF.toInt())
 
@@ -226,10 +230,12 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
         // print time
-        var dbgCnt = 10
-        App.debugTimers.forEach { t, u ->
-//            printLine(batch, dbgCnt, "$ccO$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
-            dbgCnt++
+        if (showTimers) {
+            var dbgCnt = 10
+            App.debugTimers.forEach { t, u ->
+                printLine(batch, dbgCnt, "$ccO$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
+                dbgCnt++
+            }
         }
 
 
