@@ -60,6 +60,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val WIRE = 0xD4.toChar()
     private val MASS = 0xD5.toChar()
     private val HEIGHT = 0xC7.toChar()
+    private val WIDTH = 0xCD.toChar()
 
     private val KEY_TIMERS = Input.Keys.U
 
@@ -161,7 +162,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
             App.fontSmallNumbers.draw(batch, "${if (player.downDownVirtually) "$ccG" else "$ccK"}$ARROW_DOWN", gap + 7f*(jX + 11), line(jY+1))
 
-            App.fontSmallNumbers.draw(batch, "$HEIGHT$ccG${player.hitbox.width.toString().padEnd(5).substring(0,5).trim()}$ccY${0xF9.toChar()}$ccG${player.hitbox.height.toString().padEnd(5).substring(0,5)}", gap + 7f*(jX + 13), line(jY))
+            App.fontSmallNumbers.draw(batch, "$WIDTH$ccG${player.hitbox.width.toString().padEnd(5).substring(0,5).trim()}$ccY$HEIGHT$ccG${player.hitbox.height.toString().padEnd(5).substring(0,5)}", gap + 7f*(jX + 13), line(jY))
             App.fontSmallNumbers.draw(batch, "$MASS$ccG${player.mass.toString().padEnd(8).substring(0,8)}", gap + 7f*(jX + 13), line(jY+1))
 
 
@@ -244,28 +245,28 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         // memory pressure
-        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (windowWidth - 23 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (windowWidth - 25 * TinyAlphNum.W - 2).toFloat(), line(0))
         // thread count
         App.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (App.MULTITHREAD) ccG else ccR}${App.THREAD_COUNT.toString().padStart(2, ' ')}",
                 (windowWidth - 2 - 8 * TinyAlphNum.W).toFloat(), line(1))
 
         // memory texts
-        App.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
-                (windowWidth - 19 * TinyAlphNum.W - 2).toFloat(), line(0))
-        App.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
+        App.fontSmallNumbers.draw(batch, "${ccO}H$ccG${Terrarum.memJavaHeap}${ccY}M",
+                (windowWidth - 21 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "${ccO}U$ccG${Terrarum.memUnsafe}${ccY}M",
                 (windowWidth - 14 * TinyAlphNum.W - 2).toFloat(), line(0))
-        App.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
-                (windowWidth - 7 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "${ccO}X$ccG${Terrarum.memXmx}${ccY}M",
+                (windowWidth - 8 * TinyAlphNum.W - 2).toFloat(), line(0))
         // FPS count
         App.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
                 (windowWidth - 3 - 15 * TinyAlphNum.W).toFloat(), line(1))
         // global render counter
-        App.fontSmallNumbers.draw(batch, "${ccO}R${App.GLOBAL_RENDER_TIMER.toString().padStart(9, ' ')}",
-                (windowWidth - 35 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "$ccO${"R $ccG${App.GLOBAL_RENDER_TIMER}".padStart(10).substring(0,10)}",
+                (windowWidth - 34 * TinyAlphNum.W - 2).toFloat(), line(0))
         (ingame as? TerrarumIngame)?.let {
             // global update counter (if applicable)
-            App.fontSmallNumbers.draw(batch, "${ccO}U${it.WORLD_UPDATE_TIMER.toString().padStart(9, ' ')}",
-                    (windowWidth - 35 * TinyAlphNum.W - 2).toFloat(), line(1))
+            App.fontSmallNumbers.draw(batch, "$ccO${"U $ccG${it.WORLD_UPDATE_TIMER}".padStart(10).substring(0,10)}",
+                    (windowWidth - 34 * TinyAlphNum.W - 2).toFloat(), line(1))
         }
         /**
          * Bottom left

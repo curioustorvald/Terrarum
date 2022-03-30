@@ -118,11 +118,11 @@ object Terrarum : Disposable {
             javaHeapCircularArray.appendHead((Gdx.app.javaHeap shr 20).toInt())
             return javaHeapCircularArray.maxOrNull() ?: 0
         }
-    val memNativeHeap: Int
+    /*val memNativeHeap: Int // as long as you're sticking to the LWJGL, nativeHeap just returns javaHeap
         get() {
             nativeHeapCircularArray.appendHead((Gdx.app.nativeHeap shr 20).toInt())
             return nativeHeapCircularArray.maxOrNull() ?: 0
-        }
+        }*/
     val memUnsafe: Int
         get() = (UnsafeHelper.unsafeAllocatedSize shr 20).toInt()
     val memXmx: Int
