@@ -86,9 +86,11 @@ class BasicDebugInfoWindow : UICanvas() {
         return sb.reverse().toString()
     }
 
-    private fun Double.toIntAndFrac(textLen: Int): Pair<String,String> =
-            (this.floorInt().toString().padStart(textLen)) to
-                    (this.absoluteValue.times(10000.0).roundToInt() % 10000).toString().padEnd(4)
+    private infix fun Double.pow(b: Double) = Math.pow(this, b)
+
+    private fun Double.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
+            "${this.toInt().toString().padStart(intLen)}." +
+            (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padEnd(fracLen) }
 
     private val gap = 14f
 
@@ -123,18 +125,18 @@ class BasicDebugInfoWindow : UICanvas() {
 
         player?.let { player -> hitbox?.let { hitbox ->
 
-            val (pxInt, pxFrac) = hitbox.canonicalX.toIntAndFrac(7)
-            val (pyInt, pyFrac) = hitbox.canonicalY.toIntAndFrac(7)
-            val (evxInt, evxFrac) = player.externalV.x.toIntAndFrac(4)
-            val (evyInt, evyFrac) = player.externalV.y.toIntAndFrac(4)
-            val (cvxInt, cvxFrac) = (player.controllerV?.x ?: 0.0).toIntAndFrac(4)
-            val (cvyInt, cvyFrac) = (player.controllerV?.y ?: 0.0).toIntAndFrac(4)
-            val (mvxInt, mvxFrac) = (xdelta / updateCount).toIntAndFrac(4)
-            val (mvyInt, mvyFrac) = (ydelta / updateCount).toIntAndFrac(4)
+            val px = hitbox.canonicalX.toIntAndFrac(7)
+            val py = hitbox.canonicalY.toIntAndFrac(7)
+            val evx = player.externalV.x.toIntAndFrac(4)
+            val evy = player.externalV.y.toIntAndFrac(4)
+            val cvx = (player.controllerV?.x ?: 0.0).toIntAndFrac(4)
+            val cvy = (player.controllerV?.y ?: 0.0).toIntAndFrac(4)
+            val mvx = (xdelta / updateCount).toIntAndFrac(4)
+            val mvy = (ydelta / updateCount).toIntAndFrac(4)
 
             // TODO draw player head
-            App.fontSmallNumbers.draw(batch, "X$ccO${hitbox.canonicalX.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$pxInt.$pxFrac", gap + 7f*(pxyX + 3), line(pxyY))
-            App.fontSmallNumbers.draw(batch, "Y$ccO${hitbox.canonicalY.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$pyInt.$pyFrac", gap + 7f*(pxyX + 3), line(pxyY+1))
+            App.fontSmallNumbers.draw(batch, "X$ccO${hitbox.canonicalX.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$px", gap + 7f*(pxyX + 3), line(pxyY))
+            App.fontSmallNumbers.draw(batch, "Y$ccO${hitbox.canonicalY.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$py", gap + 7f*(pxyX + 3), line(pxyY+1))
             batch.draw(icons.get(0,1), gap + 7f*(cxyX - 1), line(pxyY))
 
             // camera info
@@ -158,20 +160,20 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
             batch.draw(icons.get(3,0), gap + 7f*cvX, line(cvY))
-            App.fontSmallNumbers.draw(batch, "X$ccG$cvxInt.$cvxFrac", gap + 7f*(cvX + 3), line(cvY))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$cvyInt.$cvyFrac", gap + 7f*(cvX + 3), line(cvY + 1))
+            App.fontSmallNumbers.draw(batch, "X$ccG$cvx", gap + 7f*(cvX + 3), line(cvY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$cvy", gap + 7f*(cvX + 3), line(cvY + 1))
 
             batch.draw(icons.get(0,1), gap + 7f*(evX - 1), line(evY))
 
             batch.draw(icons.get(2,0), gap + 7f*evX, line(evY))
-            App.fontSmallNumbers.draw(batch, "X$ccG$evxInt.$evxFrac", gap + 7f*(evX + 3), line(evY))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$evyInt.$evyFrac", gap + 7f*(evX + 3), line(evY + 1))
+            App.fontSmallNumbers.draw(batch, "X$ccG$evx", gap + 7f*(evX + 3), line(evY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$evy", gap + 7f*(evX + 3), line(evY + 1))
 
             batch.draw(icons.get(0,1), gap + 7f*(mvX - 1), line(mvY))
 
             batch.draw(icons.get(5,0), gap + 7f*mvX, line(mvY))
-            App.fontSmallNumbers.draw(batch, "X$ccG$mvxInt.$mvxFrac", gap + 7f*(mvX + 3), line(mvY))
-            App.fontSmallNumbers.draw(batch, "Y$ccG$mvyInt.$mvyFrac", gap + 7f*(mvX + 3), line(mvY + 1))
+            App.fontSmallNumbers.draw(batch, "X$ccG$mvx", gap + 7f*(mvX + 3), line(mvY))
+            App.fontSmallNumbers.draw(batch, "Y$ccG$mvy", gap + 7f*(mvX + 3), line(mvY + 1))
 
         }}
 
@@ -185,10 +187,10 @@ class BasicDebugInfoWindow : UICanvas() {
         try {
             world?.let {
                 val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
-                val rawR = valRaw?.r?.times(100f)?.round()?.div(100f)
-                val rawG = valRaw?.g?.times(100f)?.round()?.div(100f)
-                val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)
-                val rawA = valRaw?.a?.times(100f)?.round()?.div(100f)
+                val rawR = valRaw?.r?.toDouble()?.toIntAndFrac(1,3) ?: "null"
+                val rawG = valRaw?.g?.toDouble()?.toIntAndFrac(1,3) ?: "null"
+                val rawB = valRaw?.b?.toDouble()?.toIntAndFrac(1,3) ?: "null"
+                val rawA = valRaw?.a?.toDouble()?.toIntAndFrac(1,3) ?: "null"
 
                 val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
