@@ -47,6 +47,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val icons = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/debug_window_symbols.tga"), 21, 26)
     private val back = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background.tga"))
+    private val back2 = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background2.tga"))
 
     private val ARROW_RIGHT = 0xC0.toChar()
     private val ARROW_LEFT = 0xC1.toChar()
@@ -124,7 +125,8 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         batch.color = Color(1f, 1f, 1f, 0.65f)
-        batch.draw(back, gap - 5f, gap - 5f)
+        batch.draw(back, gap - 4f, gap - 4f - 1f)
+        batch.draw(back2, windowWidth - back2.width - (gap - 4f), gap - 4f - 1f)
 
         showTimers = showTimers xor Gdx.input.isKeyJustPressed(KEY_TIMERS)
 
@@ -245,28 +247,28 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         // memory pressure
-        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (windowWidth - 25 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "${ccY}MEM ", (windowWidth - 25 * TinyAlphNum.W).toFloat(), line(0))
         // thread count
         App.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (App.MULTITHREAD) ccG else ccR}${App.THREAD_COUNT.toString().padStart(2, ' ')}",
-                (windowWidth - 2 - 8 * TinyAlphNum.W).toFloat(), line(1))
+                (windowWidth - 8 * TinyAlphNum.W).toFloat(), line(1))
 
         // memory texts
         App.fontSmallNumbers.draw(batch, "${ccO}H$ccG${Terrarum.memJavaHeap}${ccY}M",
-                (windowWidth - 21 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 21 * TinyAlphNum.W).toFloat(), line(0))
         App.fontSmallNumbers.draw(batch, "${ccO}U$ccG${Terrarum.memUnsafe}${ccY}M",
-                (windowWidth - 14 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 14 * TinyAlphNum.W).toFloat(), line(0))
         App.fontSmallNumbers.draw(batch, "${ccO}X$ccG${Terrarum.memXmx}${ccY}M",
-                (windowWidth - 8 * TinyAlphNum.W - 2).toFloat(), line(0))
+                (windowWidth - 8 * TinyAlphNum.W).toFloat(), line(0))
         // FPS count
         App.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
-                (windowWidth - 3 - 15 * TinyAlphNum.W).toFloat(), line(1))
+                (windowWidth - 15 * TinyAlphNum.W).toFloat(), line(1))
         // global render counter
-        App.fontSmallNumbers.draw(batch, "$ccO${"R $ccG${App.GLOBAL_RENDER_TIMER}".padStart(10).substring(0,10)}",
-                (windowWidth - 34 * TinyAlphNum.W - 2).toFloat(), line(0))
+        App.fontSmallNumbers.draw(batch, "$ccO${"R ${App.GLOBAL_RENDER_TIMER}".padStart(10).substring(0,10)}",
+                (windowWidth - 12 * TinyAlphNum.W).toFloat(), line(2))
         (ingame as? TerrarumIngame)?.let {
             // global update counter (if applicable)
-            App.fontSmallNumbers.draw(batch, "$ccO${"U $ccG${it.WORLD_UPDATE_TIMER}".padStart(10).substring(0,10)}",
-                    (windowWidth - 34 * TinyAlphNum.W - 2).toFloat(), line(1))
+            App.fontSmallNumbers.draw(batch, "$ccO${"U ${it.WORLD_UPDATE_TIMER}".padStart(10).substring(0,10)}",
+                    (windowWidth - 12 * TinyAlphNum.W).toFloat(), line(3))
         }
         /**
          * Bottom left
@@ -296,7 +298,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // processor and renderer
         App.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
-                (windowWidth - (totalHardwareName.length + 2) * TinyAlphNum.W).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+                (windowWidth - (totalHardwareName.length+2) * TinyAlphNum.W).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""
@@ -411,5 +413,6 @@ class BasicDebugInfoWindow : UICanvas() {
     override fun dispose() {
         icons.dispose()
         back.dispose()
+        back2.dispose()
     }
 }
