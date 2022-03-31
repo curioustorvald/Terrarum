@@ -291,9 +291,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // platform-related hacks
         // allow latching down downDownVirtually only when standing on a platform AND not jumping upwards
         val occupyingTileHasPlatform = bodyTiles.filterNotNull().any { it.isPlatform }
+        val feetTileHasPlatform = feetTiles.filterNotNull().any { it.isPlatform }
         val feetTileIsAllPlatform = feetTiles.filterNotNull().all { it.isPlatform }
         if (isDownDown && feetTileIsAllPlatform && (controllerV?.y ?: 0.0) >= 0.0 ||
-            occupyingTileHasPlatform && !feetTileIsAllPlatform) { // FIXME this does not account for reverse gravity
+            occupyingTileHasPlatform && !feetTileHasPlatform) { // FIXME this does not account for reverse gravity
             downDownVirtually = true
         }
         if (downDownVirtually && !occupyingTileHasPlatform && !feetTileIsAllPlatform) {
