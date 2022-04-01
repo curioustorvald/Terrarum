@@ -20,7 +20,6 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
@@ -210,8 +209,8 @@ class BasicDebugInfoWindow : UICanvas() {
 
                 App.fontSmallNumbers.draw(batch, "$ccO$TERRAIN$ccG$tileNum", gap + 7f*(tileCursX + 3), line(tileCursY))
                 App.fontSmallNumbers.draw(batch, "$ccO$WALL$ccG$wallNum", gap + 7f*(tileCursX + 3), line(tileCursY + 1))
-                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.value} $ccO$BEAKER$ccG${fluid.amount}f", gap + 7f*(tileCursX + 3), line(tileCursY + 2))
-                App.fontSmallNumbers.draw(batch, "$ccO$WIRE$ccG$wireCount", gap + 7f*(tileCursX + 3), line(tileCursY + 3))
+                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.value.toString().padEnd(3)}$ccO$BEAKER$ccG${fluid.amount}f", gap + 7f*(tileCursX + 3), line(tileCursY + 2))
+                App.fontSmallNumbers.draw(batch, "$ccO$WIRE$ccG$wireCount ${ccY}X$ccO$mouseTileX ${ccY}Y$ccO$mouseTileY", gap + 7f*(tileCursX + 3), line(tileCursY + 3))
                 App.fontSmallNumbers.draw(batch, "$ccR$rawR $ccG$rawG $ccB$rawB $ccW$rawA", gap + 7f*(tileCursX + 3), line(tileCursY + 4))
 
                 batch.draw(icons.get(4,0), gap + 7f*tileCursX, line(tileCursY + 1) + 7)
