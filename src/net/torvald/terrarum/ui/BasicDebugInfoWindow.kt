@@ -145,11 +145,11 @@ class BasicDebugInfoWindow : UICanvas() {
             // TODO draw player head
             App.fontSmallNumbers.draw(batch, "X$ccO${hitbox.canonicalX.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$px", gap + 7f*(pxyX + 3), line(pxyY))
             App.fontSmallNumbers.draw(batch, "Y$ccO${hitbox.canonicalY.div(TILE_SIZE).toInt().toString().padStart(6)}$ccG$py", gap + 7f*(pxyX + 3), line(pxyY+1))
-            batch.draw(icons.get(0,1), gap + 7f*(cxyX - 1), line(pxyY))
+//            batch.draw(icons.get(0,1), gap + 7f*(cxyX - 1), line(pxyY))
 
             // camera info
 
-            batch.draw(icons.get(0,1), gap + 7f*(jX - 1), line(jY))
+//            batch.draw(icons.get(0,1), gap + 7f*(jX - 1), line(jY))
 
             batch.draw(icons.get(1,0), gap + 7f*jX, line(jY))
             App.fontSmallNumbers.draw(batch, "${if (player.walledLeft) "$ccG" else "$ccK"}$ARROW_LEFT", gap + 7f*(jX + 3), line(jY) + 7)
@@ -172,13 +172,13 @@ class BasicDebugInfoWindow : UICanvas() {
             App.fontSmallNumbers.draw(batch, "X$ccG$cvx", gap + 7f*(cvX + 3), line(cvY))
             App.fontSmallNumbers.draw(batch, "Y$ccG$cvy", gap + 7f*(cvX + 3), line(cvY + 1))
 
-            batch.draw(icons.get(0,1), gap + 7f*(evX - 1), line(evY))
+//            batch.draw(icons.get(0,1), gap + 7f*(evX - 1), line(evY))
 
             batch.draw(icons.get(2,0), gap + 7f*evX, line(evY))
             App.fontSmallNumbers.draw(batch, "X$ccG$evx", gap + 7f*(evX + 3), line(evY))
             App.fontSmallNumbers.draw(batch, "Y$ccG$evy", gap + 7f*(evX + 3), line(evY + 1))
 
-            batch.draw(icons.get(0,1), gap + 7f*(mvX - 1), line(mvY))
+//            batch.draw(icons.get(0,1), gap + 7f*(mvX - 1), line(mvY))
 
             batch.draw(icons.get(5,0), gap + 7f*mvX, line(mvY))
             App.fontSmallNumbers.draw(batch, "X$ccG$mvx", gap + 7f*(mvX + 3), line(mvY))
