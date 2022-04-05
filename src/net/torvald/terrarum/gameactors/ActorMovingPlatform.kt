@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame.gameactors
+package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.ActorID
@@ -11,7 +11,7 @@ import net.torvald.terrarum.gameactors.PhysProperties
 open class ActorMovingPlatform() : ActorWithBody() {
 
     protected var tilewiseWidth = 3
-    protected val actorsRiding = ArrayList<ActorID>() // saving actorID due to serialisation issues
+    @Transient protected val actorsRiding = ArrayList<ActorID>() // saving actorID due to serialisation issues
 
     init {
         physProp = PhysProperties.PHYSICS_OBJECT

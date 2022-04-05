@@ -282,6 +282,13 @@ open class ActorWithBody : Actor {
     var isPickedUp = false
 
     /**
+     * Redundant entry for ActorMovingPlatform.actorsRiding. This field must be modified by the platforms!
+     *
+     * Also see [net.torvald.terrarum.modulebasegame.gameactors.ActorMovingPlatform.actorsRiding]
+     */
+    @Transient protected val platformsRiding = ArrayList<ActorID>()
+
+    /**
      * Gravitational Constant G. Load from gameworld.
      * [m / s^2]
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
@@ -1064,7 +1071,7 @@ open class ActorWithBody : Actor {
         val x2 = hitbox.endX - A_PIXEL
         val y1 = hitbox.startY
         val y2 = hitbox.endY - A_PIXEL
-        // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENDED!
+        // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
 
         val txStart = x1.plus(HALF_PIXEL).floorInt()
         val txEnd =   x2.plus(HALF_PIXEL).floorInt()
