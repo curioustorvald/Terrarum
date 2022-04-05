@@ -79,7 +79,7 @@ return Object.freeze({"n":"Ελ. Φωνητικό","v":"none","c":"CuriousTo\uA7
             let diacriticsLength = states.code.length // dialytika-tonos is two characters internally
             let composed = diacriticsMapping[states.code][s]
             reset()
-            return [''+(2+diacriticsLength), composed || s]
+            return [''+(1+diacriticsLength), composed || s]
         }
         // nope!
         else {
