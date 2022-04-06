@@ -16,7 +16,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     private val array = UnsafeHelper.allocate(TOTAL_SIZE_IN_BYTES)
     val ptr = array.ptr
 
-    private inline fun toAddr(x: Int, y: Int) = 16L * (y * width + x)
+    private inline fun toAddr(x: Int, y: Int) = 4L * (y * width + x)
 
     fun isDestroyed() = array.destroyed
 
@@ -26,43 +26,43 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     // getters
     fun getR(x: Int, y: Int) = array.getFloat(toAddr(x, y))
-    fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 4)
-    fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 8)
-    fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 12)
+    fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 1)
+    fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 2)
+    fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 3)
     inline fun getVec(x: Int, y: Int) = Cvec(
             array.getFloat(toAddr(x, y)),
-            array.getFloat(toAddr(x, y) + 4),
-            array.getFloat(toAddr(x, y) + 8),
-            array.getFloat(toAddr(x, y) + 12)
+            array.getFloat(toAddr(x, y) + 1),
+            array.getFloat(toAddr(x, y) + 2),
+            array.getFloat(toAddr(x, y) + 3)
     )
     /**
      * @param channel 0 for R, 1 for G, 2 for B, 3 for A
      */
-    fun channelGet(x: Int, y: Int, channel: Int) = array.getFloat(toAddr(x, y) + 4L * channel)
+    fun channelGet(x: Int, y: Int, channel: Int) = array.getFloat(toAddr(x, y) + channel)
 
     // setters
     fun zerofill() = array.fillWith(0)
     fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
-    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 4, value) }
-    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 8, value) }
-    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 12, value) }
+    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 1, value) }
+    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 2, value) }
+    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 3, value) }
     inline fun setVec(x: Int, y: Int, value: Cvec) {
         array.setFloat(toAddr(x, y), value.r)
-        array.setFloat(toAddr(x, y) + 4, value.g)
-        array.setFloat(toAddr(x, y) + 8, value.b)
-        array.setFloat(toAddr(x, y) + 12, value.a)
+        array.setFloat(toAddr(x, y) + 1, value.g)
+        array.setFloat(toAddr(x, y) + 2, value.b)
+        array.setFloat(toAddr(x, y) + 3, value.a)
     }
     inline fun setScalar(x: Int, y: Int, value: Float) {
         array.setFloat(toAddr(x, y), value)
-        array.setFloat(toAddr(x, y) + 4, value)
-        array.setFloat(toAddr(x, y) + 8, value)
-        array.setFloat(toAddr(x, y) + 12, value)
+        array.setFloat(toAddr(x, y) + 1, value)
+        array.setFloat(toAddr(x, y) + 2, value)
+        array.setFloat(toAddr(x, y) + 3, value)
     }
     /**
      * @param channel 0 for R, 1 for G, 2 for B, 3 for A
      */
     fun channelSet(x: Int, y: Int, channel: Int, value: Float) {
-        array.setFloat(toAddr(x, y) + 4L * channel, value)
+        array.setFloat(toAddr(x, y) + channel, value)
     }
 
     // operators
@@ -82,20 +82,20 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     fun mulAndAssign(x: Int, y: Int, scalar: Float) {
         val addr = toAddr(x, y)
         for (k in 0..3) {
-            array.setFloat(addr + 4*k, (array.getFloat(addr + 4*k) * scalar))
+            array.setFloat(addr + k, (array.getFloat(addr + k) * scalar))
         }
     }
 
     fun forAllMulAssign(scalar: Float) {
-        for (i in 0 until TOTAL_SIZE_IN_BYTES step 4) {
+        for (i in 0 until TOTAL_SIZE_IN_BYTES / 4) {
             array.setFloat(i, array.getFloat(i) * scalar)
         }
     }
 
     fun forAllMulAssign(vector: Cvec) {
-        for (i in 0 until TOTAL_SIZE_IN_BYTES step 16) {
+        for (i in 0 until TOTAL_SIZE_IN_BYTES / 4 step 4) {
             for (k in 0 until 4) {
-                array.setFloat(i + 4*k, array.getFloat(i + 4*k) * vector.getElem(k))
+                array.setFloat(i + 4*k, array.getFloat(i + k) * vector.getElem(k))
             }
         }
     }

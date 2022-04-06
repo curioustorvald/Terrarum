@@ -124,68 +124,68 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
         UnsafeHelper.unsafe.putByte(ptr + index, value)
     }
 
-    // NOTE: get/set multibyte values are NOT BYTE-ALIGNED!
+    // NOTE: get/set multibyte values ARE BYTE-ALIGNED!
 
     fun getDouble(index: Long): Double {
-        checkNullPtr(index)
-        return UnsafeHelper.unsafe.getDouble(ptr + index)
+        checkNullPtr(index * 8L)
+        return UnsafeHelper.unsafe.getDouble(ptr + (index * 8L))
     }
 
     fun getLong(index: Long): Long {
-        checkNullPtr(index)
-        return UnsafeHelper.unsafe.getLong(ptr + index)
+        checkNullPtr(index * 8L)
+        return UnsafeHelper.unsafe.getLong(ptr + (index * 8L))
     }
 
     fun getFloat(index: Long): Float {
-        checkNullPtr(index)
-        return UnsafeHelper.unsafe.getFloat(ptr + index)
+        checkNullPtr(index * 4L)
+        return UnsafeHelper.unsafe.getFloat(ptr + (index * 4L))
     }
 
     fun getInt(index: Long): Int {
-        checkNullPtr(index)
-        return UnsafeHelper.unsafe.getInt(ptr + index)
+        checkNullPtr(index * 4L)
+        return UnsafeHelper.unsafe.getInt(ptr + (index * 4L))
     }
 
     fun getShort(index: Long): Short {
-        checkNullPtr(index)
-        return UnsafeHelper.unsafe.getShort(ptr + index)
+        checkNullPtr(index * 2L)
+        return UnsafeHelper.unsafe.getShort(ptr + (index * 2L))
     }
 
     fun getChar(index: Long): Char {
-        checkNullPtr(index)
-        return UnsafeHelper.unsafe.getChar(ptr + index)
+        checkNullPtr(index * 2L)
+        return UnsafeHelper.unsafe.getChar(ptr + (index * 2L))
     }
 
 
 
     fun setDouble(index: Long, value: Double) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putDouble(ptr + index, value)
+        checkNullPtr(index * 8L)
+        UnsafeHelper.unsafe.putDouble(ptr + (index * 8L), value)
     }
 
     fun setLong(index: Long, value: Long) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putLong(ptr + index, value)
+        checkNullPtr(index * 8L)
+        UnsafeHelper.unsafe.putLong(ptr + (index * 8L), value)
     }
 
     fun setFloat(index: Long, value: Float) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putFloat(ptr + index, value)
+        checkNullPtr(index * 4L)
+        UnsafeHelper.unsafe.putFloat(ptr + (index * 4L), value)
     }
 
     fun setInt(index: Long, value: Int) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putInt(ptr + index, value)
+        checkNullPtr(index * 4L)
+        UnsafeHelper.unsafe.putInt(ptr + (index * 4L), value)
     }
 
     fun setShort(index: Long, value: Short) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putShort(ptr + index, value)
+        checkNullPtr(index * 2L)
+        UnsafeHelper.unsafe.putShort(ptr + (index * 2L), value)
     }
 
     fun setChar(index: Long, value: Char) {
-        checkNullPtr(index)
-        UnsafeHelper.unsafe.putChar(ptr + index, value)
+        checkNullPtr(index * 2L)
+        UnsafeHelper.unsafe.putChar(ptr + (index * 2L), value)
     }
 
 

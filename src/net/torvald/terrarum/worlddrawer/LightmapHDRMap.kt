@@ -82,11 +82,11 @@ internal object LightmapHDRMap : Disposable {
 
     operator fun invoke() {
         THE_LUT.forEachIndexed { i, f ->
-            ptr.setFloat(4L * i, f)
+            ptr.setFloat(i.toLong(), f)
         }
     }
 
-    inline operator fun get(index: Int) = ptr.getFloat(4L * index)
+    inline operator fun get(index: Int) = ptr.getFloat(index.toLong())
 
     val lastIndex = THE_LUT.lastIndex
     val size = lastIndex + 1
