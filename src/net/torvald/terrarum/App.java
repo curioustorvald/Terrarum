@@ -236,7 +236,6 @@ public class App implements ApplicationListener {
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderDebugDiff;
     public static ShaderProgram shaderPassthruRGBA;
-    public static ShaderProgram shaderDitherRGBA;
     public static ShaderProgram shaderColLUT;
     public static ShaderProgram shaderReflect;
     public static ShaderProgram shaderGhastlyWhite;
@@ -444,7 +443,6 @@ public class App implements ApplicationListener {
         shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
         shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
         shaderPassthruRGBA = SpriteBatch.createDefaultShader();
-        shaderDitherRGBA = loadShaderFromClasspath("shaders/default.vert", "shaders/float_to_disp_dither.frag"); // always load the shader regardless of config because the config may cange
         shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
         shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
         shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
@@ -591,6 +589,8 @@ public class App implements ApplicationListener {
         }
 
         KeyToggler.INSTANCE.update(currentScreen instanceof TerrarumIngame);
+
+
 
         // nested FBOs are just not a thing in GL!
         FrameBufferManager.end();

@@ -17,7 +17,7 @@ vec4 gammaOut(vec4 col) {
     return pow(col, vec4(1.0 / 2.2));
 }
 
-varying vec4 v_color;
+varying vec4 v_color; // unused!
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
@@ -30,6 +30,21 @@ vec4 halfvec = vec4(0.5);
 
 vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
+mat4 rgb_to_ycocg = mat4(
+    0.25,  1.0, -0.5, 0.0,
+    0.5,  0.0,  1.0, 0.0,
+    0.25, -1.0, -0.5, 0.0,
+    0.0,  0.0,  0.0, 1.0
+);
+
+mat4 ycocg_to_rgb = mat4(
+     1.0, 1.0,  1.0, 0.0,
+     0.5, 0.0, -0.5, 0.0,
+    -0.5, 0.5, -0.5, 0.0,
+     0.0, 0.0,  0.0, 1.0
+);
+
+
 vec4 nearestColour(vec4 inColor) {
     return floor(vec4(quant) * inColor + halfvec) * vec4(1.0 / quant);
 }
@@ -40,11 +55,21 @@ vec4 getDitherredDot(vec4 inColor) {
 }
 
 
-void main(void) {
-    // create texture coordinates based on pixelSize //
-    vec4 inColor = v_color * texture2D(u_texture, v_texCoords);
-    vec4 selvec = getDitherredDot(inColor);
+uniform vec4 vibrancy = vec4(1.0);//vec4(1.0, 1.4, 1.2, 1.0);
 
-//    gl_FragColor = inColor * boolean.yyyx + boolean.xxxy;
-    gl_FragColor = selvec * boolean.yyyx + inColor * boolean.xxxy; // use quantised RGB but not the A
+void main(void) {
+    // convert input RGB into YCoCg
+    vec4 incolour = texture2D(u_texture, v_texCoords);
+    vec4 yog = rgb_to_ycocg * incolour; // vec4(Y, Co, Cg, A) where Y,A=[0,1]; Co,Cg=[-1,1]
+
+    // Do colour-grading magic
+    vec4 sgn = sign(yog);
+    vec4 absval = abs(yog);
+    vec4 raised = pow(absval, boolean.yyyy / vibrancy);
+    vec4 newColour = sgn * raised;
+
+    // Dither the output
+    vec4 graded = ycocg_to_rgb * newColour;
+    vec4 selvec = getDitherredDot(graded);
+    gl_FragColor = selvec * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
 }
