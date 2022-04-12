@@ -26,33 +26,20 @@ uniform ivec2 rnd = ivec2(0,0);
 uniform float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 
 vec2 boolean = vec2(0.0, 1.0);
-vec4 halfvec = vec4(0.5);
-
-vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
 mat4 rgb_to_ycocg = mat4(
-0.25,  1.0, -0.5, 0.0,
-0.5,  0.0,  1.0, 0.0,
-0.25, -1.0, -0.5, 0.0,
-0.0,  0.0,  0.0, 1.0
+    0.25,  1.0, -0.5, 0.0,
+    0.5,  0.0,  1.0, 0.0,
+    0.25, -1.0, -0.5, 0.0,
+    0.0,  0.0,  0.0, 1.0
 );
 
 mat4 ycocg_to_rgb = mat4(
-1.0, 1.0,  1.0, 0.0,
-0.5, 0.0, -0.5, 0.0,
--0.5, 0.5, -0.5, 0.0,
-0.0, 0.0,  0.0, 1.0
+     1.0, 1.0,  1.0, 0.0,
+     0.5, 0.0, -0.5, 0.0,
+    -0.5, 0.5, -0.5, 0.0,
+     0.0, 0.0,  0.0, 1.0
 );
-
-
-vec4 nearestColour(vec4 inColor) {
-    return floor(vec4(quant) * inColor + halfvec) * vec4(1.0 / quant);
-}
-
-vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = vec4(texture2D(u_pattern, (gl_FragCoord.xy + rnd) * patternsize) - 0.5);
-    return nearestColour(bayerThreshold * vec4(1.0 / quant) + inColor);
-}
 
 
 uniform vec4 vibrancy = vec4(1.0);//vec4(1.0, 1.4, 1.2, 1.0);

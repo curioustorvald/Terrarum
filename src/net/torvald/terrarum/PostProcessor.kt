@@ -159,7 +159,7 @@ object PostProcessor : Disposable {
         shader.setUniformi("u_texture", 0)
         shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
         shader.setUniformi("u_pattern", 1)
-        shader.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
+        shader.setUniformf("quant", 2f)//shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
         App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
 
 
