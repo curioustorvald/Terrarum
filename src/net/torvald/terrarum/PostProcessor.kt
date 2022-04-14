@@ -17,6 +17,8 @@ import net.torvald.terrarum.ui.Toolkit
 
 /**
  * Must be called by the App Loader
+ *
+ * We recommened most of the user interfaces to be contained within the UI Area which has aspect ratio of 3:2.
  */
 object PostProcessor : Disposable {
 
@@ -45,6 +47,7 @@ object PostProcessor : Disposable {
     private val shaderPostDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/postproc_dither.frag")
     private val shaderPostNoDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/postproc_nodither.frag")
 
+    private val recommendRatio = 1.5f
 
     private val shaderQuant = mapOf(
             8 to 255f,
@@ -159,7 +162,7 @@ object PostProcessor : Disposable {
         shader.setUniformi("u_texture", 0)
         shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
         shader.setUniformi("u_pattern", 1)
-        shader.setUniformf("quant", 2f)//shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
+        shader.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
         App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
 
 
@@ -173,7 +176,8 @@ object PostProcessor : Disposable {
         val tvSafeAreaH = App.scr.tvSafeGraphicsHeight.toFloat()
         val tvSafeArea2W = App.scr.tvSafeActionWidth.toFloat()
         val tvSafeArea2H = App.scr.tvSafeActionHeight.toFloat()
-
+        val uiAreaHeight = App.scr.height - 2 * tvSafeAreaH
+        val uiAreaWidth = uiAreaHeight * recommendRatio
         val scrw = Toolkit.drawWidthf
 
         shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
@@ -198,10 +202,10 @@ object PostProcessor : Disposable {
             // default res ind
             shapeRenderer.color = defaultResCol
             shapeRenderer.rect(
-                    (scrw - TerrarumScreenSize.minimumW).div(2).toFloat(),
-                    (App.scr.height - TerrarumScreenSize.minimumH).div(2).toFloat(),
-                    TerrarumScreenSize.minimumW.toFloat(),
-                    TerrarumScreenSize.minimumH.toFloat()
+                    (scrw - uiAreaWidth).div(2f),
+                    (App.scr.height - uiAreaHeight).div(2f),
+                    uiAreaWidth,
+                    uiAreaHeight
             )
         }
 
@@ -210,14 +214,14 @@ object PostProcessor : Disposable {
                 batch.color = safeAreaCol
                 App.fontSmallNumbers.draw(
                         batch, safeAreaStr,
-                        tvSafeAreaW, tvSafeAreaH - 10
+                        tvSafeAreaW, tvSafeAreaH - 12
                 )
 
                 batch.color = defaultResCol
                 App.fontSmallNumbers.draw(
                         batch, defaultResStr,
-                        (scrw - TerrarumScreenSize.minimumW).div(2).toFloat(),
-                        (App.scr.height - TerrarumScreenSize.minimumH).div(2).toFloat()
+                        (scrw - uiAreaWidth).div(2f),
+                        tvSafeAreaH
                 )
 
                 batch.color = currentResCol
@@ -237,7 +241,7 @@ object PostProcessor : Disposable {
         }
     }
 
-    private val defaultResStr = "${TerrarumScreenSize.minimumW}x${TerrarumScreenSize.minimumH}"
+    private val defaultResStr = "Ingame UI Area"
     private val currentResStr = "${App.scr.width}x${App.scr.height}"
     private val safeAreaStr = "TV Safe Area"
     private val versionStr = "Version ${App.getVERSION_STRING()}"
