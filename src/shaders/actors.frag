@@ -30,4 +30,5 @@ void main() {
     vec4 selvec = vec4(0.0, 0.0, 0.0, (alpha > bayerThreshold) ? 1.0 : 0.0);
 
     gl_FragColor = inColor * boolean.yyyx + selvec;
+    gl_FragColor = inColor;
 }

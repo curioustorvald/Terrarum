@@ -83,6 +83,7 @@ object IngameRenderer : Disposable {
 
     val shaderBlendGlow: ShaderProgram
     val shaderForActors: ShaderProgram
+    val shaderDemultiply: ShaderProgram
 
     private val WIDTH = App.scr.width
     private val HEIGHT = App.scr.height
@@ -121,6 +122,7 @@ object IngameRenderer : Disposable {
 
         shaderForActors = App.loadShaderFromClasspath("shaders/default.vert", "shaders/actors.frag")
         shaderBlendGlow = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlow.frag")
+        shaderDemultiply = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/demultiply.frag")
 
 
         shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
@@ -480,6 +482,7 @@ object IngameRenderer : Disposable {
                 blendNormal(batch)
 
                 // draw world
+                batch.shader = shaderDemultiply
                 batch.draw(fboRGB.colorBufferTexture, 0f, 0f)
                 batch.flush()
 
@@ -870,6 +873,7 @@ object IngameRenderer : Disposable {
 
         shaderBlendGlow.dispose()
         shaderForActors.dispose()
+        shaderDemultiply.dispose()
 
         try { fboRGBexport.dispose() }
         catch (e: GdxRuntimeException) {}
