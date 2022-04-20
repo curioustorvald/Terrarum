@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -83,7 +82,7 @@ object IngameRenderer : Disposable {
     val shaderKawaseUp: ShaderProgram
 
     val shaderBlendGlow: ShaderProgram
-    val shaderAlphaDither: ShaderProgram
+    val shaderForActors: ShaderProgram
 
     private val WIDTH = App.scr.width
     private val HEIGHT = App.scr.height
@@ -120,7 +119,7 @@ object IngameRenderer : Disposable {
         shaderAtoGrey = App.loadShaderFromClasspath("shaders/default.vert", "shaders/aonly.frag")
 
 
-        shaderAlphaDither = App.loadShaderFromClasspath("shaders/default.vert", "shaders/alphadither.frag")
+        shaderForActors = App.loadShaderFromClasspath("shaders/default.vert", "shaders/actors.frag")
         shaderBlendGlow = App.loadShaderFromClasspath("shaders/blendGlow.vert", "shaders/blendGlow.frag")
 
 
@@ -426,28 +425,24 @@ object IngameRenderer : Disposable {
 
         fboRGB.inAction(camera, batch) {
 
-            batch.inUse {
-                batch.shader = shaderAlphaDither
-                batch.color = Color.WHITE
-            }
-
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawWall(batch.projectionMatrix, false)
 
             batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
                 moveCameraToWorldCoord()
                 actorsRenderBehind?.forEach { it.drawBody(batch) }
-            }
-            batch.shader = shaderAlphaDither
-            batch.inUse {
                 particlesContainer?.forEach { it.drawBody(batch) }
             }
 
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawTerrain(batch.projectionMatrix, false)
 
-            batch.shader = shaderAlphaDither
+            batch.shader = shaderForActors
             batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
                 /////////////////
                 // draw actors //
                 /////////////////
@@ -464,6 +459,8 @@ object IngameRenderer : Disposable {
 
             batch.shader = null
             batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
                 FeaturesDrawer.drawEnvOverlay(batch)
             }
         }
@@ -502,6 +499,12 @@ object IngameRenderer : Disposable {
                         lightTex.regionWidth * lightmapDownsample,
                         lightTex.regionHeight * lightmapDownsample
                 )
+
+                // if right texture coord for lightTex and fboRGB are obtainable, you can try this:
+                /*
+                vec4 skyboxColour = ...
+                gl_FragCoord = alphablend skyboxColour with (fboRGB * lightTex)
+                 */
             }
 
 
@@ -529,15 +532,13 @@ object IngameRenderer : Disposable {
 
         fboA.inAction(camera, batch) {
 
-            batch.inUse {
-                batch.shader = shaderAlphaDither
-                batch.color = Color.WHITE
-            }
-
             setCameraPosition(0f, 0f)
             BlocksDrawer.drawWall(batch.projectionMatrix, true)
 
             batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
+
                 moveCameraToWorldCoord()
                 actorsRenderBehind?.forEach { it.drawGlow(batch) }
                 particlesContainer?.forEach { it.drawGlow(batch) }
@@ -569,6 +570,9 @@ object IngameRenderer : Disposable {
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             batch.inUse {
+                batch.shader = null
+                batch.color = Color.WHITE
+
                 // draw world
                 batch.draw(fboA.colorBufferTexture, 0f, 0f)
                 batch.flush()
@@ -604,15 +608,13 @@ object IngameRenderer : Disposable {
     private fun drawOverlayActors(actors: List<ActorWithBody>?) {
         fboRGB_lightMixed.inActionF(camera, batch) {
 
-            batch.inUse {
-                batch.shader = shaderAlphaDither
-                batch.color = Color.WHITE
-            }
-
             setCameraPosition(0f, 0f)
             // BlocksDrawer.renderWhateverGlow_WALL
 
             batch.inUse {
+                batch.shader = shaderForActors
+                batch.color = Color.WHITE
+
                 moveCameraToWorldCoord()
                 actors?.forEach {
                     it.drawBody(batch)
@@ -867,7 +869,7 @@ object IngameRenderer : Disposable {
         shaderKawaseUp.dispose()
 
         shaderBlendGlow.dispose()
-        shaderAlphaDither.dispose()
+        shaderForActors.dispose()
 
         try { fboRGBexport.dispose() }
         catch (e: GdxRuntimeException) {}

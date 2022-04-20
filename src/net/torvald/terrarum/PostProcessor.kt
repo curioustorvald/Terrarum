@@ -153,7 +153,6 @@ object PostProcessor : Disposable {
         else
             shaderPostNoDither
 
-
         App.getCurrentDitherTex().bind(1)
         fbo.colorBufferTexture.bind(0)
 

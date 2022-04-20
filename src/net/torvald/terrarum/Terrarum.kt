@@ -373,14 +373,17 @@ infix fun Color.mulAndAssign(other: Color): Color {
     return this
 }
 
-
+/**
+ * Use demultiplier shader on GL Source (foreground) if source has semitransparency
+ */
 fun blendMul(batch: SpriteBatch) {
-    // will break if the colour image contains semitransparency
     batch.enableBlending()
     batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
-//    batch.setBlendFunctionSeparate(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_DST_ALPHA, GL20.GL_SRC_ALPHA)
 }
 
+/**
+ * Use demultiplier shader on GL Source (foreground) if source has semitransparency
+ */
 fun blendScreen(batch: SpriteBatch) {
     // will break if the colour image contains semitransparency
     batch.enableBlending()
@@ -391,21 +394,13 @@ fun blendDisable(batch: SpriteBatch) {
     batch.disableBlending()
 }
 
+/**
+ * GLSource (foreground) must NOT have alpha premultiplied!
+ */
 fun blendNormal(batch: SpriteBatch) {
     batch.enableBlending()
 //    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA) // for premultiplied textures
     batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA) // for not premultiplied textures
-
-    // ALPHA *MUST BE* PREMULTIPLIED //
-
-    // One way to tell:
-    //  1. Check (RGB) and (A) values.
-    //  2. If there exist a pixel such that max(R,G,B) > (A), then the image is NOT premultiplied.
-    // Easy way:
-    //  Base game (mods/basegame/blocks/terrain.tga.gz) has impure window glass. When looking at the RGB channel only:
-    //      premultipied     if the glass looks very dark.
-    //      not premultipied if the glass looks VERY GREEN.
-
     // helpful links:
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
@@ -431,17 +426,6 @@ fun gdxSetBlendNormal() {
     gdxSetBlend()
 //    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA) // for premultiplied textures
     Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA) // for not premultiplied textures
-
-    // ALPHA *MUST BE* PREMULTIPLIED //
-
-    // One way to tell:
-    //  1. Check (RGB) and (A) values.
-    //  2. If there exist a pixel such that max(R,G,B) > (A), then the image is NOT premultiplied.
-    // Easy way:
-    //  Base game (mods/basegame/blocks/terrain.tga.gz) has impure window glass. When looking at the RGB channel only:
-    //      premultipied     if the glass looks very dark.
-    //      not premultipied if the glass looks VERY GREEN.
-
     // helpful links:
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
