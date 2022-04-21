@@ -1,6 +1,9 @@
 package net.torvald.gdx.graphics
 
+import jdk.incubator.vector.FloatVector
 import net.torvald.unsafe.UnsafeHelper
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 /**
  * Basically just a FloatArray. You may need to re-write the entire code to actually store the Vectors,
@@ -18,7 +21,9 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     private inline fun toAddr(x: Int, y: Int) = 4L * (y * width + x)
 
-    fun isDestroyed() = array.destroyed
+//    fun isDestroyed() = array.destroyed
+
+    private val byteOrder = ByteOrder.nativeOrder()
 
     init {
         zerofill()
@@ -29,152 +34,65 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 1)
     fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 2)
     fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 3)
-    inline fun getVec(x: Int, y: Int) = Cvec(
-            array.getFloat(toAddr(x, y)),
-            array.getFloat(toAddr(x, y) + 1),
-            array.getFloat(toAddr(x, y) + 2),
-            array.getFloat(toAddr(x, y) + 3)
-    )
-    /**
-     * @param channel 0 for R, 1 for G, 2 for B, 3 for A
-     */
-    fun channelGet(x: Int, y: Int, channel: Int) = array.getFloat(toAddr(x, y) + channel)
-
+    inline fun getVec(x: Int, y: Int) = Cvec(getFloatVector(x, y))
+    inline fun getFloatVector(x: Int, y: Int): FloatVector {
+        val offset = toAddr(x, y)
+        val array = floatArrayOf(
+                array.getFloat(offset),
+                array.getFloat(offset + 1),
+                array.getFloat(offset + 2),
+                array.getFloat(offset + 3)
+        )
+        return FloatVector.fromArray(FloatVector.SPECIES_128, array, 0)
+    }
     // setters
-    fun zerofill() = array.fillWith(0)
-    fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
-    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 1, value) }
-    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 2, value) }
-    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 3, value) }
+    fun zerofill() {
+        array.fillWith(0)
+    }
+//    fun setR(x: Int, y: Int, value: Float) { array.putFloat(toAddr(x, y), value) }
+//    fun setG(x: Int, y: Int, value: Float) { array.putFloat(toAddr(x, y) + 1, value) }
+//    fun setB(x: Int, y: Int, value: Float) { array.putFloat(toAddr(x, y) + 2, value) }
+//    fun setA(x: Int, y: Int, value: Float) { array.putFloat(toAddr(x, y) + 3, value) }
     inline fun setVec(x: Int, y: Int, value: Cvec) {
-        array.setFloat(toAddr(x, y), value.r)
-        array.setFloat(toAddr(x, y) + 1, value.g)
-        array.setFloat(toAddr(x, y) + 2, value.b)
-        array.setFloat(toAddr(x, y) + 3, value.a)
+        setFromFloatVector(x, y, value.vec)
     }
-    inline fun setScalar(x: Int, y: Int, value: Float) {
-        array.setFloat(toAddr(x, y), value)
-        array.setFloat(toAddr(x, y) + 1, value)
-        array.setFloat(toAddr(x, y) + 2, value)
-        array.setFloat(toAddr(x, y) + 3, value)
-    }
-    /**
-     * @param channel 0 for R, 1 for G, 2 for B, 3 for A
-     */
-    fun channelSet(x: Int, y: Int, channel: Int, value: Float) {
-        array.setFloat(toAddr(x, y) + channel, value)
+
+    inline fun setFromFloatVector(x: Int, y: Int, value: FloatVector) {
+        val offset = toAddr(x, y)
+        value.toArray().forEachIndexed { index, fl ->
+            array.setFloat(offset + index, fl)
+        }
     }
 
     // operators
     inline fun max(x: Int, y: Int, other: Cvec) {
-        setR(x, y, maxOf(getR(x, y), other.r))
-        setG(x, y, maxOf(getG(x, y), other.g))
-        setB(x, y, maxOf(getB(x, y), other.b))
-        setA(x, y, maxOf(getA(x, y), other.a))
+        setFromFloatVector(x, y, getFloatVector(x, y).max(other.vec))
     }
     inline fun mul(x: Int, y: Int, scalar: Float) {
-        setR(x, y, getR(x, y) * scalar)
-        setG(x, y, getG(x, y) * scalar)
-        setB(x, y, getB(x, y) * scalar)
-        setA(x, y, getA(x, y) * scalar)
+        setFromFloatVector(x, y, getFloatVector(x, y).mul(scalar))
     }
 
-    fun mulAndAssign(x: Int, y: Int, scalar: Float) {
+    /*fun mulAndAssign(x: Int, y: Int, scalar: Float) {
         val addr = toAddr(x, y)
         for (k in 0..3) {
-            array.setFloat(addr + k, (array.getFloat(addr + k) * scalar))
+            array.putFloat(addr + k, (array.getFloat(addr + k) * scalar))
         }
     }
 
     fun forAllMulAssign(scalar: Float) {
         for (i in 0 until TOTAL_SIZE_IN_BYTES / 4) {
-            array.setFloat(i, array.getFloat(i) * scalar)
+            array.putFloat(i, array.getFloat(i) * scalar)
         }
     }
 
     fun forAllMulAssign(vector: Cvec) {
         for (i in 0 until TOTAL_SIZE_IN_BYTES / 4 step 4) {
             for (k in 0 until 4) {
-                array.setFloat(i + 4*k, array.getFloat(i + k) * vector.getElem(k))
+                array.putFloat(i + 4*k, array.getFloat(i + k) * vector.getElem(k))
             }
         }
-    }
+    }*/
 
     fun destroy() = this.array.destroy()
-
-}
-
-
-/**
- * Safe (and slower) version of UnsafeCvecArray utilised to tackle down the SEGFAULT
- */
-internal class TestCvecArr(val width: Int, val height: Int) {
-
-    val TOTAL_SIZE_IN_BYTES = 4 * width * height
-
-    val array = FloatArray(TOTAL_SIZE_IN_BYTES)
-
-    private inline fun toAddr(x: Int, y: Int) = 4 * (y * width + x)
-
-    init {
-        zerofill()
-    }
-
-    // getters
-    fun getR(x: Int, y: Int) = array.get(toAddr(x, y))
-    fun getG(x: Int, y: Int) = array.get(toAddr(x, y) + 1)
-    fun getB(x: Int, y: Int) = array.get(toAddr(x, y) + 2)
-    fun getA(x: Int, y: Int) = array.get(toAddr(x, y) + 3)
-    inline fun getVec(x: Int, y: Int) = Cvec(
-            array.get(toAddr(x, y)),
-            array.get(toAddr(x, y) + 1),
-            array.get(toAddr(x, y) + 2),
-            array.get(toAddr(x, y) + 3)
-    )
-    /**
-     * @param channel 0 for R, 1 for G, 2 for B, 3 for A
-     */
-    fun channelGet(x: Int, y: Int, channel: Int) = array.get(toAddr(x, y) + 1 * channel)
-
-    // setters
-    fun zerofill() = array.fill(0f)
-    fun setR(x: Int, y: Int, value: Float) { array.set(toAddr(x, y), value) }
-    fun setG(x: Int, y: Int, value: Float) { array.set(toAddr(x, y) + 1, value) }
-    fun setB(x: Int, y: Int, value: Float) { array.set(toAddr(x, y) + 2, value) }
-    fun setA(x: Int, y: Int, value: Float) { array.set(toAddr(x, y) + 3, value) }
-    inline fun setVec(x: Int, y: Int, value: Cvec) {
-        array.set(toAddr(x, y), value.r)
-        array.set(toAddr(x, y) + 1, value.g)
-        array.set(toAddr(x, y) + 2, value.b)
-        array.set(toAddr(x, y) + 3, value.a)
-    }
-    inline fun setScalar(x: Int, y: Int, value: Float) {
-        array.set(toAddr(x, y), value)
-        array.set(toAddr(x, y) + 1, value)
-        array.set(toAddr(x, y) + 2, value)
-        array.set(toAddr(x, y) + 3, value)
-    }
-    /**
-     * @param channel 0 for R, 1 for G, 2 for B, 3 for A
-     */
-    fun channelSet(x: Int, y: Int, channel: Int, value: Float) {
-        array.set(toAddr(x, y) + 1 * channel, value)
-    }
-
-    // operators
-    inline fun max(x: Int, y: Int, other: Cvec) {
-        setR(x, y, maxOf(getR(x, y), other.r))
-        setG(x, y, maxOf(getG(x, y), other.g))
-        setB(x, y, maxOf(getB(x, y), other.b))
-        setA(x, y, maxOf(getA(x, y), other.a))
-    }
-    inline fun mul(x: Int, y: Int, scalar: Float) {
-        setR(x, y, getR(x, y) * scalar)
-        setG(x, y, getG(x, y) * scalar)
-        setB(x, y, getB(x, y) * scalar)
-        setA(x, y, getA(x, y) * scalar)
-    }
-
-    fun destroy() = {}
 
 }

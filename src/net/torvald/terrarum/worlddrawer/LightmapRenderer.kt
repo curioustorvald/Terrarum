@@ -3,6 +3,8 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import jdk.incubator.vector.FloatVector
+import jdk.incubator.vector.FloatVector.SPECIES_128
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
@@ -365,10 +367,10 @@ object LightmapRenderer {
                         for (x in lightBoxX.div(TILE_SIZE).floorInt()
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                            val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
+                            val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0f) // if two or more luminous actors share the same block, mix the light
                             val actorLight = colour
 
-                            lanternMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
+                            lanternMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.max(actorLight)
                         }
                     }
                 }
@@ -384,10 +386,10 @@ object LightmapRenderer {
                         for (x in lightBoxX.div(TILE_SIZE).floorInt()
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                            val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
+                            val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0f) // if two or more luminous actors share the same block, mix the light
                             val actorLight = colour
 
-                            shadowMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
+                            shadowMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.max(actorLight)
                         }
                     }
                 }
@@ -433,19 +435,22 @@ object LightmapRenderer {
     }*/
 
     // local variables that are made static
-    private val sunLight = Cvec(0)
+    private val sunLight = Cvec(0f)
     private var _thisTerrain = 0
     private var _thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
     private var _thisWall = 0
-    private val _ambientAccumulator = Cvec(0)
-    private val _reflectanceAccumulator = Cvec(0)
-    private val _thisTileOpacity = Cvec(0)
-    private val _thisTileOpacity2 = Cvec(0) // thisTileOpacity * sqrt(2)
-    private val _fluidAmountToCol = Cvec(0)
-    private val _thisTileLuminosity = Cvec(0)
+    private var _ambientAccumulator = Cvec(0f)
+    private var _reflectanceAccumulator = Cvec(0f)
+    private var _thisTileOpacity = Cvec(0f)
+    private var _thisTileOpacity2 = Cvec(0f) // thisTileOpacity * sqrt(2)
+    private var _fluidAmountToCol = Cvec(0f)
+    private var _thisTileLuminosity = Cvec(0f)
     private var _thisTerrainProp: BlockProp = BlockProp()
     private var _thisWallProp: BlockProp = BlockProp()
     private var _thisFluidProp: BlockProp = BlockProp()
+
+    private val VECTOR_ZERO = Cvec(0f)
+    private val VECTOR_ONE = Cvec(1f)
 
     private fun precalculate(rawx: Int, rawy: Int) {
         val lx = rawx.convX(); val ly = rawy.convY()
@@ -491,9 +496,8 @@ object LightmapRenderer {
 
         if (_thisFluid.type != Fluid.NULL) {
             _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
-
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
-            _thisTileLuminosity.maxAndAssign(_thisFluidProp.getLumCol(worldX, worldY).mul(_fluidAmountToCol))
+            _thisTileLuminosity.max(_thisFluidProp.getLumCol(worldX, worldY).cpy().mul(_fluidAmountToCol))
             _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
             _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.mul(_fluidAmountToCol))
         }
@@ -505,10 +509,11 @@ object LightmapRenderer {
         // blend shade
         _mapThisTileOpacity.max(lx, ly, shadowMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull)
 
-        _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
-        _mapThisTileOpacity2.setG(lx, ly, _mapThisTileOpacity.getG(lx, ly) * 1.41421356f)
-        _mapThisTileOpacity2.setB(lx, ly, _mapThisTileOpacity.getB(lx, ly) * 1.41421356f)
-        _mapThisTileOpacity2.setA(lx, ly, _mapThisTileOpacity.getA(lx, ly) * 1.41421356f)
+//        _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
+//        _mapThisTileOpacity2.setG(lx, ly, _mapThisTileOpacity.getG(lx, ly) * 1.41421356f)
+//        _mapThisTileOpacity2.setB(lx, ly, _mapThisTileOpacity.getB(lx, ly) * 1.41421356f)
+//        _mapThisTileOpacity2.setA(lx, ly, _mapThisTileOpacity.getA(lx, ly) * 1.41421356f)
+        _mapThisTileOpacity2.setFromFloatVector(lx, ly, _mapThisTileOpacity.getFloatVector(lx, ly).mul(1.41421356f))
 
 
         // open air || luminous tile backed by sunlight
@@ -518,7 +523,7 @@ object LightmapRenderer {
         }
 
         // blend lantern
-        _mapLightLevelThis.max(lx, ly, _thisTileLuminosity.maxAndAssign(
+        _mapLightLevelThis.max(lx, ly, _thisTileLuminosity.max(
                 lanternMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull
         ))
     }
@@ -534,17 +539,16 @@ object LightmapRenderer {
 //        }
 
         // blend nearby 4 lights to get intensity
-        _ambientAccumulator.set(0)
-                .maxAndAssign(lightmap.getVec(lx - 1, ly))
-                .maxAndAssign(lightmap.getVec(lx + 1, ly))
-                .maxAndAssign(lightmap.getVec(lx, ly - 1))
-                .maxAndAssign(lightmap.getVec(lx, ly + 1))
+        _ambientAccumulator.set(0f)
+                .max(lightmap.getVec(lx - 1, ly))
+                .max(lightmap.getVec(lx + 1, ly))
+                .max(lightmap.getVec(lx, ly - 1))
+                .max(lightmap.getVec(lx, ly + 1))
 
         _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
         _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain.toLong()]]
 
         _reflectanceAccumulator.set(App.tileMaker.terrainTileColourMap[_thisTerrainProp.id]!!)
-        _reflectanceAccumulator.a = 0f // temporarily disabled
         _reflectanceAccumulator.mul(_thisTerrainProp.reflectance).mul(giScale)
 
         _mapLightLevelThis.max(lx, ly, _reflectanceAccumulator)
@@ -557,26 +561,34 @@ object LightmapRenderer {
     private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
-        _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
-        _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
-        _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
-        _ambientAccumulator.a = _mapLightLevelThis.getA(x, y)
+//        _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
+//        _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
+//        _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
+//        _ambientAccumulator.a = _mapLightLevelThis.getA(x, y)
+
+        _ambientAccumulator = _mapLightLevelThis.getVec(x, y)
 
         if (!swipeDiag) {
-            _thisTileOpacity.r = _mapThisTileOpacity.getR(x, y)
-            _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
-            _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
-            _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
+//            _thisTileOpacity.r = _mapThisTileOpacity.getR(x, y)
+//            _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
+//            _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
+//            _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
+//            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
+            _thisTileOpacity = _mapThisTileOpacity.getVec(x, y)
+            _ambientAccumulator = _ambientAccumulator.max(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
         }
         else {
-            _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
-            _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
-            _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
-            _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
+//            _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
+//            _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
+//            _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
+//            _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
+//            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
+            _thisTileOpacity2 = _mapThisTileOpacity2.getVec(x, y)
+            _ambientAccumulator = _ambientAccumulator.max(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
         }
 
+//        _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
+//        lightmap.setVec(x, y, _ambientAccumulator)
         _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
         lightmap.setVec(x, y, _ambientAccumulator)
     }
@@ -611,9 +623,9 @@ object LightmapRenderer {
 
     var lightBuffer: Pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888) // must not be too small
 
-    private val colourNull = Cvec(0)
+    private val colourNull = Cvec(0f)
     private val gdxColorNull = Color(0)
-    const val epsilon = 1f/1024f
+    val epsilon = FloatVector.broadcast(SPECIES_128, 1f / 1024f)
 
     private var _lightBufferAsTex: Texture = Texture(64, 64, Pixmap.Format.RGBA8888) // must not be too small
 
@@ -647,10 +659,10 @@ object LightmapRenderer {
                     val arrayX = x.convX()
                     val arrayY = y.convY()
 
-                    val red = lightmap.getR(arrayX, arrayY)
-                    val grn = lightmap.getG(arrayX, arrayY)
-                    val blu = lightmap.getB(arrayX, arrayY)
-                    val uvl = lightmap.getA(arrayX, arrayY)
+                    val red = lightmap.getR(arrayX, arrayY).let { if (it.isFinite()) it else 0f }
+                    val grn = lightmap.getG(arrayX, arrayY).let { if (it.isFinite()) it else 0f }
+                    val blu = lightmap.getB(arrayX, arrayY).let { if (it.isFinite()) it else 0f }
+                    val uvl = lightmap.getA(arrayX, arrayY).let { if (it.isFinite()) it else 0f }
                     val redw = (red.sqrt() - 1f) * (7f / 24f)
                     val grnw = (grn.sqrt() - 1f)
                     val bluw = (blu.sqrt() - 1f) * (7f / 72f)
@@ -666,13 +678,21 @@ object LightmapRenderer {
                             0
                         )
                     else
-                        lightBuffer.drawPixel(
+                        /*lightBuffer.drawPixel(
                             x - this_x_start,
                             lightBuffer.height - 1 - y + this_y_start, // flip Y
                                 (maxOf(red,grnw,bluw,uvlwr) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
                                         (maxOf(redw,grn,bluw,uvlwg) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
                                         (maxOf(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
                                         (maxOf(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
+                        )*/
+                        lightBuffer.drawPixel(
+                                x - this_x_start,
+                                lightBuffer.height - 1 - y + this_y_start, // flip Y
+                                (red * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
+                                        (grn * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
+                                        (blu * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
+                                        (uvl * solidMultMagic).hdnorm().times(255f).roundToInt()
                         )
                 }
             }
@@ -720,25 +740,15 @@ object LightmapRenderer {
 
         if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return colourNull
 
-        return Cvec(
+        /*return Cvec(
                 lightmap.getR(x, y) * (1f - darken.r * lightScalingMagic),
                 lightmap.getG(x, y) * (1f - darken.g * lightScalingMagic),
                 lightmap.getB(x, y) * (1f - darken.b * lightScalingMagic),
                 lightmap.getA(x, y) * (1f - darken.a * lightScalingMagic)
-        )
-
-    }
-
-    /** infix is removed to clarify the association direction */
-    private fun Cvec.maxAndAssign(other: Cvec): Cvec {
-        // TODO investigate: if I use assignment instead of set(), it blackens like the vector branch.  --Torvald, 2019-06-07
-        //                   that was because you forgot 'this.r/g/b/a = ' part, bitch. --Torvald, 2019-06-07
-        this.r = if (this.r > other.r) this.r else other.r
-        this.g = if (this.g > other.g) this.g else other.g
-        this.b = if (this.b > other.b) this.b else other.b
-        this.a = if (this.a > other.a) this.a else other.a
-
-        return this
+        )*/
+        return Cvec(lightmap.getFloatVector(x, y).mul(
+                VECTOR_ONE.vec.sub(darken.vec.mul(lightScalingMagic))
+        ))
     }
 
     private fun Float.inv() = 1f / this
@@ -811,10 +821,7 @@ object LightmapRenderer {
 
     inline fun Float.hdnorm() = hdr(this.coerceIn(0f, 1f))
 
-    private fun Cvec.nonZero() = this.r.abs() > epsilon ||
-                                 this.g.abs() > epsilon ||
-                                 this.b.abs() > epsilon ||
-                                 this.a.abs() > epsilon
+    private fun Cvec.nonZero() = epsilon.lt(this.vec.abs()).anyTrue()
 
     val histogram: Histogram
         get() {

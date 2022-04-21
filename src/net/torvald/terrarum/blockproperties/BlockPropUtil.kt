@@ -137,11 +137,6 @@ object BlockPropUtil {
      * @return processed colour
      */
     private fun alterBrightnessUniform(data: Cvec, brighten: Float): Cvec {
-        return Cvec(
-                data.r + brighten,
-                data.g + brighten,
-                data.b + brighten,
-                data.a + brighten
-        )
+        return Cvec(data.vec.add(brighten))
     }
 }

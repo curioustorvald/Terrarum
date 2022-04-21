@@ -4,6 +4,7 @@ module Terrarum {
     requires java.desktop;
     requires java.logging;
     requires jdk.unsupported; // sun.misc.Unsafe
+    requires jdk.incubator.vector;
 
     // kotlin
     requires kotlin.stdlib;

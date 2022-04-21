@@ -18,12 +18,16 @@ package net.torvald.gdx.graphics
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.NumberUtils
+import jdk.incubator.vector.FloatVector
+import jdk.incubator.vector.FloatVector.SPECIES_128
 
 /**
  * A Cvec is kind of a Vector4f made compatible with LibGdx's Color class, with the intention of actually utilising
  * the JEP 338 VectorInstrinsics later, when the damned thing finally releases.
  *
  * Before then, the code will be identical to LibGdx's.
+ *
+ * THIS CLASS MUST NOT BE SERIALISED
  */
 
 /** A color class, holding the r, g, b and alpha component as floats in the range [0,1]. All methods perform clamping on the
@@ -33,11 +37,13 @@ import com.badlogic.gdx.utils.NumberUtils
  */
 class Cvec {
 
+    var vec = FloatVector.broadcast(SPECIES_128, 0f); private set
+
     /** the red, green, blue and alpha components  */
-    var r: Float = 0f
-    var g: Float = 0f
-    var b: Float = 0f
-    var a: Float = 0f
+    val r: Float; get() = vec.lane(0)
+    val g: Float; get() = vec.lane(1)
+    val b: Float; get() = vec.lane(2)
+    val a: Float; get() = vec.lane(3)
 
     /** Constructs a new Cvec with all components set to 0.  */
     constructor() {}
@@ -48,11 +54,16 @@ class Cvec {
         rgba8888ToCvec(this, rgba8888)
     }
 
+    constructor(scalar: Float) {
+        vec = FloatVector.broadcast(SPECIES_128, scalar)
+    }
+
     constructor(color: Color) {
-        this.r = color.r
-        this.g = color.g
-        this.b = color.b
-        this.a = color.a
+        vec = FloatVector.fromArray(SPECIES_128, floatArrayOf(color.r, color.g, color.b, color.a), 0)
+    }
+
+    constructor(vec: FloatVector) {
+        this.vec = vec
     }
 
     /** Constructor, sets the components of the color
@@ -63,10 +74,7 @@ class Cvec {
      * @param a the alpha component
      */
     constructor(r: Float, g: Float, b: Float, a: Float) {
-        this.r = r
-        this.g = g
-        this.b = b
-        this.a = a
+        vec = FloatVector.fromArray(SPECIES_128, floatArrayOf(r, g, b, a), 0)
     }
 
     /** Constructs a new color using the given color
@@ -77,10 +85,10 @@ class Cvec {
         set(color)
     }
 
-    operator fun component1() = r
-    operator fun component2() = g
-    operator fun component3() = b
-    operator fun component4() = a
+//    operator fun component1() = r
+//    operator fun component2() = g
+//    operator fun component3() = b
+//    operator fun component4() = a
 
     /**
      * Get RGBA Element using index, of which:
@@ -89,23 +97,24 @@ class Cvec {
      * - 2: B
      * - 3: A
      */
-    fun getElem(index: Int) = when(index) {
-        0 -> r
-        1 -> g
-        2 -> b
-        3 -> a
-        else -> throw IndexOutOfBoundsException("Invalid index $index")
-    }
+    inline fun getElem(index: Int) = vec.lane(index)
 
     /** Sets this color to the given color.
      *
      * @param color the Cvec
      */
     fun set(color: Cvec): Cvec {
-        this.r = color.r
-        this.g = color.g
-        this.b = color.b
-        this.a = color.a
+        this.vec = color.vec
+        return this
+    }
+
+    fun set(vec: FloatVector): Cvec {
+        this.vec = vec
+        return this
+    }
+
+    fun set(scalar: Float): Cvec {
+        this.vec = FloatVector.broadcast(SPECIES_128, scalar)
         return this
     }
 
@@ -115,10 +124,7 @@ class Cvec {
      * @return this color.
      */
     fun mul(color: Cvec): Cvec {
-        this.r *= color.r
-        this.g *= color.g
-        this.b *= color.b
-        this.a *= color.a
+        this.vec = this.vec.mul(color.vec)
         return this
     }
 
@@ -128,10 +134,7 @@ class Cvec {
      * @return this color
      */
     fun mul(value: Float): Cvec {
-        this.r *= value
-        this.g *= value
-        this.b *= value
-        this.a *= value
+        this.vec = this.vec.mul(value)
         return this
     }
 
@@ -141,10 +144,7 @@ class Cvec {
      * @return this color
      */
     fun add(color: Cvec): Cvec {
-        this.r += color.r
-        this.g += color.g
-        this.b += color.b
-        this.a += color.a
+        this.vec = this.vec.add(color.vec)
         return this
     }
 
@@ -154,10 +154,12 @@ class Cvec {
      * @return this color
      */
     fun sub(color: Cvec): Cvec {
-        this.r -= color.r
-        this.g -= color.g
-        this.b -= color.b
-        this.a -= color.a
+        this.vec = this.vec.sub(color.vec)
+        return this
+    }
+
+    fun max(color: Cvec): Cvec {
+        this.vec = this.vec.max(color.vec)
         return this
     }
 
@@ -171,10 +173,7 @@ class Cvec {
      * @return this Cvec for chaining
      */
     operator fun set(r: Float, g: Float, b: Float, a: Float): Cvec {
-        this.r = r
-        this.g = g
-        this.b = b
-        this.a = a
+        vec = FloatVector.fromArray(SPECIES_128, floatArrayOf(r, g, b, a), 0)
         return this
     }
 
@@ -185,96 +184,6 @@ class Cvec {
      */
     fun set(rgba: Int): Cvec {
         rgba8888ToCvec(this, rgba)
-        return this
-    }
-
-    /** Adds the given color component values to this Cvec's values.
-     *
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     *
-     * @return this Cvec for chaining
-     */
-    fun add(r: Float, g: Float, b: Float, a: Float): Cvec {
-        this.r += r
-        this.g += g
-        this.b += b
-        this.a += a
-        return this
-    }
-
-    /** Subtracts the given values from this Cvec's component values.
-     *
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     *
-     * @return this Cvec for chaining
-     */
-    fun sub(r: Float, g: Float, b: Float, a: Float): Cvec {
-        this.r -= r
-        this.g -= g
-        this.b -= b
-        this.a -= a
-        return this
-    }
-
-    /** Multiplies this Cvec's color components by the given ones.
-     *
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     *
-     * @return this Cvec for chaining
-     */
-    fun mul(r: Float, g: Float, b: Float, a: Float): Cvec {
-        this.r *= r
-        this.g *= g
-        this.b *= b
-        this.a *= a
-        return this
-    }
-
-    /** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
-     * this color.
-     * @param target The target color
-     * @param t The interpolation coefficient
-     * @return This color for chaining.
-     */
-    fun lerp(target: Cvec, t: Float): Cvec {
-        this.r += t * (target.r - this.r)
-        this.g += t * (target.g - this.g)
-        this.b += t * (target.b - this.b)
-        this.a += t * (target.a - this.a)
-        return this
-    }
-
-    /** Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
-     * this color.
-     * @param r The red component of the target color
-     * @param g The green component of the target color
-     * @param b The blue component of the target color
-     * @param a The alpha component of the target color
-     * @param t The interpolation coefficient
-     * @return This color for chaining.
-     */
-    fun lerp(r: Float, g: Float, b: Float, a: Float, t: Float): Cvec {
-        this.r += t * (r - this.r)
-        this.g += t * (g - this.g)
-        this.b += t * (b - this.b)
-        this.a += t * (a - this.a)
-        return this
-    }
-
-    /** Multiplies the RGB values by the alpha.  */
-    fun premultiplyAlpha(): Cvec {
-        r *= a
-        g *= a
-        b *= a
         return this
     }
 
@@ -317,101 +226,7 @@ class Cvec {
             value = "0$value"
         return value
     }
-
-    /** Sets the RGB Cvec components using the specified Hue-Saturation-Value. Note that HSV components are voluntary not clamped
-     * to preserve high range color and can range beyond typical values.
-     * @param h The Hue in degree from 0 to 360
-     * @param s The Saturation from 0 to 1
-     * @param v The Value (brightness) from 0 to 1
-     * @return The modified Cvec for chaining.
-     */
-    fun fromHsv(h: Float, s: Float, v: Float): Cvec {
-        val x = (h / 60f + 6) % 6
-        val i = x.toInt()
-        val f = x - i
-        val p = v * (1 - s)
-        val q = v * (1 - s * f)
-        val t = v * (1 - s * (1 - f))
-        when (i) {
-            0    -> {
-                r = v
-                g = t
-                b = p
-            }
-            1    -> {
-                r = q
-                g = v
-                b = p
-            }
-            2    -> {
-                r = p
-                g = v
-                b = t
-            }
-            3    -> {
-                r = p
-                g = q
-                b = v
-            }
-            4    -> {
-                r = t
-                g = p
-                b = v
-            }
-            else -> {
-                r = v
-                g = p
-                b = q
-            }
-        }
-
-        //return clamp();
-        return this
-    }
-
-    /** Sets RGB components using the specified Hue-Saturation-Value. This is a convenient method for
-     * [.fromHsv]. This is the inverse of [.toHsv].
-     * @param hsv The Hue, Saturation and Value components in that order.
-     * @return The modified Cvec for chaining.
-     */
-    fun fromHsv(hsv: FloatArray): Cvec {
-        return fromHsv(hsv[0], hsv[1], hsv[2])
-    }
-
     fun toGdxColor() = Color(r, g, b, a)
-
-    /** Extract Hue-Saturation-Value. This is the inverse of [.fromHsv].
-     * @param hsv The HSV array to be modified.
-     * @return HSV components for chaining.
-     */
-    fun toHsv(hsv: FloatArray): FloatArray {
-        val max = Math.max(Math.max(r, g), b)
-        val min = Math.min(Math.min(r, g), b)
-        val range = max - min
-        if (range == 0f) {
-            hsv[0] = 0f
-        }
-        else if (max == r) {
-            hsv[0] = (60 * (g - b) / range + 360) % 360
-        }
-        else if (max == g) {
-            hsv[0] = 60 * (b - r) / range + 120
-        }
-        else {
-            hsv[0] = 60 * (r - g) / range + 240
-        }
-
-        if (max > 0) {
-            hsv[1] = 1 - min / max
-        }
-        else {
-            hsv[1] = 0f
-        }
-
-        hsv[2] = max
-
-        return hsv
-    }
 
     /** @return a copy of this color
      */
@@ -474,10 +289,11 @@ class Cvec {
          * @param value An integer color value in RGBA8888 format.
          */
         fun rgba8888ToCvec(color: Cvec, value: Int) {
-            color.r = (value and -0x1000000).ushr(24) / 255f
-            color.g = (value and 0x00ff0000).ushr(16) / 255f
-            color.b = (value and 0x0000ff00).ushr(8) / 255f
-            color.a = (value and 0x000000ff) / 255f
+            val r = (value and -0x1000000).ushr(24) / 255f
+            val g = (value and 0x00ff0000).ushr(16) / 255f
+            val b = (value and 0x0000ff00).ushr(8) / 255f
+            val a = (value and 0x000000ff) / 255f
+            color.vec = FloatVector.fromArray(SPECIES_128, floatArrayOf(r, g, b, a), 0)
         }
 
         /** Sets the Cvec components using the specified integer value in the format ARGB8888. This is the inverse to the argb8888(a,
@@ -487,10 +303,11 @@ class Cvec {
          * @param value An integer color value in ARGB8888 format.
          */
         fun argb8888ToCvec(color: Cvec, value: Int) {
-            color.a = (value and -0x1000000).ushr(24) / 255f
-            color.r = (value and 0x00ff0000).ushr(16) / 255f
-            color.g = (value and 0x0000ff00).ushr(8) / 255f
-            color.b = (value and 0x000000ff) / 255f
+            val a = (value and -0x1000000).ushr(24) / 255f
+            val r = (value and 0x00ff0000).ushr(16) / 255f
+            val g = (value and 0x0000ff00).ushr(8) / 255f
+            val b = (value and 0x000000ff) / 255f
+            color.vec = FloatVector.fromArray(SPECIES_128, floatArrayOf(r, g, b, a), 0)
         }
 
         /** Sets the Cvec components using the specified float value in the format ABGB8888.
@@ -498,10 +315,11 @@ class Cvec {
          */
         fun abgr8888ToCvec(color: Cvec, value: Float) {
             val c = NumberUtils.floatToIntColor(value)
-            color.a = (c and -0x1000000).ushr(24) / 255f
-            color.b = (c and 0x00ff0000).ushr(16) / 255f
-            color.g = (c and 0x0000ff00).ushr(8) / 255f
-            color.r = (c and 0x000000ff) / 255f
+            val a = (c and -0x1000000).ushr(24) / 255f
+            val b = (c and 0x00ff0000).ushr(16) / 255f
+            val g = (c and 0x0000ff00).ushr(8) / 255f
+            val r = (c and 0x000000ff) / 255f
+            color.vec = FloatVector.fromArray(SPECIES_128, floatArrayOf(r, g, b, a), 0)
         }
     }
 }
