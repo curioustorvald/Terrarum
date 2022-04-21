@@ -54,12 +54,12 @@ class BlockProp {
     internal var baseLumColG = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColB = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColA = 0f // base value used to calculate dynamic luminosity
-    internal val baseLumCol = Cvec(0f)
+    internal val baseLumCol = Cvec(0)
     //var lumColR = 0f // memoised value of dynamic luminosity
     //var lumColG = 0f // memoised value of dynamic luminosity
     //var lumColB = 0f // memoised value of dynamic luminosity
     //var lumColA = 0f // memoised value of dynamic luminosity
-    internal val _lumCol = Cvec(0f)
+    internal val _lumCol = Cvec(0)
     // X- and Y-value must be treated properly beforehand! (use GameWorld.coerceXY())
     fun getLumCol(x: Int, y: Int) = if (dynamicLuminosityFunction == 0) {
         baseLumCol

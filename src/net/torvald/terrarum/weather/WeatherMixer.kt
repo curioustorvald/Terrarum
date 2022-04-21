@@ -48,7 +48,7 @@ internal object WeatherMixer : RNGConsumer {
 
     lateinit var mixedWeather: BaseModularWeather
 
-    val globalLightNow = Cvec(0f)
+    val globalLightNow = Cvec(0)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
