@@ -2,8 +2,7 @@
   "basegame:176": { /* A recipe for Wooden Platform */
     "workbench": "", /* Optional workbench TAGS separated by commas (e.g. smelter, saw) */
     "ingredients": [ /* Multiple ingredients denotes alternative recipes */
-      [1, "tag is WOOD"] /* This recipe only requires one Wooden Plank */
-    ],
-    "moq": 2 /* Number of products per unit ingredients */
+      [2, 1, "$WOOD", 1, "$ROCK"] /* This recipe only requires one Wooden Plank */
+    ]
   }
 }

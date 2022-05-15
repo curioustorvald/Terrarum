@@ -1,39 +1,42 @@
 Multiple JSON files can exist under this directory.
 
-### Ingredient Querying Language
+### Workbenches
 
-An ingredient can refer one exact item or items that matches the conditions.
+Some items can only be manufactured on certain workbenches. Every workbench has tags assigned and checked against
+this property.
 
-To specify single exact item:
+Multiple workbenches are separated by commas, and alternative workbenches are separated by semicolons.
 
-    ID IS item@basegame:1
+### Ingredient Querying
 
-To specify using tags:
+Ingredients are defined as list of records. Multiple records denotes multiple alternative recipes, whereas
+entries in a record denote multiple ingredients the recipe requires.
 
-    TAG HASALLOF a_tag,b_tag,c_tag OR TAG IS s_tag
-    TAG IS one_tag
-    TAG HASALLOF a_tag,b_tag
+Example:
 
-The query can have one or more terms. The terms are always either one of:
+```
+"ingredients": [
+    [2, 1, "$WOOD", 1, "$ROCK"],
+    [20, 1, "ITEM_PLATFORM_BUILDING_KIT"]
+]
+```
 
-    TERM  OPERATOR  TERM
-    TAG_LITERAL
+Each entry is interpreted as:
 
-Since "TAG" is a valid term to operate against, said word can frequently appear for complex queries.
+```[moq, count 1, ingredient 1, count 2, ingredient 2, ...]```
 
-#### List of Operators
+- moq: this item combination creates this amount of items.
 
-- IS : Exactly this
-- HASALLOF : Has all of these
-- HASSOMEOF : Has one or more of these
-- HASNONEOF : Has none of these
-- ISNOT : Exactly not this
-- AND : Both left and right terms are truthy
-- OR : One or more hands are truthy
-- , : Creates an array containing two or more words separated by this operator
+For example:
 
-#### List of Predefined Operands
+```[2, 1, "$WOOD", 1, "$ROCK"]```
 
-- TAG : Tags assigned to the blocks or items
-- ID : Item ID
+This line is interpreted as: this item requires 1 tagged-as-wood ingredient and 1 tagged-as-rock ingredient,
+and returns 2 of manufactured items.
 
+```[20, 1, "ITEM_PLATFORM_BUILDING_KIT"]```
+
+This line is interpreted as: this item requires 1 verbatim item "ITEM_PLATFORM_BUILDING_KIT" and returns
+20 of manufactured items.
+
+Therefore, the single record has at least three items and always has odd number of items.
