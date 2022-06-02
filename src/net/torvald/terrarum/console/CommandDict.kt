@@ -27,7 +27,9 @@ object CommandDict {
             "SetLocale",
             "TakeScreenshot",
             "Unpause",
-            "Version"
+            "Version",
+            "SetGR",
+            "GetGR",
     )
 
     init {

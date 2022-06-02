@@ -65,6 +65,8 @@ open class GameWorld() : Disposable {
     /** Creation time for this world, NOT the entire savegame */
     internal var totalPlayTime = 0L // cumulative value for this very world
 
+    val gameRules = KVHashMap() // spawn points, creation/lastplay/totalplaytimes are NOT stored to gameRules
+
     init {
         creationTime = App.getTIME_T()
     }
