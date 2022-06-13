@@ -351,8 +351,8 @@ public class App implements ApplicationListener {
             ShaderProgram.pedantic = false;
 
             scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
-            int width = scr.getWidth();
-            int height = scr.getHeight();
+            int width = (int) Math.round(scr.getWidth() * scr.getMagn());
+            int height = (int) Math.round(scr.getHeight() * scr.getMagn());
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
@@ -719,7 +719,13 @@ public class App implements ApplicationListener {
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int w, int h) {
+
+        double magn = getConfigDouble("screenmagnifying");
+        int width = (int) Math.round(w / magn);
+        int height = (int) Math.round(h / magn);
+
+
         printdbg(this, "Resize called: "+width+","+height);
         printStackTrace(this);
 
@@ -1221,6 +1227,20 @@ public class App implements ApplicationListener {
     public static int getConfigInt(String key) {
         Object cfg = getConfigMaster(key);
         return ((int) cfg);
+    }
+
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * *
+     * @return Config from config set or default config if it does not exist.
+     * *
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    public static double getConfigDouble(String key) {
+        Object cfg = getConfigMaster(key);
+        return (cfg instanceof Integer) ? (((Integer) cfg) * 1.0) : ((double) (cfg));
     }
 
     /**

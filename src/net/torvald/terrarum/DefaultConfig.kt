@@ -105,7 +105,9 @@ object DefaultConfig {
             //"fx_3dlut" to false,
 
             "basekeyboardlayout" to "en_intl_qwerty",
-            "inputmethod" to "none"
+            "inputmethod" to "none",
+
+            "screenmagnifying" to 1.0
 
 
             // settings regarding debugger

@@ -15,12 +15,13 @@ import net.torvald.terrarum.*
 class UIItemSpinner(
         parentUI: UICanvas,
         initialX: Int, initialY: Int,
-        initialValue: Int,
-        val min: Int,
-        val max: Int,
-        val step: Int,
+        initialValue: Number,
+        val min: Number,
+        val max: Number,
+        val step: Number,
         override val width: Int,
-        private val drawBorder: Boolean = true
+        private val drawBorder: Boolean = true,
+        private val numberToTextFunction: (Number) -> String = { "$it" }
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -33,12 +34,12 @@ class UIItemSpinner(
 
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
 
-    var value = initialValue.coerceIn(min, max)
+    var value = initialValue.toDouble().coerceIn(min.toDouble(), max.toDouble()) as Number
     var fboUpdateLatch = true
 
     private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
 
-    var selectionChangeListener: (Int) -> Unit = {}
+    var selectionChangeListener: (Number) -> Unit = {}
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -55,7 +56,7 @@ class UIItemSpinner(
 
         if (!mouseLatched && Terrarum.mouseDown && mouseOnButton in 1..2) {
             mouseLatched = true
-            value = (value + step * ((mouseOnButton * 2) - 3)).coerceIn(min, max)
+            value = (value.toDouble() + step.toDouble() * ((mouseOnButton * 2) - 3)).coerceIn(min.toDouble(), max.toDouble())
             fboUpdateLatch = true
             selectionChangeListener(value)
         }
@@ -72,7 +73,7 @@ class UIItemSpinner(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                val t = "$value"
+                val t = numberToTextFunction(value)
                 val tw = App.fontGame.getWidth(t)
                 App.fontGameFBO.draw(it, t, (fbo.width - tw) / 2, 0)
             } }
@@ -133,9 +134,9 @@ class UIItemSpinner(
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (mouseUp) {
             if (amountX <= -1 || amountY <= -1)
-                value = (value - step).coerceIn(min, max)
+                value = (value.toDouble() - step.toDouble()).coerceIn(min.toDouble(), max.toDouble())
             else if (amountX >= 1 || amountY >= 1)
-                value = (value + step).coerceIn(min, max)
+                value = (value.toDouble() + step.toDouble()).coerceIn(min.toDouble(), max.toDouble())
 
             selectionChangeListener(value)
             fboUpdateLatch = true

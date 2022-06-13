@@ -25,6 +25,7 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
     var aspectRatio: Float = 0f; private set
     var chatWidth: Int = 0; private set
 
+    var magn: Double = 0.0; private set // this value is stored here so that the initial instance would stay, forcing the players to require restart to apply the screen magnifying
 
     val tvSafeGraphicsWidth: Int; get() = Math.round(width * TV_SAFE_GRAPHICS)
     val tvSafeGraphicsHeight: Int; get() = Math.round(height * TV_SAFE_GRAPHICS)
@@ -46,6 +47,8 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
         halfhf = hf / 2f
         aspectRatio = wf / hf
         chatWidth = (width - (width * 0.84375).roundToInt()) and 0x7FFFFFFE
+
+        magn = App.getConfigDouble("screenmagnifying")
     }
 
 }

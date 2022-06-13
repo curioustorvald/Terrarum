@@ -220,16 +220,16 @@ object Terrarum : Disposable {
 
     /** Position of the cursor in the world, rounded */
     val mouseX: Double
-        get() = (WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()).fmod(WorldCamera.worldWidth.toDouble())
+        get() = (WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).times(scr.magn)).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val mouseY: Double
-        get() = (WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble())
+        get() = (WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).times(scr.magn))
     /** Position of the cursor in the world, rounded */
     val oldMouseX: Double
-        get() = (WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()).fmod(WorldCamera.worldWidth.toDouble())
+        get() = (WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).times(scr.magn)).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val oldMouseY: Double
-        get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
+        get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).times(scr.magn)
     /** Position of the cursor in the world, rounded */
     @JvmStatic val mouseTileX: Int
         get() = (mouseX / TILE_SIZE).floorInt()
@@ -243,13 +243,13 @@ object Terrarum : Disposable {
     @JvmStatic val oldMouseTileY: Int
         get() = (oldMouseY / TILE_SIZE).floorInt()
     inline val mouseScreenX: Int
-        get() = Gdx.input.x
+        get() = Gdx.input.x.div(scr.magn).roundToInt()
     inline val mouseScreenY: Int
-        get() = Gdx.input.y
+        get() = Gdx.input.y.div(scr.magn).roundToInt()
     inline val mouseDeltaX: Int
-        get() = Gdx.input.deltaX
+        get() = Gdx.input.deltaX.div(scr.magn).roundToInt()
     inline val mouseDeltaY: Int
-        get() = Gdx.input.deltaY
+        get() = Gdx.input.deltaY.div(scr.magn).roundToInt()
     /** Delta converted as it it was a FPS */
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.deltaTime
