@@ -47,7 +47,13 @@ object JsonFetcher {
 
     }
 
-    fun forEach(map: JsonValue, action: (String, JsonValue) -> Unit) {
+    /**
+     * Iterates [JsonValue] over its siblings.
+     *
+     * @param map JsonValue to iterate over
+     * @param action A `function(`Name of the sibling or a stringified integer if the `map` is an array`, `JsonValue representation of the sibling`)` -> `Unit`
+     */
+    fun forEachSiblings(map: JsonValue, action: (String, JsonValue) -> Unit) {
         var counter = 0
         var entry = map.child
         while (entry != null) {
@@ -56,4 +62,17 @@ object JsonFetcher {
             counter += 1
         }
     }
+
+    fun forEachSiblingsIndexed(map: JsonValue, action: (Int, String, JsonValue) -> Unit) {
+        var counter = 0
+        var entry = map.child
+        while (entry != null) {
+            action(counter, entry.name ?: "$counter", entry)
+            entry = entry.next
+            counter += 1
+        }
+    }
 }
+
+fun JsonValue.forEachSiblings(action: (String, JsonValue) -> Unit) = JsonFetcher.forEachSiblings(this, action)
+fun JsonValue.forEachSiblingsIndexed(action: (Int, String, JsonValue) -> Unit) = JsonFetcher.forEachSiblingsIndexed(this, action)

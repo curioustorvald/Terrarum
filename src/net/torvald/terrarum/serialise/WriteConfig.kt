@@ -31,7 +31,7 @@ object WriteConfig {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): KVHashMap {
                 val map = KVHashMap()
-                JsonFetcher.forEach(jsonData) { key, obj ->
+                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
                     map[key] = json.readValue(null, obj)
                 }
                 return map

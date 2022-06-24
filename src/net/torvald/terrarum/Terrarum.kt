@@ -23,6 +23,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.savegame.ByteArray64Reader
@@ -72,6 +73,7 @@ object Terrarum : Disposable {
     var wireCodex = WireCodex(); internal set
     var materialCodex = MaterialCodex(); internal set
     var factionCodex = FactionCodex(); internal set
+    var craftingCodex = CraftingCodex(); internal set
     var apocryphas = HashMap<String, Any>(); internal set
 
 

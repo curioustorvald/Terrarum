@@ -100,6 +100,11 @@ object PostProcessor : Disposable {
 
             gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
+            fbo.colorBufferTexture.setFilter(
+                    Texture.TextureFilter.Linear,
+                    if (App.scr.magn % 1.0 < 0.0001) Texture.TextureFilter.Nearest else Texture.TextureFilter.Linear
+            )
+
             postShader(projMat, fbo)
 
             // draw things when F keys are on

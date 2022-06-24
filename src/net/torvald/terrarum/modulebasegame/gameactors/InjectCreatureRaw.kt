@@ -27,7 +27,7 @@ object InjectCreatureRaw {
         val jsonObj = JsonFetcher(ModMgr.getFile(module, "creatures/$jsonFileName"))
 
 
-        JsonFetcher.forEach(jsonObj) { key, value -> if (!key.startsWith("_")) {
+        JsonFetcher.forEachSiblings(jsonObj) { key, value -> if (!key.startsWith("_")) {
             val diceRollers = ArrayList<String>()
 
             if (!value.isArray && !value.isObject) {

@@ -8,6 +8,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
@@ -224,7 +225,7 @@ object ModMgr {
 
                                 // check for module-info.java
                                 val moduleInfoPath = cl.getResources("module-info.class").toList().filter { it.toString().contains("$moduleName/$jar!/module-info.class") && it.toString().endsWith("module-info.class")}
-                                if (moduleInfoPath.size == 0) {
+                                if (moduleInfoPath.isEmpty()) {
                                     throw IllegalStateException("module-info not found on $moduleName")
                                 }
 
@@ -441,7 +442,7 @@ object ModMgr {
     }
 
     object GameItemLoader {
-        val itemPath = "items/"
+        const val itemPath = "items/"
 
         init {
             Terrarum.itemCodex = ItemCodex()
@@ -488,7 +489,7 @@ object ModMgr {
     }
 
     object GameLanguageLoader {
-        val langPath = "locales/"
+        const val langPath = "locales/"
 
         @JvmStatic operator fun invoke(module: String) {
             Lang.load(getFile(module, langPath))
@@ -496,7 +497,7 @@ object ModMgr {
     }
 
     object GameMaterialLoader {
-        val matePath = "materials/"
+        const val matePath = "materials/"
 
         init {
             Terrarum.materialCodex = MaterialCodex()
@@ -511,7 +512,7 @@ object ModMgr {
      * A sugar-library for easy texture pack creation
      */
     object GameRetextureLoader {
-        val retexturesPath = "retextures/"
+        const val retexturesPath = "retextures/"
         val retexables = listOf("blocks","wires")
         val altFilePaths = HashMap<String, FileHandle>()
         val retexableCallbacks = HashMap<String, () -> Unit>()
@@ -537,8 +538,8 @@ object ModMgr {
 
                     if (dir.isDirectory && dir.exists()) {
                         dir.listFiles { it: File ->
-                                it?.name?.contains('-') == true
-                        }.forEach {
+                            it.name.contains('-')
+                        }?.forEach {
                             // <other modname>-<hopefully a number>.tga or .png
                             val tokens = it.name.split('-')
                             if (tokens.size > 1) {
@@ -555,6 +556,16 @@ object ModMgr {
 
             printdbg(this, "ALT FILE PATHS")
             altFilePaths.forEach { (k, v) -> printdbg(this, "$k -> $v") }
+        }
+    }
+
+    object GameCraftingRecipeLoader {
+        const val recipePath = "crafting/"
+
+        @JvmStatic operator fun invoke(module: String) {
+            getFile(module, recipePath).listFiles { it: File -> it.name.lowercase().endsWith(".json") }?.forEach { jsonFile ->
+                Terrarum.craftingCodex.addFromJson(JsonFetcher(jsonFile), module)
+            }
         }
     }
 

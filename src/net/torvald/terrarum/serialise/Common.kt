@@ -120,7 +120,7 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashArray<*> {
                 val hashMap = HashArray<Any>()
-                JsonFetcher.forEach(jsonData) { key, obj ->
+                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
                     hashMap[key.toLong()] = json.readValue(null, obj)
                 }
                 return hashMap
@@ -138,7 +138,7 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWirings {
                 val hashMap = HashedWirings()
-                JsonFetcher.forEach(jsonData) { key, obj ->
+                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
                     hashMap[key.toLong()] = json.readValue(GameWorld.WiringNode::class.java, obj)
                 }
                 return hashMap
@@ -156,7 +156,7 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): HashedWiringGraph {
                 val hashMap = HashedWiringGraph()
-                JsonFetcher.forEach(jsonData) { key, obj ->
+                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
                     hashMap[key.toLong()] = json.readValue(WiringGraphMap::class.java, obj)
                 }
                 return hashMap
@@ -174,7 +174,7 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WiringGraphMap {
                 val hashMap = WiringGraphMap()
-                JsonFetcher.forEach(jsonData) { key, obj ->
+                JsonFetcher.forEachSiblings(jsonData) { key, obj ->
                     hashMap[key] = json.readValue(GameWorld.WiringSimCell::class.java, obj)
                 }
                 return hashMap

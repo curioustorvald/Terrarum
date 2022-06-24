@@ -79,10 +79,10 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     /** Position of mouse relative to this item */
     protected val itemRelativeMouseX: Int
-        get() = (Terrarum.mouseScreenX - (parentUI.posX) - this.posX)
+        get() = (Terrarum.mouseScreenX - parentUI.posX - this.posX)
     /** Position of mouse relative to this item */
     protected val itemRelativeMouseY: Int
-        get() = (Terrarum.mouseScreenY - (parentUI.posY) - this.posY)
+        get() = (Terrarum.mouseScreenY - parentUI.posY - this.posY)
 
     /** If mouse is hovering over it */
     open val mouseUp: Boolean

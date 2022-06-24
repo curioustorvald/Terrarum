@@ -87,7 +87,7 @@ object Lang {
          *      "<<STRING ID>>" = "<<LOCALISED TEXT>>"
          */
         //println(json.entrySet())
-        JsonFetcher.forEach(json) { key, value ->
+        JsonFetcher.forEachSiblings(json) { key, value ->
             langpack.put("${key}_$lang", value.asString())
         }
 
@@ -112,7 +112,7 @@ object Lang {
          *             (the array continues)
          *
          */
-        JsonFetcher.forEach(json.get("resources").get("data")) { _, entry ->
+        JsonFetcher.forEachSiblings(json.get("resources").get("data")) { _, entry ->
             langpack.put(
                     "${entry.getString("n")}_$lang",
                     entry.getString("s")
