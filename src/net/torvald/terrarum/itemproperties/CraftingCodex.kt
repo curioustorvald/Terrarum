@@ -10,9 +10,9 @@ import net.torvald.terrarum.utils.forEachSiblingsIndexed
  */
 class CraftingCodex {
 
-    @Transient private val props = HashMap<ItemID, ArrayList<CraftingRecipe>>()
+    @Transient internal val props = HashMap<ItemID, ArrayList<CraftingRecipe>>()
 
-    fun addFromJson(json: JsonValue, moduleName: String) {
+    fun addFromJson(json: JsonValue, moduleName: String, fileName:String) {
 
         if (moduleName.filter { it.code in 33..127 } .length < 5)
             throw IllegalStateException("Invalid module name: ${moduleName}")
@@ -38,8 +38,8 @@ class CraftingCodex {
                 }
 
                 // sanity check
-                if (moq < 1)
-                    throw IllegalStateException("Recipe #${ingredientIndex+1} for item '$itemName' has moq of ${moq}")
+                if (moq !in 1..1000)
+                    throw IllegalStateException("Recipe #${ingredientIndex+1} for item '$itemName' has invalid moq of ${moq}")
                 else if (qtys.size != itemsStr.size)
                     throw IllegalStateException("Mismatched item name and count for recipe #${ingredientIndex+1} for item '$itemName'")
 
@@ -59,7 +59,7 @@ class CraftingCodex {
                             qtys[i]
                     ))
                 }
-                recipes.add(CraftingRecipe(workbenchStr, ingredients.toTypedArray(), moq, moduleName))
+                recipes.add(CraftingRecipe(workbenchStr, ingredients.toTypedArray(), moq, "$moduleName/$fileName"))
             }
 
             // register to the main props

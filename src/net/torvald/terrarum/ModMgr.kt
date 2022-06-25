@@ -564,7 +564,7 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             getFile(module, recipePath).listFiles { it: File -> it.name.lowercase().endsWith(".json") }?.forEach { jsonFile ->
-                Terrarum.craftingCodex.addFromJson(JsonFetcher(jsonFile), module)
+                Terrarum.craftingCodex.addFromJson(JsonFetcher(jsonFile), module, jsonFile.name)
             }
         }
     }

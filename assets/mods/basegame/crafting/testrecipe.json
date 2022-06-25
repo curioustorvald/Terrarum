@@ -4,5 +4,12 @@
     "ingredients": [ /* Multiple ingredients denotes alternative recipes */
       [2, 1, "$WOOD", 1, "$ROCK"] /* This recipe only requires one Wooden Plank */
     ]
+  },
+
+  "basegame:176": { /* alternative recipes can be added like this */
+    "workbench": "SOME_WORKBENCH",
+    "ingredients": [
+      [5, 1, "$ROCKWOOD"]
+    ]
   }
 }

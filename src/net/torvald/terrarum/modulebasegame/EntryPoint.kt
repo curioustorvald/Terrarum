@@ -29,13 +29,13 @@ class EntryPoint : ModuleEntryPoint() {
 
         // load common resources to the AssetsManager
         CommonResourcePool.addToLoadingList("$moduleName.items16") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16, flipY = false)
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16)
         }
         CommonResourcePool.addToLoadingList("$moduleName.items24") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items24.tga"), 24, 24, flipY = false)
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items24.tga"), 24, 24)
         }
         CommonResourcePool.addToLoadingList("$moduleName.items48") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48, flipY = false)
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48)
         }
         CommonResourcePool.loadAll()
 
@@ -45,6 +45,16 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameItemLoader.invoke(moduleName)
         ModMgr.GameBlockLoader.invoke(moduleName)
         ModMgr.GameLanguageLoader.invoke(moduleName)
+        ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
+
+        println("Crafting Recipes: ")
+        Terrarum.craftingCodex.props.forEach { item, recipes ->
+            println("$item ->")
+            recipes.forEach {
+                print("    ")
+                println(it)
+            }
+        }
 
         /////////////////////////////////
         // load customised item loader //

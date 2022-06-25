@@ -41,7 +41,7 @@ object Toolkit : Disposable {
     private lateinit var blurWriteQuad2: Mesh
     private lateinit var blurWriteQuad4: Mesh
 
-    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36, flipY = false)
+    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
 
     val textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
     val textureWhiteCircle = Texture(Gdx.files.internal("assets/graphics/circle_512.tga"))

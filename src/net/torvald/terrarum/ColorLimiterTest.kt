@@ -50,7 +50,7 @@ object ColorLimiterTest : ApplicationAdapter() {
         batch = SpriteBatch()
         shapeRenderer = ShapeRenderer()
 
-        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
+        font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
 
 
         if (!shader4096.isCompiled) {

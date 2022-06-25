@@ -106,7 +106,7 @@ object IME {
         }
 
 
-        val iconSheet = TextureRegionPack("assets/graphics/gui/ime_icons_by_language.tga", 20, 20, flipY = false)
+        val iconSheet = TextureRegionPack("assets/graphics/gui/ime_icons_by_language.tga", 20, 20)
         val iconPixmap = Pixmap(Gdx.files.internal("assets/graphics/gui/ime_icons_by_language.tga"))
         for (k in 0 until iconPixmap.height step 20) {
             val langCode = StringBuilder()

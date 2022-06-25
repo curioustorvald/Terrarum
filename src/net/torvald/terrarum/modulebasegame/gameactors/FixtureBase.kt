@@ -236,7 +236,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         fun getSpritesheet(module: String, path: String, tileW: Int, tileH: Int): TextureRegionPack {
             val id = "$module/${path.replace('\\','/')}"
             return (CommonResourcePool.getOrPut(id) {
-                TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH, flipY = false)
+                TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH)
             } as TextureRegionPack)
         }
     }

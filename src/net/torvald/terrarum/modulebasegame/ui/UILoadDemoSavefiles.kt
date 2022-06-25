@@ -86,7 +86,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
             t.flip(false, false); t
         }
         CommonResourcePool.addToLoadingList("savegame_status_icon") {
-            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24, flipY = false)
+            TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)
         }
         CommonResourcePool.loadAll()
     }

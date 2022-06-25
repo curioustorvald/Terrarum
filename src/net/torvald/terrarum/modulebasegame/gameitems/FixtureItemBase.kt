@@ -101,7 +101,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         fun getItemImageFromSheet(module: String, path: String, tileW: Int, tileH: Int): TextureRegion {
             val id = "$module/${path.replace('\\','/')}"
             return (CommonResourcePool.getOrPut(id) {
-                TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH, flipY = false)
+                TextureRegionPack(ModMgr.getGdxFile(module, path), tileW, tileH)
             } as TextureRegionPack).get(0,0)
         }
 
