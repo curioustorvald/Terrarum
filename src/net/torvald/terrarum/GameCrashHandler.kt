@@ -16,15 +16,60 @@ import javax.swing.*
  */
 class GameCrashHandler(e: Throwable) : JFrame() {
 
-    val textArea = JTextArea()
+    val textArea = JTextPane()
+
+    val htmlSB = StringBuilder()
 
     private val outputStream = object : OutputStream() {
         override fun write(p0: Int) {
-            textArea.append("${p0.toChar()}")
+            htmlSB.appendCodePoint(p0)
         }
     }
 
-    private val printStream = object : PrintStream(outputStream) {}
+    private val css = """
+body {
+    font-size: 12px;
+    font-family: sans-serif;
+    margin: 3px;
+    background-color: #fdfdfd;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #444;
+    margin: 20px 10px 12px 10px;
+}
+
+h4 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+    margin: 0 12px 6px 12px;
+}
+
+li {
+    margin: 0;
+}
+
+p {
+    margin: 3px 12px;
+}
+
+pre {
+    font-faminy: monospaced;
+    color: #801;
+    border: 1px solid #801;
+    border-radius: 3px;
+    padding: 3px 6px;
+}
+    """
+
+    private val printStream = object : PrintStream(outputStream) {
+        override fun println(x: String?) {
+            super.print(x)
+        }
+    }
 
     init {
         val border = JPanel()
@@ -41,9 +86,9 @@ class GameCrashHandler(e: Throwable) : JFrame() {
         border.add(title, BorderLayout.NORTH)
 
 
-        textArea.font = Font("Monospaced", PLAIN, 14)
         textArea.isVisible = true
         textArea.isEditable = false
+        textArea.contentType = "text/html"
         border.add(JScrollPane(textArea), BorderLayout.CENTER)
 
 
@@ -62,38 +107,51 @@ class GameCrashHandler(e: Throwable) : JFrame() {
         val uptime = App.getTIME_T() - App.startupTime
 
         // print out device info
-        printStream.println("== System Info ==")
-        printStream.println("Uptime: ${uptime / 3600}h${(uptime % 3600) / 60}m${uptime % 60}s")
-        printStream.println("Java version: ${System.getProperty("java.version")}")
-        printStream.println("OS Name: ${App.OSName}")
-        printStream.println("OS Version: ${App.OSVersion}")
-        printStream.println("System architecture: ${App.systemArch}")
-        printStream.println("Processor: ${App.processor} x${Runtime.getRuntime().availableProcessors()} (${App.processorVendor})")
+        printStream.println("<h3>System Info</h3>")
+        printStream.println("<ul>")
+        printStream.println("<li>Game name: ${TerrarumAppConfiguration.GAME_NAME}</li>")
+        printStream.println("<li>Engine version: ${App.getVERSION_STRING()}</li>")
+        printStream.println("<li>Java version: ${System.getProperty("java.version")}</li>")
+        printStream.println("<li>Uptime: ${uptime / 3600}h${(uptime % 3600) / 60}m${uptime % 60}s</li>")
+        printStream.println("<li>OS Name: ${App.OSName}</li>")
+        printStream.println("<li>OS Version: ${App.OSVersion}</li>")
+        printStream.println("<li>System architecture: ${App.systemArch}</li>")
+        printStream.println("<li>Processor: ${App.processor} x${Runtime.getRuntime().availableProcessors()} (${App.processorVendor})</li>")
+        printStream.println("</ul>")
 
-        printStream.println()
+        printStream.println("<h3>OpenGL Info</h3>")
+        printStream.println("<ul><li>${Gdx.graphics.glVersion.debugVersionString.replace("\n","</li><li>")}</li></ul>")
 
-        printStream.println("== OpenGL Info ==")
-        printStream.println(Gdx.graphics.glVersion.debugVersionString)
+        printStream.println("<h3>Module Info</h3>")
+        printStream.println("<h4>Load Order</h4>")
+        printStream.println("<ol>${ModMgr.loadOrder.joinToString(separator = "") { "<li>$it</li>" }}</ol>")
+
 
         ModMgr.errorLogs.let {
             if (it.size > 0) {
-                printStream.println()
-                printStream.println("== Module Errors ==")
+                printStream.println("<h4>Module Errors</h4>")
                 System.err.println("== Module Errors ==")
                 it.forEach {
-                    printStream.println("From Module '${it.moduleName}' (${it.type}):")
+                    printStream.println("<p>From Module '<strong>${it.moduleName}</strong>' (${it.type}):</p>")
+                    printStream.println("<pre>")
                     it.cause?.printStackTrace(printStream)
+                    printStream.println("</pre>")
                     it.cause?.printStackTrace(System.err)
                 }
             }
         }
 
-        printStream.println()
-        printStream.println("== The Error Info ==")
+        printStream.println("<h3>The Error Info</h3>")
         System.err.println("== The Error Info ==")
 
+        printStream.println("<pre>")
         e.printStackTrace(printStream)
+        printStream.println("</pre>")
         e.printStackTrace(System.err)
+
+
+
+        textArea.text = "<html><style type=\"text/css\">$css</style><body>$htmlSB</body></html>"
     }
 
 }
