@@ -75,11 +75,25 @@ class GameCrashHandler(e: Throwable) : JFrame() {
         printStream.println("== OpenGL Info ==")
         printStream.println(Gdx.graphics.glVersion.debugVersionString)
 
+        ModMgr.errorLogs.let {
+            if (it.size > 0) {
+                printStream.println()
+                printStream.println("== Module Errors ==")
+                System.err.println("== Module Errors ==")
+                it.forEach {
+                    printStream.println("From Module '${it.moduleName}' (${it.type}):")
+                    it.cause?.printStackTrace(printStream)
+                    it.cause?.printStackTrace(System.err)
+                }
+            }
+        }
+
         printStream.println()
         printStream.println("== The Error Info ==")
+        System.err.println("== The Error Info ==")
 
         e.printStackTrace(printStream)
-        e.printStackTrace()
+        e.printStackTrace(System.err)
     }
 
 }
