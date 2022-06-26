@@ -63,6 +63,15 @@ pre {
     border-radius: 3px;
     padding: 3px 6px;
 }
+
+small {
+    font-size: 9px;
+}
+
+emph {
+    font-style: italic;
+    color: #777;
+}
     """
 
     private val printStream = object : PrintStream(outputStream) {
@@ -70,6 +79,11 @@ pre {
             super.print(x)
         }
     }
+
+    private fun moduleMetaToText(m: ModMgr.ModuleMetadata?) = if (m == null)
+        "<emph>metadata not available or the mod failed to load</emph>"
+    else
+        "author: ${m.author}, version: ${m.version}, release date: ${m.releaseDate}, dependencies: ${m.dependencies.joinToString("/")}"
 
     init {
         val border = JPanel()
@@ -124,7 +138,11 @@ pre {
 
         printStream.println("<h3>Module Info</h3>")
         printStream.println("<h4>Load Order</h4>")
-        printStream.println("<ol>${ModMgr.loadOrder.joinToString(separator = "") { "<li>$it</li>" }}</ol>")
+        printStream.println("<ol>${ModMgr.loadOrder.joinToString(separator = "") { "<li>" +
+                   "$it <small>(" +
+                   "${moduleMetaToText(ModMgr.moduleInfo[it] ?: ModMgr.moduleInfoErrored[it])}" +
+                   ")</small></li>" }
+                }</ol>")
 
 
         ModMgr.errorLogs.let {
