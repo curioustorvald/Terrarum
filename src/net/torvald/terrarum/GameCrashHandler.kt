@@ -58,6 +58,7 @@ p {
 
 pre {
     font-faminy: monospaced;
+    font-size: 11px;
     color: #801;
     border: 1px solid #801;
     border-radius: 3px;
@@ -139,7 +140,7 @@ emph {
         printStream.println("<h3>Module Info</h3>")
         printStream.println("<h4>Load Order</h4>")
         printStream.println("<ol>${ModMgr.loadOrder.joinToString(separator = "") { "<li>" +
-                   "$it <small>(" +
+                   "$it&ensp;<small>(" +
                    "${moduleMetaToText(ModMgr.moduleInfo[it] ?: ModMgr.moduleInfoErrored[it])}" +
                    ")</small></li>" }
                 }</ol>")
@@ -150,7 +151,7 @@ emph {
                 printStream.println("<h4>Module Errors</h4>")
                 System.err.println("== Module Errors ==")
                 it.forEach {
-                    printStream.println("<p>From Module '<strong>${it.moduleName}</strong>' (${it.type}):</p>")
+                    printStream.println("<p>From Module <strong>${it.moduleName}</strong> (${it.type.toHTML()}):</p>")
                     printStream.println("<pre>")
                     it.cause?.printStackTrace(printStream)
                     printStream.println("</pre>")
@@ -170,6 +171,12 @@ emph {
 
 
         textArea.text = "<html><style type=\"text/css\">$css</style><body>$htmlSB</body></html>"
+    }
+
+    private fun ModMgr.LoadErrorType.toHTML() = when(this) {
+        ModMgr.LoadErrorType.YOUR_FAULT -> "caused by the module"
+        ModMgr.LoadErrorType.MY_FAULT -> "caused by the game"
+        ModMgr.LoadErrorType.NOT_EVEN_THERE -> "dependency not satisfied"
     }
 
 }

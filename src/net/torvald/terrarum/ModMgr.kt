@@ -267,7 +267,14 @@ object ModMgr {
                 catch (noSuchModule: FileNotFoundException) {
                     printmsgerr(this, "No such module: $moduleName, skipping...")
 
-                    logError(LoadErrorType.NOT_EVEN_THERE, moduleName)
+                    logError(LoadErrorType.NOT_EVEN_THERE, moduleName, noSuchModule)
+
+                    moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                }
+                catch (noSuchModule2: ModuleDependencyNotSatisfied) {
+                    printmsgerr(this, noSuchModule2.message)
+
+                    logError(LoadErrorType.NOT_EVEN_THERE, moduleName, noSuchModule2)
 
                     moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
                 }
