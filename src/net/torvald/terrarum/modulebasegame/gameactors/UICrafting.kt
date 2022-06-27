@@ -70,6 +70,11 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
 
         // crafting list to the left
+        // TODO This UIItem need to be custom-built version of UIItemInventoryItemGrid, with requirements:
+        // - Takes list of [net.torvald.terrarum.itemproperties.CraftingRecipe] as an "inventory"
+        // - Displays `CraftingRecipe.product` as an "inventory cell"
+        // - When clicked, the cell is activated and displays its `ingredients` to the itemListIngredients
+        // - The clicked status must be recorded and be accessible to this very class
         itemListCraftable = UIItemInventoryItemGrid(
                 this,
                 catBar,

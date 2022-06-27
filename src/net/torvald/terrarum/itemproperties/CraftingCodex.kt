@@ -10,7 +10,7 @@ import net.torvald.terrarum.utils.forEachSiblingsIndexed
  */
 class CraftingCodex {
 
-    @Transient internal val props = HashMap<ItemID, ArrayList<CraftingRecipe>>()
+    @Transient internal val props = HashMap<ItemID, ArrayList<CraftingRecipe>>() // the key ItemID and value.product must be equal
 
     fun addFromJson(json: JsonValue, moduleName: String, fileName:String) {
 
@@ -59,7 +59,7 @@ class CraftingCodex {
                             qtys[i]
                     ))
                 }
-                recipes.add(CraftingRecipe(workbenchStr, ingredients.toTypedArray(), moq, "$moduleName/$fileName"))
+                recipes.add(CraftingRecipe(workbenchStr, ingredients.toTypedArray(), moq, itemName,  "$moduleName/$fileName"))
             }
 
             // register to the main props
@@ -75,27 +75,27 @@ class CraftingCodex {
      * this function is guaranteed to return null.
      */
     fun getRecipesFor(itemID: ItemID): List<CraftingRecipe>? = props[itemID]?.toList()?.let {
-        return if (it.isNotEmpty()) it else null
+        return it.ifEmpty { null }
     }
 
     /**
      * @return list of itemIDs and corresponding recipes
      */
-    fun getRecipesUsingTheseItems(items: List<ItemID>): List<Pair<ItemID, CraftingRecipe>> {
+    fun getRecipesUsingTheseItems(items: List<ItemID>): List<CraftingRecipe> {
         TODO()
     }
 
     /**
      * @return list of itemIDs and corresponding recipes
      */
-    fun getRecipesForIngredients(ingredients: List<Pair<ItemID, Long>>): List<Pair<ItemID, CraftingRecipe>> {
+    fun getRecipesForIngredients(ingredients: List<Pair<ItemID, Long>>): List<CraftingRecipe> {
         TODO()
     }
 
 
 
 
-    data class CraftingRecipe(val workbench: String, val ingredients: Array<CraftingIngredients>, val moq: Long, val addedBy: String)
+    data class CraftingRecipe(val workbench: String, val ingredients: Array<CraftingIngredients>, val moq: Long, val product: ItemID, val addedBy: String)
     data class CraftingIngredients(val key: String, val keyMode: CraftingItemKeyMode, val qty: Long)
     enum class CraftingItemKeyMode { VERBATIM, TAG }
 }

@@ -11,5 +11,12 @@
     "ingredients": [
       [5, 1, "$ROCKWOOD"]
     ]
+  },
+
+  "basegame:161": {
+    "workbench": "",
+    "ingredients": [
+      [4, 1, "$WOOD"]
+    ]
   }
 }
