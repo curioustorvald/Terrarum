@@ -5,6 +5,9 @@ build/*
 .gradle/*
 TerrarumBuild.jar
 buildapp/out/Terrarum*
+buildapp/TerrarumLinux.*
+buildapp/TerrarumMac.*
+buildapp/TerrarumWindows.*
 assets/mods/dwarventech/ModuleComputers.jar
 
 # Java native errors

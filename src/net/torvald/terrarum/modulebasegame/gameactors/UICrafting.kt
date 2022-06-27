@@ -32,11 +32,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     override var openCloseTime: Second = 0.0f
 
     private val itemListPlayer: UIItemInventoryItemGrid
-    private val itemListCraftable: UIItemInventoryItemGrid
+    private val itemListCraftable: UIItemInventoryItemGrid // might be changed to something else
+    private val itemListIngredients: UIItemInventoryItemGrid // this one is definitely not to be changed
     private val buttonCraft: UIItemTextButton
     private val spinnerCraftCount: UIItemSpinner
 
-    private val fakeInventory = FixtureInventory()
+    private val craftables = FixtureInventory() // might be changed to something else
+    private val ingredients = FixtureInventory() // this one is definitely not to be changed
 
     private val negotiator = object : InventoryNegotiator() {
         override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Long) {
@@ -49,7 +51,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     }
 
     override fun getNegotiator() = negotiator
-    override fun getFixtureInventory(): FixtureInventory = fakeInventory
+    override fun getFixtureInventory(): FixtureInventory = craftables
+
     override fun getPlayerInventory(): FixtureInventory = INGAME.actorNowPlaying!!.inventory
 
     private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
@@ -59,6 +62,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     private val thisXend = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 13 - listGap
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
 
+    private val TEXT_GAP = 26
+    private val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
+
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
@@ -67,23 +73,22 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         itemListCraftable = UIItemInventoryItemGrid(
                 this,
                 catBar,
-                { getFixtureInventory() },
+                { craftables },
                 thisOffsetX,
                 thisOffsetY,
-                6, UIInventoryFull.CELLS_VRT - 1, // decrease the internal height so that craft/cancel button would fit in
+                6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
                 drawScrollOnRightside = false,
                 drawWallet = false,
-                keyDownFun = { _, _, _ -> Unit },
+                keyDownFun = { _, _, _ -> },
                 touchDownFun = { gameItem, amount, _ ->
-                    if (gameItem != null) {
-                        negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                    /*if (gameItem != null) {
+                        negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
                     }
-                    itemListUpdate()
+                    itemListUpdate()*/
                 }
         )
-
         buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth)
+        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"${it.toInt()}"})
 
         buttonCraft.touchDownListener = { _,_,_,_ ->
             printdbg(this, "Craft!")
@@ -92,6 +97,26 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         // make grid mode buttons work together
         itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
         itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+
+        // ingredient list
+        itemListIngredients =  UIItemInventoryItemGrid(
+                this,
+                catBar,
+                { ingredients },
+                thisOffsetX,
+                thisOffsetY + LAST_LINE_IN_GRID,
+                6, 1,
+                drawScrollOnRightside = false,
+                drawWallet = false,
+                hideSidebar = true,
+                keyDownFun = { _, _, _ -> },
+                touchDownFun = { _, _, _ -> }
+        )
+
+        // make sure grid buttons for ingredients do nothing (even if they are hidden!)
+        itemListIngredients.gridModeButtons[0].touchDownListener = { _,_,_,_ -> }
+        itemListIngredients.gridModeButtons[1].touchDownListener = { _,_,_,_ -> }
+        itemListIngredients.isCompactMode = true
 
         // player inventory to the right
         itemListPlayer = UIItemInventoryItemGrid(
@@ -103,12 +128,12 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 6, UIInventoryFull.CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
-                keyDownFun = { _, _, _ -> Unit },
+                keyDownFun = { _, _, _ -> },
                 touchDownFun = { gameItem, amount, _ ->
-                    if (gameItem != null) {
+                    /*if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }
-                    itemListUpdate()
+                    itemListUpdate()*/
                 }
         )
         itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
@@ -117,6 +142,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         handler.allowESCtoClose = true
 
         addUIitem(itemListCraftable)
+        addUIitem(itemListIngredients)
         addUIitem(itemListPlayer)
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
@@ -145,6 +171,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     private var encumbrancePerc = 0f
 
     private fun itemListUpdate() {
+        // fill in craftables
+        getFixtureInventory().let {
+            it.itemList.clear()
+            it.itemList.add(InventoryPair("basegame:18", 1))
+        }
+
+        // let itemlists be sorted
         itemListCraftable.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
         encumbrancePerc = getPlayerInventory().let {
@@ -189,8 +222,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         batch.color = Color.WHITE
 
         // text label for two inventory grids
-        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], thisOffsetX + 2, thisOffsetY - 30)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], thisOffsetX + 2, thisOffsetY - TEXT_GAP)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY_INGREDIENTS"], thisOffsetX + 2, thisOffsetY + LAST_LINE_IN_GRID - TEXT_GAP)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - TEXT_GAP)
 
 
         // control hints

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
@@ -42,6 +41,7 @@ class UIItemInventoryItemGrid(
         val verticalCells: Int,
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true,
+        val hideSidebar: Boolean = false,
         keyDownFun: (GameItem?, Long, Int) -> Unit, // Item, Amount, Keycode
         touchDownFun: (GameItem?, Long, Int) -> Unit // Item, Amount, Button
 ) : UIItem(parentUI, initialX, initialY) {
@@ -265,34 +265,36 @@ class UIItemInventoryItemGrid(
 
     init {
         // initially highlight grid mode buttons
-        gridModeButtons[if (isCompactMode) 1 else 0].highlighted = true
+        if (!hideSidebar) {
+            gridModeButtons[if (isCompactMode) 1 else 0].highlighted = true
 
 
-        gridModeButtons[0].touchDownListener = { _, _, _, _ ->
-            isCompactMode = false
-            gridModeButtons[0].highlighted = true
-            gridModeButtons[1].highlighted = false
-            itemPage = 0
-            rebuild(currentFilter)
-        }
-        gridModeButtons[1].touchDownListener = { _, _, _, _ ->
-            isCompactMode = true
-            gridModeButtons[0].highlighted = false
-            gridModeButtons[1].highlighted = true
-            itemPage = 0
-            rebuild(currentFilter)
-        }
+            gridModeButtons[0].touchDownListener = { _, _, _, _ ->
+                isCompactMode = false
+                gridModeButtons[0].highlighted = true
+                gridModeButtons[1].highlighted = false
+                itemPage = 0
+                rebuild(currentFilter)
+            }
+            gridModeButtons[1].touchDownListener = { _, _, _, _ ->
+                isCompactMode = true
+                gridModeButtons[0].highlighted = false
+                gridModeButtons[1].highlighted = true
+                itemPage = 0
+                rebuild(currentFilter)
+            }
 
-        scrollUpButton.clickOnceListener = { _, _, _ ->
-            scrollUpButton.highlighted = false
-            scrollItemPage(-1)
-        }
-        scrollDownButton.clickOnceListener = { _, _, _ ->
-            scrollDownButton.highlighted = false
-            scrollItemPage(1)
-        }
+            scrollUpButton.clickOnceListener = { _, _, _ ->
+                scrollUpButton.highlighted = false
+                scrollItemPage(-1)
+            }
+            scrollDownButton.clickOnceListener = { _, _, _ ->
+                scrollDownButton.highlighted = false
+                scrollItemPage(1)
+            }
 
-        // if (is.mouseUp) handled by this.touchDown()
+            // if (is.mouseUp) handled by this.touchDown()
+        }
     }
 
 
@@ -302,9 +304,11 @@ class UIItemInventoryItemGrid(
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
         itemList.forEach { it.posX += posXDelta }
-        gridModeButtons.forEach { it.posX += posXDelta }
-        scrollUpButton.posX += posXDelta
-        scrollDownButton.posX += posXDelta
+        if (!hideSidebar) {
+            gridModeButtons.forEach { it.posX += posXDelta }
+            scrollUpButton.posX += posXDelta
+            scrollDownButton.posX += posXDelta
+        }
 
 
         fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 10 + upDownButtonGapToDots + 10 * i
@@ -316,9 +320,11 @@ class UIItemInventoryItemGrid(
 
         items.forEach { it.render(batch, camera) }
 
-        gridModeButtons.forEach { it.render(batch, camera) }
-        scrollUpButton.render(batch, camera)
-        scrollDownButton.render(batch, camera)
+        if (!hideSidebar) {
+            gridModeButtons.forEach { it.render(batch, camera) }
+            scrollUpButton.render(batch, camera)
+            scrollDownButton.render(batch, camera)
+        }
 
         // draw scroll dots
         for (i in 0 until itemPageCount) {
@@ -384,10 +390,11 @@ class UIItemInventoryItemGrid(
         }
 
 
-
-        gridModeButtons.forEach { it.update(delta) }
-        scrollUpButton.update(delta)
-        scrollDownButton.update(delta)
+        if (!hideSidebar) {
+            gridModeButtons.forEach { it.update(delta) }
+            scrollUpButton.update(delta)
+            scrollDownButton.update(delta)
+        }
     }
 
 
@@ -482,9 +489,11 @@ class UIItemInventoryItemGrid(
         super.touchDown(screenX, screenY, pointer, button)
 
         items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
-        gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
-        if (scrollUpButton.mouseUp) scrollUpButton.touchDown(screenX, screenY, pointer, button)
-        if (scrollDownButton.mouseUp) scrollDownButton.touchDown(screenX, screenY, pointer, button)
+        if (!hideSidebar) {
+            gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
+            if (scrollUpButton.mouseUp) scrollUpButton.touchDown(screenX, screenY, pointer, button)
+            if (scrollDownButton.mouseUp) scrollDownButton.touchDown(screenX, screenY, pointer, button)
+        }
         return true
     }
 
