@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
@@ -65,43 +67,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     private val TEXT_GAP = 26
     private val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
 
+    private var recipeClicked: CraftingCodex.CraftingRecipe? = null
+
+    private val catAll = arrayOf(CAT_ALL)
+
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
-
-        // crafting list to the left
-        // TODO This UIItem need to be custom-built version of UIItemInventoryItemGrid, with requirements:
-        // - Takes list of [net.torvald.terrarum.itemproperties.CraftingRecipe] as an "inventory"
-        // - Displays `CraftingRecipe.product` as an "inventory cell"
-        // - When clicked, the cell is activated and displays its `ingredients` to the itemListIngredients
-        // - The clicked status must be recorded and be accessible to this very class
-        itemListCraftable = UIItemInventoryItemGrid(
-                this,
-                catBar,
-                { craftables },
-                thisOffsetX,
-                thisOffsetY,
-                6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
-                drawScrollOnRightside = false,
-                drawWallet = false,
-                keyDownFun = { _, _, _ -> },
-                touchDownFun = { gameItem, amount, _ ->
-                    /*if (gameItem != null) {
-                        negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
-                    }
-                    itemListUpdate()*/
-                }
-        )
-        buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"${it.toInt()}"})
-
-        buttonCraft.touchDownListener = { _,_,_,_ ->
-            printdbg(this, "Craft!")
-        }
-
-        // make grid mode buttons work together
-        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-        itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
         // ingredient list
         itemListIngredients =  UIItemInventoryItemGrid(
@@ -114,14 +86,71 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 drawScrollOnRightside = false,
                 drawWallet = false,
                 hideSidebar = true,
-                keyDownFun = { _, _, _ -> },
-                touchDownFun = { _, _, _ -> }
+                keyDownFun = { _, _, _, _ -> },
+                touchDownFun = { _, _, _, _ -> }
         )
 
         // make sure grid buttons for ingredients do nothing (even if they are hidden!)
         itemListIngredients.gridModeButtons[0].touchDownListener = { _,_,_,_ -> }
         itemListIngredients.gridModeButtons[1].touchDownListener = { _,_,_,_ -> }
         itemListIngredients.isCompactMode = true
+
+
+        // crafting list to the left
+        // TODO This UIItem need to be custom-built version of UIItemInventoryItemGrid, with requirements:
+        // - Takes list of [net.torvald.terrarum.itemproperties.CraftingRecipe] as an "inventory"
+        // - Displays `CraftingRecipe.product` as an "inventory cell"
+        // - When clicked, the cell is activated and displays its `ingredients` to the itemListIngredients
+        // - The clicked status must be recorded and be accessible to this very class
+        itemListCraftable = UIItemCraftingCandidateGrid(
+                this,
+                catBar,
+                thisOffsetX,
+                thisOffsetY,
+                6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
+                keyDownFun = { _, _, _, _ -> },
+                touchDownFun = { gameItem, amount, _, recipe0 ->
+                    /*if (gameItem != null) {
+                        negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
+                    }
+                    itemListUpdate()*/
+
+                    val playerInventory = getPlayerInventory()
+
+                    (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
+                        ingredients.clear()
+                        recipeClicked = recipe
+                        printdbg(this, "Recipe selected: $recipe")
+                        recipe.ingredients.forEach { ingredient ->
+                            // TODO item tag support
+                            if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
+                                // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
+                                val selectedItem = playerInventory.itemList.filter { (itm, qty) ->
+                                    ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
+                                }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.tags.contains(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
+
+                                printdbg(this, "Adding ingredients by tag ${selectedItem} (${ingredient.qty})")
+                                ingredients.add(selectedItem, ingredient.qty)
+                            }
+                            else {
+                                printdbg(this, "Adding ingredients by name ${ingredient.key} (${ingredient.qty})")
+                                ingredients.add(ingredient.key, ingredient.qty)
+                            }
+                        }
+                    }
+
+                    itemListIngredients.rebuild(catAll)
+                }
+        )
+        buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"${it.toInt()}"})
+
+        buttonCraft.touchDownListener = { _,_,_,_ ->
+            printdbg(this, "Craft!")
+        }
+        // make grid mode buttons work together
+//        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+//        itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
         // player inventory to the right
         itemListPlayer = UIItemInventoryItemGrid(
@@ -133,16 +162,17 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 6, UIInventoryFull.CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
-                keyDownFun = { _, _, _ -> },
-                touchDownFun = { gameItem, amount, _ ->
+                keyDownFun = { _, _, _, _ -> },
+                touchDownFun = { gameItem, amount, _, _ ->
                     /*if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }
                     itemListUpdate()*/
                 }
         )
-        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+        // make grid mode buttons work together
+//        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+//        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
         handler.allowESCtoClose = true
 
@@ -183,8 +213,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         }
 
         // let itemlists be sorted
-        itemListCraftable.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
-        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListCraftable.rebuild(catAll)
+        itemListPlayer.rebuild(catAll)
         encumbrancePerc = getPlayerInventory().let {
             it.capacity.toFloat() / it.maxCapacity
         }
@@ -195,13 +225,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         itemListCraftable.gridModeButtons[0].highlighted = !yes
         itemListCraftable.gridModeButtons[1].highlighted = yes
         itemListCraftable.itemPage = 0
-        itemListCraftable.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListCraftable.rebuild(catAll)
 
         itemListPlayer.isCompactMode = yes
         itemListPlayer.gridModeButtons[0].highlighted = !yes
         itemListPlayer.gridModeButtons[1].highlighted = yes
         itemListPlayer.itemPage = 0
-        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListPlayer.rebuild(catAll)
 
         itemListUpdate()
     }

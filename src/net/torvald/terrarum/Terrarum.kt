@@ -656,6 +656,8 @@ val MaterialCodex: MaterialCodex
     get() = Terrarum.materialCodex
 val FactionCodex: FactionCodex
     get() = Terrarum.factionCodex
+val CraftingRecipeCodex: CraftingCodex
+    get() = Terrarum.craftingCodex
 val Apocryphas: HashMap<String, Any>
     get() = Terrarum.apocryphas
 

@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderSigrid
 internal object DebugFillInventory : ConsoleCommand {
     override fun execute(args: Array<String>) {
         INGAME.actorNowPlaying?.let {
-            it.inventory.nuke()
+            it.inventory.clear()
             PlayerBuilderSigrid.fillTestInventory(it.inventory)
         }
     }

@@ -2,7 +2,6 @@ package net.torvald.terrarum.gameitems
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
@@ -180,6 +179,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     open var durability: Float = 0f
 
     @Transient var using = false // Always false when loaded from savegame
+
+    var tags = HashSet<String>()
 
     /**
      * Mainly intended to be used by third-party modules

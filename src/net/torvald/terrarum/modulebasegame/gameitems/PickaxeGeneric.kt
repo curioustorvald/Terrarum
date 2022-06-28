@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
@@ -113,7 +112,7 @@ object PickaxeCore {
 class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
     internal constructor() : this("-uninitialised-")
 
-    override val originalName = "PACKAGED_PICK"
+    override val originalName = "COPPER_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var stackable = true
     override var inventoryCategory = Category.TOOL
@@ -129,6 +128,7 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
         super.maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
         super.durability = maxDurability.toFloat()
         super.name = "Copper Pickaxe"
+        super.tags.add("PICK")
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
@@ -141,7 +141,7 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
 class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
     internal constructor() : this("-uninitialised-")
 
-    override val originalName = "PACKAGED_PICK"
+    override val originalName = "IRON_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var stackable = true
     override var inventoryCategory = Category.TOOL
@@ -157,6 +157,7 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
         super.maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
         super.durability = maxDurability.toFloat()
         super.name = "Iron Pickaxe"
+        super.tags.add("PICK")
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
@@ -169,7 +170,7 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
 class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
     internal constructor() : this("-uninitialised-")
 
-    override val originalName = "PACKAGED_PICK"
+    override val originalName = "STEEL_PICK"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
     override var stackable = true
     override var inventoryCategory = Category.TOOL
@@ -185,6 +186,7 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
         super.maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
         super.durability = maxDurability.toFloat()
         super.name = "Steel Pickaxe"
+        super.tags.add("PICK")
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)

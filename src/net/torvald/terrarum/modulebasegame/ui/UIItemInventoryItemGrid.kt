@@ -31,7 +31,7 @@ import kotlin.math.floor
  *
  * Created by minjaesong on 2017-10-21.
  */
-class UIItemInventoryItemGrid(
+open class UIItemInventoryItemGrid(
         parentUI: UICanvas,
         val catBar: UIItemInventoryCatBar,
         var getInventory: () -> FixtureInventory, // when you're going to display List of Craftables, you could implement a Delegator...? Or just build a virtual inventory
@@ -42,8 +42,8 @@ class UIItemInventoryItemGrid(
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true,
         val hideSidebar: Boolean = false,
-        keyDownFun: (GameItem?, Long, Int) -> Unit, // Item, Amount, Keycode
-        touchDownFun: (GameItem?, Long, Int) -> Unit // Item, Amount, Button
+        keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
+        touchDownFun: (GameItem?, Long, Int, Any?) -> Unit // Item, Amount, Button, extra info
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -85,13 +85,13 @@ class UIItemInventoryItemGrid(
             rebuild(currentFilter)
         }
     var itemPageCount = 1 // TODO total size of current category / items.size
-        private set
+        protected set
 
     var inventorySortList = ArrayList<InventoryPair>()
-    private var rebuildList = true
+    protected var rebuildList = true
 
-    private val walletFont = TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
-    private var walletText = ""
+    protected val walletFont = TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
+    protected var walletText = ""
 
 
     companion object {
@@ -101,8 +101,8 @@ class UIItemInventoryItemGrid(
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-        fun createInvCellGenericKeyDownFun(): (GameItem?, Long, Int) -> Unit {
-            return { item: GameItem?, amount: Long, keycode: Int ->
+        fun createInvCellGenericKeyDownFun(): (GameItem?, Long, Int, Any?) -> Unit {
+            return { item: GameItem?, amount: Long, keycode: Int, _ ->
                 if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
                     val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                     if (player != null) {
@@ -131,8 +131,8 @@ class UIItemInventoryItemGrid(
             }
         }
 
-        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int) -> Unit {
-            return { item: GameItem?, amount: Long, button: Int ->
+        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int, Any?) -> Unit {
+            return { item: GameItem?, amount: Long, button: Int, _ ->
                 if (item != null && Terrarum.ingame != null) {
                     // equip da shit
                     val itemEquipSlot = item.equipPosition
@@ -202,7 +202,7 @@ class UIItemInventoryItemGrid(
         )
     }
 
-    private var items: Array<UIItemInventoryCellBase> = itemList
+    protected var items: Array<UIItemInventoryCellBase> = itemList
 
     var isCompactMode = false // this is INIT code
         set(value) {
@@ -324,19 +324,20 @@ class UIItemInventoryItemGrid(
             gridModeButtons.forEach { it.render(batch, camera) }
             scrollUpButton.render(batch, camera)
             scrollDownButton.render(batch, camera)
+
+            // draw scroll dots
+            for (i in 0 until itemPageCount) {
+                val colour = if (i == itemPage) Color.WHITE else Color(0xffffff7f.toInt())
+
+                batch.color = colour
+                batch.draw(
+                        catBar.catIcons.get(if (i == itemPage) 20 else 21, 0),
+                        scrollUpButton.posX.toFloat(),
+                        getScrollDotYHeight(i).toFloat()
+                )
+            }
         }
 
-        // draw scroll dots
-        for (i in 0 until itemPageCount) {
-            val colour = if (i == itemPage) Color.WHITE else Color(0xffffff7f.toInt())
-
-            batch.color = colour
-            batch.draw(
-                    catBar.catIcons.get(if (i == itemPage) 20 else 21, 0),
-                    scrollUpButton.posX.toFloat(),
-                    getScrollDotYHeight(i).toFloat()
-            )
-        }
 
         // draw wallet text
         if (drawWallet) {
@@ -398,7 +399,7 @@ class UIItemInventoryItemGrid(
     }
 
 
-    internal fun rebuild(filter: Array<String>) {
+    open internal fun rebuild(filter: Array<String>) {
         //println("Rebuilt inventory")
         //println("rebuild: actual itempage: $itemPage")
 
@@ -406,7 +407,7 @@ class UIItemInventoryItemGrid(
         //val filter = catIconsMeaning[selectedIcon]
         currentFilter = filter
 
-        inventorySortList = ArrayList<InventoryPair>()
+        inventorySortList.clear()
 
         // filter items
         getInventory().forEach {

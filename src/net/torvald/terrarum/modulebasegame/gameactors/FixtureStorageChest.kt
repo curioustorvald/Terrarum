@@ -121,8 +121,8 @@ internal class UIStorageChest : UICanvas(
                 6, CELLS_VRT,
                 drawScrollOnRightside = false,
                 drawWallet = false,
-                keyDownFun = { _, _, _ -> Unit },
-                touchDownFun = { gameItem, amount, _ ->
+                keyDownFun = { _, _, _, _ -> Unit },
+                touchDownFun = { gameItem, amount, _, _ ->
                     if (gameItem != null) {
                         negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
                     }
@@ -142,8 +142,8 @@ internal class UIStorageChest : UICanvas(
                 6, CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
-                keyDownFun = { _, _, _ -> Unit },
-                touchDownFun = { gameItem, amount, _ ->
+                keyDownFun = { _, _, _, _ -> Unit },
+                touchDownFun = { gameItem, amount, _, _ ->
                     if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }

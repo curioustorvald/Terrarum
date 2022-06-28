@@ -120,8 +120,8 @@ class ActorInventory() : FixtureInventory() {
         }
     }
 
-    override fun nuke() {
-        super.nuke()
+    override fun clear() {
+        super.clear()
         itemEquipped.fill(null)
         quickSlot.fill(null)
     }

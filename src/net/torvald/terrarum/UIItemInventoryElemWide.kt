@@ -28,9 +28,10 @@ class UIItemInventoryElemWide(
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
-        keyDownFun: (GameItem?, Long, Int) -> Unit, // Item, Amount, Keycode
-        touchDownFun: (GameItem?, Long, Int) -> Unit // Item, Amount, Button
-) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun) {
+        keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
+        touchDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Button, extra info
+        extraInfo: Any? = null
+) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo) {
 
     companion object {
         val height = 48

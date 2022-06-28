@@ -213,7 +213,7 @@ open class FixtureInventory() {
         return -(low + 1)  // key not found
     }
 
-    open fun nuke() {
+    open fun clear() {
         itemList.clear()
     }
 }

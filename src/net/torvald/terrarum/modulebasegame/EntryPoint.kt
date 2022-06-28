@@ -101,6 +101,7 @@ class EntryPoint : ModuleEntryPoint() {
 
         init {
             equipPosition = EquipPosition.HAND_GRIP
+            tags.addAll(tile.tags)
         }
 
         override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {

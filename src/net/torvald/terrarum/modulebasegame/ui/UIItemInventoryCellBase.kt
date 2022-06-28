@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.GdxColorMap
-import net.torvald.terrarum.abs
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -27,20 +26,21 @@ abstract class UIItemInventoryCellBase(
         open var itemImage: TextureRegion?,
         open var quickslot: Int? = null,
         open var equippedSlot: Int? = null,
-        val keyDownFun: (GameItem?, Long, Int) -> Unit, // Item, Amount, Keycode
-        val touchDownFun: (GameItem?, Long, Int) -> Unit // Item, Amount, Button
+        val keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
+        val touchDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Button, extra info
+        open var extraInfo: Any?
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(batch: SpriteBatch, camera: Camera)
 
     override fun keyDown(keycode: Int): Boolean {
-        keyDownFun(item, amount, keycode)
+        keyDownFun(item, amount, keycode, extraInfo)
         super.keyDown(keycode)
         return true
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        touchDownFun(item, amount, button)
+        touchDownFun(item, amount, button, extraInfo)
         super.touchDown(screenX, screenY, pointer, button)
         return true
     }
