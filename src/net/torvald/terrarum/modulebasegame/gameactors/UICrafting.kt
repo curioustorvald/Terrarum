@@ -34,7 +34,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     override var openCloseTime: Second = 0.0f
 
     private val itemListPlayer: UIItemInventoryItemGrid
-    private val itemListCraftable: UIItemInventoryItemGrid // might be changed to something else
+    private val itemListCraftable: UIItemCraftingCandidateGrid // might be changed to something else
     private val itemListIngredients: UIItemInventoryItemGrid // this one is definitely not to be changed
     private val buttonCraft: UIItemTextButton
     private val spinnerCraftCount: UIItemSpinner
@@ -86,8 +86,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 drawScrollOnRightside = false,
                 drawWallet = false,
                 hideSidebar = true,
-                keyDownFun = { _, _, _, _ -> },
-                touchDownFun = { _, _, _, _ -> }
+                keyDownFun = { _, _, _, _, _ -> },
+                touchDownFun = { _, _, _, _, _ -> }
         )
 
         // make sure grid buttons for ingredients do nothing (even if they are hidden!)
@@ -108,8 +108,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 thisOffsetX,
                 thisOffsetY,
                 6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
-                keyDownFun = { _, _, _, _ -> },
-                touchDownFun = { gameItem, amount, _, recipe0 ->
+                keyDownFun = { _, _, _, _, _ -> },
+                touchDownFun = { gameItem, amount, _, recipe0, button ->
                     /*if (gameItem != null) {
                         negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
                     }
@@ -120,7 +120,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                     (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
                         ingredients.clear()
                         recipeClicked = recipe
-                        printdbg(this, "Recipe selected: $recipe")
+//                        printdbg(this, "Recipe selected: $recipe")
                         recipe.ingredients.forEach { ingredient ->
                             // TODO item tag support
                             if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
@@ -129,17 +129,18 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                                     ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
                                 }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.tags.contains(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
 
-                                printdbg(this, "Adding ingredients by tag ${selectedItem} (${ingredient.qty})")
+//                                printdbg(this, "Adding ingredients by tag ${selectedItem} (${ingredient.qty})")
                                 ingredients.add(selectedItem, ingredient.qty)
                             }
                             else {
-                                printdbg(this, "Adding ingredients by name ${ingredient.key} (${ingredient.qty})")
+//                                printdbg(this, "Adding ingredients by name ${ingredient.key} (${ingredient.qty})")
                                 ingredients.add(ingredient.key, ingredient.qty)
                             }
                         }
                     }
 
                     itemListIngredients.rebuild(catAll)
+                    highlightCraftingCandidateButton(button)
                 }
         )
         buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
@@ -162,8 +163,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                 6, UIInventoryFull.CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
-                keyDownFun = { _, _, _, _ -> },
-                touchDownFun = { gameItem, amount, _, _ ->
+                keyDownFun = { _, _, _, _, _ -> },
+                touchDownFun = { gameItem, amount, _, _, _ ->
                     /*if (gameItem != null) {
                         negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
                     }
@@ -183,6 +184,10 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         addUIitem(buttonCraft)
     }
 
+    private fun highlightCraftingCandidateButton(button: UIItemInventoryCellBase) { // a proxy function
+        itemListCraftable.highlightButton(button)
+    }
+    
     // reset whatever player has selected to null and bring UI to its initial state
     fun resetUI() {
 

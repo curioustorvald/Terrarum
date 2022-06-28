@@ -42,8 +42,8 @@ open class UIItemInventoryItemGrid(
         val drawScrollOnRightside: Boolean = false,
         val drawWallet: Boolean = true,
         val hideSidebar: Boolean = false,
-        keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
-        touchDownFun: (GameItem?, Long, Int, Any?) -> Unit // Item, Amount, Button, extra info
+        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit // Item, Amount, Button, extra info, self
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -101,8 +101,8 @@ open class UIItemInventoryItemGrid(
         fun getEstimatedW(horizontalCells: Int) = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
         fun getEstimatedH(verticalCells: Int) = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
 
-        fun createInvCellGenericKeyDownFun(): (GameItem?, Long, Int, Any?) -> Unit {
-            return { item: GameItem?, amount: Long, keycode: Int, _ ->
+        fun createInvCellGenericKeyDownFun(): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit {
+            return { item: GameItem?, amount: Long, keycode: Int, _, _ ->
                 if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
                     val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
                     if (player != null) {
@@ -131,8 +131,8 @@ open class UIItemInventoryItemGrid(
             }
         }
 
-        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int, Any?) -> Unit {
-            return { item: GameItem?, amount: Long, button: Int, _ ->
+        fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit {
+            return { item: GameItem?, amount: Long, button: Int, _, _ ->
                 if (item != null && Terrarum.ingame != null) {
                     // equip da shit
                     val itemEquipSlot = item.equipPosition

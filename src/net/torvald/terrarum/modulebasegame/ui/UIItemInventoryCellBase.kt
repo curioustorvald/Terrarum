@@ -26,21 +26,23 @@ abstract class UIItemInventoryCellBase(
         open var itemImage: TextureRegion?,
         open var quickslot: Int? = null,
         open var equippedSlot: Int? = null,
-        val keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
-        val touchDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Button, extra info
+        val keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+        val touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         open var extraInfo: Any?
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(batch: SpriteBatch, camera: Camera)
 
+    var forceHighlighted = false
+
     override fun keyDown(keycode: Int): Boolean {
-        keyDownFun(item, amount, keycode, extraInfo)
+        keyDownFun(item, amount, keycode, extraInfo, this)
         super.keyDown(keycode)
         return true
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        touchDownFun(item, amount, button, extraInfo)
+        touchDownFun(item, amount, button, extraInfo, this)
         super.touchDown(screenX, screenY, pointer, button)
         return true
     }

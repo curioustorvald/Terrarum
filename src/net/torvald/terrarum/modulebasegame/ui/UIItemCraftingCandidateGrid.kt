@@ -16,8 +16,8 @@ class UIItemCraftingCandidateGrid(
         initialX: Int, initialY: Int,
         horizontalCells: Int, verticalCells: Int,
         drawScrollOnRightside: Boolean = false,
-        keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
-        touchDownFun: (GameItem?, Long, Int, Any?) -> Unit // Item, Amount, Button, extra info
+        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, keyed button
+        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit // Item, Amount, Button, extra info, clicked button
 ) : UIItemInventoryItemGrid(
         parentUI, catBar,
         { TODO() /* UNUSED and MUST NOT BE USED! */ },
@@ -36,6 +36,11 @@ class UIItemCraftingCandidateGrid(
     }
 
     internal val recipesSortList = ArrayList<CraftingCodex.CraftingRecipe>() // a dual to the [inventorySortList] which contains the actual recipes instead of crafting recipes
+
+    fun highlightButton(button: UIItemInventoryCellBase) {
+        items.forEach { it.forceHighlighted = false }
+        button.forceHighlighted = true
+    }
 
     override fun rebuild(filter: Array<String>) {
         // test fill craftingRecipes with every possible recipes in the game

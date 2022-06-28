@@ -28,8 +28,8 @@ class UIItemInventoryElemWide(
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true,
-        keyDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Keycode, extra info
-        touchDownFun: (GameItem?, Long, Int, Any?) -> Unit, // Item, Amount, Button, extra info
+        keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
+        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         extraInfo: Any? = null
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo) {
 
@@ -73,7 +73,7 @@ class UIItemInventoryElemWide(
             Toolkit.fillArea(batch, posX, posY, width, height)
         }
         // cell border
-        batch.color = if (equippedSlot != null) Toolkit.Theme.COL_HIGHLIGHT
+        batch.color = if (equippedSlot != null || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
                 else if (mouseUp) Toolkit.Theme.COL_ACTIVE
                 else Toolkit.Theme.COL_INVENTORY_CELL_BORDER
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
@@ -91,7 +91,7 @@ class UIItemInventoryElemWide(
             // if mouse is over, text lights up
             // highlight item name and count (blocks/walls) if the item is equipped
             batch.color = item!!.nameColour mul (
-                    if (equippedSlot != null) Toolkit.Theme.COL_HIGHLIGHT
+                    if (equippedSlot != null || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
                     else if (mouseUp) Toolkit.Theme.COL_ACTIVE
                     else Color.WHITE
             )
