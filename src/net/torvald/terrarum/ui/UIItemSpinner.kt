@@ -1,12 +1,10 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 2021-10-23.
@@ -32,7 +30,9 @@ class UIItemSpinner(
     override val height = 24
     private val buttonW = 30
 
-    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
+    private val fboWidth = width - 2*buttonW - 6
+    private val fboHeight = height - 4
+//    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
 
     var value = initialValue.toDouble().coerceIn(min.toDouble(), max.toDouble()) as Number
     var fboUpdateLatch = true
@@ -63,20 +63,26 @@ class UIItemSpinner(
         else if (!Terrarum.mouseDown) mouseLatched = false
     }
 
+    private var textCache = ""
+    private var textCacheLen = 0
+
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         batch.end()
 
         if (fboUpdateLatch) {
+//            printdbg(this, "FBO Latched")
             fboUpdateLatch = false
-            fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
+            textCache = numberToTextFunction(value)
+            textCacheLen = App.fontGame.getWidth(textCache)
+            /*fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
                 val t = numberToTextFunction(value)
                 val tw = App.fontGame.getWidth(t)
                 App.fontGameFBO.draw(it, t, (fbo.width - tw) / 2, 0)
-            } }
+            } }*/
         }
 
         batch.begin()
@@ -125,8 +131,8 @@ class UIItemSpinner(
 
         // draw text
         batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
-        batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
-
+//        batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
+        App.fontGame.draw(batch, textCache, posX + buttonW + 3f + (fboWidth - textCacheLen).div(2), posY + 2f)
 
         super.render(batch, camera)
     }
@@ -148,6 +154,6 @@ class UIItemSpinner(
     }
 
     override fun dispose() {
-        fbo.dispose()
+//        fbo.dispose()
     }
 }

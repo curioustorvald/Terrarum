@@ -1226,6 +1226,13 @@ public class App implements ApplicationListener {
      */
     public static int getConfigInt(String key) {
         Object cfg = getConfigMaster(key);
+
+        if (cfg instanceof Integer) return ((int) cfg);
+
+        double value = (double) cfg;
+
+        if (Math.abs(value % 1.0) < 0.00000001)
+            return (int) Math.round(value);
         return ((int) cfg);
     }
 

@@ -135,7 +135,13 @@ emph {
         printStream.println("</ul>")
 
         printStream.println("<h3>OpenGL Info</h3>")
-        printStream.println("<ul><li>${Gdx.graphics.glVersion.debugVersionString.replace("\n","</li><li>")}</li></ul>")
+
+        try {
+            printStream.println("<ul><li>${Gdx.graphics.glVersion.debugVersionString.replace("\n", "</li><li>")}</li></ul>")
+        }
+        catch (e: NullPointerException) {
+            printStream.println("<p><emph>GL not initialised</emph></p>")
+        }
 
         printStream.println("<h3>Module Info</h3>")
         printStream.println("<h4>Load Order</h4>")

@@ -74,7 +74,7 @@ class UIItemInventoryElemWide(
         }
         // cell border
         batch.color = if (equippedSlot != null || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
-                else if (mouseUp) Toolkit.Theme.COL_ACTIVE
+                else if (mouseUp && item != null) Toolkit.Theme.COL_ACTIVE
                 else Toolkit.Theme.COL_INVENTORY_CELL_BORDER
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 
@@ -92,7 +92,7 @@ class UIItemInventoryElemWide(
             // highlight item name and count (blocks/walls) if the item is equipped
             batch.color = item!!.nameColour mul (
                     if (equippedSlot != null || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
-                    else if (mouseUp) Toolkit.Theme.COL_ACTIVE
+                    else if (mouseUp && item != null) Toolkit.Theme.COL_ACTIVE
                     else Color.WHITE
             )
 

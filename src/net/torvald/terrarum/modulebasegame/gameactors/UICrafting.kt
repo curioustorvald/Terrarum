@@ -21,10 +21,7 @@ import net.torvald.terrarum.ui.UIItemTextButton
  *
  * Created by minjaesong on 2022-03-10.
  */
-class UICrafting(val full: UIInventoryFull) : UICanvas(
-        toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
-        toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
-), HasInventory {
+class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private val catBar: UIItemInventoryCatBar
         get() = full.catBar
@@ -115,9 +112,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                     }
                     itemListUpdate()*/
 
-                    val playerInventory = getPlayerInventory()
 
                     (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
+                        val playerInventory = getPlayerInventory()
                         ingredients.clear()
                         recipeClicked = recipe
 //                        printdbg(this, "Recipe selected: $recipe")
@@ -137,17 +134,17 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
                                 ingredients.add(ingredient.key, ingredient.qty)
                             }
                         }
-                    }
 
-                    itemListIngredients.rebuild(catAll)
-                    highlightCraftingCandidateButton(button)
+                        itemListIngredients.rebuild(catAll)
+                        highlightCraftingCandidateButton(button)
+                    }
                 }
         )
         buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"${it.toInt()}"})
+        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
 
         buttonCraft.touchDownListener = { _,_,_,_ ->
-            printdbg(this, "Craft!")
+            printdbg(this, "Recipe to go: ${recipeClicked}")
         }
         // make grid mode buttons work together
 //        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
@@ -184,13 +181,20 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
         addUIitem(buttonCraft)
     }
 
-    private fun highlightCraftingCandidateButton(button: UIItemInventoryCellBase) { // a proxy function
+    private fun highlightCraftingCandidateButton(button: UIItemInventoryCellBase?) { // a proxy function
         itemListCraftable.highlightButton(button)
     }
     
     // reset whatever player has selected to null and bring UI to its initial state
     fun resetUI() {
-
+        // reset spinner
+        spinnerCraftCount.value = 1
+        spinnerCraftCount.fboUpdateLatch = true
+        // reset selected recipe status
+        recipeClicked = null
+        highlightCraftingCandidateButton(null)
+        ingredients.clear()
+        itemListIngredients.rebuild(catAll)
     }
 
     private var openingClickLatched = false
@@ -201,8 +205,14 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
 
         openingClickLatched = Terrarum.mouseDown
 
-        spinnerCraftCount.value = 1
+        // reset spinner
+        /*spinnerCraftCount.value = 1
         spinnerCraftCount.fboUpdateLatch = true
+        // reset selected recipe status
+        recipeClicked = null
+        highlightCraftingCandidateButton(null)
+        ingredients.clear()
+        itemListIngredients.rebuild(catAll)*/
 
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
@@ -319,23 +329,22 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(
     }
 
     override fun doOpening(delta: Float) {
-//        INGAME.pause()
+        resetUI()
+
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
-//        INGAME.resume()
         INGAME.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
-
-        spinnerCraftCount.value = 1 // hide() is required as show() is not called unless the parent's panel number has changed (?)
-        spinnerCraftCount.fboUpdateLatch = true
-
+        resetUI()
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
