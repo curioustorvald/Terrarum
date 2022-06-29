@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.gamepadLabelLEFTRIGHT
+import net.torvald.terrarum.App.gamepadLabelStart
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -14,6 +16,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemSpinner
 import net.torvald.terrarum.ui.UIItemTextButton
+import net.torvald.unicode.getKeycapPC
 
 /**
  * This UI has inventory, but it's just there to display all craftable items and should not be serialised.
@@ -66,6 +69,14 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private var recipeClicked: CraftingCodex.CraftingRecipe? = null
 
     private val catAll = arrayOf(CAT_ALL)
+
+    private val controlHelp: String
+        get() = if (App.environment == RunningEnvironment.PC)
+            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+        else
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}\u3000" +
+            "$gamepadLabelLEFTRIGHT ${Lang["GAME_OBJECTIVE_MULTIPLIER"]}\u3000" +
+            "${App.gamepadLabelWest} ${Lang["GAME_ACTION_CRAFT"]}"
 
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
@@ -289,7 +300,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         // control hints
         val controlHintXPos = thisOffsetX.toFloat()
         blendNormal(batch)
-        App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)
+        App.fontGame.draw(batch, controlHelp, controlHintXPos, full.yEnd - 20)
 
         
 
