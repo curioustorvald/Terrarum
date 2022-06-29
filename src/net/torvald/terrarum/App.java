@@ -360,10 +360,12 @@ public class App implements ApplicationListener {
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
             appConfig.setWindowedMode(width, height);
-            int fps = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
-            if (fps <= 0) fps = GLOBAL_FRAMERATE_LIMIT;
-            appConfig.setIdleFPS(fps);
-            appConfig.setForegroundFPS(fps);
+            int fpsActive = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
+            if (fpsActive <= 0) fpsActive = GLOBAL_FRAMERATE_LIMIT;
+            int fpsBack = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfpsidle"));
+            if (fpsBack <= 0) fpsBack = GLOBAL_FRAMERATE_LIMIT;
+            appConfig.setIdleFPS(fpsBack);
+            appConfig.setForegroundFPS(fpsActive);
             appConfig.setTitle(GAME_NAME);
             //appConfig.forceExit = true; // it seems KDE 5 likes this one better...
             // (Plasma freezes upon app exit. with forceExit = true, it's only frozen for a minute; with forceExit = false, it's indefinite)
