@@ -177,8 +177,10 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                     player.remove(itm, qty * mult)
                 }
                 player.add(recipe.product, recipe.moq * mult)
+
+                // reset selection status after a crafting to hide the possible artefact where no-longer-craftable items are still displayed due to ingredient depletion
+                resetUI()
                 itemListPlayer.rebuild(catAll)
-                itemListIngredients.rebuild(catAll)
                 itemListCraftable.rebuild(catAll)
             } }
         }
