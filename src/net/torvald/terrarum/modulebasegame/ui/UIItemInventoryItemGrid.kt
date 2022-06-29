@@ -50,6 +50,8 @@ open class UIItemInventoryItemGrid(
     //override var oldPosX = posX
     //override var oldPosY = posY
 
+    var numberMultiplier = 1L
+
     private val hash = System.nanoTime()
 
     override val width  = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
@@ -425,7 +427,7 @@ open class UIItemInventoryItemGrid(
             try {
                 val sortListItem = inventorySortList[k + itemPage * items.size]
                 items[k].item = ItemCodex[sortListItem.itm]
-                items[k].amount = sortListItem.qty
+                items[k].amount = sortListItem.qty * numberMultiplier
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.itm)
 
                 // set quickslot number

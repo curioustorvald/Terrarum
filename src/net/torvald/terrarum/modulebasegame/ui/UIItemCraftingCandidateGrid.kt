@@ -32,8 +32,6 @@ class UIItemCraftingCandidateGrid(
 
     val craftingRecipes = ArrayList<CraftingCodex.CraftingRecipe>()
 
-    init {
-    }
 
     internal val recipesSortList = ArrayList<CraftingCodex.CraftingRecipe>() // a dual to the [inventorySortList] which contains the actual recipes instead of crafting recipes
 
@@ -61,7 +59,7 @@ class UIItemCraftingCandidateGrid(
             try {
                 val sortListItem = recipesSortList[k + itemPage * items.size]
                 items[k].item = ItemCodex[sortListItem.product]
-                items[k].amount = sortListItem.moq
+                items[k].amount = sortListItem.moq * numberMultiplier
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.product)
                 items[k].extraInfo = sortListItem
 

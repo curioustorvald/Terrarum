@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -142,13 +141,12 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         )
         buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
         spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
-
-        buttonCraft.touchDownListener = { _,_,_,_ ->
-            printdbg(this, "Recipe to go: ${recipeClicked}")
+        spinnerCraftCount.selectionChangeListener = {
+            itemListIngredients.numberMultiplier = it.toLong()
+            itemListIngredients.rebuild(catAll)
+            itemListCraftable.numberMultiplier = it.toLong()
+            itemListCraftable.rebuild(catAll)
         }
-        // make grid mode buttons work together
-//        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-//        itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
         // player inventory to the right
         itemListPlayer = UIItemInventoryItemGrid(
@@ -172,6 +170,22 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 //        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
 //        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
+        buttonCraft.touchDownListener = { _,_,_,_ ->
+            getPlayerInventory().let { player -> recipeClicked?.let { recipe ->
+                val mult = spinnerCraftCount.value.toLong()
+                itemListIngredients.getInventory().itemList.forEach { (itm, qty) ->
+                    player.remove(itm, qty * mult)
+                }
+                player.add(recipe.product, recipe.moq * mult)
+                itemListPlayer.rebuild(catAll)
+                itemListIngredients.rebuild(catAll)
+                itemListCraftable.rebuild(catAll)
+            } }
+        }
+        // make grid mode buttons work together
+//        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
+//        itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+
         handler.allowESCtoClose = true
 
         addUIitem(itemListCraftable)
@@ -190,6 +204,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         // reset spinner
         spinnerCraftCount.value = 1
         spinnerCraftCount.fboUpdateLatch = true
+        itemListIngredients.numberMultiplier = 1L
+        itemListCraftable.numberMultiplier = 1L
         // reset selected recipe status
         recipeClicked = null
         highlightCraftingCandidateButton(null)
@@ -204,15 +220,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         itemListUpdate()
 
         openingClickLatched = Terrarum.mouseDown
-
-        // reset spinner
-        /*spinnerCraftCount.value = 1
-        spinnerCraftCount.fboUpdateLatch = true
-        // reset selected recipe status
-        recipeClicked = null
-        highlightCraftingCandidateButton(null)
-        ingredients.clear()
-        itemListIngredients.rebuild(catAll)*/
 
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
