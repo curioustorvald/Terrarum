@@ -12,8 +12,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.UICrafting
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
-import net.torvald.unicode.ENDASH
-import net.torvald.unicode.getKeycapPC
+import net.torvald.unicode.*
 
 /**
  * Created by minjaesong on 2017-10-21.
@@ -117,8 +116,8 @@ class UIInventoryFull(
     val listControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
             "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
-            "${0xe011.toChar()}$ENDASH${0x2009.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "$KEYCAP_LEFT_MOUSE ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "$KEYCAP_1$ENDASH\u2009$KEYCAP_0 ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${getKeycapPC(App.getConfigInt("control_key_discard"))} ${Lang["GAME_INVENTORY_DROP"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
@@ -129,15 +128,15 @@ class UIInventoryFull(
             "$gamepadLabelEast ${Lang["GAME_INVENTORY_DROP"]}"
     val minimapControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${0xe006.toChar()}${0xe009.toChar()} ${Lang["GAME_ACTION_MOVE_VERB"]}"
+            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "$KEYCAP_LEFT_MOUSE$KEYCAP_MOVE ${Lang["GAME_ACTION_MOVE_VERB"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelRStick ${Lang["GAME_ACTION_MOVE_VERB"]}$SP" +
             "$gamepadLabelRT ${Lang["GAME_INVENTORY"]}"
     val gameMenuControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"

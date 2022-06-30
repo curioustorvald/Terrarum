@@ -75,8 +75,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         get() = if (App.environment == RunningEnvironment.PC)
             "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}\u3000" +
-            "$gamepadLabelLEFTRIGHT ${Lang["GAME_OBJECTIVE_MULTIPLIER"]}\u3000" +
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}\u3000 " +
+            "$gamepadLabelLEFTRIGHT ${Lang["GAME_OBJECTIVE_MULTIPLIER"]}\u3000 " +
             "${App.gamepadLabelWest} ${Lang["GAME_ACTION_CRAFT"]}"
 
     private val oldSelectedItems = ArrayList<ItemID>()

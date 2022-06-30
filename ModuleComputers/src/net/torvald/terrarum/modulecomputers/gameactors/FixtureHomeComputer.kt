@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.BlockBox
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
@@ -21,8 +22,8 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.tsvm.*
 import net.torvald.tsvm.peripheral.AdapterConfig
 import net.torvald.tsvm.peripheral.GraphicsAdapter
-import net.torvald.tsvm.peripheral.ReferenceGraphicsAdapter
 import net.torvald.tsvm.peripheral.VMProgramRom
+import net.torvald.unicode.*
 
 /**
  * Created by minjaesong on 2021-12-04.
@@ -160,6 +161,12 @@ internal class UIHomeComputer : UICanvas(
 
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
 
+    private val controlHelp =
+            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}\u3000 " +
+            "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_T$KEYCAP_R Terminate\u3000" +
+            "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_R$KEYCAP_S Reset\u3000" +
+            "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_R$KEYCAP_Q SysRq"
+
     override fun updateUI(delta: Float) {
     }
 
@@ -185,6 +192,8 @@ internal class UIHomeComputer : UICanvas(
         otherBatch.draw(fbo.colorBufferTexture, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         otherBatch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(otherBatch, posX - 1, posY - 1, width + 2, height + 2)
+
+        App.fontGame.draw(otherBatch, controlHelp, posX, posY + height + 4)
     }
 
     override fun doOpening(delta: Float) {
