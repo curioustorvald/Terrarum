@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
@@ -319,8 +320,11 @@ open class UIItemInventoryItemGrid(
         scrollDownButton.posY = getScrollDotYHeight(itemPageCount) + upDownButtonGapToDots
 
 
-
-        items.forEach { it.render(batch, camera) }
+        // define each button's highlighted status from the list of forceHighlighted, then render the button
+        items.forEach {
+            it.forceHighlighted = forceHighlightList.contains(it.item?.dynamicID)
+            it.render(batch, camera)
+        }
 
         if (!hideSidebar) {
             gridModeButtons.forEach { it.render(batch, camera) }
@@ -400,6 +404,25 @@ open class UIItemInventoryItemGrid(
         }
     }
 
+    private val forceHighlightList = HashSet<ItemID>()
+
+    /**
+     * Call before rebuild()
+     */
+    open internal fun clearForceHighlightList() {
+        forceHighlightList.clear()
+    }
+
+    /**
+     * Call before rebuild()
+     */
+    open internal fun addToForceHighlightList(items: List<ItemID>) {
+        forceHighlightList.addAll(items)
+    }
+
+    open internal fun removeFromForceHighlightList(items: List<ItemID>) {
+        forceHighlightList.removeAll(items)
+    }
 
     open internal fun rebuild(filter: Array<String>) {
         //println("Rebuilt inventory")
@@ -421,14 +444,17 @@ open class UIItemInventoryItemGrid(
         // test sort by name
         inventorySortList.sortBy { ItemCodex[it.itm]!!.name }
 
+//        items.forEach { it.forceHighlighted = false }
+
         // map sortList to item list
         for (k in items.indices) {
+            val item = items[k]
             // we have an item
             try {
                 val sortListItem = inventorySortList[k + itemPage * items.size]
-                items[k].item = ItemCodex[sortListItem.itm]
-                items[k].amount = sortListItem.qty * numberMultiplier
-                items[k].itemImage = ItemCodex.getItemImage(sortListItem.itm)
+                item.item = ItemCodex[sortListItem.itm]
+                item.amount = sortListItem.qty * numberMultiplier
+                item.itemImage = ItemCodex.getItemImage(sortListItem.itm)
 
                 // set quickslot number
                 if (getInventory() is ActorInventory) {
@@ -436,33 +462,38 @@ open class UIItemInventoryItemGrid(
 
                     for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
                         if (sortListItem.itm == ainv.getQuickslotItem(qs - 1)?.itm) {
-                            items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
+                            item.quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }
                         else
-                            items[k].quickslot = null
+                            item.quickslot = null
                     }
 
                     // set equippedslot number
                     for (eq in ainv.itemEquipped.indices) {
                         if (eq < ainv.itemEquipped.size) {
-                            if (ainv.itemEquipped[eq] == items[k].item?.dynamicID) {
-                                items[k].equippedSlot = eq
+                            if (ainv.itemEquipped[eq] == item.item?.dynamicID) {
+                                item.equippedSlot = eq
                                 break
                             }
                             else
-                                items[k].equippedSlot = null
+                                item.equippedSlot = null
                         }
                     }
+                }
+
+                // highlight if matches
+                if (forceHighlightList.contains(item.item?.dynamicID)) {
+                    item.forceHighlighted = true
                 }
             }
             // we do not have an item, empty the slot
             catch (e: IndexOutOfBoundsException) {
-                items[k].item = null
-                items[k].amount = 0
-                items[k].itemImage = null
-                items[k].quickslot = null
-                items[k].equippedSlot = null
+                item.item = null
+                item.amount = 0
+                item.itemImage = null
+                item.quickslot = null
+                item.equippedSlot = null
             }
         }
 

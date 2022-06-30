@@ -8,6 +8,7 @@ import net.torvald.terrarum.App.gamepadLabelLEFTRIGHT
 import net.torvald.terrarum.App.gamepadLabelStart
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.*
@@ -78,6 +79,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             "$gamepadLabelLEFTRIGHT ${Lang["GAME_OBJECTIVE_MULTIPLIER"]}\u3000" +
             "${App.gamepadLabelWest} ${Lang["GAME_ACTION_CRAFT"]}"
 
+    private val oldSelectedItems = ArrayList<ItemID>()
+
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
@@ -103,62 +106,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         itemListIngredients.isCompactMode = true
 
 
-        // crafting list to the left
-        // TODO This UIItem need to be custom-built version of UIItemInventoryItemGrid, with requirements:
-        // - Takes list of [net.torvald.terrarum.itemproperties.CraftingRecipe] as an "inventory"
-        // - Displays `CraftingRecipe.product` as an "inventory cell"
-        // - When clicked, the cell is activated and displays its `ingredients` to the itemListIngredients
-        // - The clicked status must be recorded and be accessible to this very class
-        itemListCraftable = UIItemCraftingCandidateGrid(
-                this,
-                catBar,
-                thisOffsetX,
-                thisOffsetY,
-                6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
-                keyDownFun = { _, _, _, _, _ -> },
-                touchDownFun = { gameItem, amount, _, recipe0, button ->
-                    /*if (gameItem != null) {
-                        negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
-                    }
-                    itemListUpdate()*/
-
-
-                    (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
-                        val playerInventory = getPlayerInventory()
-                        ingredients.clear()
-                        recipeClicked = recipe
-//                        printdbg(this, "Recipe selected: $recipe")
-                        recipe.ingredients.forEach { ingredient ->
-                            // TODO item tag support
-                            if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
-                                // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
-                                val selectedItem = playerInventory.itemList.filter { (itm, qty) ->
-                                    ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
-                                }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.tags.contains(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
-
-//                                printdbg(this, "Adding ingredients by tag ${selectedItem} (${ingredient.qty})")
-                                ingredients.add(selectedItem, ingredient.qty)
-                            }
-                            else {
-//                                printdbg(this, "Adding ingredients by name ${ingredient.key} (${ingredient.qty})")
-                                ingredients.add(ingredient.key, ingredient.qty)
-                            }
-                        }
-
-                        itemListIngredients.rebuild(catAll)
-                        highlightCraftingCandidateButton(button)
-                    }
-                }
-        )
-        buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
-        spinnerCraftCount.selectionChangeListener = {
-            itemListIngredients.numberMultiplier = it.toLong()
-            itemListIngredients.rebuild(catAll)
-            itemListCraftable.numberMultiplier = it.toLong()
-            itemListCraftable.rebuild(catAll)
-        }
-
         // player inventory to the right
         itemListPlayer = UIItemInventoryItemGrid(
                 this,
@@ -181,6 +128,75 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 //        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
 //        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
 
+
+
+        // crafting list to the left
+        // TODO This UIItem need to be custom-built version of UIItemInventoryItemGrid, with requirements:
+        // - Takes list of [net.torvald.terrarum.itemproperties.CraftingRecipe] as an "inventory"
+        // - Displays `CraftingRecipe.product` as an "inventory cell"
+        // - When clicked, the cell is activated and displays its `ingredients` to the itemListIngredients
+        // - The clicked status must be recorded and be accessible to this very class
+        itemListCraftable = UIItemCraftingCandidateGrid(
+                this,
+                catBar,
+                thisOffsetX,
+                thisOffsetY,
+                6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
+                keyDownFun = { _, _, _, _, _ -> },
+                touchDownFun = { gameItem, amount, _, recipe0, button ->
+                    /*if (gameItem != null) {
+                        negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
+                    }
+                    itemListUpdate()*/
+
+                    (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
+                        val selectedItems = ArrayList<ItemID>()
+
+                        val playerInventory = getPlayerInventory()
+                        ingredients.clear()
+                        recipeClicked = recipe
+//                        printdbg(this, "Recipe selected: $recipe")
+                        recipe.ingredients.forEach { ingredient ->
+                            // TODO item tag support
+                            val selectedItem: ItemID = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
+                                // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
+                                val selectedItem = playerInventory.itemList.filter { (itm, qty) ->
+                                    ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
+                                }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.tags.contains(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
+
+//                                printdbg(this, "Adding ingredients by tag ${selectedItem} (${ingredient.qty})")
+                                selectedItem
+                            }
+                            else {
+//                                printdbg(this, "Adding ingredients by name ${ingredient.key} (${ingredient.qty})")
+                                ingredient.key
+                            }
+
+                            selectedItems.add(selectedItem)
+                            ingredients.add(selectedItem, ingredient.qty)
+                        }
+
+                        itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
+                        itemListPlayer.addToForceHighlightList(selectedItems)
+                        itemListPlayer.rebuild(catAll)
+                        itemListIngredients.rebuild(catAll)
+                        highlightCraftingCandidateButton(button)
+
+                        oldSelectedItems.clear()
+                        oldSelectedItems.addAll(selectedItems)
+                    }
+                }
+        )
+        buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
+        spinnerCraftCount.selectionChangeListener = {
+            itemListIngredients.numberMultiplier = it.toLong()
+            itemListIngredients.rebuild(catAll)
+            itemListCraftable.numberMultiplier = it.toLong()
+            itemListCraftable.rebuild(catAll)
+        }
+
+
         buttonCraft.touchDownListener = { _,_,_,_ ->
             getPlayerInventory().let { player -> recipeClicked?.let { recipe ->
                 val mult = spinnerCraftCount.value.toLong()
@@ -190,7 +206,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 player.add(recipe.product, recipe.moq * mult)
 
                 // reset selection status after a crafting to hide the possible artefact where no-longer-craftable items are still displayed due to ingredient depletion
-                resetUI()
+                resetUI() // also clears forcehighlightlist
                 itemListPlayer.rebuild(catAll)
                 itemListCraftable.rebuild(catAll)
             } }
@@ -223,6 +239,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         recipeClicked = null
         highlightCraftingCandidateButton(null)
         ingredients.clear()
+        itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
         itemListIngredients.rebuild(catAll)
     }
 
@@ -241,12 +258,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private var encumbrancePerc = 0f
 
     private fun itemListUpdate() {
-        // fill in craftables
-        getFixtureInventory().let {
-            it.itemList.clear()
-            it.itemList.add(InventoryPair("basegame:18", 1))
-        }
-
         // let itemlists be sorted
         itemListCraftable.rebuild(catAll)
         itemListPlayer.rebuild(catAll)
