@@ -117,12 +117,27 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 drawScrollOnRightside = true,
                 drawWallet = false,
                 keyDownFun = { _, _, _, _, _ -> },
-                touchDownFun = { gameItem, amount, _, _, _ ->
-                    /*if (gameItem != null) {
-                        negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
+                touchDownFun = { gameItem, amount, _, _, button -> recipeClicked?.let { recipe -> gameItem?.let { gameItem ->
+                    val itemID = gameItem.dynamicID
+                    // don't rely on highlightedness of the button to determine the item on the button is the selected
+                    // ingredient (because I don't fully trust my code lol)
+                    val targetItemToAlter = recipe.ingredients.filter { // altering recipe doesn't make sense if player selected a recipe that requires no tag-ingredients
+                        (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && gameItem.tags.contains(it.key))
+                    }.let {
+                        if (it.size > 1)
+                            println("[UICrafting] Your recipe seems to have two similar ingredients defined\n" +
+                                    "affected ingredients: ${it.joinToString()}\n" +
+                                    "the recipe: ${recipe}")
+                        it.firstOrNull()
                     }
-                    itemListUpdate()*/
-                }
+
+                    targetItemToAlter?.let {
+                        val oldItem = itemListIngredients.getInventory().itemList.first { itemPair ->
+                            (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itemPair.itm]!!.tags.contains(it.key))
+                        }
+                        changeIngredient(oldItem, itemID)
+                    }
+                } } }
         )
         // make grid mode buttons work together
 //        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
@@ -144,11 +159,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
                 keyDownFun = { _, _, _, _, _ -> },
                 touchDownFun = { gameItem, amount, _, recipe0, button ->
-                    /*if (gameItem != null) {
-                        negotiator.reject(craftables, getPlayerInventory(), gameItem, amount)
-                    }
-                    itemListUpdate()*/
-
                     (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
                         val selectedItems = ArrayList<ItemID>()
 
@@ -222,6 +232,22 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         addUIitem(itemListPlayer)
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
+    }
+
+    private fun changeIngredient(old: InventoryPair, new: ItemID) {
+        itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
+        oldSelectedItems.remove(old.itm)
+
+        itemListPlayer.addToForceHighlightList(oldSelectedItems)
+        itemListPlayer.rebuild(catAll)
+
+        // change highlight status of itemListIngredients
+        itemListIngredients.getInventory().let {
+            val amount = old.qty
+            it.remove(old.itm, amount)
+            it.add(new, amount)
+        }
+        itemListIngredients.rebuild(catAll)
     }
 
     private fun highlightCraftingCandidateButton(button: UIItemInventoryCellBase?) { // a proxy function
