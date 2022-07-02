@@ -23,12 +23,13 @@ class UIItemInventoryElemSimple(
         override var amount: Long,
         override var itemImage: TextureRegion?,
         override var quickslot: Int? = null,
-        override var equippedSlot: Int? = null,
+        override var equippedSlot: Int? = null, // remnants of wide cell displaying slot number and highlighting; in this style of cell this field only determines highlightedness at render
         val drawBackOnNull: Boolean = true,
         keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
         touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
-        extraInfo: Any? = null
-) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo) {
+        extraInfo: Any? = null,
+        highlightEquippedItem: Boolean = true // for some UIs that only cares about getting equipped slot number but not highlighting
+) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem) {
     
     companion object {
         val height = UIItemInventoryElemWide.height
@@ -55,7 +56,7 @@ class UIItemInventoryElemSimple(
             Toolkit.fillArea(batch, posX, posY, width, height)
         }
         // cell border
-        batch.color = if (equippedSlot != null || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
+        batch.color = if ((equippedSlot != null && highlightEquippedItem) || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
                 else if (mouseUp && item != null) Toolkit.Theme.COL_ACTIVE
                 else Toolkit.Theme.COL_INVENTORY_CELL_BORDER
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
@@ -95,7 +96,7 @@ class UIItemInventoryElemSimple(
                 // if mouse is over, text lights up
                 // highlight item count (blocks/walls) if the item is equipped
                 batch.color = item!!.nameColour mul (
-                        if (equippedSlot != null || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
+                        if ((equippedSlot != null && highlightEquippedItem) || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
                         else if (mouseUp && item != null) Toolkit.Theme.COL_ACTIVE
                         else Color.WHITE
                                                     )

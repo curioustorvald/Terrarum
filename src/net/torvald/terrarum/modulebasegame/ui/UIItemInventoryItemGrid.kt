@@ -45,7 +45,8 @@ open class UIItemInventoryItemGrid(
         val hideSidebar: Boolean = false,
         keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
         touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
-        protected val useHighlightingManager: Boolean = true // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
+        protected val useHighlightingManager: Boolean = true, // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
+        open protected val highlightEquippedItem: Boolean = true // for some UIs that only cares about getting equipped slot number but not highlighting
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -184,7 +185,8 @@ open class UIItemInventoryItemGrid(
                 itemImage = null,
                 drawBackOnNull = true,
                 keyDownFun = keyDownFun,
-                touchDownFun = touchDownFun
+                touchDownFun = touchDownFun,
+                highlightEquippedItem = highlightEquippedItem
         )
     }
     // automatically determine how much columns are needed. Minimum Width = 5 grids
@@ -202,7 +204,8 @@ open class UIItemInventoryItemGrid(
                 itemImage = null,
                 drawBackOnNull = true,
                 keyDownFun = keyDownFun,
-                touchDownFun = touchDownFun
+                touchDownFun = touchDownFun,
+                highlightEquippedItem = highlightEquippedItem
         )
     }
 

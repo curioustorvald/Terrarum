@@ -116,6 +116,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 6, UIInventoryFull.CELLS_VRT,
                 drawScrollOnRightside = true,
                 drawWallet = false,
+                highlightEquippedItem = false,
                 keyDownFun = { _, _, _, _, _ -> },
                 touchDownFun = { gameItem, amount, _, _, button -> recipeClicked?.let { recipe -> gameItem?.let { gameItem ->
                     val itemID = gameItem.dynamicID
@@ -239,7 +240,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private fun changeIngredient(old: InventoryPair, new: ItemID) {
         itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
+
         oldSelectedItems.remove(old.itm)
+        oldSelectedItems.add(new)
 
         itemListPlayer.addToForceHighlightList(oldSelectedItems)
         itemListPlayer.rebuild(catAll)
