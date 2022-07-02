@@ -18,6 +18,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemSpinner
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.unicode.getKeycapPC
+import kotlin.math.ceil
 
 /**
  * This UI has inventory, but it's just there to display all craftable items and should not be serialised.
@@ -84,6 +85,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private val craftMult
         get() = spinnerCraftCount.value.toLong()
 
+    private fun _getItemListPlayer() = itemListPlayer
+    private fun _getItemListIngredients() = itemListIngredients
+
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
@@ -103,7 +107,76 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         cellHighlightSubCol = Toolkit.Theme.COL_INACTIVE
                 ),
                 keyDownFun = { _, _, _, _, _ -> },
-                touchDownFun = { _, _, _, _, _ -> }
+                touchDownFun = { gameItem, amount, _, _, _ -> gameItem?.let { gameItem ->
+                    // if the item is craftable one, load its recipe instead
+                    CraftingRecipeCodex.getRecipesFor(gameItem.originalID)?.let { recipes ->
+                        // select most viable recipe (completely greedy search)
+                        val player = getPlayerInventory()
+                        // list of [Score, Ingredients, Recipe]
+                        recipes.map { recipe ->
+                            // list of (Item, How many player has, How many the recipe requires)
+                            val items = recipe.ingredients.map { ingredient ->
+                                val selectedItem = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
+                                    // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
+                                    player.itemList.filter { (itm, qty) ->
+                                        ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
+                                    }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.tags.contains(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
+                                }
+                                else {
+                                    ingredient.key
+                                }
+
+                                val howManyPlayerHas = player.searchByID(selectedItem)?.qty ?: 0L
+
+                                val howManyTheRecipeWants = ingredient.qty
+
+                                listOf(selectedItem, howManyPlayerHas, howManyTheRecipeWants)
+                            }
+
+                            val score = items.fold(1L) { acc, item ->
+                                (item[1] as Long).times(16L) + 1L
+                            }
+
+                            listOf(score, items, recipe)
+                        }.maxByOrNull { it[0] as Long }?.let { (_, items, recipe) ->
+                            val items = items as List<List<*>>
+                            val recipe = recipe as CraftingCodex.CraftingRecipe
+
+                            // change selected recipe to mostViableRecipe then update the UIs accordingly
+                            // FIXME recipe highlighting will not change correctly!
+                            val selectedItems = ArrayList<ItemID>()
+
+                            // auto-dial the spinner so that player would just have to click the Craft! button (for the most time, that is)
+                            val howManyRequired = craftMult * amount
+                            val howManyPlayerHas = player.searchByID(gameItem.dynamicID)?.qty ?: 0
+                            val howManyPlayerMightNeed = ceil((howManyRequired - howManyPlayerHas).toDouble() / recipe.moq).toLong()
+                            resetSpinner(howManyPlayerMightNeed.coerceIn(1L, App.getConfigInt("basegame:gameplay_max_crafting").toLong()))
+
+                            ingredients.clear()
+                            recipeClicked = recipe
+
+                            items.forEach {
+                                val itm = it[0] as ItemID
+                                val qty = it[2] as Long
+
+                                selectedItems.add(itm)
+                                ingredients.add(itm, qty)
+                            }
+
+                            _getItemListPlayer().removeFromForceHighlightList(oldSelectedItems)
+                            _getItemListPlayer().addToForceHighlightList(selectedItems)
+                            _getItemListPlayer().rebuild(catAll)
+                            _getItemListIngredients().rebuild(catAll)
+
+                            // TODO highlightCraftingCandidateButton by searching for the buttons that has the recipe
+
+                            oldSelectedItems.clear()
+                            oldSelectedItems.addAll(selectedItems)
+
+                            refreshCraftButtonStatus()
+                        }
+                    }
+                } }
         )
 
         // make sure grid buttons for ingredients do nothing (even if they are hidden!)
@@ -147,7 +220,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                     }
 
                     targetItemToAlter?.let {
-                        val oldItem = itemListIngredients.getInventory().itemList.first { itemPair ->
+                        val oldItem = _getItemListIngredients().getInventory().itemList.first { itemPair ->
                             (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itemPair.itm]!!.tags.contains(it.key))
                         }
                         changeIngredient(oldItem, itemID)
@@ -162,11 +235,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
 
         // crafting list to the left
-        // TODO This UIItem need to be custom-built version of UIItemInventoryItemGrid, with requirements:
-        // - Takes list of [net.torvald.terrarum.itemproperties.CraftingRecipe] as an "inventory"
-        // - Displays `CraftingRecipe.product` as an "inventory cell"
-        // - When clicked, the cell is activated and displays its `ingredients` to the itemListIngredients
-        // - The clicked status must be recorded and be accessible to this very class
         itemListCraftable = UIItemCraftingCandidateGrid(
                 this,
                 catBar,
@@ -183,7 +251,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         recipeClicked = recipe
 //                        printdbg(this, "Recipe selected: $recipe")
                         recipe.ingredients.forEach { ingredient ->
-                            // TODO item tag support
                             val selectedItem: ItemID = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
                                 // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
                                 val selectedItem = playerInventory.itemList.filter { (itm, qty) ->
@@ -202,10 +269,11 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                             ingredients.add(selectedItem, ingredient.qty)
                         }
 
-                        itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
-                        itemListPlayer.addToForceHighlightList(selectedItems)
-                        itemListPlayer.rebuild(catAll)
-                        itemListIngredients.rebuild(catAll)
+                        _getItemListPlayer().removeFromForceHighlightList(oldSelectedItems)
+                        _getItemListPlayer().addToForceHighlightList(selectedItems)
+                        _getItemListPlayer().rebuild(catAll)
+                        _getItemListIngredients().rebuild(catAll)
+
                         highlightCraftingCandidateButton(button)
 
                         oldSelectedItems.clear()
@@ -216,7 +284,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 }
         )
         buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, 100, 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
+        spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, App.getConfigInt("basegame:gameplay_max_crafting"), 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
         spinnerCraftCount.selectionChangeListener = {
             itemListIngredients.numberMultiplier = it.toLong()
             itemListIngredients.rebuild(catAll)
@@ -302,10 +370,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     // reset whatever player has selected to null and bring UI to its initial state
     fun resetUI() {
         // reset spinner
-        spinnerCraftCount.value = 1
-        spinnerCraftCount.fboUpdateLatch = true
-        itemListIngredients.numberMultiplier = 1L
-        itemListCraftable.numberMultiplier = 1L
+        resetSpinner()
         // reset selected recipe status
         recipeClicked = null
         highlightCraftingCandidateButton(null)
@@ -314,6 +379,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         itemListIngredients.rebuild(catAll)
 
         refreshCraftButtonStatus()
+    }
+
+    private fun resetSpinner(value: Long = 1L) {
+        spinnerCraftCount.value = value
+        spinnerCraftCount.fboUpdateLatch = true
+        itemListIngredients.numberMultiplier = value
+        itemListCraftable.numberMultiplier = value
     }
 
     private var openingClickLatched = false

@@ -108,7 +108,11 @@ object DefaultConfig {
             "basekeyboardlayout" to "en_intl_qwerty",
             "inputmethod" to "none",
 
-            "screenmagnifying" to 1.0
+            "screenmagnifying" to 1.0,
+
+
+            // TODO move to basegame module's default config!
+            "basegame:gameplay_max_crafting" to 100
 
 
             // settings regarding debugger
