@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.GdxColorMap
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import kotlin.math.absoluteValue
@@ -33,6 +34,14 @@ abstract class UIItemInventoryCellBase(
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(batch: SpriteBatch, camera: Camera)
+
+    /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
+     * Set to `null` to use default rule:
+     *
+     * "`equippedSlot` defined and set to `highlightEquippedItem`" or "`forceHighlighted`" */
+    var customHighlightRuleMain: ((UIItemInventoryCellBase) -> Boolean)? = null
+    /** Custom highlight rule to highlight this button to secondary accent colour (yellow by default). Set to `null` to use default rule (which does nothing). */
+    var customHighlightRule2: ((UIItemInventoryCellBase) -> Boolean)? = null
 
     var forceHighlighted = false
         /*set(value) {
@@ -85,4 +94,26 @@ object UIItemInventoryCellCommonRes {
         
         // -2.14B
     }
+
+    val defaultInventoryCellTheme = InventoryCellColourTheme(
+            Toolkit.Theme.COL_HIGHLIGHT,
+            Toolkit.Theme.COL_LIST_DEFAULT,
+            Toolkit.Theme.COL_ACTIVE,
+            Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
+            Toolkit.Theme.COL_HIGHLIGHT,
+            Color.WHITE,
+            Toolkit.Theme.COL_ACTIVE,
+            Color.WHITE,
+    )
 }
+
+data class InventoryCellColourTheme(
+        val cellHighlightMainCol: Color,
+        val cellHighlightSubCol: Color,
+        val cellHighlightMouseUpCol: Color,
+        val cellHighlightNormalCol: Color,
+        val textHighlightMainCol: Color,
+        val textHighlightSubCol: Color,
+        val textHighlightMouseUpCol: Color,
+        val textHighlightNormalCol: Color,
+)

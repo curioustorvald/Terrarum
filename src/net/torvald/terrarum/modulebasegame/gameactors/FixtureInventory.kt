@@ -106,7 +106,7 @@ open class FixtureInventory() {
             val newCount = existingItem.qty - count
 
             /*if (newCount < 0) {
-                throw Error("[${this.javaClass.canonicalName}] Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
+                throw InventoryFailedTransactionError("[${this.javaClass.canonicalName}] Tried to remove $count of $item, but the inventory only contains ${existingItem.qty} of them.")
             }
             else*/ if (newCount > 0) {
                 // decrement count
@@ -120,7 +120,7 @@ open class FixtureInventory() {
             }
         }
         else {
-//            throw Error("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
+//            throw InventoryFailedTransactionError("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
         }
     }
     
@@ -235,3 +235,5 @@ class InventoryPair : Comparable<InventoryPair> {
 
     override fun compareTo(other: InventoryPair) = this.itm.compareTo(other.itm)
 }
+
+class InventoryTransactionFailedError(msg: String) : Error(msg)

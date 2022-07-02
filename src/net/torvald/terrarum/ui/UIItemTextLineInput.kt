@@ -99,7 +99,7 @@ class UIItemTextLineInput(
             false
     )
 
-    var isActive: Boolean = false // keep it false by default!
+    override var isActive: Boolean = false // keep it false by default!
         set(value) {
             if (field && !value) endComposing(true)
             field = value

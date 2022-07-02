@@ -42,7 +42,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private val craftables = FixtureInventory() // might be changed to something else
     private val ingredients = FixtureInventory() // this one is definitely not to be changed
 
-    private val negotiator = object : InventoryNegotiator() {
+    private val negotiator = object : InventoryTransactionNegotiator() {
         override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Long) {
 //            TODO()
         }
@@ -81,6 +81,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private val oldSelectedItems = ArrayList<ItemID>()
 
+    private val craftMult
+        get() = spinnerCraftCount.value.toLong()
+
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
         val buttonWidth = (UIItemInventoryElemWide.height + listGap) * 3 - listGap - 2
@@ -96,6 +99,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 drawScrollOnRightside = false,
                 drawWallet = false,
                 hideSidebar = true,
+                colourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme.copy(
+                        cellHighlightSubCol = Toolkit.Theme.COL_INACTIVE
+                ),
                 keyDownFun = { _, _, _, _, _ -> },
                 touchDownFun = { _, _, _, _, _ -> }
         )
@@ -104,6 +110,14 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         itemListIngredients.gridModeButtons[0].touchDownListener = { _,_,_,_ -> }
         itemListIngredients.gridModeButtons[1].touchDownListener = { _,_,_,_ -> }
         itemListIngredients.isCompactMode = true
+        itemListIngredients.setCustomHighlightRuleSub {
+            it.item?.let { ingredient ->
+                return@setCustomHighlightRuleSub getPlayerInventory().searchByID(ingredient.dynamicID)?.let { itemOnPlayer ->
+                    itemOnPlayer.qty * craftMult >= it.amount * craftMult
+                } == true
+            }
+            false
+        }
 
 
         // player inventory to the right
@@ -137,6 +151,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                             (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itemPair.itm]!!.tags.contains(it.key))
                         }
                         changeIngredient(oldItem, itemID)
+                        refreshCraftButtonStatus()
                     }
                 } } }
         )
@@ -195,6 +210,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
                         oldSelectedItems.clear()
                         oldSelectedItems.addAll(selectedItems)
+
+                        refreshCraftButtonStatus()
                     }
                 }
         )
@@ -205,25 +222,31 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             itemListIngredients.rebuild(catAll)
             itemListCraftable.numberMultiplier = it.toLong()
             itemListCraftable.rebuild(catAll)
+            refreshCraftButtonStatus()
         }
 
 
         buttonCraft.touchDownListener = { _,_,_,_ ->
             getPlayerInventory().let { player -> recipeClicked?.let { recipe ->
-                val mult = spinnerCraftCount.value.toLong()
-
-                // TODO check if player has enough amount of ingredients
-
-                itemListIngredients.getInventory().itemList.forEach { (itm, qty) ->
-                    player.remove(itm, qty * mult)
+                // check if player has enough amount of ingredients
+                val itemCraftable = itemListIngredients.getInventory().itemList.all { (itm, qty) ->
+                    (player.searchByID(itm)?.qty ?: -1) >= qty * craftMult
                 }
-                player.add(recipe.product, recipe.moq * mult)
 
-                // reset selection status after a crafting to hide the possible artefact where no-longer-craftable items are still displayed due to ingredient depletion
-                resetUI() // also clears forcehighlightlist
-                itemListPlayer.rebuild(catAll)
-                itemListCraftable.rebuild(catAll)
+
+                if (itemCraftable) {
+                    itemListIngredients.getInventory().itemList.forEach { (itm, qty) ->
+                        player.remove(itm, qty * craftMult)
+                    }
+                    player.add(recipe.product, recipe.moq * craftMult)
+
+                    // reset selection status after a crafting to hide the possible artefact where no-longer-craftable items are still displayed due to ingredient depletion
+                    resetUI() // also clears forcehighlightlist
+                    itemListPlayer.rebuild(catAll)
+                    itemListCraftable.rebuild(catAll)
+                }
             } }
+            refreshCraftButtonStatus()
         }
         // make grid mode buttons work together
 //        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
@@ -260,7 +283,22 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         itemListCraftable.highlightButton(button)
         itemListCraftable.rebuild(catAll)
     }
-    
+
+    /**
+     * Updates Craft! button so that the button is correctly highlighted
+     */
+    fun refreshCraftButtonStatus() {
+        val itemCraftable = if (itemListIngredients.getInventory().itemList.size < 1) false
+        else getPlayerInventory().let { player ->
+            // check if player has enough amount of ingredients
+            itemListIngredients.getInventory().itemList.all { (itm, qty) ->
+                (player.searchByID(itm)?.qty ?: -1) >= qty * craftMult
+            }
+        }
+
+        buttonCraft.isActive = itemCraftable
+    }
+
     // reset whatever player has selected to null and bring UI to its initial state
     fun resetUI() {
         // reset spinner
@@ -274,6 +312,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         ingredients.clear()
         itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
         itemListIngredients.rebuild(catAll)
+
+        refreshCraftButtonStatus()
     }
 
     private var openingClickLatched = false

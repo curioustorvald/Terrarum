@@ -37,6 +37,8 @@ open class UIItemTextButton(
         /** Colour on normal status */
         val inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
 
+        val disabledCol: Color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
+
         val hasBorder: Boolean = false,
 
         val paddingLeft:  Int = 0,
@@ -108,7 +110,8 @@ open class UIItemTextButton(
         }
 
 
-        batch.color = if (highlighted) highlightCol
+        batch.color = if (!isActive) disabledCol
+        else if (highlighted) highlightCol
         else if (mouseUp) activeCol
         else inactiveCol
 

@@ -7,7 +7,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 /**
  * Created by minjaesong on 2021-03-12.
  */
-abstract class InventoryNegotiator {
+abstract class InventoryTransactionNegotiator {
     /** Retrieve item filter to be used to show only the acceptable items when player's own inventory is being displayed */
     open fun getItemFilter(): List<String> = listOf(CAT_ALL) // GameItem.Category
     /** Accepts item from the player and pass it to right inventory (object), slot (UI), etc... */

@@ -125,6 +125,11 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
      * gamepad button events for one or more UIItems in one or more UICanvases. */
     open var controllerInFocus = false
 
+    /**
+     * Whether the button is "available" or not to the player
+     */
+    open var isActive = true
+
 
     open fun show() {}
     open fun hide() {}
@@ -136,23 +141,24 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                 updateListener!!.invoke(delta)
             }
 
+            if (isActive) {
+                mouseOverCall?.update(delta)
 
-            mouseOverCall?.update(delta)
+                if (mouseUp) {
+                    if (mouseOverCall?.isVisible ?: false) {
+                        mouseOverCall?.setAsOpen()
+                    }
 
-            if (mouseUp) {
-                if (mouseOverCall?.isVisible ?: false) {
-                    mouseOverCall?.setAsOpen()
+                    mouseOverCall?.updateUI(delta)
                 }
-
-                mouseOverCall?.updateUI(delta)
-            }
-            else {
-                if (mouseOverCall?.isVisible ?: false) {
-                    mouseOverCall?.setAsClose()
+                else {
+                    if (mouseOverCall?.isVisible ?: false) {
+                        mouseOverCall?.setAsClose()
+                    }
                 }
-
-                mouseLatched = false
             }
+
+            if (!mouseUp) mouseLatched = false
         }
     }
 
@@ -161,17 +167,19 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
      */
     open fun render(batch: SpriteBatch, camera: Camera) {
         if (parentUI.isVisible) {
-            mouseOverCall?.render(batch, camera)
+            if (isActive) {
+                mouseOverCall?.render(batch, camera)
 
-            if (mouseUp) {
-                mouseOverCall?.renderUI(batch, camera)
+                if (mouseUp) {
+                    mouseOverCall?.renderUI(batch, camera)
+                }
             }
         }
     }
 
     // keyboard controlled
     open fun keyDown(keycode: Int): Boolean {
-        if (parentUI.isVisible && keyDownListener != null) {
+        if (parentUI.isVisible && keyDownListener != null && isActive) {
             keyDownListener!!.invoke(keycode)
             return true
         }
@@ -179,7 +187,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun keyUp(keycode: Int): Boolean {
-        if (parentUI.isVisible && keyUpListener != null) {
+        if (parentUI.isVisible && keyUpListener != null && isActive) {
             keyUpListener!!.invoke(keycode)
             return true
         }
@@ -187,7 +195,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun keyTyped(character: Char): Boolean  {
-        if (parentUI.isVisible && keyTypedListener != null) {
+        if (parentUI.isVisible && keyTypedListener != null && isActive) {
             keyTypedListener!!.invoke(character)
             return true
         }
@@ -197,7 +205,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     // mouse controlled
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (parentUI.isVisible && touchDraggedListener != null) {
+        if (parentUI.isVisible && touchDraggedListener != null && isActive) {
             touchDraggedListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer)
             return true
         }
@@ -207,7 +215,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var actionDone = false
 
-        if (parentUI.isVisible) {
+        if (parentUI.isVisible && isActive) {
             if (touchDownListener != null && mouseUp) {
                 touchDownListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
                 actionDone = true
@@ -232,7 +240,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (parentUI.isVisible && scrolledListener != null && mouseUp) {
+        if (parentUI.isVisible && scrolledListener != null && mouseUp && isActive) {
             scrolledListener!!.invoke(amountX, amountY)
             return true
         }

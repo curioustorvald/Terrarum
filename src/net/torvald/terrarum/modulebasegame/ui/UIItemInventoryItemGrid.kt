@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -46,7 +47,8 @@ open class UIItemInventoryItemGrid(
         keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
         touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         protected val useHighlightingManager: Boolean = true, // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
-        open protected val highlightEquippedItem: Boolean = true // for some UIs that only cares about getting equipped slot number but not highlighting
+        open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+        colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -186,7 +188,8 @@ open class UIItemInventoryItemGrid(
                 drawBackOnNull = true,
                 keyDownFun = keyDownFun,
                 touchDownFun = touchDownFun,
-                highlightEquippedItem = highlightEquippedItem
+                highlightEquippedItem = highlightEquippedItem,
+                colourTheme = colourTheme
         )
     }
     // automatically determine how much columns are needed. Minimum Width = 5 grids
@@ -205,7 +208,8 @@ open class UIItemInventoryItemGrid(
                 drawBackOnNull = true,
                 keyDownFun = keyDownFun,
                 touchDownFun = touchDownFun,
-                highlightEquippedItem = highlightEquippedItem
+                highlightEquippedItem = highlightEquippedItem,
+                colourTheme = colourTheme
         )
     }
 
@@ -265,6 +269,16 @@ open class UIItemInventoryItemGrid(
             initialY = getIconPosY(3),
             highlightable = false
     )
+
+    fun setCustomHighlightRuleMain(predicate: ((UIItemInventoryCellBase) -> Boolean)?) {
+        itemGrid.forEach { it.customHighlightRuleMain = predicate }
+        itemList.forEach { it.customHighlightRuleMain = predicate }
+    }
+
+    fun setCustomHighlightRuleSub(predicate: ((UIItemInventoryCellBase) -> Boolean)?) {
+        itemGrid.forEach { it.customHighlightRule2 = predicate }
+        itemList.forEach { it.customHighlightRule2 = predicate }
+    }
 
     fun scrollItemPage(relativeAmount: Int) {
         itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)

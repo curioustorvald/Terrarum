@@ -4,7 +4,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 
 interface HasInventory {
 
-    fun getNegotiator(): InventoryNegotiator
+    fun getNegotiator(): InventoryTransactionNegotiator
     fun getFixtureInventory(): FixtureInventory
     fun getPlayerInventory(): FixtureInventory
 

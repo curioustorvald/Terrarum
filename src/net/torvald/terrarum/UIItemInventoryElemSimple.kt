@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.modulebasegame.ui.InventoryCellColourTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -28,7 +30,8 @@ class UIItemInventoryElemSimple(
         keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
         touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         extraInfo: Any? = null,
-        highlightEquippedItem: Boolean = true // for some UIs that only cares about getting equipped slot number but not highlighting
+        highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+        var colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
 ) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem) {
     
     companion object {
@@ -47,8 +50,14 @@ class UIItemInventoryElemSimple(
 
     }
 
+    private var highlightToMainCol = false
+    private var highlightToSubCol = false
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
+
+        highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: (equippedSlot != null && highlightEquippedItem) || forceHighlighted
+        highlightToSubCol = customHighlightRule2?.invoke(this) ?: false
 
         // cell background
         if (item != null || drawBackOnNull) {
@@ -56,9 +65,10 @@ class UIItemInventoryElemSimple(
             Toolkit.fillArea(batch, posX, posY, width, height)
         }
         // cell border
-        batch.color = if ((equippedSlot != null && highlightEquippedItem) || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
-                else if (mouseUp && item != null) Toolkit.Theme.COL_ACTIVE
-                else Toolkit.Theme.COL_INVENTORY_CELL_BORDER
+        batch.color = if (highlightToMainCol) colourTheme.cellHighlightMainCol
+                else if (highlightToSubCol) colourTheme.cellHighlightSubCol
+                else if (mouseUp && item != null) colourTheme.cellHighlightMouseUpCol
+                else colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, posX, posY, width, height)
 
 
@@ -96,10 +106,10 @@ class UIItemInventoryElemSimple(
                 // if mouse is over, text lights up
                 // highlight item count (blocks/walls) if the item is equipped
                 batch.color = item!!.nameColour mul (
-                        if ((equippedSlot != null && highlightEquippedItem) || forceHighlighted) Toolkit.Theme.COL_HIGHLIGHT
-                        else if (mouseUp && item != null) Toolkit.Theme.COL_ACTIVE
-                        else Color.WHITE
-                                                    )
+                        if (highlightToMainCol) colourTheme.textHighlightMainCol
+                        else if (highlightToSubCol) colourTheme.textHighlightSubCol
+                        else if (mouseUp && item != null) colourTheme.textHighlightMouseUpCol
+                        else colourTheme.textHighlightNormalCol)
 
                 App.fontSmallNumbers.draw(batch,
                         amountString,
