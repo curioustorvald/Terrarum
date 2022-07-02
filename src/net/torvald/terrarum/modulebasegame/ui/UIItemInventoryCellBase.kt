@@ -34,6 +34,13 @@ abstract class UIItemInventoryCellBase(
     abstract override fun render(batch: SpriteBatch, camera: Camera)
 
     var forceHighlighted = false
+        /*set(value) {
+            if (field != value) {
+                printdbg(this, "forceHighlighted: ${field} -> ${value}; ${App.GLOBAL_RENDER_TIMER}")
+                printStackTrace(this)
+            }
+            field = value
+        }*/
 
     override fun keyDown(keycode: Int): Boolean {
         keyDownFun(item, amount, keycode, extraInfo, this)

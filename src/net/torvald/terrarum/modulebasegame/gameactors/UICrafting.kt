@@ -210,6 +210,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         buttonCraft.touchDownListener = { _,_,_,_ ->
             getPlayerInventory().let { player -> recipeClicked?.let { recipe ->
                 val mult = spinnerCraftCount.value.toLong()
+
+                // TODO check if player has enough amount of ingredients
+
                 itemListIngredients.getInventory().itemList.forEach { (itm, qty) ->
                     player.remove(itm, qty * mult)
                 }
@@ -252,6 +255,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private fun highlightCraftingCandidateButton(button: UIItemInventoryCellBase?) { // a proxy function
         itemListCraftable.highlightButton(button)
+        itemListCraftable.rebuild(catAll)
     }
     
     // reset whatever player has selected to null and bring UI to its initial state
@@ -290,22 +294,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         encumbrancePerc = getPlayerInventory().let {
             it.capacity.toFloat() / it.maxCapacity
         }
-    }
-
-    private fun setCompact(yes: Boolean) {
-        itemListCraftable.isCompactMode = yes
-        itemListCraftable.gridModeButtons[0].highlighted = !yes
-        itemListCraftable.gridModeButtons[1].highlighted = yes
-        itemListCraftable.itemPage = 0
-        itemListCraftable.rebuild(catAll)
-
-        itemListPlayer.isCompactMode = yes
-        itemListPlayer.gridModeButtons[0].highlighted = !yes
-        itemListPlayer.gridModeButtons[1].highlighted = yes
-        itemListPlayer.itemPage = 0
-        itemListPlayer.rebuild(catAll)
-
-        itemListUpdate()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

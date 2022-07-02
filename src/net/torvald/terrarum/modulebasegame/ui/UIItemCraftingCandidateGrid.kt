@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CraftingRecipeCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.UIItemInventoryCatBar
@@ -27,7 +28,8 @@ class UIItemCraftingCandidateGrid(
         drawWallet = false,
         hideSidebar = false,
         keyDownFun = keyDownFun,
-        touchDownFun = touchDownFun
+        touchDownFun = touchDownFun,
+        useHighlightingManager = false
 ) {
 
     val craftingRecipes = ArrayList<CraftingCodex.CraftingRecipe>()
@@ -38,13 +40,18 @@ class UIItemCraftingCandidateGrid(
     fun highlightButton(button: UIItemInventoryCellBase?) {
         items.forEach { it.forceHighlighted = false }
         button?.forceHighlighted = true
+
+        button?.let {
+            printdbg(this, "highlighting button UIItemInventoryCellBase: ${it.item?.dynamicID}, ${it.amount}")
+        }
     }
 
     override fun rebuild(filter: Array<String>) {
-        // test fill craftingRecipes with every possible recipes in the game
+        // TODO test fill craftingRecipes with every possible recipes in the game
+        // filtering policy: if the player have all the ingredient item (regardless of the amount!), make the recipe visible
         craftingRecipes.clear()
         CraftingRecipeCodex.props.forEach { (_, recipes) -> craftingRecipes.addAll(recipes) }
-
+        // end of test fill
 
         recipesSortList.clear() // kinda like the output list
 
@@ -62,32 +69,6 @@ class UIItemCraftingCandidateGrid(
                 items[k].amount = sortListItem.moq * numberMultiplier
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.product)
                 items[k].extraInfo = sortListItem
-
-                // set quickslot number
-                /*if (getInventory() is ActorInventory) {
-                    val ainv = getInventory() as ActorInventory
-
-                    for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
-                        if (sortListItem.product == ainv.getQuickslotItem(qs - 1)?.itm) {
-                            items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
-                            break
-                        }
-                        else
-                            items[k].quickslot = null
-                    }
-
-                    // set equippedslot number
-                    for (eq in ainv.itemEquipped.indices) {
-                        if (eq < ainv.itemEquipped.size) {
-                            if (ainv.itemEquipped[eq] == items[k].item?.dynamicID) {
-                                items[k].equippedSlot = eq
-                                break
-                            }
-                            else
-                                items[k].equippedSlot = null
-                        }
-                    }
-                }*/
             }
             // we do not have an item, empty the slot
             catch (e: IndexOutOfBoundsException) {

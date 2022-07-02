@@ -44,7 +44,8 @@ open class UIItemInventoryItemGrid(
         val drawWallet: Boolean = true,
         val hideSidebar: Boolean = false,
         keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
-        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit // Item, Amount, Button, extra info, self
+        touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
+        protected val useHighlightingManager: Boolean = true // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -322,7 +323,7 @@ open class UIItemInventoryItemGrid(
 
         // define each button's highlighted status from the list of forceHighlighted, then render the button
         items.forEach {
-            it.forceHighlighted = forceHighlightList.contains(it.item?.dynamicID)
+            if (useHighlightingManager) it.forceHighlighted = forceHighlightList.contains(it.item?.dynamicID)
             it.render(batch, camera)
         }
 
@@ -405,6 +406,10 @@ open class UIItemInventoryItemGrid(
     }
 
     private val forceHighlightList = HashSet<ItemID>()
+        get() {
+            if (!useHighlightingManager) throw IllegalStateException("useHighlightingManager is set to false")
+            return field
+        }
 
     /**
      * Call before rebuild()
@@ -480,11 +485,6 @@ open class UIItemInventoryItemGrid(
                                 item.equippedSlot = null
                         }
                     }
-                }
-
-                // highlight if matches
-                if (forceHighlightList.contains(item.item?.dynamicID)) {
-                    item.forceHighlighted = true
                 }
             }
             // we do not have an item, empty the slot
