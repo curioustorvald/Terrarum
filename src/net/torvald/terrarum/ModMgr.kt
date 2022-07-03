@@ -2,28 +2,26 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.forEachSiblings
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
 import java.io.File
-import java.io.FileFilter
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.FilenameFilter
+import java.io.IOException
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLClassLoader
@@ -151,10 +149,21 @@ object ModMgr {
                     modMetadata.load(FileInputStream(file))
 
                     if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
-                        val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
-                        // read config and store it to the game
+                        try {
+                            val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
 
-                        // write to user's config file
+                            // read config and store it to the game
+                            var entry: JsonValue? = defaultConfig.child
+                            while (entry != null) {
+                                setToGameConfig(entry, moduleName)
+                                entry = entry.next
+                            } // copied from App.java
+
+                            // write to user's config file
+                        }
+                        catch (e: IOException) {
+                            e.printStackTrace()
+                        }
                     }
 
 

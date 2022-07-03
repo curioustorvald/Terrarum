@@ -1182,6 +1182,45 @@ public class App implements ApplicationListener {
     }
 
     /**
+     * Will forcibly overwrite previously loaded config value.
+     *
+     * Key naming convention will be 'modName:propertyName'; if modName is null, the key will be just propertyName.
+     *
+     * @param value JsonValue (the key-value pair)
+     * @param modName module name, nullable
+     */
+    public static void setToGameConfigForced(JsonValue value, String modName) {
+        gameConfig.set((modName == null) ? value.name : modName+":"+value.name,
+                value.isArray() ? value.asDoubleArray() :
+                value.isDouble() ? value.asDouble() :
+                value.isBoolean() ? value.asBoolean() :
+                value.isLong() ? value.asInt() :
+                value.asString()
+        );
+    }
+
+    /**
+     * Will not overwrite previously loaded config value.
+     *
+     * Key naming convention will be 'modName:propertyName'; if modName is null, the key will be just propertyName.
+     *
+     * @param value JsonValue (the key-value pair)
+     * @param modName module name, nullable
+     */
+    public static void setToGameConfig(JsonValue value, String modName) {
+        String key = (modName == null) ? value.name : modName+":"+value.name;
+        if (gameConfig.get(key) == null) {
+            gameConfig.set(key,
+                    value.isArray() ? value.asDoubleArray() :
+                    value.isDouble() ? value.asDouble() :
+                    value.isBoolean() ? value.asBoolean() :
+                    value.isLong() ? value.asInt() :
+                    value.asString()
+            );
+        }
+    }
+
+    /**
      *
      * @return true on successful, false on failure.
      */
@@ -1192,18 +1231,12 @@ public class App implements ApplicationListener {
 
             // make config
             for (JsonValue entry = map.child; entry != null; entry = entry.next) {
-                gameConfig.set(entry.name,
-                        entry.isArray() ? entry.asDoubleArray() :
-                        entry.isDouble() ? entry.asDouble() :
-                        entry.isBoolean() ? entry.asBoolean() :
-                        entry.isLong() ? entry.asInt() :
-                        entry.asString()
-                );
+                setToGameConfigForced(entry, null);
             }
 
             return true;
         }
-        catch (java.nio.file.NoSuchFileException e) {
+        catch (IOException e) {
             // write default config to game dir. Call th.is method again to read config from it.
             try {
                 createConfigJson();

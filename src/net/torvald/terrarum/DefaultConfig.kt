@@ -111,9 +111,6 @@ object DefaultConfig {
             "screenmagnifying" to 1.0,
 
 
-            // TODO move to basegame module's default config!
-            "basegame:gameplay_max_crafting" to 100
-
 
             // settings regarding debugger
             /*"buildingmakerfavs" to arrayOf(
