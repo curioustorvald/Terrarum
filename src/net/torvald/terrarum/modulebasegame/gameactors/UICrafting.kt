@@ -87,6 +87,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private fun _getItemListPlayer() = itemListPlayer
     private fun _getItemListIngredients() = itemListIngredients
+    private fun _getItemListCraftables() = itemListCraftable
 
     init {
         val craftButtonsY = thisOffsetY + 23 + (UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 1)
@@ -163,12 +164,31 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                                 ingredients.add(itm, qty)
                             }
 
-                            _getItemListPlayer().removeFromForceHighlightList(oldSelectedItems)
-                            _getItemListPlayer().addToForceHighlightList(selectedItems)
-                            _getItemListPlayer().rebuild(catAll)
+                            _getItemListPlayer().let {
+                                it.removeFromForceHighlightList(oldSelectedItems)
+                                it.addToForceHighlightList(selectedItems)
+                                it.rebuild(catAll)
+                            }
                             _getItemListIngredients().rebuild(catAll)
 
-                            // TODO highlightCraftingCandidateButton by searching for the buttons that has the recipe
+                            // highlighting CraftingCandidateButton by searching for the buttons that has the recipe
+                            _getItemListCraftables().let {
+                                // turn the highlights off
+                                it.items.forEach { it.forceHighlighted = false }
+
+                                // search for the recipe
+                                // also need to find what "page" the recipe might be in
+                                // use it.isCompactMode to find out the current mode
+                                var ord = 0
+                                while (ord < it.craftingRecipes.indices.last) {
+                                    if (recipeClicked == it.craftingRecipes[ord]) break
+                                    ord += 1
+                                }
+                                val itemSize = it.items.size
+
+                                it.itemPage = ord / itemSize
+                                it.items[ord % itemSize].forceHighlighted = true
+                            }
 
                             oldSelectedItems.clear()
                             oldSelectedItems.addAll(selectedItems)

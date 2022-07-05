@@ -34,7 +34,6 @@ class UIItemCraftingCandidateGrid(
 
     val craftingRecipes = ArrayList<CraftingCodex.CraftingRecipe>()
 
-
     internal val recipesSortList = ArrayList<CraftingCodex.CraftingRecipe>() // a dual to the [inventorySortList] which contains the actual recipes instead of crafting recipes
 
     fun highlightButton(button: UIItemInventoryCellBase?) {

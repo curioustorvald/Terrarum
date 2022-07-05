@@ -213,7 +213,7 @@ open class UIItemInventoryItemGrid(
         )
     }
 
-    protected var items: Array<UIItemInventoryCellBase> = itemList
+    var items: Array<UIItemInventoryCellBase> = itemList
 
     var isCompactMode = false // this is INIT code
         set(value) {
@@ -231,7 +231,7 @@ open class UIItemInventoryItemGrid(
             posY - 1 + (4 + UIItemInventoryElemWide.height - catBar.catIcons.tileH) * index
 
     /** Long/compact mode buttons */
-    internal val gridModeButtons = Array<UIItemImageButton>(2) { index ->
+    val gridModeButtons = Array<UIItemImageButton>(2) { index ->
         UIItemImageButton(
                 parentUI,
                 catBar.catIcons.get(index + 14, 0),
@@ -424,29 +424,29 @@ open class UIItemInventoryItemGrid(
 
     private val forceHighlightList = HashSet<ItemID>()
         get() {
-            if (!useHighlightingManager) throw IllegalStateException("useHighlightingManager is set to false")
+            if (!useHighlightingManager) throw IllegalStateException("useHighlightingManager is set to false; you the programmer are in charge of managing the highlighting status of buttons by yourself!")
             return field
         }
 
     /**
      * Call before rebuild()
      */
-    open internal fun clearForceHighlightList() {
+    open fun clearForceHighlightList() {
         forceHighlightList.clear()
     }
 
     /**
      * Call before rebuild()
      */
-    open internal fun addToForceHighlightList(items: List<ItemID>) {
+    open fun addToForceHighlightList(items: List<ItemID>) {
         forceHighlightList.addAll(items)
     }
 
-    open internal fun removeFromForceHighlightList(items: List<ItemID>) {
+    open fun removeFromForceHighlightList(items: List<ItemID>) {
         forceHighlightList.removeAll(items)
     }
 
-    open internal fun rebuild(filter: Array<String>) {
+    open fun rebuild(filter: Array<String>) {
         //println("Rebuilt inventory")
         //println("rebuild: actual itempage: $itemPage")
 

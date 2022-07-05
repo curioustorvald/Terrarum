@@ -40,7 +40,7 @@ class UIItemInventoryElemWide(
         val height = 48
         val UNIQUE_ITEM_HAS_NO_AMOUNT = -1L
 
-        internal val durabilityBarThickness = 3
+        val durabilityBarThickness = 3
     }
 
     override val height = UIItemInventoryElemWide.height
