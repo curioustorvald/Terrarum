@@ -66,11 +66,13 @@ class ActorInventory() : FixtureInventory() {
 
     fun getQuickslotItem(slot: Int): InventoryPair? = searchByID(quickSlot[slot])
 
-    fun consumeItem(item: GameItem) {
+    fun consumeItem(item: GameItem, amount: Long = 1L) {
         val actor = this.actor as Actor
 
+        if (item.isDynamic && amount != 1L) throw IllegalArgumentException("Dynamic item must be consumed 'once' (expected 1, got $amount)")
+
         if (item.stackable && !item.isDynamic) {
-            remove(item, 1)
+            remove(item, amount)
         }
         else if (item.isUnique) {
             return // don't consume a bike!

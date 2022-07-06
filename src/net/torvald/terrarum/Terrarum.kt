@@ -17,6 +17,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
@@ -257,6 +258,87 @@ object Terrarum : Disposable {
         get() = 1.0 / Gdx.graphics.deltaTime
     val mouseDown: Boolean
         get() = Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))
+
+
+    /**
+     * Subtile and Vector indices:
+     * ```
+     * 4px  8px
+     * +-+-----+-+
+     * | |  4  | |
+     * +-+-----+-+
+     * |3|  0  |1|
+     * +-+-----+-+
+     * | |  2  | |
+     * +-+-----+-+
+     * ```
+     */
+
+    enum class SubtileVector {
+        INVALID, CENTRE, LEFT, BOTTOM, RIGHT, TOP
+    }
+
+    data class MouseSubtile4(val x: Int, val y: Int, val vector: SubtileVector) {
+
+        val nx = when (vector) {
+            SubtileVector.CENTRE -> x
+            SubtileVector.RIGHT  -> x + 1
+            SubtileVector.BOTTOM -> x
+            SubtileVector.LEFT   -> x - 1
+            SubtileVector.TOP    -> x
+            else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
+        }
+
+        val ny = when (vector) {
+            SubtileVector.CENTRE -> y
+            SubtileVector.RIGHT  -> y
+            SubtileVector.BOTTOM -> y + 1
+            SubtileVector.LEFT   -> y
+            SubtileVector.TOP    -> y - 1
+            else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
+        }
+
+        fun getNextTileCoord() = when (vector) {
+            SubtileVector.CENTRE -> x to y
+            SubtileVector.RIGHT  -> (x + 1) to y
+            SubtileVector.BOTTOM -> x to (y + 1)
+            SubtileVector.LEFT   -> (x - 1) to y
+            SubtileVector.TOP    -> x to (y - 1)
+            else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
+        }
+
+        fun getCurrentTileCoord() = x to y
+    }
+
+    fun getMouseSubtile4(): MouseSubtile4 {
+        val SMALLGAP = 4.0
+        val LARGEGAP = 8.0 // 2*SMALLGAP + LARGEGAP must be equal to TILE_SIZE
+        assert(2 * SMALLGAP + LARGEGAP == TILE_SIZED)
+
+        val mx = mouseX
+        val my = mouseY
+        val mtx = (mouseX / TILE_SIZE).floorInt()
+        val mty = (mouseY / TILE_SIZE).floorInt()
+        val msx = mx fmod TILE_SIZED
+        val msy = my fmod TILE_SIZED
+        val vector = if (msx < SMALLGAP) { // X to the left
+            if (msy < SMALLGAP) SubtileVector.INVALID // TOP LEFT
+            else if (msy < SMALLGAP + LARGEGAP) SubtileVector.LEFT // LEFT
+            else SubtileVector.INVALID // BOTTOM LEFT
+        }
+        else if (msx < SMALLGAP + LARGEGAP) { // X to the centre
+            if (msy < SMALLGAP) SubtileVector.TOP // TOP
+            else if (msy < SMALLGAP + LARGEGAP) SubtileVector.CENTRE // CENTRE
+            else SubtileVector.BOTTOM // BOTTOM
+        }
+        else { // X to the right
+            if (msy < SMALLGAP) SubtileVector.INVALID // TOP RIGHT
+            else if (msy < SMALLGAP + LARGEGAP) SubtileVector.RIGHT // RIGHT
+            else SubtileVector.INVALID // BOTTOM RIGHT
+        }
+
+        return MouseSubtile4(mtx, mty, vector)
+    }
 
     /**
      * Usage:

@@ -49,7 +49,8 @@ open class FixtureInventory() {
 
         // other invalid values
         if (count == 0L)
-            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
+//            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
+            return
         if (count < 0L)
             throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()\n" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
@@ -94,7 +95,8 @@ open class FixtureInventory() {
         println("[ActorInventory] remove $item, $count")
 
         if (count == 0L)
-            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
+//            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
+            return
         if (count < 0L)
             throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is negative number. If you intended adding items, use add()" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")

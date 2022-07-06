@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
@@ -50,6 +49,7 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer.LIGHTMAP_OVERRENDER
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.unicode.EMDASH
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
 import java.util.*
@@ -631,8 +631,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // don't want to open the UI and use the item at the same time, would ya?
         if (!uiOpened && itemOnGrip != null) {
             val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
-            if (consumptionSuccessful)
-                (actor as Pocketed).inventory.consumeItem(itemOnGrip)
+            if (consumptionSuccessful > -1)
+                (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
         }
         // #3. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
         else if (itemOnGrip == null) {
@@ -657,8 +657,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     /*override fun worldSecondaryClickStart(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
         val consumptionSuccessful = ItemCodex[itemOnGrip]?.startSecondaryUse(delta) ?: false
-        if (consumptionSuccessful)
-            actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!)
+        if (consumptionSuccessful > -1)
+            actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!, consumptionSuccessful)
     }
 
     override fun worldSecondaryClickEnd(delta: Float) {

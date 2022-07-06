@@ -206,14 +206,14 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * - Screen tap
      * - XBox controller RT (fixed; LT is for jumping)
      *
-     * @return true when used successfully, false otherwise
+     * @return amount of the item to remove from the inventory -- 0 or greater when used successfully, -1 when failed
      *
      * note: DO NOT super() this!
      *
      * Consumption function is executed in net.torvald.terrarum.gamecontroller.IngameController,
      * in which the function itself is defined in net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
      */
-    open fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean = false
+    open fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long = -1
 
     /**
      * I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
@@ -365,14 +365,14 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
  * @param actor actor to check the reach
  * @param action returns true if the action was successfully performed
  */
-fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Boolean): Boolean {
+fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Long): Long {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
     val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
     val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
     val actorPos = actor.centrePosVector
     val dist = minOf(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2), actorPos.distanceSquared(mousePos3))
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale // perform some error checking here
-    if (dist <= distMax.sqr()) return action() else return false
+    if (dist <= distMax.sqr()) return action() else return -1
 }
 fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMultiplierInTiles: (Int) -> Double = { it.toDouble() }, action: () -> Boolean): Boolean {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)

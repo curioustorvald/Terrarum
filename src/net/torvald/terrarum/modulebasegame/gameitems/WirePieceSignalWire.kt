@@ -30,7 +30,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
         return BlockBase.wireStartPrimaryUse(actor,this, delta)
     }
 

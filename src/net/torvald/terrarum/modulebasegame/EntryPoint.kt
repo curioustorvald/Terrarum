@@ -104,7 +104,7 @@ class EntryPoint : ModuleEntryPoint() {
             tags.addAll(tile.tags)
         }
 
-        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
+        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
             return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)
         }
 

@@ -34,7 +34,7 @@ object BlockBase {
                 if (it is ActorWithBody && it.physProp.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
                     ret1 = false // return is not allowed here
             }
-            if (!ret1) return@mouseInInteractableRange ret1
+            if (!ret1) return@mouseInInteractableRange -1L
         }
 
         // return false if the tile underneath is:
@@ -46,7 +46,7 @@ object BlockBase {
             gameItem.dynamicID == "wall@" + ingame.world.getTileFromWall(mouseTile.x, mouseTile.y) ||
             BlockCodex[ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)].nameKey.contains("ACTORBLOCK_")
         )
-            return@mouseInInteractableRange false
+            return@mouseInInteractableRange 1L
 
         // filter passed, do the job
         // FIXME this is only useful for Player
@@ -67,31 +67,41 @@ object BlockBase {
             )
         }
 
-        true
+        1L
     }
 
     fun blockEffectWhenEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
+    private fun Int.shiftByTwo() = this.shl(4).or(this).ushr(2).and(15)
+    private fun connectedEachOther(one: Int, other: Int) = one.shiftByTwo() and other != 0
+
     fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) {
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
-        val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
+        val mouseTile = Terrarum.getMouseSubtile4()
 
-        // return false if the tile is already there
-        if (ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.searchFor(itemID) != null)
-            return@mouseInInteractableRange false
+        val thisTileWires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)
+        val otherTileWires = ingame.world.getAllWiresFrom(mouseTile.nx, mouseTile.ny)
+        val thisTileWireCnx = ingame.world.getWireGraphOf(mouseTile.x, mouseTile.y, itemID)
+        val otherTileWireCnx = ingame.world.getWireGraphOf(mouseTile.x, mouseTile.y, itemID)
 
-        // filter passed, do the job
-        ingame.world.setTileWire(
-                mouseTile.x,
-                mouseTile.y,
-                itemID,
-                false
-        )
+        // cases:
+        // * regardless of vector, this tile was not dragged-on
+        //  -> if this tile is occupied (use thisTileWires?.searchFor(itemID) != null): return -1
+        //     else: place the tile, then return 1
+        // * regardless of vector, this tile was dragged-on, and the oldtile is neighbouring tile
+        //  -> if this tile is occupied and connectivities are already set (use connectedEachOther(thisTileWireCnx, otherTileWireCnx)): return -1
+        //     else if this tile is occupied: set connectivity, then return 0
+        //     else: place the tile, set connectivity, then return 1
+        // (dragged-on: let net.torvald.terrarum.Terrarum record the tile that the mouse button was just down,
+        //  and the poll again later; if tile now != recorded tile, it is dragged-on)
 
-        true
+        // TODO
+
+
+        TODO()
     }
 
     fun wireEffectWhenEquipped(gameItem: GameItem, delta: Float) {

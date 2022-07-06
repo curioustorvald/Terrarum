@@ -217,6 +217,7 @@ open class GameWorld() : Disposable {
     }
 
     fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceIn(0, height - 1))
+    fun coerceXY(xy: Pair<Int, Int>) = (xy.first fmod width) to (xy.second.coerceIn(0, height - 1))
 
     /**
      * @return ItemID, WITHOUT wall tag
@@ -307,7 +308,7 @@ open class GameWorld() : Disposable {
         }
     }
 
-    fun setTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
+    fun setTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean, connection: Int) {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         val wireNode = wirings[blockAddr]
@@ -323,7 +324,8 @@ open class GameWorld() : Disposable {
             Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
         }
 
-
+        /*
+        // auto-connect-to-the-neighbour wire placement
         // figure out wiring graphs
         val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
             (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index
@@ -337,7 +339,10 @@ open class GameWorld() : Disposable {
                 val old = getWireGraphOf(x + tx, y + ty, tile) ?: 0
                 setWireGraphOf(x + tx, y + ty, tile, old or WIRE_ANTIPOS_MAP[i])
             }
-        }
+        }*/
+
+        // scratch-that-i'll-figure-it-out wire placement
+        setWireGraphOfUnsafe(blockAddr, tile, connection)
     }
 
     fun removeTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
@@ -663,7 +668,7 @@ open class GameWorld() : Disposable {
      * These values must be updated by none other than [WorldSimulator]()
      */
     data class WiringSimCell(
-            var cnx: Int = 0, // connections
+            var cnx: Int = 0, // connections. [1, 2, 4, 8] = [RIGHT, DOWN, LEFT, UP]
             val emt: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
             val rcv: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
     )
