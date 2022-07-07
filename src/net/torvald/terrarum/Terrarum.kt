@@ -298,16 +298,8 @@ object Terrarum : Disposable {
             else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
         }
 
-        fun getNextTileCoord() = when (vector) {
-            SubtileVector.CENTRE -> x to y
-            SubtileVector.RIGHT  -> (x + 1) to y
-            SubtileVector.BOTTOM -> x to (y + 1)
-            SubtileVector.LEFT   -> (x - 1) to y
-            SubtileVector.TOP    -> x to (y - 1)
-            else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
-        }
-
-        fun getCurrentTileCoord() = x to y
+        val currentTileCoord = x to y
+        val nextTileCoord = nx to ny
     }
 
     fun getMouseSubtile4(): MouseSubtile4 {

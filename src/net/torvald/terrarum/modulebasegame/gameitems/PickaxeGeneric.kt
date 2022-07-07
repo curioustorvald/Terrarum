@@ -131,7 +131,8 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
         super.tags.add("PICK")
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+            if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
 
@@ -160,7 +161,8 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
         super.tags.add("PICK")
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+            if (PickaxeCore.startPrimaryUse(actor , delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
 
@@ -189,6 +191,7 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
         super.tags.add("PICK")
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+            if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }

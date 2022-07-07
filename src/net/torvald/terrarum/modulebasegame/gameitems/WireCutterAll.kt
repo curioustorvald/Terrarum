@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -45,9 +44,9 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         wires?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
             ingame.queueActorAddition(DroppedItem(it, mouseTile.x * TILE_SIZED, mouseTile.y * TILE_SIZED))
-        } ?: return@mouseInInteractableRange false
+        } ?: return@mouseInInteractableRange -1L
 
-        true
+        0L
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {

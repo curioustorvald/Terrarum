@@ -622,8 +622,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                         )
                         it.setAsOpen()
                     }
-                    true
-                }) break
+                    0L
+                } == 0L) break
             }
         }
 
@@ -638,7 +638,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         else if (itemOnGrip == null) {
             mouseInInteractableRange(actor) {
                 performBarehandAction(actor, delta)
-                true
+                0L
             }
         }
     }

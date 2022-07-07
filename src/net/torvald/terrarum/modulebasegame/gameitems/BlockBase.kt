@@ -1,10 +1,12 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
+import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 /**
@@ -75,17 +77,69 @@ object BlockBase {
     }
 
     private fun Int.shiftByTwo() = this.shl(4).or(this).ushr(2).and(15)
-    private fun connectedEachOther(one: Int, other: Int) = one.shiftByTwo() and other != 0
+    private fun connectedEachOther(one: Int?, other: Int?) =
+            if (one == null || other == null) false
+            else (one.shiftByTwo().and(other) != 0)
+
+    private var initialMouseDownTileX = -1 // keeps track of the tile coord where the mouse was just down (not dragged-on)
+    private var initialMouseDownTileY = -1
+
+    private var oldTileX = -1
+    private var oldTileY = -1
+
+    private fun placeWirePieceTo(world: GameWorld, item: ItemID, x: Int, y: Int) {
+        world.setTileWire(x, y, item, false, 0)
+    }
+
+    /**
+     * This function assumes xy and oxy are neighboured and tiles are correctly placed
+     */
+    private fun setConnectivity(world: GameWorld,  item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
+        val thisNodeCnx = world.getWireGraphOf(x, y, item)!!
+        val otherNodeCnx = world.getWireGraphOf(ox, oy, item)!!
+
+        val vec = if (x - ox == 1) 4 // direction from thisNode towards the otherNode. [1, 2, 4, 8] = [RIGHT, DOWN, LEFT, UP]
+                else if (x - ox == -1) 1
+                else if (y - oy == 1) 8
+                else 2
+        val antivec = if (x - ox == 1) 1
+                else if (x - ox == -1) 4
+                else if (y - oy == 1) 2
+                else 8
+
+        world.setWireGraphOf(x, y, item, vec or thisNodeCnx)
+        world.setWireGraphOf(ox, oy, item, antivec or otherNodeCnx)
+    }
 
     fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) {
+
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
-        val mouseTile = Terrarum.getMouseSubtile4()
+        val mouseTileX = Terrarum.mouseTileX
+        val mouseTileY = Terrarum.mouseTileY
 
-        val thisTileWires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)
-        val otherTileWires = ingame.world.getAllWiresFrom(mouseTile.nx, mouseTile.ny)
-        val thisTileWireCnx = ingame.world.getWireGraphOf(mouseTile.x, mouseTile.y, itemID)
-        val otherTileWireCnx = ingame.world.getWireGraphOf(mouseTile.x, mouseTile.y, itemID)
+        if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary")) ||
+            // reset dragged-on status when there's drag-discontinuity (not dragging towards the neighbouring tiles)
+            !((oldTileX - mouseTileX).abs() == 1 && (oldTileY - mouseTileY).abs() == 0 ||
+              (oldTileX - mouseTileX).abs() == 0 && (oldTileY - mouseTileY).abs() == 1)
+            ) {
+            initialMouseDownTileX = mouseTileX
+            initialMouseDownTileY = mouseTileY
+            oldTileX = mouseTileX
+            oldTileY = mouseTileY
+        }
+
+        val thisTileWires = ingame.world.getAllWiresFrom(mouseTileX, mouseTileY)
+        val oldTileWires = ingame.world.getAllWiresFrom(oldTileX, oldTileY)
+        val thisTileWireCnx = ingame.world.getWireGraphOf(mouseTileX, mouseTileY, itemID)
+        val oldTileWireCnx = ingame.world.getWireGraphOf(oldTileX, oldTileY, itemID)
+
+        val thisTileOccupied = thisTileWires?.searchFor(itemID) != null
+        val oldTileOccupied = oldTileWires?.searchFor(itemID) != null
+        val connectedEachOther = connectedEachOther(thisTileWireCnx, oldTileWireCnx)
+        val thisTileWasDraggedOn = initialMouseDownTileX != mouseTileX || initialMouseDownTileY != mouseTileY
+
+        var ret = -1L
 
         // cases:
         // * regardless of vector, this tile was not dragged-on
@@ -97,11 +151,30 @@ object BlockBase {
         //     else: place the tile, set connectivity, then return 1
         // (dragged-on: let net.torvald.terrarum.Terrarum record the tile that the mouse button was just down,
         //  and the poll again later; if tile now != recorded tile, it is dragged-on)
+        if (!thisTileWasDraggedOn) {
+            if (thisTileOccupied) return@mouseInInteractableRange -1
+            else {
+                placeWirePieceTo(ingame.world, itemID, mouseTileX, mouseTileY)
+                ret = 1
+            }
+        }
+        else {
+            if (thisTileOccupied && connectedEachOther) return@mouseInInteractableRange -1
+            else if (thisTileOccupied && oldTileOccupied) {
+                setConnectivity(ingame.world, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
+                ret = 0
+            }
+            else {
+                placeWirePieceTo(ingame.world, itemID, mouseTileX, mouseTileY)
+                setConnectivity(ingame.world, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
+                ret = 1
+            }
+        }
 
-        // TODO
+        oldTileX = mouseTileX
+        oldTileY = mouseTileY
 
-
-        TODO()
+        ret
     }
 
     fun wireEffectWhenEquipped(gameItem: GameItem, delta: Float) {

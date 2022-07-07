@@ -364,6 +364,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 /**
  * @param actor actor to check the reach
  * @param action returns true if the action was successfully performed
+ * @return an amount to remove from the inventory (>= 0); -1 if the action failed or not in interactable range
  */
 fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Long): Long {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)

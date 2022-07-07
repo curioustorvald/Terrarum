@@ -50,17 +50,17 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
         override val isDynamic = false
         override val material = Material()
 
-        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Boolean {
+        override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
             try {
                 // place the actor to the world
                 this@HumanoidNPC.setPosition(Terrarum.mouseX, Terrarum.mouseY)
                 INGAME.queueActorAddition(this@HumanoidNPC)
                 // successful
-                return true
+                return 1
             }
             catch (e: Exception) {
                 e.printStackTrace()
-                return false
+                return -1
             }
         }
     }
