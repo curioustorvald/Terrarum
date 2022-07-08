@@ -8,7 +8,6 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorID
-import net.torvald.terrarum.gameactors.WireActor
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
@@ -355,7 +354,7 @@ open class GameWorld() : Disposable {
                 Terrarum.ingame?.queueWireChangedEvent(tile, true, x, y)
                 Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
             }
-
+            /*
             // figure out wiring graphs
             val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
                 (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index
@@ -369,7 +368,7 @@ open class GameWorld() : Disposable {
             }
 
             wiringGraph[blockAddr]!!.remove(tile)
-            wirings[blockAddr]!!.ws.remove(tile)
+            wirings[blockAddr]!!.ws.remove(tile)*/
         }
     }
 
@@ -470,14 +469,14 @@ open class GameWorld() : Disposable {
         }
     }
 
-    fun getAllWiresFrom(x: Int, y: Int): SortedArrayList<ItemID>? {
+    fun getAllWiresFrom(x: Int, y: Int): Pair<SortedArrayList<ItemID>?, WiringGraphMap?> {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         return getAllWiresFrom(blockAddr)
     }
 
-    fun getAllWiresFrom(blockAddr: BlockAddress): SortedArrayList<ItemID>? {
-        return wirings[blockAddr]?.ws
+    fun getAllWiresFrom(blockAddr: BlockAddress): Pair<SortedArrayList<ItemID>?, WiringGraphMap?> {
+        return wirings[blockAddr]?.ws to wiringGraph[blockAddr]
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): ItemID {

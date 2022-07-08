@@ -205,7 +205,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
                 val wires = it.getAllWiresFrom(mouseTileX, mouseTileY)
                 val fluid = it.getFluid(mouseTileX, mouseTileY)
-                val wireCount = wires?.size?.toString() ?: "no"
+                val wireCount = wires.first?.size?.toString() ?: "no"
 
                 App.fontSmallNumbers.draw(batch, "$ccO$TERRAIN$ccG$tileNum", gap + 7f*(tileCursX + 3), line(tileCursY))
                 App.fontSmallNumbers.draw(batch, "$ccO$WALL$ccG$wallNum", gap + 7f*(tileCursX + 3), line(tileCursY + 1))

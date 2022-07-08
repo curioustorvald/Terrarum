@@ -903,10 +903,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end) {
                 if (wiringCounter >= maxRenderableWires) break
-                world.getAllWiresFrom(x, y)?.forEach {
+
+                val (wires, nodes) = world.getAllWiresFrom(x, y)
+
+                wires?.forEach {
                     val wireActor = wireActorsContainer[wiringCounter]
 
-                    wireActor.setWire(it, x, y)
+                    wireActor.setWire(it, x, y, nodes!![it]!!.cnx)
 
                     if (WireCodex[it].renderClass == selectedWireRenderClass || selectedWireRenderClass == "wire_render_all") {
                         wireActor.renderOrder = Actor.RenderOrder.OVERLAY

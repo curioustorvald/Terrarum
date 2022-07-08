@@ -134,8 +134,8 @@ object BlockBase {
         val thisTileWireCnx = ingame.world.getWireGraphOf(mouseTileX, mouseTileY, itemID)
         val oldTileWireCnx = ingame.world.getWireGraphOf(oldTileX, oldTileY, itemID)
 
-        val thisTileOccupied = thisTileWires?.searchFor(itemID) != null
-        val oldTileOccupied = oldTileWires?.searchFor(itemID) != null
+        val thisTileOccupied = thisTileWires.first?.searchFor(itemID) != null
+        val oldTileOccupied = oldTileWires.first?.searchFor(itemID) != null
         val connectedEachOther = connectedEachOther(thisTileWireCnx, oldTileWireCnx)
         val thisTileWasDraggedOn = initialMouseDownTileX != mouseTileX || initialMouseDownTileY != mouseTileY
 

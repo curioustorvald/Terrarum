@@ -38,7 +38,7 @@ class WireActor : ActorWithBody {
     /**
      * @param itemID must start with "wire@"
      */
-    fun setWire(itemID: ItemID, worldX: Int, worldY: Int) {
+    fun setWire(itemID: ItemID, worldX: Int, worldY: Int, cnx: Int) {
         setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 0)
 
         if (wireID != itemID) {
@@ -57,15 +57,7 @@ class WireActor : ActorWithBody {
         setPosition((worldX + 0.5) * TILE_SIZE, (worldY + 1.0) * TILE_SIZE - 1.0) // what the fuck?
 
         (sprite as SheetSpriteAnimation).currentRow = 0
-
-        val nearbyTiles = getNearbyTilesPos(worldX, worldY).map { world!!.getAllWiresFrom(it.x, it.y) }
-        var ret = 0
-        for (i in 0..3) {
-            if (nearbyTiles[i]?.contains(itemID) == true) {
-                ret = ret or (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
-            }
-        }
-        (sprite as SheetSpriteAnimation).currentFrame = ret
+        (sprite as SheetSpriteAnimation).currentFrame = cnx
     }
 
     private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {

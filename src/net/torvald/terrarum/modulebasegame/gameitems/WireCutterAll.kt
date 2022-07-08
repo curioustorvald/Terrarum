@@ -39,9 +39,11 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
-        val wires = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)?.cloneToList()
 
-        wires?.forEach {
+        val wireNet = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)
+        val wireItems = wireNet.first?.cloneToList()
+
+        wireItems?.forEach {
             ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
             ingame.queueActorAddition(DroppedItem(it, mouseTile.x * TILE_SIZED, mouseTile.y * TILE_SIZED))
         } ?: return@mouseInInteractableRange -1L
