@@ -77,9 +77,18 @@ object BlockBase {
     }
 
     private fun Int.shiftByTwo() = this.shl(4).or(this).ushr(2).and(15)
-    private fun connectedEachOther(one: Int?, other: Int?) =
-            if (one == null || other == null) false
-            else (one.shiftByTwo().and(other) != 0)
+    private fun connectedEachOther(oldToNewVector: Int, new: Int?, old: Int?): Boolean {
+        return if (new == null || old == null || oldToNewVector == 0) false
+        else {
+            val newToOldVector = oldToNewVector.shiftByTwo()
+            //printdbg(this, "connected? ${one.and(15).toString(2).padStart(4, '0')} vs ${other.and(15).toString(2).padStart(4, '0')}")
+            val p = oldToNewVector and old
+            val q = newToOldVector and new
+            if (p == 0 && q == 0) false
+            else if (p > 0 && q > 0) true
+            else throw IllegalStateException("oldToNewVector = $oldToNewVector, new = $new, old == $old")
+        }
+    }
 
     private var initialMouseDownTileX = -1 // keeps track of the tile coord where the mouse was just down (not dragged-on)
     private var initialMouseDownTileY = -1
@@ -136,7 +145,14 @@ object BlockBase {
 
         val thisTileOccupied = thisTileWires.first?.searchFor(itemID) != null
         val oldTileOccupied = oldTileWires.first?.searchFor(itemID) != null
-        val connectedEachOther = connectedEachOther(thisTileWireCnx, oldTileWireCnx)
+
+        val oldToNewVector = if (mouseTileX - oldTileX == 1) 1
+                else if (mouseTileX - oldTileX == -1) 4
+                else if (mouseTileY - oldTileY == 1) 2
+                else if (mouseTileY - oldTileY == -1) 8
+                else 0 // if xy == oxy, the vector will be 0
+
+        val connectedEachOther = connectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
         val thisTileWasDraggedOn = initialMouseDownTileX != mouseTileX || initialMouseDownTileY != mouseTileY
 
         var ret = -1L
@@ -159,7 +175,9 @@ object BlockBase {
             }
         }
         else {
-            if (thisTileOccupied && connectedEachOther) return@mouseInInteractableRange -1
+            if (thisTileOccupied && connectedEachOther) {
+                ret -1
+            }
             else if (thisTileOccupied && oldTileOccupied) {
                 setConnectivity(ingame.world, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
                 ret = 0
