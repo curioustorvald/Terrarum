@@ -120,6 +120,7 @@ object BlockBase {
         world.setWireGraphOf(ox, oy, item, antivec or otherNodeCnx)
     }
 
+    // TODO: take ROUNDWORLD into account on node connection
     fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) {
 
         val itemID = gameItem.originalID

@@ -340,7 +340,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     }
 
     /**
-     * Check for duplicates, append actor and sort the list
+     * Queue an actor to be added into the world. The actors will be added on the next update-frame and then the queue will be cleared.
+     * If the actor is null, this function will do nothing.
      */
     open fun queueActorAddition(actor: Actor?) {
         if (actor == null) return

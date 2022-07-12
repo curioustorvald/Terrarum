@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.gamepadLabelStart
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
@@ -22,6 +23,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unicode.getKeycapPC
 
 /**
  * Created by minjaesong on 2019-07-08.
@@ -215,6 +217,13 @@ internal class UIStorageChest : UICanvas(
     private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset
     private val thisOffsetX2 = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 7
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
+    private val cellsWidth = (listGap + UIItemInventoryElemWide.height) * 6 - listGap
+
+    private val controlHelp: String
+        get() = if (App.environment == RunningEnvironment.PC)
+            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+        else
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]} "
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
@@ -233,7 +242,7 @@ internal class UIStorageChest : UICanvas(
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         val chestName = chestNameFun()
-        val chestNameXpos = itemListChest.posX + 6f
+        val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
         val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - weightBarWidth
         val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
         val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + internalHeight).div(2).toFloat() // directly copied from UIInventoryFull.yEnd
@@ -243,10 +252,7 @@ internal class UIStorageChest : UICanvas(
 
         // encumbrance bar background
         batch.color = encumbBack
-        Toolkit.fillArea(batch,
-                encumbBarXPos, encumbBarYPos,
-                weightBarWidth, controlHelpHeight - 6f
-        )
+        Toolkit.fillArea(batch, encumbBarXPos, encumbBarYPos, weightBarWidth, controlHelpHeight - 6f)
         // encumbrance bar
         batch.color = encumbCol
         Toolkit.fillArea(batch, 
@@ -260,16 +266,15 @@ internal class UIStorageChest : UICanvas(
 
         // chest name text
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, chestName, thisOffsetX + 2, thisOffsetY - 30)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, chestName, thisOffsetX + (cellsWidth - App.fontGame.getWidth(chestName)) / 2, thisOffsetY - 30)
+        App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - 30)
+
+        // control hint
+        App.fontGame.draw(batch, controlHelp, thisOffsetX + 2f, encumbBarYPos - 3)
 
         // encumb text
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f +
-                if (App.fontGame.getWidth(chestName) + 2 + chestNameXpos >= encumbBarTextXPos)
-                    App.fontGame.lineHeight
-                else 0f
-        )
+        App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
     }
 
     override fun doOpening(delta: Float) {
