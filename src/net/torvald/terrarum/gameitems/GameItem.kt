@@ -362,6 +362,10 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 }
 
 /**
+ * When the mouse cursor is within the reach of the actor, make the given action happen.
+ *
+ * The reach is calculated using the actor's reach, reach buff actorvalue and the actor's scale.
+ *
  * @param actor actor to check the reach
  * @param action returns non-negative integer if the action was successfully performed
  * @return an amount to remove from the inventory (>= 0); -1 if the action failed or not in interactable range
@@ -375,6 +379,18 @@ fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Long): Long {
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale // perform some error checking here
     if (dist <= distMax.sqr()) return action() else return -1
 }
+
+/**
+ * When the mouse cursor is within the reach of the actor, make the given action happen.
+ *
+ * The reach is calculated using the actor's reach, reach buff actorvalue and the actor's scale as well as the tool-material's reach bonus.
+ *
+ * @param actor actor to check the reach
+ * @param item the item that represents the tool
+ * @param reachMultiplierInTiles optional: a function that modifies the calculated reach
+ * @param action returns boolean if the action was successfully performed
+ * @return true if the action was successful, false if the action failed or the mouse is not in interactable range
+ */
 fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMultiplierInTiles: (Int) -> Double = { it.toDouble() }, action: () -> Boolean): Boolean {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
     val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)

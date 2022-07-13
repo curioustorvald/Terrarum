@@ -2,17 +2,75 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.Point2i
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameitems.mouseInInteractableRange
+import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
+import net.torvald.terrarum.notEmptyOrNull
+import net.torvald.terrarum.toInt
 
+/**
+ * Modular approach to the wire cutter function
+ *
+ * Created by minjaesong on 2022-07-13.
+ */
+object WireCutterBase {
+
+    private fun disconnect(world: GameWorld, item: ItemID, x1: Int, y1: Int, x2: Int, y2: Int) {
+
+    }
+
+    fun startPrimaryUse(item: GameItem, actor: ActorWithBody, delta: Float, wireFilter: (ItemID) -> Boolean) = mouseInInteractableRangeTools(actor, item) {
+        val ingame = Terrarum.ingame!! as TerrarumIngame
+        val mouseTile = Terrarum.getMouseSubtile4()
+
+        if (mouseTile.vector == Terrarum.SubtileVector.INVALID) return@mouseInInteractableRangeTools false
+
+        val (mtx, mty) = mouseTile.currentTileCoord
+        val mvec = mouseTile.vector
+
+        if (mvec == Terrarum.SubtileVector.CENTRE) {
+            val wireNet = ingame.world.getAllWiresFrom(mtx, mty)
+            val wireItems = wireNet.first?.cloneToList()
+
+            wireItems?.filter(wireFilter)?.notEmptyOrNull()?.forEach {
+                ingame.world.removeTileWire(mtx, mty, it, false)
+                ingame.queueActorAddition(DroppedItem(it, mtx * TILE_SIZED, mty * TILE_SIZED))
+            } ?: return@mouseInInteractableRangeTools false
+
+            true
+        }
+        else {
+            val (ntx, nty) = mouseTile.nextTileCoord
+
+            val wireNetP = ingame.world.getAllWiresFrom(mtx, mty)
+            val wireNetN = ingame.world.getAllWiresFrom(mtx, mty)
+            val wireItemsP = wireNetP.first?.cloneToList()
+            val wireItemsN = wireNetN.first?.cloneToList()
+
+            // get intersection of wireItemsP and wireItemsN
+            if (wireItemsP != null && wireItemsN != null) {
+                val wireItems = wireItemsP intersect wireItemsN
+
+                wireItems.filter(wireFilter).notEmptyOrNull()?.forEach {
+                    disconnect(ingame.world, it, mtx, mty, ntx, nty)
+                } ?: return@mouseInInteractableRangeTools false
+
+                true
+            }
+            else
+                false
+        }
+    }.toInt().minus(1L) // 0L if successful, -1L if not
+
+
+}
 /**
  * TEST ITEM; this item cuts every wire on a cell, and has no durability drop
  *
@@ -36,20 +94,8 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
-        val ingame = Terrarum.ingame!! as TerrarumIngame
-        val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
-
-        val wireNet = ingame.world.getAllWiresFrom(mouseTile.x, mouseTile.y)
-        val wireItems = wireNet.first?.cloneToList()
-
-        wireItems?.forEach {
-            ingame.world.removeTileWire(mouseTile.x, mouseTile.y, it, false)
-            ingame.queueActorAddition(DroppedItem(it, mouseTile.x * TILE_SIZED, mouseTile.y * TILE_SIZED))
-        } ?: return@mouseInInteractableRange -1L
-
-        0L
-    }
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+            WireCutterBase.startPrimaryUse(this, actor, delta) { true }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = "wire_render_all"

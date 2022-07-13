@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.gamepadLabelLEFTRIGHT
 import net.torvald.terrarum.App.gamepadLabelStart
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -64,6 +65,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private val thisOffsetX2 = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 7
     private val thisXend = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 13 - listGap
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
+    private val cellsWidth = (listGap + UIItemInventoryElemWide.height) * 6 - listGap
 
     private val TEXT_GAP = 26
     private val LAST_LINE_IN_GRID = ((UIItemInventoryElemWide.height + listGap) * (UIInventoryFull.CELLS_VRT - 2)) + 22//359 // TEMPORARY VALUE!
@@ -452,9 +454,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         batch.color = Color.WHITE
 
         // text label for two inventory grids
-        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], thisOffsetX + 2, thisOffsetY - TEXT_GAP)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY_INGREDIENTS"], thisOffsetX + 2, thisOffsetY + LAST_LINE_IN_GRID - TEXT_GAP)
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], thisOffsetX2 + 2, thisOffsetY - TEXT_GAP)
+        val craftingLabel = Lang["GAME_CRAFTING"]
+        val ingredientsLabel = Lang["GAME_INVENTORY_INGREDIENTS"]
+        val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
+
+        App.fontGame.draw(batch, craftingLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(craftingLabel)) / 2, thisOffsetY - TEXT_GAP)
+        App.fontGame.draw(batch, ingredientsLabel, thisOffsetX + (cellsWidth - App.fontGame.getWidth(ingredientsLabel)) / 2, thisOffsetY + LAST_LINE_IN_GRID - TEXT_GAP)
+        App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - TEXT_GAP)
 
 
         // control hints

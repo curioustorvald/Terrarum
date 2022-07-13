@@ -76,11 +76,11 @@ object BlockBase {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
-    private fun Int.shiftByTwo() = this.shl(4).or(this).ushr(2).and(15)
-    private fun connectedEachOther(oldToNewVector: Int, new: Int?, old: Int?): Boolean {
+    fun Int.wireNodeMirror() = this.shl(4).or(this).ushr(2).and(15)
+    fun wireNodesConnectedEachOther(oldToNewVector: Int, new: Int?, old: Int?): Boolean {
         return if (new == null || old == null || oldToNewVector == 0) false
         else {
-            val newToOldVector = oldToNewVector.shiftByTwo()
+            val newToOldVector = oldToNewVector.wireNodeMirror()
             //printdbg(this, "connected? ${one.and(15).toString(2).padStart(4, '0')} vs ${other.and(15).toString(2).padStart(4, '0')}")
             val p = oldToNewVector and old
             val q = newToOldVector and new
@@ -153,7 +153,7 @@ object BlockBase {
                 else if (mouseTileY - oldTileY == -1) 8
                 else 0 // if xy == oxy, the vector will be 0
 
-        val connectedEachOther = connectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
+        val connectedEachOther = wireNodesConnectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
         val thisTileWasDraggedOn = initialMouseDownTileX != mouseTileX || initialMouseDownTileY != mouseTileY
 
         var ret = -1L

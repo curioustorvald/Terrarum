@@ -720,6 +720,8 @@ fun <T> Array<T>.init() = this.sliceArray(0 until this.lastIndex)
 fun <T> List<T>.tail() = this.subList(1, this.size)
 fun <T> List<T>.init() = this.subList(0, this.lastIndex)
 
+fun <T> Collection<T>.notEmptyOrNull() = this.ifEmpty { null }
+
 val BlockCodex: BlockCodex
     get() = Terrarum.blockCodex
 val ItemCodex: ItemCodex
