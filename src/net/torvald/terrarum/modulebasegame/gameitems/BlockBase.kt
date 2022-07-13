@@ -107,36 +107,31 @@ object BlockBase {
     /**
      * This function assumes xy and oxy are neighboured and tiles are correctly placed
      */
-    private fun setConnectivity(world: GameWorld,  item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
-        val thisNodeCnx = world.getWireGraphOf(x, y, item)!!
-        val otherNodeCnx = world.getWireGraphOf(ox, oy, item)!!
-
-        val vec = if (x - ox == 1) 4 // direction from thisNode towards the otherNode. [1, 2, 4, 8] = [RIGHT, DOWN, LEFT, UP]
-                else if (x - ox == -1) 1
-                else if (y - oy == 1) 8
-                else 2
-        val antivec = if (x - ox == 1) 1
-                else if (x - ox == -1) 4
-                else if (y - oy == 1) 2
-                else 8
-
-        world.setWireGraphOf(x, y, item, vec or thisNodeCnx)
-        world.setWireGraphOf(ox, oy, item, antivec or otherNodeCnx)
+    private fun setConnectivity(world: GameWorld, vec: Int, item: ItemID, x: Int, y: Int, ox: Int, oy: Int) {
+        world.getWireGraphOf(x, y, item)!!.let { world.setWireGraphOf(x, y, item, vec.wireNodeMirror() or it) }
+        world.getWireGraphOf(ox, oy, item)!!.let { world.setWireGraphOf(ox, oy, item, vec or it) }
     }
 
-    // TODO: take ROUNDWORLD into account on node connection
+    private fun isNeighbouring(ww: Int, x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
+        // xy is always coerced into the world's dimension
+        // i know the code below is lengthy and redundant but whatever
+        return if (  x1 == 0     && x2 == ww-1 && y1 == y2) true
+          else if (  x1 == ww-1  && x2 == 0    && y1 == y2) true
+          else if ((x1 - x2).abs() == 1 && y1 == y2) true
+          else if ((y1 - y2).abs() == 1 && x1 == x2) true
+          else false
+    }
+
     fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) {
 
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
         val mouseTileX = Terrarum.mouseTileX
         val mouseTileY = Terrarum.mouseTileY
+        val ww = ingame.world.width
 
         if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary")) ||
-            // reset dragged-on status when there's drag-discontinuity (not dragging towards the neighbouring tiles)
-            !((oldTileX - mouseTileX).abs() == 1 && (oldTileY - mouseTileY).abs() == 0 ||
-              (oldTileX - mouseTileX).abs() == 0 && (oldTileY - mouseTileY).abs() == 1)
-            ) {
+                !isNeighbouring(ww, mouseTileX, mouseTileY, oldTileX, oldTileY)) {
             initialMouseDownTileX = mouseTileX
             initialMouseDownTileY = mouseTileY
             oldTileX = mouseTileX
@@ -151,7 +146,9 @@ object BlockBase {
         val thisTileOccupied = thisTileWires.first?.searchFor(itemID) != null
         val oldTileOccupied = oldTileWires.first?.searchFor(itemID) != null
 
-        val oldToNewVector = if (mouseTileX - oldTileX == 1) 1
+        val oldToNewVector = if (mouseTileX == ww - 1 && oldTileX == 0) 4
+                else if (mouseTileX == 0 && oldTileX == ww - 1) 1
+                else if (mouseTileX - oldTileX == 1) 1
                 else if (mouseTileX - oldTileX == -1) 4
                 else if (mouseTileY - oldTileY == 1) 2
                 else if (mouseTileY - oldTileY == -1) 8
@@ -184,12 +181,12 @@ object BlockBase {
                 ret -1
             }
             else if (thisTileOccupied && oldTileOccupied) {
-                setConnectivity(ingame.world, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
+                setConnectivity(ingame.world, oldToNewVector, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
                 ret = 0
             }
             else {
                 placeWirePieceTo(ingame.world, itemID, mouseTileX, mouseTileY)
-                setConnectivity(ingame.world, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
+                setConnectivity(ingame.world, oldToNewVector, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
                 ret = 1
             }
         }
