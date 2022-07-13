@@ -22,7 +22,7 @@ class GameCrashHandler(e: Throwable) : JFrame() {
 
     private val outputStream = object : OutputStream() {
         override fun write(p0: Int) {
-            htmlSB.appendCodePoint(p0)
+            htmlSB.append((p0 and 255).toChar())
         }
     }
 

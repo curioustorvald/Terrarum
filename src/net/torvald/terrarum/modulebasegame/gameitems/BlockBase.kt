@@ -76,6 +76,10 @@ object BlockBase {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
     }
 
+    private val wireVectorChars = arrayOf(
+            "· · · ·","· · · →","· · ↓ ·","· · ↓ →","· ← · ·","· ← · →","· ← ↓ ·","· ← ↓ →","↑ · · ·","↑ · · →","↑ · ↓ ·","↑ · ↓ →","↑ ← · ·","↑ ← · →","↑ ← ↓ ·","↑ ← ↓ →",
+    )
+    fun Int.toWireVectorBitsStr(): String = "[${wireVectorChars[this]}]($this)"
     fun Int.wireNodeMirror() = this.shl(4).or(this).ushr(2).and(15)
     fun wireNodesConnectedEachOther(oldToNewVector: Int, new: Int?, old: Int?): Boolean {
         return if (new == null || old == null || oldToNewVector == 0) false
@@ -86,7 +90,7 @@ object BlockBase {
             val q = newToOldVector and new
             if (p == 0 && q == 0) false
             else if (p > 0 && q > 0) true
-            else throw IllegalStateException("oldToNewVector = $oldToNewVector, new = $new, old == $old")
+            else throw IllegalStateException("oldToNewVector = ${oldToNewVector.toWireVectorBitsStr()}, new = ${new.toWireVectorBitsStr()}, old = ${old.toWireVectorBitsStr()}")
         }
     }
 

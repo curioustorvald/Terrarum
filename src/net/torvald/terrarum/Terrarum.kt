@@ -278,6 +278,15 @@ object Terrarum : Disposable {
         INVALID, CENTRE, LEFT, BOTTOM, RIGHT, TOP
     }
 
+    fun SubtileVector.toInt() = when (this) {
+        SubtileVector.INVALID -> throw IllegalArgumentException()
+        SubtileVector.RIGHT -> 1
+        SubtileVector.BOTTOM -> 2
+        SubtileVector.LEFT -> 4
+        SubtileVector.TOP    -> 8
+        SubtileVector.CENTRE -> 0
+    }
+
     data class MouseSubtile4(val x: Int, val y: Int, val vector: SubtileVector) {
 
         val nx = when (vector) {
@@ -286,7 +295,7 @@ object Terrarum : Disposable {
             SubtileVector.BOTTOM -> x
             SubtileVector.LEFT   -> x - 1
             SubtileVector.TOP    -> x
-            else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
+            else -> x
         }
 
         val ny = when (vector) {
@@ -295,7 +304,7 @@ object Terrarum : Disposable {
             SubtileVector.BOTTOM -> y + 1
             SubtileVector.LEFT   -> y
             SubtileVector.TOP    -> y - 1
-            else -> throw IllegalArgumentException("Invalid vector index $vector for subtile $this")
+            else -> y
         }
 
         val currentTileCoord = x to y

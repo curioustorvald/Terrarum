@@ -3,17 +3,19 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.Terrarum.toInt
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
+import net.torvald.terrarum.modulebasegame.gameitems.BlockBase.wireNodeMirror
 import net.torvald.terrarum.notEmptyOrNull
 import net.torvald.terrarum.toInt
+import net.torvald.terrarum.utils.WiringGraphMap
 
 /**
  * Modular approach to the wire cutter function
@@ -22,8 +24,12 @@ import net.torvald.terrarum.toInt
  */
 object WireCutterBase {
 
-    private fun disconnect(world: GameWorld, item: ItemID, x1: Int, y1: Int, x2: Int, y2: Int) {
+    private fun disconnect(item: ItemID, mapP: WiringGraphMap, mapN: WiringGraphMap, subTile: Terrarum.SubtileVector) {
+        val pBitMask = subTile.toInt() // bit mask to turn off
+        val nBitMask = pBitMask.wireNodeMirror()
 
+        mapP[item]!!.cnx = mapP[item]!!.cnx and (15 - pBitMask) // (15 - pBitMask) -> bit mask to retain
+        mapN[item]!!.cnx = mapN[item]!!.cnx and (15 - nBitMask)
     }
 
     fun startPrimaryUse(item: GameItem, actor: ActorWithBody, delta: Float, wireFilter: (ItemID) -> Boolean) = mouseInInteractableRangeTools(actor, item) {
@@ -37,7 +43,7 @@ object WireCutterBase {
 
         if (mvec == Terrarum.SubtileVector.CENTRE) {
             val wireNet = ingame.world.getAllWiresFrom(mtx, mty)
-            val wireItems = wireNet.first?.cloneToList()
+            val wireItems = wireNet.first
 
             wireItems?.filter(wireFilter)?.notEmptyOrNull()?.forEach {
                 ingame.world.removeTileWire(mtx, mty, it, false)
@@ -50,16 +56,16 @@ object WireCutterBase {
             val (ntx, nty) = mouseTile.nextTileCoord
 
             val wireNetP = ingame.world.getAllWiresFrom(mtx, mty)
-            val wireNetN = ingame.world.getAllWiresFrom(mtx, mty)
-            val wireItemsP = wireNetP.first?.cloneToList()
-            val wireItemsN = wireNetN.first?.cloneToList()
+            val wireNetN = ingame.world.getAllWiresFrom(ntx, nty)
+            val wireItemsP = wireNetP.first
+            val wireItemsN = wireNetN.first
 
             // get intersection of wireItemsP and wireItemsN
             if (wireItemsP != null && wireItemsN != null) {
                 val wireItems = wireItemsP intersect wireItemsN
 
                 wireItems.filter(wireFilter).notEmptyOrNull()?.forEach {
-                    disconnect(ingame.world, it, mtx, mty, ntx, nty)
+                    disconnect(it, wireNetP.second!!, wireNetN.second!!, mouseTile.vector)
                 } ?: return@mouseInInteractableRangeTools false
 
                 true

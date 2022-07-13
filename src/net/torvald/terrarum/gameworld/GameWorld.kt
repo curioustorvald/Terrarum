@@ -354,21 +354,16 @@ open class GameWorld() : Disposable {
                 Terrarum.ingame?.queueWireChangedEvent(tile, true, x, y)
                 Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
             }
-            /*
-            // figure out wiring graphs
-            val matchingNeighbours = WireActor.WIRE_NEARBY.mapIndexed { index, (tx, ty) ->
-                (getAllWiresFrom(x + tx, y + ty)?.contains(tile) == true).toInt() shl index
-            }.sum()
-            for (i in 0..3) {
-                if (matchingNeighbours and WIRE_POS_MAP[i] > 0) {
-                    val (tx, ty) = WireActor.WIRE_NEARBY[i]
-                    val old = getWireGraphOf(x + tx, y + ty, tile) ?: 0
-                    setWireGraphOf(x + tx, y + ty, tile, old and (15 - WIRE_ANTIPOS_MAP[i]))
-                }
-            }
 
+            // disconnect neighbouring nodes
+            /* RIGHT */getWireGraphOf(x+1, y, tile)?.let { setWireGraphOf(x+1, y, tile, it and 0b1011) }
+            /* BOTTOM */if (y+1 < height) getWireGraphOf(x, y+1, tile)?.let { setWireGraphOf(x, y+1, tile, it and 0b0111) }
+            /* LEFT */getWireGraphOf(x-1, y, tile)?.let { setWireGraphOf(x-1, y, tile, it and 0b1110) }
+            /* TOP */if (y-1 >= 0) getWireGraphOf(x, y-1, tile)?.let { setWireGraphOf(x, y-1, tile, it and 0b1101) }
+
+            // remove wire from this tile
             wiringGraph[blockAddr]!!.remove(tile)
-            wirings[blockAddr]!!.ws.remove(tile)*/
+            wirings[blockAddr]!!.ws.remove(tile)
         }
     }
 
