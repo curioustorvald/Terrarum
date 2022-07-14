@@ -69,7 +69,7 @@ class ActorInventory() : FixtureInventory() {
     fun consumeItem(item: GameItem, amount: Long = 1L) {
         val actor = this.actor as Actor
 
-        if (item.isDynamic && amount != 1L) throw IllegalArgumentException("Dynamic item must be consumed 'once' (expected 1, got $amount)")
+        if (amount < 0) throw IllegalArgumentException("Consuming negative amount of an item (expected >=0, got $amount)")
 
         if (item.stackable && !item.isDynamic) {
             remove(item, amount)

@@ -29,7 +29,7 @@ object BlockBase {
         // FIXME     actually it's this code: not recognising hitbox's starting point correctly. Use F9 for visualisation
         // FIXME the above issue is resolved by using intTilewise instead of hInt, but the hitbox itself is still
         // FIXME     badly defined
-        
+
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
             var ret1 = true
             ingame.actorContainerActive.forEach {
@@ -39,20 +39,17 @@ object BlockBase {
             if (!ret1) return@mouseInInteractableRange -1L
         }
 
-        // return false if the tile underneath is:
-        // 0. same tile
-        // 1. actorblock
-        if (gameItem.inventoryCategory == GameItem.Category.BLOCK &&
-            gameItem.dynamicID == ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y) ||
-            gameItem.inventoryCategory == GameItem.Category.WALL &&
-            gameItem.dynamicID == "wall@" + ingame.world.getTileFromWall(mouseTile.x, mouseTile.y) ||
-            BlockCodex[ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)].nameKey.contains("ACTORBLOCK_")
-        )
-            return@mouseInInteractableRange 1L
+        val isWall = itemID.startsWith("wall@")
+        val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
+        val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
+
+        // return false if there is a tile already
+        if (isWall && BlockCodex[wallUnderCursor].isSolid || !isWall && BlockCodex[terrainUnderCursor].isSolid)
+            return@mouseInInteractableRange -1L
 
         // filter passed, do the job
         // FIXME this is only useful for Player
-        if (itemID.startsWith("wall@")) {
+        if (isWall) {
             ingame.world.setTileWall(
                     mouseTile.x,
                     mouseTile.y,
