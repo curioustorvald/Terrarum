@@ -241,7 +241,7 @@ object WorldSimulator {
                 val currentTile = world.getTileFromTerrain(x, y)
                 val prop = BlockCodex[currentTile]
                 // don't let the falling sand destroy the precious storage chest
-                val isAir = !prop.isSolid && !prop.nameKey.contains("ACTORBLOCK")
+                val isAir = !prop.isSolid && !prop.isActorBlock
                 val support = prop.maxSupport
                 val isFallable = support != -1
 

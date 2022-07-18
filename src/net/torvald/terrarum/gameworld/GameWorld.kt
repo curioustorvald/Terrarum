@@ -269,7 +269,7 @@ open class GameWorld() : Disposable {
         layerWall.unsafeSetTile(x, y, tilenum)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
 
-        if (!bypassEvent) {
+        if (!bypassEvent && oldWall != itemID) {
             Terrarum.ingame?.queueWallChangedEvent(oldWall, itemID, x, y)
             Terrarum.ingame?.modified(LandUtil.LAYER_WALL, x, y)
         }
@@ -301,7 +301,7 @@ open class GameWorld() : Disposable {
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
-        if (!bypassEvent) {
+        if (!bypassEvent && oldTerrain != itemID) {
             Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, x, y)
             Terrarum.ingame?.modified(LandUtil.LAYER_TERR, x, y)
         }

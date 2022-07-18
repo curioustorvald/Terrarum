@@ -106,4 +106,7 @@ class BlockProp {
      * Mainly intended to be used by third-party modules
      */
     val extra = Codex()
+
+    val isActorBlock: Boolean
+        get() = nameKey.contains("ACTORBLOCK")
 }

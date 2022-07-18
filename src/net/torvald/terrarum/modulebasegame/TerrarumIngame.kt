@@ -1222,7 +1222,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     fun performBarehandAction(actor: ActorWithBody, delta: Float) {
 
-        val canAttackOrDig = actor.scale * actor.baseHitboxH >= actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0
+        val canAttackOrDig = actor.scale * actor.baseHitboxH >= (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
 
 
         fun getActorsAtVicinity(worldX: Double, worldY: Double, radius: Double): List<ActorWithBody> {
@@ -1249,18 +1249,19 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         actorsUnderMouse.forEach {
             if (it is FixtureBase && it.mainUI == null)
                 fixturesUnderHand.add(it)
-            else if (it is ActorWithBody)
+            else
                 mobsUnderHand.add(it)
         }
 
         // pickup a fixture
-        if (fixturesUnderHand.size > 0 && fixturesUnderHand[0].canBeDespawned) {
+        if (fixturesUnderHand.size > 0 && fixturesUnderHand[0].canBeDespawned &&
+                System.nanoTime() - fixturesUnderHand[0].spawnRequestedTime > 500000000) { // don't pick up the fixture if it was recently placed (0.5 seconds)
             val fixture = fixturesUnderHand[0]
             val fixtureItem = ItemCodex.fixtureToItemID(fixture)
             printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
             // 1. put the fixture to the inventory
             fixture.flagDespawn()
-            // 2. register this item(fixture) to the quickslot
+            // 2. register this item(fixture) to the quickslot so that the player sprite would be actually lifting the fixture
             if (actor is Pocketed) {
                 actor.inventory.add(fixtureItem)
                 actor.equipItem(fixtureItem)

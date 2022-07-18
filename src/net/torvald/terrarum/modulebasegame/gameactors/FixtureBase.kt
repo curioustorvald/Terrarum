@@ -30,6 +30,10 @@ interface Electric {
  */
 open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
+    /** Real time, in nanoseconds */
+    @Transient var spawnRequestedTime: Long = 0L
+        private set
+
     lateinit var blockBox: BlockBox // something like TapestryObject will want to redefine this
     fun blockBoxIndexToPoint2i(it: BlockBoxIndex): Point2i = this.blockBox.width.let { w -> Point2i(it % w, it / w) }
     var blockBoxProps: BlockBoxProps = BlockBoxProps(0)
@@ -72,22 +76,27 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     var worldBlockPos: Point2i? = null
         private set
 
-    fun forEachBlockbox(action: (Int, Int) -> Unit) {
+    // something like TapestryObject will want to redefine this
+    /**
+     * @param action a function with following arguments: posX, posY, offX, offY
+     */
+    open fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
         worldBlockPos?.let { (posX, posY) ->
             for (y in posY until posY + blockBox.height) {
                 for (x in posX until posX + blockBox.width) {
-                    action(x, y)
+                    action(x, y, x - posX, y - posY)
                 }
             }
         }
     }
 
     override fun updateForTerrainChange(cue: IngameInstance.BlockChangeQueueItem) {
-        fillFillerBlock()
+        placeActorBlocks()
     }
 
-    private fun fillFillerBlock() {
-        forEachBlockbox { x, y ->
+    // something like TapestryObject will want to redefine this
+    open protected fun placeActorBlocks() {
+        forEachBlockbox { x, y, _, _ ->
             //printdbg(this, "fillerblock ${blockBox.collisionType} at ($x, $y)")
             if (blockBox.collisionType == BlockBox.ALLOW_MOVE_DOWN) {
                 // if the collision type is allow_move_down, only the top surface tile should be "the platform"
@@ -137,17 +146,17 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
 
         if (hasCollision) {
-            printdbg(this, "cannot spawn fixture ${nameFun()}, has tile collision; tilewise dim: (${blockBox.width}, ${blockBox.height}) ")
+            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; tilewise dim: (${blockBox.width}, ${blockBox.height}) ")
             return false
         }
 
-        printdbg(this, "spawn fixture ${nameFun()}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
+        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
 
         // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
 
         // fill the area with the filler blocks
-        fillFillerBlock()
+        placeActorBlocks()
 
 
         this.isVisible = true
@@ -160,12 +169,14 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         // actually add this actor into the world
         INGAME.queueActorAddition(this)
+        spawnRequestedTime = System.nanoTime()
 
 
         return true
 
     }
 
+    /** force disable despawn when inventory is not empty */
     val canBeDespawned: Boolean get() = inventory?.isEmpty() ?: true
 
     /**
@@ -178,7 +189,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             printStackTrace(this)
 
             // remove filler block
-            forEachBlockbox { x, y ->
+            forEachBlockbox { x, y, _, _ ->
                 world!!.setTileTerrain(x, y, Block.AIR, true)
             }
 
@@ -204,19 +215,36 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         INGAME.queueActorAddition(DroppedItem(drop, hitbox.startX, hitbox.startY - 1.0))
     }
 
-    private var dropItem = false
+    protected var dropItem = false
 
     override fun update(delta: Float) {
-        if (!flagDespawn && worldBlockPos != null) {
+        // FIXME retrieving fixture by mining relied on a quirk that mining a actorblock would also drop the fixture.
+        // FIXME since that particular method of operation causes so much problems, it is required to implement the
+        // FIXME said feature "correctly"
+        /*if (!flagDespawn && worldBlockPos != null) {
             // removal-by-player because player is removing the filler block by pick
             // no-flagDespawn check is there to prevent item dropping when externally despawned
             // (e.g. picked the fixture up in which case the fixture must not drop itself to the world; it must go into the actor's inventory)
-            forEachBlockbox { x, y ->
-                if (world!!.getTileFromTerrain(x, y) != blockBox.collisionType) {
+            forEachBlockbox { x, y, _, _ ->
+                if (!BlockCodex[world!!.getTileFromTerrain(x, y)].isActorBlock) {
                     flagDespawn = true
                     dropItem = true
                 }
             }
+        }*/
+        if (!canBeDespawned) flagDespawn = false // actively deny despawning request if cannot be despawned
+        if (canBeDespawned && flagDespawn) despawn()
+        if (canBeDespawned && dropItem) dropSelfAsAnItem()
+        // actual actor removal is performed by the TerrarumIngame.killOrKnockdownActors
+        super.update(delta)
+    }
+
+    /**
+     * An alternative to `super.update()`
+     */
+    fun updateWithCustomActorBlockFun(delta: Float, actorBlockFillingFunction: () -> Unit) {
+        if (!flagDespawn && worldBlockPos != null) {
+            actorBlockFillingFunction()
         }
         if (!canBeDespawned) flagDespawn = false
         if (canBeDespawned && flagDespawn) despawn()

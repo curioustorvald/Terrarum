@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
 
 /**
  * Created by minjaesong on 2019-05-02.
@@ -32,8 +33,8 @@ object BlockBase {
 
         if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
             var ret1 = true
-            ingame.actorContainerActive.forEach {
-                if (it is ActorWithBody && it.physProp.usePhysics && it.intTilewiseHitbox.intersects(mousePoint))
+            ingame.actorContainerActive.filter { it is ActorWithBody }.forEach { val it = it as ActorWithBody
+                if ((it is FixtureBase || it.physProp.usePhysics) && it.intTilewiseHitbox.intersects(mousePoint))
                     ret1 = false // return is not allowed here
             }
             if (!ret1) return@mouseInInteractableRange -1L
@@ -44,7 +45,7 @@ object BlockBase {
         val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
 
         // return false if there is a tile already
-        if (isWall && BlockCodex[wallUnderCursor].isSolid || !isWall && BlockCodex[terrainUnderCursor].isSolid)
+        if (isWall && BlockCodex[wallUnderCursor].isSolid || !isWall && (BlockCodex[terrainUnderCursor].isSolid || BlockCodex[terrainUnderCursor].isActorBlock))
             return@mouseInInteractableRange -1L
 
         // filter passed, do the job
