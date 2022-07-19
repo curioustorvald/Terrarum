@@ -31,6 +31,7 @@ module Terrarum {
     requires com.ibm.icu;
     requires org.lwjgl.opengl;
     requires prtree;
+    requires kotlin.stdlib.jdk7;
 
 
     exports net.torvald.colourutil;

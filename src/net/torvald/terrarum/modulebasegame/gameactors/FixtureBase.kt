@@ -32,7 +32,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     /** Real time, in nanoseconds */
     @Transient var spawnRequestedTime: Long = 0L
-        private set
+        protected set
 
     lateinit var blockBox: BlockBox // something like TapestryObject will want to redefine this
     fun blockBoxIndexToPoint2i(it: BlockBoxIndex): Point2i = this.blockBox.width.let { w -> Point2i(it % w, it / w) }
@@ -74,7 +74,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * Tile-wise position of this fixture when it's placed on the world, top-left origin. Null if it's not on the world
      */
     var worldBlockPos: Point2i? = null
-        private set
+        protected set
 
     // something like TapestryObject will want to redefine this
     /**
@@ -138,7 +138,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         for (y in posY until posY + blockBox.height) {
             for (x in posX until posX + blockBox.width) {
                 val tile = world!!.getTileFromTerrain(x, y)
-                if (BlockCodex[tile].isSolid || tile in Block.actorblocks) {
+                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
                     hasCollision = true
                     break@checkForCollision
                 }

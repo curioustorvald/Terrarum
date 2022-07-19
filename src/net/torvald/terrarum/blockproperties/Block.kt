@@ -131,12 +131,4 @@ object Block {
 
     const val NULL = "basegame:-1"
 
-    val actorblocks = listOf(
-            ACTORBLOCK_TILING_PLACEHOLDER,
-            ACTORBLOCK_NO_COLLISION,
-            ACTORBLOCK_FULL_COLLISION,
-            ACTORBLOCK_ALLOW_MOVE_DOWN,
-            ACTORBLOCK_NO_PASS_RIGHT,
-            ACTORBLOCK_NO_PASS_LEFT
-    )
 }

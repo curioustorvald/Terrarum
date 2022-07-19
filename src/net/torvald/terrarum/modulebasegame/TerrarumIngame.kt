@@ -1281,7 +1281,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         else if (canAttackOrDig) {
             val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
             if (punchBlockSize > 0) {
-                PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize, false)
+                PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
             }
         }
     }

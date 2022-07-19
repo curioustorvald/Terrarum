@@ -104,7 +104,7 @@ id;drop;world;name;shdr;shdg;shdb;shduv;str;dsty;mate;solid;plat;wall;grav;dlfn;
 273;273;273;BLOCK_SCAFFOLDING_EBONY;0.0312;0.0312;0.0312;0.0312;1;1400;WOOD;0;1;0;6;0;0;16;0.0;0.0;0.0;0.0;N/A;N/A;0.0;PLATFORM
 274;274;274;BLOCK_SCAFFOLDING_BIRCH;0.0312;0.0312;0.0312;0.0312;1;670;WOOD;0;1;0;6;0;0;16;0.0;0.0;0.0;0.0;N/A;N/A;0.0;PLATFORM
 275;275;275;BLOCK_SCAFFOLDING_BLOODROSE;0.0312;0.0312;0.0312;0.0312;1;900;WOOD;0;1;0;6;0;0;16;0.0;0.0;0.0;0.0;N/A;N/A;0.0;PLATFORM
-4090;N/A;N/A;ACTORBLOCK_TILING_PLACEHOLDER;0.1252;0.1252;0.1252;0.1252;48;2400;ROCK;1;0;1;N/A;0;4;16;0.0000;0.0000;0.0000;0.0000;N/A;N/A;0.0;INTERNAL
+4090;N/A;N/A;ACTORBLOCK_TILING_PLACEHOLDER;0.1252;0.1252;0.1252;0.1252;48;2400;ROCK;1;0;1;N/A;0;4;16;0.0000;0.0000;0.0000;0.0000;N/A;N/A;0.0;INTERNAL,DORENDER
 4091;N/A;N/A;ACTORBLOCK_NO_COLLISION;0.0312;0.0312;0.0312;0.0312;1;1;NULL;0;0;0;N/A;0;0;4;0.0;0.0;0.0;0.0;N/A;N/A;0.0;INTERNAL
 4092;N/A;N/A;ACTORBLOCK_FULL_COLLISION;0.0312;0.0312;0.0312;0.0312;1;1;NULL;0;0;0;N/A;0;0;16;0.0;0.0;0.0;0.0;N/A;N/A;0.0;INTERNAL
 4093;N/A;N/A;ACTORBLOCK_ALLOW_MOVE_DOWN;0.0312;0.0312;0.0312;0.0312;1;1;NULL;0;1;0;N/A;0;0;16;0.0;0.0;0.0;0.0;N/A;N/A;0.0;INTERNAL
@@ -117,6 +117,7 @@ id;drop;world;name;shdr;shdg;shdb;shduv;str;dsty;mate;solid;plat;wall;grav;dlfn;
 
 #5000;5000;BLOCK_SIGNAL_POWER_SOURCE;0.1252;0.1252;0.1252;0.1252;24;1400;NULL;0;0;0;N/A;0;4;16;0.0;0.0;0.0;0.0;N/A;N/A;0.0
 ## Notes ##
+#
 # Every block must have a shade value that is at least as dark as the air block's
 #
 # Lava/Water props are left for future references, do not delete them until FluidCodex is built #
@@ -154,7 +155,6 @@ id;drop;world;name;shdr;shdg;shdb;shduv;str;dsty;mate;solid;plat;wall;grav;dlfn;
 # grav: Whether the block should fall through the empty space. N/A to not make it fall;
 #       0 to fall immediately (e.g. Sand), nonzero to indicate that number of floating blocks can be supported (e.g. Scaffolding)
 #
-# tags: tag(s) to the item which is used by the crafting system. Multiple tags are separated using commas. Each tag must be all uppercase and only [0-9A-Z] chars are supported.
 #
 ## Illuminators ##
 #
@@ -173,6 +173,25 @@ id;drop;world;name;shdr;shdg;shdb;shduv;str;dsty;mate;solid;plat;wall;grav;dlfn;
 #
 # 16 colour palette : games's 16-colour palette
 # Magical ice: theoretical __metallic__ ice that might form under super-high pressure (> 5 TPa). Its density is a wild guess.
+#
+#
+## Actorblocks ##
+#
+# Actorblocks are virtual/placeholder blocks that accompanies actors (usually fixtures).
+# Any tile that contains "ACTORBLOCK" in its "name" will be recognised as one, so avoid having the particular string on
+# the name if your tile is not Actorblock!
+#
+#
+## Tags ##
+#
+# Tag(s) to the item which is used by the crafting system. Multiple tags are separated using commas. Each tag must be all
+# uppercase and only [0-9A-Z] chars are supported.
+#
+### Internal Tags ##
+##
+## Some tags are reserved for internal use, which are:
+## - INTERNAL: denotes that the tile is internal-use. Will not be rendered unless debug window is on.
+## - DORENDER: this internal tile must go through the standard-issue tile drawing routine.
 #
 #
 ## References ##

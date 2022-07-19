@@ -28,7 +28,7 @@ object PickaxeCore {
      */
     fun startPrimaryUse(
             actor: ActorWithBody, delta: Float, item: GameItem?, mx: Int, my: Int,
-            dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1, attackActorBlocks: Boolean = true
+            dropProbability: Double = 1.0, mw: Int = 1, mh: Int = 1
     ) = mouseInInteractableRangeTools(actor, item) {
         // un-round the mx
         val ww = INGAME.world.width
@@ -67,7 +67,7 @@ object PickaxeCore {
             if (!ret1) return ret1*/
 
             // return false if here's no tile
-            if (Block.AIR == tile || (!attackActorBlocks && tile in Block.actorblocks)) {
+            if (Block.AIR == tile || BlockCodex[tile].isActorBlock) {
                 usageStatus = usageStatus or false
                 continue
             }

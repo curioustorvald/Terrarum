@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Lightbox
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -37,14 +38,89 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
     protected var doorState = 0 // -1: open toward left, 0: closed, 1: open toward right
 
-    @Transient private var placeActorBlockLatch = false
+//    @Transient private var placeActorBlockLatch = false
 
     constructor() : super(
             BlockBox(BlockBox.FULL_COLLISION, 1, 3), // temporary value, will be overwritten by reload()
             nameFun = { "item not loaded properly, alas!" }
     ) {
+        val hbw = TILE_SIZE * (tw * 2 - twClosed)
+        val hbh = TILE_SIZE * th
+
+        nameFun = customNameFun
+
+        density = 1200.0
+        actorValue[AVKey.BASEMASS] = 10.0
+
+        // loading textures
+        CommonResourcePool.addToLoadingList("$moduleName-$textureIdentifier") {
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, texturePath), hbw, hbh)
+        }
+        CommonResourcePool.loadAll()
+        makeNewSprite(FixtureBase.getSpritesheet(moduleName, texturePath, hbw, hbh)).let {
+            it.setRowsAndFrames(3,1)
+        }
+
+        // define light/shadebox
+        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList).add(
+                Lightbox(Hitbox(0.0, 0.0, TILE_SIZED, th * TILE_SIZED), opacity))
+
         reload()
-        placeActorBlockLatch = true
+    }
+
+    override fun spawn(posX: Int, posY: Int) = spawn(posX, posY, TILE_SIZE * (tw * 2 - twClosed), TILE_SIZE * th)
+
+    // TODO move this function over FixtureBase once it's done and perfected
+    protected fun spawn(posX: Int, posY: Int, hbw: Int, hbh: Int): Boolean {
+        // wrap x-position
+        val posX = posX fmod world!!.width
+
+        // define physical size
+        setHitboxDimension(hbw, hbh, 0, 0)
+        /*this.hitbox.setFromWidthHeight(
+                posX * TILE_SIZED,
+                posY * TILE_SIZED,
+                blockBox.width * TILE_SIZED,
+                blockBox.height * TILE_SIZED
+        )*/
+        blockBox = BlockBox(BlockBox.FULL_COLLISION, tw * 2 - twClosed, th)
+
+        // check for existing blocks (and fixtures)
+        var hasCollision = false
+        checkForCollision@
+        for (y in posY until posY + blockBox.height) {
+            for (x in posX until posX + blockBox.width) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
+                    hasCollision = true
+                    break@checkForCollision
+                }
+            }
+        }
+
+        if (hasCollision) {
+            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; tilewise dim: (${blockBox.width}, ${blockBox.height}) ")
+            return false
+        }
+
+        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
+
+        // set the position of this actor
+        worldBlockPos = Point2i(posX - (hbw - 1) / 2, posY)
+
+        // fill the area with the filler blocks
+        placeActorBlocks()
+
+
+        this.isVisible = true
+
+
+        // actually add this actor into the world
+        INGAME.queueActorAddition(this)
+        spawnRequestedTime = System.nanoTime()
+
+
+        return true
     }
 
     override fun reload() {
@@ -55,28 +131,16 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
         val hbw = TILE_SIZE * (tw * 2 - twClosed)
         val hbh = TILE_SIZE * th
 
-        blockBox = BlockBox(BlockBox.FULL_COLLISION, tw * 2 - twClosed, th)
+        // redefined things that are affected by sprite size
+//        blockBox = BlockBox(BlockBox.FULL_COLLISION, tw * 2 - twClosed, th)
 
         // loading textures
-        CommonResourcePool.addToLoadingList("$moduleName-$textureIdentifier") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, texturePath), hbw, hbh)
-        }
-        CommonResourcePool.loadAll()
-
-        density = 1200.0
-        actorValue[AVKey.BASEMASS] = 10.0
 
 //        setHitboxDimension(hbw, hbh, TILE_SIZE * (tw * 2 - twClosed), 0)
-        setHitboxDimension(hbw, hbh, TILE_SIZE * ((tw * 2 - twClosed - 1) / 2), 0)
+//        setHitboxDimension(hbw, hbh, TILE_SIZE * ((tw * 2 - twClosed - 1) / 2), 0)
 
-        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList).add(
-                Lightbox(Hitbox(0.0, 0.0, TILE_SIZED, th * TILE_SIZED), opacity))
 
-        makeNewSprite(FixtureBase.getSpritesheet(moduleName, texturePath, hbw, hbh)).let {
-            it.setRowsAndFrames(3,1)
-        }
-
-        placeActorBlockLatch = false
+//        placeActorBlockLatch = false
     }
 
     open protected fun closeDoor() {
@@ -94,14 +158,14 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
         doorState = -1
     }
 
-    override fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
+    /*override fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
         val xStart = worldBlockPos!!.x - ((tw * 2 - twClosed - 1) / 2) // worldBlockPos.x is where the mouse was, of when the tilewise width was 1.
         for (y in worldBlockPos!!.y until worldBlockPos!!.y + blockBox.height) {
             for (x in xStart until xStart + blockBox.width) {
                 action(x, y, x - xStart, y - worldBlockPos!!.y)
             }
         }
-    }
+    }*/
 
     override fun placeActorBlocks() {
         forEachBlockbox { x, y, ox, oy ->
@@ -131,10 +195,10 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
     }
 
     override fun update(delta: Float) {
-        if (placeActorBlockLatch) {
+        /*if (placeActorBlockLatch) {
             placeActorBlockLatch = false
             placeActorBlocks()
-        }
+        }*/
 
         super.update(delta)
 
