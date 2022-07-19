@@ -7,7 +7,7 @@ import kotlin.io.path.Path
 /**
  * Created by minjaesong on 2016-03-07.
  */
-internal object Batch : ConsoleCommand {
+internal object Call : ConsoleCommand {
     @Throws(Exception::class)
     override fun execute(args: Array<String>) {
         if (args.size == 2) {

@@ -1,7 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitems.ItemID
@@ -139,6 +138,8 @@ class BlockCodex {
             throw NullPointerException("Blockprop with raw id $rawIndex does not exist.")
         }
     }*/
+    fun hasProp(blockID: ItemID?): Boolean = if (blockID == null) false else blockProps.containsKey(blockID)
+
     operator fun get(blockID: ItemID?): BlockProp {
         if (blockID == null || blockID == Block.NULL) {
             return nullProp

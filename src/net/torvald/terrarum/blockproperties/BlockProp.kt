@@ -108,5 +108,5 @@ class BlockProp {
     val extra = Codex()
 
     val isActorBlock: Boolean
-        get() = nameKey.contains("ACTORBLOCK")
+        get() = tags.contains("ACTORBLOCK")
 }

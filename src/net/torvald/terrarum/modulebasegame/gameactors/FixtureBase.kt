@@ -112,7 +112,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     /**
-     * Adds this instance of the fixture to the world
+     * Adds this instance of the fixture to the world. Physical dimension is derived from [blockBox].
      *
      * @param posX0 tile-wise bottem-centre position of the fixture (usually [Terrarum.mouseTileX])
      * @param posY0 tile-wise bottem-centre position of the fixture (usually [Terrarum.mouseTileY])
@@ -171,7 +171,63 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
 
         return true
+    }
 
+    /**
+     * Identical to `spawn(Int, Int)` except it takes user-defined hitbox dimension instead of taking value from [blockBox].
+     * Useful if [blockBox] cannot be determined on the time of the constructor call.
+     *
+     * @param posX tile-wise bottem-centre position of the fixture
+     * @param posY tile-wise bottem-centre position of the fixture
+     * @param thbw tile-wise Hitbox width
+     * @param thbh tile-wise Hitbox height
+     * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
+     */
+    open fun spawn(posX0: Int, posY0: Int, thbw: Int, thbh: Int): Boolean {
+        val posX = (posX0 - thbw.div(2)) fmod world!!.width
+        val posY = posY0 - thbh + 1
+
+        // set the position of this actor
+        worldBlockPos = Point2i(posX, posY)
+
+        // define physical position
+        this.hitbox.setFromWidthHeight(
+                posX * TILE_SIZED,
+                posY * TILE_SIZED,
+                blockBox.width * TILE_SIZED,
+                blockBox.height * TILE_SIZED
+        )
+
+        // check for existing blocks (and fixtures)
+        var hasCollision = false
+        forEachBlockbox { x, y, _, _ ->
+            if (!hasCollision) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
+                    hasCollision = true
+                }
+            }
+        }
+        if (hasCollision) {
+            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+            return false
+        }
+        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+
+
+        // fill the area with the filler blocks
+        placeActorBlocks()
+
+
+        this.isVisible = true
+
+
+        // actually add this actor into the world
+        INGAME.queueActorAddition(this)
+        spawnRequestedTime = System.nanoTime()
+
+
+        return true
     }
 
     /** force disable despawn when inventory is not empty */

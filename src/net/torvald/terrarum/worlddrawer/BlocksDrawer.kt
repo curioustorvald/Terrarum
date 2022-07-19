@@ -1,6 +1,7 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
@@ -9,6 +10,7 @@ import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
@@ -341,19 +343,24 @@ internal object BlocksDrawer {
                         else
                             renderTag.tileNumber
                 val tileNumber = if (thisTile == Block.AIR) 0
-                // special case: fluids
-                else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
-                // special case: occlusion
-                else if (mode == OCCLUSION)
-                    tileNumberBase + connectLut47[nearbyTilesInfo]
-                // rest of the cases: terrain and walls
-                else tileNumberBase + when (renderTag.maskType) {
-                        CreateTileAtlas.RenderTag.MASK_NA -> 0
-                        CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
-                        CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
-                        CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
-                        else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
-                    }
+                    // special case: actorblocks and F3 key
+                    else if (BlockCodex.hasProp(thisTile) && BlockCodex[thisTile].isActorBlock &&
+                             !BlockCodex[thisTile].tags.contains("DORENDER") && !KeyToggler.isOn(Keys.F3))
+                        0
+                    // special case: fluids
+                    else if (mode == FLUID)
+                        tileNumberBase + connectLut47[nearbyTilesInfo]
+                    // special case: occlusion
+                    else if (mode == OCCLUSION)
+                        tileNumberBase + connectLut47[nearbyTilesInfo]
+                    // rest of the cases: terrain and walls
+                    else tileNumberBase + when (renderTag.maskType) {
+                            CreateTileAtlas.RenderTag.MASK_NA -> 0
+                            CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
+                            CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
+                            CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
+                            else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
+                        }
 
                 var thisTileX = tileNumber % App.tileMaker.TILES_IN_X
                 var thisTileY = tileNumber / App.tileMaker.TILES_IN_X

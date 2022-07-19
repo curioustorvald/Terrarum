@@ -15,7 +15,7 @@ object CommandDict {
             "ActorsList",
             "Authenticator",
             "AVTracker",
-            "Batch",
+            "Call",
             "Echo",
             "EchoConsole",
             "EchoError",
