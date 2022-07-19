@@ -36,7 +36,7 @@ class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
         val item = FixtureHomeComputer()
 
-        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)) 1L else -1L
+        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY)) 1L else -1L
         // return true when placed, false when cannot be placed
     }
 }

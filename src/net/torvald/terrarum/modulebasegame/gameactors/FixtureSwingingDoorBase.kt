@@ -22,9 +22,9 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
     /* OVERRIDE THESE TO CUSTOMISE */
-    open val tw = 2
-    open val th = 3
-    open val twClosed = 1
+    open val tw = 2 // tilewise width of the door when opened
+    open val th = 3 // tilewise height of the door
+    open val twClosed = 1 // tilewise width of the door when closed
     open val opacity = BlockCodex[Block.STONE].opacity
     open val isOpacityActuallyLuminosity = false
     open val moduleName = "basegame"
@@ -32,6 +32,12 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
     open val textureIdentifier = "fixtures-door_test.tga"
     open val customNameFun = { "DOOR_BASE" }
     /* END OF CUTOMISABLE PARAMETERS */
+
+    private val tilewiseHitboxWidth = tw * 2 - twClosed
+    private val tilewiseHitboxHeight = th
+    private val pixelwiseHitboxWidth = TILE_SIZE * tilewiseHitboxWidth
+    private val pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
+    private val tilewiseDistToAxis = tw - twClosed
 
     @Transient override val lightBoxList: ArrayList<Lightbox> = ArrayList()
     @Transient override val shadeBoxList: ArrayList<Lightbox> = ArrayList()
@@ -41,12 +47,9 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
 //    @Transient private var placeActorBlockLatch = false
 
     constructor() : super(
-            BlockBox(BlockBox.FULL_COLLISION, 1, 3), // temporary value, will be overwritten by reload()
+            BlockBox(BlockBox.FULL_COLLISION, 1, 1), // temporary value, will be overwritten by spawn()
             nameFun = { "item not loaded properly, alas!" }
     ) {
-        val hbw = TILE_SIZE * (tw * 2 - twClosed)
-        val hbh = TILE_SIZE * th
-
         nameFun = customNameFun
 
         density = 1200.0
@@ -54,59 +57,69 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
         // loading textures
         CommonResourcePool.addToLoadingList("$moduleName-$textureIdentifier") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, texturePath), hbw, hbh)
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, texturePath), pixelwiseHitboxWidth, pixelwiseHitboxHeight)
         }
         CommonResourcePool.loadAll()
-        makeNewSprite(FixtureBase.getSpritesheet(moduleName, texturePath, hbw, hbh)).let {
+        makeNewSprite(FixtureBase.getSpritesheet(moduleName, texturePath, pixelwiseHitboxWidth, pixelwiseHitboxHeight)).let {
             it.setRowsAndFrames(3,1)
         }
 
         // define light/shadebox
+        // TODO: redefine when opened to left/right
         (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList).add(
-                Lightbox(Hitbox(0.0, 0.0, TILE_SIZED, th * TILE_SIZED), opacity))
+                Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), opacity))
+
+        // define physical size
+        setHitboxDimension(TILE_SIZE * tilewiseHitboxWidth, TILE_SIZE * tilewiseHitboxHeight, 0, 0)
+        blockBox = BlockBox(BlockBox.FULL_COLLISION, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
         reload()
     }
 
-    override fun spawn(posX: Int, posY: Int) = spawn(posX, posY, TILE_SIZE * (tw * 2 - twClosed), TILE_SIZE * th)
+    override fun spawn(posX: Int, posY: Int) = spawn(posX, posY, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
     // TODO move this function over FixtureBase once it's done and perfected
-    protected fun spawn(posX: Int, posY: Int, hbw: Int, hbh: Int): Boolean {
-        // wrap x-position
-        val posX = posX fmod world!!.width
+    /**
+     * Identical to `spawn(Int, Int)` except it takes user-defined hitbox dimension instead of taking value from [blockBox].
+     * Useful if [blockBox] cannot be determined on the time of the constructor call.
+     *
+     * @param posX tile-wise bottem-centre position of the fixture
+     * @param posY tile-wise bottem-centre position of the fixture
+     * @param thbw tile-wise Hitbox width
+     * @param thbh tile-wise Hitbox height
+     * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
+     */
+    protected fun spawn(posX0: Int, posY0: Int, thbw: Int, thbh: Int): Boolean {
+        val posX = (posX0 - thbw.div(2)) fmod world!!.width
+        val posY = posY0 - thbh + 1
 
-        // define physical size
-        setHitboxDimension(hbw, hbh, 0, 0)
-        /*this.hitbox.setFromWidthHeight(
+        // set the position of this actor
+        worldBlockPos = Point2i(posX, posY)
+
+        // define physical position
+        this.hitbox.setFromWidthHeight(
                 posX * TILE_SIZED,
                 posY * TILE_SIZED,
                 blockBox.width * TILE_SIZED,
                 blockBox.height * TILE_SIZED
-        )*/
-        blockBox = BlockBox(BlockBox.FULL_COLLISION, tw * 2 - twClosed, th)
+        )
 
         // check for existing blocks (and fixtures)
         var hasCollision = false
-        checkForCollision@
-        for (y in posY until posY + blockBox.height) {
-            for (x in posX until posX + blockBox.width) {
+        forEachBlockbox { x, y, _, _ ->
+            if (!hasCollision) {
                 val tile = world!!.getTileFromTerrain(x, y)
                 if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
                     hasCollision = true
-                    break@checkForCollision
                 }
             }
         }
-
         if (hasCollision) {
-            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; tilewise dim: (${blockBox.width}, ${blockBox.height}) ")
+            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
             return false
         }
+        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
 
-        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
-
-        // set the position of this actor
-        worldBlockPos = Point2i(posX - (hbw - 1) / 2, posY)
 
         // fill the area with the filler blocks
         placeActorBlocks()
@@ -128,19 +141,11 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
         nameFun = customNameFun
 
-        val hbw = TILE_SIZE * (tw * 2 - twClosed)
-        val hbh = TILE_SIZE * th
+        // define light/shadebox
+        // TODO: redefine when opened to left/right
+        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList).add(
+                Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), opacity))
 
-        // redefined things that are affected by sprite size
-//        blockBox = BlockBox(BlockBox.FULL_COLLISION, tw * 2 - twClosed, th)
-
-        // loading textures
-
-//        setHitboxDimension(hbw, hbh, TILE_SIZE * (tw * 2 - twClosed), 0)
-//        setHitboxDimension(hbw, hbh, TILE_SIZE * ((tw * 2 - twClosed - 1) / 2), 0)
-
-
-//        placeActorBlockLatch = false
     }
 
     open protected fun closeDoor() {
@@ -169,12 +174,14 @@ class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
     override fun placeActorBlocks() {
         forEachBlockbox { x, y, ox, oy ->
+            printdbg(this, "placeActorBlocks xy=$x,$y oxy=$ox,$oy")
+
             val tile = when (doorState) {
                 // CLOSED --
                 // fill the actorBlock so that:
                 // N..N F N..N (repeated `th` times; N: no collision, F: full collision)
                 0/*CLOSED*/ -> {
-                    if (ox in tw-1 until tw-1+twClosed) Block.ACTORBLOCK_FULL_COLLISION
+                    if (ox in tilewiseDistToAxis until tilewiseDistToAxis + twClosed) Block.ACTORBLOCK_FULL_COLLISION
                     else Block.ACTORBLOCK_NO_COLLISION
                 }
                 else/*OPENED*/ -> Block.ACTORBLOCK_NO_COLLISION

@@ -2,6 +2,9 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.gdx.graphics.Cvec
 
+/**
+ * Lightbox is defined based on pixelwise position in the world!
+ */
 class Lightbox() {
     var hitbox: Hitbox = Hitbox(0.0,0.0,0.0,0.0)
     var light: Cvec = Cvec()

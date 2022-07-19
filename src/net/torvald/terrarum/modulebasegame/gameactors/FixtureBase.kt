@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.ActorID
@@ -59,6 +60,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
                 id: ActorID? = null
     ) : super(renderOrder, PhysProperties.IMMOBILE, id) {
         blockBox = blockBox0
+        setHitboxDimension(TILE_SIZE * blockBox.width, TILE_SIZE * blockBox.height, 0, 0)
         this.blockBoxProps = blockBoxProps
         this.renderOrder = renderOrder
         this.nameFun = nameFun
@@ -112,11 +114,11 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     /**
      * Adds this instance of the fixture to the world
      *
-     * @param posX tile-wise top-left position of the fixture
-     * @param posY tile-wise top-left position of the fixture
-     * @return true if successfully spawned, false if was not (e.g. occupied space)
+     * @param posX0 tile-wise bottem-centre position of the fixture (usually [Terrarum.mouseTileX])
+     * @param posY0 tile-wise bottem-centre position of the fixture (usually [Terrarum.mouseTileY])
+     * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
      */
-    open fun spawn(posX: Int, posY: Int): Boolean {
+    open fun spawn(posX0: Int, posY0: Int): Boolean {
         // place filler blocks
         // place the filler blocks where:
         //     origin posX: centre-left  if mouseX is on the right-half of the game window,
@@ -128,32 +130,28 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         // using the actor's hitbox
 
 
-        // wrap x-position
-        val posX = posX fmod world!!.width
-
-
-        // check for existing blocks (and fixtures)
-        var hasCollision = false
-        checkForCollision@
-        for (y in posY until posY + blockBox.height) {
-            for (x in posX until posX + blockBox.width) {
-                val tile = world!!.getTileFromTerrain(x, y)
-                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
-                    hasCollision = true
-                    break@checkForCollision
-                }
-            }
-        }
-
-        if (hasCollision) {
-            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; tilewise dim: (${blockBox.width}, ${blockBox.height}) ")
-            return false
-        }
-
-        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, tilewise dim: (${blockBox.width}, ${blockBox.height})")
+        val posX = (posX0 - blockBox.width.div(2)) fmod world!!.width
+        val posY = posY0 - blockBox.height + 1
 
         // set the position of this actor
         worldBlockPos = Point2i(posX, posY)
+
+        // check for existing blocks (and fixtures)
+        var hasCollision = false
+        forEachBlockbox { x, y, _, _ ->
+            if (!hasCollision) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
+                    hasCollision = true
+                }
+            }
+        }
+        if (hasCollision) {
+            printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+            return false
+        }
+        printdbg(this, "spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
+
 
         // fill the area with the filler blocks
         placeActorBlocks()

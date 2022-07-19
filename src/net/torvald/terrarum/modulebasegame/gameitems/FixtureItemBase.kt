@@ -33,8 +33,8 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 //        println("FixtureItemBase init: $hash")
     }
 
-//    private var _ghostItem: FixtureBase? = null
     @Transient private var ghostItem = AtomicReference<FixtureBase>()
+    @Transient private var ghostInit = AtomicBoolean(false)
 
     override var dynamicID: ItemID = originalID
     override val originalName = "FIXTUREBASE"
@@ -55,7 +55,6 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
     override var baseToolSize: Double? = baseMass
 
-    @Transient private var ghostInit = AtomicBoolean(false)
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
 //        println("ghost: ${ghostItem}; ghostInit = $ghostInit; instance: $hash")
@@ -87,7 +86,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
         val item = ghostItem.getAndSet(makeFixture()) // renew the "ghost" otherwise you'll be spawning exactly the same fixture again; old ghost will be returned
 
-        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY - item.blockBox.height + 1)) 1 else -1
+        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY)) 1 else -1
         // return true when placed, false when cannot be placed
     }
 
