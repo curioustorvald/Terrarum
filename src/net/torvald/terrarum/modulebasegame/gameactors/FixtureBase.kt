@@ -130,7 +130,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         // using the actor's hitbox
 
 
-        val posX = (posX0 - blockBox.width.div(2)) fmod world!!.width
+        val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - blockBox.height + 1
 
         // set the position of this actor
@@ -184,7 +184,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
      */
     open fun spawn(posX0: Int, posY0: Int, thbw: Int, thbh: Int): Boolean {
-        val posX = (posX0 - thbw.div(2)) fmod world!!.width
+        val posX = (posX0 - thbw.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - thbh + 1
 
         // set the position of this actor
@@ -238,7 +238,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      */
     open fun despawn() {
 
-        if (this !is FixtureTapestry && canBeDespawned) {
+        if (canBeDespawned) {
             printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
             printStackTrace(this)
 
@@ -259,7 +259,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
             }
         }
         else {
-//            printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
+            printdbg(this, "failed to despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
             printdbg(this, "cannot despawn a fixture with non-empty inventory")
         }
     }
