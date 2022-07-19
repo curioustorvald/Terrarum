@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration
@@ -15,6 +14,7 @@ import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.unicode.EMDASH
 import net.torvald.util.CircularArray
 
 
@@ -75,7 +75,7 @@ class ConsoleWindow : UICanvas() {
                 lb.clear()
 
                 val actorsUnderCursor = it.getActorsAt(Terrarum.mouseX, Terrarum.mouseY)
-                actorsUnderCursor.forEach {
+                actorsUnderCursor.filter { it.referenceID < 2147483647 }.forEach { // filter out the BlockMarkerActor
                     lb.add("${it.referenceID} (${it.actorValue[AVKey.NAME] ?: "\u03AF-${it.javaClass.simpleName}"})")
                 }
 
