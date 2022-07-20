@@ -175,6 +175,7 @@ class BlockCodex {
     private fun setProp(modname: String, key: Int, record: CSVRecord) {
         val prop = BlockProp()
         prop.nameKey = record.get("name")
+        prop.tags = record.get("tags").split(',').map { it.trim() }.toHashSet()
 
         prop.id = "$modname:$key"
         prop.numericID = key
@@ -207,7 +208,10 @@ class BlockCodex {
         //prop.isFluid = record.boolVal("fluid")
         prop.isSolid = record.boolVal("solid")
         //prop.isClear = record.boolVal("clear")
-        prop.isPlatform = record.boolVal("plat")
+
+        prop.isPlatform = prop.tags.contains("PLATFORM")
+        prop.isActorBlock = prop.tags.contains("ACTORBLOCK")
+
         prop.isWallable = record.boolVal("wall")
         prop.maxSupport = record.intVal("grav")
         prop.isVertFriction = record.boolVal("fv")
@@ -216,7 +220,6 @@ class BlockCodex {
 
         prop.reflectance = record.floatVal("refl")
 
-        prop.tags = record.get("tags").split(',').map { it.trim() }.toHashSet()
         prop.material = record.get("mate")
 
         blockProps[prop.id] = prop

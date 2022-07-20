@@ -107,6 +107,5 @@ class BlockProp {
      */
     val extra = Codex()
 
-    val isActorBlock: Boolean
-        get() = tags.contains("ACTORBLOCK")
+    var isActorBlock: Boolean = false
 }

@@ -5,11 +5,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,12 +28,12 @@ import java.util.Properties;
 public class CSVEditor extends JFrame {
 
     /** Default columns. When you open existing csv, it should overwrite this. */
-    private String[] columns = new String[]{"id", "drop", "world", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
+    private String[] columns = new String[]{"id", "drop", "world", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
     private final int FOUR_DIGIT = 42;
     private final int SIX_DIGIT = 50;
     private final int TWO_DIGIT = 30;
     private final int ARBITRARY = 240;
-    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT, SIX_DIGIT, ARBITRARY};
+    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT, SIX_DIGIT, ARBITRARY};
 
     private final int UNDO_BUFFER_SIZE = 10;
 
@@ -537,7 +538,7 @@ public class CSVEditor extends JFrame {
             colour=[Fluids] Colour of the block in hexadecimal RGBA.
             vscs=[Fluids] Viscocity of the block. 16 for water.
             refl=[NOT Fluids] Reflectance of the block, used by the light calculation. Valid range 0.0–1.0
-            tags=Tags used by the crafting system""";
+            tags=Tags used by the crafting system and the game's internals""";
 
     /**
      * ¤ is used as a \n marker
