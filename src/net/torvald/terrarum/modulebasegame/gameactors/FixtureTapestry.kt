@@ -105,5 +105,5 @@ internal class FixtureTapestry : FixtureBase {
     }
 
 
-    override var tooltipText: String? = "$artName\n$artAuthor"
+    override var tooltipText: String? = "TEST\nSTRING"//if (artName.length + artAuthor.length > 0) "$artName\n$artAuthor" else null
 }

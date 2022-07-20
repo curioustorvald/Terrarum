@@ -580,7 +580,12 @@ open class ActorWithBody : Actor {
             feetPosPoint.set(hitbox.centeredX, hitbox.endY)
             feetPosTile.set(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
+
+            if (mouseUp && this.tooltipText != null) INGAME.setTooltipMessage(this.tooltipText)
         }
+
+        // make sure tooltip to disable even when the actor's update is paused at unfortunate time
+        if (!mouseUp && INGAME.getTooltipMessage() == this.tooltipText) INGAME.setTooltipMessage(null)
 
         isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
     }

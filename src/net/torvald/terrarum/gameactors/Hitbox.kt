@@ -158,7 +158,8 @@ class Hitbox {
         return this
     }
 
-    fun containsPoint(x: Double, y: Double) = (hitboxStart.x - x) in 0.0..width && (hitboxStart.y - y) in 0.0..height
+    // TODO consider ROUNDWORLD
+    fun containsPoint(x: Double, y: Double) = (x - hitboxStart.x) in 0.0..width && (y - hitboxStart.y) in 0.0..height
     fun containsPoint(p: Point2d) = containsPoint(p.x, p.y)
 
 

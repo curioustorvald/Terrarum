@@ -397,6 +397,10 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         }
     }
 
+    open fun getTooltipMessage(): String {
+        return uiTooltip.message
+    }
+
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */
