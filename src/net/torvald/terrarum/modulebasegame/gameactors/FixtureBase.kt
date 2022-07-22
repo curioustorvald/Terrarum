@@ -5,14 +5,13 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.gameactors.ActorID
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.PhysProperties
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
+import java.util.*
 
 typealias BlockBoxIndex = Int
 
@@ -41,6 +40,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     @Transient var nameFun: () -> String = { "" }
     @Transient var mainUI: UICanvas? = null
     var inventory: FixtureInventory? = null
+
+    protected var actorThatInstalledThisFixture: UUID? = null
 
     private constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
 
@@ -118,7 +119,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * @param posY0 tile-wise bottem-centre position of the fixture (usually [Terrarum.mouseTileY])
      * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
      */
-    open fun spawn(posX0: Int, posY0: Int): Boolean {
+    open fun spawn(posX0: Int, posY0: Int, installersUUID: UUID?): Boolean {
         // place filler blocks
         // place the filler blocks where:
         //     origin posX: centre-left  if mouseX is on the right-half of the game window,
@@ -169,6 +170,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         INGAME.queueActorAddition(this)
         spawnRequestedTime = System.nanoTime()
 
+        actorThatInstalledThisFixture = installersUUID
 
         return true
     }
@@ -183,7 +185,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * @param thbh tile-wise Hitbox height
      * @return true if successfully spawned, false if was not (e.g. space to spawn is occupied by something else)
      */
-    open fun spawn(posX0: Int, posY0: Int, thbw: Int, thbh: Int): Boolean {
+    open fun spawn(posX0: Int, posY0: Int, installersUUID: UUID?, thbw: Int, thbh: Int): Boolean {
         val posX = (posX0 - thbw.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - thbh + 1
 
@@ -226,6 +228,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         INGAME.queueActorAddition(this)
         spawnRequestedTime = System.nanoTime()
 
+        actorThatInstalledThisFixture = installersUUID
 
         return true
     }

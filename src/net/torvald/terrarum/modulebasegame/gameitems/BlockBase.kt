@@ -44,8 +44,13 @@ object BlockBase {
         val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
         val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
 
-        // return false if there is a tile already
-        if (isWall && BlockCodex[wallUnderCursor].isSolid || !isWall && (BlockCodex[terrainUnderCursor].isSolid || BlockCodex[terrainUnderCursor].isActorBlock))
+        // return false if there is a same tile already (including non-solid!)
+        if (isWall && wallUnderCursor == itemID || !isWall && terrainUnderCursor == itemID)
+            return@mouseInInteractableRange -1L
+
+        // return false if there is a "solid" tile already
+        if (isWall && BlockCodex[wallUnderCursor].isSolid ||
+            !isWall && (BlockCodex[terrainUnderCursor].isSolid || BlockCodex[terrainUnderCursor].isActorBlock))
             return@mouseInInteractableRange -1L
 
         // filter passed, do the job

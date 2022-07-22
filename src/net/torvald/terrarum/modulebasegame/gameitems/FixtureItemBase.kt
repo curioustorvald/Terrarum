@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -86,7 +87,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
         val item = ghostItem.getAndSet(makeFixture()) // renew the "ghost" otherwise you'll be spawning exactly the same fixture again; old ghost will be returned
 
-        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY)) 1 else -1
+        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY, if (actor is IngamePlayer) actor.uuid else null)) 1 else -1
         // return true when placed, false when cannot be placed
     }
 

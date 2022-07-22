@@ -9,6 +9,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import java.util.*
 import kotlin.properties.Delegates
 
 /**
@@ -44,7 +45,7 @@ internal class FixtureTapestry : FixtureBase {
         reload()
     }
 
-    override fun spawn(posX: Int, posY: Int) = spawn(posX, posY, tilewiseHitboxWidth, tilewiseHitboxHeight)
+    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
     override fun reload() {
         super.reload()

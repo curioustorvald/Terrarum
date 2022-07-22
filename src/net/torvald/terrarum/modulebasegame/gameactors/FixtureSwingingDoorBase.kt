@@ -6,11 +6,11 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.gameactors.Lightbox
-import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.dyn4j.geometry.Vector2
+import java.util.*
+import kotlin.math.absoluteValue
 
 /**
  * @param width of hitbox, in tiles, when the door is opened. Default to 2. Closed door always have width of 1. (this limits how big and thick the door can be)
@@ -30,6 +30,8 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     open val texturePath = "sprites/fixtures/door_test.tga"
     open val textureIdentifier = "fixtures-door_test.tga"
     open val customNameFun = { "DOOR_BASE" }
+    open val doorClosedHoldLength: Second = 0.1f
+    open val doorOpenedHoldLength: Second = 0.25f
     /* END OF CUTOMISABLE PARAMETERS */
 
     private val tilewiseHitboxWidth = tw * 2 - twClosed
@@ -42,6 +44,13 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     @Transient override val shadeBoxList: ArrayList<Lightbox> = ArrayList()
 
     protected var doorState = 0 // -1: open toward left, 0: closed, 1: open toward right
+    protected var doorStateTimer: Second = 0f
+
+    @Transient private val doorHoldLength: HashMap<Int, Second> = hashMapOf(
+            -1 to doorClosedHoldLength,
+            1 to doorClosedHoldLength,
+            0 to doorOpenedHoldLength
+    )
 
 //    @Transient private var placeActorBlockLatch = false
 
@@ -49,6 +58,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
             BlockBox(BlockBox.FULL_COLLISION, 1, 1), // temporary value, will be overwritten by spawn()
             nameFun = { "item not loaded properly, alas!" }
     ) {
+
         nameFun = customNameFun
 
         density = 1200.0
@@ -75,7 +85,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
         reload()
     }
 
-    override fun spawn(posX: Int, posY: Int) = spawn(posX, posY, tilewiseHitboxWidth, tilewiseHitboxHeight)
+    override fun spawn(posX: Int, posY: Int, installersUUID: UUID?): Boolean = spawn(posX, posY, installersUUID, tilewiseHitboxWidth, tilewiseHitboxHeight)
 
     override fun reload() {
         super.reload()
@@ -90,18 +100,27 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     }
 
     open protected fun closeDoor() {
-        (sprite!! as SheetSpriteAnimation).currentRow = 0
-        doorState = 0
+        if (doorState != 0) {
+            (sprite!! as SheetSpriteAnimation).currentRow = 0
+            doorState = 0
+            placeActorBlocks()
+        }
     }
 
     open protected fun openToRight() {
-        (sprite!! as SheetSpriteAnimation).currentRow = 1
-        doorState = 1
+        if (doorState != 1) {
+            (sprite!! as SheetSpriteAnimation).currentRow = 1
+            doorState = 1
+            placeActorBlocks()
+        }
     }
 
     open protected fun openToLeft() {
-        (sprite!! as SheetSpriteAnimation).currentRow = 2
-        doorState = -1
+        if (doorState != -1) {
+            (sprite!! as SheetSpriteAnimation).currentRow = 2
+            doorState = -1
+            placeActorBlocks()
+        }
     }
 
     /*override fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
@@ -142,22 +161,96 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
     }
 
-    override fun update(delta: Float) {
-        /*if (placeActorBlockLatch) {
-            placeActorBlockLatch = false
-            placeActorBlocks()
-        }*/
+    private fun mouseOnLeftSide(): Boolean {
+        val mouseRelX = Terrarum.mouseX - hitbox.hitboxStart.x
+        val mouseRelY = Terrarum.mouseY - hitbox.hitboxStart.y
+        return 0.0 <= mouseRelX && mouseRelX < hitbox.width / 2 && mouseRelY in 0.0..hitbox.height
+    }
 
+    private fun mouseOnRightSide(): Boolean {
+        val mouseRelX = Terrarum.mouseX - hitbox.hitboxStart.x
+        val mouseRelY = Terrarum.mouseY - hitbox.hitboxStart.y
+        return hitbox.width / 2 < mouseRelX && mouseRelX <= hitbox.width && mouseRelY in 0.0..hitbox.height
+    }
+
+    private fun ActorWithBody.ontheLeftSideOfDoor(): Boolean {
+        return this.hitbox.centeredX < this@FixtureSwingingDoorBase.hitbox.centeredX
+    }
+    private fun ActorWithBody.ontheRightSideOfDoor(): Boolean {
+        return this.hitbox.centeredX > this@FixtureSwingingDoorBase.hitbox.centeredX
+    }
+
+    private fun ActorWithBody.movingTowardsRight(): Boolean {
+        return ((this.controllerV ?: Vector2()) + this.externalV).x >= PHYS_EPSILON_VELO
+    }
+    private fun ActorWithBody.movingTowardsLeft(): Boolean {
+        return ((this.controllerV ?: Vector2()) + this.externalV).x <= -PHYS_EPSILON_VELO
+    }
+    private fun ActorWithBody.notMoving(): Boolean {
+        return ((this.controllerV ?: Vector2()) + this.externalV).x.absoluteValue < PHYS_EPSILON_VELO
+    }
+
+    override fun update(delta: Float) {
         super.update(delta)
 
-        //if (!flagDespawn) placeActorBlocks()
+        if (!flagDespawn && worldBlockPos != null) {
+            val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
 
-        when (doorState) {
-            0/*CLOSED*/ -> {
-                if (!flagDespawn && worldBlockPos != null) {
+            // auto opening and closing
+            // TODO make this work with "player_alies" faction, not just a player
+            val installer: IngamePlayer? = if (actorThatInstalledThisFixture == null) null else INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }.ifEmpty {
+                INGAME.actorContainerInactive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }
+            }.getOrNull(0)
 
+            // if the door is "owned" by someone, restrict access to its "amicable" (defined using Faction subsystem) actors
+            // if the door is owned by null, restrict access to ActorHumanoid and actors with "intelligent" actor value set up
+            if (actorThatInstalledThisFixture == null || installer != null) {
+                val amicableActors: List<ActorWithBody> = ArrayList(
+                        if (actorThatInstalledThisFixture == null)
+                            actors.filterIsInstance<ActorHumanoid>() union actors.filter { it.actorValue.getAsBoolean("intelligent") == true }
+                        else {
+                            val goodFactions = installer?.faction?.flatMap { it.factionAmicable }?.toHashSet()
+                            if (goodFactions != null)
+                                actors.filterIsInstance<Factionable>().filter {
+                                    (it.faction.map { it.factionName } intersect goodFactions).isNotEmpty()
+                                } as List<ActorWithBody>
+                            else
+                                listOf()
+                        }
+                ).also {
+                    // add the installer of the door to the amicableActors if for some reason it was not added
+                    if (installer != null && !it.contains(installer)) it.add(0, installer)
+                }.filter {
+                    // filter amicableActors so that ones standing near the door remain
+                    it.hitbox.intersects(this.hitbox)
+                }
+
+                // automatic opening/closing
+                if (doorStateTimer > doorHoldLength[doorState]!!) {
+                    var nobodyIsThere = true
+                    for (actor in amicableActors) {
+                        if (actor.ontheLeftSideOfDoor() && actor.movingTowardsRight()) {
+                            openToRight()
+                            nobodyIsThere = false
+                            break
+                        }
+                        else if (actor.ontheRightSideOfDoor() && actor.movingTowardsLeft()) {
+                            openToLeft()
+                            nobodyIsThere = false
+                            break
+                        }
+                    }
+                    if (nobodyIsThere) {
+                        closeDoor()
+                    }
+
+                    doorStateTimer = 0f
                 }
             }
+
+
+            doorStateTimer += delta
         }
+
     }
 }

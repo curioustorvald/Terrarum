@@ -51,7 +51,7 @@ class SheetSpriteAnimation(parentActor: ActorWithBody) : SpriteAnimation(parentA
     /**
      * Sets delays for each rows. Array size must be the same as the rows of the sheet
      */
-    var delays: FloatArray = floatArrayOf(0.2f)
+    var delays: FloatArray = FloatArray(64) { 0.2f }
         set(value) {
             if (value.filter { it <= 0f }.isNotEmpty()) {
                 throw IllegalArgumentException("Delay array contains zero or negative value: $delays")
