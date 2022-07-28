@@ -1,6 +1,5 @@
 package net.torvald.spriteanimation
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -162,6 +161,7 @@ class AssembledSpriteAnimation(
 
     override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {
         if (parentActor.isVisible) {
+            batch.color = colourFilter
             renderThisAnimation(batch, posX, posY, scale, "${currentAnimation}_${1+currentFrame}")
         }
     }

@@ -158,21 +158,24 @@ class Hitbox {
         return this
     }
 
-    // TODO consider ROUNDWORLD
-    fun containsPoint(x: Double, y: Double) = (x - hitboxStart.x) in 0.0..width && (y - hitboxStart.y) in 0.0..height
-    fun containsPoint(p: Point2d) = containsPoint(p.x, p.y)
+    /** *ROUNDWORLD*-aware version of intersects(Double, Double). */
+    fun containsPoint(worldWidth: Double, x: Double, y: Double) = intersects(x, y) || intersects(x + worldWidth, y) || intersects(x - worldWidth, y)
+    /** *ROUNDWORLD*-aware version of intersects(Poind2d). */
+    fun containsPoint(worldWidth: Double, p: Point2d) = containsPoint(worldWidth, p.x, p.y)
+    /** *ROUNDWORLD*-aware version of intersects(Hitbox). */
+    fun containsHitbox(worldWidth: Double, other: Hitbox): Boolean {
+        val osx = other.startX; val osy = other.startY; val oex = other.endX; val oey = other.endY // to avoid redundant maths operations
+        return intersects(osx, osy, oex, oey) || intersects(osx + worldWidth, osy, oex + worldWidth, oey) || intersects(osx - worldWidth, osy, oex - worldWidth, oey)
+    }
 
-
-    infix fun intersects(position: Point2d) =
-            (position.x >= startX && position.x <= startX + width) &&
-            (position.y >= startY && position.y <= startY + height)
-    infix fun intersects(other: Hitbox) =
-            (this.startX <= other.startX && other.startX <= this.endX) ||
-            (this.startX <= other.endX && other.endX <= this.endX) &&
-
-            (this.startY <= other.startY && other.startY <= this.endY) ||
-            (this.startY <= other.endY && other.endY <= this.endY)
-
+    fun intersects(px: Double, py: Double) =
+            (px in startX..endX) &&
+            (py in startY..endY)
+    infix fun intersects(position: Point2d) = intersects(position.x, position.y)
+    infix fun intersects(other: Hitbox) = intersects(other.startX, other.startY, other.endX, other.endY)
+    fun intersects(otherStartX: Double, otherStartY: Double, otherEndX: Double, otherEndY: Double) =
+            (this.endX >= otherStartX && otherEndX >= this.startX) &&
+            (this.endY >= otherStartY && otherEndY >= this.startY)
 
     fun toVector(): Vector2 = Vector2(startX, startY)
 

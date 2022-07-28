@@ -67,7 +67,7 @@ open class ActorWithBody : Actor {
         protected set
     open var tooltipText: String? = null // null: display nothing
     val mouseUp: Boolean
-        get() = hitbox.containsPoint(Terrarum.mouseX, Terrarum.mouseY)
+        get() = hitbox.containsPoint((world?.width ?: 0) * TILE_SIZED, Terrarum.mouseX, Terrarum.mouseY)
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
     protected set

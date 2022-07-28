@@ -1,5 +1,6 @@
 package net.torvald.spriteanimation
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
@@ -19,6 +20,7 @@ abstract class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disp
 
     var flipHorizontal = false
     var flipVertical = false
+    var colourFilter = Color(-1)
 
     open fun flip(horizontal: Boolean, vertical: Boolean) {
         flipHorizontal = horizontal
@@ -144,8 +146,7 @@ class SheetSpriteAnimation(parentActor: ActorWithBody) : SpriteAnimation(parentA
 
         if (visible) {
             val region = textureRegion.get(currentFrame, currentRow)
-//            batch.color = colorFilter
-
+            batch.color = colourFilter
 
             val tx = (parentActor.hitboxTranslateX) * scale
             val txF = (parentActor.hitboxTranslateX + parentActor.baseHitboxW) * scale

@@ -84,6 +84,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
      * @param action a function with following arguments: posX, posY, offX, offY
      */
     open fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
+        // TODO scale-aware
         worldBlockPos?.let { (posX, posY) ->
             for (y in posY until posY + blockBox.height) {
                 for (x in posX until posX + blockBox.width) {

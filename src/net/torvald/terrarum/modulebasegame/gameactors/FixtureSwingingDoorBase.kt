@@ -105,6 +105,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
             doorState = 0
             placeActorBlocks()
         }
+        doorCloseQueued = false
     }
 
     open protected fun openToRight() {
@@ -113,6 +114,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
             doorState = 1
             placeActorBlocks()
         }
+        doorCloseQueued = false
     }
 
     open protected fun openToLeft() {
@@ -121,6 +123,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
             doorState = -1
             placeActorBlocks()
         }
+        doorCloseQueued = false
     }
 
     /*override fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
@@ -174,10 +177,10 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     }
 
     private fun ActorWithBody.ontheLeftSideOfDoor(): Boolean {
-        return this.hitbox.centeredX < this@FixtureSwingingDoorBase.hitbox.centeredX
+        return this.hitbox.startX < this@FixtureSwingingDoorBase.hitbox.centeredX
     }
     private fun ActorWithBody.ontheRightSideOfDoor(): Boolean {
-        return this.hitbox.centeredX > this@FixtureSwingingDoorBase.hitbox.centeredX
+        return this.hitbox.endX > this@FixtureSwingingDoorBase.hitbox.centeredX
     }
 
     private fun ActorWithBody.movingTowardsRight(): Boolean {
@@ -190,66 +193,102 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
         return ((this.controllerV ?: Vector2()) + this.externalV).x.absoluteValue < PHYS_EPSILON_VELO
     }
 
+    private var doorCloseQueueTimer = 0f
+    private var doorCloseQueued = false
+
+    private fun queueDoorClosing() {
+        doorCloseQueueTimer = 0f
+        doorCloseQueued = true
+    }
+
     override fun update(delta: Float) {
         super.update(delta)
 
+
+        // debug colouring
+//        this.sprite?.colourFilter =
+//                if (doorCloseQueued) Color.YELLOW
+//                else if (doorStateTimer > doorHoldLength[doorState]!!) Color.LIME
+//                else Color.CORAL
+
+
         if (!flagDespawn && worldBlockPos != null) {
-            val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
-
-            // auto opening and closing
-            // TODO make this work with "player_alies" faction, not just a player
-            val installer: IngamePlayer? = if (actorThatInstalledThisFixture == null) null else INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }.ifEmpty {
-                INGAME.actorContainerInactive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }
-            }.getOrNull(0)
-
-            // if the door is "owned" by someone, restrict access to its "amicable" (defined using Faction subsystem) actors
-            // if the door is owned by null, restrict access to ActorHumanoid and actors with "intelligent" actor value set up
-            if (actorThatInstalledThisFixture == null || installer != null) {
-                val amicableActors: List<ActorWithBody> = ArrayList(
-                        if (actorThatInstalledThisFixture == null)
-                            actors.filterIsInstance<ActorHumanoid>() union actors.filter { it.actorValue.getAsBoolean("intelligent") == true }
-                        else {
-                            val goodFactions = installer?.faction?.flatMap { it.factionAmicable }?.toHashSet()
-                            if (goodFactions != null)
-                                actors.filterIsInstance<Factionable>().filter {
-                                    (it.faction.map { it.factionName } intersect goodFactions).isNotEmpty()
-                                } as List<ActorWithBody>
-                            else
-                                listOf()
-                        }
-                ).also {
-                    // add the installer of the door to the amicableActors if for some reason it was not added
-                    if (installer != null && !it.contains(installer)) it.add(0, installer)
-                }.filter {
-                    // filter amicableActors so that ones standing near the door remain
-                    it.hitbox.intersects(this.hitbox)
-                }
-
-                // automatic opening/closing
-                if (doorStateTimer > doorHoldLength[doorState]!!) {
-                    var nobodyIsThere = true
-                    for (actor in amicableActors) {
-                        if (actor.ontheLeftSideOfDoor() && actor.movingTowardsRight()) {
-                            openToRight()
-                            nobodyIsThere = false
-                            break
-                        }
-                        else if (actor.ontheRightSideOfDoor() && actor.movingTowardsLeft()) {
-                            openToLeft()
-                            nobodyIsThere = false
-                            break
-                        }
-                    }
-                    if (nobodyIsThere) {
-                        closeDoor()
-                    }
-
-                    doorStateTimer = 0f
-                }
+            // delayed auto closing
+            if (doorCloseQueued && doorCloseQueueTimer >= doorOpenedHoldLength) {
+                closeDoor()
+            }
+            else if (doorCloseQueued) {
+                doorCloseQueueTimer += delta
             }
 
+            // automatic opening/closing
+            if (doorStateTimer > doorHoldLength[doorState]!!) {
+                val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
 
-            doorStateTimer += delta
+                // auto opening and closing
+                // TODO make this work with "player_alies" faction, not just a player
+                val installer: IngamePlayer? = if (actorThatInstalledThisFixture == null) null
+                else INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }.ifEmpty {
+                    INGAME.actorContainerInactive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }
+                }.getOrNull(0)
+
+                // if the door is "owned" by someone, restrict access to its "amicable" (defined using Faction subsystem) actors
+                // if the door is owned by null, restrict access to ActorHumanoid and actors with "intelligent" actor value set up
+                if (actorThatInstalledThisFixture == null || installer != null) {
+                    val amicableActors: List<ActorWithBody> = ArrayList(
+                            if (actorThatInstalledThisFixture == null)
+                                actors.filterIsInstance<ActorHumanoid>() union actors.filter { it.actorValue.getAsBoolean("intelligent") == true }
+                            else {
+                                val goodFactions = installer?.faction?.flatMap { it.factionAmicable }?.toHashSet()
+                                if (goodFactions != null)
+                                    actors.filterIsInstance<Factionable>().filter {
+                                        (it.faction.map { it.factionName } intersect goodFactions).isNotEmpty()
+                                    } as List<ActorWithBody>
+                                else
+                                    listOf()
+                            }
+                    ).also {
+                        // add the installer of the door to the amicableActors if for some reason it was not added
+                        if (installer != null && !it.contains(installer)) it.add(0, installer)
+                    }.filter {
+                        // filter amicableActors so that ones standing near the door remain
+                        this.hitbox.containsHitbox(INGAME.world.width * TILE_SIZED, it.hitbox)
+                    }
+
+                    var nobodyIsThere = true
+                    val oldState = doorState
+
+                    for (actor in amicableActors) {
+                        if (doorState != 0) {
+                            if (this.hitbox.containsHitbox(INGAME.world.width * TILE_SIZED, actor.hitbox)) {
+                                nobodyIsThere = false
+                                break
+                            }
+                        }
+                        else {
+                            if (actor.ontheLeftSideOfDoor() && actor.movingTowardsRight()) {
+                                openToRight()
+                                nobodyIsThere = false
+                                break
+                            }
+                            else if (actor.ontheRightSideOfDoor() && actor.movingTowardsLeft()) {
+                                openToLeft()
+                                nobodyIsThere = false
+                                break
+                            }
+                        }
+                    }
+                    if (nobodyIsThere && !doorCloseQueued && doorState != 0) {
+                        queueDoorClosing()
+                    }
+
+                    if (oldState != doorState) doorStateTimer = 0f
+                }
+            }
+            else {
+                doorStateTimer += delta
+            }
+
         }
 
     }
