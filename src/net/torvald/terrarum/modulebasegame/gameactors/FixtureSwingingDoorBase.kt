@@ -178,15 +178,6 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
         doorCloseQueued = false
     }
 
-    /*override fun forEachBlockbox(action: (Int, Int, Int, Int) -> Unit) {
-        val xStart = worldBlockPos!!.x - ((tw * 2 - twClosed - 1) / 2) // worldBlockPos.x is where the mouse was, of when the tilewise width was 1.
-        for (y in worldBlockPos!!.y until worldBlockPos!!.y + blockBox.height) {
-            for (x in xStart until xStart + blockBox.width) {
-                action(x, y, x - xStart, y - worldBlockPos!!.y)
-            }
-        }
-    }*/
-
     override fun placeActorBlocks() {
         forEachBlockbox { x, y, ox, oy ->
             printdbg(this, "placeActorBlocks xy=$x,$y oxy=$ox,$oy")
@@ -279,6 +270,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
                 // auto opening and closing
                 // TODO make this work with "player_alies" faction, not just a player
+                // TODO auto open from the other side does not work if X-coord is 0 or (world width - 1)
                 val installer: IngamePlayer? = if (actorThatInstalledThisFixture == null) null
                 else INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }.ifEmpty {
                     INGAME.actorContainerInactive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }
