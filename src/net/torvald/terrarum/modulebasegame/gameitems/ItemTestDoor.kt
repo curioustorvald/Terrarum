@@ -5,12 +5,12 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
-import net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorBase
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorRosewood
 
 /**
  * Created by minjaesong on 2022-07-15.
  */
-class ItemTestDoor(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorBase") {
+class ItemTestDoor(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorRosewood") {
 
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_DOOR"
@@ -29,7 +29,7 @@ class ItemTestDoor(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
     }
 
     override val makeFixture: () -> FixtureBase = {
-        FixtureSwingingDoorBase()
+        FixtureSwingingDoorRosewood()
     }
 
 }

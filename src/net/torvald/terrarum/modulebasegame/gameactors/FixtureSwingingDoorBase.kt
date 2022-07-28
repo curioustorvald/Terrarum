@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -7,6 +8,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -21,24 +23,25 @@ import kotlin.math.absoluteValue
 open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
     /* OVERRIDE THESE TO CUSTOMISE */
-    open val tw = 2 // tilewise width of the door when opened
-    open val th = 3 // tilewise height of the door
-    open val twClosed = 1 // tilewise width of the door when closed
-    open val opacity = BlockCodex[Block.STONE].opacity
-    open val isOpacityActuallyLuminosity = false
-    open val moduleName = "basegame"
-    open val texturePath = "sprites/fixtures/door_test.tga"
-    open val textureIdentifier = "fixtures-door_test.tga"
-    open val customNameFun = { "DOOR_BASE" }
-    open val doorClosedHoldLength: Second = 0.1f
-    open val doorOpenedHoldLength: Second = 0.25f
+    var tw = 2 // tilewise width of the door when opened
+    var twClosed = 1 // tilewise width of the door when closed
+    var th = 3 // tilewise height of the door
+    var opacity = BlockCodex[Block.STONE].opacity
+    var isOpacityActuallyLuminosity = false
+    var moduleName = "basegame"
+    var texturePath = "sprites/fixtures/door_test.tga"
+    var textureIdentifier = "fixtures-door_test.tga"
+    var doorClosedHoldLength: Second = 0.1f
+    var doorOpenedHoldLength: Second = 0.25f
+    var nameKey = "DOOR_BASE" // goes into the savegame
+    var nameKeyReadFromLang = true // goes into the savegame
     /* END OF CUTOMISABLE PARAMETERS */
 
-    private val tilewiseHitboxWidth = tw * 2 - twClosed
-    private val tilewiseHitboxHeight = th
-    private val pixelwiseHitboxWidth = TILE_SIZE * tilewiseHitboxWidth
-    private val pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
-    private val tilewiseDistToAxis = tw - twClosed
+    private var tilewiseHitboxWidth = tw * 2 - twClosed
+    private var tilewiseHitboxHeight = th
+    private var pixelwiseHitboxWidth = TILE_SIZE * tilewiseHitboxWidth
+    private var pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
+    private var tilewiseDistToAxis = tw - twClosed
 
     @Transient override val lightBoxList: ArrayList<Lightbox> = ArrayList()
     @Transient override val shadeBoxList: ArrayList<Lightbox> = ArrayList()
@@ -46,19 +49,62 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     protected var doorState = 0 // -1: open toward left, 0: closed, 1: open toward right
     protected var doorStateTimer: Second = 0f
 
-    @Transient private val doorHoldLength: HashMap<Int, Second> = hashMapOf(
-            -1 to doorClosedHoldLength,
-            1 to doorClosedHoldLength,
-            0 to doorOpenedHoldLength
-    )
-
-//    @Transient private var placeActorBlockLatch = false
+    @Transient private lateinit var customNameFun: () -> String
+    @Transient private lateinit var doorHoldLength: HashMap<Int, Second>
 
     constructor() : super(
             BlockBox(BlockBox.FULL_COLLISION, 1, 1), // temporary value, will be overwritten by spawn()
             nameFun = { "item not loaded properly, alas!" }
     ) {
+        _construct(
+                2,
+                1,
+                3,
+                BlockCodex[Block.STONE].opacity,
+                false,
+                "basegame",
+                "sprites/fixtures/door_test.tga",
+                "fixtures-door_test.tga",
+                "DOOR_BASE",
+                true
+        )
+    }
 
+    protected fun _construct(
+            tw: Int, // tilewise width of the door when opened
+            twClosed: Int, // tilewise width of the door when closed
+            th: Int, // tilewise height of the door
+            opacity: Cvec,
+            isOpacityActuallyLuminosity: Boolean,
+            moduleName: String,
+            texturePath: String,
+            textureIdentifier: String,
+            nameKey: String,
+            nameKeyReadFromLang: Boolean,
+            doorCloseHoldLength: Second = 0.1f,
+            doorOpenedHoldLength: Second = 0.25f
+    ) {
+        this.tw = tw
+        this.twClosed = twClosed
+        this.th = th
+        this.opacity = opacity
+        this.isOpacityActuallyLuminosity = isOpacityActuallyLuminosity
+        this.moduleName = moduleName
+        this.texturePath = texturePath
+        this.textureIdentifier = textureIdentifier
+        this.nameKey = nameKey
+        this.nameKeyReadFromLang = nameKeyReadFromLang
+        this.doorClosedHoldLength = doorCloseHoldLength
+        this.doorOpenedHoldLength = doorOpenedHoldLength
+
+        this.tilewiseHitboxWidth = tw * 2 - twClosed
+        this.tilewiseHitboxHeight = th
+        this.pixelwiseHitboxWidth = TILE_SIZE * tilewiseHitboxWidth
+        this.pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
+        this.tilewiseDistToAxis = tw - twClosed
+
+
+        this.customNameFun = { if (nameKeyReadFromLang) Lang[nameKey] else nameKey }
         nameFun = customNameFun
 
         density = 1200.0
@@ -81,6 +127,12 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
         // define physical size
         setHitboxDimension(TILE_SIZE * tilewiseHitboxWidth, TILE_SIZE * tilewiseHitboxHeight, 0, 0)
         blockBox = BlockBox(BlockBox.FULL_COLLISION, tilewiseHitboxWidth, tilewiseHitboxHeight)
+
+        doorHoldLength = hashMapOf(
+                -1 to doorClosedHoldLength,
+                1 to doorClosedHoldLength,
+                0 to doorOpenedHoldLength
+        )
 
         reload()
     }
