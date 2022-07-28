@@ -406,9 +406,9 @@ internal object BlocksDrawer {
     }
 
     private fun getNearbyTilesInfoFakeOcc(x: Int, y: Int): Int {
-        val eligible = BlockCodex[world.getTileFromWall(x, y)].isSolid && !BlockCodex[world.getTileFromTerrain(x, y)].isSolid
+        val eligible = BlockCodex[world.getTileFromWall(x, y)].isSolidForTileCnx && !BlockCodex[world.getTileFromTerrain(x, y)].isSolidForTileCnx
         val nearbyTiles = getNearbyTilesPos(x, y).map {
-            !BlockCodex[world.getTileFromTerrain(it.x, it.y)].isSolid
+            !BlockCodex[world.getTileFromTerrain(it.x, it.y)].isSolidForTileCnx
         }
 
         if (!eligible) return 255
@@ -428,7 +428,7 @@ internal object BlocksDrawer {
 
         var ret = 0
         for (i in nearbyTiles.indices) {
-            if (BlockCodex[nearbyTiles[i]].isSolid) {
+            if (BlockCodex[nearbyTiles[i]].isSolidForTileCnx) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
@@ -446,7 +446,7 @@ internal object BlocksDrawer {
         var ret = 0
         for (i in nearbyTiles.indices) {
             val fluid = world.getFluid(nearbyPos[i].x, nearbyPos[i].y)
-            if (BlockCodex[nearbyTiles[i]].isSolid || (fluid.isFluid() && 0 < App.tileMaker.fluidFillToTileLevel(fluid.amount))) {
+            if (BlockCodex[nearbyTiles[i]].isSolidForTileCnx || (fluid.isFluid() && 0 < App.tileMaker.fluidFillToTileLevel(fluid.amount))) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
@@ -463,26 +463,26 @@ internal object BlocksDrawer {
         nearbyTiles[NEARBY_TILE_KEY_BACK] =  world.getTileFrom(WALL,    x    , y)
 
         try {
-            if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
+            if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolidForTileCnx)
             // has tile on the bottom
                 return 3
-            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid
-                     && BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
+            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx
+                     && BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx)
             // has tile on both sides
                 return 0
-            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid)
+            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx)
             // has tile on the right
                 return 2
-            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
+            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx)
             // has tile on the left
                 return 1
-            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_BACK]].isSolid)
+            else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_BACK]].isSolidForTileCnx)
             // has tile on the back
                 return 0
             else
                 return 3
         } catch (e: ArrayIndexOutOfBoundsException) {
-            return if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
+            return if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolidForTileCnx)
             // has tile on the bottom
                 3 else 0
         }
@@ -495,35 +495,35 @@ internal object BlocksDrawer {
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y)
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y)
 
-        if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
-             BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid) ||
+        if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx &&
+             BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx) ||
             isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT]) &&
             isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // LR solid || LR platform
             return 0
-        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT]) &&
-                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // L solid and not platform && R not solid and not platform
             return 4
-        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT]) &&
-                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) // R solid and not platform && L not solid and nto platform
             return 6
-        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) // L solid && L not platform
             return 3
-        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+        else if (BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // R solid && R not platform
             return 5
-        else if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid ||
+        else if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx ||
                   isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) &&
-                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // L solid or platform && R not solid and not platform
             return 1
-        else if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid ||
+        else if ((BlockCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolidForTileCnx ||
                   isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) &&
-                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+                 !BlockCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolidForTileCnx &&
                  !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) // R solid or platform && L not solid and not platform
             return 2
         else

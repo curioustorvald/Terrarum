@@ -108,4 +108,11 @@ class BlockProp {
     val extra = Codex()
 
     var isActorBlock: Boolean = false
+
+    /**
+     * Is this tile should be treated as "solid" for tile connecting.
+     */
+    val isSolidForTileCnx: Boolean
+        get() = if (tags.contains("DORENDER") || !isActorBlock) isSolid else false
+
 }
