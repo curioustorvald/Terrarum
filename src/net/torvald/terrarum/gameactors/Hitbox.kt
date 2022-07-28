@@ -159,14 +159,17 @@ class Hitbox {
     }
 
     /** *ROUNDWORLD*-aware version of intersects(Double, Double). */
-    fun containsPoint(worldWidth: Double, x: Double, y: Double) = intersects(x, y) || intersects(x + worldWidth, y) || intersects(x - worldWidth, y)
+    fun containsPoint(worldWidth: Double, x: Double, y: Double) =
+            ((x in startX..endX) || (x + worldWidth in startX..endX) || (x - worldWidth in startX..endX)) && (y in startY..endY)
     /** *ROUNDWORLD*-aware version of intersects(Poind2d). */
     fun containsPoint(worldWidth: Double, p: Point2d) = containsPoint(worldWidth, p.x, p.y)
     /** *ROUNDWORLD*-aware version of intersects(Hitbox). */
-    fun containsHitbox(worldWidth: Double, other: Hitbox): Boolean {
-        val osx = other.startX; val osy = other.startY; val oex = other.endX; val oey = other.endY // to avoid redundant maths operations
-        return intersects(osx, osy, oex, oey) || intersects(osx + worldWidth, osy, oex + worldWidth, oey) || intersects(osx - worldWidth, osy, oex - worldWidth, oey)
-    }
+    fun containsHitbox(worldWidth: Double, other: Hitbox) =
+            (
+                    (this.endX >= other.startX && other.endX >= this.startX) ||
+                    (this.endX >= other.startX + worldWidth && other.endX + worldWidth >= this.startX) ||
+                    (this.endX >= other.startX - worldWidth && other.endX - worldWidth >= this.startX)
+            ) && (this.endY >= other.startY && other.endY >= this.startY)
 
     fun intersects(px: Double, py: Double) =
             (px in startX..endX) &&
