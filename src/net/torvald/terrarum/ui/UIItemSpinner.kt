@@ -5,8 +5,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ceilInt
 
 /**
+ * Internal properties, namely initialValue, min, max, step; have the type of [Double] regardless of their input type.
+ *
  * Created by minjaesong on 2021-10-23.
  */
 
@@ -22,8 +25,7 @@ class UIItemSpinner(
         private val numberToTextFunction: (Number) -> String = { "$it" }
 ) : UIItem(parentUI, initialX, initialY) {
 
-    init {
-    }
+    private val valueType = initialValue.javaClass // should be java.lang.Double or java.lang.Integer
 
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
@@ -41,6 +43,22 @@ class UIItemSpinner(
 
     var selectionChangeListener: (Number) -> Unit = {}
 
+    // to alleviate floating point errors adding up as the spinner is being used
+    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilInt()) { min.toDouble() + (step.toDouble() * it) }
+    private var currentIndex = values.indexOfFirst { it == initialValue.toDouble() }
+
+    init {
+//        println("valueType=${valueType.canonicalName} for UI ${parentUI.javaClass.canonicalName}")
+
+        if (currentIndex < 0)
+            throw IllegalArgumentException("Initial value $initialValue cannot be derived from given ($min..$max step $step) settings")
+    }
+
+    private fun changeValueBy(diff: Int) {
+        currentIndex = (currentIndex + diff).coerceIn(values.indices)
+        value = values[currentIndex]
+    }
+
     override fun update(delta: Float) {
         super.update(delta)
 
@@ -56,7 +74,8 @@ class UIItemSpinner(
 
         if (!mouseLatched && Terrarum.mouseDown && mouseOnButton in 1..2) {
             mouseLatched = true
-            value = (value.toDouble() + step.toDouble() * ((mouseOnButton * 2) - 3)).coerceIn(min.toDouble(), max.toDouble())
+
+            changeValueBy((mouseOnButton * 2) - 3)
             fboUpdateLatch = true
             selectionChangeListener(value)
         }
@@ -140,9 +159,9 @@ class UIItemSpinner(
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (mouseUp) {
             if (amountX <= -1 || amountY <= -1)
-                value = (value.toDouble() - step.toDouble()).coerceIn(min.toDouble(), max.toDouble())
+                changeValueBy(-1)
             else if (amountX >= 1 || amountY >= 1)
-                value = (value.toDouble() + step.toDouble()).coerceIn(min.toDouble(), max.toDouble())
+                changeValueBy(1)
 
             selectionChangeListener(value)
             fboUpdateLatch = true

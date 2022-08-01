@@ -31,7 +31,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
             arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
             arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
-            arrayOf("screenmagnifying", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "spinnerd,1.0,2.0,0.25"),
+            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
             arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
     )
 
@@ -45,7 +45,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         else if (args.startsWith("spinnerd,")) {
             val arg = args.split(',')
-            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${it}x" })
+            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" })
         }
         else throw IllegalArgumentException(args)
     }
