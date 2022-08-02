@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -30,9 +31,11 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
             arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
             arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
-            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
-            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
             arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
+            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
+            arrayOf("screenwidth", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "typeinint"),
+            arrayOf("screenheight", { "" }, "typeinint"),
+            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
     )
 
     private fun makeButton(args: String, x: Int, y: Int, optionName: String): UIItem {
@@ -46,6 +49,10 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         else if (args.startsWith("spinnerd,")) {
             val arg = args.split(',')
             UIItemSpinner(this, x - spinnerWidth, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" })
+        }
+        else if (args.startsWith("typeinint")) {
+//            val arg = args.split(',') // args: none
+            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE })
         }
         else throw IllegalArgumentException(args)
     }
@@ -75,6 +82,14 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 it.selectionChangeListener = {
                     App.setConfig(options[i][0] as String, it)
                 }
+            }
+            else if (it is UIItemTextLineInput) {
+                it.textCommitListener = {
+                    App.setConfig(options[i][0] as String, it.toInt()) // HAXXX!!!
+                }
+            }
+            else {
+                throw NotImplementedError()
             }
 
             addUIitem(it)

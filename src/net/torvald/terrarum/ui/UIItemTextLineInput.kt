@@ -149,6 +149,9 @@ class UIItemTextLineInput(
     private val candidatesBackCol = TEXTINPUT_COL_BACKGROUND.cpy().mul(1f,1f,1f,1.5f)
     private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
 
+    /** Event fired whenever a character is entered or pasted from clipboard */
+    var textCommitListener: (String) -> Unit = {}
+
     private fun getIME(ignoreOnOff: Boolean = false): TerrarumIME? {
         if (!imeOn && !ignoreOnOff) return null
 
@@ -481,6 +484,7 @@ class UIItemTextLineInput(
                 it.color = Color.WHITE
                 App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else textbuf, -1f*cursorDrawScroll, 0f)
             } }
+            textCommitListener(getTextOrPlaceholder())
         }
 
         batch.begin()
