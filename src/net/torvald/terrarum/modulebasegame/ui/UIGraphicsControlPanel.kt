@@ -19,7 +19,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override var height = 400
     override var openCloseTime = 0f
 
-    private val spinnerWidth = 136
+    private val spinnerWidth = 140
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
@@ -33,66 +33,74 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
             arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
             arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
-            arrayOf("screenwidth", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "typeinint"),
-            arrayOf("screenheight", { "" }, "typeinint"),
+            arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "typeinres"),
             arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
     )
 
-    private fun makeButton(args: String, x: Int, y: Int, optionName: String): UIItem {
+    // @return Pair of <UIItem, Init job for the item>
+    private fun makeButton(args: String, x: Int, y: Int, optionName: String): Pair<UIItem, (UIItem, String) -> Unit> {
         return if (args.startsWith("toggle")) {
-            UIItemToggleButton(this, x - 75, y, App.getConfigBoolean(optionName))
+            UIItemToggleButton(this, x - 75, y, App.getConfigBoolean(optionName)) to { it: UIItem, optionStr: String ->
+                (it as UIItemToggleButton).clickOnceListener = { _, _, _ ->
+                    it.toggle()
+                    App.setConfig(optionStr, it.getStatus())
+                }
+            }
         }
         else if (args.startsWith("spinner,")) {
             val arg = args.split(',')
-            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth, numberToTextFunction = { "${it.toLong()}" })
+            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
+                (it as UIItemSpinner).selectionChangeListener = {
+                    App.setConfig(optionStr, it)
+                }
+            }
         }
         else if (args.startsWith("spinnerd,")) {
             val arg = args.split(',')
-            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" })
+            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" }) to { it: UIItem, optionStr: String ->
+                (it as UIItemSpinner).selectionChangeListener = {
+                    App.setConfig(optionStr, it)
+                }            }
         }
         else if (args.startsWith("typeinint")) {
 //            val arg = args.split(',') // args: none
-            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE })
+            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }) to { it: UIItem, optionStr: String ->
+                (it as UIItemTextLineInput).textCommitListener = {
+                    App.setConfig(optionStr, it.toInt()) // HAXXX!!!
+                }
+            }
+        }
+        else if (args.startsWith("typeinres")) {
+            val keyWidth = optionName.substringBefore(',')
+            val keyHeight = optionName.substringAfter(',')
+            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }) to { it: UIItem, optionStr: String ->
+                (it as UIItemTextLineInput).textCommitListener = { text ->
+                    val text = text.lowercase()
+                    if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {
+                        val width = text.substringBefore('x').toInt()
+                        val height = text.substringAfter('x').toInt()
+                        App.setConfig(keyWidth, width)
+                        App.setConfig(keyHeight, height)
+                    }
+                    // else it.markAsInvalid
+                }
+            }
         }
         else throw IllegalArgumentException(args)
     }
 
-    private val optionControllers = options.mapIndexed { index, strings ->
+    private val optionControllers: List<Pair<UIItem, (UIItem, String) -> Unit>> = options.mapIndexed { index, strings ->
         makeButton(options[index][2] as String,
                 drawX + width - panelgap,
                 drawY + panelgap - 2 + index * (20 + linegap),
                 options[index][0] as String
         )
-        /*UIItemToggleButton(this,
-                drawX + width - panelgap - 75,
-                drawY + panelgap - 2 + index * (20 + linegap),
-                App.getConfigBoolean(options[index][0])
-        )*/
     }
 
     init {
         optionControllers.forEachIndexed { i, it ->
-            if (it is UIItemToggleButton) {
-                it.clickOnceListener = { _, _, _ ->
-                    it.toggle()
-                    App.setConfig(options[i][0] as String, it.getStatus())
-                }
-            }
-            else if (it is UIItemSpinner) {
-                it.selectionChangeListener = {
-                    App.setConfig(options[i][0] as String, it)
-                }
-            }
-            else if (it is UIItemTextLineInput) {
-                it.textCommitListener = {
-                    App.setConfig(options[i][0] as String, it.toInt()) // HAXXX!!!
-                }
-            }
-            else {
-                throw NotImplementedError()
-            }
-
-            addUIitem(it)
+            it.second.invoke(it.first, options[i][0] as String)
+            addUIitem(it.first)
         }
     }
 
