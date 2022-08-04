@@ -64,7 +64,8 @@ class UIItemTextLineInput(
         val maxLen: InputLenCap = InputLenCap(1000, InputLenCap.CharLenUnit.CODEPOINTS),
 //        val enablePasteButton: Boolean = true,
 //        val enableIMEButton: Boolean = true
-        var keyFilter: (TerrarumKeyboardEvent) -> Boolean = { true }
+        var keyFilter: (TerrarumKeyboardEvent) -> Boolean = { true },
+        val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.LEFT,
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -482,7 +483,12 @@ class UIItemTextLineInput(
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
-                App.fontGameFBO.draw(it, if (textbuf.isEmpty()) currentPlaceholderText else textbuf, -1f*cursorDrawScroll, 0f)
+
+                val text = if (textbuf.isEmpty()) currentPlaceholderText else textbuf
+                val tw = App.fontGameFBO.getWidth(text)
+                val offset = ((fbo.width - tw) / 2).coerceAtLeast(0)
+                
+                App.fontGameFBO.draw(it, text, -1f*cursorDrawScroll + offset, 0f)
             } }
             textCommitListener(getTextOrPlaceholder())
         }

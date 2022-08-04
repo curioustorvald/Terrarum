@@ -73,7 +73,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         else if (args.startsWith("typeinres")) {
             val keyWidth = optionName.substringBefore(',')
             val keyHeight = optionName.substringAfter(',')
-            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }, UIItemTextButton.Companion.Alignment.CENTRE) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = { text ->
                     val text = text.lowercase()
                     if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {
