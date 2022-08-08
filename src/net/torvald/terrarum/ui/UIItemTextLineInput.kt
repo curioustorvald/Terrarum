@@ -471,11 +471,14 @@ class UIItemTextLineInput(
 
     private fun String.toUnicodeNFC() = Normalizer2.getNFCInstance().normalize(this)
 
+    private var textDrawOffset = 0
+
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         val ime = getIME(true)
 
         batch.end()
+
 
         if (true || fboUpdateLatch) {
             fboUpdateLatch = false
@@ -486,9 +489,13 @@ class UIItemTextLineInput(
 
                 val text = if (textbuf.isEmpty()) currentPlaceholderText else textbuf
                 val tw = App.fontGameFBO.getWidth(text)
-                val offset = ((fbo.width - tw) / 2).coerceAtLeast(0)
-                
-                App.fontGameFBO.draw(it, text, -1f*cursorDrawScroll + offset, 0f)
+                textDrawOffset = if (alignment == UIItemTextButton.Companion.Alignment.CENTRE)
+                        ((fbo.width - tw) / 2).coerceAtLeast(0)
+                else
+                    0
+                // TODO support alignment-right
+
+                App.fontGameFBO.draw(it, text, -1f*cursorDrawScroll + textDrawOffset, 0f)
             } }
             textCommitListener(getTextOrPlaceholder())
         }
@@ -536,7 +543,7 @@ class UIItemTextLineInput(
         batch.draw(fbo.colorBufferTexture, inputPosX + 2f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
 
         // draw text cursor
-        val cursorXOnScreen = inputPosX + cursorDrawX + 2
+        val cursorXOnScreen = inputPosX + cursorDrawX + 2 + textDrawOffset
         if (isActive && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
