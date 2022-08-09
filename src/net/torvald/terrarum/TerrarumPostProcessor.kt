@@ -2,10 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
@@ -20,7 +17,7 @@ import net.torvald.terrarum.ui.Toolkit
  *
  * We recommened most of the user interfaces to be contained within the UI Area which has aspect ratio of 3:2.
  */
-object PostProcessor : Disposable {
+object TerrarumPostProcessor : Disposable {
 
     private lateinit var batch: FlippingSpriteBatch // not nulling to save some lines of code
     private lateinit var shapeRenderer: ShapeRenderer
@@ -29,6 +26,8 @@ object PostProcessor : Disposable {
     private lateinit var lutTex: Texture
 
     private var init = false
+
+    private lateinit var outFBO: FrameBuffer
 
     fun reloadLUT(filename: String) {
         lutTex = Texture(Gdx.files.internal("assets/clut/$filename"))
@@ -62,19 +61,22 @@ object PostProcessor : Disposable {
         App.disposables.add(this)
     }
 
+    fun resize(w: Int, h: Int) {
+        try { outFBO.dispose() } catch (_: UninitializedPropertyAccessException) {}
+        outFBO = FrameBuffer(Pixmap.Format.RGBA8888, w, h, false)
+    }
+
     override fun dispose() {
         batch.dispose()
         shapeRenderer.dispose()
         functionRowHelper.dispose()
-        try {
-            lutTex.dispose()
-        }
-        catch (e: UninitializedPropertyAccessException) { }
+        try { lutTex.dispose() } catch (_: UninitializedPropertyAccessException) {}
         shaderPostDither.dispose()
         shaderPostNoDither.dispose()
+        outFBO.dispose()
     }
 
-    fun draw(projMat: Matrix4, fbo: FrameBuffer) {
+    fun draw(projMat: Matrix4, fbo: FrameBuffer): FrameBuffer {
 
         // init
         if (!init) {
@@ -89,65 +91,72 @@ object PostProcessor : Disposable {
             batch.projectionMatrix = camera.combined
 
             shapeRenderer = ShapeRenderer()
+            shapeRenderer.projectionMatrix = camera.combined
+
             Gdx.gl20.glViewport(0, 0, App.scr.width, App.scr.height)
+
+            resize(App.scr.width, App.scr.height)
         }
 
 
         debugUI.update(Gdx.graphics.deltaTime)
 
+        outFBO.inAction(camera, batch) {
+            App.measureDebugTime("Renderer.PostProcessor") {
 
-        App.measureDebugTime("Renderer.PostProcessor") {
+                gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
-            gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
+                fbo.colorBufferTexture.setFilter(
+                        Texture.TextureFilter.Linear,
+                        if (App.scr.magn % 1.0 < 0.0001) Texture.TextureFilter.Nearest else Texture.TextureFilter.Linear
+                )
 
-            fbo.colorBufferTexture.setFilter(
-                    Texture.TextureFilter.Linear,
-                    if (App.scr.magn % 1.0 < 0.0001) Texture.TextureFilter.Nearest else Texture.TextureFilter.Linear
-            )
+                postShader(projMat, fbo)
 
-            postShader(projMat, fbo)
-
-            // draw things when F keys are on
-            if (App.IS_DEVELOPMENT_BUILD && KeyToggler.isOn(Input.Keys.F11)) {
-                drawSafeArea()
-            }
-
-
-            if (KeyToggler.isOn(Input.Keys.F1)) {
-                batch.color = Color.WHITE
-                batch.inUse {
-                    it.draw(functionRowHelper,
-                            (App.scr.width - functionRowHelper.width) / 2f,
-                            functionRowHelper.height.toFloat(),
-                            functionRowHelper.width.toFloat(),
-                            functionRowHelper.height * -1f
-                    )
+                // draw things when F keys are on
+                if (App.IS_DEVELOPMENT_BUILD && KeyToggler.isOn(Input.Keys.F11)) {
+                    drawSafeArea()
                 }
-            }
 
-            if (KeyToggler.isOn(Input.Keys.F10)) {
-                batch.color = Color.WHITE
-                batch.inUse {
-                    App.fontSmallNumbers.draw(it, "Wire draw class: ${(Terrarum.ingame as? net.torvald.terrarum.modulebasegame.TerrarumIngame)?.selectedWireRenderClass}", 2f, 2f)
+
+                if (KeyToggler.isOn(Input.Keys.F1)) {
+                    batch.color = Color.WHITE
+                    batch.inUse {
+                        it.draw(functionRowHelper,
+                                (App.scr.width - functionRowHelper.width) / 2f,
+                                0f,
+                                functionRowHelper.width.toFloat(),
+                                functionRowHelper.height.toFloat()
+                        )
+                    }
                 }
-            }
 
-            if (KeyToggler.isOn(Input.Keys.F3)) {
-                if (!debugUI.isOpened && !debugUI.isOpening) debugUI.setAsOpen()
-                batch.inUse { debugUI.renderUI(batch, camera) }
-            }
-            else {
-                if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()
-            }
+                if (KeyToggler.isOn(Input.Keys.F10)) {
+                    batch.color = Color.WHITE
+                    batch.inUse {
+                        App.fontSmallNumbers.draw(it, "Wire draw class: ${(Terrarum.ingame as? net.torvald.terrarum.modulebasegame.TerrarumIngame)?.selectedWireRenderClass}", 2f, 2f)
+                    }
+                }
 
-            // draw dev build notifiers
-            if (App.IS_DEVELOPMENT_BUILD && Terrarum.ingame != null) {
-                batch.inUse {
-                    batch.color = safeAreaCol
-                    App.fontGame.draw(it, thisIsDebugStr, 5f, App.scr.height - 24f)
+                if (KeyToggler.isOn(Input.Keys.F3)) {
+                    if (!debugUI.isOpened && !debugUI.isOpening) debugUI.setAsOpen()
+                    batch.inUse { debugUI.renderUI(batch, camera) }
+                }
+                else {
+                    if (!debugUI.isClosed && !debugUI.isClosing) debugUI.setAsClose()
+                }
+
+                // draw dev build notifiers
+                if (App.IS_DEVELOPMENT_BUILD && Terrarum.ingame != null) {
+                    batch.inUse {
+                        batch.color = safeAreaCol
+                        App.fontGame.draw(it, thisIsDebugStr, 5f, App.scr.height - 24f)
+                    }
                 }
             }
         }
+
+        return outFBO
     }
     private val rng = HQRNG()
 
@@ -176,40 +185,49 @@ object PostProcessor : Disposable {
     }
 
     private fun drawSafeArea() {
+        val magn = App.scr.magn
+
         val tvSafeAreaW = App.scr.tvSafeGraphicsWidth.toFloat()
         val tvSafeAreaH = App.scr.tvSafeGraphicsHeight.toFloat()
         val tvSafeArea2W = App.scr.tvSafeActionWidth.toFloat()
         val tvSafeArea2H = App.scr.tvSafeActionHeight.toFloat()
         val uiAreaHeight = App.scr.height - 2 * tvSafeAreaH
         val uiAreaWidth = uiAreaHeight * recommendRatio
-        val scrw = Toolkit.drawWidthf
+
+        val scrw = Toolkit.drawWidthf * magn
+        val scrh = App.scr.hf * magn
+
+        val rect2W = tvSafeArea2W * magn
+        val rect2H = tvSafeArea2H * magn
+        val rectW = tvSafeAreaW * magn
+        val rectH = tvSafeAreaH * magn
 
         shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
 
             // centre ind
             shapeRenderer.color = safeAreaCol2
-            shapeRenderer.line(0f, 0f, scrw, App.scr.hf)
-            shapeRenderer.line(0f, App.scr.hf, scrw, 0f)
+            shapeRenderer.line(0f, 0f, scrw, scrh)
+            shapeRenderer.line(0f, scrh, scrw, 0f)
 
             // safe action area
             shapeRenderer.color = safeAreaCol2
             shapeRenderer.rect(
-                    tvSafeArea2W, tvSafeArea2H, scrw - 2 * tvSafeArea2W, App.scr.height - 2 * tvSafeArea2H
+                    rect2W, rect2H, scrw - 2 * rect2W, App.scr.height * magn - 2 * rect2H
             )
 
             // safe graphics area
             shapeRenderer.color = safeAreaCol
             shapeRenderer.rect(
-                    tvSafeAreaW, tvSafeAreaH, scrw - 2 * tvSafeAreaW, App.scr.height - 2 * tvSafeAreaH
+                    rectW, rectH, scrw - 2 * rectW, App.scr.height * magn - 2 * rectH
             )
 
             // default res ind
             shapeRenderer.color = defaultResCol
             shapeRenderer.rect(
-                    (scrw - uiAreaWidth).div(2f),
-                    (App.scr.height - uiAreaHeight).div(2f),
-                    uiAreaWidth,
-                    uiAreaHeight
+                    (scrw - uiAreaWidth * magn).div(2f),
+                    (App.scr.height - uiAreaHeight).times(magn).div(2f),
+                    uiAreaWidth * magn,
+                    uiAreaHeight * magn
             )
         }
 
@@ -224,14 +242,14 @@ object PostProcessor : Disposable {
                 batch.color = defaultResCol
                 App.fontSmallNumbers.draw(
                         batch, defaultResStr,
-                        (scrw - uiAreaWidth).div(2f),
+                        (Toolkit.drawWidthf - uiAreaWidth).div(2f),
                         tvSafeAreaH
                 )
 
                 batch.color = currentResCol
                 App.fontSmallNumbers.draw(
                         batch, currentResStr,
-                        scrw - 80f,
+                        Toolkit.drawWidthf - 80f,
                         0f
                 )
             }

@@ -347,7 +347,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             )
         }
 
-        App.fontGame.draw(batch, PostProcessor.thisIsDebugStr, 5f, App.scr.height - 24f)
+        App.fontGame.draw(batch, TerrarumPostProcessor.thisIsDebugStr, 5f, App.scr.height - 24f)
 
 
 

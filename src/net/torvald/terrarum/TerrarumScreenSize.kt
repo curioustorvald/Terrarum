@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import net.torvald.terrarum.App.printdbg
 import kotlin.math.roundToInt
 
 class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
@@ -25,18 +26,21 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
     var aspectRatio: Float = 0f; private set
     var chatWidth: Int = 0; private set
 
-    var magn: Double = 0.0; private set // this value is stored here so that the initial instance would stay, forcing the players to require restart to apply the screen magnifying
+    var magn: Float = 0f; private set // this value is stored here so that the initial instance would stay, forcing the players to require restart to apply the screen magnifying
 
     val tvSafeGraphicsWidth: Int; get() = Math.round(width * TV_SAFE_GRAPHICS)
     val tvSafeGraphicsHeight: Int; get() = Math.round(height * TV_SAFE_GRAPHICS)
     val tvSafeActionWidth: Int; get() = Math.round(width * TV_SAFE_ACTION)
     val tvSafeActionHeight: Int; get() = Math.round(height * TV_SAFE_ACTION)
 
+    var windowW: Int = 0; private set
+    var windowH: Int = 0; private set
+
     init {
-        setDimension(maxOf(minimumW, scrw), maxOf(minimumH, scrh))
+        setDimension(maxOf(minimumW, scrw), maxOf(minimumH, scrh), App.getConfigDouble("screenmagnifying").toFloat(), maxOf(minimumW, scrw), maxOf(minimumH, scrh))
     }
 
-    fun setDimension(scrw: Int, scrh: Int) {
+    fun setDimension(scrw: Int, scrh: Int, magn: Float, ww: Int, wh: Int) {
         width = scrw and 0x7FFFFFFE
         height = scrh and 0x7FFFFFFE
         wf = scrw.toFloat()
@@ -48,7 +52,14 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
         aspectRatio = wf / hf
         chatWidth = (width - (width * 0.84375).roundToInt()) and 0x7FFFFFFE
 
-        magn = App.getConfigDouble("screenmagnifying")
+        this.magn = magn
+
+        windowW = ww
+        windowH = wh
+
+
+        printdbg(this, "Window dim: $ww x $wh, called by:")
+        printStackTrace(this)
     }
 
 }

@@ -11,10 +11,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer;
-import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
@@ -545,6 +542,8 @@ public class App implements ApplicationListener {
         CommonResourcePool.INSTANCE.loadAll();
     }
 
+    private FrameBuffer postProcessorOutFBO;
+
     @Override
     public void render() {
         Gdx.gl.glDisable(GL20.GL_DITHER);
@@ -560,6 +559,7 @@ public class App implements ApplicationListener {
         FrameBufferManager.begin(renderFBO);
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f);
         setCameraPosition(0, 0);
+
 
         // draw splash screen when predefined screen is null
         // because in normal operation, the only time screen == null is when the app is cold-launched
@@ -584,10 +584,13 @@ public class App implements ApplicationListener {
                     setScreen(notitle);
                 }
             }
+
+            postProcessorOutFBO = renderFBO;
         }
         // draw the screen
         else {
             currentScreen.render(UPDATE_RATE);
+            postProcessorOutFBO = TerrarumPostProcessor.INSTANCE.draw(camera.combined, renderFBO);
         }
 
         KeyToggler.INSTANCE.update(currentScreen instanceof TerrarumIngame);
@@ -597,8 +600,31 @@ public class App implements ApplicationListener {
         // nested FBOs are just not a thing in GL!
         FrameBufferManager.end();
 
-        PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
 
+
+        // process screenshot request
+        if (screenshotRequested) {
+            FrameBufferManager.begin(postProcessorOutFBO);
+            screenshotRequested = false;
+            try {
+                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, scr.getWidth(), scr.getHeight());
+                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
+                p.dispose();
+                Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
+            }
+            catch (Throwable e) {
+                e.printStackTrace();
+                Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
+            }
+            FrameBufferManager.end();
+        }
+
+
+        shaderPassthruRGBA.bind();
+        shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
+        shaderPassthruRGBA.setUniformi("u_texture", 0);
+        postProcessorOutFBO.getColorBufferTexture().bind(0);
+        fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
 
         // process resize request
         if (resizeRequested) {
@@ -607,22 +633,6 @@ public class App implements ApplicationListener {
         }
 
 
-        // process screenshot request
-        if (screenshotRequested) {
-            screenshotRequested = false;
-
-            try {
-                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, scr.getWidth(), scr.getHeight());
-                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
-                p.dispose();
-
-                Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
-            }
-            catch (Throwable e) {
-                e.printStackTrace();
-                Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
-            }
-        }
 
         splashDisplayed = true;
         GLOBAL_RENDER_TIMER += 1;
@@ -720,12 +730,23 @@ public class App implements ApplicationListener {
         logoBatch.end();
     }
 
+    /**
+     * This resize takes the apparent screen size (i.e. zoomed size) as parameters.
+     *
+     * All other Terrarum's resize() must take real screen size. (i.e not zoomed)
+     *
+     * @param w0 the new width in pixels
+     * @param h0 the new height in pixels
+     */
     @Override
-    public void resize(int w, int h) {
+    public void resize(int w0, int h0) {
 
-        double magn = getConfigDouble("screenmagnifying");
-        int width = (int) Math.round(w / magn);
-        int height = (int) Math.round(h / magn);
+        int w = (w0%2==0)?w0:w0+1;
+        int h = (h0%2==0)?h0:h0+1;
+
+        float magn = (float) getConfigDouble("screenmagnifying");
+        int width = Math.round(w / magn);
+        int height = Math.round(h / magn);
 
 
         printdbg(this, "Resize called: "+width+","+height);
@@ -735,9 +756,10 @@ public class App implements ApplicationListener {
 
         //initViewPort(width, height);
 
-        scr.setDimension(width, height);
+        scr.setDimension(width, height, magn, w, h);
 
         if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
+        TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(scr.getWidth(), scr.getHeight());
 
 
@@ -1085,7 +1107,7 @@ public class App implements ApplicationListener {
             operationSystem = "WINDOWS";
             defaultDir = System.getenv("APPDATA") + "/Terrarum";
         }
-        else if (OS.contains("OS X")) {
+        else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
             operationSystem = "OSX";
             defaultDir = System.getProperty("user.home") + "/Library/Application Support/Terrarum";
         }

@@ -72,19 +72,25 @@ class UIInventoryFull(
                 App.disposables.add(shapeRenderer)
             }
 
+            val magn = App.scr.magn
 
-            val gradTopStart = -YPOS_CORRECTION + (App.scr.height - internalHeight).div(2).toFloat()
-            val gradBottomEnd = App.scr.height - gradTopStart
+            val gradTopStart0 = -YPOS_CORRECTION + (App.scr.height - internalHeight).div(2).toFloat()
+            val gradTopStart = gradTopStart0 * magn
+            val gradBottomEnd = (App.scr.height - gradTopStart0) * magn
+            val gradHeightFlat = (2*YPOS_CORRECTION + internalHeight - (2 * gradHeight)) * magn
+            val gradHeight = gradHeight * magn
+            val w = App.scr.wf * magn
+            val h = App.scr.hf * magn
 
             shapeRenderer!!.inUse {
                 // shaperender starts at bottom-left!
-                it.rect(0f, gradTopStart, App.scr.wf, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-                it.rect(0f, gradBottomEnd, App.scr.wf, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradTopStart, w, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradBottomEnd, w, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
 
-                it.rect(0f, gradTopStart + gradHeight, App.scr.wf, 2*YPOS_CORRECTION + internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradTopStart + gradHeight, w, gradHeightFlat, gradEndCol, gradEndCol, gradEndCol, gradEndCol)
 
-                it.rect(0f, 0f, App.scr.wf, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-                it.rect(0f, App.scr.hf, App.scr.wf, -(App.scr.hf - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+                it.rect(0f, 0f, w, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+                it.rect(0f, h, w, -(h - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
             }
 
             batch.begin()

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.unicode.getKeycapConsole
 import net.torvald.unicode.getKeycapPC
 import net.torvald.terrarum.*
@@ -32,8 +31,6 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         set(value) {}
     override var openCloseTime: Second = 0f
 
-
-    private val shapeRenderer = ShapeRenderer()
 
 
     internal val uiWidth = MODULEINFO_CELL_WIDTH
@@ -255,7 +252,6 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     override fun dispose() {
-        try { shapeRenderer.dispose() } catch (e: IllegalArgumentException) {}
         try { sliderFBO.dispose() } catch (e: IllegalArgumentException) {}
     }
 

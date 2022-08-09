@@ -11,7 +11,8 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.measureDebugTime
+import net.torvald.terrarum.App.*
+import net.torvald.terrarum.Terrarum.ingame
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -27,6 +28,9 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import kotlin.system.exitProcess
+
+
+
 
 /**
  * This will be rendered to a postprocessor FBO.
@@ -409,6 +413,10 @@ object IngameRenderer : Disposable {
         blendNormal(batch)
     }
 
+    /**
+     * This "screencap" will capture the game WITHOUT gui and postprocessors!
+     * To capture the entire game, use [App.requestScreenshot]
+     */
     @Volatile internal var screencapRequested = false
     @Volatile internal var fboRGBexportedLatch = false
     @Volatile internal var screencapExportCallback: (FrameBuffer) -> Unit = {}

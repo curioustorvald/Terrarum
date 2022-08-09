@@ -223,16 +223,16 @@ object Terrarum : Disposable {
 
     /** Position of the cursor in the world, rounded */
     val mouseX: Double
-        get() = (WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).times(scr.magn)).fmod(WorldCamera.worldWidth.toDouble())
+        get() = (WorldCamera.zoomedX + Gdx.input.x / (ingame?.screenZoom ?: 1f).times(scr.magn.toDouble())).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val mouseY: Double
-        get() = (WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).times(scr.magn))
+        get() = (WorldCamera.zoomedY + Gdx.input.y / (ingame?.screenZoom ?: 1f).times(scr.magn.toDouble()))
     /** Position of the cursor in the world, rounded */
     val oldMouseX: Double
-        get() = (WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).times(scr.magn)).fmod(WorldCamera.worldWidth.toDouble())
+        get() = (WorldCamera.zoomedX + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).times(scr.magn.toDouble())).fmod(WorldCamera.worldWidth.toDouble())
     /** Position of the cursor in the world */
     val oldMouseY: Double
-        get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).times(scr.magn)
+        get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).times(scr.magn.toDouble())
     /** Position of the cursor in the world, rounded */
     @JvmStatic val mouseTileX: Int
         get() = (mouseX / TILE_SIZE).floorInt()
