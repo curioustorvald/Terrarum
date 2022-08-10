@@ -208,22 +208,35 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     }
 
     private fun mouseOnLeftSide(): Boolean {
+        val ww = INGAME.world.width
         val mouseRelX = Terrarum.mouseX - hitbox.hitboxStart.x
         val mouseRelY = Terrarum.mouseY - hitbox.hitboxStart.y
         return 0.0 <= mouseRelX && mouseRelX < hitbox.width / 2 && mouseRelY in 0.0..hitbox.height
     }
 
     private fun mouseOnRightSide(): Boolean {
+        val ww = INGAME.world.width
         val mouseRelX = Terrarum.mouseX - hitbox.hitboxStart.x
         val mouseRelY = Terrarum.mouseY - hitbox.hitboxStart.y
         return hitbox.width / 2 < mouseRelX && mouseRelX <= hitbox.width && mouseRelY in 0.0..hitbox.height
     }
 
     private fun ActorWithBody.ontheLeftSideOfDoor(): Boolean {
-        return this.hitbox.startX < this@FixtureSwingingDoorBase.hitbox.centeredX
+        val ww = INGAME.world.width * TILE_SIZED
+        val pivot = this@FixtureSwingingDoorBase.hitbox.centeredX
+        // note: this function uses startX while the dual other function uses endX; the "dist" must be same between two functions
+        val dist = pivot - this.hitbox.startX // NOTE: order is different from the other function
+        val dist2 = pivot - (this.hitbox.startX - ww)
+        val distLim = this@FixtureSwingingDoorBase.hitbox.width / 2 + this.hitbox.width
+        return dist in 0.0..distLim || dist2 in 0.0..distLim
     }
     private fun ActorWithBody.ontheRightSideOfDoor(): Boolean {
-        return this.hitbox.endX > this@FixtureSwingingDoorBase.hitbox.centeredX
+        val ww = INGAME.world.width * TILE_SIZED
+        val pivot = this@FixtureSwingingDoorBase.hitbox.centeredX
+        val dist = this.hitbox.endX - pivot // NOTE: order is different from the other function
+        val dist2 = (this.hitbox.endX + ww) - pivot
+        val distLim = this@FixtureSwingingDoorBase.hitbox.width / 2 + this.hitbox.width
+        return dist in 0.0..distLim || dist2 in 0.0..distLim
     }
 
     private fun ActorWithBody.movingTowardsRight(): Boolean {
