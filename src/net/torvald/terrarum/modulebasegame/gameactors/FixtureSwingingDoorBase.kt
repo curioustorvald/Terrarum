@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
@@ -208,17 +209,22 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     }
 
     private fun mouseOnLeftSide(): Boolean {
-        val ww = INGAME.world.width
-        val mouseRelX = Terrarum.mouseX - hitbox.hitboxStart.x
-        val mouseRelY = Terrarum.mouseY - hitbox.hitboxStart.y
-        return 0.0 <= mouseRelX && mouseRelX < hitbox.width / 2 && mouseRelY in 0.0..hitbox.height
+        val ww = INGAME.world.width * TILE_SIZED
+        val pivot = this@FixtureSwingingDoorBase.hitbox.centeredX
+        // note: this function uses startX while the dual other function uses endX; the "dist" must be same between two functions
+        val dist = pivot - Terrarum.mouseX // NOTE: order is different from the other function
+        val dist2 = pivot - (Terrarum.mouseX - ww)
+        val distLim = this@FixtureSwingingDoorBase.hitbox.width
+        return (dist in 0.0..distLim || dist2 in 0.0..distLim) && (Terrarum.mouseY - hitbox.hitboxStart.y) in 0.0..hitbox.height
     }
 
     private fun mouseOnRightSide(): Boolean {
-        val ww = INGAME.world.width
-        val mouseRelX = Terrarum.mouseX - hitbox.hitboxStart.x
-        val mouseRelY = Terrarum.mouseY - hitbox.hitboxStart.y
-        return hitbox.width / 2 < mouseRelX && mouseRelX <= hitbox.width && mouseRelY in 0.0..hitbox.height
+        val ww = INGAME.world.width * TILE_SIZED
+        val pivot = this@FixtureSwingingDoorBase.hitbox.centeredX
+        val dist = Terrarum.mouseX - pivot // NOTE: order is different from the other function
+        val dist2 = (Terrarum.mouseX + ww) - pivot
+        val distLim = this@FixtureSwingingDoorBase.hitbox.width
+        return dist in 0.0..distLim || dist2 in 0.0..distLim && (Terrarum.mouseY - hitbox.hitboxStart.y) in 0.0..hitbox.height
     }
 
     private fun ActorWithBody.ontheLeftSideOfDoor(): Boolean {
@@ -266,6 +272,9 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 //                if (doorCloseQueued) Color.YELLOW
 //                else if (doorStateTimer > doorHoldLength[doorState]!!) Color.LIME
 //                else Color.CORAL
+        this.sprite?.colourFilter = if (mouseOnLeftSide()) Color.CORAL
+                else if (mouseOnRightSide()) Color.LIME
+                else Color.WHITE
 
 
         if (!flagDespawn && worldBlockPos != null) {
