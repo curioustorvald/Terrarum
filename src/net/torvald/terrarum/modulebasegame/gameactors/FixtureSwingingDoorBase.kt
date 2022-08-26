@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.Color
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
@@ -272,9 +271,9 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 //                if (doorCloseQueued) Color.YELLOW
 //                else if (doorStateTimer > doorHoldLength[doorState]!!) Color.LIME
 //                else Color.CORAL
-        this.sprite?.colourFilter = if (mouseOnLeftSide()) Color.CORAL
-                else if (mouseOnRightSide()) Color.LIME
-                else Color.WHITE
+//        this.sprite?.colourFilter = if (mouseOnLeftSide()) Color.CORAL
+//                else if (mouseOnRightSide()) Color.LIME
+//                else Color.WHITE
 
 
         if (!flagDespawn && worldBlockPos != null) {

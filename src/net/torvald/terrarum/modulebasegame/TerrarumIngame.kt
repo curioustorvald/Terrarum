@@ -587,7 +587,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
 
-    // left click: use item, use fixture, use something else
+    // left click: use held item, attack, pick up fixture if i'm holding a pickaxe or hammer (aka tool), do 'bare hand action' if holding nothing
     override fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
 
@@ -595,7 +595,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
-        var uiOpened = false
 
         // TODO actorsUnderMouse: support ROUNDWORLD
         val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
@@ -605,39 +604,14 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         ////////////////////////////////
 
-
-        // #1. Try to open a UI under the cursor
-        // scan for the one with non-null UI.
-        // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-//        if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
-            for (kk in actorsUnderMouse.indices) {
-                if (mouseInInteractableRange(actor) {
-                    actorsUnderMouse[kk].mainUI?.let {
-                        uiOpened = true
-
-                        // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
-                        // when it's not null, the UI will be updated and rendered
-                        // when the UI is closed, it'll be replaced with a null value
-                        uiFixture = it
-                        it.setPosition(
-                                (Toolkit.drawWidth - it.width) / 4,
-                                (App.scr.height - it.height) / 4 // what the fuck?
-                        )
-                        it.setAsOpen()
-                    }
-                    0L
-                } == 0L) break
-            }
-//        }
-
-        // #2. If there is no UI under and if I'm holding an item, use it
+        // #1. If ~~there is no UI under and~~ I'm holding an item, use it
         // don't want to open the UI and use the item at the same time, would ya?
-        if (!uiOpened && itemOnGrip != null) {
+        if (itemOnGrip != null) {
             val consumptionSuccessful = itemOnGrip.startPrimaryUse(actor, delta)
             if (consumptionSuccessful > -1)
                 (actor as Pocketed).inventory.consumeItem(itemOnGrip, consumptionSuccessful)
         }
-        // #3. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
+        // #2. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
         else if (itemOnGrip == null) {
             mouseInInteractableRange(actor) {
                 performBarehandAction(actor, delta)
@@ -647,7 +621,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     override fun worldPrimaryClickEnd(actor: ActorWithBody, delta: Float) {
-        val canPerformBarehandAction = actor.scale * actor.baseHitboxH >= actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0
+        val canPerformBarehandAction = actor.scale * actor.baseHitboxH >=
+                                       (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
         val itemOnGrip = (actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
         ItemCodex[itemOnGrip]?.endPrimaryUse(actor, delta)
 
@@ -656,9 +631,40 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    // right click: pick up fixture, open debug menu (if applicable)
+    // right click: use fixture
     override fun worldSecondaryClickStart(actor: ActorWithBody, delta: Float) {
-//        println("Secondary click start!")
+        val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
+        var uiOpened = false
+        val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
+        if (actorsUnderMouse.size > 1) {
+            App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
+        }
+
+        // #1. Try to open a UI under the cursor
+        // scan for the one with non-null UI.
+        // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
+        for (kk in actorsUnderMouse.indices) {
+            if (mouseInInteractableRange(actor) {
+                        actorsUnderMouse[kk].mainUI?.let {
+                            uiOpened = true
+
+                            // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                            // when it's not null, the UI will be updated and rendered
+                            // when the UI is closed, it'll be replaced with a null value
+                            uiFixture = it
+                            it.setPosition(
+                                    (Toolkit.drawWidth - it.width) / 4,
+                                    (App.scr.height - it.height) / 4 // what the fuck?
+                            )
+                            it.setAsOpen()
+                        }
+                        0L
+                    } == 0L) break
+        }
+
+        if (!uiOpened) {
+            //...
+        }
     }
 
     override fun worldSecondaryClickEnd(actor: ActorWithBody, delta: Float) {
