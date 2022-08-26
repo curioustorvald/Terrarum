@@ -7,5 +7,8 @@ id;classname
 7;net.torvald.terrarum.modulebasegame.gameitems.WireGraphDebugger
 8;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter
 9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll
+10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter
 
-999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry
+
+999998;net.torvald.terrarum.modulebasegame.gameitems.ItemTestDoor
+999999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry

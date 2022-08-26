@@ -56,8 +56,8 @@ object Common {
                 json.writeValue(obj?.toString())
             }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BigInteger {
-                return BigInteger(jsonData.asString())
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BigInteger? {
+                return if (jsonData.isNull) null else BigInteger(jsonData.asString())
             }
         })
         // ZipCodedStr
@@ -186,8 +186,8 @@ object Common {
                 json.writeValue(obj.toString())
             }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): UUID {
-                return UUID.fromString(jsonData.asString())
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): UUID? {
+                return if (jsonData.isNull) null else UUID.fromString(jsonData.asString())
             }
         })
         // HQRNG
@@ -209,8 +209,8 @@ object Common {
                 json.writeValue(bytesToZipdStr(obj.iterator()))
             }
 
-            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ByteArray {
-                return strToBytes(StringReader(jsonData.asString())).toByteArray()
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ByteArray? {
+                return if (jsonData.isNull) return null else strToBytes(StringReader(jsonData.asString())).toByteArray()
             }
         })
     }
