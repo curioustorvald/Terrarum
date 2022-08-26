@@ -135,9 +135,9 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 terrarumIngame.worldPrimaryClickStart(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 worldPrimaryClickLatched = true
             }
-            /*if Gdx.input.isButtonPressed(AppLoader.getConfigInt("config_mousesecondary")) {
-                ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE)
-            }*/
+            if (Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
+                terrarumIngame.worldSecondaryClickStart(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
+            }
 
             // unlatch when:
             // - not clicking anymore
@@ -225,9 +225,9 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                         button == App.getConfigInt("config_mousesecondary"))) {
                     terrarumIngame.worldPrimaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
                 }
-                /*if (button == AppLoader.getConfigInt("config_mousesecondary")) {
-                    ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE)
-                }*/
+                if (button == App.getConfigInt("config_mousesecondary")) {
+                    terrarumIngame.worldSecondaryClickEnd(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
+                }
             }
         }
 

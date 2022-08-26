@@ -585,6 +585,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     }// END enter
 
+
+
+    // left click: use item, use fixture, use something else
     override fun worldPrimaryClickStart(actor: ActorWithBody, delta: Float) {
         //println("[Ingame] worldPrimaryClickStart $delta")
 
@@ -606,7 +609,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // #1. Try to open a UI under the cursor
         // scan for the one with non-null UI.
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
-        if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
+//        if (itemOnGrip?.inventoryCategory != GameItem.Category.TOOL) { // don't open the UI when player's holding a tool
             for (kk in actorsUnderMouse.indices) {
                 if (mouseInInteractableRange(actor) {
                     actorsUnderMouse[kk].mainUI?.let {
@@ -625,7 +628,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     0L
                 } == 0L) break
             }
-        }
+//        }
 
         // #2. If there is no UI under and if I'm holding an item, use it
         // don't want to open the UI and use the item at the same time, would ya?
@@ -653,18 +656,14 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    // I have decided that left and right clicks must do the same thing, so no secondary use from now on. --Torvald on 2019-05-26
-    /*override fun worldSecondaryClickStart(delta: Float) {
-        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        val consumptionSuccessful = ItemCodex[itemOnGrip]?.startSecondaryUse(delta) ?: false
-        if (consumptionSuccessful > -1)
-            actorNowPlaying?.inventory?.consumeItem(ItemCodex[itemOnGrip]!!, consumptionSuccessful)
+    // right click: pick up fixture, open debug menu (if applicable)
+    override fun worldSecondaryClickStart(actor: ActorWithBody, delta: Float) {
+//        println("Secondary click start!")
     }
 
-    override fun worldSecondaryClickEnd(delta: Float) {
-        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        ItemCodex[itemOnGrip]?.endSecondaryUse(delta)
-    }*/
+    override fun worldSecondaryClickEnd(actor: ActorWithBody, delta: Float) {
+//        println("Secondary click start!")
+    }
 
 
 
