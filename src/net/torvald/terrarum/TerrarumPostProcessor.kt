@@ -160,6 +160,36 @@ object TerrarumPostProcessor : Disposable {
     }
     private val rng = HQRNG()
 
+    private val swizzler = intArrayOf(
+            1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1,
+            1,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,1,0,
+            1,0,0,0, 0,0,1,0, 0,1,0,0, 0,0,0,1,
+            1,0,0,0, 0,0,1,0, 0,0,0,1, 0,1,0,0,
+            1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,1,0,
+            1,0,0,0, 0,0,0,1, 0,0,1,0, 0,1,0,0,
+
+            0,1,0,0, 1,0,0,0, 0,0,1,0, 0,0,0,1,
+            0,1,0,0, 1,0,0,0, 0,0,0,1, 0,0,1,0,
+            0,1,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,1,
+            0,1,0,0, 0,0,1,0, 0,0,0,1, 1,0,0,0,
+            0,1,0,0, 0,0,0,1, 1,0,0,0, 0,0,1,0,
+            0,1,0,0, 0,0,0,1, 0,0,1,0, 1,0,0,0,
+
+            0,0,1,0, 1,0,0,0, 0,1,0,0, 0,0,0,1,
+            0,0,1,0, 1,0,0,0, 0,0,0,1, 0,1,0,0,
+            0,0,1,0, 0,1,0,0, 1,0,0,0, 0,0,0,1,
+            0,0,1,0, 0,1,0,0, 0,0,0,1, 1,0,0,0,
+            0,0,1,0, 0,0,0,1, 1,0,0,0, 0,1,0,0,
+            0,0,1,0, 0,0,0,1, 0,1,0,0, 1,0,0,0,
+
+            0,0,0,1, 1,0,0,0, 0,1,0,0, 0,0,1,0,
+            0,0,0,1, 1,0,0,0, 0,0,1,0, 0,1,0,0,
+            0,0,0,1, 0,1,0,0, 1,0,0,0, 0,0,1,0,
+            0,0,0,1, 0,1,0,0, 0,0,1,0, 1,0,0,0,
+            0,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,0,
+            0,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,0,
+    ).map { it.toFloat() }.toFloatArray()
+
     private fun postShader(projMat: Matrix4, fbo: FrameBuffer) {
 
         val shader = if (App.getConfigBoolean("fx_dither"))
@@ -176,9 +206,8 @@ object TerrarumPostProcessor : Disposable {
         shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
         shader.setUniformi("u_pattern", 1)
         shader.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
+        shader.setUniformMatrix4fv("swizzler", swizzler, rng.nextInt(24), 16*4)
         App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
-
-
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 

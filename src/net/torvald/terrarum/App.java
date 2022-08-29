@@ -228,7 +228,7 @@ public class App implements ApplicationListener {
 
 
 
-    public static Texture[] ditherPatterns = new Texture[8];
+    public static Texture[] ditherPatterns = new Texture[4];
     private static ShaderProgram shaderBayerSkyboxFill; // ONLY to be used by the splash screen
     public static ShaderProgram shaderHicolour;
     public static ShaderProgram shaderDebugDiff;

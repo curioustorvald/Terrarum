@@ -22,7 +22,12 @@ varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
 uniform ivec2 rnd = ivec2(0,0);
-
+uniform mat4 swizzler = mat4(
+1.0,0.0,0.0,0.0,
+0.0,1.0,0.0,0.0,
+0.0,0.0,1.0,0.0,
+0.0,0.0,0.0,1.0
+);
 uniform float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 
 vec2 boolean = vec2(0.0, 1.0);
@@ -50,7 +55,7 @@ vec4 nearestColour(vec4 inColor) {
 }
 
 vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = vec4(matrixNormaliser + texture2D(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
+    vec4 bayerThreshold = swizzler * vec4(matrixNormaliser + texture2D(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
     return nearestColour(bayerThreshold * vec4(1.0 / quant) + inColor);
 }
 
@@ -71,5 +76,10 @@ void main(void) {
     // Dither the output
     vec4 graded = ycocg_to_rgb * newColour;
     vec4 selvec = getDitherredDot(graded);
-    gl_FragColor = selvec * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
+    vec4 outcol = selvec * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
+
+    gl_FragColor = outcol;
+//    ivec4 bytes = ivec4(255.0 * outcol);
+//    ivec4 mask = ivec4(0x55);
+//    gl_FragColor = (bytes ^ mask) / 255.0;
 }

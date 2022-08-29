@@ -1,7 +1,9 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2022-08-26.
@@ -12,6 +14,7 @@ class FixtureTypewriter : FixtureBase {
         private set
 
     private var carriagePosition = 0
+    private val textBuffer = Array(TYPEWRITER_ROWS) { "" }
 
     // constructor used when new typewriter is created
     constructor(keymapName: String) : this() {
@@ -35,8 +38,15 @@ class FixtureTypewriter : FixtureBase {
         actorValue[AVKey.BASEMASS] = 3.6
     }
 
+    override fun update(delta: Float) {
+        super.update(delta)
+
+        (sprite as SheetSpriteAnimation).currentRow = 1 + (carriagePosition.toFloat() / TYPEWRITER_COLUMNS * 10).roundToInt()
+    }
+
     companion object {
         const val TYPEWRITER_COLUMNS = 64
+        const val TYPEWRITER_ROWS = 30
     }
 
 }
