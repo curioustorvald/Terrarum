@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
@@ -8,6 +9,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
@@ -151,36 +153,39 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
     }
 
-    open protected fun closeDoor() {
+    open protected fun closeDoor(doorHandler: Int) {
         if (doorState != 0) {
             (sprite!! as SheetSpriteAnimation).currentRow = 0
             doorState = 0
             placeActorBlocks()
+            lastDoorHandler = doorHandler
         }
         doorCloseQueued = false
     }
 
-    open protected fun openToRight() {
+    open protected fun openToRight(doorHandler: Int) {
         if (doorState != 1) {
             (sprite!! as SheetSpriteAnimation).currentRow = 1
             doorState = 1
             placeActorBlocks()
+            lastDoorHandler = doorHandler
         }
         doorCloseQueued = false
     }
 
-    open protected fun openToLeft() {
+    open protected fun openToLeft(doorHandler: Int) {
         if (doorState != -1) {
             (sprite!! as SheetSpriteAnimation).currentRow = 2
             doorState = -1
             placeActorBlocks()
+            lastDoorHandler = doorHandler
         }
         doorCloseQueued = false
     }
 
     override fun placeActorBlocks() {
         forEachBlockbox { x, y, ox, oy ->
-            printdbg(this, "placeActorBlocks xy=$x,$y oxy=$ox,$oy")
+//            printdbg(this, "placeActorBlocks xy=$x,$y oxy=$ox,$oy")
 
             val tile = when (doorState) {
                 // CLOSED --
@@ -257,10 +262,15 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     private var doorCloseQueueTimer = 0f
     private var doorCloseQueued = false
 
-    private fun queueDoorClosing() {
+    private fun queueDoorClosing(doorHandler: Int) {
         doorCloseQueueTimer = 0f
         doorCloseQueued = true
+        doorCloseQueueHandler = doorHandler
     }
+
+    private var oldStateBeforeMouseDown = 0
+    private var lastDoorHandler = 0 // 0: automatic, 1: manual
+    private var doorCloseQueueHandler = 0
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -279,14 +289,41 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
         if (!flagDespawn && worldBlockPos != null) {
             // delayed auto closing
             if (doorCloseQueued && doorCloseQueueTimer >= doorOpenedHoldLength) {
-                closeDoor()
+                closeDoor(doorCloseQueueHandler)
             }
             else if (doorCloseQueued) {
                 doorCloseQueueTimer += delta
             }
 
+            // manual opening/closing
+            if (mouseUp && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
+
+                INGAME.actorNowPlaying?.let { player ->
+                    mouseInInteractableRange(player) {
+                        // keep opened/closed as long as the mouse is down
+                        if (doorStateTimer != 0f) {
+                            oldStateBeforeMouseDown = doorState
+                        }
+
+                        if (oldStateBeforeMouseDown == 0) {
+                            if (mouseOnLeftSide())
+                                openToLeft(1)
+                            else if (mouseOnRightSide())
+                                openToRight(1)
+                        }
+                        else {
+                            closeDoor(1)
+                        }
+
+                        doorStateTimer = 0f
+
+                        0L
+                    }
+                }
+
+            }
             // automatic opening/closing
-            if (doorStateTimer > doorHoldLength[doorState]!!) {
+            else if (doorStateTimer > doorHoldLength[doorState]!!) {
                 val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
 
                 // auto opening and closing
@@ -332,19 +369,20 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
                         }
                         else {
                             if (actor.ontheLeftSideOfDoor() && actor.movingTowardsRight()) {
-                                openToRight()
+                                openToRight(0)
                                 nobodyIsThere = false
                                 break
                             }
                             else if (actor.ontheRightSideOfDoor() && actor.movingTowardsLeft()) {
-                                openToLeft()
+                                openToLeft(0)
                                 nobodyIsThere = false
                                 break
                             }
                         }
                     }
-                    if (nobodyIsThere && !doorCloseQueued && doorState != 0) {
-                        queueDoorClosing()
+                    // close only when the door was automatically opened
+                    if (nobodyIsThere && !doorCloseQueued && doorState != 0 && lastDoorHandler == 0) {
+                        queueDoorClosing(0)
                     }
 
                     if (oldState != doorState) doorStateTimer = 0f
