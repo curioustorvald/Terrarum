@@ -575,7 +575,7 @@ class UIItemTextLineInput(
             val candidatesCount = minOf(candidatesMax, localCandidates.size)
             val isOnecolumn = (candidatesCount <= 3)
             val halfcount = if (isOnecolumn) candidatesCount else FastMath.ceil(candidatesCount / 2f)
-            val candidateWinH = App.fontGame.lineHeight.toInt() * halfcount
+            val candidateWinH = halfcount * 20 // using hard-coded 20 instead of the actual font height of 24
             val candidatePosX = cursorXOnScreen + 4
             val candidatePosY = posY + 2
 
@@ -596,7 +596,7 @@ class UIItemTextLineInput(
                     val candidateNum = listOf(i+48,46,32)
                     App.fontGame.draw(batch, CodepointSequence(candidateNum + localCandidates[i]),
                             candidatePosX + (i / halfcount) * (longestCandidateW + 3) + 2,
-                            candidatePosY + (i % halfcount) * 20
+                            candidatePosY + (i % halfcount) * 20 // using hard-coded 20 instead of the actual font height of 24
                     )
                 }
 
