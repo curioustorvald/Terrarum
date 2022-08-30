@@ -1,0 +1,47 @@
+
+# example lang file
+
+meta language:fiFI
+meta nounclasslabel:nom,par,accnom,accgen,gen,iness,ela,illa,adess,abla,alla,ess,trans,inst,abess,comit,pnom,ppar,paccnom,paccgen,pgen,piness,pela,pilla,padess,pabla,palla,pess,ptrans,pinst,pabess,pcomit
+meta nounseries:follow-nounclasslabel # basically tells the parser that 'nounclasslabel' has everything you need
+CONTERT_HOUSE_NOUN:talo,taloa,talo,talon,talon,talossa,talosta,taloon,talolla,talolta,talolle,talona,taloksi,,talotta,,talot,taloja,talot,talot,talojen,taloissa,taloista,taloihin,taloilla,taloilta,taloille,taloina,taloiksi,taloin,taloitta,taloineen
+CONTEXT_GO_TO_VERB:mennä <1:illa> # with CONTERT_HOUSE_NOUN: "mennä taloon"
+
+
+meta language:koKR
+meta nounclasslabel:use korean # built-in automation for korean
+meta nounseries:undefined # the grammar of this language does not take noun's count into account
+CONTEXT_HOUSE_NOUN:집
+CONTEXT_TOWARDS_VERB:<1>{1:로,으로,로} 가기 # when 'korean' is used for nounclasslabel, the character code of the hangul letter is taken into account. GIVEN_WORD_SET.get(i), where i = ((char - 44032) % 28 == 0) ? 0 : ((char - 44032) % 28 == 8) 2 : 1
+
+
+meta language:enUS
+meta nounseries:singular-plural # tells the parser that first element is singular, and the second is plural
+CONTEXT_HOUSE_NOUN:House,Houses
+CONTEXT_TOWARDS_VERB:Go to <1>
+
+
+meta language:frFR
+meta nounclasslabel:m,f,pm,pf,vm,vf
+meta nounseries:singular-plural # tells the parser that first element is singular, and the second is plural
+CONTEXT_COVID_NOUN:f:Covid,Covid
+CONTEXT_INTERNATIONALE_NOUN:vf:Internationale,Internationale
+CONTEXT_THE_STH:{1:Le ,La ,L’,L’}<1> # with CONTEXT_COVID_NOUN: "La Covid"; with CONTEXT_INTERNATIONALE_NOUN: "L’Internationale"
+
+
+meta language:la
+meta nounclasslabel:m,f,n
+meta nounseries:singular-plural # tells the parser that first element is singular, and the second is plural
+CONTEXT_CHICKEN_NOUN:m:Gallus,Galli
+CONTEXT_VERITAS_NOUN:f:Veritas,Veritates
+CONTEXT_X_IS_MY_LIGHT:<1:plural> lux {1:meus,mea,meum} # 'plural' is pre-defined name that comes with 'singular-plural' nounseries
+
+
+## the preamble
+
+meta nounclasslabel:m,f,n,mp,fp,np # for german: masculine singular, feminine singular, neuter singular, masculine plural, feminine plural, neuter plural
+
+meta nounclasslabel:m,f,n,md,fd,nd,mp,fp,np # for sanskrit: masc./fem./neu. singular, dual and plural
+
+meta nounclasslabel:use korean # a pragma to use built-in automation labeled 'korean'
+

@@ -147,13 +147,12 @@ class SavegameCracker(
     @Command("Lists contents of the disk")
     fun ls(args: List<String>) {
         letdisk {
-            it.entries.forEach { i, entry ->
-                if (i != 0L)
-                    println(
-                            ccNoun + i.toString(10).padStart(11, ' ') + " " +
-                            ccNoun2 + (diskIDtoReadableFilename(entry.entryID) + cc0).padEnd(24) { if (it == 0) ' ' else '.' }  +
-                            ccConst + " " + entry.contents.getSizePure() + " bytes"
-                    )
+            it.entries.toSortedMap().forEach { (i, entry) ->
+                if (i != 0L) println(
+                    ccNoun + i.toString(10).padStart(11, ' ') + " " +
+                    ccNoun2 + (diskIDtoReadableFilename(entry.entryID) + cc0).padEnd(24) { if (it == 0) ' ' else '.' }  +
+                    ccConst + " " + entry.contents.getSizePure() + " bytes"
+                )
             }
             val entryCount = it.entries.size - 1
             println("${cc0}$entryCount entries, total ${it.usedBytes} bytes")

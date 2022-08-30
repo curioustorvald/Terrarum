@@ -2,19 +2,15 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.spriteanimation.HasAssembledSprite
-import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.ItemCodex
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
-import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.spriteassembler.ADProperties
 import java.io.Reader
 import java.util.*
 
@@ -111,7 +107,13 @@ object WritePlayer {
             addFile(playerDisk, DiskEntry(-3L, 0L, adlGlowCreationDate, time_t, adlGlowContents))
         }
 
-
+        // write loadorder //
+        val loadOrderBa64Writer = ByteArray64Writer(Common.CHARSET)
+        loadOrderBa64Writer.write(ModMgr.loadOrder.joinToString("\n"))
+        loadOrderBa64Writer.flush(); loadOrderBa64Writer.close()
+        val loadOrderText = loadOrderBa64Writer.toByteArray64()
+        val loadOrderContents = EntryFile(loadOrderText)
+        addFile(playerDisk, DiskEntry(-4L, 0L, jsonCreationDate, time_t, loadOrderContents))
     }
 
 }

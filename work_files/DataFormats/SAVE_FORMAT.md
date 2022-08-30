@@ -10,10 +10,11 @@ The main game directory is composed of following directories:
   - "${PlayerName}-${UUID}", TVDA {
       [-1] player JSON,
       [-2] spritedef,
-      [-3] optional spritedef-glow,
-      [-1025] sprite-bodypart-name-to-entry-number-map.properties,
-      [-1026] spriteglow-bodypart-name-to-entry-number-map.properties,
-      [1+] optional bodyparts tga.gz
+      [-3] !optional! spritedef-glow,
+      [-4] loadOrder.txt
+      [-1025] !optional! sprite-bodypart-name-to-entry-number-map.properties,
+      [-1026] !optional! spriteglow-bodypart-name-to-entry-number-map.properties,
+      [1+] !optional! bodyparts tga.gz
     }
     *if file -1025 is not there, read bodyparts from assets directory
     *optionally encrypt the files other than -1
@@ -27,6 +28,7 @@ The main game directory is composed of following directories:
       [actorID] actors (mainly fixtures) JSON,
       [0x1_0000_0000L or (layerNumber shl 24) or chunkNumber] chunk data,
       [-2] screenshot.tga.gz taken by the last player
+      [-4] loadOrder.txt
     }
     *disk name is world's name encoded in UTF-8
 ```

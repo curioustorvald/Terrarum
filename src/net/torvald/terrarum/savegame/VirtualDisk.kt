@@ -236,18 +236,22 @@ class VirtualDisk(
 fun diskIDtoReadableFilename(id: EntryID): String = when (id) {
     0L -> "root"
     -1L -> "savegameinfo.json"
-    -2L -> "thumbnail.tga.gz"
-    -16L -> "blockcodex.json.gz"
-    -17L -> "itemcodex.json.gz"
-    -18L -> "wirecodex.json.gz"
-    -19L -> "materialcodex.json.gz"
-    -20L -> "factioncodex.json.gz"
-    -1024L -> "apocryphas.json.gz"
-    in 1..65535 -> "worldinfo-$id.json"
-    in 1048576..2147483647 -> "actor-$id.json"
+    -2L -> "thumbnail.tga.gz (world)/spritedef (player)"
+    -3L -> "spritedef-glow (player)"
+    -4L -> "loadOrder.txt"
+//    -16L -> "blockcodex.json.gz"
+//    -17L -> "itemcodex.json.gz"
+//    -18L -> "wirecodex.json.gz"
+//    -19L -> "materialcodex.json.gz"
+//    -20L -> "factioncodex.json.gz"
+//    -1024L -> "apocryphas.json.gz"
+    -1025L -> "bodypart-to-entry.map"
+    -1026L -> "bodypartglow-to-entry.map"
+    in 1..65535 -> "bodypart #$id.tga.gz (player)"
+    in 1048576..2147483647 -> "actor #$id.json"
     in 0x0000_0001_0000_0000L..0x0000_FFFF_FFFF_FFFFL ->
         "World${id.ushr(32)}-L${id.and(0xFF00_0000).ushr(24)}-C${id.and(0xFFFFFF)}.gz"
-    else -> "file-$id"
+    else -> "file #$id"
 }
 
 class DiskEntry(

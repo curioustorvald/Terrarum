@@ -65,4 +65,6 @@ module Terrarum {
     exports net.torvald.terrarum.modulebasegame.gameworld;
     exports net.torvald.terrarum.modulebasegame.ui;
     exports net.torvald.terrarum.modulebasegame.worldgenerator;
+
+    exports net.torvald.terrarum.debuggerapp;
 }
