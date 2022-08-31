@@ -121,7 +121,49 @@ class SavegameCracker(
     }
 
     private fun tokenise(line: String): List<String> {
-        return line.split(' ') // this will work for now
+        val tokens = ArrayList<String>()
+        val sb = StringBuilder()
+        var mode = 0 // 0: literal, 34: quote (""), 39: quote('')
+
+        fun sendout() {
+            tokens.add(sb.toString().trim())
+            sb.clear()
+        }
+
+        line.forEachIndexed { index, c ->
+            if (mode == 0) {
+                if (c == '"') {
+                    sendout()
+                    mode = 34
+                }
+                else if (c == '\'') {
+                    sendout()
+                    mode = 39
+                }
+                else
+                    sb.append(c)
+            }
+            else if (mode == 34) {
+                if (c == '"') {
+                    sendout()
+                    mode = 0
+                }
+                else
+                    sb.append(c)
+            }
+            else if (mode == 39) {
+                if (c == '\'') {
+                    sendout()
+                    mode = 0
+                }
+                else
+                    sb.append(c)
+            }
+        }
+
+        if (sb.isNotEmpty()) sendout()
+
+        return tokens
     }
 
     private fun letdisk(action: (VirtualDisk) -> Any?): Any? {
@@ -150,7 +192,7 @@ class SavegameCracker(
             it.entries.toSortedMap().forEach { (i, entry) ->
                 if (i != 0L) println(
                     ccNoun + i.toString(10).padStart(11, ' ') + " " +
-                    ccNoun2 + (diskIDtoReadableFilename(entry.entryID) + cc0).padEnd(24) { if (it == 0) ' ' else '.' }  +
+                    ccNoun2 + (diskIDtoReadableFilename(entry.entryID) + cc0).padEnd(40) { if (it == 0) ' ' else '.' }  +
                     ccConst + " " + entry.contents.getSizePure() + " bytes"
                 )
             }
