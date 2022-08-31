@@ -140,6 +140,9 @@ class SavegameCracker(
                     sendout()
                     mode = 39
                 }
+                else if (c == ' ') {
+                    sendout()
+                }
                 else
                     sb.append(c)
             }
@@ -227,6 +230,8 @@ class SavegameCracker(
         letdisk {
             val id0 = args[1].toLong(10)
             val id1 = args[2].toLong(10)
+
+            if (it.entries.containsKey(id1)) throw IllegalArgumentException("Entry ID $id1 already exists")
 
             val entry = it.entries.remove(id0)!!
             entry.entryID = id1
