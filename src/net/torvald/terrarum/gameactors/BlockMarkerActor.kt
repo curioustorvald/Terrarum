@@ -13,7 +13,7 @@ import kotlin.math.floor
 /**
  * Used as construction markers and fixture ghost images
  */
-class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT) {
+class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT), NoSerialise {
 
     private val defaultSize = 16.0
 

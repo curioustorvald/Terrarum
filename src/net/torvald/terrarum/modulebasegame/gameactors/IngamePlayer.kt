@@ -1,23 +1,16 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.spriteanimation.HasAssembledSprite
-import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.spriteassembler.ADProperties
-import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameactors.NoSerialise
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
-import net.torvald.terrarum.savegame.DiskSkimmer
-import net.torvald.terrarum.savegame.SimpleFileSystem
+import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.utils.PlayerLastStatus
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 
@@ -27,7 +20,7 @@ import java.util.*
  * Created by minjaesong on 2015-12-31.
  */
 
-class IngamePlayer : ActorHumanoid, HasAssembledSprite {
+class IngamePlayer : ActorHumanoid, HasAssembledSprite, NoSerialise {
 
     val creationTime = App.getTIME_T()
     var lastPlayTime = App.getTIME_T() // cumulative value for the savegame

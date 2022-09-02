@@ -11,7 +11,7 @@ import net.torvald.terrarum.gameitems.ItemID
  *
  * Created by minjaesong on 2021-07-30.
  */
-class WireActor : ActorWithBody {
+class WireActor : ActorWithBody, NoSerialise {
 
     companion object {
         val WIRE_NEARBY = arrayOf(

@@ -1,10 +1,8 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.gameactors.NoSerialise
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.GameWorldTitleScreen
@@ -25,10 +23,7 @@ import java.io.Reader
 object WriteWorld {
 
     fun actorAcceptable(actor: Actor): Boolean {
-        return actor.referenceID !in ReferencingRanges.ACTORS_WIRES &&
-               actor.referenceID !in ReferencingRanges.ACTORS_WIRES_HELPER &&
-               actor != (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor) &&
-               actor !is IngamePlayer // IngamePlayers must not be saved with the world
+        return actor !is NoSerialise // IngamePlayers is also NoSerialised because they must not be saved with the world
     }
 
     private fun preWrite(ingame: TerrarumIngame, time_t: Long, actorsList: List<Actor>, playersList: List<IngamePlayer>): GameWorld {
