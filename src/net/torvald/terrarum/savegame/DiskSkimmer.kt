@@ -1,5 +1,7 @@
 package net.torvald.terrarum.savegame
 
+import net.torvald.terrarum.serialise.toUint
+import net.torvald.terrarum.serialise.toUlong
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*

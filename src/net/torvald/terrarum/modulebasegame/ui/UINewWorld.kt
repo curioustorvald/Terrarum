@@ -19,7 +19,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.ReadActor
+import net.torvald.terrarum.modulebasegame.serialise.ReadActor
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 

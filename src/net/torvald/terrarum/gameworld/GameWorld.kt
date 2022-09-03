@@ -32,9 +32,9 @@ class PhysicalStatus() {
 }
 
 /**
- * Special version of GameWorld where layer data are not transient
+ * Special version of GameWorld where everything, including layer data, are saved in a single JSON file (i.e. not chunked)
  */
-class GameWorldTitleScreen : GameWorld() {
+class SimpleGameWorld : GameWorld() {
     override lateinit var layerWall: BlockLayer
     override lateinit var layerTerrain: BlockLayer
 }
@@ -128,7 +128,7 @@ open class GameWorld() : Disposable {
 
     val extraFields = HashMap<String, Any?>()
 
-//    internal var genver = -1 // only gets used when the game saves and loads
+    // NOTE: genver was here but removed: genver will be written by manually editing the serialising JSON. Reason: the 'genver' string must be found on a fixed offset on the file.
     internal var comp = -1 // only gets used when the game saves and loads
 
     internal val dynamicItemInventory = ItemTable()

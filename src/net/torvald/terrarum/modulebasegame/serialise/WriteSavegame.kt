@@ -1,4 +1,4 @@
-package net.torvald.terrarum.serialise
+package net.torvald.terrarum.modulebasegame.serialise
 
 import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.*
@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.Reader

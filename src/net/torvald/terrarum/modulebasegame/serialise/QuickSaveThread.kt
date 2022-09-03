@@ -1,4 +1,4 @@
-package net.torvald.terrarum.serialise
+package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.App.printdbg
@@ -6,8 +6,9 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.toInt
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.PlayerLastStatus
 import java.io.File
 import java.util.zip.GZIPOutputStream

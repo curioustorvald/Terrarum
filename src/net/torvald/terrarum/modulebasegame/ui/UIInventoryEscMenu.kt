@@ -16,7 +16,7 @@ import net.torvald.terrarum.modulebasegame.TitleScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_UI_HEIGHT
-import net.torvald.terrarum.serialise.WriteSavegame
+import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem

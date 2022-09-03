@@ -1,4 +1,4 @@
-package net.torvald.terrarum.serialise
+package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.spriteanimation.HasAssembledSprite
@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.spriteassembler.ADProperties
 import java.io.Reader
 import java.util.*

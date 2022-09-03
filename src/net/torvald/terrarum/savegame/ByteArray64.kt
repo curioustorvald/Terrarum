@@ -1,5 +1,6 @@
 package net.torvald.terrarum.savegame
 
+import net.torvald.terrarum.serialise.toUint
 import java.io.*
 import java.nio.channels.ClosedChannelException
 import java.nio.charset.Charset

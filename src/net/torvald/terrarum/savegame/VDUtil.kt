@@ -1,5 +1,7 @@
 package net.torvald.terrarum.savegame
 
+import net.torvald.terrarum.serialise.toUint
+import net.torvald.terrarum.serialise.toUlong
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
@@ -651,8 +653,6 @@ object VDUtil {
     }
 }
 
-fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)
-fun Byte.toUlong() = java.lang.Byte.toUnsignedLong(this)
 fun magicMismatch(magic: ByteArray, array: ByteArray): Boolean {
     return !Arrays.equals(array, magic)
 }

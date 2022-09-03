@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
 
@@ -107,5 +108,3 @@ open class BlockLayer(val width: Int, val height: Int) : Disposable {
         @Transient val BYTES_PER_BLOCK = 2L
     }
 }
-
-fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)

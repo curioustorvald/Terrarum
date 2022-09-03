@@ -38,9 +38,9 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.serialise.ReadActor
-import net.torvald.terrarum.serialise.WriteSavegame
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas

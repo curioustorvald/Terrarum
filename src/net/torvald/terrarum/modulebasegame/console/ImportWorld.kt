@@ -5,8 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.serialise.ReadActor
-import net.torvald.terrarum.serialise.ReadWorld
+import net.torvald.terrarum.serialise.ReadSimpleWorld
 import java.io.File
 import java.io.IOException
 
@@ -19,7 +18,7 @@ object ImportWorld : ConsoleCommand {
             try {
                 val file = File(App.defaultDir + "/Exports/${args[1]}.json")
                 val reader = java.io.FileReader(file)
-                ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader, file)
+                ReadSimpleWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader, file)
                 Echo("Importworld: imported a world from ${args[1]}.json")
             }
             catch (e: IOException) {

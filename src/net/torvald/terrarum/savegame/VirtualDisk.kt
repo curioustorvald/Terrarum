@@ -2,6 +2,7 @@ package net.torvald.terrarum.savegame
 
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.toUint
 import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset

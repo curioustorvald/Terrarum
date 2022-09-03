@@ -13,8 +13,8 @@ import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.LoadSavegame
-import net.torvald.terrarum.serialise.WritePlayer
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.modulebasegame.serialise.WritePlayer
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 

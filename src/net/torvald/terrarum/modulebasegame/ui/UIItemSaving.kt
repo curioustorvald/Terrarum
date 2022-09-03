@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.serialise.WriteSavegame
+import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import kotlin.math.roundToInt

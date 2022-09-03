@@ -22,8 +22,8 @@ import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.LoadSavegame
 import net.torvald.terrarum.serialise.SaveLoadError
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y

@@ -1,17 +1,18 @@
-package net.torvald.terrarum.serialise
+package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.NoSerialise
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.GameWorldTitleScreen
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.savegame.ByteArray64Writer
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.utils.PlayerLastStatus
 import net.torvald.terrarum.weather.WeatherMixer
 import java.io.File
@@ -30,7 +31,6 @@ object WriteWorld {
         val world = ingame.world
         val currentPlayTime_t = time_t - ingame.loadedTime_t
 
-//        world.genver = Common.GENVER
         world.comp = Common.COMP_GZIP
         world.lastPlayTime = time_t
         world.totalPlayTime += currentPlayTime_t
@@ -98,9 +98,6 @@ object WriteWorld {
  */
 object ReadWorld {
 
-    fun readLayerFormat(worldDataStream: Reader, origin: File?): GameWorld =
-            fillInDetails(Common.jsoner.fromJson(GameWorldTitleScreen::class.java, worldDataStream), origin)
-
     operator fun invoke(worldDataStream: Reader, origin: File?): GameWorld =
             fillInDetails(Common.jsoner.fromJson(GameWorld::class.java, worldDataStream), origin)
 
@@ -111,12 +108,6 @@ object ReadWorld {
 
         ItemCodex.loadFromSave(origin, world.dynamicToStaticTable, world.dynamicItemInventory)
 
-        return world
-    }
-
-    fun readWorldAndSetNewWorld(ingame: TerrarumIngame, worldDataStream: Reader, origin: File?): GameWorld {
-        val world = readLayerFormat(worldDataStream, origin)
-        ingame.world = world
         return world
     }
 

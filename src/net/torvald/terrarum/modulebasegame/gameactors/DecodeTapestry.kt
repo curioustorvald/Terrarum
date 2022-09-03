@@ -2,11 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import net.torvald.unicode.EMDASH
-import net.torvald.terrarum.ccC
-import net.torvald.terrarum.ccW
-import net.torvald.terrarum.gameworld.toUint
-import java.io.File
+import net.torvald.terrarum.serialise.toUint
 import java.nio.charset.Charset
 import java.util.*
 

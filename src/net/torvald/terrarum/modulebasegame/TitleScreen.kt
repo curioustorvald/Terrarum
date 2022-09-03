@@ -27,7 +27,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.ReadWorld
+import net.torvald.terrarum.serialise.ReadSimpleWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
@@ -136,7 +136,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val file = ModMgr.getFile("basegame", "demoworld")
             val reader = java.io.FileReader(file)
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
-            val world = ReadWorld.readLayerFormat(reader, file)
+            val world = ReadSimpleWorld(reader, file)
             demoWorld = world
             printdbg(this, "Demo world loaded")
         }
