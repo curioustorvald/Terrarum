@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
+import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.floor
 
@@ -39,10 +41,22 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible) {
             if (hasGhost) {
-                batch.shader = App.shaderGhastlyWhite
-                if (ghost != null) {
-                    batch.color = ghostColour
-                    drawSpriteInGoodPosition(ghost!!, batch)
+                if (INGAME.actorNowPlaying != null) {
+                    mouseInInteractableRange(INGAME.actorNowPlaying!!) {
+                        batch.shader = App.shaderGhastlyWhite
+                        if (ghost != null) {
+                            batch.color = ghostColour
+                            drawSpriteInGoodPosition(ghost!!, batch)
+                        }
+                        0L
+                    }
+                }
+                else {
+                    batch.shader = App.shaderGhastlyWhite
+                    if (ghost != null) {
+                        batch.color = ghostColour
+                        drawSpriteInGoodPosition(ghost!!, batch)
+                    }
                 }
             }
             else {
