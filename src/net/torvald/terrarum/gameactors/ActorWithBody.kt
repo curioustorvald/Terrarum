@@ -41,6 +41,28 @@ open class ActorWithBody : Actor {
 
     var physProp = PhysProperties.HUMANOID_DEFAULT
 
+    // copied from old interface Luminous
+    /**
+     * Arguments:
+     *
+     * Hitbox(x-offset, y-offset, width, height)
+     * (Use ArrayList for normal circumstances)
+     *
+     * NOTE: MUST NOT SERIALISE (use `@Transient`)
+     */
+    open var lightBoxList: List<Lightbox> = emptyList()
+
+    /**
+     * Arguments:
+     *
+     * Hitbox(x-offset, y-offset, width, height)
+     * (Use ArrayList for normal circumstances)
+     *
+     * NOTE: MUST NOT SERIALISE (use `@Transient`)
+     */
+    open var shadeBoxList: List<Lightbox> = emptyList()
+    // end of Luminous
+
     protected constructor() : super()
 
     constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID? = null) : super(renderOrder, id) {

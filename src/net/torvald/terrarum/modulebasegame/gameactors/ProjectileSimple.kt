@@ -3,14 +3,15 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2d
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.Lightbox
+import net.torvald.terrarum.gameactors.PhysProperties
 import org.dyn4j.geometry.Vector2
-import java.util.*
-import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.*
 
 /**
  * Simplest projectile.
@@ -19,7 +20,7 @@ import net.torvald.terrarum.gameactors.*
  */
 
 // TODO simplified, lightweight physics (does not call PhysicsSolver)
-open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
+open class ProjectileSimple : ActorWithBody, Projectile {
 
     private var type: Int = 0
     var damage: Int = 0
@@ -38,8 +39,8 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    @Transient override val lightBoxList = ArrayList<Lightbox>()
-    @Transient override val shadeBoxList = ArrayList<Lightbox>()
+    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0), color)) // lightbox sized 8x8 centered to the bullet
+
 
     private val lifetimeMax = 2500
     private var lifetimeCounter = 0f
@@ -57,8 +58,6 @@ open class ProjectileSimple : ActorWithBody, Luminous, Projectile {
 
         setPosition(fromPoint.x, fromPoint.y)
         posPre = Point2d(fromPoint.x, fromPoint.y)
-        // lightbox sized 8x8 centered to the bullet
-        lightBoxList.add(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0), color))
         //this.externalV.set(velocity)
 
         damage = bulletDatabase[type][OFFSET_DAMAGE] as Int

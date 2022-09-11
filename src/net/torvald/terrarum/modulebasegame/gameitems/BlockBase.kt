@@ -5,6 +5,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -40,7 +41,7 @@ object BlockBase {
             if (!ret1) return@mouseInInteractableRange -1L
         }
 
-        val isWall = itemID.startsWith("wall@")
+        val isWall = itemID.isWall()
         val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
         val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
 

@@ -22,7 +22,7 @@ import kotlin.math.absoluteValue
  *
  * Created by minjaesong on 2022-07-15.
  */
-open class FixtureSwingingDoorBase : FixtureBase, Luminous {
+open class FixtureSwingingDoorBase : FixtureBase {
 
     /* OVERRIDE THESE TO CUSTOMISE */
     var tw = 2 // tilewise width of the door when opened
@@ -45,8 +45,10 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
     private var pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
     private var tilewiseDistToAxis = tw - twClosed
 
-    @Transient override val lightBoxList: ArrayList<Lightbox> = ArrayList()
-    @Transient override val shadeBoxList: ArrayList<Lightbox> = ArrayList()
+    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
+    // the Cvec will be calculated dynamically on Update
+    @Transient override var shadeBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
+    // the Cvec will be calculated dynamically on Update
 
     protected var doorState = 0 // -1: open toward left, 0: closed, 1: open toward right
     protected var doorStateTimer: Second = 0f
@@ -123,8 +125,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
         // define light/shadebox
         // TODO: redefine when opened to left/right
-        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList).add(
-                Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), opacity))
+        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = opacity
 
         // define physical size
         setHitboxDimension(TILE_SIZE * tilewiseHitboxWidth, TILE_SIZE * tilewiseHitboxHeight, 0, 0)
@@ -148,8 +149,7 @@ open class FixtureSwingingDoorBase : FixtureBase, Luminous {
 
         // define light/shadebox
         // TODO: redefine when opened to left/right
-        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList).add(
-                Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), opacity))
+        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = opacity
 
     }
 

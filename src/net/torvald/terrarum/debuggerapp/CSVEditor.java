@@ -28,7 +28,7 @@ import java.util.Properties;
 public class CSVEditor extends JFrame {
 
     /** Default columns. When you open existing csv, it should overwrite this. */
-    private String[] columns = new String[]{"id", "drop", "world", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
+    private String[] columns = new String[]{"id", "drop", "spawn", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "wall", "grav", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs", "refl","tags"};
     private final int FOUR_DIGIT = 42;
     private final int SIX_DIGIT = 50;
     private final int TWO_DIGIT = 30;
@@ -515,7 +515,7 @@ public class CSVEditor extends JFrame {
     private String captionProperties = """
             id=ID of this block
             drop=Which item the DroppedItem actually adds to your inventory
-            world=Which item the DroppedItem should impersonate when spawned
+            spawn=Which item the DroppedItem should impersonate when spawned
             name=String identifier of the block
             shdr=Shade Red (light absorption). Valid range 0.0–1.0+
             shdg=Shade Green (light absorption). Valid range 0.0–1.0+

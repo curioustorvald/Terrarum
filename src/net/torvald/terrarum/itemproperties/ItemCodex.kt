@@ -8,8 +8,7 @@ import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
@@ -132,27 +131,23 @@ class ItemCodex {
     fun getItemImage(itemID: ItemID?): TextureRegion? {
         if (itemID == null) return null
 
-        // dynamic item
-        if (itemID.startsWith("$PREFIX_DYNAMICITEM:")) {
+        if (itemID.isDynamic()) {
             return getItemImage(dynamicToStaticID(itemID))
         }
-        // item
-        else if (itemID.startsWith("item@")) {
+        else if (itemID.isItem()) {
             return itemCodex[itemID]?.itemImage
         }
-        // wires
-        else if (itemID.startsWith("wire@")) {
+        else if (itemID.isWire()) {
             return itemCodex[itemID]?.itemImage
         }
-        // wall
-        else if (itemID.startsWith("wall@")) {
+        else if (itemID.isWall()) {
             val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
             return BlocksDrawer.tileItemWall.get(
                     itemSheetNumber % App.tileMaker.TILES_IN_X,
                     itemSheetNumber / App.tileMaker.TILES_IN_X
             )
         }
-        // terrain
+        // else: terrain
         else {
             val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
             return BlocksDrawer.tileItemTerrain.get(

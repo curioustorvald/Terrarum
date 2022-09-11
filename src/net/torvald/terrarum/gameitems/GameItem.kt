@@ -3,7 +3,9 @@ package net.torvald.terrarum.gameitems
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.ReferencingRanges.PREFIX_ACTORITEM
 import net.torvald.terrarum.ReferencingRanges.PREFIX_DYNAMICITEM
+import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -407,3 +409,11 @@ fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMu
 //fun IntRange.pickRandom() = HQRNG().nextInt(this.last - this.first + 1) + this.first // count() on 200 million entries? Se on vitun hyvää idea
 //fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
 //fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]
+
+fun ItemID.isItem() = this.startsWith("item@")
+fun ItemID.isWire() = this.startsWith("wire@")
+fun ItemID.isDynamic() = this.startsWith("$PREFIX_DYNAMICITEM:")
+fun ItemID.isActor() = this.startsWith("$PREFIX_ACTORITEM@")
+fun ItemID.isVirtual() = this.startsWith("$PREFIX_VIRTUALTILE@")
+fun ItemID.isBlock() = !this.contains('@')
+fun ItemID.isWall() = this.startsWith("wall@")

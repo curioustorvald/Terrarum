@@ -22,8 +22,10 @@ class Lightbox() {
  * For actors that either emits or blocks lights
  *
  * Created by minjaesong on 2016-02-19.
+ *
+ * the interface Luminous is merged with the ActorWithBody -- minjaesong on 2022-09-11
  */
-interface Luminous {
+/*interface Luminous {
 
     /**
      * Arguments:
@@ -44,4 +46,4 @@ interface Luminous {
      * NOTE: MUST NOT SERIALISE (use `@Transient`)
      */
     val shadeBoxList: List<Lightbox>
-}
+}*/

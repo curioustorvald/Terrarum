@@ -9,7 +9,6 @@ import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitems.GameItem
@@ -28,7 +27,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2016-10-24.
  */
-open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, LandHolder, HistoricalFigure {
 
     protected constructor()
 
@@ -100,15 +99,10 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    override val lightBoxList: List<Lightbox>
-        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), actorValueColour)).toList() // things are asymmetric!!
-        // use getter; dimension of the player may change by time.
-        // scaling of the lightbox is performed on the LightmapRenderer. Getter is still required because of the changing actorValueColour. Lightbox.light cannot be `() -> Cvec` due to performance and serialising issue.
-
-    override val shadeBoxList: List<Lightbox>
-        get() = arrayOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), actorValueShade)).toList() // things are asymmetric!!
-        // use getter; dimension of the player may change by time.
-        // scaling of the shadebox is performed on the LightmapRenderer. Getter is still required because of the changing actorValueColour. Lightbox.light cannot be `() -> Cvec` due to performance and serialising issue.
+    @Transient override var lightBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
+        // the actual values are update on the update()
+    @Transient override var shadeBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
+        // the actual values are update on the update()
 
     @Transient val BASE_DENSITY = 980.0
 
@@ -201,6 +195,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     }
 
     override fun update(delta: Float) {
+        // update lightbox
+        lightBoxList[0].light = actorValueColour
+        shadeBoxList[0].light = actorValueShade
+
+
         super.update(delta)
 
         if (vehicleRiding is IngamePlayer)

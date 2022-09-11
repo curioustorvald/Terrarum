@@ -12,10 +12,8 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
@@ -349,46 +347,44 @@ object LightmapRenderer {
         lanternMap.clear()
         shadowMap.clear()
         actorContainer.forEach {
-            if (it is Luminous) {
-                val lightBoxCopy = it.lightBoxList.subList(0, it.lightBoxList.size) // make copy to prevent ConcurrentModificationException
-                val shadeBoxCopy = it.shadeBoxList.subList(0, it.shadeBoxList.size) // make copy to prevent ConcurrentModificationException
-                val scale = it.scale
+            val lightBoxCopy = it.lightBoxList.subList(0, it.lightBoxList.size) // make copy to prevent ConcurrentModificationException
+            val shadeBoxCopy = it.shadeBoxList.subList(0, it.shadeBoxList.size) // make copy to prevent ConcurrentModificationException
+            val scale = it.scale
 
-                // put lanterns to the area the luminantBox is occupying
-                lightBoxCopy.forEach { (lightBox, colour) ->
-                    val lightBoxX = it.hitbox.startX + (lightBox.startX * scale)
-                    val lightBoxY = it.hitbox.startY + (lightBox.startY * scale)
-                    val lightBoxW = lightBox.width * scale
-                    val lightBoxH = lightBox.height * scale
-                    for (y in lightBoxY.div(TILE_SIZE).floorInt()
-                            ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
-                        for (x in lightBoxX.div(TILE_SIZE).floorInt()
-                                ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+            // put lanterns to the area the luminantBox is occupying
+            lightBoxCopy.forEach { (lightBox, colour) ->
+                val lightBoxX = it.hitbox.startX + (lightBox.startX * scale)
+                val lightBoxY = it.hitbox.startY + (lightBox.startY * scale)
+                val lightBoxW = lightBox.width * scale
+                val lightBoxH = lightBox.height * scale
+                for (y in lightBoxY.div(TILE_SIZE).floorInt()
+                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
+                    for (x in lightBoxX.div(TILE_SIZE).floorInt()
+                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                            val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
-                            val actorLight = colour
+                        val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
+                        val actorLight = colour
 
-                            lanternMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
-                        }
+                        lanternMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
                     }
                 }
+            }
 
-                // put shades to the area the luminantBox is occupying
-                shadeBoxCopy.forEach { (shadeBox, colour) ->
-                    val lightBoxX = it.hitbox.startX + (shadeBox.startX * scale)
-                    val lightBoxY = it.hitbox.startY + (shadeBox.startY * scale)
-                    val lightBoxW = shadeBox.width * scale
-                    val lightBoxH = shadeBox.height * scale
-                    for (y in lightBoxY.div(TILE_SIZE).floorInt()
-                            ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
-                        for (x in lightBoxX.div(TILE_SIZE).floorInt()
-                                ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+            // put shades to the area the luminantBox is occupying
+            shadeBoxCopy.forEach { (shadeBox, colour) ->
+                val lightBoxX = it.hitbox.startX + (shadeBox.startX * scale)
+                val lightBoxY = it.hitbox.startY + (shadeBox.startY * scale)
+                val lightBoxW = shadeBox.width * scale
+                val lightBoxH = shadeBox.height * scale
+                for (y in lightBoxY.div(TILE_SIZE).floorInt()
+                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
+                    for (x in lightBoxX.div(TILE_SIZE).floorInt()
+                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                            val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
-                            val actorLight = colour
+                        val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
+                        val actorLight = colour
 
-                            shadowMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
-                        }
+                        shadowMap[LandUtil.getBlockAddr(world, x, y)] = oldLight.maxAndAssign(actorLight)
                     }
                 }
             }

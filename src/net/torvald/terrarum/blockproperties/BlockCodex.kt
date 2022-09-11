@@ -184,7 +184,7 @@ class BlockCodex {
         //   otherModname:id -> as-is
         //   id -> thisModname:id
         prop.drop = record.get("drop").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
-        prop.world = record.get("world").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
+        prop.world = record.get("spawn").let { if (it == null) "" else if (it.contains(':')) it else "$modname:$it" }
 
         prop.shadeColR = record.floatVal("shdr")
         prop.shadeColG = record.floatVal("shdg")
