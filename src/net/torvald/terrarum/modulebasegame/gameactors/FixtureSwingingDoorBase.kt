@@ -153,12 +153,21 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
     }
 
+    private fun setOpacity() {
+        shadeBoxList[0].light = opacity
+    }
+
+    private fun unsetOpacity() {
+        shadeBoxList[0].light = Cvec(0)
+    }
+
     open protected fun closeDoor(doorHandler: Int) {
         if (doorState != 0) {
             (sprite!! as SheetSpriteAnimation).currentRow = 0
             doorState = 0
             placeActorBlocks()
             lastDoorHandler = doorHandler
+            if (!isOpacityActuallyLuminosity) setOpacity()
         }
         doorCloseQueued = false
     }
@@ -169,6 +178,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
             doorState = 1
             placeActorBlocks()
             lastDoorHandler = doorHandler
+            if (!isOpacityActuallyLuminosity) unsetOpacity()
         }
         doorCloseQueued = false
     }
@@ -179,6 +189,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
             doorState = -1
             placeActorBlocks()
             lastDoorHandler = doorHandler
+            if (!isOpacityActuallyLuminosity) unsetOpacity()
         }
         doorCloseQueued = false
     }
