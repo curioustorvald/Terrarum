@@ -12,9 +12,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import org.dyn4j.geometry.Vector2
 import java.util.*
-import kotlin.math.absoluteValue
 
 /**
  * @param width of hitbox, in tiles, when the door is opened. Default to 2. Closed door always have width of 1. (this limits how big and thick the door can be)
@@ -261,13 +259,16 @@ open class FixtureSwingingDoorBase : FixtureBase {
     }
 
     private fun ActorWithBody.movingTowardsRight(): Boolean {
-        return ((this.controllerV ?: Vector2()) + this.externalV).x >= PHYS_EPSILON_VELO
+//        return ((this.controllerV ?: Vector2()) + this.externalV).x >= PHYS_EPSILON_VELO
+        return (((this.controllerV?.x ?: 0.0) / this.externalV.x).let { if (it.isNaN()) 0.0 else it } - 1) >= PHYS_EPSILON_DIST
     }
     private fun ActorWithBody.movingTowardsLeft(): Boolean {
-        return ((this.controllerV ?: Vector2()) + this.externalV).x <= -PHYS_EPSILON_VELO
+//        return ((this.controllerV ?: Vector2()) + this.externalV).x <= -PHYS_EPSILON_VELO
+        return (((this.controllerV?.x ?: 0.0) / this.externalV.x).let { if (it.isNaN()) 0.0 else it } - 1) <= PHYS_EPSILON_DIST
     }
     private fun ActorWithBody.notMoving(): Boolean {
-        return ((this.controllerV ?: Vector2()) + this.externalV).x.absoluteValue < PHYS_EPSILON_VELO
+//        return ((this.controllerV ?: Vector2()) + this.externalV).x.absoluteValue < PHYS_EPSILON_VELO
+        return ActorWithBody.isCloseEnough(this.controllerV?.x ?: 0.0, this.externalV.x)
     }
 
     private var doorCloseQueueTimer = 0f

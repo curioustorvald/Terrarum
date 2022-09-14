@@ -751,7 +751,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             if (this is HasAssembledSprite) {
                 try {
                     val baseDelay = animDesc!!.getAnimByFrameName("ANIM_RUN").delay
-                    val moveSpeedMult = (controllerV?.x ?: 0.0).abs().coerceAtLeast(PHYS_EPSILON_VELO).toFloat() / 1.414f // FIXME empirical value
+                    val moveSpeedMult = (controllerV?.x ?: 0.0).abs().coerceAtLeast(0.001).toFloat() / 1.414f // FIXME empirical value
                     val stride = scale.toFloat()
                     val maxMoveSpeed = scale.sqrt().toFloat() // ActorWithBody uses scale.sqrt() for determining walk acceleration
                     val scaleCompensation = stride / maxMoveSpeed

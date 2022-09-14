@@ -609,7 +609,9 @@ open class ActorWithBody : Actor {
         // make sure tooltip to disable even when the actor's update is paused at unfortunate time
         if (!mouseUp && INGAME.getTooltipMessage() == this.tooltipText) INGAME.setTooltipMessage(null)
 
-        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
+//        isStationary = (hitbox - oldHitbox).magnitudeSquared < PHYS_EPSILON_VELO
+        isStationary = isCloseEnough(hitbox.startX, oldHitbox.startX) && // this is supposed to be more accurate, idk
+                       isCloseEnough(hitbox.startY, oldHitbox.startY)
     }
 
     fun getDrag(externalForce: Vector2): Vector2 {
@@ -774,7 +776,7 @@ open class ActorWithBody : Actor {
                 }*/
 
                 // trying to use same function as the others, in an effort to eliminate the "contradiction" mentioned below
-                if (isColliding(stepBox, vectorSum.y > PHYS_EPSILON_VELO)) {
+                if (isColliding(stepBox, vectorSum.y > PHYS_EPSILON_DIST)) {
                     collidingStep = step
                 }
 
@@ -1927,7 +1929,7 @@ open class ActorWithBody : Actor {
         @Transient const val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
 
         @Transient const val PHYS_EPSILON_DIST = 0.00001
-        @Transient const val PHYS_EPSILON_VELO = 0.0001
+//        @Transient const val PHYS_EPSILON_VELO = 0.0001
 
 
         /**
@@ -1967,6 +1969,8 @@ open class ActorWithBody : Actor {
 
         @Transient private val HITBOX_COLOURS0 = Color(0xFF00FF88.toInt())
         @Transient private val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
+
+        fun isCloseEnough(a: Double, b: Double) = ((a / b).let { if (it.isNaN()) 0.0 else it } - 1).absoluteValue < PHYS_EPSILON_DIST
     }
 
 
