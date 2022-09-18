@@ -2,12 +2,16 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
-import net.torvald.terrarum.*
+import net.torvald.terrarum.App
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.sqr
 import org.dyn4j.geometry.Vector2
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2016-12-30.
@@ -114,8 +118,8 @@ object WorldCamera {
 
         val camSpeed = (1f - (1f / (2f * fpsRatio))).coerceIn(0.5f, 1f)
 
-        x = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).floorInt() fmod worldWidth
-        y = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).floorInt().clampCameraY(world)
+        x = FastMath.interpolateLinear(camSpeed, oldX.toFloat(), newX.toFloat()).roundToInt() fmod worldWidth
+        y = FastMath.interpolateLinear(camSpeed, oldY.toFloat(), newY.toFloat()).roundToInt().clampCameraY(world)
 
         xEnd = x + width
         yEnd = y + height

@@ -174,7 +174,8 @@ internal class UIHomeComputer : UICanvas(
         otherBatch.end()
 
         fbo.inAction(camera, batch) {
-            Gdx.gl.glClearColor(0f,0f,0f,1f) // to hide the crap might be there
+            Gdx.gl.glClearColor(0f,0f,0f,1f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT) // to hide the crap might be there
 
             (vm.peripheralTable[1].peripheral as? GraphicsAdapter)?.let { gpu ->
                 val clearCol = gpu.getBackgroundColour()

@@ -372,7 +372,7 @@ let bufAssemble = (normalise) => {
 let isBufferEmpty = (buf) => buf[0] === undefined && buf[1] === undefined && buf[2] === undefined
 let isBufferNotEmpty = (buf) => buf[0] !== undefined || buf[1] !== undefined || buf[2] !== undefined
 let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" : `\\u${buf[i].codePointAt(0).toString(16).toUpperCase()}`).join(' ')
-return Object.freeze({"n":"세벌식 공자판","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
+return Object.freeze({"n":"세벌식 공자판","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 "l":"koKR",
 // return: [displayed output, composed output]

@@ -258,7 +258,7 @@ let states = {"keylayouts":[[""],[undefined],
 let reset = () => {
     states.code = 0
 }
-return Object.freeze({"n":"ﾺￇﾵￜﾤ ﾧￓﾲￆﾩﾵￜﾡ","v":"one","c":"CuriousTo\uA75Bvald","m":"rewrite",
+return Object.freeze({"n":"ﾺￇﾵￜﾤ ﾧￓﾲￆﾩﾵￜﾡ","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 "l":"koKRabc",
 // return: [displayed output, composed output]
