@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ceilInt
@@ -44,7 +45,10 @@ class UIItemSpinner(
     var selectionChangeListener: (Number) -> Unit = {}
 
     // to alleviate floating point errors adding up as the spinner is being used
-    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilInt()) { min.toDouble() + (step.toDouble() * it) }
+    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilInt()) {
+        printdbg(this, "$min..$max step $step; index [$it] = ${min.toDouble() + (step.toDouble() * it)}")
+        min.toDouble() + (step.toDouble() * it)
+    }
     private var currentIndex = values.indexOfFirst { it == initialValue.toDouble() }
 
     init {
@@ -92,7 +96,7 @@ class UIItemSpinner(
         if (fboUpdateLatch) {
 //            printdbg(this, "FBO Latched")
             fboUpdateLatch = false
-            textCache = numberToTextFunction(value)
+            textCache = numberToTextFunction(value.toDouble() + 0.0000000000000002)
             textCacheLen = App.fontGame.getWidth(textCache)
             /*fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
                 gdxClearAndSetBlend(0f, 0f, 0f, 0f)
