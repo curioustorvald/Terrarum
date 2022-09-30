@@ -370,10 +370,14 @@ let diacriticsMapping = {
 "\u0335":diacriticsStrikethru,
 "\u0321":diacriticsHookBelow
 }
+let dislplayKeyLayouts = JSON.parse(JSON.stringify(states.keylayouts))
+dislplayKeyLayouts.forEach(ks=>{ks.forEach((k,i)=>{
+    ks[i] = "\uDBBF\uDFC1"+k+"\uDBBF\uDFC0"
+})})
 let inRange = (s,a,b) => (a <= s && s <= b)
 let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
 return Object.freeze({"n":"\uDBBF\uDFC1Бъл. Многоезична\uDBBF\uDFC0","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
-"t":states.keylayouts,
+"t":dislplayKeyLayouts,
 "l":"bgBG",
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{

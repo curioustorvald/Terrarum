@@ -3,7 +3,6 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ceilInt
@@ -46,7 +45,7 @@ class UIItemSpinner(
 
     // to alleviate floating point errors adding up as the spinner is being used
     private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilInt()) {
-        printdbg(this, "$min..$max step $step; index [$it] = ${min.toDouble() + (step.toDouble() * it)}")
+//        printdbg(this, "$min..$max step $step; index [$it] = ${min.toDouble() + (step.toDouble() * it)}")
         min.toDouble() + (step.toDouble() * it)
     }
     private var currentIndex = values.indexOfFirst { it == initialValue.toDouble() }
