@@ -90,20 +90,20 @@ class UIQuickslotPie : UICanvas() {
                     val percentage = item.durability / item.maxDurability
                     val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
                     val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-                    val durabilityIndex = percentage.times(36).roundToInt()
+                    val durabilityIndex = percentage.times(38).roundToInt()
 
                     // draw bar background
                     batch.color = barBack
-                    batch.draw(ItemSlotImageFactory.slotImage.get(6,7), slotX - 19f, slotY - 21f)
+                    batch.draw(ItemSlotImageFactory.slotImage.get(8,7), slotX - 19f, slotY - 19f)
                     // draw bar foreground
                     batch.color = barCol
-                    batch.draw(ItemSlotImageFactory.slotImage.get(durabilityIndex % 10,4 + durabilityIndex / 10), slotX - 19f, slotY - 21f)
+                    batch.draw(ItemSlotImageFactory.slotImage.get(durabilityIndex % 10,4 + durabilityIndex / 10), slotX - 19f, slotY - 19f)
                 }
                 else if (item.stackable) {
                     val amountString = qs!!.qty.toItemCountText()
                     batch.color = Color(0xfff066_ff.toInt())
                     val textLen = amountString.length * App.fontSmallNumbers.W
-                    val y = slotY + 23 - App.fontSmallNumbers.H
+                    val y = slotY + 25 - App.fontSmallNumbers.H
                     val x = slotX - 19 + (38 - textLen) / 2
                     App.fontSmallNumbers.draw(batch, amountString, x.toFloat(), y.toFloat())
                 }
