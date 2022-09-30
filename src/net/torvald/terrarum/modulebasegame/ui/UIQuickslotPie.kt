@@ -4,17 +4,16 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.toItemCountText
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
+import kotlin.math.roundToInt
 
 /**
  * The Sims styled pie representation of the Quickslot.
@@ -64,8 +63,9 @@ class UIQuickslotPie : UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
-        for (i in 0..slotCount - 1) {
-            val item = ItemCodex[(Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslotItem(i)?.itm]
+        for (i in 0 until slotCount) {
+            val qs = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslotItem(i)
+            val item = ItemCodex[qs?.itm]
 
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
@@ -84,6 +84,30 @@ class UIQuickslotPie : UICanvas() {
             batch.color = drawColor
             image.draw(batch, slotX, slotY)
 
+            // durability meter/item count for the selected cell
+            if (i == selection && item != null) {
+                if (item.maxDurability > 0.0) {
+                    val percentage = item.durability / item.maxDurability
+                    val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
+                    val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+                    val durabilityIndex = percentage.times(36).roundToInt()
+
+                    // draw bar background
+                    batch.color = barBack
+                    batch.draw(ItemSlotImageFactory.slotImage.get(6,7), slotX - 19f, slotY - 21f)
+                    // draw bar foreground
+                    batch.color = barCol
+                    batch.draw(ItemSlotImageFactory.slotImage.get(durabilityIndex % 10,4 + durabilityIndex / 10), slotX - 19f, slotY - 21f)
+                }
+                else if (item.stackable) {
+                    val amountString = qs!!.qty.toItemCountText()
+                    batch.color = Color(0xfff066_ff.toInt())
+                    val textLen = amountString.length * App.fontSmallNumbers.W
+                    val y = slotY + 23 - App.fontSmallNumbers.H
+                    val x = slotX - 19 + (38 - textLen) / 2
+                    App.fontSmallNumbers.draw(batch, amountString, x.toFloat(), y.toFloat())
+                }
+            }
         }
     }
 

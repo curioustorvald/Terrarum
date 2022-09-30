@@ -92,12 +92,11 @@ class UIItemInventoryElemSimple(
                 val percentage = item!!.durability / item!!.maxDurability
                 val durabilityCol = UIItemInventoryCellCommonRes.getHealthMeterColour(percentage, 0f, 1f)
                 val durabilityBack = durabilityCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-                if (item!!.maxDurability > 0.0) {
-                    batch.color = durabilityBack
-                    Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + barFullLen, thickness, false)
-                    batch.color = durabilityCol
-                    Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + (barFullLen * percentage).roundToInt(), thickness, false)
-                }
+
+                batch.color = durabilityBack
+                Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + barFullLen, thickness, false)
+                batch.color = durabilityCol
+                Toolkit.drawStraightLine(batch, barOffset, posY + height - thickness, barOffset + (barFullLen * percentage).roundToInt(), thickness, false)
             }
             // draw item count when applicable
             else if (item!!.stackable) {
