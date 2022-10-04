@@ -95,7 +95,7 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     fun forAllMulAssign(vector: Cvec) {
         for (i in 0 until TOTAL_SIZE_IN_BYTES / 4 step 4) {
             for (k in 0 until 4) {
-                array.setFloat(i + 4*k, array.getFloat(i + k) * vector.getElem(k))
+                array.setFloat(i + 4*k, array.getFloat(i + k) * vector.lane(k))
             }
         }
     }

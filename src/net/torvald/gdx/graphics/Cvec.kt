@@ -89,7 +89,7 @@ class Cvec {
      * - 2: B
      * - 3: A
      */
-    fun getElem(index: Int) = when(index) {
+    fun lane(index: Int) = when(index) {
         0 -> r
         1 -> g
         2 -> b
@@ -417,6 +417,20 @@ class Cvec {
      */
     fun cpy(): Cvec {
         return Cvec(this)
+    }
+
+    /**
+     * Creates a new Cvec that this Cvec transformed by the given function.
+     *
+     * @param transformation a function with two parameters: (`this.lane(i)`, `i`) and returns a float value
+     */
+    fun lanewise(transformation: (Float, Int) -> Float): Cvec {
+        return Cvec(
+                transformation(this.r, 0),
+                transformation(this.g, 1),
+                transformation(this.b, 2),
+                transformation(this.a, 3)
+        )
     }
 
     companion object {

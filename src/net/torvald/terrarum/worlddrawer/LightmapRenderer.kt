@@ -551,48 +551,6 @@ object LightmapRenderer {
     private var swipeY = -1
     private var swipeDiag = false
     private val distFromLightSrc = Ivec4()
-    private val gaussianMap = doubleArrayOf(
-            8.892787877390726E-02,
-            8.458993346786304E-02,
-            7.653374932806653E-02,
-            6.585462151484795E-02,
-            5.388105396669377E-02,
-            4.190748641853961E-02,
-            3.097509865718143E-02,
-            2.174847352525505E-02,
-            1.449898235017003E-02,
-            9.172825568474920E-03,
-            5.503695341084953E-03,
-            3.129552252773797E-03,
-            1.685143520724352E-03,
-            8.584693407463680E-04,
-            4.133370899889921E-04,
-            1.878804954495418E-04,
-            8.052021233551793E-05,
-            3.249061199503355E-05,
-            1.232402523949548E-05,
-            4.386517458125512E-06,
-            1.462172486041837E-06,
-            4.554307743409001E-07,
-            1.322218377118743E-07,
-            3.567890858891845E-08,
-            8.919727147229610E-09,
-            2.058398572437603E-09,
-            4.366300002140369E-10,
-            8.471925377287283E-11,
-            1.495045654815403E-11,
-            2.383406116372381E-12,
-            3.404865880531974E-13,
-            4.316027172505319E-14,
-            4.795585747228131E-15,
-            4.598506880903687E-16,
-            3.728519092624612E-17,
-            2.485679395083075E-18,
-            1.308252313201618E-19,
-            5.097086934551759E-21,
-            1.306945367833784E-22,
-            1.654361225106056E-24
-    ).map { it.toFloat() }.toFloatArray()
     private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray, distFromLightSrc: Ivec4) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
@@ -606,14 +564,14 @@ object LightmapRenderer {
             _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
             _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
             _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap, distFromLightSrc))
         }
         else {
             _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
             _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
             _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
             _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap, distFromLightSrc))
         }
 
         _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
@@ -665,7 +623,7 @@ object LightmapRenderer {
         return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) 1.2f else 1f
     }
 
-    private class Ivec4 {
+    internal class Ivec4 {
 
         var r = 0
         var g = 0
@@ -683,6 +641,14 @@ object LightmapRenderer {
             g+=scalar
             b+=scalar
             a+=scalar
+        }
+
+        fun lane(index: Int) = when(index) {
+            0 -> r
+            1 -> g
+            2 -> b
+            3 -> a
+            else -> throw IndexOutOfBoundsException("Invalid index $index")
         }
 
     }
@@ -792,18 +758,21 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    internal fun darkenColoured(x: Int, y: Int, darken: Cvec, lightmap: UnsafeCvecArray): Cvec {
+    internal fun darkenColoured(x: Int, y: Int, darken: Cvec, lightmap: UnsafeCvecArray, distFromLightSrc: Ivec4 = Ivec4()): Cvec {
         // use equation with magic number 8.0
         // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 
         if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return colourNull
 
-        return Cvec(
-                lightmap.getR(x, y) * (1f - darken.r * lightScalingMagic),
-                lightmap.getG(x, y) * (1f - darken.g * lightScalingMagic),
-                lightmap.getB(x, y) * (1f - darken.b * lightScalingMagic),
-                lightmap.getA(x, y) * (1f - darken.a * lightScalingMagic)
-        )
+        return lightmap.getVec(x, y).lanewise { it, ch ->
+            it * (1f - darken.lane(ch) * lightScalingMagic)
+        }
+
+        /*val newDarken: Cvec = darken.lanewise(darkenFit)
+
+        return lightmap.getVec(x, y).lanewise { it, ch ->
+            it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))
+        }*/
 
     }
 

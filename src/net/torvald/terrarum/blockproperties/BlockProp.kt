@@ -69,10 +69,10 @@ class BlockProp {
     }
 
     fun getLumCol(x: Int, y: Int, channel: Int): Float = if (dynamicLuminosityFunction == 0) {
-        baseLumCol.getElem(channel)
+        baseLumCol.lane(channel)
     } else {
         val offset = XXHash32.hashGeoCoord(x, y).fmod(BlockCodex.DYNAMIC_RANDOM_CASES)
-        BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol.getElem(channel)
+        BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol.lane(channel)
     }
 
     /**
