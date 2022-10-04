@@ -633,14 +633,10 @@ object LightmapRenderer {
 
             distFromLightSrc.add(1)
 
-            if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getR(swipeX, swipeY))
-                distFromLightSrc[0] = 0
-            if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getG(swipeX, swipeY))
-                distFromLightSrc[0] = 0
-            if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getB(swipeX, swipeY))
-                distFromLightSrc[0] = 0
-            if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getA(swipeX, swipeY))
-                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+            if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+            if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+            if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
         }
 
         swipeX = ex; swipeY = ey
@@ -655,14 +651,10 @@ object LightmapRenderer {
 
             distFromLightSrc.add(1)
 
-            if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getR(swipeX, swipeY))
-                distFromLightSrc[0] = 0
-            if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getG(swipeX, swipeY))
-                distFromLightSrc[0] = 0
-            if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getB(swipeX, swipeY))
-                distFromLightSrc[0] = 0
-            if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getA(swipeX, swipeY))
-                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+            if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+            if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+            if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
         }
     }
 
@@ -673,24 +665,26 @@ object LightmapRenderer {
         return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) 1.2f else 1f
     }
 
-    private inline class Ivec4(val i: IntArray = intArrayOf(0,0,0,0)) {
+    private class Ivec4 {
+
+        var r = 0
+        var g = 0
+        var b = 0
+        var a = 0
+
         fun broadcast(scalar: Int) {
-            i[0]=scalar
-            i[1]=scalar
-            i[2]=scalar
-            i[3]=scalar
+            r=scalar
+            g=scalar
+            b=scalar
+            a=scalar
         }
         fun add(scalar: Int) {
-            i[0]+=scalar
-            i[1]+=scalar
-            i[2]+=scalar
-            i[3]+=scalar
+            r+=scalar
+            g+=scalar
+            b+=scalar
+            a+=scalar
         }
 
-        operator fun get(index: Int) = i[index]
-        operator fun set(index: Int, value: Int) {
-            i[index] = value
-        }
     }
 
     var lightBuffer: Pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888) // must not be too small
