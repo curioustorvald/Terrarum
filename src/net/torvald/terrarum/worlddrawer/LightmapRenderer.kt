@@ -3,6 +3,7 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
@@ -325,7 +326,7 @@ object LightmapRenderer {
             //      why dark spots appear in the first place)
             // - Multithreading? I have absolutely no idea.
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
-            r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap)
+            r1(lightmap);r2(lightmap);//r3(lightmap);r4(lightmap)
         }
 
         App.measureDebugTime("Renderer.Precalculate2") {
@@ -337,10 +338,10 @@ object LightmapRenderer {
             }
         }
 
-        App.measureDebugTime("Renderer.LightRuns2") {
+        /*App.measureDebugTime("Renderer.LightRuns2") {
             r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap) // two looks better than one
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
-        }
+        }*/
     }
 
     private fun buildLanternAndShadowMap(actorContainer: List<ActorWithBody>) {
@@ -591,10 +592,10 @@ object LightmapRenderer {
 
             distFromLightSrc.add(1)
 
-            if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-            if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-            if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-            if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+            if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+            if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+            if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+            if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
         }
 
         swipeX = ex; swipeY = ey
@@ -609,10 +610,10 @@ object LightmapRenderer {
 
             distFromLightSrc.add(1)
 
-            if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-            if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-            if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-            if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+            if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+            if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+            if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+            if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
         }
     }
 
@@ -750,6 +751,30 @@ object LightmapRenderer {
 
     private const val lightScalingMagic = 2f
 
+    private fun lerpBetween(x: Float, xStart: Float, xEnd: Float, yStart: Float, yEnd: Float): Float {
+        val scale = (x - xStart) / (xEnd - xStart)
+        return FastMath.interpolateLinear(scale, yStart, yEnd)
+    }
+
+
+    private fun darkenConv(it: Float) =
+            if (it < 0f) 0f
+            else if (it < 0.25f) lerpBetween(it, 0f, 0.25f, 0f, 1.33f)
+            else if (it < 0.5f) lerpBetween(it, 0.25f, 0.5f, 1.33f, 3.14f)
+            else if (it < 0.63f) lerpBetween(it, 0.5f, 0.63f, 3.14f, 5.6f)
+            else if (it < 0.71f) lerpBetween(it, 0.63f, 0.71f, 5.6f, 8.8f)
+            else if (it < 0.76f) lerpBetween(it, 0.71f, 0.76f, 8.8f, 12.8f)
+            else if (it < 0.796f) lerpBetween(it, 0.76f, 0.796f, 12.8f, 17.5f)
+            else if (it < 0.82f) lerpBetween(it, 0.796f, 0.82f, 17.5f, 23f)
+            else if (it < 0.84f) lerpBetween(it, 0.82f, 0.84f, 23f, 29f)
+            else if (it < 0.858f) lerpBetween(it, 0.84f, 0.858f, 29f, 36f)
+            else if (it < 0.87f) lerpBetween(it, 0.858f, 0.87f, 36f, 43f)
+            else if (it < 0.88f) lerpBetween(it, 0.87f, 0.88f, 43f, 51f)
+            else if (it < 0.89f) lerpBetween(it, 0.88f, 0.89f, 51f, 60f)
+            else if (it < 0.9f) lerpBetween(it, 0.89f, 0.9f, 60f, 71f)
+            else if (it < 0.906f) lerpBetween(it, 0.9f, 0.906f, 71f, 81f)
+            else lerpBetween(it, 0.906f, 0.911f, 81f, 92f)
+
     /**
      * Subtract each channel's RGB value.
      *
@@ -764,15 +789,17 @@ object LightmapRenderer {
 
         if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return colourNull
 
-        return lightmap.getVec(x, y).lanewise { it, ch ->
+        /*return lightmap.getVec(x, y).lanewise { it, ch ->
             it * (1f - darken.lane(ch) * lightScalingMagic)
+        }*/
+
+        val newDarken: Cvec = darken.lanewise { it, ch ->
+            darkenConv(1f - it * lightScalingMagic)
         }
 
-        /*val newDarken: Cvec = darken.lanewise(darkenFit)
-
         return lightmap.getVec(x, y).lanewise { it, ch ->
-            it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))
-        }*/
+            (it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))).coerceAtLeast(0f)
+        }
 
     }
 
