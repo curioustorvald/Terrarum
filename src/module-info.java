@@ -33,7 +33,6 @@ module Terrarum {
     requires prtree;
     requires kotlin.stdlib.jdk7;
 
-
     exports net.torvald.colourutil;
     exports net.torvald.gdx.graphics;
     exports net.torvald.random;
@@ -57,6 +56,7 @@ module Terrarum {
     exports net.torvald.terrarum.ui;
     exports net.torvald.terrarum.utils;
     exports net.torvald.terrarum.weather;
+    exports net.torvald.terrarum.worlddrawer;
 
     exports net.torvald.terrarum.modulebasegame;
     exports net.torvald.terrarum.modulebasegame.gameactors;

@@ -546,11 +546,54 @@ object LightmapRenderer {
         _mapLightLevelThis.max(lx, ly, _reflectanceAccumulator)
     }
 
-    private val giScale = 0.35f
+    private const val giScale = 0.35f
     private var swipeX = -1
     private var swipeY = -1
     private var swipeDiag = false
-    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray) {
+    private val distFromLightSrc = Ivec4()
+    private val gaussianMap = doubleArrayOf(
+            8.892787877390726E-02,
+            8.458993346786304E-02,
+            7.653374932806653E-02,
+            6.585462151484795E-02,
+            5.388105396669377E-02,
+            4.190748641853961E-02,
+            3.097509865718143E-02,
+            2.174847352525505E-02,
+            1.449898235017003E-02,
+            9.172825568474920E-03,
+            5.503695341084953E-03,
+            3.129552252773797E-03,
+            1.685143520724352E-03,
+            8.584693407463680E-04,
+            4.133370899889921E-04,
+            1.878804954495418E-04,
+            8.052021233551793E-05,
+            3.249061199503355E-05,
+            1.232402523949548E-05,
+            4.386517458125512E-06,
+            1.462172486041837E-06,
+            4.554307743409001E-07,
+            1.322218377118743E-07,
+            3.567890858891845E-08,
+            8.919727147229610E-09,
+            2.058398572437603E-09,
+            4.366300002140369E-10,
+            8.471925377287283E-11,
+            1.495045654815403E-11,
+            2.383406116372381E-12,
+            3.404865880531974E-13,
+            4.316027172505319E-14,
+            4.795585747228131E-15,
+            4.598506880903687E-16,
+            3.728519092624612E-17,
+            2.485679395083075E-18,
+            1.308252313201618E-19,
+            5.097086934551759E-21,
+            1.306945367833784E-22,
+            1.654361225106056E-24
+    ).map { it.toFloat() }.toFloatArray()
+    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray, distFromLightSrc: Ivec4) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
         _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
@@ -578,23 +621,48 @@ object LightmapRenderer {
     }
     private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, lightmap: UnsafeCvecArray) {
         swipeX = sx; swipeY = sy
+        distFromLightSrc.broadcast(0)
         while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
             // conduct the task #1
             // spread towards the end
-            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap)
+
+            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap, distFromLightSrc)
 
             swipeX += dx
             swipeY += dy
+
+            distFromLightSrc.add(1)
+
+            if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getR(swipeX, swipeY))
+                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getG(swipeX, swipeY))
+                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getB(swipeX, swipeY))
+                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) < _mapLightLevelThis.getA(swipeX, swipeY))
+                distFromLightSrc[0] = 0
         }
 
         swipeX = ex; swipeY = ey
+        distFromLightSrc.broadcast(0)
         while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
-            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap)
+            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap, distFromLightSrc)
 
             swipeX -= dx
             swipeY -= dy
+
+            distFromLightSrc.add(1)
+
+            if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getR(swipeX, swipeY))
+                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getG(swipeX, swipeY))
+                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getB(swipeX, swipeY))
+                distFromLightSrc[0] = 0
+            if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) < _mapLightLevelThis.getA(swipeX, swipeY))
+                distFromLightSrc[0] = 0
         }
     }
 
@@ -603,6 +671,26 @@ object LightmapRenderer {
 
         // brighten if solid
         return if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) 1.2f else 1f
+    }
+
+    private inline class Ivec4(val i: IntArray = intArrayOf(0,0,0,0)) {
+        fun broadcast(scalar: Int) {
+            i[0]=scalar
+            i[1]=scalar
+            i[2]=scalar
+            i[3]=scalar
+        }
+        fun add(scalar: Int) {
+            i[0]+=scalar
+            i[1]+=scalar
+            i[2]+=scalar
+            i[3]+=scalar
+        }
+
+        operator fun get(index: Int) = i[index]
+        operator fun set(index: Int, value: Int) {
+            i[index] = value
+        }
     }
 
     var lightBuffer: Pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888) // must not be too small
