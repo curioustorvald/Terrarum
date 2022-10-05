@@ -326,7 +326,11 @@ object LightmapRenderer {
             //      why dark spots appear in the first place)
             // - Multithreading? I have absolutely no idea.
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
-            r1(lightmap);r2(lightmap);//r3(lightmap);r4(lightmap)
+            r1(lightmap);r2(lightmap);
+
+            if (!App.getConfigBoolean("fx_newlight")) {
+                r3(lightmap);r4(lightmap)
+            }
         }
 
         App.measureDebugTime("Renderer.Precalculate2") {
@@ -338,10 +342,13 @@ object LightmapRenderer {
             }
         }
 
-        /*App.measureDebugTime("Renderer.LightRuns2") {
-            r1(lightmap);r2(lightmap);r3(lightmap);r4(lightmap) // two looks better than one
+        App.measureDebugTime("Renderer.LightRuns2") {
+            r1(lightmap);r2(lightmap);
+            if (!App.getConfigBoolean("fx_newlight")) {
+                r3(lightmap);r4(lightmap) // two looks better than one
+            }
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
-        }*/
+        }
     }
 
     private fun buildLanternAndShadowMap(actorContainer: List<ActorWithBody>) {
@@ -580,7 +587,7 @@ object LightmapRenderer {
     }
     private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, lightmap: UnsafeCvecArray) {
         swipeX = sx; swipeY = sy
-        distFromLightSrc.broadcast(0)
+        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
         while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
             // conduct the task #1
             // spread towards the end
@@ -590,16 +597,18 @@ object LightmapRenderer {
             swipeX += dx
             swipeY += dy
 
-            distFromLightSrc.add(1)
+            if (App.getConfigBoolean("fx_newlight")) {
+                distFromLightSrc.add(1)
 
-            if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-            if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-            if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-            if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+                if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+                if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+                if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+                if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+            }
         }
 
         swipeX = ex; swipeY = ey
-        distFromLightSrc.broadcast(0)
+        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
         while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
@@ -608,12 +617,14 @@ object LightmapRenderer {
             swipeX -= dx
             swipeY -= dy
 
-            distFromLightSrc.add(1)
+            if (App.getConfigBoolean("fx_newlight")) {
+                distFromLightSrc.add(1)
 
-            if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-            if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-            if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-            if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+                if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+                if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+                if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+                if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+            }
         }
     }
 
@@ -789,18 +800,20 @@ object LightmapRenderer {
 
         if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return colourNull
 
-        /*return lightmap.getVec(x, y).lanewise { it, ch ->
-            it * (1f - darken.lane(ch) * lightScalingMagic)
-        }*/
+        if (App.getConfigBoolean("fx_newlight")) {
+            val newDarken: Cvec = darken.lanewise { it, ch ->
+                darkenConv(1f - it * lightScalingMagic)
+            }
 
-        val newDarken: Cvec = darken.lanewise { it, ch ->
-            darkenConv(1f - it * lightScalingMagic)
+            return lightmap.getVec(x, y).lanewise { it, ch ->
+                (it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))).coerceAtLeast(0f)
+            }
         }
-
-        return lightmap.getVec(x, y).lanewise { it, ch ->
-            (it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))).coerceAtLeast(0f)
+        else {
+            return lightmap.getVec(x, y).lanewise { it, ch ->
+                it * (1f - darken.lane(ch) * lightScalingMagic)
+            }
         }
-
     }
 
     /** infix is removed to clarify the association direction */

@@ -110,6 +110,8 @@ object DefaultConfig {
 
             "screenmagnifying" to 1.0,
 
+            "fx_newlight" to true,
+
 
 
             // settings regarding debugger
