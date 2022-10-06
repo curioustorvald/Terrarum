@@ -30,6 +30,9 @@ import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
 import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
@@ -38,9 +41,6 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
-import net.torvald.terrarum.modulebasegame.serialise.ReadActor
-import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
@@ -1064,21 +1064,21 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                     if (it is CuedByTerrainChange) {
                         terrainChangeQueue.forEach { cue ->
-                            printdbg(this, "Ingame actors terrainChangeCue: ${cue}")
+//                            printdbg(this, "Ingame actors terrainChangeCue: ${cue}")
                             it.updateForTerrainChange(cue)
                         }
                     }
 
                     if (it is CuedByWallChange) {
                         wallChangeQueue.forEach { cue ->
-                            printdbg(this, "Ingame actors wallChangeCue: ${cue}")
+//                            printdbg(this, "Ingame actors wallChangeCue: ${cue}")
                             it.updateForWallChange(cue)
                         }
                     }
 
                     if (it is CuedByWireChange) {
                         wireChangeQueue.forEach { cue ->
-                            printdbg(this, "Ingame actors wireChangeCue: ${cue}")
+//                            printdbg(this, "Ingame actors wireChangeCue: ${cue}")
                             it.updateForWireChange(cue)
                         }
                     }

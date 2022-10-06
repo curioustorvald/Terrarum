@@ -499,7 +499,9 @@ object LightmapRenderer {
 
         // blend shade
         _mapThisTileOpacity.max(lx, ly, shadowMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull)
-        _mapThisTileOpacity2.setVec(lx, ly, _mapThisTileOpacity.getVec(lx, ly).mul(1.41421356f))
+
+//        _mapThisTileOpacity2.setVec(lx, ly, _mapThisTileOpacity.getVec(lx, ly).mul(1.41421356f))
+        _mapThisTileOpacity.getAndSetMap(_mapThisTileOpacity2, lx, ly) { it * 1.41421356f }
 
 
         // open air || luminous tile backed by sunlight
@@ -549,19 +551,19 @@ object LightmapRenderer {
     private var swipeY = -1
     private var swipeDiag = false
     private val distFromLightSrc = Ivec4()
-    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray, distFromLightSrc: Ivec4) {
+    private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray) {//, distFromLightSrc: Ivec4) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
-        _ambientAccumulator.set(_mapLightLevelThis.getVec(x, y))
-
+//        _ambientAccumulator.set(_mapLightLevelThis.getVec(x, y))
+        _mapLightLevelThis.getAndSet(_ambientAccumulator, x, y)
 
         if (!swipeDiag) {
-            _thisTileOpacity.set(_mapThisTileOpacity.getVec(x, y))
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap, distFromLightSrc))
+            _mapThisTileOpacity.getAndSet(_thisTileOpacity, x, y)
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap))//, distFromLightSrc))
         }
         else {
-            _thisTileOpacity2.set(_mapThisTileOpacity2.getVec(x, y))
-            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap, distFromLightSrc))
+            _mapThisTileOpacity2.getAndSet(_thisTileOpacity2, x, y)
+            _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap))//, distFromLightSrc))
         }
 
         _mapLightLevelThis.setVec(x, y, _ambientAccumulator)
@@ -574,7 +576,7 @@ object LightmapRenderer {
             // conduct the task #1
             // spread towards the end
 
-            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap, distFromLightSrc)
+            _swipeTask(swipeX, swipeY, swipeX-dx, swipeY-dy, lightmap)//, distFromLightSrc)
 
             swipeX += dx
             swipeY += dy
@@ -594,7 +596,7 @@ object LightmapRenderer {
         while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
-            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap, distFromLightSrc)
+            _swipeTask(swipeX, swipeY, swipeX+dx, swipeY+dy, lightmap)//, distFromLightSrc)
 
             swipeX -= dx
             swipeY -= dy
@@ -781,7 +783,7 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    internal fun darkenColoured(x: Int, y: Int, darken: Cvec, lightmap: UnsafeCvecArray, distFromLightSrc: Ivec4 = Ivec4()): Cvec {
+    internal fun darkenColoured(x: Int, y: Int, darken: Cvec, lightmap: UnsafeCvecArray): Cvec {//, distFromLightSrc: Ivec4 = Ivec4()): Cvec {
         // use equation with magic number 8.0
         // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 

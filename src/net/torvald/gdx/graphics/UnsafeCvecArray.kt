@@ -25,10 +25,11 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     }
 
     // getters
-    fun getR(x: Int, y: Int) = array.getFloat(toAddr(x, y))
-    fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 1)
-    fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 2)
-    fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 3)
+//    fun getR(x: Int, y: Int) = array.getFloat(toAddr(x, y))
+//    fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 1)
+//    fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 2)
+//    fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 3)
+//    operator fun get(i: Long) = array.getFloat(i)
     /**
      * Returns a copy of the vector. Use [setVec] to modify the value in the CvecArray
      */
@@ -41,6 +42,31 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
                 array.getFloat(a + 3)
         )
     }
+
+    /**
+     * `getAndSet(cvec, x, y)` is equivalent to
+     * `cvec.set(this.getVec(x, y))`
+     */
+    fun getAndSet(target: Cvec, x: Int, y: Int) {
+        val a = toAddr(x, y)
+        target.r = array.getFloat(a + 0)
+        target.g = array.getFloat(a + 1)
+        target.b = array.getFloat(a + 2)
+        target.a = array.getFloat(a + 3)
+    }
+    /**
+     * `getAndSet(cvec, x, y, func)` is equivalent to
+     * `target.setVec(x, y, func(this.getVec(x, y)))`
+     *
+     * The target must have the same dimension as this CvecArray.
+     */
+    fun getAndSetMap(target: UnsafeCvecArray, x: Int, y: Int, transform: (Float) -> Float) {
+        val a = toAddr(x, y)
+        target.array.setFloat(a + 0, transform(this.array.getFloat(a + 0)))
+        target.array.setFloat(a + 1, transform(this.array.getFloat(a + 1)))
+        target.array.setFloat(a + 2, transform(this.array.getFloat(a + 2)))
+        target.array.setFloat(a + 3, transform(this.array.getFloat(a + 3)))
+    }
     /**
      * @param channel 0 for R, 1 for G, 2 for B, 3 for A
      */
@@ -48,10 +74,11 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
 
     // setters
     fun zerofill() = array.fillWith(0)
-    //    fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
+//    fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
 //    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 1, value) }
 //    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 2, value) }
 //    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 3, value) }
+//    operator fun set(i: Long, value: Float) = array.setFloat(i, value)
     fun setVec(x: Int, y: Int, value: Cvec) {
         val a = toAddr(x, y)
         array.setFloat(a + 0, value.r)
