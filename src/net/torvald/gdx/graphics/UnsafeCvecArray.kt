@@ -29,34 +29,43 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     fun getG(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 1)
     fun getB(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 2)
     fun getA(x: Int, y: Int) = array.getFloat(toAddr(x, y) + 3)
-    inline fun getVec(x: Int, y: Int) = Cvec(
-            array.getFloat(toAddr(x, y)),
-            array.getFloat(toAddr(x, y) + 1),
-            array.getFloat(toAddr(x, y) + 2),
-            array.getFloat(toAddr(x, y) + 3)
-    )
+    /**
+     * Returns a copy of the vector. Use [setVec] to modify the value in the CvecArray
+     */
+    fun getVec(x: Int, y: Int): Cvec {
+        val a = toAddr(x, y)
+        return Cvec(
+                array.getFloat(a + 0),
+                array.getFloat(a + 1),
+                array.getFloat(a + 2),
+                array.getFloat(a + 3)
+        )
+    }
     /**
      * @param channel 0 for R, 1 for G, 2 for B, 3 for A
      */
-    fun channelGet(x: Int, y: Int, channel: Int) = array.getFloat(toAddr(x, y) + channel)
+//    fun channelGet(x: Int, y: Int, channel: Int) = array.getFloat(toAddr(x, y) + channel)
 
     // setters
     fun zerofill() = array.fillWith(0)
-    fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
-    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 1, value) }
-    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 2, value) }
-    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 3, value) }
-    inline fun setVec(x: Int, y: Int, value: Cvec) {
-        array.setFloat(toAddr(x, y), value.r)
-        array.setFloat(toAddr(x, y) + 1, value.g)
-        array.setFloat(toAddr(x, y) + 2, value.b)
-        array.setFloat(toAddr(x, y) + 3, value.a)
+    //    fun setR(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y), value) }
+//    fun setG(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 1, value) }
+//    fun setB(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 2, value) }
+//    fun setA(x: Int, y: Int, value: Float) { array.setFloat(toAddr(x, y) + 3, value) }
+    fun setVec(x: Int, y: Int, value: Cvec) {
+        val a = toAddr(x, y)
+        array.setFloat(a + 0, value.r)
+        array.setFloat(a + 1, value.g)
+        array.setFloat(a + 2, value.b)
+        array.setFloat(a + 3, value.a)
     }
-    inline fun setScalar(x: Int, y: Int, value: Float) {
-        array.setFloat(toAddr(x, y), value)
-        array.setFloat(toAddr(x, y) + 1, value)
-        array.setFloat(toAddr(x, y) + 2, value)
-        array.setFloat(toAddr(x, y) + 3, value)
+    fun setScalar(x: Int, y: Int, value: Float) {
+        val a = toAddr(x, y)
+
+        array.setFloat(a + 0, value)
+        array.setFloat(a + 1, value)
+        array.setFloat(a + 2, value)
+        array.setFloat(a + 3, value)
     }
     /**
      * @param channel 0 for R, 1 for G, 2 for B, 3 for A
@@ -66,24 +75,27 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     }
 
     // operators
-    inline fun max(x: Int, y: Int, other: Cvec) {
-        setR(x, y, maxOf(getR(x, y), other.r))
-        setG(x, y, maxOf(getG(x, y), other.g))
-        setB(x, y, maxOf(getB(x, y), other.b))
-        setA(x, y, maxOf(getA(x, y), other.a))
+    fun max(x: Int, y: Int, other: Cvec) {
+        val a = toAddr(x, y)
+        array.setFloat(a + 0, maxOf(array.getFloat(a + 0), other.r))
+        array.setFloat(a + 1, maxOf(array.getFloat(a + 1), other.g))
+        array.setFloat(a + 2, maxOf(array.getFloat(a + 2), other.b))
+        array.setFloat(a + 3, maxOf(array.getFloat(a + 3), other.a))
     }
-    inline fun mul(x: Int, y: Int, scalar: Float) {
-        setR(x, y, getR(x, y) * scalar)
-        setG(x, y, getG(x, y) * scalar)
-        setB(x, y, getB(x, y) * scalar)
-        setA(x, y, getA(x, y) * scalar)
+    fun mul(x: Int, y: Int, scalar: Float) {
+        val a = toAddr(x, y)
+        array.setFloat(a + 0, (array.getFloat(a + 0) * scalar))
+        array.setFloat(a + 1, (array.getFloat(a + 1) * scalar))
+        array.setFloat(a + 2, (array.getFloat(a + 2) * scalar))
+        array.setFloat(a + 3, (array.getFloat(a + 3) * scalar))
     }
 
     fun mulAndAssign(x: Int, y: Int, scalar: Float) {
         val addr = toAddr(x, y)
-        for (k in 0..3) {
-            array.setFloat(addr + k, (array.getFloat(addr + k) * scalar))
-        }
+        array.setFloat(addr + 0, (array.getFloat(addr + 0) * scalar))
+        array.setFloat(addr + 1, (array.getFloat(addr + 1) * scalar))
+        array.setFloat(addr + 2, (array.getFloat(addr + 2) * scalar))
+        array.setFloat(addr + 3, (array.getFloat(addr + 3) * scalar))
     }
 
     fun forAllMulAssign(scalar: Float) {

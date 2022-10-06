@@ -73,7 +73,7 @@ object LightmapRenderer {
 
     private val lanternMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
     private val shadowMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
-    private val giMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+//    private val giMap = HashMap<BlockAddress, Cvec>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
     /**
      * Float value, 1.0 for 1023
      *
@@ -119,8 +119,7 @@ object LightmapRenderer {
      * @param y world tile coord
      */
     internal fun getLight(x: Int, y: Int): Cvec? {
-        var y = y
-        var x = if (for_x_start - overscan_open + LIGHTMAP_WIDTH >= world.width && x - for_x_start + overscan_open < 0)
+        val x = if (for_x_start - overscan_open + LIGHTMAP_WIDTH >= world.width && x - for_x_start + overscan_open < 0)
             x + world.width
         else if (for_x_start - overscan_open + LIGHTMAP_WIDTH < 0 && x - for_x_start + overscan_open >= world.width)
             x - world.width else x
@@ -129,15 +128,7 @@ object LightmapRenderer {
             null
         }
         else {
-            x = x.convX()
-            y = y.convY()
-
-            Cvec(
-                    lightmap.getR(x, y),
-                    lightmap.getG(x, y),
-                    lightmap.getB(x, y),
-                    lightmap.getA(x, y)
-            )
+            lightmap.getVec(x.convX(), y.convY())
         }
     }
 
@@ -201,9 +192,8 @@ object LightmapRenderer {
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
 
-            giMap.clear()
-
-            _mapLightLevelThis.zerofill()
+//            giMap.clear()
+//            _mapLightLevelThis.zerofill()
 
             for (y in for_y_start - overscan_open..for_y_end + overscan_open) {
                 for (x in for_x_start - overscan_open..for_x_end + overscan_open) {
@@ -328,9 +318,9 @@ object LightmapRenderer {
             // - If you naively slice the screen (job area) to multithread, the seam will appear.
             r1(lightmap);r2(lightmap);
 
-            if (!App.getConfigBoolean("fx_newlight")) {
+//            if (!App.getConfigBoolean("fx_newlight")) {
                 r3(lightmap);r4(lightmap)
-            }
+//            }
         }
 
         App.measureDebugTime("Renderer.Precalculate2") {
@@ -344,9 +334,9 @@ object LightmapRenderer {
 
         App.measureDebugTime("Renderer.LightRuns2") {
             r1(lightmap);r2(lightmap);
-            if (!App.getConfigBoolean("fx_newlight")) {
+//            if (!App.getConfigBoolean("fx_newlight")) {
                 r3(lightmap);r4(lightmap) // two looks better than one
-            }
+//            }
             // no rendering trickery will eliminate the need of 2nd pass, even the "decay out"
         }
     }
@@ -462,6 +452,7 @@ object LightmapRenderer {
 //        }
 
 
+
         _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
         _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain.toLong()]]
         _thisWall = world.getTileFromWallRaw(worldX, worldY)
@@ -508,17 +499,16 @@ object LightmapRenderer {
 
         // blend shade
         _mapThisTileOpacity.max(lx, ly, shadowMap[LandUtil.getBlockAddr(world, worldX, worldY)] ?: colourNull)
-
-        _mapThisTileOpacity2.setR(lx, ly, _mapThisTileOpacity.getR(lx, ly) * 1.41421356f)
-        _mapThisTileOpacity2.setG(lx, ly, _mapThisTileOpacity.getG(lx, ly) * 1.41421356f)
-        _mapThisTileOpacity2.setB(lx, ly, _mapThisTileOpacity.getB(lx, ly) * 1.41421356f)
-        _mapThisTileOpacity2.setA(lx, ly, _mapThisTileOpacity.getA(lx, ly) * 1.41421356f)
+        _mapThisTileOpacity2.setVec(lx, ly, _mapThisTileOpacity.getVec(lx, ly).mul(1.41421356f))
 
 
         // open air || luminous tile backed by sunlight
         if ((!_thisTerrainProp.isSolid && !_thisWallProp.isSolid) ||
             (_thisTileLuminosity.nonZero() && !_thisWallProp.isSolid)) {
             _mapLightLevelThis.setVec(lx, ly, sunLight)
+        }
+        else {
+            _mapLightLevelThis.setScalar(lx, ly, 0f)
         }
 
         // blend lantern
@@ -562,23 +552,15 @@ object LightmapRenderer {
     private fun _swipeTask(x: Int, y: Int, x2: Int, y2: Int, lightmap: UnsafeCvecArray, distFromLightSrc: Ivec4) {
         if (x2 < 0 || y2 < 0 || x2 >= LIGHTMAP_WIDTH || y2 >= LIGHTMAP_HEIGHT) return
 
-        _ambientAccumulator.r = _mapLightLevelThis.getR(x, y)
-        _ambientAccumulator.g = _mapLightLevelThis.getG(x, y)
-        _ambientAccumulator.b = _mapLightLevelThis.getB(x, y)
-        _ambientAccumulator.a = _mapLightLevelThis.getA(x, y)
+        _ambientAccumulator.set(_mapLightLevelThis.getVec(x, y))
+
 
         if (!swipeDiag) {
-            _thisTileOpacity.r = _mapThisTileOpacity.getR(x, y)
-            _thisTileOpacity.g = _mapThisTileOpacity.getG(x, y)
-            _thisTileOpacity.b = _mapThisTileOpacity.getB(x, y)
-            _thisTileOpacity.a = _mapThisTileOpacity.getA(x, y)
+            _thisTileOpacity.set(_mapThisTileOpacity.getVec(x, y))
             _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity, lightmap, distFromLightSrc))
         }
         else {
-            _thisTileOpacity2.r = _mapThisTileOpacity2.getR(x, y)
-            _thisTileOpacity2.g = _mapThisTileOpacity2.getG(x, y)
-            _thisTileOpacity2.b = _mapThisTileOpacity2.getB(x, y)
-            _thisTileOpacity2.a = _mapThisTileOpacity2.getA(x, y)
+            _thisTileOpacity2.set(_mapThisTileOpacity2.getVec(x, y))
             _ambientAccumulator.maxAndAssign(darkenColoured(x2, y2, _thisTileOpacity2, lightmap, distFromLightSrc))
         }
 
@@ -587,7 +569,7 @@ object LightmapRenderer {
     }
     private fun swipeLight(sx: Int, sy: Int, ex: Int, ey: Int, dx: Int, dy: Int, lightmap: UnsafeCvecArray) {
         swipeX = sx; swipeY = sy
-        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
+//        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
         while (swipeX*dx <= ex*dx && swipeY*dy <= ey*dy) {
             // conduct the task #1
             // spread towards the end
@@ -597,18 +579,18 @@ object LightmapRenderer {
             swipeX += dx
             swipeY += dy
 
-            if (App.getConfigBoolean("fx_newlight")) {
-                distFromLightSrc.add(1)
-
-                if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-                if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-                if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-                if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
-            }
+//            if (App.getConfigBoolean("fx_newlight")) {
+//                distFromLightSrc.add(1)
+//
+//                if (_mapLightLevelThis.getR(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+//                if (_mapLightLevelThis.getG(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+//                if (_mapLightLevelThis.getB(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+//                if (_mapLightLevelThis.getA(swipeX - dx, swipeY - dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+//            }
         }
 
         swipeX = ex; swipeY = ey
-        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
+//        if (App.getConfigBoolean("fx_newlight")) distFromLightSrc.broadcast(0)
         while (swipeX*dx >= sx*dx && swipeY*dy >= sy*dy) {
             // conduct the task #2
             // spread towards the start
@@ -617,14 +599,14 @@ object LightmapRenderer {
             swipeX -= dx
             swipeY -= dy
 
-            if (App.getConfigBoolean("fx_newlight")) {
-                distFromLightSrc.add(1)
-
-                if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
-                if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
-                if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
-                if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
-            }
+//            if (App.getConfigBoolean("fx_newlight")) {
+//                distFromLightSrc.add(1)
+//
+//                if (_mapLightLevelThis.getR(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getR(swipeX, swipeY)) distFromLightSrc.r = 0
+//                if (_mapLightLevelThis.getG(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getG(swipeX, swipeY)) distFromLightSrc.g = 0
+//                if (_mapLightLevelThis.getB(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getB(swipeX, swipeY)) distFromLightSrc.b = 0
+//                if (_mapLightLevelThis.getA(swipeX + dx, swipeY + dy) <= _mapLightLevelThis.getA(swipeX, swipeY)) distFromLightSrc.a = 0
+//            }
         }
     }
 
@@ -703,17 +685,14 @@ object LightmapRenderer {
                     val arrayX = x.convX()
                     val arrayY = y.convY()
 
-                    val red = lightmap.getR(arrayX, arrayY)
-                    val grn = lightmap.getG(arrayX, arrayY)
-                    val blu = lightmap.getB(arrayX, arrayY)
-                    val uvl = lightmap.getA(arrayX, arrayY)
-                    val redw = (red.sqrt() - 1f) * (7f / 24f)
-                    val grnw = (grn.sqrt() - 1f)
-                    val bluw = (blu.sqrt() - 1f) * (7f / 72f)
-                    val bluwv = (blu.sqrt() - 1f) * (1f / 50f)
-                    val uvlwr = (uvl.sqrt() - 1f) * (1f / 13f)
-                    val uvlwg = (uvl.sqrt() - 1f) * (1f / 10f)
-                    val uvlwb = (uvl.sqrt() - 1f) * (1f / 8f)
+                    val (red, grn, blu, uvl) = lightmap.getVec(arrayX, arrayY)
+//                    val redw = (red.sqrt() - 1f) * (7f / 24f)
+//                    val grnw = (grn.sqrt() - 1f)
+//                    val bluw = (blu.sqrt() - 1f) * (7f / 72f)
+//                    val bluwv = (blu.sqrt() - 1f) * (1f / 50f)
+//                    val uvlwr = (uvl.sqrt() - 1f) * (1f / 13f)
+//                    val uvlwg = (uvl.sqrt() - 1f) * (1f / 10f)
+//                    val uvlwb = (uvl.sqrt() - 1f) * (1f / 8f)
 
                     if (solidMultMagic == null)
                         lightBuffer.drawPixel(
@@ -722,13 +701,21 @@ object LightmapRenderer {
                             0
                         )
                     else
-                        lightBuffer.drawPixel(
+                        /*lightBuffer.drawPixel(
                             x - this_x_start,
                             lightBuffer.height - 1 - y + this_y_start, // flip Y
                                 (maxOf(red,grnw,bluw,uvlwr) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
                                         (maxOf(redw,grn,bluw,uvlwg) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
                                         (maxOf(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
                                         (maxOf(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
+                        )*/
+                        lightBuffer.drawPixel(
+                                x - this_x_start,
+                                lightBuffer.height - 1 - y + this_y_start, // flip Y
+                                (red * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
+                                        (grn * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
+                                        (blu * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
+                                        (uvl * solidMultMagic).hdnorm().times(255f).roundToInt()
                         )
                 }
             }
@@ -800,20 +787,20 @@ object LightmapRenderer {
 
         if (x !in 0 until LIGHTMAP_WIDTH || y !in 0 until LIGHTMAP_HEIGHT) return colourNull
 
-        if (App.getConfigBoolean("fx_newlight")) {
-            val newDarken: Cvec = darken.lanewise { it, ch ->
-                darkenConv(1f - it * lightScalingMagic)
-            }
-
-            return lightmap.getVec(x, y).lanewise { it, ch ->
-                (it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))).coerceAtLeast(0f)
-            }
-        }
-        else {
+//        if (App.getConfigBoolean("fx_newlight")) {
+//            val newDarken: Cvec = darken.lanewise { it, ch ->
+//                darkenConv(1f - it * lightScalingMagic)
+//            }
+//
+//            return lightmap.getVec(x, y).lanewise { it, ch ->
+//                (it * ((newDarken.lane(ch) - distFromLightSrc.lane(ch)) / newDarken.lane(ch))).coerceAtLeast(0f)
+//            }
+//        }
+//        else {
             return lightmap.getVec(x, y).lanewise { it, ch ->
                 it * (1f - darken.lane(ch) * lightScalingMagic)
             }
-        }
+//        }
     }
 
     /** infix is removed to clarify the association direction */

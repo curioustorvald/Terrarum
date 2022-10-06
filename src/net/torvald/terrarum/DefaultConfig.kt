@@ -110,7 +110,7 @@ object DefaultConfig {
 
             "screenmagnifying" to 1.0,
 
-            "fx_newlight" to true,
+            "fx_newlight" to false,
 
 
 
