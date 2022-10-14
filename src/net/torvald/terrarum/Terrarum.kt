@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
-import net.torvald.unsafe.UnsafeHelper
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App.*
@@ -33,6 +32,7 @@ import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
+import net.torvald.unsafe.UnsafeHelper
 import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
@@ -114,7 +114,7 @@ object Terrarum : Disposable {
 
     private val javaHeapCircularArray = CircularArray<Int>(64, true)
     private val nativeHeapCircularArray = CircularArray<Int>(64, true)
-    private val updateRateCircularArray = CircularArray<Double>(16, true)
+    private val updateRateCircularArray = CircularArray<Double>(64, true)
 
     val memJavaHeap: Int
         get() {
@@ -133,7 +133,7 @@ object Terrarum : Disposable {
     val updateRateStr: String
         get() {
             updateRateCircularArray.appendHead(updateRate)
-            return String.format("%.2f", updateRateCircularArray.maxOrNull() ?: 0.0)
+            return String.format("%.2f", updateRateCircularArray.average())
         }
 
     lateinit var testTexture: Texture

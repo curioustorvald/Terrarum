@@ -581,7 +581,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // some sketchy test code here
 
-
+        KeyToggler.forceSet(App.getConfigInt("debug_key_deltat_benchmark"), false)
 
     }// END enter
 
@@ -819,6 +819,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
             WORLD_UPDATE_TIMER += 1
+
+            if (KeyToggler.isOn(App.getConfigInt("debug_key_deltat_benchmark"))) {
+                deltaTeeBenchmarks.appendHead(1f / Gdx.graphics.deltaTime)
+            }
         }
 
 

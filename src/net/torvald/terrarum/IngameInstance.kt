@@ -19,6 +19,7 @@ import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
+import net.torvald.util.CircularArray
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.*
 import java.io.File
@@ -77,6 +78,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     /** For in-world text overlays? e.g. cursor on the ore block and tooltip will say "Malachite" or something */
     open var uiTooltip: UITooltip = UITooltip()
     open var notifier: Notification = Notification()
+
+    val deltaTeeBenchmarks = CircularArray<Float>(1024, true)
 
     init {
         consoleHandler.setPosition(0, 0)

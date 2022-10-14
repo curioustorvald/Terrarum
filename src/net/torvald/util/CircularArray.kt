@@ -80,6 +80,9 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
         }
     }
 
+    /**
+     * To just casually add items to the list, use [appendHead], **please!**
+     */
     fun appendTail(item: T) {
         // even if overflowing is enabled, appending at tail causes head element to be altered, therefore such action
         // must be blocked by throwing overflow error
@@ -181,6 +184,12 @@ class CircularArray<T>(val size: Int, val overwriteOnOverflow: Boolean): Iterabl
         }
 
         return accumulator
+    }
+
+    fun toList(): List<T> {
+        val list = ArrayList<T>()
+        iterator().forEach { list.add(it) }
+        return list.toList()
     }
 
     private inline fun Int.wrap() = this fmod size

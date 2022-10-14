@@ -112,6 +112,8 @@ object DefaultConfig {
 
             "fx_newlight" to false,
 
+            "debug_key_deltat_benchmark" to Input.Keys.SLASH
+
 
 
             // settings regarding debugger

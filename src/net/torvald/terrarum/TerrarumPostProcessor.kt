@@ -153,12 +153,34 @@ object TerrarumPostProcessor : Disposable {
                         App.fontGame.draw(it, thisIsDebugStr, 5f, App.scr.height - 24f)
                     }
                 }
+
+                if (KeyToggler.isOn(App.getConfigInt("debug_key_deltat_benchmark"))) {
+                    batch.color = Toolkit.Theme.COL_ACTIVE
+                    batch.inUse {
+                        // we're going to assume the data are normally distributed
+                        val benchstr = if (INGAME.deltaTeeBenchmarks.elemCount < INGAME.deltaTeeBenchmarks.size) {
+                            "ΔF: Gathering data (${INGAME.deltaTeeBenchmarks.elemCount}/${INGAME.deltaTeeBenchmarks.size})"
+                        }
+                        else {
+                            val tallies = INGAME.deltaTeeBenchmarks.toList()
+                            val average = tallies.average()
+                            val stdev = (tallies.sumOf { (it - average).sqr() } / tallies.size).sqrt()
+                            val low5 = average + stdev * -1.64
+                            val low1 = average + stdev * -2.33
+                            "ΔF: Avr ${average.format(1)}; 95% ${low5.format(1)}; 99% ${low1.format(1)}; σ ${stdev.format(1)}"
+                        }
+                        val tw = App.fontGame.getWidth(benchstr)
+                        App.fontGame.draw(it, benchstr, Toolkit.drawWidth - tw - 5f, App.scr.height - 24f)
+                    }
+                }
             }
         }
 
         return outFBO
     }
     private val rng = HQRNG()
+
+    private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
     private val swizzler = intArrayOf(
             1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1,
