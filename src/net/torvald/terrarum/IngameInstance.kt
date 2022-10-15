@@ -79,7 +79,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     open var uiTooltip: UITooltip = UITooltip()
     open var notifier: Notification = Notification()
 
-    val deltaTeeBenchmarks = CircularArray<Float>(1024, true)
+    val deltaTeeBenchmarks = CircularArray<Float>(App.getConfigInt("debug_deltat_benchmark_sample_sizes"), true)
 
     init {
         consoleHandler.setPosition(0, 0)

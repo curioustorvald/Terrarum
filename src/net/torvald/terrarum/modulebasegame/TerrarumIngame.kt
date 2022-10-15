@@ -742,6 +742,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private var oldCamX = 0
     private var oldPlayerX = 0.0
 
+    private var deltaTeeCleared = false
+
     /**
      * Ingame (world) related updates; UI update must go to renderGame()
      */
@@ -756,7 +758,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // will also queue up the block/wall/wire placed events
         ingameController.update()
 
-        if (!paused || newWorldLoadedLatch) {
+        if ((!paused && !App.isScreenshotRequested()) || newWorldLoadedLatch) {
 
             //hypothetical_input_capturing_function_if_you_finally_decided_to_forgo_gdx_input_processor_and_implement_your_own_to_synchronise_everything()
 
@@ -822,11 +824,17 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             if (KeyToggler.isOn(App.getConfigInt("debug_key_deltat_benchmark"))) {
                 deltaTeeBenchmarks.appendHead(1f / Gdx.graphics.deltaTime)
+
+                if (deltaTeeCleared) deltaTeeCleared = false
+            }
+            else if (!deltaTeeCleared) {
+                deltaTeeCleared = true
+                deltaTeeBenchmarks.clear()
             }
         }
 
 
-        if (!paused || newWorldLoadedLatch) {
+        if ((!paused && !App.isScreenshotRequested()) || newWorldLoadedLatch) {
             // completely consume block change queues because why not
             terrainChangeQueue.clear()
             wallChangeQueue.clear()
@@ -858,7 +866,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         //println("paused = $paused")
 
-        if (!paused && newWorldLoadedLatch) newWorldLoadedLatch = false
+        if ((!paused && !App.isScreenshotRequested()) && newWorldLoadedLatch) newWorldLoadedLatch = false
     }
 
 

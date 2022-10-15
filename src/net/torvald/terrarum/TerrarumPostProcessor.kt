@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
+import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
@@ -162,12 +163,20 @@ object TerrarumPostProcessor : Disposable {
                             "ΔF: Gathering data (${INGAME.deltaTeeBenchmarks.elemCount}/${INGAME.deltaTeeBenchmarks.size})"
                         }
                         else {
-                            val tallies = INGAME.deltaTeeBenchmarks.toList()
+                            val tallies = INGAME.deltaTeeBenchmarks.toList().sorted()
                             val average = tallies.average()
-                            val stdev = (tallies.sumOf { (it - average).sqr() } / tallies.size).sqrt()
-                            val low5 = average + stdev * -1.64
-                            val low1 = average + stdev * -2.33
-                            "ΔF: Avr ${average.format(1)}; 95% ${low5.format(1)}; 99% ${low1.format(1)}; σ ${stdev.format(1)}"
+
+                            val halfPos = 0.5f * INGAME.deltaTeeBenchmarks.size
+                            val halfInd = halfPos.floorInt()
+                            val low5pos = 0.05f * INGAME.deltaTeeBenchmarks.size
+                            val low5ind = low5pos.floorInt()
+                            val low1pos = 0.01f * INGAME.deltaTeeBenchmarks.size
+                            val low1ind = low1pos.floorInt()
+
+                            val median = FastMath.interpolateLinear(halfPos - halfInd, tallies[halfInd], tallies[halfInd + 1])
+                            val low5 = FastMath.interpolateLinear(low5pos - low5ind, tallies[low5ind], tallies[low5ind + 1])
+                            val low1 = FastMath.interpolateLinear(low1pos - low1ind, tallies[low1ind], tallies[low1ind + 1])
+                            "ΔF: Avr ${average.format(1)}; Med ${median.format(1)}; 5% ${low5.format(1)}; 1% ${low1.format(1)}"
                         }
                         val tw = App.fontGame.getWidth(benchstr)
                         App.fontGame.draw(it, benchstr, Toolkit.drawWidth - tw - 5f, App.scr.height - 24f)
@@ -181,6 +190,7 @@ object TerrarumPostProcessor : Disposable {
     private val rng = HQRNG()
 
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
+    private fun Float.format(digits: Int) = "%.${digits}f".format(this)
 
     private val swizzler = intArrayOf(
             1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1,

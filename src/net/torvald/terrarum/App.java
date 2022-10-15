@@ -1078,6 +1078,10 @@ public class App implements ApplicationListener {
         screenshotRequested = true;
     }
 
+    public static boolean isScreenshotRequested() {
+        return screenshotRequested;
+    }
+
     // DEFAULT DIRECTORIES //
 
     public static String OSName = System.getProperty("os.name");

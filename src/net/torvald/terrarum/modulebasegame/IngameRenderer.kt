@@ -11,8 +11,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.*
-import net.torvald.terrarum.Terrarum.ingame
+import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -222,7 +221,7 @@ object IngameRenderer : Disposable {
         this.player = player
 
 
-        if (!gamePaused || newWorldLoadedLatch) {
+        if ((!gamePaused && !App.isScreenshotRequested()) || newWorldLoadedLatch) {
             measureDebugTime("Renderer.LightRun*") {
                 // recalculate for even frames, or if the sign of the cam-x changed
                 if (App.GLOBAL_RENDER_TIMER % 3 == 0 || Math.abs(WorldCamera.x - oldCamX) >= world.width * 0.85f * TILE_SIZEF || newWorldLoadedLatch) {

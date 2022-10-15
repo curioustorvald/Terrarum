@@ -112,7 +112,8 @@ object DefaultConfig {
 
             "fx_newlight" to false,
 
-            "debug_key_deltat_benchmark" to Input.Keys.SLASH
+            "debug_key_deltat_benchmark" to Input.Keys.SLASH,
+            "debug_deltat_benchmark_sample_sizes" to 2048,
 
 
 
