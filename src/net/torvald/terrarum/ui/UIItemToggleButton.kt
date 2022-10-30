@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.toInt
 import kotlin.math.roundToInt
 
@@ -95,7 +95,7 @@ class UIItemToggleButton(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         batch.draw(togglerBase, posX.toFloat(), posY.toFloat())
         batch.draw(togglerHandle, (posX + handlePos).toFloat(), posY.toFloat())

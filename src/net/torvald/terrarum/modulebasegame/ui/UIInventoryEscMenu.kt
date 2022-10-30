@@ -8,7 +8,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
 import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -271,7 +271,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
         screenRenders[screen](batch, camera)
     }

@@ -141,7 +141,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
 
         lateinit var savePixmap: Pixmap
         sliderFBO.inAction(camera as OrthographicCamera, batch) {
-            gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+            gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
             setCameraPosition(batch, camera, 0f, 0f)
             batch.color = Color.WHITE

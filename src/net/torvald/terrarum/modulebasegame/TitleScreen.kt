@@ -297,7 +297,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         //camera.setToOrtho(true, AppLoader.terrarumAppConfig.screenWf, AppLoader.terrarumAppConfig.screenHf)
 
         // render world
-        gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
+        gdxClearAndEnableBlend(.64f, .754f, .84f, 1f)
 
 
         if (!demoWorld.layerTerrain.ptr.destroyed) { // FIXME q&d hack to circumvent the dangling pointer issue #26
@@ -328,7 +328,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private fun renderOverlayTexts() {
         setCameraPosition(0f, 0f)
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         batch.shader = null
 
         batch.color = Color.LIGHT_GRAY

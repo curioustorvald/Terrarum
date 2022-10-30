@@ -54,7 +54,7 @@ class UIItemInventoryElemSimple(
     private var highlightToSubCol = false
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: (equippedSlot != null && highlightEquippedItem) || forceHighlighted
         highlightToSubCol = customHighlightRule2?.invoke(this) ?: false

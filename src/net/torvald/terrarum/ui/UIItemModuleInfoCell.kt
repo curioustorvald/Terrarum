@@ -58,7 +58,7 @@ class UIItemModuleInfoCell(
     private val ccDesc = App.fontGame.toColorCode(13,13,13)
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         batch.color = Toolkit.Theme.COL_CELL_FILL
         Toolkit.fillArea(batch, initialX, initialY, 32, height)

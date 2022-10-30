@@ -65,7 +65,7 @@ class UIInventoryFull(
 
         fun drawBackground(batch: SpriteBatch) {
             batch.end()
-            gdxSetBlendNormal()
+            gdxBlendNormalStraightAlpha()
 
             if (shapeRenderer == null) {
                 shapeRenderer = ShapeRenderer()

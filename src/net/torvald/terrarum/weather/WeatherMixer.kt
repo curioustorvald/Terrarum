@@ -186,7 +186,7 @@ internal object WeatherMixer : RNGConsumer {
         // draw using shaperenderer or whatever
 
         //Terrarum.textureWhiteSquare.bind(0)
-        gdxSetBlendNormal()
+        gdxBlendNormalStraightAlpha()
 
         // draw to skybox texture
         skyboxPixmap.setColor(colBottom)

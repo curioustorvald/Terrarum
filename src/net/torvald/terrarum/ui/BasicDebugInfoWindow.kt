@@ -359,7 +359,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 Toolkit.fillArea(batch, bar_x, bar_y, bar_w, -bar_h)
             }
         }
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     private fun drawGamepadAxis(gamepad: TerrarumController, batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
@@ -375,10 +375,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
         val deadzone = App.gamepadDeadzone
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         batch.end()
-        gdxSetBlendNormal()
+        gdxBlendNormalStraightAlpha()
         Terrarum.inShapeRenderer {
             it.color = uiColour
             it.rect(uiX.toFloat(), App.scr.height - uiY.toFloat(), w, -h)

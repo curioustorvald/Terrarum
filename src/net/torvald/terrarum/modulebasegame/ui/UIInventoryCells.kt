@@ -91,7 +91,7 @@ internal class UIInventoryCells(
 
         // control hints
         val controlHintXPos = full.offsetX
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
         App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)
 
@@ -110,7 +110,7 @@ internal class UIInventoryCells(
         App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
 
         // encumbrance bar background
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
         batch.color = encumbBack

@@ -483,7 +483,7 @@ class UIItemTextLineInput(
         if (true || fboUpdateLatch) {
             fboUpdateLatch = false
             fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
-                gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+                gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
 

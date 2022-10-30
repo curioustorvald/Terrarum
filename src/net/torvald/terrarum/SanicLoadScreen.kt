@@ -78,10 +78,10 @@ object SanicLoadScreen : LoadScreenBase() {
 
 
 
-        gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
+        gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
 
         textFbo.inAction(null, null) {
-            gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+            gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
         }
 
         // update arrow object
@@ -114,7 +114,7 @@ object SanicLoadScreen : LoadScreenBase() {
                 App.batch.inUse {
 
 
-                    blendNormal(App.batch)
+                    blendNormalStraightAlpha(App.batch)
                     App.fontGame
                     it.color = Color.WHITE
 
@@ -137,7 +137,7 @@ object SanicLoadScreen : LoadScreenBase() {
             App.batch.inUse {
                 initViewPort(App.scr.width, App.scr.height) // dunno, no render without this
                 it.projectionMatrix = camera.combined
-                blendNormal(App.batch)
+                blendNormalStraightAlpha(App.batch)
 
 
                 // almost black background
@@ -204,7 +204,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
                 initViewPort(App.scr.width, App.scr.height) // dunno, no render without this
                 it.projectionMatrix = camera.combined
-                blendNormal(App.batch)
+                blendNormalStraightAlpha(App.batch)
 
 
 

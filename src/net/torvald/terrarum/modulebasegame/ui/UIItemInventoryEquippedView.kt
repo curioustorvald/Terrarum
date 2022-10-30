@@ -68,7 +68,7 @@ class UIItemInventoryEquippedView(
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
@@ -84,7 +84,7 @@ class UIItemInventoryEquippedView(
         // sprite
         INGAME.actorNowPlaying?.let { actor ->
             actor.sprite?.let {
-                blendNormal(batch)
+                blendNormalStraightAlpha(batch)
 
                 batch.color = SPRITE_DRAW_COL
 

@@ -50,7 +50,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
         genericBackdrop
 
     override fun render(updateRate: Float) {
-        gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+        gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
         if (!init) {
             val lh = 28f
@@ -68,7 +68,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
             val centering = (App.scr.hf - heights.last() - App.fontGameFBO.lineHeight) / 2f
 
             fbo.inAction(null, null) {
-                gdxClearAndSetBlend(backdrop)
+                gdxClearAndEnableBlend(backdrop)
                 batch.inUse {
                     batch.color = Color.WHITE
                     wot.reversed().forEachIndexed { index, s ->

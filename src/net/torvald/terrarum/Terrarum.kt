@@ -479,46 +479,62 @@ fun blendDisable(batch: SpriteBatch) {
     batch.disableBlending()
 }
 
-/**
- * GLSource (foreground) must NOT have alpha premultiplied!
- */
-fun blendNormal(batch: SpriteBatch) {
+fun blendNormalStraightAlpha(batch: SpriteBatch) {
     batch.enableBlending()
-//    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA) // for premultiplied textures
-    batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA) // for not premultiplied textures
+    batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA)
     // helpful links:
+    // - https://stackoverflow.com/questions/19674740/opengl-es2-premultiplied-vs-straight-alpha-blending#37869033
+    // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
+    // - https://www.andersriggelsen.dk/glblendfunc.php
+    // - https://stackoverflow.com/questions/45781683/how-to-get-correct-sourceover-alpha-compositing-in-sdl-with-opengl
+}
+fun blendNormalPremultAlpha(batch: SpriteBatch) {
+    batch.enableBlending()
+    batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    // helpful links:
+    // - https://stackoverflow.com/questions/19674740/opengl-es2-premultiplied-vs-straight-alpha-blending#37869033
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
     // - https://stackoverflow.com/questions/45781683/how-to-get-correct-sourceover-alpha-compositing-in-sdl-with-opengl
 }
 
-fun gdxClearAndSetBlend(color: Color) {
-    gdxClearAndSetBlend(color.r, color.g, color.b, color.a)
+fun gdxClearAndEnableBlend(color: Color) {
+    gdxClearAndEnableBlend(color.r, color.g, color.b, color.a)
 }
 
-fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
+fun gdxClearAndEnableBlend(r: Float, g: Float, b: Float, a: Float) {
     Gdx.gl.glClearColor(r,g,b,a)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-    gdxSetBlend()
+    gdxEnableBlend()
 }
 
-fun gdxSetBlend() {
+fun gdxEnableBlend() {
     Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
     Gdx.gl.glEnable(GL20.GL_BLEND)
 }
 
-fun gdxSetBlendNormal() {
-    gdxSetBlend()
-//    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA) // for premultiplied textures
-    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA) // for not premultiplied textures
+fun gdxBlendNormalStraightAlpha() {
+    gdxEnableBlend()
+    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA)
     // helpful links:
+    // - https://stackoverflow.com/questions/19674740/opengl-es2-premultiplied-vs-straight-alpha-blending#37869033
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
     // - https://www.andersriggelsen.dk/glblendfunc.php
     // - https://stackoverflow.com/questions/45781683/how-to-get-correct-sourceover-alpha-compositing-in-sdl-with-opengl
 }
 
-fun gdxSetBlendMul() {
-    gdxSetBlend()
+fun gdxBlendNormalPremultAlpha() {
+    gdxEnableBlend()
+    Gdx.gl.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    // helpful links:
+    // - https://stackoverflow.com/questions/19674740/opengl-es2-premultiplied-vs-straight-alpha-blending#37869033
+    // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
+    // - https://www.andersriggelsen.dk/glblendfunc.php
+    // - https://stackoverflow.com/questions/45781683/how-to-get-correct-sourceover-alpha-compositing-in-sdl-with-opengl
+}
+
+fun gdxBlendMul() {
+    gdxEnableBlend()
     Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 }
 
@@ -532,7 +548,7 @@ object BlendMode {
         when (mode) {
             SCREEN   -> blendScreen(batch)
             MULTIPLY -> blendMul(batch)
-            NORMAL   -> blendNormal(batch)
+            NORMAL   -> blendNormalStraightAlpha(batch)
             //MAX      -> blendLightenOnly() // not supported by GLES -- use shader
             else     -> throw Error("Unknown blend mode: $mode")
         }

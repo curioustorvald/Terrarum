@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
 import net.torvald.terrarum.ui.Toolkit
@@ -128,7 +128,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         palette.forEach { it.render(batch, camera) }
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         // gaps between tabs and close button
         batch.color = DEFAULT_BACKGROUNDCOL

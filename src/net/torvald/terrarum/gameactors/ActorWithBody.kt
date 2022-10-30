@@ -1695,7 +1695,7 @@ open class ActorWithBody : Actor {
 
     open fun drawGlow(batch: SpriteBatch) {
         if (isVisible && spriteGlow != null) {
-            blendNormal(batch)
+            blendNormalStraightAlpha(batch)
             drawSpriteInGoodPosition(spriteGlow!!, batch)
         }
     }

@@ -55,7 +55,7 @@ class UIFakeGradOverlay : UICanvas() {
         blendMul(batch)
         batch.draw(tex, 0f, 0f, App.scr.wf, App.scr.hf)
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     override fun doOpening(delta: Float) {}
@@ -90,7 +90,7 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
             batch.color = darken
             Toolkit.fillArea(batch, 0, 0, width, height)
 
-            blendNormal(batch)
+            blendNormalStraightAlpha(batch)
         }
     }
 

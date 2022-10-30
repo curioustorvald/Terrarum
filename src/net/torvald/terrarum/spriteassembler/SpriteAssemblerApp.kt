@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.unicode.EMDASH
 import net.torvald.gdx.graphics.PixmapIO2
-import net.torvald.terrarum.gdxClearAndSetBlend
+import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
 import java.awt.BorderLayout
 import java.awt.Font
@@ -288,7 +288,7 @@ class SpriteAssemblerPreview: Game() {
         }
 
 
-        gdxClearAndSetBlend(bgCol)
+        gdxClearAndEnableBlend(bgCol)
 
 
         batch.inUse {

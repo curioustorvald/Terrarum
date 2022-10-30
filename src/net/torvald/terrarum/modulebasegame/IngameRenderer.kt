@@ -241,7 +241,7 @@ object IngameRenderer : Disposable {
 
         // clear main or whatever super-FBO being used
         //clearBuffer()
-        gdxClearAndSetBlend(.64f, .754f, .84f, 0f)
+        gdxClearAndEnableBlend(.64f, .754f, .84f, 0f)
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -252,7 +252,7 @@ object IngameRenderer : Disposable {
         aTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         fboMixedOut.inAction(camera, batch) {
-            gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+            gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
             // draw sky
             WeatherMixer.render(camera, batch, world)
@@ -269,7 +269,7 @@ object IngameRenderer : Disposable {
 
 
                 batch.inUse {
-                    blendNormal(batch)
+                    blendNormalStraightAlpha(batch)
                     batch.shader = shaderBlendGlow
                     shaderBlendGlow.setUniformi("tex1", 1)
                     batch.draw(rgbTex,
@@ -287,7 +287,7 @@ object IngameRenderer : Disposable {
             ) {
                 debugMode = 1
                 batch.inUse {
-                    blendNormal(batch)
+                    blendNormalStraightAlpha(batch)
                     batch.shader = null
                     batch.draw(rgbTex,
                             -0.5f * rgbTex.regionWidth * zoom + 0.5f * rgbTex.regionWidth,
@@ -314,7 +314,7 @@ object IngameRenderer : Disposable {
             ) {
                 debugMode = 2
                 batch.inUse {
-                    blendNormal(batch)
+                    blendNormalStraightAlpha(batch)
                     batch.shader = null
                     batch.draw(aTex,
                             -0.5f * aTex.regionWidth * zoom + 0.5f * aTex.regionWidth,
@@ -348,7 +348,7 @@ object IngameRenderer : Disposable {
             }
         }
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         batch.inUse {
             // it's no use applying dithering here: colours are no longer "floats" once they're written to the FBO
@@ -389,7 +389,7 @@ object IngameRenderer : Disposable {
         }
 
         // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
 
 
@@ -409,7 +409,7 @@ object IngameRenderer : Disposable {
             processKawaseBlur(lightmapFbo)
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     /**
@@ -479,14 +479,14 @@ object IngameRenderer : Disposable {
             setCameraPosition(0f, 0f)
             val (xrem, yrem) = worldCamToRenderPos()
 
-            gdxSetBlend()
+            gdxEnableBlend()
 
 //            App.getCurrentDitherTex().bind(1)
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             batch.inUse {
 
-                blendNormal(batch)
+                blendNormalStraightAlpha(batch)
 
                 // draw world
                 batch.shader = shaderDemultiply
@@ -497,7 +497,7 @@ object IngameRenderer : Disposable {
                 lightTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
                 if (KeyToggler.isOn(Input.Keys.F8))
-                    blendNormal(batch)
+                    blendNormalStraightAlpha(batch)
                 else
                     blendMul(batch)
 
@@ -522,7 +522,7 @@ object IngameRenderer : Disposable {
         }
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     private fun drawToA(
@@ -536,7 +536,7 @@ object IngameRenderer : Disposable {
         fboA.inAction(null, null) {
             clearBuffer()
             // paint black
-            gdxClearAndSetBlend(0f,0f,0f,1f) // solid black: so that unused area will be also black
+            gdxClearAndEnableBlend(0f,0f,0f,1f) // solid black: so that unused area will be also black
         }
         fboA_lightMixed.inAction(null, null) { clearBuffer() }
 
@@ -591,7 +591,7 @@ object IngameRenderer : Disposable {
                 lightTex.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
                 if (KeyToggler.isOn(Input.Keys.F8))
-                    blendNormal(batch)
+                    blendNormalStraightAlpha(batch)
                 else
                     blendMul(batch)
 
@@ -612,7 +612,7 @@ object IngameRenderer : Disposable {
         }
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     private fun drawOverlayActors(actors: List<ActorWithBody>?) {
@@ -652,7 +652,7 @@ object IngameRenderer : Disposable {
     }
 
     private fun clearBuffer() {
-        gdxClearAndSetBlend(0f,0f,0f,0f)
+        gdxClearAndEnableBlend(0f,0f,0f,0f)
     }
 
     private fun moveCameraToWorldCoord() {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.unicode.EMDASH
-import net.torvald.terrarum.gdxClearAndSetBlend
+import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
 
 /**
@@ -101,7 +101,7 @@ class GetKeycode : Game() {
     override fun render() {
         Gdx.graphics.setTitle("Get Keycode $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
-        gdxClearAndSetBlend(.1f,.1f,.1f,1f)
+        gdxClearAndEnableBlend(.1f,.1f,.1f,1f)
 
         batch.inUse {
             font.draw(batch, "Hit a key", 10f, 20f)

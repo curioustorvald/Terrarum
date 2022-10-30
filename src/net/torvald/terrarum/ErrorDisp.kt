@@ -38,7 +38,7 @@ object ErrorDisp : Screen {
     }
 
     override fun render(delta: Float) {
-        gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
+        gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
 
 
 

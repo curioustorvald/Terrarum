@@ -188,7 +188,7 @@ internal class UIHomeComputer : UICanvas(
 
         otherBatch.begin()
         otherBatch.shader = null
-        blendNormal(otherBatch)
+        blendNormalStraightAlpha(otherBatch)
         otherBatch.color = Color.WHITE
         otherBatch.draw(fbo.colorBufferTexture, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         otherBatch.color = Toolkit.Theme.COL_INACTIVE

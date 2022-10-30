@@ -174,7 +174,7 @@ class UINSMenu(
             Toolkit.fillArea(batch, it.ui.posX.toFloat(), it.ui.posY.toFloat() - LINE_HEIGHT, it.ui.width.toFloat(), LINE_HEIGHT.toFloat())
 
             batch.color = titleTextCol
-            blendNormal(batch)
+            blendNormalStraightAlpha(batch)
             App.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.ui.posX, TEXT_OFFSETY + it.ui.posY - LINE_HEIGHT)
 
             // draw the list

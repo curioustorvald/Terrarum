@@ -84,7 +84,7 @@ class UIElemTest : ApplicationAdapter() {
 
 
     override fun render() {
-        gdxClearAndSetBlend(0.1f, 0.1f, 0.1f, 1f)
+        gdxClearAndEnableBlend(0.1f, 0.1f, 0.1f, 1f)
 
         ui.update(Gdx.graphics.deltaTime)
         ui.render(batch, camera)

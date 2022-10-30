@@ -7,7 +7,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blendMul
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.gameworld.GameWorld
@@ -68,7 +68,7 @@ object FeaturesDrawer {
                 (App.scr.height * if (zoom < 1) 1f / zoom else zoom).roundToInt()
         )
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     /**

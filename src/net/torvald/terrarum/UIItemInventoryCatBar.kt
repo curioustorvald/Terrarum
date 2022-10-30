@@ -267,7 +267,7 @@ class UIItemInventoryCatBar(
         if (showSideButtons) sideButtons.forEach { it.render(batch, camera) }
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
 
         // underline

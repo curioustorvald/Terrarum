@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.BuildingMaker
@@ -74,7 +74,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw title bar
         batch.color = UINSMenu.DEFAULT_TITLEBACKCOL
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         Toolkit.fillArea(batch, 0, 0, width, LINE_HEIGHT)
 
         // draw "Pal."

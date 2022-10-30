@@ -295,7 +295,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
             // to hide the "flipped skybox" artefact
             batch.end()
 
-            gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
+            gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
 
             batch.begin()
 
@@ -314,7 +314,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
             lateinit var savePixmap: Pixmap
             sliderFBO.inAction(camera as OrthographicCamera, batch) {
-                gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+                gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
                 setCameraPosition(batch, camera, 0f, 0f)
                 batch.color = Color.WHITE
@@ -787,7 +787,7 @@ class UIItemWorldCells(
 
         // draw thumbnail
         batch.color = Color.WHITE
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         batch.draw(thumb ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb"), x, y, width.toFloat(), height.toFloat())
         // draw gradient
         blendMul(batch)
@@ -795,7 +795,7 @@ class UIItemWorldCells(
 
         // draw texts
         batch.color = highlightCol
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         // save status icon
         (if (saveDamaged) icons.get(1,0)

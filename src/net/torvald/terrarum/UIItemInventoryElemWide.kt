@@ -79,7 +79,7 @@ class UIItemInventoryElemWide(
     var textHighlightNormalCol = Color.WHITE
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: (equippedSlot != null && highlightEquippedItem) || forceHighlighted
         highlightToSubCol = customHighlightRule2?.invoke(this) ?: false
@@ -100,7 +100,7 @@ class UIItemInventoryElemWide(
         if (item != null && itemImage != null) {
             val amountString = amount.toItemCountText()
 
-            blendNormal(batch)
+            blendNormalStraightAlpha(batch)
             
             // item image
             batch.color = Color.WHITE

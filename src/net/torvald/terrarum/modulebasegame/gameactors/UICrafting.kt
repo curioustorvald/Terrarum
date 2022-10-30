@@ -465,7 +465,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
         // control hints
         val controlHintXPos = thisOffsetX.toFloat()
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         App.fontGame.draw(batch, controlHelp, controlHintXPos, full.yEnd - 20)
 
         
@@ -482,7 +482,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                             else 0f
         App.fontGame.draw(batch, encumbranceText, encumbBarTextXPos, encumbBarYPos - 3f)
         // encumbrance bar background
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
         val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
         batch.color = encumbBack
@@ -511,7 +511,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         }
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
     }
 
     override fun doOpening(delta: Float) {

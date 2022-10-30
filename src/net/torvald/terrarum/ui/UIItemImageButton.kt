@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 
 /**
  * Created by minjaesong on 2017-07-16.
@@ -62,7 +62,7 @@ open class UIItemImageButton(
 
 
         // draw image
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         batch.color = if (highlighted) highlightCol
         else if (mouseUp) activeCol

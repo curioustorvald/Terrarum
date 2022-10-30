@@ -207,15 +207,15 @@ internal object BlocksDrawer {
     }
 
     internal fun drawWall(projectionMatrix: Matrix4, drawGlow: Boolean) {
-        gdxSetBlendNormal()
+        gdxBlendNormalStraightAlpha()
         renderUsingBuffer(WALL, projectionMatrix, drawGlow)
 
-        gdxSetBlendMul()
+        gdxBlendMul()
         renderUsingBuffer(OCCLUSION, projectionMatrix, false)
     }
 
     internal fun drawTerrain(projectionMatrix: Matrix4, drawGlow: Boolean) {
-        gdxSetBlendNormal()
+        gdxBlendNormalStraightAlpha()
 
         renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow)
         renderUsingBuffer(FLUID, projectionMatrix, drawGlow)
@@ -223,14 +223,14 @@ internal object BlocksDrawer {
 
 
     internal fun drawFront(projectionMatrix: Matrix4) {
-        gdxSetBlendMul()
+        gdxBlendMul()
 
         // let's just not MUL on terrain, make it FLUID only...
         renderUsingBuffer(FLUID, projectionMatrix, false)
 
 
 
-        gdxSetBlendNormal()
+        gdxBlendNormalStraightAlpha()
 
         /*if (selectedWireRenderClass.isNotBlank()) {
             //println("Wires! draw: $drawWires") // use F10 instead

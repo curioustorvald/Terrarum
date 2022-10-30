@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.blockstats.MinimapComposer.MINIMAP_TILE_HEIGHT
@@ -67,7 +66,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
         val cellOffY = INVENTORY_CELLS_OFFSET_Y()
         val worldWidth = INGAME.world.width
 
@@ -145,7 +144,7 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
 
         minimapFBO.inActionF(minimapCamera, batch) {
-            gdxClearAndSetBlend(MINIMAP_SKYCOL)
+            gdxClearAndEnableBlend(MINIMAP_SKYCOL)
 
             batch.inUse {
 

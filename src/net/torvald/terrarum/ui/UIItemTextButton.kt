@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.langpack.Lang
 
 /**
@@ -102,7 +102,7 @@ open class UIItemTextButton(
         }*/
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         if (hasBorder) {
             batch.color = Toolkit.Theme.COL_CELL_FILL

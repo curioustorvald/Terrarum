@@ -237,7 +237,7 @@ internal class UIStorageChest : UICanvas(
         itemListPlayer.render(batch, camera)
 
 
-        blendNormal(batch)
+        blendNormalStraightAlpha(batch)
 
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]

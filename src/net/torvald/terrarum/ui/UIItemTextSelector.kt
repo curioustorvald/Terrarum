@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * @param width width of the text input where the text gets drawn, not the entire item
@@ -130,7 +129,7 @@ class UIItemTextSelector(
         if (fboUpdateLatch) {
             fboUpdateLatch = false
             fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
-                gdxClearAndSetBlend(0f, 0f, 0f, 0f)
+                gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
                 it.color = Color.WHITE
                 val t = labelCache[selection]
