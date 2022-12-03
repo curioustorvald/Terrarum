@@ -24,6 +24,9 @@ import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.SaveLoadError
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.savegame.VDFileID.BODYPART_TO_ENTRY_MAP
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF
 import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
 import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y
@@ -497,7 +500,7 @@ class UIItemPlayerCells(
     private var playerUUID: UUID? = null
 
     init {
-        skimmer.getFile(-1L)?.bytes?.let {
+        skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
             val json = JsonReader().parse(ByteArray64Reader(it, Common.CHARSET))
 
             playerUUID = UUID.fromString(json["uuid"]?.asString())
@@ -554,15 +557,15 @@ class UIItemPlayerCells(
     override fun render(batch: SpriteBatch, camera: Camera) {
         // try to generate a texture
         if (skimmer.initialised && !hasTexture) {
-            skimmer.getFile(-1L)?.bytes?.let {
+            skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
                 try {
                     printdbg(this, "Generating portrait for $playerName")
                     val frameName = "ANIM_IDLE_1"
-                    val animFile = skimmer.getFile(-2L)!!
+                    val animFile = skimmer.getFile(SPRITEDEF)!!
                     val props = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
 
-                    val imagesSelfContained = skimmer.hasEntry(-1025L)
-                    val bodypartMapping = Properties().also { if (imagesSelfContained) it.load(ByteArray64Reader(skimmer.getFile(-1025L)!!.bytes, Common.CHARSET)) }
+                    val imagesSelfContained = skimmer.hasEntry(BODYPART_TO_ENTRY_MAP)
+                    val bodypartMapping = Properties().also { if (imagesSelfContained) it.load(ByteArray64Reader(skimmer.getFile(BODYPART_TO_ENTRY_MAP)!!.bytes, Common.CHARSET)) }
 
                     val fileGetter = if (imagesSelfContained)
                         AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, skimmer)

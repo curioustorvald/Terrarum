@@ -28,6 +28,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -798,7 +799,7 @@ fun AppUpdateListOfSavegames() {
         println("${index+1}.\t${it.diskFile.absolutePath}")
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
-        val jsonFile = it.getFile(-1L)!!
+        val jsonFile = it.getFile(SAVEGAMEINFO)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val worldUUID = UUID.fromString(json.getString("worldIndex"))
         App.savegameWorlds[worldUUID] = it
@@ -824,7 +825,7 @@ fun AppUpdateListOfSavegames() {
         println("${index+1}.\t${it.diskFile.absolutePath}")
         it.rebuild() // disk skimmer was created without initialisation, so do it now
 
-        val jsonFile = it.getFile(-1L)!!
+        val jsonFile = it.getFile(SAVEGAMEINFO)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val playerUUID = UUID.fromString(json.getString("uuid"))
         App.savegamePlayers[playerUUID] = it

@@ -20,6 +20,7 @@ import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 
@@ -91,7 +92,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 //            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
-            val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer
+            val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
             val seed = try {
                 seedInput.getTextOrPlaceholder().toLong()
             }

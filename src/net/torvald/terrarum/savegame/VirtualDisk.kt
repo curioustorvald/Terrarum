@@ -234,20 +234,31 @@ class VirtualDisk(
     }
 }
 
+object VDFileID {
+    const val ROOT = 0L
+    const val SAVEGAMEINFO = -1L
+    const val THUMBNAIL = -2L
+    const val SPRITEDEF = -2L
+    const val SPRITEDEF_GLOW = -3L
+    const val LOADORDER = -4L
+    const val BODYPART_TO_ENTRY_MAP = -1025L
+    const val BODYPARTGLOW_TO_ENTRY_MAP = -1026L
+}
+
 fun diskIDtoReadableFilename(id: EntryID): String = when (id) {
-    0L -> "root"
-    -1L -> "savegameinfo.json"
-    -2L -> "thumbnail.tga.gz (world)/spritedef (player)"
-    -3L -> "spritedef-glow (player)"
-    -4L -> "loadOrder.txt"
+    VDFileID.ROOT -> "root"
+    VDFileID.SAVEGAMEINFO -> "savegameinfo.json"
+    VDFileID.THUMBNAIL, VDFileID.SPRITEDEF -> "thumbnail.tga.gz (world)/spritedef (player)"
+    VDFileID.SPRITEDEF_GLOW -> "spritedef-glow (player)"
+    VDFileID.LOADORDER -> "loadOrder.txt"
 //    -16L -> "blockcodex.json.gz"
 //    -17L -> "itemcodex.json.gz"
 //    -18L -> "wirecodex.json.gz"
 //    -19L -> "materialcodex.json.gz"
 //    -20L -> "factioncodex.json.gz"
 //    -1024L -> "apocryphas.json.gz"
-    -1025L -> "bodypart-to-entry.map"
-    -1026L -> "bodypartglow-to-entry.map"
+    VDFileID.BODYPART_TO_ENTRY_MAP -> "bodypart-to-entry.map"
+    VDFileID.BODYPARTGLOW_TO_ENTRY_MAP -> "bodypartglow-to-entry.map"
     in 1..65535 -> "bodypart #$id.tga.gz (player)"
     in 1048576..2147483647 -> "actor #$id.json"
     in 0x0000_0001_0000_0000L..0x0000_FFFF_FFFF_FFFFL ->

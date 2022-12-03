@@ -10,6 +10,13 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.BODYPARTGLOW_TO_ENTRY_MAP
+import net.torvald.terrarum.savegame.VDFileID.BODYPART_TO_ENTRY_MAP
+import net.torvald.terrarum.savegame.VDFileID.LOADORDER
+import net.torvald.terrarum.savegame.VDFileID.ROOT
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF
+import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF_GLOW
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.spriteassembler.ADProperties
 import java.io.Reader
@@ -95,17 +102,17 @@ object WritePlayer {
         val adlGlow = player.animDescGlow?.getRawADL() // NULLABLE!
 
         val jsonContents = EntryFile(actorJson)
-        val jsonCreationDate = playerDisk.getEntry(-1)?.creationDate ?: time_t
-        addFile(playerDisk, DiskEntry(-1L, 0L, jsonCreationDate, time_t, jsonContents))
+        val jsonCreationDate = playerDisk.getEntry(SAVEGAMEINFO)?.creationDate ?: time_t
+        addFile(playerDisk, DiskEntry(SAVEGAMEINFO, ROOT, jsonCreationDate, time_t, jsonContents))
 
         val adlContents = EntryFile(ByteArray64.fromByteArray(adl.toByteArray(Common.CHARSET)))
-        val adlCreationDate = playerDisk.getEntry(-2)?.creationDate ?: time_t
-        addFile(playerDisk, DiskEntry(-2L, 0L, adlCreationDate, time_t, adlContents))
+        val adlCreationDate = playerDisk.getEntry(SPRITEDEF)?.creationDate ?: time_t
+        addFile(playerDisk, DiskEntry(SPRITEDEF, ROOT, adlCreationDate, time_t, adlContents))
 
         if (adlGlow != null) {
             val adlGlowContents = EntryFile(ByteArray64.fromByteArray(adlGlow.toByteArray(Common.CHARSET)))
-            val adlGlowCreationDate = playerDisk.getEntry(-3)?.creationDate ?: time_t
-            addFile(playerDisk, DiskEntry(-3L, 0L, adlGlowCreationDate, time_t, adlGlowContents))
+            val adlGlowCreationDate = playerDisk.getEntry(SPRITEDEF_GLOW)?.creationDate ?: time_t
+            addFile(playerDisk, DiskEntry(SPRITEDEF_GLOW, ROOT, adlGlowCreationDate, time_t, adlGlowContents))
         }
 
         // write loadorder //
@@ -114,7 +121,7 @@ object WritePlayer {
         loadOrderBa64Writer.flush(); loadOrderBa64Writer.close()
         val loadOrderText = loadOrderBa64Writer.toByteArray64()
         val loadOrderContents = EntryFile(loadOrderText)
-        addFile(playerDisk, DiskEntry(-4L, 0L, jsonCreationDate, time_t, loadOrderContents))
+        addFile(playerDisk, DiskEntry(LOADORDER, ROOT, jsonCreationDate, time_t, loadOrderContents))
     }
 
 }
@@ -152,15 +159,25 @@ object ReadActor {
 
 
         if (actor is ActorWithBody && actor is IngamePlayer) {
-            val animFile = disk.getFile(-2L)
-            val animFileGlow = disk.getFile(-3L)
-            val bodypartsFile = disk.getFile(-1025)
+            val animFile = disk.getFile(SPRITEDEF)
+            val animFileGlow = disk.getFile(SPRITEDEF_GLOW)
+            val bodypartsFile = disk.getFile(BODYPART_TO_ENTRY_MAP)
 
             actor.animDesc = ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET))
-            actor.sprite = AssembledSpriteAnimation(actor.animDesc!!, actor, if (bodypartsFile != null) disk else null, if (bodypartsFile != null) -1025 else null)
+            actor.sprite = AssembledSpriteAnimation(
+                    actor.animDesc!!,
+                    actor,
+                    if (bodypartsFile != null) disk else null,
+                    if (bodypartsFile != null) BODYPART_TO_ENTRY_MAP else null
+            )
             if (animFileGlow != null) {
                 actor.animDescGlow = ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
-                actor.spriteGlow = AssembledSpriteAnimation(actor.animDescGlow!!, actor, if (bodypartsFile != null) disk else null, if (bodypartsFile != null) -1025 else null)
+                actor.spriteGlow = AssembledSpriteAnimation(
+                        actor.animDescGlow!!,
+                        actor,
+                        if (bodypartsFile != null) disk else null,
+                        if (bodypartsFile != null) BODYPARTGLOW_TO_ENTRY_MAP else null
+                )
             }
 
             ItemCodex.loadFromSave(disk.getBackingFile(), actor.dynamicToStaticTable, actor.dynamicItemInventory)

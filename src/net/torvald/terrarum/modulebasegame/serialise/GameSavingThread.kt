@@ -13,6 +13,10 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.LOADORDER
+import net.torvald.terrarum.savegame.VDFileID.ROOT
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.savegame.VDFileID.THUMBNAIL
 import net.torvald.terrarum.serialise.Common
 import java.io.File
 import java.util.zip.GZIPOutputStream
@@ -123,7 +127,7 @@ class WorldSavingThread(
             IngameRenderer.fboRGBexport.dispose()
 
             val thumbContent = EntryFile(tgaout.toByteArray64())
-            val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
+            val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
             addFile(disk, thumb)
         }
 
@@ -132,7 +136,7 @@ class WorldSavingThread(
         // Write World //
 
         val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t, actorsList, playersList))
-        val world = DiskEntry(-1L, 0, creation_t, time_t, worldMeta)
+        val world = DiskEntry(SAVEGAMEINFO, ROOT, creation_t, time_t, worldMeta)
         addFile(disk, world)
 
         WriteSavegame.saveProgress += 1f
@@ -149,7 +153,7 @@ class WorldSavingThread(
                     val entryID = 0x1_0000_0000L or layer.toLong().shl(24) or chunkNumber
 
                     val entryContent = EntryFile(chunkBytes)
-                    val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)
+                    val entry = DiskEntry(entryID, ROOT, creation_t, time_t, entryContent)
                     // "W1L0-92,15"
                     addFile(disk, entry)
 
@@ -164,7 +168,7 @@ class WorldSavingThread(
 //            Echo("Writing actors... ${count+1}/${actorsList.size}")
 
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-            val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
+            val actor = DiskEntry(it.referenceID.toLong(), ROOT, creation_t, time_t, actorContent)
             addFile(disk, actor)
 
             WriteSavegame.saveProgress += 1
@@ -177,7 +181,7 @@ class WorldSavingThread(
         loadOrderBa64Writer.flush(); loadOrderBa64Writer.close()
         val loadOrderText = loadOrderBa64Writer.toByteArray64()
         val loadOrderContents = EntryFile(loadOrderText)
-        addFile(disk, DiskEntry(-4L, 0L, creation_t, time_t, loadOrderContents))
+        addFile(disk, DiskEntry(LOADORDER, ROOT, creation_t, time_t, loadOrderContents))
 
 
 

@@ -7,6 +7,9 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.ROOT
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.savegame.VDFileID.THUMBNAIL
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.PlayerLastStatus
@@ -78,7 +81,7 @@ class QuickSingleplayerWorldSavingThread(
             IngameRenderer.fboRGBexport.dispose()
 
             val thumbContent = EntryFile(tgaout.toByteArray64())
-            val thumb = DiskEntry(-2, 0, creation_t, time_t, thumbContent)
+            val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
             addFile(disk, thumb)
         }
 
@@ -90,7 +93,7 @@ class QuickSingleplayerWorldSavingThread(
             ingame.world.playersLastStatus[it.uuid] = PlayerLastStatus(it, ingame.isMultiplayer)
         }
         val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t, actorsList, playersList))
-        val world = DiskEntry(-1L, 0, creation_t, time_t, worldMeta)
+        val world = DiskEntry(SAVEGAMEINFO, ROOT, creation_t, time_t, worldMeta)
         addFile(disk, world); skimmer.appendEntryOnly(world)
 
         WriteSavegame.saveProgress += 1f
@@ -112,7 +115,7 @@ class QuickSingleplayerWorldSavingThread(
                         val entryID = 0x1_0000_0000L or layerNum.toLong().shl(24) or chunkNumber.toLong()
 
                         val entryContent = EntryFile(chunkBytes)
-                        val entry = DiskEntry(entryID, 0, creation_t, time_t, entryContent)
+                        val entry = DiskEntry(entryID, ROOT, creation_t, time_t, entryContent)
                         // "W1L0-92,15"
                         addFile(disk, entry); skimmer.appendEntryOnly(entry)
 
@@ -130,7 +133,7 @@ class QuickSingleplayerWorldSavingThread(
             printdbg(this, "Writing actors... ${count+1}/${actorsList.size}")
 
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-            val actor = DiskEntry(it.referenceID.toLong(), 0, creation_t, time_t, actorContent)
+            val actor = DiskEntry(it.referenceID.toLong(), ROOT, creation_t, time_t, actorContent)
             addFile(disk, actor); skimmer.appendEntryOnly(actor)
 
             WriteSavegame.saveProgress += actorProgressMultiplier

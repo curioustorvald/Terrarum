@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
@@ -120,13 +121,13 @@ object LoadSavegame {
      */
     operator fun invoke(playerDisk: DiskSkimmer, worldDisk0: DiskSkimmer? = null) {
         val newIngame = TerrarumIngame(App.batch)
-        val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(-1L)!!.bytes, Common.CHARSET)) as IngamePlayer
+        val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
 
         printdbg(this, "Player localhash: ${player.localHashStr}, hasSprite: ${player.sprite != null}")
 
         val currentWorldId = player.worldCurrentlyPlaying
         val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!
-        val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(-1L)!!.bytes, Common.CHARSET), worldDisk.diskFile)
+        val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET), worldDisk.diskFile)
 
         world.layerTerrain = BlockLayer(world.width, world.height)
         world.layerWall = BlockLayer(world.width, world.height)
