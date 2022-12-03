@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ModuleRenamingHistory">
-    <module old-name="terrarum" new-name="terrarum.terrarum" />
+    <module old-name="terrarum" new-name="TerrarumBuild" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ModuleComputers/ModuleComputers.iml" filepath="$PROJECT_DIR$/ModuleComputers/ModuleComputers.iml" />
-      <module fileurl="file://$PROJECT_DIR$/terrarum.terrarum.iml" filepath="$PROJECT_DIR$/terrarum.terrarum.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TerrarumBuild.iml" filepath="$PROJECT_DIR$/TerrarumBuild.iml" />
     </modules>
   </component>
 </project>

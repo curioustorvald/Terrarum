@@ -8,7 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="ModuleComputersLib" level="project" />
-    <orderEntry type="module" module-name="terrarum.terrarum" />
+    <orderEntry type="module" module-name="TerrarumBuild" />
     <orderEntry type="library" name="com.badlogicgames.gdx:gdx-backend-lwjgl3:1.10.0" level="project" />
     <orderEntry type="library" name="com.badlogicgames.gdx:gdx:1.10.0" level="project" />
     <orderEntry type="library" name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0" level="project" />

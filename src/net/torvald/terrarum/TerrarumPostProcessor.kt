@@ -77,6 +77,8 @@ object TerrarumPostProcessor : Disposable {
         outFBO.dispose()
     }
 
+    private var deltatBenchStr = "ΔF: Gathering data"
+
     fun draw(projMat: Matrix4, fbo: FrameBuffer): FrameBuffer {
 
         // init
@@ -156,10 +158,9 @@ object TerrarumPostProcessor : Disposable {
                 }
 
                 if (KeyToggler.isOn(App.getConfigInt("debug_key_deltat_benchmark"))) {
-                    batch.color = Toolkit.Theme.COL_ACTIVE
-                    batch.inUse {
+                    if (INGAME.WORLD_UPDATE_TIMER % 64 == 42) {
                         // we're going to assume the data are normally distributed
-                        val benchstr = if (INGAME.deltaTeeBenchmarks.elemCount < INGAME.deltaTeeBenchmarks.size) {
+                        deltatBenchStr = if (INGAME.deltaTeeBenchmarks.elemCount < INGAME.deltaTeeBenchmarks.size) {
                             "ΔF: Gathering data (${INGAME.deltaTeeBenchmarks.elemCount}/${INGAME.deltaTeeBenchmarks.size})"
                         }
                         else {
@@ -178,8 +179,11 @@ object TerrarumPostProcessor : Disposable {
                             val low1 = FastMath.interpolateLinear(low1pos - low1ind, tallies[low1ind], tallies[low1ind + 1])
                             "ΔF: Avr ${average.format(1)}; Med ${median.format(1)}; 5% ${low5.format(1)}; 1% ${low1.format(1)}"
                         }
-                        val tw = App.fontGame.getWidth(benchstr)
-                        App.fontGame.draw(it, benchstr, Toolkit.drawWidth - tw - 5f, App.scr.height - 24f)
+                    }
+                    batch.color = Toolkit.Theme.COL_ACTIVE
+                    batch.inUse {
+                        val tw = App.fontGame.getWidth(deltatBenchStr)
+                        App.fontGame.draw(it, deltatBenchStr, Toolkit.drawWidth - tw - 5f, App.scr.height - 24f)
                     }
                 }
             }

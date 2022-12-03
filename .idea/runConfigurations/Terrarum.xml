@@ -5,7 +5,7 @@
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="ALTERNATIVE_JRE_PATH" value="17" />
-    <module name="terrarum.terrarum" />
+    <module name="TerrarumBuild" />
     <method v="2">
       <option name="BuildArtifacts" enabled="true">
         <artifact name="ModuleComputers" />
