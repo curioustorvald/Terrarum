@@ -173,7 +173,7 @@ object VDUtil {
 
                         val crcMsg =
                             "CRC failed: stored value is ${entryCRC.toHex()}, but calculated value is ${calculatedCRC.toHex()}\n" +
-                                    "at file \"${diskIDtoReadableFilename(diskEntry.entryID)}\" (entry ID ${diskEntry.entryID})"
+                                    "at file \"${diskIDtoReadableFilename(diskEntry.entryID, vdisk.saveKind)}\" (entry ID ${diskEntry.entryID})"
 
                         if (calculatedCRC != entryCRC) {
 
@@ -196,7 +196,7 @@ object VDUtil {
                 }
             }
             catch (e: ArrayIndexOutOfBoundsException) {
-                System.err.println("An error occurred while reading a file (entryID: $entryID (${diskIDtoReadableFilename(entryID)}), typeFlag: $entryTypeFlag)")
+                System.err.println("An error occurred while reading a file (entryID: $entryID (${diskIDtoReadableFilename(entryID, vdisk.saveKind)}), typeFlag: $entryTypeFlag)")
                 System.err.println("Stack trace:")
                 e.printStackTrace()
                 break

@@ -139,7 +139,7 @@ class VirtualDiskCracker(val sysCharset: Charset = Charsets.UTF_8) : JFrame() {
                     if (vdisk != null) {
                         val entry = currentDirectoryEntries!![rowIndex - 1]
                         return when(columnIndex) {
-                            0 -> diskIDtoReadableFilename(entry.entryID)
+                            0 -> diskIDtoReadableFilename(entry.entryID, vdisk?.saveKind)
                             1 -> Instant.ofEpochSecond(entry.modificationDate).
                                     atZone(TimeZone.getDefault().toZoneId()).
                                     format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -623,7 +623,7 @@ class VirtualDiskCracker(val sysCharset: Charset = Charsets.UTF_8) : JFrame() {
     private fun updateDiskInfo() {
         val sb = StringBuilder()
         directoryHierarchy.forEach {
-            sb.append(diskIDtoReadableFilename(it))
+            sb.append(diskIDtoReadableFilename(it, vdisk?.saveKind))
             sb.append('/')
         }
         sb.dropLast(1)
@@ -647,7 +647,7 @@ Write protected: ${disk.isReadOnly.toEnglish()}"""
 
 
     private fun getFileInfoText(file: DiskEntry): String {
-        return """Name: ${diskIDtoReadableFilename(file.entryID)}
+        return """Name: ${diskIDtoReadableFilename(file.entryID, vdisk?.saveKind)}
 Size: ${file.getEffectiveSize()}
 Type: ${DiskEntry.getTypeString(file.contents)}
 CRC: ${file.hashCode().toHex()}

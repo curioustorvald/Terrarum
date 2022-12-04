@@ -169,10 +169,10 @@ removefile:
 
             if (typeFlag > 0) {
                 entryToOffsetTable[entryID] = offset
-                debugPrintln("[DiskSkimmer] ... successfully read the entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
+                debugPrintln("[DiskSkimmer] ... successfully read the entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
             }
             else {
-                debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID)})")
+                debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
             }
         }
 
@@ -343,8 +343,18 @@ removefile:
         fa.writeByte(bits)
     }
 
+    fun setSaveKind(bits: Int) {
+        fa.seek(50L)
+        fa.writeByte(bits)
+    }
+
     fun getSaveMode(): Int {
         fa.seek(49L)
+        return fa.read()
+    }
+
+    fun getSaveKind(): Int {
+        fa.seek(50L)
         return fa.read()
     }
 

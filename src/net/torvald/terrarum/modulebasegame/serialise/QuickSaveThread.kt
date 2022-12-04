@@ -140,9 +140,12 @@ class QuickSingleplayerWorldSavingThread(
         }
 
 
+        disk.saveKind = VDSaveKind.WORLD_DATA
+
         skimmer.rewriteDirectories()
         skimmer.injectDiskCRC(disk.hashCode())
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
+        skimmer.setSaveKind(VDSaveKind.WORLD_DATA)
 
         printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 

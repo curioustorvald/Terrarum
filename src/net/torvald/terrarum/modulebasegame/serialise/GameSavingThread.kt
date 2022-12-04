@@ -62,6 +62,7 @@ class WorldSavingThread(
     override fun save() {
 
         disk.saveMode = 2 * isAuto.toInt() // no quick
+        disk.saveKind = VDSaveKind.WORLD_DATA
 
         if (hasThumbnail) {
             while (!IngameRenderer.fboRGBexportedLatch) {
@@ -224,6 +225,7 @@ class PlayerSavingThread(
 
     override fun save() {
         disk.saveMode = 2 * isAuto.toInt() // no quick
+        disk.saveKind = VDSaveKind.PLAYER_DATA
         disk.capacity = 0L
 
         WriteSavegame.saveProgress = 0f

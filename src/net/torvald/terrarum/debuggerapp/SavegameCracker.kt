@@ -195,7 +195,7 @@ class SavegameCracker(
             it.entries.toSortedMap().forEach { (i, entry) ->
                 if (i != 0L) println(
                     ccNoun + i.toString(10).padStart(11, ' ') + " " +
-                    ccNoun2 + (diskIDtoReadableFilename(entry.entryID) + cc0).padEnd(40) { if (it == 0) ' ' else '.' }  +
+                    ccNoun2 + (diskIDtoReadableFilename(entry.entryID, it.saveKind) + cc0).padEnd(40) { if (it == 0) ' ' else '.' }  +
                     ccConst + " " + entry.contents.getSizePure() + " bytes"
                 )
             }
