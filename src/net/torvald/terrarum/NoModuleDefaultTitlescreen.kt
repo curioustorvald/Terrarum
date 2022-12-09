@@ -24,7 +24,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
 
     private var init = false
 
-    private val pathText = App.loadOrderDir
+    private val pathText = App.loadOrderDir.let { if (App.operationSystem == "WINDOWS") it.replace('/','\\') else it.replace('\\','/') }
     private val pathFile = File(App.loadOrderDir)//.parentFile
     private val pathButtonW = App.fontGameFBO.getWidth(pathText)
     private val pathButtonH = 20
