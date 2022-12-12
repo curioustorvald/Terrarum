@@ -156,30 +156,30 @@ class UIItemTextSelector(
             }
 
             // left button border
-            batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
-            else if (mouseOnButton == 1) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
+            batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_SELECTED
+            else if (mouseOnButton == 1) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
             Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, buttonW + 2, height + 2)
 
             // right button border
-            batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
-            else if (mouseOnButton == 2) Toolkit.Theme.COL_ACTIVE else Toolkit.Theme.COL_INACTIVE
+            batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_SELECTED
+            else if (mouseOnButton == 2) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
             Toolkit.drawBoxBorder(batch, posX + width - buttonW - 1, posY - 1, buttonW + 2, height + 2)
 
             // text area border (again)
             if (!paletteShowing && mouseOnButton == 3) {
-                batch.color = Toolkit.Theme.COL_ACTIVE
+                batch.color = Toolkit.Theme.COL_MOUSE_UP
                 Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 4, height + 2)
             }
         }
 
         // left button icon
-        batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
-        else if (mouseOnButton == 1) Toolkit.Theme.COL_ACTIVE else UIItemTextLineInput.TEXTINPUT_COL_TEXT
+        batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_SELECTED
+        else if (mouseOnButton == 1) Toolkit.Theme.COL_MOUSE_UP else UIItemTextLineInput.TEXTINPUT_COL_TEXT
         batch.draw(labels.get(16,0), posX + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // right button icon
-        batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_HIGHLIGHT
-        else if (mouseOnButton == 2) Toolkit.Theme.COL_ACTIVE else UIItemTextLineInput.TEXTINPUT_COL_TEXT
+        batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_SELECTED
+        else if (mouseOnButton == 2) Toolkit.Theme.COL_MOUSE_UP else UIItemTextLineInput.TEXTINPUT_COL_TEXT
         batch.draw(labels.get(17,0), posX + width - buttonW + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // draw text
@@ -202,13 +202,13 @@ class UIItemTextSelector(
             batch.color = palCursorCol
             Toolkit.drawBoxBorder(batch, posX + buttonW + 2, posY - 1, width - 2*buttonW - 4, height + 2)
             // palette border
-            batch.color = Toolkit.Theme.COL_ACTIVE
+            batch.color = Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, palX-1, palY-1, palW+2, palH+2)
 
             // palette items
             labelCache.forEachIndexed { index, s ->
-                batch.color = if (index == selection) Toolkit.Theme.COL_HIGHLIGHT
-                    else if (index == mouseOnPaletteItem) Toolkit.Theme.COL_ACTIVE
+                batch.color = if (index == selection) Toolkit.Theme.COL_SELECTED
+                    else if (index == mouseOnPaletteItem) Toolkit.Theme.COL_MOUSE_UP
                     else UIItemTextLineInput.TEXTINPUT_COL_TEXT
                 val t = labelCache[index]
                 val tw = App.fontGame.getWidth(t)

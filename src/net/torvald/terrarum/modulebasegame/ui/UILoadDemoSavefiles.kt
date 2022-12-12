@@ -539,7 +539,7 @@ class UIItemPlayerCells(
     internal var hasTexture = false
         private set
 
-    private val litCol = Toolkit.Theme.COL_ACTIVE
+    private val litCol = Toolkit.Theme.COL_MOUSE_UP
     private val cellCol = CELL_COL
     private val defaultCol = Color.WHITE
     private val hruleCol = Color(1f,1f,1f,0.35f)
@@ -755,7 +755,7 @@ class UIItemWorldCells(
 
     override fun update(delta: Float) {
         super.update(delta)
-        highlightCol = if (mouseUp) Toolkit.Theme.COL_ACTIVE else Color.WHITE
+        highlightCol = if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Color.WHITE
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {

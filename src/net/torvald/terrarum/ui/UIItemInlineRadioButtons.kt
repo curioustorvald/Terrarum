@@ -79,7 +79,7 @@ class UIItemInlineRadioButtons(
         // mouseover borders and text
         if (mouseOnSelection > -1 && mouseOnSelection != selection) {
             val xpos = getCellX(mouseOnSelection)
-            batch.color = Toolkit.Theme.COL_ACTIVE
+            batch.color = Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, xpos - 1, posY - 1, cellWidth + 2, height + 2)
             val text = labelfuns[mouseOnSelection]()
             val tw = App.fontGame.getWidth(text)
@@ -88,7 +88,7 @@ class UIItemInlineRadioButtons(
 
         // selection borders and text
         val xpos = getCellX(selection)
-        batch.color = Toolkit.Theme.COL_HIGHLIGHT
+        batch.color = Toolkit.Theme.COL_SELECTED
         Toolkit.drawBoxBorder(batch, xpos - 1, posY - 1, cellWidth + 2, height + 2)
         val text = labelfuns[selection]()
         val tw = App.fontGame.getWidth(text)

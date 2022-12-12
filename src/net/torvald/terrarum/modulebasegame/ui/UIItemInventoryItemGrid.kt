@@ -239,7 +239,7 @@ open class UIItemInventoryItemGrid(
                 activeBackCol = Color(0),
                 highlightBackCol = Color(0),
                 activeBackBlendMode = BlendMode.NORMAL,
-                activeCol = Toolkit.Theme.COL_ACTIVE,
+                activeCol = Toolkit.Theme.COL_MOUSE_UP,
                 initialX = iconPosX,
                 initialY = getIconPosY(index),
                 highlightable = true
@@ -252,7 +252,7 @@ open class UIItemInventoryItemGrid(
             backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = Toolkit.Theme.COL_ACTIVE,
+            activeCol = Toolkit.Theme.COL_MOUSE_UP,
             initialX = iconPosX,
             initialY = getIconPosY(2),
             highlightable = false
@@ -264,7 +264,7 @@ open class UIItemInventoryItemGrid(
             backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = Toolkit.Theme.COL_ACTIVE,
+            activeCol = Toolkit.Theme.COL_MOUSE_UP,
             initialX = iconPosX,
             initialY = getIconPosY(3),
             highlightable = false

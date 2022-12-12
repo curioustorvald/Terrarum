@@ -96,13 +96,13 @@ object UIItemInventoryCellCommonRes {
     }
 
     val defaultInventoryCellTheme = InventoryCellColourTheme(
-            Toolkit.Theme.COL_HIGHLIGHT,
+            Toolkit.Theme.COL_SELECTED,
             Toolkit.Theme.COL_LIST_DEFAULT,
-            Toolkit.Theme.COL_ACTIVE,
+            Toolkit.Theme.COL_MOUSE_UP,
             Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
-            Toolkit.Theme.COL_HIGHLIGHT,
+            Toolkit.Theme.COL_SELECTED,
             Color.WHITE,
-            Toolkit.Theme.COL_ACTIVE,
+            Toolkit.Theme.COL_MOUSE_UP,
             Color.WHITE,
     )
 }

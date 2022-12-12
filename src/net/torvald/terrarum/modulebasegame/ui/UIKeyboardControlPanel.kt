@@ -286,8 +286,8 @@ private class UIItemKeycap(
 
     private val borderKeyForbidden = Color(0x000000C0)
     private val borderKeyNormal = Toolkit.Theme.COL_INACTIVE
-    private val borderMouseUp = Toolkit.Theme.COL_ACTIVE
-    private val borderKeyPressed = Toolkit.Theme.COL_HIGHLIGHT
+    private val borderMouseUp = Toolkit.Theme.COL_MOUSE_UP
+    private val borderKeyPressed = Toolkit.Theme.COL_SELECTED
     private val borderKeyPressedAndSelected = Color(0x33FF33FF.toInt())
 
     private val keycapFill = Toolkit.Theme.COL_CELL_FILL

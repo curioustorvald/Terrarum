@@ -31,13 +31,13 @@ class UIItemTextButtonList(
 
         // copied directly from UIItemTextButton
         /** Colour when mouse is over */
-        val activeCol: Color = Toolkit.Theme.COL_ACTIVE,
+        val activeCol: Color = Toolkit.Theme.COL_MOUSE_UP,
         /** Colour when mouse is over */
         val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
         /** Colour when mouse is over */
         val activeBackBlendMode: String = BlendMode.NORMAL,
         /** Colour when clicked/selected */
-        val highlightCol: Color = Toolkit.Theme.COL_HIGHLIGHT,
+        val highlightCol: Color = Toolkit.Theme.COL_SELECTED,
         /** Colour when clicked/selected */
         val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
         /** Colour when clicked/selected */

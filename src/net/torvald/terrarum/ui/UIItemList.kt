@@ -22,10 +22,10 @@ class UIItemList<Item: UIItem>(
         val defaultSelection: Int? = null, // negative: INVALID, positive: valid, null: no select
 
         // copied directly from UIItemTextButton
-        val activeCol: Color = Toolkit.Theme.COL_ACTIVE,
+        val activeCol: Color = Toolkit.Theme.COL_MOUSE_UP,
         val activeBackCol: Color = Color(0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = Toolkit.Theme.COL_HIGHLIGHT,
+        val highlightCol: Color = Toolkit.Theme.COL_SELECTED,
         val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = Toolkit.Theme.COL_INACTIVE,

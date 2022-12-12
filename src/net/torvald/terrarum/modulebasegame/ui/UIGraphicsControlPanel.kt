@@ -129,7 +129,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             batch.color = Color(0x00f8ff_40)
             Toolkit.fillArea(batch, xstart + 1, 1, App.scr.chatWidth - 2, App.scr.height - 2)
 
-            batch.color = Toolkit.Theme.COL_ACTIVE
+            batch.color = Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, xstart + 1, 1, App.scr.chatWidth - 2, App.scr.height - 2)
 
             val overlayResTxt = "${(App.scr.chatWidth * App.scr.magn).ceilInt()}$TIMES${App.scr.windowH}"

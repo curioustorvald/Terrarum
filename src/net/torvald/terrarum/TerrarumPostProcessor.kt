@@ -180,7 +180,7 @@ object TerrarumPostProcessor : Disposable {
                             "ΔF: Avr ${average.format(1)}; Med ${median.format(1)}; 5% ${low5.format(1)}; 1% ${low1.format(1)}"
                         }
                     }
-                    batch.color = Toolkit.Theme.COL_ACTIVE
+                    batch.color = Toolkit.Theme.COL_MOUSE_UP
                     batch.inUse {
                         val tw = App.fontGame.getWidth(deltatBenchStr)
                         App.fontGame.draw(it, deltatBenchStr, Toolkit.drawWidth - tw - 5f, App.scr.height - 24f)

@@ -23,8 +23,8 @@ object Toolkit : Disposable {
 
         val COL_LIST_DEFAULT = Color.WHITE
         val COL_INACTIVE = Color.LIGHT_GRAY
-        val COL_ACTIVE = Color(0xfff066_ff.toInt()) // yellow
-        val COL_HIGHLIGHT = Color(0x00f8ff_ff) // cyan
+        val COL_SELECTED = Color(0x00f8ff_ff) // cyan, HIGHLY SATURATED
+        val COL_MOUSE_UP = Color(0xfff066_ff.toInt()) // yellow (all yellows are of low saturation according to the colour science)
         val COL_DISABLED = Color(0xaaaaaaff.toInt())
     }
 

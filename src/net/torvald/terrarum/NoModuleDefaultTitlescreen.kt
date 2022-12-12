@@ -96,7 +96,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
             fbatch.inUse {
                 it.color = Color.WHITE
                 it.draw(fbo.colorBufferTexture, 0f, fbo.height.toFloat(), fbo.width.toFloat(), -fbo.height.toFloat())
-                it.color = if (mouseOnLink) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_ACTIVE
+                it.color = if (mouseOnLink) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP
                 App.fontGame.draw(it, pathText, pathButtonX, pathButtonY)
             }
 

@@ -112,7 +112,7 @@ class UIItemInventoryCatBar(
                     initialX = iconPosX,
                     initialY = posY + iconPosY,
                     inactiveCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),
-                    activeCol = if (index == 0 || index == 3) Toolkit.Theme.COL_ACTIVE else Color(0xffffff7f.toInt()),
+                    activeCol = if (index == 0 || index == 3) Toolkit.Theme.COL_MOUSE_UP else Color(0xffffff7f.toInt()),
                     highlightable = (index == 0 || index == 3)
             )
         }

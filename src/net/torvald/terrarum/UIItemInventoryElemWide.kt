@@ -68,14 +68,14 @@ class UIItemInventoryElemWide(
     private var highlightToMainCol = false
     private var highlightToSubCol = false
 
-    var cellHighlightMainCol = Toolkit.Theme.COL_HIGHLIGHT
+    var cellHighlightMainCol = Toolkit.Theme.COL_SELECTED
     var cellHighlightSubCol = Toolkit.Theme.COL_LIST_DEFAULT
-    var cellHighlightMouseUpCol = Toolkit.Theme.COL_ACTIVE
+    var cellHighlightMouseUpCol = Toolkit.Theme.COL_MOUSE_UP
     var cellHighlightNormalCol = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
 
-    var textHighlightMainCol = Toolkit.Theme.COL_HIGHLIGHT
+    var textHighlightMainCol = Toolkit.Theme.COL_SELECTED
     var textHighlightSubCol = Color.WHITE
-    var textHighlightMouseUpCol = Toolkit.Theme.COL_ACTIVE
+    var textHighlightMouseUpCol = Toolkit.Theme.COL_MOUSE_UP
     var textHighlightNormalCol = Color.WHITE
 
     override fun render(batch: SpriteBatch, camera: Camera) {

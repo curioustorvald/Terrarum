@@ -519,21 +519,21 @@ class UIItemTextLineInput(
 
         // text area border (pop-up for isActive)
         if (isActive) {
-            batch.color = Toolkit.Theme.COL_HIGHLIGHT
+            batch.color = Toolkit.Theme.COL_SELECTED
             Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2) // this is a full border, not a text area
         }
 
         // button border
         if (mouseUpOnPasteButton) {
-            batch.color = if (mouseDown) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_ACTIVE
+            batch.color = if (mouseDown) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, btn2PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
         }
         else if (mouseUpOnIMEButton) {
-            batch.color = if (mouseDown) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_ACTIVE
+            batch.color = if (mouseDown) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, btn1PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
         }
         else if (mouseUpOnTextArea && !isActive) {
-            batch.color = Toolkit.Theme.COL_ACTIVE
+            batch.color = Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, inputPosX - 1, posY - 1, fbo.width + 2 * UI_TEXT_MARGIN+ 2, height + 2)
         }
 
@@ -558,10 +558,10 @@ class UIItemTextLineInput(
 
         // draw icon
         // IME button
-        batch.color = if (mouseUpOnIMEButton && mouseDown || imeOn) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnIMEButton) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
+        batch.color = if (mouseUpOnIMEButton && mouseDown || imeOn) Toolkit.Theme.COL_MOUSE_UP else if (mouseUpOnIMEButton) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_INACTIVE
         batch.draw(imeButton, btn1PosX + 2f, posY + 2f)
         // paste button
-        batch.color = if (mouseUpOnPasteButton && mouseDown) Toolkit.Theme.COL_ACTIVE else if (mouseUpOnPasteButton) Toolkit.Theme.COL_HIGHLIGHT else Toolkit.Theme.COL_INACTIVE
+        batch.color = if (mouseUpOnPasteButton && mouseDown) Toolkit.Theme.COL_MOUSE_UP else if (mouseUpOnPasteButton) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_INACTIVE
         batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
 
         // state of the candidates are concurrently changing, so we buffer them
@@ -588,7 +588,7 @@ class UIItemTextLineInput(
                 batch.color = candidatesBackCol
                 Toolkit.fillArea(batch, candidatePosX, candidatePosY, candidateWinW + 4, candidateWinH)
                 // candidate view border
-                batch.color = Toolkit.Theme.COL_ACTIVE
+                batch.color = Toolkit.Theme.COL_MOUSE_UP
                 Toolkit.drawBoxBorder(batch, candidatePosX - 1, candidatePosY - 1, candidateWinW + 6, candidateWinH + 2)
 
                 // candidate texts
@@ -613,7 +613,7 @@ class UIItemTextLineInput(
                 batch.color = candidatesBackCol
                 Toolkit.fillArea(batch, candidatePosX, candidatePosY, candidateWinW, candidateWinH)
                 // candidate view border
-                batch.color = Toolkit.Theme.COL_ACTIVE
+                batch.color = Toolkit.Theme.COL_MOUSE_UP
                 Toolkit.drawBoxBorder(batch, candidatePosX - 1, candidatePosY - 1, candidateWinW + 2, candidateWinH + 2)
 
                 val previewTextWidth = textWidths[0]
