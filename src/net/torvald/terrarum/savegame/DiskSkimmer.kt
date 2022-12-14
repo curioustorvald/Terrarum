@@ -123,7 +123,7 @@ removefile:
         fun readUshortBig(): Int {
             val buffer = ByteArray(2)
             val readStatus = readBytes(buffer)
-            if (readStatus != 2) throw InternalError("Unexpected error -- EOF reached? (expected 4, got $readStatus)")
+            if (readStatus != 2) throw InternalError("Unexpected error -- EOF reached? (expected 2, got $readStatus)")
             return buffer.toShortBig()
         }
         fun readIntBig(): Int {
