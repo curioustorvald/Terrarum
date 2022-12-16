@@ -32,7 +32,8 @@ class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
 
         fun fromByteArray(byteArray: ByteArray): ByteArray64 {
             val ba64 = ByteArray64(byteArray.size.toLong())
-            byteArray.forEachIndexed { i, byte -> ba64[i.toLong()] = byte }
+//            byteArray.forEachIndexed { i, byte -> ba64[i.toLong()] = byte }
+            ba64.appendBytes(byteArray)
             return ba64
         }
     }
