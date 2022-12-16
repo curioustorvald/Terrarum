@@ -291,7 +291,7 @@ object Common {
         while (true) {
             val byte = zi.read()
             if (byte == -1) break
-            unzipdBytes.add(byte.toByte())
+            unzipdBytes.appendByte(byte.toByte())
         }
         zi.close()
         return unzipdBytes
@@ -307,14 +307,14 @@ object Common {
             val char = reader.read()
             if (char < 0) break
             if (bai > 0 && bai % 5 == 0) {
-                Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
+                unasciidBytes.appendBytes(Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]))
                 buf.fill(Ascii85.PAD_CHAR)
             }
 
             buf[bai % 5] = char.toChar()
 
             bai += 1
-        }; Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]).forEach { unasciidBytes.add(it) }
+        }; unasciidBytes.appendBytes(Ascii85.decode(buf[0], buf[1], buf[2], buf[3], buf[4]))
 
         return unasciidBytes
     }

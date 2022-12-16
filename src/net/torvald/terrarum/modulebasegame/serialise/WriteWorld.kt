@@ -83,8 +83,8 @@ object WriteWorld {
         for (y in cy * LandUtil.CHUNK_H until (cy + 1) * LandUtil.CHUNK_H) {
             for (x in cx * LandUtil.CHUNK_W until (cx + 1) * LandUtil.CHUNK_W) {
                 val tilenum = layer.unsafeGetTile(x, y)
-                ba.add(tilenum.ushr(8).and(255).toByte())
-                ba.add(tilenum.and(255).toByte())
+                ba.appendByte(tilenum.ushr(8).and(255).toByte())
+                ba.appendByte(tilenum.and(255).toByte())
             }
         }
 

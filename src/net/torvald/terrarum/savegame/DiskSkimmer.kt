@@ -9,9 +9,9 @@ import java.util.logging.Level
 import kotlin.experimental.and
 
 /**
- * Skimming allows modifying the Virtual Disk without loading entire disk onto the memory.
+ * Skimmer allows modifications of the Virtual Disk without building a DOM (disk object model).
  *
- * Skimmer will just scan through the raw bytes of the Virtual Disk to get the file requested with its Entry ID;
+ * Skimmer will scan through the raw bytes of the Virtual Disk to get the file requested with its Entry ID;
  * modifying/removing files will edit the Virtual Disk in "dirty" way, where old entries are simply marked as deletion
  * and leaves the actual contents untouched, then will simply append modified files at the end.
  *

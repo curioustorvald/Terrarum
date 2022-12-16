@@ -18,7 +18,7 @@ import java.nio.charset.UnsupportedCharsetException
  *
  * Created by Minjaesong on 2017-04-12.
  */
-class ByteArray64(initialSize: Long = bankSize.toLong()) {
+class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
     var internalCapacity: Long = initialSize
         private set
 
@@ -28,7 +28,7 @@ class ByteArray64(initialSize: Long = bankSize.toLong()) {
     private var finalised = false
 
     companion object {
-        val bankSize: Int = 8192
+        val BANK_SIZE: Int = 8192
 
         fun fromByteArray(byteArray: ByteArray): ByteArray64 {
             val ba64 = ByteArray64(byteArray.size.toLong())
@@ -47,16 +47,16 @@ class ByteArray64(initialSize: Long = bankSize.toLong()) {
         if (internalCapacity < 0)
             throw IllegalArgumentException("Invalid array size: $internalCapacity")
         else if (internalCapacity == 0L) // signalling empty array
-            internalCapacity = bankSize.toLong()
+            internalCapacity = BANK_SIZE.toLong()
 
         val requiredBanks: Int = (initialSize - 1).toBankNumber() + 1
 
         __data = ArrayList<ByteArray>(requiredBanks)
-        repeat(requiredBanks) { __data.add(ByteArray(bankSize)) }
+        repeat(requiredBanks) { __data.add(ByteArray(BANK_SIZE)) }
     }
 
-    private fun Long.toBankNumber(): Int = (this / bankSize).toInt()
-    private fun Long.toBankOffset(): Int = (this % bankSize).toInt()
+    private fun Long.toBankNumber(): Int = (this / BANK_SIZE).toInt()
+    private fun Long.toBankOffset(): Int = (this % BANK_SIZE).toInt()
 
     operator fun set(index: Long, value: Byte) {
         checkMutability()
@@ -74,7 +74,62 @@ class ByteArray64(initialSize: Long = bankSize.toLong()) {
         }
     }
 
-    fun add(value: Byte) = set(size, value)
+    fun appendByte(value: Byte) = set(size, value)
+
+    fun appendBytes(bytes: ByteArray64) {
+        checkMutability()
+        ensureCapacity(size + bytes.size)
+
+        val bankOffset = size.toBankOffset()
+        val initialBankNumber = size.toBankNumber()
+        val remaining = BANK_SIZE - bankOffset
+
+        bytes.forEachUsedBanksIndexed { index, bytesInBank, srcBank ->
+            // as the data must be written bank-aligned, each bank copy requires two separate copies, split by the
+            // 'remaining' below
+            if (remaining < bytesInBank) { // 'remaining' should never be less than zero
+                System.arraycopy(srcBank, 0, __data[initialBankNumber + index], bankOffset, remaining)
+                System.arraycopy(srcBank, remaining, __data[initialBankNumber + index + 1], 0, bytesInBank - remaining)
+            }
+            else if (bytesInBank > 0) {
+                System.arraycopy(srcBank, 0, __data[initialBankNumber + index], bankOffset, bytesInBank)
+            }
+        }
+
+        size += bytes.size
+    }
+
+    fun appendBytes(bytes: ByteArray) {
+        checkMutability()
+        ensureCapacity(size + bytes.size)
+        val bankOffset = size.toBankOffset()
+        var currentBankNumber = size.toBankNumber()
+        val remainingInHeadBank = BANK_SIZE - bankOffset // how much space left in the current (= head) bank
+        var remainingBytesToCopy = bytes.size
+        var srcCursor = 0
+
+        // as the source is single contiguous byte array, we only need three separate copies:
+        // 1. Copy over some bytes so that the current bank is fully filled
+        // 2. Copy over 8192*n bytes to fill a chunk in single operation
+        // 3. Copy over the remaining bytes
+
+        // 1.
+        var actualBytesToCopy = minOf(remainingBytesToCopy, remainingInHeadBank) // it is possible that size of the bytes is smaller than the remainingInHeadBank
+        System.arraycopy(bytes, srcCursor, __data[currentBankNumber], bankOffset, actualBytesToCopy)
+        remainingBytesToCopy -= actualBytesToCopy
+        srcCursor += actualBytesToCopy
+        if (remainingBytesToCopy <= 0) { size += bytes.size; return }
+
+        // 2. and 3.
+        while (remainingBytesToCopy > 0) {
+            currentBankNumber += 1
+            actualBytesToCopy = minOf(remainingBytesToCopy, BANK_SIZE) // it is possible that size of the bytes is smaller than the remainingInHeadBank
+            System.arraycopy(bytes, srcCursor, __data[currentBankNumber], 0, actualBytesToCopy)
+            remainingBytesToCopy -= actualBytesToCopy
+            srcCursor += actualBytesToCopy
+        }
+        size += bytes.size; return
+    }
 
     operator fun get(index: Long): Byte {
         if (index < 0 || index >= size)
@@ -93,8 +148,8 @@ class ByteArray64(initialSize: Long = bankSize.toLong()) {
     }
 
     private fun addOneBank() {
-        __data.add(ByteArray(bankSize))
-        internalCapacity = __data.size * bankSize.toLong()
+        __data.add(ByteArray(BANK_SIZE))
+        internalCapacity = __data.size * BANK_SIZE.toLong()
     }
 
     /**
@@ -171,20 +226,20 @@ class ByteArray64(initialSize: Long = bankSize.toLong()) {
 
     /**
      * @param consumer (Int, Int, ByteArray)-to-Unit function where first Int is index;
-     * second Int is actual number of bytes written in that bank, 0 to BankSize inclusive.
+     * second Int is actual number of bytes written in that bank, 0..BANK_SIZE (0 means that the bank is unused)
      */
     fun forEachUsedBanksIndexed(consumer: (Int, Int, ByteArray) -> Unit) {
         __data.forEachIndexed { index, bytes ->
-            consumer(index, (size - bankSize * index).coerceIn(0, bankSize.toLong()).toInt(), bytes)
+            consumer(index, (size - BANK_SIZE * index).coerceIn(0, BANK_SIZE.toLong()).toInt(), bytes)
         }
     }
 
     /**
-     * @param consumer (Int, Int, ByteArray)-to-Unit function where Int is actual number of bytes written in that bank, 0 to BankSize inclusive.
+     * @param consumer (Int, ByteArray)-to-Unit function where Int is actual number of bytes written in that bank, 0..BANK_SIZE (0 means that the bank is unused)
      */
     fun forEachUsedBanks(consumer: (Int, ByteArray) -> Unit) {
         __data.forEachIndexed { index, bytes ->
-            consumer((size - bankSize * index).coerceIn(0, bankSize.toLong()).toInt(), bytes)
+            consumer((size - BANK_SIZE * index).coerceIn(0, BANK_SIZE.toLong()).toInt(), bytes)
         }
     }
 
@@ -260,7 +315,7 @@ open class ByteArray64OutputStream(val byteArray64: ByteArray64): OutputStream()
 
     override fun write(b: Int) {
         try {
-            byteArray64.add(b.toByte())
+            byteArray64.appendByte(b.toByte())
             writeCounter += 1
         }
         catch (e: ArrayIndexOutOfBoundsException) {
@@ -275,7 +330,7 @@ open class ByteArray64OutputStream(val byteArray64: ByteArray64): OutputStream()
 
 /** Just like Java's ByteArrayOutputStream, except its size grows if you exceed the initial size
  */
-open class ByteArray64GrowableOutputStream(size: Long = ByteArray64.bankSize.toLong()): OutputStream() {
+open class ByteArray64GrowableOutputStream(size: Long = ByteArray64.BANK_SIZE.toLong()): OutputStream() {
     protected open var buf = ByteArray64(size)
     protected open var count = 0L
 
@@ -290,7 +345,7 @@ open class ByteArray64GrowableOutputStream(size: Long = ByteArray64.bankSize.toL
             throw IllegalStateException("This output stream is finalised and cannot be modified.")
         }
         else {
-            buf.add(b.toByte())
+            buf.appendByte(b.toByte())
             count += 1
         }
     }
@@ -360,7 +415,7 @@ open class ByteArray64Writer(val charset: Charset) : Writer() {
                     throw IllegalStateException("Surrogate high: ${surrogateBuf.toUcode()}, surrogate low: ${c.toUcode()}")
             }
             Charset.forName("CP437") -> {
-                ba.add(c.toByte())
+                ba.appendByte(c.toByte())
             }
             else -> throw UnsupportedCharsetException(charset.name())
         }
@@ -368,21 +423,21 @@ open class ByteArray64Writer(val charset: Charset) : Writer() {
 
     fun writeUtf8Codepoint(codepoint: Int) {
         when (codepoint) {
-            in 0..127 -> ba.add(codepoint.toByte())
+            in 0..127 -> ba.appendByte(codepoint.toByte())
             in 128..2047 -> {
-                ba.add((0xC0 or codepoint.ushr(6).and(31)).toByte())
-                ba.add((0x80 or codepoint.and(63)).toByte())
+                ba.appendByte((0xC0 or codepoint.ushr(6).and(31)).toByte())
+                ba.appendByte((0x80 or codepoint.and(63)).toByte())
             }
             in 2048..65535 -> {
-                ba.add((0xE0 or codepoint.ushr(12).and(15)).toByte())
-                ba.add((0x80 or codepoint.ushr(6).and(63)).toByte())
-                ba.add((0x80 or codepoint.and(63)).toByte())
+                ba.appendByte((0xE0 or codepoint.ushr(12).and(15)).toByte())
+                ba.appendByte((0x80 or codepoint.ushr(6).and(63)).toByte())
+                ba.appendByte((0x80 or codepoint.and(63)).toByte())
             }
             in 65536..1114111 -> {
-                ba.add((0xF0 or codepoint.ushr(18).and(7)).toByte())
-                ba.add((0x80 or codepoint.ushr(12).and(63)).toByte())
-                ba.add((0x80 or codepoint.ushr(6).and(63)).toByte())
-                ba.add((0x80 or codepoint.and(63)).toByte())
+                ba.appendByte((0xF0 or codepoint.ushr(18).and(7)).toByte())
+                ba.appendByte((0x80 or codepoint.ushr(12).and(63)).toByte())
+                ba.appendByte((0x80 or codepoint.ushr(6).and(63)).toByte())
+                ba.appendByte((0x80 or codepoint.and(63)).toByte())
             }
             else -> throw IllegalArgumentException("Not a unicode code point: U+${codepoint.toString(16).toUpperCase()}")
         }
@@ -395,7 +450,7 @@ open class ByteArray64Writer(val charset: Charset) : Writer() {
 
     override fun write(str: String) {
         checkOpen()
-        str.toByteArray(charset).forEach { ba.add(it) }
+        ba.appendBytes(str.toByteArray(charset))
     }
 
     override fun write(cbuf: CharArray, off: Int, len: Int) {

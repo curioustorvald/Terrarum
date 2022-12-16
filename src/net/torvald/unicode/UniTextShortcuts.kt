@@ -100,21 +100,21 @@ fun List<Int>.toUTF8Bytes64(): ByteArray64 {
     val ba = ByteArray64()
     this.forEach { codepoint ->
         when (codepoint) {
-            in 0..127 -> ba.add(codepoint.toByte())
+            in 0..127 -> ba.appendByte(codepoint.toByte())
             in 128..2047 -> {
-                ba.add((0xC0 or codepoint.ushr(6).and(31)).toByte())
-                ba.add((0x80 or codepoint.and(63)).toByte())
+                ba.appendByte((0xC0 or codepoint.ushr(6).and(31)).toByte())
+                ba.appendByte((0x80 or codepoint.and(63)).toByte())
             }
             in 2048..65535 -> {
-                ba.add((0xE0 or codepoint.ushr(12).and(15)).toByte())
-                ba.add((0x80 or codepoint.ushr(6).and(63)).toByte())
-                ba.add((0x80 or codepoint.and(63)).toByte())
+                ba.appendByte((0xE0 or codepoint.ushr(12).and(15)).toByte())
+                ba.appendByte((0x80 or codepoint.ushr(6).and(63)).toByte())
+                ba.appendByte((0x80 or codepoint.and(63)).toByte())
             }
             in 65536..1114111 -> {
-                ba.add((0xF0 or codepoint.ushr(18).and(7)).toByte())
-                ba.add((0x80 or codepoint.ushr(12).and(63)).toByte())
-                ba.add((0x80 or codepoint.ushr(6).and(63)).toByte())
-                ba.add((0x80 or codepoint.and(63)).toByte())
+                ba.appendByte((0xF0 or codepoint.ushr(18).and(7)).toByte())
+                ba.appendByte((0x80 or codepoint.ushr(12).and(63)).toByte())
+                ba.appendByte((0x80 or codepoint.ushr(6).and(63)).toByte())
+                ba.appendByte((0x80 or codepoint.and(63)).toByte())
             }
             else -> throw IllegalArgumentException("Not a unicode code point: U+${codepoint.toString(16).toUpperCase()}")
         }

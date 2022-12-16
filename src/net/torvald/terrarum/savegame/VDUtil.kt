@@ -38,7 +38,7 @@ object VDUtil {
     }
 
     fun dumpToRealMachine(disk: VirtualDisk, outfile: File) {
-        outfile.writeBytes64(disk.serialize().array)
+        outfile.writeBytes64(disk.serialize())
     }
 
     private const val DEBUG_PRINT_READ = false
@@ -156,7 +156,7 @@ object VDUtil {
                         // test print
                         if (DEBUG_PRINT_READ) {
                             val testbytez = diskEntry.contents.serialize()
-                            val testbytes = testbytez.array
+                            val testbytes = testbytez
                             (diskEntry.contents as? EntryDirectory)?.forEach {
                                 println("entry: ${it.toHex()}")
                             }
@@ -646,7 +646,7 @@ object VDUtil {
         while (true) {
             val byte = zi.read()
             if (byte == -1) break
-            unzipdBytes.add(byte.toByte())
+            unzipdBytes.appendByte(byte.toByte())
         }
         zi.close()
         return unzipdBytes
@@ -657,10 +657,10 @@ fun magicMismatch(magic: ByteArray, array: ByteArray): Boolean {
     return !Arrays.equals(array, magic)
 }
 fun String.toEntryName(length: Int, charset: Charset): ByteArray {
-    val buffer = AppendableByteBuffer(length.toLong())
+    val buffer = ByteArray64(length.toLong())
     val stringByteArray = this.toByteArray(charset)
-    buffer.put(stringByteArray.sliceArray(0..minOf(length, stringByteArray.size) - 1))
-    return buffer.array.toByteArray()
+    buffer.appendBytes(stringByteArray.sliceArray(0 until minOf(length, stringByteArray.size)))
+    return buffer.toByteArray()
 }
 fun ByteArray.toCanonicalString(charset: Charset): String {
     var lastIndexOfRealStr = 0
