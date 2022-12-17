@@ -59,11 +59,12 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
 //        println("ghost: ${ghostItem}; ghostInit = $ghostInit; instance: $hash")
-        if (!ghostInit.get()) {
-            ghostItem.getAndSet(makeFixture())
-            ghostInit.getAndSet(true)
+        if (!ghostInit.compareAndExchangeAcquire(false, true)) {
+            ghostItem.set(makeFixture())
 //            printdbg(this, "ghost item initialised: $ghostItem")
+
         }
+
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.setGhost(ghostItem.get())
