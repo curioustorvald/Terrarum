@@ -44,17 +44,17 @@ basegame
      *
      *
      *
-     * 0xAA_BB_XXXX, where:
+     * 0xAAAA_BBBB_XXXXXX, where:
      *
-     *  * AA: Major version
-     *  * BB: Minor version
-     *  * XXXX: Patch version
+     *  * AAAA: Major version
+     *  * BBBB: Minor version
+     *  * XXXXXX: Patch version
      *
      *
      * e.g. 0x02010034 will be translated as 2.1.52
      *
      */
-    const val VERSION_RAW = 0x00030002
+    const val VERSION_RAW: Long = 0x0000_000003_000002
     // Commit counts up to the Release 0.3.0: 2259
     // Commit counts up to the Release 0.3.1: 2278
 

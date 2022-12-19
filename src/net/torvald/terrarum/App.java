@@ -60,10 +60,10 @@ public class App implements ApplicationListener {
     public static final long startupTime = System.currentTimeMillis() / 1000L;
 
     public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
-    public static final int VERSION_RAW = TerrarumAppConfiguration.VERSION_RAW;
+    public static final long VERSION_RAW = TerrarumAppConfiguration.VERSION_RAW;
 
     public static final String getVERSION_STRING() {
-        return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
+        return String.format("%d.%d.%d", VERSION_RAW >>> 48, (VERSION_RAW & 0xffff000000L) >>> 24, VERSION_RAW & 0xffffffL);
     }
 
     /**
