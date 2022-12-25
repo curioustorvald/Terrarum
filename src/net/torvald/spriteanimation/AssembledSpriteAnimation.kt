@@ -91,7 +91,7 @@ class AssembledSpriteAnimation(
     }
 
     fun renderThisAnimation(batch: SpriteBatch, posX: Float, posY: Float, scale: Float, animName: String) {
-        val animNameRoot = animName.substring(0, animName.indexOfLast { it == '_' })
+        val animNameRoot = animName.substring(0, animName.indexOfLast { it == '_' }).ifBlank { return@renderThisAnimation }
 
         val tx = (parentActor.hitboxTranslateX) * scale
         val txFlp = -(parentActor.hitboxTranslateX) * scale
@@ -100,7 +100,7 @@ class AssembledSpriteAnimation(
         val tyFlp = (parentActor.hitboxTranslateY) * scale
 
 
-        adp.animations[animNameRoot]!!.let { theAnim ->
+        adp.animations[animNameRoot]?.let { theAnim ->
             val skeleton = theAnim.skeleton.joints.reversed()
             val transforms = adp.getTransform(animName)
             val bodypartOrigins = adp.bodypartJoints
@@ -156,7 +156,7 @@ class AssembledSpriteAnimation(
                     }
                 }
             }
-        }
+        } ?: throw NullPointerException("Animation with name '$animNameRoot' is not found")
     }
 
     override fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float) {

@@ -126,6 +126,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     init {
         warning32bitJavaIcon.flip(false, false)
+        gameUpdateGovernor = LimitUpdateRate.also { it.reset() }
     }
 
     private fun loadThingsWhileIntroIsVisible() {
@@ -246,32 +247,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val introUncoverTime: Second = 0.3f
     private var introUncoverDeltaCounter = 0f
-    private var updateAkku = 0f
-
-    private var fucklatch = false
 
     override fun render(updateRate: Float) {
-        if (!fucklatch) {
-            printdbg(this, "render start")
-            fucklatch = true
-        }
-
         // async update and render
-
-        val dt = Gdx.graphics.deltaTime
-        updateAkku += dt
-
-        var i = 0L
-        while (updateAkku >= updateRate) {
-            App.measureDebugTime("Ingame.Update") { updateScreen(updateRate) }
-            updateAkku -= updateRate
-            i += 1
-        }
-        App.setDebugTime("Ingame.UpdateCounter", i)
-
-
-        // render? just do it anyway
-        App.measureDebugTime("Ingame.Render") { renderScreen() }
+        gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, { dt -> updateScreen(dt) }, { renderScreen() })
     }
 
     fun updateScreen(delta: Float) {

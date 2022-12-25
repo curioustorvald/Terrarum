@@ -96,6 +96,8 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         gameWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         world = gameWorld
+
+        gameUpdateGovernor = LimitUpdateRate.also { it.reset() }
     }
 
 
@@ -307,27 +309,13 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         super.show()
     }
 
-    private var updateAkku = 0f
 
     override fun render(updateRate: Float) {
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
         // ASYNCHRONOUS UPDATE AND RENDER //
-
-        val dt = Gdx.graphics.deltaTime
-        updateAkku += dt
-
-        var i = 0L
-        while (updateAkku >= updateRate) {
-            App.measureDebugTime("Ingame.Update") { updateGame(updateRate) }
-            updateAkku -= updateRate
-            i += 1
-        }
-        App.setDebugTime("Ingame.UpdateCounter", i)
-
-        // render? just do it anyway
-        App.measureDebugTime("Ingame.Render") { renderGame() }
+        gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, { dt -> updateGame(dt) }, { renderGame() })
         App.setDebugTime("Ingame.Render - (Light + Tiling)",
                 ((App.debugTimers["Ingame.Render"] as? Long) ?: 0) -
                 (

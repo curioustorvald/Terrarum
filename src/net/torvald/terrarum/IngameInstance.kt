@@ -151,6 +151,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     val blockMarkingActor: BlockMarkerActor
         get() = CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor
 
+    protected lateinit var gameUpdateGovernor: GameUpdateGovernor
+
     override fun hide() {
     }
 

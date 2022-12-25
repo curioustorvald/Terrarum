@@ -158,6 +158,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         particlesContainer.overwritingPolicy = {
             it.dispose()
         }
+
+        gameUpdateGovernor = LimitUpdateRate
     }
 
 
@@ -703,32 +705,22 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             postInit()
 
+            gameUpdateGovernor.reset()
+
             gameFullyLoaded = true
         }
 
         ingameController.update()
 
 
-        // define custom update rate
-        val updateRate = App.UPDATE_RATE // if (KeyToggler.isOn(Input.Keys.APOSTROPHE)) 1f / 8f else App.UPDATE_RATE
-
         // ASYNCHRONOUS UPDATE AND RENDER //
 
         /** UPDATE CODE GOES HERE */
         val dt = Gdx.graphics.deltaTime
-        updateAkku += dt
         autosaveTimer += dt
 
-        var i = 0L
-        while (updateAkku >= updateRate) {
-            measureDebugTime("Ingame.Update") { updateGame(updateRate) }
-            updateAkku -= updateRate
-            i += 1
-        }
-        setDebugTime("Ingame.UpdateCounter", i)
+        gameUpdateGovernor.update(dt, App.UPDATE_RATE, { dt -> updateGame(dt) }, { renderGame() })
 
-        /** RENDER CODE GOES HERE */
-        measureDebugTime("Ingame.Render") { renderGame() }
 
         val autosaveInterval = App.getConfigInt("autosaveinterval").coerceAtLeast(60000) / 1000f
         if (autosaveTimer >= autosaveInterval) {
