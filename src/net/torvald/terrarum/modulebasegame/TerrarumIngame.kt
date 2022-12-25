@@ -719,7 +719,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val dt = Gdx.graphics.deltaTime
         autosaveTimer += dt
 
-        gameUpdateGovernor.update(dt, App.UPDATE_RATE, { dt -> updateGame(dt) }, { renderGame() })
+        gameUpdateGovernor.update(dt, App.UPDATE_RATE, updateGame, renderGame)
 
 
         val autosaveInterval = App.getConfigInt("autosaveinterval").coerceAtLeast(60000) / 1000f
@@ -739,7 +739,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     /**
      * Ingame (world) related updates; UI update must go to renderGame()
      */
-    protected fun updateGame(delta: Float) {
+    private val updateGame =  { delta: Float ->
         val world = this.world
         worldWidth = world.width.toDouble() * TILE_SIZE
 
@@ -862,7 +862,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
 
-    private fun renderGame() {
+    private val renderGame = { delta: Float ->
         Gdx.graphics.setTitle(getCanonicalTitle())
 
         WorldCamera.update(world, actorNowPlaying)

@@ -315,15 +315,16 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         // ASYNCHRONOUS UPDATE AND RENDER //
-        gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, { dt -> updateGame(dt) }, { renderGame() })
+        gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, updateGame, renderGame
+        )
         App.setDebugTime("Ingame.Render - (Light + Tiling)",
-                ((App.debugTimers["Ingame.Render"] as? Long) ?: 0) -
+                ((App.debugTimers["Ingame.Render"]) ?: 0) -
                 (
-                        ((App.debugTimers["Renderer.Lanterns"] as? Long) ?: 0) +
-                        ((App.debugTimers["Renderer.LightPrecalc"] as? Long) ?: 0) +
-                        ((App.debugTimers["Renderer.LightRuns"] as? Long) ?: 0) +
-                        ((App.debugTimers["Renderer.LightToScreen"] as? Long) ?: 0) +
-                        ((App.debugTimers["Renderer.Tiling"] as? Long) ?: 0)
+                        ((App.debugTimers["Renderer.Lanterns"]) ?: 0) +
+                        ((App.debugTimers["Renderer.LightPrecalc"]) ?: 0) +
+                        ((App.debugTimers["Renderer.LightRuns"]) ?: 0) +
+                        ((App.debugTimers["Renderer.LightToScreen"]) ?: 0) +
+                        ((App.debugTimers["Renderer.Tiling"]) ?: 0)
                 )
         )
 
@@ -333,7 +334,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     internal var tappedOnUI = false // when true, even if the UI is closed, pen won't work unless your pen is lifted
     // must be set to TRUE by UIs
 
-    private fun updateGame(delta: Float) {
+    private val updateGame = { delta: Float ->
 
         WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
@@ -377,7 +378,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val particles = CircularArray<ParticleBase>(16, true)
 
-    private fun renderGame() {
+    private val renderGame = { delta: Float ->
         _testMarkerDrawCalls = 0L
 
         IngameRenderer.invoke(false,

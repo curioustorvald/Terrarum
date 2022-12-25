@@ -250,10 +250,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     override fun render(updateRate: Float) {
         // async update and render
-        gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, { dt -> updateScreen(dt) }, { renderScreen() })
+        gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, updateScreen, renderScreen)
     }
 
-    fun updateScreen(delta: Float) {
+    private val updateScreen = { delta: Float ->
         demoWorld.globalLight = WeatherMixer.globalLightNow
         demoWorld.updateWorldTime(delta)
         WeatherMixer.update(delta, cameraPlayer, demoWorld)
@@ -269,7 +269,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val particles = CircularArray<ParticleBase>(16, true)
 
-    fun renderScreen() {
+    private val renderScreen = { delta: Float ->
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
