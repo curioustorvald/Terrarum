@@ -48,7 +48,9 @@ internal object BlocksDrawer {
     lateinit var tilesTerrainBlend: TextureRegionPack; private set
     //val tilesWire: TextureRegionPack
     val tileItemTerrain: TextureRegionPack
+    val tileItemTerrainGlow: TextureRegionPack
     val tileItemWall: TextureRegionPack
+    val tileItemWallGlow: TextureRegionPack
     val tilesFluid: TextureRegionPack
     val tilesGlow: TextureRegionPack
 
@@ -119,7 +121,9 @@ internal object BlocksDrawer {
         // test print
 
         tileItemTerrain = TextureRegionPack(App.tileMaker.itemTerrainTexture, TILE_SIZE, TILE_SIZE)
+        tileItemTerrainGlow = TextureRegionPack(App.tileMaker.itemTerrainTextureGlow, TILE_SIZE, TILE_SIZE)
         tileItemWall = TextureRegionPack(App.tileMaker.itemWallTexture, TILE_SIZE, TILE_SIZE)
+        tileItemWallGlow = TextureRegionPack(App.tileMaker.itemWallTextureGlow, TILE_SIZE, TILE_SIZE)
 
 
 //        val texdata = tileItemTerrain.texture.textureData
@@ -733,7 +737,9 @@ internal object BlocksDrawer {
         tilesGlow.dispose()
         //tilesWire.dispose()
         tileItemTerrain.dispose()
+        tileItemTerrainGlow.dispose()
         tileItemWall.dispose()
+        tileItemWallGlow.dispose()
         tilesFluid.dispose()
         tilesBuffer.dispose()
         _tilesBufferAsTex.dispose()

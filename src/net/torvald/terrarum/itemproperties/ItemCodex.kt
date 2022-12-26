@@ -124,8 +124,12 @@ class ItemCodex {
 
     fun getItemImage(item: GameItem?): TextureRegion? {
         if (item == null) return null
-
         return getItemImage(item.originalID)
+    }
+
+    fun getItemImageGlow(item: GameItem?): TextureRegion? {
+        if (item == null) return null
+        return getItemImageGlow(item.originalID)
     }
 
     fun getItemImage(itemID: ItemID?): TextureRegion? {
@@ -155,7 +159,35 @@ class ItemCodex {
                     itemSheetNumber / App.tileMaker.TILES_IN_X
             )
         }
+    }
 
+    fun getItemImageGlow(itemID: ItemID?): TextureRegion? {
+        if (itemID == null) return null
+
+        if (itemID.isDynamic()) {
+            return getItemImageGlow(dynamicToStaticID(itemID))
+        }
+        else if (itemID.isItem()) {
+            return itemCodex[itemID]?.itemImageGlow
+        }
+        else if (itemID.isWire()) {
+            return itemCodex[itemID]?.itemImageGlow
+        }
+        else if (itemID.isWall()) {
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID.substring(5))
+            return BlocksDrawer.tileItemWallGlow.get(
+                itemSheetNumber % App.tileMaker.TILES_IN_X,
+                itemSheetNumber / App.tileMaker.TILES_IN_X
+            )
+        }
+        // else: terrain
+        else {
+            val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(itemID)
+            return BlocksDrawer.tileItemTerrainGlow.get(
+                itemSheetNumber % App.tileMaker.TILES_IN_X,
+                itemSheetNumber / App.tileMaker.TILES_IN_X
+            )
+        }
     }
 
     fun hasItem(itemID: ItemID): Boolean = dynamicItemInventory.containsKey(itemID)

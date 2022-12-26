@@ -165,18 +165,20 @@ object ReadActor {
 
             actor.animDesc = ADProperties(ByteArray64Reader(animFile!!.bytes, Common.CHARSET))
             actor.sprite = AssembledSpriteAnimation(
-                    actor.animDesc!!,
-                    actor,
-                    if (bodypartsFile != null) disk else null,
-                    if (bodypartsFile != null) BODYPART_TO_ENTRY_MAP else null
+                actor.animDesc!!,
+                actor,
+                if (bodypartsFile != null) disk else null,
+                if (bodypartsFile != null) BODYPART_TO_ENTRY_MAP else null,
+                false
             )
             if (animFileGlow != null) {
                 actor.animDescGlow = ADProperties(ByteArray64Reader(animFileGlow.bytes, Common.CHARSET))
                 actor.spriteGlow = AssembledSpriteAnimation(
-                        actor.animDescGlow!!,
-                        actor,
-                        if (bodypartsFile != null) disk else null,
-                        if (bodypartsFile != null) BODYPARTGLOW_TO_ENTRY_MAP else null
+                    actor.animDescGlow!!,
+                    actor,
+                    if (bodypartsFile != null) disk else null,
+                    if (bodypartsFile != null) BODYPARTGLOW_TO_ENTRY_MAP else null,
+                    true
                 )
             }
 
@@ -190,8 +192,8 @@ object ReadActor {
                 actor.reassembleSprite(actor.sprite!!, actor.spriteGlow, heldItem)*/
         }
         else if (actor is ActorWithBody && actor is HasAssembledSprite) {
-            if (actor.animDesc != null) actor.sprite = AssembledSpriteAnimation(actor.animDesc!!, actor)
-            if (actor.animDescGlow != null) actor.spriteGlow = AssembledSpriteAnimation(actor.animDescGlow!!, actor)
+            if (actor.animDesc != null) actor.sprite = AssembledSpriteAnimation(actor.animDesc!!, actor, false)
+            if (actor.animDescGlow != null) actor.spriteGlow = AssembledSpriteAnimation(actor.animDescGlow!!, actor, true)
 
             //actor.reassembleSprite(actor.sprite, actor.spriteGlow, null)
         }

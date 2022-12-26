@@ -44,7 +44,9 @@ class CreateTileAtlas {
     lateinit var atlasFluid: Pixmap
     lateinit var atlasGlow: Pixmap // glowing won't be affected by the season... for now
     lateinit var itemTerrainTexture: Texture
+    lateinit var itemTerrainTextureGlow: Texture
     lateinit var itemWallTexture: Texture
+    lateinit var itemWallTextureGlow: Texture
     lateinit var terrainTileColourMap: HashMap<ItemID, Cvec>
     lateinit var tags: HashMap<ItemID, RenderTag> // TileID, RenderTag
         private set
@@ -64,7 +66,9 @@ class CreateTileAtlas {
     private var itemSheetCursor = 16
 
     internal val itemTerrainPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+    internal val itemTerrainPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
     internal val itemWallPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+    internal val itemWallPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
 
     /**
@@ -164,13 +168,17 @@ class CreateTileAtlas {
             val destX = (t % TILES_IN_X) * TILE_SIZE
             val destY = (t / TILES_IN_X) * TILE_SIZE
             itemTerrainPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemTerrainPixmapGlow.drawPixmap(atlasGlow, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
             itemWallPixmap.drawPixmap(atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemWallPixmapGlow.drawPixmap(atlasGlow, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
         }
         // darken things for the wall
         for (y in 0 until itemWallPixmap.height) {
             for (x in 0 until itemWallPixmap.width) {
-                val c = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
-                itemWallPixmap.drawPixel(x, y, c)
+                val c1 = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
+                itemWallPixmap.drawPixel(x, y, c1)
+                val c2 = Color(itemWallPixmapGlow.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
+                itemWallPixmapGlow.drawPixel(x, y, c2)
             }
         }
 
@@ -203,7 +211,9 @@ class CreateTileAtlas {
         }
 
         itemTerrainTexture = Texture(itemTerrainPixmap)
+        itemTerrainTextureGlow = Texture(itemTerrainPixmapGlow)
         itemWallTexture = Texture(itemWallPixmap)
+        itemWallTextureGlow = Texture(itemWallPixmapGlow)
 //        itemTerrainPixmap.dispose()
 //        itemWallPixmap.dispose()
         initPixmap.dispose()
@@ -295,13 +305,13 @@ class CreateTileAtlas {
         printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }
 
-    private fun drawToAtlantes(pixmap: Pixmap, glow: Pixmap, tilesCount: Int) {
+    private fun drawToAtlantes(matte: Pixmap, glow: Pixmap, tilesCount: Int) {
         if (atlasCursor >= TOTAL_TILES) {
             throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
         }
 
-        val seasonal = pixmap.width == pixmap.height && pixmap.width == 14 * TILE_SIZE
-        val txOfPixmap = pixmap.width / TILE_SIZE
+        val seasonal = matte.width == matte.height && matte.width == 14 * TILE_SIZE
+        val txOfPixmap = matte.width / TILE_SIZE
         val txOfPixmapGlow = glow.width / TILE_SIZE
         for (i in 0 until tilesCount) {
             //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
@@ -309,16 +319,16 @@ class CreateTileAtlas {
             // different texture for different seasons (224x224)
             if (seasonal) {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(pixmap, atlasCursor, i % 7, i / 7, 1)
-                _drawToAtlantes(pixmap, atlasCursor, i % 7 + 7, i / 7, 2)
-                _drawToAtlantes(pixmap, atlasCursor, i % 7 + 7, i / 7 + 7, 3)
-                _drawToAtlantes(pixmap, atlasCursor, i % 7, i / 7 + 7, 4)
+                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7, 1)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7, 2)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7 + 7, 3)
+                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7 + 7, 4)
                 _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, 6)
                 atlasCursor += 1
             }
             else {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(pixmap, atlasCursor, i % txOfPixmap, i / txOfPixmap, 0)
+                _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, 0)
                 _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, 6)
                 atlasCursor += 1
             }
@@ -389,7 +399,9 @@ class CreateTileAtlas {
         atlasFluid.dispose()
         atlasGlow.dispose()
         //itemTerrainTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
+        //itemTerrainTextureGlow.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
         //itemWallTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemWall (TextureRegionPack)'
+        //itemWallTextureGlow.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemWall (TextureRegionPack)'
         itemTerrainPixmap.dispose()
         itemWallPixmap.dispose()
 

@@ -29,8 +29,8 @@ object PlayerBuilderWerebeastTest {
         p.sprite!!.delays = floatArrayOf(2f, 1f/12f) // second value does nothing -- overridden by ActorHumanoid.updateSprite(float)
         p.sprite!!.setRowsAndFrames(2, 4)*/
 
-        p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p) }
-        p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p) }
+        p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p, false) }
+        p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p, true) }
         //p.reassembleSprite(p.sprite, p.spriteGlow, null)
         p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 30, 0)
 

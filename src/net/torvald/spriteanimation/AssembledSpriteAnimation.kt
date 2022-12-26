@@ -28,13 +28,14 @@ import java.util.*
  * Created by minjaesong on 2022-03-23.
  */
 class AssembledSpriteAnimation(
-        @Transient val adp: ADProperties,
-        parentActor: ActorWithBody,
-        @Transient val disk: SimpleFileSystem?, // specify if the resources for the animation is contained in the disk archive
-        @Transient val bodypartToFileMap: EntryID? // which file in the disk contains bodypart-to-fileid mapping for this particular instance of sprite animation
+    @Transient val adp: ADProperties,
+    parentActor: ActorWithBody,
+    @Transient val disk: SimpleFileSystem?, // specify if the resources for the animation is contained in the disk archive
+    @Transient val bodypartToFileMap: EntryID?, // which file in the disk contains bodypart-to-fileid mapping for this particular instance of sprite animation
+    @Transient val isGlow: Boolean
 ) : SpriteAnimation(parentActor) {
 
-    constructor(adp: ADProperties, parentActor: ActorWithBody) : this(adp, parentActor, null, null)
+    constructor(adp: ADProperties, parentActor: ActorWithBody, isGlow: Boolean) : this(adp, parentActor, null, null, isGlow)
 
     var currentFrame = 0 // while this number is zero-based, the frame number on the ADP is one-based
         private set
@@ -90,8 +91,11 @@ class AssembledSpriteAnimation(
         }
     }
 
+    private fun fetchItemImage(item: GameItem) = if (isGlow) ItemCodex.getItemImageGlow(item) else ItemCodex.getItemImage(item)
+
     fun renderThisAnimation(batch: SpriteBatch, posX: Float, posY: Float, scale: Float, animName: String) {
         val animNameRoot = animName.substring(0, animName.indexOfLast { it == '_' }).ifBlank { return@renderThisAnimation }
+        // quick fix for the temporary de-sync bug in which when the update-rate per frame is much greater than once, it attempts to load animation with blank name
 
         val tx = (parentActor.hitboxTranslateX) * scale
         val txFlp = -(parentActor.hitboxTranslateX) * scale
@@ -111,9 +115,10 @@ class AssembledSpriteAnimation(
                 if (flipHorizontal) bodypartPos = bodypartPos.invertX()
                 bodypartPos += ADPropertyObject.Vector2i(1,0)
 
+                // draw held items/armours?
                 if (name in jointNameToEquipPos) {
                     ItemCodex[(parentActor as? Pocketed)?.inventory?.itemEquipped?.get(jointNameToEquipPos[name]!!)]?.let { item ->
-                        ItemCodex.getItemImage(item)?.let { image ->
+                        fetchItemImage(item)?.let { image ->
                             val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
                             val w = image.regionWidth * scale
                             val h = image.regionHeight * scale
