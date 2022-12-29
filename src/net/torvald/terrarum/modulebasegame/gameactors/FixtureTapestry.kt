@@ -1,3 +1,4 @@
+
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Pixmap

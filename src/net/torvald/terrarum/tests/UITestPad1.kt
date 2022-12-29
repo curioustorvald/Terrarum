@@ -2,7 +2,6 @@ package net.torvald.terrarum.tests
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -16,8 +15,6 @@ import net.torvald.colourutil.HUSLColorConverter
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UINSMenu
 
 val UITEST1_WIDTH = 1280
 val UITEST1_HEIGHT = 720
@@ -133,7 +130,8 @@ fun main(args: Array<String>) {
     appConfig.useVsync(false)
     appConfig.setResizable(false)
     appConfig.setWindowedMode(UITEST1_WIDTH, UITEST1_HEIGHT)
-    appConfig.useOpenGL3(true, 3, 2)
+    //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
+    appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2)
 
     App.scr = TerrarumScreenSize(UITEST1_WIDTH, UITEST1_HEIGHT)
 

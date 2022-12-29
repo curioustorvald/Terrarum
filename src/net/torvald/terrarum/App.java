@@ -353,7 +353,7 @@ public class App implements ApplicationListener {
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
-            appConfig.useOpenGL3(true, 3, 2);
+            appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
             appConfig.setWindowedMode(width, height);

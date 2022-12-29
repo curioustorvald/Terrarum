@@ -13,6 +13,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import kotlin.math.roundToInt
 
 /**
@@ -319,17 +320,17 @@ class CreateTileAtlas {
             // different texture for different seasons (224x224)
             if (seasonal) {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7, 1)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7, 2)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7 + 7, 3)
-                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7 + 7, 4)
-                _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, 6)
+                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7, SUMMER)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7, AUTUMN)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7 + 7, WINTER)
+                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7 + 7, SPRING)
+                _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, GLOW)
                 atlasCursor += 1
             }
             else {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, 0)
-                _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, 6)
+                _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, FOUR_SEASONS)
+                _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
                 atlasCursor += 1
             }
         }
@@ -338,12 +339,12 @@ class CreateTileAtlas {
     /**
      * mode: 0 for all the atlantes, 1-4 for summer/autumn/winter/spring atlas
      */
-    private fun _drawToAtlantes(pixmap: Pixmap, destTileNum: Int, srcTileX: Int, srcTileY: Int, mode: Int) {
-        if (mode == 0) {
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, 1)
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, 2)
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, 3)
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, 4)
+    private fun _drawToAtlantes(pixmap: Pixmap, destTileNum: Int, srcTileX: Int, srcTileY: Int, source: AtlasSource) {
+        if (source == FOUR_SEASONS) {
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, SUMMER)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, AUTUMN)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, WINTER)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, SPRING)
         }
         else {
             val atlasX = (destTileNum % TILES_IN_X) * TILE_SIZE
@@ -353,13 +354,14 @@ class CreateTileAtlas {
 
             //if (mode == 1) printdbg(this, "atlaspos: ($atlasX, $atlasY), srcpos: ($sourceX, $sourceY), srcpixmap = $pixmap")
 
-            when (mode) {
-                1 -> atlas.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                2 -> atlasAutumn.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                3 -> atlasWinter.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                4 -> atlasSpring.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                5 -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                6 -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+            when (source) {
+                SUMMER -> atlas.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                AUTUMN -> atlasAutumn.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                WINTER -> atlasWinter.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                SPRING -> atlasSpring.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                FLUID -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                GLOW -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                else -> throw IllegalArgumentException("Unknown draw source $source")
             }
         }
     }
@@ -406,5 +408,9 @@ class CreateTileAtlas {
         itemWallPixmap.dispose()
 
         nullTile.dispose()
+    }
+
+    private enum class AtlasSource {
+        FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING, FLUID, GLOW
     }
 }

@@ -8,8 +8,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="com.badlogicgames.gdx:gdx:1.10.0" level="project" />
-    <orderEntry type="library" name="com.badlogicgames.gdx:gdx-backend-lwjgl3:1.10.0" level="project" />
     <orderEntry type="library" name="GetCpuName-src" level="project" />
     <orderEntry type="library" name="prtree" level="project" />
     <orderEntry type="library" name="Terrarum_Joise" level="project" />
@@ -19,8 +17,10 @@
     <orderEntry type="library" name="gdx-controllers-core-2.2.1" level="project" />
     <orderEntry type="library" name="gdx-controllers-desktop-2.2.1" level="project" />
     <orderEntry type="library" name="jxinput-1.0.0" level="project" />
-    <orderEntry type="library" name="gdx-platform-1.10.0-natives-desktop" level="project" />
+    <orderEntry type="library" name="gdx-platform-1.11.0-natives" level="project" />
     <orderEntry type="library" name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0" level="project" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" name="badlogicgames.gdx" level="project" />
+    <orderEntry type="library" name="badlogicgames.gdx.backend.lwjgl3" level="project" />
   </component>
 </module>
