@@ -846,6 +846,8 @@ public class App implements ApplicationListener {
 
         inputStrober.dispose();
 
+        audioDevice.dispose();
+
         deleteTempfiles();
 
         disposables.forEach((it) -> {
