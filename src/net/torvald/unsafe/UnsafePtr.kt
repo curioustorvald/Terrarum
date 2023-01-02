@@ -7,13 +7,15 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
+class DanglingPointerException(msg: String) : NullPointerException(msg)
+class AddressOverflowException(msg: String) : IndexOutOfBoundsException(msg)
+
 /**
  * Further read:
  * - http://www.docjar.com/docs/api/sun/misc/Unsafe.html
  *
  * Created by minjaesong on 2019-06-21.
  */
-
 internal object UnsafeHelper {
     var unsafeAllocatedSize = 0L
         internal set
@@ -110,8 +112,8 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
         // You may break the glass and use this tool when some fucking incomprehensible bugs ("vittujen vitun bugit")
         // appear (e.g. getting garbage values when it fucking shouldn't)
 
-        assert(!destroyed) { throw NullPointerException("The pointer is already destroyed ($this)") }
-        assert(index in 0 until size) { throw IndexOutOfBoundsException("Index: $index; alloc size: $size") }
+        assert(!destroyed) { throw DanglingPointerException("The pointer is already destroyed ($this)") }
+        assert(index in 0 until size) { throw AddressOverflowException("Index: $index; alloc size: $size") }
     }
 
     operator fun get(index: Long): Byte {
