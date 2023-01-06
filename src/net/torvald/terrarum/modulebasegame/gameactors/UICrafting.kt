@@ -33,7 +33,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     override var width = App.scr.width
     override var height = App.scr.height
-    override var openCloseTime: Second = 0.0f
 
     private val itemListPlayer: UIItemInventoryItemGrid
     private val itemListCraftable: UIItemCraftingCandidateGrid // might be changed to something else
@@ -515,21 +514,24 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     }
 
     override fun doOpening(delta: Float) {
+        super.doOpening(delta)
         resetUI()
-
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
+        super.doClosing(delta)
         INGAME.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
+        super.endOpening(delta)
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
 
     override fun endClosing(delta: Float) {
+        super.endClosing(delta)
         resetUI()
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!

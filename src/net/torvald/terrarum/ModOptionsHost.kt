@@ -7,7 +7,6 @@ import net.torvald.terrarum.ui.UICanvas
 
 class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
 
-    override var openCloseTime: Second = 0f
 
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8
@@ -19,18 +18,6 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-    }
-
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
     }
 
     override fun dispose() {

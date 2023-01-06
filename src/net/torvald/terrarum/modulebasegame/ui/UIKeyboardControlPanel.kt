@@ -20,7 +20,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     override var width = 480
     override var height = 600
-    override var openCloseTime = 0f
 
 
     private val drawX = (Toolkit.drawWidth - width) / 2
@@ -229,18 +228,6 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         super.touchUp(screenX, screenY, pointer, button)
         buttonReset.touchUp(screenX, screenY, pointer, button)
         return true
-    }
-
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
     }
 
     override fun dispose() {

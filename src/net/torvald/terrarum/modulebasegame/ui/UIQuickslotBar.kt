@@ -144,23 +144,6 @@ class UIQuickslotBar : UICanvas() {
 
     }
 
-
-    override fun doOpening(delta: Float) {
-        handler.opacity = handler.openCloseCounter / openCloseTime
-    }
-
-    override fun doClosing(delta: Float) {
-        handler.opacity = (openCloseTime - handler.openCloseCounter) / openCloseTime
-    }
-
-    override fun endOpening(delta: Float) {
-        handler.opacity = 1f
-    }
-
-    override fun endClosing(delta: Float) {
-        handler.opacity = 0f
-    }
-
     override fun dispose() {
     }
 

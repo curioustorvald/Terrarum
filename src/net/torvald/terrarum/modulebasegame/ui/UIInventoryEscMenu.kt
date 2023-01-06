@@ -27,7 +27,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
-    override var openCloseTime = 0.0f
 
     private val gameMenu = arrayOf(
             "MENU_IO_SAVE_GAME",
@@ -300,18 +299,18 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         }
     }
 
-    override fun doOpening(delta: Float) {
-    }
-
     override fun doClosing(delta: Float) {
+        super.doClosing(delta)
         screen = 0
     }
 
     override fun endOpening(delta: Float) {
+        super.endOpening(delta)
         INGAME.setTooltipMessage(null)
     }
 
     override fun endClosing(delta: Float) {
+        super.endClosing(delta)
         screen = 0
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)

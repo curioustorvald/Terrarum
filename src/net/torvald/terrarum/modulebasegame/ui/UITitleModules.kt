@@ -29,7 +29,6 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
     override var height: Int
         get() = App.scr.height
         set(value) {}
-    override var openCloseTime: Second = 0f
 
 
 
@@ -236,16 +235,9 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         }
         return true
     }
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
 
     override fun endClosing(delta: Float) {
+        super.endClosing(delta)
         listScroll = 0
         scrollTarget = 0
         uiScroll = 0f

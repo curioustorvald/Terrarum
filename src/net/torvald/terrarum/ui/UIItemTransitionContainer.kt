@@ -5,9 +5,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 
 open class UIItemTransitionContainer(
-        parent: UICanvas,
+        private val parent: UICanvas,
         initialX: Int,
         initialY: Int,
         override val width: Int,
@@ -77,7 +78,7 @@ open class UIItemTransitionContainer(
         uis.forEachIndexed { index, ui ->
             if (currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon) {
                 if (!ui.isOpened && !ui.isOpening) ui.setAsOpen()
-                ui.render(batch, camera)
+                ui.render(batch, camera, parent.opacity)
 
                 if (debugvals) {
                     App.fontSmallNumbers.draw(batch, "$index", 300f + (20 * index), 10f)

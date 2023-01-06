@@ -20,7 +20,6 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
 
     override var width = 480
     override var height = 600
-    override var openCloseTime = 0f
 
 
     private val drawX = (Toolkit.drawWidth - width) / 2
@@ -206,18 +205,6 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         catch (e: NullPointerException) {
             return null
         }
-    }
-
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
     }
 
     override fun dispose() {

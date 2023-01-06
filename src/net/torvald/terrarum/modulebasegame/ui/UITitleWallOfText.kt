@@ -11,8 +11,6 @@ import net.torvald.terrarum.ui.UIItemTextArea
 
 open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
-    override var openCloseTime: Second = 0f
-
 
     private val textAreaHMargin = 48
     override var width = 600
@@ -38,18 +36,6 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
         textArea.render(batch, camera)
 
         //AppLoader.printdbg(this, "Rendering texts of length ${text.size}")
-    }
-
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
     }
 
     override fun dispose() {

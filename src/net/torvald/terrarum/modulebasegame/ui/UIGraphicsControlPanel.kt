@@ -18,7 +18,6 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     override var width = 400
     override var height = 400
-    override var openCloseTime = 0f
 
     private val spinnerWidth = 140
     private val drawX = (Toolkit.drawWidth - width) / 2
@@ -139,26 +138,6 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                     ((App.scr.height - App.fontGame.lineHeight) / 2).toFloat()
             )
         }
-    }
-
-    override fun show() {
-        super.show()
-    }
-
-    override fun hide() {
-        super.hide()
-    }
-
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
     }
 
     override fun dispose() {

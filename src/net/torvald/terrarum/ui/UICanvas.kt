@@ -91,7 +91,7 @@ abstract class UICanvas(
      *
      * Timer itself is implemented in the ui.handler.
      */
-    abstract var openCloseTime: Second
+    open var openCloseTime: Second = OPENCLOSE_GENERIC
 
 
     protected val uiItems = ArrayList<UIItem>()
@@ -117,8 +117,8 @@ abstract class UICanvas(
         handler.update(this, delta)
     }
     /** Called by the screen */
-    fun render(batch: SpriteBatch, camera: Camera) {
-        handler.render(this, batch, camera)
+    fun render(batch: SpriteBatch, camera: Camera, parentOpacity: Float = 1f) {
+        handler.render(this, batch, camera, parentOpacity)
     }
 
 
@@ -152,22 +152,30 @@ abstract class UICanvas(
     /**
      * Do not modify ui.handler.openCloseCounter here.
      */
-    abstract fun doOpening(delta: Float)
+    open fun doOpening(delta: Float) {
+        handler.opacity = handler.openCloseCounter / openCloseTime
+    }
 
     /**
      * Do not modify ui.handler.openCloseCounter here.
      */
-    abstract fun doClosing(delta: Float)
+    open fun doClosing(delta: Float) {
+        handler.opacity = (openCloseTime - handler.openCloseCounter) / openCloseTime
+    }
 
     /**
      * Do not modify ui.handler.openCloseCounter here.
      */
-    abstract fun endOpening(delta: Float)
+    open fun endOpening(delta: Float) {
+        handler.opacity = 1f
+    }
 
     /**
      * Do not modify ui.handler.openCloseCounter here.
      */
-    abstract fun endClosing(delta: Float)
+    open fun endClosing(delta: Float) {
+        handler.opacity = 0f
+    }
 
     abstract override fun dispose()
 
@@ -328,7 +336,7 @@ abstract class UICanvas(
     }
 
     companion object {
-        const val OPENCLOSE_GENERIC = 0.2f
+        const val OPENCLOSE_GENERIC = 0.0666f
 
         fun doOpeningFade(ui: UICanvas, openCloseTime: Second) {
             ui.handler.opacity = maxOf(0f, ui.handler.openCloseCounter - 0.02f) / openCloseTime // fade start 1/50 sec late, it's intended

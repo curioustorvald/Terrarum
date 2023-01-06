@@ -77,7 +77,6 @@ internal class UIStorageChest : UICanvas(
 
     override var width = App.scr.width
     override var height = App.scr.height
-    override var openCloseTime: Second = 0.0f
 
     private val negotiator = object : InventoryTransactionNegotiator() {
         override fun accept(player: FixtureInventory, fixture: FixtureInventory, item: GameItem, amount: Long) {
@@ -227,7 +226,7 @@ internal class UIStorageChest : UICanvas(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
-        UIInventoryFull.drawBackground(batch)
+        UIInventoryFull.drawBackground(batch, handler.opacity)
 
         // UI items
         batch.color = Color.WHITE

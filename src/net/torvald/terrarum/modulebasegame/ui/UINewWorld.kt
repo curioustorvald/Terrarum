@@ -38,7 +38,6 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     override var width = 480
     override var height = 480
-    override var openCloseTime: Second = 0f
 
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
@@ -154,18 +153,6 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         App.fontGame.draw(batch, Lang["CONTEXT_GENERATOR_SEED"], drawX, drawY + sizeSelY + 120)
 
         uiItems.forEach { it.render(batch, camera) }
-    }
-
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
     }
 
     override fun dispose() {

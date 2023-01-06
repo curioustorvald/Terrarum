@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.langpack.Lang
@@ -29,7 +30,6 @@ class UIInventoryFull(
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
-    override var openCloseTime: Second = 0.0f
 
     companion object {
         private var shapeRenderer: ShapeRenderer? = null
@@ -63,7 +63,10 @@ class UIInventoryFull(
 
         val controlHelpHeight = App.fontGame.lineHeight
 
-        fun drawBackground(batch: SpriteBatch) {
+        private val gsta = Color(gradStartCol)
+        private val gend = Color(gradEndCol)
+
+        fun drawBackground(batch: SpriteBatch, opacity: Float) {
             batch.end()
             gdxBlendNormalStraightAlpha()
 
@@ -82,15 +85,17 @@ class UIInventoryFull(
             val w = App.scr.wf * magn
             val h = App.scr.hf * magn
 
+            gsta.a = 0.375f * opacity
+            gend.a = 0.4375f * opacity
             shapeRenderer!!.inUse {
                 // shaperender starts at bottom-left!
-                it.rect(0f, gradTopStart, w, gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
-                it.rect(0f, gradBottomEnd, w, -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradTopStart, w, gradHeight, gsta, gsta, gend, gend)
+                it.rect(0f, gradBottomEnd, w, -gradHeight, gsta, gsta, gend, gend)
 
-                it.rect(0f, gradTopStart + gradHeight, w, gradHeightFlat, gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+                it.rect(0f, gradTopStart + gradHeight, w, gradHeightFlat, gend, gend, gend, gend)
 
-                it.rect(0f, 0f, w, gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
-                it.rect(0f, h, w, -(h - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+                it.rect(0f, 0f, w, gradTopStart, gsta, gsta, gsta, gsta)
+                it.rect(0f, h, w, -(h - gradBottomEnd), gsta, gsta, gsta, gsta)
             }
 
             batch.begin()
@@ -275,7 +280,7 @@ class UIInventoryFull(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        drawBackground(batch)
+        drawBackground(batch, handler.opacity)
 
         // UI items
         catBar.render(batch, camera)
@@ -308,19 +313,28 @@ class UIInventoryFull(
     }
 
     override fun doOpening(delta: Float) {
+        super.doOpening(delta)
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.pause()
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
+        super.doClosing(delta)
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.resume()
         INGAME.setTooltipMessage(null)
+
     }
 
     override fun endOpening(delta: Float) {
+        super.endOpening(delta)
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f)  }
     }
 
     override fun endClosing(delta: Float) {
+        super.endClosing(delta)
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.setTooltipMessage(null) // required!
 //        MinimapComposer.revalidateAll()
 

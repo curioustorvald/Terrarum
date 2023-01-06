@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -75,29 +76,51 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
         get() = App.scr.height
         set(value) {}
 
-    override var openCloseTime: Second = 0f
+    override var openCloseTime: Second = OPENCLOSE_GENERIC
 
     private val darken = Color(0.5f, 0.5f, 0.5f, 1f)
 
+    private val darkeningVarCol = Color(255)
+    private val batchDrawCol = Color(-1)
+
     override fun updateUI(delta: Float) {}
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        batchDrawCol.a = openness
+        batch.color = batchDrawCol
         if (App.getConfigBoolean("fx_backgroundblur")) {
-            Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius, 0, 0, width, height)
+            Toolkit.blurEntireScreen(batch, camera as OrthographicCamera, blurRadius * openness, 0, 0, width, height)
         }
 
         if (!nodarken) {
             blendMul(batch)
-            batch.color = darken
+            darkeningVarCol.r = FastMath.interpolateLinear(openness, 1f, 0.5f)
+            darkeningVarCol.g = FastMath.interpolateLinear(openness, 1f, 0.5f)
+            darkeningVarCol.b = FastMath.interpolateLinear(openness, 1f, 0.5f)
+            batch.color = darkeningVarCol
             Toolkit.fillArea(batch, 0, 0, width, height)
 
             blendNormalStraightAlpha(batch)
         }
     }
 
-    override fun doOpening(delta: Float) {}
-    override fun doClosing(delta: Float) {}
-    override fun endOpening(delta: Float) {}
-    override fun endClosing(delta: Float) {}
+    private var openness = 0f // 0-closed, 1-opened
+
+    override fun doOpening(delta: Float) {
+        openness = handler.openCloseCounter / openCloseTime
+    }
+
+    override fun doClosing(delta: Float) {
+        openness = (openCloseTime - handler.openCloseCounter) / openCloseTime
+    }
+
+    override fun endOpening(delta: Float) {
+        openness = 1f
+    }
+
+    override fun endClosing(delta: Float) {
+        openness = 0f
+    }
+
     override fun dispose() {
     }
 }

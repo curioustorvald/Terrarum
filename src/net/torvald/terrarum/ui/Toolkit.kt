@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
 import com.badlogic.gdx.utils.Disposable
+import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -167,13 +168,60 @@ object Toolkit : Disposable {
     fun blurEntireScreen(batch: SpriteBatch, camera: OrthographicCamera, blurRadius0: Float, x: Int, y: Int, w: Int, h: Int) {
         batch.end()
 
-        val blurRadius = blurRadius0
+        val blurRadius = FastMath.pow(blurRadius0, 0.5f)
         val renderTarget = FrameBufferManager.peek()
 
-        /*fboBlurHalf.inAction(camera, batch) {
-            blurtex0 = renderTarget.colorBufferTexture
-            blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            blurtex0.bind(0)
+        /*if (blurRadius > 3f) {
+            val radius3 = (blurRadius - 3f) / 8f
+            fboBlurHalf.inAction(camera, batch) {
+                blurtex0 = renderTarget.colorBufferTexture
+                blurtex0.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                blurtex0.bind(0)
+                shaderKawaseDown.bind()
+                shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
+                shaderKawaseDown.setUniformi("u_texture", 0)
+                shaderKawaseDown.setUniformf("halfpixel", radius3 / fboBlurHalf.width, radius3 / fboBlurHalf.height)
+                blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+            }
+
+            fboBlurQuarter.inAction(camera, batch) {
+                blurtex1 = fboBlurHalf.colorBufferTexture
+                blurtex1.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                blurtex1.bind(0)
+                shaderKawaseDown.bind()
+                shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
+                shaderKawaseDown.setUniformi("u_texture", 0)
+                shaderKawaseDown.setUniformf("halfpixel", radius3 / fboBlurQuarter.width, radius3 / fboBlurQuarter.height)
+                blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+            }
+
+            fboBlurHalf.inAction(camera, batch) {
+                blurtex2 = fboBlurQuarter.colorBufferTexture
+                blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                blurtex2.bind(0)
+                shaderKawaseUp.bind()
+                shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
+                shaderKawaseUp.setUniformi("u_texture", 0)
+                shaderKawaseUp.setUniformf("halfpixel", radius3 / fboBlurQuarter.width, radius3 / fboBlurQuarter.height)
+                blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+            }
+
+            fboBlur.inAction(camera,  batch) {
+                blurtex3 = fboBlurHalf.colorBufferTexture
+                blurtex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                blurtex3.bind(0)
+                shaderKawaseUp.bind()
+                shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
+                shaderKawaseUp.setUniformi("u_texture", 0)
+                shaderKawaseUp.setUniformf("halfpixel", radius3 / fboBlurHalf.width, radius3 / fboBlurHalf.height)
+                blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+            }
+        }*/
+
+        fboBlurHalf.inAction(camera, batch) {
+            blurtex2 = renderTarget.colorBufferTexture
+            blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+            blurtex2.bind(0)
             shaderKawaseDown.bind()
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
@@ -181,29 +229,7 @@ object Toolkit : Disposable {
             blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
         }
 
-        fboBlurQuarter.inAction(camera, batch) {
-            blurtex1 = fboBlurHalf.colorBufferTexture
-            blurtex1.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            blurtex1.bind(0)
-            shaderKawaseDown.bind()
-            shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
-            shaderKawaseDown.setUniformi("u_texture", 0)
-            shaderKawaseDown.setUniformf("halfpixel", blurRadius / fboBlurQuarter.width, blurRadius / fboBlurQuarter.height)
-            blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLES)
-        }
-
-        fboBlurHalf.inAction(camera, batch) {
-            blurtex2 = fboBlurQuarter.colorBufferTexture
-            blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            blurtex2.bind(0)
-            shaderKawaseUp.bind()
-            shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
-            shaderKawaseUp.setUniformi("u_texture", 0)
-            shaderKawaseUp.setUniformf("halfpixel", blurRadius / fboBlurQuarter.width, blurRadius / fboBlurQuarter.height)
-            blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
-        }
-
-        fboBlur.inAction(camera,  batch) {
+        fboBlur.inAction(camera, batch) {
             blurtex3 = fboBlurHalf.colorBufferTexture
             blurtex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             blurtex3.bind(0)
@@ -212,30 +238,6 @@ object Toolkit : Disposable {
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", blurRadius / fboBlurHalf.width, blurRadius / fboBlurHalf.height)
             blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
-        }*/
-
-        ////////////////////////////////////////////////////////////////////////
-
-        fboBlurHalf.inAction(camera, batch) {
-            blurtex2 = renderTarget.colorBufferTexture
-            blurtex2.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            blurtex2.bind(0)
-            shaderBoxDown.bind()
-            shaderBoxDown.setUniformMatrix("u_projTrans", camera.combined)
-            shaderBoxDown.setUniformi("u_texture", 0)
-            shaderBoxDown.setUniformf("halfpixel", blurRadius / fboBlurHalf.width, blurRadius / fboBlurHalf.height)
-            blurWriteQuad2.render(shaderBoxDown, GL20.GL_TRIANGLES)
-        }
-
-        fboBlur.inAction(camera,  batch) {
-            blurtex3 = fboBlurHalf.colorBufferTexture
-            blurtex3.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-            blurtex3.bind(0)
-            shaderBoxUp.bind()
-            shaderBoxUp.setUniformMatrix("u_projTrans", camera.combined)
-            shaderBoxUp.setUniformi("u_texture", 0)
-            shaderBoxUp.setUniformf("halfpixel", blurRadius / fboBlurHalf.width, blurRadius / fboBlurHalf.height)
-            blurWriteQuad.render(shaderBoxUp, GL20.GL_TRIANGLES)
         }
 
 

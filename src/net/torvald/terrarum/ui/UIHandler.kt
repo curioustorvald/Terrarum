@@ -271,7 +271,7 @@ void main() {
         subUIs.forEach { it.update(delta) }
     }
 
-    fun render(ui: UICanvas, batch: SpriteBatch, camera: Camera) {
+    fun render(ui: UICanvas, batch: SpriteBatch, camera: Camera, parentOpacity: Float) {
 
         if (isVisible) {
             // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
@@ -290,7 +290,7 @@ void main() {
             batch.color = Color.WHITE
 
             batch.shader = shader
-            shader.setUniformf("opacity", opacity)
+            shader.setUniformf("opacity", opacity * parentOpacity)
             ui.renderUI(batch, camera)
             //ingameGraphics.flush()
 

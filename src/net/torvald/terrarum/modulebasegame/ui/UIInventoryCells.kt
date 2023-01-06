@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
@@ -23,7 +24,6 @@ internal class UIInventoryCells(
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
-    override var openCloseTime: Second = 0.0f
 
     companion object {
         val weightBarWidth = UIItemInventoryElemSimple.height * 2f + UIItemInventoryItemGrid.listGap
@@ -144,16 +144,9 @@ internal class UIInventoryCells(
         INGAME.setTooltipMessage(null)
     }
 
-    override fun doOpening(delta: Float) {
-    }
-
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
 
     override fun endClosing(delta: Float) {
+        super.endClosing(delta)
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
     }
