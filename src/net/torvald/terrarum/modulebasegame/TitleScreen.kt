@@ -326,6 +326,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             )
         }
 
+        batch.color = if (App.IS_DEVELOPMENT_BUILD) Toolkit.Theme.COL_MOUSE_UP else Color.LIGHT_GRAY
         App.fontGame.draw(batch, TerrarumPostProcessor.thisIsDebugStr, 5f, App.scr.height - 24f)
 
 

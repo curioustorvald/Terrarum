@@ -39,6 +39,9 @@ import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas;
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
+import net.torvald.unsafe.AddressOverflowException;
+import net.torvald.unsafe.DanglingPointerException;
+import net.torvald.unsafe.UnsafeHelper;
 import net.torvald.util.DebugTimers;
 
 import java.io.File;
@@ -70,12 +73,6 @@ public class App implements ApplicationListener {
      * when FALSE, some assertion and print code will not execute
      */
     public static boolean IS_DEVELOPMENT_BUILD = false;
-
-    {
-        // if -ea flag is set, turn on all the debug prints
-        try { assert (false); }
-        catch (AssertionError e) { IS_DEVELOPMENT_BUILD = true; }
-    }
 
     /**
      * Singleton instance
@@ -314,22 +311,22 @@ public class App implements ApplicationListener {
     }
 
     public static void main(String[] args) {
+
+        // if -ea flag is set, turn on all the debug prints
+        try {
+            assert false;
+        }
+        catch (AssertionError e) {
+            IS_DEVELOPMENT_BUILD = true;
+        }
+
+
         // print copyright message
         System.out.println(csiB+GAME_NAME+" "+csiG+getVERSION_STRING()+" "+csiK+"\u2014"+" "+csi0+TerrarumAppConfiguration.COPYRIGHT_DATE_NAME);
         System.out.println(csiG+TerrarumAppConfiguration.COPYRIGHT_LICENSE_TERMS_SHORT+csi0);
-
+        System.out.println("IS_DEVELOPMENT_BUILD = " + IS_DEVELOPMENT_BUILD);
 
         try {
-
-
-            // load configs
-            getDefaultDirectory();
-            createDirs();
-            initialiseConfig();
-            readConfigJson();
-
-            setGamepadButtonLabels();
-
 
             try {
                 processor = GetCpuName.getModelName();
@@ -343,6 +340,26 @@ public class App implements ApplicationListener {
             catch (IOException e2) {
                 processorVendor = "Unknown CPU";
             }
+
+
+            if (!IS_DEVELOPMENT_BUILD) {
+                var p = UnsafeHelper.INSTANCE.allocate(64);
+                p.destroy();
+                try {
+                    p.get(0);
+                }
+                catch (DanglingPointerException | AddressOverflowException e) {
+                    throw new RuntimeException("Build Error: App is not Development Build but pointer check is still installed. If the game is a production release, please report this to the developers.");
+                }
+            }
+
+
+            // load configs
+            getDefaultDirectory();
+            createDirs();
+            initialiseConfig();
+            readConfigJson();
+            setGamepadButtonLabels();
 
 
             ShaderProgram.pedantic = false;

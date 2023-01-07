@@ -1,6 +1,6 @@
 *Terrarum*
 
-Copyright (C) 2013-2022 Minjae Song ("CuriousTorvald")
+Copyright (C) 2013-2023 Minjae Song ("CuriousTorvald")
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

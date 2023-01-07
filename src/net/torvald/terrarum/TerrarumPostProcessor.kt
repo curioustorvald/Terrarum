@@ -332,7 +332,7 @@ object TerrarumPostProcessor : Disposable {
     private val currentResStr = "${App.scr.width}x${App.scr.height}"
     private val safeAreaStr = "TV Safe Area"
     private val versionStr = "Version ${App.getVERSION_STRING()}"
-    internal val thisIsDebugStr = "${App.GAME_NAME} Develoment Build $versionStr"
+    internal val thisIsDebugStr = "${App.GAME_NAME} Development Build $versionStr"
 
     /**
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
