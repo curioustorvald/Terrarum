@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import net.torvald.terrarum.App
 import net.torvald.terrarum.TerrarumAppConfiguration
+import java.util.*
 
 /**
  * BIG WARNING SIGN: since the strober will run on separate thread, ALWAYS BEWARE OF THE [ConcurrentModificationException]!
@@ -15,6 +16,8 @@ object InputStrober {
     const val KEY_DOWN = 0
     const val KEY_CHANGE = 1
     const val N_KEY_ROLLOVER = 8
+
+    private const val JIFFIES = 25L
 
     var KEYBOARD_DELAYS = longArrayOf(0L,250000000L,0L,25000000L,0L)
     private var stroboTime = 0L
@@ -45,21 +48,21 @@ object InputStrober {
 
     // code proudly stolen from tsvm's TVDOS.SYS
     private fun withKeyboardEvent() {
-        val keys = strobeKeys()
-        var keyChanged = !arrayEq(keys, oldKeys)
-        val keyDiff = arrayDiff(keys, oldKeys)
+        strobeKeys()
+        var keyChanged = !arrayEq(keybuf, oldKeys)
+        val keyDiff = arrayDiff(keybuf, oldKeys)
         val keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
 //        println("Key strobed: ${keys.joinToString()}")
 
-        if (stroboStatus % 2 == 0 && keys[0] != 0) {
+        if (stroboStatus % 2 == 0 && keybuf[0] != 0) {
             stroboStatus += 1
             stroboTime = System.nanoTime()
             repeatCount += 1
 
-            val shiftin = keys.containsSome(Input.Keys.SHIFT_LEFT, Input.Keys.SHIFT_RIGHT)
-            val altgrin = keys.contains(Input.Keys.ALT_RIGHT) || keys.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
-            val keysym0 = keysToStr(keymap, keys)
+            val shiftin = keybuf.containsSome(Input.Keys.SHIFT_LEFT, Input.Keys.SHIFT_RIGHT)
+            val altgrin = keybuf.contains(Input.Keys.ALT_RIGHT) || keybuf.containsAll(Input.Keys.ALT_LEFT, Input.Keys.CONTROL_LEFT)
+            val keysym0 = keysToStr(keymap, keybuf)
             val newKeysym0 = keysToStr(keymap, keyDiff)
             val keysym =
                     if (keysym0 == null) null
@@ -74,32 +77,39 @@ object InputStrober {
                     else if (shiftin && newKeysym0[1]?.isNotEmpty() == true) newKeysym0[1]
                     else newKeysym0[0]
 
-            val headKeyCode = if (keyDiff.size < 1) keys[0] else keyDiff[0]
+            val headKeyCode = if (keyDiff.size < 1) keybuf[0] else keyDiff[0]
 
             if (!keyChanged) {
 //                    println("KEY_DOWN '$keysym' ($headKeyCode) $repeatCount; ${keys.joinToString()}")
-                App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, keysym, headKeyCode, repeatCount, keys))
+                App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, keysym, headKeyCode, repeatCount, keybuf))
             }
             else if (newKeysym != null) {
 //                    println("KEY_DOWC '$newKeysym' ($headKeyCode) $repeatCount; ${keys.joinToString()}")
-                App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, headKeyCode, repeatCount, keys))
+                App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, headKeyCode, repeatCount, keybuf))
             }
 
-            oldKeys = keys // don't put this outside of if-cascade
+            oldKeys = keybuf // don't put this outside of if-cascade
         }
-        else if (keyChanged || keys[0] == 0) {
+        else if (keyChanged || keybuf[0] == 0) {
             stroboStatus = 0
             repeatCount = 0
 
-            if (keys[0] == 0) keyChanged = false
+            if (keybuf[0] == 0) {
+                keyChanged = false
+//                println("InputStrober idle")
+                Thread.sleep(JIFFIES) // idle sleep time. This also determines the minimum time the key need to be held down to be recognised.
+            }
         }
         else if (stroboStatus % 2 == 1 && System.nanoTime() - stroboTime < KEYBOARD_DELAYS[stroboStatus]) {
-            Thread.sleep(20L)
+//            println("InputStrober state hold")
+            Thread.sleep(JIFFIES) // key repeat duration accumulation time
         }
         else {
             stroboStatus += 1
             if (stroboStatus >= 4)
                 stroboStatus = 2
+
+//            println("InputStrober state change")
         }
     }
 
@@ -110,18 +120,19 @@ object InputStrober {
         return keymap.symbols?.get(headkey)
     }
 
-    private fun strobeKeys(): IntArray {
+    private val keybuf = IntArray(N_KEY_ROLLOVER) { 0 }
+
+    private fun strobeKeys() {
         var keysPushed = 0
-        val keyEventBuffers = IntArray(N_KEY_ROLLOVER) { 0 }
+        Arrays.fill(keybuf, 0)
         for (k in 1..254) {
             if (Gdx.input.isKeyPressed(k)) {
-                keyEventBuffers[keysPushed] = k
+                keybuf[keysPushed] = k
                 keysPushed += 1
             }
 
             if (keysPushed >= N_KEY_ROLLOVER) break
         }
-        return keyEventBuffers
     }
 
     private fun arrayEq(a: IntArray, b: IntArray): Boolean {
