@@ -30,7 +30,7 @@ object InputStrober {
 
     init {
 //        println("InputStrobe start")
-        thread.priority = 10
+        thread.priority = 5
         thread.start()
     }
 
@@ -94,7 +94,7 @@ object InputStrober {
             if (keys[0] == 0) keyChanged = false
         }
         else if (stroboStatus % 2 == 1 && System.nanoTime() - stroboTime < KEYBOARD_DELAYS[stroboStatus]) {
-            Thread.sleep(1L)
+            Thread.sleep(20L)
         }
         else {
             stroboStatus += 1

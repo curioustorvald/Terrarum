@@ -88,6 +88,10 @@ class UIItemSpinner(
     private var textCache = ""
     private var textCacheLen = 0
 
+    override fun show() {
+        fboUpdateLatch = true
+    }
+
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         batch.end()

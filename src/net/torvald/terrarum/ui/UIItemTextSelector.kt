@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.fmod
 
 /**
@@ -39,7 +40,8 @@ class UIItemTextSelector(
     override val height = 24
     private val buttonW = 30
 
-    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
+    private val fboWidth = width - 2*buttonW - 6
+//    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, fboWidth, height - 4, false)
 
     var selection = initialSelection
     private var fboUpdateLatch = true
@@ -60,6 +62,10 @@ class UIItemTextSelector(
     private var palH = palCellHeight * labelfuns.size + 2*palCursorGap
 
     private var labelCache: List<String> = listOf()
+
+    override fun show() {
+        fboUpdateLatch = true
+    }
 
     override fun update(delta: Float) {
         super.update(delta)
@@ -126,7 +132,7 @@ class UIItemTextSelector(
 
         batch.end()
 
-        if (fboUpdateLatch) {
+        /*if (fboUpdateLatch) {
             fboUpdateLatch = false
             fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
                 gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
@@ -134,9 +140,12 @@ class UIItemTextSelector(
                 it.color = Color.WHITE
                 val t = labelCache[selection]
                 val tw = App.fontGame.getWidth(t)
+
+                printdbg(this, "Drawing text: $t")
+
                 App.fontGameFBO.draw(it, t, (fbo.width - tw) / 2, 0)
             } }
-        }
+        }*/
 
         batch.begin()
 
@@ -185,7 +194,10 @@ class UIItemTextSelector(
         // draw text
         if (!paletteShowing) {
             batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
-            batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
+            val t = labelCache[selection]
+            val tw = App.fontGame.getWidth(t)
+//            batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
+            App.fontGame.draw(batch, t, posX + buttonW + 3 + (fboWidth - tw) / 2, posY + 2)
         }
         // palette
         else {
@@ -247,6 +259,6 @@ class UIItemTextSelector(
     }
 
     override fun dispose() {
-        fbo.dispose()
+//        fbo.dispose()
     }
 }

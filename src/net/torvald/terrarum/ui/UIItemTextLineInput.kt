@@ -377,6 +377,10 @@ class UIItemTextLineInput(
 
     }
 
+    override fun show() {
+        fboUpdateLatch = true
+    }
+
     override fun update(delta: Float) {
         if (mouseoverUpdateLatch) {
             super.update(delta)
