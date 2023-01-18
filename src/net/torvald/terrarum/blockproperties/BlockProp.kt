@@ -1,8 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
-import jdk.incubator.vector.FloatVector
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.gdx.graphics.VectorArray.Companion.NULLVEC
 import net.torvald.random.XXHash32
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameitems.ItemID
@@ -24,7 +22,7 @@ class BlockProp {
     var shadeColB = 0f
     var shadeColA = 0f
 
-    lateinit var opacity: FloatVector
+    lateinit var opacity: Cvec
 
     fun getOpacity(channel: Int) = when (channel) {
         0 -> shadeColR
@@ -56,12 +54,12 @@ class BlockProp {
     internal var baseLumColG = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColB = 0f // base value used to calculate dynamic luminosity
     internal var baseLumColA = 0f // base value used to calculate dynamic luminosity
-    internal var baseLumCol: FloatVector = NULLVEC
+    internal val baseLumCol = Cvec(0)
     //var lumColR = 0f // memoised value of dynamic luminosity
     //var lumColG = 0f // memoised value of dynamic luminosity
     //var lumColB = 0f // memoised value of dynamic luminosity
     //var lumColA = 0f // memoised value of dynamic luminosity
-    internal var _lumCol: FloatVector = NULLVEC
+    internal val _lumCol = Cvec(0)
     // X- and Y-value must be treated properly beforehand! (use GameWorld.coerceXY())
     fun getLumCol(x: Int, y: Int) = if (dynamicLuminosityFunction == 0) {
         baseLumCol

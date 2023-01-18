@@ -1,22 +1,18 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import jdk.incubator.vector.FloatVector
-import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.blockproperties.Block
 
 /**
  * Created by minjaesong on 2022-07-28.
  */
-private fun FloatVector.toCvec() = Cvec(this.lane(0), this.lane(1), this.lane(2), this.lane(3))
-
 class FixtureSwingingDoorOak : FixtureSwingingDoorBase {
     constructor() : super() {
         _construct(
                 2,
                 1,
                 3,
-                BlockCodex[Block.STONE].opacity.toCvec(),
+                BlockCodex[Block.STONE].opacity,
                 false,
                 "basegame",
                 "sprites/fixtures/door_basegame-48.tga",
@@ -33,7 +29,7 @@ class FixtureSwingingDoorEbony : FixtureSwingingDoorBase {
                 2,
                 1,
                 3,
-                BlockCodex[Block.STONE].opacity.toCvec(),
+                BlockCodex[Block.STONE].opacity,
                 false,
                 "basegame",
                 "sprites/fixtures/door_basegame-49.tga",
@@ -50,7 +46,7 @@ class FixtureSwingingDoorBirch : FixtureSwingingDoorBase {
                 2,
                 1,
                 3,
-                BlockCodex[Block.STONE].opacity.toCvec(),
+                BlockCodex[Block.STONE].opacity,
                 false,
                 "basegame",
                 "sprites/fixtures/door_basegame-50.tga",
@@ -67,7 +63,7 @@ class FixtureSwingingDoorRosewood : FixtureSwingingDoorBase {
                 2,
                 1,
                 3,
-                BlockCodex[Block.STONE].opacity.toCvec(),
+                BlockCodex[Block.STONE].opacity,
                 false,
                 "basegame",
                 "sprites/fixtures/door_basegame-51.tga",

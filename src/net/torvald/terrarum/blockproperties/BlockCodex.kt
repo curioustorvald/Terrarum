@@ -1,7 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
-import jdk.incubator.vector.FloatVector
-import net.torvald.gdx.graphics.VectorArray
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitems.ItemID
@@ -191,7 +190,7 @@ class BlockCodex {
         prop.shadeColG = record.floatVal("shdg")
         prop.shadeColB = record.floatVal("shdb")
         prop.shadeColA = record.floatVal("shduv")
-
+        prop.opacity = Cvec(prop.shadeColR, prop.shadeColG, prop.shadeColB, prop.shadeColA)
 
         prop.strength = record.intVal("str")
         prop.density = record.intVal("dsty")
@@ -200,13 +199,7 @@ class BlockCodex {
         prop.baseLumColG = record.floatVal("lumg")
         prop.baseLumColB = record.floatVal("lumb")
         prop.baseLumColA = record.floatVal("lumuv")
-
-        val cvec = floatArrayOf(
-            prop.shadeColR, prop.shadeColG, prop.shadeColB, prop.shadeColA,
-            prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA
-        )
-        prop.opacity = FloatVector.fromArray(VectorArray.SPECIES, cvec, 0)
-        prop.baseLumCol = FloatVector.fromArray(VectorArray.SPECIES, cvec, 4)
+        prop.baseLumCol.set(prop.baseLumColR, prop.baseLumColG, prop.baseLumColB, prop.baseLumColA)
 
         prop.friction = record.intVal("fr")
         prop.viscosity = record.intVal("vscs")

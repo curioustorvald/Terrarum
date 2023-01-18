@@ -1,16 +1,15 @@
 package net.torvald.terrarum.gameactors
 
-import jdk.incubator.vector.FloatVector
-import net.torvald.gdx.graphics.VectorArray
+import net.torvald.gdx.graphics.Cvec
 
 /**
  * Lightbox is defined based on pixelwise position in the world!
  */
 class Lightbox() {
     var hitbox: Hitbox = Hitbox(0.0,0.0,0.0,0.0)
-    var light: FloatVector = FloatVector.broadcast(VectorArray.SPECIES, 0f)
+    var light: Cvec = Cvec()
 
-    constructor(hitbox: Hitbox, light: FloatVector) : this() {
+    constructor(hitbox: Hitbox, light: Cvec) : this() {
         this.hitbox = hitbox
         this.light = light
     }

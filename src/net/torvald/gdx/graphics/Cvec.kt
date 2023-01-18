@@ -380,8 +380,6 @@ class Cvec {
 
     fun toGdxColor() = Color(r, g, b, a)
 
-    fun toFloatArray() = floatArrayOf(r, g, b, a)
-
     /** Extract Hue-Saturation-Value. This is the inverse of [.fromHsv].
      * @param hsv The HSV array to be modified.
      * @return HSV components for chaining.

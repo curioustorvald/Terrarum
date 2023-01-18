@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.gdx.graphics.VectorArray.Companion.NULLVEC
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ItemCodex
@@ -40,9 +39,9 @@ open class DroppedItem : ActorWithBody {
     private val randKey1 = (Math.random() * 256).toInt()
     private val randKey2 = (Math.random() * 256).toInt()
 
-    override var lightBoxList = listOf(Lightbox(this.hitbox.clone().setPosition(0.0, 0.0), NULLVEC))
+    override var lightBoxList = listOf(Lightbox(this.hitbox.clone().setPosition(0.0, 0.0), Cvec(0)))
         // the Cvec will be calculated dynamically on Update
-    override var shadeBoxList = listOf(Lightbox(this.hitbox.clone().setPosition(0.0, 0.0), NULLVEC))
+    override var shadeBoxList = listOf(Lightbox(this.hitbox.clone().setPosition(0.0, 0.0), Cvec(0)))
         // the Cvec will be calculated dynamically on Update
 
     /**
