@@ -2,7 +2,9 @@ package net.torvald.terrarum.blockproperties
 
 import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
+import jdk.incubator.vector.FloatVector
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.VectorArray
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
@@ -33,17 +35,17 @@ object BlockPropUtil {
 
     }
 
-    private fun getTorchFlicker(prop: BlockProp): Cvec {
+    private fun getTorchFlicker(prop: BlockProp): FloatVector {
         val funcY = FastMath.interpolateLinear(prop.rngBase0 / flickerFuncDomain, prop.rngBase1, prop.rngBase2)
         return alterBrightnessUniform(prop.baseLumCol, funcY)
     }
 
-    private fun getSlowBreath(prop: BlockProp): Cvec {
+    private fun getSlowBreath(prop: BlockProp): FloatVector {
         val funcY = FastMath.sin(FastMath.PI * prop.rngBase0 / breathCycleDuration) * breathRange
         return alterBrightnessUniform(prop.baseLumCol, funcY)
     }
 
-    private fun getPulsate(prop: BlockProp): Cvec {
+    private fun getPulsate(prop: BlockProp): FloatVector {
         val funcY = FastMath.sin(FastMath.PI * prop.rngBase0 / pulsateCycleDuration) * pulsateRange
         return alterBrightnessUniform(prop.baseLumCol, funcY)
     }
@@ -92,7 +94,7 @@ object BlockPropUtil {
                 prop.rngBase2 = getNewRandom()
             }
 
-            prop._lumCol.set(getDynamicLumFunc(prop))
+            prop._lumCol = getDynamicLumFunc(prop)
             //prop.lumColR = prop.lumCol.r
             //prop.lumColG = prop.lumCol.g
             //prop.lumColB = prop.lumCol.b
@@ -104,11 +106,11 @@ object BlockPropUtil {
 
     private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x
 
-    private fun getDynamicLumFunc(prop: BlockProp): Cvec {
+    private fun getDynamicLumFunc(prop: BlockProp): FloatVector {
         return when (prop.dynamicLuminosityFunction) {
             1    -> getTorchFlicker(prop)
-            2    -> (INGAME.world).globalLight.cpy() // current global light
-            3    -> WeatherMixer.getGlobalLightOfTime(INGAME.world, WorldTime.DAY_LENGTH / 2).cpy() // daylight at noon
+            2    -> FloatVector.fromArray(VectorArray.SPECIES, INGAME.world.globalLight.toFloatArray(), 0) // current global light
+            3    -> FloatVector.fromArray(VectorArray.SPECIES, WeatherMixer.getGlobalLightOfTime(INGAME.world, WorldTime.DAY_LENGTH / 2).toFloatArray(), 0) // daylight at noon
             4    -> getSlowBreath(prop)
             5    -> getPulsate(prop)
             else -> prop.baseLumCol
@@ -136,12 +138,7 @@ object BlockPropUtil {
      * @param brighten (-1.0 - 1.0) negative means darkening
      * @return processed colour
      */
-    private fun alterBrightnessUniform(data: Cvec, brighten: Float): Cvec {
-        return Cvec(
-                data.r + brighten,
-                data.g + brighten,
-                data.b + brighten,
-                data.a + brighten
-        )
+    private fun alterBrightnessUniform(data: FloatVector, brighten: Float): FloatVector {
+        return data.add(brighten)
     }
 }

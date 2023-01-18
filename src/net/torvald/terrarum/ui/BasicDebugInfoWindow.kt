@@ -196,10 +196,10 @@ class BasicDebugInfoWindow : UICanvas() {
         try {
             world?.let {
                 val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
-                val rawR = valRaw?.r?.toDouble().toIntAndFrac(1,3)
-                val rawG = valRaw?.g?.toDouble().toIntAndFrac(1,3)
-                val rawB = valRaw?.b?.toDouble().toIntAndFrac(1,3)
-                val rawA = valRaw?.a?.toDouble().toIntAndFrac(1,3)
+                val rawR = valRaw?.lane(0)?.toDouble().toIntAndFrac(1,3)
+                val rawG = valRaw?.lane(1)?.toDouble().toIntAndFrac(1,3)
+                val rawB = valRaw?.lane(2)?.toDouble().toIntAndFrac(1,3)
+                val rawA = valRaw?.lane(3)?.toDouble().toIntAndFrac(1,3)
 
                 val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)

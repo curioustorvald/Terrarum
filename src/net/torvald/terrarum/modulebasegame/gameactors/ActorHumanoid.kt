@@ -3,7 +3,10 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
+import jdk.incubator.vector.FloatVector
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.VectorArray
+import net.torvald.gdx.graphics.VectorArray.Companion.NULLVEC
 import net.torvald.spriteanimation.AssembledSpriteAnimation
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.spriteanimation.SheetSpriteAnimation
@@ -65,32 +68,32 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         if (houseDesignation != null) houseDesignation!!.clear()
     }
 
-    var actorValueColour: Cvec
-        get() = Cvec(
+    var actorValueColour: FloatVector
+        get() = FloatVector.fromArray(VectorArray.SPECIES, floatArrayOf(
                 (actorValue.getAsFloat(AVKey.LUMR) ?: 0f),
                 (actorValue.getAsFloat(AVKey.LUMG) ?: 0f),
                 (actorValue.getAsFloat(AVKey.LUMB) ?: 0f),
                 (actorValue.getAsFloat(AVKey.LUMA) ?: 0f)
-        )
+        ), 0)
         set(value) {
-            actorValue[AVKey.LUMR] = value.r
-            actorValue[AVKey.LUMG] = value.g
-            actorValue[AVKey.LUMB] = value.b
-            actorValue[AVKey.LUMA] = value.a
+            actorValue[AVKey.LUMR] = value.lane(0)
+            actorValue[AVKey.LUMG] = value.lane(1)
+            actorValue[AVKey.LUMB] = value.lane(2)
+            actorValue[AVKey.LUMA] = value.lane(3)
         }
 
-    var actorValueShade: Cvec
-        get() = Cvec(
+    var actorValueShade: FloatVector
+        get() = FloatVector.fromArray(VectorArray.SPECIES, floatArrayOf(
                 (actorValue.getAsFloat(AVKey.OPAR) ?: 0f),
                 (actorValue.getAsFloat(AVKey.OPAG) ?: 0f),
                 (actorValue.getAsFloat(AVKey.OPAB) ?: 0f),
                 (actorValue.getAsFloat(AVKey.OPAA) ?: 0f)
-        )
+        ), 0)
         set(value) {
-            actorValue[AVKey.OPAR] = value.r
-            actorValue[AVKey.OPAG] = value.g
-            actorValue[AVKey.OPAB] = value.b
-            actorValue[AVKey.OPAA] = value.a
+            actorValue[AVKey.OPAR] = value.lane(0)
+            actorValue[AVKey.OPAG] = value.lane(1)
+            actorValue[AVKey.OPAB] = value.lane(2)
+            actorValue[AVKey.OPAA] = value.lane(3)
         }
 
     /**
@@ -99,9 +102,9 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    @Transient override var lightBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
+    @Transient override var lightBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), NULLVEC))
         // the actual values are update on the update()
-    @Transient override var shadeBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
+    @Transient override var shadeBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), NULLVEC))
         // the actual values are update on the update()
 
     @Transient val BASE_DENSITY = 980.0

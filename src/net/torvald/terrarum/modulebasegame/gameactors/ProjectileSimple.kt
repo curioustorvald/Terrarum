@@ -2,7 +2,9 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import jdk.incubator.vector.FloatVector
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.VectorArray
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Point2d
@@ -29,8 +31,8 @@ open class ProjectileSimple : ActorWithBody, Projectile {
     var speed: Int = 0
 
 
-    private var color: Cvec
-        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Cvec).cpy()
+    private var color: FloatVector
+        get() = bulletDatabase[type][OFFSET_LUMINOSITY] as FloatVector
         set(value) {
         }
     /**
@@ -115,7 +117,9 @@ open class ProjectileSimple : ActorWithBody, Projectile {
 
     override fun drawGlow(batch: SpriteBatch) = drawBody(batch)
 
+
     companion object {
+        private fun Int.toFloatVector() = FloatVector.fromArray(VectorArray.SPECIES, Cvec(this).toFloatArray(), 0)
         val OFFSET_DAMAGE = 0
         val OFFSET_COL = 1 // Color or SpriteAnimation
         val OFFSET_NOGRAVITY = 2
@@ -123,8 +127,8 @@ open class ProjectileSimple : ActorWithBody, Projectile {
         val OFFSET_LUMINOSITY = 4
         val bulletDatabase = arrayOf(
                 // damage, display colour, no gravity, speed
-                arrayOf(7, Cvec(0xFF5429_FF.toInt()), true, 40, 32),
-                arrayOf(8, Cvec(0xFF5429_FF.toInt()), true, 20, 0)
+                arrayOf(7, 0xFF5429_FF.toInt().toFloatVector(), true, 40, 32),
+                arrayOf(8, 0xFF5429_FF.toInt().toFloatVector(), true, 20, 0)
                 // ...
         )
     }

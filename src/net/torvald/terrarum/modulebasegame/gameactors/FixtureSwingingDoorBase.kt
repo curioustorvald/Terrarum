@@ -1,7 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
+import jdk.incubator.vector.FloatVector
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.VectorArray
+import net.torvald.gdx.graphics.VectorArray.Companion.NULLVEC
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -26,7 +29,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
     var tw = 2 // tilewise width of the door when opened
     var twClosed = 1 // tilewise width of the door when closed
     var th = 3 // tilewise height of the door
-    var opacity = BlockCodex[Block.STONE].opacity
+    var opacity = BlockCodex[Block.STONE].opacity.toCvec()
     var isOpacityActuallyLuminosity = false
     var moduleName = "basegame"
     var texturePath = "sprites/fixtures/door_test.tga"
@@ -43,9 +46,9 @@ open class FixtureSwingingDoorBase : FixtureBase {
     private var pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
     private var tilewiseDistToAxis = tw - twClosed
 
-    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
+    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), NULLVEC))
     // the Cvec will be calculated dynamically on Update
-    @Transient override var shadeBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
+    @Transient override var shadeBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), NULLVEC))
     // the Cvec will be calculated dynamically on Update
 
     protected var doorState = 0 // -1: open toward left, 0: closed, 1: open toward right
@@ -53,6 +56,9 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
     @Transient private lateinit var customNameFun: () -> String
     @Transient private lateinit var doorHoldLength: HashMap<Int, Second>
+
+    private fun FloatVector.toCvec() = Cvec(this.lane(0), this.lane(1), this.lane(2), this.lane(3))
+
 
     constructor() : super(
             BlockBox(BlockBox.FULL_COLLISION, 1, 1), // temporary value, will be overwritten by spawn()
@@ -62,7 +68,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
                 2,
                 1,
                 3,
-                BlockCodex[Block.STONE].opacity,
+                BlockCodex[Block.STONE].opacity.toCvec(),
                 false,
                 "basegame",
                 "sprites/fixtures/door_test.tga",
@@ -73,18 +79,18 @@ open class FixtureSwingingDoorBase : FixtureBase {
     }
 
     protected fun _construct(
-            tw: Int, // tilewise width of the door when opened
-            twClosed: Int, // tilewise width of the door when closed
-            th: Int, // tilewise height of the door
-            opacity: Cvec,
-            isOpacityActuallyLuminosity: Boolean,
-            moduleName: String,
-            texturePath: String,
-            textureIdentifier: String,
-            nameKey: String,
-            nameKeyReadFromLang: Boolean,
-            doorCloseHoldLength: Second = 0.1f,
-            doorOpenedHoldLength: Second = 0.25f
+        tw: Int, // tilewise width of the door when opened
+        twClosed: Int, // tilewise width of the door when closed
+        th: Int, // tilewise height of the door
+        opacity: Cvec,
+        isOpacityActuallyLuminosity: Boolean,
+        moduleName: String,
+        texturePath: String,
+        textureIdentifier: String,
+        nameKey: String,
+        nameKeyReadFromLang: Boolean,
+        doorCloseHoldLength: Second = 0.1f,
+        doorOpenedHoldLength: Second = 0.25f
     ) {
         this.tw = tw
         this.twClosed = twClosed
@@ -123,7 +129,7 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
         // define light/shadebox
         // TODO: redefine when opened to left/right
-        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = opacity
+        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = FloatVector.fromArray(VectorArray.SPECIES, opacity.toFloatArray(), 0)
 
         // define physical size
         setHitboxDimension(TILE_SIZE * tilewiseHitboxWidth, TILE_SIZE * tilewiseHitboxHeight, 0, 0)
@@ -147,16 +153,16 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
         // define light/shadebox
         // TODO: redefine when opened to left/right
-        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = opacity
+        (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = FloatVector.fromArray(VectorArray.SPECIES, opacity.toFloatArray(), 0)
 
     }
 
     private fun setOpacity() {
-        shadeBoxList[0].light = opacity
+        shadeBoxList[0].light = FloatVector.fromArray(VectorArray.SPECIES, opacity.toFloatArray(), 0)
     }
 
     private fun unsetOpacity() {
-        shadeBoxList[0].light = Cvec(0)
+        shadeBoxList[0].light = NULLVEC
     }
 
     open protected fun closeDoor(doorHandler: Int) {
