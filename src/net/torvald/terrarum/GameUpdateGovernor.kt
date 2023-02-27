@@ -28,7 +28,7 @@ object Anarchy : GameUpdateGovernor {
     }
 }
 
-object LimitUpdateRate : GameUpdateGovernor {
+object ConsistentUpdateRate : GameUpdateGovernor {
 
     private var akku = 0f
 

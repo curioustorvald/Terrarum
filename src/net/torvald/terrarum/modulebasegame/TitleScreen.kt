@@ -126,7 +126,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     init {
         warning32bitJavaIcon.flip(false, false)
-        gameUpdateGovernor = LimitUpdateRate.also { it.reset() }
+        gameUpdateGovernor = ConsistentUpdateRate.also { it.reset() }
     }
 
     private fun loadThingsWhileIntroIsVisible() {
@@ -139,10 +139,12 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
             val world = ReadSimpleWorld(reader, file)
             demoWorld = world
+            demoWorld.worldTime.timeDelta = 0//60
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
             demoWorld = GameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
+            demoWorld.worldTime.timeDelta = 60
             printdbg(this, "Demo world not found, using empty world")
         }
 
@@ -177,8 +179,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         cameraPlayer = CameraPlayer(demoWorld, cameraAI)
-
-        demoWorld.worldTime.timeDelta = 0//60
 
 
         IngameRenderer.setRenderedWorld(demoWorld)

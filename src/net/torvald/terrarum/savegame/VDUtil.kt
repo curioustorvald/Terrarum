@@ -8,6 +8,7 @@ import java.util.*
 import java.util.logging.Level
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import kotlin.collections.HashMap
 import kotlin.experimental.and
 
 /**
@@ -71,11 +72,14 @@ object VDUtil {
 
         //println("[VDUtil] currentUnixtime = $currentUnixtime")
 
+        val entryOffsetInfoForDebug = HashMap<EntryID, Long>()
+
         var entryOffset = VirtualDisk.HEADER_SIZE
         // not footer, entries
         while (entryOffset < inbytes.size) {
             //println("[VDUtil] entryOffset = $entryOffset")
             // read and prepare all the shits
+            val entryOffsetStart = entryOffset
             val entryID = inbytes.sliceArray64(entryOffset..entryOffset + 7).toLongBig()
             val entryParentID = inbytes.sliceArray64(entryOffset + 8..entryOffset + 15).toLongBig()
             val entryTypeFlag = inbytes[entryOffset + 16]
@@ -187,11 +191,15 @@ object VDUtil {
                     }
 
                     // add entry to disk
+                    if (vdisk.entries[entryID] != null) {
+                        println("[savegame.VDUtil] Overwriting existing entry ${entryID.toHex()} to new one; offset: ${entryOffsetInfoForDebug[entryID]} -> $entryOffsetStart; raw type flag: $entryTypeFlag)")
+                    }
                     vdisk.entries[entryID] = diskEntry
+                    entryOffsetInfoForDebug[entryID] = entryOffsetStart
                 }
                 else {
                     if (DEBUG_PRINT_READ) {
-                        println("[savegame.VDUtil] Discarding entry ${entryID.toHex()} (raw type flag: $entryTypeFlag)")
+                        println("[savegame.VDUtil] Discarding entry ${entryID.toHex()} at offset $entryOffsetStart (raw type flag: $entryTypeFlag)")
                     }
                 }
             }

@@ -159,7 +159,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             it.dispose()
         }
 
-        gameUpdateGovernor = LimitUpdateRate
+        gameUpdateGovernor = ConsistentUpdateRate
     }
 
 

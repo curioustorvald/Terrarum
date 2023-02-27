@@ -97,7 +97,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         world = gameWorld
 
-        gameUpdateGovernor = LimitUpdateRate.also { it.reset() }
+        gameUpdateGovernor = ConsistentUpdateRate.also { it.reset() }
     }
 
 
