@@ -51,6 +51,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static net.torvald.terrarum.TerrarumKt.*;
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * The framework's Application Loader
@@ -132,6 +133,8 @@ public class App implements ApplicationListener {
     public static String processorVendor = "(andromeda software development)"; // definitely not taken from "that" demogroup
     public static String renderer = "(a super-fancy virtual photoradiator)";
     public static String rendererVendor = "(aperture science psychovisualcomputation laboratory)";
+
+    public static boolean isAppleM = false;
 
     public static int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
     public static boolean MULTITHREAD;
@@ -341,6 +344,10 @@ public class App implements ApplicationListener {
                 processorVendor = "Unknown CPU";
             }
 
+            if (processor.startsWith("Apple M") && Objects.equals(systemArch, "aarch64")) {
+                isAppleM = true;
+                System.out.println("Apple Proprietary "+processor+" detected; don't expect smooth sailing...");
+            }
 
             if (!IS_DEVELOPMENT_BUILD) {
                 var p = UnsafeHelper.INSTANCE.allocate(64);
@@ -437,7 +444,7 @@ public class App implements ApplicationListener {
         camera = new OrthographicCamera((scr.getWf()), (scr.getHf()));
 
         batch = new FlippingSpriteBatch();
-        shapeRender = new ShapeRenderer();
+        shapeRender = new ShapeRenderer(5000, MacosGL32Shaders.INSTANCE.createShapeRendererShader());
 
         initViewPort(scr.getWidth(), scr.getHeight());
 
