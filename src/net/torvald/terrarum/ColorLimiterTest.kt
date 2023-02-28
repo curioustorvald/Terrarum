@@ -48,7 +48,7 @@ object ColorLimiterTest : ApplicationAdapter() {
         img = Texture("assets/test_texture.tga")
 
         batch = SpriteBatch()
-        shapeRenderer = ShapeRenderer()
+        shapeRenderer = App.makeShapeRenderer()
 
         font = TerrarumSansBitmap("assets/graphics/fonts/terrarum-sans-bitmap")
 

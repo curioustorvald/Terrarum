@@ -93,7 +93,7 @@ object TerrarumPostProcessor : Disposable {
 
             batch.projectionMatrix = camera.combined
 
-            shapeRenderer = ShapeRenderer()
+            shapeRenderer = App.makeShapeRenderer()
             shapeRenderer.projectionMatrix = camera.combined
 
             Gdx.gl20.glViewport(0, 0, App.scr.width, App.scr.height)

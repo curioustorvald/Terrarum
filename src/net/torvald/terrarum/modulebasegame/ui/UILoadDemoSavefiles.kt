@@ -103,7 +103,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
     override var openCloseTime: Second = OPENCLOSE_GENERIC
 
 
-    private val shapeRenderer = ShapeRenderer()
+    private val shapeRenderer = App.makeShapeRenderer()
 
 
     internal val uiWidth = SAVE_CELL_WIDTH

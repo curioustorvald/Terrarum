@@ -313,6 +313,10 @@ public class App implements ApplicationListener {
         return currentScreen;
     }
 
+    public static ShapeRenderer makeShapeRenderer() {
+        return new ShapeRenderer(5000, MacosGL32Shaders.INSTANCE.createShapeRendererShader());
+    }
+
     public static void main(String[] args) {
 
         // if -ea flag is set, turn on all the debug prints
@@ -444,7 +448,7 @@ public class App implements ApplicationListener {
         camera = new OrthographicCamera((scr.getWf()), (scr.getHf()));
 
         batch = new FlippingSpriteBatch();
-        shapeRender = new ShapeRenderer(5000, MacosGL32Shaders.INSTANCE.createShapeRendererShader());
+        shapeRender = makeShapeRenderer();
 
         initViewPort(scr.getWidth(), scr.getHeight());
 
@@ -465,7 +469,7 @@ public class App implements ApplicationListener {
         );
         shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
         shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
-        shaderPassthruRGBA = SpriteBatch.createDefaultShader();
+        shaderPassthruRGBA = loadShaderFromClasspath("shaders/gl32spritebatch.vert", "shaders/gl32spritebatch.frag");
         shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
         shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
         shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");

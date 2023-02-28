@@ -71,7 +71,7 @@ class UIInventoryFull(
             gdxBlendNormalStraightAlpha()
 
             if (shapeRenderer == null) {
-                shapeRenderer = ShapeRenderer()
+                shapeRenderer = App.makeShapeRenderer()
                 App.disposables.add(shapeRenderer)
             }
 

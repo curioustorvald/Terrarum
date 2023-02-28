@@ -17,6 +17,8 @@ vec2 doubley = vec2(0.0, 2.0);
 vec2 twister = vec2(1.0, -1.0);
 vec2 boolean = vec2(1.0, 0.0);
 
+out vec4 fragColor;
+
 void main() {
     vec4 sum = texture(u_texture, v_texCoords) +
     texture(u_texture, v_texCoords + halfpixel) +
@@ -28,5 +30,5 @@ void main() {
     texture(u_texture, v_texCoords + halfpixel * boolean.yx) +
     texture(u_texture, v_texCoords - halfpixel * boolean.yx) ;
 
-    gl_FragColor = sum / 9.0;
+    fragColor = sum / 9.0;
 }
