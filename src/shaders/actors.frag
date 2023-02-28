@@ -1,10 +1,10 @@
-#version 130
+#version 150
 #ifdef GL_ES
     precision mediump float;
 #endif
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+in vec4 v_color;
+in vec2 v_texCoords;
 uniform sampler2D u_texture;
 
 int bayer[36] = int[](
@@ -19,6 +19,7 @@ float bayerSize = 6.0;
 float bayerDivider = 256;
 
 vec2 boolean = vec2(0.0, 1.0);
+out vec4 fragColor;
 
 void main() {
     vec4 inColor = v_color * (texture2D(u_texture, v_texCoords));
@@ -29,6 +30,6 @@ void main() {
 
     vec4 selvec = vec4(0.0, 0.0, 0.0, (alpha > bayerThreshold) ? 1.0 : 0.0);
 
-    gl_FragColor = inColor * boolean.yyyx + selvec;
-    gl_FragColor = inColor;
+    fragColor = inColor * boolean.yyyx + selvec;
+    fragColor = inColor;
 }

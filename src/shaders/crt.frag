@@ -1,11 +1,11 @@
-#version 130
+#version 150
 #ifdef GL_ES
     precision mediump float;
 #endif
 
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+in vec4 v_color;
+in vec2 v_texCoords;
 uniform sampler2D u_texture;
 
 uniform vec2 resolution;
@@ -17,6 +17,7 @@ vec3 scanline_darkening = vec3(0.66, 0.66, 0.66);
 uniform float alternative_scanline = 0.0; // 1.0: true
 
 uniform float blur_blend = 0.5;
+out vec4 fragColor;
 
 void main(void) {
     vec4 color = texture2D(u_texture, v_texCoords).rgba;
@@ -40,6 +41,6 @@ void main(void) {
         out_color = out_color * scanline_darkening;
     }
 
-    gl_FragColor = vec4(out_color, 1);
-    //gl_FragColor = texture2D(u_texture, v_texCoords);
+    fragColor = vec4(out_color, 1);
+    //fragColor = texture2D(u_texture, v_texCoords);
 }

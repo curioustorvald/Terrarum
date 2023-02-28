@@ -2,7 +2,7 @@
 
 */
 
-#version 130
+#version 150
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -10,8 +10,9 @@ precision mediump float;
 //layout(origin_upper_left) in vec4 gl_FragCoord; // commented; requires #version 150 or later
 // gl_FragCoord is origin to bottom-left
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+in vec4 v_color;
+in vec2 v_texCoords;
+
 uniform sampler2D u_texture;
 
 
@@ -40,6 +41,8 @@ uniform float drawBreakage = 1.0; // set it to 0f to not draw breakage, 1f to dr
 uniform float mulBlendIntensity = 1.0; // used my MUL-blending drawings; works about the same way as the Layer Opacity slider of Photoshop/Krita/etc.
 
 const vec2 bc = vec2(1.0, 0.0); //binary constant
+
+out vec4 fragColor;
 
 ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
@@ -106,6 +109,6 @@ void main() {
 
     vec4 finalColor =mix(finalTile, finalBreakage, finalBreakage.a) * bc.xxxy + (finalTile * bc.yyyx);
 
-    gl_FragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
+    fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
 
 }

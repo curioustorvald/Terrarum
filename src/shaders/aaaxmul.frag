@@ -1,14 +1,15 @@
-#version 130
+#version 150
 #ifdef GL_ES
     precision mediump float;
 #endif
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
-uniform sampler2D u_texture; // world texture, has alpha value that is meaningful
+in vec4 v_color;
+in vec2 v_texCoords;
 
+uniform sampler2D u_texture; // world texture, has alpha value that is meaningful
 uniform sampler2D tex1; // lightmap texture
 uniform vec2 tex1Offset;
+out vec4 fragColor;
 
 void main() {
 	vec4 colorTex0 = texture2D(u_texture, v_texCoords); // world texture
@@ -16,5 +17,5 @@ void main() {
 
     colorTex1 = vec4(colorTex1.www, 1.0);
 
-    gl_FragColor = colorTex0 * colorTex1;
+    fragColor = colorTex0 * colorTex1;
 }

@@ -1,14 +1,16 @@
-#version 130
+#version 150
 #ifdef GL_ES
     precision mediump float;
 #endif
 
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+in vec4 v_color;
+in vec2 v_texCoords;
+
 uniform sampler2D u_texture;
 
+out vec4 fragColor;
 
 void main(void) {
-    gl_FragColor = vec4(texture2D(u_texture, v_texCoords).rgb, 1.0);
+    fragColor = vec4(texture2D(u_texture, v_texCoords).rgb, 1.0);
 }

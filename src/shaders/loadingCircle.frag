@@ -1,11 +1,11 @@
-#version 130
+#version 150
 #ifdef GL_ES
     precision mediump float;
 #endif
 
+in vec4 v_color;
+in vec2 v_texCoords;
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 
 uniform float rcount = 64.0;
@@ -17,6 +17,8 @@ uniform vec2 circleCentrePoint;
 uniform vec2 colorCentrePoint;
 uniform float circleSize;
 
+out vec4 fragColor;
+
 void main() {
     vec2 screenCoord = gl_FragCoord.xy;
 
@@ -27,13 +29,13 @@ void main() {
 
 
     if (distToCircleCentre <= circleSizeSqr) {
-    	gl_FragColor = vec4(0.993, 0.993, 0.993, 1.0);
+    	fragColor = vec4(0.993, 0.993, 0.993, 1.0);
     }
     else if (distToCircleCentre <= circleSizeSqr + 200) { // dunno why it's 200; 2000 makes 10px feather
-    	gl_FragColor = vec4(0.993, 0.993, 0.993, 1 - (distToCircleCentre - circleSizeSqr) / 200);
+    	fragColor = vec4(0.993, 0.993, 0.993, 1 - (distToCircleCentre - circleSizeSqr) / 200);
     }
     else {
-        gl_FragColor = vec4(0,0,0,1);
+        fragColor = vec4(0,0,0,1);
     }
 
 }

@@ -3,7 +3,7 @@
  * http://momentsingraphics.de/BlueNoise.html
  */
 
-#version 130
+#version 150
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -17,8 +17,9 @@ vec4 gammaOut(vec4 col) {
     return pow(col, vec4(1.0 / 2.2));
 }
 
-varying vec4 v_color; // unused!
-varying vec2 v_texCoords;
+in vec4 v_color; // unused!
+in vec2 v_texCoords;
+
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
 uniform ivec2 rnd = ivec2(0,0);
@@ -29,6 +30,8 @@ uniform mat4 swizzler = mat4(
 0.0,0.0,0.0,1.0
 );
 uniform float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
+
+out vec4 fragColor;
 
 vec2 boolean = vec2(0.0, 1.0);
 vec4 matrixNormaliser = vec4(0.5 / 256.0);
@@ -78,8 +81,8 @@ void main(void) {
     vec4 selvec = getDitherredDot(graded);
     vec4 outcol = selvec * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
 
-    gl_FragColor = outcol;
+    fragColor = outcol;
 //    ivec4 bytes = ivec4(255.0 * outcol);
 //    ivec4 mask = ivec4(0x55);
-//    gl_FragColor = (bytes ^ mask) / 255.0;
+//    fragColor = (bytes ^ mask) / 255.0;
 }

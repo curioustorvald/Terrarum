@@ -1,11 +1,12 @@
-#version 130
+#version 150
 #ifdef GL_ES
     precision mediump float;
 #endif
 
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+in vec4 v_color;
+in vec2 v_texCoords;
+
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
 
@@ -18,6 +19,7 @@ uniform float parallax_size = 1.0/3.0; // 0: no parallax
 // inverted zoom; this value must set to (1f/zoom)
 uniform float zoomInv = 1.0;
 
+out vec4 fragColor;
 
 float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 vec4 quantiser = vec4(quant);
@@ -50,7 +52,7 @@ void main(void) {
     vec4 inColor = v_color * mix(newBottom, newTop, scale);
     vec4 selvec = getDitherredDot(inColor);
 
-    gl_FragColor = selvec;
+    fragColor = selvec;
 }
 
 /*

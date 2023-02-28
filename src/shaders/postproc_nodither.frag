@@ -3,7 +3,7 @@
  * http://momentsingraphics.de/BlueNoise.html
  */
 
-#version 130
+#version 150
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -17,8 +17,9 @@ vec4 gammaOut(vec4 col) {
     return pow(col, vec4(1.0 / 2.2));
 }
 
-varying vec4 v_color; // unused!
-varying vec2 v_texCoords;
+in vec4 v_color; // unused!
+in vec2 v_texCoords;
+
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
 uniform ivec2 rnd = ivec2(0,0);
@@ -44,6 +45,8 @@ mat4 ycocg_to_rgb = mat4(
 
 uniform vec4 vibrancy = vec4(1.0);//vec4(1.0, 1.4, 1.2, 1.0);
 
+out vec4 fragColor;
+
 void main(void) {
     // convert input RGB into YCoCg
     vec4 incolour = texture2D(u_texture, v_texCoords);
@@ -57,5 +60,5 @@ void main(void) {
 
     // Dither the output
     vec4 graded = ycocg_to_rgb * newColour;
-    gl_FragColor = graded * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
+    fragColor = graded * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
 }

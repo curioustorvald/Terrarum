@@ -1,11 +1,14 @@
+#version 150
 #ifdef GL_ES
 precision mediump float;
 #endif
 
+in vec4 v_color;
+in vec2 v_texCoords;
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
 uniform sampler2D u_texture;
+
+out vec4 fragColor;
 
 mat4 rgb_to_ycocg = mat4(
     0.25,  1.0, -0.5, 0.0,
@@ -29,5 +32,5 @@ void main() {
 
     vec4 scalar = vec4(1.0, 2.0, 2.0, 1.0);
 
-    gl_FragColor = ycocg_to_rgb * (yog * scalar);
+    fragColor = ycocg_to_rgb * (yog * scalar);
 }
