@@ -18,6 +18,7 @@ import com.sudoplay.joise.module.ModuleFractal
 import com.sudoplay.joise.module.ModuleScaleOffset
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
+import net.torvald.terrarum.DefaultGL32Shaders
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.concurrent.sliceEvenly
 import net.torvald.terrarum.inUse
@@ -45,7 +46,7 @@ class NoiseGenerator : ScreenAdapter() {
     override fun show() {
         Gdx.input.inputProcessor = NoiseGeneratorController(this)
 
-        batch = SpriteBatch()
+        batch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
         camera = OrthographicCamera(App.scr.wf, App.scr.hf)
 
         camera.setToOrtho(true, App.scr.wf, App.scr.hf)

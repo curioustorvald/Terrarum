@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.unsafe.UnsafeHelper
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.DefaultGL32Shaders
 import net.torvald.terrarum.concurrent.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.inUse
@@ -27,7 +27,6 @@ import java.util.concurrent.Future
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
-import kotlin.coroutines.*
 
 const val NOISEBOX_WIDTH = 768
 const val NOISEBOX_HEIGHT = 512
@@ -61,7 +60,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
     override fun create() {
         font = BitmapFont() // use default because fuck it
 
-        batch = SpriteBatch()
+        batch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
         camera = OrthographicCamera(NOISEBOX_WIDTH.toFloat(), NOISEBOX_HEIGHT.toFloat())
         camera.setToOrtho(false) // some elements are pre-flipped, while some are not. The statement itself is absolutely necessary to make edge of the screen as the origin
         camera.update()

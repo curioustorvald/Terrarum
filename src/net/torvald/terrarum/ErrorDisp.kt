@@ -29,7 +29,7 @@ object ErrorDisp : Screen {
 
 
     override fun show() {
-        batch = SpriteBatch()
+        batch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
 
 
         camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 /**
  * Created by minjaesong on 2023-02-28
  */
-object MacosGL32Shaders {
+object DefaultGL32Shaders {
     fun createSpriteBatchShader(): ShaderProgram {
         return App.loadShaderFromClasspath("shaders/gl32spritebatch.vert", "shaders/gl32spritebatch.frag")
     }

@@ -33,7 +33,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
 
     private var gamemode = 0
 
-    private val fbatch = SpriteBatch()
+    private val fbatch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
 
     private val genericBackdrop = Toolkit.Theme.COL_CELL_FILL.cpy().add(0f,0f,0f,1f)
     private val winTenBackdrop = Color(0x1070AAFF)

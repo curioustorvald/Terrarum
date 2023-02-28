@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.unicode.EMDASH
 import net.torvald.gdx.graphics.PixmapIO2
+import net.torvald.terrarum.DefaultGL32Shaders
 import net.torvald.terrarum.gdxClearAndEnableBlend
 import net.torvald.terrarum.inUse
 import java.awt.BorderLayout
@@ -263,7 +264,7 @@ class SpriteAssemblerPreview: Game() {
 
     override fun create() {
         Gdx.graphics.setTitle("Sprite Assembler Preview")
-        batch = SpriteBatch()
+        batch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
         renderTexture = Texture(1, 1, Pixmap.Format.RGBA8888)
     }
 

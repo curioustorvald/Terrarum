@@ -9,7 +9,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.Disposable;
@@ -51,7 +50,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static net.torvald.terrarum.TerrarumKt.*;
-import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * The framework's Application Loader
@@ -314,7 +312,7 @@ public class App implements ApplicationListener {
     }
 
     public static ShapeRenderer makeShapeRenderer() {
-        return new ShapeRenderer(5000, MacosGL32Shaders.INSTANCE.createShapeRendererShader());
+        return new ShapeRenderer(5000, DefaultGL32Shaders.INSTANCE.createShapeRendererShader());
     }
 
     public static void main(String[] args) {

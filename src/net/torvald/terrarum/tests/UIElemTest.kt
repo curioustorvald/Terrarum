@@ -35,7 +35,7 @@ class UIElemTest : ApplicationAdapter() {
                 256, false, 0.5f, false
         )
 
-        batch = SpriteBatch()
+        batch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
         camera = OrthographicCamera()
         camera.setToOrtho(true, 800f, 600f)
         camera.update()
