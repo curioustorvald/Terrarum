@@ -87,7 +87,7 @@ void main() {
 
     // get required tile numbers //
 
-    vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // raw tile number
+    vec4 tileFromMap = texture(tilemap, flippedFragCoord / overscannedScreenDimension); // raw tile number
     int tile = getTileFromColor(tileFromMap);
     int breakage = getBreakageFromColor(tileFromMap);
     ivec2 tileXY = getTileXY(tile);
@@ -107,12 +107,12 @@ void main() {
 
     // blending a breakage tex with main tex //
 
-    vec4 tileCol = texture2D(tilesAtlas, finalUVCoordForTile);
-    vec4 tileAltCol = texture2D(tilesBlendAtlas, finalUVCoordForTile);
+    vec4 tileCol = texture(tilesAtlas, finalUVCoordForTile);
+    vec4 tileAltCol = texture(tilesBlendAtlas, finalUVCoordForTile);
 
     vec4 finalTile = mix(tileCol, tileAltCol, tilesBlend);
 
-    vec4 finalBreakage = drawBreakage * texture2D(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
+    vec4 finalBreakage = drawBreakage * texture(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
 
     vec4 finalColor =mix(finalTile, finalBreakage, finalBreakage.a) * bc.xxxy + (finalTile * bc.yyyx);
 

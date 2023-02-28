@@ -27,7 +27,7 @@ mat4 ycocg_to_rgb = mat4(
 vec2 boolean = vec2(0.0, 1.0);
 
 void main() {
-    vec4 incolour = texture2D(u_texture, v_texCoords);
+    vec4 incolour = texture(u_texture, v_texCoords);
     vec4 yog = rgb_to_ycocg * incolour; // vec4(Y, Co, Cg, A) where Y,A=[0,1]; Co,Cg=[-1,1]
 
     vec4 scalar = vec4(1.0, 2.0, 2.0, 1.0);

@@ -12,8 +12,8 @@ uniform sampler2D tex1; // glow texture, SHOULD contain alpha of all 1.0
 out vec4 fragColor;
 
 void main(void) {
-    vec4 colorTex0 = texture2D(u_texture, v_texCoords); // lightmap (RGB) pre-mixed
-    vec4 colorTex1 = texture2D(tex1, v_texCoords); // lightmap (A) pre-mixed
+    vec4 colorTex0 = texture(u_texture, v_texCoords); // lightmap (RGB) pre-mixed
+    vec4 colorTex1 = texture(tex1, v_texCoords); // lightmap (A) pre-mixed
 
     fragColor = vec4(max(colorTex0.rgb, colorTex1.rgb), colorTex0.a);
 }

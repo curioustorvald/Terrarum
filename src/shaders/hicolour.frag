@@ -53,7 +53,7 @@ void main(void) {
 
 
     // create texture coordinates based on pixelSize //
-    vec4 inColor = (texture2D(u_texture, v_texCoords));
+    vec4 inColor = (texture(u_texture, v_texCoords));
 
     vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
 

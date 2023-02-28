@@ -12,7 +12,7 @@ uniform mat4 u_projTrans;
 out vec4 fragColor;
 
 void main() {
-    vec3 color = texture2D(u_texture, v_texCoords).rgb;
+    vec3 color = texture(u_texture, v_texCoords).rgb;
     float gray = (3.0 * color.r + 4.0 * color.g + color.b) / 8.0;
     vec3 grayscale = vec3(gray);
 

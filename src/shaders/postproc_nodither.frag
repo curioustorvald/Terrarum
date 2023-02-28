@@ -49,7 +49,7 @@ out vec4 fragColor;
 
 void main(void) {
     // convert input RGB into YCoCg
-    vec4 incolour = texture2D(u_texture, v_texCoords);
+    vec4 incolour = texture(u_texture, v_texCoords);
     vec4 yog = rgb_to_ycocg * incolour; // vec4(Y, Co, Cg, A) where Y,A=[0,1]; Co,Cg=[-1,1]
 
     // Do colour-grading magic

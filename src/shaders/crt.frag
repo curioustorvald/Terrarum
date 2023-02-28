@@ -20,9 +20,9 @@ uniform float blur_blend = 0.5;
 out vec4 fragColor;
 
 void main(void) {
-    vec4 color = texture2D(u_texture, v_texCoords).rgba;
-    vec4 color_pre =  texture2D(u_texture, (v_texCoords + (vec2(-1.0, 0.0) / resolution))).rgba;
-    vec4 color_next = texture2D(u_texture, (v_texCoords + (vec2( 1.0, 0.0) / resolution))).rgba;
+    vec4 color = texture(u_texture, v_texCoords).rgba;
+    vec4 color_pre =  texture(u_texture, (v_texCoords + (vec2(-1.0, 0.0) / resolution))).rgba;
+    vec4 color_next = texture(u_texture, (v_texCoords + (vec2( 1.0, 0.0) / resolution))).rgba;
 
     color = color * (1.0 - blur_blend) + color_pre * (blur_blend / 2.0) + color_next * (blur_blend / 2.0);
 
@@ -42,5 +42,5 @@ void main(void) {
     }
 
     fragColor = vec4(out_color, 1);
-    //fragColor = texture2D(u_texture, v_texCoords);
+    //fragColor = texture(u_texture, v_texCoords);
 }

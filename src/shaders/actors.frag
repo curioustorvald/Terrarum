@@ -22,7 +22,7 @@ vec2 boolean = vec2(0.0, 1.0);
 out vec4 fragColor;
 
 void main() {
-    vec4 inColor = v_color * (texture2D(u_texture, v_texCoords));
+    vec4 inColor = v_color * (texture(u_texture, v_texCoords));
     vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
 
     float bayerThreshold = float(bayer[int(entry.y) * int(bayerSize) + int(entry.x)]) / bayerDivider;

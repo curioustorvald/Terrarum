@@ -15,8 +15,8 @@ uniform vec2 tex1Resolution;
 out vec4 fragColor;
 
 void main() {
-	vec4 colorTex0 = texture2D(u_texture, v_texCoords + vec2(0.5, 0.5)); // world texture
-    vec4 colorTex1 = texture2D(tex1, v_texCoords); // lightmap (RGBA)
+	vec4 colorTex0 = texture(u_texture, v_texCoords + vec2(0.5, 0.5)); // world texture
+    vec4 colorTex1 = texture(tex1, v_texCoords); // lightmap (RGBA)
 
     colorTex1 = vec4(colorTex1.xyz, 1.0);
 

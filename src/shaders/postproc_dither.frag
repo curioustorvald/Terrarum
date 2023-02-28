@@ -58,7 +58,7 @@ vec4 nearestColour(vec4 inColor) {
 }
 
 vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = swizzler * vec4(matrixNormaliser + texture2D(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
+    vec4 bayerThreshold = swizzler * vec4(matrixNormaliser + texture(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
     return nearestColour(bayerThreshold * vec4(1.0 / quant) + inColor);
 }
 
@@ -67,7 +67,7 @@ uniform vec4 vibrancy = vec4(1.0);//vec4(1.0, 1.4, 1.2, 1.0);
 
 void main(void) {
     // convert input RGB into YCoCg
-    vec4 incolour = texture2D(u_texture, v_texCoords);
+    vec4 incolour = texture(u_texture, v_texCoords);
     vec4 yog = rgb_to_ycocg * incolour; // vec4(Y, Co, Cg, A) where Y,A=[0,1]; Co,Cg=[-1,1]
 
     // Do colour-grading magic

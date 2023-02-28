@@ -18,15 +18,15 @@ vec2 doubley = vec2(0.0, 2.0);
 vec2 twister = vec2(1.0, -1.0);
 
 void main() {
-    vec4 sum = texture2D(u_texture, v_texCoords - halfpixel * doublex);
-    sum += texture2D(u_texture, v_texCoords - halfpixel * twister) * 2.0;
-    sum += texture2D(u_texture, v_texCoords + halfpixel * doubley);
-    sum += texture2D(u_texture, v_texCoords + halfpixel) * 2.0;
-    sum += texture2D(u_texture, v_texCoords + halfpixel * doublex);
-    sum += texture2D(u_texture, v_texCoords + halfpixel * twister) * 2.0;
-    sum += texture2D(u_texture, v_texCoords - halfpixel * doubley);
-    sum += texture2D(u_texture, v_texCoords - halfpixel) * 2.0;
+    vec4 sum = texture(u_texture, v_texCoords - halfpixel * doublex);
+    sum += texture(u_texture, v_texCoords - halfpixel * twister) * 2.0;
+    sum += texture(u_texture, v_texCoords + halfpixel * doubley);
+    sum += texture(u_texture, v_texCoords + halfpixel) * 2.0;
+    sum += texture(u_texture, v_texCoords + halfpixel * doublex);
+    sum += texture(u_texture, v_texCoords + halfpixel * twister) * 2.0;
+    sum += texture(u_texture, v_texCoords - halfpixel * doubley);
+    sum += texture(u_texture, v_texCoords - halfpixel) * 2.0;
     fragColor = sum / 12.0;
 
-//    fragColor = texture2D(u_texture, v_texCoords);
+//    fragColor = texture(u_texture, v_texCoords);
 }

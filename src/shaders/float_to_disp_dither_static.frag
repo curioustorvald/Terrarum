@@ -35,7 +35,7 @@ vec4 nearestColour(vec4 inColor) {
 }
 
 vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = vec4(texture2D(u_pattern, gl_FragCoord.xy * patternsize) - 0.5);
+    vec4 bayerThreshold = vec4(texture(u_pattern, gl_FragCoord.xy * patternsize) - 0.5);
     return nearestColour(inColor + bayerThreshold * quantiserDivider);
 }
 

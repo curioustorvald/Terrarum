@@ -19,15 +19,15 @@ vec2 boolean = vec2(1.0, 0.0);
 out vec4 fragColor;
 
 void main() {
-    vec4 sum = texture2D(u_texture, v_texCoords) +
-    texture2D(u_texture, v_texCoords + halfpixel) +
-    texture2D(u_texture, v_texCoords - halfpixel) +
-    texture2D(u_texture, v_texCoords + halfpixel * twister) +
-    texture2D(u_texture, v_texCoords - halfpixel * twister) +
-    texture2D(u_texture, v_texCoords + halfpixel * boolean.xy) +
-    texture2D(u_texture, v_texCoords - halfpixel * boolean.xy) +
-    texture2D(u_texture, v_texCoords + halfpixel * boolean.yx) +
-    texture2D(u_texture, v_texCoords - halfpixel * boolean.yx) ;
+    vec4 sum = texture(u_texture, v_texCoords) +
+    texture(u_texture, v_texCoords + halfpixel) +
+    texture(u_texture, v_texCoords - halfpixel) +
+    texture(u_texture, v_texCoords + halfpixel * twister) +
+    texture(u_texture, v_texCoords - halfpixel * twister) +
+    texture(u_texture, v_texCoords + halfpixel * boolean.xy) +
+    texture(u_texture, v_texCoords - halfpixel * boolean.xy) +
+    texture(u_texture, v_texCoords + halfpixel * boolean.yx) +
+    texture(u_texture, v_texCoords - halfpixel * boolean.yx) ;
 
     fragColor = sum / 9.0;
 }

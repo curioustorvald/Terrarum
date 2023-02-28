@@ -16,12 +16,12 @@ out vec4 fragColor;
 vec2 twister = vec2(1.0, -1.0);
 
 void main() {
-    vec4 sum = texture2D(u_texture, v_texCoords) * 4.0;
-    sum += texture2D(u_texture, v_texCoords - halfpixel);
-    sum += texture2D(u_texture, v_texCoords + halfpixel);
-    sum += texture2D(u_texture, v_texCoords - halfpixel * twister);
-    sum += texture2D(u_texture, v_texCoords + halfpixel * twister);
+    vec4 sum = texture(u_texture, v_texCoords) * 4.0;
+    sum += texture(u_texture, v_texCoords - halfpixel);
+    sum += texture(u_texture, v_texCoords + halfpixel);
+    sum += texture(u_texture, v_texCoords - halfpixel * twister);
+    sum += texture(u_texture, v_texCoords + halfpixel * twister);
     fragColor = sum / 8.0;
 
-//    gl_FragColor = texture2D(u_texture, v_texCoords);
+//    gl_FragColor = texture(u_texture, v_texCoords);
 }

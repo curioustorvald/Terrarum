@@ -10,7 +10,7 @@ uniform sampler2D u_texture;
 out vec4 fragColor;
 
 void main(void) {
-    vec4 inColor = texture2D(u_texture, v_texCoords);
+    vec4 inColor = texture(u_texture, v_texCoords);
     ivec4 bytes = ivec4(255.0 * inColor);
     ivec4 mask = ivec4(0x55);
     fragColor = (bytes ^ mask) / 255.0;
