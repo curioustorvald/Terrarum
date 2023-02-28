@@ -4,36 +4,28 @@ Download and unzip the JDK for the appropriate operation systems first! JDKs can
 
 Then, on the terminal, run following commands:
 
+```
 jlink --add-modules java.base,java.desktop,java.logging,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-linux-x86 --no-header-files --no-man-pages --strip-debug --compress=2
-
 jlink --module-path ~/Documents/openjdk/jdk-17.0.1-arm/jmods:mods  --add-modules java.base,java.desktop,java.logging,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-linux-arm --no-header-files --no-man-pages --strip-debug --compress=2
 jlink --module-path ~/Documents/openjdk/jdk-17.0.1-windows/jmods:mods  --add-modules java.base,java.desktop,java.logging,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-windows-x86 --no-header-files --no-man-pages --strip-debug --compress=2
 jlink --module-path ~/Documents/openjdk/jdk-17.0.1.jdk-arm/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.logging,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-arm --no-header-files --no-man-pages --strip-debug --compress=2
 jlink --module-path ~/Documents/openjdk/jdk-17.0.1.jdk-x86/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.logging,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-x86 --no-header-files --no-man-pages --strip-debug --compress=2
+```
 
 This process assumes that the game does NOT use the Java 9+ modules and every single required libraries are fat-jar'd (their contents extracted right into the Jar)
 
 ### Packaging
 
-Create an output directory; its contents shall be:
-
-```
-+assets
-`(regular "assets")
-`TerrarumBuild.jar
-Terrarum.arm.app      /* uses start_game_mac_aarch64.sh and contains runtime-osx-arm */
-Terrarum.x86.app      /* uses start_game_mac_x86_64.sh and contains runtime-osx-x86 */
-Terrarum.arm.AppImage /* uses start_game_linux_aarch64.sh and contains runtime-linux-arm */
-Terrarum.x86.AppImage /* uses start_game_linux_x86_64.sh and contains runtime-linux-x86 */
-Terrarum.exe          /* uses start_game_windows.bat and contains runtime-windows-x86 */
-```
-
-#### Packaging Script
+Create an output directory if there is none (project root/buildapp/out)
 
 Before running the packaging script make sure:
 
-1. All five runtimes must exist on `<project dir>/out/runtime-<linux|osx|windows>-<arm|x86>` directory
+1. The required runtime must exist on `(project root)/out/runtime-<linux|osx|windows>-<arm|x86>` directory
 2. The build scripts are on a subdirectory of the project directory
+
+To build, **cd into the "(project root)/buildapp/", then execute the appropriate script**.
+
+The packaged application can be found on `(project root)/buildapp/out/`
 
 #### OSX .app Packaging
 
@@ -45,8 +37,6 @@ Terrarum.*.app
  +MacOS
   `start_game_mac_*.sh    * permission: +x */
 ```
-
-
 
 `assets/TerrarumBuild.jar` is the artifact built using the TerrarumBuild.
 
