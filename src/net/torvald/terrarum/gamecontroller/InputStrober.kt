@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import net.torvald.terrarum.App
 import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.unsafe.UnsafeHelper
 import java.util.*
 
 /**
@@ -17,13 +18,13 @@ object InputStrober {
     const val KEY_CHANGE = 1
     const val N_KEY_ROLLOVER = 8
 
-    private const val JIFFIES = 25L
+    private const val JIFFIES = 5L
 
     var KEYBOARD_DELAYS = longArrayOf(0L,250000000L,0L,25000000L,0L)
     private var stroboTime = 0L
     private var stroboStatus = 0
     private var repeatCount = 0
-    private var oldKeys = IntArray(N_KEY_ROLLOVER) { 0 }
+    private val oldKeys = IntArray(N_KEY_ROLLOVER) { 0 }
     /** always Low Layer */
 //        private var keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
@@ -49,13 +50,14 @@ object InputStrober {
     // code proudly stolen from tsvm's TVDOS.SYS
     private fun withKeyboardEvent() {
         strobeKeys()
+
         var keyChanged = !arrayEq(keybuf, oldKeys)
         val keyDiff = arrayDiff(keybuf, oldKeys)
         val keymap = IME.getLowLayerByName(App.getConfigString("basekeyboardlayout"))
 
-//        println("Key strobed: ${keys.joinToString()}")
-
         if (stroboStatus % 2 == 0 && keybuf[0] != 0) {
+//            println("Key strobed: ${keybuf.joinToString()}; ${oldKeys.joinToString()}; changed = $keyChanged")
+
             stroboStatus += 1
             stroboTime = System.nanoTime()
             repeatCount += 1
@@ -88,7 +90,7 @@ object InputStrober {
                 App.inputStrobed(TerrarumKeyboardEvent(KEY_DOWN, newKeysym, headKeyCode, repeatCount, keybuf))
             }
 
-            oldKeys = keybuf // don't put this outside of if-cascade
+            arrayCopy(oldKeys, keybuf)
         }
         else if (keyChanged || keybuf[0] == 0) {
             stroboStatus = 0
@@ -111,6 +113,8 @@ object InputStrober {
 
 //            println("InputStrober state change")
         }
+
+
     }
 
 
@@ -133,6 +137,10 @@ object InputStrober {
 
             if (keysPushed >= N_KEY_ROLLOVER) break
         }
+    }
+
+    private fun arrayCopy(target: IntArray, source: IntArray) {
+        UnsafeHelper.memcpyRaw(source, UnsafeHelper.getArrayOffset(source), target, UnsafeHelper.getArrayOffset(target), 4L * N_KEY_ROLLOVER)
     }
 
     private fun arrayEq(a: IntArray, b: IntArray): Boolean {
