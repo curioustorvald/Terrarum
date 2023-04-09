@@ -28,13 +28,14 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val panelgap = 20
 
     private val options = arrayOf(
-            arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
-            arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
-            arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
-            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
-            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
-            arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "typeinres"),
-            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
+        arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
+        arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
+        arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
+        arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
+        arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"]+"*" }, "spinner,0,300,2"),
+        arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
+        arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "typeinres"),
+        arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
     )
 
     // @return Pair of <UIItem, Init job for the item>
