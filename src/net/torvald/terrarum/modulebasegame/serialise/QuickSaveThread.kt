@@ -94,7 +94,7 @@ class QuickSingleplayerWorldSavingThread(
         }
         val worldMeta = EntryFile(WriteWorld.encodeToByteArray64(ingame, time_t, actorsList, playersList))
         val world = DiskEntry(SAVEGAMEINFO, ROOT, creation_t, time_t, worldMeta)
-        addFile(disk, world); skimmer.appendEntryOnly(world)
+        addFile(disk, world); skimmer.appendEntry(world)
 
         WriteSavegame.saveProgress += 1f
 
@@ -117,7 +117,7 @@ class QuickSingleplayerWorldSavingThread(
                         val entryContent = EntryFile(chunkBytes)
                         val entry = DiskEntry(entryID, ROOT, creation_t, time_t, entryContent)
                         // "W1L0-92,15"
-                        addFile(disk, entry); skimmer.appendEntryOnly(entry)
+                        addFile(disk, entry); skimmer.appendEntry(entry)
 
                         WriteSavegame.saveProgress += chunkProgressMultiplier
                         chunksWrote += 1
@@ -134,7 +134,7 @@ class QuickSingleplayerWorldSavingThread(
 
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
             val actor = DiskEntry(it.referenceID.toLong(), ROOT, creation_t, time_t, actorContent)
-            addFile(disk, actor); skimmer.appendEntryOnly(actor)
+            addFile(disk, actor); skimmer.appendEntry(actor)
 
             WriteSavegame.saveProgress += actorProgressMultiplier
         }
@@ -142,7 +142,7 @@ class QuickSingleplayerWorldSavingThread(
 
         disk.saveKind = VDSaveKind.WORLD_DATA
 
-        skimmer.rewriteDirectories()
+//        skimmer.rewriteDirectories()
         skimmer.injectDiskCRC(disk.hashCode())
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
         skimmer.setSaveKind(VDSaveKind.WORLD_DATA)

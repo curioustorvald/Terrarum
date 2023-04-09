@@ -80,3 +80,9 @@ Making `inventory` transient is impossible as it would render Storage Chests unu
 1. Allow multiple players share the same world
 2. Make multiplayer possible
 3. Make Players distributable (like VRChat avatars)
+
+## Quirks with Terrarum's custom TVDA implementation
+
+- Subdirectory is not allowed -- every file must be on the root directory
+- The entry for the root directory is there (only to satisfy the format constraints), but it's basically meaningless -- contents of the entry are undefined
+- Programmers are encouraged to scan the entire disk to get the file listings

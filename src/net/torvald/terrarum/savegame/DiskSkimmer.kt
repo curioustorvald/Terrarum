@@ -168,11 +168,15 @@ removefile:
             skipRead(entrySize) // skips rest of the entry's actual contents
 
             if (typeFlag > 0) {
+                if (entryToOffsetTable[entryID] != null)
+                    debugPrintln("[DiskSkimmer] ... overwriting the entry $entryID previously found at offset:${entryToOffsetTable[entryID]} with offset:$offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
+                else
+                    debugPrintln("[DiskSkimmer] ... successfully read the entry $entryID at offset:$offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
+
                 entryToOffsetTable[entryID] = offset
-                debugPrintln("[DiskSkimmer] ... successfully read the entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
             }
             else {
-                debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset $offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
+                debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset:$offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
             }
         }
 
@@ -192,6 +196,8 @@ removefile:
      * @return DiskEntry if the entry exists on the disk, `null` otherwise.
      */
     fun requestFile(entryID: EntryID): DiskEntry? {
+        if (entryID == 0L) throw UnsupportedOperationException("Peeking at the root entry is an undefined behaviour for the Terrarum Savegame format.")
+
         if (!initialised) throw IllegalStateException("File entries not built! Initialise the Skimmer by executing rebuild()")
 
         entryToOffsetTable[entryID].let { offset ->
@@ -323,9 +329,9 @@ removefile:
         fa.write(crc.toBigEndian())
     }
 
-    private val modifiedDirectories = TreeSet<DiskEntry>()
+    //private val modifiedDirectories = TreeSet<DiskEntry>()
 
-    fun rewriteDirectories() {
+    /*fun rewriteDirectories() {
         modifiedDirectories.forEach {
             invalidateEntry(it.entryID)
 
@@ -336,7 +342,7 @@ removefile:
             entryToOffsetTable[it.entryID] = appendAt + 8
             it.serialize().forEach { fa.writeByte(it.toInt()) }
         }
-    }
+    }*/
 
     fun setSaveMode(bits: Int) {
         fa.seek(49L)
@@ -409,7 +415,7 @@ removefile:
     // THESE ARE METHODS TO SUPPORT ON-LINE MODIFICATION //
     ///////////////////////////////////////////////////////
 
-    fun appendEntryOnly(entry: DiskEntry) {
+    /*fun appendEntryOnly(entry: DiskEntry) {
         val parentDir = requestFile(entry.parentEntryID)!!
         val id = entry.entryID
 
@@ -426,19 +432,19 @@ removefile:
         // append new file
         entryToOffsetTable[id] = appendAt + 8
         entry.serialize().forEach { fa.writeByte(it.toInt()) }
-    }
+    }*/
 
     fun appendEntry(entry: DiskEntry) {
-        val parentDir = requestFile(entry.parentEntryID)!!
+//        val parentDir = requestFile(entry.parentEntryID)!!
         val id = entry.entryID
-        val parent = entry.parentEntryID
+//        val parent = entry.parentEntryID
 
         // add the entry to its parent directory if there was none
-        val dirContent = (parentDir.contents as EntryDirectory)
-        if (!dirContent.contains(id)) dirContent.add(id)
+//        val dirContent = (parentDir.contents as EntryDirectory)
+//        if (!dirContent.contains(id)) dirContent.add(id)
 
-        invalidateEntry(parent)
-        invalidateEntry(id)
+//        invalidateEntry(parent)
+//        invalidateEntry(id)
 
         val appendAt = fa.length()
         fa.seek(appendAt)
@@ -447,27 +453,28 @@ removefile:
         entryToOffsetTable[id] = appendAt + 8
         entry.serialize().forEach { fa.writeByte(it.toInt()) }
         // append modified directory
-        entryToOffsetTable[parent] = fa.filePointer + 8
-        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
+//        entryToOffsetTable[parent] = fa.filePointer + 8
+//        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
     }
 
     fun deleteEntry(id: EntryID) {
         val entry = requestFile(id)!!
-        val parentDir = requestFile(entry.parentEntryID)!!
-        val parent = entry.parentEntryID
+//        val parentDir = requestFile(entry.parentEntryID)!!
+//        val parent = entry.parentEntryID
 
-        invalidateEntry(parent)
+//        invalidateEntry(parent)
+        invalidateEntry(id)
 
         // remove the entry
-        val dirContent = (parentDir.contents as EntryDirectory)
-        dirContent.remove(id)
+//        val dirContent = (parentDir.contents as EntryDirectory)
+//        dirContent.remove(id)
 
         val appendAt = fa.length()
         fa.seek(appendAt)
 
         // append modified directory
-        entryToOffsetTable[id] = appendAt + 8
-        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
+//        entryToOffsetTable[id] = appendAt + 8
+//        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
     }
 
     fun appendEntries(entries: List<DiskEntry>) = entries.forEach { appendEntry(it) }
