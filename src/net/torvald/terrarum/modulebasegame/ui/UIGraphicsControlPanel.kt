@@ -78,12 +78,13 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 (it as UIItemTextLineInput).textCommitListener = { text ->
                     val text = text.lowercase()
                     if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {
+                        it.markAsNormal()
                         val width = text.substringBefore('x').toInt()
                         val height = text.substringAfter('x').toInt()
                         App.setConfig(keyWidth, width)
                         App.setConfig(keyHeight, height)
                     }
-                    // else it.markAsInvalid
+                    else it.markAsInvalid()
                 }
             }
         }

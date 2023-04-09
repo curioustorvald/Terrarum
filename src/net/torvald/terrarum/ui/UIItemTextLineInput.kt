@@ -150,6 +150,24 @@ class UIItemTextLineInput(
     private val candidatesBackCol = TEXTINPUT_COL_BACKGROUND.cpy().mul(1f,1f,1f,1.5f)
     private val candidateNumberStrWidth = App.fontGame.getWidth("8. ")
 
+    private var textStatus = 0 // 0: normal, 1: invalid, 2: disabled
+
+    private var textColours = arrayOf(
+        Color.WHITE,
+        Color(0xff8888ff.toInt()),
+        Color(0x888888ff.toInt())
+    )
+
+    fun markAsNormal() {
+        textStatus = 0
+    }
+    fun markAsInvalid() {
+        textStatus = 1
+    }
+    fun markAsDisabled() {
+        textStatus = 2
+    }
+
     /** Event fired whenever a character is entered or pasted from clipboard */
     var textCommitListener: (String) -> Unit = {}
 
@@ -489,7 +507,7 @@ class UIItemTextLineInput(
             fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
                 gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
-                it.color = Color.WHITE
+                it.color = textColours[textStatus]
 
                 val text = if (textbuf.isEmpty()) currentPlaceholderText else textbuf
                 val tw = App.fontGameFBO.getWidth(text)
