@@ -9,7 +9,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockstats.BlockStats
+import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.ui.Toolkit
 import kotlin.math.roundToInt
@@ -42,6 +42,19 @@ object FeaturesDrawer {
               Block.SAND_DESERT
             , Block.SAND_RED)
 
+    init {
+        TileSurvey.submitProposal(
+            TileSurvey.SurveyProposal(
+                "basegame.FeaturesDrawer.coldTiles", 72, 48, 2, 2
+            ) { world, x, y -> TILES_COLD.contains(world.getTileFromTerrain(x, y)) }
+        )
+        TileSurvey.submitProposal(
+            TileSurvey.SurveyProposal(
+                "basegame.FeaturesDrawer.warmTiles", 72, 48, 2, 2
+            ) { world, x, y -> TILES_WARM.contains(world.getTileFromTerrain(x, y)) }
+        )
+    }
+
     fun update(delta: Float) {
     }
 
@@ -50,13 +63,12 @@ object FeaturesDrawer {
      * usually targeted for the environmental temperature (desert/winterland), hence the name.
      */
     fun drawEnvOverlay(batch: SpriteBatch) {
-        val onscreen_tiles_max = FastMath.ceil(App.scr.height * App.scr.width / FastMath.sqr(TILE_SIZEF)) * 2
-        val onscreen_tiles_cap = onscreen_tiles_max / 4f
-        val onscreen_cold_tiles = BlockStats.getCount(*TILES_COLD).toFloat()
-        val onscreen_warm_tiles = BlockStats.getCount(*TILES_WARM).toFloat()
+        val onscreen_tiles_cap = 0.3
+        val onscreen_cold_tiles = (TileSurvey.getRatio("basegame.FeaturesDrawer.coldTiles") ?: 0.0).coerceAtMost(onscreen_tiles_cap)
+        val onscreen_warm_tiles = (TileSurvey.getRatio("basegame.FeaturesDrawer.warmTiles") ?: 0.0).coerceAtMost(onscreen_tiles_cap)
 
-        val colTemp_cold = colTempLinearFunc(onscreen_cold_tiles / onscreen_tiles_cap)
-        val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap))
+        val colTemp_cold = colTempLinearFunc((onscreen_cold_tiles / onscreen_tiles_cap).toFloat())
+        val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap).toFloat())
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
         val zoom = Terrarum.ingame?.screenZoom ?: 1f
 

@@ -11,7 +11,7 @@ import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
-import net.torvald.terrarum.blockstats.BlockStats
+import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.AVTracker
@@ -800,7 +800,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 WeatherMixer.update(delta, actorNowPlaying, world)
             }
             measureDebugTime("BlockStats.update") {
-                BlockStats.update()
+                TileSurvey.update()
             }
             // fill up visibleActorsRenderFront for wires but not on every update
             measureDebugTime("Ingame.FillUpWiresBuffer*") {
