@@ -1,9 +1,16 @@
 #!/bin/bash
+if (( $EUID == 0 )); then echo "The build process is not meant to be run with root privilege, exiting now." >&2; exit 1; fi
+
 cd "${0%/*}"
 APPIMAGETOOL="appimagetool-x86_64.AppImage"
 SRCFILES="terrarumlinux_arm"
 DESTDIR="TerrarumLinux.arm"
 RUNTIME="runtime-linux-arm"
+
+if [ ! -d "../assets_release" ]; then
+    echo "'assets_release' does not exist; prepare the assets for the release and put them into the assets_release directory, exiting now." >&2
+    exit 1
+fi
 
 # Cleanup
 rm -rf $DESTDIR || true
@@ -19,7 +26,8 @@ chmod +x $DESTDIR/AppRun
 cp -r "../out/$RUNTIME" $DESTDIR/
 
 # Copy over all the assets and a jarfile
-cp -r "../assets" $DESTDIR/
+cp -r "../assets_release" $DESTDIR/
+mv $DESTDIR/assets_release $DESTDIR/assets
 cp -r "../out/TerrarumBuild.jar" $DESTDIR/assets/
 
 # Pack everything to AppImage
