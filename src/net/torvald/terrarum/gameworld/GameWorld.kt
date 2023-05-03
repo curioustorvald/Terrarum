@@ -716,7 +716,8 @@ infix fun Long.fmod(other: Long) = Math.floorMod(this, other)
 infix fun Float.fmod(other: Float) = if (this >= 0f) this % other else (this % other) + other
 infix fun Double.fmod(other: Double) = if (this >= 0.0) this % other else (this % other) + other
 
-inline class FluidType(val value: Int) {
+@JvmInline
+value class FluidType(val value: Int) {
     infix fun sameAs(other: FluidType) = this.value.absoluteValue == other.value.absoluteValue
     fun abs() = this.value.absoluteValue
 }

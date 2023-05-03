@@ -360,7 +360,8 @@ interface CuedByWireChange {
  *
  * In the savegame's JSON, this flag set should be stored as signed integer.
  */
-inline class BlockBoxProps(val flags: Int) {
+@JvmInline
+value class BlockBoxProps(val flags: Int) {
 
 }
 

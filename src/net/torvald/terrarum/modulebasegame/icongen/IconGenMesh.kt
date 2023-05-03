@@ -15,7 +15,8 @@ import net.torvald.terrarum.Point2d
  *
  * Created by minjaesong on 2020-02-11.
  */
-inline class IconGenMesh(val datapoints: Array<Point2d>) {
+@JvmInline
+value class IconGenMesh(val datapoints: Array<Point2d>) {
 
     operator fun times(other: PerturbMesh) {
 
@@ -23,6 +24,7 @@ inline class IconGenMesh(val datapoints: Array<Point2d>) {
 
 }
 
-inline class PerturbMesh(val datapoints: Array<Point2d>) {
+@JvmInline
+value class PerturbMesh(val datapoints: Array<Point2d>) {
 
 }

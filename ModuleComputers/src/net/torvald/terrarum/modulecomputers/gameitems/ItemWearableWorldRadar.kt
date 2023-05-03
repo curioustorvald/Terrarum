@@ -5,10 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -26,8 +22,9 @@ import net.torvald.tsvm.peripheral.VMProgramRom
 /**
  * Created by minjaesong on 2021-12-03.
  */
-class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
+class ItemWearableWorldRadar(originalID: String) {// : GameItem(originalID) {
 
+    /*
     override var dynamicID: ItemID = originalID
     override val originalName = "ITEM_COMPUTER_DIRTBOARD_FAKETM"
     override var baseMass = 2.0
@@ -106,6 +103,9 @@ class ItemWearableWorldRadar(originalID: String) : GameItem(originalID) {
         (Terrarum.ingame!! as TerrarumIngame).wearableDeviceUI = null
         closeVM()
     }
+
+
+     */
 }
 
 class WearableWorldRadarUI(val device: VM) : UICanvas() {

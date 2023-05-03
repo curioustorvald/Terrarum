@@ -50,7 +50,8 @@ import java.util.*
  *
  * Created by minjaesong on 2018-12-08.
  */
-inline class Yaml(val text: String) {
+@JvmInline
+value class Yaml(val text: String) {
 
     companion object {
         val SEPARATOR = Regex(" : ")

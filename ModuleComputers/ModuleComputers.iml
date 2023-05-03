@@ -10,9 +10,11 @@
     <orderEntry type="library" name="ModuleComputersLib" level="project" />
     <orderEntry type="module" module-name="TerrarumBuild" />
     <orderEntry type="library" name="graalvm-js-21.1.0 and graalvm-js-scriptengine-21.1.0" level="project" />
-    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
     <orderEntry type="library" name="TerrarumSansBitmap" level="project" />
     <orderEntry type="library" name="badlogicgames.gdx" level="project" />
     <orderEntry type="library" name="badlogicgames.gdx.backend.lwjgl3" level="project" />
+    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlin.reflect" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
   </component>
 </module>

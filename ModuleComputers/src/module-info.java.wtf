@@ -6,6 +6,6 @@ module ModuleComputers {
     requires Terrarum;
     requires TerrarumSansBitmap;
     requires kotlin.stdlib;
-    requires kotlinx.coroutines.core;
+    requires kotlin.coroutines.core;
     requires TerrarumTSVM;
 }

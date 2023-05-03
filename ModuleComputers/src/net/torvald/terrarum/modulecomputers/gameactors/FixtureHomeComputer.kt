@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.Disposable
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlin.coroutines.*
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
@@ -35,7 +32,7 @@ class FixtureHomeComputer : FixtureBase {
             VMProgramRom(ModMgr.getGdxFile("dwarventech", "bios/tsvmbios.js").path())
     ))
     @Transient private lateinit var vmRunner: VMRunner
-    @Transient private lateinit var coroutineJob: Job
+//    @Transient private lateinit var coroutineJob: Job
 
     @Transient private var vmStarted = false
     @Transient private lateinit var disposableObj: Disposable
@@ -76,7 +73,7 @@ class FixtureHomeComputer : FixtureBase {
     }
 
     fun startVM() {
-        if (!vmStarted) {
+        /*if (!vmStarted) {
             vmStarted = true
 
             coroutineJob = GlobalScope.launch {
@@ -89,11 +86,11 @@ class FixtureHomeComputer : FixtureBase {
                 vm.dispose()
             }
             INGAME.disposables.add(disposableObj)
-        }
+        }*/
     }
 
     fun stopVM() {
-        if (vmStarted) {
+        /*if (vmStarted) {
             vmStarted = false
 
             vmRunner.close()
@@ -101,7 +98,7 @@ class FixtureHomeComputer : FixtureBase {
             vm.dispose()
 
             INGAME.disposables.remove(disposableObj)
-        }
+        }*/
     }
 
     override fun reload() {

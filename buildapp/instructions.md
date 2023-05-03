@@ -56,6 +56,10 @@ Terrarum.*.app
 
 Hide the `.jar` within the subdirectory; users will think this file is the main executable and will try to execute it using whatever JVM they may (or may not) have.
 
+#### Some Notes
+
+- Windows EXE creation is not there yet. Maybe use one of [these?](https://sourceforge.net/projects/batch-compiler/)
+
 ### Notes to Terrarum Programmers
 
 By self-containing everything in one file, it is not possible to modify the base game easily. Modloading scheme must be extended to load from mutable directory such as `%APPDATA%/Terrarum/mods`.

@@ -22,5 +22,7 @@
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="badlogicgames.gdx" level="project" />
     <orderEntry type="library" name="badlogicgames.gdx.backend.lwjgl3" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlin.reflect" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
   </component>
 </module>
