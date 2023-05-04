@@ -1928,8 +1928,8 @@ open class ActorWithBody : Actor {
          */
         @Transient const val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
 
-        @Transient const val PHYS_EPSILON_DIST = 0.00001
-//        @Transient const val PHYS_EPSILON_VELO = 0.0001
+        @Transient const val PHYS_EPSILON_DIST = 1.0 / 65536.0
+//        @Transient const val PHYS_EPSILON_VELO = 1.0 / 8192.0
 
 
         /**
