@@ -2,6 +2,7 @@
 out/*
 bin/*
 build/*
+assets_release/*
 .gradle/*
 TerrarumBuild.jar
 buildapp/out/Terrarum*

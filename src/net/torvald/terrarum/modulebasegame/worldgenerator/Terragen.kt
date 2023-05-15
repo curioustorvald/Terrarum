@@ -157,13 +157,9 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         lowlandShapeFractal.setFrequency(0.25)
         lowlandShapeFractal.seed = seed shake lowlandMagic
 
-        val lowlandAutoCorrect = ModuleAutoCorrect()
-        lowlandAutoCorrect.setSource(lowlandShapeFractal)
-        lowlandAutoCorrect.setLow(0.0)
-        lowlandAutoCorrect.setHigh(1.0)
-
         val lowlandScale = ModuleScaleOffset()
-        lowlandScale.setScale(0.125)
+        lowlandScale.setSource(lowlandShapeFractal)
+        lowlandScale.setScale(0.22)
         lowlandScale.setOffset(params.lowlandScaleOffset) // TODO linearly alters the height
 
         val lowlandYScale = ModuleScaleDomain()
@@ -184,14 +180,9 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         highlandShapeFractal.setFrequency(2.0)
         highlandShapeFractal.seed = seed shake highlandMagic
 
-        val highlandAutocorrect = ModuleAutoCorrect()
-        highlandAutocorrect.setSource(highlandShapeFractal)
-        highlandAutocorrect.setLow(-1.0)
-        highlandAutocorrect.setHigh(1.0)
-
         val highlandScale = ModuleScaleOffset()
-        highlandScale.setSource(highlandAutocorrect)
-        highlandScale.setScale(0.25)
+        highlandScale.setSource(highlandShapeFractal)
+        highlandScale.setScale(0.5)
         highlandScale.setOffset(params.highlandScaleOffset) // TODO linearly alters the height
 
         val highlandYScale = ModuleScaleDomain()
@@ -211,14 +202,9 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         mountainShapeFractal.setFrequency(1.0)
         mountainShapeFractal.seed = seed shake mountainMagic
 
-        val mountainAutocorrect = ModuleAutoCorrect()
-        mountainAutocorrect.setSource(mountainShapeFractal)
-        mountainAutocorrect.setLow(-1.0)
-        mountainAutocorrect.setHigh(1.0)
-
         val mountainScale = ModuleScaleOffset()
-        mountainScale.setSource(mountainAutocorrect)
-        mountainScale.setScale(0.45)
+        mountainScale.setSource(mountainShapeFractal)
+        mountainScale.setScale(1.0)
         mountainScale.setOffset(params.mountainScaleOffset) // TODO linearly alters the height
 
         val mountainYScale = ModuleScaleDomain()
@@ -239,7 +225,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         terrainTypeFractal.setFrequency(0.125)
         terrainTypeFractal.seed = seed shake selectionMagic
 
-        val terrainAutocorrect = ModuleAutoCorrect()
+        val terrainAutocorrect = ModuleAutoCorrect() // absolutely required
         terrainAutocorrect.setSource(terrainTypeFractal)
         terrainAutocorrect.setLow(0.0)
         terrainAutocorrect.setHigh(1.0)
