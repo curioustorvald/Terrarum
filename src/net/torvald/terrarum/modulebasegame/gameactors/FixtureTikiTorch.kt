@@ -23,7 +23,7 @@ internal class FixtureTikiTorch : FixtureBase {
     private val rndHash1 = (Math.random() * 256).toInt()
     private val rndHash2 = (Math.random() * 256).toInt()
 
-    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0), BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)))
+    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(6.0, 5.0, 4.0, 3.0), BlockCodex[Block.TORCH].getLumCol(rndHash1, rndHash2)))
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 2),

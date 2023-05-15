@@ -39,7 +39,7 @@ open class ProjectileSimple : ActorWithBody, Projectile {
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0), color)) // lightbox sized 8x8 centered to the bullet
+    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(-4.0, -4.0, 8.0, 8.0), color)) // lightbox sized 8x8 centered to the bullet
 
 
     private val lifetimeMax = 2500

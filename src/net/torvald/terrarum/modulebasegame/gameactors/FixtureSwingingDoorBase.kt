@@ -43,9 +43,9 @@ open class FixtureSwingingDoorBase : FixtureBase {
     private var pixelwiseHitboxHeight = TILE_SIZE * tilewiseHitboxHeight
     private var tilewiseDistToAxis = tw - twClosed
 
-    @Transient override var lightBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
+    @Transient override var lightBoxList = arrayListOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
     // the Cvec will be calculated dynamically on Update
-    @Transient override var shadeBoxList = listOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
+    @Transient override var shadeBoxList = arrayListOf(Lightbox(Hitbox(TILE_SIZED * tilewiseDistToAxis, 0.0, TILE_SIZED * twClosed, TILE_SIZED * th), Cvec(0)))
     // the Cvec will be calculated dynamically on Update
 
     protected var doorState = 0 // -1: open toward left, 0: closed, 1: open toward right

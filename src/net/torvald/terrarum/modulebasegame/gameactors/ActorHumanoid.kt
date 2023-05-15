@@ -99,9 +99,9 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
      * Hitbox(x-offset, y-offset, width, height)
      * (Use ArrayList for normal circumstances)
      */
-    @Transient override var lightBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
+    @Transient override var lightBoxList: ArrayList<Lightbox> = arrayListOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
         // the actual values are update on the update()
-    @Transient override var shadeBoxList: List<Lightbox> = listOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
+    @Transient override var shadeBoxList: ArrayList<Lightbox> = arrayListOf(Lightbox(Hitbox(2.0, 2.0, baseHitboxW - 3.0, baseHitboxH - 3.0), Cvec(0)))
         // the actual values are update on the update()
 
     @Transient val BASE_DENSITY = 980.0

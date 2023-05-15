@@ -50,7 +50,7 @@ open class ActorWithBody : Actor {
      *
      * NOTE: MUST NOT SERIALISE (use `@Transient`)
      */
-    open var lightBoxList: List<Lightbox> = emptyList()
+    open var lightBoxList: ArrayList<Lightbox> = arrayListOf() // must use ArrayList: has no-arg constructor
 
     /**
      * Arguments:
@@ -60,7 +60,7 @@ open class ActorWithBody : Actor {
      *
      * NOTE: MUST NOT SERIALISE (use `@Transient`)
      */
-    open var shadeBoxList: List<Lightbox> = emptyList()
+    open var shadeBoxList: ArrayList<Lightbox> = arrayListOf() // must use ArrayList: has no-arg constructor
     // end of Luminous
 
     protected constructor() : super()
