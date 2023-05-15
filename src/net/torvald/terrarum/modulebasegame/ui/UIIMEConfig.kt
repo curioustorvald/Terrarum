@@ -177,9 +177,19 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         App.fontGame.draw(batch, txt2, selDrawX + halfselw + (halfselw - tw2) / 2, y1)
 
         // title
-        // TODO only when text input using gamepad is supported, and even then, use text spinner
-//        val title = Lang["MENU_LABEL_IME"]
-//        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+        // todo show "Keyboard"/"Gamepad" accordingly
+        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+
+
+        // button help for string input UI
+        val help1 = "￬ ${Lang["MENU_LABEL_IME_TOGGLE"]}"
+        App.fontGame.draw(batch, help1, drawX + 10f, height - 40f - 28f)
+        val help2 = "${Lang["MENU_LABEL_PASTE_FROM_CLIPBOARD"]} ￪"
+        App.fontGame.draw(batch, help2, drawX + keyboardTestPanel.width - 4f - App.fontGame.getWidth(help2), height - 40f + 30f)
+
+
 
         batch.color = Color.WHITE
         uiItems.forEach { it.render(batch, camera) }

@@ -22,5 +22,8 @@
   "MENU_OPTIONS_PARTICLES": "Particles",
   "MENU_IO_IMPORT": "Import",
   "APP_NOMODULE_1": "No Module is currently loaded.",
-  "APP_NOMODULE_2": "Please configure your Load Order and restart:"
+  "APP_NOMODULE_2": "Please configure your Load Order and restart:",
+  "MENU_LABEL_KEYCONFIG_HELP1": "Click On the Keycap to Assign Actions",
+  "MENU_LABEL_IME_TOGGLE": "Toggle IME",
+  "MENU_LABEL_PASTE_FROM_CLIPBOARD": "Paste from Cliboard"
 }

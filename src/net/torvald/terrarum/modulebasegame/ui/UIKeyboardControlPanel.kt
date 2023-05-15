@@ -197,18 +197,20 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.render(batch, camera) }
         buttonReset.render(batch, camera)
 
+        // title
+        // todo show "Keyboard"/"Gamepad" accordingly
         batch.color = Color.WHITE
+        val title = Lang["MENU_CONTROLS_KEYBOARD"]
+        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
 
+        val desc = Lang["MENU_LABEL_KEYCONFIG_HELP1"]
+        App.fontGame.draw(batch, desc, drawX.toFloat() + (width - App.fontGame.getWidth(desc)) / 2, drawY + 360f)
+
+        // action palette
+        batch.color = Color.WHITE
         if (keycapClicked >= 0 && controlSelected < 0) {
             controlPalette.render(batch, camera)
         }
-
-        // title
-        // TODO display window "title" using text spinner ONLY WHEN gamepad config is also supported
-//        val title = Lang["MENU_OPTIONS_CONTROLS"]
-//        batch.color = Color.WHITE
-//        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
-
     }
 
     fun setControlOf(key: Int, control: Int) {
