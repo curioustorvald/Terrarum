@@ -16,9 +16,10 @@ rm -rf $DESTDIR || true
 mkdir $DESTDIR
 mkdir $DESTDIR/Contents
 mkdir $DESTDIR/Contents/MacOS
+mkdir $DESTDIR/Contents/Resources
 
 # Prepare an application
-cp icns.png $DESTDIR/.icns
+cp AppIcon.icns $DESTDIR/Contents/Resources/AppIcon.icns
 cp $SRCFILES/Info.plist $DESTDIR/Contents/
 cp $SRCFILES/Terrarum.sh $DESTDIR/Contents/MacOS/
 chmod +x $DESTDIR/Contents/MacOS/Terrarum.sh

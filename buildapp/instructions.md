@@ -56,6 +56,14 @@ Terrarum.*.app
 
 Hide the `.jar` within the subdirectory; users will think this file is the main executable and will try to execute it using whatever JVM they may (or may not) have.
 
+### OSX .icns creation
+
+0. Do this on a real macOS
+1. Create a folder `icon.iconset`, then cp the .png file as `icon_512x512.png`
+2. On Terminal, `iconutil -c icns icon.iconset`
+
+https://gist.github.com/jamieweavis/b4c394607641e1280d447deed5fc85fc
+
 #### Some Notes
 
 - Windows EXE creation is not there yet. Maybe use one of [these?](https://sourceforge.net/projects/batch-compiler/)
