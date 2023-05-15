@@ -425,7 +425,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row4)
 
         App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_IME"], col1 + 40, row2)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME_TOGGLE"], col1 + 40, row2)
         App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3)
     }
 
