@@ -30,5 +30,5 @@ cp -r "../out/$RUNTIME" $DESTDIR/Contents/MacOS/
 cp -r "../assets_release" $DESTDIR/Contents/MacOS/
 mv $DESTDIR/Contents/MacOS/assets_release $DESTDIR/Contents/MacOS/assets
 cp -r "../out/TerrarumBuild.jar" $DESTDIR/Contents/MacOS/assets/
-zip -r -9 -l $DESTDIR.zip $DESTDIR
+
 echo "Build successful: $DESTDIR"
