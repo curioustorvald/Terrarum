@@ -588,7 +588,7 @@ Igloo
 Image
 Ion
 Iron
-Islam
+Isles
 Issue
 Item
 Ivory
