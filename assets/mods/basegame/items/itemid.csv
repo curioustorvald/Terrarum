@@ -9,6 +9,9 @@ id;classname
 9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll
 10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter
 
+256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
+257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony
+258;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorBirch
+259;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorRosewood
 
-999998;net.torvald.terrarum.modulebasegame.gameitems.ItemTestDoor
 999999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry
