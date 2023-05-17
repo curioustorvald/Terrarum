@@ -28,8 +28,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
 
-const val NOISEBOX_WIDTH = 768
-const val NOISEBOX_HEIGHT = 512
+const val NOISEBOX_WIDTH = 1024
+const val NOISEBOX_HEIGHT = 768
 const val TWO_PI = Math.PI * 2
 
 /**
@@ -259,6 +259,7 @@ fun main(args: Array<String>) {
     appConfig.setResizable(false)
     appConfig.setWindowedMode(NOISEBOX_WIDTH, NOISEBOX_HEIGHT)
     appConfig.setForegroundFPS(60)
+    appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2)
 
     Lwjgl3Application(WorldgenNoiseSandbox(), appConfig)
 }
@@ -274,7 +275,7 @@ internal object BiomeMaker : NoiseMaker {
 
     override fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         val colPal = biomeColors
-        val control = noiseValue[0].times(colPal.size).minus(0.00001f).toInt().fmod(colPal.size)
+        val control = noiseValue[0].coerceIn(0.0, 0.99999).times(colPal.size).toInt().coerceIn(colPal.indices)
 
         outTex.setColor(colPal[control])
         outTex.drawPixel(x, y)
@@ -286,22 +287,26 @@ internal object BiomeMaker : NoiseMaker {
         //biome.setType(ModuleBasisFunction.BasisType.SIMPLEX)
 
         // simplex AND fractal for more noisy edges, mmmm..!
-        val fractal = ModuleFractal()
-        fractal.setType(ModuleFractal.FractalType.MULTI)
-        fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
-        fractal.setNumOctaves(4)
-        fractal.setFrequency(1.0)
-        fractal.seed = seed shake 0x7E22A
+        val fractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.MULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+            it.setNumOctaves(4)
+            it.setFrequency(1.0)
+            it.seed = seed shake 0x7E22A
+        }
 
-        val autocorrect = ModuleAutoCorrect()
-        autocorrect.setSource(fractal)
-        autocorrect.setRange(0.0, 1.0)
+        val scaleDomain = ModuleScaleDomain().also {
+            it.setSource(fractal)
+            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize)
+            it.setScaleZ(1.0 / params.featureSize)
+        }
 
-        val scale = ModuleScaleDomain()
-        scale.setSource(autocorrect)
-        scale.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-        scale.setScaleY(1.0 / params.featureSize)
-        scale.setScaleZ(1.0 / params.featureSize)
+        val scale = ModuleScaleOffset().also {
+            it.setSource(scaleDomain)
+            it.setOffset(1.0)
+            it.setScale(1.0)
+        }
 
         val last = scale
 
@@ -310,12 +315,13 @@ internal object BiomeMaker : NoiseMaker {
 
     // with this method, only TWO distinct (not bland) biomes are possible. CLUT order is important here.
     val biomeColors = intArrayOf(
-            //0x2288ccff.toInt(), // ísland
-            0x229944ff.toInt(), // woodlands
-            0x77bb77ff.toInt(), // shrubland
-            0x88bb66ff.toInt(), // plains
-            0xeeddbbff.toInt(), // sands
-            0x888888ff.toInt() // rockyland
+        //0x2288ccff.toInt(), // ísland
+        0x229944ff.toInt(), // woodlands
+        0x77bb77ff.toInt(), // shrubland
+        0xbbdd99ff.toInt(), // plains
+        0xbbdd99ff.toInt(), // plains
+//        0xeeddbbff.toInt(), // sands
+        0x888888ff.toInt() // rockyland
     )
 }
 

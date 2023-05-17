@@ -1,10 +1,7 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import com.sudoplay.joise.Joise
-import com.sudoplay.joise.module.ModuleAutoCorrect
-import com.sudoplay.joise.module.ModuleBasisFunction
-import com.sudoplay.joise.module.ModuleFractal
-import com.sudoplay.joise.module.ModuleScaleDomain
+import com.sudoplay.joise.module.*
 import net.torvald.terrarum.App
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.concurrent.ThreadExecutor
@@ -76,7 +73,7 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
     }
 
     private fun draw(x: Int, y: Int, noiseValue: List<Double>, world: GameWorld) {
-        val control = noiseValue[0].times(slices).minus(0.00001f).toInt().fmod(slices)
+        val control = noiseValue[0].coerceIn(0.0, 0.99999).times(slices).toInt().coerceIn(0 until slices)
 
         if (y > 0) {
             val tileThis = world.getTileFromTerrain(x, y)
@@ -123,22 +120,26 @@ class Biomegen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         //biome.setType(ModuleBasisFunction.BasisType.SIMPLEX)
 
         // simplex AND fractal for more noisy edges, mmmm..!
-        val fractal = ModuleFractal()
-        fractal.setType(ModuleFractal.FractalType.MULTI)
-        fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
-        fractal.setNumOctaves(4)
-        fractal.setFrequency(1.0)
-        fractal.seed = seed shake 0x7E22A
+        val fractal = ModuleFractal().also {
+            it.setType(ModuleFractal.FractalType.MULTI)
+            it.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.SIMPLEX)
+            it.setNumOctaves(4)
+            it.setFrequency(1.0)
+            it.seed = seed shake 0x7E22A
+        }
 
-        val autocorrect = ModuleAutoCorrect()
-        autocorrect.setSource(fractal)
-        autocorrect.setRange(0.0, 1.0)
+        val scaleDomain = ModuleScaleDomain().also {
+            it.setSource(fractal)
+            it.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
+            it.setScaleY(1.0 / params.featureSize)
+            it.setScaleZ(1.0 / params.featureSize)
+        }
 
-        val scale = ModuleScaleDomain()
-        scale.setSource(autocorrect)
-        scale.setScaleX(1.0 / params.featureSize) // adjust this value to change features size
-        scale.setScaleY(1.0 / params.featureSize)
-        scale.setScaleZ(1.0 / params.featureSize)
+        val scale = ModuleScaleOffset().also {
+            it.setSource(scaleDomain)
+            it.setOffset(1.0)
+            it.setScale(1.0)
+        }
 
         val last = scale
 
