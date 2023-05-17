@@ -108,8 +108,8 @@ object WriteSavegame {
 object LoadSavegame {
 
     fun getSavegameNickname(worldDisk: SimpleFileSystem) = worldDisk.getDiskName(Common.CHARSET)
-    fun getWorldSavefileName(nick: String, world: GameWorld) = "$nick-${world.worldIndex}"
-    fun getPlayerSavefileName(player: IngamePlayer) = (player.actorValue.getAsString(AVKey.NAME) ?: "Player") + "-${player.uuid}"
+    fun getWorldSavefileName(world: GameWorld) = "${world.worldIndex}"
+    fun getPlayerSavefileName(player: IngamePlayer) = "${player.uuid}"
 
     fun getFileBytes(disk: SimpleFileSystem, id: Long): ByteArray64 = disk.getFile(id)!!.bytes
     fun getFileReader(disk: SimpleFileSystem, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
@@ -136,7 +136,7 @@ object LoadSavegame {
         newIngame.worldDisk =  VDUtil.readDiskArchive(worldDisk.diskFile, Level.INFO)
         newIngame.playerDisk = VDUtil.readDiskArchive(playerDisk.diskFile, Level.INFO)
         newIngame.savegameNickname = getSavegameNickname(worldDisk)
-        newIngame.worldSavefileName = getWorldSavefileName(newIngame.savegameNickname, world)
+        newIngame.worldSavefileName = getWorldSavefileName(world)
         newIngame.playerSavefileName = getPlayerSavefileName(player)
 
 //        worldDisk.dispose()

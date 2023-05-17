@@ -381,7 +381,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
     private fun postInitForNewGame() {
-        worldSavefileName = LoadSavegame.getWorldSavefileName(savegameNickname, world)
+        worldSavefileName = LoadSavegame.getWorldSavefileName(world)
         playerSavefileName = LoadSavegame.getPlayerSavefileName(actorGamer)
 
         worldDisk = VDUtil.createNewDisk(

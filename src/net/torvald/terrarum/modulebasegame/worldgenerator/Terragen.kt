@@ -239,14 +239,14 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
             it.seed = seed shake selectionMagic
         }
 
-        val terrainAutocorrect = ModuleAutoCorrect().also { // absolutely required
+        val terrainScaleOffset = ModuleScaleOffset().also {
             it.setSource(terrainTypeFractal)
-            it.setLow(0.0)
-            it.setHigh(1.0)
-        } // TODO REPLACE WITH ScaleOffset and play with the both values
+            it.setOffset(0.5)
+            it.setScale(0.5)
+        }
 
         val terrainTypeYScale = ModuleScaleDomain().also {
-            it.setSource(terrainAutocorrect)
+            it.setSource(terrainScaleOffset)
             it.setScaleY(0.0)
         }
 

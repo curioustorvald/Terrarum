@@ -788,7 +788,7 @@ fun AppUpdateListOfSavegames() {
     // create list of worlds
     File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
-            DiskSkimmer(file, Common.CHARSET, true)
+            DiskSkimmer(file, true)
         }
         catch (e: Throwable) {
             System.err.println("Unable to load a world file ${file.absolutePath}")
@@ -814,7 +814,7 @@ fun AppUpdateListOfSavegames() {
     // create list of players
     File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
-            DiskSkimmer(file, Common.CHARSET, true)
+            DiskSkimmer(file, true)
         }
         catch (e: Throwable) {
             System.err.println("Unable to load a player file ${file.absolutePath}")

@@ -21,7 +21,6 @@ import kotlin.experimental.and
  */
 class DiskSkimmer(
         val diskFile: File,
-        val charset: Charset = Charset.defaultCharset(),
         noInit: Boolean = false
 ): SimpleFileSystem {
 

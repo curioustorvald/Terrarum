@@ -46,7 +46,7 @@ class QuickSingleplayerWorldSavingThread(
 
 
     override fun save() {
-        val skimmer = DiskSkimmer(outFile, Common.CHARSET)
+        val skimmer = DiskSkimmer(outFile)
 
         if (hasThumbnail) {
             while (!IngameRenderer.fboRGBexportedLatch) {
