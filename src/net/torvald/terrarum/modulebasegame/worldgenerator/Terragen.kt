@@ -242,7 +242,7 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
         val terrainScaleOffset = ModuleScaleOffset().also {
             it.setSource(terrainTypeFractal)
             it.setOffset(0.5)
-            it.setScale(0.5)
+            it.setScale(0.666666) // greater = more dynamic terrain
         }
 
         val terrainTypeYScale = ModuleScaleDomain().also {
