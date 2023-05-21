@@ -802,9 +802,13 @@ fun AppUpdateListOfSavegames() {
         val jsonFile = it.getFile(SAVEGAMEINFO)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val worldUUID = UUID.fromString(json.getString("worldIndex"))
-        App.savegameWorlds[worldUUID] = it
-        App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
-        App.sortedSavegameWorlds.add(worldUUID)
+
+        // if multiple valid savegames with same UUID exist, only the most recent one is retained
+        if (!App.savegameWorlds.contains(worldUUID)) {
+            App.savegameWorlds[worldUUID] = it
+            App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
+            App.sortedSavegameWorlds.add(worldUUID)
+        }
     }
 
 
@@ -828,9 +832,13 @@ fun AppUpdateListOfSavegames() {
         val jsonFile = it.getFile(SAVEGAMEINFO)!!
         val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
         val playerUUID = UUID.fromString(json.getString("uuid"))
-        App.savegamePlayers[playerUUID] = it
-        App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
-        App.sortedPlayers.add(playerUUID)
+
+        // if multiple valid savegames with same UUID exist, only the most recent one is retained
+        if (!App.savegamePlayers.contains(playerUUID)) {
+            App.savegamePlayers[playerUUID] = it
+            App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
+            App.sortedPlayers.add(playerUUID)
+        }
     }
 
 }
