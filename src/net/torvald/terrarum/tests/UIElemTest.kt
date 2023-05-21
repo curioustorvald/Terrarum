@@ -100,7 +100,7 @@ class UIElemTest : ApplicationAdapter() {
 }
 
 class DummyTogglePane : UICanvas() {
-    private val button1 = UIItemToggleButton(this, 400, 100)
+    private val button1 = UIItemToggleButton(this, 400, 100, 80)
     private val textin = UIItemTextLineInput(this, 400, 160, 400)
 
     override var width = 800
