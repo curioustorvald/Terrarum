@@ -145,8 +145,10 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
         nameFun = customNameFun
 
+        // redefine the sprite's appearance when opened to left/right
+        (sprite!! as SheetSpriteAnimation).currentRow = if (doorState < 0) 2 else doorState
+
         // define light/shadebox
-        // TODO: redefine when opened to left/right
         (if (isOpacityActuallyLuminosity) lightBoxList else shadeBoxList)[0].light = opacity
 
     }
@@ -336,20 +338,20 @@ open class FixtureSwingingDoorBase : FixtureBase {
             }
             // automatic opening/closing
             else if (doorStateTimer > doorHoldLength[doorState]!!) {
-                val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
+//                val actors = INGAME.actorContainerActive.filterIsInstance<ActorWithBody>()
 
                 // auto opening and closing
                 // TODO make this work with "player_alies" faction, not just a player
                 // TODO auto open from the other side does not work if X-coord is 0 or (world width - 1)
-                val installer: IngamePlayer? = if (actorThatInstalledThisFixture == null) null
-                else INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }.ifEmpty {
-                    INGAME.actorContainerInactive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }
-                }.getOrNull(0)
+//                val installer: IngamePlayer? = if (actorThatInstalledThisFixture == null) null
+//                else INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }.ifEmpty {
+//                    INGAME.actorContainerInactive.filterIsInstance<IngamePlayer>().filter { it.uuid == actorThatInstalledThisFixture }
+//                }.getOrNull(0)
 
                 // if the door is "owned" by someone, restrict access to its "amicable" (defined using Faction subsystem) actors
                 // if the door is owned by null, restrict access to ActorHumanoid and actors with "intelligent" actor value set up
-                if (actorThatInstalledThisFixture == null || installer != null) {
-                    val amicableActors: List<ActorWithBody> = ArrayList(
+                if (true) {//actorThatInstalledThisFixture == null || installer != null) {
+                    /*val amicableActors: List<ActorWithBody> = ArrayList(
                             if (actorThatInstalledThisFixture == null)
                                 actors.filterIsInstance<ActorHumanoid>() union actors.filter { it.actorValue.getAsBoolean("intelligent") == true }
                             else {
@@ -367,7 +369,11 @@ open class FixtureSwingingDoorBase : FixtureBase {
                     }.filter {
                         // filter amicableActors so that ones standing near the door remain
                         this.hitbox.containsHitbox(INGAME.world.width * TILE_SIZED, it.hitbox)
-                    }
+                    }*/
+
+
+                    val amicableActors = INGAME.actorContainerActive.filterIsInstance<IngamePlayer>()
+
 
                     var nobodyIsThere = true
                     val oldState = doorState
