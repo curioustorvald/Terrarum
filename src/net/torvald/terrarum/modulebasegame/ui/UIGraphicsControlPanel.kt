@@ -16,32 +16,70 @@ import net.torvald.unicode.TIMES
  */
 class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
-    override var width = 400
-    override var height = 400
+
+    private val linegap = 14
+    private val panelgap = 20
+
+    private val rowheight = 20 + linegap
+
+    private val h1MarginTop = 16
+    private val h1MarginBottom = 4
+
+    private val options = arrayOf(
+        arrayOf("", { Lang["MENU_OPTIONS_PERFORMANCE"] }, "h1"),
+            arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
+            arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
+            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
+        arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
+            arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
+            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"] }, "spinnerd,1.0,2.0,0.05"),
+            arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
+            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
+            arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+        arrayOf("", { Lang["GAME_GENRE_MISC"] }, "h1"),
+            arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
+    )
+
+    private val optionsYpos = IntArray(options.size + 1)
+
+    init {
+        var akku = 0
+        options.forEachIndexed { index, row ->
+            val option = row[2]
+
+            if (index > 0 && option == "h1") {
+                akku += h1MarginTop
+            }
+
+            optionsYpos[index] = akku
+
+            akku += when (option) {
+                "h1" -> rowheight + h1MarginBottom
+                else -> rowheight
+            }
+        }
+        optionsYpos[optionsYpos.lastIndex] = akku
+    }
+
+    override var width = 420
+    override var height = optionsYpos.last()
+
 
     private val spinnerWidth = 140
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-
-    private val linegap = 16
-    private val panelgap = 20
-
-    private val options = arrayOf(
-        arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
-        arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
-        arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
-        arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
-        arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"]+"*" }, "spinner,0,300,2"),
-        arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"]+"*" }, "toggle"),
-        arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"]+"*" }, "typeinres"),
-        arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"]+"*" }, "spinnerd,1.0,2.0,0.05"),
-    )
-
     // @return Pair of <UIItem, Init job for the item>
     private fun makeButton(args: String, x: Int, y: Int, optionName: String): Pair<UIItem, (UIItem, String) -> Unit> {
-        return if (args.startsWith("toggle")) {
-            UIItemToggleButton(this, x - 75, y, App.getConfigBoolean(optionName)) to { it: UIItem, optionStr: String ->
+        return if (args.startsWith("h1") || args.startsWith("p")) {
+            (object : UIItem(this, x, y) {
+                override val width = 1
+                override val height = 1
+                override fun dispose() {}
+            }) to { _, _ -> }
+        }
+        else if (args.startsWith("toggle")) {
+            UIItemToggleButton(this, x, y, App.getConfigBoolean(optionName)) to { it: UIItem, optionStr: String ->
                 (it as UIItemToggleButton).clickOnceListener = { _, _, _ ->
                     it.toggle()
                     App.setConfig(optionStr, it.getStatus())
@@ -50,7 +88,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         else if (args.startsWith("spinner,")) {
             val arg = args.split(',')
-            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
+            UIItemSpinner(this, x, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
                 (it as UIItemSpinner).selectionChangeListener = {
                     App.setConfig(optionStr, it)
                 }
@@ -58,14 +96,14 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         else if (args.startsWith("spinnerd,")) {
             val arg = args.split(',')
-            UIItemSpinner(this, x - spinnerWidth, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" }) to { it: UIItem, optionStr: String ->
+            UIItemSpinner(this, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" }) to { it: UIItem, optionStr: String ->
                 (it as UIItemSpinner).selectionChangeListener = {
                     App.setConfig(optionStr, it)
                 }            }
         }
         else if (args.startsWith("typeinint")) {
 //            val arg = args.split(',') // args: none
-            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = {
                     App.setConfig(optionStr, it.toInt()) // HAXXX!!!
                 }
@@ -74,7 +112,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         else if (args.startsWith("typeinres")) {
             val keyWidth = optionName.substringBefore(',')
             val keyHeight = optionName.substringAfter(',')
-            UIItemTextLineInput(this, x - spinnerWidth, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }, UIItemTextButton.Companion.Alignment.CENTRE) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }, UIItemTextButton.Companion.Alignment.CENTRE) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = { text ->
                     val text = text.lowercase()
                     if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {
@@ -93,8 +131,8 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val optionControllers: List<Pair<UIItem, (UIItem, String) -> Unit>> = options.mapIndexed { index, strings ->
         makeButton(options[index][2] as String,
-                drawX + width - panelgap,
-                drawY + panelgap - 2 + index * (20 + linegap),
+                drawX + width / 2 + panelgap,
+                drawY - 2 + optionsYpos[index],
                 options[index][0] as String
         )
     }
@@ -111,18 +149,30 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        batch.color = Toolkit.Theme.COL_INACTIVE
+        /*batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 
         batch.color = CELL_COL
-        Toolkit.fillArea(batch, drawX, drawY, width, height)
+        Toolkit.fillArea(batch, drawX, drawY, width, height)*/
 
-        batch.color = Color.WHITE
         options.forEachIndexed { index, strings ->
-            App.fontGame.draw(batch, (strings[1] as () -> String).invoke(), drawX + panelgap.toFloat(), drawY + panelgap + index * (20f + linegap))
+            val mode = strings[2]
+            val label = (strings[1] as () -> String).invoke()
+            val labelWidth = App.fontGame.getWidth(label)
+            batch.color = when (mode) {
+                "h1" -> Toolkit.Theme.COL_MOUSE_UP
+                "p" -> Color.LIGHT_GRAY
+                else -> Color.WHITE
+            }
+
+            val xpos = if (mode == "p" || mode == "h1")
+                drawX + (width - labelWidth)/2 // centre-aligned
+            else
+                drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
+
+            App.fontGame.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index].toFloat())
         }
         uiItems.forEach { it.render(batch, camera) }
-        App.fontGame.draw(batch, "* ${Lang["MENU_LABEL_RESTART_REQUIRED"]}", drawX + panelgap.toFloat(), drawY + height - panelgap - App.fontGame.lineHeight)
 
         if (App.getConfigBoolean("fx_streamerslayout")) {
             val xstart = App.scr.width - App.scr.chatWidth
