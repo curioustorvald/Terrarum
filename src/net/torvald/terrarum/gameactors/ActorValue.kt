@@ -3,6 +3,8 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.KVHashMap
 
 /**
+ * For the dictionary of recognised ActorValues, see the source code of [net.torvald.terrarum.gameactors.AVKey]
+ *
  * Created by minjaesong on 2017-04-28.
  */
 class ActorValue : KVHashMap {

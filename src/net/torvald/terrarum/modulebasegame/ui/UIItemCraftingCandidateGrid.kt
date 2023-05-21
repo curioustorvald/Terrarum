@@ -7,7 +7,6 @@ import net.torvald.terrarum.UIItemInventoryCatBar
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
-import net.torvald.terrarum.modulebasegame.gameactors.UICrafting
 
 /**
  * Created by minjaesong on 2022-06-28.

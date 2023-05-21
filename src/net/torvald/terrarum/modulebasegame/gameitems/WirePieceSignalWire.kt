@@ -22,7 +22,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
     override var inventoryCategory = Category.WIRE
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegionPack(atlasID).get(sheetX, sheetY)
 

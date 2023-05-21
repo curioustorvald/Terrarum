@@ -85,8 +85,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
     init {
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
-            val t = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
-            t.flip(false, false); t
+            TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
         }
         CommonResourcePool.addToLoadingList("savegame_status_icon") {
             TextureRegionPack("assets/graphics/gui/savegame_status_icon.tga", 24, 24)

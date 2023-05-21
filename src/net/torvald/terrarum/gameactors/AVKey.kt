@@ -50,10 +50,7 @@ object AVKey {
     const val STRENGTH = "strength"
     const val STRENGTHBUFF = "$STRENGTH$BUFF"
     const val ENCUMBRANCE = "encumbrance"
-    /** 30-bit RGB (Int)
-     * 0000 0010000000 0010000000 0010000000
-     *      ^ Red      ^ Green    ^ Blue
-     */
+
     const val LUMR = "luminosityred"
     const val LUMG = "luminositygreen"
     const val LUMB = "luminosityblue"
@@ -142,4 +139,14 @@ object AVKey {
 
     const val BAREHAND_MINHEIGHT = "barehandactionminheight"
     const val BAREHAND_BASE_DIGSIZE = "basebarehanddiggingsize"
+
+
+    /** String
+     * Comma-separated values of UUID for the world, Ascii85-encoded, big endian.
+     *
+     * Use extension function `UUID.toAscii85()` and `String.ascii85toUUID()` defined in the file for net.torvald.terrarum.serialise.Ascii85
+     *
+     * example value: `"SIxM+kGlrjZgLx5Zeqz7,;:UIZ5Q=2WT35SgKpOp.,vvf'fNW3G<ROimy(Y;E<,-mdtr5|^RGOqr0x*T*lC,YABr1oQwErKG)pGC'gUG"`
+     */
+    const val WORLD_PORTAL_DICT = ""
 }

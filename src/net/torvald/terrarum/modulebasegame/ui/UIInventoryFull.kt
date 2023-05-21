@@ -9,7 +9,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.modulebasegame.gameactors.UICrafting
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
@@ -160,6 +159,7 @@ class UIInventoryFull(
     fun unlockTransition() {
         panelTransitionLocked = false
     }
+    fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
 
     val catBar = UIItemInventoryCatBar(
             this,
@@ -167,13 +167,12 @@ class UIInventoryFull(
             42 - YPOS_CORRECTION + (App.scr.height - internalHeight) / 2,
             internalWidth,
             catBarWidth,
-            true,
-            { i -> if (!panelTransitionLocked) requestTransition(i) }
-    )
+            true
+    ) { i -> if (!panelTransitionLocked) requestTransition(i) }
 
 
-//    private val transitionalMinimap = UIInventoryMinimap(this) // PLACEHOLDER
-    private val transitionalCraftingUI = UICrafting(this) // PLACEHOLDER
+    //    private val transitionalMinimap = UIInventoryMinimap(this)
+    private val transitionalCraftingUI = UICrafting(this)
     private val transitionalItemCells = UIInventoryCells(this)
     private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
@@ -257,8 +256,6 @@ class UIInventoryFull(
         private set
     internal var offsetY = ((App.scr.height - internalHeight) / 2).toFloat()
         private set
-
-    fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
 
     override fun updateUI(delta: Float) {
         if (handler.openFired) {

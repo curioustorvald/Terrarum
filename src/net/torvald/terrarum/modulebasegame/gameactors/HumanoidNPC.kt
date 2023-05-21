@@ -48,7 +48,7 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
         override var stackable = true
         override val isDynamic = false
-        override val material = Material()
+        override val materialId = ""
 
         override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
             try {

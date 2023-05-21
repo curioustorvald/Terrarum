@@ -22,29 +22,19 @@ object CommonResourcePool {
 
     init {
         addToLoadingList("itemplaceholder_16") {
-            val t = TextureRegion(Texture("assets/item_kari_16.tga"))
-            t.flip(false, false)
-            /*return*/t
+            TextureRegion(Texture("assets/item_kari_16.tga")).also { it.flip(false, false) }
         }
         addToLoadingList("itemplaceholder_24") {
-            val t = TextureRegion(Texture("assets/item_kari_24.tga"))
-            t.flip(false, false)
-            /*return*/t
+            TextureRegion(Texture("assets/item_kari_24.tga")).also { it.flip(false, false) }
         }
         addToLoadingList("itemplaceholder_32") {
-            val t = TextureRegion(Texture("assets/item_kari_32.tga"))
-            t.flip(false, false)
-            /*return*/t
+            TextureRegion(Texture("assets/item_kari_32.tga")).also { it.flip(false, false) }
         }
         addToLoadingList("itemplaceholder_48") {
-            val t = TextureRegion(Texture("assets/item_kari_48.tga"))
-            t.flip(false, false)
-            /*return*/t
+            TextureRegion(Texture("assets/item_kari_48.tga")).also { it.flip(false, false) }
         }
         addToLoadingList("test_texture") {
-            val t = TextureRegion(Texture("assets/test_texture.tga"))
-            t.flip(false, false)
-            /*return*/t
+            TextureRegion(Texture("assets/test_texture.tga")).also { it.flip(false, false) }
         }
         loadAll()
     }
@@ -130,7 +120,7 @@ object CommonResourcePool {
     fun getAsTexture(identifier: String) = getAs<Texture>(identifier)
 
     fun dispose() {
-        pool.forEach { name, u ->
+        pool.forEach { (name, u) ->
             try {
                 when {
                     u is Disposable -> u.dispose()

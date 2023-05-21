@@ -1,6 +1,6 @@
 package net.torvald.parametricsky.datasets
 
-import net.torvald.terrarum.serialise.toLittleLong
+import net.torvald.terrarum.serialise.toLittleInt64
 import java.io.File
 import java.io.FileInputStream
 
@@ -14,7 +14,7 @@ object DatasetOp {
         val ret = DoubleArray(entrysize) {
             val inputbuf = ByteArray(8)
             fis.read(inputbuf)
-            val rawnum = inputbuf.toLittleLong()
+            val rawnum = inputbuf.toLittleInt64()
             Double.fromBits(rawnum)
         }
 

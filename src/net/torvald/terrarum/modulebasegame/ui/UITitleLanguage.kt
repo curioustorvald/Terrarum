@@ -4,12 +4,12 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
-import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
+import kotlin.math.ceil
 
 class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
@@ -22,8 +22,8 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
     private val textButtonLineHeight = 32
 
     private val localeList = Lang.languageList.toList().sorted()
-    private val localeFirstHalf = localeList.subList(0, localeList.size / 2)
-    private val localeSecondHalf = localeList.subList(localeList.size / 2, localeList.size)
+    private val localeFirstHalf = localeList.subList(0, ceil(localeList.size / 2f).toInt())
+    private val localeSecondHalf = localeList.subList(ceil(localeList.size / 2f).toInt(), localeList.size)
 
     override var width = 480
     override var height = maxOf(localeFirstHalf.size, localeSecondHalf.size) * textButtonLineHeight

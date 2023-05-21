@@ -44,7 +44,7 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
 
     /**
      * Do not address the CommonResourcePool directly; just do it like this snippet:

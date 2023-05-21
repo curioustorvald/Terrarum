@@ -1,8 +1,11 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.terrarum.savegame.toBigEndian
+import java.util.UUID
+import kotlin.math.ceil
+
 /**
- * Standard Ascii85 implementation, except that the character sets used are as defined in
- * RFC 1924 for JSON-compatibility, and will NOT truncate '00000' into something else;
+ * Ascii85 implementation with my own character table based on RFC 1924. Will NOT truncate '00000' into something else;
  * just gzip the inputstream instead!
  */
 object Ascii85 {
@@ -31,9 +34,6 @@ object Ascii85 {
             INVERSE_TABLE[CHAR_TABLE[i].toInt()] = i.toLong()
     }
 
-    /**
-     * Put -1 ([Ascii85.PAD_BYTE]) for null-bytes
-     */
     fun encode(i1: Int?, i2: Int?, i3: Int?, i4: Int?): String {
         var b1=i1 ?: PAD_BYTE; var b2=i2 ?: PAD_BYTE; var b3=i3 ?: PAD_BYTE; var b4=i4 ?: PAD_BYTE
         var padLen = 0
@@ -73,9 +73,6 @@ object Ascii85 {
                 "${CHAR_TABLE[sum.toInt()]}").substring(0,5 - padLen)
     }
 
-    /**
-     * Put '\0' ([Ascii85.PAD_CHAR]) for null-chars
-     */
     fun decode(x1: Char?, x2: Char?, x3: Char?, x4: Char?, x5: Char?): ByteArray {
         var s1=x1 ?: PAD_CHAR; var s2=x2 ?: PAD_CHAR; var s3=x3 ?: PAD_CHAR; var s4=x4 ?: PAD_CHAR; var s5=x5 ?: PAD_CHAR
         var padLen = 0
@@ -106,6 +103,47 @@ object Ascii85 {
                   INVERSE_TABLE[s5.toInt()]
         return ByteArray(4 - padLen) { sum.ushr((3 - it) * 8).and(255).toByte() }
     }
+
+    fun encodeBytes(bytes: ByteArray): String {
+        val sb = StringBuilder()
+        for (k in 0..(bytes.size / 4)) {
+            sb.append(Ascii85.encode(
+                bytes.getOrNull(k*4)?.toInt(),
+                bytes.getOrNull(k*4+1)?.toInt(),
+                bytes.getOrNull(k*4+2)?.toInt(),
+                bytes.getOrNull(k*4+3)?.toInt()
+            ))
+        }
+        return sb.toString()
+    }
+    fun decodeBytes(encoded: String): ByteArray {
+        val bytes = ByteArray(ceil(encoded.length * 0.8).toInt())
+        var curs = 0
+        for (k in 0..(encoded.length / 5)) {
+            Ascii85.decode(
+                encoded.getOrNull(k*5),
+                encoded.getOrNull(k*5+1),
+                encoded.getOrNull(k*5+2),
+                encoded.getOrNull(k*5+3),
+                encoded.getOrNull(k*5+4),
+            ).let {
+                it.forEachIndexed { i, b ->
+                    bytes[curs + i] = b
+                }
+                curs += it.size
+            }
+        }
+        return bytes
+    }
+}
+
+fun UUID.toAscii85() =
+    Ascii85.encodeBytes(this.mostSignificantBits.toBigEndian() + this.leastSignificantBits.toBigEndian())
+fun String.ascii85toUUID(): UUID {
+    val bytes = Ascii85.decodeBytes(this)
+    val msb = bytes.toBigInt64(0)
+    val lsb = bytes.toBigInt64(8)
+    return UUID(msb, lsb)
 }
 
 /*fun main(args: Array<String>) {

@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame.gameactors
+package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
@@ -12,6 +12,8 @@ import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.Toolkit

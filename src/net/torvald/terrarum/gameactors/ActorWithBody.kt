@@ -433,15 +433,15 @@ open class ActorWithBody : Actor {
     }
 
     // get() methods are moved to update(), too much stray object being created is definitely not good
-    val centrePosVector: Vector2 = Vector2(0.0,0.0)
+    @Transient val centrePosVector: Vector2 = Vector2(0.0,0.0)
         //get() = Vector2(hitbox.centeredX, hitbox.centeredY)
-    val centrePosPoint: Point2d = Point2d(0.0, 0.0)
+    @Transient val centrePosPoint: Point2d = Point2d(0.0, 0.0)
         //get() = Point2d(hitbox.centeredX, hitbox.centeredY)
-    val feetPosVector: Vector2 = Vector2(0.0,0.0)
+    @Transient val feetPosVector: Vector2 = Vector2(0.0,0.0)
         //get() = Vector2(hitbox.centeredX, hitbox.endY)
-    val feetPosPoint: Point2d = Point2d(0.0,0.0)
+    @Transient val feetPosPoint: Point2d = Point2d(0.0,0.0)
         //get() = Point2d(hitbox.centeredX, hitbox.endY)
-    val feetPosTile: Point2i = Point2i(0,0)
+    @Transient val feetPosTile: Point2i = Point2i(0,0)
         //get() = Point2i(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
     override fun run() = update(App.UPDATE_RATE)

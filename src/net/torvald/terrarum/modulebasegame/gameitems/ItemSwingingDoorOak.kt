@@ -19,7 +19,7 @@ class ItemSwingingDoorOak(originalID: ItemID) :
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
     override var baseToolSize: Double? = baseMass
@@ -44,7 +44,7 @@ class ItemSwingingDoorEbony(originalID: ItemID) :
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
     override var baseToolSize: Double? = baseMass
@@ -69,7 +69,7 @@ class ItemSwingingDoorBirch(originalID: ItemID) :
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
     override var baseToolSize: Double? = baseMass
@@ -94,7 +94,7 @@ class ItemSwingingDoorRosewood(originalID: ItemID) :
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
     override var baseToolSize: Double? = baseMass

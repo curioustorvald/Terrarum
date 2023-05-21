@@ -108,7 +108,9 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      */
     var equipPosition: Int = EquipPosition.NULL
 
-    abstract val material: Material
+    internal val material: Material
+        get() = MaterialCodex.getOrDefault(materialId)
+    abstract val materialId: String
 
     /**
      * DO NOT READ FROM THIS VALUE: USE `ItemCodex.getItemImage(item)`;

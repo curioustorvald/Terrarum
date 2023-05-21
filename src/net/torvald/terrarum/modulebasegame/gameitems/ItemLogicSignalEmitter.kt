@@ -17,7 +17,7 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
 

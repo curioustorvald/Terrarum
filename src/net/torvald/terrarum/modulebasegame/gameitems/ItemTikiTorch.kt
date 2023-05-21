@@ -17,7 +17,7 @@ class ItemTikiTorch(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32)
 

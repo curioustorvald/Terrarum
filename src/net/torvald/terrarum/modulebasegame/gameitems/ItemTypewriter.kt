@@ -17,7 +17,7 @@ class ItemTypewriter(originalID: ItemID) : FixtureItemBase(originalID, "net.torv
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSheet("basegame", "sprites/fixtures/typewriter.tga", 32, 16)
 

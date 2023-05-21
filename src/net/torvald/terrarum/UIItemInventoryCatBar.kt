@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
@@ -40,6 +41,18 @@ class UIItemInventoryCatBar(
             arrayOf(GameItem.Category.WALL),
             arrayOf(GameItem.Category.MISC),
             arrayOf(CAT_ALL)
+    )
+    internal val catIconsLabels = listOf(
+        { Lang["GAME_INVENTORY_WEAPONS"] },
+        { Lang["CONTEXT_ITEM_TOOL_PLURAL"] },
+        { Lang["CONTEXT_ITEM_ARMOR"] },
+        { Lang["GAME_INVENTORY_INGREDIENTS"] },
+        { Lang["GAME_INVENTORY_POTIONS"] },
+        { Lang["CONTEXT_ITEM_MAGIC"] },
+        { Lang["GAME_INVENTORY_BLOCKS"] },
+        { Lang["GAME_INVENTORY_WALLS"] },
+        { Lang["GAME_GENRE_MISC"] },
+        { Lang["MENU_LABEL_ALL"] },
     )
 
 
@@ -274,12 +287,17 @@ class UIItemInventoryCatBar(
         batch.color = underlineColour
         Toolkit.drawStraightLine(batch, posX, posY + height - 1, posX + width, 1, false)
 
-        // indicator
         if (selectedPanel == 1) {
+            // indicator
             batch.color = underlineHighlightColour
-            batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2).toFloat().round(), posY + highlighterYPos)
-        }
+            batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2).round(), posY + highlighterYPos)
 
+            // label
+            batch.color = Color.WHITE
+            catIconsLabels[selectedIcon]().let {
+                App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2).toFloat(), posY + highlighterYPos + 4)
+            }
+        }
 
     }
 

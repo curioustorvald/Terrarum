@@ -24,7 +24,7 @@ class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
     override var inventoryCategory = Category.MISC
     override val isUnique = false
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = FixtureItemBase.getItemImageFromSheet("dwarventech", "sprites/fixtures/desktop_computer.tga", TerrarumAppConfiguration.TILE_SIZE, TerrarumAppConfiguration.TILE_SIZE)
     override var baseToolSize: Double? = baseMass

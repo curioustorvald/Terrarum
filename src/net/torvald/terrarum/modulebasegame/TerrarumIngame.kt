@@ -356,7 +356,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 codices.player.setPosition(it.physics.position)
                 if (isMultiplayer) {
+                    printdbg(this, "Using world's ActorValue instead of player's")
                     codices.player.actorValue = it.actorValue!!
+                    printdbg(this, "Using world's Inventory instead of player's")
                     codices.player.inventory = it.inventory!!
                 }
             }

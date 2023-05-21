@@ -92,7 +92,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
     override var inventoryCategory = Category.TOOL
     override val isUnique = true
     override val isDynamic = false
-    override val material = Material()
+    override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegionPack("basegame.items16").get(0, 9)
 

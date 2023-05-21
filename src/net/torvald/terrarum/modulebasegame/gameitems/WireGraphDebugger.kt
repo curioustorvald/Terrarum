@@ -18,7 +18,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
     override var inventoryCategory = Category.TOOL
     override val isUnique = true
     override val isDynamic = false
-    override val material = MaterialCodex["CUPR"]
+    override val materialId = "CUPR"
     override var baseMass = 2.0
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_24")

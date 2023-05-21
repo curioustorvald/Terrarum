@@ -191,7 +191,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
         override var stackable = false
         override val isDynamic = false
-        override val material = Material()
+        override val materialId = ""
     }
 
     override fun update(delta: Float) {

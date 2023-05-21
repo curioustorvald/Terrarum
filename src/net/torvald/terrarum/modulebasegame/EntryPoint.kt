@@ -88,7 +88,7 @@ class EntryPoint : ModuleEntryPoint() {
         override var stackable = true
         override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
         override var isDynamic = false
-        override val material = MaterialCodex.getOrDefault(tile.material)
+        override val materialId = tile.material
 //        override val itemImage: TextureRegion
 //            get() {
 //                val itemSheetNumber = App.tileMaker.tileIDtoItemSheetNumber(originalID)

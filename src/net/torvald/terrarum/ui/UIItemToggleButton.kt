@@ -23,14 +23,10 @@ class UIItemToggleButton(
 
     init {
         CommonResourcePool.addToLoadingList("ui_item_toggler_base") {
-            val t = TextureRegion(Texture(Gdx.files.internal("./assets/graphics/gui/toggler_back.tga")))
-            t.flip(false, false)
-            t
+            TextureRegion(Texture(Gdx.files.internal("./assets/graphics/gui/toggler_back.tga")))
         }
         CommonResourcePool.addToLoadingList("ui_item_toggler_handle") {
-            val t = TextureRegion(Texture(Gdx.files.internal("./assets/graphics/gui/toggler_switch.tga")))
-            t.flip(false, false)
-            t
+            TextureRegion(Texture(Gdx.files.internal("./assets/graphics/gui/toggler_switch.tga")))
         }
         CommonResourcePool.loadAll()
     }
