@@ -137,8 +137,7 @@ object WritePlayer {
 object ReadPlayer {
 
     operator fun invoke(disk: SimpleFileSystem, dataStream: Reader): IngamePlayer =
-            ReadActor(disk, dataStream) as IngamePlayer
-
+        ReadActor(disk, dataStream) as IngamePlayer
 }
 
 /**
@@ -152,9 +151,11 @@ object ReadPlayer {
 object ReadActor {
 
     operator fun invoke(disk: SimpleFileSystem, dataStream: Reader): Actor =
-            fillInDetails(disk, Common.jsoner.fromJson(null, dataStream))
+        Common.jsoner.fromJson<Actor?>(null, dataStream).also {
+            fillInDetails(disk, it)
+        }
 
-    private fun fillInDetails(disk: SimpleFileSystem, actor: Actor): Actor {
+    private fun fillInDetails(disk: SimpleFileSystem, actor: Actor) {
         actor.reload()
 
 
@@ -197,9 +198,6 @@ object ReadActor {
 
             //actor.reassembleSprite(actor.sprite, actor.spriteGlow, null)
         }
-
-
-        return actor
     }
 
 }

@@ -459,6 +459,40 @@ open class ActorWithBody : Actor {
 
     private val bounceDampenVelThreshold = 0.5
 
+    /**
+     * Used on final loading phase, move the player to the opposite direction of the gravitation, until the player's
+     * not colliding
+     */
+    open fun tryUnstuck() {
+        val newHitbox = hitbox.clone()
+        val translation = gravitation.setMagnitude(-1.0)
+
+        while (isColliding(newHitbox)) {
+            newHitbox.translate(translation)
+        }
+
+        hitbox.reassign(newHitbox)
+
+        hIntTilewiseHitbox.setFromTwoPoints(
+            hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+            hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+            hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
+            hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5
+        )
+        intTilewiseHitbox.setFromTwoPoints(
+            hitbox.startX.div(TILE_SIZE).floor(),
+            hitbox.startY.div(TILE_SIZE).floor(),
+            hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+            hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor()
+        )
+
+        centrePosVector.set(hitbox.centeredX, hitbox.centeredY)
+        centrePosPoint.set(hitbox.centeredX, hitbox.centeredY)
+        feetPosVector.set(hitbox.centeredX, hitbox.endY)
+        feetPosPoint.set(hitbox.centeredX, hitbox.endY)
+        feetPosTile.set(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
+    }
+
     override fun update(delta: Float) {
 
         // re-scale hitbox

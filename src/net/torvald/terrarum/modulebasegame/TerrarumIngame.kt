@@ -372,6 +372,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
 
+        // try to unstuck the repositioned player
+        codices.player.tryUnstuck()
+
+
+
         // by doing this, whatever the "possession" the player had will be broken by the game load
         actorNowPlaying = codices.player
         actorGamer = codices.player

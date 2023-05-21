@@ -15,16 +15,16 @@ import java.io.Reader
 object ReadSimpleWorld {
 
     operator fun invoke(worldDataStream: Reader, origin: File?): GameWorld =
-            fillInDetails(Common.jsoner.fromJson(SimpleGameWorld::class.java, worldDataStream), origin)
+        Common.jsoner.fromJson(SimpleGameWorld::class.java, worldDataStream).also {
+            fillInDetails(origin, it)
+        }
 
-    private fun fillInDetails(world: GameWorld, origin: File?): GameWorld {
+    private fun fillInDetails(origin: File?, world: GameWorld) {
         world.tileNumberToNameMap.forEach { l, s ->
             world.tileNameToNumberMap[s] = l.toInt()
         }
 
         ItemCodex.loadFromSave(origin, world.dynamicToStaticTable, world.dynamicItemInventory)
-
-        return world
     }
 
     fun readWorldAndSetNewWorld(ingame: IngameInstance, worldDataStream: Reader, origin: File?): GameWorld {
