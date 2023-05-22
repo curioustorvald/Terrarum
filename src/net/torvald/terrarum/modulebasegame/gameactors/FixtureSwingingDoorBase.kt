@@ -372,7 +372,10 @@ open class FixtureSwingingDoorBase : FixtureBase {
                     }*/
 
 
-                    val amicableActors = INGAME.actorContainerActive.filterIsInstance<IngamePlayer>()
+                    val amicableActors = INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().filter {
+                        // actor.ontheLeftSideOfDoor and actor.ontheRightSideOfDoor won't consider the distance of the actor so we filter the actors further
+                        this.hitbox.containsHitbox(INGAME.world.width * TILE_SIZED, it.hitbox)
+                    }
 
 
                     var nobodyIsThere = true
