@@ -73,6 +73,9 @@ class ItemCodex {
                 }
             }
             dynamicItemInventory[dynid] = item
+
+            // try to call reload() of the dynamic items
+            item.reload()
         }
     }
 

@@ -74,10 +74,10 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 
+    /* called when the actor is loaded from the save; one use of this function is to "re-sync" the
+     * Transient variables such as `mainUI` of FixtureBase
+     */
     open fun reload() {
-        /* called when the actor is loaded from the save; one use of this function is to "re-sync" the
-         * Transient variables such as `mainUI` of FixtureBase
-         */
         actorValue.actor = this
 
         if (this is Pocketed)

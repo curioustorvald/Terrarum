@@ -192,6 +192,11 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      */
     open val extra = Codex()
 
+    /* called when the instance of the dynamic is loaded from the save; one may use this function to "re-sync" some values,
+     * for the purpose of savegame format update, defence against rogue savegame manipulation, etc.
+     */
+    open fun reload() { }
+
     /**
      * Effects applied continuously while in pocket
      */
