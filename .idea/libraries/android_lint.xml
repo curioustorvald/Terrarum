@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="android-lint">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/android-lint" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/android-lint" recursive="false" />
+  </library>
+</component>

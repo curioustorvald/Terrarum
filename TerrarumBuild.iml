@@ -24,5 +24,6 @@
     <orderEntry type="library" name="badlogicgames.gdx.backend.lwjgl3" level="project" />
     <orderEntry type="library" name="jetbrains.kotlin.reflect" level="project" />
     <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
+    <orderEntry type="library" name="android-lint" level="project" />
   </component>
 </module>
