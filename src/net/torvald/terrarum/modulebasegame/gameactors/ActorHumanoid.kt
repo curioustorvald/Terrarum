@@ -37,8 +37,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         this.physProp = physProp
     }
 
-    var vehicleRiding: Controllable? = null // usually player only
-
+    @Transient internal var vehicleRiding: Controllable? = null // usually player only
+    var vehicleRidingActorID: ActorID? = null
 
 
     /** Must be set by PlayerFactory */

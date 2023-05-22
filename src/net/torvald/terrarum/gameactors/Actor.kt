@@ -1,8 +1,10 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ReferencingRanges
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.savegame.toBigEndian
 import net.torvald.terrarum.utils.PasswordBase32
@@ -82,6 +84,9 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
         if (this is Pocketed)
             inventory.actor = this
+        if (this is ActorHumanoid && vehicleRidingActorID != null) {
+            vehicleRiding = INGAME.getActorByID(vehicleRidingActorID!!) as Controllable
+        }
     }
 
     /**

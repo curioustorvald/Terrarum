@@ -1,6 +1,6 @@
 package net.torvald.terrarum
 
-import com.android.tools.lint.client.api.IssueRegistry
+/*import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.*
 import net.torvald.random.HQRNG
@@ -94,4 +94,4 @@ class TerrarumNonTransientUnserialisableType : Detector(), Detector.UastScanner 
             }
         }
     }
-}
+}*/

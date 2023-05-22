@@ -30,7 +30,7 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: () -> FixtureBase = {
         FixtureTapestry(
                 Gdx.files.internal("assets/monkey_island").readBytes(),
                 Block.PLANK_NORMAL

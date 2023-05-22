@@ -28,7 +28,7 @@ class ItemSwingingDoorOak(originalID: ItemID) :
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: () -> FixtureBase = {
         FixtureSwingingDoorOak()
     }
 
@@ -53,7 +53,7 @@ class ItemSwingingDoorEbony(originalID: ItemID) :
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: () -> FixtureBase = {
         FixtureSwingingDoorEbony()
     }
 
@@ -78,7 +78,7 @@ class ItemSwingingDoorBirch(originalID: ItemID) :
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: () -> FixtureBase = {
         FixtureSwingingDoorBirch()
     }
 
@@ -103,7 +103,7 @@ class ItemSwingingDoorRosewood(originalID: ItemID) :
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override val makeFixture: () -> FixtureBase = {
+    @Transient override val makeFixture: () -> FixtureBase = {
         FixtureSwingingDoorRosewood()
     }
 
