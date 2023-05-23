@@ -21,6 +21,7 @@ fun main() {
         // comparison: exact match
         "Z",
         "B",
+        "C",
         "S",
         "I",
         "J",
@@ -36,6 +37,7 @@ fun main() {
         "Ljava/lang/String", // includes ZipCodedStr
         "Ljava/lang/Boolean",
         "Ljava/lang/Byte",
+        "Ljava/lang/Character",
         "Ljava/lang/Short",
         "Ljava/lang/Integer",
         "Ljava/lang/Long",
