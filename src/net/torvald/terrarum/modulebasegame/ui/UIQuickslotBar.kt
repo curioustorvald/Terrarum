@@ -37,7 +37,7 @@ class UIQuickslotBar : UICanvas() {
 
     companion object {
         const val SLOT_COUNT = 10
-        const val DISPLAY_OPACITY = 0.8f
+        const val DISPLAY_OPACITY = 0.92f
         const val COMMON_OPEN_CLOSE = 0.12f
     }
 
@@ -85,9 +85,10 @@ class UIQuickslotBar : UICanvas() {
             for (i in 0 until SLOT_COUNT) {
                 val qs = actor.inventory.getQuickslotItem(i)
                 val item = ItemCodex[qs?.itm]
+                val itemHasGauge = ((item?.maxDurability ?: 0) > 0.0) || item?.stackable == true
 
                 val image = if (i == selection)
-                    ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)
+                    ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item, itemHasGauge)
                 else
                     ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, item)
 

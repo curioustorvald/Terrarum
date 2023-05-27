@@ -33,8 +33,9 @@ object ItemSlotImageFactory {
         return ItemSlotImage(slotImage.get(number, 0 or isBlack.toInt().shl(1)), ItemCodex.getItemImage(item))
     }
 
-    fun produceLarge(isBlack: Boolean, number: Int = 10, item: GameItem?): ItemSlotImage {
-        return ItemSlotImage(slotImage.get(number, 1 or isBlack.toInt().shl(1)), ItemCodex.getItemImage(item))
+    fun produceLarge(isBlack: Boolean, number: Int = 10, item: GameItem?, hasGauge: Boolean): ItemSlotImage {
+        val y = if (hasGauge && isBlack) 9 else if (hasGauge && !isBlack) 8 else if (!hasGauge && isBlack) 3 else 1
+        return ItemSlotImage(slotImage.get(number, y), ItemCodex.getItemImage(item))
     }
 
 

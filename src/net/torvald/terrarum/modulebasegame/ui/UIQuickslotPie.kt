@@ -26,7 +26,7 @@ class UIQuickslotPie : UICanvas() {
     private val slotCount = UIQuickslotBar.SLOT_COUNT
 
     private val slotDistanceFromCentre: Double
-            get() = cellSize * 2.5 * handler.scale
+            get() = cellSize * 2.666 * handler.scale
     override var width: Int = cellSize * 7
     override var height: Int = width
 
@@ -36,7 +36,7 @@ class UIQuickslotPie : UICanvas() {
      */
     override var openCloseTime: Second = COMMON_OPEN_CLOSE
 
-    private val smallenSize = 0.93f
+    private val smallenSize = 0.92f
 
     var selection: Int = -1
 
@@ -66,6 +66,7 @@ class UIQuickslotPie : UICanvas() {
         for (i in 0 until slotCount) {
             val qs = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.inventory?.getQuickslotItem(i)
             val item = ItemCodex[qs?.itm]
+            val itemHasGauge = ((item?.maxDurability ?: 0) > 0.0) || item?.stackable == true
 
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
@@ -73,7 +74,7 @@ class UIQuickslotPie : UICanvas() {
 
             // draw cells
             val image = if (i == selection)
-                ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)
+                ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item, itemHasGauge)
             else
                 ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, item)
 
