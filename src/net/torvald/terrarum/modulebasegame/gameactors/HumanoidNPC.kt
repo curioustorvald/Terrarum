@@ -16,7 +16,8 @@ import net.torvald.terrarum.itemproperties.Material
  */
 open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
 
-    override lateinit var ai: ActorAI
+    var aiName: String = ""
+    @Transient override lateinit var ai: ActorAI
 
     companion object {
         val DEFAULT_COLLISION_TYPE = COLLISION_DYNAMIC
@@ -26,6 +27,7 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
 
     constructor(ai: ActorAI, born: Long) : super(born) {
         this.ai = ai
+        this.aiName = ai::class.java.canonicalName
     }
 
     init {

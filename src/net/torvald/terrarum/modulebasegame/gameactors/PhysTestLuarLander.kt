@@ -13,7 +13,7 @@ import net.torvald.terrarum.gameactors.*
  */
 class PhysTestLuarLander : ActorWithBody(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT), Controllable {
 
-    private val texture = Texture(ModMgr.getGdxFile("basegame", "sprites/phystest_lunarlander.tga"))
+    @Transient private val texture = Texture(ModMgr.getGdxFile("basegame", "sprites/phystest_lunarlander.tga"))
 
     override val hitbox: Hitbox
 

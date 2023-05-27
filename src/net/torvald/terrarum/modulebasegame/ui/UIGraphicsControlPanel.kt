@@ -1,14 +1,17 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.ui.*
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.TIMES
 
 /**
@@ -43,6 +46,13 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val optionsYpos = IntArray(options.size + 1)
 
     init {
+        CommonResourcePool.addToLoadingList("gui_hrule") {
+            TextureRegionPack(Gdx.files.internal("assets/graphics/gui/hrule.tga"), 216, 20)
+        }
+        CommonResourcePool.loadAll()
+
+
+
         var akku = 0
         options.forEachIndexed { index, row ->
             val option = row[2]
@@ -60,10 +70,10 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         optionsYpos[optionsYpos.lastIndex] = akku
     }
-
-    override var width = 420
+    override var width = 560
     override var height = optionsYpos.last()
 
+    private val hrule = CommonResourcePool.getAsTextureRegionPack("gui_hrule")
 
     private val spinnerWidth = 140
     private val drawX = (Toolkit.drawWidth - width) / 2
@@ -171,6 +181,13 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
 
             App.fontGame.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index].toFloat())
+
+            // draw hrule
+            if (mode == "h1") {
+                val ruleWidth = ((width - 24 - labelWidth) / 2).toFloat()
+                batch.draw(hrule.get(0,0), xpos - 24f - ruleWidth, drawY + optionsYpos[index].toFloat(), ruleWidth, hrule.tileH.toFloat())
+                batch.draw(hrule.get(0,1), xpos + 24f + labelWidth, drawY + optionsYpos[index].toFloat(), ruleWidth, hrule.tileH.toFloat())
+            }
         }
         uiItems.forEach { it.render(batch, camera) }
 

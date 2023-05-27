@@ -65,7 +65,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
     private val cameraAI = object : ActorAI {
-
         private var firstTime = true
         private val lookaheadDist = 100.0
 
