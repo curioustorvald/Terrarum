@@ -349,12 +349,12 @@ object LightmapRenderer {
             val shadeBoxCopy = it.shadeBoxList.subList(0, it.shadeBoxList.size) // make copy to prevent ConcurrentModificationException
             val scale = it.scale
 
-            // put lanterns to the area the luminantBox is occupying
+            // put lanterns to the area the lightBox is occupying
             lightBoxCopy.forEach { (lightBox, colour) ->
                 val lightBoxX = it.hitbox.startX + (lightBox.startX * scale)
                 val lightBoxY = it.hitbox.startY + (lightBox.startY * scale)
-                val lightBoxW = lightBox.width * scale
-                val lightBoxH = lightBox.height * scale
+                val lightBoxW = lightBox.width * scale - 1
+                val lightBoxH = lightBox.height * scale - 1
                 for (y in lightBoxY.div(TILE_SIZE).floorInt()
                         ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
                     for (x in lightBoxX.div(TILE_SIZE).floorInt()
@@ -368,12 +368,12 @@ object LightmapRenderer {
                 }
             }
 
-            // put shades to the area the luminantBox is occupying
+            // put shades to the area the shadeBox is occupying
             shadeBoxCopy.forEach { (shadeBox, colour) ->
                 val lightBoxX = it.hitbox.startX + (shadeBox.startX * scale)
                 val lightBoxY = it.hitbox.startY + (shadeBox.startY * scale)
-                val lightBoxW = shadeBox.width * scale
-                val lightBoxH = shadeBox.height * scale
+                val lightBoxW = shadeBox.width * scale - 1
+                val lightBoxH = shadeBox.height * scale - 1
                 for (y in lightBoxY.div(TILE_SIZE).floorInt()
                         ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
                     for (x in lightBoxX.div(TILE_SIZE).floorInt()

@@ -25,11 +25,6 @@ class UIWorldPortal : UICanvas() {
 
 
 
-    val gradStartCol = Color(0x404040_60)
-    val gradEndCol   = Color(0x000000_70)
-    val gradHeight = 48f
-
-
     val controlHelpHeight = App.fontGame.lineHeight
 
     private var panelTransitionLocked = false
