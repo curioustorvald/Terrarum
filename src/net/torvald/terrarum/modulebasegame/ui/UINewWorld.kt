@@ -14,6 +14,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.NEW_WORLD_SIZE
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.savegame.ByteArray64Reader
@@ -34,7 +35,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val normalTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/normal.png")))
     private val smallTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/small.png")))
 
-    private val tex = arrayOf(smallTex, normalTex, largeTex, hugeTex)
+    private val tex = arrayOf(/*smallTex, */normalTex, largeTex, hugeTex)
 
     override var width = 480
     override var height = 480
@@ -44,7 +45,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val radioCellWidth = 100
     private val inputWidth = 340
-    private val radioX = (width - (radioCellWidth * (if (App.IS_DEVELOPMENT_BUILD) 5 else 4) + 9)) / 2
+    private val radioX = (width - (radioCellWidth * NEW_WORLD_SIZE.size + 9)) / 2
     private val inputX = width - inputWidth
 
     private val sizeSelY = 186 + 40
@@ -56,14 +57,14 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             if (App.IS_DEVELOPMENT_BUILD)
                 listOf(
                         { Lang["CONTEXT_DESCRIPTION_TINY"] },
-                        { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+//                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // only available for World Portal
                         { Lang["MENU_SETTING_MEDIUM"] }, // ;p
                         { Lang["CONTEXT_DESCRIPTION_BIG"] },
                         { Lang["CONTEXT_DESCRIPTION_HUGE"] }
                 )
             else
                 listOf(
-                        { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+//                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // only available for World Portal
                         { Lang["MENU_SETTING_MEDIUM"] }, // ;p
                         { Lang["CONTEXT_DESCRIPTION_BIG"] },
                         { Lang["CONTEXT_DESCRIPTION_HUGE"] }
@@ -98,7 +99,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             catch (e: NumberFormatException) {
                 XXHash64.hash(seedInput.getTextOrPlaceholder().toByteArray(Charsets.UTF_8), 10000)
             }
-            val (wx, wy) = TerrarumIngame.WORLDSIZE[sizeSelector.selection]
+            val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
             val worldParam = TerrarumIngame.NewGameParams(
                     player, TerrarumIngame.NewWorldParameters(
                         wx, wy, seed, nameInput.getTextOrPlaceholder()
