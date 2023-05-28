@@ -67,7 +67,7 @@ abstract class UIItemInventoryCellBase(
 
 object UIItemInventoryCellCommonRes {
     val meterColourMap = GdxColorMap(Gdx.files.internal("./assets/clut/health_bar_colouring_4096.tga"))
-    val meterBackDarkening = Color(0x828282ff.toInt())
+    val meterBackDarkening = Color(0x666666ff.toInt())
 
     fun getHealthMeterColour(value: Float, start: Float, end: Float): Color {
         if (start > end) throw IllegalArgumentException("Start value is greater than end value: $start..$end")

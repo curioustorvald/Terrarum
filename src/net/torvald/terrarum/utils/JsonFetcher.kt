@@ -3,6 +3,7 @@ package net.torvald.terrarum.utils
 import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.printdbg
+import java.io.Reader
 
 /**
  * Created by minjaesong on 2016-02-15.
@@ -18,9 +19,7 @@ object JsonFetcher {
 
         printdbg(this, "Reading JSON $jsonFilePath")
 
-        if (jsonString == null) {
-            throw Error("[JsonFetcher] jsonString is null!")
-        }
+        if (jsonString == null) throw Error("[JsonFetcher] jsonString is null!")
 
         return JsonReader().parse(jsonString.toString())
     }
@@ -32,11 +31,13 @@ object JsonFetcher {
 
         printdbg(this, "Reading JSON ${jsonFile.path}")
 
-        if (jsonString == null) {
-            throw Error("[JsonFetcher] jsonString is null!")
-        }
+        if (jsonString == null) throw Error("[JsonFetcher] jsonString is null!")
 
         return JsonReader().parse(jsonString.toString())
+    }
+
+    fun readFromJsonString(stringReader: Reader): JsonValue {
+        return JsonReader().parse(stringReader.readText())
     }
 
     @Throws(java.io.IOException::class)

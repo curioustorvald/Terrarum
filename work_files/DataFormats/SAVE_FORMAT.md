@@ -7,7 +7,7 @@ The main game directory is composed of following directories:
 ```
 .Terrarum
 + Players
-  - "${PlayerName}-${UUID}", TVDA {
+  - "${UUID}", TVDA {
       [-1] player JSON,
       [-2] spritedef,
       [-3] !optional! spritedef-glow,
@@ -23,7 +23,7 @@ The main game directory is composed of following directories:
   - <e.g. Disk GUID>, TEVD { * }
   - <this directory can have anything>
 + Worlds
-  - "${WorldName}-${UUID}", TVDA {
+  - "${UUID}", TVDA {
       [-1] world JSON with Player Data,
       [actorID] actors (mainly fixtures) JSON,
       [0x1_0000_0000L or (layerNumber shl 24) or chunkNumber] chunk data,
