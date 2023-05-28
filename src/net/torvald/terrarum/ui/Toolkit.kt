@@ -22,7 +22,7 @@ object Toolkit : Disposable {
         val COL_INVENTORY_CELL_BORDER = Color(1f, 1f, 1f, 0.25f)
         val COL_CELL_FILL = Color(0x282828C8)
 
-        val COL_LIST_DEFAULT = Color.WHITE
+        val COL_LIST_DEFAULT = Color.WHITE // white
         val COL_INACTIVE = Color.LIGHT_GRAY
         val COL_SELECTED = Color(0x00f8ff_ff) // cyan, HIGHLY SATURATED
         val COL_MOUSE_UP = Color(0xfff066_ff.toInt()) // yellow (all yellows are of low saturation according to the colour science)

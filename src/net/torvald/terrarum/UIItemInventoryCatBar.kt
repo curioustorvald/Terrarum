@@ -136,11 +136,11 @@ class UIItemInventoryCatBar(
     private val underlineColour = Color(0xeaeaea_40.toInt())
     private val underlineHighlightColour = mainButtons[0].highlightCol
 
-    private var highlighterXPos = mainButtons[selectedIndex].posX.toFloat()
+    private var highlighterXPos = mainButtons[selectedIndex].posX
     private var highlighterXStart = highlighterXPos
     private var highlighterXEnd = highlighterXPos
 
-    private val highlighterYPos = catIcons.tileH + 4f
+    private val highlighterYPos = catIcons.tileH + 4
     private var highlighterMoving = false
     private val highlighterMoveDuration: Second = 0.15f
     private var highlighterMoveTimer: Second = 0f
@@ -196,11 +196,11 @@ class UIItemInventoryCatBar(
             highlighterMoveTimer += delta
 
             highlighterXPos = Movement.moveQuick(
-                    highlighterXStart,
-                    highlighterXEnd,
+                    highlighterXStart.toFloat(),
+                    highlighterXEnd.toFloat(),
                     highlighterMoveTimer,
                     highlighterMoveDuration
-            )
+            ).roundToInt()
 
             if (highlighterMoveTimer > highlighterMoveDuration) {
                 highlighterMoveTimer = 0f
@@ -224,10 +224,10 @@ class UIItemInventoryCatBar(
                 // normal stuffs
                 val oldIndex = selectedIndex
 
-                highlighterXStart = mainButtons[selectedIndex].posX.toFloat() // using old selectedIndex
+                highlighterXStart = mainButtons[selectedIndex].posX // using old selectedIndex
                 selectedIndex = index
                 highlighterMoving = true
-                highlighterXEnd = mainButtons[selectedIndex].posX.toFloat() // using new selectedIndex
+                highlighterXEnd = mainButtons[selectedIndex].posX // using new selectedIndex
 
                 selectionChangeListener?.invoke(oldIndex, index)
             }
@@ -290,12 +290,12 @@ class UIItemInventoryCatBar(
         if (selectedPanel == 1) {
             // indicator
             batch.color = underlineHighlightColour
-            batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2).round(), posY + highlighterYPos)
+            batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2), posY + highlighterYPos.toFloat())
 
             // label
             batch.color = Color.WHITE
             catIconsLabels[selectedIcon]().let {
-                App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2).toFloat(), posY + highlighterYPos + 4)
+                App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 4)
             }
         }
 

@@ -16,5 +16,7 @@
   "GAME_ACTION_QUICKSEL": "Quick Select",
   "GAME_ACTION_CRAFT": "Craft",
   "GAME_CRAFTING": "Crafting",
-  "GAME_CRAFTABLE_ITEMS": "Craftable Items"
+  "GAME_CRAFTABLE_ITEMS": "Craftable Items",
+  "CONTEXT_WORLD_SEARCH": "World Search",
+  "CONTEXT_WORLD_LIST": "Worlds List"
 }

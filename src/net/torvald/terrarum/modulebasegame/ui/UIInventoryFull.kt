@@ -40,8 +40,12 @@ class UIInventoryFull(
 
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
         const val CELLS_HOR = 10
-        val CELLS_VRT: Int; get() = (App.scr.height - REQUIRED_MARGIN - 134 + UIItemInventoryItemGrid.listGap) / // 134 is another magic number
-                                (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap)
+
+        fun getCellCountVertically(cellHeight: Int, gapHeight: Int = UIItemInventoryItemGrid.listGap): Int {
+            return (App.scr.height - REQUIRED_MARGIN - 134 + gapHeight) / // 134 is another magic number
+                    (cellHeight + gapHeight)
+        }
+        val CELLS_VRT: Int; get() = getCellCountVertically(UIItemInventoryElemSimple.height, UIItemInventoryItemGrid.listGap)
 
         const val itemListToEquipViewGap = UIItemInventoryItemGrid.listGap // used to be 24; figured out that the extra gap does nothig
 

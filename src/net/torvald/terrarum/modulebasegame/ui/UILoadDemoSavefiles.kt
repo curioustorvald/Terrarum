@@ -532,7 +532,7 @@ class UIItemPlayerCells(
 
     private val litCol = Toolkit.Theme.COL_MOUSE_UP
     private val cellCol = CELL_COL
-    private val defaultCol = Color.WHITE
+    private val defaultCol = Toolkit.Theme.COL_LIST_DEFAULT
     private val hruleCol = Color(1f,1f,1f,0.35f)
     private val hruleColLit = litCol.cpy().sub(0f,0f,0f,0.65f)
 
@@ -734,7 +734,7 @@ class UIItemWorldCells(
     private val colourBad = Color(0xFF0011FF.toInt())
     private val cellCol = CELL_COL
 
-    private var highlightCol: Color = Color.WHITE
+    private var highlightCol: Color = Toolkit.Theme.COL_LIST_DEFAULT
 
     override var clickOnceListener: ((Int, Int, Int) -> Unit)? = { _: Int, _: Int, _: Int ->
         UILoadGovernor.worldDisk = skimmer
@@ -746,7 +746,7 @@ class UIItemWorldCells(
 
     override fun update(delta: Float) {
         super.update(delta)
-        highlightCol = if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Color.WHITE
+        highlightCol = if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
