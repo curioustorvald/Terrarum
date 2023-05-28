@@ -154,6 +154,7 @@ abstract class UICanvas(
      */
     open fun doOpening(delta: Float) {
         handler.opacity = handler.openCloseCounter / openCloseTime
+
     }
 
     /**

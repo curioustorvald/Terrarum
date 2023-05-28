@@ -18,7 +18,10 @@ import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
  *
  * Created by minjaesong on 2023-05-19.
  */
-class UIWorldPortal : UICanvas() {
+class UIWorldPortal : UICanvas(
+    toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
+    toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
+) {
 
     override var width = App.scr.width
     override var height = App.scr.height
@@ -97,11 +100,13 @@ class UIWorldPortal : UICanvas() {
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         resetUI()
+        INGAME.pause()
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
+        INGAME.resume()
         INGAME.setTooltipMessage(null)
     }
 

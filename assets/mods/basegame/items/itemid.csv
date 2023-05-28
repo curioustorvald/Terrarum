@@ -14,4 +14,6 @@ id;classname
 258;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorBirch
 259;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorRosewood
 
+320;net.torvald.terrarum.modulebasegame.gameitems.ItemWorldPortal
+
 999999;net.torvald.terrarum.modulebasegame.gameitems.ItemTapestry

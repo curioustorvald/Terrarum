@@ -98,6 +98,8 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:258", 995) // doors
         inventory.add("item@basegame:259", 995) // doors
 
+        inventory.add("item@basegame:320", 1) // portal
+
         WireCodex.getAll().forEach {
             try {
                 inventory.add(it.id, 9995)

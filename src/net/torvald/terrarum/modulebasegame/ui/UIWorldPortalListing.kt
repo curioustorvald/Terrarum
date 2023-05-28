@@ -30,7 +30,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val buttonHeight = 24
     private val gridGap = listGap
 
-    private var worldList: List<Pair<UUID, DiskSkimmer>>
+    private val worldList = ArrayList<Pair<UUID, DiskSkimmer>>()
     private var selectedWorld: DiskSkimmer? = null
 
 
@@ -70,13 +70,15 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         addUIitem(buttonReset)
 
-
-        worldList = (INGAME.actorGamer.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(",").map {
-            it.ascii85toUUID().let { it to App.savegameWorlds[it] }
-        }.filter { it.second != null } as List<Pair<UUID, DiskSkimmer>>
     }
 
+    override fun show() {
+        worldList.clear()
+        worldList.addAll((INGAME.actorGamer.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(",").filter { it.isNotBlank() }.map {
+            it.ascii85toUUID().let { it to App.savegameWorlds[it] }
+        }.filter { it.second != null } as List<Pair<UUID, DiskSkimmer>>)
 
+    }
 
     override fun updateUI(delta: Float) {
 
@@ -84,24 +86,22 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        batch.inUse {
 
-            // draw background //
-            // screencap panel
-            batch.color = cellCol
-            Toolkit.fillArea(batch, hx - thumbw - gridGap/2, y, thumbw, thumbh)
-
-
-            // draw border //
-            // screencap panel
-            batch.color = highlightCol
-            Toolkit.drawBoxBorder(batch, hx - thumbw - gridGap/2 - 1, y - 1, thumbw + 2, thumbh + 2)
-            // memory gauge
-            Toolkit.drawBoxBorder(batch, hx - 330 - gridGap/2 - 1, y + listHeight - 1, 240 + 2, buttonHeight + 2)
+        // draw background //
+        // screencap panel
+        batch.color = cellCol
+        Toolkit.fillArea(batch, hx - thumbw - gridGap/2, y, thumbw, thumbh)
 
 
-            uiItems.forEach { it.render(batch, camera) }
-        }
+        // draw border //
+        // screencap panel
+        batch.color = highlightCol
+        Toolkit.drawBoxBorder(batch, hx - thumbw - gridGap/2 - 1, y - 1, thumbw + 2, thumbh + 2)
+        // memory gauge
+        Toolkit.drawBoxBorder(batch, hx - 330 - gridGap/2 - 1, y + listHeight - 1, 240 + 2, buttonHeight + 2)
+
+
+        uiItems.forEach { it.render(batch, camera) }
 
     }
 
