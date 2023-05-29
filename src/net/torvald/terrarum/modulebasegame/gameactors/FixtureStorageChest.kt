@@ -23,7 +23,7 @@ internal class FixtureStorageChest : FixtureBase {
         (mainUI as UIStorageChest).chestInventory = this.inventory!!
         (mainUI as UIStorageChest).chestNameFun = this.nameFun
 
-        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(CommonResourcePool.getAsTextureRegion("itemplaceholder_16").texture, 16, 16)).let {
             it.setRowsAndFrames(1,1)

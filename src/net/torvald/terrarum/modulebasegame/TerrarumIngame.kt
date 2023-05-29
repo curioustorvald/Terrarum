@@ -1264,9 +1264,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val fixturesUnderHand = ArrayList<FixtureBase>()
         val mobsUnderHand = ArrayList<ActorWithBody>()
         actorsUnderMouse.forEach {
-            if (it is FixtureBase && it.mainUI == null)
+            if (it is FixtureBase) // && it.mainUI == null) // pickup avail check must be done against fixture.canBeDespawned
                 fixturesUnderHand.add(it)
-            else
+            else if (it !is FixtureBase)
                 mobsUnderHand.add(it)
         }
 

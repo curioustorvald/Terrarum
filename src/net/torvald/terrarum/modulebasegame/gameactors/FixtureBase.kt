@@ -244,7 +244,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
         if (canBeDespawned) {
             printdbg(this, "despawn at T${INGAME.WORLD_UPDATE_TIMER}: ${nameFun()}")
-            printStackTrace(this)
+//            printStackTrace(this)
 
             // remove filler block
             forEachBlockbox { x, y, _, _ ->
@@ -312,7 +312,13 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     }
 
     override fun flagDespawn() {
-        if (canBeDespawned) flagDespawn = true
+        if (canBeDespawned) {
+            printdbg(this, "Fixture at (${this.intTilewiseHitbox}) flagging despawn: ${this.javaClass.canonicalName}")
+            flagDespawn = true
+        }
+        else {
+            printdbg(this, "Fixture at (${this.intTilewiseHitbox}) CANNOT be despawned: ${this.javaClass.canonicalName}")
+        }
     }
 
     /**

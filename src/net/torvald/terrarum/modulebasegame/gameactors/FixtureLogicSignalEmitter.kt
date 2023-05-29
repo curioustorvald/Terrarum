@@ -27,7 +27,7 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
 
         density = 1400.0
-        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, -1)
+        setHitboxDimension(TILE_SIZE, TILE_SIZE, 0, 1)
 
         makeNewSprite(TextureRegionPack(itemImage.texture, TILE_SIZE, TILE_SIZE)).let {
             it.setRowsAndFrames(1,1)
