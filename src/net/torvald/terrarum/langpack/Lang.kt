@@ -123,6 +123,9 @@ object Lang {
 
     private val bindOp = ">>="
 
+    fun getOrNull(key: String?, capitalise: Boolean = true) =
+        if (key == null) null else get(key, capitalise)
+
     /**
      * Syntax example:
      *

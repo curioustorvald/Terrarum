@@ -148,5 +148,5 @@ object AVKey {
      *
      * example value: `"SIxM+kGlrjZgLx5Zeqz7,;:UIZ5Q=2WT35SgKpOp.,vvf'fNW3G<ROimy(Y;E<,-mdtr5|^RGOqr0x*T*lC,YABr1oQwErKG)pGC'gUG"`
      */
-    const val WORLD_PORTAL_DICT = ""
+    const val WORLD_PORTAL_DICT = "worldportaldict"
 }

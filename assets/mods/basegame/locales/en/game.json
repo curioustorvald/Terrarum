@@ -18,5 +18,6 @@
   "GAME_CRAFTING": "Crafting",
   "GAME_CRAFTABLE_ITEMS": "Craftable Items",
   "CONTEXT_WORLD_SEARCH": "World Search",
-  "CONTEXT_WORLD_LIST": "Worlds List"
+  "CONTEXT_WORLD_LIST": "Worlds List",
+  "MENU_LABEL_RENAME": "Rename"
 }

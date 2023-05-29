@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_CORRECTION
@@ -12,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.unicode.getKeycapConsole
 import net.torvald.unicode.getKeycapPC
 
 /**
@@ -57,9 +59,12 @@ class UIWorldPortal : UICanvas(
     private val SP = "\u3000 "
     val portalListingControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${getKeycapPC(App.getConfigInt("control_key_up"))}${getKeycapPC(App.getConfigInt("control_key_down"))}" +
+                    " ${Lang["MENU_CONTROLS_SCROLL"]}" +
+                    "$SP${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" +
+            "${getKeycapConsole('R')} ${Lang["MENU_CONTROLS_SCROLL"]}" +
+                    "$SP${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" +
                     "$SP${App.gamepadLabelLT} ${Lang["GAME_WORLD_SEARCH"]}" +
                     "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
 
@@ -103,6 +108,12 @@ class UIWorldPortal : UICanvas(
         // UI items
         catBar.render(batch, camera)
         transitionPanel.render(batch, camera)
+    }
+
+    override fun show() {
+        super.show()
+        transitionPanel.show()
+        INGAME.setTooltipMessage(null)
     }
 
     override fun dispose() {
@@ -153,7 +164,7 @@ class UIItemWorldPortalTopBar(
 
     init {
         CommonResourcePool.addToLoadingList("terrarum-basegame-worldportalicons") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/worldportal_catbar.tga"), 20, 20)
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/worldportal_catbar.tga"), 30, 20)
         }
         CommonResourcePool.loadAll()
     }
