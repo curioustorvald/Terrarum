@@ -48,7 +48,7 @@ open class UIItemInventoryItemGrid(
         touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         protected val useHighlightingManager: Boolean = true, // only used by UIItemCraftingCandidateGrid which addresses buttons directly to set highlighting
         open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-        colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
+        private val colourTheme: InventoryCellColourTheme = defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
 
     // deal with the moving position
@@ -225,10 +225,8 @@ open class UIItemInventoryItemGrid(
     private val iconPosX = if (drawScrollOnRightside)
         posX + width + LIST_TO_CONTROL_GAP
     else
-        posX - LIST_TO_CONTROL_GAP - catBar.catIcons.tileW + 2
+        posX - LIST_TO_CONTROL_GAP - catBar.catIcons.tileW
 
-    private fun getIconPosY(index: Int) =
-            posY - 1 + (4 + UIItemInventoryElemWide.height - catBar.catIcons.tileH) * index
 
     /** Long/compact mode buttons */
     val gridModeButtons = Array<UIItemImageButton>(2) { index ->
@@ -321,6 +319,9 @@ open class UIItemInventoryItemGrid(
 
     private val upDownButtonGapToDots = 7 // apparent gap may vary depend on the texture itself
 
+    private fun getIconPosY(index: Int) =
+        posY + 8 + 26 * index
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
@@ -332,7 +333,7 @@ open class UIItemInventoryItemGrid(
         }
 
 
-        fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 10 + upDownButtonGapToDots + 10 * i
+        fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 14 + upDownButtonGapToDots + 10 * i
 
 
         scrollDownButton.posY = getScrollDotYHeight(itemPageCount) + upDownButtonGapToDots
@@ -345,6 +346,13 @@ open class UIItemInventoryItemGrid(
         }
 
         if (!hideSidebar) {
+            // draw the tray
+            batch.color = Toolkit.Theme.COL_CELL_FILL
+            Toolkit.fillArea(batch, iconPosX - 4, getIconPosY(0) - 8, 28, height)
+            // cell border
+            batch.color = colourTheme.cellHighlightNormalCol
+            Toolkit.drawBoxBorder(batch, iconPosX - 4, getIconPosY(0) - 8, 28, height)
+
             gridModeButtons.forEach { it.render(batch, camera) }
             scrollUpButton.render(batch, camera)
             scrollDownButton.render(batch, camera)
@@ -356,7 +364,7 @@ open class UIItemInventoryItemGrid(
                 batch.color = colour
                 batch.draw(
                         catBar.catIcons.get(if (i == itemPage) 20 else 21, 0),
-                        scrollUpButton.posX.toFloat(),
+                        iconPosX.toFloat(),
                         getScrollDotYHeight(i).toFloat()
                 )
             }
@@ -369,8 +377,8 @@ open class UIItemInventoryItemGrid(
             walletText.forEachIndexed { index, it ->
                 batch.draw(
                         walletFont.get(0, it - '0'),
-                        gridModeButtons[0].posX.toFloat(), // scroll button size: 20px, font width: 20 px
-                        gridModeButtons[0].posY + height - index * walletFont.tileH - 1f
+                        gridModeButtons[0].posX - 1f, // scroll button size: 20px, font width: 20 px
+                        gridModeButtons[0].posY + height - index * walletFont.tileH - 18f
                 )
             }
         }

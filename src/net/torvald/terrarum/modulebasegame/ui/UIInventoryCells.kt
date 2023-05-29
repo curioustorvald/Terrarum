@@ -90,7 +90,7 @@ internal class UIInventoryCells(
 
 
         // control hints
-        val controlHintXPos = full.offsetX
+        val controlHintXPos = full.offsetX - 34
         blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
         App.fontGame.draw(batch, full.listControlHelp, controlHintXPos, full.yEnd - 20)

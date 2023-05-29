@@ -53,7 +53,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val listHeight = UIItemWorldCellsSimple.height + (listCount - 1) * (UIItemWorldCellsSimple.height + gridGap)
 
     private val memoryGaugeWidth = textAreaW
-    private val deleteButtonWidth = (memoryGaugeWidth - gridGap) / 2
+    private val deleteButtonWidth = (thumbw - gridGap) / 2
     private val buttonDeleteWorld = UIItemTextButton(this,
         "MENU_LABEL_DELETE_WORLD",
         hx - gridGap/2 - deleteButtonWidth,
@@ -232,6 +232,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth - gridGap/2
         val memoryGaugeYpos = y + listHeight - buttonHeight - gridGap - buttonHeight
+        val textXpos = memoryGaugeXpos + 3
 
         // draw background //
         // screencap panel
@@ -241,15 +242,22 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         // draw border //
         // screencap panel
-        batch.color = Toolkit.Theme.COL_LIST_DEFAULT
+        batch.color = if (selected?.worldInfo == null) Toolkit.Theme.COL_INVENTORY_CELL_BORDER else Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, hx - thumbw - gridGap/2 - 1, y - 1, thumbw + 2, thumbh + 2)
 
 
         // memory gauge
         val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(chunksMax - chunksUsed, 0, chunksMax)
         val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+
+        batch.color = Toolkit.Theme.COL_CELL_FILL
+        Toolkit.fillArea(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt(), memoryGaugeYpos, buttonHeight + 6, buttonHeight)
+        batch.color = Toolkit.Theme.COL_INACTIVE
+        Toolkit.drawBoxBorder(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt() - 1, memoryGaugeYpos - 1, buttonHeight + 7, buttonHeight + 2)
         batch.color = Color.WHITE
-        batch.draw(icons.get(2, 2), memoryGaugeXpos - iconSizeGap, memoryGaugeYpos + 2f)
+        batch.draw(icons.get(2, 2), textXpos - iconSizeGap, memoryGaugeYpos + 2f)
+
+        batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, memoryGaugeXpos - 1, memoryGaugeYpos - 1, memoryGaugeWidth + 2, buttonHeight + 2)
         batch.color = barBack
         Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, memoryGaugeWidth, buttonHeight)
@@ -260,8 +268,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         if (selected?.worldInfo != null) {
             // some texts
             worldTexts.forEachIndexed { index, (icon, str) ->
-                batch.draw(icon, memoryGaugeXpos - iconSizeGap, y + thumbh + 16f + textualListHeight * index)
-                App.fontGame.draw(batch, str, memoryGaugeXpos.toFloat(), y + thumbh + 16f + textualListHeight * index)
+                batch.draw(icon, textXpos - iconSizeGap, y + thumbh + 16f + textualListHeight * index)
+                App.fontGame.draw(batch, str, textXpos.toFloat(), y + thumbh + 16f + textualListHeight * index)
             }
             // size indicator on the memory gauge
             Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (selected?.worldInfo!!.dimensionInChunks / chunksMax.toFloat())).ceilInt(), buttonHeight)
@@ -280,7 +288,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, (hx - textAreaW - gridGap/2).toInt(), (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, hx - thumbw - gridGap/2 + 2, (full.yEnd - 20).toInt())
     }
 
     override fun hide() {
@@ -359,12 +367,18 @@ class UIItemWorldCellsSimple(
         batch.color = UIInventoryFull.CELL_COL
         Toolkit.fillArea(batch, posX, posY, width, height)
 
-        // draw border
+        val mouseUp = mouseUp && worldInfo != null
+
         val bcol = if (highlighted || mouseUp && mousePushed) Toolkit.Theme.COL_SELECTED
-        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
+        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else (if (worldInfo == null) Toolkit.Theme.COL_INVENTORY_CELL_BORDER else Toolkit.Theme.COL_INACTIVE)
+        val tcol = if (highlighted || mouseUp && mousePushed) Toolkit.Theme.COL_SELECTED
+        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else (if (worldInfo == null) Toolkit.Theme.COL_INACTIVE else Toolkit.Theme.COL_LIST_DEFAULT)
+
+        // draw border
         batch.color = bcol
         Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2)
         // draw texts
+        batch.color = tcol
         batch.draw(icons.get(0, 1), posX + 4f, posY + 1f)
         App.fontGame.draw(batch, worldName ?: "$EMDASH", posX + 32, posY + 1)
         batch.draw(icons.get(1, 1), posX + 4f, posY + 25f)

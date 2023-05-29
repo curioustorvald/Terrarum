@@ -190,7 +190,7 @@ internal class UIStorageChest : UICanvas(
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         val chestName = chestNameFun()
         val playerName = INGAME.actorNowPlaying!!.actorValue.getAsString(AVKey.NAME).orEmpty().let { it.ifBlank { Lang["GAME_INVENTORY"] } }
-        val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - UIInventoryCells.weightBarWidth
+        val encumbBarXPos = itemListPlayer.posX + itemListPlayer.width - UIInventoryCells.weightBarWidth + 36
         val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
         val yEnd = -UIInventoryFull.YPOS_CORRECTION + (App.scr.height + UIInventoryFull.internalHeight).div(2).toFloat() // directly copied from UIInventoryFull.yEnd
         val encumbBarYPos = yEnd - 20 + 3 // dunno why but extra 3 px is needed
@@ -224,7 +224,7 @@ internal class UIStorageChest : UICanvas(
         App.fontGame.draw(batch, playerName, thisOffsetX2 + (cellsWidth - App.fontGame.getWidth(playerName)) / 2, thisOffsetY - 30)
 
         // control hint
-        App.fontGame.draw(batch, controlHelp, thisOffsetX + 2f, encumbBarYPos - 3)
+        App.fontGame.draw(batch, controlHelp, thisOffsetX - 34f, encumbBarYPos - 3)
 
         // encumb text
         batch.color = Color.WHITE

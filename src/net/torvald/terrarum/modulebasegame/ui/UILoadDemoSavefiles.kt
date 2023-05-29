@@ -532,17 +532,19 @@ class UIItemPlayerCells(
 
     private val litCol = Toolkit.Theme.COL_MOUSE_UP
     private val cellCol = CELL_COL
-    private val defaultCol = Toolkit.Theme.COL_LIST_DEFAULT
+    private val defaultCol = Toolkit.Theme.COL_INACTIVE
     private val hruleCol = Color(1f,1f,1f,0.35f)
     private val hruleColLit = litCol.cpy().sub(0f,0f,0f,0.65f)
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     private var highlightCol: Color = defaultCol
+    private var highlightTextCol: Color = defaultCol
 
     override fun update(delta: Float) {
         super.update(delta)
         highlightCol = if (mouseUp) litCol else defaultCol
+        highlightTextCol = if (mouseUp) litCol else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -632,6 +634,7 @@ class UIItemPlayerCells(
         Toolkit.drawBoxBorder(batch, posX + 115, posY + 33, width - 114, 88)
 
         // texts
+        batch.color = highlightTextCol
         val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
         App.fontGame.draw(batch, playerName, x + 146f, y + height - 82f)
         App.fontGame.draw(batch, worldName, x + 146f, y + height - 53f)

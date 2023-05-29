@@ -465,7 +465,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
 
         // control hints
-        val controlHintXPos = thisOffsetX.toFloat()
+        val controlHintXPos = thisOffsetX + 2f
         blendNormalStraightAlpha(batch)
         App.fontGame.draw(batch, controlHelp, controlHintXPos, full.yEnd - 20)
 
@@ -475,7 +475,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         // encumbrance meter
         val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
         // encumbrance bar will go one row down if control help message is too long
-        val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth
+        val encumbBarXPos = thisXend - UIInventoryCells.weightBarWidth + 36
         val encumbBarTextXPos = encumbBarXPos - 6 - App.fontGame.getWidth(encumbranceText)
         val encumbBarYPos = full.yEnd-20 + 3f +
                             if (App.fontGame.getWidth(full.listControlHelp) + 2 + controlHintXPos >= encumbBarTextXPos)
