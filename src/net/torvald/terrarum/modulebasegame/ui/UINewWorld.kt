@@ -43,7 +43,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    private val radioCellWidth = 100
+    private val radioCellWidth = 116
     private val inputWidth = 340
     private val radioX = (width - (radioCellWidth * NEW_WORLD_SIZE.size + 9)) / 2
     private val inputX = width - inputWidth
@@ -57,15 +57,15 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             if (App.IS_DEVELOPMENT_BUILD)
                 listOf(
                         { Lang["CONTEXT_DESCRIPTION_TINY"] },
-//                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // only available for World Portal
-                        { Lang["MENU_SETTING_MEDIUM"] }, // ;p
+//                        { Lang["CONTEXT_DESCRIPTION_TINY"] }, // only available for World Portal
+                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // ;p
                         { Lang["CONTEXT_DESCRIPTION_BIG"] },
                         { Lang["CONTEXT_DESCRIPTION_HUGE"] }
                 )
             else
                 listOf(
-//                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // only available for World Portal
-                        { Lang["MENU_SETTING_MEDIUM"] }, // ;p
+//                        { Lang["CONTEXT_DESCRIPTION_TINY"] }, // only available for World Portal
+                        { Lang["CONTEXT_DESCRIPTION_SMALL"] }, // ;p
                         { Lang["CONTEXT_DESCRIPTION_BIG"] },
                         { Lang["CONTEXT_DESCRIPTION_HUGE"] }
                 )

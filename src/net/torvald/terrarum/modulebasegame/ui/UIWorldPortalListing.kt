@@ -192,8 +192,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val nullTimestamp = "0000-00-00 --:--:--"
     private val nullDurationStamp = "--h--m--s"
     private fun Int.chunkCountToWorldSize() = when(this) {
-        in 0 until 2000 -> "CONTEXT_DESCRIPTION_SMALL"
-        in 2000 until 4500 -> "MENU_SETTING_MEDIUM"
+        in 0 until 2000 -> "CONTEXT_DESCRIPTION_TINY"
+        in 2000 until 4500 -> "CONTEXT_DESCRIPTION_SMALL"
         in 4500 until 10000 -> "CONTEXT_DESCRIPTION_BIG"
         else -> "CONTEXT_DESCRIPTION_HUGE"
     }
