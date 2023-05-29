@@ -55,7 +55,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val memoryGaugeWidth = textAreaW
     private val deleteButtonWidth = (thumbw - gridGap) / 2
     private val buttonDeleteWorld = UIItemTextButton(this,
-        "MENU_LABEL_DELETE_WORLD",
+        "MENU_LABEL_DELETE",
         hx - gridGap/2 - deleteButtonWidth,
         y + listHeight - buttonHeight,
         deleteButtonWidth,
