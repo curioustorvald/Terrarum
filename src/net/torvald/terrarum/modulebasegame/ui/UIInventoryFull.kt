@@ -39,7 +39,7 @@ class UIInventoryFull(
         const val YPOS_CORRECTION = 16 // another hard-coding. X_X
 
         const val REQUIRED_MARGIN: Int = 138 // hard-coded value. Don't know the details. Range: [91-146]. I chose MAX-8 because cell gap is 8
-        const val CELLS_HOR = 10
+        const val CELLS_HOR = 12
 
         fun getCellCountVertically(cellHeight: Int, gapHeight: Int = UIItemInventoryItemGrid.listGap): Int {
             return (App.scr.height - REQUIRED_MARGIN - 134 + gapHeight) / // 134 is another magic number
