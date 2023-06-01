@@ -98,10 +98,7 @@ fun main() {
                 !field.isTransient &&
                 !field.isEnum &&
                 !serialisablePrimitives.contains(field.typeSignatureOrTypeDescriptorStr) &&
-                serialisableTypes.none { field.typeSignatureOrTypeDescriptorStr.startsWith(it) } &&
-                !field.typeSignatureOrTypeDescriptorStr.endsWith("\$Companion;") &&
-                !field.className.contains("$") &&
-                !field.name.contains("$")
+                serialisableTypes.none { field.typeSignatureOrTypeDescriptorStr.startsWith(it) }
             }
         }
 

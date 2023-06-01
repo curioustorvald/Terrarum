@@ -215,6 +215,147 @@ object Common {
         })
     }
 
+
+    data class SpliceCmd(
+        var strPos: Int,
+        var stackDepth: Int = -1,
+        var objStartPos: Int = -1,
+        var objEndPos: Int = -1,
+        var prependedCommaPos: Int = -1
+    )
+
+    fun scanForCompanionObjects(s: String): List<SpliceCmd> {
+        val retBin = ArrayList<SpliceCmd>()
+
+        val state = Stack<String>().also { it.push("lit") } // lit, esc, qot
+        val parenStack = Stack<Char>() // { [ " '
+
+        val searchStr = "Companion"
+        val strCircBuf = StringBuilder()
+
+        val workBin = Stack<SpliceCmd>()
+        var kvMode = "key"
+
+        s.forEachIndexed { index, c ->
+            strCircBuf.append(c); if (strCircBuf.length > searchStr.length) strCircBuf.deleteCharAt(0)
+
+            when (c) {
+                '{', '[', '(' -> {
+                    parenStack.push(c)
+                    if (workBin.isNotEmpty()) {
+                        workBin.peek().let {
+                            if (it.objStartPos == -1) {
+                                it.objStartPos = index
+                                it.stackDepth = parenStack.size
+                            }
+                        }
+
+//                        println("== workBin mod ==;")
+//                        workBin.forEach { println("$it;") }
+                    }
+                }
+                '}', ']', ')' -> {
+                    if (workBin.isNotEmpty()) {
+
+                        workBin.peek().let {
+                            if (it.objEndPos == -1) {
+                                if (parenStack.size == it.stackDepth) it.objEndPos = index
+//                                println("  parenStack.size=${parenStack.size}, it=$it;")
+                            }
+                        }
+
+//                        println("== workBin pop ==;")
+//                        workBin.forEach { println("$it;") }
+
+                        retBin.add(workBin.pop())
+                    }
+                    parenStack.pop()
+
+                    if (kvMode == "val") {
+                        kvMode = "key"
+                    }
+                }
+                '\\' -> {
+                    if (state.peek() == "esc") {
+                        state.pop()
+                    }
+                    else {
+                        state.push("esc")
+                    }
+                }
+                '"', '\'' -> {
+                    if (state.peek() == "esc")
+                        state.pop()
+                    else if (parenStack.peek() == c) {
+                        parenStack.pop()
+                        state.pop() // assuming no errors :p
+                    }
+                    else {
+                        parenStack.push(c)
+                        state.push("qot")
+                    }
+                }
+                ':' -> {
+                    if (state.peek() == "lit" && kvMode == "key") {
+                        kvMode = "val"
+                    }
+                }
+                ',' -> {
+                    if (state.peek() == "lit" && kvMode == "val") {
+                        kvMode = "key"
+                    }
+                }
+                else -> {
+                    if (state.peek() == "esc")
+                        state.pop()
+                }
+            }
+
+            if (strCircBuf.toString() == searchStr && kvMode == "key") {
+                workBin.push(SpliceCmd(index))
+
+//                println("== workBin push ==;")
+//                workBin.forEach { println("$it;") }
+            }
+
+//            println("$c\t${state.peek()};")
+        }
+
+        return retBin
+    }
+
+    fun String.jsonRemoveCompanionObjects(): String {
+        val objectIndices = scanForCompanionObjects(this)
+
+        // search backwards for a valid comma
+        // terminate when '{' is reached (means the Companion was the first object)
+        objectIndices.forEach {
+            var c = it.strPos - 1
+            while (c > 0 && this[c] != ',' && this[c-1] != '{') {
+                c -= 1
+            }
+            it.prependedCommaPos = c
+        }
+
+//        println(objectIndices)
+
+        // splice the string
+        // when the search results are indeed correct, they will have the following properties:
+        // 1. str[objStartPos]='{' && str[objEndPos]='}'
+        // 2. str[strPos]='n' // as in 'Companio_n_'
+
+
+        // 1. fill str[prependedCommaPos : objEndPos+1] will null characters
+        // 2. create the new string that has null chars filtered
+        val sb = StringBuilder(this)
+        objectIndices.forEach {
+            for (k in it.prependedCommaPos..it.objEndPos) {
+                sb[k] = '\u0000'
+            }
+        }
+        return sb.filter { it != '\u0000' }.toString()
+    }
+
     private data class LayerInfo(val h: String, val b: String, val x: Int, val y: Int)
 
     /**
