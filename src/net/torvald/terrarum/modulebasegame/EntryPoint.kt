@@ -28,14 +28,8 @@ class EntryPoint : ModuleEntryPoint() {
         printdbg(this, "Hello, world!")
 
         // load common resources to the AssetsManager
-        CommonResourcePool.addToLoadingList("$moduleName.items16") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16)
-        }
-        CommonResourcePool.addToLoadingList("$moduleName.items24") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items24.tga"), 24, 24)
-        }
-        CommonResourcePool.addToLoadingList("$moduleName.items48") {
-            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48)
+        CommonResourcePool.addToLoadingList("$moduleName.items") {
+            ItemSheet(ModMgr.getGdxFile(moduleName, "items/items.tga"))
         }
         CommonResourcePool.loadAll()
 

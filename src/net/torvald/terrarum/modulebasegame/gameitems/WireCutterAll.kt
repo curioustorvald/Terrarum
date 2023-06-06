@@ -94,7 +94,7 @@ class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegionPack("basegame.items16").get(0, 9)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP

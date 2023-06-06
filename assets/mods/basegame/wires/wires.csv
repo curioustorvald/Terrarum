@@ -1,11 +1,11 @@
 id;drop;name;renderclass;accept;inputcount;inputtype;outputtype;javaclass;inventoryimg;branching
-8192;8192;WIRE_RED;signal;digital_bit;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,1,9;1
-8193;8193;WIRE_GREEN;signal;digital_bit;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,1,10;1
-8194;8194;WIRE_BLUE;signal;digital_bit;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,1,11;1
-#8195;8195;WIRE_BUNDLE;signal;digital_3bits;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,1,2;1
-8196;8196;WIRE_POWER_LOW;power;power_low;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,2,9;1
-8197;8197;WIRE_POWER_HIGH;power;power_high;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,3,9;1
-8198;8198;WIRE_ETHERNET;network;10base2;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items16,4,9;1
+8192;8192;WIRE_RED;signal;digital_bit;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,0,4;1
+8193;8193;WIRE_GREEN;signal;digital_bit;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,1,4;1
+8194;8194;WIRE_BLUE;signal;digital_bit;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,2,4;1
+#8195;8195;WIRE_BUNDLE;signal;digital_3bits;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,0,0;1
+8196;8196;WIRE_POWER_LOW;power;power_low;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,3,4;1
+8197;8197;WIRE_POWER_HIGH;power;power_high;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,4,4;1
+8198;8198;WIRE_ETHERNET;network;10base2;3;N/A;N/A;net.torvald.terrarum.modulebasegame.gameitems.WirePieceSignalWire;basegame.items,5,4;1
 
 
 # accept: which wiretype (defined elsewhere) the wires acceps. Use comma to separate multiple. N/A for electronic components (aka not wires)

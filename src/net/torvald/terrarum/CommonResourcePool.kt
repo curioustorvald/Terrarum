@@ -118,6 +118,7 @@ object CommonResourcePool {
     fun getAsTextureRegionPack(identifier: String) = getAs<TextureRegionPack>(identifier)
     fun getAsTextureRegion(identifier: String) = getAs<TextureRegion>(identifier)
     fun getAsTexture(identifier: String) = getAs<Texture>(identifier)
+    fun getAsItemSheet(identifier: String) = getAs<ItemSheet>(identifier)
 
     fun dispose() {
         pool.forEach { (name, u) ->

@@ -24,7 +24,7 @@ class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, priva
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsTextureRegionPack(atlasID).get(sheetX, sheetY)
+        get() = CommonResourcePool.getAsItemSheet(atlasID).get(sheetX, sheetY)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP
