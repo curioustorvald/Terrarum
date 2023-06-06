@@ -21,6 +21,7 @@ object Toolkit : Disposable {
     object Theme {
         val COL_INVENTORY_CELL_BORDER = Color(1f, 1f, 1f, 0.25f)
         val COL_CELL_FILL = Color(0x282828C8)
+        val COL_CELL_FILL_OPAQUE = Color(0x282828FF)
 
         val COL_LIST_DEFAULT = Color.WHITE // white
         val COL_INACTIVE = Color.LIGHT_GRAY
@@ -50,7 +51,7 @@ object Toolkit : Disposable {
     private lateinit var blurWriteQuad2: Mesh
     private lateinit var blurWriteQuad4: Mesh
 
-    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
+//    val baloonTile = TextureRegionPack("assets/graphics/gui/message_black_tileable.tga", 36, 36)
 
     val textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
     val textureWhiteCircle = Texture(Gdx.files.internal("assets/graphics/circle_512.tga"))
@@ -70,7 +71,7 @@ object Toolkit : Disposable {
     private val rng = HQRNG()
 
     override fun dispose() {
-        baloonTile.dispose()
+//        baloonTile.dispose()
         textureWhiteSquare.dispose()
         textureWhiteCircle.dispose()
 
@@ -251,7 +252,7 @@ object Toolkit : Disposable {
 
     fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) {
         // centre area
-        batch.draw(baloonTile.get(1, 1), x, y, w, h)
+        /*batch.draw(baloonTile.get(1, 1), x, y, w, h)
 
         // edges
         batch.draw(baloonTile.get(1, 0), x, y - baloonTile.tileH, w, baloonTile.tileH.toFloat())
@@ -263,7 +264,13 @@ object Toolkit : Disposable {
         batch.draw(baloonTile.get(0, 0), x - baloonTile.tileW, y - baloonTile.tileH)
         batch.draw(baloonTile.get(2, 0), x + w, y - baloonTile.tileH)
         batch.draw(baloonTile.get(2, 2), x + w, y + h)
-        batch.draw(baloonTile.get(0, 2), x - baloonTile.tileW, y + h)
+        batch.draw(baloonTile.get(0, 2), x - baloonTile.tileW, y + h)*/
+
+
+        batch.color = Theme.COL_CELL_FILL_OPAQUE
+        fillArea(batch, x - 4, y - 4, w + 8, h + 8)
+        batch.color = Theme.COL_INACTIVE
+        drawBoxBorder(batch, x - 4, y - 4, w + 8, h + 8)
     }
 
     private var init = false

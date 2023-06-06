@@ -241,6 +241,7 @@ object IME {
                 TerrarumIMEConf(name, copying, lang, candidatesCount, if (keysymtable == null) keysyms else null, if (keysymtable == null) null else keysymtable, mode),
                 { headkey, shifted, alted, lowLayerKeysym ->
                     val a = jsval.invokeMember("accept", headkey, shifted, alted, lowLayerKeysym)
+//                    println(a.getArrayElement(0).asString().map { it.code.toString(16) })
                     a.getArrayElement(0).asString().toCanditates() to a.getArrayElement(1).asString()
                 }, {
                     jsval.invokeMember("backspace").asString().toCanditates()

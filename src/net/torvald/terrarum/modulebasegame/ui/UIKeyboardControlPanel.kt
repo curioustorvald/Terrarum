@@ -416,17 +416,17 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
         // texts. Sorted in the same way as UIItemControlPaletteBaloon.iconButtons
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], col0 + 72, posY + 43)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col1 + 40, posY + 43)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_MOVE_VERB"], col0 + 72, posY + 41)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_JUMP"], col1 + 40, posY + 41)
 
-        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row1)
-        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], col0 + 40, row2)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3)
-        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row4)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY"], col0 + 40, row1 - 2)
+        App.fontGame.draw(batch, Lang["GAME_CRAFTING"], col0 + 40, row2 - 2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_GRAPPLE"], col0 + 40, row3 - 2)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_QUICKSEL"], col0 + 40, row4 - 2)
 
-        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_IME_TOGGLE"], col1 + 40, row2)
-        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3)
+        App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1 - 2)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_IME_TOGGLE"], col1 + 40, row2 - 2)
+        App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3 - 2)
     }
 
 

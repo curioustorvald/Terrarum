@@ -517,7 +517,7 @@ class UIItemTextLineInput(
                     0
                 // TODO support alignment-right
 
-                App.fontGameFBO.draw(it, text, -1f*cursorDrawScroll + textDrawOffset, 0f)
+                App.fontGameFBO.draw(it, text, -1f*cursorDrawScroll + textDrawOffset, -2f)
             } }
             textCommitListener(getTextOrPlaceholder())
         }
@@ -587,7 +587,8 @@ class UIItemTextLineInput(
         batch.draw(labels.get(8,2), btn2PosX + 2f, posY + 2f)
 
         // state of the candidates are concurrently changing, so we buffer them
-        val localCandidates = ArrayList<CodepointSequence>(); candidates.forEach { localCandidates.add(it) }
+        val localCandidates = ArrayList<CodepointSequence>()
+        candidates.forEach { localCandidates.add(it) }
 
         // draw candidates view
         if (localCandidates.isNotEmpty() && ime != null) {
@@ -618,7 +619,7 @@ class UIItemTextLineInput(
                     val candidateNum = listOf(i+48,46,32)
                     App.fontGame.draw(batch, CodepointSequence(candidateNum + localCandidates[i]),
                             candidatePosX + (i / halfcount) * (longestCandidateW + 3) + 2,
-                            candidatePosY + (i % halfcount) * 20 // using hard-coded 20 instead of the actual font height of 24
+                            candidatePosY + (i % halfcount) * 20 - 2 // using hard-coded 20 instead of the actual font height of 24
                     )
                 }
 
@@ -639,7 +640,7 @@ class UIItemTextLineInput(
                 Toolkit.drawBoxBorder(batch, candidatePosX - 1, candidatePosY - 1, candidateWinW + 2, candidateWinH + 2)
 
                 val previewTextWidth = textWidths[0]
-                App.fontGame.draw(batch, localCandidates[0], candidatePosX + (candidateWinW - previewTextWidth) / 2, candidatePosY)
+                App.fontGame.draw(batch, localCandidates[0], candidatePosX + (candidateWinW - previewTextWidth) / 2, candidatePosY - 2)
             }
         }
 

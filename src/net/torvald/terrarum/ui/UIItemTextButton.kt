@@ -81,7 +81,7 @@ open class UIItemTextButton(
             Alignment.LEFT -> posX + paddingLeft
             Alignment.RIGHT -> width - paddingRight - textW
         }
-        val fontY = posY + 2 + (hitboxSize - font.lineHeight.toInt()) / 2
+        val fontY = posY + (hitboxSize - font.lineHeight.toInt()) / 2
 
 
         // draw background

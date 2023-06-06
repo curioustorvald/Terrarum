@@ -387,9 +387,9 @@ class UIItemWorldCellsSimple(
         // draw texts
         batch.color = tcol
         batch.draw(icons.get(0, 1), posX + 4f, posY + 1f)
-        App.fontGame.draw(batch, worldName ?: "$EMDASH", posX + 32, posY + 1)
+        App.fontGame.draw(batch, worldName ?: "$EMDASH", posX + 32, posY - 1)
         batch.draw(icons.get(1, 1), posX + 4f, posY + 25f)
-        App.fontGame.draw(batch, if (worldInfo?.seed == null) "$EMDASH" else "${(if (worldInfo.seed > 0) "+" else "")}${worldInfo.seed}" , posX + 32, posY + 25)
+        App.fontGame.draw(batch, if (worldInfo?.seed == null) "$EMDASH" else "${(if (worldInfo.seed > 0) "+" else "")}${worldInfo.seed}" , posX + 32, posY + 23)
         // text separator
         batch.color = bcol.cpy().sub(0f,0f,0f,0.65f)
         Toolkit.fillArea(batch, posX + 2, posY + 23, width - 4, 1)

@@ -85,12 +85,12 @@ class UIItemModuleInfoCell(
         batch.draw(modIcon, initialX + 35f, initialY + 12f)
         batch.shader = null
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 3f, initialY + 2f)
+        App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 3f, initialY.toFloat())
         if (modErrored)
-            App.fontGame.draw(batch, "$emphRed${modErrors.first().cause?.message}", initialX + 86f + 3f, initialY + 26f)
+            App.fontGame.draw(batch, "$emphRed${modErrors.first().cause?.message}", initialX + 86f + 3f, initialY + 24f)
         else
-            App.fontGame.draw(batch, "$ccDesc$modDesc", initialX + 86f + 3f, initialY + 26f)
-        App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 3f, initialY + 50f)
+            App.fontGame.draw(batch, "$ccDesc$modDesc", initialX + 86f + 3f, initialY + 24f)
+        App.fontGame.draw(batch, "$ccZero2$modAuthor$ccNum2 $modDate", initialX + 86f + 3f, initialY + 48f)
 
         if (modErrored) {
             batch.draw(CommonResourcePool.getAsTextureRegion("basegame_errored_icon32"), initialX + width - 40f, initialY + 8f + 12f)

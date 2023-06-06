@@ -29,7 +29,7 @@ class IMEDictionary(private val filename: String) {
     private var dictLoaded = false
 
     private fun loadDict() {
-        val reader = FileReader(File("assets/keylayout/", filename))
+        val reader = FileReader(File("assets/keylayout/", filename), Charsets.UTF_8)
         reader.forEachLine {
             if (it.contains(',')) {
                 val (key, value) = it.split(',')

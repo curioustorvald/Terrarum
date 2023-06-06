@@ -197,7 +197,7 @@ class UIItemTextSelector(
             val t = labelCache[selection]
             val tw = App.fontGame.getWidth(t)
 //            batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
-            App.fontGame.draw(batch, t, posX + buttonW + 3 + (fboWidth - tw) / 2, posY + 2)
+            App.fontGame.draw(batch, t, posX + buttonW + 3 + (fboWidth - tw) / 2, posY)
         }
         // palette
         else {
@@ -226,7 +226,7 @@ class UIItemTextSelector(
                 val tw = App.fontGame.getWidth(t)
                 App.fontGame.draw(batch, t,
                         palX + (palW - tw) / 2,
-                        getPalItemPosY(index)
+                        getPalItemPosY(index) - 2
                 )
             }
         }

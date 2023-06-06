@@ -180,7 +180,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             else
                 drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
 
-            App.fontGame.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index].toFloat())
+            App.fontGame.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index] - 2f)
 
             // draw hrule
             if (mode == "h1") {

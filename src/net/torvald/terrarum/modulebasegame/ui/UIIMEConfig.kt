@@ -350,7 +350,7 @@ private class UIItemInputKeycap(
                 batch.draw(labels.get(21,2), (posX + (width - 20) / 2).toFloat(), posY + 4f)
             else {
                 val keysymw = App.fontGame.getWidth(keysym)
-                App.fontGame.draw(batch, keysym, posX + (width - keysymw) / 2, posY + 4)
+                App.fontGame.draw(batch, keysym, posX + (width - keysymw) / 2, posY + 2)
             }
         }
 

@@ -636,10 +636,10 @@ class UIItemPlayerCells(
         // texts
         batch.color = highlightTextCol
         val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
-        App.fontGame.draw(batch, playerName, x + 146f, y + height - 82f)
-        App.fontGame.draw(batch, worldName, x + 146f, y + height - 53f)
-        App.fontGame.draw(batch, lastPlayTime, x + 146f, y + height - 24f)
-        App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, y + height - 24f)
+        App.fontGame.draw(batch, playerName, x + 146f, y + height - 84f)
+        App.fontGame.draw(batch, worldName, x + 146f, y + height - 55f)
+        App.fontGame.draw(batch, lastPlayTime, x + 146f, y + height - 26f)
+        App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, y + height - 26f)
         // icons
         batch.draw(icons.get(24,0), x + 120f, y + height - 82f) // player name
         batch.draw(icons.get(12,0), x + 119f, y + height - 53f) // world map
@@ -808,7 +808,7 @@ class UIItemWorldCells(
         App.fontSmallNumbers.draw(batch, "${skimmer.diskFile.length().ushr(10)} KiB", x + 3f, y + height - 16f)
         // savegame name
         if (saveDamaged) batch.color = colourBad
-        App.fontGame.draw(batch, saveName, x + 3f, y + 1f)
+        App.fontGame.draw(batch, saveName, x + 3f, y + -1f)
 
         super.render(batch, camera)
         batch.color = Color.WHITE

@@ -35,10 +35,10 @@ class UITooltip : UICanvas() {
     val textMarginX = 4
 
     override var width: Int
-        get() = msgWidth + (textMarginX + Toolkit.baloonTile.tileW) * 2
+        get() = msgWidth + (textMarginX + 36) * 2
         set(value) { throw Error("You are not supposed to set the width of the tooltip manually.") }
     override var height: Int
-        get() = Toolkit.baloonTile.tileH * 2 + font.lineHeight.toInt()
+        get() = 36 * 2 + font.lineHeight.toInt()
         set(value) { throw Error("You are not supposed to set the height of the tooltip manually.") }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

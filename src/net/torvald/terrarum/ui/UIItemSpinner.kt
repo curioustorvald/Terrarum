@@ -158,7 +158,7 @@ class UIItemSpinner(
         // draw text
         batch.color = UIItemTextLineInput.TEXTINPUT_COL_TEXT
 //        batch.draw(fbo.colorBufferTexture, posX + buttonW + 3f, posY + 2f, fbo.width.toFloat(), fbo.height.toFloat())
-        App.fontGame.draw(batch, textCache, posX + buttonW + 3f + (fboWidth - textCacheLen).div(2), posY + 2f)
+        App.fontGame.draw(batch, textCache, posX + buttonW + 3f + (fboWidth - textCacheLen).div(2), posY.toFloat())
 
         super.render(batch, camera)
     }

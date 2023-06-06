@@ -72,7 +72,7 @@ class UIItemInlineRadioButtons(
                 val xpos = getCellX(i)
                 val text = labelfuns[i]()
                 val tw = App.fontGame.getWidth(text)
-                App.fontGame.draw(batch, text, xpos + (cellWidth - tw) / 2, posY + 2)
+                App.fontGame.draw(batch, text, xpos + (cellWidth - tw) / 2, posY)
             }
         }
 
@@ -83,7 +83,7 @@ class UIItemInlineRadioButtons(
             Toolkit.drawBoxBorder(batch, xpos - 1, posY - 1, cellWidth + 2, height + 2)
             val text = labelfuns[mouseOnSelection]()
             val tw = App.fontGame.getWidth(text)
-            App.fontGame.draw(batch, text, xpos + (cellWidth - tw) / 2, posY + 2)
+            App.fontGame.draw(batch, text, xpos + (cellWidth - tw) / 2, posY)
         }
 
         // selection borders and text
@@ -92,7 +92,7 @@ class UIItemInlineRadioButtons(
         Toolkit.drawBoxBorder(batch, xpos - 1, posY - 1, cellWidth + 2, height + 2)
         val text = labelfuns[selection]()
         val tw = App.fontGame.getWidth(text)
-        App.fontGame.draw(batch, text, xpos + (cellWidth - tw) / 2, posY + 2)
+        App.fontGame.draw(batch, text, xpos + (cellWidth - tw) / 2, posY)
 
 
         super.render(batch, camera)
