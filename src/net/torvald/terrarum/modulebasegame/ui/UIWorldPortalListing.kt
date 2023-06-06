@@ -276,7 +276,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             batch.color = Color.WHITE
             worldTexts.forEachIndexed { index, (icon, str) ->
                 batch.draw(icon, textXpos - iconSizeGap + 6, y + thumbh + 3+10 + textualListHeight * index)
-                App.fontGame.draw(batch, str, textXpos + 6f, y + thumbh + 3+10 + textualListHeight * index)
+                App.fontGame.draw(batch, str, textXpos + 6f, y + thumbh + 3+10 + textualListHeight * index - 2f)
             }
             // size indicator on the memory gauge
             Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (selected?.worldInfo!!.dimensionInChunks / chunksMax.toFloat())).ceilInt(), buttonHeight)
