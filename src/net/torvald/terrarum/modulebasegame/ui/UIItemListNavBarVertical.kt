@@ -17,7 +17,7 @@ import net.torvald.terrarum.ui.UIItemImageButton
 class UIItemListNavBarVertical(
     parentUI: UICanvas, initialX: Int, initialY: Int,
     override val height: Int,
-    hasGridModeButtons: Boolean, initialModeSelection: Int = 0,
+    val hasGridModeButtons: Boolean, initialModeSelection: Int = 0,
     private val colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme,
     var extraDrawOpOnBottom: (UIItemListNavBarVertical, SpriteBatch) -> Unit = { _,_ -> }
 ) : UIItem(parentUI, initialX, initialY) {
@@ -130,7 +130,7 @@ class UIItemListNavBarVertical(
         batch.color = colourTheme.cellHighlightNormalCol
         Toolkit.drawBoxBorder(batch, iconPosX - 4, getIconPosY(0) - 8, width, height)
 
-        gridModeButtons.forEach { it.render(batch, camera) }
+        if (hasGridModeButtons) gridModeButtons.forEach { it.render(batch, camera) }
         scrollUpButton.render(batch, camera)
         scrollDownButton.render(batch, camera)
 
@@ -155,7 +155,7 @@ class UIItemListNavBarVertical(
 
     override fun update(delta: Float) {
 
-        gridModeButtons.forEach { it.update(delta) }
+        if (hasGridModeButtons) gridModeButtons.forEach { it.update(delta) }
         scrollUpButton.update(delta)
         scrollDownButton.update(delta)
 
@@ -163,7 +163,7 @@ class UIItemListNavBarVertical(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
+        if (hasGridModeButtons) gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
         if (scrollUpButton.mouseUp) scrollUpButton.touchDown(screenX, screenY, pointer, button)
         if (scrollDownButton.mouseUp) scrollDownButton.touchDown(screenX, screenY, pointer, button)
         return super.touchDown(screenX, screenY, pointer, button)

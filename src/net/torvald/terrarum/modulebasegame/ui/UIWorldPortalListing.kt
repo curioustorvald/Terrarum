@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getCellCountVertically
@@ -28,6 +29,7 @@ import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.zip.GZIPInputStream
+import kotlin.math.ceil
 
 /**
  * Created by minjaesong on 2023-05-19.
@@ -98,6 +100,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
     }
 
+    private val navRemoCon = UIItemListNavBarVertical(full, hx + 6 + UIItemWorldCellsSimple.width, y + 7, listHeight, false)
+
     private val worldList = ArrayList<WorldInfo>()
     data class WorldInfo(
         val uuid: UUID,
@@ -119,23 +123,21 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
         CommonResourcePool.loadAll()
 
+        navRemoCon.scrollUpListener = { _,_ -> scrollItemPage(-1) }
+        navRemoCon.scrollDownListener = { _,_ -> scrollItemPage(1) }
 
         addUIitem(buttonRenameWorld)
         addUIitem(buttonDeleteWorld)
         addUIitem(buttonTeleport)
         addUIitem(buttonCancel)
-
+        addUIitem(navRemoCon)
     }
 
-    private var chunksUsed = 0
-    private val chunksMax = 100000
+    fun scrollItemPage(relativeAmount: Int) {
+        listPage = if (listPageCount == 0) 0 else (listPage + relativeAmount).fmod(listPageCount)
+    }
 
-    private lateinit var worldCells: Array<UIItemWorldCellsSimple>
-
-    private var selected: UIItemWorldCellsSimple? = null
-    private var selectedIndex: Int? = null
-
-    override fun show() {
+    private fun readWorldList() {
         worldList.clear()
         (INGAME.actorGamer.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(",").filter { it.isNotBlank() }.map {
             it.ascii85toUUID().let { it to App.savegameWorlds[it] }
@@ -175,16 +177,38 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }.let {
             worldList.addAll(it)
         }
-
-
-
         chunksUsed = worldList.sumOf { it.dimensionInChunks }
+        listPageCount = ceil(worldList.size.toDouble() / listCount).toInt()
+    }
 
-        worldCells = Array(maxOf(worldList.size, listCount)) {
+    private var chunksUsed = 0
+    private val chunksMax = 100000
+
+    private lateinit var worldCells: Array<UIItemWorldCellsSimple>
+
+    private var selected: UIItemWorldCellsSimple? = null
+    private var selectedIndex: Int? = null
+
+    var listPage
+        set(value) {
+            navRemoCon.itemPage = if (listPageCount == 0) 0 else (value).fmod(listPageCount)
+            rebuildList()
+        }
+        get() = navRemoCon.itemPage
+
+    var listPageCount // TODO total size of current category / items.size
+        protected set(value) {
+            navRemoCon.itemPageCount = value
+        }
+        get() = navRemoCon.itemPageCount
+
+    private fun rebuildList() {
+        worldCells = Array(listCount) { it0 ->
+            val it = it0 + listCount * listPage
             UIItemWorldCellsSimple(
                 this,
                 hx + gridGap / 2,
-                y + (gridGap + UIItemWorldCellsSimple.height) * it,
+                y + (gridGap + UIItemWorldCellsSimple.height) * it0,
                 worldList.getOrNull(it),
                 worldList.getOrNull(it)?.diskSkimmer?.getDiskName(Common.CHARSET)
             ).also { button ->
@@ -195,6 +219,14 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 }
             }
         }
+    }
+
+    override fun show() {
+        listPage = 0
+
+        readWorldList()
+
+        rebuildList()
 
         uiItems.forEach { it.show() }
         worldCells.forEach { it.show() }
@@ -358,11 +390,21 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
         else return false
     }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        if (this.isVisible) {
+            uiItems.forEach { it.scrolled(amountX, amountY) }
+            worldCells.forEach { it.scrolled(amountX, amountY) }
+            handler.subUIs.forEach { it.scrolled(amountX, amountY) }
+            return true
+        }
+        else return false
+    }
 }
 
 
 class UIItemWorldCellsSimple(
-    parent: UIWorldPortalListing,
+    val parent: UIWorldPortalListing,
     initialX: Int,
     initialY: Int,
     internal val worldInfo: UIWorldPortalListing.WorldInfo? = null,
@@ -421,6 +463,15 @@ class UIItemWorldCellsSimple(
         batch.color = bcol.cpy().sub(0f,0f,0f,0.65f)
         Toolkit.fillArea(batch, posX + 2, posY + 23, width - 4, 1)
 
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+
+        if (mouseUp) {
+            parent.scrollItemPage(amountY.toInt())
+        }
+
+        return true
     }
 
     override fun dispose() {
