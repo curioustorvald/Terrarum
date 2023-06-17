@@ -49,7 +49,7 @@ class UIQuickslotPie : UICanvas() {
         // update controls
         if (handler.isOpened || handler.isOpening) {
             val cursorPos = Vector2(Terrarum.mouseScreenX.toDouble(), Terrarum.mouseScreenY.toDouble())
-            val centre = Vector2(Toolkit.drawWidth / 2.0, App.scr.halfh.toDouble())
+            val centre = Vector2(Toolkit.hdrawWidth.toDouble(), App.scr.halfh.toDouble())
             val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)

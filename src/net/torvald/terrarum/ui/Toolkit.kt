@@ -93,6 +93,10 @@ object Toolkit : Disposable {
         get() = App.scr.width - if (App.getConfigBoolean("fx_streamerslayout")) App.scr.chatWidth else 0
     val drawWidthf: Float
         get() = drawWidth.toFloat()
+    val hdrawWidth: Int
+        get() = drawWidth / 2
+    val hdrawWidthf: Float
+        get() = hdrawWidth.toFloat()
 
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width

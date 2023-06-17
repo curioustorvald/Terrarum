@@ -3,8 +3,8 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_CORRECTION
@@ -13,7 +13,6 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import net.torvald.unicode.getKeycapConsole
 import net.torvald.unicode.getKeycapPC
 
 /**
@@ -53,7 +52,9 @@ class UIWorldPortal : UICanvas(
         this,
         0,
         42 - YPOS_CORRECTION + (App.scr.height - internalHeight) / 2,
-    ) { i -> if (!panelTransitionLocked) requestTransition(i) }
+    ) { i ->
+        if (!panelTransitionLocked) requestTransition(i ushr 1)
+    }
 
 
     private val SP = "\u3000 "
@@ -83,7 +84,9 @@ class UIWorldPortal : UICanvas(
         addUIitem(catBar)
         addUIitem(transitionPanel)
 
+        catBar.selectionChangeListener = { old, new ->
 
+        }
 
     }
 
@@ -96,7 +99,8 @@ class UIWorldPortal : UICanvas(
 
 
     override fun updateUI(delta: Float) {
-
+        catBar.update(delta)
+        transitionPanel.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -113,8 +117,13 @@ class UIWorldPortal : UICanvas(
         INGAME.setTooltipMessage(null)
     }
 
+    override fun hide() {
+        transitionPanel.hide()
+    }
+
     override fun dispose() {
         catBar.dispose()
+        transitionPanel.dispose()
     }
 
     fun resetUI() {
@@ -124,18 +133,21 @@ class UIWorldPortal : UICanvas(
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
         resetUI()
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.pause()
         INGAME.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.resume()
         INGAME.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
         super.endOpening(delta)
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f)  }
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
@@ -143,6 +155,7 @@ class UIWorldPortal : UICanvas(
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
         resetUI()
+        transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
     }
@@ -179,13 +192,19 @@ class UIItemWorldPortalTopBar(
         "CONTEXT_WORLD_SEARCH",
         "",
         "CONTEXT_WORLD_LIST",
-        "GAME_INVENTORY",
         "",
+        "GAME_INVENTORY",
     )
     private val buttonGapSize = 120
     private val highlighterYPos = icons.tileH + 4
 
-    var selection = 2
+    var selectedPanel = 2; private set
+
+    /** (oldIndex: Int?, newIndex: Int) -> Unit
+     * Indices are raw index. That is, not re-arranged. */
+    var selectionChangeListener: ((Int?, Int) -> Unit)? = null
+
+    private var transitionFired = false
 
     private val buttons = Array<UIItemImageButton>(5) {
         val xoff = if (it == 1) -32 else if (it == 3) 32 else 0
@@ -204,6 +223,30 @@ class UIItemWorldPortalTopBar(
         )
     }
 
+    private val workingButtons = arrayOf(0,2,4)
+
+    override fun update(delta: Float) {
+        super.update(delta)
+
+
+        workingButtons.forEach { buttons[it].update(delta) }
+
+        // transition stuffs
+        workingButtons.filter { buttons[it].mousePushed }.firstOrNull()?.let { pushedButton ->
+            if (selectedPanel != pushedButton) transitionFired = true
+            selectedPanel = pushedButton
+
+            workingButtons.forEach {  i ->
+                buttons[i].highlighted = i == pushedButton
+            }
+        }
+
+        if (transitionFired) {
+            transitionFired = false
+            panelTransitionReqFun(selectedPanel)
+        }
+    }
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         super.render(batch, camera)
 
@@ -212,8 +255,8 @@ class UIItemWorldPortalTopBar(
 
         // label
         batch.color = Color.WHITE
-        val text = Lang[catIconLabels[selection]]
-        App.fontGame.draw(batch, text, buttons[selection].posX + 10 - (App.fontGame.getWidth(text) / 2), posY + highlighterYPos + 4)
+        val text = Lang[catIconLabels[selectedPanel]]
+        App.fontGame.draw(batch, text, buttons[selectedPanel].posX + 10 - (App.fontGame.getWidth(text) / 2), posY + highlighterYPos + 4)
 
 
         blendNormalStraightAlpha(batch)

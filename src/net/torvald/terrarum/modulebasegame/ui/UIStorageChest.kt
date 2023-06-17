@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidthOfCells
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.unicode.getKeycapPC
@@ -23,7 +24,7 @@ internal class UIStorageChest : UICanvas(
     lateinit var chestInventory: FixtureInventory
     lateinit var chestNameFun: () -> String
 
-    override var width = App.scr.width
+    override var width = Toolkit.drawWidth
     override var height = App.scr.height
 
     private val negotiator = object : InventoryTransactionNegotiator() {
@@ -49,12 +50,12 @@ internal class UIStorageChest : UICanvas(
     private var encumbrancePerc = 0f
     private var isEncumbered = false
 
-    private var halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap) / 2
+    private var halfSlotOffset = (UIItemInventoryElemSimple.height + UIItemInventoryItemGrid.listGap * 2) / 2
 
     init {
         catBar = UIItemInventoryCatBar(
             this,
-            (App.scr.width - UIInventoryFull.catBarWidth) / 2,
+            (width - UIInventoryFull.catBarWidth) / 2,
             42 - UIInventoryFull.YPOS_CORRECTION + (App.scr.height - UIInventoryFull.internalHeight) / 2,
             UIInventoryFull.internalWidth,
             UIInventoryFull.catBarWidth,
@@ -65,17 +66,19 @@ internal class UIStorageChest : UICanvas(
             this,
             catBar,
             { getFixtureInventory() },
-            UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset,
+            Toolkit.hdrawWidth - getWidthOfCells(6) - halfSlotOffset,
             UIInventoryFull.INVENTORY_CELLS_OFFSET_Y(),
             6, UIInventoryFull.CELLS_VRT,
             drawScrollOnRightside = false,
             drawWallet = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, _, _, _ ->
-                if (gameItem != null) {
-                    negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+            touchDownFun = { gameItem, amount, button, _, _ ->
+                if (button == App.getConfigInt("config_mouseprimary")) {
+                    if (gameItem != null) {
+                        negotiator.reject(getFixtureInventory(), getPlayerInventory(), gameItem, amount)
+                    }
+                    itemListUpdate()
                 }
-                itemListUpdate()
             }
         )
         // make grid mode buttons work together
@@ -86,17 +89,19 @@ internal class UIStorageChest : UICanvas(
             this,
             catBar,
             { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-            UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7,
+            Toolkit.hdrawWidth + halfSlotOffset,
             UIInventoryFull.INVENTORY_CELLS_OFFSET_Y(),
             6, UIInventoryFull.CELLS_VRT,
             drawScrollOnRightside = true,
             drawWallet = false,
             keyDownFun = { _, _, _, _, _ -> Unit },
-            touchDownFun = { gameItem, amount, _, _, _ ->
-                if (gameItem != null) {
-                    negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
+            touchDownFun = { gameItem, amount, button, _, _ ->
+                if (button == App.getConfigInt("config_mouseprimary")) {
+                    if (gameItem != null) {
+                        negotiator.accept(getPlayerInventory(), getFixtureInventory(), gameItem, amount)
+                    }
+                    itemListUpdate()
                 }
-                itemListUpdate()
             }
         )
         itemListPlayer.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
@@ -161,7 +166,7 @@ internal class UIStorageChest : UICanvas(
         if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
-    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() - halfSlotOffset
+    private val thisOffsetX = Toolkit.hdrawWidth - getWidthOfCells(6) - halfSlotOffset
     private val thisOffsetX2 = thisOffsetX + (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 7
     private val thisOffsetY = UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
     private val cellsWidth = (UIItemInventoryItemGrid.listGap + UIItemInventoryElemWide.height) * 6 - UIItemInventoryItemGrid.listGap

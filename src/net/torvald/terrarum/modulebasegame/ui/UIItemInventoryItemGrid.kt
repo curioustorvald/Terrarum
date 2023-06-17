@@ -145,35 +145,37 @@ open class UIItemInventoryItemGrid(
 
         fun createInvCellGenericTouchDownFun(listRebuildFun: () -> Unit): (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit {
             return { item: GameItem?, amount: Long, button: Int, _, _ ->
-                if (item != null && Terrarum.ingame != null) {
-                    // equip da shit
-                    val itemEquipSlot = item.equipPosition
-                    if (itemEquipSlot == GameItem.EquipPosition.NULL) {
-                        TODO("Equip position is NULL, does this mean it's single-consume items like a potion? (from item: \"$item\" with itemID: ${item.originalID}/${item.dynamicID})")
-                    }
-                    val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
-                    if (player != null) {
+                if (button == App.getConfigInt("config_mouseprimary")) {
+                    if (item != null && Terrarum.ingame != null) {
+                        // equip da shit
+                        val itemEquipSlot = item.equipPosition
+                        if (itemEquipSlot == GameItem.EquipPosition.NULL) {
+                            TODO("Equip position is NULL, does this mean it's single-consume items like a potion? (from item: \"$item\" with itemID: ${item.originalID}/${item.dynamicID})")
+                        }
+                        val player = (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying
+                        if (player != null) {
 
-                        if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
-                            player.equipItem(item)
+                            if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
+                                player.equipItem(item)
 
-                            // also equip on the quickslot
-                            player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                                player.inventory.setQuickslotItem(it, item.dynamicID)
+                                // also equip on the quickslot
+                                player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                                    player.inventory.setQuickslotItem(it, item.dynamicID)
+                                }
+                            }
+                            else { // if not, unequip it
+                                player.unequipItem(item)
+
+                                // also unequip on the quickslot
+                                player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
+                                    player.inventory.setQuickslotItem(it, null)
+                                }
                             }
                         }
-                        else { // if not, unequip it
-                            player.unequipItem(item)
-
-                            // also unequip on the quickslot
-                            player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)?.let {
-                                player.inventory.setQuickslotItem(it, null)
-                            }
-                        }
                     }
+
+                    listRebuildFun()
                 }
-
-                listRebuildFun()
             }
         }
 

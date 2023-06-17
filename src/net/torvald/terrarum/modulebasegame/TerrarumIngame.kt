@@ -42,6 +42,7 @@ import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.ui.Toolkit.hdrawWidth
 import net.torvald.terrarum.ui.UIAutosaveNotifier
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
@@ -521,7 +522,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // pie menu
         uiPieMenu = UIQuickslotPie()
-        uiPieMenu.setPosition(drawWidth / 2, App.scr.halfh)
+        uiPieMenu.setPosition(hdrawWidth, App.scr.halfh)
 
         // vital metre
         // fill in getter functions by

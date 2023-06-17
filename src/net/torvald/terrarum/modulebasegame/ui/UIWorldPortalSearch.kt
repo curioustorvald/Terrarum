@@ -15,14 +15,11 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     override var height: Int = App.scr.height
 
     override fun updateUI(delta: Float) {
-        TODO("Not yet implemented")
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        TODO("Not yet implemented")
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
     }
 }

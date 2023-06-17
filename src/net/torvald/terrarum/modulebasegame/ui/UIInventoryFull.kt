@@ -58,6 +58,9 @@ class UIInventoryFull(
         val INVENTORY_CELLS_OFFSET_X = { 0 + (Toolkit.drawWidth - internalWidth) / 2 }
         val INVENTORY_CELLS_OFFSET_Y = { -YPOS_CORRECTION + 107 + (App.scr.height - internalHeight) / 2 }
 
+        fun getWidthOfCells(count: Int, cellWidth: Int = UIItemInventoryElemWide.height, gapWidth: Int = UIItemInventoryItemGrid.listGap) =
+            (cellWidth * count) + (gapWidth * (count - 1))
+
         val catBarWidth = 330
 
         val gradStartCol = Color(0x404040_60)

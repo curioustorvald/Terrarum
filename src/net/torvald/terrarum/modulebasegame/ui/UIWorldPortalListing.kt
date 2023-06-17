@@ -259,7 +259,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
-        worldCells.forEach { it.update(delta) }
+        if (::worldCells.isInitialized) worldCells.forEach { it.update(delta) }
     }
 
     private val iconGap = 12f
@@ -350,7 +350,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
 
         uiItems.forEach { it.render(batch, camera) }
-        worldCells.forEach { it.render(batch, camera) }
+        if (::worldCells.isInitialized) worldCells.forEach { it.render(batch, camera) }
 
         // control hints
         batch.color = Color.WHITE
@@ -359,15 +359,15 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
     override fun hide() {
         uiItems.forEach { it.hide() }
-        worldCells.forEach { it.hide() }
+        if (::worldCells.isInitialized) worldCells.forEach { it.hide() }
 
-        worldCells.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
+        if (::worldCells.isInitialized) worldCells.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
         worldList.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
     }
 
     override fun dispose() {
         uiItems.forEach { it.dispose() }
-        worldCells.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
+        if (::worldCells.isInitialized) worldCells.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
         worldList.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
     }
 
@@ -384,7 +384,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
-            worldCells.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            if (::worldCells.isInitialized) worldCells.forEach { it.touchUp(screenX, screenY, pointer, button) }
             handler.subUIs.forEach { it.touchUp(screenX, screenY, pointer, button) }
             return true
         }
@@ -394,7 +394,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.scrolled(amountX, amountY) }
-            worldCells.forEach { it.scrolled(amountX, amountY) }
+            if (::worldCells.isInitialized) worldCells.forEach { it.scrolled(amountX, amountY) }
             handler.subUIs.forEach { it.scrolled(amountX, amountY) }
             return true
         }
