@@ -66,7 +66,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
                 activeCol = Color.WHITE
             )
 
-            paletteItem.clickOnceListener = { _, _, _ ->
+            paletteItem.clickOnceListener = { _, _ ->
                 parent.setPencilColour(prop.id)
             }
 

@@ -37,25 +37,6 @@ class UIWorldPortal : UICanvas(
 
     val controlHelpHeight = App.fontGame.lineHeight
 
-    private var panelTransitionLocked = false
-
-    fun lockTransition() {
-        panelTransitionLocked = true
-    }
-    fun unlockTransition() {
-        panelTransitionLocked = false
-    }
-    fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
-
-
-    val catBar = UIItemWorldPortalTopBar(
-        this,
-        0,
-        42 - YPOS_CORRECTION + (App.scr.height - internalHeight) / 2,
-    ) { i ->
-        if (!panelTransitionLocked) requestTransition(i ushr 1)
-    }
-
 
     private val SP = "\u3000 "
     val portalListingControlHelp: String
@@ -67,26 +48,21 @@ class UIWorldPortal : UICanvas(
                     "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
 
 
-    val transitionalSearch = UIWorldPortalSearch(this)
+//    val transitionalSearch = UIWorldPortalSearch(this)
     val transitionalListing = UIWorldPortalListing(this)
-    val transitionalCargo = UIWorldPortalCargo(this)
+//    val transitionalCargo = UIWorldPortalCargo(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         (width - internalWidth) / 2,
         INVENTORY_CELLS_OFFSET_Y(),
         width,
         App.scr.height,
-        1f,
-        transitionalSearch, transitionalListing, transitionalCargo
+        0f,
+         transitionalListing
     )
 
     init {
-        addUIitem(catBar)
         addUIitem(transitionPanel)
-
-        catBar.selectionChangeListener = { old, new ->
-
-        }
 
     }
 
@@ -99,7 +75,6 @@ class UIWorldPortal : UICanvas(
 
 
     override fun updateUI(delta: Float) {
-        catBar.update(delta)
         transitionPanel.update(delta)
     }
 
@@ -107,7 +82,6 @@ class UIWorldPortal : UICanvas(
         drawBackground(batch, handler.opacity)
 
         // UI items
-        catBar.render(batch, camera)
         transitionPanel.render(batch, camera)
     }
 
@@ -122,7 +96,6 @@ class UIWorldPortal : UICanvas(
     }
 
     override fun dispose() {
-        catBar.dispose()
         transitionPanel.dispose()
     }
 

@@ -111,7 +111,7 @@ class DummyTogglePane : UICanvas() {
     private var timer = 0f
 
     init {
-        button1.clickOnceListener = { _,_,_ ->
+        button1.clickOnceListener = { _,_ ->
             button1.toggle()
         }
         uiItems.add(button1)

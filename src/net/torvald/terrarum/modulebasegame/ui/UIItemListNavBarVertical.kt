@@ -91,11 +91,11 @@ class UIItemListNavBarVertical(
             gridButtonListener(this, gridModeButtons[1])
         }
 
-        scrollUpButton.clickOnceListener = { _, _, _ ->
+        scrollUpButton.clickOnceListener = { _, _ ->
             scrollUpButton.highlighted = false
             scrollUpListener(this, scrollUpButton)
         }
-        scrollDownButton.clickOnceListener = { _, _, _ ->
+        scrollDownButton.clickOnceListener = { _, _ ->
             scrollDownButton.highlighted = false
             scrollDownListener(this, scrollDownButton)
         }

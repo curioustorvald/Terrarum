@@ -100,11 +100,9 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         toolButtons.forEachIndexed { index, button ->
             uiItems.add(button)
 
-            button.clickOnceListener = { _, _, b ->
-                if (b == App.getConfigInt("config_mouseprimary")) {
-                    toolButtonsJob[index].invoke()
-                    closeGracefully()
-                }
+            button.clickOnceListener = { _, _ ->
+                toolButtonsJob[index].invoke()
+                closeGracefully()
             }
         }
     }

@@ -49,7 +49,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val textAreaW = thumbw - 32
     private val thumbh = 252
     private val hx = Toolkit.drawWidth.div(2)
-    private val y = INVENTORY_CELLS_OFFSET_Y() + 1
+    private val y = INVENTORY_CELLS_OFFSET_Y() + 1 - 34
 
     private val listCount = getCellCountVertically(UIItemWorldCellsSimple.height, gridGap)
     private val listHeight = UIItemWorldCellsSimple.height + (listCount - 1) * (UIItemWorldCellsSimple.height + gridGap)
@@ -57,18 +57,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val memoryGaugeWidth = textAreaW
     private val deleteButtonWidth = (thumbw - gridGap) / 2
     private val buttonsY = y + listHeight + gridGap
-    private val buttonDeleteWorld = UIItemTextButton(this,
-        "MENU_LABEL_DELETE",
-        hx - gridGap/2 - deleteButtonWidth,
-        buttonsY,
-        deleteButtonWidth,
-        readFromLang = true,
-        hasBorder = true,
-        alignment = UIItemTextButton.Companion.Alignment.CENTRE
-    )
-    private val buttonRenameWorld = UIItemTextButton(this,
-        "MENU_LABEL_RENAME",
-        buttonDeleteWorld.posX - gridGap - deleteButtonWidth,
+
+    private val buttonSearch = UIItemTextButton(this,
+        "CONTEXT_WORLD_SEARCH",
+        hx - gridGap/2 - 2*deleteButtonWidth - gridGap,
         buttonsY,
         deleteButtonWidth,
         readFromLang = true,
@@ -76,7 +68,16 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
     private val buttonTeleport = UIItemTextButton(this,
-        "CONTEXT_GAME_TELEPORT",
+        "GAME_ACTION_TELEPORT",
+        hx - gridGap/2 - deleteButtonWidth,
+        buttonsY,
+        deleteButtonWidth,
+        readFromLang = true,
+        hasBorder = true,
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE
+    )
+    private val buttonRename = UIItemTextButton(this,
+        "MENU_LABEL_RENAME",
         hx + gridGap/2,
         buttonsY,
         deleteButtonWidth,
@@ -84,21 +85,15 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
-    private val buttonCancel = UIItemTextButton(this,
-        "MENU_LABEL_CANCEL",
+    private val buttonDelete = UIItemTextButton(this,
+        "MENU_LABEL_DELETE",
         hx + gridGap/2 + deleteButtonWidth + gridGap,
         buttonsY,
         deleteButtonWidth,
         readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
-    ).also {
-        it.clickOnceListener = { _, _, _ ->
-            selected = null
-            selectedIndex = null
-            updateUIbyButtonSelection()
-        }
-    }
+    )
 
     private val navRemoCon = UIItemListNavBarVertical(full, hx + 6 + UIItemWorldCellsSimple.width, y + 7, listHeight + 2, false)
 
@@ -117,6 +112,12 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
     }
 
+    private fun highlightListEditButtons(state: Boolean) {
+        buttonRename.isActive = state
+        buttonDelete.isActive = state
+        buttonTeleport.isActive = state
+    }
+
     init {
         CommonResourcePool.addToLoadingList("terrarum-basegame-worldportalicons") {
             TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/worldportal_catbar.tga"), 30, 20)
@@ -126,10 +127,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         navRemoCon.scrollUpListener = { _,_ -> scrollItemPage(-1) }
         navRemoCon.scrollDownListener = { _,_ -> scrollItemPage(1) }
 
-        addUIitem(buttonRenameWorld)
-        addUIitem(buttonDeleteWorld)
+        addUIitem(buttonDelete)
+        addUIitem(buttonRename)
         addUIitem(buttonTeleport)
-        addUIitem(buttonCancel)
+        addUIitem(buttonSearch)
         addUIitem(navRemoCon)
     }
 
@@ -212,9 +213,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 worldList.getOrNull(it),
                 worldList.getOrNull(it)?.diskSkimmer?.getDiskName(Common.CHARSET)
             ).also { button ->
-                button.clickOnceListener = { _, _, _ ->
+                button.clickOnceListener = { _, _ ->
                     selected = button
                     selectedIndex = it
+                    highlightListEditButtons(it in worldList.indices)
                     updateUIbyButtonSelection()
                 }
             }
@@ -232,6 +234,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         worldCells.forEach { it.show() }
         selected = null
 
+        highlightListEditButtons(false)
         updateUIbyButtonSelection()
     }
 
@@ -354,7 +357,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, hx - thumbw - gridGap/2 + 2, (full.yEnd + 8).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, hx - thumbw - gridGap/2 + 2, (full.yEnd - 20).toInt())
     }
 
     override fun hide() {

@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 
@@ -113,11 +114,11 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
     /** Parameters: amountX, amountY */
     open var scrolledListener: ((Float, Float) -> Unit)? = null
-    /** Parameters: relative mouseX, relative mouseY, button
-     *
+    /** Parameters: relative mouseX, relative mouseY
+     * ClickOnce listeners are only fired when clicked with primary mouse button
      * PROTIP: if clickOnceListener does not seem to work, make sure your parent UI is handling touchDown() and touchUp() events!
      */
-    open var clickOnceListener: ((Int, Int, Int) -> Unit)? = null
+    open var clickOnceListener: ((Int, Int) -> Unit)? = null
     open var clickOnceListenerFired = false
 
 
@@ -221,8 +222,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                 actionDone = true
             }
 
-            if (clickOnceListener != null && !clickOnceListenerFired && mouseUp) {
-                clickOnceListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, button)
+            if (clickOnceListener != null && !clickOnceListenerFired && mouseUp && button == App.getConfigInt("config_mouseprimary")) {
+                clickOnceListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY)
                 actionDone = true
             }
         }

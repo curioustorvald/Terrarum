@@ -115,7 +115,7 @@ class UIItemIntSlider(
     override var scrolledListener: ((Float, Float) -> Unit)?
         get() = super.scrolledListener
         set(_) {}
-    override var clickOnceListener: ((Int, Int, Int) -> Unit)?
+    override var clickOnceListener: ((Int, Int) -> Unit)?
         get() = super.clickOnceListener
         set(_) {}
     override var clickOnceListenerFired: Boolean

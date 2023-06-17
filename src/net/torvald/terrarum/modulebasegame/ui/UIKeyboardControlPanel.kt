@@ -122,7 +122,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         keycaps.values.forEach { addUIitem(it) }
         updateKeycaps()
 
-        buttonReset.clickOnceListener = { x, y, button ->
+        buttonReset.clickOnceListener = { x, y ->
             resetKeyConfig()
             updateKeycaps()
         }

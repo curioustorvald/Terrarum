@@ -90,7 +90,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         else if (args.startsWith("toggle")) {
             UIItemToggleButton(this, x, y, spinnerWidth, App.getConfigBoolean(optionName)) to { it: UIItem, optionStr: String ->
-                (it as UIItemToggleButton).clickOnceListener = { _, _, _ ->
+                (it as UIItemToggleButton).clickOnceListener = { _, _ ->
                     it.toggle()
                     App.setConfig(optionStr, it.getStatus())
                 }
