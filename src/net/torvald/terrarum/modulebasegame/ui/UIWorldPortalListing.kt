@@ -54,10 +54,11 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
     private val memoryGaugeWidth = textAreaW
     private val deleteButtonWidth = (thumbw - gridGap) / 2
+    private val buttonsY = y + listHeight + gridGap
     private val buttonDeleteWorld = UIItemTextButton(this,
         "MENU_LABEL_DELETE",
         hx - gridGap/2 - deleteButtonWidth,
-        y + listHeight - buttonHeight,
+        buttonsY,
         deleteButtonWidth,
         readFromLang = true,
         hasBorder = true,
@@ -66,12 +67,36 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val buttonRenameWorld = UIItemTextButton(this,
         "MENU_LABEL_RENAME",
         buttonDeleteWorld.posX - gridGap - deleteButtonWidth,
-        y + listHeight - buttonHeight,
+        buttonsY,
         deleteButtonWidth,
         readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
+    private val buttonTeleport = UIItemTextButton(this,
+        "CONTEXT_GAME_TELEPORT",
+        hx + gridGap/2,
+        buttonsY,
+        deleteButtonWidth,
+        readFromLang = true,
+        hasBorder = true,
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE
+    )
+    private val buttonCancel = UIItemTextButton(this,
+        "MENU_LABEL_CANCEL",
+        hx + gridGap/2 + deleteButtonWidth + gridGap,
+        buttonsY,
+        deleteButtonWidth,
+        readFromLang = true,
+        hasBorder = true,
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE
+    ).also {
+        it.clickOnceListener = { _, _, _ ->
+            selected = null
+            selectedIndex = null
+            updateUIbyButtonSelection()
+        }
+    }
 
     private val worldList = ArrayList<WorldInfo>()
     data class WorldInfo(
@@ -97,6 +122,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         addUIitem(buttonRenameWorld)
         addUIitem(buttonDeleteWorld)
+        addUIitem(buttonTeleport)
+        addUIitem(buttonCancel)
 
     }
 
@@ -231,7 +258,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth - gridGap/2
-        val memoryGaugeYpos = y + listHeight - buttonHeight - gridGap - buttonHeight
+        val memoryGaugeYpos = y + listHeight - buttonHeight
         val textXpos = memoryGaugeXpos + 3
 
         // draw background //
@@ -295,7 +322,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, hx - thumbw - gridGap/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, hx - thumbw - gridGap/2 + 2, (full.yEnd + 8).toInt())
     }
 
     override fun hide() {

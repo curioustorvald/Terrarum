@@ -79,8 +79,8 @@ internal class UIStorageChest : UICanvas(
             }
         )
         // make grid mode buttons work together
-        itemListChest.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-        itemListChest.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+        itemListChest.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
+        itemListChest.navRemoCon.gridButtonListener = { _,_ -> setCompact(true) }
 
         itemListPlayer = UIItemInventoryItemGrid(
             this,
@@ -99,8 +99,8 @@ internal class UIStorageChest : UICanvas(
                 itemListUpdate()
             }
         )
-        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+        itemListPlayer.navRemoCon.listButtonListener = { _,_ -> setCompact(false) }
+        itemListPlayer.navRemoCon.gridButtonListener = { _,_ -> setCompact(true) }
 
         handler.allowESCtoClose = true
 
@@ -132,14 +132,14 @@ internal class UIStorageChest : UICanvas(
 
     private fun setCompact(yes: Boolean) {
         itemListChest.isCompactMode = yes
-        itemListChest.gridModeButtons[0].highlighted = !yes
-        itemListChest.gridModeButtons[1].highlighted = yes
+        itemListChest.navRemoCon.gridModeButtons[0].highlighted = !yes
+        itemListChest.navRemoCon.gridModeButtons[1].highlighted = yes
         itemListChest.itemPage = 0
         itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
 
         itemListPlayer.isCompactMode = yes
-        itemListPlayer.gridModeButtons[0].highlighted = !yes
-        itemListPlayer.gridModeButtons[1].highlighted = yes
+        itemListPlayer.navRemoCon.gridModeButtons[0].highlighted = !yes
+        itemListPlayer.navRemoCon.gridModeButtons[1].highlighted = yes
         itemListPlayer.itemPage = 0
         itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
 

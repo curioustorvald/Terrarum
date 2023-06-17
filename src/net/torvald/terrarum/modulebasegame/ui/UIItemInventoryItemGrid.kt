@@ -86,13 +86,18 @@ open class UIItemInventoryItemGrid(
 
     private val inventoryUI = parentUI
 
-    var itemPage = 0
+    var itemPage
         set(value) {
-            field = if (itemPageCount == 0) 0 else (value).fmod(itemPageCount)
+            navRemoCon.itemPage = if (itemPageCount == 0) 0 else (value).fmod(itemPageCount)
             rebuild(currentFilter)
         }
-    var itemPageCount = 1 // TODO total size of current category / items.size
-        protected set
+        get() = navRemoCon.itemPage
+
+    var itemPageCount // TODO total size of current category / items.size
+        protected set(value) {
+            navRemoCon.itemPageCount = value
+        }
+        get() = navRemoCon.itemPageCount
 
     var inventorySortList = ArrayList<InventoryPair>()
     protected var rebuildList = true
@@ -223,50 +228,9 @@ open class UIItemInventoryItemGrid(
         }
 
     private val iconPosX = if (drawScrollOnRightside)
-        posX + width + LIST_TO_CONTROL_GAP
+        posX + width
     else
-        posX - LIST_TO_CONTROL_GAP - catBar.catIcons.tileW
-
-
-    /** Long/compact mode buttons */
-    val gridModeButtons = Array<UIItemImageButton>(2) { index ->
-        UIItemImageButton(
-                parentUI,
-                catBar.catIcons.get(index + 14, 0),
-                backgroundCol = Color(0),
-                activeBackCol = Color(0),
-                highlightBackCol = Color(0),
-                activeBackBlendMode = BlendMode.NORMAL,
-                activeCol = Toolkit.Theme.COL_MOUSE_UP,
-                initialX = iconPosX,
-                initialY = getIconPosY(index),
-                highlightable = true
-        )
-    }
-
-    private val scrollUpButton = UIItemImageButton(
-            parentUI,
-            catBar.catIcons.get(18, 0),
-            backgroundCol = Color(0),
-            activeBackCol = Color(0),
-            activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = Toolkit.Theme.COL_MOUSE_UP,
-            initialX = iconPosX,
-            initialY = getIconPosY(2),
-            highlightable = false
-    )
-
-    private val scrollDownButton = UIItemImageButton(
-            parentUI,
-            catBar.catIcons.get(19, 0),
-            backgroundCol = Color(0),
-            activeBackCol = Color(0),
-            activeBackBlendMode = BlendMode.NORMAL,
-            activeCol = Toolkit.Theme.COL_MOUSE_UP,
-            initialX = iconPosX,
-            initialY = getIconPosY(3),
-            highlightable = false
-    )
+        posX - UIItemListNavBarVertical.LIST_TO_CONTROL_GAP - UIItemListNavBarVertical.WIDTH - 4
 
     fun setCustomHighlightRuleMain(predicate: ((UIItemInventoryCellBase) -> Boolean)?) {
         itemGrid.forEach { it.customHighlightRuleMain = predicate }
@@ -282,63 +246,53 @@ open class UIItemInventoryItemGrid(
         itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)
     }
 
+    val navRemoCon = UIItemListNavBarVertical(parentUI, iconPosX, posY + 8, height, true, if (isCompactMode) 1 else 0)
+
     init {
         // initially highlight grid mode buttons
         if (!hideSidebar) {
-            gridModeButtons[if (isCompactMode) 1 else 0].highlighted = true
-
-
-            gridModeButtons[0].touchDownListener = { _, _, _, _ ->
+            navRemoCon.listButtonListener = { _, _ ->
                 isCompactMode = false
-                gridModeButtons[0].highlighted = true
-                gridModeButtons[1].highlighted = false
-                itemPage = 0
                 rebuild(currentFilter)
             }
-            gridModeButtons[1].touchDownListener = { _, _, _, _ ->
+            navRemoCon.gridButtonListener = { _, _ ->
                 isCompactMode = true
-                gridModeButtons[0].highlighted = false
-                gridModeButtons[1].highlighted = true
-                itemPage = 0
                 rebuild(currentFilter)
             }
-
-            scrollUpButton.clickOnceListener = { _, _, _ ->
-                scrollUpButton.highlighted = false
+            navRemoCon.scrollUpListener = { _, it ->
+                it.highlighted = false
                 scrollItemPage(-1)
             }
-            scrollDownButton.clickOnceListener = { _, _, _ ->
-                scrollDownButton.highlighted = false
+            navRemoCon.scrollDownListener = { _, it ->
+                it.highlighted = false
                 scrollItemPage(1)
             }
-
-            // if (is.mouseUp) handled by this.touchDown()
+            // draw wallet text
+            navRemoCon.extraDrawOpOnBottom = { ui, batch ->
+                if (drawWallet) {
+                    batch.color = Color.WHITE
+                    walletText.forEachIndexed { index, it ->
+                        batch.draw(
+                            walletFont.get(0, it - '0'),
+                            ui.gridModeButtons[0].posX - 1f, // scroll button size: 20px, font width: 20 px
+                            ui.gridModeButtons[0].posY + height - index * walletFont.tileH - 18f
+                        )
+                    }
+                }
+            }
         }
     }
 
 
-    private val upDownButtonGapToDots = 7 // apparent gap may vary depend on the texture itself
+//    private val upDownButtonGapToDots = 7 // apparent gap may vary depend on the texture itself
 
-    private fun getIconPosY(index: Int) =
-        posY + 8 + 26 * index
+//    private fun getIconPosY(index: Int) =
+//        posY + 8 + 26 * index
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
         itemList.forEach { it.posX += posXDelta }
-        if (!hideSidebar) {
-            gridModeButtons.forEach { it.posX += posXDelta }
-            scrollUpButton.posX += posXDelta
-            scrollDownButton.posX += posXDelta
-        }
-
-
-        fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 14 + upDownButtonGapToDots + 10 * i
-
-
-        scrollDownButton.posY = getScrollDotYHeight(itemPageCount) + upDownButtonGapToDots
-
-
         // define each button's highlighted status from the list of forceHighlighted, then render the button
         items.forEach {
             if (useHighlightingManager) it.forceHighlighted = forceHighlightList.contains(it.item?.dynamicID)
@@ -346,41 +300,7 @@ open class UIItemInventoryItemGrid(
         }
 
         if (!hideSidebar) {
-            // draw the tray
-            batch.color = Toolkit.Theme.COL_CELL_FILL
-            Toolkit.fillArea(batch, iconPosX - 4, getIconPosY(0) - 8, 28, height)
-            // cell border
-            batch.color = colourTheme.cellHighlightNormalCol
-            Toolkit.drawBoxBorder(batch, iconPosX - 4, getIconPosY(0) - 8, 28, height)
-
-            gridModeButtons.forEach { it.render(batch, camera) }
-            scrollUpButton.render(batch, camera)
-            scrollDownButton.render(batch, camera)
-
-            // draw scroll dots
-            for (i in 0 until itemPageCount) {
-                val colour = if (i == itemPage) Color.WHITE else Color(0xffffff7f.toInt())
-
-                batch.color = colour
-                batch.draw(
-                        catBar.catIcons.get(if (i == itemPage) 20 else 21, 0),
-                        iconPosX.toFloat(),
-                        getScrollDotYHeight(i).toFloat()
-                )
-            }
-        }
-
-
-        // draw wallet text
-        if (drawWallet) {
-            batch.color = Color.WHITE
-            walletText.forEachIndexed { index, it ->
-                batch.draw(
-                        walletFont.get(0, it - '0'),
-                        gridModeButtons[0].posX - 1f, // scroll button size: 20px, font width: 20 px
-                        gridModeButtons[0].posY + height - index * walletFont.tileH - 18f
-                )
-            }
+            navRemoCon.render(batch, camera)
         }
 
         super.render(batch, camera)
@@ -424,9 +344,7 @@ open class UIItemInventoryItemGrid(
 
 
         if (!hideSidebar) {
-            gridModeButtons.forEach { it.update(delta) }
-            scrollUpButton.update(delta)
-            scrollDownButton.update(delta)
+            navRemoCon.update(delta)
         }
     }
 
@@ -549,9 +467,7 @@ open class UIItemInventoryItemGrid(
 
         items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
         if (!hideSidebar) {
-            gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
-            if (scrollUpButton.mouseUp) scrollUpButton.touchDown(screenX, screenY, pointer, button)
-            if (scrollDownButton.mouseUp) scrollDownButton.touchDown(screenX, screenY, pointer, button)
+            navRemoCon.touchDown(screenX, screenY, pointer, button)
         }
         return true
     }

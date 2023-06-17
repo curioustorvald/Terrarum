@@ -203,8 +203,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         )
 
         // make sure grid buttons for ingredients do nothing (even if they are hidden!)
-        itemListIngredients.gridModeButtons[0].touchDownListener = { _,_,_,_ -> }
-        itemListIngredients.gridModeButtons[1].touchDownListener = { _,_,_,_ -> }
+        itemListIngredients.navRemoCon.listButtonListener = { _,_, -> }
+        itemListIngredients.navRemoCon.gridButtonListener = { _,_, -> }
         itemListIngredients.isCompactMode = true
         itemListIngredients.setCustomHighlightRuleSub {
             it.item?.let { ingredient ->

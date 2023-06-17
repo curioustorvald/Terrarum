@@ -59,12 +59,9 @@ class UIWorldPortal : UICanvas(
     private val SP = "\u3000 "
     val portalListingControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_up"))}${getKeycapPC(App.getConfigInt("control_key_down"))}" +
-                    " ${Lang["MENU_CONTROLS_SCROLL"]}" +
-                    "$SP${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+                    "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "${getKeycapConsole('R')} ${Lang["MENU_CONTROLS_SCROLL"]}" +
-                    "$SP${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" +
+                    "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" +
                     "$SP${App.gamepadLabelLT} ${Lang["GAME_WORLD_SEARCH"]}" +
                     "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
 
