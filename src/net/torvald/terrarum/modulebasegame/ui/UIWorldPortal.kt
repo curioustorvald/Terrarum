@@ -67,9 +67,9 @@ class UIWorldPortal : UICanvas(
                     "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
 
 
-    private val transitionalSearch = UIWorldPortalSearch(this)
-    private val transitionalListing = UIWorldPortalListing(this)
-    private val transitionalCargo = UIWorldPortalCargo(this)
+    val transitionalSearch = UIWorldPortalSearch(this)
+    val transitionalListing = UIWorldPortalListing(this)
+    val transitionalCargo = UIWorldPortalCargo(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         (width - internalWidth) / 2,

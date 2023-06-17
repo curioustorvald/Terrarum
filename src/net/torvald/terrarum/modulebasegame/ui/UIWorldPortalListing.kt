@@ -100,7 +100,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
     }
 
-    private val navRemoCon = UIItemListNavBarVertical(full, hx + 6 + UIItemWorldCellsSimple.width, y + 7, listHeight, false)
+    private val navRemoCon = UIItemListNavBarVertical(full, hx + 6 + UIItemWorldCellsSimple.width, y + 7, listHeight + 2, false)
 
     private val worldList = ArrayList<WorldInfo>()
     data class WorldInfo(

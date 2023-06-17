@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_WEIGHT
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UIWorldPortal
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -14,9 +15,14 @@ class FixtureWorldPortal : FixtureBase {
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 5, 2),
         nameFun = { Lang["ITEM_WORLD_PORTAL"] },
-            mainUI = UIWorldPortal()
+        mainUI = UIWorldPortal(),
+        inventory = FixtureInventory(200, CAPACITY_MODE_WEIGHT)
     ) {
         // TODO do something with (mainUI as UIWorldPortal).***
+        (mainUI as UIWorldPortal).let { ui ->
+            ui.transitionalCargo.chestInventory = this.inventory!!
+            ui.transitionalCargo.chestNameFun = this.nameFun
+        }
     }
 
 
