@@ -201,7 +201,9 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         // todo show "Keyboard"/"Gamepad" accordingly
         batch.color = Color.WHITE
         val title = Lang["MENU_CONTROLS_KEYBOARD"]
-        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+        App.fontUITitle.draw(batch, title, drawX.toFloat() + (width - App.fontUITitle.getWidth(title)) / 2, drawY.toFloat())
+
+
 
         val desc = Lang["MENU_LABEL_KEYCONFIG_HELP1"]
         App.fontGame.draw(batch, desc, drawX.toFloat() + (width - App.fontGame.getWidth(desc)) / 2, drawY + 360f)

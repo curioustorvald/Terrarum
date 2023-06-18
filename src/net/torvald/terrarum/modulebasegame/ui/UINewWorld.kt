@@ -131,7 +131,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         batch.color = Color.WHITE
         // ui title
 //        val titlestr = Lang["CONTEXT_WORLD_NEW"]
-//        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontGame.getWidth(titlestr)).div(2).toFloat(), titleTextPosY.toFloat())
+//        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), titleTextPosY.toFloat())
 
         // draw size previews
         val texture = tex[sizeSelector.selection.coerceAtMost(tex.lastIndex)]

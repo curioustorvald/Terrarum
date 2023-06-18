@@ -16,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VDFileID
 import net.torvald.terrarum.savegame.VirtualDisk
@@ -52,8 +53,6 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val inputX = width - inputWidth
 
     private val sizeSelY = 186 + 40
-
-    internal val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
 
     private val sizeSelector = UIItemInlineRadioButtons(this,
         drawX + radioX, drawY + sizeSelY, radioCellWidth,
@@ -149,8 +148,8 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
         batch.color = Color.WHITE
         // ui title
-//        val titlestr = Lang["CONTEXT_WORLD_NEW"]
-//        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontGame.getWidth(titlestr)).div(2).toFloat(), titleTextPosY.toFloat())
+        val titlestr = Lang["CONTEXT_WORLD_SEARCH"]
+        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), INVENTORY_CELLS_OFFSET_Y() - 72f)
 
         // draw size previews
         val texture = tex[sizeSelector.selection.coerceAtMost(tex.lastIndex)]

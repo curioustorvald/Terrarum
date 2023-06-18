@@ -557,7 +557,7 @@ public class App implements ApplicationListener {
                 false,
                 64, false, 0.5f, false
         );
-        fontUITitle.setInterchar(2);
+        fontUITitle.setInterchar(1);
         fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
                 false,
                 64, false, 203f/255f, false

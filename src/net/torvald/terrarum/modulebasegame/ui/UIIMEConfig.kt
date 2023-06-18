@@ -180,7 +180,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         // todo show "Keyboard"/"Gamepad" accordingly
         val title = Lang["MENU_CONTROLS_KEYBOARD"]
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, title, drawX.toFloat() + (width - App.fontGame.getWidth(title)) / 2, drawY.toFloat())
+        App.fontUITitle.draw(batch, title, drawX.toFloat() + (width - App.fontUITitle.getWidth(title)) / 2, drawY.toFloat())
 
 
         // button help for string input UI

@@ -167,8 +167,11 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
         options.forEachIndexed { index, strings ->
             val mode = strings[2]
+
+            val font = if (mode == "h1") App.fontUITitle else App.fontGame
+
             val label = (strings[1] as () -> String).invoke()
-            val labelWidth = App.fontGame.getWidth(label)
+            val labelWidth = font.getWidth(label)
             batch.color = when (mode) {
                 "h1" -> Toolkit.Theme.COL_MOUSE_UP
                 "p" -> Color.LIGHT_GRAY
@@ -180,7 +183,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             else
                 drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
 
-            App.fontGame.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index] - 2f)
+            font.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index] - 2f)
 
             // draw hrule
             if (mode == "h1") {

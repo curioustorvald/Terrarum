@@ -192,7 +192,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
             // draw texts
             val loadGameTitleStr = Lang["MENU_MODULES"]// + "$EMDASH$hash"
             // "Game Load"
-            App.fontUITitle.draw(batch, loadGameTitleStr, (width - App.fontGame.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
+            App.fontUITitle.draw(batch, loadGameTitleStr, (width - App.fontUITitle.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
             // Control help
             App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
         }
