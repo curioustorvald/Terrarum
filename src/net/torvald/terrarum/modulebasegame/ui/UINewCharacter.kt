@@ -47,7 +47,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
     private var uiLocked = false
 
     init {
-        goButton.touchDownListener = { _, _, _, _ ->
+        goButton.clickOnceListener = { _,_ ->
             uiLocked = true
 
 
@@ -83,7 +83,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
             }, "TerrarumBasegameNewCharcterSaveThread")
             savingThread.start()
         }
-        backButton.touchDownListener = { _, _, _, _ ->
+        backButton.clickOnceListener = { _,_ ->
             remoCon.openUI(UILoadDemoSavefiles(remoCon, 0))
         }
 

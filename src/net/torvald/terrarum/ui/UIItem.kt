@@ -110,6 +110,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open var keyTypedListener: ((Char) -> Unit)? = null
     open var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
     /** Parameters: screenX, screenY, pointer, button */
+    @Deprecated("Not really deprecated but you MOST DEFINITELY want to use clickOnceListener(mouseX, mouseY) instead.")
     open var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
     open var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
     /** Parameters: amountX, amountY */
@@ -146,14 +147,14 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                 mouseOverCall?.update(delta)
 
                 if (mouseUp) {
-                    if (mouseOverCall?.isVisible ?: false) {
+                    if (mouseOverCall?.isVisible == true) {
                         mouseOverCall?.setAsOpen()
                     }
 
                     mouseOverCall?.updateUI(delta)
                 }
                 else {
-                    if (mouseOverCall?.isVisible ?: false) {
+                    if (mouseOverCall?.isVisible == true) {
                         mouseOverCall?.setAsClose()
                     }
                 }

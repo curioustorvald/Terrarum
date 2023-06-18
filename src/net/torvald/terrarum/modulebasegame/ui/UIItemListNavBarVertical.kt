@@ -151,6 +151,8 @@ class UIItemListNavBarVertical(
         extraDrawOpOnBottom(this, batch)
 
         super.render(batch, camera)
+
+        oldPosX = posX
     }
 
     override fun update(delta: Float) {

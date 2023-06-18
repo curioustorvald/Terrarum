@@ -86,7 +86,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val goButton = UIItemTextButton(this, "MENU_LABEL_CONFIRM_BUTTON", drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
     init {
-        goButton.touchDownListener = { _, _, _, _ ->
+        goButton.clickOnceListener = { _, _ ->
 //            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
@@ -111,7 +111,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             App.setLoadScreen(loadScreen)
 
         }
-        backButton.touchDownListener = { _, _, _, _ ->
+        backButton.clickOnceListener = { _, _ ->
             remoCon.openUI(UILoadDemoSavefiles(remoCon, 1))
         }
 

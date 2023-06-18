@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_CORRECTION
@@ -135,6 +136,57 @@ class UIWorldPortal : UICanvas(
         INGAME.setTooltipMessage(null) // required!
     }
 
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        super.inputStrobed(e)
+        transitionPanel.uis.forEach { it.inputStrobed(e) }
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        super.touchDragged(screenX, screenY, pointer)
+        transitionPanel.uis.forEach { it.touchDragged(screenX, screenY, pointer) }
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchDown(screenX, screenY, pointer, button)
+        transitionPanel.uis.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchUp(screenX, screenY, pointer, button)
+        transitionPanel.uis.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        super.scrolled(amountX, amountY)
+        transitionPanel.uis.forEach { it.scrolled(amountX, amountY) }
+        return true
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        super.keyDown(keycode)
+        transitionPanel.uis.forEach { it.keyDown(keycode) }
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        super.keyUp(keycode)
+        transitionPanel.uis.forEach { it.keyUp(keycode) }
+        return true
+    }
+
+    override fun keyTyped(character: Char): Boolean {
+        super.keyTyped(character)
+        transitionPanel.uis.forEach { it.keyTyped(character) }
+        return true
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        transitionPanel.uis.forEach { it.resize(width, height) }
+    }
 }
 
 class UIItemWorldPortalTopBar(

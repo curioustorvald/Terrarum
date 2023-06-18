@@ -252,8 +252,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 } } }
         )
         // make grid mode buttons work together
-//        itemListPlayer.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-//        itemListPlayer.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+//        itemListPlayer.gridModeButtons[0].clickOnceListener = { _,_ -> setCompact(false) }
+//        itemListPlayer.gridModeButtons[1].clickOnceListener = { _,_ -> setCompact(true) }
 
 
 
@@ -317,7 +317,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         }
 
 
-        buttonCraft.touchDownListener = { _,_,_,_ ->
+        buttonCraft.clickOnceListener = { _,_ ->
             getPlayerInventory().let { player -> recipeClicked?.let { recipe ->
                 // check if player has enough amount of ingredients
                 val itemCraftable = itemListIngredients.getInventory().itemList.all { (itm, qty) ->
@@ -340,8 +340,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             refreshCraftButtonStatus()
         }
         // make grid mode buttons work together
-//        itemListCraftable.gridModeButtons[0].touchDownListener = { _,_,_,_ -> setCompact(false) }
-//        itemListCraftable.gridModeButtons[1].touchDownListener = { _,_,_,_ -> setCompact(true) }
+//        itemListCraftable.gridModeButtons[0].clickOnceListener = { _,_ -> setCompact(false) }
+//        itemListCraftable.gridModeButtons[1].clickOnceListener = { _,_ -> setCompact(true) }
 
         handler.allowESCtoClose = true
 

@@ -121,9 +121,9 @@ class UIItemTextLineInput(
     private var currentPlaceholderText = ArrayList<Int>(placeholder().toCodePoints()) // the placeholder text may change every time you call it
 
 
-    private val btn1PosX = posX
-    private val btn2PosX = posX + width - WIDTH_ONEBUTTON
-    private val inputPosX = posX + WIDTH_ONEBUTTON + 3
+    private val btn1PosX; get() = posX
+    private val btn2PosX; get() = posX + width - WIDTH_ONEBUTTON
+    private val inputPosX; get() = posX + WIDTH_ONEBUTTON + 3
 
     var mouseoverUpdateLatch = true // keep it true by default!
         set(value) {
@@ -240,6 +240,13 @@ class UIItemTextLineInput(
             moveCursorBack(oldTextLenPx - currentTextLenPx)
             oldTextLenPx = currentTextLenPx
         }
+    }
+
+    /**
+     * Only makes sense when the placeholder returns randomised texts
+     */
+    fun refreshPlaceholder() {
+        currentPlaceholderText = ArrayList<Int>(placeholder().toCodePoints())
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
@@ -496,6 +503,8 @@ class UIItemTextLineInput(
     private var textDrawOffset = 0
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+        val posXDelta = posX - oldPosX
+
 
         val ime = getIME(true)
 
@@ -646,6 +655,9 @@ class UIItemTextLineInput(
 
         batch.color = Color.WHITE
         super.render(batch, camera)
+
+
+        oldPosX = posX
     }
 
     fun getText() = textbufToString()

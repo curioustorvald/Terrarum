@@ -128,9 +128,15 @@ abstract class UICanvas(
 
 
     /** A function that is run ONCE when the UI is requested to be opened; will work identical to [endOpening] if [openCloseTime] is zero */
-    open fun show() {}
+    open fun show() {
+        uiItems.forEach { it.show() }
+        handler.subUIs.forEach { it.show() }
+    }
     /** A function that is run ONCE when the UI is requested to be closed; will work identical to [endClosing] if [openCloseTime] is zero */
-    open fun hide() {}
+    open fun hide() {
+        uiItems.forEach { it.hide() }
+        handler.subUIs.forEach { it.hide() }
+    }
 
 
     /** **DO NOT CALL THIS FUNCTION FOR THE ACTUAL UPDATING OF THE UI — USE update() INSTEAD**
