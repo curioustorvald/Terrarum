@@ -39,10 +39,12 @@ class SimpleGameWorld : GameWorld() {
     override lateinit var layerTerrain: BlockLayer
 }
 
-open class GameWorld() : Disposable {
+open class GameWorld(
+    val worldIndex: UUID // should not be immutable as JSON loader will want to overwrite it
+) : Disposable {
 
-//    var worldName: String = "New World"
-    var worldIndex: UUID = UUID.randomUUID() // should not be immutable as JSON loader will want to overwrite it
+    constructor() : this(UUID.randomUUID())
+
     var worldCreator: UUID = UUID(0L,0L) // TODO record a value to this
     var width: Int = 999; private set
     var height: Int = 999; private set

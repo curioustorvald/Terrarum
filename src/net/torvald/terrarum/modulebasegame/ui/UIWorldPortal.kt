@@ -208,7 +208,7 @@ class UIItemWorldPortalTopBar(
 
     private val genericIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
-    private val catIconImages = listOf(
+    /*private val catIconImages = listOf(
         icons.get(0, 0),
         genericIcons.get(16,0),
         icons.get(1, 0),
@@ -221,7 +221,7 @@ class UIItemWorldPortalTopBar(
         "CONTEXT_WORLD_LIST",
         "",
         "GAME_INVENTORY",
-    )
+    )*/
     private val buttonGapSize = 120
     private val highlighterYPos = icons.tileH + 4
 
@@ -233,7 +233,7 @@ class UIItemWorldPortalTopBar(
 
     private var transitionFired = false
 
-    private val buttons = Array<UIItemImageButton>(5) {
+    /*private val buttons = Array<UIItemImageButton>(5) {
         val xoff = if (it == 1) -32 else if (it == 3) 32 else 0
         UIItemImageButton(
             parentUI,
@@ -250,13 +250,13 @@ class UIItemWorldPortalTopBar(
         )
     }
 
-    private val workingButtons = arrayOf(0,2,4)
+    private val workingButtons = arrayOf(0,2,4)*/
 
     override fun update(delta: Float) {
         super.update(delta)
 
 
-        workingButtons.forEach { buttons[it].update(delta) }
+        /*workingButtons.forEach { buttons[it].update(delta) }
 
         // transition stuffs
         workingButtons.filter { buttons[it].mousePushed }.firstOrNull()?.let { pushedButton ->
@@ -266,7 +266,7 @@ class UIItemWorldPortalTopBar(
             workingButtons.forEach {  i ->
                 buttons[i].highlighted = i == pushedButton
             }
-        }
+        }*/
 
         if (transitionFired) {
             transitionFired = false
@@ -278,13 +278,13 @@ class UIItemWorldPortalTopBar(
         super.render(batch, camera)
 
         // button
-        buttons.forEach { it.render(batch, camera) }
+        /*buttons.forEach { it.render(batch, camera) }
 
         // label
         batch.color = Color.WHITE
         val text = Lang[catIconLabels[selectedPanel]]
         App.fontGame.draw(batch, text, buttons[selectedPanel].posX + 10 - (App.fontGame.getWidth(text) / 2), posY + highlighterYPos + 4)
-
+        */
 
         blendNormalStraightAlpha(batch)
 

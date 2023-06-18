@@ -32,6 +32,13 @@ import java.util.zip.GZIPInputStream
 import kotlin.math.ceil
 
 /**
+ *
+ * "Teleport" button sets the destination and makes the portal surface to 'glow' to indicate the teleportation is ready.
+ * Teleportation is initiated with a rising edge of a logic signal.
+ *
+ * "New World" sets the parameter of the new world, and make the new (not yet generated) world as the teleportation target.
+ * THe world generation will be done when the "teleportation" is on going.
+ *
  * Created by minjaesong on 2023-05-19.
  */
 class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
@@ -59,7 +66,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val buttonsY = y + listHeight + gridGap
 
     private val buttonSearch = UIItemTextButton(this,
-        "CONTEXT_WORLD_SEARCH",
+        "CONTEXT_WORLD_NEW",
         hx - gridGap/2 - 2*deleteButtonWidth - gridGap,
         buttonsY,
         deleteButtonWidth,
@@ -116,10 +123,21 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
     }
 
-    private fun highlightListEditButtons(state: Boolean) {
-        buttonRename.isActive = state
-        buttonDelete.isActive = state
-        buttonTeleport.isActive = state
+    private fun disableListEditButtons() {
+        buttonRename.isActive = false
+        buttonDelete.isActive = false
+        buttonTeleport.isActive = false
+    }
+
+    private fun highlightListEditButtons(info: WorldInfo?) {
+        // will disable the delete and teleport button if the world is equal to the currently playing world
+
+        if (info == null) disableListEditButtons()
+        else {
+            buttonRename.isActive = true
+            buttonDelete.isActive = info.uuid != INGAME.world.worldIndex
+            buttonTeleport.isActive = info.uuid != INGAME.world.worldIndex
+        }
     }
 
     init {
@@ -220,7 +238,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 button.clickOnceListener = { _, _ ->
                     selected = button
                     selectedIndex = it
-                    highlightListEditButtons(it in worldList.indices)
+                    highlightListEditButtons(worldList.getOrNull(it))
                     updateUIbyButtonSelection()
                 }
             }
@@ -238,7 +256,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         worldCells.forEach { it.show() }
         selected = null
 
-        highlightListEditButtons(false)
+        disableListEditButtons()
         updateUIbyButtonSelection()
     }
 

@@ -148,7 +148,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
         batch.color = Color.WHITE
         // ui title
-        val titlestr = Lang["CONTEXT_WORLD_SEARCH"]
+        val titlestr = Lang["CONTEXT_WORLD_NEW"]
         App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), INVENTORY_CELLS_OFFSET_Y() - 72f)
 
         // draw size previews
