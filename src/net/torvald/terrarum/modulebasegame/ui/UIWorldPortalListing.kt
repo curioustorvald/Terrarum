@@ -66,7 +66,11 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
-    )
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            full.requestTransition(1)
+        }
+    }
     private val buttonTeleport = UIItemTextButton(this,
         "GAME_ACTION_TELEPORT",
         hx - gridGap/2 - deleteButtonWidth,

@@ -48,7 +48,7 @@ class UIWorldPortal : UICanvas(
                     "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
 
 
-//    val transitionalSearch = UIWorldPortalSearch(this)
+    val transitionalSearch = UIWorldPortalSearch(this)
     val transitionalListing = UIWorldPortalListing(this)
 //    val transitionalCargo = UIWorldPortalCargo(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
@@ -58,8 +58,15 @@ class UIWorldPortal : UICanvas(
         width,
         App.scr.height,
         0f,
-         transitionalListing
+         transitionalListing, transitionalSearch
     )
+
+    /**
+     * Called by:
+     * - "Search" button on UIWorldPortalListing
+     * - "Cancel" button on UIWorldPortalSearch
+     */
+    fun requestTransition(target: Int) = transitionPanel.requestTransition(target)
 
     init {
         addUIitem(transitionPanel)
@@ -87,6 +94,7 @@ class UIWorldPortal : UICanvas(
 
     override fun show() {
         super.show()
+        transitionPanel.forcePosition(0)
         transitionPanel.show()
         INGAME.setTooltipMessage(null)
     }
@@ -99,13 +107,8 @@ class UIWorldPortal : UICanvas(
         transitionPanel.dispose()
     }
 
-    fun resetUI() {
-
-    }
-
     override fun doOpening(delta: Float) {
         super.doOpening(delta)
-        resetUI()
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         INGAME.pause()
         INGAME.setTooltipMessage(null)
@@ -127,7 +130,6 @@ class UIWorldPortal : UICanvas(
 
     override fun endClosing(delta: Float) {
         super.endClosing(delta)
-        resetUI()
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!

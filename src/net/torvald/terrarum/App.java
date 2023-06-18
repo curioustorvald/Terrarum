@@ -242,7 +242,7 @@ public class App implements ApplicationListener {
     public static AudioDevice audioDevice;
 
     public static FlippingSpriteBatch batch;
-    public static ShapeRenderer shapeRender;
+//    public static ShapeRenderer shapeRender;
 
     private static com.badlogic.gdx.graphics.Color gradWhiteTop = new com.badlogic.gdx.graphics.Color(0xf8f8f8ff);
     private static com.badlogic.gdx.graphics.Color gradWhiteBottom = new com.badlogic.gdx.graphics.Color(0xd8d8d8ff);
@@ -446,7 +446,7 @@ public class App implements ApplicationListener {
         camera = new OrthographicCamera((scr.getWf()), (scr.getHf()));
 
         batch = new FlippingSpriteBatch();
-        shapeRender = makeShapeRenderer();
+//        shapeRender = makeShapeRenderer();
 
         initViewPort(scr.getWidth(), scr.getHeight());
 
@@ -855,7 +855,7 @@ public class App implements ApplicationListener {
         fullscreenQuad.dispose();
         logoBatch.dispose();
         batch.dispose();
-        shapeRender.dispose();
+//        shapeRender.dispose();
 
         fontGame.dispose();
         fontGameFBO.dispose();

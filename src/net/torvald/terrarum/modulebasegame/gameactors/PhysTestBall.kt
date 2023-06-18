@@ -25,7 +25,7 @@ class PhysTestBall : ActorWithBody(RenderOrder.MIDDLE, PhysProperties.PHYSICS_OB
     }
 
     override fun drawBody(batch: SpriteBatch) {
-        Terrarum.inShapeRenderer {
+        /*Terrarum.inShapeRenderer {
             it.color = color
             it.circle(
                     hitbox.startX.toFloat() - 1f,
@@ -44,7 +44,7 @@ class PhysTestBall : ActorWithBody(RenderOrder.MIDDLE, PhysProperties.PHYSICS_OB
                     hitbox.startY.toFloat() - 1f,
                     hitbox.width.toFloat()
             )
-        }
+        }*/
 
         //println(moveDelta)
     }

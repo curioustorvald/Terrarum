@@ -62,11 +62,11 @@ object Terrarum : Disposable {
      */
     const val PLAYER_REF_ID: Int = 0x91A7E2
 
-    inline fun inShapeRenderer(shapeRendererType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, action: (ShapeRenderer) -> Unit) {
+    /*inline fun inShapeRenderer(shapeRendererType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, action: (ShapeRenderer) -> Unit) {
         shapeRender.begin(shapeRendererType)
         action(shapeRender)
         shapeRender.end()
-    }
+    }*/
 
 
     var blockCodex = BlockCodex(); internal set

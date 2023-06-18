@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.*
 
 /**
@@ -31,8 +32,20 @@ class UIInventoryFull(
     override var height: Int = App.scr.height
 
     companion object {
-        private var shapeRenderer: ShapeRenderer? = null
+//        private var shapeRenderer: ShapeRenderer? = null
 
+        private val backDropsLoaded = Array<Boolean>(16) { false }
+        private val backdrop01: TextureRegionPack
+            get() {
+                if (!backDropsLoaded[0]) {
+                    CommonResourcePool.addToLoadingList("basegame.uibackdrop01") {
+                        TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/backdrop01.tga"), 2, 140)
+                    }
+                    CommonResourcePool.loadAll()
+                    backDropsLoaded[0] = true
+                }
+                return CommonResourcePool.getAsTextureRegionPack("basegame.uibackdrop01")
+            }
 
         val CELL_COL = Toolkit.Theme.COL_CELL_FILL
 
@@ -73,8 +86,8 @@ class UIInventoryFull(
         private val gend = Color(gradEndCol)
 
         fun drawBackground(batch: SpriteBatch, opacity: Float) {
-            batch.end()
             gdxBlendNormalStraightAlpha()
+            /*batch.end()
 
             if (shapeRenderer == null) {
                 shapeRenderer = App.makeShapeRenderer()
@@ -104,7 +117,22 @@ class UIInventoryFull(
                 it.rect(0f, h, w, -(h - gradBottomEnd), gsta, gsta, gsta, gsta)
             }
 
-            batch.begin()
+            batch.begin()*/
+            batch.color = Color.WHITE
+            val w = App.scr.wf
+            val h = App.scr.hf
+            val gradTopStart = (-YPOS_CORRECTION + (App.scr.height - internalHeight).div(2).toFloat()) * App.scr.magn
+
+            val hTop = gradTopStart
+            val hTopRem = hTop - 64f
+
+            val hMid = h - 2 * (hTopRem + 140f)
+            batch.draw(backdrop01.get(0, 0), 0f, 0f, w, hTopRem)
+            batch.draw(backdrop01.get(0, 1), 0f, hTopRem, w, 140f)
+            batch.draw(backdrop01.get(0, 2), 0f, hTopRem + 140f, w, hMid)
+            batch.draw(backdrop01.get(0, 3), 0f, hTopRem + 140f + hMid, w, 140f)
+            batch.draw(backdrop01.get(0, 4), 0f, hTopRem + 280f + hMid, w, hTopRem)
+
         }
     }
 

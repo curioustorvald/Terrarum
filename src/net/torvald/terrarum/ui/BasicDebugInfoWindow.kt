@@ -377,7 +377,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         blendNormalStraightAlpha(batch)
 
-        batch.end()
+        /*batch.end()
         gdxBlendNormalStraightAlpha()
         Terrarum.inShapeRenderer {
             it.color = uiColour
@@ -388,7 +388,7 @@ class BasicDebugInfoWindow : UICanvas() {
             it.line(uiX + halfW, App.scr.height - (uiY + halfH), uiX + halfW + pointDX, App.scr.height - (uiY + halfH + pointDY))
             it.color = Color.GRAY
         }
-        batch.begin()
+        batch.begin()*/
 
         App.fontSmallNumbers.draw(batch, gamepad.getName(), Toolkit.drawWidth - (gamepad.getName().length + 2f) * TinyAlphNum.W, uiY.toFloat() + h + 2)
 
