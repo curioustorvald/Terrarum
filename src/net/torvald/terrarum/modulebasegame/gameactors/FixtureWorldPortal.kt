@@ -6,11 +6,19 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UIWorldPortal
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.dyn4j.geometry.Vector2
+import java.util.HashMap
 
 /**
  * Created by minjaesong on 2023-05-28.
  */
-class FixtureWorldPortal : FixtureBase {
+class FixtureWorldPortal : FixtureBase, Electric {
+
+    @Transient override val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
+    @Transient override val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
+    @Transient override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
+    @Transient override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
+
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 5, 2),
@@ -36,6 +44,20 @@ class FixtureWorldPortal : FixtureBase {
         }
 
         actorValue[AVKey.BASEMASS] = FixtureLogicSignalEmitter.MASS
+
+        setWireSinkAt(2, 1, "digital_bit")
+    }
+
+    override fun update(delta: Float) {
+        super.update(delta)
+    }
+
+    override fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
+        println("[FixtureWorldPortal] updateOnWireGraphTraversal! ($offsetX, $offsetY, $sinkType)")
+    }
+
+    override fun onRisingEdge(readFrom: BlockBoxIndex) {
+        println("[FixtureWorldPortal] teleport! ($readFrom)")
     }
 
     override fun reload() {
@@ -43,4 +65,5 @@ class FixtureWorldPortal : FixtureBase {
 
         // TODO do something with (mainUI as UIWorldPortal).***
     }
+
 }

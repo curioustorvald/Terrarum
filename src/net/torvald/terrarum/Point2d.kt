@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import net.torvald.random.XXHash32
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -114,6 +115,10 @@ class Point2i() {
 
         return this
     }
+
+    override fun hashCode(): Int = XXHash32.hashGeoCoord(x, y)
+
+    override fun toString() = "Point2i($x, $y)"
 
     operator fun component1() = x
     operator fun component2() = y

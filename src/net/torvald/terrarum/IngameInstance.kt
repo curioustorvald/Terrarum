@@ -7,6 +7,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
 import net.torvald.terrarum.gameactors.BlockMarkerActor
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
@@ -49,8 +50,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
         override fun getMax(axis: Int, t: ActorWithBody): Double =
                 when (axis) {
-                    0 -> t.hitbox.endX
-                    1 -> t.hitbox.endY
+                    0 -> t.hitbox.endX - PHYS_EPSILON_DIST
+                    1 -> t.hitbox.endY - PHYS_EPSILON_DIST
                     else -> throw IllegalArgumentException("nonexistent axis $axis for ${dimensions}-dimensional object")
                 }
     }
@@ -449,7 +450,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
         val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
 
-        minOf(dist1, minOf(dist2, dist3))
+        minOf(dist1, dist2, dist3)
     }
 
     /**
@@ -467,7 +468,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     fun getActorsAt(worldX: Double, worldY: Double): List<ActorWithBody> {
         val outList = ArrayList<ActorWithBody>()
         try {
-            actorsRTree.find(worldX, worldY, worldX + 1.0, worldY + 1.0, outList)
+            actorsRTree.find(worldX, worldY, worldX, worldY, outList)
         }
         catch (e: NullPointerException) {}
         return outList

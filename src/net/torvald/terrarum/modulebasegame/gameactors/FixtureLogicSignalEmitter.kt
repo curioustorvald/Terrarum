@@ -1,9 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
@@ -13,9 +9,10 @@ import org.dyn4j.geometry.Vector2
 
 class FixtureLogicSignalEmitter : FixtureBase, Electric {
 
-    override val wireEmitterTypes: HashMap<String, BlockBoxIndex> = HashMap()
-    override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
-    override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
+    @Transient override val wireEmitterTypes: java.util.HashMap<BlockBoxIndex, WireEmissionType> = java.util.HashMap()
+    @Transient override val wireSinkTypes: java.util.HashMap<BlockBoxIndex, WireEmissionType> = java.util.HashMap()
+    @Transient override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
+    @Transient override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
 
 
     constructor() : super(
@@ -34,12 +31,13 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
         }
 
         actorValue[AVKey.BASEMASS] = MASS
+        
+        setWireEmitterAt(0, 0, "digital_bit")
+        setWireEmissionAt(0, 0, Vector2(1.0, 0.0))
     }
 
     override fun update(delta: Float) {
         // the values does not get preserved on save reload??
-        wireEmitterTypes["digital_bit"] = 0
-        wireEmission[0] = Vector2(1.0, 0.0)
 
         super.update(delta)
     }

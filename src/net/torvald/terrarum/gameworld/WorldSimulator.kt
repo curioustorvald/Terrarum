@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -476,6 +477,7 @@ object WorldSimulator {
     private val wireSimMarked = HashSet<Long>()
     private val wireSimPoints = Queue<WireGraphCursor>()
     private val oldTraversedNodes = ArrayList<WireGraphCursor>()
+    private val fixtureCache = HashMap<Point2i, Pair<FixtureBase, WireEmissionType>>() // also instance of Electric
 
     private fun simulateWires(delta: Float) {
         // unset old wires before we begin
@@ -484,11 +486,12 @@ object WorldSimulator {
         }
 
         oldTraversedNodes.clear()
+        fixtureCache.clear()
 
         wiresimGetSourceBlocks().let { sources ->
             // signal-emitting fixtures must set emitState of its own tiles via update()
             sources.forEach {
-                (it as Electric).wireEmitterTypes.forEach { wireType, bbi ->
+                (it as Electric).wireEmitterTypes.forEach { bbi, wireType ->
 
                     val startingPoint = it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi)
                     val signal = (it as Electric).wireEmission[bbi] ?: Vector2(0.0, 0.0)
@@ -505,6 +508,8 @@ object WorldSimulator {
     }
 
     private fun traverseWireGraph(world: GameWorld, wire: ItemID, startingPoint: WireGraphCursor, signal: Vector2) {
+
+        val emissionType = WireCodex[wire].accepts
 
         fun getAdjacent(cnx: Int, point: WireGraphCursor): List<WireGraphCursor> {
             val r = ArrayList<WireGraphCursor>()
@@ -540,6 +545,29 @@ object WorldSimulator {
                         enq(x)
                     }
                 }
+
+                // do something with the power receiver
+                val tilePoint = Point2i(point.x, point.y)
+                var fixture = fixtureCache[tilePoint]
+                var tileOffsetFromFixture: Point2i? = null
+                if (fixture == null) {
+                    INGAME.getActorsAt(point.x * TILE_SIZED, point.y * TILE_SIZED).filterIsInstance<Electric>().firstOrNull().let { found ->
+                        if (found != null) {
+                            val foundFixture = (found as FixtureBase)
+                            // get offset from the fixture's origin
+                            tileOffsetFromFixture = foundFixture.intTilewiseHitbox.let { Point2i(it.startX.toInt(), it.startY.toInt()) } - tilePoint
+
+//                            println("$tilePoint; ${found.javaClass.canonicalName}, $tileOffsetFromFixture, ${found.getWireSinkAt(tileOffsetFromFixture!!)}")
+
+                            if (found.getWireSinkAt(tileOffsetFromFixture!!) == emissionType) {
+                                fixtureCache[tilePoint] = foundFixture to emissionType
+                                fixture = foundFixture to emissionType
+                            }
+                        }
+                    }
+                }
+                (fixture?.first as? Electric)?.updateOnWireGraphTraversal(tileOffsetFromFixture!!.x, tileOffsetFromFixture!!.y, fixture!!.second)
+
             }
         }
     }
