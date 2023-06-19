@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_WEIGHT
@@ -12,13 +14,7 @@ import java.util.HashMap
 /**
  * Created by minjaesong on 2023-05-28.
  */
-class FixtureWorldPortal : FixtureBase, Electric {
-
-    @Transient override val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
-    @Transient override val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
-    @Transient override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
-    @Transient override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
-
+class FixtureWorldPortal : Electric {
 
     constructor() : super(
         BlockBox(BlockBox.NO_COLLISION, 5, 2),
@@ -46,14 +42,6 @@ class FixtureWorldPortal : FixtureBase, Electric {
         actorValue[AVKey.BASEMASS] = FixtureLogicSignalEmitter.MASS
 
         setWireSinkAt(2, 1, "digital_bit")
-    }
-
-    override fun update(delta: Float) {
-        super.update(delta)
-    }
-
-    override fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
-        println("[FixtureWorldPortal] updateOnWireGraphTraversal! ($offsetX, $offsetY, $sinkType)")
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {

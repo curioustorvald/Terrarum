@@ -469,15 +469,15 @@ object WorldSimulator {
     /**
      * @return List of FixtureBases, safe to cast into Electric
      */
-    private fun wiresimGetSourceBlocks(): List<FixtureBase> =
-            INGAME.actorContainerActive.filterIsInstance<FixtureBase>().filter {
-                it is Electric && it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
+    private fun wiresimGetSourceBlocks(): List<Electric> =
+            INGAME.actorContainerActive.filterIsInstance<Electric>().filter {
+                it.inUpdateRange(world) && it.wireEmitterTypes.isNotEmpty()
             }
 
     private val wireSimMarked = HashSet<Long>()
     private val wireSimPoints = Queue<WireGraphCursor>()
     private val oldTraversedNodes = ArrayList<WireGraphCursor>()
-    private val fixtureCache = HashMap<Point2i, Pair<FixtureBase, WireEmissionType>>() // also instance of Electric
+    private val fixtureCache = HashMap<Point2i, Pair<Electric, WireEmissionType>>() // also instance of Electric
 
     private fun simulateWires(delta: Float) {
         // unset old wires before we begin
@@ -491,10 +491,10 @@ object WorldSimulator {
         wiresimGetSourceBlocks().let { sources ->
             // signal-emitting fixtures must set emitState of its own tiles via update()
             sources.forEach {
-                (it as Electric).wireEmitterTypes.forEach { bbi, wireType ->
+                it.wireEmitterTypes.forEach { bbi, wireType ->
 
                     val startingPoint = it.worldBlockPos!! + it.blockBoxIndexToPoint2i(bbi)
-                    val signal = (it as Electric).wireEmission[bbi] ?: Vector2(0.0, 0.0)
+                    val signal = it.wireEmission[bbi] ?: Vector2(0.0, 0.0)
 
                     world.getAllWiringGraph(startingPoint.x, startingPoint.y)?.keys?.filter { WireCodex[it].accepts == wireType }?.forEach { wire ->
                         val simStartingPoint = WireGraphCursor(startingPoint, wire)
@@ -553,20 +553,19 @@ object WorldSimulator {
                 if (fixture == null) {
                     INGAME.getActorsAt(point.x * TILE_SIZED, point.y * TILE_SIZED).filterIsInstance<Electric>().firstOrNull().let { found ->
                         if (found != null) {
-                            val foundFixture = (found as FixtureBase)
                             // get offset from the fixture's origin
-                            tileOffsetFromFixture = foundFixture.intTilewiseHitbox.let { Point2i(it.startX.toInt(), it.startY.toInt()) } - tilePoint
+                            tileOffsetFromFixture = found.intTilewiseHitbox.let { Point2i(it.startX.toInt(), it.startY.toInt()) } - tilePoint
 
 //                            println("$tilePoint; ${found.javaClass.canonicalName}, $tileOffsetFromFixture, ${found.getWireSinkAt(tileOffsetFromFixture!!)}")
 
                             if (found.getWireSinkAt(tileOffsetFromFixture!!) == emissionType) {
-                                fixtureCache[tilePoint] = foundFixture to emissionType
-                                fixture = foundFixture to emissionType
+                                fixtureCache[tilePoint] = found to emissionType
+                                fixture = found to emissionType
                             }
                         }
                     }
                 }
-                (fixture?.first as? Electric)?.updateOnWireGraphTraversal(tileOffsetFromFixture!!.x, tileOffsetFromFixture!!.y, fixture!!.second)
+                fixture?.first?.updateOnWireGraphTraversal(tileOffsetFromFixture!!.x, tileOffsetFromFixture!!.y, fixture!!.second)
 
             }
         }

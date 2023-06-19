@@ -16,18 +16,108 @@ import java.util.*
 typealias BlockBoxIndex = Int
 typealias WireEmissionType = String
 
-interface Electric {
-    val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType>
-    val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType>
-    val wireEmission: HashMap<BlockBoxIndex, Vector2>
-    val wireConsumption: HashMap<BlockBoxIndex, Vector2>
+open class Electric : FixtureBase {
 
-    fun onRisingEdge(readFrom: BlockBoxIndex) {}
-    fun onFallingEdge(readFrom: BlockBoxIndex) {}
-    fun onSignalHigh(readFrom: BlockBoxIndex, highThreshold: Double = 0.9) {}
-    fun onSignalLow(readFrom: BlockBoxIndex, lowThreshold: Double = 0.1) {}
+    protected constructor() : super() {
+        oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+    }
 
-    fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {}
+    /**
+     * Making the sprite: do not address the CommonResourcePool directly; just do it like this snippet:
+     *
+     * ```makeNewSprite(FixtureBase.getSpritesheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32))```
+     */
+    constructor(
+        blockBox0: BlockBox,
+        blockBoxProps: BlockBoxProps = BlockBoxProps(0),
+        renderOrder: RenderOrder = RenderOrder.MIDDLE,
+        nameFun: () -> String,
+        mainUI: UICanvas? = null,
+        inventory: FixtureInventory? = null,
+        id: ActorID? = null
+    ) : super(renderOrder, PhysProperties.IMMOBILE, id) {
+        blockBox = blockBox0
+        setHitboxDimension(TILE_SIZE * blockBox.width, TILE_SIZE * blockBox.height, 0, 0)
+        this.blockBoxProps = blockBoxProps
+        this.renderOrder = renderOrder
+        this.nameFun = nameFun
+        this.mainUI = mainUI
+        this.inventory = inventory
+
+        if (mainUI != null)
+            App.disposables.add(mainUI)
+
+        oldSinkStatus = Array(blockBox.width * blockBox.height) { Vector2() }
+    }
+
+    companion object {
+        const val ELECTIC_THRESHOLD_HIGH = 0.9
+        const val ELECTRIC_THRESHOLD_LOW = 0.1
+        const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.7
+    }
+
+    fun getWireEmitterAt(point: Point2i) = if (this is Electric) this.wireEmitterTypes[pointToBlockBoxIndex(point)] else throw IllegalStateException("Fixture is not instance of Electric")
+    fun getWireEmitterAt(x: Int, y: Int) = if (this is Electric) this.wireEmitterTypes[pointToBlockBoxIndex(x, y)] else throw IllegalStateException("Fixture is not instance of Electric")
+    fun getWireSinkAt(point: Point2i) = if (this is Electric) this.wireSinkTypes[pointToBlockBoxIndex(point)] else throw IllegalStateException("Fixture is not instance of Electric")
+    fun getWireSinkAt(x: Int, y: Int) = if (this is Electric) this.wireSinkTypes[pointToBlockBoxIndex(x, y)] else throw IllegalStateException("Fixture is not instance of Electric")
+
+    fun setWireEmitterAt(x: Int, y: Int, type: WireEmissionType) { if (this is Electric) wireEmitterTypes[pointToBlockBoxIndex(x, y)] = type else throw IllegalStateException("Fixture is not instance of Electric") }
+    fun setWireSinkAt(x: Int, y: Int, type: WireEmissionType) { if (this is Electric) wireSinkTypes[pointToBlockBoxIndex(x, y)] = type else throw IllegalStateException("Fixture is not instance of Electric") }
+    fun setWireEmissionAt(x: Int, y: Int, emission: Vector2) { if (this is Electric) wireEmission[pointToBlockBoxIndex(x, y)] = emission else throw IllegalStateException("Fixture is not instance of Electric") }
+    fun setWireConsumptionAt(x: Int, y: Int, consumption: Vector2) { if (this is Electric) wireConsumption[pointToBlockBoxIndex(x, y)] = consumption else throw IllegalStateException("Fixture is not instance of Electric") }
+
+    @Transient val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
+    @Transient val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
+    @Transient val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
+    @Transient val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
+
+    /** Edge detection only considers the real component (labeled as 'x') of the vector */
+    open fun onRisingEdge(readFrom: BlockBoxIndex) {}
+    /** Edge detection only considers the real component (labeled as 'x') of the vector */
+    open fun onFallingEdge(readFrom: BlockBoxIndex) {}
+    /** Level detection only considers the real component (labeled as 'x') of the vector */
+    open fun onSignalHigh(readFrom: BlockBoxIndex) {}
+    /** Level detection only considers the real component (labeled as 'x') of the vector */
+    open fun onSignalLow(readFrom: BlockBoxIndex) {}
+
+
+    private val oldSinkStatus: Array<Vector2>
+
+    open fun updateOnWireGraphTraversal(offsetX: Int, offsetY: Int, sinkType: WireEmissionType) {
+        val index = pointToBlockBoxIndex(offsetX, offsetY)
+        val old = oldSinkStatus[index]
+        val wx = offsetX + intTilewiseHitbox.startX.toInt()
+        val wy = offsetY + intTilewiseHitbox.startY.toInt()
+        val new = WireCodex.getAllWiresThatAccepts("digital_bit").fold(Vector2()) { acc, (id, _) ->
+            INGAME.world.getWireEmitStateOf(wx, wy, id).let {
+                Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
+            }
+        }
+
+        if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
+            onRisingEdge(index)
+        else if (old.x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
+            onFallingEdge(index)
+        else if (new.x >= ELECTIC_THRESHOLD_HIGH)
+            onSignalHigh(index)
+        else if (new.y <= ELECTRIC_THRESHOLD_LOW)
+            onSignalLow(index)
+
+    }
+
+    override fun update(delta: Float) {
+        super.update(delta)
+        oldSinkStatus.indices.forEach { index ->
+            val wx = (index % blockBox.width) + intTilewiseHitbox.startX.toInt()
+            val wy = (index / blockBox.width) + intTilewiseHitbox.startY.toInt()
+            val new = WireCodex.getAllWiresThatAccepts(getWireSinkAt(index % blockBox.width, index / blockBox.width) ?: "").fold(Vector2()) { acc, (id, _) ->
+                INGAME.world.getWireEmitStateOf(wx, wy, id).let {
+                    Vector2(acc.x + (it?.x ?: 0.0), acc.y + (it?.y ?: 0.0))
+                }
+            }
+            oldSinkStatus[index].set(new)
+        }
+    }
 }
 
 /**
@@ -49,16 +139,6 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     fun pointToBlockBoxIndex(point: Point2i) = point.y * this.blockBox.width + point.x
     fun pointToBlockBoxIndex(x: Int, y: Int) = y * this.blockBox.width + x
 
-    fun getWireEmitterAt(point: Point2i) = if (this is Electric) this.wireEmitterTypes[pointToBlockBoxIndex(point)] else throw IllegalStateException("Fixture is not instance of Electric")
-    fun getWireEmitterAt(x: Int, y: Int) = if (this is Electric) this.wireEmitterTypes[pointToBlockBoxIndex(x, y)] else throw IllegalStateException("Fixture is not instance of Electric")
-    fun getWireSinkAt(point: Point2i) = if (this is Electric) this.wireSinkTypes[pointToBlockBoxIndex(point)] else throw IllegalStateException("Fixture is not instance of Electric")
-    fun getWireSinkAt(x: Int, y: Int) = if (this is Electric) this.wireSinkTypes[pointToBlockBoxIndex(x, y)] else throw IllegalStateException("Fixture is not instance of Electric")
-
-    fun setWireEmitterAt(x: Int, y: Int, type: WireEmissionType) { if (this is Electric) wireEmitterTypes[pointToBlockBoxIndex(x, y)] = type else throw IllegalStateException("Fixture is not instance of Electric") }
-    fun setWireSinkAt(x: Int, y: Int, type: WireEmissionType) { if (this is Electric) wireSinkTypes[pointToBlockBoxIndex(x, y)] = type else throw IllegalStateException("Fixture is not instance of Electric") }
-    fun setWireEmissionAt(x: Int, y: Int, emission: Vector2) { if (this is Electric) wireEmission[pointToBlockBoxIndex(x, y)] = emission else throw IllegalStateException("Fixture is not instance of Electric") }
-    fun setWireConsumptionAt(x: Int, y: Int, consumption: Vector2) { if (this is Electric) wireConsumption[pointToBlockBoxIndex(x, y)] = consumption else throw IllegalStateException("Fixture is not instance of Electric") }
-
     var blockBoxProps: BlockBoxProps = BlockBoxProps(0)
     @Transient var nameFun: () -> String = { "" }
     @Transient var mainUI: UICanvas? = null
@@ -66,7 +146,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
 
     protected var actorThatInstalledThisFixture: UUID? = null
 
-    private constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
+    protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
+    protected constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID?) : super(renderOrder, physProp, id)
 
 
     /**

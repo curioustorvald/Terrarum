@@ -151,4 +151,8 @@ class WireCodex {
 
         printdbg(this, "Setting prop ${prop.id} ->>\t${prop.nameKey}")
     }
+
+    fun getAllWiresThatAccepts(accept: String): List<Pair<ItemID, WireProp>> {
+        return wireProps.filter { it.value.accepts == accept }.toList()
+    }
 }

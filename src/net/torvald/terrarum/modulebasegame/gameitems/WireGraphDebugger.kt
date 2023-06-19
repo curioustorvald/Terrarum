@@ -51,7 +51,7 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
             val wireName = WireCodex[itemID].nameKey
 
             val emit = simCell.emt
-            val recv = simCell.rcv
+            val recv = simCell.rcp
 
             sb.append("$connexionIcon $wireName")
             sb.append("\nE: $emit")

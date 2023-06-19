@@ -389,14 +389,14 @@ open class GameWorld(
         return wiringGraph[blockAddr]?.get(itemID)?.emt
     }
 
-    fun getWireRecvStateOf(x: Int, y: Int, itemID: ItemID): ArrayList<WireRecvState>? {
+    fun getWireReceptionStateOf(x: Int, y: Int, itemID: ItemID): ArrayList<WireReceptionState>? {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
-        return getWireRecvStateUnsafe(blockAddr, itemID)
+        return getWireReceptionStateUnsafe(blockAddr, itemID)
     }
 
-    fun getWireRecvStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): ArrayList<WireRecvState>? {
-        return wiringGraph[blockAddr]?.get(itemID)?.rcv
+    fun getWireReceptionStateUnsafe(blockAddr: BlockAddress, itemID: ItemID): ArrayList<WireReceptionState>? {
+        return wiringGraph[blockAddr]?.get(itemID)?.rcp
     }
 
     fun setWireGraphOf(x: Int, y: Int, itemID: ItemID, cnx: Int) {
@@ -429,7 +429,7 @@ open class GameWorld(
         wiringGraph[blockAddr]!![itemID]!!.emt.set(vector)
     }
 
-    fun addWireRecvStateOf(x: Int, y: Int, itemID: ItemID, state: WireRecvState) {
+    fun addWireRecvStateOf(x: Int, y: Int, itemID: ItemID, state: WireReceptionState) {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         return addWireRecvStateOfUnsafe(blockAddr, itemID, state)
@@ -441,13 +441,13 @@ open class GameWorld(
         return clearAllWireRecvStateUnsafe(blockAddr)
     }
 
-    fun addWireRecvStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, state: WireRecvState) {
+    fun addWireRecvStateOfUnsafe(blockAddr: BlockAddress, itemID: ItemID, state: WireReceptionState) {
         if (wiringGraph[blockAddr] == null)
             wiringGraph[blockAddr] = WiringGraphMap()
         if (wiringGraph[blockAddr]!![itemID] == null)
             wiringGraph[blockAddr]!![itemID] = WiringSimCell(0)
 
-        wiringGraph[blockAddr]!![itemID]!!.rcv.add(state)
+        wiringGraph[blockAddr]!![itemID]!!.rcp.add(state)
     }
 
     fun getAllWiringGraph(x: Int, y: Int): HashMap<ItemID, WiringSimCell>? {
@@ -462,7 +462,7 @@ open class GameWorld(
 
     fun clearAllWireRecvStateUnsafe(blockAddr: BlockAddress) {
         wiringGraph[blockAddr]?.forEach {
-            it.value.rcv.clear()
+            it.value.rcp.clear()
         }
     }
 
@@ -654,7 +654,7 @@ open class GameWorld(
             val ws: SortedArrayList<ItemID> = SortedArrayList<ItemID>() // what could possibly go wrong bloating up the RAM footprint when it's practically infinite these days?
     )
 
-    data class WireRecvState(
+    data class WireReceptionState(
             var dist: Int = -1, // how many tiles it took to traverse
             var src: Point2i = Point2i(0,0) // xy position
             // to get the state, use the src to get the state of the source emitter directly, then use dist to apply attenuation
@@ -666,7 +666,7 @@ open class GameWorld(
     data class WiringSimCell(
             var cnx: Int = 0, // connections. [1, 2, 4, 8] = [RIGHT, DOWN, LEFT, UP]
             val emt: Vector2 = Vector2(0.0, 0.0), // i'm emitting this much power
-            val rcv: ArrayList<WireRecvState> = ArrayList() // how far away are the power sources
+            val rcp: ArrayList<WireReceptionState> = ArrayList() // how far away are the power sources
     )
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {

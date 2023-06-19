@@ -7,13 +7,7 @@ import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
-class FixtureLogicSignalEmitter : FixtureBase, Electric {
-
-    @Transient override val wireEmitterTypes: java.util.HashMap<BlockBoxIndex, WireEmissionType> = java.util.HashMap()
-    @Transient override val wireSinkTypes: java.util.HashMap<BlockBoxIndex, WireEmissionType> = java.util.HashMap()
-    @Transient override val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
-    @Transient override val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
-
+class FixtureLogicSignalEmitter : Electric {
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
@@ -31,15 +25,9 @@ class FixtureLogicSignalEmitter : FixtureBase, Electric {
         }
 
         actorValue[AVKey.BASEMASS] = MASS
-        
+
         setWireEmitterAt(0, 0, "digital_bit")
         setWireEmissionAt(0, 0, Vector2(1.0, 0.0))
-    }
-
-    override fun update(delta: Float) {
-        // the values does not get preserved on save reload??
-
-        super.update(delta)
     }
 
     override fun dispose() { }
