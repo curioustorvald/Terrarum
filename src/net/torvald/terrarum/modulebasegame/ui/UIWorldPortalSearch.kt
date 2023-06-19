@@ -14,6 +14,7 @@ import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
@@ -82,32 +83,15 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
     init {
         goButton.clickOnceListener = { _, _ ->
-//            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
-
-            /*val ingame = TerrarumIngame(App.batch)
-            val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(
-                VDFileID.SAVEGAMEINFO
-            )!!.bytes, Common.CHARSET)
-            ) as IngamePlayer
             val seed = try {
                 seedInput.getTextOrPlaceholder().toLong()
             }
             catch (e: NumberFormatException) {
                 XXHash64.hash(seedInput.getTextOrPlaceholder().toByteArray(Charsets.UTF_8), 10000)
             }
-            val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
-            val worldParam = TerrarumIngame.NewGameParams(
-                player, TerrarumIngame.NewWorldParameters(
-                    wx, wy, seed, nameInput.getTextOrPlaceholder()
-                )
-            )
-            ingame.gameLoadInfoPayload = worldParam
-            ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
-
-            Terrarum.setCurrentIngameInstance(ingame)
-            val loadScreen = WorldgenLoadScreen(ingame, wx, wy)
-            App.setLoadScreen(loadScreen)*/
-
+            val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
+            val worldParam = TerrarumIngame.NewWorldParameters(wx, wy, seed, nameInput.getTextOrPlaceholder())
+            full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(null, worldParam)
         }
         backButton.clickOnceListener = { _, _ ->
             full.requestTransition(0)

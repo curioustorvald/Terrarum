@@ -4,9 +4,11 @@ import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_WEIGHT
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
 import net.torvald.terrarum.modulebasegame.ui.UIWorldPortal
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.HashMap
@@ -27,6 +29,8 @@ class FixtureWorldPortal : Electric {
 //            ui.transitionalCargo.chestInventory = this.inventory!!
 //            ui.transitionalCargo.chestNameFun = this.nameFun
 //        }
+
+        (mainUI as UIWorldPortal).host = this
     }
 
 
@@ -44,8 +48,14 @@ class FixtureWorldPortal : Electric {
         setWireSinkAt(2, 1, "digital_bit")
     }
 
+    @Transient internal var teleportRequest: TeleportRequest? = null
+
+    override fun update(delta: Float) {
+        super.update(delta)
+    }
+
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
-        println("[FixtureWorldPortal] teleport! ($readFrom)")
+        println("[FixtureWorldPortal] teleport! $teleportRequest")
     }
 
     override fun reload() {
@@ -54,4 +64,8 @@ class FixtureWorldPortal : Electric {
         // TODO do something with (mainUI as UIWorldPortal).***
     }
 
+    internal data class TeleportRequest(
+        val worldDiskToLoad: DiskSkimmer?, // for loading existing worlds
+        val worldLoadParam: TerrarumIngame.NewWorldParameters? // for creating new world
+    )
 }

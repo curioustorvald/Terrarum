@@ -7,6 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_CORRECTION
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.drawBackground
@@ -34,6 +35,7 @@ class UIWorldPortal : UICanvas(
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
 
+    internal lateinit var host: FixtureWorldPortal
 
 
     val controlHelpHeight = App.fontGame.lineHeight

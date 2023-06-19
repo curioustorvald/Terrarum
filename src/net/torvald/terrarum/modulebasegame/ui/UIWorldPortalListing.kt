@@ -11,6 +11,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getCellCountVertically
 import net.torvald.terrarum.realestate.LandUtil.CHUNK_H
@@ -86,7 +87,15 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
-    )
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            if (selected?.worldInfo != null) {
+                full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(
+                    selected?.worldInfo?.diskSkimmer, null
+                )
+            }
+        }
+    }
     private val buttonRename = UIItemTextButton(this,
         "MENU_LABEL_RENAME",
         hx + gridGap/2,
