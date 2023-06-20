@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
@@ -13,9 +14,11 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.YPOS_COR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.drawBackground
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalHeight
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
+import net.torvald.terrarum.serialise.toAscii85
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.getKeycapPC
+import java.util.UUID
 
 /**
  * Structure:
@@ -95,11 +98,25 @@ class UIWorldPortal : UICanvas(
         transitionPanel.render(batch, camera)
     }
 
+    private fun addWorldToPlayersDict(uuid: UUID) {
+        val uuidstr = uuid.toAscii85()
+        INGAME.actorNowPlaying?.let {
+            val avList = (it.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(',').filter { it.isNotBlank() }.toMutableList()
+            if (!avList.contains(uuidstr)) {
+                avList.add(uuidstr)
+                it.actorValue[AVKey.WORLD_PORTAL_DICT] = avList.joinToString(",")
+            }
+        }
+    }
+
     override fun show() {
         super.show()
         transitionPanel.forcePosition(0)
         transitionPanel.show()
         INGAME.setTooltipMessage(null)
+
+        // add current world to the player's worldportaldict
+        addWorldToPlayersDict(INGAME.world.worldIndex)
     }
 
     override fun hide() {
