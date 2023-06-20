@@ -92,6 +92,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
             val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
             val worldParam = TerrarumIngame.NewWorldParameters(wx, wy, seed, nameInput.getTextOrPlaceholder())
             full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(null, worldParam)
+            full.setAsClose()
         }
         backButton.clickOnceListener = { _, _ ->
             full.requestTransition(0)

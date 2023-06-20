@@ -93,6 +93,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(
                     selected?.worldInfo?.diskSkimmer, null
                 )
+                full.setAsClose()
             }
         }
     }
