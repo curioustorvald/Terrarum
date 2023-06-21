@@ -16,7 +16,12 @@ rm -rf $DESTDIR || true
 mkdir $DESTDIR
 
 # Prepare an application
-cp $SRCFILES/Terrarum.bat $DESTDIR/
+if ! command -v x86_64-w64-mingw32-gcc  &> /dev/null
+then
+    echo 'Mingw32 not found; please install mingw64-cross-gcc (or similar) to your system' >&2; exit 1;
+fi
+
+x86_64-w64-mingw32-gcc -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c || { echo 'Building EXE failed' >&2; exit 1; }
 
 # Copy over a Java runtime
 cp -r "../out/$RUNTIME" $DESTDIR/
