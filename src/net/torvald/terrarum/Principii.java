@@ -1,12 +1,9 @@
 package net.torvald.terrarum;
 
 import com.badlogic.gdx.utils.JsonValue;
-import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.utils.JsonFetcher;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,16 +86,39 @@ public class Principii {
         try {
             Process proc = Runtime.getRuntime().exec("java"+extracmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App");
 
-            // TODO redirect proc's PrintStream to System.out
-            int size = 0;
-            byte[] buffer = new byte[1024];
-            while ((size = proc.getInputStream().read(buffer)) != -1) {
-                System.out.write(buffer, 0, size);
-            }
+            Thread tp = new Thread(() -> {
+                String p = null;
+                while (proc.isAlive()) {
+                    try {
+                        p = proc.inputReader().readLine();
+                    }
+                    catch (IOException ignored) {
+                    }
+                    if (p != null) System.out.println(p);
+                }
+            });
+            Thread te = new Thread(() -> {
+                String e = null;
+                while (proc.isAlive()) {
+                    try {
+                        e = proc.errorReader().readLine();
+                    }
+                    catch (IOException ignored) {
+                    }
+                    if (e != null) System.err.println(e);
+                }
+            });
 
+            tp.start();
+            te.start();
+
+            System.exit(proc.waitFor());
         }
         catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
