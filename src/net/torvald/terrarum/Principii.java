@@ -15,15 +15,15 @@ import java.util.Map;
  */
 public class Principii {
 
-    public static KVHashMap gameConfig = new KVHashMap();
+    private static KVHashMap gameConfig = new KVHashMap();
 
-    public static String OSName = System.getProperty("os.name");
+    private static String OSName = System.getProperty("os.name");
 
-    public static String operationSystem;
+    private static String operationSystem;
     /** %appdata%/Terrarum, without trailing slash */
-    public static String defaultDir;
+    private static String defaultDir;
     /** defaultDir + "/config.json" */
-    public static String configDir;
+    private static String configDir;
 
 
     public static void getDefaultDirRoot() {
@@ -67,6 +67,7 @@ public class Principii {
         String OS = OSName.toUpperCase();
         String CPUARCH = System.getProperty("os.arch").toUpperCase();
         if (OS.contains("WIN")) {
+            // reserved for future use
         }
         else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
             extracmd += " -XstartOnFirstThread";
@@ -115,7 +116,7 @@ public class Principii {
      * *
      * @throws NullPointerException if the specified config simply does not exist.
      */
-    public static int getConfigInt(String key) {
+    private static int getConfigInt(String key) {
         Object cfg = getConfigMaster(key);
 
         if (cfg instanceof Integer) return ((int) cfg);
@@ -136,7 +137,7 @@ public class Principii {
      * *
      * @throws NullPointerException if the specified config simply does not exist.
      */
-    public static double getConfigDouble(String key) {
+    private static double getConfigDouble(String key) {
         Object cfg = getConfigMaster(key);
         return (cfg instanceof Integer) ? (((Integer) cfg) * 1.0) : ((double) (cfg));
     }
@@ -149,7 +150,7 @@ public class Principii {
      * *
      * @throws NullPointerException if the specified config simply does not exist.
      */
-    public static String getConfigString(String key) {
+    private static String getConfigString(String key) {
         Object cfg = getConfigMaster(key);
         return ((String) cfg);
     }
@@ -160,7 +161,7 @@ public class Principii {
      * *
      * @return Config from config set or default config if it does not exist. If the default value is undefined, will return false.
      */
-    public static boolean getConfigBoolean(String key) {
+    private static boolean getConfigBoolean(String key) {
         try {
             Object cfg = getConfigMaster(key);
             return ((boolean) cfg);
@@ -170,7 +171,7 @@ public class Principii {
         }
     }
 
-    /*public static int[] getConfigIntArray(String key) {
+    /*private static int[] getConfigIntArray(String key) {
         Object cfg = getConfigMaster(key);
         if (cfg instanceof JsonArray) {
             JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
@@ -185,12 +186,12 @@ public class Principii {
             return ((int[]) cfg);
     }*/
 
-    public static double[] getConfigDoubleArray(String key) {
+    private static double[] getConfigDoubleArray(String key) {
         Object cfg = getConfigMaster(key);
         return ((double[]) cfg);
     }
 
-    public static int[] getConfigIntArray(String key) {
+    private static int[] getConfigIntArray(String key) {
         double[] a = getConfigDoubleArray(key);
         int[] r = new int[a.length];
         for (int i = 0; i < a.length; i++) {
@@ -199,7 +200,7 @@ public class Principii {
         return r;
     }
 
-    /*public static String[] getConfigStringArray(String key) {
+    /*private static String[] getConfigStringArray(String key) {
         Object cfg = getConfigMaster(key);
         if (cfg instanceof JsonArray) {
             JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
@@ -253,11 +254,6 @@ public class Principii {
         }
     }
 
-    public static void setConfig(String key, Object value) {
-        gameConfig.set(key.toLowerCase(), value);
-    }
-
-
     /**
      *
      * @return true on successful, false on failure.
@@ -279,13 +275,7 @@ public class Principii {
         }
         catch (IOException e) {
             // write default config to game dir. Call th.is method again to read config from it.
-            try {
-                createConfigJson();
-            }
-            catch (IOException e1) {
-                System.out.println("[Bootstrap] Unable to write config.json file");
-                e.printStackTrace();
-            }
+            e.printStackTrace();
 
             return false;
         }
@@ -293,13 +283,6 @@ public class Principii {
     }
 
 
-    private static void createConfigJson() throws IOException {
-        File configFile = new File(configDir);
-
-        if (!configFile.exists() || configFile.length() == 0L) {
-            WriteConfig.INSTANCE.invoke();
-        }
-    }
 
     /**
      * Reads DefaultConfig to populate the gameConfig
@@ -318,7 +301,7 @@ public class Principii {
      * @param value JsonValue (the key-value pair)
      * @param modName module name, nullable
      */
-    public static void setToGameConfigForced(JsonValue value, String modName) {
+    private static void setToGameConfigForced(JsonValue value, String modName) {
         gameConfig.set((modName == null) ? value.name : modName+":"+value.name,
                 value.isArray() ? value.asDoubleArray() :
                         value.isDouble() ? value.asDouble() :
@@ -328,25 +311,5 @@ public class Principii {
         );
     }
 
-    /**
-     * Will not overwrite previously loaded config value.
-     *
-     * Key naming convention will be 'modName:propertyName'; if modName is null, the key will be just propertyName.
-     *
-     * @param value JsonValue (the key-value pair)
-     * @param modName module name, nullable
-     */
-    public static void setToGameConfig(JsonValue value, String modName) {
-        String key = (modName == null) ? value.name : modName+":"+value.name;
-        if (gameConfig.get(key) == null) {
-            gameConfig.set(key,
-                    value.isArray() ? value.asDoubleArray() :
-                            value.isDouble() ? value.asDouble() :
-                                    value.isBoolean() ? value.asBoolean() :
-                                            value.isLong() ? value.asInt() :
-                                                    value.asString()
-            );
-        }
-    }
 
 }

@@ -20,8 +20,8 @@ object DefaultConfig {
             "atlastexsize" to 2048,
 
             "language" to App.getSysLang(),
-            "notificationshowuptime" to 4096, // 4s
-            "selecteditemnameshowuptime" to 4096, // 4s
+            "notificationshowuptime" to 4000, // 4s
+            "selecteditemnameshowuptime" to 4000, // 4s
             "autosaveinterval" to 300000, // 5s
             "multithread" to true,
 
