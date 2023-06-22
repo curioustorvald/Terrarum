@@ -2335,7 +2335,7 @@
             },
             {
                 "n": "MENU_OPTIONS",
-                "s": "Stillingar "
+                "s": "Valkostir "
             },
             {
                 "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
@@ -2395,11 +2395,11 @@
             },
             {
                 "n": "MENU_OPTIONS_GAMEPLAY",
-                "s": "Gameplay Options"
+                "s": "Leikvalkostir"
             },
             {
                 "n": "MENU_OPTIONS_GRAPHICS",
-                "s": "Grafíkstillingar"
+                "s": "Grafíkvalkostir"
             },
             {
                 "n": "MENU_OPTIONS_HUD",

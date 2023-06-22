@@ -15,5 +15,15 @@
   "MENU_OPTIONS_DITHER": "Dither",
   "MENU_OPTIONS_BLUR": "Óskýrt",
   "MENU_OPTIONS_PARTICLES": "Eind",
-  "MENU_IO_IMPORT": "Flytja inn"
+  "MENU_IO_IMPORT": "Flytja inn",
+  "APP_NOMODULE_1": "Engin eining er hlaðin eins og er.",
+  "APP_NOMODULE_2": "Vinsamlega stilltu hleðslupöntunina þína og endurræstu:",
+  "MENU_LABEL_KEYCONFIG_HELP1": "Smelltu á lyklalokið til að úthluta aðgerðum",
+  "MENU_LABEL_IME_TOGGLE": "Breyttu IME",
+  "MENU_LABEL_PASTE_FROM_CLIPBOARD": "Límdu frá klemmuspjald",
+  "MENU_OPTIONS_PERFORMANCE": "Afköst",
+  "MENU_LABEL_DELETE": "Eyða",
+  "MENU_OPTIONS_JVM_HEAP_MAX": "Hámarks JVM hrúguminni",
+  "MENU_OPTIONS_AUTOSAVE": "Sjálfvirk vistun",
+  "CONTEXT_TIME_MINUTE_PLURAL": "Mínútur"
 }

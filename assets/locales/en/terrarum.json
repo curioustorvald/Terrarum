@@ -25,7 +25,7 @@
   "APP_NOMODULE_2": "Please configure your Load Order and restart:",
   "MENU_LABEL_KEYCONFIG_HELP1": "Click On the Keycap to Assign Actions",
   "MENU_LABEL_IME_TOGGLE": "Toggle IME",
-  "MENU_LABEL_PASTE_FROM_CLIPBOARD": "Paste from Cliboard",
+  "MENU_LABEL_PASTE_FROM_CLIPBOARD": "Paste from Clipboard",
   "MENU_OPTIONS_PERFORMANCE": "Performance",
   "MENU_LABEL_DELETE": "Delete",
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max JVM Heap Memory",
