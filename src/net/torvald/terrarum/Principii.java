@@ -63,35 +63,17 @@ public class Principii {
             devMode = true;
         }
 
-        String runtimeDir = null;
         String extracmd = devMode ? " -ea" : "";
         String OS = OSName.toUpperCase();
         String CPUARCH = System.getProperty("os.arch").toUpperCase();
         if (OS.contains("WIN")) {
-            if (CPUARCH.equals("AMD64"))
-                runtimeDir = "runtime-windows-x86";
         }
         else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
             extracmd += " -XstartOnFirstThread";
-            if (CPUARCH.equals("AMD64"))
-                runtimeDir = "runtime-osx-x86";
-            else if (CPUARCH.equals("AARCH64"))
-                runtimeDir = "runtime-osx-arm";
         }
         else {
             extracmd += " -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd";
-            if (CPUARCH.equals("AMD64") || CPUARCH.equals("X86"))
-                runtimeDir = "runtime-linux-x86";
-            else if (CPUARCH.equals("AARCH64"))
-                runtimeDir = "runtime-linux-arm";
         }
-
-        if (runtimeDir == null) {
-            // TODO show error message of incompatible processor (possibly 32-bit?)
-            System.exit(1);
-        }
-
-
 
 
         getDefaultDirRoot();
