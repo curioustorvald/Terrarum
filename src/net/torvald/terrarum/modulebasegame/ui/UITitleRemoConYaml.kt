@@ -18,6 +18,7 @@ object UITitleRemoConYaml {
  - MENU_OPTIONS_CONTROLS : net.torvald.terrarum.modulebasegame.ui.UIKeyboardControlPanel
  - MENU_LABEL_IME : net.torvald.terrarum.modulebasegame.ui.UIIMEConfig
  - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
+ - GAME_GENRE_MISC : net.torvald.terrarum.modulebasegame.ui.UIPerformanceControlPanel
  - MENU_MODULES : net.torvald.terrarum.ModOptionsHost
  - MENU_LABEL_RETURN+WRITETOCONFIG
 - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules

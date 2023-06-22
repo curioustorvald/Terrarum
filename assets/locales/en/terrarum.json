@@ -27,5 +27,8 @@
   "MENU_LABEL_IME_TOGGLE": "Toggle IME",
   "MENU_LABEL_PASTE_FROM_CLIPBOARD": "Paste from Cliboard",
   "MENU_OPTIONS_PERFORMANCE": "Performance",
-  "MENU_LABEL_DELETE": "Delete"
+  "MENU_LABEL_DELETE": "Delete",
+  "MENU_OPTIONS_JVM_HEAP_MAX": "Max JVM Heap Memory",
+  "MENU_OPTIONS_AUTOSAVE": "Autosave",
+  "CONTEXT_TIME_MINUTE_PLURAL": "Minutes"
 }

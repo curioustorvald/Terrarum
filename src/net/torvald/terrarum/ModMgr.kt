@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.*
+import net.torvald.terrarum.App.setToGameConfig
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameitems.GameItem

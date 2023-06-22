@@ -9,15 +9,14 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.TIMES
 
 /**
- * Created by minjaesong on 2021-10-06.
+ * Created by minjaesong on 2023-06-22.
  */
-class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
+class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
 
     private val linegap = 14
@@ -29,18 +28,11 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val h1MarginBottom = 4
 
     private val options = arrayOf(
+        arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
+            arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,5,120,5,60000"),
         arrayOf("", { Lang["MENU_OPTIONS_PERFORMANCE"] }, "h1"),
-            arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
-            arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
-            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
-        arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
-            arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
-            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"] }, "spinnerd,1.0,2.0,0.05"),
-            arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
-            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
+            arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX"] + " (GB)" }, "spinner,2,32,1"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
-        arrayOf("", { Lang["GAME_GENRE_MISC"] }, "h1"),
-            arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
     )
 
     private val optionsYpos = IntArray(options.size + 1)
@@ -112,6 +104,15 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 }
             }
         }
+        else if (args.startsWith("spinnerimul,")) {
+            val arg = args.split(',')
+            val mult = arg[4].toInt()
+            UIItemSpinner(this, x, y, App.getConfigInt(optionName) / mult, arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
+                (it as UIItemSpinner).selectionChangeListener = {
+                    App.setConfig(optionStr, it.toInt() * mult)
+                }
+            }
+        }
         else if (args.startsWith("typeinint")) {
 //            val arg = args.split(',') // args: none
             UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }) to { it: UIItem, optionStr: String ->
@@ -142,9 +143,9 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val optionControllers: List<Pair<UIItem, (UIItem, String) -> Unit>> = options.mapIndexed { index, strings ->
         makeButton(options[index][2] as String,
-                drawX + width / 2 + panelgap,
-                drawY - 2 + optionsYpos[index],
-                options[index][0] as String
+            drawX + width / 2 + panelgap,
+            drawY - 2 + optionsYpos[index],
+            options[index][0] as String
         )
     }
 
@@ -207,8 +208,8 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             val overlayResTxt = "${(App.scr.chatWidth * App.scr.magn).ceilInt()}$TIMES${App.scr.windowH}"
 
             App.fontGame.draw(batch, overlayResTxt,
-                    (xstart + (App.scr.chatWidth - App.fontGame.getWidth(overlayResTxt)) / 2).toFloat(),
-                    ((App.scr.height - App.fontGame.lineHeight) / 2).toFloat()
+                (xstart + (App.scr.chatWidth - App.fontGame.getWidth(overlayResTxt)) / 2).toFloat(),
+                ((App.scr.height - App.fontGame.lineHeight) / 2).toFloat()
             )
         }
     }

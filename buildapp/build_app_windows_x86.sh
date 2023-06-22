@@ -29,7 +29,8 @@ cp -r "../out/$RUNTIME" $DESTDIR/
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/
 mv $DESTDIR/assets_release $DESTDIR/assets
-cp -r "../out/TerrarumBuild.jar" $DESTDIR/assets/
+mkdir $DESTDIR/out
+cp  "../out/TerrarumBuild.jar" $DESTDIR/out/
 
 # Temporary solution: zip everything
 zip -r -9 -l "out/TerrarumWindows.x86.zip" $DESTDIR

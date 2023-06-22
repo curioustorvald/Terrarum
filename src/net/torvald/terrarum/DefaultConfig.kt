@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input
 object DefaultConfig {
 
     val hashMap = hashMapOf<String, Any>(
+            "jvm_xmx" to 8,
             "displayfps" to 0, // 0: no limit, non-zero: limit
             "displayfpsidle" to 0, // 0: no limit, non-zero: limit
             "displaycolourdepth" to 8,
@@ -21,7 +22,7 @@ object DefaultConfig {
             "language" to App.getSysLang(),
             "notificationshowuptime" to 4096, // 4s
             "selecteditemnameshowuptime" to 4096, // 4s
-            "autosaveinterval" to 262144, // 4m22s
+            "autosaveinterval" to 300000, // 5s
             "multithread" to true,
 
             "showhealthmessageonstartup" to true,

@@ -28,7 +28,8 @@ cp -r "../out/$RUNTIME" $DESTDIR/
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/
 mv $DESTDIR/assets_release $DESTDIR/assets
-cp -r "../out/TerrarumBuild.jar" $DESTDIR/assets/
+mkdir $DESTDIR/out
+cp "../out/TerrarumBuild.jar" $DESTDIR/out/
 
 # Pack everything to AppImage
 ARCH=arm_aarch64 "./$APPIMAGETOOL" $DESTDIR "out/$DESTDIR.AppImage" || { echo 'Building AppImage failed' >&2; exit 1; }
