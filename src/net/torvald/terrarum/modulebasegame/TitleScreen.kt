@@ -336,21 +336,32 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val linegap = 4
         val imgTxtGap = 10
         val yoff = App.scr.height - App.scr.tvSafeGraphicsHeight - 64 - (3*(20+linegap)) - imgTxtGap - 9
-        if (App.is32BitJVM && uiRemoCon.currentRemoConContents.parent == null) {
-            Toolkit.drawCentered(batch, warning32bitJavaIcon, yoff)
-            for (i in 0..2) {
-                val text = Lang.get("GAME_32BIT_WARNING${i+1}", (i != 2))
-                if (i == 2) batch.color = Toolkit.Theme.COL_SELECTED
-                App.fontGame.draw(batch, text, ((drawWidth - App.fontGame.getWidth(text)) / 2).toFloat(), yoff + imgTxtGap + 64f + linegap + i*(20+linegap))
+        if (uiRemoCon.currentRemoConContents.parent == null) {
+            var texts = emptyList<String>()
+            var textcols = emptyList<Color>()
+            if (App.is32BitJVM) {
+                Toolkit.drawCentered(batch, warning32bitJavaIcon, yoff)
+                texts = (1..3).map { Lang.get("GAME_32BIT_WARNING$it", (it != 3)) }
+                textcols = (1..3).map { if (it == 3) Toolkit.Theme.COL_SELECTED else Color.WHITE }
             }
-        }
-        // warn: rosetta on Apple M-chips
-        else if (App.getUndesirableConditions() == "apple_execution_through_rosetta") {
-            listOf(
-                "It seems you are using a Mac with Apple Silicon but running the game through Rosetta.",
-                "A native build for the game is available which runs much faster than current version."
-            ).forEachIndexed { i, text ->
-                App.fontGame.draw(batch, text, ((drawWidth - App.fontGame.getWidth(text)) / 2).toFloat(), yoff + imgTxtGap + 64f + linegap + i*(20+linegap))
+            // warn: rosetta on Apple M-chips
+            else if (App.getUndesirableConditions() == "apple_execution_through_rosetta") {
+                texts = listOf(
+                    "It seems you are using a Mac with Apple Silicon but running the game through Rosetta.",
+                    "A native build for the game is available which runs much faster than current version."
+                )
+                textcols = texts.map { Color.WHITE }
+            }
+
+
+            texts.forEachIndexed { i, text ->
+                batch.color = textcols[i]
+                App.fontGame.draw(
+                    batch,
+                    text,
+                    ((drawWidth - App.fontGame.getWidth(text)) / 2).toFloat(),
+                    yoff + imgTxtGap + 64f + linegap + i * (20 + linegap)
+                )
             }
         }
     }
