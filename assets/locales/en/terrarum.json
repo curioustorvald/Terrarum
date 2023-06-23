@@ -13,6 +13,8 @@
   "GAME_32BIT_WARNING1": "It looks like you’re running a 32-Bit version of Java.",
   "GAME_32BIT_WARNING2": "Please download and install the latest 64-Bit Java at:",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
+  "GAME_APPLE_ROSETTA_WARNING1": "It seems you are using a Mac with Apple Silicon but running the x86 build of the game.",
+  "GAME_APPLE_ROSETTA_WARNING2": "Please use the native build for improved performance and the gameplay experiences.",
   "MENU_OPTION_STREAMERS_LAYOUT": "Chat Overlay",
   "MENU_LABEL_RESTART_REQUIRED": "Restart Required",
   "MENU_LABEL_KEYBOARD_LAYOUT": "Keyboard Layout",

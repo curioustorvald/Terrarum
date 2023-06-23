@@ -122,9 +122,9 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private lateinit var worldFBO: FloatFrameBuffer
 
     private val warning32bitJavaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/32_bit_warning.tga")))
+    private val warningAppleRosettaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/apple_rosetta_warning.tga")))
 
     init {
-        warning32bitJavaIcon.flip(false, false)
         gameUpdateGovernor = ConsistentUpdateRate.also { it.reset() }
     }
 
@@ -346,10 +346,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             }
             // warn: rosetta on Apple M-chips
             else if (App.getUndesirableConditions() == "apple_execution_through_rosetta") {
-                texts = listOf(
-                    "It seems you are using a Mac with Apple Silicon but running the game through Rosetta.",
-                    "A native build for the game is available which runs much faster than current version."
-                )
+                Toolkit.drawCentered(batch, warningAppleRosettaIcon, yoff)
+                texts = (1..2).map { Lang.get("GAME_APPLE_ROSETTA_WARNING$it") }
                 textcols = texts.map { Color.WHITE }
             }
 
@@ -399,6 +397,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiRemoCon.dispose()
         demoWorld.dispose()
         warning32bitJavaIcon.texture.dispose()
+        warningAppleRosettaIcon.texture.dispose()
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
