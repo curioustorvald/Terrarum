@@ -30,5 +30,6 @@
   "MENU_LABEL_DELETE": "Delete",
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max JVM Heap Memory",
   "MENU_OPTIONS_AUTOSAVE": "Autosave",
-  "CONTEXT_TIME_MINUTE_PLURAL": "Minutes"
+  "CONTEXT_TIME_MINUTE_PLURAL": "Minutes",
+  "MENU_LABEL_SYSTEM_INFO": "System Info"
 }

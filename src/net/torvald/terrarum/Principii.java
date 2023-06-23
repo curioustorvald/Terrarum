@@ -64,15 +64,32 @@ public class Principii {
         String extracmd = devMode ? " -ea" : "";
         String OS = OSName.toUpperCase();
         String CPUARCH = System.getProperty("os.arch").toUpperCase();
+        String runtimeRoot;
+        String runtimeArch;
+        if (!CPUARCH.equals("AMD64") && !CPUARCH.equals("AARCH64")) {
+            System.err.println("Unsupported CPU architecture: " + CPUARCH);
+            System.exit(1);
+            return;
+        }
+        else {
+            runtimeArch = CPUARCH.equals("AMD64") ? "x86" : "arm";
+        }
+
         if (OS.contains("WIN")) {
-            // reserved for future use
+            runtimeRoot = "runtime-windows-" + runtimeArch;
         }
         else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
+            runtimeRoot = "runtime-osx-" + runtimeArch;
             extracmd += " -XstartOnFirstThread";
         }
         else {
+            runtimeRoot = "runtime-linux-" + runtimeArch;
             extracmd += " -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd";
         }
+
+        String runtime = new File("out/"+runtimeRoot+"/bin/java").getAbsolutePath();
+        System.out.println("Runtime path: "+runtime);
+
 
 
         getDefaultDirRoot();
@@ -84,40 +101,13 @@ public class Principii {
 
         int xmx = getConfigInt("jvm_xmx");
 
-        String runtime = new File("./out/runtime-osx-x86/bin/java").getAbsolutePath();
 
-        System.out.println("Runtime path: "+runtime);
 
         try {
-            Process proc = Runtime.getRuntime().exec(runtime+extracmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App");
-
-            Thread tp = new Thread(() -> {
-                String p = null;
-                while (proc.isAlive()) {
-                    try {
-                        p = proc.inputReader().readLine();
-                    }
-                    catch (IOException ignored) {
-                    }
-                    if (p != null) System.out.println(p);
-                }
-            });
-            Thread te = new Thread(() -> {
-                String e = null;
-                while (proc.isAlive()) {
-                    try {
-                        e = proc.errorReader().readLine();
-                    }
-                    catch (IOException ignored) {
-                    }
-                    if (e != null) System.err.println(e);
-                }
-            });
-
-            tp.start();
-            te.start();
-
-            System.exit(proc.waitFor());
+            String[] cmd = (runtime+extracmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
+            ProcessBuilder pb = new ProcessBuilder(cmd);
+            pb.inheritIO();
+            System.exit(pb.start().waitFor());
         }
         catch (IOException e) {
             e.printStackTrace();

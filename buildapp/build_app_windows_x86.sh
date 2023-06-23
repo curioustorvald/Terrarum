@@ -24,12 +24,12 @@ fi
 x86_64-w64-mingw32-gcc -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c || { echo 'Building EXE failed' >&2; exit 1; }
 
 # Copy over a Java runtime
-cp -r "../out/$RUNTIME" $DESTDIR/
+mkdir $DESTDIR/out
+cp -r "../out/$RUNTIME" $DESTDIR/out/
 
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/
 mv $DESTDIR/assets_release $DESTDIR/assets
-mkdir $DESTDIR/out
 cp  "../out/TerrarumBuild.jar" $DESTDIR/out/
 
 # Temporary solution: zip everything

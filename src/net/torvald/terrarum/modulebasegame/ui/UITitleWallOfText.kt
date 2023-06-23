@@ -44,3 +44,4 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
 class UITitleCredits(val remoCon: UIRemoCon) : UITitleWallOfText(CreditSingleton.credit)
 class UITitleGPL3(val remoCon: UIRemoCon) : UITitleWallOfText(CreditSingleton.gpl3)
+class UISystemInfo(val remoCon: UIRemoCon) : UITitleWallOfText(CreditSingleton.systeminfo)

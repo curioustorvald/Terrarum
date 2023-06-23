@@ -26,6 +26,7 @@ object UITitleRemoConYaml {
 - MENU_LABEL_CREDITS
  - MENU_LABEL_COPYRIGHT : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
  - MENU_CREDIT_GPL_DNT : net.torvald.terrarum.modulebasegame.ui.UITitleGPL3
+ - MENU_LABEL_SYSTEM_INFO : net.torvald.terrarum.modulebasegame.ui.UISystemInfo
  - MENU_LABEL_RETURN
 - MENU_LABEL_QUIT
 """

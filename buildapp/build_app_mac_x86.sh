@@ -25,12 +25,12 @@ cp $SRCFILES/Terrarum.sh $DESTDIR/Contents/MacOS/
 chmod +x $DESTDIR/Contents/MacOS/Terrarum.sh
 
 # Copy over a Java runtime
-cp -r "../out/$RUNTIME" $DESTDIR/Contents/MacOS/
+mkdir $DESTDIR/Contents/MacOS/out
+cp -r "../out/$RUNTIME" $DESTDIR/Contents/MacOS/out/
 
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/Contents/MacOS/
 mv $DESTDIR/Contents/MacOS/assets_release $DESTDIR/Contents/MacOS/assets
-mkdir $DESTDIR/Contents/MacOS/out
 cp "../out/TerrarumBuild.jar" $DESTDIR/Contents/MacOS/out/
 
 echo "Build successful: $DESTDIR"

@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Gdx
 import net.torvald.unicode.BULLET
 import net.torvald.unicode.ENDASH
 
@@ -222,6 +223,22 @@ GNU General Public License with the “Classpath” Exception.
 Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
 """).split('\n')
 
+
+    private val javaVersion = System.getProperty("java.version")
+    private val osName = App.OSName
+    private val osVersion = App.OSVersion
+    private val sysArch = App.systemArch
+    private val processor = App.processor
+    private val processorVendor = App.processorVendor
+    private val glinfo = Gdx.graphics.glVersion.debugVersionString
+
+    val systeminfo: List<String>; get() = """
+JRE Version: $javaVersion
+Operation System: $osName $osVersion
+Architecture: $sysArch
+Processor: $processor ($processorVendor)
+GL Info: $glinfo
+""".split('\n')
 
 
     val gpl3: List<String>; get() = """                    GNU GENERAL PUBLIC LICENSE

@@ -23,12 +23,12 @@ cp $SRCFILES/AppRun $DESTDIR/AppRun
 chmod +x $DESTDIR/AppRun
 
 # Copy over a Java runtime
-cp -r "../out/$RUNTIME" $DESTDIR/
+mkdir $DESTDIR/out
+cp -r "../out/$RUNTIME" $DESTDIR/out/
 
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/
 mv $DESTDIR/assets_release $DESTDIR/assets
-mkdir $DESTDIR/out
 cp "../out/TerrarumBuild.jar" $DESTDIR/out/
 
 # Pack everything to AppImage

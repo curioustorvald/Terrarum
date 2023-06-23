@@ -2,5 +2,5 @@
 #include <stdlib.h>
 
 int main() {
-    return system(".\\runtime-windows-x86\\bin\\java -jar .\\out\\TerrarumBuild.jar");
+    return system(".\\out\\runtime-windows-x86\\bin\\java -jar .\\out\\TerrarumBuild.jar");
 }
