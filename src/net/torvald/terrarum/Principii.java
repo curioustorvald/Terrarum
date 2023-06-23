@@ -66,13 +66,13 @@ public class Principii {
         String CPUARCH = System.getProperty("os.arch").toUpperCase();
         String runtimeRoot;
         String runtimeArch;
-        if (!CPUARCH.equals("AMD64") && !CPUARCH.equals("AARCH64")) {
+        if (!CPUARCH.equals("AMD64") && !CPUARCH.equals("X86_64") && !CPUARCH.equals("AARCH64")) { // macOS Rosetta2 reports X86_64
             System.err.println("Unsupported CPU architecture: " + CPUARCH);
             System.exit(1);
             return;
         }
         else {
-            runtimeArch = CPUARCH.equals("AMD64") ? "x86" : "arm";
+            runtimeArch = (CPUARCH.equals("AMD64") || CPUARCH.equals("X86_64")) ? "x86" : "arm";
         }
 
         if (OS.contains("WIN")) {
