@@ -110,10 +110,10 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
 
 
-                    INGAME.makeSavegameBackupCopy(playerSavefile)
+                    INGAME.makeSavegameBackupCopy(playerSavefile, false)
                     WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, false, onError) {
 
-                        INGAME.makeSavegameBackupCopy(worldSavefile)
+                        INGAME.makeSavegameBackupCopy(worldSavefile, false)
                         WriteSavegame(saveTime_t, WriteSavegame.SaveMode.WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, false, onError) {
                             // callback:
                             // rebuild the disk skimmers

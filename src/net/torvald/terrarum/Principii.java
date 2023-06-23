@@ -3,6 +3,7 @@ package net.torvald.terrarum;
 import com.badlogic.gdx.utils.JsonValue;
 import net.torvald.terrarum.utils.JsonFetcher;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,8 +84,12 @@ public class Principii {
 
         int xmx = getConfigInt("jvm_xmx");
 
+        String runtime = new File("./out/runtime-osx-x86/bin/java").getAbsolutePath();
+
+        System.out.println("Runtime path: "+runtime);
+
         try {
-            Process proc = Runtime.getRuntime().exec("java"+extracmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App");
+            Process proc = Runtime.getRuntime().exec(runtime+extracmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App");
 
             Thread tp = new Thread(() -> {
                 String p = null;

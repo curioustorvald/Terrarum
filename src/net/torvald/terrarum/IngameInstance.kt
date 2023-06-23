@@ -410,14 +410,14 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */
-    fun makeSavegameBackupCopy(file: File) {
+    fun makeSavegameBackupCopy(file: File, isAuto: Boolean) {
         if (!file.exists()) {
             return
         }
 
-        val file1 = File("${file.absolutePath}.1")
-        val file2 = File("${file.absolutePath}.2")
-        val file3 = File("${file.absolutePath}.3")
+        val file1 = File("${file.absolutePath}.${if (isAuto) "a" else "1"}")
+        val file2 = File("${file.absolutePath}.${if (isAuto) "b" else "1"}")
+        val file3 = File("${file.absolutePath}.${if (isAuto) "c" else "1"}")
 
         try {
             // do not overwrite clean .2 with dirty .1
