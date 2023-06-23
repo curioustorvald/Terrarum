@@ -142,6 +142,12 @@ public class App implements ApplicationListener {
 
     public static final int GLOBAL_FRAMERATE_LIMIT = 300;
 
+    private static String undesirableConditions;
+
+    public static String getUndesirableConditions() {
+        return undesirableConditions;
+    }
+
     /**
      * These languages won't distinguish regional differences (e.g. enUS and enUK, frFR and frCA)
      */
@@ -346,9 +352,12 @@ public class App implements ApplicationListener {
                 processorVendor = "Unknown CPU";
             }
 
-            if (processor.startsWith("Apple M") && Objects.equals(systemArch, "aarch64")) {
+            if (processor.startsWith("Apple M") && systemArch.equals("aarch64")) {
                 isAppleM = true;
                 System.out.println("Apple Proprietary "+processor+" detected; don't expect smooth sailing...");
+            }
+            if (processor.startsWith("Apple M") && !systemArch.equals("aarch64")) {
+                undesirableConditions = "apple_execution_through_rosetta";
             }
 
             if (!IS_DEVELOPMENT_BUILD) {
