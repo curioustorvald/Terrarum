@@ -50,13 +50,13 @@ removefile:
 
     fun checkFileSanity() {
         if (!diskFile.exists()) throw NoSuchFileException(diskFile.absoluteFile)
-        if (diskFile.length() < 310L) throw RuntimeException("Invalid Virtual Disk file!")
+        if (diskFile.length() < 310L) throw RuntimeException("Invalid Virtual Disk file: ${diskFile.path}")
 
         // check magic
         val fis = FileInputStream(diskFile)
 
         val magic = ByteArray(4).let { fis.read(it); it }
-        if (!magic.contentEquals(VirtualDisk.MAGIC)) throw RuntimeException("Invalid Virtual Disk file!")
+        if (!magic.contentEquals(VirtualDisk.MAGIC)) throw RuntimeException("Invalid Virtual Disk file: ${diskFile.path}")
 
         fis.close()
     }

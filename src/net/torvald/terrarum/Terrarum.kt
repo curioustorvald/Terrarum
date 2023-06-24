@@ -31,6 +31,8 @@ import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.unsafe.UnsafeHelper
@@ -797,15 +799,17 @@ fun AppUpdateListOfSavegames() {
         }
     }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
         println("${index+1}.\t${it.diskFile.absolutePath}")
-        it.rebuild() // disk skimmer was created without initialisation, so do it now
+        it.rebuild()
 
         val jsonFile = it.getFile(SAVEGAMEINFO)!!
-        val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
-        val worldUUID = UUID.fromString(json.getString("worldIndex"))
+        var worldUUID: UUID? = null
+        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
+            if (name == "worldIndex") worldUUID = UUID.fromString(value.asString())
+        }
 
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegameWorlds.contains(worldUUID)) {
-            App.savegameWorlds[worldUUID] = it
+            App.savegameWorlds[worldUUID] = SavegameCollection.collectFromBaseFilename(File(worldsDir), it.diskFile.name)
             App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
             App.sortedSavegameWorlds.add(worldUUID)
         }
@@ -827,15 +831,17 @@ fun AppUpdateListOfSavegames() {
         }
     }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
         println("${index+1}.\t${it.diskFile.absolutePath}")
-        it.rebuild() // disk skimmer was created without initialisation, so do it now
+        it.rebuild()
 
         val jsonFile = it.getFile(SAVEGAMEINFO)!!
-        val json = JsonReader().parse(ByteArray64Reader(jsonFile.bytes, Common.CHARSET).readText())
-        val playerUUID = UUID.fromString(json.getString("uuid"))
+        var playerUUID: UUID? = null
+        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
+            if (name == "uuid") playerUUID = UUID.fromString(value.asString())
+        }
 
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegamePlayers.contains(playerUUID)) {
-            App.savegamePlayers[playerUUID] = it
+            App.savegamePlayers[playerUUID] = SavegameCollection.collectFromBaseFilename(File(playersDir), it.diskFile.name)
             App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
             App.sortedPlayers.add(playerUUID)
         }

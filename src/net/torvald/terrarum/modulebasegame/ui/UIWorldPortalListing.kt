@@ -174,8 +174,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         worldList.clear()
         (INGAME.actorGamer.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(",").filter { it.isNotBlank() }.map {
             it.ascii85toUUID().let { it to App.savegameWorlds[it] }
-        }.filter { it.second != null }.mapIndexed { index, (uuid, disk) ->
+        }.filter { it.second != null }.mapIndexed { index, (uuid, disk0) ->
 
+            val disk = disk0!!.loadable()
             var chunksCount = 0
             var seed = 0L
             var lastPlayed = 0L

@@ -14,7 +14,7 @@
   "GAME_32BIT_WARNING2": "Please download and install the latest 64-Bit Java at:",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
   "GAME_APPLE_ROSETTA_WARNING1": "It seems you are using a Mac with Apple Silicon but running the x86 build of the game.",
-  "GAME_APPLE_ROSETTA_WARNING2": "Please use the native build for improved performance and the gameplay experiences.",
+  "GAME_APPLE_ROSETTA_WARNING2": "Please use the native build for improved performance and gameplay experiences.",
   "MENU_OPTION_STREAMERS_LAYOUT": "Chat Overlay",
   "MENU_LABEL_RESTART_REQUIRED": "Restart Required",
   "MENU_LABEL_KEYBOARD_LAYOUT": "Keyboard Layout",
@@ -33,5 +33,8 @@
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max JVM Heap Memory",
   "MENU_OPTIONS_AUTOSAVE": "Autosave",
   "CONTEXT_TIME_MINUTE_PLURAL": "Minutes",
-  "MENU_LABEL_SYSTEM_INFO": "System Info"
+  "MENU_LABEL_SYSTEM_INFO": "System Info",
+  "GAME_PREV_SAVE_WAS_LOADED": "The most recently saved game was corrupted.\nThe previously saved game was loaded.",
+  "GAME_MORE_RECENT_AUTOSAVE1": "The Autosave is more recent than the manual save.",
+  "GAME_MORE_RECENT_AUTOSAVE2": "Please select the saved game you want to load:"
 }

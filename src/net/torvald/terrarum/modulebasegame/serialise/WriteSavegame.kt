@@ -126,7 +126,7 @@ object LoadSavegame {
         printdbg(this, "Player localhash: ${player.localHashStr}, hasSprite: ${player.sprite != null}")
 
         val currentWorldId = player.worldCurrentlyPlaying
-        val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!
+        val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!.loadable()
         val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET), worldDisk.diskFile)
 
         world.layerTerrain = BlockLayer(world.width, world.height)

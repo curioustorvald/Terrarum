@@ -36,6 +36,8 @@ import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -74,12 +76,16 @@ object UILoadGovernor {
     }
 }
 
+abstract class Advanceable : UICanvas() {
+    abstract fun advanceMode()
+}
+
 /**
  * Only works if current screen set by the App is [TitleScreen]
  *
  * Created by minjaesong on 2021-09-09.
  */
-class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
+class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
 
 //    private val hash = RandomWordsName(3)
 
@@ -155,7 +161,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
         this.mode = mode
     }
 
-    fun advanceMode() {
+    override fun advanceMode() {
         mode += 1
         uiScroll = 0f
         scrollFrom = 0
@@ -175,7 +181,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
                 // read savegames
                 var savegamesCount = 0
                 App.sortedSavegameWorlds.forEach { uuid ->
-                    val skimmer = App.savegameWorlds[uuid]!!
+                    val skimmer = App.savegameWorlds[uuid]!!.loadable()
                     val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
@@ -190,7 +196,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
                 savegamesCount = 0
                 App.sortedPlayers.forEach { uuid ->
-                    val skimmer = App.savegamePlayers[uuid]!!
+                    val skimmer = App.savegamePlayers[uuid]!!.loadable()
                     val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
@@ -470,7 +476,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : UICanvas() {
 
 
 class UIItemPlayerCells(
-        parent: UILoadDemoSavefiles,
+        parent: Advanceable,
         initialX: Int,
         initialY: Int,
         val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
@@ -492,24 +498,22 @@ class UIItemPlayerCells(
 
     init {
         skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
-            val json = JsonReader().parse(ByteArray64Reader(it, Common.CHARSET))
+            var playerUUID: UUID? = null
+            var worldUUID: UUID? = null
+            var lastPlayTime0 = 0L
 
-            playerUUID = UUID.fromString(json["uuid"]?.asString())
-            val worldUUID = UUID.fromString(json["worldCurrentlyPlaying"]?.asString())
+            JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
+                if (name == "uuid") playerUUID = UUID.fromString(value.asString())
+                if (name == "worldCurrentlyPlaying") worldUUID = UUID.fromString(value.asString())
+                if (name == "totalPlayTime") totalPlayTime = parseDuration(value.asLong())
+                if (name == "lastPlayTime") lastPlayTime0 = value.asLong()
+            }
 
             App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
             App.savegameWorldsName[worldUUID]?.let { if (it.isNotBlank()) worldName = it }
-            /*json["lastPlayTime"]?.asString()?.let {
-                lastPlayTime = Instant.ofEpochSecond(it.toLong())
-                        .atZone(TimeZone.getDefault().toZoneId())
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            }*/
-            lastPlayTime = Instant.ofEpochSecond(skimmer.getLastModifiedTime())
+            lastPlayTime = Instant.ofEpochSecond(lastPlayTime0)
                     .atZone(TimeZone.getDefault().toZoneId())
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            json["totalPlayTime"]?.asString()?.let {
-                totalPlayTime = parseDuration(it.toLong())
-            }
 
         }
     }
@@ -670,7 +674,7 @@ class UIItemPlayerCells(
 
 
 class UIItemWorldCells(
-        parent: UILoadDemoSavefiles,
+        parent: Advanceable,
         initialX: Int,
         initialY: Int,
         val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
@@ -685,9 +689,6 @@ class UIItemWorldCells(
     private val lastPlayedTimestamp: String
 
     init {
-        printdbg(this, "Rebuilding skimmer for savefile ${skimmer.diskFile.absolutePath}")
-        skimmer.rebuild()
-
         metaFile = skimmer.getFile(-1)
         if (metaFile == null) saveDamaged = true
 
@@ -699,14 +700,18 @@ class UIItemWorldCells(
         saveDamaged = saveDamaged or checkForSavegameDamage(skimmer)
 
         if (metaFile != null) {
-            val worldJson = JsonReader().parse(ByteArray64Reader(metaFile.bytes, Common.CHARSET))
-            val lastplay_t = skimmer.getLastModifiedTime()//worldJson["lastPlayTime"].asLong()
-            val playtime_t = worldJson["totalPlayTime"].asLong()
+//            val lastplay_t = skimmer.getLastModifiedTime()//worldJson["lastPlayTime"].asLong()
+            var playtime_t = ""
+            var lastplay_t = 0L
+            JsonFetcher.readFromJsonString(ByteArray64Reader(metaFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
+                if (name == "lastPlayTime") lastplay_t = value.asLong()
+                if (name == "totalPlayTime") playtime_t = parseDuration(value.asLong())
+            }
             lastPlayedTimestamp =
                     Instant.ofEpochSecond(lastplay_t)
                             .atZone(TimeZone.getDefault().toZoneId())
                             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
-                    "/${parseDuration(playtime_t)}"
+                    "/$playtime_t"
         }
         else {
             lastPlayedTimestamp = "--:--:--/--h--m--s"

@@ -12,7 +12,7 @@ object UITitleRemoConYaml {
      * The class must be the UICanvas
      */
     val menuBase = """
-- MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles
+- MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame
 - MENU_OPTIONS
  - MENU_LABEL_GRAPHICS : net.torvald.terrarum.modulebasegame.ui.UIGraphicsControlPanel
  - MENU_OPTIONS_CONTROLS : net.torvald.terrarum.modulebasegame.ui.UIKeyboardControlPanel
