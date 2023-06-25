@@ -254,7 +254,7 @@ object Toolkit : Disposable {
         (batch as FlippingSpriteBatch).drawFlipped(fboBlur.colorBufferTexture, x.toFloat(), y.toFloat())
     }
 
-    fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) {
+    fun drawBaloon(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float, opacity: Float = 1f) {
         // centre area
         /*batch.draw(baloonTile.get(1, 1), x, y, w, h)
 
@@ -271,9 +271,9 @@ object Toolkit : Disposable {
         batch.draw(baloonTile.get(0, 2), x - baloonTile.tileW, y + h)*/
 
 
-        batch.color = Theme.COL_CELL_FILL_OPAQUE
+        batch.color = Theme.COL_CELL_FILL_OPAQUE.cpy().mul(1f,1f,1f,opacity)
         fillArea(batch, x - 4, y - 4, w + 8, h + 8)
-        batch.color = Theme.COL_INACTIVE
+        batch.color = Theme.COL_INACTIVE.cpy().mul(1f,1f,1f,opacity)
         drawBoxBorder(batch, x - 4, y - 4, w + 8, h + 8)
     }
 

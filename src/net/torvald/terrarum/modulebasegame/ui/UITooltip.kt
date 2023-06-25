@@ -56,10 +56,11 @@ class UITooltip : UICanvas() {
         batch.color = tooltipBackCol
 
         Toolkit.drawBaloon(batch,
-                tooltipX - textMarginX,
-                tooltipY,
-                tooltipW,
-                font.lineHeight * msgBuffer.size
+            tooltipX - textMarginX,
+            tooltipY,
+            tooltipW,
+            font.lineHeight * msgBuffer.size,
+            Notification.OPACITY
         )
 
         batch.color = tooltipForeCol

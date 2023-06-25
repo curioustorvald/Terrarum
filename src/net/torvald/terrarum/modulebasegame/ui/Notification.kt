@@ -48,12 +48,9 @@ class Notification : UICanvas() {
         }
     }
 
-    private val drawColor = Color(1f, 1f, 1f, 1f)
-
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         blendNormalStraightAlpha(batch)
-        drawColor.a = handler.opacity
-        fontCol.a = handler.opacity
+        fontCol.a = handler.opacity * OPACITY
 
         val realTextWidth = 12 + if (message.size == 1)
             App.fontGame.getWidth(message[0])
@@ -63,12 +60,11 @@ class Notification : UICanvas() {
 
         // force the UI to the centre of the screen
         this.posX = (App.scr.width - displayedTextWidth) / 2
-
         val textHeight = message.size * App.fontGame.lineHeight
 
-        batch.color = drawColor
 
-        Toolkit.drawBaloon(batch, 0f, -textHeight, displayedTextWidth.toFloat(), textHeight)
+
+        Toolkit.drawBaloon(batch, 0f, -textHeight, displayedTextWidth.toFloat(), textHeight, handler.opacity * OPACITY)
 
         batch.color = fontCol
         message.forEachIndexed { index, s ->
@@ -79,7 +75,6 @@ class Notification : UICanvas() {
 
 
         // dunno why, it doesn't work without this.
-        drawColor.a = 1f
         fontCol.a = 1f
     }
 
@@ -111,6 +106,7 @@ class Notification : UICanvas() {
 
     companion object {
         // private int messagesShowingIndex = 0;
-        val OPEN_CLOSE_TIME = 0.16f
+        const val OPEN_CLOSE_TIME = 0.16f
+        const val OPACITY = 0.9f
     }
 }
