@@ -30,8 +30,10 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val options = arrayOf(
         arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
             arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,5,120,5,60000"),
+            arrayOf("notificationshowuptime", { Lang["MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION"] + " (${Lang["CONTEXT_TIME_SECOND_PLURAL"]})" }, "spinnerimul,2,10,1,1000"),
         arrayOf("", { Lang["MENU_OPTIONS_PERFORMANCE"] }, "h1"),
             arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX"] + " (GB)" }, "spinner,2,32,1"),
+            arrayOf("jvm_extra_cmd", { Lang["MENU_LABEL_EXTRA_JVM_ARGUMENTS"] }, "typein"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
     )
 
@@ -68,6 +70,7 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val hrule = CommonResourcePool.getAsTextureRegionPack("gui_hrule")
 
     private val spinnerWidth = 140
+    private val typeinWidth = 320
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
@@ -115,7 +118,11 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         else if (args.startsWith("typeinint")) {
 //            val arg = args.split(',') // args: none
-            UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x, y, spinnerWidth,
+                    defaultValue = { "${App.getConfigInt(optionName)}" },
+                    maxLen = InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS),
+                    keyFilter = { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }
+            ) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = {
                     App.setConfig(optionStr, it.toInt()) // HAXXX!!!
                 }
@@ -124,7 +131,12 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         else if (args.startsWith("typeinres")) {
             val keyWidth = optionName.substringBefore(',')
             val keyHeight = optionName.substringAfter(',')
-            UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }, UIItemTextButton.Companion.Alignment.CENTRE) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x, y, spinnerWidth,
+                    defaultValue = { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" },
+                    maxLen = InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS),
+                    keyFilter = { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true },
+                    alignment = UIItemTextButton.Companion.Alignment.CENTRE
+            ) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = { text ->
                     val text = text.lowercase()
                     if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {
@@ -135,6 +147,14 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                         App.setConfig(keyHeight, height)
                     }
                     else it.markAsInvalid()
+                }
+            }
+        }
+        else if (args.startsWith("typein")) {
+            //args: none
+            UIItemTextLineInput(this, x, y, typeinWidth, defaultValue = { App.getConfigString(optionName) }) to { it: UIItem, optionStr: String ->
+                (it as UIItemTextLineInput).textCommitListener = {
+                    App.setConfig(optionStr, it)
                 }
             }
         }

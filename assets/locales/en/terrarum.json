@@ -33,7 +33,11 @@
   "MENU_OPTIONS_JVM_HEAP_MAX": "Max JVM Heap Memory",
   "MENU_OPTIONS_AUTOSAVE": "Autosave",
   "CONTEXT_TIME_MINUTE_PLURAL": "Minutes",
+  "CONTEXT_TIME_SECOND_PLURAL": "Seconds",
   "MENU_LABEL_SYSTEM_INFO": "System Info",
+  "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "Show notification for",
+  "MENU_LABEL_STREAMING": "Livestreaming",
+  "MENU_LABEL_EXTRA_JVM_ARGUMENTS": "Extra JVM Arguments",
   "GAME_PREV_SAVE_WAS_LOADED": "The most recently saved game was corrupted.\nThe previously saved game was loaded.",
   "GAME_MORE_RECENT_AUTOSAVE1": "The Autosave is more recent than the manual save.",
   "GAME_MORE_RECENT_AUTOSAVE2": "Please select the saved game you want to load:"

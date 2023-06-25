@@ -29,7 +29,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val h1MarginBottom = 4
 
     private val options = arrayOf(
-        arrayOf("", { Lang["MENU_OPTIONS_PERFORMANCE"] }, "h1"),
+        arrayOf("", { Lang["CREDITS_VFX"] }, "h1"),
             arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
             arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
             arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
@@ -39,7 +39,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
             arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
-        arrayOf("", { Lang["GAME_GENRE_MISC"] }, "h1"),
+        arrayOf("", { Lang["MENU_LABEL_STREAMING"] }, "h1"),
             arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
     )
 
@@ -114,7 +114,11 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         }
         else if (args.startsWith("typeinint")) {
 //            val arg = args.split(',') // args: none
-            UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(optionName)}" }, InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x, y, spinnerWidth,
+                defaultValue = { "${App.getConfigInt(optionName)}" },
+                maxLen = InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS),
+                keyFilter = { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }
+            ) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = {
                     App.setConfig(optionStr, it.toInt()) // HAXXX!!!
                 }
@@ -123,7 +127,12 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         else if (args.startsWith("typeinres")) {
             val keyWidth = optionName.substringBefore(',')
             val keyHeight = optionName.substringAfter(',')
-            UIItemTextLineInput(this, x, y, spinnerWidth, { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" }, InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS), { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true }, UIItemTextButton.Companion.Alignment.CENTRE) to { it: UIItem, optionStr: String ->
+            UIItemTextLineInput(this, x, y, spinnerWidth,
+                defaultValue = { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" },
+                maxLen = InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS),
+                keyFilter = { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true },
+                alignment = UIItemTextButton.Companion.Alignment.CENTRE
+            ) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextLineInput).textCommitListener = { text ->
                     val text = text.lowercase()
                     if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {

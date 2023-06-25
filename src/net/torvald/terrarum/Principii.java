@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Bootstrapper that launches the bundled JVM and injects VM configs such as -Xmx
+ *
  * Created by minjaesong on 2023-06-22.
  */
 public class Principii {
@@ -100,11 +102,13 @@ public class Principii {
 
 
         int xmx = getConfigInt("jvm_xmx");
+        String userDefinedExtraCmd = getConfigString("jvm_extra_cmd").trim();
+        if (!userDefinedExtraCmd.isEmpty()) userDefinedExtraCmd = " "+userDefinedExtraCmd;
 
 
 
         try {
-            String[] cmd = (runtime+extracmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
+            String[] cmd = (runtime+extracmd+userDefinedExtraCmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
             ProcessBuilder pb = new ProcessBuilder(cmd);
             pb.inheritIO();
             System.exit(pb.start().waitFor());

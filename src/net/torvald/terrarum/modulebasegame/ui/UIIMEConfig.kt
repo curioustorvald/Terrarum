@@ -110,14 +110,14 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
     private val selDrawX = (Toolkit.drawWidth - selectorWidth) / 2
     private val halfw = width / 2
 
-    private val y1 = 400
-    private val y2 = y1 + 40
+//    private val y1 = 400
+//    private val y2 = y1 + 40
 
     private val lowLayerCodes = IME.getAllLowLayers().sorted()
     private val lowLayerNames = lowLayerCodes.map { { IME.getLowLayerByName(it).name } }
     private val keyboardLayoutSelection = UIItemTextSelector(this,
             selDrawX + (halfselw - textSelWidth) / 2,
-            y2,
+        kby + 260,
             lowLayerNames,
             lowLayerCodes.linearSearch { it == App.getConfigString("basekeyboardlayout") } ?: throw IME.LayoutNotFound(App.getConfigString("basekeyboardlayout")),
             textSelWidth
@@ -127,8 +127,8 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
     private val imeCodes = listOf("none") + imeCodes0
     private val imeNames = listOf({"$EMDASH"}) + imeCodes0.map { { IME.getHighLayerByName(it).name } }
     private val imeSelection = UIItemTextSelector(this,
-            selDrawX + halfselw + (halfselw - textSelWidth) / 2,
-            y2,
+        selDrawX + halfselw + (halfselw - textSelWidth) / 2,
+        kby + 260,
             imeNames,
             imeCodes.linearSearch { it == App.getConfigString("inputmethod") } ?: throw IME.LayoutNotFound(App.getConfigString("inputmethod")),
             textSelWidth
@@ -138,7 +138,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
 
     private val keyboardTestPanel = UIItemTextLineInput(this,
             drawX + (width - 480) / 2 + 3,
-            height - 40,
+            drawY + height - 120,
             474
     )
 
@@ -171,10 +171,10 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         batch.color = Color.WHITE
 
         val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT"]; val tw1 = App.fontGame.getWidth(txt1)
-        App.fontGame.draw(batch, txt1, selDrawX + (halfselw - tw1) / 2, y1)
+        App.fontGame.draw(batch, txt1, selDrawX + (halfselw - tw1) / 2, keyboardLayoutSelection.posY - 40)
 
         val txt2 = Lang["MENU_LABEL_IME"]; val tw2 = App.fontGame.getWidth(txt2)
-        App.fontGame.draw(batch, txt2, selDrawX + halfselw + (halfselw - tw2) / 2, y1)
+        App.fontGame.draw(batch, txt2, selDrawX + halfselw + (halfselw - tw2) / 2, keyboardLayoutSelection.posY - 40)
 
         // title
         // todo show "Keyboard"/"Gamepad" accordingly
@@ -185,9 +185,9 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
 
         // button help for string input UI
         val help1 = "￬ ${Lang["MENU_LABEL_IME_TOGGLE"]}"
-        App.fontGame.draw(batch, help1, drawX + 10f, height - 40f - 28f)
+        App.fontGame.draw(batch, help1, drawX + 10f, keyboardTestPanel.posY - 28f)
         val help2 = "${Lang["MENU_LABEL_PASTE_FROM_CLIPBOARD"]} ￪"
-        App.fontGame.draw(batch, help2, drawX + keyboardTestPanel.width - 4f - App.fontGame.getWidth(help2), height - 40f + 30f)
+        App.fontGame.draw(batch, help2, drawX + keyboardTestPanel.width - 4f - App.fontGame.getWidth(help2), keyboardTestPanel.posY + 30f)
 
 
 

@@ -66,6 +66,7 @@ class UIItemTextLineInput(
 //        val enableIMEButton: Boolean = true
         var keyFilter: (TerrarumKeyboardEvent) -> Boolean = { true },
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.LEFT,
+        val defaultValue: (() -> String?)? = null
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -403,6 +404,9 @@ class UIItemTextLineInput(
     }
 
     override fun show() {
+        defaultValue?.let {
+            setText(it() ?: "")
+        }
         fboUpdateLatch = true
     }
 
