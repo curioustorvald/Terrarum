@@ -57,6 +57,11 @@ val SAVE_CELL_HEIGHT = 120
  * WARNING: the values are not guaranteed to reset when the selector UI is closed!
  */
 object UILoadGovernor {
+    // used by the default save loader
+    var playerUUID: UUID? = null
+    var worldUUID: UUID? = null
+    var previousSaveWasLoaded = false
+    // used by the debug save loader
     var playerDisk: DiskSkimmer? = null
         set(value) {
             printdbg(this, "Player selected: ${value?.diskFile?.name}")
@@ -73,6 +78,10 @@ object UILoadGovernor {
         printdbg(this, "Resetting player and world selection")
         playerDisk = null
         worldDisk = null
+
+        playerUUID = null
+        worldUUID = null
+        previousSaveWasLoaded = false
     }
 }
 
@@ -486,6 +495,8 @@ class UIItemPlayerCells(
 
     override var clickOnceListener: ((Int, Int) -> Unit)? = { _: Int, _: Int ->
         UILoadGovernor.playerDisk = skimmer
+        UILoadGovernor.playerUUID = playerUUID
+        UILoadGovernor.worldUUID = worldUUID
         parent.advanceMode()
     }
 
@@ -494,12 +505,11 @@ class UIItemPlayerCells(
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
 
-    private var playerUUID: UUID? = null
+    private lateinit var playerUUID: UUID
+    private lateinit var worldUUID: UUID
 
     init {
         skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
-            var playerUUID: UUID? = null
-            var worldUUID: UUID? = null
             var lastPlayTime0 = 0L
 
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->

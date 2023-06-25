@@ -24,6 +24,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.ui.UILoadGovernor
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.realestate.LandUtil
@@ -237,6 +238,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         printdbg(this, "update list of savegames")
         // to show "Continue" and "Load" on the titlescreen, uncomment this line
         App.updateListOfSavegames()
+        UILoadGovernor.reset()
 
 
         loadThingsWhileIntroIsVisible()

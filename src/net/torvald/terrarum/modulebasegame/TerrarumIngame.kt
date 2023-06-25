@@ -26,6 +26,7 @@ import net.torvald.terrarum.gameitems.mouseInInteractableRange
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
@@ -715,6 +716,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             postInit()
 
             gameUpdateGovernor.reset()
+
+            if (UILoadGovernor.previousSaveWasLoaded) {
+                sendNotification(listOf(Lang["GAME_PREV_SAVE_WAS_LOADED1"], Lang["GAME_PREV_SAVE_WAS_LOADED2"]))
+            }
 
             gameFullyLoaded = true
         }

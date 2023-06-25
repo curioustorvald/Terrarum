@@ -134,17 +134,30 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
         // look for recently played world
         if (mode == 1) {
-            UILoadGovernor.playerDisk!!.getFile(SAVEGAMEINFO)?.bytes?.let {
-                var worldUUID: UUID? = null
-                JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
-                    if (name == "worldCurrentlyPlaying") worldUUID = UUID.fromString(value.asString())
-                }
 
-                // TODO select the most recent loadable save by comparing manual and autosaves, NOT JUST going with loadable()
-                UILoadGovernor.worldDisk = App.savegameWorlds[worldUUID!!]!!.loadable()
+            // select the most recent loadable save by comparing manual and autosaves, NOT JUST going with loadable()
+            printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
+            val loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
 
-                mode += 1
+            var loadAuto = false
+            if (loadables.moreRecentAutosaveAvailable()) {
+                // TODO make choice for load manual or auto, if available
+
             }
+            else if (!loadables.saveAvaliable()) {
+                // TODO show save is damaged and cannot be loaded
+                return
+            }
+
+            val (p, w) = if (loadAuto) loadables.getAutoSave()!! else loadables.getManualSave()!!
+            UILoadGovernor.playerDisk = p; UILoadGovernor.worldDisk = w
+
+            if (loadables.newerSaveIsDamaged) {
+                // TODO queue message: GAME_PREV_SAVE_WAS_LOADED
+            }
+
+            mode += 1
+
         }
     }
 
