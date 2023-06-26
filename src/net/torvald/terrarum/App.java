@@ -777,8 +777,8 @@ public class App implements ApplicationListener {
     public void resize(int w0, int h0) {
 
         float magn = (float) getConfigDouble("screenmagnifying");
-        int width = Math.round(w0 / magn);
-        int height = Math.round(h0 / magn);
+        int width = (int) Math.floor(w0 / magn);
+        int height = (int) Math.floor(h0 / magn);
 
 
         printdbg(this, "Resize called: "+width+","+height);

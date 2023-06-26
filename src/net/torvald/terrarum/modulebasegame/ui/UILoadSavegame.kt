@@ -191,7 +191,16 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                     imageDrawHeight = imageButtonH,
                     highlightable = false,
                     useBorder = true,
-                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!) }
+                ).also {
+                    it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!)
+                    it.clickOnceListener = { _,_ ->
+                        loadables.getManualSave()!!.let {
+                            UILoadGovernor.playerDisk = it.player
+                            UILoadGovernor.worldDisk = it.world
+                        }
+                        mode = MODE_LOAD_DA_SHIT_ALREADY
+                    }
+                }
                 loadAutoThumbButton = UIItemImageButton(this, autoThumb,
                     initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQQQdrawW - imageButtonW/2,
                     initialY = altSelDrawY + 120,
@@ -201,7 +210,16 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                     imageDrawHeight = imageButtonH,
                     highlightable = false,
                     useBorder = true,
-                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getAutoSave()!!) }
+                ).also {
+                    it.extraDrawOp = getDrawTextualInfoFun(loadables.getAutoSave()!!)
+                    it.clickOnceListener = { _,_ ->
+                        loadables.getAutoSave()!!.let {
+                            UILoadGovernor.playerDisk = it.player
+                            UILoadGovernor.worldDisk = it.world
+                        }
+                        mode = MODE_LOAD_DA_SHIT_ALREADY
+                    }
+                }
 
                 MODE_SAVE_MULTIPLE_CHOICES
             }
@@ -217,12 +235,12 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                     UILoadGovernor.previousSaveWasLoaded = true
                 }
 
-//                MODE_LOAD_DA_SHIT_ALREADY
+                MODE_LOAD_DA_SHIT_ALREADY
 
 
                 // test codes //
 
-                val autoThumb = loadables.getManualSave()!!.getThumbnail()
+                /*val autoThumb = loadables.getManualSave()!!.getThumbnail()
                 val manualThumb = loadables.getManualSave()!!.getThumbnail()
 
                 loadManualThumbButton = UIItemImageButton(this, manualThumb,
@@ -234,7 +252,16 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                     imageDrawHeight = imageButtonH,
                     highlightable = false,
                     useBorder = true,
-                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!) }
+                ).also {
+                    it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!)
+                    it.clickOnceListener = { _,_ ->
+                        loadables.getManualSave()!!.let {
+                            UILoadGovernor.playerDisk = it.player
+                            UILoadGovernor.worldDisk = it.world
+                        }
+                        mode = MODE_LOAD_DA_SHIT_ALREADY
+                    }
+                }
                 loadAutoThumbButton = UIItemImageButton(this, autoThumb,
                     initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQQQdrawW - imageButtonW/2,
                     initialY = altSelDrawY + 120,
@@ -244,9 +271,18 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                     imageDrawHeight = imageButtonH,
                     highlightable = false,
                     useBorder = true,
-                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!) }
+                ).also {
+                    it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!)
+                    it.clickOnceListener = { _,_ ->
+                        loadables.getManualSave()!!.let {
+                            UILoadGovernor.playerDisk = it.player
+                            UILoadGovernor.worldDisk = it.world
+                        }
+                        mode = MODE_LOAD_DA_SHIT_ALREADY
+                    }
+                }
 
-                MODE_SAVE_MULTIPLE_CHOICES
+                MODE_SAVE_MULTIPLE_CHOICES*/
             }
         }
     }
@@ -492,11 +528,15 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (mode == MODE_SELECT) getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
+        if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchDown(screenX, screenY, pointer, button) }
+        if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchDown(screenX, screenY, pointer, button) }
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (mode == MODE_SELECT) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
+        if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchUp(screenX, screenY, pointer, button) }
+        if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchUp(screenX, screenY, pointer, button) }
         return true
     }
 

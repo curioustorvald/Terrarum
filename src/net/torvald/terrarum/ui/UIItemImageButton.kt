@@ -76,7 +76,7 @@ open class UIItemImageButton(
         // draw image
         batch.color = if (highlighted) highlightCol
         else if (mouseUp) activeCol
-        else Toolkit.Theme.COL_INACTIVE
+        else if (useBorder) Toolkit.Theme.COL_INACTIVE else inactiveCol
         if (useBorder) {
             Toolkit.drawBoxBorder(batch, posX - 1f, posY - 1f, width + 2f, height + 2f)
             batch.color = Color.WHITE
