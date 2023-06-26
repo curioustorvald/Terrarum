@@ -415,41 +415,6 @@ class VirtualDiskCracker(val sysCharset: Charset = Charsets.UTF_8) : JFrame() {
                 }
             }
         })
-        menuEdit.add("Resize Disk…").addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent?) {
-                if (vdisk != null) {
-                    try {
-                        val dialog = OptionSize()
-                        val confirmed = dialog.showDialog("Input") == JOptionPane.OK_OPTION
-                        if (confirmed) {
-                            vdisk!!.capacity = (dialog.capacity.value as Long).toLong()
-                            updateDiskInfo()
-                            setStat("Disk resized")
-                        }
-                    }
-                    catch (e: Exception) {
-                        e.printStackTrace()
-                        popupError(e.toString())
-                    }
-                }
-            }
-        })
-        menuEdit.addSeparator()
-        menuEdit.add("Set/Unset Write Protection").addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent?) {
-                if (vdisk != null) {
-                    try {
-                        vdisk!!.isReadOnly = vdisk!!.isReadOnly.not()
-                        updateDiskInfo()
-                        setStat("Disk write protection ${if (vdisk!!.isReadOnly) "" else "dis"}engaged")
-                    }
-                    catch (e: Exception) {
-                        e.printStackTrace()
-                        popupError(e.toString())
-                    }
-                }
-            }
-        })
         menuBar.add(menuEdit)
 
         val menuManage = JMenu("Manage")
@@ -638,8 +603,7 @@ class VirtualDiskCracker(val sysCharset: Charset = Charsets.UTF_8) : JFrame() {
     }
     private fun getDiskInfoText(disk: VirtualDisk): String {
         return """Name: ${String(disk.diskName, sysCharset)}
-Capacity: ${disk.capacity} bytes (${disk.usedBytes} bytes used, ${disk.capacity - disk.usedBytes} bytes free)
-Write protected: ${disk.isReadOnly.toEnglish()}"""
+Capacity: ${disk.capacity} bytes (${disk.usedBytes} bytes used, ${disk.capacity - disk.usedBytes} bytes free)"""
     }
 
 

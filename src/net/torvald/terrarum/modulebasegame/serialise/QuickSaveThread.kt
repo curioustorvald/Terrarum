@@ -24,7 +24,6 @@ class QuickSingleplayerWorldSavingThread(
         val disk: VirtualDisk,
         val outFile: File,
         val ingame: TerrarumIngame,
-        val hasThumbnail: Boolean,
         val isAuto: Boolean,
         val callback: () -> Unit,
         val errorHandler: (Throwable) -> Unit
@@ -46,14 +45,10 @@ class QuickSingleplayerWorldSavingThread(
 
 
     override fun save() {
-        printdbg(this, "Quicksaveworld has thumbnail: $hasThumbnail")
-
         val skimmer = DiskSkimmer(outFile)
 
-        if (hasThumbnail) {
-            while (!IngameRenderer.fboRGBexportedLatch) {
-                Thread.sleep(1L)
-            }
+        while (!IngameRenderer.fboRGBexportedLatch) {
+            Thread.sleep(1L)
         }
 
         val allTheActors = ingame.actorContainerActive.cloneToList() + ingame.actorContainerInactive.cloneToList()
@@ -78,14 +73,14 @@ class QuickSingleplayerWorldSavingThread(
         val creation_t = ingame.world.creationTime
 
 
-        if (hasThumbnail) {
-            PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
-            IngameRenderer.fboRGBexport.dispose()
+        PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
+        IngameRenderer.fboRGBexport.dispose()
 
-            val thumbContent = EntryFile(tgaout.toByteArray64())
-            val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
-            addFile(disk, thumb)
-        }
+        val thumbContent = EntryFile(tgaout.toByteArray64())
+        val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
+        addFile(disk, thumb)
+
+
 
         WriteSavegame.saveProgress += 1f
 
@@ -152,7 +147,7 @@ class QuickSingleplayerWorldSavingThread(
         printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 
 
-        if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false
+        IngameRenderer.fboRGBexportedLatch = false
         WriteSavegame.savingStatus = 255
         ingame.clearModifiedChunks()
 

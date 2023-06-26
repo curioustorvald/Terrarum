@@ -14,6 +14,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.savegame.VDFileID.LOADORDER
+import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
 import net.torvald.terrarum.savegame.VDFileID.ROOT
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.savegame.VDFileID.THUMBNAIL
@@ -53,7 +54,6 @@ class WorldSavingThread(
         val disk: VirtualDisk,
         val outFile: File,
         val ingame: TerrarumIngame,
-        val hasThumbnail: Boolean,
         val isAuto: Boolean,
         val callback: () -> Unit,
         val errorHandler: (Throwable) -> Unit
@@ -64,10 +64,8 @@ class WorldSavingThread(
         disk.saveMode = 2 * isAuto.toInt() // no quick
         disk.saveKind = VDSaveKind.WORLD_DATA
 
-        if (hasThumbnail) {
-            while (!IngameRenderer.fboRGBexportedLatch) {
-                Thread.sleep(1L)
-            }
+        while (!IngameRenderer.fboRGBexportedLatch) {
+            Thread.sleep(1L)
         }
 
         val allTheActors = ingame.actorContainerActive.cloneToList() + ingame.actorContainerInactive.cloneToList()
@@ -123,14 +121,14 @@ class WorldSavingThread(
 
 
 
-        if (hasThumbnail) {
-            PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
-            IngameRenderer.fboRGBexport.dispose()
+        PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
+        IngameRenderer.fboRGBexport.dispose()
 
-            val thumbContent = EntryFile(tgaout.toByteArray64())
-            val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
-            addFile(disk, thumb)
-        }
+        val thumbContent = EntryFile(tgaout.toByteArray64())
+        val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
+        addFile(disk, thumb)
+
+
 
         WriteSavegame.saveProgress += 1f
 
@@ -199,7 +197,7 @@ class WorldSavingThread(
         printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 
 
-        if (hasThumbnail) IngameRenderer.fboRGBexportedLatch = false
+        IngameRenderer.fboRGBexportedLatch = false
         WriteSavegame.savingStatus = 255
 
 
@@ -217,7 +215,6 @@ class PlayerSavingThread(
         val disk: VirtualDisk,
         val outFile: File,
         val ingame: TerrarumIngame,
-        val hasThumbnail: Boolean,
         val isAuto: Boolean,
         val callback: () -> Unit,
         val errorHandler: (Throwable) -> Unit
@@ -230,10 +227,29 @@ class PlayerSavingThread(
 
         WriteSavegame.saveProgress = 0f
 
+        // wait for screencap
+        while (!IngameRenderer.fboRGBexportedLatch) {
+            Thread.sleep(1L)
+        }
+
+        // write screencap
+        val tgaout = ByteArray64GrowableOutputStream()
+        val gzout = GZIPOutputStream(tgaout)
+        PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
+        IngameRenderer.fboRGBexport.dispose()
+        val thumbContent = EntryFile(tgaout.toByteArray64())
+        val thumb = DiskEntry(PLAYER_SCREENSHOT, ROOT, ingame.world.creationTime, time_t, thumbContent)
+        addFile(disk, thumb)
+
+
+
         printdbg(this, "Writing The Player...")
         WritePlayer(ingame.actorGamer, disk, ingame, time_t)
         disk.entries[0]!!.modificationDate = time_t
         VDUtil.dumpToRealMachine(disk, outFile)
+
+
+        IngameRenderer.fboRGBexportedLatch = false
 
         callback()
     }

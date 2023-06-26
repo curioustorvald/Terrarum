@@ -12,6 +12,7 @@ The main game directory is composed of following directories:
       [-2] spritedef,
       [-3] !optional! spritedef-glow,
       [-4] loadOrder.txt
+      [-5] screenshot.tga.gz
       [-1025] !optional! sprite-bodypart-name-to-entry-number-map.properties,
       [-1026] !optional! spriteglow-bodypart-name-to-entry-number-map.properties,
       [1+] !optional! bodyparts tga.gz

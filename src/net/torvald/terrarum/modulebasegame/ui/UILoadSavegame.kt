@@ -16,6 +16,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
@@ -116,7 +117,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val disposablePool = ArrayList<Disposable>()
 
     private fun DiskPair.getThumbnail(): TextureRegion {
-        return this.world.requestFile(-2).let { file ->
+        return this.player.requestFile(PLAYER_SCREENSHOT).let { file ->
             CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
 
             if (file != null) {

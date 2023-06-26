@@ -503,8 +503,8 @@ object VDUtil {
      * Throws an exception if specified size cannot fit into the disk
      */
     fun VirtualDisk.checkCapacity(newSize: Long) {
-        if (this.usedBytes + newSize > this.capacity)
-            throw IOException("Not enough space on the disk")
+//        if (this.usedBytes + newSize > this.capacity)
+//            throw IOException("Not enough space on the disk")
     }
     fun ByteArray64.toIntBig(): Int {
         if (this.size != 4L)

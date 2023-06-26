@@ -36,43 +36,40 @@ object WriteSavegame {
     @Volatile var saveProgress = 0f
     @Volatile var saveProgressMax = 1f
 
-    private fun getSaveThread(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, hasThumbnail: Boolean, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) = when (mode) {
-        SaveMode.WORLD -> WorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
-        SaveMode.PLAYER -> PlayerSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
-        SaveMode.QUICK_WORLD -> QuickSingleplayerWorldSavingThread(time_t, disk, outFile, ingame, hasThumbnail, isAuto, callback, errorHandler)
+    private fun getSaveThread(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) = when (mode) {
+        SaveMode.WORLD -> WorldSavingThread(time_t, disk, outFile, ingame, isAuto, callback, errorHandler)
+        SaveMode.PLAYER -> PlayerSavingThread(time_t, disk, outFile, ingame, isAuto, callback, errorHandler)
+        SaveMode.QUICK_WORLD -> QuickSingleplayerWorldSavingThread(time_t, disk, outFile, ingame, isAuto, callback, errorHandler)
         else -> throw IllegalArgumentException("$mode")
     }
 
     operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
         savingStatus = 0
-        val hasThumbnail = (mode == SaveMode.WORLD || mode == SaveMode.QUICK_WORLD)
         printdbg(this, "Save queued")
 
-        if (hasThumbnail) {
-            IngameRenderer.screencapExportCallback = { fb ->
-                printdbg(this, "Generating thumbnail...")
+        IngameRenderer.screencapExportCallback = { fb ->
+            printdbg(this, "Generating thumbnail...")
 
-                val w = 960
-                val h = 640
+            val w = 960
+            val h = 640
 
-                val cx = /*1-*/(WorldCamera.x % 2)
-                val cy = /*1-*/(WorldCamera.y % 2)
+            val cx = /*1-*/(WorldCamera.x % 2)
+            val cy = /*1-*/(WorldCamera.y % 2)
 
-                val x = (fb.width - w) / 2 - cx // force the even-numbered position
-                val y = (fb.height - h) / 2 - cy // force the even-numbered position
+            val x = (fb.width - w) / 2 - cx // force the even-numbered position
+            val y = (fb.height - h) / 2 - cy // force the even-numbered position
 
-                val p = Pixmap.createFromFrameBuffer(x, y, w, h)
-                IngameRenderer.fboRGBexport = p
-                //PixmapIO2._writeTGA(gzout, p, true, true)
-                //p.dispose()
-                IngameRenderer.fboRGBexportedLatch = true
+            val p = Pixmap.createFromFrameBuffer(x, y, w, h)
+            IngameRenderer.fboRGBexport = p
+            //PixmapIO2._writeTGA(gzout, p, true, true)
+            //p.dispose()
+            IngameRenderer.fboRGBexportedLatch = true
 
-                printdbg(this, "Done thumbnail generation")
-            }
-            IngameRenderer.screencapRequested = true
+            printdbg(this, "Done thumbnail generation")
         }
+        IngameRenderer.screencapRequested = true
 
-        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, hasThumbnail, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up
@@ -86,7 +83,7 @@ object WriteSavegame {
 
         printdbg(this, "Immediate save fired")
 
-        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, false, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
+        val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
 
         // it is caller's job to keep the game paused or keep a "save in progress" ui up

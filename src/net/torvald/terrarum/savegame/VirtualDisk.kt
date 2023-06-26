@@ -145,9 +145,7 @@ class VirtualDisk(
 
     var extraInfoBytes = ByteArray(16)
     val entries = HashMap<EntryID, DiskEntry>()
-    var isReadOnly: Boolean
-        set(value) { extraInfoBytes[0] = (extraInfoBytes[0] and 0xFE.toByte()) or value.toBit() }
-        get() = capacity == 0L || (extraInfoBytes.size > 0 && extraInfoBytes[0].and(1) == 1.toByte())
+    val isReadOnly = false
     var saveMode: Int
         set(value) { extraInfoBytes[1] = value.toByte() }
         get() = extraInfoBytes[1].toUint()
@@ -260,6 +258,7 @@ object VDFileID {
     const val SPRITEDEF = -2L
     const val SPRITEDEF_GLOW = -3L
     const val LOADORDER = -4L
+    const val PLAYER_SCREENSHOT = -5L
     const val BODYPART_TO_ENTRY_MAP = -1025L
     const val BODYPARTGLOW_TO_ENTRY_MAP = -1026L
 }
@@ -277,6 +276,11 @@ fun diskIDtoReadableFilename(id: EntryID, saveKind: Int?): String = when (id) {
     VDFileID.SPRITEDEF_GLOW ->
         if (saveKind == PLAYER_DATA)
             "spritedef-glow"
+        else
+            "file #$id"
+    VDFileID.PLAYER_SCREENSHOT ->
+        if (saveKind == PLAYER_DATA)
+            "screenshot.tga.gz"
         else
             "file #$id"
     VDFileID.LOADORDER -> "loadOrder.txt"
