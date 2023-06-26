@@ -215,6 +215,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        // FIXME does not work with magnified screen
+
         var actionDone = false
 
         if (parentUI.isVisible && isActive) {

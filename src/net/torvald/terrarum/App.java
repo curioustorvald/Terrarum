@@ -383,8 +383,8 @@ public class App implements ApplicationListener {
             ShaderProgram.pedantic = false;
 
             scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
-            int width = (int) Math.round(scr.getWidth() * scr.getMagn());
-            int height = (int) Math.round(scr.getHeight() * scr.getMagn());
+            int width = scr.getWindowW();
+            int height = scr.getWindowH();
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
@@ -776,12 +776,9 @@ public class App implements ApplicationListener {
     @Override
     public void resize(int w0, int h0) {
 
-        int w = (w0%2==0)?w0:w0+1;
-        int h = (h0%2==0)?h0:h0+1;
-
         float magn = (float) getConfigDouble("screenmagnifying");
-        int width = Math.round(w / magn);
-        int height = Math.round(h / magn);
+        int width = Math.round(w0 / magn);
+        int height = Math.round(h0 / magn);
 
 
         printdbg(this, "Resize called: "+width+","+height);
@@ -791,7 +788,7 @@ public class App implements ApplicationListener {
 
         //initViewPort(width, height);
 
-        scr.setDimension(width, height, magn, w, h);
+        scr.setDimension(width, height, magn);
 
         if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
         TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());

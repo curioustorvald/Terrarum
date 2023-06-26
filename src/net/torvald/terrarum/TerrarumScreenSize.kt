@@ -33,14 +33,16 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
     val tvSafeActionWidth: Int; get() = Math.round(width * TV_SAFE_ACTION)
     val tvSafeActionHeight: Int; get() = Math.round(height * TV_SAFE_ACTION)
 
+    /** Apparent window size. `roundToEven(width * magn)` */
     var windowW: Int = 0; private set
+    /** Apparent window size. `roundToEven(height * magn)` */
     var windowH: Int = 0; private set
 
     init {
-        setDimension(maxOf(minimumW, scrw), maxOf(minimumH, scrh), App.getConfigDouble("screenmagnifying").toFloat(), maxOf(minimumW, scrw), maxOf(minimumH, scrh))
+        setDimension(maxOf(minimumW, scrw), maxOf(minimumH, scrh), App.getConfigDouble("screenmagnifying").toFloat())
     }
 
-    fun setDimension(scrw: Int, scrh: Int, magn: Float, ww: Int, wh: Int) {
+    fun setDimension(scrw: Int, scrh: Int, magn: Float,) {
         width = scrw and 0x7FFFFFFE
         height = scrh and 0x7FFFFFFE
         wf = scrw.toFloat()
@@ -54,11 +56,11 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
 
         this.magn = magn
 
-        windowW = ww
-        windowH = wh
+        windowW = (scrw * magn).roundToInt() and 0x7FFFFFFE
+        windowH = (scrh * magn).roundToInt() and 0x7FFFFFFE
 
 
-        printdbg(this, "Window dim: $ww x $wh, called by:")
+        printdbg(this, "Window dim: $windowW x $windowH, called by:")
         printStackTrace(this)
     }
 

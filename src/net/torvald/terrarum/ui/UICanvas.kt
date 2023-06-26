@@ -190,7 +190,7 @@ abstract class UICanvas(
         if (!uiItems.contains(uiItem)) uiItems.add(uiItem)
     }
 
-    fun mouseInScreen(x: Int, y: Int) = x in 0 until App.scr.width && y in 0 until App.scr.height
+    fun mouseInScreen(x: Int, y: Int) = x in 0 until App.scr.windowW && y in 0 until App.scr.windowH
 
     /**
      * Called by the screen's InputProcessor
