@@ -109,6 +109,14 @@ class UIWorldPortal : UICanvas(
         }
     }
 
+    private fun cleanUpWorldDict() {
+        // remove dupes, etc
+        INGAME.actorNowPlaying?.let {
+            val avList = (it.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(',').filter { it.isNotBlank() }.toSet()
+            it.actorValue[AVKey.WORLD_PORTAL_DICT] = avList.joinToString(",")
+        }
+    }
+
     override fun show() {
         super.show()
         transitionPanel.forcePosition(0)
@@ -117,6 +125,7 @@ class UIWorldPortal : UICanvas(
 
         // add current world to the player's worldportaldict
         addWorldToPlayersDict(INGAME.world.worldIndex)
+        cleanUpWorldDict()
     }
 
     override fun hide() {

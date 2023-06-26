@@ -67,17 +67,26 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
                 val wcf = world.files[wc]
                 val wcm = wcf.getLastModifiedTime()
 
+                printdbg(this, "pc=$pc, wc=$wc, pcm=$pcm, wcm=$wcm")
+
                 if (playerDiskNotDamaged(pcf) && worldDiskNotDamaged(wcf)) {
+
+                    printdbg(this, "pcf.autosaved=${pcf.isAutosaved()}, wcf.autosaved=${wcf.isAutosaved()}")
+
                     when (pcf.isAutosaved().toInt(1) or wcf.isAutosaved().toInt()) {
                         3 -> {
-                            autoPlayer = pcf
-                            autoWorld = wcf
+                            if (!::autoPlayer.isInitialized && !::autoWorld.isInitialized) {
+                                autoPlayer = pcf
+                                autoWorld = wcf
+                            }
                             pc += 1
                             wc += 1
                         }
                         0 -> {
-                            manualPlayer = pcf
-                            manualWorld = wcf
+                            if (!::manualPlayer.isInitialized && !::manualWorld.isInitialized) {
+                                manualPlayer = pcf
+                                manualWorld = wcf
+                            }
                             pc += 1
                             wc += 1
                         }
@@ -92,7 +101,6 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
                                 wc += 1
                         }
                     }
-
                 }
 
 
