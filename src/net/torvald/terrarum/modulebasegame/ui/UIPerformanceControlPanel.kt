@@ -29,7 +29,7 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val options = arrayOf(
         arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
-            arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,5,120,5,60000"),
+            arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,1,120,1,60000"),
             arrayOf("notificationshowuptime", { Lang["MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION"] + " (${Lang["CONTEXT_TIME_SECOND_PLURAL"]})" }, "spinnerimul,2,10,1,1000"),
         arrayOf("", { Lang["MENU_LABEL_JVM_DNT"] }, "h1"),
             arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX"] + " (GB)" }, "spinner,2,32,1"),

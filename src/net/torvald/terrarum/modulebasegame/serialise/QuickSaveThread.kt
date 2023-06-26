@@ -46,6 +46,8 @@ class QuickSingleplayerWorldSavingThread(
 
 
     override fun save() {
+        printdbg(this, "Quicksaveworld has thumbnail: $hasThumbnail")
+
         val skimmer = DiskSkimmer(outFile)
 
         if (hasThumbnail) {

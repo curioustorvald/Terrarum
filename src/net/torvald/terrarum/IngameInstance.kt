@@ -410,14 +410,14 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */
-    fun makeSavegameBackupCopy(file: File, isAuto: Boolean) {
+    fun makeSavegameBackupCopy(file: File) {
         if (!file.exists()) {
             return
         }
 
-        val file1 = File("${file.absolutePath}.${if (isAuto) "a" else "1"}")
-        val file2 = File("${file.absolutePath}.${if (isAuto) "b" else "1"}")
-        val file3 = File("${file.absolutePath}.${if (isAuto) "c" else "1"}")
+        val file1 = File("${file.absolutePath}.1")
+        val file2 = File("${file.absolutePath}.2")
+        val file3 = File("${file.absolutePath}.3")
 
         try {
             // do not overwrite clean .2 with dirty .1
@@ -439,6 +439,30 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
             file.copyTo(file1, true)
         } catch (e: IOException) {}
+    }
+
+
+    fun makeSavegameBackupCopyAuto(file0: File): File {
+        val file1 = File("${file0.absolutePath}.a")
+        val file2 = File("${file0.absolutePath}.b")
+        val file3 = File("${file0.absolutePath}.c")
+
+        try {
+            // do not overwrite clean .2 with dirty .1
+            val flags3 = FileInputStream(file3).let { it.skip(49L); val r = it.read(); it.close(); r }
+            val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
+            if (!(flags3 == 0 && flags2 != 0) || !file3.exists()) file1.copyTo(file3, true)
+        } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
+        try {
+            if (file2.exists() && !file3.exists())
+                file2.copyTo(file3, true)
+            if (file1.exists() && !file2.exists())
+                file1.copyTo(file2, true)
+
+            file0.copyTo(file1, true)
+        } catch (e: IOException) {}
+
+        return file1
     }
 
 

@@ -421,10 +421,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiAutosaveNotifier.setAsOpen()
         val saveTime_t = App.getTIME_T()
         WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, true, autosaveOnErrorAction) {
-            makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName), true)
+            makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
             WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, true, autosaveOnErrorAction) {
-                makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName), true) // don't put it on the postInit() or render(); must be called using callback
+                makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
                 uiAutosaveNotifier.setAsClose()
             }
         }
@@ -1113,13 +1113,13 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiAutosaveNotifier.setAsOpen()
 
         val saveTime_t = App.getTIME_T()
-        val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
-        val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
+        val playerSavefile0 = getPlayerSaveFiledesc(INGAME.playerSavefileName)
+        val worldSavefile0 = getWorldSaveFiledesc(INGAME.worldSavefileName)
 
-        INGAME.makeSavegameBackupCopy(playerSavefile, true)
+        val playerSavefile = INGAME.makeSavegameBackupCopyAuto(playerSavefile0)
         WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, true, autosaveOnErrorAction) {
 
-            INGAME.makeSavegameBackupCopy(worldSavefile, true)
+            val worldSavefile = INGAME.makeSavegameBackupCopyAuto(worldSavefile0)
             WriteSavegame(saveTime_t, WriteSavegame.SaveMode.QUICK_WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, true, autosaveOnErrorAction) {
                 // callback:
                 // rebuild the disk skimmers
