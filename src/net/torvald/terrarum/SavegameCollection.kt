@@ -139,14 +139,15 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
     fun moreRecentAutosaveAvailable() = (status == 2)
     fun saveAvaliable() = (status > 0)
 
-    fun getManualSave(): Pair<DiskSkimmer, DiskSkimmer>? {
+    fun getManualSave(): DiskPair? {
         if (status == 0) return null
-        return manualPlayer to manualWorld
+        return DiskPair(manualPlayer, manualWorld)
     }
 
-    fun getAutoSave(): Pair<DiskSkimmer, DiskSkimmer>? {
+    fun getAutoSave(): DiskPair? {
         if (status != 2) return null
-        return autoPlayer to autoWorld
+        return DiskPair(autoPlayer, autoWorld)
     }
-
 }
+
+data class DiskPair(val player: DiskSkimmer, val world: DiskSkimmer)

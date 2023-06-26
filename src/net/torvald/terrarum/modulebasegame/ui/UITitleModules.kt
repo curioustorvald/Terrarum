@@ -88,7 +88,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
                     savegamesCount += 1
                 }
                 catch (e: Throwable) {
-                    System.err.println("[UILoadDemoSavefiles] Error while loading module info for '$s'")
+                    System.err.println("[UITitleModules] Error while loading module info for '$s'")
                     e.printStackTrace()
                 }
             }

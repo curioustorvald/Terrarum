@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.abs
 import net.torvald.terrarum.blendNormalStraightAlpha
 
 /**
@@ -33,14 +34,24 @@ open class UIItemImageButton(
 
         initialX: Int,
         initialY: Int,
+        /** this does NOT resize the image; use imageDrawWidth to actually resize the image */
         override val width: Int = image.regionWidth,
+        /** this does NOT resize the image; use imageDrawHeight to actually resize the image */
         override val height: Int = image.regionHeight,
 
         /** When clicked, toggle its "lit" status */
-        var highlightable: Boolean
+        var highlightable: Boolean,
+        /** Changes the appearance to use a border instead of colour-changing image for highlighter */
+        val useBorder: Boolean = false,
+
+        /** Image won't be place at right position if `image.regionWidth != imageDrawWidth`; define the `width` argument to avoid the issue */
+        val imageDrawWidth: Int = image.regionWidth,
+        /** Image won't be place at right position if `image.regionHeight != imageDrawHeight`; define the `height` argument to avoid the issue */
+        val imageDrawHeight: Int = image.regionHeight,
 ) : UIItem(parent, initialX, initialY) {
 
     var highlighted = false
+    var extraDrawOp: (UIItem, SpriteBatch) -> Unit = { _,_ -> }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         // draw background
@@ -60,15 +71,22 @@ open class UIItemImageButton(
             Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
 
+        blendNormalStraightAlpha(batch)
 
         // draw image
-        blendNormalStraightAlpha(batch)
+        batch.color = if (highlighted) highlightCol
+        else if (mouseUp) activeCol
+        else Toolkit.Theme.COL_INACTIVE
+        if (useBorder) {
+            Toolkit.drawBoxBorder(batch, posX - 1f, posY - 1f, width + 2f, height + 2f)
+            batch.color = Color.WHITE
+        }
+        batch.draw(image, (posX + (width - imageDrawWidth) / 2).toFloat(), (posY + (height - imageDrawHeight) / 2).toFloat(), imageDrawWidth.toFloat(), imageDrawHeight.toFloat())
 
         batch.color = if (highlighted) highlightCol
         else if (mouseUp) activeCol
         else inactiveCol
-
-        batch.draw(image, (posX + (width - image.regionWidth) / 2).toFloat(), (posY + (height - image.regionHeight) / 2).toFloat())
+        extraDrawOp(this, batch)
     }
 
     override fun dispose() {

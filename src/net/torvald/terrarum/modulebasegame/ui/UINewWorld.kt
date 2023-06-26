@@ -30,6 +30,12 @@ import net.torvald.terrarum.utils.RandomWordsName
  */
 class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
+    private var newPlayerCreationThread = Thread {}
+
+    constructor(remoCon: UIRemoCon, playerCreationThread: Thread) : this(remoCon) {
+        newPlayerCreationThread = playerCreationThread
+    }
+
     private val hugeTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/huge.png")))
     private val largeTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/large.png")))
     private val normalTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/normal.png")))
@@ -87,6 +93,11 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     init {
         goButton.clickOnceListener = { _, _ ->
+
+            // after the save is complete, proceed to new world generation
+            newPlayerCreationThread.join()
+
+
 //            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
@@ -112,7 +123,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
         }
         backButton.clickOnceListener = { _, _ ->
-            remoCon.openUI(UILoadDemoSavefiles(remoCon, 1))
+            remoCon.openUI(UILoadSavegame(remoCon))
         }
 
         addUIitem(sizeSelector)

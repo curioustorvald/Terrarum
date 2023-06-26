@@ -81,10 +81,13 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
 
 
             }, "TerrarumBasegameNewCharcterSaveThread")
-            savingThread.start()
+
+//            savingThread.join()
+
+            remoCon.openUI(UINewWorld(remoCon, savingThread)) // let UINewWorld handle the character file generation
         }
         backButton.clickOnceListener = { _,_ ->
-            remoCon.openUI(UILoadDemoSavefiles(remoCon, 0))
+            remoCon.openUI(UILoadSavegame(remoCon))
         }
 
         addUIitem(nameInput)
@@ -99,7 +102,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
 
         if (returnedFromChargen) {
             returnedFromChargen = false
-            remoCon.openUI(UILoadDemoSavefiles(remoCon, 1)) // 0 to go back (Terraria's behav), set variables up and 1 to choose world
+            remoCon.openUI(UILoadSavegame(remoCon))
         }
     }
 

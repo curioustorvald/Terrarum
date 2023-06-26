@@ -6,43 +6,23 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
-import com.badlogic.gdx.utils.JsonReader
-import com.jme3.math.FastMath
-import net.torvald.unicode.EMDASH
 import net.torvald.unicode.getKeycapConsole
 import net.torvald.unicode.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELL_COL
 import net.torvald.terrarum.savegame.ByteArray64InputStream
-import net.torvald.terrarum.savegame.ByteArray64Reader
-import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.EntryFile
-import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.serialise.SaveLoadError
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
-import net.torvald.terrarum.savegame.VDFileID.BODYPART_TO_ENTRY_MAP
-import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
-import net.torvald.terrarum.savegame.VDFileID.SPRITEDEF
-import net.torvald.terrarum.spriteassembler.ADProperties
-import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_X
-import net.torvald.terrarum.spriteassembler.ADProperties.Companion.EXTRA_HEADROOM_Y
-import net.torvald.terrarum.spriteassembler.AssembleFrameBase
-import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
-import net.torvald.terrarum.ui.Movement
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.utils.forEachSiblings
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.zip.GZIPInputStream
+import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
 
@@ -122,6 +102,63 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     var mode = 0; private set// 0: show players, 1: show worlds
 
+    private val MODE_SELECT = 0
+    private val MODE_SELECT_AFTER = 1
+    private val MODE_SAVE_MULTIPLE_CHOICES = 2
+    private val MODE_LOAD_DA_SHIT_ALREADY = 255
+    private val MODE_SAVE_DAMAGED = 256
+
+    private lateinit var loadables: SavegameCollectionPair
+
+    private lateinit var loadManualThumbButton: UIItemImageButton
+    private lateinit var loadAutoThumbButton: UIItemImageButton
+
+    private val disposablePool = ArrayList<Disposable>()
+
+    private fun DiskPair.getThumbnail(): TextureRegion {
+        return this.world.requestFile(-2).let { file ->
+            CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
+
+            if (file != null) {
+                val zippedTga = (file.contents as EntryFile).bytes
+                val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
+                val tgaFileContents = gzin.readAllBytes(); gzin.close()
+                val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
+                TextureRegion(Texture(pixmap)).also {
+                    disposablePool.add(it.texture)
+                    // do cropping and resizing
+                    it.setRegion(
+                        (pixmap.width - imageButtonW*2) / 2,
+                        (pixmap.height - imageButtonH*2) / 2,
+                        imageButtonW * 2,
+                        imageButtonH * 2
+                    )
+                }
+            }
+            else {
+                CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
+            }
+        }
+    }
+
+    private val altSelDrawW = 640
+    private val altSelHdrawW = altSelDrawW / 2
+    private val altSelDrawH = 480
+    private val imageButtonW = 300
+    private val imageButtonH = 240
+    private val altSelDrawY = ((App.scr.height - altSelDrawH)/2)
+    private val altSelQdrawW = altSelDrawW / 4
+    private val altSelQQQdrawW = altSelDrawW * 3 / 4
+
+    private fun getDrawTextualInfoFun(disks: DiskPair): (UIItem, SpriteBatch) -> Unit {
+        val lastPlayedStamp = Instant.ofEpochSecond(disks.player.getLastModifiedTime())
+            .atZone(TimeZone.getDefault().toZoneId())
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        return { item: UIItem, batch: SpriteBatch ->
+            App.fontSmallNumbers.draw(batch, lastPlayedStamp, item.posX + 5f, item.posY + 3f)
+        }
+    }
+
     override fun advanceMode() {
         mode += 1
         uiScroll = 0f
@@ -133,31 +170,84 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         printdbg(this, "savelist mode: $mode")
 
         // look for recently played world
-        if (mode == 1) {
+        if (mode == MODE_SELECT_AFTER) {
 
             // select the most recent loadable save by comparing manual and autosaves, NOT JUST going with loadable()
             printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
-            val loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
+            loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
 
-            var loadAuto = false
-            if (loadables.moreRecentAutosaveAvailable()) {
-                // TODO make choice for load manual or auto, if available
+            mode = if (loadables.moreRecentAutosaveAvailable()) {
+                // make choice for load manual or auto, if available
 
+                val autoThumb = loadables.getAutoSave()!!.getThumbnail()
+                val manualThumb = loadables.getManualSave()!!.getThumbnail()
+
+                loadManualThumbButton = UIItemImageButton(this, manualThumb,
+                    initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQdrawW - imageButtonW/2,
+                    initialY = altSelDrawY + 120,
+                    width = imageButtonW,
+                    height = imageButtonH,
+                    imageDrawWidth = imageButtonW,
+                    imageDrawHeight = imageButtonH,
+                    highlightable = false,
+                    useBorder = true,
+                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!) }
+                loadAutoThumbButton = UIItemImageButton(this, autoThumb,
+                    initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQQQdrawW - imageButtonW/2,
+                    initialY = altSelDrawY + 120,
+                    width = imageButtonW,
+                    height = imageButtonH,
+                    imageDrawWidth = imageButtonW,
+                    imageDrawHeight = imageButtonH,
+                    highlightable = false,
+                    useBorder = true,
+                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getAutoSave()!!) }
+
+                MODE_SAVE_MULTIPLE_CHOICES
             }
             else if (!loadables.saveAvaliable()) {
-                // TODO show save is damaged and cannot be loaded
-                return
+                // show save is damaged and cannot be loaded
+                MODE_SAVE_DAMAGED
             }
+            else {
+                val (p, w) = loadables.getManualSave()!!
+                UILoadGovernor.playerDisk = p; UILoadGovernor.worldDisk = w
 
-            val (p, w) = if (loadAuto) loadables.getAutoSave()!! else loadables.getManualSave()!!
-            UILoadGovernor.playerDisk = p; UILoadGovernor.worldDisk = w
+                if (loadables.newerSaveIsDamaged) {
+                    UILoadGovernor.previousSaveWasLoaded = true
+                }
 
-            if (loadables.newerSaveIsDamaged) {
-                // TODO queue message: GAME_PREV_SAVE_WAS_LOADED
+//                MODE_LOAD_DA_SHIT_ALREADY
+
+
+                // test codes //
+
+                val autoThumb = loadables.getManualSave()!!.getThumbnail()
+                val manualThumb = loadables.getManualSave()!!.getThumbnail()
+
+                loadManualThumbButton = UIItemImageButton(this, manualThumb,
+                    initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQdrawW - imageButtonW/2,
+                    initialY = altSelDrawY + 120,
+                    width = imageButtonW,
+                    height = imageButtonH,
+                    imageDrawWidth = imageButtonW,
+                    imageDrawHeight = imageButtonH,
+                    highlightable = false,
+                    useBorder = true,
+                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!) }
+                loadAutoThumbButton = UIItemImageButton(this, autoThumb,
+                    initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQQQdrawW - imageButtonW/2,
+                    initialY = altSelDrawY + 120,
+                    width = imageButtonW,
+                    height = imageButtonH,
+                    imageDrawWidth = imageButtonW,
+                    imageDrawHeight = imageButtonH,
+                    highlightable = false,
+                    useBorder = true,
+                ).also { it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!) }
+
+                MODE_SAVE_MULTIPLE_CHOICES
             }
-
-            mode += 1
-
         }
     }
 
@@ -178,7 +268,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                         savegamesCount += 1
                     }
                     catch (e: Throwable) {
-                        System.err.println("[UILoadDemoSavefiles] Error while loading Player '${skimmer.diskFile.absolutePath}'")
+                        System.err.println("[UILoadSavegame] Error while loading Player '${skimmer.diskFile.absolutePath}'")
                         e.printStackTrace()
                     }
                 }
@@ -210,14 +300,14 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     init {
         // this UI will NOT persist; the parent of the mode1Node must be set using an absolute value (e.g. treeRoot, not remoCon.currentRemoConContents)
 
-        //printdbg(this, "UILoadDemoSaveFiles called, from:")
+        //printdbg(this, "UILoadSavegame called, from:")
         //printStackTrace(this)
 
         mode1Node.parent = remoCon.treeRoot
         mode2Node.parent = mode1Node
 
-        mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
-        mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadDemoSavefiles"
+        mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
+        mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
 
 //        printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
 //        printdbg(this, "mode1Node data: ${mode1Node.data}")
@@ -229,8 +319,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun updateUI(delta: Float) {
-
-        if (mode < 2) {
+        if (mode == MODE_SELECT) {
 
             if (oldMode != mode) {
                 modeChangedHandler(mode)
@@ -270,7 +359,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        if (mode == 2) {
+        if (mode == MODE_LOAD_DA_SHIT_ALREADY) {
             loadFired += 1
             // to hide the "flipped skybox" artefact
             batch.end()
@@ -287,7 +376,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 LoadSavegame(UILoadGovernor.playerDisk!!, UILoadGovernor.worldDisk)
             }
         }
-        else {
+        else if (mode == MODE_SELECT) {
             batch.end()
 
             val cells = getCells()
@@ -362,6 +451,24 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
             batch.begin()
         }
+        else if (mode == MODE_SAVE_MULTIPLE_CHOICES) {
+            // "The Autosave is more recent than the manual save"
+            val tw1 = App.fontGame.getWidth(Lang["GAME_MORE_RECENT_AUTOSAVE1"])
+            val tw2 = App.fontGame.getWidth(Lang["GAME_MORE_RECENT_AUTOSAVE2"])
+            App.fontGame.draw(batch, Lang["GAME_MORE_RECENT_AUTOSAVE1"], ((Toolkit.drawWidth - tw1)/2).toFloat(), altSelDrawY + 0f)
+            App.fontGame.draw(batch, Lang["GAME_MORE_RECENT_AUTOSAVE2"], ((Toolkit.drawWidth - tw2)/2).toFloat(), altSelDrawY + 24f)
+
+            val twm = App.fontGame.getWidth(Lang["MENU_IO_MANUAL_SAVE"])
+            val twa = App.fontGame.getWidth(Lang["MENU_IO_AUTOSAVE"])
+
+            App.fontGame.draw(batch, Lang["MENU_IO_MANUAL_SAVE"], ((Toolkit.drawWidth - altSelDrawW)/2).toFloat() + altSelQdrawW - twm/2, altSelDrawY + 80f)
+            App.fontGame.draw(batch, Lang["MENU_IO_AUTOSAVE"], ((Toolkit.drawWidth - altSelDrawW)/2).toFloat() + altSelQQQdrawW - twa/2, altSelDrawY + 80f)
+
+
+            // draw thumbnail-buttons
+            loadAutoThumbButton.render(batch, camera)
+            loadManualThumbButton.render(batch, camera)
+        }
     }
 
 
@@ -384,17 +491,17 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
+        if (mode == MODE_SELECT) getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
+        if (mode == MODE_SELECT) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
         return true
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (this.isVisible) {
+        if (this.isVisible && mode == MODE_SELECT) {
             val cells = getCells()
 
             if (amountY <= -1f && scrollTarget > 0) {
@@ -421,6 +528,9 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     override fun dispose() {
         try { shapeRenderer.dispose() } catch (e: IllegalArgumentException) {}
         try { sliderFBO.dispose() } catch (e: IllegalArgumentException) {}
+        disposablePool.forEach {
+            try { it.dispose() } catch (e: GdxRuntimeException) {}
+        }
     }
 
     override fun resize(width: Int, height: Int) {

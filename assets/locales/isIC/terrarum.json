@@ -23,7 +23,7 @@
   "MENU_LABEL_PASTE_FROM_CLIPBOARD": "Límdu frá klemmuspjald",
   "MENU_OPTIONS_PERFORMANCE": "Afköst",
   "MENU_LABEL_DELETE": "Eyða",
-  "MENU_OPTIONS_JVM_HEAP_MAX": "Hámarks JVM hrúguminni",
+  "MENU_OPTIONS_JVM_HEAP_MAX": "Hámarks hrúguminni",
   "MENU_OPTIONS_AUTOSAVE": "Sjálfvirk vistun",
   "CONTEXT_TIME_MINUTE_PLURAL": "Mínútur"
 }
