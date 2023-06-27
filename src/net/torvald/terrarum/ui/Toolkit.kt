@@ -28,6 +28,8 @@ object Toolkit : Disposable {
         val COL_SELECTED = Color(0x00f8ff_ff) // cyan, HIGHLY SATURATED
         val COL_MOUSE_UP = Color(0xfff066_ff.toInt()) // yellow (all yellows are of low saturation according to the colour science)
         val COL_DISABLED = Color(0xaaaaaaff.toInt())
+        val COL_RED = Color(0xff8888ff.toInt())
+        val COL_REDD = Color(0xff4448ff.toInt())
 
         /*
         Try this for alt colour set:

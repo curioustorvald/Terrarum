@@ -45,10 +45,17 @@ class QuickSingleplayerWorldSavingThread(
 
 
     override fun save() {
+        printdbg(this, "outFile: ${outFile.path}")
+
         val skimmer = DiskSkimmer(outFile)
 
-        while (!IngameRenderer.fboRGBexportedLatch) {
-            Thread.sleep(1L)
+        // wait for screencap
+        var emergencyStopCnt = 0
+        while (IngameRenderer.screencapBusy) {
+//            printdbg(this, "spinning for screencap to be taken")
+            Thread.sleep(4L)
+            emergencyStopCnt += 1
+            if (emergencyStopCnt >= SCREENCAP_WAIT_TRY_MAX) throw InterruptedException("Waiting screencap to be taken for too long")
         }
 
         val allTheActors = ingame.actorContainerActive.cloneToList() + ingame.actorContainerInactive.cloneToList()
@@ -147,7 +154,7 @@ class QuickSingleplayerWorldSavingThread(
         printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 
 
-        IngameRenderer.fboRGBexportedLatch = false
+//        IngameRenderer.screencapBusy = false
         WriteSavegame.savingStatus = 255
         ingame.clearModifiedChunks()
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
@@ -64,6 +65,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
 
 
             val savingThread = Thread({
+                printdbg(this, "Player saving thread fired")
 
                 disk.saveMode = 2 // auto, no quick
                 disk.capacity = 0L
@@ -79,9 +81,11 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
                 UILoadGovernor.playerDisk = DiskSkimmer(outFile)
                 // comment above if chargen must send gamers back to the charcters list
 
+                printdbg(this, "playerdisk: ${UILoadGovernor.playerDisk?.diskFile?.path}")
 
             }, "TerrarumBasegameNewCharcterSaveThread")
 
+//            savingThread.start()
 //            savingThread.join()
 
             remoCon.openUI(UINewWorld(remoCon, savingThread)) // let UINewWorld handle the character file generation

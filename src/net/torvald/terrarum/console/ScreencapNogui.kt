@@ -16,7 +16,7 @@ object ScreencapNogui: ConsoleCommand {
                 PixmapIO2.writeTGA(Gdx.files.absolute(App.defaultDir + "/Exports/${args[1]}.tga"), p, true)
                 p.dispose()
             }
-            IngameRenderer.screencapRequested = true
+            IngameRenderer.requestScreencap()
             Echo("FBO exported to$ccG Exports/${args[1]}.tga")
         }
         else {

@@ -32,7 +32,7 @@ class UIAutosaveNotifier : UICanvas() {
     private var errored = false
 
     private var normalCol = Color.WHITE
-    private var errorCol = Color(0xFF8888FF.toInt())
+    private var errorCol = Toolkit.Theme.COL_RED
 
     override fun updateUI(delta: Float) {
         spinnerTimer += delta

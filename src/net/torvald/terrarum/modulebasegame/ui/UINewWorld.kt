@@ -95,10 +95,11 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         goButton.clickOnceListener = { _, _ ->
 
             // after the save is complete, proceed to new world generation
+            newPlayerCreationThread.start()
             newPlayerCreationThread.join()
 
 
-//            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
+            printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
             val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer

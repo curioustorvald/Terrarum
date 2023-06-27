@@ -80,7 +80,7 @@ class UIItemTextLineInput(
 
     companion object {
         val TEXTINPUT_COL_TEXT = Color.WHITE
-        val TEXTINPUT_COL_TEXT_NOMORE = Color(0xFF8888FF.toInt())
+        val TEXTINPUT_COL_TEXT_NOMORE = Toolkit.Theme.COL_RED
         val TEXTINPUT_COL_TEXT_DISABLED = Toolkit.Theme.COL_DISABLED
         val TEXTINPUT_COL_BACKGROUND = Toolkit.Theme.COL_CELL_FILL
         val TEXTINPUT_COL_BACKGROUND2 = Toolkit.Theme.COL_CELL_FILL.cpy()
@@ -155,7 +155,7 @@ class UIItemTextLineInput(
 
     private var textColours = arrayOf(
         Color.WHITE,
-        Color(0xff8888ff.toInt()),
+        Toolkit.Theme.COL_RED,
         Color(0x888888ff.toInt())
     )
 

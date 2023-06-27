@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.measureDebugTime
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -21,6 +21,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.weather.WeatherMixer.render
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -365,13 +366,19 @@ object IngameRenderer : Disposable {
         ///////////////////////////////////////////////////////////////////////
 
         if (screencapRequested) {
-            screencapRequested = false
+            printdbg(this, "Screencap was requested, processing...")
+            var hasError = false
             try {
                 screencapExportCallback(fboMixedOut)
             }
             catch (e: Throwable) {
+                printdbgerr(this, "An error occured while taking screencap:")
                 e.printStackTrace()
+                hasError = true
             }
+            printdbg(this, "Screencap ${if (hasError) "failed" else "successful"}")
+            screencapBusy = false
+            screencapRequested = false
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -416,10 +423,15 @@ object IngameRenderer : Disposable {
      * This "screencap" will capture the game WITHOUT gui and postprocessors!
      * To capture the entire game, use [App.requestScreenshot]
      */
-    @Volatile internal var screencapRequested = false
-    @Volatile internal var fboRGBexportedLatch = false
+    @Volatile private var screencapRequested = false
+    @Volatile internal var screencapBusy = false; private set
     @Volatile internal var screencapExportCallback: (FrameBuffer) -> Unit = {}
     @Volatile internal lateinit var fboRGBexport: Pixmap
+
+    fun requestScreencap() {
+        screencapRequested = true
+        screencapBusy = true
+    }
 
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,

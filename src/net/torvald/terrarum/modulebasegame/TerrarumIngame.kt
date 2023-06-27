@@ -420,10 +420,15 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         //  2. cannot sync up the "counter" to determine whether both are finished
         uiAutosaveNotifier.setAsOpen()
         val saveTime_t = App.getTIME_T()
+        printdbg(this, "Immediate Save")
         WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.PLAYER, playerDisk, getPlayerSaveFiledesc(playerSavefileName), this, true, autosaveOnErrorAction) {
+            printdbg(this, "immediate save callback from PLAYER")
+
             makeSavegameBackupCopy(getPlayerSaveFiledesc(playerSavefileName))
 
             WriteSavegame.immediate(saveTime_t, WriteSavegame.SaveMode.WORLD, worldDisk, getWorldSaveFiledesc(worldSavefileName), this, true, autosaveOnErrorAction) {
+                printdbg(this, "immediate save callback from WORLD")
+
                 makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
                 uiAutosaveNotifier.setAsClose()
             }
@@ -472,7 +477,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             world.worldCreator = UUID.fromString(player.uuid.toString())
 
-            printdbg(this, "new woridIndex: ${world.worldIndex}")
+            printdbg(this, "new worldIndex: ${world.worldIndex}")
             printdbg(this, "worldCurrentlyPlaying: ${player.worldCurrentlyPlaying}")
 
             actorNowPlaying = player

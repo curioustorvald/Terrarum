@@ -43,10 +43,7 @@ object WriteSavegame {
         else -> throw IllegalArgumentException("$mode")
     }
 
-    operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
-        savingStatus = 0
-        printdbg(this, "Save queued")
-
+    private fun installScreencap() {
         IngameRenderer.screencapExportCallback = { fb ->
             printdbg(this, "Generating thumbnail...")
 
@@ -63,11 +60,19 @@ object WriteSavegame {
             IngameRenderer.fboRGBexport = p
             //PixmapIO2._writeTGA(gzout, p, true, true)
             //p.dispose()
-            IngameRenderer.fboRGBexportedLatch = true
 
             printdbg(this, "Done thumbnail generation")
         }
-        IngameRenderer.screencapRequested = true
+    }
+
+    operator fun invoke(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
+        savingStatus = 0
+        printdbg(this, "Save queued")
+
+        installScreencap()
+        try { printdbg(this, "ScreencapExport installed: ${IngameRenderer.screencapExportCallback}") }
+        catch (e: UninitializedPropertyAccessException) { printdbg(this, "ScreencapExport installed: no") }
+        IngameRenderer.requestScreencap()
 
         val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()
@@ -78,10 +83,13 @@ object WriteSavegame {
 
 
     fun immediate(time_t: Long, mode: SaveMode, disk: VirtualDisk, outFile: File, ingame: TerrarumIngame, isAuto: Boolean, errorHandler: (Throwable) -> Unit, callback: () -> Unit) {
-
         savingStatus = 0
-
         printdbg(this, "Immediate save fired")
+
+        installScreencap()
+        try { printdbg(this, "ScreencapExport installed: ${IngameRenderer.screencapExportCallback}") }
+        catch (e: UninitializedPropertyAccessException) { printdbg(this, "ScreencapExport installed: no") }
+        IngameRenderer.requestScreencap()
 
         val savingThread = Thread(getSaveThread(time_t, mode, disk, outFile, ingame, isAuto, errorHandler, callback), "TerrarumBasegameGameSaveThread")
         savingThread.start()

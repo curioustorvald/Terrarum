@@ -39,10 +39,10 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
 
 class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollection?) {
 
-    private lateinit var manualPlayer: DiskSkimmer
-    private lateinit var manualWorld: DiskSkimmer
-    private lateinit var autoPlayer: DiskSkimmer
-    private lateinit var autoWorld: DiskSkimmer
+    private var manualPlayer: DiskSkimmer? = null
+    private var manualWorld: DiskSkimmer? = null
+    private var autoPlayer: DiskSkimmer? = null
+    private var autoWorld: DiskSkimmer? = null
 
     var status = 0 // 0: none available, 1: loadable manual save is newer than loadable auto; 2: loadable autosave is newer than loadable manual
         private set
@@ -55,8 +55,8 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
 
         if (player != null && world != null) {
 
-            printdbg(this, player.files.joinToString { it.diskFile.name })
-            printdbg(this, world.files.joinToString { it.diskFile.name })
+            printdbg(this, "player files: " + player.files.joinToString { it.diskFile.name })
+            printdbg(this, "world files:" + world.files.joinToString { it.diskFile.name })
 
             // if a pair of files were saved successfully, they must have identical lastModifiedTime()
             var pc = 0; val pt = player.files[0].getLastModifiedTime()
@@ -75,7 +75,7 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
 
                     when (pcf.isAutosaved().toInt(1) or wcf.isAutosaved().toInt()) {
                         3 -> {
-                            if (!::autoPlayer.isInitialized && !::autoWorld.isInitialized) {
+                            if (autoPlayer == null && autoWorld == null) {
                                 autoPlayer = pcf
                                 autoWorld = wcf
                             }
@@ -83,7 +83,7 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
                             wc += 1
                         }
                         0 -> {
-                            if (!::manualPlayer.isInitialized && !::manualWorld.isInitialized) {
+                            if (manualPlayer == null && manualWorld == null) {
                                 manualPlayer = pcf
                                 manualWorld = wcf
                             }
@@ -105,32 +105,25 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
 
 
 
-                if (::manualPlayer.isInitialized && ::manualWorld.isInitialized && ::autoPlayer.isInitialized && ::autoWorld.isInitialized)
+                if (manualPlayer != null && manualWorld != null && autoPlayer != null && autoWorld != null)
                     break
             }
 
-            if (::manualPlayer.isInitialized && ::manualWorld.isInitialized && ::autoPlayer.isInitialized && ::autoWorld.isInitialized) {
-                status = if (manualPlayer.getLastModifiedTime() > autoPlayer.getLastModifiedTime()) 1 else 2
-
-                printdbg(this, "manualPlayer = ${manualPlayer.diskFile.path}")
-                printdbg(this, "manualWorld = ${manualWorld.diskFile.path}")
-                printdbg(this, "autoPlayer = ${autoPlayer.diskFile.path}")
-                printdbg(this, "autoWorld = ${autoWorld.diskFile.path}")
+            if (manualPlayer != null && manualWorld != null && autoPlayer != null && autoWorld != null) {
+                status = if (manualPlayer!!.getLastModifiedTime() > autoPlayer!!.getLastModifiedTime()) 1 else 2
             }
-            else if (::manualPlayer.isInitialized && ::manualWorld.isInitialized || ::autoPlayer.isInitialized && ::autoWorld.isInitialized) {
+            else if (manualPlayer != null && manualWorld != null || autoPlayer != null && autoWorld != null) {
                 status = 1
-                if (::manualPlayer.isInitialized) {
-                    printdbg(this, "manualPlayer = ${manualPlayer.diskFile.path}")
-                    printdbg(this, "manualWorld = ${manualWorld.diskFile.path}")
-                }
-                else {
-                    printdbg(this, "autoPlayer = ${autoPlayer.diskFile.path}")
-                    printdbg(this, "autoWorld = ${autoWorld.diskFile.path}")
-                }
             }
             else {
                 status = 0
             }
+
+            printdbg(this, "manualPlayer = ${manualPlayer?.diskFile?.path}")
+            printdbg(this, "manualWorld = ${manualWorld?.diskFile?.path}")
+            printdbg(this, "autoPlayer = ${autoPlayer?.diskFile?.path}")
+            printdbg(this, "autoWorld = ${autoWorld?.diskFile?.path}")
+            printdbg(this, "status = $status")
         }
     }
 
@@ -149,12 +142,20 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
 
     fun getManualSave(): DiskPair? {
         if (status == 0) return null
-        return DiskPair(manualPlayer, manualWorld)
+        return DiskPair(manualPlayer!!, manualWorld!!)
     }
 
     fun getAutoSave(): DiskPair? {
         if (status != 2) return null
-        return DiskPair(autoPlayer, autoWorld)
+        return DiskPair(autoPlayer!!, autoWorld!!)
+    }
+
+    fun getLoadableSave(): DiskPair? {
+        if (status == 0) return null
+        return if (manualPlayer != null && manualWorld != null)
+            DiskPair(manualPlayer!!, manualWorld!!)
+        else
+            DiskPair(autoPlayer!!, autoWorld!!)
     }
 }
 

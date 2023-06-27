@@ -108,6 +108,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val MODE_SAVE_MULTIPLE_CHOICES = 2
     private val MODE_LOAD_DA_SHIT_ALREADY = 255
     private val MODE_SAVE_DAMAGED = 256
+    private val MODE_SAVE_DELETE = 512
 
     private lateinit var loadables: SavegameCollectionPair
 
@@ -229,7 +230,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 MODE_SAVE_DAMAGED
             }
             else {
-                val (p, w) = loadables.getManualSave()!!
+                val (p, w) = loadables.getLoadableSave()!!
                 UILoadGovernor.playerDisk = p; UILoadGovernor.worldDisk = w
 
                 if (loadables.newerSaveIsDamaged) {
@@ -329,10 +330,25 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private var oldMode = -1
 
     private val mode1Node = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
-    private val mode2Node = Yaml(UITitleRemoConYaml.injectedMenuSingleWorldSel).parse()
+//    private val mode2Node = Yaml(UITitleRemoConYaml.injectedMenuSingleWorldSel).parse()
 
-    private val menus = listOf(mode1Node, mode2Node)
-    private val titles = listOf("CONTEXT_CHARACTER", "MENU_LABEL_WORLD")
+//    private val menus = listOf(mode1Node, mode2Node)
+
+    private val deleteCharacterButton = UIItemTextButton(
+        this, "CONTEXT_CHARACTER_DELETE",
+        UIRemoCon.menubarOffX - UIRemoCon.UIRemoConElement.paddingLeft + 11,
+        UIRemoCon.menubarOffY - UIRemoCon.UIRemoConElement.lineHeight * 3 + 16,
+        remoCon.width + UIRemoCon.UIRemoConElement.paddingLeft,
+        true,
+        inactiveCol = Toolkit.Theme.COL_RED,
+        activeCol = Toolkit.Theme.COL_REDD,
+        hitboxSize = UIRemoCon.UIRemoConElement.lineHeight - 2
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            mode = MODE_SAVE_DELETE
+            it.highlighted = true
+        }
+    }
 
     init {
         // this UI will NOT persist; the parent of the mode1Node must be set using an absolute value (e.g. treeRoot, not remoCon.currentRemoConContents)
@@ -341,22 +357,25 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         //printStackTrace(this)
 
         mode1Node.parent = remoCon.treeRoot
-        mode2Node.parent = mode1Node
+//        mode2Node.parent = mode1Node
 
         mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
-        mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
+//        mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
 
 //        printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
 //        printdbg(this, "mode1Node data: ${mode1Node.data}")
 //        printdbg(this, "mode2Node data: ${mode2Node.data}")
+
     }
 
     private fun modeChangedHandler(mode: Int) {
-        remoCon.setNewRemoConContents(menus[mode])
+        printdbg(this, "Change mode: $oldMode -> $mode")
+//        remoCon.setNewRemoConContents(menus[mode])
+        remoCon.setNewRemoConContents(mode1Node)
     }
 
     override fun updateUI(delta: Float) {
-        if (mode == MODE_SELECT) {
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
 
             if (oldMode != mode) {
                 modeChangedHandler(mode)
@@ -413,7 +432,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 LoadSavegame(UILoadGovernor.playerDisk!!, UILoadGovernor.worldDisk)
             }
         }
-        else if (mode == MODE_SELECT) {
+        else if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
             batch.end()
 
             val cells = getCells()
@@ -474,11 +493,6 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             val saveTex = TextureRegion(Texture(savePixmap)); saveTex.flip(false, true)
             batch.inUse {
                 batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
-
-                // draw texts
-                val loadGameTitleStr = Lang[titles[mode]]// + "$EMDASH$hash"
-                // "Game Load"
-                App.fontUITitle.draw(batch, loadGameTitleStr, (width - App.fontUITitle.getWidth(loadGameTitleStr)).div(2).toFloat(), titleTextPosY.toFloat())
                 // Control help
                 App.fontGame.draw(batch, controlHelp, uiX.toFloat(), controlHelperY.toFloat())
             }
@@ -506,11 +520,16 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             loadAutoThumbButton.render(batch, camera)
             loadManualThumbButton.render(batch, camera)
         }
+
+
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
+            deleteCharacterButton.render(batch, camera)
+        }
     }
 
 
     override fun keyDown(keycode: Int): Boolean {
-        if (this.isVisible) {
+        if (this.isVisible && (mode == MODE_SELECT || mode == MODE_SAVE_DELETE)) {
             val cells = getCells()
 
             if ((keycode == Input.Keys.UP || keycode == App.getConfigInt("control_key_up")) && scrollTarget > 0) {
@@ -531,6 +550,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         if (mode == MODE_SELECT) getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
         if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchDown(screenX, screenY, pointer, button) }
         if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchDown(screenX, screenY, pointer, button) }
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
         return true
     }
 
@@ -538,11 +558,12 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         if (mode == MODE_SELECT) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
         if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchUp(screenX, screenY, pointer, button) }
         if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchUp(screenX, screenY, pointer, button) }
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
         return true
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (this.isVisible && mode == MODE_SELECT) {
+        if (this.isVisible && mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
             val cells = getCells()
 
             if (amountY <= -1f && scrollTarget > 0) {
