@@ -117,7 +117,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val drawX = (Toolkit.drawWidth - 480) / 2
     private val drawY = (App.scr.height - 480) / 2
     private val confirmBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", drawX + (240 - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, drawY + 480- 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, drawY + 480- 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD)
 
     private lateinit var loadables: SavegameCollectionPair
 

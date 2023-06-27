@@ -27,6 +27,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.function.Consumer
@@ -423,19 +425,19 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
             // do not overwrite clean .2 with dirty .1
             val flags3 = FileInputStream(file3).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
-            if (!(flags3 == 0 && flags2 != 0) || !file3.exists()) file2.copyTo(file3, true)
+            if (!(flags3 == 0 && flags2 != 0) || !file3.exists()) Files.move(file2.toPath(), file3.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
             // do not overwrite clean .2 with dirty .1
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
-            if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) file1.copyTo(file2, true)
+            if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) Files.move(file1.toPath(), file2.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
             if (file2.exists() && !file3.exists())
-                file2.copyTo(file3, true)
+                Files.move(file2.toPath(), file3.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
             if (file1.exists() && !file2.exists())
-                file1.copyTo(file2, true)
+                Files.move(file1.toPath(), file2.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
 
             file.copyTo(file1, true)
         } catch (e: IOException) {}
@@ -451,13 +453,19 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
             // do not overwrite clean .2 with dirty .1
             val flags3 = FileInputStream(file3).let { it.skip(49L); val r = it.read(); it.close(); r }
             val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
-            if (!(flags3 == 0 && flags2 != 0) || !file3.exists()) file1.copyTo(file3, true)
+            if (!(flags3 == 0 && flags2 != 0) || !file3.exists()) Files.move(file2.toPath(), file3.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+        } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
+        try {
+            // do not overwrite clean .2 with dirty .1
+            val flags2 = FileInputStream(file2).let { it.skip(49L); val r = it.read(); it.close(); r }
+            val flags1 = FileInputStream(file1).let { it.skip(49L); val r = it.read(); it.close(); r }
+            if (!(flags2 == 0 && flags1 != 0) || !file2.exists()) Files.move(file1.toPath(), file2.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         } catch (e: NoSuchFileException) {} catch (e: FileNotFoundException) {}
         try {
             if (file2.exists() && !file3.exists())
-                file2.copyTo(file3, true)
+                Files.move(file2.toPath(), file3.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
             if (file1.exists() && !file2.exists())
-                file1.copyTo(file2, true)
+                Files.move(file1.toPath(), file2.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
 
             file0.copyTo(file1, true)
         } catch (e: IOException) {}
