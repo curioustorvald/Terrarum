@@ -86,7 +86,7 @@ object UILoadGovernor {
 }
 
 abstract class Advanceable : UICanvas() {
-    abstract fun advanceMode()
+    abstract fun advanceMode(button: UIItem)
 }
 
 /**
@@ -170,7 +170,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
         this.mode = mode
     }
 
-    override fun advanceMode() {
+    override fun advanceMode(button: UIItem) {
         mode += 1
         uiScroll = 0f
         scrollFrom = 0
@@ -497,7 +497,7 @@ class UIItemPlayerCells(
         UILoadGovernor.playerDisk = skimmer
         UILoadGovernor.playerUUID = playerUUID
         UILoadGovernor.worldUUID = worldUUID
-        parent.advanceMode()
+        parent.advanceMode(this)
     }
 
     private var playerName: String = "$EMDASH"
@@ -555,10 +555,12 @@ class UIItemPlayerCells(
     private var highlightCol: Color = defaultCol
     private var highlightTextCol: Color = defaultCol
 
+    var forceMouseDown = false
+
     override fun update(delta: Float) {
         super.update(delta)
-        highlightCol = if (mouseUp) litCol else defaultCol
-        highlightTextCol = if (mouseUp) litCol else Toolkit.Theme.COL_LIST_DEFAULT
+        highlightCol = if (mouseUp && !forceMouseDown) litCol else defaultCol
+        highlightTextCol = if (mouseUp && !forceMouseDown) litCol else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -756,7 +758,7 @@ class UIItemWorldCells(
 
     override var clickOnceListener: ((Int, Int) -> Unit)? = { _: Int, _: Int ->
         UILoadGovernor.worldDisk = skimmer
-        parent.advanceMode()
+        parent.advanceMode(this)
     }
 
     internal var hasTexture = false

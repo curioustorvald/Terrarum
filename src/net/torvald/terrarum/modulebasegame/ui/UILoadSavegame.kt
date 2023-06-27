@@ -69,8 +69,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     internal val cellInterval = cellGap + SAVE_CELL_HEIGHT
     internal val gradAreaHeight = 32
 
-    internal val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
-    internal val titleTopGradStart: Int = titleTextPosY + textH
+//    internal val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
+    internal val titleTopGradStart: Int = App.scr.tvSafeGraphicsHeight
     internal val titleTopGradEnd: Int = titleTopGradStart + gradAreaHeight
     internal val titleBottomGradStart: Int = height - App.scr.tvSafeGraphicsHeight - gradAreaHeight
     internal val titleBottomGradEnd: Int = titleBottomGradStart + gradAreaHeight
@@ -109,6 +109,15 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val MODE_LOAD_DA_SHIT_ALREADY = 255
     private val MODE_SAVE_DAMAGED = 256
     private val MODE_SAVE_DELETE = 512
+    private val MODE_SAVE_DELETE_CONFIRM = 513
+
+    private var buttonSelectedForDeletion: UIItemPlayerCells? = null
+
+    private val goButtonWidth = 180
+    private val drawX = (Toolkit.drawWidth - 480) / 2
+    private val drawY = (App.scr.height - 480) / 2
+    private val confirmBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", drawX + (240 - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, drawY + 480- 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
     private lateinit var loadables: SavegameCollectionPair
 
@@ -161,7 +170,13 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         }
     }
 
-    override fun advanceMode() {
+    init {
+        confirmBackButton.clickOnceListener = { _,_ ->
+            remoCon.openUI(UILoadSavegame(remoCon))
+        }
+    }
+
+    override fun advanceMode(button: UIItem) {
         mode += 1
         uiScroll = 0f
         scrollFrom = 0
@@ -285,6 +300,14 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 }
 
                 MODE_SAVE_MULTIPLE_CHOICES*/
+            }
+        }
+        else if (mode == MODE_SAVE_DELETE_CONFIRM) {
+            // confirm deletion of selected player
+            buttonSelectedForDeletion = (button as UIItemPlayerCells).also {
+                deleteCellPosYstart = it.posY.toFloat()
+                it.forceMouseDown = true
+                it.update(0.01f)
             }
         }
     }
@@ -411,7 +434,18 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 }
             }
         }
+
+        if (mode == MODE_SAVE_DELETE_CONFIRM && deleteCellAnimCounter <= scrollAnimLen) {
+            // do transitional moving stuff
+            buttonSelectedForDeletion?.posY = Movement.fastPullOut(deleteCellAnimCounter / scrollAnimLen, deleteCellPosYstart, (titleTopGradEnd + cellInterval).toFloat()).roundToInt()
+
+            deleteCellAnimCounter += delta
+            if (deleteCellAnimCounter > scrollAnimLen) deleteCellAnimCounter = scrollAnimLen
+        }
     }
+
+    private var deleteCellAnimCounter = 0f
+    private var deleteCellPosYstart = 0f
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
@@ -522,11 +556,17 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         }
 
 
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE || mode == MODE_SAVE_DELETE_CONFIRM) {
             deleteCharacterButton.render(batch, camera)
         }
-    }
+        if (mode == MODE_SAVE_DELETE_CONFIRM) {
+            // do transitional moving stuff
 
+            buttonSelectedForDeletion?.render(batch, camera)
+            confirmBackButton.render(batch, camera)
+            confirmDeleteButton.render(batch, camera)
+        }
+    }
 
     override fun keyDown(keycode: Int): Boolean {
         if (this.isVisible && (mode == MODE_SELECT || mode == MODE_SAVE_DELETE)) {
@@ -547,18 +587,28 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (mode == MODE_SELECT) getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
         if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchDown(screenX, screenY, pointer, button) }
         if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchDown(screenX, screenY, pointer, button) }
         if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
+        if (mode == MODE_SAVE_DELETE_CONFIRM) {
+            confirmBackButton.touchDown(screenX, screenY, pointer, button)
+            confirmDeleteButton.touchDown(screenX, screenY, pointer, button)
+        }
+
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (mode == MODE_SELECT) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
         if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchUp(screenX, screenY, pointer, button) }
         if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchUp(screenX, screenY, pointer, button) }
         if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
+        if (mode == MODE_SAVE_DELETE_CONFIRM) {
+            confirmBackButton.touchUp(screenX, screenY, pointer, button)
+            confirmDeleteButton.touchUp(screenX, screenY, pointer, button)
+        }
+
         return true
     }
 
