@@ -116,7 +116,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val goButtonWidth = 180
     private val drawX = (Toolkit.drawWidth - 480) / 2
     private val drawY = (App.scr.height - 480) / 2
-    private val confirmBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", drawX + (240 - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val confirmCancelButton = UIItemTextButton(this, "MENU_LABEL_CANCEL", drawX + (240 - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
     private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, drawY + 480- 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD)
 
     private lateinit var loadables: SavegameCollectionPair
@@ -171,9 +172,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     init {
-        confirmBackButton.clickOnceListener = { _,_ ->
-            remoCon.openUI(UILoadSavegame(remoCon))
-        }
+        corruptedBackButton.clickOnceListener = { _,_ -> remoCon.openUI(UILoadSavegame(remoCon)) }
+        confirmCancelButton.clickOnceListener = { _, _ -> remoCon.openUI(UILoadSavegame(remoCon)) }
         confirmDeleteButton.clickOnceListener = { _,_ ->
             val pu = buttonSelectedForDeletion!!.playerUUID
             val wu = buttonSelectedForDeletion!!.worldUUID
@@ -182,11 +182,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 App.savegamePlayers.remove(pu)
                 App.savegamePlayersName.remove(pu)
             }
-            App.savegameWorlds[wu]?.moveToRecycle(App.recycledWorldsDir)?.let {
-                App.sortedSavegameWorlds.remove(wu)
-                App.savegameWorlds.remove(wu)
-                App.savegameWorldsName.remove(wu)
-            }
+            // don't delete the world please
             remoCon.openUI(UILoadSavegame(remoCon))
         }
     }
@@ -374,13 +370,14 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     private val deleteCharacterButton = UIItemTextButton(
         this, "CONTEXT_CHARACTER_DELETE",
-        UIRemoCon.menubarOffX - UIRemoCon.UIRemoConElement.paddingLeft + 11,
+        UIRemoCon.menubarOffX - UIRemoCon.UIRemoConElement.paddingLeft + 72,
         UIRemoCon.menubarOffY - UIRemoCon.UIRemoConElement.lineHeight * 3 + 16,
         remoCon.width + UIRemoCon.UIRemoConElement.paddingLeft,
         true,
         inactiveCol = Toolkit.Theme.COL_RED,
         activeCol = Toolkit.Theme.COL_REDD,
-        hitboxSize = UIRemoCon.UIRemoConElement.lineHeight - 2
+        hitboxSize = UIRemoCon.UIRemoConElement.lineHeight - 2,
+        alignment = UIItemTextButton.Companion.Alignment.LEFT
     ).also {
         it.clickOnceListener = { _,_ ->
             mode = MODE_SAVE_DELETE
@@ -553,21 +550,21 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         }
         else if (mode == MODE_SAVE_MULTIPLE_CHOICES) {
             // "The Autosave is more recent than the manual save"
-            val tw1 = App.fontGame.getWidth(Lang["GAME_MORE_RECENT_AUTOSAVE1"])
-            val tw2 = App.fontGame.getWidth(Lang["GAME_MORE_RECENT_AUTOSAVE2"])
-            App.fontGame.draw(batch, Lang["GAME_MORE_RECENT_AUTOSAVE1"], ((Toolkit.drawWidth - tw1)/2).toFloat(), altSelDrawY + 0f)
-            App.fontGame.draw(batch, Lang["GAME_MORE_RECENT_AUTOSAVE2"], ((Toolkit.drawWidth - tw2)/2).toFloat(), altSelDrawY + 24f)
-
-            val twm = App.fontGame.getWidth(Lang["MENU_IO_MANUAL_SAVE"])
-            val twa = App.fontGame.getWidth(Lang["MENU_IO_AUTOSAVE"])
-
-            App.fontGame.draw(batch, Lang["MENU_IO_MANUAL_SAVE"], ((Toolkit.drawWidth - altSelDrawW)/2).toFloat() + altSelQdrawW - twm/2, altSelDrawY + 80f)
-            App.fontGame.draw(batch, Lang["MENU_IO_AUTOSAVE"], ((Toolkit.drawWidth - altSelDrawW)/2).toFloat() + altSelQQQdrawW - twa/2, altSelDrawY + 80f)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE1"], Toolkit.drawWidth, 0, altSelDrawY)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE2"], Toolkit.drawWidth, 0, altSelDrawY + 24)
+            // Manual Save             Autosave
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_MANUAL_SAVE"], altSelHdrawW, (Toolkit.drawWidth - altSelDrawW)/2, altSelDrawY + 80)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_AUTOSAVE"], altSelHdrawW, Toolkit.drawWidth/2, altSelDrawY + 80)
 
 
             // draw thumbnail-buttons
             loadAutoThumbButton.render(batch, camera)
             loadManualThumbButton.render(batch, camera)
+        }
+        else if (mode == MODE_SAVE_DAMAGED) {
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["ERROR_SAVE_CORRUPTED"], Toolkit.drawWidth, 0, App.scr.height / 2 - 42)
+
+            corruptedBackButton.render(batch, camera)
         }
 
 
@@ -575,12 +572,18 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             deleteCharacterButton.render(batch, camera)
         }
         if (mode == MODE_SAVE_DELETE_CONFIRM) {
-            // do transitional moving stuff
-
             buttonSelectedForDeletion?.render(batch, camera)
-            confirmBackButton.render(batch, camera)
+            confirmCancelButton.render(batch, camera)
             confirmDeleteButton.render(batch, camera)
         }
+
+        if (mode == MODE_SAVE_DELETE_CONFIRM) {
+            batch.color = Color.WHITE
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_SAVE_WILL_BE_DELETED"], Toolkit.drawWidth, 0, titleTopGradEnd + cellInterval - 46)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_ARE_YOU_SURE"], Toolkit.drawWidth, 0, titleTopGradEnd + cellInterval + SAVE_CELL_HEIGHT + 36)
+        }
+
+
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -607,9 +610,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchDown(screenX, screenY, pointer, button) }
         if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
         if (mode == MODE_SAVE_DELETE_CONFIRM) {
-            confirmBackButton.touchDown(screenX, screenY, pointer, button)
+            confirmCancelButton.touchDown(screenX, screenY, pointer, button)
             confirmDeleteButton.touchDown(screenX, screenY, pointer, button)
         }
+        if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchDown(screenX, screenY, pointer, button)
 
         return true
     }
@@ -618,11 +622,12 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
         if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchUp(screenX, screenY, pointer, button) }
         if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchUp(screenX, screenY, pointer, button) }
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
+        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchUp(screenX, screenY, pointer, button)
         if (mode == MODE_SAVE_DELETE_CONFIRM) {
-            confirmBackButton.touchUp(screenX, screenY, pointer, button)
+            confirmCancelButton.touchUp(screenX, screenY, pointer, button)
             confirmDeleteButton.touchUp(screenX, screenY, pointer, button)
         }
+        if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchUp(screenX, screenY, pointer, button)
 
         return true
     }

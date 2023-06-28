@@ -630,6 +630,7 @@ fun Float.sqrt() = FastMath.sqrt(this)
 fun Int.abs() = this.absoluteValue
 fun Double.bipolarClamp(limit: Double) = this.coerceIn(-limit, limit)
 fun Boolean.toInt(shift: Int = 0) = if (this) 1.shl(shift) else 0
+fun Boolean.toLong(shift: Int = 0) = if (this) 1L.shl(shift) else 0L
 fun Int.bitCount() = java.lang.Integer.bitCount(this)
 fun Long.bitCount() = java.lang.Long.bitCount(this)
 

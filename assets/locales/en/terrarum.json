@@ -44,5 +44,6 @@
   "GAME_MORE_RECENT_AUTOSAVE1": "The Autosave is more recent than the manual save.",
   "GAME_MORE_RECENT_AUTOSAVE2": "Please select the saved game you wish to play:",
   "MENU_IO_MANUAL_SAVE": "Manual Save",
-  "MENU_IO_AUTOSAVE": "Autosave"
+  "MENU_IO_AUTOSAVE": "Autosave",
+  "MENU_LABEL_SAVE_WILL_BE_DELETED": "The selected save file will be deleted."
 }

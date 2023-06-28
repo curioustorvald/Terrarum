@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
@@ -9,6 +10,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -118,6 +120,11 @@ object Toolkit : Disposable {
     fun drawCentered(batch: SpriteBatch, image: TextureRegion, screenPosY: Int, targetW: Int, offsetX: Int = 0, offsetY: Int = 0) {
         val imageW = image.regionWidth
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat() + offsetX, screenPosY.toFloat() + offsetY)
+    }
+
+    fun drawTextCentered(batch: SpriteBatch, font: TerrarumSansBitmap, text: String, tbw: Int, tbx: Int, tby: Int) {
+        val tw = font.getWidth(text)
+        font.draw(batch, text, tbx + (tbw - tw) / 2, tby)
     }
 
     fun fillArea(batch: SpriteBatch, x: Int, y: Int, w: Int, h: Int) {
