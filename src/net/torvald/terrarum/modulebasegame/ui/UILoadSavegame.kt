@@ -101,7 +101,11 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     private val playerCells = ArrayList<UIItemPlayerCells>()
 
-    var mode = 0; private set// 0: show players, 1: show worlds
+    var mode = 0 // 0: show players, 1: show worlds
+        private set(value) {
+            touchLatched = true
+            field = value
+        }
 
     private val MODE_SELECT = 0
     private val MODE_SELECT_AFTER = 1
@@ -188,6 +192,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun advanceMode(button: UIItem) {
+        printdbg(this, "advanceMode ${button.javaClass.canonicalName}")
+
         mode += 1
         uiScroll = 0f
         scrollFrom = 0
@@ -312,6 +318,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
                 MODE_SAVE_MULTIPLE_CHOICES*/
             }
+
+            printdbg(this, "mode = $mode")
         }
         else if (mode == MODE_SAVE_DELETE_CONFIRM) {
             // confirm deletion of selected player
@@ -358,6 +366,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         playerCells.forEach { it.dispose() }
         playerCells.clear()
     }
+
+    private var touchLatched = false
 
     private fun getCells() = playerCells
     private var loadFired = 0
@@ -605,29 +615,40 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
-        if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchDown(screenX, screenY, pointer, button) }
-        if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchDown(screenX, screenY, pointer, button) }
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
-        if (mode == MODE_SAVE_DELETE_CONFIRM) {
+        printdbg(this, "touchDown mode=$mode")
+
+        if (mode == MODE_SAVE_MULTIPLE_CHOICES) {
+            if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.touchDown(screenX, screenY, pointer, button)
+            if (::loadManualThumbButton.isInitialized) loadManualThumbButton.touchDown(screenX, screenY, pointer, button)
+        }
+        else if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
+            getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
+            deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
+        }
+        else if (mode == MODE_SAVE_DELETE_CONFIRM) {
             confirmCancelButton.touchDown(screenX, screenY, pointer, button)
             confirmDeleteButton.touchDown(screenX, screenY, pointer, button)
         }
-        if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchDown(screenX, screenY, pointer, button)
+        else if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchDown(screenX, screenY, pointer, button)
 
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
-        if (::loadAutoThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadAutoThumbButton.touchUp(screenX, screenY, pointer, button) }
-        if (::loadManualThumbButton.isInitialized && mode == MODE_SAVE_MULTIPLE_CHOICES) { loadManualThumbButton.touchUp(screenX, screenY, pointer, button) }
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) deleteCharacterButton.touchUp(screenX, screenY, pointer, button)
-        if (mode == MODE_SAVE_DELETE_CONFIRM) {
+        if (mode == MODE_SAVE_MULTIPLE_CHOICES) {
+            if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.touchUp(screenX, screenY, pointer, button)
+            if (::loadManualThumbButton.isInitialized) loadManualThumbButton.touchUp(screenX, screenY, pointer, button)
+        }
+        else if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
+            getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
+            deleteCharacterButton.touchUp(screenX, screenY, pointer, button)
+        }
+        else if (mode == MODE_SAVE_DELETE_CONFIRM) {
             confirmCancelButton.touchUp(screenX, screenY, pointer, button)
             confirmDeleteButton.touchUp(screenX, screenY, pointer, button)
         }
-        if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchUp(screenX, screenY, pointer, button)
+        else if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchUp(screenX, screenY, pointer, button)
+
 
         return true
     }

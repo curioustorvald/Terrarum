@@ -31,7 +31,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
     const val DEFAULT_LOADORDER_FILE = """# Load Order
 # Modules are loaded from top to bottom.
-# You can disable basegame, but we don't recommend.
+# Name of the module corresponds with the name of the directory the module is stored in,
+# typically under:
+#    1. assets/mods of the installation path (the modules comes with the release of the game)
+#    2. %APPDATA%/Modules (the modules installed by the user)
+#    where %APPDATA% is:
+#        Windows -- C:\Users\<username>\AppData\Roaming\Terrarum
+#        macOS   -- /Users/<username>/Library/Application Support/Terrarum
+#        Linux   -- /home/<username>/.Terrarum
+# Please refrain from removing 'basegame' on the load order -- it may render the game unpalyable.
 
 basegame
 """

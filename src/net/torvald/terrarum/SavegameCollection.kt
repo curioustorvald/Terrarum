@@ -14,7 +14,11 @@ import kotlin.io.path.Path
 class SavegameCollection(files0: List<DiskSkimmer>) {
 
     /** Sorted in reverse by the last modified time of the files, index zero being the most recent */
-    val files = files0.sortedByDescending { it.getLastModifiedTime().shl(2) or it.diskFile.extension.isBlank().toLong(1) or it.diskFile.extension.matches(Regex("^[abc]${'$'}")).toLong() }
+    val files = files0.sortedByDescending {
+        it.getLastModifiedTime().shl(2) or
+        it.diskFile.extension.matches(Regex("^[abc]${'$'}")).toLong(1) or
+        it.diskFile.extension.isBlank().toLong(0)
+    }
     /** Sorted in reverse by the last modified time of the files, index zero being the most recent */
     val autoSaves = files.filter { it.diskFile.extension.matches(Regex("[a-z]")) }
     /** Sorted in reverse by the last modified time of the files, index zero being the most recent */
