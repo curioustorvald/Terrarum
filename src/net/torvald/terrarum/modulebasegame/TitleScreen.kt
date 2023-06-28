@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -13,11 +14,13 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
@@ -65,49 +68,63 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
+    private val cameraNodeWidth = 10
+    private val lookaheadDist = cameraNodeWidth * TILE_SIZED
+    private fun getPointAt(px: Double): Double {
+        val ww = TILE_SIZEF * demoWorld.width
+        val x = px % ww
+
+        val indexThis = ((x / ww * cameraNodes.size).floorInt())
+        val xwstart: Double = indexThis.toDouble() / cameraNodes.size * ww
+        val xwend: Double = ((indexThis + 1).toDouble() / cameraNodes.size) * ww
+        val xw: Double = xwend - xwstart
+        val xperc: Double = (x - xwstart) / xw
+
+        return FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis fmod cameraNodes.size], cameraNodes[(indexThis + 1) fmod cameraNodes.size]).toDouble()
+    }
     private val cameraAI = object : ActorAI {
         private var firstTime = true
-        private val lookaheadDist = 100.0
 
-        private fun getPointAt(px: Double): Float {
-            val ww = TILE_SIZEF * demoWorld.width
-            val x = px % ww
-
-            val indexThis = ((x / ww * cameraNodes.size).floorInt()) fmod cameraNodes.size
-            val xwstart: Float = indexThis.toFloat() / cameraNodes.size * ww
-            val xwend: Float = ((indexThis + 1).toFloat() / cameraNodes.size) * ww
-            val xw: Float = xwend - xwstart
-            val xperc: Double = (x - xwstart) / xw
-
-            return FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis], cameraNodes[(indexThis + 1) % cameraNodes.size])
-        }
 
         override fun update(actor: Actor, delta: Float) {
             val ww = TILE_SIZEF * demoWorld.width
             val actor = actor as CameraPlayer
 
-            val px: Double = actor.hitbox.canonicalX + actor.actorValue.getAsDouble(AVKey.SPEED)!!
-            val pxP = px - lookaheadDist * cos(actor.targetBearing)
-            val pxN = px + lookaheadDist * cos(actor.targetBearing)
+            val x1 = actor.hitbox.startX
+            val y1 = actor.hitbox.startY
 
-            val yP = getPointAt(pxP)
-            val yN = getPointAt(pxN)
+            val px1L = x1 - lookaheadDist// * cos(actor.bearing1A)
+            val px1C = x1
+            val px1R = x1 + lookaheadDist// * cos(actor.bearing1B)
+            val py1L = getPointAt(px1L)
+            val py1C = getPointAt(px1C)
+            val py1R = getPointAt(px1R)
 
-            val y = (yP + yN) / 2f
+            val px2L = (px1L + px1C) / 2.0
+            val px2R = (px1C + px1R) / 2.0
+            val py2L = (py1L + py1C) / 2.0
+            val py2R = (py1C + py1R) / 2.0
+
+            val x2 = (px2L + px2R) / 2
+            val y2 = (py2L + py2R) / 2
+
+            val theta = atan2(py2R - py2L, px2R - px2L)
 
             if (firstTime) {
                 firstTime = false
-                actor.hitbox.setPositionY(y - 8.0)
+                actor.hitbox.setPosition(x1, getPointAt(x1))
             }
             else {
-                //actor.moveTo(px, y - 8.0)
-                //actor.hitbox.setPosition(px, y - 8.0)
-                actor.moveTo(atan2((yN - yP).toDouble(), pxN - pxP))
+                actor.bearing1A = atan2(py1C - py1L, px1C - px1L)
+                actor.bearing1B = atan2(py1R - py1C, px1R - px1C)
+                actor.bearing2A = atan2(py2R - py2L, px2R - px2L)
+                actor.moveTo(theta)
             }
 
-            if (actor.hitbox.canonicalX > ww) {
+            if (actor.hitbox.startX > ww) {
                 actor.hitbox.translatePosX(-ww.toDouble())
             }
+
         }
     }
     private lateinit var cameraPlayer: ActorWithBody
@@ -153,7 +170,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         // construct camera nodes
-        val nodeCount = demoWorld.width / 10
+        val nodeCount = demoWorld.width / cameraNodeWidth
         cameraNodes = kotlin.FloatArray(nodeCount) {
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
@@ -270,6 +287,20 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val particles = CircularArray<ParticleBase>(16, true)
 
+    private fun drawLineOnWorld(x1: Float, y1: Float, x2: Float, y2: Float) {
+        val w = 2.0f
+        App.shapeRender.rectLine(
+            x1 - WorldCamera.x, App.scr.height - (y1 - WorldCamera.y),
+            x2 - WorldCamera.x, App.scr.height - (y2 - WorldCamera.y),
+            w
+        )
+    }
+    private fun drawLineOnWorld(x1: Double, y1: Double, x2: Double, y2: Double) {
+        val ww = demoWorld.width * TILE_SIZE
+        drawLineOnWorld(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
+        drawLineOnWorld(x1.toFloat() + ww, y1.toFloat(), x2.toFloat() + ww, y2.toFloat())
+    }
+
     private val renderScreen = { delta: Float ->
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
@@ -292,6 +323,41 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     particles,
                     uiContainer = uiContainer
             )
+
+            if (KeyToggler.isOn(Input.Keys.F10)) {
+                App.shapeRender.inUse {
+                    (1..cameraNodes.lastIndex + 16).forEach { index0 ->
+                        it.color = if (index0 == cameraNodes.lastIndex + 1) Color.CORAL else Color.CYAN
+                        val x1 = (index0 - 1) * cameraNodeWidth * TILE_SIZEF; val x2 = (index0 - 0) * cameraNodeWidth * TILE_SIZEF
+                        val y1 = cameraNodes[(index0 - 1) fmod cameraNodes.size]; val y2 = cameraNodes[index0 fmod cameraNodes.size]
+                        drawLineOnWorld(x1, y1, x2, y2)
+                    }
+
+                    val actor = cameraPlayer as CameraPlayer
+
+                    val x1 = actor.hitbox.startX
+                    val y1 = actor.hitbox.startY
+
+                    val px1L = x1 - lookaheadDist// * cos(actor.bearing1A)
+                    val px1C = x1
+                    val px1R = x1 + lookaheadDist// * cos(actor.bearing1B)
+                    val py1L = getPointAt(px1L)
+                    val py1C = getPointAt(px1C)
+                    val py1R = getPointAt(px1R)
+
+                    val px2L = (px1L + px1C) / 2.0
+                    val px2R = (px1C + px1R) / 2.0
+                    val py2L = (py1L + py1C) / 2.0
+                    val py2R = (py1C + py1R) / 2.0
+
+                    it.color = Color.CORAL
+                    drawLineOnWorld(px1L, py1L, px1C, py1C)
+                    drawLineOnWorld(px1C, py1C, px1R, py1R)
+
+                    it.color = Color.YELLOW
+                    drawLineOnWorld(px2L, py2L, px2R, py2R)
+                }
+            }
         }
         else {
             printdbgerr(this, "Demoworld is already been destroyed")
@@ -496,7 +562,14 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         var targetBearing = 0.0
-        var currentBearing = Double.NaN
+        var currentBearing = 0.0
+
+        var bearing1A = 0.0
+        var bearing1B = 0.0
+        var bearing1C = 0.0
+        var bearing2A = 0.0
+        var bearing2B = 0.0
+        var bearing3A = 0.0
 
         override fun moveTo(bearing: Double) {
             targetBearing = bearing
@@ -516,6 +589,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             val xdiff = if (xdiff1 < 0) xdiff2 else xdiff1
             val ydiff = toY - hitbox.canonicalY
+
             moveTo(atan2(ydiff, xdiff))
             hitbox.setPositionX(hitbox.canonicalX % ww)
         }
