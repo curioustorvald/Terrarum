@@ -3,6 +3,10 @@ package net.torvald.terrarum
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.savegame.DiskSkimmer
 import java.io.File
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import kotlin.io.path.Path
 
 /**
  * Created by minjaesong on 2023-06-24.
@@ -35,6 +39,16 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
         return files.first()
     }
 
+    fun moveToRecycle(basedir: String) {
+        files.forEach {
+            try {
+                Files.move(it.diskFile.toPath(), Path(basedir, it.diskFile.name), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+            }
+            catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
 
 class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollection?) {

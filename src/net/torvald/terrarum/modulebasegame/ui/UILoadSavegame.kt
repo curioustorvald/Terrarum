@@ -174,6 +174,21 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         confirmBackButton.clickOnceListener = { _,_ ->
             remoCon.openUI(UILoadSavegame(remoCon))
         }
+        confirmDeleteButton.clickOnceListener = { _,_ ->
+            val pu = buttonSelectedForDeletion!!.playerUUID
+            val wu = buttonSelectedForDeletion!!.worldUUID
+            App.savegamePlayers[pu]?.moveToRecycle(App.recycledPlayersDir)?.let {
+                App.sortedPlayers.remove(pu)
+                App.savegamePlayers.remove(pu)
+                App.savegamePlayersName.remove(pu)
+            }
+            App.savegameWorlds[wu]?.moveToRecycle(App.recycledWorldsDir)?.let {
+                App.sortedSavegameWorlds.remove(wu)
+                App.savegameWorlds.remove(wu)
+                App.savegameWorldsName.remove(wu)
+            }
+            remoCon.openUI(UILoadSavegame(remoCon))
+        }
     }
 
     override fun advanceMode(button: UIItem) {

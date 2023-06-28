@@ -505,8 +505,8 @@ class UIItemPlayerCells(
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
 
-    private lateinit var playerUUID: UUID
-    private lateinit var worldUUID: UUID
+    lateinit var playerUUID: UUID; private set
+    lateinit var worldUUID: UUID; private set
 
     init {
         skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {

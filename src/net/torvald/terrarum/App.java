@@ -1139,6 +1139,11 @@ public class App implements ApplicationListener {
 
     public static RunningEnvironment environment;
 
+    /** defaultDir + "/Recycled/Players" */
+    public static String recycledPlayersDir;
+    /** defaultDir + "/Recycled/Worlds" */
+    public static String recycledWorldsDir;
+
     private static void getDefaultDirectory() {
         String OS = OSName.toUpperCase();
         if (OS.contains("WIN")) {
@@ -1168,6 +1173,8 @@ public class App implements ApplicationListener {
         worldsDir = defaultDir + "/Worlds";
         configDir = defaultDir + "/config.json";
         loadOrderDir = defaultDir + "/LoadOrder.txt";
+        recycledPlayersDir = defaultDir + "/Recycled/Players";
+        recycledWorldsDir = defaultDir + "/Recycled/Worlds";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));
@@ -1177,10 +1184,12 @@ public class App implements ApplicationListener {
 
     private static void createDirs() {
         File[] dirs = {
-                new File(saveDir),
+//                new File(saveDir),
                 new File(saveSharedDir),
                 new File(playersDir),
-                new File(worldsDir)
+                new File(worldsDir),
+                new File(recycledPlayersDir),
+                new File(recycledWorldsDir),
         };
 
         for (File it : dirs) {
