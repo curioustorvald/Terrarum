@@ -301,6 +301,10 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         drawLineOnWorld(x1.toFloat() + ww, y1.toFloat(), x2.toFloat() + ww, y2.toFloat())
     }
 
+    private val baseSlopeCol = Color(0f, 1f, 1f, 1f)
+    private val firstOrderSlopeCol = Color(0f, 0.4f, 0f, 1f)
+    private val secondOrderSlopeCol = Color(0.6f, 0.6f, 0.0f, 1f)
+
     private val renderScreen = { delta: Float ->
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
@@ -326,12 +330,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             if (KeyToggler.isOn(Input.Keys.F10)) {
                 App.shapeRender.inUse {
-                    (1..cameraNodes.lastIndex + 16).forEach { index0 ->
-                        it.color = if (index0 == cameraNodes.lastIndex + 1) Color.CORAL else Color.CYAN
-                        val x1 = (index0 - 1) * cameraNodeWidth * TILE_SIZEF; val x2 = (index0 - 0) * cameraNodeWidth * TILE_SIZEF
-                        val y1 = cameraNodes[(index0 - 1) fmod cameraNodes.size]; val y2 = cameraNodes[index0 fmod cameraNodes.size]
-                        drawLineOnWorld(x1, y1, x2, y2)
-                    }
 
                     val actor = cameraPlayer as CameraPlayer
 
@@ -350,12 +348,21 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     val py2L = (py1L + py1C) / 2.0
                     val py2R = (py1C + py1R) / 2.0
 
-                    it.color = Color.CORAL
+                    it.color = firstOrderSlopeCol
                     drawLineOnWorld(px1L, py1L, px1C, py1C)
                     drawLineOnWorld(px1C, py1C, px1R, py1R)
 
-                    it.color = Color.YELLOW
+                    it.color = secondOrderSlopeCol
                     drawLineOnWorld(px2L, py2L, px2R, py2R)
+
+
+                    (1..cameraNodes.lastIndex + 16).forEach { index0 ->
+                        it.color = baseSlopeCol
+                        val x1 = (index0 - 1) * cameraNodeWidth * TILE_SIZEF; val x2 = (index0 - 0) * cameraNodeWidth * TILE_SIZEF
+                        val y1 = cameraNodes[(index0 - 1) fmod cameraNodes.size]; val y2 = cameraNodes[index0 fmod cameraNodes.size]
+                        drawLineOnWorld(x1, y1, x2, y2)
+                    }
+
                 }
             }
         }
@@ -522,7 +529,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         override val hitbox = Hitbox(0.0, 0.0, 2.0, 2.0)
 
         init {
-            actorValue[AVKey.SPEED] = 1.666
+            actorValue[AVKey.SPEED] = 1.666 * (if (Math.random() < 1.0 / 65536.0) -1 else 1) // some easter egg
             hitbox.setPosition(
                     HQRNG().nextInt(demoWorld.width) * TILE_SIZED,
                     0.0 // Y pos: placeholder; camera AI will take it over
