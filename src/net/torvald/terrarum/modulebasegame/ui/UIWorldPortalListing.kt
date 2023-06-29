@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
@@ -94,6 +95,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                     selected?.worldInfo?.diskSkimmer, null
                 )
                 full.setAsClose()
+                printdbg(this, "Teleport target set: ${full.host.teleportRequest}")
             }
         }
     }
@@ -137,6 +139,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         buttonRename.isActive = false
         buttonDelete.isActive = false
         buttonTeleport.isActive = false
+        currentWorldSelected = false
     }
 
     private fun highlightListEditButtons(info: WorldInfo?) {
@@ -147,8 +150,11 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             buttonRename.isActive = true
             buttonDelete.isActive = info.uuid != INGAME.world.worldIndex
             buttonTeleport.isActive = info.uuid != INGAME.world.worldIndex
+            currentWorldSelected = info.uuid == INGAME.world.worldIndex
         }
     }
+
+    private var currentWorldSelected = false
 
     init {
         CommonResourcePool.addToLoadingList("terrarum-basegame-worldportalicons") {
@@ -296,6 +302,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
         if (::worldCells.isInitialized) worldCells.forEach { it.update(delta) }
+
+        if (currentWorldSelected) {
+            INGAME.setTooltipMessage(if (buttonTeleport.mouseUp || buttonDelete.mouseUp) Lang["CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING"] else null)
+        }
     }
 
     private val iconGap = 12f

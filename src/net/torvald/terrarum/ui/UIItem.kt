@@ -96,32 +96,33 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     protected var mouseLatched = Terrarum.mouseDown
 
     /** UI to call (show up) while mouse is up */
-    open val mouseOverCall: UICanvas? = null
+    open var mouseOverCall: UICanvas? = null
 
 
     // kind of listener implementation
     /** Fired once for every update
      * Parameter: delta */
-    open var updateListener: ((Float) -> Unit)? = null
+    open var updateListener: ((Float) -> Unit) = {}
     /** Parameter: keycode */
-    open var keyDownListener: ((Int) -> Unit)? = null
+    open var keyDownListener: ((Int) -> Unit) = {}
     /** Parameter: keycode */
-    open var keyUpListener: ((Int) -> Unit)? = null
-    open var keyTypedListener: ((Char) -> Unit)? = null
-    open var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
+    open var keyUpListener: ((Int) -> Unit) = {}
+    open var keyTypedListener: ((Char) -> Unit) = {}
+    open var touchDraggedListener: ((Int, Int, Int) -> Unit) = { _,_,_ -> }
     /** Parameters: screenX, screenY, pointer, button */
     @Deprecated("Not really deprecated but you MOST DEFINITELY want to use clickOnceListener(mouseX, mouseY) instead.")
-    open var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
-    open var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
+    open var touchDownListener: ((Int, Int, Int, Int) -> Unit) = { _,_,_,_ -> }
+    open var touchUpListener: ((Int, Int, Int, Int) -> Unit) = { _,_,_,_ -> }
     /** Parameters: amountX, amountY */
-    open var scrolledListener: ((Float, Float) -> Unit)? = null
+    open var scrolledListener: ((Float, Float) -> Unit) = { _,_ -> }
     /** Parameters: relative mouseX, relative mouseY
      * ClickOnce listeners are only fired when clicked with primary mouse button
      * PROTIP: if clickOnceListener does not seem to work, make sure your parent UI is handling touchDown() and touchUp() events!
      */
-    open var clickOnceListener: ((Int, Int) -> Unit)? = null
+    open var clickOnceListener: ((Int, Int) -> Unit) = { _,_ -> }
     open var clickOnceListenerFired = false
-
+    /** Parameters: relative mouseX, mouseY */
+    open var mouseUpListener: ((Int, Int) -> Unit) = { _,_, -> }
 
     /** Since gamepads can't just choose which UIItem to control, this variable is used to allow processing of
      * gamepad button events for one or more UIItems in one or more UICanvases. */
@@ -139,11 +140,9 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     open fun update(delta: Float) {
         if (parentUI.isVisible) {
-            if (updateListener != null) {
-                updateListener!!.invoke(delta)
-            }
+            updateListener.invoke(delta)
 
-            if (isActive) {
+//            if (isActive) {
                 mouseOverCall?.update(delta)
 
                 if (mouseUp) {
@@ -152,13 +151,14 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                     }
 
                     mouseOverCall?.updateUI(delta)
+                    mouseUpListener.invoke(itemRelativeMouseX, itemRelativeMouseY)
                 }
                 else {
                     if (mouseOverCall?.isVisible == true) {
                         mouseOverCall?.setAsClose()
                     }
                 }
-            }
+//            }
 
             if (!mouseUp) mouseLatched = false
         }
@@ -169,36 +169,36 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
      */
     open fun render(batch: SpriteBatch, camera: Camera) {
         if (parentUI.isVisible) {
-            if (isActive) {
+//            if (isActive) {
                 mouseOverCall?.render(batch, camera)
 
                 if (mouseUp) {
                     mouseOverCall?.renderUI(batch, camera)
                 }
-            }
+//            }
         }
     }
 
     // keyboard controlled
     open fun keyDown(keycode: Int): Boolean {
-        if (parentUI.isVisible && keyDownListener != null && isActive) {
-            keyDownListener!!.invoke(keycode)
+        if (parentUI.isVisible && isActive) {
+            keyDownListener.invoke(keycode)
             return true
         }
 
         return false
     }
     open fun keyUp(keycode: Int): Boolean {
-        if (parentUI.isVisible && keyUpListener != null && isActive) {
-            keyUpListener!!.invoke(keycode)
+        if (parentUI.isVisible && isActive) {
+            keyUpListener.invoke(keycode)
             return true
         }
 
         return false
     }
     open fun keyTyped(character: Char): Boolean  {
-        if (parentUI.isVisible && keyTypedListener != null && isActive) {
-            keyTypedListener!!.invoke(character)
+        if (parentUI.isVisible && isActive) {
+            keyTypedListener.invoke(character)
             return true
         }
 
@@ -207,26 +207,24 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     // mouse controlled
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (parentUI.isVisible && touchDraggedListener != null && isActive) {
-            touchDraggedListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer)
+        if (parentUI.isVisible && isActive) {
+            touchDraggedListener.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer)
             return true
         }
 
         return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        // FIXME does not work with magnified screen
-
         var actionDone = false
 
         if (parentUI.isVisible && isActive) {
-            if (touchDownListener != null && mouseUp) {
-                touchDownListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
+            if (mouseUp) {
+                touchDownListener.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
                 actionDone = true
             }
 
-            if (clickOnceListener != null && !clickOnceListenerFired && mouseUp && button == App.getConfigInt("config_mouseprimary")) {
-                clickOnceListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY)
+            if (!clickOnceListenerFired && mouseUp && button == App.getConfigInt("config_mouseprimary")) {
+                clickOnceListener.invoke(itemRelativeMouseX, itemRelativeMouseY)
                 actionDone = true
             }
         }
@@ -236,16 +234,16 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         clickOnceListenerFired = false
 
-        if (parentUI.isVisible && touchUpListener != null && mouseUp) {
-            touchUpListener!!.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
+        if (parentUI.isVisible && mouseUp) {
+            touchUpListener.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
             return true
         }
 
         return false
     }
     open fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (parentUI.isVisible && scrolledListener != null && mouseUp && isActive) {
-            scrolledListener!!.invoke(amountX, amountY)
+        if (parentUI.isVisible && mouseUp && isActive) {
+            scrolledListener.invoke(amountX, amountY)
             return true
         }
 

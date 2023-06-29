@@ -493,7 +493,7 @@ class UIItemPlayerCells(
     override val width = SAVE_CELL_WIDTH
     override val height = SAVE_CELL_HEIGHT
 
-    override var clickOnceListener: ((Int, Int) -> Unit)? = { _: Int, _: Int ->
+    override var clickOnceListener: ((Int, Int) -> Unit) = { _: Int, _: Int ->
         UILoadGovernor.playerDisk = skimmer
         UILoadGovernor.playerUUID = playerUUID
         UILoadGovernor.worldUUID = worldUUID
@@ -756,7 +756,7 @@ class UIItemWorldCells(
 
     private var highlightCol: Color = Toolkit.Theme.COL_LIST_DEFAULT
 
-    override var clickOnceListener: ((Int, Int) -> Unit)? = { _: Int, _: Int ->
+    override var clickOnceListener: ((Int, Int) -> Unit) = { _: Int, _: Int ->
         UILoadGovernor.worldDisk = skimmer
         parent.advanceMode(this)
     }
