@@ -316,7 +316,7 @@ final public class FastMath {
 
 
     public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3) {
-        return interpolateHermite(scale, p0, p1, p2, p3, 1f, 0f);
+        return interpolateHermite(scale, p0, p1, p2, p3, 0f, 0f);
     }
     public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3, float tension, float bias) {
         float mu2 = scale * scale;

@@ -68,7 +68,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private lateinit var demoWorld: GameWorld
     private lateinit var cameraNodes: FloatArray // camera Y-pos
-    private val cameraNodeWidth = 10
+    private val cameraNodeWidth = 15
     private val lookaheadDist = cameraNodeWidth * TILE_SIZED
     private fun getPointAt(px: Double): Double {
         val ww = TILE_SIZEF * demoWorld.width
@@ -80,7 +80,13 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val xw: Double = xwend - xwstart
         val xperc: Double = (x - xwstart) / xw
 
-        return FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis fmod cameraNodes.size], cameraNodes[(indexThis + 1) fmod cameraNodes.size]).toDouble()
+//        return FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis fmod cameraNodes.size], cameraNodes[(indexThis + 1) fmod cameraNodes.size]).toDouble()
+        return FastMath.interpolateHermite(xperc.toFloat(),
+            cameraNodes[(indexThis - 1) fmod cameraNodes.size],
+            cameraNodes[(indexThis - 0) fmod cameraNodes.size],
+            cameraNodes[(indexThis + 1) fmod cameraNodes.size],
+            cameraNodes[(indexThis + 2) fmod cameraNodes.size]
+        ).toDouble()
     }
     private val cameraAI = object : ActorAI {
         private var firstTime = true
@@ -90,12 +96,14 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             val ww = TILE_SIZEF * demoWorld.width
             val actor = actor as CameraPlayer
 
-            val x1 = actor.hitbox.startX
+            val stride = cos(actor.bearing1A) * actor.actorValue.getAsDouble(AVKey.SPEED)!!
+
+            val x1 = actor.hitbox.startX// + stride
             val y1 = actor.hitbox.startY
 
-            val px1L = x1 - lookaheadDist// * cos(actor.bearing1A)
+            val px1L = x1 - lookaheadDist
             val px1C = x1
-            val px1R = x1 + lookaheadDist// * cos(actor.bearing1B)
+            val px1R = x1 + lookaheadDist
             val py1L = getPointAt(px1L)
             val py1C = getPointAt(px1C)
             val py1R = getPointAt(px1R)
@@ -119,6 +127,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 actor.bearing1B = atan2(py1R - py1C, px1R - px1C)
                 actor.bearing2A = atan2(py2R - py2L, px2R - px2L)
                 actor.moveTo(theta)
+//                actor.hitbox.setPosition(x2, y2) // there is no reason it would work -- speed is wildly inconsistent as the angle reaches 90deg
             }
 
             if (actor.hitbox.startX > ww) {
@@ -355,12 +364,20 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     it.color = secondOrderSlopeCol
                     drawLineOnWorld(px2L, py2L, px2R, py2R)
 
-
-                    (1..cameraNodes.lastIndex + 16).forEach { index0 ->
-                        it.color = baseSlopeCol
+                    it.color = baseSlopeCol
+                    /*(1..cameraNodes.lastIndex + 16).forEach { index0 ->
                         val x1 = (index0 - 1) * cameraNodeWidth * TILE_SIZEF; val x2 = (index0 - 0) * cameraNodeWidth * TILE_SIZEF
                         val y1 = cameraNodes[(index0 - 1) fmod cameraNodes.size]; val y2 = cameraNodes[index0 fmod cameraNodes.size]
                         drawLineOnWorld(x1, y1, x2, y2)
+                    }*/
+                    val points = (0..App.scr.width).map { x ->
+                        val worldX = (WorldCamera.x + x).toDouble()
+                        worldX to getPointAt(worldX)
+                    }
+                    points.forEachIndexed { index, (x, y) ->
+                        if (index > 0) {
+                            drawLineOnWorld(points[index - 1].first, points[index - 1].second, x, y)
+                        }
                     }
 
                 }
