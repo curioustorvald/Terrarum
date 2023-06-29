@@ -231,6 +231,10 @@ final public class FastMath {
         return (float) (((c4 * u + c3) * u + c2) * u + c1);
     }
 
+    public static float interpolateCatmullRom(float u, float p0, float p1, float p2, float p3) {
+        return interpolateCatmullRom(u, 0.5f, p0, p1, p2, p3);
+    }
+
     /**Interpolate a spline between at least 4 control points following the Catmull-Rom equation.
      * here is the interpolation matrix
      * m = [ 0.0  1.0  0.0   0.0 ]
@@ -316,24 +320,25 @@ final public class FastMath {
 
 
     public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3) {
-        return interpolateHermite(scale, p0, p1, p2, p3, 0f, 0f);
-    }
-    public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3, float tension, float bias) {
+//        return interpolateHermite(scale, p0, p1, p2, p3, 0f, 0f);
         float mu2 = scale * scale;
         float mu3 = mu2 * scale;
+        float biasTensionTerms = 0.5f;//(1f + bias) * (1f - tension) / 2f;
 
-        float m0 = (p1 - p0) * (1f + bias) * (1f - tension) / 2f;
-        m0 += (p2 - p1) * (1f + bias) * (1f - tension) / 2f;
-        float m1 = (p2 - p1) * (1f + bias) * (1f - tension) / 2f;
-        m1 += (p3 - p2) * (1f + bias) * (1f - tension) / 2f;
+        float m0 = (p1 - p0) * biasTensionTerms;
+        float mTemp = (p2 - p1) * biasTensionTerms;
+        m0 += mTemp;
+        float m1 = mTemp;
+        m1 += (p3 - p2) * biasTensionTerms;
 
-        float a0 = 2 * mu3 - 3 * mu2 + 1;
-        float a1 = mu3 - 2 * mu2 + scale;
-        float a2 = mu3 - mu2;
-        float a3 = -2 * mu3 + 3 * mu2;
+        float a0 =  2*mu3 - 3*mu2 + 1;
+        float a1 =  1*mu3 - 2*mu2 + scale;
+        float a2 =  1*mu3 - 1*mu2 + 0;
+        float a3 = -2*mu3 + 3*mu2 + 0;
 
-        return a0 * p1 + a1 * m0 + a2 * m1 + a3 * p2;
+        return a0*p1 + a1*m0 + a2*m1 + a3*p2;
     }
+    //public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3, float tension, float bias) {}
 
 
     /**
