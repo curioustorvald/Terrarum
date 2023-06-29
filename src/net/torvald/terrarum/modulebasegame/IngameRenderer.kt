@@ -205,7 +205,7 @@ object IngameRenderer : Disposable {
             actorsRenderOverlay: List<ActorWithBody>,
             particlesContainer : CircularArray<ParticleBase>,
             player: ActorWithBody? = null,
-            uiContainer: UIContainer? = null
+            uiContainer: UIContainer? = null,
     ) {
         renderingActorsCount = (actorsRenderBehind.size) +
                                (actorsRenderMiddle.size) +

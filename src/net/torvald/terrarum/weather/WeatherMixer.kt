@@ -57,6 +57,18 @@ internal object WeatherMixer : RNGConsumer {
 
     // TODO to save from GL overhead, store lightmap to array; use GdxColorMap
 
+    var forceTimeAt: Int? = null
+
+    override fun loadFromSave(s0: Long, s1: Long) {
+        super.loadFromSave(s0, s1)
+        internalReset()
+    }
+
+    fun internalReset() {
+        globalLightOverridden = false
+        forceTimeAt = null
+    }
+
     init {
         weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
 
@@ -146,7 +158,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // we will not care for nextSkybox for now
-        val timeNow = world.worldTime.TIME_T.toInt() % WorldTime.DAY_LENGTH
+        val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
         val skyboxColourMap = currentWeather.skyboxGradColourMap
 
         // calculate global light

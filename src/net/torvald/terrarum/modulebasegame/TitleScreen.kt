@@ -165,7 +165,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
             val world = ReadSimpleWorld(reader, file)
             demoWorld = world
-            demoWorld.worldTime.timeDelta = 0//60
+            demoWorld.worldTime.timeDelta = 440 // a year = 6 minutes
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
@@ -281,9 +281,14 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     private val updateScreen = { delta: Float ->
-        demoWorld.globalLight = WeatherMixer.globalLightNow
+        // TODO: desynched weather and time-of-day change
+
+        val forcedTime = 39693
+//        demoWorld.globalLight = WeatherMixer.globalLightNow
+        demoWorld.globalLight = WeatherMixer.getGlobalLightOfTime(demoWorld, forcedTime)
         demoWorld.updateWorldTime(delta)
-        WeatherMixer.update(delta, cameraPlayer, demoWorld)
+//        WeatherMixer.update(delta, cameraPlayer, demoWorld)
+        WeatherMixer.forceTimeAt = forcedTime
         cameraPlayer.update(delta)
 
         // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX

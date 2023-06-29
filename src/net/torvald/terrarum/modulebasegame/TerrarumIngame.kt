@@ -484,6 +484,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             actorGamer = player
             forceAddActor(player)
 
+            WeatherMixer.internalReset()
         }
 
         KeyToggler.forceSet(Input.Keys.Q, false)
