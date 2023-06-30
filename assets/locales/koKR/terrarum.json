@@ -6,14 +6,11 @@
   "APP_WARNING_HEALTH_AND_SAFETY": "경고—건강과 안전을 위하여",
   "MENU_LABEL_PRESS_START_SYMBOL": ">을 누르세요",
   "MENU_MODULES" : "모듈",
+
+
   "GAME_ACTION_MOVE_VERB" : "이동하기",
   "GAME_ACTION_ZOOM" : "확대·축소",
   "MENU_LABEL_RESET" : "재설정",
-  "GAME_32BIT_WARNING1": "32비트 버전의 Java를 사용중인 것 같습니다.",
-  "GAME_32BIT_WARNING2": "아래 링크에서 최신 64비트 Java를 내려받아 설치해주세요.",
-  "GAME_32BIT_WARNING3": "https://www.java.com/ko/download/",
-  "GAME_APPLE_ROSETTA_WARNING1": "Apple Silicon이 탑재된 Mac을 사용 중이지만 x86 빌드의 게임을 실행 중입니다.",
-  "GAME_APPLE_ROSETTA_WARNING2": "최적의 성능과 게임 경험을 위해 Apple Silicon용 빌드의 게임을 이용해 주십시오.",
   "MENU_OPTION_STREAMERS_LAYOUT": "채팅창 오버레이",
   "MENU_LABEL_RESTART_REQUIRED": "재시작 필요",
   "MENU_LABEL_KEYBOARD_LAYOUT": "자판 배열",
@@ -22,9 +19,6 @@
   "MENU_OPTIONS_BLUR": "흐림",
   "MENU_OPTIONS_PARTICLES": "입자 수",
   "MENU_IO_IMPORT": "가져오기",
-  "APP_NOMODULE_1": "현재 불러와진 모듈이 없습니다.",
-  "APP_NOMODULE_2": "다음의 파일에서 불러오기 순서를 설정하고 게임을 재시작하십시오.",
-  "MENU_LABEL_KEYCONFIG_HELP1": "키캡을 클릭해 컨트롤을 배정하십시오",
   "MENU_LABEL_IME_TOGGLE": "입력기 켜고 끄기",
   "MENU_LABEL_PASTE_FROM_CLIPBOARD": "복사한 텍스트 붙여넣기",
   "MENU_OPTIONS_PERFORMANCE": "성능",
@@ -37,11 +31,7 @@
   "MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION": "알림 표시 시간",
   "MENU_LABEL_STREAMING": "실시간 방송",
   "MENU_LABEL_EXTRA_JVM_ARGUMENTS": "추가 명령 인수",
-  "GAME_PREV_SAVE_WAS_LOADED1": "가장 최근에 저장된 게임이 손상되었습니다.",
-  "GAME_PREV_SAVE_WAS_LOADED2": "이전에 저장된 게임을 불러왔습니다.",
-  "GAME_MORE_RECENT_AUTOSAVE1": "자동 저장된 게임이 수동으로 저장한 게임보다 더 최신입니다.",
-  "GAME_MORE_RECENT_AUTOSAVE2": "불러올 게임을 선택해 주십시오.",
   "MENU_IO_MANUAL_SAVE": "수동 저장",
   "MENU_IO_AUTOSAVE": "자동 저장",
-  "MENU_LABEL_SAVE_WILL_BE_DELETED": "선택된 세이브가 삭제됩니다."
+  "MENU_OPTIONS_DEBUG_CONSOLE": "디버그 콘솔"
 }

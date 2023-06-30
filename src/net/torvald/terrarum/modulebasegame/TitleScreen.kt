@@ -165,7 +165,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
             val world = ReadSimpleWorld(reader, file)
             demoWorld = world
-            demoWorld.worldTime.timeDelta = 440 // a year = 6 minutes
+            demoWorld.worldTime.timeDelta = 330 // a year = 8 minutes
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {

@@ -12,6 +12,7 @@ object DefaultConfig {
     val hashMap = hashMapOf<String, Any>(
             "jvm_xmx" to 4,
             "jvm_extra_cmd" to "",
+
             "displayfps" to 0, // 0: no limit, non-zero: limit
             "displayfpsidle" to 0, // 0: no limit, non-zero: limit
             "displaycolourdepth" to 8,
