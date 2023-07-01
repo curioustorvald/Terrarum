@@ -56,28 +56,28 @@ open class Electric : FixtureBase {
         const val ELECTRIC_THRESHOLD_EDGE_DELTA = 0.7
     }
 
-    fun getWireEmitterAt(point: Point2i) = if (this is Electric) this.wireEmitterTypes[pointToBlockBoxIndex(point)] else throw IllegalStateException("Fixture is not instance of Electric")
-    fun getWireEmitterAt(x: Int, y: Int) = if (this is Electric) this.wireEmitterTypes[pointToBlockBoxIndex(x, y)] else throw IllegalStateException("Fixture is not instance of Electric")
-    fun getWireSinkAt(point: Point2i) = if (this is Electric) this.wireSinkTypes[pointToBlockBoxIndex(point)] else throw IllegalStateException("Fixture is not instance of Electric")
-    fun getWireSinkAt(x: Int, y: Int) = if (this is Electric) this.wireSinkTypes[pointToBlockBoxIndex(x, y)] else throw IllegalStateException("Fixture is not instance of Electric")
+    fun getWireEmitterAt(point: Point2i) = this.wireEmitterTypes[pointToBlockBoxIndex(point)]
+    fun getWireEmitterAt(x: Int, y: Int) = this.wireEmitterTypes[pointToBlockBoxIndex(x, y)]
+    fun getWireSinkAt(point: Point2i) = this.wireSinkTypes[pointToBlockBoxIndex(point)]
+    fun getWireSinkAt(x: Int, y: Int) = this.wireSinkTypes[pointToBlockBoxIndex(x, y)]
 
-    fun setWireEmitterAt(x: Int, y: Int, type: WireEmissionType) { if (this is Electric) wireEmitterTypes[pointToBlockBoxIndex(x, y)] = type else throw IllegalStateException("Fixture is not instance of Electric") }
-    fun setWireSinkAt(x: Int, y: Int, type: WireEmissionType) { if (this is Electric) wireSinkTypes[pointToBlockBoxIndex(x, y)] = type else throw IllegalStateException("Fixture is not instance of Electric") }
-    fun setWireEmissionAt(x: Int, y: Int, emission: Vector2) { if (this is Electric) wireEmission[pointToBlockBoxIndex(x, y)] = emission else throw IllegalStateException("Fixture is not instance of Electric") }
-    fun setWireConsumptionAt(x: Int, y: Int, consumption: Vector2) { if (this is Electric) wireConsumption[pointToBlockBoxIndex(x, y)] = consumption else throw IllegalStateException("Fixture is not instance of Electric") }
+    fun setWireEmitterAt(x: Int, y: Int, type: WireEmissionType) { wireEmitterTypes[pointToBlockBoxIndex(x, y)] = type }
+    fun setWireSinkAt(x: Int, y: Int, type: WireEmissionType) { wireSinkTypes[pointToBlockBoxIndex(x, y)] = type }
+    fun setWireEmissionAt(x: Int, y: Int, emission: Vector2) { wireEmission[pointToBlockBoxIndex(x, y)] = emission }
+    fun setWireConsumptionAt(x: Int, y: Int, consumption: Vector2) { wireConsumption[pointToBlockBoxIndex(x, y)] = consumption }
 
     @Transient val wireEmitterTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
     @Transient val wireSinkTypes: HashMap<BlockBoxIndex, WireEmissionType> = HashMap()
     @Transient val wireEmission: HashMap<BlockBoxIndex, Vector2> = HashMap()
     @Transient val wireConsumption: HashMap<BlockBoxIndex, Vector2> = HashMap()
 
-    /** Edge detection only considers the real component (labeled as 'x') of the vector */
+    /** Triggered when 'digital_bit' rises from low to high. Edge detection only considers the real component (labeled as 'x') of the vector */
     open fun onRisingEdge(readFrom: BlockBoxIndex) {}
-    /** Edge detection only considers the real component (labeled as 'x') of the vector */
+    /** Triggered when 'digital_bit' rises from high to low. Edge detection only considers the real component (labeled as 'x') of the vector */
     open fun onFallingEdge(readFrom: BlockBoxIndex) {}
-    /** Level detection only considers the real component (labeled as 'x') of the vector */
+    /** Triggered when 'digital_bit' is held high. This function WILL NOT be triggered simultaneously with the rising edge. Level detection only considers the real component (labeled as 'x') of the vector */
     open fun onSignalHigh(readFrom: BlockBoxIndex) {}
-    /** Level detection only considers the real component (labeled as 'x') of the vector */
+    /** Triggered when 'digital_bit' is held low. This function WILL NOT be triggered simultaneously with the falling edge. Level detection only considers the real component (labeled as 'x') of the vector */
     open fun onSignalLow(readFrom: BlockBoxIndex) {}
 
 
@@ -94,15 +94,16 @@ open class Electric : FixtureBase {
             }
         }
 
-        if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
-            onRisingEdge(index)
-        else if (old.x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
-            onFallingEdge(index)
-        else if (new.x >= ELECTIC_THRESHOLD_HIGH)
-            onSignalHigh(index)
-        else if (new.y <= ELECTRIC_THRESHOLD_LOW)
-            onSignalLow(index)
-
+        if (sinkType == "digital_bit") {
+            if (new.x - old.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x >= ELECTIC_THRESHOLD_HIGH)
+                onRisingEdge(index)
+            else if (old.x - new.x >= ELECTRIC_THRESHOLD_EDGE_DELTA && new.x <= ELECTRIC_THRESHOLD_LOW)
+                onFallingEdge(index)
+            else if (new.x >= ELECTIC_THRESHOLD_HIGH)
+                onSignalHigh(index)
+            else if (new.y <= ELECTRIC_THRESHOLD_LOW)
+                onSignalLow(index)
+        }
     }
 
     override fun update(delta: Float) {
@@ -139,7 +140,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     fun pointToBlockBoxIndex(point: Point2i) = point.y * this.blockBox.width + point.x
     fun pointToBlockBoxIndex(x: Int, y: Int) = y * this.blockBox.width + x
 
-    var blockBoxProps: BlockBoxProps = BlockBoxProps(0)
+    @Transient var blockBoxProps: BlockBoxProps = BlockBoxProps(0)
     @Transient var nameFun: () -> String = { "" }
     @Transient var mainUI: UICanvas? = null
     var inventory: FixtureInventory? = null
@@ -461,10 +462,10 @@ interface CuedByWireChange {
  * Standard 32-bit binary flags.
  *
  * (LSB)
- * - 0: fluid resist - when FALSE, the fixture will break itself to item/nothing.
- *       For example, crops has this flag FALSE.
- * - 1: don't drop item when broken - when TRUE, the fixture will simply disappear instead of
- *       dropping itself. For example, crop has this flag TRUE.
+ * - 0: fluid intolerance - when SET, the fixture will break itself to item/nothing (depends on the flag #1).
+ *       For example, crops have this flag SET.
+ * - 1: no drops - when SET, the fixture will simply disappear instead of dropping itself.
+ *       For example, crops have this flag SET.
  *
  * (MSB)
  *
