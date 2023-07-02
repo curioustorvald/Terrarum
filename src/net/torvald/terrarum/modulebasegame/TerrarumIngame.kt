@@ -879,6 +879,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         //println("paused = $paused")
 
         if ((!paused && !App.isScreenshotRequested()) && newWorldLoadedLatch) newWorldLoadedLatch = false
+
+        if (saveRequested != null) {
+            doForceSave(saveRequested!!)
+            saveRequested = null
+        }
     }
 
 
@@ -913,6 +918,53 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 actorNowPlaying,
                 uiContainer// + uiFixture
         )
+    }
+
+    private var saveRequested: (() -> Unit)? = null
+
+    override fun requestForceSave(callback: () -> Unit) {
+        saveRequested = callback
+    }
+
+    internal fun doForceSave(callback: () -> Unit) {
+        // TODO show appropriate UI
+        
+        saveTheGame({ // onSuccessful
+            System.gc()
+            autosaveTimer = 0f
+
+            // TODO hide appropriate UI
+
+            callback()
+        }, { // onError
+            // TODO show failure message
+
+            // TODO hide appropriate UI
+        })
+    }
+
+    override fun saveTheGame(onSuccessful: () -> Unit, onError: (Throwable) -> Unit) {
+        val saveTime_t = App.getTIME_T()
+        val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
+        val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
+
+
+        INGAME.makeSavegameBackupCopy(playerSavefile)
+        WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, false, onError) {
+
+            INGAME.makeSavegameBackupCopy(worldSavefile)
+            WriteSavegame(saveTime_t, WriteSavegame.SaveMode.WORLD, INGAME.worldDisk, worldSavefile, INGAME as TerrarumIngame, false, onError) {
+                // callback:
+                // rebuild the disk skimmers
+                INGAME.actorContainerActive.filterIsInstance<IngamePlayer>().forEach {
+                    printdbg(this, "Game Save callback -- rebuilding the disk skimmer for IngamePlayer ${it.actorValue.getAsString(AVKey.NAME)}")
+//                                it.rebuildingDiskSkimmer?.rebuild()
+                }
+
+                // return to normal state
+                onSuccessful()
+            }
+        }
     }
 
     private val maxRenderableWires = ReferencingRanges.ACTORS_WIRES.last - ReferencingRanges.ACTORS_WIRES.first + 1

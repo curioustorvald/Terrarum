@@ -53,6 +53,10 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
             }
         }
     }
+
+    fun getBaseFile(): DiskSkimmer {
+        return files.first { it.diskFile.extension.isBlank() }
+    }
 }
 
 class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollection?) {

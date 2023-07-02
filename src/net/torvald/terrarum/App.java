@@ -640,7 +640,6 @@ public class App implements ApplicationListener {
         // process screenshot request
         if (screenshotRequested) {
             FrameBufferManager.begin(postProcessorOutFBO);
-            screenshotRequested = false;
             try {
                 Pixmap p = Pixmap.createFromFrameBuffer(0, 0, scr.getWidth(), scr.getHeight());
                 PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
@@ -652,6 +651,7 @@ public class App implements ApplicationListener {
                 Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
             }
             FrameBufferManager.end();
+            screenshotRequested = false;
         }
 
 

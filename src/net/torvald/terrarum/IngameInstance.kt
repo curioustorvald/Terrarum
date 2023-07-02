@@ -409,6 +409,14 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         return uiTooltip.message
     }
 
+    open fun requestForceSave(callback: () -> Unit) {
+
+    }
+
+    open fun saveTheGame(onSuccessful: () -> Unit, onError: (Throwable) -> Unit) {
+
+    }
+
     /**
      * Copies most recent `save` to `save.1`, leaving `save` for overwriting, previous `save.1` will be copied to `save.2`
      */

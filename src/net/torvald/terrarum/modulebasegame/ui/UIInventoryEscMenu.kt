@@ -105,11 +105,19 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                         full.unlockTransition()
                     }
 
-                    val saveTime_t = App.getTIME_T()
+                    val onSuccessful = {
+                        // return to normal state
+                        System.gc()
+                        screen = 0
+                        full.handler.unlockToggle()
+                        full.unlockTransition()
+                        (INGAME as TerrarumIngame).autosaveTimer = 0f
+                    }
+
+
+                    /*val saveTime_t = App.getTIME_T()
                     val playerSavefile = getPlayerSaveFiledesc(INGAME.playerSavefileName)
                     val worldSavefile = getWorldSaveFiledesc(INGAME.worldSavefileName)
-
-
                     INGAME.makeSavegameBackupCopy(playerSavefile)
                     WriteSavegame(saveTime_t, WriteSavegame.SaveMode.PLAYER, INGAME.playerDisk, playerSavefile, INGAME as TerrarumIngame, false, onError) {
 
@@ -123,13 +131,12 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                             }
 
                             // return to normal state
-                            System.gc()
-                            screen = 0
-                            full.handler.unlockToggle()
-                            full.unlockTransition()
-                            (INGAME as TerrarumIngame).autosaveTimer = 0f
+                            onSuccessful()
                         }
-                    }
+                    }*/
+
+                    INGAME.saveTheGame(onSuccessful, onError)
+
 
                 }
                 1 -> {

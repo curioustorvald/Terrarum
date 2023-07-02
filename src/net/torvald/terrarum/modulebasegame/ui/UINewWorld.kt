@@ -7,11 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
 import net.torvald.random.XXHash64
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.NEW_WORLD_SIZE
@@ -90,6 +87,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val goButtonWidth = 180
     private val backButton = UIItemTextButton(this, "MENU_LABEL_BACK", drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
     private val goButton = UIItemTextButton(this, "MENU_LABEL_CONFIRM_BUTTON", drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+
 
     init {
         goButton.clickOnceListener = { _, _ ->

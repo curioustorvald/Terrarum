@@ -1,14 +1,25 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.random.XXHash64
+import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory.Companion.CAPACITY_MODE_WEIGHT
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.modulebasegame.ui.UILoadGovernor
 import net.torvald.terrarum.modulebasegame.ui.UIWorldPortal
+import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.savegame.VDFileID
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.HashMap
@@ -55,7 +66,48 @@ class FixtureWorldPortal : Electric {
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {
-        println("[FixtureWorldPortal] teleport! $teleportRequest")
+        printdbg(this, "teleport! $teleportRequest")
+        teleportRequest?.let {
+            if (it.worldDiskToLoad != null && it.worldLoadParam != null) {
+                throw InternalError("Contradiction -- worldDiskToLoad and worldLoadParam are both not null: $teleportRequest")
+            }
+
+            val player = INGAME.actorGamer
+
+            // load existing
+            val jobAfterSave: () -> Unit
+            if (it.worldDiskToLoad != null) {
+                UILoadGovernor.worldDisk = it.worldDiskToLoad
+                UILoadGovernor.playerDisk = App.savegamePlayers[player.uuid]!!.getBaseFile()
+                jobAfterSave = {
+                    LoadSavegame(UILoadGovernor.worldDisk!!, UILoadGovernor.playerDisk)
+                }
+            }
+            // create new
+            else {
+                jobAfterSave = {
+                    val wx = it.worldLoadParam!!.width
+                    val wy = it.worldLoadParam!!.height
+                    val seed = it.worldLoadParam!!.worldGenSeed
+                    val name = it.worldLoadParam!!.savegameName
+                    printdbg(this, "generate for teleportation! Size=${wx}x${wy}, Name=$name, Seed=$seed")
+
+                    val ingame = TerrarumIngame(App.batch)
+                    val worldParam = TerrarumIngame.NewGameParams(player, it.worldLoadParam)
+                    ingame.gameLoadInfoPayload = worldParam
+                    ingame.gameLoadMode = TerrarumIngame.GameLoadMode.CREATE_NEW
+
+                    Terrarum.setCurrentIngameInstance(ingame)
+                    val loadScreen = WorldgenLoadScreen(ingame, wx, wy)
+                    App.setLoadScreen(loadScreen)
+                }
+            }
+
+            INGAME.requestForceSave(jobAfterSave)
+
+
+            teleportRequest = null
+        }
     }
 
     override fun reload() {
