@@ -57,6 +57,7 @@ class PlayerSavingThread(
         val gzout = GZIPOutputStream(tgaout)
         PixmapIO2._writeTGA(gzout, IngameRenderer.fboRGBexport, true, true)
         IngameRenderer.fboRGBexport.dispose()
+//        App.disposables.add(IngameRenderer.fboRGBexport)
         val thumbContent = EntryFile(tgaout.toByteArray64())
         val thumb =
             DiskEntry(VDFileID.PLAYER_SCREENSHOT, VDFileID.ROOT, ingame.world.creationTime, time_t, thumbContent)

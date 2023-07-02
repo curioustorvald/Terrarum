@@ -221,7 +221,7 @@ removefile:
                         fa.read(4).toIntBig().toLong()
                     }
                     DiskEntry.SYMLINK -> 8L
-                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag") // FIXME no support for compressed file
+                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag for entryID $entryID at offset $offset") // FIXME no support for compressed file
                 }
 
 
@@ -251,7 +251,7 @@ removefile:
 
                         EntrySymlink(target)
                     }
-                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag") // FIXME no support for compressed file
+                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag for entryID $entryID at offset $offset") // FIXME no support for compressed file
                 }
 
                 return DiskEntry(entryID, parent, creationTime, modifyTime, entryContent)

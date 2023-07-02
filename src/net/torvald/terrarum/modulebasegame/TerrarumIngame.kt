@@ -880,9 +880,15 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         if ((!paused && !App.isScreenshotRequested()) && newWorldLoadedLatch) newWorldLoadedLatch = false
 
-        if (saveRequested != null) {
-            doForceSave(saveRequested!!)
-            saveRequested = null
+        if (saveRequested) {
+            saveRequested = false
+            doForceSave()
+        }
+
+        if (doThingsAfterSave) {
+            saveRequested = false
+            doThingsAfterSave = false
+            saveCallback!!()
         }
     }
 
@@ -920,22 +926,25 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         )
     }
 
-    private var saveRequested: (() -> Unit)? = null
+    private var saveRequested = false
+    private var saveCallback: (() -> Unit)? = null
+    private var doThingsAfterSave = false
 
     override fun requestForceSave(callback: () -> Unit) {
-        saveRequested = callback
+        saveCallback = callback
+        saveRequested = true
     }
 
-    internal fun doForceSave(callback: () -> Unit) {
+    internal fun doForceSave() {
         // TODO show appropriate UI
-        
+
         saveTheGame({ // onSuccessful
             System.gc()
             autosaveTimer = 0f
 
             // TODO hide appropriate UI
 
-            callback()
+            doThingsAfterSave = true
         }, { // onError
             // TODO show failure message
 

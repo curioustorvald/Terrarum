@@ -191,6 +191,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             var h = 0
             var thumb: TextureRegion? = null
 
+            disk.rebuild()
+
             JsonFetcher.readFromJsonString(ByteArray64Reader(disk!!.requestFile(-1)!!.contents.getContent() as ByteArray64, Common.CHARSET)).let {
                 JsonFetcher.forEachSiblings(it) { name, value ->
                     if (name == "width") w = value.asInt()

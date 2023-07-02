@@ -431,6 +431,8 @@ object IngameRenderer : Disposable {
     fun requestScreencap() {
         screencapRequested = true
         screencapBusy = true
+        printdbg(this, "requestScreencap called from:")
+        printStackTrace(this)
     }
 
     private fun drawToRGB(

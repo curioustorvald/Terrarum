@@ -151,8 +151,16 @@ object ReadPlayer {
 object ReadActor {
 
     operator fun invoke(disk: SimpleFileSystem, dataStream: Reader): Actor =
-        Common.jsoner.fromJson<Actor?>(null, dataStream).also {
-            fillInDetails(disk, it)
+        try {
+            Common.jsoner.fromJson<Actor?>(null, dataStream).also {
+                fillInDetails(disk, it)
+            }
+        }
+        catch (e: ClassCastException) {
+            System.err.println(e.message)
+            System.err.println("The JSON:")
+            System.err.println(dataStream.readText())
+            throw e
         }
 
     private fun fillInDetails(disk: SimpleFileSystem, actor: Actor) {
