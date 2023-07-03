@@ -6,6 +6,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import kotlin.math.roundToInt
@@ -30,9 +31,10 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+        // these things will not scroll along with the parent GUI!
         val t = Lang["MENU_IO_SAVING"]
         val tlen = App.fontGame.getWidth(t)
-        App.fontGame.draw(batch, t, (posX + (width - tlen) / 2).toFloat(), posY - 32f)
+        App.fontGame.draw(batch, t, (posX + (width - tlen) / 2).toFloat(), ((App.scr.height - circleSheet.tileH) / 2) - 40f)
 
         // -1..63
         val index = ((WriteSavegame.saveProgress / WriteSavegame.saveProgressMax) * circles).roundToInt() - 1
@@ -41,7 +43,11 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
             val sy = index / circleSheet.horizontalCount
             // q&d fix for ArrayIndexOutOfBoundsException caused when saving huge world... wut?
             if (sx in 0 until circleSheet.horizontalCount && sy in 0 until circleSheet.horizontalCount) {
-                batch.draw(circleSheet.get(sx, sy), (posX + (width - circleSheet.tileW) / 2).toFloat(), posY.toFloat())
+                batch.draw(
+                    circleSheet.get(sx, sy),
+                    ((Toolkit.drawWidth - circleSheet.tileW) / 2).toFloat(),
+                    ((App.scr.height - circleSheet.tileH) / 2).toFloat()
+                )
             }
         }
     }

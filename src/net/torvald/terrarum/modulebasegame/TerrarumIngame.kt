@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
@@ -35,6 +36,7 @@ import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
 import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.modulebasegame.ui.*
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.gradEndCol
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldgenParams
@@ -55,6 +57,7 @@ import net.torvald.unicode.EMDASH
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
 import java.util.*
+import kotlin.math.roundToInt
 
 
 /**
@@ -933,6 +936,36 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 actorNowPlaying,
                 uiContainer// + uiFixture
         )
+
+        // quick and dirty way to show
+        if (worldTransitionOngoing) {
+            batch.inUse {
+                batch.color = gradEndCol
+                Toolkit.fillArea(batch, 0, 0, App.scr.width, App.scr.height)
+
+
+                batch.color = Color.WHITE
+                val t = Lang["MENU_IO_SAVING"]
+                val circleSheet = CommonResourcePool.getAsTextureRegionPack("loading_circle_64")
+                Toolkit.drawTextCentered(batch, App.fontGame, t, Toolkit.drawWidth, 0, ((App.scr.height - circleSheet.tileH) / 2) - 40)
+
+                // -1..63
+                val index =
+                    ((WriteSavegame.saveProgress / WriteSavegame.saveProgressMax) * circleSheet.horizontalCount * circleSheet.verticalCount).roundToInt() - 1
+                if (index >= 0) {
+                    val sx = index % circleSheet.horizontalCount
+                    val sy = index / circleSheet.horizontalCount
+                    // q&d fix for ArrayIndexOutOfBoundsException caused when saving huge world... wut?
+                    if (sx in 0 until circleSheet.horizontalCount && sy in 0 until circleSheet.horizontalCount) {
+                        batch.draw(
+                            circleSheet.get(sx, sy),
+                            ((Toolkit.drawWidth - circleSheet.tileW) / 2).toFloat(),
+                            ((App.scr.height - circleSheet.tileH) / 2).toFloat()
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private var worldTransitionOngoing = false
