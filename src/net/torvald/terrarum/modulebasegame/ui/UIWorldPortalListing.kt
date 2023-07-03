@@ -136,9 +136,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     }
 
     private fun disableListEditButtons() {
-        buttonRename.isActive = false
-        buttonDelete.isActive = false
-        buttonTeleport.isActive = false
+        buttonRename.isEnabled = false
+        buttonDelete.isEnabled = false
+        buttonTeleport.isEnabled = false
         currentWorldSelected = false
     }
 
@@ -147,9 +147,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         if (info == null) disableListEditButtons()
         else {
-            buttonRename.isActive = true
-            buttonDelete.isActive = info.uuid != INGAME.world.worldIndex
-            buttonTeleport.isActive = info.uuid != INGAME.world.worldIndex
+            buttonRename.isEnabled = true
+            buttonDelete.isEnabled = info.uuid != INGAME.world.worldIndex
+            buttonTeleport.isEnabled = info.uuid != INGAME.world.worldIndex
             currentWorldSelected = info.uuid == INGAME.world.worldIndex
         }
     }

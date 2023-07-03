@@ -68,7 +68,6 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.setGhost(ghostItem.get())
-            it.isVisible = true
             it.update(delta)
             it.setGhostColourBlock()
             mouseInInteractableRange(actor) { it.setGhostColourAllow(); 0L }
@@ -80,7 +79,6 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {
             it.unsetGhost()
-            it.isVisible = false
             it.setGhostColourNone()
         }
     }

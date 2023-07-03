@@ -14,7 +14,6 @@ import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -387,7 +386,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             }
         }
 
-        buttonCraft.isActive = itemCraftable
+        buttonCraft.isEnabled = itemCraftable
     }
 
     // reset whatever player has selected to null and bring UI to its initial state

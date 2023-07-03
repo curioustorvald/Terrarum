@@ -13,9 +13,19 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.floor
 
 /**
- * Used as construction markers and fixture ghost images
+ * Used as construction markers and fixture ghost images.
+ *
+ * `isVisible` behaves differently by `markerMode`.
+ * - FIXTURE_GHOST: `isVisible` toggles if the ghost is being updated. FALSE - will not be updated and also not visible
+ * - BLOCK_MARKER: `isVisible` controls the visibility. FALSE - invisible, TRUE - always visible
+ *
+ * MarkerMode must be set manually after calling `setGhost` -- the `unsetGhost` will not reset the field.
  */
 class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = PhysProperties.MOBILE_OBJECT), NoSerialise {
+
+    enum class MarkerMode {
+        FIXTURE_GHOST, BLOCK_MARKER
+    }
 
     private val defaultSize = 16.0
 
@@ -29,7 +39,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
         get() = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common")
 
     private var ghost: SpriteAnimation? = null
-    private var hasGhost = false
+    var markerMode: MarkerMode = MarkerMode.FIXTURE_GHOST
     var ghostColour = Color.WHITE
 
 
@@ -38,9 +48,10 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
         renderOrder = Actor.RenderOrder.OVERLAY // for some reason the constructor didn't work
     }
 
+
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible) {
-            if (hasGhost) {
+            if (markerMode == MarkerMode.FIXTURE_GHOST) {
                 if (INGAME.actorNowPlaying != null) {
                     mouseInInteractableRange(INGAME.actorNowPlaying!!) {
                         batch.shader = App.shaderGhastlyWhite
@@ -59,7 +70,7 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
                     }
                 }
             }
-            else {
+            else if (markerMode == MarkerMode.BLOCK_MARKER) {
                 batch.shader = null
                 batch.color = markerColour
                 batch.draw(blockMarkings.get(markerShape, 0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
@@ -91,13 +102,12 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
 
     fun setGhost(actor: ActorWithBody) {
         ghost = actor.sprite
-        hasGhost = true
+        markerMode = MarkerMode.FIXTURE_GHOST
         hitbox.setDimension(actor.baseHitboxW.toDouble(), actor.baseHitboxH.toDouble())
     }
 
     fun unsetGhost() {
         ghost = null
-        hasGhost = false
         setGhostColourNone()
         hitbox.setDimension(TILE_SIZED, TILE_SIZED)
     }

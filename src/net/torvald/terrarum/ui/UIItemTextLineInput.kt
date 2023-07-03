@@ -101,7 +101,7 @@ class UIItemTextLineInput(
             false
     )
 
-    override var isActive: Boolean = false // keep it false by default!
+    override var isEnabled: Boolean = false // keep it false by default!
         set(value) {
             if (field && !value) endComposing(true)
             field = value
@@ -132,7 +132,7 @@ class UIItemTextLineInput(
             if (!value) {
                 mouseLatched = false
                 fboUpdateLatch = false
-                isActive = false
+                isEnabled = false
                 cursorOn = false
                 cursorBlinkCounter = 0f
             }
@@ -251,10 +251,10 @@ class UIItemTextLineInput(
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
-        val oldActive = isActive
+        val oldActive = isEnabled
 
         // process keypresses
-        if (isActive) {
+        if (isEnabled) {
 
             val (eventType, char, headkey, repeatCount, keycodes) = e
 
@@ -416,12 +416,12 @@ class UIItemTextLineInput(
             val mouseDown = Terrarum.mouseDown
 
             if (mouseDown) {
-                isActive = mouseUp
+                isEnabled = mouseUp
             }
 
             if (App.getConfigString("inputmethod") == "none") imeOn = false
 
-            if (isActive) {
+            if (isEnabled) {
                 cursorBlinkCounter += delta
 
                 while (cursorBlinkCounter >= CURSOR_BLINK_TIME) {
@@ -553,7 +553,7 @@ class UIItemTextLineInput(
         Toolkit.drawBoxBorder(batch, btn1PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
 
         // text area border (pop-up for isActive)
-        if (isActive) {
+        if (isEnabled) {
             batch.color = Toolkit.Theme.COL_SELECTED
             Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, width + 2, height + 2) // this is a full border, not a text area
         }
@@ -567,7 +567,7 @@ class UIItemTextLineInput(
             batch.color = if (mouseDown) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, btn1PosX - 1, posY - 1, WIDTH_ONEBUTTON + 2, height + 2)
         }
-        else if (mouseUpOnTextArea && !isActive) {
+        else if (mouseUpOnTextArea && !isEnabled) {
             batch.color = Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, inputPosX - 1, posY - 1, fbo.width + 2 * UI_TEXT_MARGIN+ 2, height + 2)
         }
@@ -579,7 +579,7 @@ class UIItemTextLineInput(
 
         // draw text cursor
         val cursorXOnScreen = inputPosX + cursorDrawX + 2 + textDrawOffset
-        if (isActive && cursorOn) {
+        if (isEnabled && cursorOn) {
             val baseCol = if (maxLen.exceeds(textbuf, listOf(32))) TEXTINPUT_COL_TEXT_NOMORE else TEXTINPUT_COL_TEXT
 
             batch.color = baseCol.cpy().mul(0.5f,0.5f,0.5f,1f)

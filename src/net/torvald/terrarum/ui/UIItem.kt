@@ -131,6 +131,11 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     /**
      * Whether the button is "available" or not to the player
      */
+    open var isEnabled = true
+
+    /**
+     * Whether the button should receive updates
+     */
     open var isActive = true
 
 
@@ -140,9 +145,9 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     open fun update(delta: Float) {
         if (parentUI.isVisible) {
-            updateListener.invoke(delta)
+            if (isActive) {
+                updateListener.invoke(delta)
 
-//            if (isActive) {
                 mouseOverCall?.update(delta)
 
                 if (mouseUp) {
@@ -158,9 +163,9 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                         mouseOverCall?.setAsClose()
                     }
                 }
-//            }
 
-            if (!mouseUp) mouseLatched = false
+                if (!mouseUp) mouseLatched = false
+            }
         }
     }
 
@@ -181,7 +186,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     // keyboard controlled
     open fun keyDown(keycode: Int): Boolean {
-        if (parentUI.isVisible && isActive) {
+        if (parentUI.isVisible && isEnabled) {
             keyDownListener.invoke(keycode)
             return true
         }
@@ -189,7 +194,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun keyUp(keycode: Int): Boolean {
-        if (parentUI.isVisible && isActive) {
+        if (parentUI.isVisible && isEnabled) {
             keyUpListener.invoke(keycode)
             return true
         }
@@ -197,7 +202,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun keyTyped(character: Char): Boolean  {
-        if (parentUI.isVisible && isActive) {
+        if (parentUI.isVisible && isEnabled) {
             keyTypedListener.invoke(character)
             return true
         }
@@ -207,7 +212,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
 
     // mouse controlled
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (parentUI.isVisible && isActive) {
+        if (parentUI.isVisible && isEnabled) {
             touchDraggedListener.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer)
             return true
         }
@@ -217,7 +222,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var actionDone = false
 
-        if (parentUI.isVisible && isActive) {
+        if (parentUI.isVisible && isEnabled) {
             if (mouseUp) {
                 touchDownListener.invoke(itemRelativeMouseX, itemRelativeMouseY, pointer, button)
                 actionDone = true
@@ -242,7 +247,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
         return false
     }
     open fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (parentUI.isVisible && mouseUp && isActive) {
+        if (parentUI.isVisible && mouseUp && isEnabled) {
             scrolledListener.invoke(amountX, amountY)
             return true
         }

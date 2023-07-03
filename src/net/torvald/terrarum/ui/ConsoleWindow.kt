@@ -64,7 +64,7 @@ class ConsoleWindow : UICanvas() {
     init {
         reset()
         addUIitem(textinput)
-        textinput.isActive = false
+        textinput.isEnabled = false
     }
 
     private val lb = ArrayList<String>()
@@ -99,7 +99,7 @@ class ConsoleWindow : UICanvas() {
             clickLatched = false
         }
 
-        textinput.isActive = (isOpened && !isClosing)
+        textinput.isEnabled = (isOpened && !isClosing)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -269,14 +269,14 @@ class ConsoleWindow : UICanvas() {
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 0f, -height.toFloat()
         )*/
-        textinput.isActive = false
+        textinput.isEnabled = false
         textinput.mouseoverUpdateLatch = false
     }
 
     override fun endOpening(delta: Float) {
         drawOffY = 0f
         openingTimeCounter = 0f
-        textinput.isActive = true
+        textinput.isEnabled = true
         textinput.mouseoverUpdateLatch = true
     }
 

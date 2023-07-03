@@ -23,21 +23,21 @@ open class UIItemTextButton(
         val readFromLang: Boolean = false,
 
         /** Colour when mouse is over */
-        val activeCol: Color = Toolkit.Theme.COL_MOUSE_UP,
+        var activeCol: Color = Toolkit.Theme.COL_MOUSE_UP,
         /** Colour when mouse is over */
-        val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
+        var activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
         /** Colour when mouse is over */
-        val activeBackBlendMode: String = BlendMode.NORMAL,
+        var activeBackBlendMode: String = BlendMode.NORMAL,
         /** Colour when clicked/selected */
-        val highlightCol: Color = Toolkit.Theme.COL_SELECTED,
+        var highlightCol: Color = Toolkit.Theme.COL_SELECTED,
         /** Colour when clicked/selected */
-        val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        var highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
         /** Colour when clicked/selected */
-        val highlightBackBlendMode: String = BlendMode.NORMAL,
+        var highlightBackBlendMode: String = BlendMode.NORMAL,
         /** Colour on normal status */
-        val inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
+        var inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
 
-        val disabledCol: Color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
+        var disabledCol: Color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
 
         val hasBorder: Boolean = false,
 
@@ -59,6 +59,8 @@ open class UIItemTextButton(
         }
     }
 
+    var skipUpdate = false
+
     /** Actually displayed text (changes with the app language) */
     val label: String
         get() = if (readFromLang) Lang[labelText] else labelText
@@ -70,8 +72,6 @@ open class UIItemTextButton(
 
     override fun update(delta: Float) {
         super.update(delta)
-
-
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -110,7 +110,8 @@ open class UIItemTextButton(
         }
 
 
-        batch.color = if (!isActive) disabledCol
+        batch.color = if (skipUpdate) inactiveCol
+        else if (!isEnabled) disabledCol
         else if (highlighted) highlightCol
         else if (mouseUp) activeCol
         else inactiveCol

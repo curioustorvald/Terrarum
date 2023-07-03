@@ -262,7 +262,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
         IngameRenderer.setRenderedWorld(world)
-
+        blockMarkingActor.isVisible = true
 
         super.show() // this function sets gameInitialised = true
     }
@@ -863,7 +863,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         //notifier.update(delta)
         // open/close fake blur UI according to what's opened
         if (uiInventoryPlayer.isVisible ||
-            getUIFixture.get()?.isVisible == true) {
+            getUIFixture.get()?.isVisible == true || worldTransitionOngoing) {
             uiBlur.setAsOpen()
         }
         else {
@@ -880,16 +880,25 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         if ((!paused && !App.isScreenshotRequested()) && newWorldLoadedLatch) newWorldLoadedLatch = false
 
-        if (saveRequested) {
-            saveRequested = false
-            doForceSave()
-        }
 
         if (doThingsAfterSave) {
-            saveRequested = false
+            saveRequested2 = false
             doThingsAfterSave = false
             saveCallback!!()
         }
+
+        if (saveRequested2) {
+            saveRequested2 = false
+            doForceSave()
+        }
+
+        if (worldTransitionPauseRequested > 0) { // let a frame to update before locking (=pausing) entirely
+            worldTransitionPauseRequested -= 1
+        }
+        else if (worldTransitionPauseRequested == 0) {
+            paused = true
+        }
+
     }
 
 
@@ -926,29 +935,36 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         )
     }
 
-    private var saveRequested = false
+    private var worldTransitionOngoing = false
+    private var worldTransitionPauseRequested = -1
+    private var saveRequested2 = false
     private var saveCallback: (() -> Unit)? = null
     private var doThingsAfterSave = false
 
     override fun requestForceSave(callback: () -> Unit) {
         saveCallback = callback
-        saveRequested = true
+        worldTransitionOngoing = true
+        saveRequested2 = true
+        worldTransitionPauseRequested = 1
+        blockMarkingActor.isVisible = false
     }
 
     internal fun doForceSave() {
         // TODO show appropriate UI
+//        uiBlur.setAsOpen()
 
         saveTheGame({ // onSuccessful
             System.gc()
             autosaveTimer = 0f
 
             // TODO hide appropriate UI
-
+            uiBlur.setAsClose()
             doThingsAfterSave = true
         }, { // onError
             // TODO show failure message
 
             // TODO hide appropriate UI
+            uiBlur.setAsClose()
         })
     }
 

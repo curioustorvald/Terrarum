@@ -50,7 +50,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             defaultSelection = null
     )
     private val areYouSureMainMenuButtons = UIItemTextButtonList(
-            this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_QUIT_CONFIRM", "MENU_LABEL_QUIT", "MENU_LABEL_CANCEL"),
+            this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_QUIT_CONFIRM", "MENU_LABEL_UNSAVED_PROGRESSES_WILL_BE_LOST", "MENU_LABEL_QUIT", "MENU_LABEL_CANCEL"),
             (width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y() + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
             gameMenuListWidth, DEFAULT_LINE_HEIGHT * 3,
@@ -60,7 +60,12 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             highlightBackCol = Color(0),
             inactiveCol = Color.WHITE,
             defaultSelection = null
-    )
+    ).also {
+        listOf(it.buttons[0], it.buttons[1]).forEach {
+            it.skipUpdate = true
+            it.isActive = false
+        }
+    }
     /*private val areYouSureQuitButtons = UIItemTextButtonList(
             this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_DESKTOP_QUESTION", "MENU_LABEL_DESKTOP", "MENU_LABEL_CANCEL"),
             (width - gameMenuListWidth) / 2,
@@ -155,11 +160,11 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         }
         areYouSureMainMenuButtons.selectionChangeListener = { _, new ->
             when (new) {
-                1 -> {
+                2 -> {
                     areYouSureMainMenuButtons.deselect()
                     App.setScreen(TitleScreen(App.batch))
                 }
-                2 -> {
+                3 -> {
                     screen = 0; areYouSureMainMenuButtons.deselect()
                 }
             }
