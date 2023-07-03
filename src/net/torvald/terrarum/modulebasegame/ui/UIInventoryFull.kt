@@ -85,6 +85,8 @@ class UIInventoryFull(
         private val gsta = Color(gradStartCol)
         private val gend = Color(gradEndCol)
 
+
+        private val drawBackgroundColourBuffer = Color(1f,1f,1f,1f)
         fun drawBackground(batch: SpriteBatch, opacity: Float) {
             gdxBlendNormalStraightAlpha()
             /*batch.end()
@@ -118,7 +120,8 @@ class UIInventoryFull(
             }
 
             batch.begin()*/
-            batch.color = Color.WHITE
+//            drawBackgroundColourBuffer.a = opacity
+            batch.color = drawBackgroundColourBuffer
             val w = App.scr.wf
             val h = App.scr.hf
             val gradTopStart = (-YPOS_CORRECTION + (App.scr.height - internalHeight).div(2).toFloat()) * App.scr.magn
@@ -312,7 +315,7 @@ class UIInventoryFull(
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        drawBackground(batch, handler.opacity)
+        drawBackground(batch, 1f)
 
         // UI items
         catBar.render(batch, camera)

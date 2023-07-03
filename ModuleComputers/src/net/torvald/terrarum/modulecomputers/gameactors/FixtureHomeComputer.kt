@@ -195,17 +195,10 @@ internal class UIHomeComputer : UICanvas(
     }
 
     override fun doOpening(delta: Float) {
+        super.doOpening(delta)
         fixture.startVM()
     }
 
-    override fun doClosing(delta: Float) {
-    }
-
-    override fun endOpening(delta: Float) {
-    }
-
-    override fun endClosing(delta: Float) {
-    }
 
     override fun dispose() {
         fbo.dispose()

@@ -448,6 +448,29 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
         else return false
     }
+
+    override fun doOpening(delta: Float) {
+        super.doOpening(delta)
+        INGAME.pause()
+        INGAME.setTooltipMessage(null)
+    }
+
+    override fun doClosing(delta: Float) {
+        super.doClosing(delta)
+        INGAME.resume()
+        INGAME.setTooltipMessage(null)
+    }
+
+    override fun endOpening(delta: Float) {
+        super.endOpening(delta)
+    }
+
+    override fun endClosing(delta: Float) {
+        super.endClosing(delta)
+        UIItemInventoryItemGrid.tooltipShowing.clear()
+        INGAME.setTooltipMessage(null) // required!
+    }
+
 }
 
 

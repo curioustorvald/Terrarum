@@ -92,7 +92,7 @@ class UIWorldPortal : UICanvas(
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        drawBackground(batch, handler.opacity)
+        drawBackground(batch, 1f)
 
         // UI items
         transitionPanel.render(batch, camera)

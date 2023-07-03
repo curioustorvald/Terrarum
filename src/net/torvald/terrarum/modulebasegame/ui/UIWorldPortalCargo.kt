@@ -171,7 +171,7 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background fill
-        UIInventoryFull.drawBackground(batch, handler.opacity)
+        UIInventoryFull.drawBackground(batch, 1f)
 
         // UI items
         batch.color = Color.WHITE
