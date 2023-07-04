@@ -390,7 +390,7 @@ return Object.freeze({"n":"신세벌식 P2","v":"none","c":"CuriousTo\uA75Bvald"
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1
 
-    let s = states.keylayouts[headkey][layer]
+    let s = states.keylayouts[headkey][layer] || states.keylayouts[headkey][0]
     let s2 = states.keylayouts[headkey][2]
     let bufIndex = isJungseong(s) ? 1 : isJongseong(s) ? 2 : 0
 

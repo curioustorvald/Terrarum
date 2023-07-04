@@ -379,7 +379,7 @@ return Object.freeze({"n":"ЙЦУКЕН Многоязычна","v":"none","c":"
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin + 2*altgrin
 
-    let s = states.keylayouts[headkey][layer]
+    let s = (states.keylayouts[headkey][layer] || states.keylayouts[headkey][1*shiftin]) || states.keylayouts[headkey][0]
 
     // typing seq for diacritics: diacritics THEN a character
     if (isDiacritics(s)) {

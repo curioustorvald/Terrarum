@@ -276,7 +276,7 @@ return Object.freeze({"n":"五倉正體 Qwerty","v":"many","c":"CuriousTo\uA75Bv
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
 
-    let cjkey = states.keylayouts[headkey][layer]
+    let cjkey = states.keylayouts[headkey][layer] || states.keylayouts[headkey][0]
     let cjkeyAsc = cjkey.codePointAt(0)
 
     if (states.code == 1 && 48 <= cjkeyAsc && cjkeyAsc <= 57) {

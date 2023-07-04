@@ -274,7 +274,7 @@ return Object.freeze({"n":"แป้นพิมพ์ปัตตะโชต�
     let layer = 1*shiftin + 2*altgrin // use AltGr to type conventional numbers
     states.code = 0
 
-    let s = states.keylayouts[headkey][layer]
+    let s = (states.keylayouts[headkey][layer] || states.keylayouts[headkey][1*shiftin]) || states.keylayouts[headkey][0]
     return ['0', s]
 },
 "backspace":()=>{

@@ -351,7 +351,7 @@ return Object.freeze({"n":"두벌식 수정 표준","v":"none","c":"CuriousTo\uA
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1
 
-    let s = states.keylayouts[headkey][layer]
+    let s = states.keylayouts[headkey][layer] || states.keylayouts[headkey][0]
 
     if (isHangul(s)) {
         let bufIndex = (isJongseongConsonant(s) && isConsonant(states.buf[0]) && undefined !== states.buf[1]) ? 2 :

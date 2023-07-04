@@ -15,7 +15,7 @@
   "GAME_32BIT_WARNING1": "看起来您正在运行32位版本的Java。",
   "GAME_32BIT_WARNING2": "请下载并安装最新的64位Java :",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",
-  "MENU_OPTION_STREAMERS_LAYOUT": "聊天叠加",
+  "MENU_OPTIONS_STREAMERS_LAYOUT": "聊天叠加",
   "MENU_LABEL_RESTART_REQUIRED": "需要重新启动",
   "MENU_LABEL_KEYBOARD_LAYOUT": "键盘布局",
   "MENU_LABEL_IME": "输入法",

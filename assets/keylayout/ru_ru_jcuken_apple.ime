@@ -27,7 +27,7 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 ["ф","Ф","ƒ","ƒ"],
-["и","И"],
+["и","И","и","И"],
 ["с","С","≠","≠"],
 ["в","В","ћ","Ћ"],
 ["у","У","ќ","Ќ"],
@@ -69,10 +69,10 @@ let states = {"keylayouts":[[""],[undefined],
 ["-","_","—","–"],
 ["=","+","»","«"],
 ["х","Х","“","“"],
-["ъ","Ъ"],
-["ё","Ё"],
+["ъ","Ъ","ъ","Ъ"],
+["ё","Ё","ё","Ё"],
 ["ж","Ж","…","…"],
-["э",'Э'],
+["э",'Э',"э",'Э'],
 ["/","?","„","„"],
 [undefined],
 [undefined],
@@ -268,7 +268,7 @@ return Object.freeze({"n":"ЙЦУКЕН (Рус. Apple)","v":"none","c":"Curious
     let layer = 1*shiftin + 2*altgrin
     states.code = 1
 
-    let s = states.keylayouts[headkey][layer]
+    let s = (states.keylayouts[headkey][layer] || states.keylayouts[headkey][1*shiftin]) || states.keylayouts[headkey][0]
 
     if (isDiacritics(s)) {
         return ['1', '']

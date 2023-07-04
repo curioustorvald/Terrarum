@@ -1,21 +1,19 @@
-// TODO: implement the automata as per https://www.nectec.or.th/it-standards/keyboard_layout/thai-key.html
-
 let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u0E08","\u0E57","0",")"],
-["\u0E45","+","1","!"],
-["/","\u0E51","2","@"],
-["-","\u0E52","3","#"],
-["\u0E20","\u0E53","4","$"],
-["\u0E16","\u0E54","5","%"],
-["\u0E38","\u0E39","6","^"],
-["\u0E36","\u0E3F","7","&"],
-["\u0E04","\u0E55","8","*"],
-["\u0E15","\u0E56","9","("],
+["0","0","0",")"],
+["1","1","1","!"],
+["2","2","2","@"],
+["3","3","3","#"],
+["4","4","4","$"],
+["5","5","5","%"],
+["6","6","6","^"],
+["7","7","7","&"],
+["8","8","8","*"],
+["9","9","9","("],
 ["*"],
 ["#"],
 [undefined],
@@ -28,34 +26,34 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["\u0E1F","\u0E24"],// A
-["\u0E34","\u0E3A"],// B
-["\u0E41","\u0E09"],// C
-["\u0E01","\u0E0F"],// D
-["\u0E33","\u0E0E"],// E
-["\u0E14","\u0E42"],// F
-["\u0E40","\u0E0C"],// G
-["\u0E49","\u0E47"],// H
-["\u0E23","\u0E13"],// I
-["\u0E48","\u0E4B"],// J
-["\u0E32","\u0E29"],// K
-["\u0E2A","\u0E28"],// L
-["\u0E17","?"],// M
-["\u0E37","\u0E4C"],// N
-["\u0E19","\u0E2F"],// O
-["\u0E22","\u0E0D"],// P
-["\u0E46","\u0E50"],// Q
-["\u0E1E","\u0E11"],// R
-["\u0E2B","\u0E06"],// S
-["\u0E30","\u0E18"],// T
-["\u0E35","\u0E4A"],// U
-["\u0E2D","\u0E2E"],// V
-["\u0E44",'"'],// W
-["\u0E1B",")"],// X
-["\u0E31","\u0E4D"],// Y
-["\u0E1C","("],// Z
-["\u0E21","\u0E12","\u0E5A","\u0E5A"],// <
-["\u0E43","\u0E2C","\u0E4F","\u0E4F"],// >
+["\u094B","\u0913"],
+["\u0935","\u0934"],
+["\u092E","\u0923","\u0954","\u0923"],
+["\u094D","\u0905"],
+["\u093E","\u0906"],
+["\u093F","\u0907","\u0962","\u090C"],
+["\u0941","\u0909"],
+["\u092A","\u092B","\u092A","\u095E"],
+["\u0917","\u0918","\u095A","\u0918"],
+["\u0930","\u0931"],
+["\u0915","\u0916","\u0958","\u0959"],
+["\u0924","\u0925"],
+["\u0938","\u0936"],
+["\u0932","\u0933"],
+["\u0926","\u0927"],
+["\u091C","\u091D","\u095B","\u091D"],
+["\u094C","\u0914"],
+["\u0940","\u0908","\u0963","\u0961"],
+["\u094B","\u090F"],
+["\u0942","\u090A"],
+["\u0939","\u0919"],
+["\u0928","\u0929"],
+["\u0948","\u0910"],
+["\u0902","\u0901","\u0902","\u0950"],
+["\u092C","\u092D"],
+["\u0946","\u090E","\u0953","\u090E"],
+[",","\u0937","\u0970","\u0970"],
+[".","\u0964","\u0965","\u093D"],
 [undefined],
 [undefined],
 [undefined],
@@ -67,15 +65,15 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 ["\n"],
 ["\x08"],
-["_","%","¤","¤"],// ~
-["\u0E02","\u0E58"],// -
-["\u0E0A","\u0E59"],// =
-["\u0E1A","\u0E10"],// [
-["\u0E25",","],// ]
-["\u0E03","\u0E05"],// \
-["\u0E27","\u0E0B"],// ;
-["\u0E07",'.'],// '
-["\u0E1D","\u0E26","\u0E5B","\u0E5B"],// ?
+["\u094A","\u0912"],
+["-","\u0903"],
+["\u0943","\u090B","\u0944","\u0960"],
+["\u0921","\u0922","\u095C","\u095D"],
+["\u093C","\u091E"],
+["\u0949","\u0911"],
+["\u091A","\u091B","\u0952","\u091B"],
+["\u091F","\u0920","\u0951","\u0920"],
+["\u092F","\u095F"],
 [undefined],
 [undefined],
 [undefined],
@@ -260,21 +258,16 @@ let states = {"keylayouts":[[""],[undefined],
 let reset = () => {
     states.code = 0
 }
-
-let diacriticsMapping = {
-
-}
 let inRange = (s,a,b) => (a <= s && s <= b)
-let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x036F)
-return Object.freeze({"n":"แป้นพิมพ์เกษมณี","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
+return Object.freeze({"n":"इनस्क्रिप्ट","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts,
-"l":"thTH",
+"l":"hiIN",
 // return: [displayed output, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
-    let layer = 1*shiftin + 2*altgrin // use AltGr to type conventional numbers
-    states.code = 0
+    let layer = 1*shiftin + 2*altgrin
 
     let s = (states.keylayouts[headkey][layer] || states.keylayouts[headkey][1*shiftin]) || states.keylayouts[headkey][0]
+
     return ['0', s]
 },
 "backspace":()=>{

@@ -9,7 +9,7 @@
   "GAME_ACTION_MOVE_VERB" : "हिलना",
   "GAME_ACTION_ZOOM" : "ज़ूम",
   "MENU_LABEL_RESET" : "रीसेट",
-  "MENU_OPTION_STREAMERS_LAYOUT": "Chat Overlay",
+  "MENU_OPTIONS_STREAMERS_LAYOUT": "Chat Overlay",
   "MENU_LABEL_RESTART_REQUIRED": "पुनः शुरआत जरुरी है",
   "MENU_LABEL_KEYBOARD_LAYOUT": "कीबोर्ड विन्यास",
   "MENU_LABEL_IME": "इनपुट विधि",

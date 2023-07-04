@@ -41,7 +41,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
         arrayOf("", { Lang["MENU_LABEL_STREAMING"] }, "h1"),
-            arrayOf("fx_streamerslayout", { Lang["MENU_OPTION_STREAMERS_LAYOUT"] }, "toggle"),
+            arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT"] }, "toggle"),
     )
 
     private val optionsYpos = IntArray(options.size + 1)
