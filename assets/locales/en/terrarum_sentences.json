@@ -11,5 +11,6 @@
   "GAME_PREV_SAVE_WAS_LOADED2": "The previously saved game was loaded.",
   "GAME_MORE_RECENT_AUTOSAVE1": "The Autosave is more recent than the manual save.",
   "GAME_MORE_RECENT_AUTOSAVE2": "Please select the saved game you wish to play:",
-  "MENU_LABEL_SAVE_WILL_BE_DELETED": "The selected save file will be deleted."
+  "MENU_LABEL_SAVE_WILL_BE_DELETED": "The selected save file will be deleted.",
+  "MENU_LABEL_UNSAVED_PROGRESS_WILL_BE_LOST": "Unsaved progress will be lost."
 }

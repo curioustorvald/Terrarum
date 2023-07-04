@@ -50,7 +50,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             defaultSelection = null
     )
     private val areYouSureMainMenuButtons = UIItemTextButtonList(
-            this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_QUIT_CONFIRM", "MENU_LABEL_UNSAVED_PROGRESSES_WILL_BE_LOST", "MENU_LABEL_QUIT", "MENU_LABEL_CANCEL"),
+            this, DEFAULT_LINE_HEIGHT, arrayOf("MENU_LABEL_QUIT_CONFIRM", "MENU_LABEL_UNSAVED_PROGRESS_WILL_BE_LOST", "MENU_LABEL_QUIT", "MENU_LABEL_CANCEL"),
             (width - gameMenuListWidth) / 2,
             INVENTORY_CELLS_OFFSET_Y() + (INVENTORY_CELLS_UI_HEIGHT - (DEFAULT_LINE_HEIGHT * 3)) / 2,
             gameMenuListWidth, DEFAULT_LINE_HEIGHT * 3,
