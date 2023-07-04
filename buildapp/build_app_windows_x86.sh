@@ -21,7 +21,8 @@ then
     echo 'Mingw32 not found; please install mingw64-cross-gcc (or similar) to your system' >&2; exit 1;
 fi
 
-x86_64-w64-mingw32-gcc -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c || { echo 'Building EXE failed' >&2; exit 1; }
+x86_64-w64-mingw32-gcc -Os -s -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c || { echo 'Building EXE failed' >&2; exit 1; }
+# TODO add icon to the exe
 
 # Copy over a Java runtime
 mkdir $DESTDIR/out
