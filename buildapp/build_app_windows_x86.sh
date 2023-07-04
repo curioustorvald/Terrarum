@@ -22,7 +22,7 @@ then
 fi
 
 x86_64-w64-mingw32-gcc -Os -s -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c || { echo 'Building EXE failed' >&2; exit 1; }
-# TODO add icon to the exe
+# TODO add icon to the exe (use x86_64-w64-mingw32-windres?)
 
 # Copy over a Java runtime
 mkdir $DESTDIR/out
