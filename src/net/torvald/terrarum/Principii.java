@@ -5,8 +5,7 @@ import net.torvald.terrarum.utils.JsonFetcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Bootstrapper that launches the bundled JVM and injects VM configs such as -Xmx
@@ -24,7 +23,6 @@ public class Principii {
     private static String defaultDir;
     /** defaultDir + "/config.json" */
     private static String configDir;
-
 
     public static void getDefaultDirRoot() {
         String OS = OSName.toUpperCase();
@@ -63,7 +61,7 @@ public class Principii {
             devMode = true;
         }
 
-        String extracmd = devMode ? " -ea" : "";
+        String extracmd0 = devMode ? " -ea" : "";
         String OS = OSName.toUpperCase();
         String CPUARCH = System.getProperty("os.arch").toUpperCase();
         String runtimeRoot;
@@ -82,11 +80,11 @@ public class Principii {
         }
         else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
             runtimeRoot = "runtime-osx-" + runtimeArch;
-            extracmd += " -XstartOnFirstThread";
+            extracmd0 += " -XstartOnFirstThread";
         }
         else {
             runtimeRoot = "runtime-linux-" + runtimeArch;
-            extracmd += " -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd";
+            extracmd0 += " -Dswing.aatext=true -Dawt.useSystemAAFontSettings=lcd";
         }
 
         String runtime = new File("out/"+runtimeRoot+"/bin/java").getAbsolutePath();
@@ -102,13 +100,27 @@ public class Principii {
 
 
         int xmx = getConfigInt("jvm_xmx");
-        String userDefinedExtraCmd = getConfigString("jvm_extra_cmd").trim();
-        if (!userDefinedExtraCmd.isEmpty()) userDefinedExtraCmd = " "+userDefinedExtraCmd;
+        String userDefinedExtraCmd0 = getConfigString("jvm_extra_cmd").trim();
+        if (!userDefinedExtraCmd0.isEmpty()) userDefinedExtraCmd0 = " "+userDefinedExtraCmd0;
 
+//            String[] cmd = (runtime+extracmd0+userDefinedExtraCmd0+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
 
+        List<String> extracmds = Arrays.stream(extracmd0.split(" ")).toList();
+        List<String> userDefinedExtraCmds = Arrays.stream(userDefinedExtraCmd0.split(" ")).toList();
+        ArrayList<String> cmd0 = new ArrayList<>();
+        cmd0.add(runtime);
+        cmd0.addAll(extracmds);
+        cmd0.addAll(userDefinedExtraCmds);
+        cmd0.add("-Xms1G");
+        cmd0.add("-Xmx"+xmx+"G");
+        cmd0.add("-cp");
+        cmd0.add("./out/TerrarumBuild.jar");
+        cmd0.add("net.torvald.terrarum.App");
+        var cmd = cmd0.stream().filter((it) -> !it.isBlank()).toList();
+
+        System.out.println(cmd);
 
         try {
-            String[] cmd = (runtime+extracmd+userDefinedExtraCmd+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
             ProcessBuilder pb = new ProcessBuilder(cmd);
             pb.inheritIO();
             System.exit(pb.start().waitFor());
