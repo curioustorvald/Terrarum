@@ -16,6 +16,8 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -165,6 +167,29 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val altSelDrawY = ((App.scr.height - altSelDrawH)/2)
     private val altSelQdrawW = altSelDrawW / 4
     private val altSelQQQdrawW = altSelDrawW * 3 / 4
+
+    private val transitionalListing = UILoadList(this)
+    private val transitionalAutosave = UILoadAutosave(this)
+    private val transitionalManage = UILoadManage(this)
+    private val transitionPanel = UIItemHorizontalFadeSlide(
+        this,
+        (width - internalWidth) / 2,
+        INVENTORY_CELLS_OFFSET_Y(),
+        width,
+        App.scr.height,
+        0f,
+        transitionalListing, transitionalManage
+    )
+
+    init {
+        listOf(transitionalAutosave, transitionalManage).forEach {
+            it.posX = (-width / 2f).roundToInt()
+            it.initialX = (-width / 2f).roundToInt()
+            it.posY = 0
+            it.initialY = 0
+            it.opacity = 0f
+        }
+    }
 
     private fun getDrawTextualInfoFun(disks: DiskPair): (UIItem, SpriteBatch) -> Unit {
         val lastPlayedStamp = Instant.ofEpochSecond(disks.player.getLastModifiedTime())
