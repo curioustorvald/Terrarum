@@ -66,11 +66,9 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     internal val uiXdiffChatOverlay = App.scr.chatWidth / 2
 
     internal val textH = App.fontGame.lineHeight.toInt()
-
     internal val cellGap = 20
     internal val cellInterval = cellGap + SAVE_CELL_HEIGHT
     internal val gradAreaHeight = 32
-
 //    internal val titleTextPosY: Int = App.scr.tvSafeGraphicsHeight + 10
     internal val titleTopGradStart: Int = App.scr.tvSafeGraphicsHeight
     internal val titleTopGradEnd: Int = titleTopGradStart + gradAreaHeight
@@ -90,18 +88,16 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private var scrollAreaHeight = height - 2 * App.scr.tvSafeGraphicsHeight - 64
     private var listScroll = 0 // only update when animation is finished
     private var savesVisible = (scrollAreaHeight + cellGap) / cellInterval
-
     private var uiScroll = 0f
     private var scrollFrom = 0
     private var scrollTarget = 0
     private var scrollAnimCounter = 0f
     private val scrollAnimLen = 0.1f
-
     private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, false)
 
-    private var showSpinner = false
+    internal var showSpinner = false
 
-    private val playerCells = ArrayList<UIItemPlayerCells>()
+//    private val playerCells = ArrayList<UIItemPlayerCells>()
 
     var mode = 0 // 0: show players, 1: show worlds
         private set(value) {
@@ -122,9 +118,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val goButtonWidth = 180
     private val drawX = (Toolkit.drawWidth - 480) / 2
     private val drawY = (App.scr.height - 480) / 2
-    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val confirmCancelButton = UIItemTextButton(this, "MENU_LABEL_CANCEL", drawX + (240 - goButtonWidth) / 2, drawY + 480 - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, drawY + 480- 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD)
+    private val buttonRowY = drawY + 480 - 24
+    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val confirmCancelButton = UIItemTextButton(this, "MENU_LABEL_CANCEL", drawX + (240 - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD)
 
     private lateinit var loadables: SavegameCollectionPair
 
@@ -171,6 +168,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val transitionalListing = UILoadList(this)
     private val transitionalAutosave = UILoadAutosave(this)
     private val transitionalManage = UILoadManage(this)
+    private val transitionalNewCharacter = UILoadNewCharacter(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         (width - internalWidth) / 2,
@@ -182,7 +180,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     )
 
     init {
-        listOf(transitionalAutosave, transitionalManage).forEach {
+        listOf(transitionalAutosave, transitionalManage, transitionalNewCharacter).forEach {
             it.posX = (-width / 2f).roundToInt()
             it.initialX = (-width / 2f).roundToInt()
             it.posY = 0
@@ -202,7 +200,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     init {
         corruptedBackButton.clickOnceListener = { _,_ -> remoCon.openUI(UILoadSavegame(remoCon)) }
-        confirmCancelButton.clickOnceListener = { _, _ -> remoCon.openUI(UILoadSavegame(remoCon)) }
+        confirmCancelButton.clickOnceListener = { _,_ -> remoCon.openUI(UILoadSavegame(remoCon)) }
         confirmDeleteButton.clickOnceListener = { _,_ ->
             val pu = buttonSelectedForDeletion!!.playerUUID
             val wu = buttonSelectedForDeletion!!.worldUUID
@@ -357,7 +355,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun show() {
-        try {
+        transitionPanel.show()
+        /*try {
             remoCon.handler.lockToggle()
             showSpinner = true
 
@@ -384,26 +383,27 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             }.start()
 
         }
-        catch (e: UninitializedPropertyAccessException) {}
+        catch (e: UninitializedPropertyAccessException) {}*/
     }
 
     override fun hide() {
-        playerCells.forEach { it.dispose() }
-        playerCells.clear()
+        transitionPanel.hide()
+//        playerCells.forEach { it.dispose() }
+//        playerCells.clear()
     }
 
     private var touchLatched = false
 
-    private fun getCells() = playerCells
+//    private fun getCells() = playerCells
     private var loadFired = 0
     private var oldMode = -1
 
-    private val mode1Node = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
+//    private val mode1Node = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
 //    private val mode2Node = Yaml(UITitleRemoConYaml.injectedMenuSingleWorldSel).parse()
 
 //    private val menus = listOf(mode1Node, mode2Node)
 
-    private val deleteCharacterButton = UIItemTextButton(
+    /*private val deleteCharacterButton = UIItemTextButton(
         this, "CONTEXT_CHARACTER_DELETE",
         UIRemoCon.menubarOffX - UIRemoCon.UIRemoConElement.paddingLeft + 72,
         UIRemoCon.menubarOffY - UIRemoCon.UIRemoConElement.lineHeight * 3 + 16,
@@ -418,7 +418,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             mode = MODE_SAVE_DELETE
             it.highlighted = true
         }
-    }
+    }*/
 
     init {
         // this UI will NOT persist; the parent of the mode1Node must be set using an absolute value (e.g. treeRoot, not remoCon.currentRemoConContents)
@@ -426,10 +426,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         //printdbg(this, "UILoadSavegame called, from:")
         //printStackTrace(this)
 
-        mode1Node.parent = remoCon.treeRoot
+//        mode1Node.parent = remoCon.treeRoot
 //        mode2Node.parent = mode1Node
 
-        mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
+//        mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
 //        mode2Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
 
 //        printdbg(this, "mode1Node parent: ${mode1Node.parent?.data}") // will be 'null' because the parent is the root node
@@ -441,11 +441,12 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private fun modeChangedHandler(mode: Int) {
         printdbg(this, "Change mode: $oldMode -> $mode")
 //        remoCon.setNewRemoConContents(menus[mode])
-        remoCon.setNewRemoConContents(mode1Node)
+//        remoCon.setNewRemoConContents(mode1Node)
     }
 
     override fun updateUI(delta: Float) {
-        if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
+        transitionPanel.update(delta)
+        /*if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
 
             if (oldMode != mode) {
                 modeChangedHandler(mode)
@@ -480,7 +481,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                     it.update(delta)
                 }
             }
-        }
+        }*/
 
         if (mode == MODE_SAVE_DELETE_CONFIRM && deleteCellAnimCounter <= scrollAnimLen) {
             // do transitional moving stuff
@@ -495,6 +496,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private var deleteCellPosYstart = 0f
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        transitionPanel.render(batch, camera)
 
         if (mode == MODE_LOAD_DA_SHIT_ALREADY) {
             loadFired += 1
@@ -514,7 +516,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             }
         }
         else if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
-            batch.end()
+            /*batch.end()
 
             val cells = getCells()
 
@@ -581,7 +583,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             saveTex.texture.dispose()
             savePixmap.dispose()
 
-            batch.begin()
+            batch.begin()*/
         }
         else if (mode == MODE_SAVE_MULTIPLE_CHOICES) {
             // "The Autosave is more recent than the manual save"
@@ -604,7 +606,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
 
         if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE || mode == MODE_SAVE_DELETE_CONFIRM) {
-            deleteCharacterButton.render(batch, camera)
+//            deleteCharacterButton.render(batch, camera)
         }
         if (mode == MODE_SAVE_DELETE_CONFIRM) {
             buttonSelectedForDeletion?.render(batch, camera)
@@ -622,7 +624,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        if (this.isVisible && (mode == MODE_SELECT || mode == MODE_SAVE_DELETE)) {
+        /*if (this.isVisible && (mode == MODE_SELECT || mode == MODE_SAVE_DELETE)) {
             val cells = getCells()
 
             if ((keycode == Input.Keys.UP || keycode == App.getConfigInt("control_key_up")) && scrollTarget > 0) {
@@ -635,7 +637,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 scrollTarget += 1
                 scrollAnimCounter = 0f
             }
-        }
+        }*/
+        transitionPanel.keyDown(keycode)
         return true
     }
 
@@ -647,15 +650,15 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             if (::loadManualThumbButton.isInitialized) loadManualThumbButton.touchDown(screenX, screenY, pointer, button)
         }
         else if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
-            getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
-            deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
+//            getCells().forEach { it.touchDown(screenX, screenY, pointer, button) }
+//            deleteCharacterButton.touchDown(screenX, screenY, pointer, button)
         }
         else if (mode == MODE_SAVE_DELETE_CONFIRM) {
             confirmCancelButton.touchDown(screenX, screenY, pointer, button)
             confirmDeleteButton.touchDown(screenX, screenY, pointer, button)
         }
         else if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchDown(screenX, screenY, pointer, button)
-
+        transitionPanel.touchDown(screenX, screenY, pointer, button)
         return true
     }
 
@@ -665,21 +668,20 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
             if (::loadManualThumbButton.isInitialized) loadManualThumbButton.touchUp(screenX, screenY, pointer, button)
         }
         else if (mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
-            getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
-            deleteCharacterButton.touchUp(screenX, screenY, pointer, button)
+//            getCells().forEach { it.touchUp(screenX, screenY, pointer, button) }
+//            deleteCharacterButton.touchUp(screenX, screenY, pointer, button)
         }
         else if (mode == MODE_SAVE_DELETE_CONFIRM) {
             confirmCancelButton.touchUp(screenX, screenY, pointer, button)
             confirmDeleteButton.touchUp(screenX, screenY, pointer, button)
         }
         else if (mode == MODE_SAVE_DAMAGED) corruptedBackButton.touchUp(screenX, screenY, pointer, button)
-
-
+        transitionPanel.touchUp(screenX, screenY, pointer, button)
         return true
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        if (this.isVisible && mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
+        /*if (this.isVisible && mode == MODE_SELECT || mode == MODE_SAVE_DELETE) {
             val cells = getCells()
 
             if (amountY <= -1f && scrollTarget > 0) {
@@ -692,7 +694,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
                 scrollTarget += 1
                 scrollAnimCounter = 0f
             }
-        }
+        }*/
+        transitionPanel.scrolled(amountX, amountY)
         return true
     }
 
@@ -724,7 +727,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, false)
     }
 
-    private fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+    internal fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
         camera.position.set((-newX + App.scr.halfw).round(), (-newY + App.scr.halfh).round(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
