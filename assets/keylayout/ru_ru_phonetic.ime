@@ -33,7 +33,7 @@ let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x
 return Object.freeze({"n":"Рус. Фонетическая","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "tf":states.layouttable,
 "l":"ruRU",
-// return: [displayed output, composed output]
+// return: [delete count, composed output]
 "accept":(headkey,shiftin,altgrin,lowlayerkey)=>{
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1

@@ -375,7 +375,7 @@ let bufDebugStringify = (buf) => [0,1,2].map(i => (buf[i] == undefined) ? "·" :
 return Object.freeze({"n":"세벌식 공자판","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts.map(it => [it[0],it[1]]),
 "l":"koKR",
-// return: [displayed output, composed output]
+// return: [delete count, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin// + 2*altgrin
     states.code = 1

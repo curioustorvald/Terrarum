@@ -379,7 +379,7 @@ let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x
 return Object.freeze({"n":"\uDBBF\uDFC1Бъл. Многоезична\uDBBF\uDFC0","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":dislplayKeyLayouts,
 "l":"bgBG",
-// return: [displayed output, composed output]
+// return: [delete count, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin + 2*altgrin
 

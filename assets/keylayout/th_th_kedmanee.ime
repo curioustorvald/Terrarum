@@ -269,7 +269,7 @@ let isDiacritics = (s) => s !== undefined && inRange(s.charCodeAt(0), 0x0300, 0x
 return Object.freeze({"n":"แป้นพิมพ์เกษมณี","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
 "t":states.keylayouts,
 "l":"thTH",
-// return: [displayed output, composed output]
+// return: [delete count, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin + 2*altgrin // use AltGr to type conventional numbers
     states.code = 0

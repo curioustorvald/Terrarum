@@ -4,16 +4,16 @@ let states = {"keylayouts":[[""],[undefined],
 [undefined],
 [undefined],
 [undefined],
-["0","0","0",")"],
-["1","1","1","!"],
-["2","2","2","@"],
-["3","3","3","#"],
-["4","4","4","$"],
-["5","5","5","%"],
-["6","6","6","^"],
-["7","7","7","&"],
-["8","8","8","*"],
-["9","9","9","("],
+["0",")","\u0966",")"],
+["1","\u090D","\u0967","!"],
+["2","\u0945","\u0968","@"],
+["3","\u094D\u0930","\u0969","#"],
+["4","\u0930\u094D","\u096A","$"],
+["5","\u091C\u094D\u091E","\u096B","%"],
+["6","\u0924\u094D\u0930","\u096C","^"],
+["7","\u0915\u094D\u0937","\u096D","&"],
+["8","\u0936\u094D\u0930","\u096E","*"],
+["9","(","\u096F","("],
 ["*"],
 ["#"],
 [undefined],
@@ -260,9 +260,9 @@ let reset = () => {
 }
 let inRange = (s,a,b) => (a <= s && s <= b)
 return Object.freeze({"n":"इनस्क्रिप्ट","v":"none","c":"CuriousTo\uA75Bvald","m":"rewrite",
-"t":states.keylayouts,
+"t":states.keylayouts.slice(0,10).concat([["3","\uDBBF\uDE01\u094D\u0930","\u0969","#"], ["4","\u0930\u094D\uDBBF\uDE01","\u096A","$"]], states.keylayouts.slice(12)),
 "l":"hiIN",
-// return: [displayed output, composed output]
+// return: [delete count, composed output]
 "accept":(headkey,shiftin,altgrin)=>{
     let layer = 1*shiftin + 2*altgrin
 
