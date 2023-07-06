@@ -8,14 +8,14 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 
 open class UIItemTransitionContainer(
-        private val parent: UICanvas,
-        initialX: Int,
-        initialY: Int,
-        override val width: Int,
-        override val height: Int,
-        val transitionLength: Float = 0.15f,
-        var currentPosition: Float = 0f,
-        val uis: Array<out UICanvas>
+    private val parent: UICanvas,
+    initialX: Int,
+    initialY: Int,
+    override val width: Int,
+    override val height: Int,
+    val transitionLength: Float = 0.15f,
+    var currentPosition: Float = 0f,
+    open val uis: List<UICanvas>
 ) : UIItem(parent, initialX, initialY) {
 
     val debugvals = false
@@ -51,7 +51,7 @@ open class UIItemTransitionContainer(
         uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.update(delta) }
     }
 
-    open fun onTransition(currentPosition: Float, uis: Array<out UICanvas>) {}
+    open fun onTransition(currentPosition: Float, uis: List<UICanvas>) {}
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         super.render(batch, camera)

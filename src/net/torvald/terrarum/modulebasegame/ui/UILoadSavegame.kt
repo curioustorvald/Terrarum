@@ -176,17 +176,12 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         width,
         App.scr.height,
         0f,
-        transitionalListing, transitionalManage
+        listOf(transitionalListing),
+        listOf(transitionalManage, transitionalAutosave, transitionalNewCharacter)
     )
 
     init {
-        listOf(transitionalAutosave, transitionalManage, transitionalNewCharacter).forEach {
-            it.posX = (-width / 2f).roundToInt()
-            it.initialX = (-width / 2f).roundToInt()
-            it.posY = 0
-            it.initialY = 0
-            it.opacity = 0f
-        }
+
     }
 
     private fun getDrawTextualInfoFun(disks: DiskPair): (UIItem, SpriteBatch) -> Unit {

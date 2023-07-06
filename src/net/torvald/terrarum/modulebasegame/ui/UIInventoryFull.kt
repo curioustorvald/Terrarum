@@ -214,13 +214,15 @@ class UIInventoryFull(
     private val transitionalItemCells = UIInventoryCells(this)
     private val transitionalEscMenu = UIInventoryEscMenu(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
-            this,
-            (width - internalWidth) / 2,
-            INVENTORY_CELLS_OFFSET_Y(),
-            width,
-            App.scr.height,
-            1f,
-            transitionalCraftingUI, transitionalItemCells, transitionalEscMenu
+        this,
+        (width - internalWidth) / 2,
+        INVENTORY_CELLS_OFFSET_Y(),
+        width,
+        App.scr.height,
+        1f,
+        listOf(transitionalCraftingUI),
+        listOf(transitionalItemCells),
+        listOf(transitionalEscMenu)
     )
 
 
