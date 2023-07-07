@@ -97,78 +97,28 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     internal var showSpinner = false
 
-//    private val playerCells = ArrayList<UIItemPlayerCells>()
-
-    var mode = 0 // 0: show players, 1: show worlds
-        private set(value) {
-            touchLatched = true
-            field = value
-        }
-
-    private val MODE_SELECT = 0
-    private val MODE_SELECT_AFTER = 1
-    private val MODE_SAVE_MULTIPLE_CHOICES = 2
-    private val MODE_LOAD_DA_SHIT_ALREADY = 255
-    private val MODE_SAVE_DAMAGED = 256
-    private val MODE_SAVE_DELETE = 512
-    private val MODE_SAVE_DELETE_CONFIRM = 513
-
-    private var buttonSelectedForDeletion: UIItemPlayerCells? = null
+    internal var buttonSelectedForDeletion: UIItemPlayerCells? = null
 
     private val goButtonWidth = 180
     private val drawX = (Toolkit.drawWidth - 480) / 2
     private val drawY = (App.scr.height - 480) / 2
     private val buttonRowY = drawY + 480 - 24
-    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val confirmCancelButton = UIItemTextButton(this, "MENU_LABEL_CANCEL", drawX + (240 - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD)
 
     private lateinit var loadables: SavegameCollectionPair
 
-    private lateinit var loadManualThumbButton: UIItemImageButton
-    private lateinit var loadAutoThumbButton: UIItemImageButton
-
-    private val disposablePool = ArrayList<Disposable>()
-
-    private fun DiskPair.getThumbnail(): TextureRegion {
-        return this.player.requestFile(PLAYER_SCREENSHOT).let { file ->
-            CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
-
-            if (file != null) {
-                val zippedTga = (file.contents as EntryFile).bytes
-                val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
-                val tgaFileContents = gzin.readAllBytes(); gzin.close()
-                val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
-                TextureRegion(Texture(pixmap)).also {
-                    disposablePool.add(it.texture)
-                    // do cropping and resizing
-                    it.setRegion(
-                        (pixmap.width - imageButtonW*2) / 2,
-                        (pixmap.height - imageButtonH*2) / 2,
-                        imageButtonW * 2,
-                        imageButtonH * 2
-                    )
-                }
-            }
-            else {
-                CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
-            }
-        }
-    }
-
-    private val altSelDrawW = 640
+    /*private val altSelDrawW = 640
     private val altSelHdrawW = altSelDrawW / 2
     private val altSelDrawH = 480
     private val imageButtonW = 300
     private val imageButtonH = 240
     private val altSelDrawY = ((App.scr.height - altSelDrawH)/2)
     private val altSelQdrawW = altSelDrawW / 4
-    private val altSelQQQdrawW = altSelDrawW * 3 / 4
+    private val altSelQQQdrawW = altSelDrawW * 3 / 4*/
 
     private val transitionalListing = UILoadList(this)
     private val transitionalAutosave = UILoadAutosave(this)
     private val transitionalManage = UILoadManage(this)
-    private val transitionalNewCharacter = UILoadNewCharacter(this)
+    private val transitionalNewCharacter = UINewCharacter(remoCon)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         (width - internalWidth) / 2,
@@ -184,29 +134,9 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     }
 
-    private fun getDrawTextualInfoFun(disks: DiskPair): (UIItem, SpriteBatch) -> Unit {
-        val lastPlayedStamp = Instant.ofEpochSecond(disks.player.getLastModifiedTime())
-            .atZone(TimeZone.getDefault().toZoneId())
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-        return { item: UIItem, batch: SpriteBatch ->
-            App.fontSmallNumbers.draw(batch, lastPlayedStamp, item.posX + 5f, item.posY + 3f)
-        }
-    }
 
     init {
-        corruptedBackButton.clickOnceListener = { _,_ -> remoCon.openUI(UILoadSavegame(remoCon)) }
-        confirmCancelButton.clickOnceListener = { _,_ -> remoCon.openUI(UILoadSavegame(remoCon)) }
-        confirmDeleteButton.clickOnceListener = { _,_ ->
-            val pu = buttonSelectedForDeletion!!.playerUUID
-            val wu = buttonSelectedForDeletion!!.worldUUID
-            App.savegamePlayers[pu]?.moveToRecycle(App.recycledPlayersDir)?.let {
-                App.sortedPlayers.remove(pu)
-                App.savegamePlayers.remove(pu)
-                App.savegamePlayersName.remove(pu)
-            }
-            // don't delete the world please
-            remoCon.openUI(UILoadSavegame(remoCon))
-        }
+
     }
 
     override fun advanceMode(button: UIItem) {
@@ -230,48 +160,6 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
             mode = if (loadables.moreRecentAutosaveAvailable()) {
                 // make choice for load manual or auto, if available
-
-                val autoThumb = loadables.getAutoSave()!!.getThumbnail()
-                val manualThumb = loadables.getManualSave()!!.getThumbnail()
-
-                loadManualThumbButton = UIItemImageButton(this, manualThumb,
-                    initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQdrawW - imageButtonW/2,
-                    initialY = altSelDrawY + 120,
-                    width = imageButtonW,
-                    height = imageButtonH,
-                    imageDrawWidth = imageButtonW,
-                    imageDrawHeight = imageButtonH,
-                    highlightable = false,
-                    useBorder = true,
-                ).also {
-                    it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!)
-                    it.clickOnceListener = { _,_ ->
-                        loadables.getManualSave()!!.let {
-                            UILoadGovernor.playerDisk = it.player
-                            UILoadGovernor.worldDisk = it.world
-                        }
-                        mode = MODE_LOAD_DA_SHIT_ALREADY
-                    }
-                }
-                loadAutoThumbButton = UIItemImageButton(this, autoThumb,
-                    initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQQQdrawW - imageButtonW/2,
-                    initialY = altSelDrawY + 120,
-                    width = imageButtonW,
-                    height = imageButtonH,
-                    imageDrawWidth = imageButtonW,
-                    imageDrawHeight = imageButtonH,
-                    highlightable = false,
-                    useBorder = true,
-                ).also {
-                    it.extraDrawOp = getDrawTextualInfoFun(loadables.getAutoSave()!!)
-                    it.clickOnceListener = { _,_ ->
-                        loadables.getAutoSave()!!.let {
-                            UILoadGovernor.playerDisk = it.player
-                            UILoadGovernor.worldDisk = it.world
-                        }
-                        mode = MODE_LOAD_DA_SHIT_ALREADY
-                    }
-                }
 
                 MODE_SAVE_MULTIPLE_CHOICES
             }
