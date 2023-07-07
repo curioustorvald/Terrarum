@@ -100,7 +100,8 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
-            val player = ReadActor.invoke(UILoadGovernor.playerDisk!!, ByteArray64Reader(UILoadGovernor.playerDisk!!.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
+            val playerDisk = App.savegamePlayers[UILoadGovernor.playerUUID]!!.loadable()
+            val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
             val seed = try {
                 seedInput.getTextOrPlaceholder().toLong()
             }

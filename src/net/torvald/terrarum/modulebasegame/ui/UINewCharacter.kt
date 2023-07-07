@@ -78,10 +78,10 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
 
 
                 // comment below if chargen must send gamers back to the charcters list
-                UILoadGovernor.playerDisk = DiskSkimmer(outFile)
+//                UILoadGovernor.playerDisk = DiskSkimmer(outFile)
                 // comment above if chargen must send gamers back to the charcters list
 
-                printdbg(this, "playerdisk: ${UILoadGovernor.playerDisk?.diskFile?.path}")
+//                printdbg(this, "playerdisk: ${UILoadGovernor.playerDisk?.diskFile?.path}")
 
             }, "TerrarumBasegameNewCharcterSaveThread")
 

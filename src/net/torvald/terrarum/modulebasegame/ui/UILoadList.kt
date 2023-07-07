@@ -57,36 +57,70 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
 
     private val mode1Node = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
 
+    private var showSpinner = false
+
+
+    fun advanceMode() {
+        App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
+        full.loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
+
+
+        if (full.loadables.moreRecentAutosaveAvailable()) {
+            // make choice for load manual or auto, if available
+            full.hasNewerAutosave = true
+
+            full.queueUpManageScr()
+            full.bringAutosaveSelectorUp()
+        }
+        else if (!full.loadables.saveAvaliable()) {
+            // show save is damaged and cannot be loaded
+            full.queueUpDamagedSaveScr()
+            full.takeAutosaveSelectorDown()
+        }
+        else {
+//            val (p, w) = full.loadables.getLoadableSave()!!
+//            UILoadGovernor.playerDisk = p; UILoadGovernor.worldDisk = w
+
+            if (full.loadables.newerSaveIsDamaged) {
+                UILoadGovernor.previousSaveWasLoaded = true
+            }
+
+            full.queueUpManageScr()
+            full.takeAutosaveSelectorDown()
+        }
+
+        full.changePanelTo(1)
+    }
 
     override fun show() {
         mode1Node.parent = full.remoCon.treeRoot
         mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
         full.remoCon.setNewRemoConContents(mode1Node)
+        playerCells.clear()
 
         try {
             full.remoCon.handler.lockToggle()
-            full.showSpinner = true
+            showSpinner = true
 
             Thread {
                 // read savegames
                 var savegamesCount = 0
                 App.sortedPlayers.forEach { uuid ->
-                    val skimmer = App.savegamePlayers[uuid]!!.loadable()
                     val x = full.uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
-                        playerCells.add(UIItemPlayerCells(full, x, y, skimmer))
+                        playerCells.add(UIItemPlayerCells(full, x, y, uuid))
                         savegamesCount += 1
                     }
                     catch (e: Throwable) {
-                        System.err.println("[UILoadSavegame] Error while loading Player '${skimmer.diskFile.absolutePath}'")
+                        System.err.println("[UILoadSavegame] Error while loading Player with UUID $uuid")
                         e.printStackTrace()
                     }
                 }
 
 
                 full.remoCon.handler.unlockToggle()
-                full.showSpinner = false
+                showSpinner = false
             }.start()
 
         }
@@ -180,9 +214,9 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         full.setCameraPosition(batch, camera, 0f, 0f)
         val saveTex = TextureRegion(Texture(savePixmap)); saveTex.flip(false, true)
         batch.inUse {
-            batch.draw(saveTex, (width - uiWidth - 10) / 2f, 0f)
+            batch.draw(saveTex, posX + (width - uiWidth - 10) / 2f, 0f)
             // Control help
-            App.fontGame.draw(batch, controlHelp, full.uiX.toFloat(), controlHelperY.toFloat())
+            App.fontGame.draw(batch, controlHelp, posX + full.uiX.toFloat(), controlHelperY.toFloat())
         }
 
         saveTex.texture.dispose()

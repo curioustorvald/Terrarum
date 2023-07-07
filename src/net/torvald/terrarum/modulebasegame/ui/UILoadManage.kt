@@ -21,7 +21,6 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - 480) / 2
     private val drawY = (App.scr.height - 480) / 2
     private val buttonRowY = drawY + 480 - 24
-    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
     private val confirmCancelButton = UIItemTextButton(this, "MENU_LABEL_CANCEL", drawX + (240 - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
     private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", drawX + 240 + (240 - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD)
 
@@ -32,7 +31,6 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val MODE_RENAME = 32 // show rename dialogue
 
     init {
-        corruptedBackButton.clickOnceListener = { _,_ -> full.remoCon.openUI(UILoadSavegame(full.remoCon)) }
         confirmCancelButton.clickOnceListener = { _,_ -> full.remoCon.openUI(UILoadSavegame(full.remoCon)) }
         confirmDeleteButton.clickOnceListener = { _,_ ->
             val pu = full.buttonSelectedForDeletion!!.playerUUID
@@ -45,17 +43,21 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             // don't delete the world please
             full.remoCon.openUI(UILoadSavegame(full.remoCon))
         }
+
+        addUIitem(confirmCancelButton)
+        addUIitem(confirmDeleteButton)
     }
 
 
     override fun updateUI(delta: Float) {
-        TODO("Not yet implemented")
+        confirmCancelButton.update(delta)
+        confirmDeleteButton.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         if (mode == MODE_DELETE) {
-            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_SAVE_WILL_BE_DELETED"], Toolkit.drawWidth, 0, titleTopGradEnd + cellInterval - 46)
-            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_ARE_YOU_SURE"], Toolkit.drawWidth, 0, titleTopGradEnd + cellInterval + SAVE_CELL_HEIGHT + 36)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_SAVE_WILL_BE_DELETED"], Toolkit.drawWidth, 0, full.titleTopGradEnd + full.cellInterval - 46)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_ARE_YOU_SURE"], Toolkit.drawWidth, 0, full.titleTopGradEnd + full.cellInterval + SAVE_CELL_HEIGHT + 36)
 
             full.buttonSelectedForDeletion!!.render(batch, camera)
 
@@ -65,7 +67,20 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        confirmCancelButton.touchDown(screenX, screenY, pointer, button)
+        confirmDeleteButton.touchDown(screenX, screenY, pointer, button)
+
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        confirmCancelButton.touchUp(screenX, screenY, pointer, button)
+        confirmDeleteButton.touchUp(screenX, screenY, pointer, button)
+
+        return true
     }
 
 }

@@ -77,11 +77,11 @@ class FixtureWorldPortal : Electric {
             // load existing
             val jobAfterSave: () -> Unit
             if (it.worldDiskToLoad != null) {
-                UILoadGovernor.worldDisk = it.worldDiskToLoad
-                UILoadGovernor.playerDisk = App.savegamePlayers[player.uuid]!!.files[0]
                 jobAfterSave = {
-                    UILoadGovernor.playerDisk!!.rebuild()
-                    LoadSavegame(UILoadGovernor.playerDisk!!, UILoadGovernor.worldDisk!!)
+                    LoadSavegame(
+                        App.savegamePlayers[player.uuid]!!.files[0],
+                        it.worldDiskToLoad
+                    )
                 }
             }
             // create new

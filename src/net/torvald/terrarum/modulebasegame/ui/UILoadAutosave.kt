@@ -63,8 +63,8 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
             it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!)
             it.clickOnceListener = { _,_ ->
                 loadables.getManualSave()!!.let {
-                    UILoadGovernor.playerDisk = it.player
-                    UILoadGovernor.worldDisk = it.world
+//                    UILoadGovernor.playerDisk = it.player
+//                    UILoadGovernor.worldDisk = it.world
                 }
             }
         }
@@ -81,8 +81,8 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
             it.extraDrawOp = getDrawTextualInfoFun(loadables.getAutoSave()!!)
             it.clickOnceListener = { _,_ ->
                 loadables.getAutoSave()!!.let {
-                    UILoadGovernor.playerDisk = it.player
-                    UILoadGovernor.worldDisk = it.world
+//                    UILoadGovernor.playerDisk = it.player
+//                    UILoadGovernor.worldDisk = it.world
                 }
             }
         }

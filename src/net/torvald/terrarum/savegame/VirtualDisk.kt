@@ -254,6 +254,7 @@ object VDSaveKind {
 object VDFileID {
     const val ROOT = 0L
     const val SAVEGAMEINFO = -1L
+    const val PLAYER_JSON = -1L
     const val THUMBNAIL = -2L
     const val SPRITEDEF = -2L
     const val SPRITEDEF_GLOW = -3L

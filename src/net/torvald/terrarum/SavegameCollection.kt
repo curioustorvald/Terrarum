@@ -1,11 +1,19 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.savegame.DiskSkimmer
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.ROOT
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.forEachSiblings
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.*
 import kotlin.io.path.Path
 
 /**
@@ -56,6 +64,39 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
 
     fun getBaseFile(): DiskSkimmer {
         return files.first { it.diskFile.extension.isBlank() }
+    }
+
+    fun getUUID(): UUID {
+        var uuid: UUID? = null
+        loadable().getFile(SAVEGAMEINFO)!!.let {
+            JsonFetcher.readFromJsonString(ByteArray64Reader(it.bytes, Common.CHARSET)).forEachSiblings { name, value ->
+                if (name == "worldIndex" || name == "uuid") uuid = UUID.fromString(value.asString())
+            }
+        }
+        return uuid!!
+    }
+
+    fun renamePlayer(name: String) {
+        files.forEach { skimmer ->
+            skimmer.rebuild()
+            skimmer.getFile(SAVEGAMEINFO)!!.let { file ->
+                val json = JsonFetcher.readFromJsonString(ByteArray64Reader(file.bytes, Common.CHARSET))
+                json.getChild("actorValue").getChild(AVKey.NAME).set(name)
+
+                val jsonBytes = json.prettyPrint(JsonWriter.OutputType.json, 0).encodeToByteArray().toByteArray64()
+                val newEntry = DiskEntry(SAVEGAMEINFO, ROOT, skimmer.requestFile(SAVEGAMEINFO)!!.creationDate, App.getTIME_T(), EntryFile(jsonBytes))
+
+                skimmer.appendEntry(newEntry)
+
+                skimmer.setDiskName(name, Common.CHARSET)
+            }
+        }
+    }
+
+    fun renameWorld(name: String) {
+        files.forEach { skimmer ->
+            skimmer.setDiskName(name, Common.CHARSET)
+        }
     }
 }
 

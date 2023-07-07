@@ -62,7 +62,7 @@ object UILoadGovernor {
     var worldUUID: UUID? = null
     var previousSaveWasLoaded = false
     // used by the debug save loader
-    var playerDisk: DiskSkimmer? = null
+    /*var playerDisk: DiskSkimmer? = null
         set(value) {
             printdbg(this, "Player selected: ${value?.diskFile?.name}")
             field = value
@@ -72,12 +72,12 @@ object UILoadGovernor {
         set(value) {
             printdbg(this, "World selected: ${value?.diskFile?.name}")
             field = value
-        }
+        }*/
 
     fun reset() {
         printdbg(this, "Resetting player and world selection")
-        playerDisk = null
-        worldDisk = null
+//        playerDisk = null
+//        worldDisk = null
 
         playerUUID = null
         worldUUID = null
@@ -205,15 +205,14 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
 
                 savegamesCount = 0
                 App.sortedPlayers.forEach { uuid ->
-                    val skimmer = App.savegamePlayers[uuid]!!.loadable()
                     val x = uiX
                     val y = titleTopGradEnd + cellInterval * savegamesCount
                     try {
-                        playerCells.add(UIItemPlayerCells(this, x, y, skimmer))
+                        playerCells.add(UIItemPlayerCells(this, x, y, uuid))
                         savegamesCount += 1
                     }
                     catch (e: Throwable) {
-                        System.err.println("[UILoadDemoSavefiles] Error while loading Player '${skimmer.diskFile.absolutePath}'")
+                        System.err.println("[UILoadDemoSavefiles] Error while loading Player with UUID $uuid")
                         e.printStackTrace()
                     }
                 }
@@ -321,7 +320,10 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
             App.fontGame.draw(batch, txt, (App.scr.width - App.fontGame.getWidth(txt)) / 2f, (App.scr.height - App.fontGame.lineHeight) / 2f)
 
             if (loadFired == 2) {
-                LoadSavegame(UILoadGovernor.playerDisk!!, UILoadGovernor.worldDisk)
+                LoadSavegame(
+                    App.savegamePlayers[UILoadGovernor.playerUUID]!!.loadable(),
+                    App.savegameWorlds[UILoadGovernor.worldUUID]?.loadable()
+                )
             }
         }
         else {
@@ -488,13 +490,13 @@ class UIItemPlayerCells(
         parent: Advanceable,
         initialX: Int,
         initialY: Int,
-        val skimmer: DiskSkimmer) : UIItem(parent, initialX, initialY) {
+        val playerUUID: UUID) : UIItem(parent, initialX, initialY) {
 
     override val width = SAVE_CELL_WIDTH
     override val height = SAVE_CELL_HEIGHT
 
     override var clickOnceListener: ((Int, Int) -> Unit) = { _: Int, _: Int ->
-        UILoadGovernor.playerDisk = skimmer
+//        UILoadGovernor.playerDisk = App.
         UILoadGovernor.playerUUID = playerUUID
         UILoadGovernor.worldUUID = worldUUID
         parent.advanceMode(this)
@@ -505,15 +507,14 @@ class UIItemPlayerCells(
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
 
-    lateinit var playerUUID: UUID; private set
+//    lateinit var playerUUID: UUID; private set
     lateinit var worldUUID: UUID; private set
 
     init {
-        skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
+        App.savegamePlayers[playerUUID]!!.loadable().getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
 
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
-                if (name == "uuid") playerUUID = UUID.fromString(value.asString())
                 if (name == "worldCurrentlyPlaying") worldUUID = UUID.fromString(value.asString())
                 if (name == "totalPlayTime") totalPlayTime = parseDuration(value.asLong())
                 if (name == "lastPlayTime") lastPlayTime0 = value.asLong()
@@ -565,7 +566,8 @@ class UIItemPlayerCells(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         // try to generate a texture
-        if (skimmer.initialised && !hasTexture) {
+        if (!hasTexture) {
+            val skimmer = App.savegamePlayers[playerUUID]!!.loadable()
             skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
                 try {
                     printdbg(this, "Generating portrait for $playerName")
@@ -757,7 +759,7 @@ class UIItemWorldCells(
     private var highlightCol: Color = Toolkit.Theme.COL_LIST_DEFAULT
 
     override var clickOnceListener: ((Int, Int) -> Unit) = { _: Int, _: Int ->
-        UILoadGovernor.worldDisk = skimmer
+//        UILoadGovernor.worldDisk = skimmer
         parent.advanceMode(this)
     }
 

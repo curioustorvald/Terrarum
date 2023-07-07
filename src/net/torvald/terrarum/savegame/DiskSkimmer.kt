@@ -1,5 +1,6 @@
 package net.torvald.terrarum.savegame
 
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.serialise.toUlong
 import java.io.*
@@ -72,7 +73,6 @@ removefile:
      */
     private var entryToOffsetTable = HashMap<EntryID, Long>()
 
-    val fa: RandomAccessFile = RandomAccessFile(diskFile, "rw")
 
     private fun debugPrintln(s: Any) {
         if (false) println(s.toString())
@@ -87,84 +87,125 @@ removefile:
         }
     }
 
+    private fun FileInputStream.readBytes(buffer: ByteArray): Int {
+        val readStatus = this.read(buffer)
+        return readStatus
+    }
+    private fun FileInputStream.readInt16(): Int {
+        val buffer = ByteArray(2)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 2) throw InternalError("Unexpected error -- EOF reached? (expected 2, got $readStatus)")
+        return buffer.toInt16()
+    }
+    private fun FileInputStream.readInt32(): Int {
+        val buffer = ByteArray(4)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 4) throw InternalError("Unexpected error -- EOF reached? (expected 4, got $readStatus)")
+        return buffer.toInt32()
+    }
+    private fun FileInputStream.readInt48(): Long {
+        val buffer = ByteArray(6)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 6) throw InternalError("Unexpected error -- EOF reached? (expected 6, got $readStatus)")
+        return buffer.toInt48()
+    }
+    private fun FileInputStream.readInt24(): Int {
+        val buffer = ByteArray(3)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 3) throw InternalError("Unexpected error -- EOF reached? (expected 3, got $readStatus)")
+        return buffer.toInt24()
+    }
+    private fun FileInputStream.readInt64(): Long {
+        val buffer = ByteArray(8)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 8) throw InternalError("Unexpected error -- EOF reached? (expected 8, got $readStatus)")
+        return buffer.toInt64()
+    }
+    private fun ByteArray.toInt16(offset: Int = 0): Int {
+        return  this[0 + offset].toUint().shl(8) or
+                this[1 + offset].toUint()
+    }
+    private fun ByteArray.toInt24(offset: Int = 0): Int {
+        return  this[0 + offset].toUint().shl(16) or
+                this[1 + offset].toUint().shl(8) or
+                this[2 + offset].toUint()
+    }
+    private fun ByteArray.toInt32(offset: Int = 0): Int {
+        return  this[0 + offset].toUint().shl(24) or
+                this[1 + offset].toUint().shl(16) or
+                this[2 + offset].toUint().shl(8) or
+                this[3 + offset].toUint()
+    }
+    private fun ByteArray.toInt48(offset: Int = 0): Long {
+        return  this[0 + offset].toUlong().shl(40) or
+                this[1 + offset].toUlong().shl(32) or
+                this[2 + offset].toUlong().shl(24) or
+                this[3 + offset].toUlong().shl(16) or
+                this[4 + offset].toUlong().shl(8) or
+                this[5 + offset].toUlong()
+    }
+    private fun ByteArray.toInt64(offset: Int = 0): Long {
+        return  this[0 + offset].toUlong().shl(56) or
+                this[1 + offset].toUlong().shl(48) or
+                this[2 + offset].toUlong().shl(40) or
+                this[3 + offset].toUlong().shl(32) or
+                this[4 + offset].toUlong().shl(24) or
+                this[5 + offset].toUlong().shl(16) or
+                this[6 + offset].toUlong().shl(8) or
+                this[7 + offset].toUlong()
+    }
+
     fun rebuild() {
         checkFileSanity() // state of the file may have been changed (e.g. file deleted) so we check again
+
+        entryToOffsetTable.clear()
 
 //        fa = RandomAccessFile(diskFile, "rw")
 
         val fis = FileInputStream(diskFile)
-        var currentPosition = fis.skip(VirtualDisk.HEADER_SIZE) // skip disk header
+        var currentPosition = VirtualDisk.HEADER_SIZE
+        fis.skipNBytes(VirtualDisk.HEADER_SIZE) // skip disk header
 
-//        println("[DiskSkimmer] loading the diskfile ${diskFile.canonicalPath}")
-
-        fun skipRead(bytes: Long) {
-            currentPosition += fis.skip(bytes)
-        }
-        /**
-         * Reads a byte and adds up the position var
-         */
-        fun readByte(): Byte {
-            currentPosition++
-            val read = fis.read()
-
-            if (read < 0) throw InternalError("Unexpectedly reached EOF")
-            return read.toByte()
-        }
-
-        /**
-         * Reads specific bytes to the buffer and adds up the position var
-         */
-        fun readBytes(buffer: ByteArray): Int {
-            val readStatus = fis.read(buffer)
-            currentPosition += readStatus
-            return readStatus
-        }
-        fun readUshortBig(): Int {
-            val buffer = ByteArray(2)
-            val readStatus = readBytes(buffer)
-            if (readStatus != 2) throw InternalError("Unexpected error -- EOF reached? (expected 2, got $readStatus)")
-            return buffer.toShortBig()
-        }
-        fun readIntBig(): Int {
-            val buffer = ByteArray(4)
-            val readStatus = readBytes(buffer)
-            if (readStatus != 4) throw InternalError("Unexpected error -- EOF reached? (expected 4, got $readStatus)")
-            return buffer.toIntBig()
-        }
-        fun readInt48(): Long {
-            val buffer = ByteArray(6)
-            val readStatus = readBytes(buffer)
-            if (readStatus != 6) throw InternalError("Unexpected error -- EOF reached? (expected 6, got $readStatus)")
-            return buffer.toInt48()
-        }
-        fun readLongBig(): Long {
-            val buffer = ByteArray(8)
-            val readStatus = readBytes(buffer)
-            if (readStatus != 8) throw InternalError("Unexpected error -- EOF reached? (expected 8, got $readStatus)")
-            return buffer.toLongBig()
-        }
+        println("[DiskSkimmer] rebuild ${diskFile.canonicalPath}")
 
 
         val currentLength = diskFile.length()
+        var ccc = 0
         while (currentPosition < currentLength) {
 
-            val entryID = readLongBig() // at this point, cursor is 8 bytes past to the entry head
+            val entryID = fis.readInt64() // at this point, cursor is 8 bytes past to the entry head
+            currentPosition += 8
 
-            // fill up the offset table
+            // fill up the offset table/
             val offset = currentPosition
 
-            skipRead(8) // parent ID
-            val typeFlag = readByte()
-            skipRead(3)
-            skipRead(16) // skip rest of the header
+//            printdbg(this, "Offset $offset, entryID $entryID")
+
+            fis.readInt64() // parentID
+            val typeFlag = fis.read().toByte()
+            fis.readInt24()
+            fis.read(16)
+
+            currentPosition += 8+4+16
+
+//            printdbg(this, "    $currentPosition")
 
             val entrySize = when (typeFlag and 127) {
-                DiskEntry.NORMAL_FILE -> readInt48()
-                DiskEntry.DIRECTORY -> readIntBig().toLong() * 8L
+                DiskEntry.NORMAL_FILE -> {
+                    currentPosition += 6
+                    fis.readInt48()
+                }
+                DiskEntry.DIRECTORY -> {
+                    currentPosition += 4
+                    fis.readInt32().toLong() * 8L
+                }
                 else -> 0
             }
 
-            skipRead(entrySize) // skips rest of the entry's actual contents
+//            printdbg(this, "    type $typeFlag entrySize = $entrySize")
+
+            currentPosition += entrySize // skips rest of the entry's actual contents
+            fis.skipNBytes(entrySize)
 
             if (typeFlag > 0) {
                 if (entryToOffsetTable[entryID] != null)
@@ -177,6 +218,12 @@ removefile:
             else {
                 debugPrintln("[DiskSkimmer] ... discarding entry $entryID at offset:$offset (name: ${diskIDtoReadableFilename(entryID, getSaveKind())})")
             }
+
+//            printdbg(this, "   currentPosition = $currentPosition / $currentLength")
+
+            ccc++
+//            if (ccc == 13) System.exit(1)
+
         }
 
         fis.close()
@@ -199,38 +246,42 @@ removefile:
 
         if (!initialised) throw IllegalStateException("File entries not built! Initialise the Skimmer by executing rebuild()")
 
+//        rebuild()
+
         entryToOffsetTable[entryID].let { offset ->
             if (offset == null) {
                 debugPrintln("[DiskSkimmer.requestFile] entry $entryID does not exist on the table")
                 return null
             }
             else {
-                fa.seek(offset)
-                val parent = fa.read(8).toLongBig()
-                val fileFlag = fa.read(4)[0]
-                val creationTime = fa.read(6).toInt48()
-                val modifyTime = fa.read(6).toInt48()
-                val skip_crc = fa.read(4)
+                val fis = FileInputStream(diskFile)
+                fis.skipNBytes(offset)
+                val parent = fis.readInt64()
+                val fileFlag = fis.read().toByte()
+                fis.readInt24()
+                val creationTime = fis.readInt48()
+                val modifyTime = fis.readInt48()
+                fis.readInt32()
+
 
                 // get entry size     // TODO future me, is this kind of comment helpful or redundant?
                 val entrySize = when (fileFlag) {
                     DiskEntry.NORMAL_FILE -> {
-                        fa.read(6).toInt48()
+                        fis.readInt48()
                     }
                     DiskEntry.DIRECTORY -> {
-                        fa.read(4).toIntBig().toLong()
+                        fis.readInt32().toLong() and 0xFFFFFFFFL
                     }
                     DiskEntry.SYMLINK -> 8L
-                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag for entryID $entryID at offset $offset") // FIXME no support for compressed file
+                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag for entryID $entryID at offset ${offset+8}") // FIXME no support for compressed file
                 }
-
 
                 val entryContent = when (fileFlag) {
                     DiskEntry.NORMAL_FILE -> {
                         val byteArray = ByteArray64(entrySize)
                         // read one byte at a time
                         for (c in 0L until entrySize) {
-                            byteArray[c] = fa.read().toByte()
+                            byteArray[c] = fis.read().toByte()
                         }
 
                         EntryFile(byteArray)
@@ -240,20 +291,21 @@ removefile:
                         // read 8 bytes at a time
                         val bytesBuffer8 = ByteArray(8)
                         for (c in 0L until entrySize) {
-                            fa.read(bytesBuffer8)
+                            fis.read(bytesBuffer8)
                             dirContents.add(bytesBuffer8.toLongBig())
                         }
 
                         EntryDirectory(dirContents)
                     }
                     DiskEntry.SYMLINK -> {
-                        val target = fa.read(8).toLongBig()
+                        val target = fis.readInt64()
 
                         EntrySymlink(target)
                     }
-                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag for entryID $entryID at offset $offset") // FIXME no support for compressed file
+                    else -> throw UnsupportedOperationException("Unsupported entry type: $fileFlag for entryID $entryID at offset ${offset+8}") // FIXME no support for compressed file
                 }
 
+                fis.close()
                 return DiskEntry(entryID, parent, creationTime, modifyTime, entryContent)
             }
         }
@@ -313,6 +365,7 @@ removefile:
     }*/
 
     fun invalidateEntry(id: EntryID) {
+        val fa = RandomAccessFile(diskFile, "rwd")
         entryToOffsetTable[id]?.let {
             fa.seek(it + 8)
             val type = fa.read()
@@ -320,12 +373,15 @@ removefile:
             fa.write(type or 128)
             entryToOffsetTable.remove(id)
         }
+        fa.close()
     }
 
 
     fun injectDiskCRC(crc: Int) {
+        val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(42L)
         fa.write(crc.toBigEndian())
+        fa.close()
     }
 
     //private val modifiedDirectories = TreeSet<DiskEntry>()
@@ -344,33 +400,41 @@ removefile:
     }*/
 
     fun setSaveMode(bits: Int) {
+        val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(49L)
         fa.writeByte(bits)
+        fa.close()
     }
 
     fun setSaveKind(bits: Int) {
+        val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(50L)
         fa.writeByte(bits)
+        fa.close()
     }
 
     fun getSaveMode(): Int {
+        val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(49L)
-        return fa.read()
+        return fa.read().also { fa.close() }
     }
 
     fun getSaveKind(): Int {
+        val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(50L)
-        return fa.read()
+        return fa.read().also { fa.close() }
     }
 
 
 
     override fun getDiskName(charset: Charset): String {
+        val fa = RandomAccessFile(diskFile, "rwd")
         val bytes = ByteArray(268)
-        fa.seek(10L)
+        fa.seek(10)
         fa.read(bytes, 0, 32)
         fa.seek(60L)
         fa.read(bytes, 32, 236)
+        fa.close()
         return bytes.toCanonicalString(charset)
     }
 
@@ -378,9 +442,11 @@ removefile:
      * @return creation time of the root directory
      */
     fun getCreationTime(): Long {
+        val fa = RandomAccessFile(diskFile, "rwd")
         val bytes = ByteArray(6)
         fa.seek(320L)
         fa.read(bytes)
+        fa.close()
         return bytes.toInt48()
     }
 
@@ -388,9 +454,11 @@ removefile:
      * @return last modified time of the root directory
      */
     fun getLastModifiedTime(): Long {
+        val fa = RandomAccessFile(diskFile, "rwd")
         val bytes = ByteArray(6)
         fa.seek(326L)
         fa.read(bytes)
+        fa.close()
         return bytes.toInt48()
     }
 
@@ -398,18 +466,22 @@ removefile:
      * redefines creation time of the root directory
      */
     fun setCreationTime(time_t: Long) {
+        val fa = RandomAccessFile(diskFile, "rwd")
         val bytes = ByteArray(6)
         fa.seek(320L)
         fa.write(time_t.toInt48())
+        fa.close()
     }
 
     /**
      * redefines last modified time of the root directory
      */
     fun setLastModifiedTime(time_t: Long) {
+        val fa = RandomAccessFile(diskFile, "rwd")
         val bytes = ByteArray(6)
         fa.seek(326L)
         fa.write(time_t.toInt48())
+        fa.close()
     }
 
     ///////////////////////////////////////////////////////
@@ -436,6 +508,9 @@ removefile:
     }*/
 
     fun appendEntry(entry: DiskEntry) {
+        val fa = RandomAccessFile(diskFile, "rwd")
+
+
 //        val parentDir = requestFile(entry.parentEntryID)!!
         val id = entry.entryID
 //        val parent = entry.parentEntryID
@@ -456,9 +531,14 @@ removefile:
         // append modified directory
 //        entryToOffsetTable[parent] = fa.filePointer + 8
 //        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
+
+        fa.close()
     }
 
     fun deleteEntry(id: EntryID) {
+        val fa = RandomAccessFile(diskFile, "rwd")
+
+
         val entry = requestFile(id)!!
 //        val parentDir = requestFile(entry.parentEntryID)!!
 //        val parent = entry.parentEntryID
@@ -476,6 +556,8 @@ removefile:
         // append modified directory
 //        entryToOffsetTable[id] = appendAt + 8
 //        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
+
+        fa.close()
     }
 
     fun appendEntries(entries: List<DiskEntry>) = entries.forEach { appendEntry(it) }
@@ -523,9 +605,9 @@ removefile:
         debugPrintln("[DiskSkimmer.getEntryBlockSize] offset for entry $id = $offset")
 
         val fis = FileInputStream(diskFile)
-        fis.skip(offset + 8)
+        fis.skipNBytes(offset + 8)
         val type = fis.read().toByte()
-        fis.skip(272) // skip name, timestamp and CRC
+        fis.skipNBytes(272) // skip name, timestamp and CRC
 
 
         val ret: Long
@@ -581,5 +663,15 @@ removefile:
                 this[5].toUlong().shl(16) or
                 this[6].toUlong().shl(8) or
                 this[7].toUlong()
+    }
+
+    fun setDiskName(name: String, charset: Charset) {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        val bytes = name.toEntryName(268, charset)
+        fa.seek(10L)
+        fa.write(bytes, 0, 32)
+        fa.seek(60L)
+        fa.write(bytes, 32, 236)
+        fa.close()
     }
 }

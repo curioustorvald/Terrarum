@@ -800,17 +800,20 @@ fun AppUpdateListOfSavegames() {
         }
     }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
         println("${index+1}.\t${it.diskFile.absolutePath}")
-        it.rebuild()
+//        it.rebuild()
 
-        val jsonFile = it.getFile(SAVEGAMEINFO)!!
-        var worldUUID: UUID? = null
-        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
-            if (name == "worldIndex") worldUUID = UUID.fromString(value.asString())
-        }
+//        val jsonFile = it.getFile(SAVEGAMEINFO)!!
+//        var worldUUID: UUID? = null
+//        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
+//            if (name == "worldIndex") worldUUID = UUID.fromString(value.asString())
+//        }
+
+        val collection = SavegameCollection.collectFromBaseFilename(File(worldsDir), it.diskFile.name)
+        val worldUUID = collection.getUUID()
 
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegameWorlds.contains(worldUUID)) {
-            App.savegameWorlds[worldUUID] = SavegameCollection.collectFromBaseFilename(File(worldsDir), it.diskFile.name)
+            App.savegameWorlds[worldUUID] = collection
             App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
             App.sortedSavegameWorlds.add(worldUUID)
         }
@@ -831,18 +834,21 @@ fun AppUpdateListOfSavegames() {
             null
         }
     }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
-        println("${index+1}.\t${it.diskFile.absolutePath}")
-        it.rebuild()
+//        println("${index+1}.\t${it.diskFile.absolutePath}")
+//        it.rebuild()
 
-        val jsonFile = it.getFile(SAVEGAMEINFO)!!
-        var playerUUID: UUID? = null
-        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
-            if (name == "uuid") playerUUID = UUID.fromString(value.asString())
-        }
+//        val jsonFile = it.getFile(SAVEGAMEINFO)!!
+//        var playerUUID: UUID? = null
+//        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
+//            if (name == "uuid") playerUUID = UUID.fromString(value.asString())
+//        }
+
+        val collection = SavegameCollection.collectFromBaseFilename(File(playersDir), it.diskFile.name)
+        val playerUUID = collection.getUUID()
 
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegamePlayers.contains(playerUUID)) {
-            App.savegamePlayers[playerUUID] = SavegameCollection.collectFromBaseFilename(File(playersDir), it.diskFile.name)
+            App.savegamePlayers[playerUUID] = collection
             App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
             App.sortedPlayers.add(playerUUID)
         }
