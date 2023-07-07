@@ -439,13 +439,10 @@ public class App implements ApplicationListener {
 
         glInfo.create();
 
-        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
-        CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
-        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
-        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
-        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, false));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
+        // make loading list
+        CommonResourcePool.INSTANCE.loadAll();
 
         newTempFile("wenquanyi.tga"); // temp file required by the font
 
@@ -474,12 +471,8 @@ public class App implements ApplicationListener {
         shaderBayerSkyboxFill = loadShaderFromClasspath("shaders/default.vert",
                 "shaders/float_to_disp_dither_static.frag"
         );
-        shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
-        shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
         shaderPassthruRGBA = loadShaderFromClasspath("shaders/gl32spritebatch.vert", "shaders/gl32spritebatch.frag");
-        shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
         shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
-        shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -489,92 +482,15 @@ public class App implements ApplicationListener {
         );
         updateFullscreenQuad(scr.getWidth(), scr.getHeight());
 
-
         // set up renderer info variables
         renderer = Gdx.graphics.getGLVersion().getRendererString();
         rendererVendor = Gdx.graphics.getGLVersion().getVendorString();
 
 
-        // make gamepad(s)
-        if (App.getConfigBoolean("usexinput")) {
-            try {
-                gamepad = new XinputControllerAdapter(XInputDevice.getDeviceFor(0));
-            }
-            catch (Throwable e) {
-                gamepad = null;
-            }
-
-            // nullify if not actually connected
-            try {
-                if (!((XinputControllerAdapter) gamepad).getC().isConnected()) {
-                    gamepad = null;
-                }
-            }
-            catch (NullPointerException notQuiteWindows) {
-                gamepad = null;
-            }
-        }
-
-        if (gamepad == null) {
-            try {
-                gamepad = new GdxControllerAdapter(Controllers.getControllers().get(0));
-            }
-            catch (Throwable e) {
-                gamepad = null;
-            }
-
-        }
-
-        // tell the game that we have a gamepad
-        environment = RunningEnvironment.PC;
-
-        if (gamepad != null) {
-            String name = gamepad.getName().toLowerCase();
-            for (String allowedName : gamepadWhitelist) {
-                if (name.contains(allowedName)) {
-                    environment = RunningEnvironment.CONSOLE;
-                    break;
-                }
-            }
-        }
-        /*if (gamepad != null) {
-            environment = RunningEnvironment.CONSOLE;
-
-            // calibrate the sticks
-            printdbg(this, "Calibrating the gamepad...");
-            float[] axesZeroPoints = new float[]{
-                    gamepad.getAxisRaw(0),
-                    gamepad.getAxisRaw(1),
-                    gamepad.getAxisRaw(2),
-                    gamepad.getAxisRaw(3)
-            };
-            setConfig("control_gamepad_axiszeropoints", axesZeroPoints);
-            for (int i = 0; i < 4; i++) {
-                printdbg(this, "Axis " + i + ": " + axesZeroPoints[i]);
-            }
-
-        }
-        else {
-            environment = RunningEnvironment.PC;
-        }*/
-
         fontGame = new TerrarumSansBitmap(FONT_DIR, false, false, false,
                 false,
                 256, false, 0.5f, false
         );
-        fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, false, false,
-                false,
-                64, false, 0.5f, false
-        );
-        fontUITitle.setInterchar(1);
-        fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
-                false,
-                64, false, 203f/255f, false
-        );
-        Lang.invoke();
-
-        // make loading list
-        CommonResourcePool.INSTANCE.loadAll();
     }
 
     private FrameBuffer postProcessorOutFBO;
@@ -954,6 +870,94 @@ public class App implements ApplicationListener {
      * Init stuffs which needs GL context
      */
     private void postInit() {
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarkings_common", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("blockmarking_actor", () -> new BlockMarkerActor());
+        CommonResourcePool.INSTANCE.addToLoadingList("loading_circle_64", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/loading_circle_64.tga"), 64, 64, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("inline_loading_spinner", () -> new TextureRegionPack(Gdx.files.internal("assets/graphics/gui/inline_loading_spinner.tga"), 20, 20, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.addToLoadingList("inventory_category", () -> new TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20, 0, 0, 0, 0, false, false, false));
+        CommonResourcePool.INSTANCE.loadAll();
+
+        shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
+        shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
+        shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
+        shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
+
+
+        // make gamepad(s)
+        if (App.getConfigBoolean("usexinput")) {
+            try {
+                gamepad = new XinputControllerAdapter(XInputDevice.getDeviceFor(0));
+            }
+            catch (Throwable e) {
+                gamepad = null;
+            }
+
+            // nullify if not actually connected
+            try {
+                if (!((XinputControllerAdapter) gamepad).getC().isConnected()) {
+                    gamepad = null;
+                }
+            }
+            catch (NullPointerException notQuiteWindows) {
+                gamepad = null;
+            }
+        }
+
+        if (gamepad == null) {
+            try {
+                gamepad = new GdxControllerAdapter(Controllers.getControllers().get(0));
+            }
+            catch (Throwable e) {
+                gamepad = null;
+            }
+
+        }
+
+        // tell the game that we have a gamepad
+        environment = RunningEnvironment.PC;
+
+        if (gamepad != null) {
+            String name = gamepad.getName().toLowerCase();
+            for (String allowedName : gamepadWhitelist) {
+                if (name.contains(allowedName)) {
+                    environment = RunningEnvironment.CONSOLE;
+                    break;
+                }
+            }
+        }
+        /*if (gamepad != null) {
+            environment = RunningEnvironment.CONSOLE;
+
+            // calibrate the sticks
+            printdbg(this, "Calibrating the gamepad...");
+            float[] axesZeroPoints = new float[]{
+                    gamepad.getAxisRaw(0),
+                    gamepad.getAxisRaw(1),
+                    gamepad.getAxisRaw(2),
+                    gamepad.getAxisRaw(3)
+            };
+            setConfig("control_gamepad_axiszeropoints", axesZeroPoints);
+            for (int i = 0; i < 4; i++) {
+                printdbg(this, "Axis " + i + ": " + axesZeroPoints[i]);
+            }
+
+        }
+        else {
+            environment = RunningEnvironment.PC;
+        }*/
+        fontUITitle = new TerrarumSansBitmap(FONT_DIR, false, false, false,
+                false,
+                64, false, 0.5f, false
+        );
+        fontUITitle.setInterchar(1);
+        fontGameFBO = new TerrarumSansBitmap(FONT_DIR, false, true, false,
+                false,
+                64, false, 203f/255f, false
+        );
+        Lang.invoke();
+
+
+
         ModMgr.INSTANCE.invoke(); // invoke Module Manager
 
 
