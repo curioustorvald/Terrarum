@@ -788,6 +788,7 @@ fun AppUpdateListOfSavegames() {
 
     println("Listing saved worlds...")
 
+
     // create list of worlds
     File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
@@ -834,7 +835,7 @@ fun AppUpdateListOfSavegames() {
             null
         }
     }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
-//        println("${index+1}.\t${it.diskFile.absolutePath}")
+        println("${index+1}.\t${it.diskFile.absolutePath}")
 //        it.rebuild()
 
 //        val jsonFile = it.getFile(SAVEGAMEINFO)!!
@@ -852,6 +853,11 @@ fun AppUpdateListOfSavegames() {
             App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
             App.sortedPlayers.add(playerUUID)
         }
+    }
+
+    println("SortedPlayers...")
+    App.sortedPlayers.forEach {
+        println(it)
     }
 
 }

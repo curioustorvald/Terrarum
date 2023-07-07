@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.Toolkit
@@ -92,39 +93,53 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         full.changePanelTo(1)
     }
 
+    private var showCalled = false
+
     override fun show() {
-        mode1Node.parent = full.remoCon.treeRoot
-        mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
-        full.remoCon.setNewRemoConContents(mode1Node)
-        playerCells.clear()
+        if (!showCalled) {
+            showCalled = true
+//            println("UILoadList ${this.hashCode()} show called by:")
+//            printStackTrace(this)
 
-        try {
-            full.remoCon.handler.lockToggle()
-            showSpinner = true
+            mode1Node.parent = full.remoCon.treeRoot
+            mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
+            full.remoCon.setNewRemoConContents(mode1Node)
+            playerCells.clear()
 
-            Thread {
-                // read savegames
-                var savegamesCount = 0
-                App.sortedPlayers.forEach { uuid ->
-                    val x = full.uiX
-                    val y = titleTopGradEnd + cellInterval * savegamesCount
-                    try {
-                        playerCells.add(UIItemPlayerCells(full, x, y, uuid))
-                        savegamesCount += 1
+            try {
+                full.remoCon.handler.lockToggle()
+                showSpinner = true
+
+                Thread {
+                    // read savegames
+                    var savegamesCount = 0
+                    printdbg(this, "============== ${this.hashCode()} ============== ")
+                    App.sortedPlayers.forEach { uuid ->
+                        printdbg(this, "Reading player $uuid")
+
+
+                        val x = full.uiX
+                        val y = titleTopGradEnd + cellInterval * savegamesCount
+                        try {
+                            playerCells.add(UIItemPlayerCells(full, x, y, uuid))
+                            savegamesCount += 1
+                        }
+                        catch (e: Throwable) {
+                            System.err.println("[UILoadSavegame] Error while loading Player with UUID $uuid")
+                            e.printStackTrace()
+                        }
                     }
-                    catch (e: Throwable) {
-                        System.err.println("[UILoadSavegame] Error while loading Player with UUID $uuid")
-                        e.printStackTrace()
-                    }
-                }
+                    printdbg(this, "============== ${this.hashCode()} ============== ")
 
 
-                full.remoCon.handler.unlockToggle()
-                showSpinner = false
-            }.start()
+                    full.remoCon.handler.unlockToggle()
+                    showSpinner = false
+                }.start()
 
+            }
+            catch (e: UninitializedPropertyAccessException) {
+            }
         }
-        catch (e: UninitializedPropertyAccessException) {}
     }
 
     override fun updateUI(delta: Float) {
@@ -277,6 +292,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     override fun hide() {
         playerCells.forEach { it.dispose() }
         playerCells.clear()
+        showCalled = false
     }
 
     override fun resize(width: Int, height: Int) {

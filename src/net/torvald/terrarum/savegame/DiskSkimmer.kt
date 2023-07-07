@@ -121,6 +121,40 @@ removefile:
         if (readStatus != 8) throw InternalError("Unexpected error -- EOF reached? (expected 8, got $readStatus)")
         return buffer.toInt64()
     }
+    private fun RandomAccessFile.readBytes(buffer: ByteArray): Int {
+        val readStatus = this.read(buffer)
+        return readStatus
+    }
+    private fun RandomAccessFile.readInt16(): Int {
+        val buffer = ByteArray(2)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 2) throw InternalError("Unexpected error -- EOF reached? (expected 2, got $readStatus)")
+        return buffer.toInt16()
+    }
+    private fun RandomAccessFile.readInt32(): Int {
+        val buffer = ByteArray(4)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 4) throw InternalError("Unexpected error -- EOF reached? (expected 4, got $readStatus)")
+        return buffer.toInt32()
+    }
+    private fun RandomAccessFile.readInt48(): Long {
+        val buffer = ByteArray(6)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 6) throw InternalError("Unexpected error -- EOF reached? (expected 6, got $readStatus)")
+        return buffer.toInt48()
+    }
+    private fun RandomAccessFile.readInt24(): Int {
+        val buffer = ByteArray(3)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 3) throw InternalError("Unexpected error -- EOF reached? (expected 3, got $readStatus)")
+        return buffer.toInt24()
+    }
+    private fun RandomAccessFile.readInt64(): Long {
+        val buffer = ByteArray(8)
+        val readStatus = readBytes(buffer)
+        if (readStatus != 8) throw InternalError("Unexpected error -- EOF reached? (expected 8, got $readStatus)")
+        return buffer.toInt64()
+    }
     private fun ByteArray.toInt16(offset: Int = 0): Int {
         return  this[0 + offset].toUint().shl(8) or
                 this[1 + offset].toUint()
@@ -162,18 +196,18 @@ removefile:
 
 //        fa = RandomAccessFile(diskFile, "rw")
 
-        val fis = FileInputStream(diskFile)
+        val fa = RandomAccessFile(diskFile, "rwd")
         var currentPosition = VirtualDisk.HEADER_SIZE
-        fis.skipNBytes(VirtualDisk.HEADER_SIZE) // skip disk header
+        fa.seek(VirtualDisk.HEADER_SIZE) // skip disk header
 
-        println("[DiskSkimmer] rebuild ${diskFile.canonicalPath}")
+//        println("[DiskSkimmer] rebuild ${diskFile.canonicalPath}")
 
 
         val currentLength = diskFile.length()
         var ccc = 0
         while (currentPosition < currentLength) {
 
-            val entryID = fis.readInt64() // at this point, cursor is 8 bytes past to the entry head
+            val entryID = fa.readInt64() // at this point, cursor is 8 bytes past to the entry head
             currentPosition += 8
 
             // fill up the offset table/
@@ -181,10 +215,10 @@ removefile:
 
 //            printdbg(this, "Offset $offset, entryID $entryID")
 
-            fis.readInt64() // parentID
-            val typeFlag = fis.read().toByte()
-            fis.readInt24()
-            fis.read(16)
+            fa.readInt64() // parentID
+            val typeFlag = fa.read().toByte()
+            fa.readInt24()
+            fa.read(16)
 
             currentPosition += 8+4+16
 
@@ -193,11 +227,11 @@ removefile:
             val entrySize = when (typeFlag and 127) {
                 DiskEntry.NORMAL_FILE -> {
                     currentPosition += 6
-                    fis.readInt48()
+                    fa.readInt48()
                 }
                 DiskEntry.DIRECTORY -> {
                     currentPosition += 4
-                    fis.readInt32().toLong() * 8L
+                    fa.readInt32().toLong() * 8L
                 }
                 else -> 0
             }
@@ -205,7 +239,7 @@ removefile:
 //            printdbg(this, "    type $typeFlag entrySize = $entrySize")
 
             currentPosition += entrySize // skips rest of the entry's actual contents
-            fis.skipNBytes(entrySize)
+            fa.seek(currentPosition)
 
             if (typeFlag > 0) {
                 if (entryToOffsetTable[entryID] != null)
@@ -226,7 +260,7 @@ removefile:
 
         }
 
-        fis.close()
+        fa.close()
         initialised = true
     }
 
