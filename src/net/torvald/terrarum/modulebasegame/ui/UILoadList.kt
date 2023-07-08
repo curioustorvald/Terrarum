@@ -109,6 +109,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
             mode1Node.parent = full.remoCon.treeRoot
             mode1Node.data = "MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UILoadSavegame"
             full.remoCon.setNewRemoConContents(mode1Node)
+            playerCells.forEach { it.dispose() }
             playerCells.clear()
 
             try {
@@ -264,6 +265,8 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun dispose() {
+        playerCells.forEach { it.dispose() }
+        playerCells.clear()
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -313,8 +316,6 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun hide() {
-        playerCells.forEach { it.dispose() }
-        playerCells.clear()
         showCalled = false
         cellLoadThread.interrupt()
     }

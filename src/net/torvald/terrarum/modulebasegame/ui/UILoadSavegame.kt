@@ -5,19 +5,13 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.unicode.getKeycapConsole
-import net.torvald.unicode.getKeycapPC
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
-import kotlin.math.roundToInt
 
 
 /**
@@ -77,7 +71,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val scrollAnimLen = 0.1f
     private var sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, false)
 
-    internal var buttonSelectedForDeletion: UIItemPlayerCells? = null
+    internal var playerButtonSelected: UIItemPlayerCells? = null
 
     private val goButtonWidth = 180
     private val drawX = (Toolkit.drawWidth - 480) / 2
@@ -130,6 +124,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
         if (button.javaClass.simpleName == "UIItemPlayerCells") {
             transitionalListing.advanceMode()
+            playerButtonSelected = button as UIItemPlayerCells
         }
 
     }

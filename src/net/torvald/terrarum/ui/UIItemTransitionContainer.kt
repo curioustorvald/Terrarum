@@ -28,7 +28,7 @@ open class UIItemTransitionContainer(
 
     private val epsilon = 0.001f
 
-    private fun timeToUpdate(index: Int) = true//(currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon)
+    private fun timeToUpdate(index: Int) = (currentPosition > index - 1 + epsilon && currentPosition < index + 1 - epsilon)
 
     fun requestTransition(target: Int) {
         if (!transitionOngoing) {

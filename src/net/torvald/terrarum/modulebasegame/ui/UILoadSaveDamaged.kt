@@ -21,14 +21,13 @@ class UILoadSaveDamaged(val full: UILoadSavegame) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - 480) / 2
     private val drawY = (App.scr.height - 480) / 2
     private val buttonRowY = drawY + 480 - 24
-    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val corruptedBackButton = UIItemTextButton(this, "MENU_LABEL_BACK", (Toolkit.drawWidth - goButtonWidth) / 2, buttonRowY, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            full.changePanelTo(0)
+        }
+    }
 
     init {
-        corruptedBackButton.clickOnceListener = { _,_ ->
-            full.changePanelTo(0)
-            println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        }
-
         addUIitem(corruptedBackButton)
     }
 

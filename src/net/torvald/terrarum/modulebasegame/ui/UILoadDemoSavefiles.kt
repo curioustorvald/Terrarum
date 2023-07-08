@@ -564,7 +564,7 @@ class UIItemPlayerCells(
         highlightTextCol = if (mouseUp && !forceMouseDown) litCol else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    fun render(batch: SpriteBatch, camera: Camera, offX: Int, offY: Int) {
         // try to generate a texture
         if (!hasTexture) {
             val skimmer = App.savegamePlayers[playerUUID]!!.loadable()
@@ -636,20 +636,20 @@ class UIItemPlayerCells(
             hasTexture = true
         }
 
-        val x = posX.toFloat()
-        val y = posY.toFloat()
+        val x = posX + offX
+        val y = posY + offY
 
         // draw box backgrounds
         batch.color = cellCol
-        Toolkit.fillArea(batch, posX, posY, 106, height)
-        Toolkit.fillArea(batch, posX + 116, posY + 34, width - 116, 86)
+        Toolkit.fillArea(batch, x, y, 106, height)
+        Toolkit.fillArea(batch, x + 116, y + 34, width - 116, 86)
 
         // draw borders
         batch.color = highlightCol
         // avatar border
-        Toolkit.drawBoxBorder(batch, posX - 1, posY - 1, 106 + 2, height + 2)
+        Toolkit.drawBoxBorder(batch, x - 1, y - 1, 106 + 2, height + 2)
         // infocell border
-        Toolkit.drawBoxBorder(batch, posX + 115, posY + 33, width - 114, 88)
+        Toolkit.drawBoxBorder(batch, x + 115, y + 33, width - 114, 88)
 
         // texts
         batch.color = highlightTextCol
@@ -666,17 +666,21 @@ class UIItemPlayerCells(
 
         // infocell divider
         batch.color = if (mouseUp) hruleColLit else hruleCol
-        Toolkit.fillArea(batch, posX + 118, posY + 62, width - 120, 1)
-        Toolkit.fillArea(batch, posX + 118, posY + 91, width - 120, 1)
+        Toolkit.fillArea(batch, x + 118, y + 62, width - 120, 1)
+        Toolkit.fillArea(batch, x + 118, y + 91, width - 120, 1)
 
         // player avatar
         batch.color = Color.WHITE
         this.sprite?.let {
             batch.draw(it,
-                    x + FastMath.ceil((106f - it.regionWidth) / 2f) + EXTRA_HEADROOM_X / 2,
-                    y + FastMath.ceil((height - it.regionHeight) / 2f) - EXTRA_HEADROOM_Y / 2
+                    x.toFloat() + FastMath.ceil((106f - it.regionWidth) / 2f) + EXTRA_HEADROOM_X / 2,
+                    y.toFloat() + FastMath.ceil((height - it.regionHeight) / 2f) - EXTRA_HEADROOM_Y / 2
             )
         }
+    }
+
+    override fun render(batch: SpriteBatch, camera: Camera) {
+        render(batch, camera, 0, 0)
     }
 
     override fun dispose() {
