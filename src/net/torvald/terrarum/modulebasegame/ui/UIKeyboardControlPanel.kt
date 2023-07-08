@@ -468,9 +468,13 @@ private object Keebsym {
     val PIE = labels.get(8,1)
     val MENU = labels.get(6,2)
     val IME = {
-        net.torvald.terrarum.gamecontroller.IME.icons[net.torvald.terrarum.gamecontroller.IME.getHighLayerByName(
-            App.getConfigString("inputmethod")
-        ).config.lang] ?: labels.get(7, 2)
+        App.getConfigString("inputmethod").let { imeName ->
+            if (imeName == "none") labels.get(7, 2)
+            else net.torvald.terrarum.gamecontroller.IME.icons[net.torvald.terrarum.gamecontroller.IME.getHighLayerByName(
+                App.getConfigString("inputmethod")
+            ).config.lang] ?: labels.get(7, 2)
+        }
+
     }
     val CRAFTING = labels.get(9,1)
 }
