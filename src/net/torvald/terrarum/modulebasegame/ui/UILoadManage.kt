@@ -80,14 +80,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         }
     }
 
-    private val confirmCancelButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_CANCEL"] }, buttonXleft, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
-        it.clickOnceListener = { _,_ ->
-            mode = MODE_INIT
-        }
-    }
     private val confirmDeleteButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_DELETE"] }, buttonXright, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
+        { Lang["MENU_LABEL_DELETE"] }, buttonXleft, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
         it.clickOnceListener = { _,_ ->
             val pu = full.playerButtonSelected!!.playerUUID
             val wu = full.playerButtonSelected!!.worldUUID
@@ -98,6 +92,12 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             }
             // don't delete the world please
             full.remoCon.openUI(UILoadSavegame(full.remoCon))
+        }
+    }
+    private val confirmCancelButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_CANCEL"] }, buttonXright, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            mode = MODE_INIT
         }
     }
 
