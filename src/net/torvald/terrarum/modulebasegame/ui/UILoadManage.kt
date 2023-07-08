@@ -19,11 +19,11 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
 
-    private val buttonHeight = 24
-    private val buttonGap = 10
-    private val buttonWidth = 180
-    private val drawX = (Toolkit.drawWidth - 480) / 2
-    private val drawY = (App.scr.height - 480) / 2
+    private val buttonHeight = full.buttonHeight
+    private val buttonGap = full.buttonGap
+    private val buttonWidth = full.buttonWidth
+    private val drawX = full.drawX
+    private val drawY = full.drawY
     private val hx = Toolkit.hdrawWidth
 
     private val buttonX1third = hx - (buttonWidth * 1.5).toInt() - buttonGap
@@ -37,18 +37,20 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val buttonRowY2 = buttonRowY - buttonHeight - buttonGap
 
     private val mainGoButton = UIItemTextButton(this,
-        { Lang["MENU_IO_LOAD_GAME"] }, buttonX1third, buttonRowY, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { Lang["MENU_IO_LOAD_GAME"] }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
             App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
 
             if (full.loadables.moreRecentAutosaveAvailable()) {
-                TODO()
+                full.bringAutosaveSelectorUp()
+                full.changePanelTo(2)
             }
             else if (full.loadables.saveAvaliable()) {
                 if (full.loadables.newerSaveIsDamaged) {
                     UILoadGovernor.previousSaveWasLoaded = true
                 }
 
+                full.takeAutosaveSelectorDown()
                 full.loadManageSelectedGame = full.loadables.getLoadableSave()!!
 
                 mode = MODE_LOAD
@@ -56,23 +58,23 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         }
     }
     private val mainNoGoButton = UIItemTextButton(this,
-        { Lang["ERROR_SAVE_CORRUPTED"].replace(".","") }, buttonX1third, buttonRowY, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { Lang["ERROR_SAVE_CORRUPTED"].replace(".","") }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.isEnabled = false
     }
-    private val mainReturnButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_BACK"] }, buttonX1third, buttonRowY2, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
-        it.clickOnceListener = { _,_ ->
-            full.changePanelTo(0)
-        }
-    }
     private val mainRenameButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_RENAME"] }, buttonXcentre, buttonRowY2, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { Lang["MENU_LABEL_RENAME"] }, buttonX1third, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
             mode = MODE_RENAME
         }
     }
+    private val mainBackButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_BACK"] }, buttonXcentre, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            full.changePanelTo(0)
+        }
+    }
     private val mainDeleteButton = UIItemTextButton(this,
-        { Lang["CONTEXT_CHARACTER_DELETE"] }, buttonX3third, buttonRowY2, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
+        { Lang["CONTEXT_CHARACTER_DELETE"] }, buttonX3third, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
         it.clickOnceListener = { _,_ ->
             mode = MODE_DELETE
         }
@@ -101,8 +103,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private var mode = 0
 
-    private var mainButtons0 = listOf(mainGoButton, mainReturnButton, mainRenameButton, mainDeleteButton)
-    private var mainButtons1 = listOf(mainNoGoButton, mainReturnButton, mainRenameButton, mainDeleteButton)
+    private var mainButtons0 = listOf(mainGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
+    private var mainButtons1 = listOf(mainNoGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
     private var delButtons = listOf(confirmCancelButton, confirmDeleteButton)
 
     private val mainButtons: List<UIItemTextButton>
@@ -154,20 +156,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             }
             MODE_LOAD -> {
                 loadFiredFrameCounter += 1
-                // to hide the "flipped skybox" artefact
-                batch.end()
-
-                gdxClearAndEnableBlend(.094f, .094f, .094f, 0f)
-
-                batch.begin()
-
-                batch.color = Color.WHITE
-                val txt = Lang["MENU_IO_LOADING"]
-                App.fontGame.draw(batch, txt, (App.scr.width - App.fontGame.getWidth(txt)) / 2f, (App.scr.height - App.fontGame.lineHeight) / 2f)
-
-                if (loadFiredFrameCounter == 2) {
-                    LoadSavegame(full.loadManageSelectedGame)
-                }
+                StaticLoadScreenSubstitute(batch)
+                if (loadFiredFrameCounter == 2) LoadSavegame(full.loadManageSelectedGame)
             }
         }
     }
@@ -191,10 +181,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         when (mode) {
             MODE_INIT -> {
-                mainButtons.forEach { it.touchDown(screenX, screenY, pointer, button) }
+                mainButtons.forEach { it.touchUp(screenX, screenY, pointer, button) }
             }
             MODE_DELETE -> {
-                delButtons.forEach { it.touchDown(screenX, screenY, pointer, button) }
+                delButtons.forEach { it.touchUp(screenX, screenY, pointer, button) }
             }
         }
 

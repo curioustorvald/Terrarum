@@ -1,22 +1,18 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.DiskPair
-import net.torvald.terrarum.SavegameCollectionPair
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.EntryFile
 import net.torvald.terrarum.savegame.VDFileID
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemImageButton
+import net.torvald.terrarum.ui.*
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -43,6 +39,26 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
     private lateinit var loadManualThumbButton: UIItemImageButton
     private lateinit var loadAutoThumbButton: UIItemImageButton
 
+    private val buttonXcentre = Toolkit.hdrawWidth - (full.buttonWidth / 2)
+    private val buttonRowY = full.drawY + 480 - full.buttonHeight
+
+    private var mode = 0
+    private val MODE_INIT = 0
+    private val MODE_LOAD = 256 // is needed to make the static loading screen
+
+    private lateinit var selectedGame: DiskPair
+
+    private val mainBackButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_BACK"] }, buttonXcentre, buttonRowY, full.buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            full.changePanelTo(1)
+        }
+    }
+
+    init {
+        addUIitem(mainBackButton)
+    }
+
     override fun show() {
         super.show()
 
@@ -62,10 +78,8 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
         ).also {
             it.extraDrawOp = getDrawTextualInfoFun(loadables.getManualSave()!!)
             it.clickOnceListener = { _,_ ->
-                loadables.getManualSave()!!.let {
-//                    UILoadGovernor.playerDisk = it.player
-//                    UILoadGovernor.worldDisk = it.world
-                }
+                selectedGame = loadables.getManualSave()!!
+                mode = MODE_LOAD
             }
         }
         loadAutoThumbButton = UIItemImageButton(this, autoThumb,
@@ -80,10 +94,8 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
         ).also {
             it.extraDrawOp = getDrawTextualInfoFun(loadables.getAutoSave()!!)
             it.clickOnceListener = { _,_ ->
-                loadables.getAutoSave()!!.let {
-//                    UILoadGovernor.playerDisk = it.player
-//                    UILoadGovernor.worldDisk = it.world
-                }
+                selectedGame = loadables.getAutoSave()!!
+                mode = MODE_LOAD
             }
         }
 
@@ -92,18 +104,30 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
     override fun updateUI(delta: Float) {
         if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.update(delta)
         if (::loadManualThumbButton.isInitialized) loadManualThumbButton.update(delta)
+        mainBackButton.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        // "The Autosave is more recent than the manual save"
-        Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE1"], Toolkit.drawWidth, 0, altSelDrawY)
-        Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE2"], Toolkit.drawWidth, 0, altSelDrawY + 24)
-        // Manual Save             Autosave
-        Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_MANUAL_SAVE"], altSelHdrawW, (Toolkit.drawWidth - altSelDrawW)/2, altSelDrawY + 80)
-        Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_AUTOSAVE"], altSelHdrawW, Toolkit.drawWidth/2, altSelDrawY + 80)
+    private var loadFiredFrameCounter = 0
 
-        if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.render(batch, camera)
-        if (::loadManualThumbButton.isInitialized) loadManualThumbButton.render(batch, camera)
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        if (mode == MODE_INIT) {
+            // "The Autosave is more recent than the manual save"
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE1"], Toolkit.drawWidth, 0, altSelDrawY)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE2"], Toolkit.drawWidth, 0, altSelDrawY + 24)
+            // Manual Save             Autosave
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_MANUAL_SAVE"], altSelHdrawW, (Toolkit.drawWidth - altSelDrawW)/2, altSelDrawY + 80)
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_IO_AUTOSAVE"], altSelHdrawW, Toolkit.drawWidth/2, altSelDrawY + 80)
+
+            if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.render(batch, camera)
+            if (::loadManualThumbButton.isInitialized) loadManualThumbButton.render(batch, camera)
+
+            mainBackButton.render(batch, camera)
+        }
+        else if (mode == MODE_LOAD) {
+            loadFiredFrameCounter += 1
+            StaticLoadScreenSubstitute(batch)
+            if (loadFiredFrameCounter == 2) LoadSavegame(selectedGame)
+        }
     }
 
     override fun dispose() {

@@ -106,7 +106,7 @@ public class Principii {
 //            String[] cmd = (runtime+extracmd0+userDefinedExtraCmd0+" -Xms1G -Xmx"+xmx+"G -cp ./out/TerrarumBuild.jar net.torvald.terrarum.App").split(" ");
 
         List<String> extracmds = Arrays.stream(extracmd0.split(" ")).toList();
-        List<String> userDefinedExtraCmds = Arrays.stream(userDefinedExtraCmd0.split(" ")).toList();
+        List<String> userDefinedExtraCmds = Arrays.stream(userDefinedExtraCmd0.split(" +")).filter((it) -> !it.isBlank()).toList();
         ArrayList<String> cmd0 = new ArrayList<>();
         cmd0.add(runtime);
         cmd0.addAll(extracmds);

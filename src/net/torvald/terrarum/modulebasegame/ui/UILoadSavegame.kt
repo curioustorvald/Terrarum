@@ -73,25 +73,16 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     internal var playerButtonSelected: UIItemPlayerCells? = null
 
-    private val goButtonWidth = 180
-    private val drawX = (Toolkit.drawWidth - 480) / 2
-    private val drawY = (App.scr.height - 480) / 2
-    private val buttonRowY = drawY + 480 - 24
 
     internal lateinit var loadables: SavegameCollectionPair // will be used and modified by subUIs
 
     internal lateinit var loadManageSelectedGame: DiskPair
 
-    /*private val altSelDrawW = 640
-    private val altSelHdrawW = altSelDrawW / 2
-    private val altSelDrawH = 480
-    private val imageButtonW = 300
-    private val imageButtonH = 240
-    private val altSelDrawY = ((App.scr.height - altSelDrawH)/2)
-    private val altSelQdrawW = altSelDrawW / 4
-    private val altSelQQQdrawW = altSelDrawW * 3 / 4*/
-
-//    internal var hasNewerAutosave = false
+    internal val buttonHeight = 24
+    internal val buttonGap = 10
+    internal val buttonWidth = 180
+    internal val drawX = (Toolkit.drawWidth - 480) / 2
+    internal val drawY = (App.scr.height - 480) / 2
 
     private val transitionalListing = UILoadList(this)
     private val transitionalAutosave = UILoadAutosave(this)
