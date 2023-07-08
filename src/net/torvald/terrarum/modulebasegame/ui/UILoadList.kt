@@ -59,7 +59,12 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     private val mode1Node = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
 
     private var showSpinner = false
+    private val spinner = CommonResourcePool.getAsTextureRegionPack("inline_loading_spinner")
+    private var spinnerTimer = 0f
+    private var spinnerFrame = 0
+    private val spinnerInterval = 1f / 60
 
+    private lateinit var cellLoadThread: Thread
 
     fun advanceMode() {
         App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
@@ -107,16 +112,15 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
             playerCells.clear()
 
             try {
-                full.remoCon.handler.lockToggle()
+//                full.remoCon.handler.lockToggle() // lock not needed -- hide() will interrupt the thread
                 showSpinner = true
 
-                Thread {
+                cellLoadThread = Thread {
                     // read savegames
                     var savegamesCount = 0
                     printdbg(this, "============== ${this.hashCode()} ============== ")
                     App.sortedPlayers.forEach { uuid ->
                         printdbg(this, "Reading player $uuid")
-
 
                         val x = full.uiX
                         val y = titleTopGradEnd + cellInterval * savegamesCount
@@ -129,12 +133,13 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                             e.printStackTrace()
                         }
                     }
+
                     printdbg(this, "============== ${this.hashCode()} ============== ")
 
 
-                    full.remoCon.handler.unlockToggle()
+//                    full.remoCon.handler.unlockToggle()
                     showSpinner = false
-                }.start()
+                }.also { it.start() }
 
             }
             catch (e: UninitializedPropertyAccessException) {
@@ -165,6 +170,14 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                 // re-position
                 it.posY = (it.initialY - uiScroll).roundToInt()
                 it.update(delta)
+            }
+        }
+
+        if (showSpinner) {
+            spinnerTimer += delta
+            while (spinnerTimer > spinnerInterval) {
+                spinnerFrame = (spinnerFrame + 1) % 32
+                spinnerTimer -= spinnerInterval
             }
         }
     }
@@ -238,6 +251,14 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         savePixmap.dispose()
 
         batch.begin()
+
+        batch.color = Color.WHITE
+        if (showSpinner) {
+            val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
+            val offX = UIRemoCon.menubarOffX - UIRemoCon.UIRemoConElement.paddingLeft + 72 + 1
+            val offY = UIRemoCon.menubarOffY - UIRemoCon.UIRemoConElement.lineHeight * 3 + 16
+            batch.draw(spin, offX.toFloat(), offY.toFloat())
+        }
     }
 
     override fun dispose() {
@@ -293,6 +314,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         playerCells.forEach { it.dispose() }
         playerCells.clear()
         showCalled = false
+        cellLoadThread.interrupt()
     }
 
     override fun resize(width: Int, height: Int) {
