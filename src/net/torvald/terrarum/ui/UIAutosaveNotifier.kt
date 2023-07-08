@@ -65,7 +65,7 @@ class UIAutosaveNotifier : UICanvas() {
             batch.draw(spinner.get(0,4), offX, offY)
         }
         batch.color = if (errored) errorCol else normalCol
-        App.fontGame.draw(batch, text, offX + 30f, offY)
+        App.fontGame.draw(batch, text, offX + 30f, offY - 2f)
     }
 
     fun setAsError() {

@@ -510,6 +510,8 @@ class UIItemPlayerCells(
 //    lateinit var playerUUID: UUID; private set
     lateinit var worldUUID: UUID; private set
 
+    private val savegameStatus: Int
+
     init {
         App.savegamePlayers[playerUUID]!!.loadable().getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
@@ -527,6 +529,8 @@ class UIItemPlayerCells(
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
         }
+
+        savegameStatus = SavegameCollectionPair(App.savegamePlayers[playerUUID], App.savegameWorlds[worldUUID]).status
     }
 
     private fun parseDuration(seconds: Long): String {
@@ -663,6 +667,11 @@ class UIItemPlayerCells(
         batch.draw(icons.get(12,0), x + 119f, y + height - 53f) // world map
         batch.draw(icons.get(13,0), x + 120f, y + height - 24f) // journal
         batch.draw(icons.get(23,0), x + width - 4f - playTimeTextLen - 24f, y + height - 24f) // stopwatch
+        // autosave marker
+        if (savegameStatus == 2)
+            batch.draw(icons.get(24,1), x + 459f, y + 5f)
+        else if (savegameStatus == 0)
+            batch.draw(icons.get(23,1), x + 459f, y + 5f)
 
         // infocell divider
         batch.color = if (mouseUp) hruleColLit else hruleCol
