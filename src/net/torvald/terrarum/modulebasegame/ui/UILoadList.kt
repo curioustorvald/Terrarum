@@ -132,6 +132,8 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                             System.err.println("[UILoadSavegame] Error while loading Player with UUID $uuid")
                             e.printStackTrace()
                         }
+
+                        Thread.sleep(18) // to alleviate the "hiccup" when the UI is being opened
                     }
 
                     printdbg(this, "============== ${this.hashCode()} ============== ")
