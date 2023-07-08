@@ -36,23 +36,32 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val buttonRowY = drawY + 480 - buttonHeight
     private val buttonRowY2 = buttonRowY - buttonHeight - buttonGap
 
-    private val mainGoButton = UIItemTextButton(this, "MENU_IO_LOAD_GAME", buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+    private val mainGoButton = UIItemTextButton(this, "MENU_IO_LOAD_GAME", buttonX1third, buttonRowY, buttonWidth * 3 + buttonGap * 2, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
     }
-    private val mainReturnButton = UIItemTextButton(this, "MENU_LABEL_RETURN", buttonX1third, buttonRowY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+    private val mainNoGoButton = UIItemTextButton(this, "ERROR_SAVE_CORRUPTED", buttonX1third, buttonRowY, buttonWidth * 3 + buttonGap * 2, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.isEnabled = false
+    }
+    private val mainReturnButton = UIItemTextButton(this, "MENU_LABEL_BACK", buttonX1third, buttonRowY2, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
             full.changePanelTo(0)
         }
     }
-    private val mainRenameButton = UIItemTextButton(this, "MENU_LABEL_RENAME", buttonXcentre, buttonRowY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
-
+    private val mainRenameButton = UIItemTextButton(this, "MENU_LABEL_RENAME", buttonXcentre, buttonRowY2, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            mode = MODE_RENAME
+        }
     }
-    private val mainDeleteButton = UIItemTextButton(this, "CONTEXT_CHARACTER_DELETE", buttonX3third, buttonRowY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
-
+    private val mainDeleteButton = UIItemTextButton(this, "CONTEXT_CHARACTER_DELETE", buttonX3third, buttonRowY2, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
+        it.clickOnceListener = { _,_ ->
+            mode = MODE_DELETE
+        }
     }
 
     private val confirmCancelButton = UIItemTextButton(this, "MENU_LABEL_CANCEL", buttonXleft, buttonRowY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
-        it.clickOnceListener = { _,_ -> full.remoCon.openUI(UILoadSavegame(full.remoCon)) }
+        it.clickOnceListener = { _,_ ->
+            mode = MODE_INIT
+        }
     }
     private val confirmDeleteButton = UIItemTextButton(this, "MENU_LABEL_DELETE", buttonXright, buttonRowY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true, inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD).also {
         it.clickOnceListener = { _,_ ->
@@ -70,8 +79,12 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private var mode = 0
 
-    private var mainButtons = listOf(mainGoButton, mainReturnButton, mainRenameButton, mainDeleteButton)
+    private var mainButtons0 = listOf(mainGoButton, mainReturnButton, mainRenameButton, mainDeleteButton)
+    private var mainButtons1 = listOf(mainNoGoButton, mainReturnButton, mainRenameButton, mainDeleteButton)
     private var delButtons = listOf(confirmCancelButton, confirmDeleteButton)
+
+    private val mainButtons: List<UIItemTextButton>
+        get() = if (full.loadables.saveAvaliable()) mainButtons0 else mainButtons1
 
     private val MODE_INIT = 0
     private val MODE_DELETE = 16 // are you sure?

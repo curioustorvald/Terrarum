@@ -95,7 +95,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val transitionalAutosave = UILoadAutosave(this)
     private val transitionalManage = UILoadManage(this)
     private val transitionalNewCharacter = UINewCharacter(remoCon)
-    private val transitionalSaveDamaged = UILoadSaveDamaged(this)
+//    private val transitionalSaveDamaged = UILoadSaveDamaged(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
         (width - internalWidth) / 2,
@@ -104,13 +104,13 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         App.scr.height,
         0f,
         listOf(transitionalListing),
-        listOf(transitionalManage, transitionalNewCharacter, transitionalSaveDamaged),
+        listOf(transitionalManage, transitionalNewCharacter),
         listOf(NullUI, transitionalAutosave)
     )
 
     internal fun queueUpManageScr() { transitionPanel.setCentreUIto(0) }
     internal fun queueUpNewCharScr() { transitionPanel.setCentreUIto(1) }
-    internal fun queueUpDamagedSaveScr() { transitionPanel.setCentreUIto(2) }
+//    internal fun queueUpDamagedSaveScr() { transitionPanel.setCentreUIto(2) }
 
     internal fun bringAutosaveSelectorUp() { transitionPanel.setRightUIto(1) }
     internal fun takeAutosaveSelectorDown() { transitionPanel.setRightUIto(0) }

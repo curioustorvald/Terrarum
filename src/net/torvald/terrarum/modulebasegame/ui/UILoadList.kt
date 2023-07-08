@@ -80,7 +80,8 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         }
         else if (!full.loadables.saveAvaliable()) {
             // show save is damaged and cannot be loaded
-            full.queueUpDamagedSaveScr()
+//            full.queueUpDamagedSaveScr()
+            full.queueUpManageScr() // management screen will take care of damaged saves
             full.takeAutosaveSelectorDown()
         }
         else {
