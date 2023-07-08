@@ -162,7 +162,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = Keebsym.HOOK
         keycaps[App.getConfigInt("control_key_quicksel")]?.symbolControl = Keebsym.PIE
         keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = Keebsym.MENU
-        keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = Keebsym.IME
+        keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = Keebsym.IME()
         keycaps[App.getConfigInt("control_key_crafting")]?.symbolControl = Keebsym.CRAFTING
     }
 
@@ -368,7 +368,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             // zoom
             UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // IME
-            UIItemImageButton(parent, Keebsym.IME, initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+            UIItemImageButton(parent, Keebsym.IME(), initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
             // system menu
             UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
@@ -467,6 +467,10 @@ private object Keebsym {
     val HOOK = labels.get(5,1)
     val PIE = labels.get(8,1)
     val MENU = labels.get(6,2)
-    val IME = labels.get(7,2)
+    val IME = {
+        net.torvald.terrarum.gamecontroller.IME.icons[net.torvald.terrarum.gamecontroller.IME.getHighLayerByName(
+            App.getConfigString("inputmethod")
+        ).config.lang] ?: labels.get(7, 2)
+    }
     val CRAFTING = labels.get(9,1)
 }
