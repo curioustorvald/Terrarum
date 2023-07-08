@@ -65,7 +65,7 @@ class UIWorldPortal : UICanvas(
         App.scr.height,
         0f,
          listOf(transitionalListing),
-        listOf(),
+        listOf(transitionalSearch),
         listOf()
     )
 

@@ -10,6 +10,7 @@ import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TitleScreen
 import net.torvald.terrarum.serialise.WriteConfig
 import net.torvald.terrarum.ui.Toolkit
@@ -100,11 +101,11 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
                     oldSelectedItem?.highlighted = false
 
                     // selection change
-                    if (it.labelText == "MENU_LABEL_QUIT") {
+                    if (it.textfun() == Lang["MENU_LABEL_QUIT"]) {
                         //System.exit(0)
                         Gdx.app.exit()
                     }
-                    else if (it.labelText.startsWith("MENU_LABEL_RETURN")) {
+                    else if (it.textfun() == Lang["MENU_LABEL_RETURN"]) {
                         val tag = it.tags
                         if (tag.contains("WRITETOCONFIG")) WriteConfig()
 

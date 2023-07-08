@@ -16,11 +16,10 @@ import net.torvald.terrarum.langpack.Lang
 open class UIItemTextButton(
         parentUI: UICanvas,
         /** Stored text (independent to the Langpack) */
-        val labelText: String,
+        val textfun: () -> String,
         initialX: Int,
         initialY: Int,
         override val width: Int,
-        val readFromLang: Boolean = false,
 
         /** Colour when mouse is over */
         var activeCol: Color = Toolkit.Theme.COL_MOUSE_UP,
@@ -38,6 +37,7 @@ open class UIItemTextButton(
         var inactiveCol: Color = Toolkit.Theme.COL_LIST_DEFAULT,
 
         var disabledCol: Color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
+        var disabledTextCol: Color = Color(0x888888FF.toInt()),
 
         val hasBorder: Boolean = false,
 
@@ -63,7 +63,7 @@ open class UIItemTextButton(
 
     /** Actually displayed text (changes with the app language) */
     val label: String
-        get() = if (readFromLang) Lang[labelText] else labelText
+        get() = textfun()
 
 
     override val height: Int = hitboxSize
@@ -128,6 +128,7 @@ open class UIItemTextButton(
         }
 
         // draw text
+        if (!isEnabled) batch.color = disabledTextCol
         font.draw(batch, label, fontX, fontY)
     }
 

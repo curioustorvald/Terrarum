@@ -46,7 +46,7 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
     override fun show() {
         super.show()
 
-        val loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
+        val loadables = full.loadables
         val autoThumb = loadables.getAutoSave()!!.getThumbnail()
         val manualThumb = loadables.getManualSave()!!.getThumbnail()
 

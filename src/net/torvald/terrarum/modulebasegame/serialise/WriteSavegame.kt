@@ -119,6 +119,8 @@ object LoadSavegame {
     fun getFileBytes(disk: SimpleFileSystem, id: Long): ByteArray64 = disk.getFile(id)!!.bytes
     fun getFileReader(disk: SimpleFileSystem, id: Long): Reader = ByteArray64Reader(getFileBytes(disk, id), Common.CHARSET)
 
+    operator fun invoke(diskPair: DiskPair) = invoke(diskPair.player, diskPair.world)
+
     /**
      * @param playerDisk DiskSkimmer representing the Player.
      * @param worldDisk0 DiskSkimmer representing the World to be loaded.
@@ -126,12 +128,14 @@ object LoadSavegame {
      */
     operator fun invoke(playerDisk: DiskSkimmer, worldDisk0: DiskSkimmer? = null) {
         val newIngame = TerrarumIngame(App.batch)
+        playerDisk.rebuild()
         val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
 
         printdbg(this, "Player localhash: ${player.localHashStr}, hasSprite: ${player.sprite != null}")
 
         val currentWorldId = player.worldCurrentlyPlaying
         val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!.loadable()
+        worldDisk.rebuild()
         val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET), worldDisk.diskFile)
 
         world.layerTerrain = BlockLayer(world.width, world.height)

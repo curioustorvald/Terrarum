@@ -85,8 +85,10 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             { rng.nextLong().toString() }, InputLenCap(256, InputLenCap.CharLenUnit.CODEPOINTS))
 
     private val goButtonWidth = 180
-    private val backButton = UIItemTextButton(this, "MENU_LABEL_BACK", drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val goButton = UIItemTextButton(this, "MENU_LABEL_CONFIRM_BUTTON", drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val backButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+    private val goButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
 
     init {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -79,13 +80,15 @@ class UIItemTextButtonList(
         val lh = itemHitboxSize
         val vertOff = lineHeight * i
 
+        val ld0 = { s }
+        val ld1 = { Lang[s] }
+
 //        if (!kinematic) {
             UIItemTextButton(
-                    parentUI, s,
+                    parentUI, if (readFromLang) ld1 else ld0,
                     initialX = posX,
                     initialY = posY + vertOff,
                     width = width,
-                    readFromLang = readFromLang,
                     activeCol = activeCol,
                     activeBackCol = activeBackCol,
                     activeBackBlendMode = activeBackBlendMode,

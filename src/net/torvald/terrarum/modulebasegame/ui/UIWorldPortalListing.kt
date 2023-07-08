@@ -68,11 +68,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val buttonsY = y + listHeight + gridGap
 
     private val buttonSearch = UIItemTextButton(this,
-        "CONTEXT_WORLD_NEW",
+        { Lang["CONTEXT_WORLD_NEW"] },
         hx - gridGap/2 - 2*deleteButtonWidth - gridGap,
         buttonsY,
         deleteButtonWidth,
-        readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     ).also {
@@ -81,11 +80,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
     }
     private val buttonTeleport = UIItemTextButton(this,
-        "GAME_ACTION_TELEPORT",
+        { Lang["GAME_ACTION_TELEPORT"] },
         hx - gridGap/2 - deleteButtonWidth,
         buttonsY,
         deleteButtonWidth,
-        readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     ).also {
@@ -100,20 +98,18 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
     }
     private val buttonRename = UIItemTextButton(this,
-        "MENU_LABEL_RENAME",
+        { Lang["MENU_LABEL_RENAME"] },
         hx + gridGap/2,
         buttonsY,
         deleteButtonWidth,
-        readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
     private val buttonDelete = UIItemTextButton(this,
-        "MENU_LABEL_DELETE",
+        { Lang["MENU_LABEL_DELETE"] },
         hx + gridGap/2 + deleteButtonWidth + gridGap,
         buttonsY,
         deleteButtonWidth,
-        readFromLang = true,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )

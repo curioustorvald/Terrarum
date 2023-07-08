@@ -80,12 +80,12 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
         // highlight initial
         textArea1.buttons.forEachIndexed { index, it ->
-            if (it.labelText == Lang["MENU_LANGUAGE_THIS"]) {
+            if (it.textfun() == Lang["MENU_LANGUAGE_THIS"]) {
                 textArea1.select(index)
             }
         }
         textArea2.buttons.forEachIndexed { index, it ->
-            if (it.labelText == Lang["MENU_LANGUAGE_THIS"]) {
+            if (it.textfun() == Lang["MENU_LANGUAGE_THIS"]) {
                 textArea2.select(index)
             }
         }

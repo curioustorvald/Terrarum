@@ -305,7 +305,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                     }
                 }
         )
-        buttonCraft = UIItemTextButton(this, "GAME_ACTION_CRAFT", thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, true, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        buttonCraft = UIItemTextButton(this,
+            { Lang["GAME_ACTION_CRAFT"] }, thisOffsetX + 3 + buttonWidth + listGap, craftButtonsY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
         spinnerCraftCount = UIItemSpinner(this, thisOffsetX + 1, craftButtonsY, 1, 1, App.getConfigInt("basegame:gameplay_max_crafting"), 1, buttonWidth, numberToTextFunction = {"×\u200A${it.toInt()}"})
         spinnerCraftCount.selectionChangeListener = {
             itemListIngredients.numberMultiplier = it.toLong()

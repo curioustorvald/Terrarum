@@ -106,13 +106,12 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val resetButtonWidth = 140
     private val buttonReset = UIItemTextButton(this,
-            "MENU_LABEL_RESET",
-            kbx + (width - resetButtonWidth) / 2,
-            kby + 162 + 12,
-            resetButtonWidth,
-            readFromLang = true,
-            hasBorder = true,
-            alignment = UIItemTextButton.Companion.Alignment.CENTRE
+        { Lang["MENU_LABEL_RESET"] },
+        kbx + (width - resetButtonWidth) / 2,
+        kby + 162 + 12,
+        resetButtonWidth,
+        hasBorder = true,
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
 
     private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 500) / 2, kby + 219)

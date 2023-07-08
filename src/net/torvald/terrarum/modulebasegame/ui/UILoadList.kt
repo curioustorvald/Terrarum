@@ -69,33 +69,8 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     fun advanceMode() {
         App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
         full.loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
-
-
-        if (full.loadables.moreRecentAutosaveAvailable()) {
-            // make choice for load manual or auto, if available
-            full.hasNewerAutosave = true
-
-            full.queueUpManageScr()
-            full.bringAutosaveSelectorUp()
-        }
-        else if (!full.loadables.saveAvaliable()) {
-            // show save is damaged and cannot be loaded
-//            full.queueUpDamagedSaveScr()
-            full.queueUpManageScr() // management screen will take care of damaged saves
-            full.takeAutosaveSelectorDown()
-        }
-        else {
-//            val (p, w) = full.loadables.getLoadableSave()!!
-//            UILoadGovernor.playerDisk = p; UILoadGovernor.worldDisk = w
-
-            if (full.loadables.newerSaveIsDamaged) {
-                UILoadGovernor.previousSaveWasLoaded = true
-            }
-
-            full.queueUpManageScr()
-            full.takeAutosaveSelectorDown()
-        }
-
+        full.queueUpManageScr()
+        full.takeAutosaveSelectorDown()
         full.changePanelTo(1)
     }
 

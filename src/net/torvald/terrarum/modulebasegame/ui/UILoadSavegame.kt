@@ -80,6 +80,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     internal lateinit var loadables: SavegameCollectionPair // will be used and modified by subUIs
 
+    internal lateinit var loadManageSelectedGame: DiskPair
+
     /*private val altSelDrawW = 640
     private val altSelHdrawW = altSelDrawW / 2
     private val altSelDrawH = 480
@@ -89,7 +91,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     private val altSelQdrawW = altSelDrawW / 4
     private val altSelQQQdrawW = altSelDrawW * 3 / 4*/
 
-    internal var hasNewerAutosave = false
+//    internal var hasNewerAutosave = false
 
     private val transitionalListing = UILoadList(this)
     private val transitionalAutosave = UILoadAutosave(this)
@@ -132,7 +134,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     override fun show() {
         takeAutosaveSelectorDown()
         transitionPanel.show()
-        hasNewerAutosave = false
+//        hasNewerAutosave = false
         /*try {
             remoCon.handler.lockToggle()
             showSpinner = true
