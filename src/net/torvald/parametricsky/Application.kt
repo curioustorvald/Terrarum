@@ -89,7 +89,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
 
         val tex = Texture(oneScreen)
-        tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
         batch.inUse {
             batch.draw(tex, hwf, 0f, hwf, hf)
@@ -116,8 +116,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         oneScreen.dispose()
     }
 
-    val outTexWidth = 256
-    val outTexHeight = 256
+    val outTexWidth = 64
+    val outTexHeight = 64
 
     private fun Float.scaleFun() =
             (1f - 1f / 2f.pow(this/6f)) * 0.97f

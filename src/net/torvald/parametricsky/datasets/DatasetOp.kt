@@ -11,8 +11,8 @@ object DatasetOp {
         val entrysize = file.length().toInt() / 8
         val fis = FileInputStream(file)
 
+        val inputbuf = ByteArray(8)
         val ret = DoubleArray(entrysize) {
-            val inputbuf = ByteArray(8)
             fis.read(inputbuf)
             val rawnum = inputbuf.toLittleInt64()
             Double.fromBits(rawnum)
