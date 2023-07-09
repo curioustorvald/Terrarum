@@ -64,7 +64,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
     private lateinit var oneScreen: Pixmap
     private lateinit var batch: SpriteBatch
 
-    var turbidity = 5.0
+    var turbidity = 2.0
     var albedo = 0.1
     var elevation = Math.toRadians(45.0)
 
@@ -84,7 +84,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
         if (turbidity <= 0) throw IllegalStateException()
 
-        // we need to use different modelstate to accomodate different albedo for each spectral band but oh well...
+        // we need to use different model-state to accommodate different albedo for each spectral band but oh well...
         genTexLoop(ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs()))
 
 
@@ -92,9 +92,10 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
         batch.inUse {
-            batch.draw(tex, hwf, 0f, hwf, hf)
-            batch.draw(tex, hwf, 0f, -hwf, hf)
+//            batch.draw(tex, hwf, 0f, hwf, hf)
+//            batch.draw(tex, hwf, 0f, -hwf, hf)
 
+            batch.draw(tex, 0f, 0f, wf, hf)
         }
 
         tex.dispose()
@@ -116,7 +117,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         oneScreen.dispose()
     }
 
-    val outTexWidth = 64
+    val outTexWidth = 2
     val outTexHeight = 64
 
     private fun Float.scaleFun() =
@@ -130,12 +131,6 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
     private fun CIEXYZ.scaleToFit(elevation: Double): CIEXYZ {
         return if (elevation >= 0) {
-
-            val xr = this.X / this.Y
-            val zr = this.Z / this.Y
-            val scale = this.Y.scaleFun() / this.Y
-
-
             CIEXYZ(
                 this.X.scaleFun(),
                 this.Y.scaleFun(),
@@ -172,19 +167,28 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         }
 
         val ys = ArrayList<Float>()
+        val ys2 = ArrayList<Float>()
 
-        for (y in 0 until oneScreen.height) {
-            for (x in 0 until oneScreen.width) {
-                val gamma = (x / oneScreen.width.toDouble()) * PI // bearing, where 0 is right at the sun
+        for (x in 0 until oneScreen.width) {
+//            val elevation = Math.toRadians((x.toDouble() / oneScreen.width * 2.0 - 1.0) * 75)
+//            val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs())
+//            val gamma = (x / oneScreen.width.toDouble()) * PI // bearing, where 0 is right at the sun
+            val gamma = HALF_PI
+
+            for (y in 0 until oneScreen.height) {
                 val theta = (y / oneScreen.height.toDouble()) * HALF_PI // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
+
+
 
                 val xyz = CIEXYZ(
                         ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat(),
                         ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 1).toFloat(),
                         ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat()
                 )
+                val xyz2 = xyz.scaleToFit(elevation)
                 ys.add(xyz.Y)
-                val rgb = xyz.scaleToFit(elevation).toRGB().toColor()
+                ys2.add(xyz2.Y)
+                val rgb = xyz2.toRGB().toColor()
                 rgb.a = 1f
 
                 val rgb2 = Color(
@@ -202,8 +206,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
         }
 
-        ymaxDisp.text = "${ys.max()}" // ~750.0
-        ymaxDisp2.text = "${ys.maxOf { it.scaleFun() }}" // ~1.0
+        ymaxDisp.text = "${ys.max()}"
+        ymaxDisp2.text = "${ys2.max()}"
 
         //System.exit(0)
     }
@@ -231,7 +235,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
         val dialSize = Dimension(45, 20)
 
-        val turbidityControl = JSpinner(SpinnerNumberModel(5.0, 1.0, 10.0, 0.1)).also {
+        val turbidityControl = JSpinner(SpinnerNumberModel(2.0, 1.0, 10.0, 0.1)).also {
             it.preferredSize = dialSize
             it.addChangeListener { _ ->
                 app.turbidity = it.value as Double
@@ -265,7 +269,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         init {
             val atmosPanel = JPanel()
             val turbidityPanel = JPanel().also {
-                it.add(JLabel("Turbidity"))
+                it.add(JLabel("Turbidity (log_2)"))
                 it.add(turbidityControl)
                 atmosPanel.add(it)
             }
@@ -351,8 +355,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 fun main(args: Array<String>) {
     val config = Lwjgl3ApplicationConfiguration()
 
-    val WIDTH = 1600
-    val HEIGHT = 960
+    val WIDTH = 2048
+    val HEIGHT = 2048
 
     config.setWindowedMode(WIDTH, HEIGHT)
     Lwjgl3Application(Application(WIDTH, HEIGHT), config)

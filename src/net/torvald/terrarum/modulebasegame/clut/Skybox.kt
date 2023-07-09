@@ -9,7 +9,7 @@ object Skybox {
 
     const val gradSize = 64
 
-    operator fun get(solarHeight: Double): Array<Texture> {
+    operator fun get(elevation: Double, turbidity: Double): Array<Texture> {
         TODO()
     }
 
