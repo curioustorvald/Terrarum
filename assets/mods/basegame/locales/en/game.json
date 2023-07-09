@@ -19,5 +19,5 @@
   "GAME_CRAFTABLE_ITEMS": "Craftable Items",
   "MENU_LABEL_RENAME": "Rename",
   "GAME_ACTION_TELEPORT": "Teleport",
-  "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "This is a world currently playing."
+  "CONTEXT_PLACE_COORDINATE": "Coordinate"
 }

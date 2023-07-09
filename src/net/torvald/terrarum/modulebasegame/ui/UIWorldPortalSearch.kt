@@ -153,7 +153,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
         // name/seed input labels
         App.fontGame.draw(batch, Lang["MENU_NAME"], drawX, drawY + sizeSelY + 80)
-        App.fontGame.draw(batch, Lang["CONTEXT_GENERATOR_SEED"], drawX, drawY + sizeSelY + 120)
+        App.fontGame.draw(batch, Lang["CONTEXT_PLACE_COORDINATE"], drawX, drawY + sizeSelY + 120)
 
         uiItems.forEach { it.render(batch, camera) }
 

@@ -20,5 +20,5 @@
   "GAME_CRAFTABLE_ITEMS": "제작 가능한 아이템",
   "MENU_LABEL_RENAME": "이름 바꾸기",
   "GAME_ACTION_TELEPORT": "텔레포트하기",
-  "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "현재 플레이 중인 월드입니다."
+  "CONTEXT_PLACE_COORDINATE": "좌표"
 }

@@ -14,22 +14,33 @@ import net.torvald.colourutil.*
 import net.torvald.parametricsky.datasets.DatasetCIEXYZ
 import net.torvald.parametricsky.datasets.DatasetRGB
 import net.torvald.parametricsky.datasets.DatasetSpectral
+import net.torvald.terrarum.abs
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
+import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.FlowLayout
+import java.awt.GridLayout
 import javax.swing.*
+import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
-
-const val WIDTH = 1200
-const val HEIGHT = 600
 
 /**
  * Created by minjaesong on 2018-08-01.
  */
-class Application : Game() {
+class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
+
+    private val HW = WIDTH / 2
+    private val HH = HEIGHT / 2
+
+    private val wf = WIDTH.toFloat()
+    private val hf = HEIGHT.toFloat()
+    private val hwf = HW.toFloat()
+//    private val hhf = HH.toFloat()
 
     /* Variables:
      * 1. Canvas Y (theta)
@@ -53,12 +64,12 @@ class Application : Game() {
     private lateinit var oneScreen: Pixmap
     private lateinit var batch: SpriteBatch
 
-    private lateinit var testTex: Texture
-
     var turbidity = 5.0
     var albedo = 0.1
-    var elevation = 0.0
-    var scalefactor = 1f
+    var elevation = Math.toRadians(45.0)
+
+    var solarBearing = Math.toRadians(90.0)
+    var cameraHeading = Math.toRadians(90.0)
 
     override fun getScreen(): Screen {
         return super.getScreen()
@@ -74,14 +85,16 @@ class Application : Game() {
         if (turbidity <= 0) throw IllegalStateException()
 
         // we need to use different modelstate to accomodate different albedo for each spectral band but oh well...
-        genTexLoop(ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation))
+        genTexLoop(ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs()))
 
 
         val tex = Texture(oneScreen)
         tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         batch.inUse {
-            batch.draw(tex, 0f, 0f, WIDTH.toFloat(), HEIGHT.toFloat())
+            batch.draw(tex, hwf, 0f, hwf, hf)
+            batch.draw(tex, hwf, 0f, -hwf, hf)
+
         }
 
         tex.dispose()
@@ -106,6 +119,44 @@ class Application : Game() {
     val outTexWidth = 256
     val outTexHeight = 256
 
+    private fun Float.scaleFun() =
+            (1f - 1f / 2f.pow(this/6f)) * 0.97f
+
+    private fun Float.negativeElevationScale() =
+        minOf(
+            (1f - 1f / 2f.pow(this/6f)) * 0.97f,
+            1f - (1f - 1f / 2f.pow(this/6f)) * 0.97f
+        )
+
+    private fun CIEXYZ.scaleToFit(elevation: Double): CIEXYZ {
+        return if (elevation >= 0) {
+
+            val xr = this.X / this.Y
+            val zr = this.Z / this.Y
+            val scale = this.Y.scaleFun() / this.Y
+
+
+            CIEXYZ(
+                this.X.scaleFun(),
+                this.Y.scaleFun(),
+                this.Z.scaleFun(),
+                this.alpha
+            )
+        }
+        else {
+            val elevation1 = -Math.toDegrees(elevation)
+            val elevation2 = -Math.toDegrees(elevation) / 28.5
+            val scale = (1f - (1f - 1f / 1.8.pow(elevation1)) * 0.97f).toFloat()
+            val scale2 = (1.0 - (elevation2.pow(E) / E.pow(elevation2))*0.8).toFloat()
+            CIEXYZ(
+                this.X.scaleFun() * scale * scale2,
+                this.Y.scaleFun() * scale * scale2,
+                this.Z.scaleFun() * scale * scale2,
+                this.alpha
+            )
+        }
+    }
+
     /**
      * Generated texture is as if you took the panorama picture of sky: up 70deg to horizon, east-south-west;
      * with sun not moving (sun is at exact south, sun's height is adjustable)
@@ -120,19 +171,28 @@ class Application : Game() {
             return v.toFloat()
         }
 
+        val ys = ArrayList<Float>()
 
         for (y in 0 until oneScreen.height) {
             for (x in 0 until oneScreen.width) {
-                val gamma = (x / oneScreen.width.toDouble()) * TWO_PI // 0deg..360deg
-                val theta = (1.0 - (y / oneScreen.height.toDouble())) * HALF_PI // 90deg..0deg
+                val gamma = (x / oneScreen.width.toDouble()) * PI // bearing, where 0 is right at the sun
+                val theta = (y / oneScreen.height.toDouble()) * HALF_PI // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 
                 val xyz = CIEXYZ(
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat().times(scalefactor / 10f),
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 1).toFloat().times(scalefactor / 10f),
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat().times(scalefactor / 10f)
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat(),
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 1).toFloat(),
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat()
                 )
-                val rgb = xyz.toRGB().toColor()
+                ys.add(xyz.Y)
+                val rgb = xyz.scaleToFit(elevation).toRGB().toColor()
                 rgb.a = 1f
+
+                val rgb2 = Color(
+                    ((rgb.r * 255f).roundToInt() xor 0xAA) / 255f,
+                    ((rgb.g * 255f).roundToInt() xor 0xAA) / 255f,
+                    ((rgb.b * 255f).roundToInt() xor 0xAA) / 255f,
+                    rgb.a
+                )
 
                 oneScreen.setColor(rgb)
                 oneScreen.drawPixel(x, y)
@@ -142,71 +202,16 @@ class Application : Game() {
 
         }
 
+        ymaxDisp.text = "${ys.max()}" // ~750.0
+        ymaxDisp2.text = "${ys.maxOf { it.scaleFun() }}" // ~1.0
+
         //System.exit(0)
     }
 
-    /**
-     * Generated texture is as if you took the panorama picture of sky: up 70deg to horizon, east-south-west;
-     * with sun not moving (sun is at exact south, sun's height is adjustable)
-     */
-    /*private fun genTexLoop2(T: Double, theta_s: Double) {
-
-        fun hazeFun(T: Double): Double {
-            val T = T - 1
-            if (T >= 10) return 1.0
-            else return 2.0.pow(T).div(1024.0)
-        }
-
-        // loop thru gamma and theta
-        for (y in 0..outTexDim) { // theta
-            for (x in 0..outTexDim) { // gamma
-                val theta = Math.toRadians(y * (90.0 / outTexDim.toDouble())) // of observer
-                val gamma = Math.toRadians(x * (90.0 / outTexDim.toDouble())) // of observer
-
-                val Y_z = Model.getAbsoluteZenithLuminance(T, theta_s)
-                val x_z = Model.getZenithChromaX(T, theta_s)
-                val y_z = Model.getZenithChromaY(T, theta_s)
-
-                val Y_p = Y_z * Model.getFforLuma(theta, gamma, T) / Model.getFforLuma(0.0, theta_s, T)
-                val Y_oc = Y_z * (1.0 + 2.0 * Math.cos(theta)) / 3.0
-                val x_p = (x_z * Model.getFforChromaX(theta, gamma, T) / Model.getFforChromaX(0.0, theta_s, T)).coerceIn(0.0, 1.0)
-                val y_p = (y_z * Model.getFforChromaY(theta, gamma, T) / Model.getFforChromaY(0.0, theta_s, T)).coerceIn(0.0, 1.0)
-
-                val normalisedY = Y_p.toFloat().pow(0.5f).div(10f)
-                val normalisedY_oc = Y_oc.toFloat().pow(0.5f).div(10f)
-
-                //println("$Y_p -> $normalisedY, $x_p, $y_p")
-
-                if (T < 11) {
-                    val rgbColour = CIEYXY(normalisedY, x_p.toFloat(), y_p.toFloat()).toXYZ().toColorRaw()
-                    val hazeColour = CIEYXY(normalisedY_oc, 0.3128f, 0.3290f).toXYZ().toColorRaw()
-
-                    val hazeAmount = hazeFun(T).toFloat()
-                    val newColour = Color(
-                            FastMath.interpolateLinear(hazeAmount, rgbColour.r, hazeColour.r),
-                            FastMath.interpolateLinear(hazeAmount, rgbColour.g, hazeColour.g),
-                            FastMath.interpolateLinear(hazeAmount, rgbColour.b, hazeColour.b),
-                            1f
-                    )
-
-                    oneScreen.setColor(newColour)
-                    oneScreen.drawPixel(x, y)
-                }
-                else {
-                    val hazeColour = CIEYXY(normalisedY_oc, 0.3128f, 0.3290f).toXYZ().toColorRaw()
-                    oneScreen.setColor(hazeColour)
-                    oneScreen.drawPixel(x, y)
-                }
-            }
-        }
-        // end loop
-    }*/
-
     override fun create() {
         batch = SpriteBatch()
-        testTex = Texture(Gdx.files.internal("assets/test_texture.tga"))
 
-        oneScreen = Pixmap(outTexWidth * 2, outTexHeight, Pixmap.Format.RGBA8888)
+        oneScreen = Pixmap(outTexWidth, outTexHeight, Pixmap.Format.RGBA8888)
 
         DatasetSpectral
         DatasetCIEXYZ
@@ -215,67 +220,127 @@ class Application : Game() {
         ApplicationController(this)
     }
 
+    val ymaxDisp = JTextField().also {
+        it.preferredSize = Dimension(64, 20)
+    }
+    val ymaxDisp2 = JTextField().also {
+        it.preferredSize = Dimension(64, 20)
+    }
 
+    class ApplicationController(val app: Application) : JFrame() {
 
-    class ApplicationController(app: Application) : JFrame() {
+        val dialSize = Dimension(45, 20)
 
-        val mainPanel = JPanel()
-
-        val turbidityControl = JSpinner(SpinnerNumberModel(5.0, 1.0, 10.0, 0.1))
-        val albedoControl = JSpinner(SpinnerNumberModel(0.1, 0.0, 1.0, 0.05))
-        val elevationControl = JSpinner(SpinnerNumberModel(0.0, 0.0, 90.0, 0.5))
-        val scalefactorControl = JSpinner(SpinnerNumberModel(1.0, 0.0, 2.0, 0.01))
+        val turbidityControl = JSpinner(SpinnerNumberModel(5.0, 1.0, 10.0, 0.1)).also {
+            it.preferredSize = dialSize
+            it.addChangeListener { _ ->
+                app.turbidity = it.value as Double
+            }
+        }
+        val albedoControl = JSpinner(SpinnerNumberModel(0.1, 0.0, 1.0, 0.05)).also {
+            it.preferredSize = dialSize
+            it.addChangeListener { _ ->
+                app.albedo = it.value as Double
+            }
+        }
+        val elevationControl = JSpinner(SpinnerNumberModel(45.0, -75.0, 75.0, 0.5)).also {
+            it.preferredSize = dialSize
+            it.addChangeListener { _ ->
+                app.elevation = Math.toRadians(it.value as Double)
+            }
+        }
+        val solarBearing = JSpinner(SpinnerNumberModel(90.0, 0.0, 180.0, 1.0)).also {
+            it.preferredSize = dialSize
+            it.addChangeListener { _ ->
+                app.solarBearing = (it.value as Double)
+            }
+        }
+        val cameraHeading = JSpinner(SpinnerNumberModel(90.0, 0.0, 180.0, 1.0)).also {
+            it.preferredSize = dialSize
+            it.addChangeListener { _ ->
+                app.cameraHeading = (it.value as Double)
+            }
+        }
 
         init {
-            val turbidityPanel = JPanel()
-            val albedoPanel = JPanel()
-            val elevationPanel = JPanel()
-            val scalefactorPanel = JPanel()
+            val atmosPanel = JPanel()
+            val turbidityPanel = JPanel().also {
+                it.add(JLabel("Turbidity"))
+                it.add(turbidityControl)
+                atmosPanel.add(it)
+            }
+            val albedoPanel = JPanel().also {
+                it.add(JLabel("Albedo"))
+                it.add(albedoControl)
+                atmosPanel.add(it)
+            }
 
-            turbidityControl.preferredSize = Dimension(45, 18)
-            albedoControl.preferredSize = Dimension(45, 18)
-            elevationControl.preferredSize = Dimension(45, 18)
-            scalefactorControl.preferredSize = Dimension(45, 18)
+            val sunPanel = JPanel()
+            val elevationPanel = JPanel().also {
+                it.add(JLabel("Elevation"))
+                it.add(elevationControl)
+                sunPanel.add(it)
+            }
+            val scalefactorPanel = JPanel().also {
+                it.add(JLabel("Bearing"))
+                it.add(solarBearing)
+                sunPanel.add(it)
+            }
 
-            turbidityPanel.add(JLabel("Turbidity"))
-            turbidityPanel.add(turbidityControl)
+            val cameraPanel = JPanel()
+            val headingPanel = JPanel().also {
+                it.add(JLabel("Heading"))
+                it.add(cameraHeading)
+                cameraPanel.add(it)
+            }
 
-            albedoPanel.add(JLabel("Albedo"))
-            albedoPanel.add(albedoControl)
+            val statsPanel = JPanel()
+            val ymaxPanel = JPanel().also {
+                it.add(JLabel("Ymax (CIEXYZ)"))
+                it.add(app.ymaxDisp)
+                statsPanel.add(it)
+            }
+            val ymaxPanel2 = JPanel().also {
+                it.add(JLabel("Ymax (scaled)"))
+                it.add(app.ymaxDisp2)
+                statsPanel.add(it)
+            }
 
-            elevationPanel.add(JLabel("Elevation"))
-            elevationPanel.add(elevationControl)
+            val mainPanel = JPanel()
 
-            scalefactorPanel.add(JLabel("Scaling Factor"))
-            scalefactorPanel.add(scalefactorControl)
-
-            mainPanel.add(turbidityPanel)
-            mainPanel.add(albedoPanel)
-            mainPanel.add(elevationPanel)
-            mainPanel.add(scalefactorPanel)
+            mainPanel.layout = BoxLayout(mainPanel, BoxLayout.Y_AXIS)
+            JPanel().also {
+                it.layout = BorderLayout()
+                it.add(JPanel().also { it.add(JLabel("Atmosphere")) }, BorderLayout.NORTH)
+                it.add(atmosPanel, BorderLayout.CENTER)
+                it.add(JSeparator(), BorderLayout.SOUTH)
+                mainPanel.add(it)
+            }
+            JPanel().also {
+                it.layout = BorderLayout()
+                it.add(JPanel().also { it.add(JLabel("Sun")) }, BorderLayout.NORTH)
+                it.add(sunPanel, BorderLayout.CENTER)
+                it.add(JSeparator(), BorderLayout.SOUTH)
+                mainPanel.add(it)
+            }
+            JPanel().also {
+                it.layout = BorderLayout()
+                it.add(JPanel().also { it.add(JLabel("Camera")) }, BorderLayout.NORTH)
+                it.add(cameraPanel, BorderLayout.CENTER)
+                it.add(JSeparator(), BorderLayout.SOUTH)
+                mainPanel.add(it)
+            }
+            JPanel().also {
+                it.layout = BorderLayout()
+                it.add(JPanel().also { it.add(JLabel("Statistics")) }, BorderLayout.NORTH)
+                it.add(statsPanel, BorderLayout.CENTER)
+                mainPanel.add(it)
+            }
 
             this.isVisible = true
             this.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-            this.size = Dimension(300, 400)
-
-            this.add(mainPanel)
-
-
-            turbidityControl.addChangeListener {
-                app.turbidity = turbidityControl.value as Double
-            }
-
-            albedoControl.addChangeListener {
-                app.albedo = albedoControl.value as Double
-            }
-
-            elevationControl.addChangeListener {
-                app.elevation = Math.toRadians(elevationControl.value as Double)
-            }
-
-            scalefactorControl.addChangeListener {
-                app.scalefactor = (scalefactorControl.value as Double).toFloat()
-            }
+            this.size = Dimension(300, 600)
+            this.add(mainPanel, BorderLayout.CENTER)
 
         }
 
@@ -285,7 +350,10 @@ class Application : Game() {
 
 fun main(args: Array<String>) {
     val config = Lwjgl3ApplicationConfiguration()
-    config.setWindowedMode(WIDTH, HEIGHT)
 
-    Lwjgl3Application(Application(), config)
+    val WIDTH = 1600
+    val HEIGHT = 960
+
+    config.setWindowedMode(WIDTH, HEIGHT)
+    Lwjgl3Application(Application(WIDTH, HEIGHT), config)
 }
