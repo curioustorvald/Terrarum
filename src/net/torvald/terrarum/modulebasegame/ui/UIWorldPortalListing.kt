@@ -76,6 +76,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     ).also {
         it.clickOnceListener = { _,_ ->
+            full.queueUpSearchScr()
             full.requestTransition(1)
         }
     }
@@ -104,15 +105,27 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         deleteButtonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
-    )
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            full.queueUpRenameScr()
+            full.changePanelTo(1)
+        }
+    }
     private val buttonDelete = UIItemTextButton(this,
-        { Lang["MENU_LABEL_DELETE"] },
+        { Lang["MENU_LABEL_DELETE_WORLD"] },
         hx + gridGap/2 + deleteButtonWidth + gridGap,
         buttonsY,
         deleteButtonWidth,
         hasBorder = true,
-        alignment = UIItemTextButton.Companion.Alignment.CENTRE
-    )
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE,
+        inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            full.queueUpDeleteScr()
+            full.changePanelTo(1)
+        }
+    }
+
 
     private val navRemoCon = UIItemListNavBarVertical(full, hx + 6 + UIItemWorldCellsSimple.width, y + 7, listHeight + 2, false)
 
@@ -251,6 +264,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 worldList.getOrNull(it)?.diskSkimmer?.getDiskName(Common.CHARSET)
             ).also { button ->
                 button.clickOnceListener = { _, _ ->
+                    full.selectedButton = button
                     selected = button
                     selectedIndex = it
                     highlightListEditButtons(worldList.getOrNull(it))
@@ -475,8 +489,10 @@ class UIItemWorldCellsSimple(
     initialX: Int,
     initialY: Int,
     internal val worldInfo: UIWorldPortalListing.WorldInfo? = null,
-    internal val worldName: String? = null,
+    internal var worldName: String? = null,
 ) : UIItem(parent, initialX, initialY) {
+
+    var forceMouseDown = false
 
     companion object {
         const val width = 378
@@ -502,20 +518,22 @@ class UIItemWorldCellsSimple(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    fun render(batch: SpriteBatch, camera: Camera, offX: Int, offY: Int) {
         super.render(batch, camera)
 
+        val posX = posX + offX
+        val posY = posY + offY
 
         // draw background
         batch.color = UIInventoryFull.CELL_COL
         Toolkit.fillArea(batch, posX, posY, width, height)
 
-        val mouseUp = mouseUp && worldInfo != null
+        val mouseUp = mouseUp && worldInfo != null && !forceMouseDown
 
-        val bcol = if (highlighted || mouseUp && mousePushed) Toolkit.Theme.COL_SELECTED
-        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else (if (worldInfo == null) Toolkit.Theme.COL_INVENTORY_CELL_BORDER else Toolkit.Theme.COL_INACTIVE)
-        val tcol = if (highlighted || mouseUp && mousePushed) Toolkit.Theme.COL_SELECTED
-        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else (if (worldInfo == null) Toolkit.Theme.COL_INACTIVE else Toolkit.Theme.COL_LIST_DEFAULT)
+        val bcol = if (highlighted && !forceMouseDown || mouseUp && mousePushed) Toolkit.Theme.COL_SELECTED
+        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else (if (worldInfo == null && !forceMouseDown) Toolkit.Theme.COL_INVENTORY_CELL_BORDER else Toolkit.Theme.COL_INACTIVE)
+        val tcol = if (highlighted && !forceMouseDown || mouseUp && mousePushed) Toolkit.Theme.COL_SELECTED
+        else if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else (if (worldInfo == null && !forceMouseDown) Toolkit.Theme.COL_INACTIVE else Toolkit.Theme.COL_LIST_DEFAULT)
 
         // draw border
         batch.color = bcol
@@ -529,7 +547,11 @@ class UIItemWorldCellsSimple(
         // text separator
         batch.color = bcol.cpy().sub(0f,0f,0f,0.65f)
         Toolkit.fillArea(batch, posX + 2, posY + 23, width - 4, 1)
+    }
 
+
+    override fun render(batch: SpriteBatch, camera: Camera) {
+        render(batch, camera, 0, 0)
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {

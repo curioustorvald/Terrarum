@@ -56,6 +56,8 @@ class UIWorldPortal : UICanvas(
 
     val transitionalSearch = UIWorldPortalSearch(this)
     val transitionalListing = UIWorldPortalListing(this)
+    val transitionalDelete = UIWorldPortalDelete(this)
+    val transitionalRename = UIWorldPortalRename(this)
 //    val transitionalCargo = UIWorldPortalCargo(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
@@ -65,9 +67,20 @@ class UIWorldPortal : UICanvas(
         App.scr.height,
         0f,
          listOf(transitionalListing),
-        listOf(transitionalSearch),
+        listOf(transitionalSearch, transitionalDelete, transitionalRename),
         listOf()
     )
+
+    internal var selectedButton: UIItemWorldCellsSimple? = null
+
+    internal fun queueUpSearchScr() { transitionPanel.setCentreUIto(0) }
+    internal fun queueUpDeleteScr() { transitionPanel.setCentreUIto(1) }
+    internal fun queueUpRenameScr() { transitionPanel.setCentreUIto(2) }
+
+    internal fun changePanelTo(index: Int) {
+        transitionPanel.requestTransition(index)
+    }
+
 
     /**
      * Called by:
@@ -100,7 +113,7 @@ class UIWorldPortal : UICanvas(
         transitionPanel.render(batch, camera)
     }
 
-    private fun addWorldToPlayersDict(uuid: UUID) {
+    internal fun addWorldToPlayersDict(uuid: UUID) {
         val uuidstr = uuid.toAscii85()
         INGAME.actorNowPlaying?.let {
             val avList = (it.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(',').filter { it.isNotBlank() }.toMutableList()
@@ -111,7 +124,16 @@ class UIWorldPortal : UICanvas(
         }
     }
 
-    private fun cleanUpWorldDict() {
+    internal fun removeWorldfromDict(uuid: UUID) {
+        val uuidstr = uuid.toAscii85()
+        INGAME.actorNowPlaying?.let {
+            val avList = (it.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(',').filter { it.isNotBlank() }.toMutableList()
+            avList.remove(uuidstr)
+            it.actorValue[AVKey.WORLD_PORTAL_DICT] = avList.joinToString(",")
+        }
+    }
+
+    internal fun cleanUpWorldDict() {
         // remove dupes, etc
         INGAME.actorNowPlaying?.let {
             val avList = (it.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(',').filter { it.isNotBlank() }.toSet()

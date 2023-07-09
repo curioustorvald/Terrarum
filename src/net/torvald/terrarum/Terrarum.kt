@@ -399,6 +399,8 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     //this.begin()
     FrameBufferManager.begin(this)
 
+    val oldCamPos = camera?.position?.cpy()
+
     camera?.setToOrtho(true, this.width.toFloat(), this.height.toFloat())
     camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
     camera?.update()
@@ -410,6 +412,7 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     FrameBufferManager.end()
 
     camera?.setToOrtho(true, App.scr.wf, App.scr.hf)
+    camera?.position?.set(oldCamPos)
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 }
@@ -420,6 +423,8 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
 inline fun FrameBuffer.inActionF(camera: OrthographicCamera?, batch: SpriteBatch?, action: (FrameBuffer) -> Unit) {
     //this.begin()
     FrameBufferManager.begin(this)
+
+    val oldCamPos = camera?.position?.cpy()
 
     camera?.setToOrtho(false, this.width.toFloat(), this.height.toFloat())
     camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
@@ -432,6 +437,7 @@ inline fun FrameBuffer.inActionF(camera: OrthographicCamera?, batch: SpriteBatch
     FrameBufferManager.end()
 
     camera?.setToOrtho(true, App.scr.wf, App.scr.hf)
+    camera?.position?.set(oldCamPos)
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 }

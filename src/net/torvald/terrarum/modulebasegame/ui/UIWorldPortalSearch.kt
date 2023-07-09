@@ -51,7 +51,6 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val radioCellWidth = 116
     private val inputWidth = 340
     private val radioX = (width - (radioCellWidth * tex.size + 9)) / 2
-    private val inputX = width - inputWidth
 
     private val sizeSelY = 186 + 40
 
@@ -78,10 +77,12 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     )
 
     private val goButtonWidth = 180
+    private val buttonY = drawY + height - 24
+
     private val backButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
     private val goButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
     init {
         goButton.clickOnceListener = { _, _ ->
@@ -101,10 +102,10 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         }
 
         addUIitem(sizeSelector)
-        addUIitem(seedInput)  // order is important
-        addUIitem(nameInput) // because of the IME candidates overlay
         addUIitem(goButton)
         addUIitem(backButton)
+        addUIitem(seedInput)  // order is important
+        addUIitem(nameInput) // because of the IME candidates overlay
     }
 
 
@@ -126,17 +127,15 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         val posXDelta = posX - oldPosX
 
         // ugh why won't you just scroll along??
-        seedInput.posX += posXDelta
-        nameInput.posX += posXDelta
-        goButton.posX += posXDelta
-        backButton.posX += posXDelta
+//        seedInput.posX += posXDelta
+//        nameInput.posX += posXDelta // is it fixed now?
 
-
+        // TODO teleporter memory usage and whatnot
 
         batch.color = Color.WHITE
         // ui title
         val titlestr = Lang["CONTEXT_WORLD_NEW"]
-        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), INVENTORY_CELLS_OFFSET_Y() - 72f)
+        App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), INVENTORY_CELLS_OFFSET_Y() - 36f)
 
         // draw size previews
         val texture = tex[sizeSelector.selection.coerceAtMost(tex.lastIndex)]

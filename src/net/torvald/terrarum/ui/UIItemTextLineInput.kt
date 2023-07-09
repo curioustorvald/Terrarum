@@ -507,6 +507,7 @@ class UIItemTextLineInput(
     private var textDrawOffset = 0
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+
         val posXDelta = posX - oldPosX
 
 
@@ -515,6 +516,7 @@ class UIItemTextLineInput(
         batch.end()
 
 
+        // FIXME any subsequent UIItems after this function are not moved even if their parent UI is moving
         if (true || fboUpdateLatch) {
             fboUpdateLatch = false
             fbo.inAction(camera as OrthographicCamera, batch) { batch.inUse {
