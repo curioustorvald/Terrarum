@@ -211,9 +211,9 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
         oneScreen = Pixmap(outTexWidth, outTexHeight, Pixmap.Format.RGBA8888)
 
-        DatasetSpectral
+//        DatasetSpectral
         DatasetCIEXYZ
-        DatasetRGB
+//        DatasetRGB
 
         ApplicationController(this)
     }

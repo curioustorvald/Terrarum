@@ -147,7 +147,7 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
-    private var turbidity = 2.0
+    private var turbidity = 4.0
     private var gH = 2f * App.scr.height
 
     private val HALF_DAY = DAY_LENGTH / 2
@@ -158,14 +158,12 @@ internal object WeatherMixer : RNGConsumer {
         val parallaxZeroPos = (world.height / 3f)
         val parallaxDomainSize = world.height / 6f
 
-
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
         val daylightClut = currentWeather.daylightClut
         // calculate global light
         val globalLight = getGradientColour2(daylightClut, world.worldTime.solarElevationDeg, timeNow)
         globalLightNow.set(globalLight)
-
 
         /* (copied from the shader source)
          UV mapping coord.y
@@ -190,8 +188,8 @@ internal object WeatherMixer : RNGConsumer {
         val degThis = deg.floor()
         val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 
-        val texture1 = Skybox.get(degThis, turbidity)
-        val texture2 = Skybox.get(degNext, turbidity)
+        val texture1 = Skybox[degThis, turbidity]
+        val texture2 = Skybox[degNext, turbidity]
         val lerpScale = (if (timeNow < HALF_DAY) deg - degThis else 1f - (deg - degThis)).toFloat()
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
@@ -208,8 +206,6 @@ internal object WeatherMixer : RNGConsumer {
 
 
     }
-
-    fun Float.clampOne() = if (this > 1) 1f else this
 
     private operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
 

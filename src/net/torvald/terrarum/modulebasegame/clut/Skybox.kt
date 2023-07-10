@@ -82,7 +82,7 @@ object Skybox : Disposable {
 
             val elevationDeg = (it / turbCnt).plus(elevations.first).toDouble()
             val elevationRad = Math.toRadians(elevationDeg)
-            val turbidity = 1.0 + (it % turbCnt) / 100.0
+            val turbidity = 1.0 + (it % turbCnt) / 2.0
 
             val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
             val pixmap = Pixmap(1, gradSize, Pixmap.Format.RGBA8888)
