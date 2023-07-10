@@ -161,9 +161,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
-        val skyboxColourMap = currentWeather.skyboxGradColourMap
         val daylightClut = currentWeather.daylightClut
-
         // calculate global light
         val globalLight = getGradientColour2(daylightClut, world.worldTime.solarElevationDeg, timeNow)
         globalLightNow.set(globalLight)
@@ -185,7 +183,10 @@ internal object WeatherMixer : RNGConsumer {
 
         gdxBlendNormalStraightAlpha()
 
-        val deg =world.worldTime.solarElevationDeg
+        val deg = if (forceTimeAt != null)
+            world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
+        else
+            world.worldTime.solarElevationDeg
         val degThis = deg.floor()
         val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 
@@ -224,8 +225,11 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Get a GL of specific time
      */
-    fun getGlobalLightOfTime(world: GameWorld, timeInSec: Int): Cvec =
-            getGradientColour(world, currentWeather.skyboxGradColourMap, 2, timeInSec)
+    fun getGlobalLightOfTimeOfNoon(): Cvec {
+        currentWeather.daylightClut.let { it.get(it.width - 1, 0) }.let {
+            return Cvec(it.r, it.g, it.b, it.a)
+        }
+    }
 
     fun getGradientColour(world: GameWorld, colorMap: GdxColorMap, row: Int, timeInSec: Int): Cvec {
         val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width

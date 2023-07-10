@@ -287,7 +287,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         val forcedTime = 39693
 //        demoWorld.globalLight = WeatherMixer.globalLightNow
-        demoWorld.globalLight = WeatherMixer.getGlobalLightOfTime(demoWorld, forcedTime)
+        demoWorld.globalLight = WeatherMixer.getGlobalLightOfTimeOfNoon()
         demoWorld.updateWorldTime(delta)
 //        WeatherMixer.update(delta, cameraPlayer, demoWorld)
         WeatherMixer.forceTimeAt = forcedTime
