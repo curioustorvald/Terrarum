@@ -64,7 +64,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     lateinit var playerDisk: VirtualDisk; internal set
     lateinit var worldSavefileName: String; internal set
     lateinit var playerSavefileName: String; internal set
-    var savegameNickname: String = "SplinesReticulated"; internal set
+    var worldName: String = "SplinesReticulated"; internal set // worldName is stored as a name of the disk
 
     var screenZoom = 1.0f
     val ZOOM_MAXIMUM = 4.0f

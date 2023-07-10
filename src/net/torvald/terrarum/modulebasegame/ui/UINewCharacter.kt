@@ -3,10 +3,9 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
+import net.torvald.terrarum.App.playersDir
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderTestSubject1
@@ -18,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.modulebasegame.serialise.WritePlayer
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
+import java.io.File
 
 /**
  * Created by minjaesong on 2021-12-09.
@@ -75,9 +75,13 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
                 WritePlayer(player, disk, null, time_t)
                 VDUtil.dumpToRealMachine(disk, outFile)
 
+                App.savegamePlayers[player.uuid] = SavegameCollection.collectFromBaseFilename(File(playersDir), outFile.name)
+                App.savegamePlayersName[player.uuid] = player.actorValue.getAsString(AVKey.NAME)
+                UILoadGovernor.playerUUID = player.uuid
+
+
                 uiLocked = false
                 returnedFromChargen = true
-
 
                 // comment below if chargen must send gamers back to the charcters list
 //                UILoadGovernor.playerDisk = DiskSkimmer(outFile)

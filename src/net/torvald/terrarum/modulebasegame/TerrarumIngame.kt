@@ -28,7 +28,6 @@ import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.clut.Skybox
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore
@@ -57,7 +56,9 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.unicode.EMDASH
 import net.torvald.util.CircularArray
 import org.khelekore.prtree.PRTree
+import java.io.File
 import java.util.*
+import java.util.logging.Level
 import kotlin.math.roundToInt
 
 
@@ -400,15 +401,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         worldDisk = VDUtil.createNewDisk(
                 1L shl 60,
-                savegameNickname,
+                worldName,
                 Common.CHARSET
         )
 
-        playerDisk = VDUtil.createNewDisk(
-                1L shl 60,
-                actorGamer.actorValue.getAsString(AVKey.NAME) ?: "",
-                Common.CHARSET
-        )
+        playerDisk = VDUtil.readDiskArchive(App.savegamePlayers[actorGamer.uuid]!!.loadable().diskFile, Level.INFO)
 
         // go to spawn position
         printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
@@ -435,6 +432,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 makeSavegameBackupCopy(getWorldSaveFiledesc(worldSavefileName)) // don't put it on the postInit() or render(); must be called using callback
                 uiAutosaveNotifier.setAsClose()
+
+                App.savegameWorlds[world.worldIndex] = SavegameCollection.collectFromBaseFilename(File(worldsDir), worldSavefileName)
+                App.savegameWorldsName[world.worldIndex] = worldName
             }
         }
     }
@@ -476,7 +476,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             historicalFigureIDBucket = ArrayList<Int>()
 
-            savegameNickname = worldParams.savegameName
+            worldName = worldParams.savegameName
 
 
             world.worldCreator = UUID.fromString(player.uuid.toString())
@@ -489,6 +489,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             forceAddActor(player)
 
             WeatherMixer.internalReset()
+
+            UILoadGovernor.worldUUID = world.worldIndex
         }
 
         KeyToggler.forceSet(Input.Keys.Q, false)

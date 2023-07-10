@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.BlockLayer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
@@ -112,7 +111,7 @@ object WriteSavegame {
  */
 object LoadSavegame {
 
-    fun getSavegameNickname(worldDisk: SimpleFileSystem) = worldDisk.getDiskName(Common.CHARSET)
+    fun getWorldName(worldDisk: SimpleFileSystem) = worldDisk.getDiskName(Common.CHARSET)
     fun getWorldSavefileName(world: GameWorld) = "${world.worldIndex}"
     fun getPlayerSavefileName(player: IngamePlayer) = "${player.uuid}"
 
@@ -144,7 +143,7 @@ object LoadSavegame {
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
         newIngame.worldDisk =  VDUtil.readDiskArchive(worldDisk.diskFile, Level.INFO)
         newIngame.playerDisk = VDUtil.readDiskArchive(playerDisk.diskFile, Level.INFO)
-        newIngame.savegameNickname = getSavegameNickname(worldDisk)
+        newIngame.worldName = getWorldName(worldDisk)
         newIngame.worldSavefileName = getWorldSavefileName(world)
         newIngame.playerSavefileName = getPlayerSavefileName(player)
 
