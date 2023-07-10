@@ -20,6 +20,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.sign
 
 /**
@@ -117,7 +118,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val windowWidth = Toolkit.drawWidth
         val player = ingame?.actorNowPlaying
         val hitbox = player?.hitbox
-        val updateCount = maxOf(1L, (App.debugTimers["Ingame.UpdateCounter"] ?: 1L) as Long)
+        val updateCount = max(1L, (App.debugTimers["Ingame.UpdateCounter"] ?: 1L))
 
         /**
          * Top Left

@@ -59,6 +59,7 @@ import org.khelekore.prtree.PRTree
 import java.io.File
 import java.util.*
 import java.util.logging.Level
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 
@@ -95,7 +96,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     companion object {
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
         fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
-            camera.position.set((-newX + App.scr.halfw).round(), (-newY + App.scr.halfh).round(), 0f)
+            camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
         }
@@ -111,20 +112,20 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val ACTOR_UPDATE_RANGE = 4096
 
         fun distToActorSqr(world: GameWorld, a: ActorWithBody, p: ActorWithBody) =
-                minOf(// take min of normal position and wrapped (x < 0) position
-                        (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
+                min(// take min of normal position and wrapped (x < 0) position
+                        min((a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
                         (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
                         ((a.hitbox.centeredX + world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
-                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                        (a.hitbox.centeredY - p.hitbox.centeredY).sqr()),
                         ((a.hitbox.centeredX - world.width * TILE_SIZE) - p.hitbox.centeredX).sqr() +
                         (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
                 )
         fun distToCameraSqr(world: GameWorld, a: ActorWithBody) =
-                minOf(
-                        (a.hitbox.centeredX - WorldCamera.xCentre).sqr() +
+                min(
+                        min((a.hitbox.centeredX - WorldCamera.xCentre).sqr() +
                         (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
                         ((a.hitbox.centeredX + world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
-                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr(),
+                        (a.hitbox.centeredY - WorldCamera.yCentre).sqr()),
                         ((a.hitbox.centeredX - world.width * TILE_SIZE) - WorldCamera.xCentre).sqr() +
                         (a.hitbox.centeredY - WorldCamera.yCentre).sqr()
                 )
@@ -1035,10 +1036,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     } }
 
     private fun fillUpWiresBuffer() {
-        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt() - LIGHTMAP_OVERRENDER
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt() - LIGHTMAP_OVERRENDER
         val for_y_end = for_y_start + BlocksDrawer.tilesInVertical + 2*LIGHTMAP_OVERRENDER
 
-        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt() - LIGHTMAP_OVERRENDER
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt() - LIGHTMAP_OVERRENDER
         val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal + 2*LIGHTMAP_OVERRENDER
 
         var wiringCounter = 0
@@ -1421,7 +1422,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 //        }
         // else, punch a block
         else if (canAttackOrDig) {
-            val punchBlockSize = punchSize.div(TILE_SIZED).floorInt()
+            val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
             if (punchBlockSize > 0) {
                 PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
             }

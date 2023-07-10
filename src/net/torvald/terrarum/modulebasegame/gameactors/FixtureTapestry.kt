@@ -69,8 +69,8 @@ internal class FixtureTapestry : FixtureBase {
             Pixmap(ModMgr.getGdxFilesFromEveryMod("tapestries/common/canvas.tga").last().second)
         } as Pixmap
 
-        tilewiseHitboxWidth = pixmap.width.div(TILE_SIZEF).ceilInt()
-        tilewiseHitboxHeight = pixmap.height.div(TILE_SIZEF).ceilInt()
+        tilewiseHitboxWidth = pixmap.width.div(TILE_SIZEF).ceilToInt()
+        tilewiseHitboxHeight = pixmap.height.div(TILE_SIZEF).ceilToInt()
 
         // blend canvas texture
         for (y in 0 until pixmap.height) { for (x in 0 until pixmap.width) {

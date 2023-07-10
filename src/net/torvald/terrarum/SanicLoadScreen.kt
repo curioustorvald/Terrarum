@@ -9,6 +9,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.ui.Toolkit
+import kotlin.math.max
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -46,7 +47,7 @@ object SanicLoadScreen : LoadScreenBase() {
 
         textFbo = FrameBuffer(
                 Pixmap.Format.RGBA4444,
-                maxOf(
+                max(
                         App.fontGame.getWidth(Lang["MENU_IO_LOADING"]),
                         App.fontGame.getWidth(Lang["ERROR_GENERIC_TEXT"])
                 ),
@@ -61,7 +62,7 @@ object SanicLoadScreen : LoadScreenBase() {
     }
 
 
-    val textX: Float; get() = (App.scr.width * 0.72f).floor()
+    val textX: Float; get() = (App.scr.width * 0.72f).floorToFloat()
 
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it
 

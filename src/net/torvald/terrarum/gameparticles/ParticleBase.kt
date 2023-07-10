@@ -46,12 +46,12 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
             if (velocity.isZero ||
                 // simple stuck check
                 BlockCodex[(INGAME.world).getTileFromTerrain(
-                        hitbox.centeredX.div(TerrarumAppConfiguration.TILE_SIZE).floorInt(),
-                        hitbox.startY.div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
+                        hitbox.centeredX.div(TerrarumAppConfiguration.TILE_SIZE).floorToInt(),
+                        hitbox.startY.div(TerrarumAppConfiguration.TILE_SIZE).floorToInt()
                 )].isSolid ||
                 BlockCodex[(INGAME.world).getTileFromTerrain(
-                        hitbox.centeredX.div(TerrarumAppConfiguration.TILE_SIZE).floorInt(),
-                        hitbox.endY.div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
+                        hitbox.centeredX.div(TerrarumAppConfiguration.TILE_SIZE).floorToInt(),
+                        hitbox.endY.div(TerrarumAppConfiguration.TILE_SIZE).floorToInt()
                 )].isSolid) {
 
 

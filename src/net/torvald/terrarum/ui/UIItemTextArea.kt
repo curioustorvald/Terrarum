@@ -3,8 +3,9 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
-import net.torvald.terrarum.floor
+import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarum.ui.UIItemTextButton.Companion.Alignment
+import kotlin.math.min
 
 class UIItemTextArea(
         parentUI: UICanvas,
@@ -33,14 +34,14 @@ class UIItemTextArea(
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        for (i in scrollPos until minOf(lineCount + scrollPos, entireText.size)) {
+        for (i in scrollPos until min(lineCount + scrollPos, entireText.size)) {
             val yPtr = i - scrollPos
 
             val textWidth = App.fontGame.getWidth(entireText[i])
 
             when (align) {
                 Alignment.LEFT -> App.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
-                Alignment.CENTRE -> App.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).floor(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
+                Alignment.CENTRE -> App.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).roundToFloat(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
                 Alignment.RIGHT -> App.fontGame.draw(batch, entireText[i], posX + width - textWidth.toFloat(), posY + yPtr * (App.fontGame.lineHeight + lineGap))
             }
         }

@@ -13,6 +13,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.inUpdateRange
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import org.dyn4j.geometry.Vector2
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -120,10 +121,10 @@ object WorldSimulator {
 
             // kill grasses surrounded by dirts in cruciform formation
             // NOPE this part would not work; environment-depending degrassing must be done by the "grass spread simulator"
-            /*val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+            /*val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
             val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
 
-            val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+            val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
             val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
             for (y in for_y_start..for_y_end) {
                 for (x in for_x_start..for_x_end) {
@@ -354,7 +355,7 @@ object WorldSimulator {
                     if (flow > minFlow) {
                         flow *= 0.5f // leads to smoother flow
                     }
-                    flow = flow.coerceIn(0f, minOf(maxSpeed, remainingMass))
+                    flow = flow.coerceIn(0f, min(maxSpeed, remainingMass))
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y + 1][x] += flow
@@ -404,7 +405,7 @@ object WorldSimulator {
                     if (flow > minFlow) {
                         flow *= 0.5f
                     }
-                    flow = flow.coerceIn(0f, minOf(maxSpeed, remainingMass))
+                    flow = flow.coerceIn(0f, min(maxSpeed, remainingMass))
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y - 1][x] += flow

@@ -110,7 +110,7 @@ public class HUSLColorConverter {
             float x = intersectLineLine(line, new float[]{-1 / m1, 0});
             float length = distanceFromPole(new float[]{x, b1 + x * m1});
 
-            min = FastMath.min(min, length);
+            min = Math.min(min, length);
         }
 
         return min;
@@ -125,7 +125,7 @@ public class HUSLColorConverter {
         for (float[] bound : bounds) {
             Length length = lengthOfRayUntilIntersect(hrad, bound);
             if (length.greaterEqualZero) {
-                min = FastMath.min(min, length.length);
+                min = Math.min(min, length.length);
             }
         }
 

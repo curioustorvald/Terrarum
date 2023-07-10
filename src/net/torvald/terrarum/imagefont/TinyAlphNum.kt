@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import net.torvald.terrarum.round
+import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -41,8 +41,8 @@ object TinyAlphNum : BitmapFont() {
         colMain = batch.color.cpy()
         colShadow = colMain.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
 
-        val x = x.round()
-        val y = y.round()
+        val x = x.roundToFloat()
+        val y = y.roundToFloat()
 
         var charsPrinted = 0
         text.forEachIndexed { index, c ->
@@ -56,13 +56,13 @@ object TinyAlphNum : BitmapFont() {
             }
             else if (c in 0.toChar()..255.toChar()) {
                 batch.color = colShadow
-                batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W + 1, y)
-                batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W, y + 1)
-                batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W + 1, y + 1)
+                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W + 1, y)
+                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W, y + 1)
+                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W + 1, y + 1)
 
 
                 batch.color = colMain
-                batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W, y)
+                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W, y)
 
                 charsPrinted += 1
             }
@@ -80,8 +80,8 @@ object TinyAlphNum : BitmapFont() {
 
 
 
-    private fun isColourCodeHigh(c: Char) = c.toInt() in 0b110110_1111000000..0b110110_1111111111
-    private fun isColourCodeLow(c: Char) = c.toInt() in 0b110111_0000000000..0b110111_1111111111
+    private fun isColourCodeHigh(c: Char) = c.code in 0b110110_1111000000..0b110110_1111111111
+    private fun isColourCodeLow(c: Char) = c.code in 0b110111_0000000000..0b110111_1111111111
 
     private fun getColour(charHigh: Char, charLow: Char): Color { // input: 0x10ARGB, out: RGBA8888
         val codePoint = Character.toCodePoint(charHigh, charLow)

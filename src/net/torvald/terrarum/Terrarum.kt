@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -26,13 +25,9 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.DiskSkimmer
-import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.unsafe.UnsafeHelper
@@ -40,10 +35,7 @@ import net.torvald.util.CircularArray
 import java.io.File
 import java.io.PrintStream
 import java.util.*
-import kotlin.math.absoluteValue
-import kotlin.math.round
-import kotlin.math.roundToInt
-
+import kotlin.math.*
 
 
 typealias RGBA8888 = Int
@@ -238,16 +230,16 @@ object Terrarum : Disposable {
         get() = WorldCamera.zoomedY + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).times(scr.magn.toDouble())
     /** Position of the cursor in the world, rounded */
     @JvmStatic val mouseTileX: Int
-        get() = (mouseX / TILE_SIZE).floorInt()
+        get() = (mouseX / TILE_SIZE).floorToInt()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileY: Int
-        get() = (mouseY / TILE_SIZE).floorInt()
+        get() = (mouseY / TILE_SIZE).floorToInt()
     /** Position of the cursor in the world, rounded */
     @JvmStatic val oldMouseTileX: Int
-        get() = (oldMouseX / TILE_SIZE).floorInt()
+        get() = (oldMouseX / TILE_SIZE).floorToInt()
     /** Position of the cursor in the world */
     @JvmStatic val oldMouseTileY: Int
-        get() = (oldMouseY / TILE_SIZE).floorInt()
+        get() = (oldMouseY / TILE_SIZE).floorToInt()
     inline val mouseScreenX: Int
         get() = Gdx.input.x.div(scr.magn).roundToInt()
     inline val mouseScreenY: Int
@@ -321,8 +313,8 @@ object Terrarum : Disposable {
 
         val mx = mouseX
         val my = mouseY
-        val mtx = (mouseX / TILE_SIZE).floorInt()
-        val mty = (mouseY / TILE_SIZE).floorInt()
+        val mtx = (mouseX / TILE_SIZE).floorToInt()
+        val mty = (mouseY / TILE_SIZE).floorToInt()
         val msx = mx fmod TILE_SIZED
         val msy = my fmod TILE_SIZED
         val vector = if (msx < SMALLGAP) { // X to the left
@@ -402,7 +394,7 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     val oldCamPos = camera?.position?.cpy()
 
     camera?.setToOrtho(true, this.width.toFloat(), this.height.toFloat())
-    camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
+    camera?.position?.set((this.width / 2f).roundToFloat(), (this.height / 2f).roundToFloat(), 0f) // TODO floor? ceil? round?
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 
@@ -427,7 +419,7 @@ inline fun FrameBuffer.inActionF(camera: OrthographicCamera?, batch: SpriteBatch
     val oldCamPos = camera?.position?.cpy()
 
     camera?.setToOrtho(false, this.width.toFloat(), this.height.toFloat())
-    camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
+    camera?.position?.set((this.width / 2f).roundToFloat(), (this.height / 2f).roundToFloat(), 0f) // TODO floor? ceil? round?
     camera?.update()
     batch?.projectionMatrix = camera?.combined
 
@@ -617,28 +609,28 @@ val emphVerb = TerrarumSansBitmap.toColorCode(0xFFF6)
 
 typealias Second = Float
 
-fun Int.sqr(): Int = this * this
-fun Double.floorInt() = Math.floor(this).toInt()
-fun Float.floorInt() = FastMath.floor(this)
-fun Float.floor() = FastMath.floor(this).toFloat()
-fun Double.ceilInt() = Math.ceil(this).toInt()
-fun Float.ceil(): Float = FastMath.ceil(this).toFloat()
-fun Float.ceilInt() = FastMath.ceil(this)
-fun Float.round(): Float = round(this)
-fun Double.round() = Math.round(this).toDouble()
-fun Double.floor() = Math.floor(this)
-fun Double.ceil() = this.floor() + 1.0
-fun Double.abs() = Math.abs(this)
-fun Double.sqr() = this * this
-fun Float.sqr() = this * this
-fun Double.sqrt() = Math.sqrt(this)
-fun Float.sqrt() = FastMath.sqrt(this)
-fun Int.abs() = this.absoluteValue
-fun Double.bipolarClamp(limit: Double) = this.coerceIn(-limit, limit)
-fun Boolean.toInt(shift: Int = 0) = if (this) 1.shl(shift) else 0
-fun Boolean.toLong(shift: Int = 0) = if (this) 1L.shl(shift) else 0L
-fun Int.bitCount() = java.lang.Integer.bitCount(this)
-fun Long.bitCount() = java.lang.Long.bitCount(this)
+inline fun Double.floorToInt() = floor(this).toInt()
+inline fun Float.floorToInt() = FastMath.floor(this)
+inline fun Double.ceilToInt() = Math.ceil(this).toInt()
+inline fun Float.ceilToFloat(): Float = FastMath.ceil(this).toFloat()
+inline fun Float.ceilToInt() = FastMath.ceil(this)
+inline fun Float.floorToFloat() = FastMath.floor(this).toFloat()
+inline fun Float.roundToFloat(): Float = round(this)
+//inline fun Double.round() = Math.round(this).toDouble()
+inline fun Double.floorToDouble() = floor(this)
+inline fun Double.ceilToDouble() = ceil(this)
+inline fun Int.sqr(): Int = this * this
+inline fun Double.sqr() = this * this
+inline fun Float.sqr() = this * this
+inline fun Double.sqrt() = Math.sqrt(this)
+inline fun Float.sqrt() = FastMath.sqrt(this)
+inline fun Int.abs() = this.absoluteValue
+inline fun Double.abs() = this.absoluteValue
+inline fun Double.bipolarClamp(limit: Double) = this.coerceIn(-limit, limit)
+inline fun Boolean.toInt(shift: Int = 0) = if (this) 1.shl(shift) else 0
+inline fun Boolean.toLong(shift: Int = 0) = if (this) 1L.shl(shift) else 0L
+inline fun Int.bitCount() = java.lang.Integer.bitCount(this)
+inline fun Long.bitCount() = java.lang.Long.bitCount(this)
 
 
 fun absMax(left: Double, right: Double): Double {
@@ -657,7 +649,6 @@ fun absMax(left: Double, right: Double): Double {
 }
 
 fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
-fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
 fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Double {
     if (startValue == endValue) {
         return startValue

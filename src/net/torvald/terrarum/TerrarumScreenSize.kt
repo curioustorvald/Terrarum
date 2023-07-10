@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.App.printdbg
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
@@ -39,7 +40,7 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
     var windowH: Int = 0; private set
 
     init {
-        setDimension(maxOf(minimumW, scrw), maxOf(minimumH, scrh), App.getConfigDouble("screenmagnifying").toFloat())
+        setDimension(max(minimumW, scrw), max(minimumH, scrh), App.getConfigDouble("screenmagnifying").toFloat())
     }
 
     fun setDimension(scrw: Int, scrh: Int, magn: Float,) {
@@ -56,8 +57,8 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
 
         this.magn = magn
 
-        windowW = (scrw * magn).ceilInt() and 0x7FFFFFFE
-        windowH = (scrh * magn).ceilInt() and 0x7FFFFFFE
+        windowW = (scrw * magn).ceilToInt() and 0x7FFFFFFE
+        windowH = (scrh * magn).ceilToInt() and 0x7FFFFFFE
 
 
         printdbg(this, "Window dim: $windowW x $windowH, called by:")

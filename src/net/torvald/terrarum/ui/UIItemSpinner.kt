@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.ceilToInt
 
 /**
  * Internal properties, namely initialValue, min, max, step; have the type of [Double] regardless of their input type.
@@ -44,7 +44,7 @@ class UIItemSpinner(
     var selectionChangeListener: (Number) -> Unit = {}
 
     // to alleviate floating point errors adding up as the spinner is being used
-    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilInt()) {
+    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilToInt()) {
 //        printdbg(this, "$min..$max step $step; index [$it] = ${min.toDouble() + (step.toDouble() * it)}")
         min.toDouble() + (step.toDouble() * it)
     }

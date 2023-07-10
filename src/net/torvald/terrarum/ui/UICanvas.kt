@@ -7,6 +7,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -346,7 +347,7 @@ abstract class UICanvas(
         const val OPENCLOSE_GENERIC = 0.0666f
 
         fun doOpeningFade(ui: UICanvas, openCloseTime: Second) {
-            ui.handler.opacity = maxOf(0f, ui.handler.openCloseCounter - 0.02f) / openCloseTime // fade start 1/50 sec late, it's intended
+            ui.handler.opacity = max(0f, ui.handler.openCloseCounter - 0.02f) / openCloseTime // fade start 1/50 sec late, it's intended
         }
         fun doClosingFade(ui: UICanvas, openCloseTime: Second) {
             ui.handler.opacity = (openCloseTime - ui.handler.openCloseCounter) / openCloseTime

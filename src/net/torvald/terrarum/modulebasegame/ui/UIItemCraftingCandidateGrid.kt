@@ -4,7 +4,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CraftingRecipeCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.UIItemInventoryCatBar
-import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
 
@@ -80,7 +80,7 @@ class UIItemCraftingCandidateGrid(
         }
 
 
-        itemPageCount = (recipesSortList.size.toFloat() / items.size.toFloat()).ceilInt()
+        itemPageCount = (recipesSortList.size.toFloat() / items.size.toFloat()).ceilToInt()
 
         rebuildList = false
     }

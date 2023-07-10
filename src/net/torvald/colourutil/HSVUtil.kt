@@ -2,6 +2,8 @@ package net.torvald.colourutil
 
 import com.jme3.math.FastMath
 import com.badlogic.gdx.graphics.Color
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * OBSOLETE; use CIELchUtil for natural-looking colour
@@ -75,8 +77,8 @@ object HSVUtil {
         val g = color.g
         val b = color.b
 
-        val rgbMin = FastMath.min(r, g, b)
-        val rgbMax = FastMath.max(r, g, b)
+        val rgbMin = min(min(r, g), b)
+        val rgbMax = max(max(r, g), b)
 
         var h: Float
         val s: Float

@@ -166,7 +166,7 @@ class UIItemInventoryCatBar(
     // set up underlined indicator
     init {
         // procedurally generate texture
-        val pixmap = Pixmap(catIcons.tileW + buttonGapSize.floorInt(), 1, Pixmap.Format.RGBA8888)
+        val pixmap = Pixmap(catIcons.tileW + buttonGapSize.floorToInt(), 1, Pixmap.Format.RGBA8888)
         for (x in 0 until pixmap.width.plus(1).ushr(1)) { // eqv. of ceiling the half-int
             val col = /*if      (x == 0)*/ /*0xffffff_80.toInt()*/
                       /*else if (x == 1)*/ /*0xffffff_c0.toInt()*/

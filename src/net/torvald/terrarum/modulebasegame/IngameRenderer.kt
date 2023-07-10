@@ -680,7 +680,7 @@ object IngameRenderer : Disposable {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     private fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + App.scr.halfw).round(), (-newY + App.scr.halfh).round(), 0f)
+        camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

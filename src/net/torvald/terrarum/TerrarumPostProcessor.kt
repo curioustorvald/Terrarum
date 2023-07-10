@@ -168,11 +168,11 @@ object TerrarumPostProcessor : Disposable {
                             val average = tallies.average()
 
                             val halfPos = 0.5f * INGAME.deltaTeeBenchmarks.size
-                            val halfInd = halfPos.floorInt()
+                            val halfInd = halfPos.floorToInt()
                             val low5pos = 0.05f * INGAME.deltaTeeBenchmarks.size
-                            val low5ind = low5pos.floorInt()
+                            val low5ind = low5pos.floorToInt()
                             val low1pos = 0.01f * INGAME.deltaTeeBenchmarks.size
-                            val low1ind = low1pos.floorInt()
+                            val low1ind = low1pos.floorToInt()
 
                             val median = FastMath.interpolateLinear(halfPos - halfInd, tallies[halfInd], tallies[halfInd + 1])
                             val low5 = FastMath.interpolateLinear(low5pos - low5ind, tallies[low5ind], tallies[low5ind + 1])

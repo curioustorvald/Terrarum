@@ -379,7 +379,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         batch.color = barBack
         Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, memoryGaugeWidth, buttonHeight)
         batch.color = barCol
-        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (chunksUsed / chunksMax.toFloat())).ceilInt(), buttonHeight)
+        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (chunksUsed / chunksMax.toFloat())).ceilToInt(), buttonHeight)
 
         batch.color = Color.WHITE
         if (selected?.worldInfo != null) {
@@ -396,7 +396,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 App.fontGame.draw(batch, str, textXpos + 6f, y + thumbh + 3+10 + textualListHeight * index - 2f)
             }
             // size indicator on the memory gauge
-            Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (selected?.worldInfo!!.dimensionInChunks / chunksMax.toFloat())).ceilInt(), buttonHeight)
+            Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (selected?.worldInfo!!.dimensionInChunks / chunksMax.toFloat())).ceilToInt(), buttonHeight)
 
             // thumbnail
             selected?.worldInfo?.screenshot?.let {

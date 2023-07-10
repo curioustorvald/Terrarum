@@ -3,11 +3,8 @@ package net.torvald.terrarum.worlddrawer
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
-import net.torvald.terrarum.App
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
-import net.torvald.terrarum.blendMul
-import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.gameworld.GameWorld
@@ -32,26 +29,16 @@ object FeaturesDrawer {
     var colTemp: Int = 0
         private set
 
-    private val TILES_COLD = arrayOf(
-              Block.ICE_MAGICAL
-            , Block.ICE_FRAGILE
-            , Block.ICE_NATURAL
-            , Block.SNOW)
-
-    private val TILES_WARM = arrayOf(
-              Block.SAND_DESERT
-            , Block.SAND_RED)
-
     init {
         TileSurvey.submitProposal(
             TileSurvey.SurveyProposal(
                 "basegame.FeaturesDrawer.coldTiles", 72, 48, 2, 2
-            ) { world, x, y -> TILES_COLD.contains(world.getTileFromTerrain(x, y)) }
+            ) { world, x, y -> BlockCodex[world.getTileFromTerrain(x, y)].tags.contains("COLD") }
         )
         TileSurvey.submitProposal(
             TileSurvey.SurveyProposal(
                 "basegame.FeaturesDrawer.warmTiles", 72, 48, 2, 2
-            ) { world, x, y -> TILES_WARM.contains(world.getTileFromTerrain(x, y)) }
+            ) { world, x, y -> BlockCodex[world.getTileFromTerrain(x, y)].tags.contains("WARM") }
         )
     }
 
@@ -92,6 +79,6 @@ object FeaturesDrawer {
     private fun colTempLinearFunc(x: Float): Int {
         val colTempMedian = (ENV_COLTEMP_HIGHEST + ENV_COLTEMP_LOWEST) / 2
 
-        return Math.round((ENV_COLTEMP_HIGHEST - ENV_COLTEMP_LOWEST) / 2 * FastMath.clamp(x, -1f, 1f) + colTempMedian)
+        return ((ENV_COLTEMP_HIGHEST - ENV_COLTEMP_LOWEST) / 2 * x.coerceIn(-1f, 1f) + colTempMedian).roundToInt()
     }
 }

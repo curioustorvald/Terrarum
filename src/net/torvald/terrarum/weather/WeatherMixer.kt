@@ -185,7 +185,7 @@ internal object WeatherMixer : RNGConsumer {
             world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
         else
             world.worldTime.solarElevationDeg
-        val degThis = deg.floor()
+        val degThis = deg.floorToDouble()
         val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 
         val texture1 = Skybox[degThis, turbidity]
@@ -255,7 +255,7 @@ internal object WeatherMixer : RNGConsumer {
     fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int): Cvec {
         val pNowRaw = (solarAngleInDeg + 75.0) / 150.0 * colorMap.width
 
-        val pStartRaw = pNowRaw.floorInt()
+        val pStartRaw = pNowRaw.floorToInt()
         val pNextRaw = pStartRaw + 1
 
         val pSx: Int; val pSy: Int; val pNx: Int; val pNy: Int

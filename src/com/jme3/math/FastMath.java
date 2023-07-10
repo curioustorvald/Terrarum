@@ -801,28 +801,6 @@ final public class FastMath {
     }
 
     /**
-     * Take a float input and clamp it between min and max.
-     *
-     * @param input
-     * @param min
-     * @param max
-     * @return clamped input
-     */
-    public static float clamp(float input, float min, float max) {
-        return (input < min) ? min : (input > max) ? max : input;
-    }
-
-    /**
-     * Clamps the given float to be between 0 and 1.
-     *
-     * @param input
-     * @return input clamped between 0 and 1.
-     */
-    public static float saturate(float input) {
-        return clamp(input, 0f, 1f);
-    }
-
-    /**
      * Converts a single precision (32 bit) floating point value
      * into half precision (16 bit).
      *
@@ -876,31 +854,6 @@ final public class FastMath {
                 | ((((f & 0x7f800000) - 0x38000000) >> 13) & 0x7c00)
                 | ((f >> 13) & 0x03ff));
     }
-
-    public static float min(float... f) {
-        float min = f[0];
-        for (int i = 1; i < f.length; i++) min = (f[i] < min) ? f[i] : min;
-        return min;
-    }
-
-    public static float max(float... f) {
-        float max = f[0];
-        for (int i = 1; i < f.length; i++) max = (f[i] > max) ? f[i] : max;
-        return max;
-    }
-
-    public static int min(int... f) {
-        int min = f[0];
-        for (int i = 1; i < f.length; i++) min = (f[i] < min) ? f[i] : min;
-        return min;
-    }
-
-    public static int max(int... f) {
-        int max = f[0];
-        for (int i = 1; i < f.length; i++) max = (f[i] > max) ? f[i] : max;
-        return max;
-    }
-
     public static int getGCD(int a, int b) {
         while (a != b) {
             if (a > b) a = a-b;

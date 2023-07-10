@@ -19,6 +19,8 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.ui.abs
 import net.torvald.terrarum.realestate.LandUtil
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -66,8 +68,8 @@ object LightmapRenderer {
     const val overscan_opaque: Int = 10
     const val LIGHTMAP_OVERRENDER = 10
 
-    private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
-    private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+    private var LIGHTMAP_WIDTH: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilToInt() + overscan_open * 2 + 3
+    private var LIGHTMAP_HEIGHT: Int = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilToInt() + overscan_open * 2 + 3
 
     //private val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
@@ -257,8 +259,8 @@ object LightmapRenderer {
              */
             for (i in 0 until LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) {
                 swipeLight(
-                        maxOf(1, i - LIGHTMAP_HEIGHT + 4), maxOf(1, LIGHTMAP_HEIGHT - 2 - i),
-                        minOf(LIGHTMAP_WIDTH - 2, i + 1), minOf(LIGHTMAP_HEIGHT - 2, (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) - i),
+                        max(1, i - LIGHTMAP_HEIGHT + 4), max(1, LIGHTMAP_HEIGHT - 2 - i),
+                        min(LIGHTMAP_WIDTH - 2, i + 1), min(LIGHTMAP_HEIGHT - 2, (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) - i),
                         1, 1,
                         lightmap
                 )
@@ -291,8 +293,8 @@ object LightmapRenderer {
              */
             for (i in 0 until LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 5) {
                 swipeLight(
-                        maxOf(1, i - LIGHTMAP_HEIGHT + 4), minOf(LIGHTMAP_HEIGHT - 2, i + 1),
-                        minOf(LIGHTMAP_WIDTH - 2, i + 1), maxOf(1, (LIGHTMAP_HEIGHT - 2) - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6) + i),
+                        max(1, i - LIGHTMAP_HEIGHT + 4), min(LIGHTMAP_HEIGHT - 2, i + 1),
+                        min(LIGHTMAP_WIDTH - 2, i + 1), max(1, (LIGHTMAP_HEIGHT - 2) - (LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT - 6) + i),
                         1, -1,
                         lightmap
                 )
@@ -355,10 +357,10 @@ object LightmapRenderer {
                 val lightBoxY = it.hitbox.startY + (lightBox.startY * scale)
                 val lightBoxW = lightBox.width * scale - 1
                 val lightBoxH = lightBox.height * scale - 1
-                for (y in lightBoxY.div(TILE_SIZE).floorInt()
-                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
-                    for (x in lightBoxX.div(TILE_SIZE).floorInt()
-                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+                for (y in lightBoxY.div(TILE_SIZE).floorToInt()
+                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorToInt()) {
+                    for (x in lightBoxX.div(TILE_SIZE).floorToInt()
+                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorToInt()) {
 
                         val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
                         val actorLight = colour
@@ -374,10 +376,10 @@ object LightmapRenderer {
                 val lightBoxY = it.hitbox.startY + (shadeBox.startY * scale)
                 val lightBoxW = shadeBox.width * scale - 1
                 val lightBoxH = shadeBox.height * scale - 1
-                for (y in lightBoxY.div(TILE_SIZE).floorInt()
-                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
-                    for (x in lightBoxX.div(TILE_SIZE).floorInt()
-                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+                for (y in lightBoxY.div(TILE_SIZE).floorToInt()
+                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorToInt()) {
+                    for (x in lightBoxX.div(TILE_SIZE).floorToInt()
+                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorToInt()) {
 
                         val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
                         val actorLight = colour
@@ -706,10 +708,10 @@ object LightmapRenderer {
                         /*lightBuffer.drawPixel(
                             x - this_x_start,
                             lightBuffer.height - 1 - y + this_y_start, // flip Y
-                                (maxOf(red,grnw,bluw,uvlwr) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
-                                        (maxOf(redw,grn,bluw,uvlwg) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
-                                        (maxOf(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
-                                        (maxOf(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
+                                (max(red,grnw,bluw,uvlwr) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
+                                        (max(redw,grn,bluw,uvlwg) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
+                                        (max(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
+                                        (max(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
                         )*/
                         lightBuffer.drawPixel(
                                 x - this_x_start,
@@ -809,10 +811,10 @@ object LightmapRenderer {
     private fun Cvec.maxAndAssign(other: Cvec): Cvec {
         // TODO investigate: if I use assignment instead of set(), it blackens like the vector branch.  --Torvald, 2019-06-07
         //                   that was because you forgot 'this.r/g/b/a = ' part, bitch. --Torvald, 2019-06-07
-        this.r = if (this.r > other.r) this.r else other.r
-        this.g = if (this.g > other.g) this.g else other.g
-        this.b = if (this.b > other.b) this.b else other.b
-        this.a = if (this.a > other.a) this.a else other.a
+        this.r = max(this.r, other.r)
+        this.g = max(this.g, other.g)
+        this.b = max(this.b, other.b)
+        this.a = max(this.a, other.a)
 
         return this
     }
@@ -825,8 +827,8 @@ object LightmapRenderer {
 
     // input: 0..1 for int 0..1023
     fun hdr(intensity: Float): Float {
-        val intervalStart = (intensity / 4f * LightmapHDRMap.size).floorInt()
-        val intervalEnd = (intensity / 4f * LightmapHDRMap.size).floorInt() + 1
+        val intervalStart = (intensity / 4f * LightmapHDRMap.size).floorToInt()
+        val intervalEnd = (intensity / 4f * LightmapHDRMap.size).floorToInt() + 1
 
         if (intervalStart == intervalEnd) return LightmapHDRMap[intervalStart]
 
@@ -849,11 +851,11 @@ object LightmapRenderer {
         // copied from BlocksDrawer, duh!
         // FIXME 'lightBuffer' is not zoomable in this way
 
-        val tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilInt() + 1 + LIGHTMAP_OVERRENDER * 2
-        val tilesInVertical = (App.scr.hf / TILE_SIZE).ceilInt() + 1 + LIGHTMAP_OVERRENDER * 2
+        val tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt() + 1 + LIGHTMAP_OVERRENDER * 2
+        val tilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt() + 1 + LIGHTMAP_OVERRENDER * 2
 
-        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
-        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilInt() + overscan_open * 2 + 3
+        LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.width).div(TILE_SIZE).ceilToInt() + overscan_open * 2 + 3
+        LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(App.scr.height).div(TILE_SIZE).ceilToInt() + overscan_open * 2 + 3
 
         if (_init) {
             lightBuffer.dispose()

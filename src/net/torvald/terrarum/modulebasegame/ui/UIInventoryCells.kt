@@ -17,6 +17,8 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import kotlin.math.max
+import kotlin.math.min
 
 internal class UIInventoryCells(
         val full: UIInventoryFull
@@ -125,7 +127,7 @@ internal class UIInventoryCells(
                 if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                     1f
                 else // make sure 1px is always be seen
-                    minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
+                    min(weightBarWidth, max(1f, weightBarWidth * encumbrancePerc)),
                 controlHelpHeight - 6f
         )
         // debug text

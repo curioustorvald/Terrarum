@@ -32,6 +32,7 @@ import java.nio.file.StandardCopyOption
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.function.Consumer
+import kotlin.math.min
 
 /**
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
@@ -490,7 +491,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         val dist2 = (p.getOrd(0) - (t.hitbox.centeredX - world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
         val dist3 = (p.getOrd(0) - (t.hitbox.centeredX + world.width * TILE_SIZE)).sqr() + (p.getOrd(1) - t.hitbox.centeredY).sqr()
 
-        minOf(dist1, dist2, dist3)
+        min(min(dist1, dist2), dist3)
     }
 
     /**

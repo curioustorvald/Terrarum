@@ -8,6 +8,7 @@ import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
 import java.util.*
+import kotlin.math.max
 
 internal data class Joint(val name: String, val position: ADPropertyObject.Vector2i) {
     override fun toString() = "$name $position"
@@ -144,13 +145,13 @@ class ADProperties {
                 // if animFrames does not have our entry, add it.
                 // otherwise, max() against the existing value
                 if (animFrames.containsKey(animName)) {
-                    animFrames[animName] = maxOf(animFrames[animName]!!, frameNumber)
+                    animFrames[animName] = max(animFrames[animName]!!, frameNumber)
                 }
                 else {
                     animFrames[animName] = frameNumber
                 }
 
-                maxColFinder = maxOf(maxColFinder, frameNumber)
+                maxColFinder = max(maxColFinder, frameNumber)
             }
         }
         // populate skeletons and animations
@@ -176,7 +177,7 @@ class ADProperties {
                         Skeleton(skeletonName, skeletonDef.toJoints())
                 )
 
-                maxRowFinder = maxOf(maxRowFinder, animations[s]!!.row)
+                maxRowFinder = max(maxRowFinder, animations[s]!!.row)
             }
         }
 

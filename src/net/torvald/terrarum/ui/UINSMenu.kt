@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import kotlin.math.max
 
 /**
  * Nextstep-themed menu bar with mandatory title line
@@ -38,7 +39,7 @@ class UINSMenu(
     val tree = treeRepresentation.parseAsYamlInvokable()
     override var width = 0
     override var height = 0
-    //override var width = maxOf(minimumWidth, tree.getLevelData(1).map { AppLoader.fontGame.getWidth(it ?: "") }.max() ?: 0)
+    //override var width = max(minimumWidth, tree.getLevelData(1).map { AppLoader.fontGame.getWidth(it ?: "") }.max() ?: 0)
     //override var height = LINE_HEIGHT * (tree.children.size + 1)
 
 
@@ -90,8 +91,8 @@ class UINSMenu(
             tree.children[it].data?.first + if (tree.children[it].children.isNotEmpty()) "  $CHILD_ARROW" else ""
         }
 
-        val listWidth = maxOf(
-                App.fontGame.getWidth(menuTitle), minimumWidth,
+        val listWidth = max(
+                max(App.fontGame.getWidth(menuTitle), minimumWidth),
                 stringsFromTree.map { App.fontGame.getWidth(it) }.maxOrNull() ?: 0
         )
         val uiWidth = listWidth + (2 * TEXT_OFFSETX.toInt())

@@ -1,8 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors.physicssolver
 
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.abs
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.sqr
 import java.util.*
 
 /**
@@ -201,9 +203,6 @@ object CollisionSolver {
 
         return (t_ax.sqr() + t_ay.sqr()) < actor_dist_t_sqr
     }
-
-    fun Double.abs() = if (this < 0) -this else this
-    fun Double.sqr() = this * this
 
     data class CollisionMarkings(
             val pos: Double,

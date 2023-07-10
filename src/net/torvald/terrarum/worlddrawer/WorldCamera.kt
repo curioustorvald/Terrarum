@@ -5,7 +5,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -42,9 +42,9 @@ object WorldCamera {
         get() = y + (height * zoomSamplePoint).toInt()
 
     val zoomedWidth: Int
-        get() = (width / zoom).ceilInt()
+        get() = (width / zoom).ceilToInt()
     val zoomedHeight: Int
-        get() = (height / zoom).ceilInt()
+        get() = (height / zoom).ceilToInt()
 
     var xEnd: Int = 0 // right position
         private set
@@ -89,14 +89,14 @@ object WorldCamera {
         else
             nullVec
 
-        x = ((player.hitbox.centeredX - pVecSum.x).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
+        x = ((player.hitbox.centeredX - pVecSum.x).toFloat() - (width / 2)).floorToInt() // X only: ROUNDWORLD implementation
 
 
         y = (FastMath.clamp(
                 (player.hitbox.centeredY - pVecSum.y).toFloat() - height / 2,
                 TILE_SIZEF,
                 world.height * TILE_SIZE - height - TILE_SIZEF
-        )).floorInt().clampCameraY(world)*/
+        )).floorToInt().clampCameraY(world)*/
 
 
 //        val fpsRatio = App.UPDATE_RATE / Gdx.graphics.deltaTime // if FPS=32 & RATE=64, ratio will be 0.5

@@ -15,10 +15,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
-import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.floor
 
@@ -443,7 +441,7 @@ open class UIItemInventoryItemGrid(
         }
 
 
-        itemPageCount = (inventorySortList.size.toFloat() / items.size.toFloat()).ceilInt()
+        itemPageCount = (inventorySortList.size.toFloat() / items.size.toFloat()).ceilToInt()
 
 
         // ¤   42g

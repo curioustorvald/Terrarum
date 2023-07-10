@@ -293,10 +293,10 @@ internal object BlocksDrawer {
         //      the window frame which should NOT be MUL'd)
 
 
-        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
         val for_y_end = for_y_start + tilesBuffer.height - 1
 
-        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
         val for_x_end = for_x_start + tilesBuffer.width - 1
 
         // loop
@@ -657,11 +657,11 @@ internal object BlocksDrawer {
     var tilesInVertical = -1; private set
 
     fun resize(screenW: Int, screenH: Int) {
-        tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilInt() + 1
-        tilesInVertical = (App.scr.hf / TILE_SIZE).ceilInt() + 1
+        tilesInHorizontal = (App.scr.wf / TILE_SIZE).ceilToInt() + 1
+        tilesInVertical = (App.scr.hf / TILE_SIZE).ceilToInt() + 1
 
-        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilInt() + 1
-        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilInt() + 1
+        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilToInt() + 1
+        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilToInt() + 1
 
         // only update if it's really necessary
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {

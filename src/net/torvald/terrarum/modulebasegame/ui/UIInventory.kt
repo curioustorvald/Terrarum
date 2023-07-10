@@ -270,7 +270,7 @@ package net.torvald.terrarum.modulebasegame.ui
                     if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
                         1f
                     else // make sure 1px is always be seen
-                        minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
+                        min(weightBarWidth, max(1f, weightBarWidth * encumbrancePerc)),
                     controlHelpHeight - 5f
             )
         }
@@ -347,7 +347,7 @@ package net.torvald.terrarum.modulebasegame.ui
             }
 
 
-            itemPageCount = maxOf(1, 1 + (inventorySortList.size.minus(1) / items.size))
+            itemPageCount = max(1, 1 + (inventorySortList.size.minus(1) / items.size))
         }
     }
 

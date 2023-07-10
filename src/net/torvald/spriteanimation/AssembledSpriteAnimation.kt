@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Second
-import net.torvald.terrarum.floor
+import net.torvald.terrarum.floorToFloat
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
@@ -122,8 +122,8 @@ class AssembledSpriteAnimation(
                             val drawPos = adp.origin + bodypartPos // imgCentre for held items are (0,0)
                             val w = image.regionWidth * scale
                             val h = image.regionHeight * scale
-                            val fposX = posX.floor() + drawPos.x * scale
-                            val fposY = posY.floor() + drawPos.y * scale - h
+                            val fposX = posX.floorToFloat() + drawPos.x * scale
+                            val fposY = posY.floorToFloat() + drawPos.y * scale - h
 
                             // draw
                             if (flipHorizontal && flipVertical)
@@ -146,8 +146,8 @@ class AssembledSpriteAnimation(
                         val drawPos = adp.origin + bodypartPos - imgCentre
                         val w = image.regionWidth * scale
                         val h = image.regionHeight * scale
-                        val fposX = posX.floor() + drawPos.x * scale
-                        val fposY = posY.floor() + drawPos.y * scale
+                        val fposX = posX.floorToFloat() + drawPos.x * scale
+                        val fposY = posY.floorToFloat() + drawPos.y * scale
 
                         if (flipHorizontal && flipVertical)
                             batch.draw(image, fposX + txFlp, fposY + tyFlp, -w, -h)

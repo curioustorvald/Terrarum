@@ -17,6 +17,7 @@ import net.torvald.terrarum.savegame.ByteArray64
 import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.utils.ZipCodedStr
 import org.dyn4j.geometry.Vector2
+import kotlin.math.min
 
 typealias ItemID = String
 
@@ -388,7 +389,7 @@ fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Long): Long {
     val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
     val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
     val actorPos = actor.centrePosVector
-    val dist = minOf(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2), actorPos.distanceSquared(mousePos3))
+    val dist = min(min(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2)), actorPos.distanceSquared(mousePos3))
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale // perform some error checking here
     if (dist <= distMax.sqr()) return action() else return -1
 }
@@ -409,13 +410,13 @@ fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMu
     val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
     val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
     val actorPos = actor.centrePosVector
-    val dist = minOf(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2), actorPos.distanceSquared(mousePos3))
+    val dist = min(min(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2)), actorPos.distanceSquared(mousePos3))
 
     val reachBonus = (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * reachBonus // perform some error checking here
     val toolDistMax = (TILE_SIZED * reachMultiplierInTiles(item?.material?.toolReach ?: Int.MAX_VALUE)) * reachBonus
 
-    if (dist <= minOf(toolDistMax, distMax).sqr()) return action() else return false
+    if (dist <= min(toolDistMax, distMax).sqr()) return action() else return false
 }
 //fun IntRange.pickRandom() = HQRNG().nextInt(this.last - this.first + 1) + this.first // count() on 200 million entries? Se on vitun hyvää idea
 //fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]

@@ -14,6 +14,7 @@ import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.utils.Clipboard
 import net.torvald.terrarumsansbitmap.gdx.CodepointSequence
 import net.torvald.unicode.toJavaString
+import kotlin.math.min
 import kotlin.streams.toList
 
 data class InputLenCap(val count: Int, val unit: CharLenUnit) {
@@ -194,7 +195,7 @@ class UIItemTextLineInput(
     private fun moveCursorBack(delta: Int) {
         cursorDrawX -= delta
         if (cursorDrawX < 0) {
-            val stride = -cursorDrawX + minOf(256, fbo.width * 40 / 100) // + lookbehind term
+            val stride = -cursorDrawX + min(256, fbo.width * 40 / 100) // + lookbehind term
             cursorDrawX += stride
             cursorDrawScroll -= stride
         }
@@ -610,7 +611,7 @@ class UIItemTextLineInput(
 
             val textWidths = localCandidates.map { App.fontGame.getWidth(CodepointSequence(it)) }
             val candidatesMax = ime.config.candidates.toInt()
-            val candidatesCount = minOf(candidatesMax, localCandidates.size)
+            val candidatesCount = min(candidatesMax, localCandidates.size)
             val isOnecolumn = (candidatesCount <= 3)
             val halfcount = if (isOnecolumn) candidatesCount else FastMath.ceil(candidatesCount / 2f)
             val candidateWinH = halfcount * 20 // using hard-coded 20 instead of the actual font height of 24

@@ -70,14 +70,14 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
         App.batch.inUse { val it = it as FlippingSpriteBatch
             it.color = Color.WHITE
-            val previewX = (drawWidth - previewWidth).div(2f).round()
-            val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).round()
+            val previewX = (drawWidth - previewWidth).div(2f).roundToFloat()
+            val previewY = (App.scr.height - previewHeight.times(1.5f)).div(2f).roundToFloat()
             Toolkit.drawBoxBorder(it, previewX.toInt()-1, previewY.toInt()-1, previewWidth+2, previewHeight+2)
             it.drawFlipped(previewTexture, previewX, previewY)
             val text = messages.getHeadElem() ?: ""
             App.fontGame.draw(it,
                     text,
-                    (drawWidth - App.fontGame.getWidth(text)).div(2f).round(),
+                    (drawWidth - App.fontGame.getWidth(text)).div(2f).roundToFloat(),
                     previewY + previewHeight + 98 - App.fontGame.lineHeight
             )
         }

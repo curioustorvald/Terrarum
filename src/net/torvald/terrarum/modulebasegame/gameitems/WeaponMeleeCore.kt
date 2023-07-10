@@ -5,6 +5,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import kotlin.math.max
 import kotlin.math.pow
 
 /**
@@ -21,7 +22,7 @@ object WeaponMeleeCore {
     private fun getAttackMomentum(weapon: WeaponMeleeBase, actor: ActorHumanoid) =
             weapon.mass * weapon.material.density * weapon.velocityMod * actor.scale.pow(SQRT2) // TODO multiply racial strength from RaceCodex
     fun getAttackPower(weapon: WeaponMeleeBase, actor: ActorHumanoid, actee: ActorHumanoid) =
-            getAttackMomentum(weapon, actor) * randomise() * maxOf(1.0, (actee.hitbox.endY - actor.hitbox.startY) / actee.hitbox.height)
+            getAttackMomentum(weapon, actor) * randomise() * max(1.0, (actee.hitbox.endY - actor.hitbox.startY) / actee.hitbox.height)
 
 }
 

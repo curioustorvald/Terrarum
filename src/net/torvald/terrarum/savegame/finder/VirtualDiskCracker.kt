@@ -15,6 +15,7 @@ import java.util.logging.Level
 import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.text.DefaultCaret
+import kotlin.math.min
 
 
 /**
@@ -619,7 +620,7 @@ EntryID: ${file.entryID}
 ParentID: ${file.parentEntryID}""" + if (file.contents is EntryFile) """
 
 Contents:
-${String(file.contents.bytes.sliceArray64(0L..minOf(PREVIEW_MAX_BYTES, file.contents.bytes.size) - 1).toByteArray(), sysCharset)}""" else ""
+${String(file.contents.bytes.sliceArray64(0L..min(PREVIEW_MAX_BYTES, file.contents.bytes.size) - 1).toByteArray(), sysCharset)}""" else ""
     }
     private fun setWindowTitleWithName(name: String) {
         this.title = "$appName - $name"

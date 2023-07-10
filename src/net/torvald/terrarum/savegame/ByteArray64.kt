@@ -5,6 +5,8 @@ import java.io.*
 import java.nio.channels.ClosedChannelException
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
+import kotlin.math.max
+import kotlin.math.min
 
 
 /**
@@ -65,7 +67,7 @@ class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
 
         try {
             __data[index.toBankNumber()][index.toBankOffset()] = value
-            size = maxOf(size, index + 1)
+            size = max(size, index + 1)
         }
         catch (e: IndexOutOfBoundsException) {
             val msg = "index: $index -> bank ${index.toBankNumber()} offset ${index.toBankOffset()}\n" +
@@ -115,7 +117,7 @@ class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
         // 3. Copy over the remaining bytes
 
         // 1.
-        var actualBytesToCopy = minOf(remainingBytesToCopy, remainingInHeadBank) // it is possible that size of the bytes is smaller than the remainingInHeadBank
+        var actualBytesToCopy = min(remainingBytesToCopy, remainingInHeadBank) // it is possible that size of the bytes is smaller than the remainingInHeadBank
         System.arraycopy(bytes, srcCursor, __data[currentBankNumber], bankOffset, actualBytesToCopy)
         remainingBytesToCopy -= actualBytesToCopy
         srcCursor += actualBytesToCopy
@@ -124,7 +126,7 @@ class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
         // 2. and 3.
         while (remainingBytesToCopy > 0) {
             currentBankNumber += 1
-            actualBytesToCopy = minOf(remainingBytesToCopy, BANK_SIZE) // it is possible that size of the bytes is smaller than the remainingInHeadBank
+            actualBytesToCopy = min(remainingBytesToCopy, BANK_SIZE) // it is possible that size of the bytes is smaller than the remainingInHeadBank
             System.arraycopy(bytes, srcCursor, __data[currentBankNumber], 0, actualBytesToCopy)
             remainingBytesToCopy -= actualBytesToCopy
             srcCursor += actualBytesToCopy
@@ -535,7 +537,7 @@ open class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader
                         surrogateLeftover = ' '
                     }
                     else {
-                        val bbuf = (0 until minOf(4L, remaining)).map { ba[readCursor + it] }
+                        val bbuf = (0 until min(4L, remaining)).map { ba[readCursor + it] }
                         val charLen = utf8GetCharLen(bbuf[0])
                         val codePoint = utf8decode(bbuf.subList(0, charLen))
 
@@ -573,7 +575,7 @@ open class ByteArray64Reader(val ba: ByteArray64, val charset: Charset) : Reader
                 }
             }
             Charset.forName("CP437") -> {
-                for (i in 0 until minOf(len.toLong(), remaining)) {
+                for (i in 0 until min(len.toLong(), remaining)) {
                     cbuf[(off + i).toInt()] = ba[readCursor].toChar()
                     readCursor += 1
                     readCount += 1

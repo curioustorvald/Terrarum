@@ -25,6 +25,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.shake
 import net.torvald.terrarum.worlddrawer.toRGBA
 import java.util.concurrent.Future
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -71,7 +72,7 @@ class WorldgenNoiseSandbox : ApplicationAdapter() {
         testTex.blending = Pixmap.Blending.None
         tempTex = Texture(1, 1, Pixmap.Format.RGBA8888)
 
-        genSlices = maxOf(threadExecutor.threadCount, testTex.width / 8)
+        genSlices = max(threadExecutor.threadCount, testTex.width / 8)
 
         println("Init done")
     }
@@ -342,7 +343,7 @@ internal object AccidentalCave {
     fun draw(x: Int, y: Int, noiseValue: List<Double>, outTex: Pixmap) {
         // simple one-source draw
         /*val c = noiseValue[0].toFloat()
-        val selector = c.minus(0.0001).floorInt() fmod notationColours.size
+        val selector = c.minus(0.0001).floorToInt() fmod notationColours.size
         val selecteeColour = Color(c - selector, c - selector, c - selector, 1f)
         if (c < 0) {
             outTex.setColor(-c, 0f, 0f, 1f)

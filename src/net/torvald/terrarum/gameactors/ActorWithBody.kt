@@ -24,6 +24,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -442,7 +443,7 @@ open class ActorWithBody : Actor {
     @Transient val feetPosPoint: Point2d = Point2d(0.0,0.0)
         //get() = Point2d(hitbox.centeredX, hitbox.endY)
     @Transient val feetPosTile: Point2i = Point2i(0,0)
-        //get() = Point2i(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
+        //get() = Point2i(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
 
     override fun run() = update(App.UPDATE_RATE)
 
@@ -474,23 +475,23 @@ open class ActorWithBody : Actor {
         hitbox.reassign(newHitbox)
 
         hIntTilewiseHitbox.setFromTwoPoints(
-            hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
-            hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
-            hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
-            hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5
+            hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+            hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+            hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+            hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5
         )
         intTilewiseHitbox.setFromTwoPoints(
-            hitbox.startX.div(TILE_SIZE).floor(),
-            hitbox.startY.div(TILE_SIZE).floor(),
-            hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
-            hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor()
+            hitbox.startX.div(TILE_SIZE).floorToDouble(),
+            hitbox.startY.div(TILE_SIZE).floorToDouble(),
+            hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
+            hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble()
         )
 
         centrePosVector.set(hitbox.centeredX, hitbox.centeredY)
         centrePosPoint.set(hitbox.centeredX, hitbox.centeredY)
         feetPosVector.set(hitbox.centeredX, hitbox.endY)
         feetPosPoint.set(hitbox.centeredX, hitbox.endY)
-        feetPosTile.set(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
+        feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
     }
 
     override fun update(delta: Float) {
@@ -618,23 +619,23 @@ open class ActorWithBody : Actor {
             }
 
             hIntTilewiseHitbox.setFromTwoPoints(
-                    hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
-                    hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
-                    hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5,
-                    hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor() + 0.5
+                    hitbox.startX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+                    hitbox.startY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+                    hitbox.endX.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5,
+                    hitbox.endY.plus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble() + 0.5
             )
             intTilewiseHitbox.setFromTwoPoints(
-                    hitbox.startX.div(TILE_SIZE).floor(),
-                    hitbox.startY.div(TILE_SIZE).floor(),
-                    hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
-                    hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor()
+                    hitbox.startX.div(TILE_SIZE).floorToDouble(),
+                    hitbox.startY.div(TILE_SIZE).floorToDouble(),
+                    hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
+                    hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble()
             )
 
             centrePosVector.set(hitbox.centeredX, hitbox.centeredY)
             centrePosPoint.set(hitbox.centeredX, hitbox.centeredY)
             feetPosVector.set(hitbox.centeredX, hitbox.endY)
             feetPosPoint.set(hitbox.centeredX, hitbox.endY)
-            feetPosTile.set(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
+            feetPosTile.set(hIntTilewiseHitbox.centeredX.floorToInt(), hIntTilewiseHitbox.endY.floorToInt())
 
 
             if (mouseUp && this.tooltipText != null) INGAME.setTooltipMessage(this.tooltipText)
@@ -746,23 +747,23 @@ open class ActorWithBody : Actor {
             fun BlockAddress.isFeetTile(hitbox: Hitbox): Boolean {
                 val (x, y) = LandUtil.resolveBlockAddr(world!!, this)
                 val newTilewiseHitbox = Hitbox.fromTwoPoints(
-                        hitbox.startX.div(TILE_SIZE).floor(),
-                        hitbox.startY.div(TILE_SIZE).floor(),
-                        hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
-                        hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+                        hitbox.startX.div(TILE_SIZE).floorToDouble(),
+                        hitbox.startY.div(TILE_SIZE).floorToDouble(),
+                        hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
+                        hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
                         true
                 )
 
                 // offset 1 pixel to the down so that friction would work
                 val yMatch = if (gravitation.y >= 0.0)
-                    hitbox.endY.plus(A_PIXEL).div(TILE_SIZE).floorInt()
+                    hitbox.endY.plus(A_PIXEL).div(TILE_SIZE).floorToInt()
                 else
-                    hitbox.startY.minus(A_PIXEL).div(TILE_SIZE).floorInt()
+                    hitbox.startY.minus(A_PIXEL).div(TILE_SIZE).floorToInt()
                 return y == yMatch && // copied from forEachFeetTileNum
                        (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
             }
 
-            fun Double.modTile() = this.div(TILE_SIZE).floorInt().times(TILE_SIZE)
+            fun Double.modTile() = this.div(TILE_SIZE).floorToInt().times(TILE_SIZE)
             fun Double.modTileDelta() = this - this.modTile()
 
 
@@ -776,7 +777,7 @@ open class ActorWithBody : Actor {
             // the job of the ccd is that the "next hitbox" would not dig into the terrain greater than the tile size,
             // in which the modTileDelta returns a wrong value
             val vectorSum = (externalV + controllerV)
-            val ccdSteps = (vectorSum.magnitude / TILE_SIZE).floorInt().coerceIn(2, 16) // adaptive
+            val ccdSteps = (vectorSum.magnitude / TILE_SIZE).floorToInt().coerceIn(2, 16) // adaptive
 
 
 
@@ -906,15 +907,15 @@ open class ActorWithBody : Actor {
 
                     // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                     val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
-                        newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE - PHYS_EPSILON_DIST
+                        newHitbox.endX.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
                     else
-                        newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
+                        newHitbox.startX.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
 
                     // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                     val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
-                        newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE - PHYS_EPSILON_DIST
+                        newHitbox.endY.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
                     else
-                        newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
+                        newHitbox.startY.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
 
                     val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
                         newHitbox.endX
@@ -1136,10 +1137,10 @@ open class ActorWithBody : Actor {
         val y2 = hitbox.endY - A_PIXEL
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
 
-        val txStart = x1.plus(HALF_PIXEL).floorInt()
-        val txEnd =   x2.plus(HALF_PIXEL).floorInt()
-        val tyStart = y1.plus(HALF_PIXEL).floorInt()
-        val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
+        val txStart = x1.plus(HALF_PIXEL).floorToInt()
+        val txEnd =   x2.plus(HALF_PIXEL).floorToInt()
+        val tyStart = y1.plus(HALF_PIXEL).floorToInt()
+        val tyEnd =   y2.plus(HALF_PIXEL).floorToInt()
 
         return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, feet).first > 0
     }
@@ -1203,10 +1204,10 @@ open class ActorWithBody : Actor {
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(HALF_PIXEL).floorInt()
-        val txEnd =   x2.plus(HALF_PIXEL).floorInt()
-        val tyStart = y1.plus(HALF_PIXEL).floorInt()
-        val tyEnd =   y2.plus(HALF_PIXEL).floorInt()
+        val txStart = x1.plus(HALF_PIXEL).floorToInt()
+        val txEnd =   x2.plus(HALF_PIXEL).floorToInt()
+        val tyStart = y1.plus(HALF_PIXEL).floorToInt()
+        val tyEnd =   y2.plus(HALF_PIXEL).floorToInt()
 
         return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first == 2
     }
@@ -1258,27 +1259,27 @@ open class ActorWithBody : Actor {
             y2 = hitbox.endY - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
-            return maxOf(maxOf(isWalledStairs(hitbox, COLLIDING_LEFT).first,
+            return max(max(isWalledStairs(hitbox, COLLIDING_LEFT).first,
                     isWalledStairs(hitbox, COLLIDING_RIGHT).first),
-                    maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
+                    max(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
                             isWalledStairs(hitbox, COLLIDING_TOP).first)) to 0
 
         }
         else if (option == COLLIDING_LR) {
             val v1 = isWalledStairs(hitbox, COLLIDING_LEFT)
             val v2 = isWalledStairs(hitbox, COLLIDING_RIGHT)
-            return maxOf(v1.first, v2.first) to maxOf(v2.first, v2.second)
+            return max(v1.first, v2.first) to max(v2.first, v2.second)
         }
         else if (option == COLLIDING_UD) {
-            return maxOf(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
+            return max(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
                     isWalledStairs(hitbox, COLLIDING_TOP).first) to 0
         }
         else throw IllegalArgumentException("$option")
 
-        val pxStart = x1.plus(0.5f).floorInt()
-        val pxEnd =   x2.plus(0.5f).floorInt()
-        val pyStart = y1.plus(0.5f).floorInt()
-        val pyEnd =   y2.plus(0.5f).floorInt()
+        val pxStart = x1.plus(0.5f).floorToInt()
+        val pxEnd =   x2.plus(0.5f).floorToInt()
+        val pyStart = y1.plus(0.5f).floorToInt()
+        val pyEnd =   y2.plus(0.5f).floorToInt()
 
         return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, gravitation.y >= 0.0 && option == COLLIDING_BOTTOM || gravitation.y < 0.0 && option == COLLIDING_TOP)
     }
@@ -1890,10 +1891,10 @@ open class ActorWithBody : Actor {
 
 
         val newTilewiseHitbox = Hitbox.fromTwoPoints(
-                hitbox.startX.div(TILE_SIZE).floor(),
-                hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
-                hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floor(),
+                hitbox.startX.div(TILE_SIZE).floorToDouble(),
+                hitbox.startY.div(TILE_SIZE).floorToDouble(),
+                hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
+                hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
                 true
         ) // NOT the same as intTilewiseHitbox !!
 
@@ -1914,7 +1915,7 @@ open class ActorWithBody : Actor {
         val tiles = ArrayList<ItemID?>()
 
         // offset 1 pixel to the down so that friction would work
-        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()
+        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
 
         for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
             tiles.add(world!!.getTileFromTerrain(x, y))
@@ -1930,7 +1931,7 @@ open class ActorWithBody : Actor {
         val tileProps = ArrayList<BlockProp?>()
 
         // offset 1 pixel to the down so that friction would work
-        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()
+        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
 
         for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
             tileProps.add(BlockCodex[world!!.getTileFromTerrain(x, y)])

@@ -75,7 +75,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val ww = TILE_SIZEF * demoWorld.width
         val x = px % ww
 
-        val indexThis = ((x / ww * cameraNodes.size).floorInt())
+        val indexThis = ((x / ww * cameraNodes.size).floorToInt())
         val xwstart: Double = indexThis.toDouble() / cameraNodes.size * ww
         val xwend: Double = ((indexThis + 1).toDouble() / cameraNodes.size) * ww
         val xw: Double = xwend - xwstart
@@ -182,7 +182,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // construct camera nodes
         val nodeCount = demoWorld.width / cameraNodeWidth
         cameraNodes = kotlin.FloatArray(nodeCount) {
-            val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
+            val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorToInt()
             var travelDownCounter = 0
             while (travelDownCounter < demoWorld.height &&
                    !BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid

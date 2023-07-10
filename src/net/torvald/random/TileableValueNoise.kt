@@ -1,7 +1,7 @@
 package net.torvald.random
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.fmod
 import java.util.*
 
@@ -45,9 +45,9 @@ class TileableValueNoise(
             try {
                 for (x in 0..width) {
                     val thisSampleStart: Int = // 0-256 -> 0-4 -> 0-256(qnt)
-                            (x / width.toFloat() * samples).floorInt() * (width / samples)
+                            (x / width.toFloat() * samples).floorToInt() * (width / samples)
                     val nextSampleStart: Int =
-                            (x / width.toFloat() * samples).floorInt().plus(1) * (width / samples)
+                            (x / width.toFloat() * samples).floorToInt().plus(1) * (width / samples)
                     val stepWithinWindow: Int = x % (nextSampleStart - thisSampleStart)
                     val windowScale: Float = stepWithinWindow.toFloat() / (width / samples)
 

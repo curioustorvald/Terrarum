@@ -81,7 +81,7 @@ fun Color.toXYZ(): CIEXYZ = RGB(this).toXYZ()
         }
         val step = value.clampOne() * 255f // 0.0 .. 255.0
         val intStep = step.toInt() // 0 .. 255
-        val NeXTSTEP = minOf(intStep + 1, 255) // 1 .. 255
+        val NeXTSTEP = min(intStep + 1, 255) // 1 .. 255
 
         out[i] = interpolateLinear(step - intStep, rgbLinLUT[intStep], rgbLinLUT[NeXTSTEP])
     }
@@ -123,7 +123,7 @@ fun RGB.linearise(): RGB {
         }
         val step = value.clampOne() * 255f // 0.0 .. 255.0
         val intStep = step.toInt() // 0 .. 255
-        val NeXTSTEP = minOf(intStep + 1, 255) // 1 .. 255
+        val NeXTSTEP = min(intStep + 1, 255) // 1 .. 255
 
         out[i] = interpolateLinear(step - intStep, rgbUnLinLUT[intStep], rgbUnLinLUT[NeXTSTEP])
     }

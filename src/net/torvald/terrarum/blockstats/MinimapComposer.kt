@@ -19,11 +19,12 @@ import net.torvald.terrarum.toInt
 import java.util.concurrent.Callable
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 object MinimapComposer : Disposable {
 
-    private val threadExecutor = ThreadExecutor(maxOf(1, App.THREAD_COUNT.times(2).div(3)))
+    private val threadExecutor = ThreadExecutor(max(1, App.THREAD_COUNT.times(2).div(3)))
 
     const val SQUARE_SIZE = 13 // preferably in odd number
 

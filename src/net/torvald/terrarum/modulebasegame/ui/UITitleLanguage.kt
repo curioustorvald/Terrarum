@@ -10,6 +10,7 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import kotlin.math.ceil
+import kotlin.math.max
 
 class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
@@ -26,7 +27,7 @@ class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
     private val localeSecondHalf = localeList.subList(ceil(localeList.size / 2f).toInt(), localeList.size)
 
     override var width = 480
-    override var height = maxOf(localeFirstHalf.size, localeSecondHalf.size) * textButtonLineHeight
+    override var height = max(localeFirstHalf.size, localeSecondHalf.size) * textButtonLineHeight
 
 
     private val textArea1 = UIItemTextButtonList(this,

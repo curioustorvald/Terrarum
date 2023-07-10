@@ -476,7 +476,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     private fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
-        camera.position.set((-newX + App.scr.halfw).round(), (-newY + App.scr.halfh).round(), 0f)
+        camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

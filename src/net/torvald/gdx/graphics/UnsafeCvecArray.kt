@@ -104,10 +104,10 @@ internal class UnsafeCvecArray(val width: Int, val height: Int) {
     // operators
     fun max(x: Int, y: Int, other: Cvec) {
         val a = toAddr(x, y)
-        array.setFloat(a + 0, maxOf(array.getFloat(a + 0), other.r))
-        array.setFloat(a + 1, maxOf(array.getFloat(a + 1), other.g))
-        array.setFloat(a + 2, maxOf(array.getFloat(a + 2), other.b))
-        array.setFloat(a + 3, maxOf(array.getFloat(a + 3), other.a))
+        array.setFloat(a + 0, kotlin.math.max(array.getFloat(a + 0), other.r))
+        array.setFloat(a + 1, kotlin.math.max(array.getFloat(a + 1), other.g))
+        array.setFloat(a + 2, kotlin.math.max(array.getFloat(a + 2), other.b))
+        array.setFloat(a + 3, kotlin.math.max(array.getFloat(a + 3), other.a))
     }
     fun mul(x: Int, y: Int, scalar: Float) {
         val a = toAddr(x, y)
@@ -202,10 +202,10 @@ internal class TestCvecArr(val width: Int, val height: Int) {
 
     // operators
     inline fun max(x: Int, y: Int, other: Cvec) {
-        setR(x, y, maxOf(getR(x, y), other.r))
-        setG(x, y, maxOf(getG(x, y), other.g))
-        setB(x, y, maxOf(getB(x, y), other.b))
-        setA(x, y, maxOf(getA(x, y), other.a))
+        setR(x, y, kotlin.math.max(getR(x, y), other.r))
+        setG(x, y, kotlin.math.max(getG(x, y), other.g))
+        setB(x, y, kotlin.math.max(getB(x, y), other.b))
+        setA(x, y, kotlin.math.max(getA(x, y), other.a))
     }
     inline fun mul(x: Int, y: Int, scalar: Float) {
         setR(x, y, getR(x, y) * scalar)

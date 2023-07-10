@@ -71,7 +71,7 @@ class UIVitalMetre(
             g.lineWidth = 2f
 
 
-            val ratio = minOf(1f, vitalGetterVal()!! / vitalGetterMax()!!)
+            val ratio = min(1f, vitalGetterVal()!! / vitalGetterMax()!!)
 
             // background
             g.color = backColor

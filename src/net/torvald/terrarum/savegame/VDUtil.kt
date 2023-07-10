@@ -10,6 +10,7 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import kotlin.collections.HashMap
 import kotlin.experimental.and
+import kotlin.math.min
 
 /**
  * Temporarily disabling on-disk compression; it somehow does not work, compress the files by yourself!
@@ -667,7 +668,7 @@ fun magicMismatch(magic: ByteArray, array: ByteArray): Boolean {
 fun String.toEntryName(length: Int, charset: Charset): ByteArray {
     val buf = ByteArray(length)
     val stringByteArray = this.toByteArray(charset)
-    System.arraycopy(stringByteArray, 0, buf, 0, minOf(length, stringByteArray.size))
+    System.arraycopy(stringByteArray, 0, buf, 0, min(length, stringByteArray.size))
     return buf
 }
 fun ByteArray.toCanonicalString(charset: Charset): String {

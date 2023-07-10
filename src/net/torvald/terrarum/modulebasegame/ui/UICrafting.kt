@@ -21,6 +21,8 @@ import net.torvald.terrarum.ui.UIItemSpinner
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.unicode.getKeycapPC
 import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This UI has inventory, but it's just there to display all craftable items and should not be serialised.
@@ -498,7 +500,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                 if (full.actor.inventory.capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                     1f
                 else // make sure 1px is always be seen
-                    minOf(UIInventoryCells.weightBarWidth, maxOf(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
+                    min(UIInventoryCells.weightBarWidth, max(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
                 UIInventoryFull.controlHelpHeight - 6f
         )
         // debug text

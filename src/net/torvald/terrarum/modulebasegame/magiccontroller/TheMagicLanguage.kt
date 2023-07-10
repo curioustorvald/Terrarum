@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.magiccontroller
 
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
+import kotlin.math.min
 
 /**
  * "Data Type" describing magical force
@@ -33,13 +34,13 @@ class TheMagicLanguage(vm: TheMagicMachine) {
             if (power >= 0) {
                 // pour out positive power without inversion; result is positive power
                 if (value >= 0) {
-                    val value = minOf(power, value)
+                    val value = min(power, value)
                     other.pourIn(value)
                     power -= value
                 }
                 // pour out positive power with inversion; result is negative power
                 else {
-                    val value = minOf(-power, value)
+                    val value = min(-power, value)
                     other.pourIn(value)
                     power += value
                 }
@@ -47,12 +48,12 @@ class TheMagicLanguage(vm: TheMagicMachine) {
             else {
                 // pour out negative power without inversion; result is negative power
                 if (value < 0) {
-                    val value = minOf(power, value)
+                    val value = min(power, value)
                     other.pourIn(-value)
                 }
                 // pour out negative power with inversion; result is positive power
                 else {
-                    val value = minOf(-power, value)
+                    val value = min(-power, value)
                     other.pourIn(-value)
                 }
             }

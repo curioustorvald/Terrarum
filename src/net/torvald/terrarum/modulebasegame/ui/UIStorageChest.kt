@@ -12,6 +12,8 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.getWidth
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.unicode.getKeycapPC
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Created by minjaesong on 2019-07-08.
@@ -219,7 +221,7 @@ internal class UIStorageChest : UICanvas(
             if (getPlayerInventory().capacityMode == FixtureInventory.CAPACITY_MODE_NO_ENCUMBER)
                 1f
             else // make sure 1px is always be seen
-                minOf(UIInventoryCells.weightBarWidth, maxOf(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
+                min(UIInventoryCells.weightBarWidth, max(1f, UIInventoryCells.weightBarWidth * encumbrancePerc)),
             UIInventoryFull.controlHelpHeight - 6f
         )
 

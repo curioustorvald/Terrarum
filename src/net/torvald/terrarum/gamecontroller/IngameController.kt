@@ -12,7 +12,7 @@ import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
-import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameworld.fmod
@@ -42,10 +42,10 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         get() = WorldCamera.y + Gdx.input.y / (terrarumIngame.screenZoom)
     /** currently pointing tile coordinate */
     val mouseTileX: Int
-        get() = (mouseX / TILE_SIZE).floorInt()
+        get() = (mouseX / TILE_SIZE).floorToInt()
     /** currently pointing tile coordinate */
     val mouseTileY: Int
-        get() = (mouseY / TILE_SIZE).floorInt()
+        get() = (mouseY / TILE_SIZE).floorToInt()
 
     init {
         try {

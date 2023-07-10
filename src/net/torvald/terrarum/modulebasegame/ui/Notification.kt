@@ -8,6 +8,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.blendNormalStraightAlpha
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import kotlin.math.max
 
 /**
  * Created by minjaesong on 2016-01-23.
@@ -56,7 +57,7 @@ class Notification : UICanvas() {
             App.fontGame.getWidth(message[0])
         else
             message.map { App.fontGame.getWidth(it) }.sorted().last()
-        val displayedTextWidth = maxOf(240, realTextWidth)
+        val displayedTextWidth = max(240, realTextWidth)
 
         // force the UI to the centre of the screen
         this.posX = (App.scr.width - displayedTextWidth) / 2

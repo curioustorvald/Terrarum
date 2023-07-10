@@ -545,7 +545,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
             if (hasPlatformOnTheFeet) {
                 // equation copied verbatim from the ActorWthBody.forEachFeetTile
-                val y = hitbox.endY.plus(1.0).div(TerrarumAppConfiguration.TILE_SIZE).floorInt()
+                val y = hitbox.endY.plus(1.0).div(TerrarumAppConfiguration.TILE_SIZE).floorToInt()
                 var wxStart = hIntTilewiseHitbox.startX.toInt()
                 var wxEnd = wxStart
                 // scan to the left

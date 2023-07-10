@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -225,7 +225,7 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             batch.color = Toolkit.Theme.COL_MOUSE_UP
             Toolkit.drawBoxBorder(batch, xstart + 1, 1, App.scr.chatWidth - 2, App.scr.height - 2)
 
-            val overlayResTxt = "${(App.scr.chatWidth * App.scr.magn).ceilInt()}$TIMES${App.scr.windowH}"
+            val overlayResTxt = "${(App.scr.chatWidth * App.scr.magn).ceilToInt()}$TIMES${App.scr.windowH}"
 
             App.fontGame.draw(batch, overlayResTxt,
                 (xstart + (App.scr.chatWidth - App.fontGame.getWidth(overlayResTxt)) / 2).toFloat(),

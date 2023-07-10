@@ -109,8 +109,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) {
             minimapZoom = 1f
-            minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.round()?.toFloat() ?: (INGAME.world.width / 2f)
-            minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.round()?.toFloat() ?: (INGAME.world.height / 2f)
+            minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.roundToInt()?.toFloat() ?: (INGAME.world.width / 2f)
+            minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.roundToInt()?.toFloat() ?: (INGAME.world.height / 2f)
             dragStatus = 1
         }
 
@@ -185,8 +185,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
                         val worldPos = it.hitbox
                         val cw = t.regionWidth * sf
                         val ch = t.regionHeight * sf
-                        val cx = worldPos.centeredX.div(TILE_SIZEF).round().toFloat()
-                        val cy = worldPos.startY.plus(headHeight * sf).div(TILE_SIZEF).round().toFloat()
+                        val cx = worldPos.centeredX.div(TILE_SIZEF).roundToInt().toFloat()
+                        val cy = worldPos.startY.plus(headHeight * sf).div(TILE_SIZEF).roundToInt().toFloat()
                         val dx = cx - oldPanX
                         val dy = cy - oldPanY
 
@@ -255,8 +255,8 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
     override fun doClosing(delta: Float) {}
 
     override fun endOpening(delta: Float) {
-        minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.round()?.toFloat() ?: (INGAME.world.width / 2f)
-        minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.round()?.toFloat() ?: (INGAME.world.height / 2f)
+        minimapPanX = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredX?.roundToInt()?.toFloat() ?: (INGAME.world.width / 2f)
+        minimapPanY = INGAME.actorNowPlaying?.intTilewiseHitbox?.centeredY?.roundToInt()?.toFloat() ?: (INGAME.world.height / 2f)
 
         minimapRerenderInterval = 0.25f
     }
