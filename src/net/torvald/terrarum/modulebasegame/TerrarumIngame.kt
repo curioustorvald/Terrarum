@@ -28,6 +28,7 @@ import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.clut.Skybox
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore

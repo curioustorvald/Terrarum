@@ -123,12 +123,6 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
     private fun Float.scaleFun() =
             (1f - 1f / 2f.pow(this/6f)) * 0.97f
 
-    private fun Float.negativeElevationScale() =
-        minOf(
-            (1f - 1f / 2f.pow(this/6f)) * 0.97f,
-            1f - (1f - 1f / 2f.pow(this/6f)) * 0.97f
-        )
-
     private fun CIEXYZ.scaleToFit(elevation: Double): CIEXYZ {
         return if (elevation >= 0) {
             CIEXYZ(

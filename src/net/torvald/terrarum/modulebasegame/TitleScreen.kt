@@ -27,6 +27,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.clut.Skybox
 import net.torvald.terrarum.modulebasegame.ui.UILoadGovernor
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
@@ -239,6 +240,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiRemoCon)
 
         CommandDict // invoke
+        Skybox // invoke
         // TODO add console here
 
 

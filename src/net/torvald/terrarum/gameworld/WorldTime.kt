@@ -1,5 +1,9 @@
 package net.torvald.terrarum.gameworld
 
+import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
+import kotlin.math.cos
+import kotlin.math.sin
+
 
 /**
  * Please also see:
@@ -117,9 +121,22 @@ class WorldTime(initTime: Long = 0L) {
     inline val moonPhase: Double
         get() = (TIME_T.plus(1700000L) % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
 
+    val solarElevationDeg: Double
+        get() {
+            val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
+            val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
+
+            // 51.56 and 23.44 will make yearly min/max elevation to be 75deg
+            // -0.2504264: a number that makes y=min when x=0 (x=0 is midnight)
+            return 51.56 * sin(TWO_PI * (x - 0.2504264)) + d
+        }
+    val solarElevationRad: Double
+        get() = Math.toRadians(solarElevationDeg)
+
     @Transient private var realSecAcc: Double = 0.0
     @Transient private val REAL_SEC_TO_GAME_SECS = 1.0 / GAME_MIN_TO_REAL_SEC // how slow is real-life clock (second-wise) relative to the ingame one
 
+    // NOTE: ingame calendars (the fixture with GUI) should use symbols AND fullnames; the watch already uses shot daynames
     val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
             "Mondag", "Tysdag", "Midtveke" //middle-week
             , "Torsdag", "Fredag", "Laurdag", "Sundag", "Verddag" //From Norsk word 'verd'
@@ -138,19 +155,21 @@ class WorldTime(initTime: Long = 0L) {
 
     companion object {
         /** Each day is displayed as 24 hours, but in real-life clock it's 22 mins long */
-        val DAY_LENGTH = 86400 //must be the multiple of 3600
+        const val DAY_LENGTH = 86400 //must be the multiple of 3600
 
-        val HOUR_SEC: Int = 3600
-        val MINUTE_SEC: Int = 60
-        val HOUR_MIN: Int = 60
-        val GAME_MIN_TO_REAL_SEC: Double = 720.0 / 11.0
-        val HOURS_PER_DAY = DAY_LENGTH / HOUR_SEC
+        const val HOUR_SEC: Int = 3600
+        const val MINUTE_SEC: Int = 60
+        const val HOUR_MIN: Int = 60
+        const val GAME_MIN_TO_REAL_SEC: Double = 720.0 / 11.0
+        const val HOURS_PER_DAY = DAY_LENGTH / HOUR_SEC
 
-        val YEAR_DAYS: Int = 120
+        const val YEAR_DAYS: Int = 120
 
-        val MONTH_LENGTH = 30 // ingame calendar specific
+        const val MONTH_LENGTH = 30 // ingame calendar specific
 
-        val EPOCH_YEAR = 125
+        const val EPOCH_YEAR = 125
+
+        val YEAR_SECONDS = DAY_LENGTH * YEAR_DAYS
 
         /**
          * Parse a time in the format of "8h30" (hour and minute) or "39882" (second) and return a time of day, in seconds

@@ -1,6 +1,5 @@
 package net.torvald.terrarum.weather
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.jme3.math.FastMath
@@ -13,8 +12,10 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.clut.Skybox
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -105,9 +106,10 @@ internal object WeatherMixer : RNGConsumer {
             e.printStackTrace()
 
             val defaultWeather = BaseModularWeather(
-                    GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
-                    "default",
-                    ArrayList<Texture>()
+                GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
+                GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
+                "default",
+                ArrayList<Texture>()
             )
 
             currentWeather = defaultWeather
@@ -142,27 +144,28 @@ internal object WeatherMixer : RNGConsumer {
         if (!globalLightOverridden) {
             world.globalLight = WeatherMixer.globalLightNow
         }
+
     }
 
-    //private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT * 0.75f // just an arb multiplier (266.66666 -> 200)
+    private var turbidity = 2.0
+    private var gH = 2f * App.scr.height
 
-    private val skyboxPixmap = Pixmap(2, 2, Pixmap.Format.RGBA8888)
-    private var skyboxTexture = Texture(skyboxPixmap)
-
+    private val HALF_DAY = DAY_LENGTH / 2
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
     internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
-        val parallaxZeroPos = (world.height / 3f) * 0.8888f
-        val parallaxDomainSize = world.height / 4f
+        val parallaxZeroPos = (world.height / 3f)
+        val parallaxDomainSize = world.height / 6f
 
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
         val skyboxColourMap = currentWeather.skyboxGradColourMap
+        val daylightClut = currentWeather.daylightClut
 
         // calculate global light
-        val globalLight = getGradientColour(world, skyboxColourMap, 2, timeNow)
+        val globalLight = getGradientColour2(daylightClut, world.worldTime.solarElevationDeg, timeNow)
         globalLightNow.set(globalLight)
 
 
@@ -178,56 +181,30 @@ internal object WeatherMixer : RNGConsumer {
          -+ <- 0.0  =
          */
         val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
-        val parallaxSize = 1f / 3f
-        val parallaxMidpt = (parallax + 1f) / 2f
-        val parallaxTop = (parallaxMidpt - (parallaxSize / 2f)).coerceIn(0f, 1f)
-        val parallaxBottom = (parallaxMidpt + (parallaxSize / 2f)).coerceIn(0f, 1f)
+//        println(parallax) // parallax value works as intended.
 
-        //println("$parallaxZeroPos, $parallax | $parallaxTop - $parallaxMidpt - $parallaxBottom | $parallaxDomainSize")
-
-        // draw skybox to provided graphics instance
-        val colTopmost = getGradientColour(world, skyboxColourMap, 0, timeNow).toGdxColor()
-        val colBottommost = getGradientColour(world, skyboxColourMap, 1, timeNow).toGdxColor()
-        val colMid = colorMix(colTopmost, colBottommost, 0.5f)
-
-        //println(parallax) // parallax value works as intended.
-
-        val colTop = colorMix(colTopmost, colBottommost, parallaxTop)
-        val colBottom = colorMix(colTopmost, colBottommost, parallaxBottom)
-
-        // draw using shaperenderer or whatever
-
-        //Terrarum.textureWhiteSquare.bind(0)
         gdxBlendNormalStraightAlpha()
 
-        // draw to skybox texture
-        skyboxPixmap.setColor(colBottom)
-        skyboxPixmap.drawPixel(0, 0); skyboxPixmap.drawPixel(1, 0)
-        skyboxPixmap.setColor(colTop)
-        skyboxPixmap.drawPixel(0, 1); skyboxPixmap.drawPixel(1, 1)
-        skyboxTexture.dispose()
-        skyboxTexture = Texture(skyboxPixmap); skyboxTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        val deg =world.worldTime.solarElevationDeg
+        val degThis = deg.floor()
+        val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 
+        val texture1 = Skybox.get(degThis, turbidity)
+        val texture2 = Skybox.get(degNext, turbidity)
+        val lerpScale = (if (timeNow < HALF_DAY) deg - degThis else 1f - (deg - degThis)).toFloat()
 
+        val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
         batch.inUse {
             batch.shader = null
-            batch.drawFlipped(skyboxTexture, 0f, -App.scr.halfhf, App.scr.wf, App.scr.hf * 2f) // because of how the linear filter works, we extend the image by two
+            batch.color = Color.WHITE
+            batch.drawFlipped(texture1, 0f, gradY, App.scr.wf, gH)
+
+            batch.color = Color(1f, 1f, 1f, lerpScale)
+            batch.drawFlipped(texture2, 0f, gradY, App.scr.wf, gH)
+
+            batch.color = Color.WHITE
         }
 
-        // don't use shader to just fill the whole screen... frag shader will be called a million times and it's best to not burden it
-        /*
-        IngameRenderer.shaderSkyboxFill.bind()
-        IngameRenderer.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
-        IngameRenderer.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
-        IngameRenderer.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
-        IngameRenderer.shaderSkyboxFill.setUniformf("parallax", parallax.coerceIn(-1f, 1f))
-        IngameRenderer.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
-        IngameRenderer.shaderSkyboxFill.setUniformf("zoomInv", 1f / (Terrarum.ingame?.screenZoom ?: 1f))
-        AppLoader.fullscreenQuad.render(IngameRenderer.shaderSkyboxFill, GL20.GL_TRIANGLES)
-        */
-
-
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
     }
 
@@ -275,6 +252,36 @@ internal object WeatherMixer : RNGConsumer {
         return Cvec(newCol)
     }
 
+    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int): Cvec {
+        val pNowRaw = (solarAngleInDeg + 75.0) / 150.0 * colorMap.width
+
+        val pStartRaw = pNowRaw.floorInt()
+        val pNextRaw = pStartRaw + 1
+
+        val pSx: Int; val pSy: Int; val pNx: Int; val pNy: Int
+        if (timeOfDay < HALF_DAY) {
+            pSx = pStartRaw; pSy = 0
+            if (pSx == colorMap.width-1) { pNx = pSx; pNy = 1 }
+            else                         { pNx = pNextRaw; pNy = 0 }
+        }
+        else {
+            pSx = pStartRaw; pSy = 1
+            if (pSx == 0) { pNx = 0; pNy = 0 }
+            else          { pNx = pSx - 1; pNy = 1 }
+        }
+
+        val colourThis = colorMap.get(pSx, pSy)
+        val colourNext = colorMap.get(pNx, pNy)
+
+        // interpolate R, G, B and A
+        var scale = (pNowRaw - pStartRaw).toFloat()
+        if (timeOfDay >= HALF_DAY) scale = 1f - scale
+
+        val newCol = colourThis.cpy().lerp(colourNext, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+
+        return Cvec(newCol)
+    }
+
     fun getWeatherList(classification: String) = weatherList[classification]!!
     fun getRandomWeather(classification: String) =
             getWeatherList(classification)[HQRNG().nextInt(getWeatherList(classification).size)]
@@ -299,10 +306,12 @@ internal object WeatherMixer : RNGConsumer {
         val JSON = JsonFetcher(path)
 
         val skyboxInJson = JSON.getString("skyboxGradColourMap")
+        val lightbox = JSON.getString("daylightClut")
         val extraImagesPath = JSON.get("extraImages").asStringArray()
 
         val skybox = GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${skyboxInJson}"))
 
+        val daylight = GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${lightbox}"))
 
 
         val extraImages = ArrayList<Texture>()
@@ -327,18 +336,14 @@ internal object WeatherMixer : RNGConsumer {
 
 
         return BaseModularWeather(
-                skyboxGradColourMap = skybox,
-                classification = classification,
-                extraImages = extraImages
+            skyboxGradColourMap = skybox,
+            daylightClut = daylight,
+            classification = classification,
+            extraImages = extraImages
         )
     }
 
     fun dispose() {
-        try {
-            skyboxTexture.dispose()
-        }
-        catch (e: Throwable) {}
 
-        skyboxPixmap.dispose()
     }
 }
