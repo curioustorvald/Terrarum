@@ -71,13 +71,15 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
         val pixmapManual = full.playerButtonSelected!!.pixmapManual
         val pixmapAuto = full.playerButtonSelected!!.pixmapAuto
 
+        // might throw "texture already disposed" error
         textureManual?.texture?.tryDispose()
         textureAuto?.texture?.tryDispose()
 
-        val manualThumb = if (pixmapManual != null) TextureRegion(Texture(pixmapManual)) else texPlaceholder
-        val autoThumb = if (pixmapAuto != null) TextureRegion(Texture(pixmapAuto)) else texPlaceholder
+        textureManual = if (pixmapManual != null) TextureRegion(Texture(pixmapManual)) else null
+        textureAuto = if (pixmapAuto != null) TextureRegion(Texture(pixmapAuto)) else null
 
-        loadManualThumbButton = UIItemImageButton(this, manualThumb,
+
+        loadManualThumbButton = UIItemImageButton(this, textureManual ?: texPlaceholder,
             initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQdrawW - imageButtonW/2,
             initialY = altSelDrawY + 120,
             width = imageButtonW,
@@ -93,7 +95,7 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
                 mode = MODE_LOAD
             }
         }
-        loadAutoThumbButton = UIItemImageButton(this, autoThumb,
+        loadAutoThumbButton = UIItemImageButton(this, textureAuto ?: texPlaceholder,
             initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQQQdrawW - imageButtonW/2,
             initialY = altSelDrawY + 120,
             width = imageButtonW,
@@ -142,37 +144,9 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun dispose() {
-        if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.dispose()
-        if (::loadManualThumbButton.isInitialized) loadManualThumbButton.dispose()
-
-        // might throw Texture already disposed
+        // might throw "texture already disposed" error
         textureManual?.texture?.tryDispose()
         textureAuto?.texture?.tryDispose()
-    }
-
-
-    private fun DiskPair.getThumbnail(): TextureRegion {
-        return this.player.requestFile(VDFileID.PLAYER_SCREENSHOT).let { file ->
-            if (file != null) {
-                val zippedTga = (file.contents as EntryFile).bytes
-                val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
-                val tgaFileContents = gzin.readAllBytes(); gzin.close()
-                val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
-                TextureRegion(Texture(pixmap)).also {
-                    App.disposables.add(it.texture)
-                    // do cropping and resizing
-                    it.setRegion(
-                        (pixmap.width - imageButtonW*2) / 2,
-                        (pixmap.height - imageButtonH*2) / 2,
-                        imageButtonW * 2,
-                        imageButtonH * 2
-                    )
-                }
-            }
-            else {
-                CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
-            }
-        }
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

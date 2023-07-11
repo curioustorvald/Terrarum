@@ -507,6 +507,7 @@ class UIItemPlayerCells(
     private var worldName: String = "$EMDASH"
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
+    private var versionString: String = "0.0.0"
 
 //    lateinit var playerUUID: UUID; private set
     lateinit var worldUUID: UUID; private set
@@ -523,6 +524,7 @@ class UIItemPlayerCells(
                 if (name == "worldCurrentlyPlaying") worldUUID = UUID.fromString(value.asString())
                 if (name == "totalPlayTime") totalPlayTime = parseDuration(value.asLong())
                 if (name == "lastPlayTime") lastPlayTime0 = value.asLong()
+                if (name == "genver") versionString = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
             }
 
             App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
@@ -649,40 +651,48 @@ class UIItemPlayerCells(
         val x = posX + offX
         val y = posY + offY
 
+        val line1 = y + 3f
+        val line2 = line1 + 30
+        val line3 = line2 + 30
+        val line4 = line3 + 30
+
         // draw box backgrounds
         batch.color = cellCol
         Toolkit.fillArea(batch, x, y, 106, height)
-        Toolkit.fillArea(batch, x + 116, y + 34, width - 116, 86)
+        Toolkit.fillArea(batch, x + 116, y, width - 116, height)
 
         // draw borders
         batch.color = highlightCol
         // avatar border
         Toolkit.drawBoxBorder(batch, x - 1, y - 1, 106 + 2, height + 2)
         // infocell border
-        Toolkit.drawBoxBorder(batch, x + 115, y + 33, width - 114, 88)
+        Toolkit.drawBoxBorder(batch, x + 115, y - 1, width - 114, height + 2)
 
         // texts
         batch.color = highlightTextCol
         val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
-        App.fontGame.draw(batch, playerName, x + 146f, y + height - 84f)
-        App.fontGame.draw(batch, worldName, x + 146f, y + height - 55f)
-        App.fontGame.draw(batch, lastPlayTime, x + 146f, y + height - 26f)
-        App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, y + height - 26f)
+        App.fontGame.draw(batch, playerName, x + 146f, line1)
+        App.fontGame.draw(batch, worldName, x + 146f, line2)
+        App.fontGame.draw(batch, lastPlayTime, x + 146f, line3)
+        App.fontGame.draw(batch, versionString, x + 146f, line4)
+        App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, line4)
         // icons
-        batch.draw(icons.get(24,0), x + 120f, y + height - 82f) // player name
-        batch.draw(icons.get(12,0), x + 119f, y + height - 53f) // world map
-        batch.draw(icons.get(13,0), x + 120f, y + height - 24f) // journal
-        batch.draw(icons.get(23,0), x + width - 4f - playTimeTextLen - 24f, y + height - 24f) // stopwatch
+        batch.draw(icons.get(24,0), x + 120f, line1 + 2f) // player name
+        batch.draw(icons.get(12,0), x + 119f, line2 + 2f) // world map
+        batch.draw(icons.get(13,0), x + 120f, line3 + 2f) // journal
+        batch.draw(icons.get(22,1), x + 119f, line4 + 2f) // version(?)
+        batch.draw(icons.get(23,0), x + width - 4f - playTimeTextLen - 24f, line4 + 2f) // stopwatch
         // autosave marker
         if (savegameStatus == 2)
-            batch.draw(icons.get(24,1), x + 459f, y + 5f)
+            batch.draw(icons.get(24,1), x + 457f, line1 + 2f)
         else if (savegameStatus == 0)
-            batch.draw(icons.get(23,1), x + 459f, y + 5f)
+            batch.draw(icons.get(23,1), x + 457f, line1 + 2f)
 
         // infocell divider
         batch.color = if (mouseUp) hruleColLit else hruleCol
-        Toolkit.fillArea(batch, x + 118, y + 62, width - 120, 1)
-        Toolkit.fillArea(batch, x + 118, y + 91, width - 120, 1)
+        Toolkit.fillArea(batch, x + 118, y + 29, width - 120, 1)
+        Toolkit.fillArea(batch, x + 118, y + 59, width - 120, 1)
+        Toolkit.fillArea(batch, x + 118, y + 89, width - 120, 1)
 
         // player avatar
         batch.color = Color.WHITE
