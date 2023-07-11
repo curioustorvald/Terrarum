@@ -16,6 +16,7 @@ import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
+import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -60,6 +61,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private val WALL = 0xD3.toChar()
     private val WIRE = 0xD4.toChar()
     private val MASS = 0xD5.toChar()
+    private val SOL = 0xD6.toChar()
+    private val TAU = 0xD7.toChar()
     private val HEIGHT = 0xC7.toChar()
     private val WIDTH = 0xCD.toChar()
 
@@ -111,6 +114,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val cvX = 0; private val cvY = 2
     private val evX = 14; private val evY = 2
     private val mvX = 28; private val mvY = 2
+    private val sol = 42;
 
     private val tileCursX = 0; private val tileCursY = 4
 
@@ -192,6 +196,14 @@ class BasicDebugInfoWindow : UICanvas() {
         App.fontSmallNumbers.draw(batch, "Y$ccG${WorldCamera.y.toString().padStart(7)}", gap + 7f*(cxyX + 3), line(cxyY+1))
 
 
+        // sun and weather
+        val soldeg = world?.worldTime?.solarElevationDeg
+        val soldegStr = (soldeg ?: 0.0).toIntAndFrac(3,2)
+        val soldegNeg = ((soldeg ?: 0.0) >= 0.0).toInt()
+        val turbidity = WeatherMixer.turbidity
+        App.fontSmallNumbers.draw(batch, "$SOL $ccG$soldegStr", gap + 7f*(sol), line(mvY))
+        App.fontSmallNumbers.draw(batch, "$TAU   $ccG$turbidity", gap + 7f*(sol), line(mvY + 1))
+
 
 
         try {
@@ -232,11 +244,12 @@ class BasicDebugInfoWindow : UICanvas() {
             )
         }
 
+
         // print time
         if (showTimers) {
             var dbgCnt = 10
             App.debugTimers.forEach { t, u ->
-                printLine(batch, dbgCnt, "$ccO$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
+                printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
                 dbgCnt++
             }
         }

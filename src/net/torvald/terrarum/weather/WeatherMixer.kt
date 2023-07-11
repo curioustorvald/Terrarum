@@ -147,7 +147,7 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
-    private var turbidity = 4.0
+    var turbidity = 4.0; private set
     private var gH = 2f * App.scr.height
 
     private val HALF_DAY = DAY_LENGTH / 2
