@@ -110,7 +110,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                             e.printStackTrace()
                         }
 
-                        Thread.sleep(18) // to alleviate the "hiccup" when the UI is being opened
+                        Thread.sleep(1) // to alleviate the "hiccup" when the UI is being opened
                     }
 
                     printdbg(this, "============== ${this.hashCode()} ============== ")

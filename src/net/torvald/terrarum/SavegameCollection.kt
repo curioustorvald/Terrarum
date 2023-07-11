@@ -132,10 +132,30 @@ fun DiskSkimmer.getTgaGz(vid: EntryID, width: Int, height: Int, shrinkage: Doubl
         }
     }
 }
+fun DiskSkimmer.getTgaGzPixmap(vid: EntryID, width: Int, height: Int, shrinkage: Double): Pixmap? {
+    return this.requestFile(vid).let { file ->
+        if (file != null) {
+            val zippedTga = (file.contents as EntryFile).bytes
+            val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
+            val tgaFileContents = gzin.readAllBytes(); gzin.close()
+            val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
+            return pixmap
+        }
+        else {
+            null
+        }
+    }
+}
 fun DiskSkimmer.getThumbnail(width: Int, height: Int, shrinkage: Double) =
     when (this.getSaveKind()) {
         1 -> this.getTgaGz(PLAYER_SCREENSHOT, width, height, shrinkage)
         2 -> this.getTgaGz(WORLD_SCREENSHOT, width, height, shrinkage)
+        else -> throw IllegalArgumentException("Unknown save kind: ${this.getSaveKind()}")
+    }
+fun DiskSkimmer.getThumbnailPixmap(width: Int, height: Int, shrinkage: Double) =
+    when (this.getSaveKind()) {
+        1 -> this.getTgaGzPixmap(PLAYER_SCREENSHOT, width, height, shrinkage)
+        2 -> this.getTgaGzPixmap(WORLD_SCREENSHOT, width, height, shrinkage)
         else -> throw IllegalArgumentException("Unknown save kind: ${this.getSaveKind()}")
     }
 

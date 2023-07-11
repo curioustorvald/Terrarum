@@ -59,12 +59,23 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
         addUIitem(mainBackButton)
     }
 
+    private var textureManual: TextureRegion? = null
+    private var textureAuto: TextureRegion? = null
+
     override fun show() {
         super.show()
 
         val loadables = full.loadables
-        val autoThumb = loadables.getAutoSave()!!.getThumbnail()
-        val manualThumb = loadables.getManualSave()!!.getThumbnail()
+        val texPlaceholder = CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
+
+        val pixmapManual = full.playerButtonSelected!!.pixmapManual
+        val pixmapAuto = full.playerButtonSelected!!.pixmapAuto
+
+        textureManual?.texture?.tryDispose()
+        textureAuto?.texture?.tryDispose()
+
+        val manualThumb = if (pixmapManual != null) TextureRegion(Texture(pixmapManual)) else texPlaceholder
+        val autoThumb = if (pixmapAuto != null) TextureRegion(Texture(pixmapAuto)) else texPlaceholder
 
         loadManualThumbButton = UIItemImageButton(this, manualThumb,
             initialX = (Toolkit.drawWidth - altSelDrawW)/2 + altSelQdrawW - imageButtonW/2,
@@ -133,6 +144,10 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
     override fun dispose() {
         if (::loadAutoThumbButton.isInitialized) loadAutoThumbButton.dispose()
         if (::loadManualThumbButton.isInitialized) loadManualThumbButton.dispose()
+
+        // might throw Texture already disposed
+        textureManual?.texture?.tryDispose()
+        textureAuto?.texture?.tryDispose()
     }
 
 

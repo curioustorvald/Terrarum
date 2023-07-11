@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
@@ -130,7 +131,9 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         full.playerButtonSelected?.forceUnhighlight = true
         full.playerButtonSelected?.let { button ->
             screencap?.texture?.tryDispose()
-            screencap = App.savegamePlayers[button.playerUUID]!!.getThumbnail(screencapW, screencapH, 2.0)
+            (button.pixmapAuto ?: button.pixmapManual)?.let {
+                screencap = TextureRegion(Texture(it))
+            }
         }
     }
 
@@ -166,6 +169,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
                 // draw thumbnails of the most recent game
                 val tex = screencap ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
+
+
                 val tx = (Toolkit.drawWidth - screencapW) / 2
                 val ty = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
 
@@ -192,6 +197,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun dispose() {
+        screencap?.texture?.tryDispose()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
