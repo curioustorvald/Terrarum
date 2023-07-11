@@ -862,27 +862,27 @@ object IngameRenderer : Disposable {
     }
 
     override fun dispose() {
-        try { blurWriteQuad.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        try { blurWriteQuad2.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        //try { blurWriteQuad4.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        blurWriteQuad.tryDispose()
+        blurWriteQuad2.tryDispose()
+        //blurWriteQuad4.tryDispose()
 
-        try { fboRGB.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        try { fboA.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        try { fboRGB_lightMixed.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        try { fboA_lightMixed.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        try { fboMixedOut.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        try { lightmapFbo.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        fboRGB.tryDispose()
+        fboA.tryDispose()
+        fboRGB_lightMixed.tryDispose()
+        fboA_lightMixed.tryDispose()
+        fboMixedOut.tryDispose()
+        lightmapFbo.tryDispose()
 
-        try { blurtex0.dispose() } catch (e: GdxRuntimeException) {}
+        blurtex0.tryDispose()
 
-        try { fboBlurHalf.dispose() } catch (e: UninitializedPropertyAccessException) {}
-        //try { fboBlurQuarter.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        fboBlurHalf.tryDispose()
+        //fboBlurQuarter.tryDispose()
 
         LightmapRenderer.dispose()
         BlocksDrawer.dispose()
         WeatherMixer.dispose()
 
-        try { batch.dispose() } catch (e: UninitializedPropertyAccessException) {}
+        batch.tryDispose()
 
 
         shaderBlur.dispose()
@@ -896,10 +896,7 @@ object IngameRenderer : Disposable {
         shaderForActors.dispose()
         shaderDemultiply.dispose()
 
-        try { fboRGBexport.dispose() }
-        catch (e: GdxRuntimeException) {}
-        catch (e: UninitializedPropertyAccessException) {}
-        catch (e: Throwable) { e.printStackTrace(System.out) }
+        fboRGBexport.tryDispose()
     }
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {

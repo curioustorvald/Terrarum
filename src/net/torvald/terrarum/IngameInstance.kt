@@ -205,13 +205,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         actorContainerInactive.forEach { it.dispose() }
         world.dispose()
 
-        disposables.forEach(Consumer {
-            try { it.dispose() }
-            catch (_: NullPointerException) { }
-            catch (_: IllegalArgumentException) { }
-            catch (_: GdxRuntimeException) { }
-            catch (_: ConcurrentModificationException) { }
-        })
+        disposables.forEach(Consumer { it.tryDispose() })
     }
 
     ////////////

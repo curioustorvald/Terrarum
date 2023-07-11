@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
-import com.badlogic.gdx.utils.JsonReader
 import com.jme3.math.FastMath
 import net.torvald.unicode.EMDASH
 import net.torvald.unicode.getKeycapConsole
@@ -458,8 +456,8 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     override fun dispose() {
-        try { shapeRenderer.dispose() } catch (e: IllegalArgumentException) {}
-        try { sliderFBO.dispose() } catch (e: IllegalArgumentException) {}
+        shapeRenderer.tryDispose()
+        sliderFBO.tryDispose()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -560,12 +558,12 @@ class UIItemPlayerCells(
     private var highlightCol: Color = defaultCol
     private var highlightTextCol: Color = defaultCol
 
-    var forceMouseDown = false
+    var forceUnhighlight = false
 
     override fun update(delta: Float) {
         super.update(delta)
-        highlightCol = if (mouseUp && !forceMouseDown) litCol else defaultCol
-        highlightTextCol = if (mouseUp && !forceMouseDown) litCol else Toolkit.Theme.COL_LIST_DEFAULT
+        highlightCol = if (mouseUp && !forceUnhighlight) litCol else defaultCol
+        highlightTextCol = if (mouseUp && !forceUnhighlight) litCol else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
     fun render(batch: SpriteBatch, camera: Camera, offX: Int, offY: Int) {

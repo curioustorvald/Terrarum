@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -138,8 +139,8 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         val lastPlayedString: String,
         val totalPlayedString: String,
         val screenshot: TextureRegion?,
-    ) {
-        fun dispose() {
+    ): Disposable {
+        override fun dispose() {
             screenshot?.texture?.dispose()
         }
     }
@@ -419,14 +420,14 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         uiItems.forEach { it.hide() }
         if (::worldCells.isInitialized) worldCells.forEach { it.hide() }
 
-        if (::worldCells.isInitialized) worldCells.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
-        worldList.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
+        if (::worldCells.isInitialized) worldCells.forEach { it.tryDispose() }
+        worldList.forEach { it.tryDispose() }
     }
 
     override fun dispose() {
         uiItems.forEach { it.dispose() }
-        if (::worldCells.isInitialized) worldCells.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
-        worldList.forEach { try { it.dispose() } catch (_: GdxRuntimeException) {} }
+        if (::worldCells.isInitialized) worldCells.forEach { it.tryDispose() }
+        worldList.forEach { it.tryDispose() }
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

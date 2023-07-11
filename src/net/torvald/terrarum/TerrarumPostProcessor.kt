@@ -63,7 +63,7 @@ object TerrarumPostProcessor : Disposable {
     }
 
     fun resize(w: Int, h: Int) {
-        try { outFBO.dispose() } catch (_: UninitializedPropertyAccessException) {}
+        if (::outFBO.isInitialized) outFBO.tryDispose()
         outFBO = FrameBuffer(Pixmap.Format.RGBA8888, w, h, false)
     }
 
@@ -71,10 +71,10 @@ object TerrarumPostProcessor : Disposable {
         batch.dispose()
         shapeRenderer.dispose()
         functionRowHelper.dispose()
-        try { lutTex.dispose() } catch (_: UninitializedPropertyAccessException) {}
         shaderPostDither.dispose()
         shaderPostNoDither.dispose()
-        outFBO.dispose()
+        if (::lutTex.isInitialized) lutTex.tryDispose()
+        if (::outFBO.isInitialized) outFBO.dispose()
     }
 
     private var deltatBenchStr = "ΔF: Gathering data"

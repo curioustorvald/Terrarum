@@ -108,7 +108,7 @@ class WorldSavingThread(
         IngameRenderer.fboRGBexport.dispose()
 
         val thumbContent = EntryFile(tgaout.toByteArray64())
-        val thumb = DiskEntry(VDFileID.THUMBNAIL, VDFileID.ROOT, creation_t, time_t, thumbContent)
+        val thumb = DiskEntry(VDFileID.WORLD_SCREENSHOT, VDFileID.ROOT, creation_t, time_t, thumbContent)
         addFile(disk, thumb)
 
 

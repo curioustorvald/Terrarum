@@ -265,6 +265,6 @@ class UIInventoryMinimap(val full: UIInventoryFull) : UICanvas() {
 
     override fun dispose() {
         minimapFBO.dispose()
-        renderTextures.forEach { try { it.dispose() } catch (e: GdxRuntimeException) {} }
+        renderTextures.forEach { it.tryDispose() }
     }
 }

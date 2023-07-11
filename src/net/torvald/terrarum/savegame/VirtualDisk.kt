@@ -10,8 +10,6 @@ import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.CRC32
-import kotlin.experimental.and
-import kotlin.experimental.or
 
 
 /*
@@ -255,7 +253,7 @@ object VDFileID {
     const val ROOT = 0L
     const val SAVEGAMEINFO = -1L
     const val PLAYER_JSON = -1L
-    const val THUMBNAIL = -2L
+    const val WORLD_SCREENSHOT = -2L
     const val SPRITEDEF = -2L
     const val SPRITEDEF_GLOW = -3L
     const val LOADORDER = -4L
@@ -267,7 +265,7 @@ object VDFileID {
 fun diskIDtoReadableFilename(id: EntryID, saveKind: Int?): String = when (id) {
     VDFileID.ROOT -> "root"
     VDFileID.SAVEGAMEINFO -> "savegameinfo.json"
-    VDFileID.THUMBNAIL, VDFileID.SPRITEDEF ->
+    VDFileID.WORLD_SCREENSHOT, VDFileID.SPRITEDEF ->
         if (saveKind == PLAYER_DATA)
             "spritedef"
         else if (saveKind == WORLD_DATA)

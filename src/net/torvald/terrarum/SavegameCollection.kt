@@ -1,11 +1,16 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
 import net.torvald.terrarum.savegame.VDFileID.ROOT
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.savegame.VDFileID.WORLD_SCREENSHOT
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
@@ -14,7 +19,9 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import java.util.zip.GZIPInputStream
 import kotlin.io.path.Path
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2023-06-24.
@@ -98,9 +105,35 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
             skimmer.setDiskName(name, Common.CHARSET)
         }
     }
+
+    private fun getThumbnail0(vid: EntryID, width: Int, height: Int, shrinkage: Double): TextureRegion? {
+        return this.loadable().requestFile(vid).let { file ->
+            if (file != null) {
+                val zippedTga = (file.contents as EntryFile).bytes
+                val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
+                val tgaFileContents = gzin.readAllBytes(); gzin.close()
+                val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
+                TextureRegion(Texture(pixmap)).also {
+                    App.disposables.add(it.texture)
+                    // do cropping and resizing
+                    it.setRegion(
+                        ((pixmap.width - width*2) / shrinkage).roundToInt(),
+                        ((pixmap.height - height*2) / shrinkage).roundToInt(),
+                        (width * shrinkage).roundToInt(),
+                        (height * shrinkage).roundToInt()
+                    )
+                }
+            }
+            else {
+                null
+            }
+        }
+    }
+    fun getPlayerThumbnail(width: Int, height: Int, shrinkage: Double) = getThumbnail0(PLAYER_SCREENSHOT, width, height, shrinkage)
+    fun getWorldThumbnail(width: Int, height: Int, shrinkage: Double) = getThumbnail0(WORLD_SCREENSHOT, width, height, shrinkage)
 }
 
-class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollection?) {
+class SavegameCollectionPair(private val player: SavegameCollection?, private val world: SavegameCollection?) {
 
     private var manualPlayer: DiskSkimmer? = null
     private var manualWorld: DiskSkimmer? = null
@@ -222,4 +255,6 @@ class SavegameCollectionPair(player: SavegameCollection?, world: SavegameCollect
     }
 }
 
-data class DiskPair(val player: DiskSkimmer, val world: DiskSkimmer)
+data class DiskPair(val player: DiskSkimmer, val world: DiskSkimmer) {
+
+}

@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.modulebasegame.ui.NullUI
+import net.torvald.terrarum.tryDispose
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -81,9 +82,9 @@ class UIItemHorizontalFadeSlide(
     }
 
     override fun dispose() {
-        uisOnLeft.forEach { try { it.dispose() } catch (e: IllegalArgumentException) {} }
-        uisOnCentre.forEach { try { it.dispose() } catch (e: IllegalArgumentException) {} }
-        uisOnRight.forEach { try { it.dispose() } catch (e: IllegalArgumentException) {} }
+        uisOnLeft.forEach { it.tryDispose() }
+        uisOnCentre.forEach { it.tryDispose() }
+        uisOnRight.forEach { it.tryDispose() }
     }
 
     override fun keyDown(keycode: Int): Boolean {

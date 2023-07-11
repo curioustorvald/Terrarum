@@ -3,10 +3,13 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
-import net.torvald.terrarum.gdxClearAndEnableBlend
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
+import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -119,12 +122,25 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     }
 
+    private var screencap: TextureRegion? = null
+    private val screencapW = SAVE_CELL_WIDTH
+    private val screencapH = SAVE_CELL_HEIGHT * 2
+
     override fun doOpening(delta: Float) {
-        full.playerButtonSelected?.forceMouseDown = true
+        full.playerButtonSelected?.forceUnhighlight = true
+        full.playerButtonSelected?.let { button ->
+            screencap?.texture?.tryDispose()
+            screencap = App.savegamePlayers[button.playerUUID]!!.getPlayerThumbnail(screencapW, screencapH, 2.0)
+        }
     }
 
     override fun doClosing(delta: Float) {
-        full.playerButtonSelected?.forceMouseDown = false
+        full.playerButtonSelected?.forceUnhighlight = false
+    }
+
+    override fun show() {
+        super.show()
+
     }
 
     override fun updateUI(delta: Float) {
@@ -141,12 +157,25 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private var loadFiredFrameCounter = 0
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        val buttonYdelta = (full.titleTopGradEnd + full.cellInterval) - full.playerButtonSelected!!.posY
+        val buttonYdelta = (full.titleTopGradEnd) - full.playerButtonSelected!!.posY
         full.playerButtonSelected!!.render(batch, camera, 0, buttonYdelta)
 
         when (mode) {
             MODE_INIT -> {
                 mainButtons.forEach { it.render(batch, camera) }
+
+                // draw thumbnails of the most recent game
+                val tex = screencap ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
+                val tx = (Toolkit.drawWidth - screencapW) / 2
+                val ty = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
+
+                batch.color = Toolkit.Theme.COL_INACTIVE
+                Toolkit.drawBoxBorder(batch, tx - 1, ty - 1, screencapW + 2, screencapH + 2)
+                batch.color = UIInventoryFull.CELL_COL
+                Toolkit.fillArea(batch, tx, ty, screencapW, screencapH)
+                batch.color = Color.WHITE
+                batch.draw(tex, tx.toFloat(), ty.toFloat(), screencapW.toFloat(), screencapH.toFloat())
+
             }
             MODE_DELETE -> {
                 Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_SAVE_WILL_BE_DELETED"], Toolkit.drawWidth, 0, full.titleTopGradEnd + full.cellInterval - 46)

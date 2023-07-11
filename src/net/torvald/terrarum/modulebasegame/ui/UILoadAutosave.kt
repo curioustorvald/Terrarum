@@ -138,8 +138,6 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
 
     private fun DiskPair.getThumbnail(): TextureRegion {
         return this.player.requestFile(VDFileID.PLAYER_SCREENSHOT).let { file ->
-            CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
-
             if (file != null) {
                 val zippedTga = (file.contents as EntryFile).bytes
                 val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))

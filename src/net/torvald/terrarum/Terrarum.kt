@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -895,4 +896,12 @@ fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
         e.printStackTrace()
         return true
     }
+}
+
+/**
+ * No lateinit!
+ */
+inline fun Disposable.tryDispose() {
+    try { this.dispose() }
+    catch (_: Throwable) {}
 }

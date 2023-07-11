@@ -105,8 +105,8 @@ class UITestPad1 : TerrarumGamescreen {
     }
 
     override fun dispose() {
-        try { colourPickerTex.dispose() } catch (e: GdxRuntimeException) {}
-        try { colourPickerPixmap.dispose() } catch (e: GdxRuntimeException) {}
+        colourPickerTex.tryDispose()
+        colourPickerPixmap.tryDispose()
     }
 
 

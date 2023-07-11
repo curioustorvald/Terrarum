@@ -244,7 +244,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
     }
 
     override fun dispose() {
-        try { sliderFBO.dispose() } catch (e: IllegalArgumentException) {}
+        sliderFBO.tryDispose()
     }
 
     override fun resize(width: Int, height: Int) {

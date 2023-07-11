@@ -19,6 +19,7 @@ import net.torvald.terrarum.spriteassembler.ADProperties
 import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.spriteassembler.AssembleFrameBase
 import net.torvald.terrarum.spriteassembler.AssembleSheetPixmap
+import net.torvald.terrarum.tryDispose
 import java.io.InputStream
 import java.util.*
 
@@ -172,7 +173,7 @@ class AssembledSpriteAnimation(
     }
 
     override fun dispose() {
-        res.values.forEach { try { it?.texture?.dispose() } catch (_: GdxRuntimeException) {} }
+        res.values.forEach { it?.texture?.tryDispose() }
     }
 
     companion object {

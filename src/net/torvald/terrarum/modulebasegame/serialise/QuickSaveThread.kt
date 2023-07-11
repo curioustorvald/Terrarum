@@ -9,8 +9,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.savegame.VDFileID.ROOT
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
-import net.torvald.terrarum.savegame.VDFileID.THUMBNAIL
-import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.savegame.VDFileID.WORLD_SCREENSHOT
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.utils.PlayerLastStatus
 import java.io.File
@@ -84,7 +83,7 @@ class QuickSingleplayerWorldSavingThread(
         IngameRenderer.fboRGBexport.dispose()
 
         val thumbContent = EntryFile(tgaout.toByteArray64())
-        val thumb = DiskEntry(THUMBNAIL, ROOT, creation_t, time_t, thumbContent)
+        val thumb = DiskEntry(WORLD_SCREENSHOT, ROOT, creation_t, time_t, thumbContent)
         addFile(disk, thumb)
 
 
