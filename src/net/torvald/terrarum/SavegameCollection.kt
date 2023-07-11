@@ -106,32 +106,38 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
         }
     }
 
-    private fun getThumbnail0(vid: EntryID, width: Int, height: Int, shrinkage: Double): TextureRegion? {
-        return this.loadable().requestFile(vid).let { file ->
-            if (file != null) {
-                val zippedTga = (file.contents as EntryFile).bytes
-                val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
-                val tgaFileContents = gzin.readAllBytes(); gzin.close()
-                val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
-                TextureRegion(Texture(pixmap)).also {
-                    App.disposables.add(it.texture)
-                    // do cropping and resizing
-                    it.setRegion(
-                        ((pixmap.width - width*2) / shrinkage).roundToInt(),
-                        ((pixmap.height - height*2) / shrinkage).roundToInt(),
-                        (width * shrinkage).roundToInt(),
-                        (height * shrinkage).roundToInt()
-                    )
-                }
-            }
-            else {
-                null
+    fun getThumbnail(width: Int, height: Int, shrinkage: Double) = this.loadable().getThumbnail(width, height, shrinkage)
+}
+
+fun DiskSkimmer.getTgaGz(vid: EntryID, width: Int, height: Int, shrinkage: Double): TextureRegion? {
+    return this.requestFile(vid).let { file ->
+        if (file != null) {
+            val zippedTga = (file.contents as EntryFile).bytes
+            val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
+            val tgaFileContents = gzin.readAllBytes(); gzin.close()
+            val pixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
+            TextureRegion(Texture(pixmap)).also {
+                App.disposables.add(it.texture)
+                // do cropping and resizing
+                it.setRegion(
+                    ((pixmap.width - width*2) / shrinkage).roundToInt(),
+                    ((pixmap.height - height*2) / shrinkage).roundToInt(),
+                    (width * shrinkage).roundToInt(),
+                    (height * shrinkage).roundToInt()
+                )
             }
         }
+        else {
+            null
+        }
     }
-    fun getPlayerThumbnail(width: Int, height: Int, shrinkage: Double) = getThumbnail0(PLAYER_SCREENSHOT, width, height, shrinkage)
-    fun getWorldThumbnail(width: Int, height: Int, shrinkage: Double) = getThumbnail0(WORLD_SCREENSHOT, width, height, shrinkage)
 }
+fun DiskSkimmer.getThumbnail(width: Int, height: Int, shrinkage: Double) =
+    when (this.getSaveKind()) {
+        1 -> this.getTgaGz(PLAYER_SCREENSHOT, width, height, shrinkage)
+        2 -> this.getTgaGz(WORLD_SCREENSHOT, width, height, shrinkage)
+        else -> throw IllegalArgumentException("Unknown save kind: ${this.getSaveKind()}")
+    }
 
 class SavegameCollectionPair(private val player: SavegameCollection?, private val world: SavegameCollection?) {
 

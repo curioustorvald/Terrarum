@@ -123,14 +123,14 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     }
 
     private var screencap: TextureRegion? = null
-    private val screencapW = SAVE_CELL_WIDTH
-    private val screencapH = SAVE_CELL_HEIGHT * 2
+    private val screencapW = SAVE_THUMBNAIL_MAIN_WIDTH
+    private val screencapH = SAVE_THUMBNAIL_MAIN_HEIGHT
 
     override fun doOpening(delta: Float) {
         full.playerButtonSelected?.forceUnhighlight = true
         full.playerButtonSelected?.let { button ->
             screencap?.texture?.tryDispose()
-            screencap = App.savegamePlayers[button.playerUUID]!!.getPlayerThumbnail(screencapW, screencapH, 2.0)
+            screencap = App.savegamePlayers[button.playerUUID]!!.getThumbnail(screencapW, screencapH, 2.0)
         }
     }
 

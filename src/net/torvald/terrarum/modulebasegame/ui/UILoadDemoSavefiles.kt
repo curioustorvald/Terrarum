@@ -45,6 +45,8 @@ import kotlin.math.roundToInt
 
 val SAVE_CELL_WIDTH = 480
 val SAVE_CELL_HEIGHT = 120
+val SAVE_THUMBNAIL_MAIN_WIDTH = 480
+val SAVE_THUMBNAIL_MAIN_HEIGHT = 320
 
 /**
  * The pinnacle of the dirty coding! This object exists only because I couldn't make
@@ -485,10 +487,11 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
 
 
 class UIItemPlayerCells(
-        parent: Advanceable,
-        initialX: Int,
-        initialY: Int,
-        val playerUUID: UUID) : UIItem(parent, initialX, initialY) {
+    parent: Advanceable,
+    initialX: Int,
+    initialY: Int,
+    val playerUUID: UUID,
+) : UIItem(parent, initialX, initialY) {
 
     override val width = SAVE_CELL_WIDTH
     override val height = SAVE_CELL_HEIGHT
@@ -528,7 +531,8 @@ class UIItemPlayerCells(
 
         }
 
-        savegameStatus = SavegameCollectionPair(App.savegamePlayers[playerUUID], App.savegameWorlds[worldUUID]).status
+        val savegamePair = SavegameCollectionPair(App.savegamePlayers[playerUUID], App.savegameWorlds[worldUUID])
+        savegameStatus = savegamePair.status
     }
 
     private fun parseDuration(seconds: Long): String {

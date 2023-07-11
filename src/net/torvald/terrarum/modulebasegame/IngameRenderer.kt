@@ -862,27 +862,27 @@ object IngameRenderer : Disposable {
     }
 
     override fun dispose() {
-        blurWriteQuad.tryDispose()
-        blurWriteQuad2.tryDispose()
-        //blurWriteQuad4.tryDispose()
+        if (::blurWriteQuad.isInitialized) blurWriteQuad.tryDispose()
+        if (::blurWriteQuad2.isInitialized) blurWriteQuad2.tryDispose()
+        //if (::blurWriteQuad4.isInitialized) blurWriteQuad4.tryDispose()
 
-        fboRGB.tryDispose()
-        fboA.tryDispose()
-        fboRGB_lightMixed.tryDispose()
-        fboA_lightMixed.tryDispose()
-        fboMixedOut.tryDispose()
-        lightmapFbo.tryDispose()
+        if (::fboRGB.isInitialized) fboRGB.tryDispose()
+        if (::fboA.isInitialized) fboA.tryDispose()
+        if (::fboRGB_lightMixed.isInitialized) fboRGB_lightMixed.tryDispose()
+        if (::fboA_lightMixed.isInitialized) fboA_lightMixed.tryDispose()
+        if (::fboMixedOut.isInitialized) fboMixedOut.tryDispose()
+        if (::lightmapFbo.isInitialized) lightmapFbo.tryDispose()
 
         blurtex0.tryDispose()
 
-        fboBlurHalf.tryDispose()
-        //fboBlurQuarter.tryDispose()
+        if (::fboBlurHalf.isInitialized) fboBlurHalf.tryDispose()
+        //if (::fboBlurQuarter.isInitialized) fboBlurQuarter.tryDispose()
 
         LightmapRenderer.dispose()
         BlocksDrawer.dispose()
         WeatherMixer.dispose()
 
-        batch.tryDispose()
+        if (::batch.isInitialized) batch.tryDispose()
 
 
         shaderBlur.dispose()
@@ -896,7 +896,7 @@ object IngameRenderer : Disposable {
         shaderForActors.dispose()
         shaderDemultiply.dispose()
 
-        fboRGBexport.tryDispose()
+        if (::fboRGBexport.isInitialized) fboRGBexport.tryDispose()
     }
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {
