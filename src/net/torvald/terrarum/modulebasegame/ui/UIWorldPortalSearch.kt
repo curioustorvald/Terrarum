@@ -47,26 +47,13 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    private val radioCellWidth = 120
-    private val inputWidth = 350
-    private val radioX = (width - (radioCellWidth * tex.size + 9)) / 2
-
-    private val sizeSelY = 186 + 40
-
-    private val sizeSelector = UIItemInlineRadioButtons(this,
-        drawX + radioX, drawY + sizeSelY, radioCellWidth,
-        listOf(
-            { Lang["CONTEXT_DESCRIPTION_TINY"] },
-            { Lang["CONTEXT_DESCRIPTION_SMALL"] },
-            { Lang["CONTEXT_DESCRIPTION_BIG"] },
-            { Lang["CONTEXT_DESCRIPTION_HUGE"] }
-        )
-    )
-
     private val rng = HQRNG()
 
+    private val inputWidth = 350
     private val inputLineY1 = 90
     private val inputLineY2 = 130
+
+    private val sizeSelY = 186 + 40
 
     private val nameInput = UIItemTextLineInput(this,
         drawX + width - inputWidth + 5, drawY + sizeSelY + inputLineY1, inputWidth,
@@ -81,12 +68,45 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val goButtonWidth = 180
     private val buttonY = drawY + height - 24
 
+
+    private val radioCellWidth = 120
+    private val radioX = (width - (radioCellWidth * tex.size + 9)) / 2
+    private var selectedSizeChunks = 0
+
     private val backButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+
+        it.clickOnceListener = { _, _ ->
+            full.requestTransition(0)
+        }
+    }
     private val goButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+
+
+    }
+
+    private val sizeSelector = UIItemInlineRadioButtons(this,
+        drawX + radioX, drawY + sizeSelY, radioCellWidth,
+        listOf(
+            { Lang["CONTEXT_DESCRIPTION_TINY"] },
+            { Lang["CONTEXT_DESCRIPTION_SMALL"] },
+            { Lang["CONTEXT_DESCRIPTION_BIG"] },
+            { Lang["CONTEXT_DESCRIPTION_HUGE"] }
+        )
+    ).also {
+        it.selectionChangeListener = { sel ->
+            val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sel]
+            selectedSizeChunks = (wx / LandUtil.CHUNK_W) * (wy / LandUtil.CHUNK_H)
+            goButton.isEnabled = (full.chunksUsed + selectedSizeChunks) <= full.chunksMax
+        }
+    }
 
     init {
+        val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
+        selectedSizeChunks = (wx / LandUtil.CHUNK_W) * (wy / LandUtil.CHUNK_H)
+        goButton.isEnabled = (full.chunksUsed + selectedSizeChunks) <= full.chunksMax
+
         goButton.clickOnceListener = { _, _ ->
             val seed = try {
                 seedInput.getTextOrPlaceholder().toLong()
@@ -99,9 +119,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
             full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(null, worldParam)
             full.setAsClose()
         }
-        backButton.clickOnceListener = { _, _ ->
-            full.requestTransition(0)
-        }
+
 
         addUIitem(sizeSelector)
         addUIitem(goButton)
@@ -175,8 +193,6 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         val chunksUsed = full.chunksUsed
         val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(full.chunksMax - chunksUsed, 0, full.chunksMax)
         val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
-        val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
-        val selectedSizeChunks = (wx / LandUtil.CHUNK_W) * (wy / LandUtil.CHUNK_H)
         val gaugeUsedWidth = (memoryGaugeWidth * (chunksUsed / full.chunksMax.toFloat())).ceilToInt()
         val gaugeEstimatedFullWidth = (memoryGaugeWidth * ((chunksUsed + selectedSizeChunks) / full.chunksMax.toFloat())).ceilToInt()
         val gaugeExtraWidth = (gaugeEstimatedFullWidth - gaugeUsedWidth)//.coerceIn(0 .. (memoryGaugeWidth - gaugeUsedWidth)) // deliberately NOT coercing
