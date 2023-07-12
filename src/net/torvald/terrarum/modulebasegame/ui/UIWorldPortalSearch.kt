@@ -144,7 +144,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     }
 
 
-    private val memoryGaugeWidth = radioCellWidth * 4 + 3 * 3
+    private val memoryGaugeWidth = radioCellWidth * 4 + 3 * 3 - 32
     private val hx = Toolkit.drawWidth.div(2)
     private val iconGap = 12f
     private val iconSize = 30f
@@ -199,26 +199,26 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
         // memory icon
         batch.color = Toolkit.Theme.COL_CELL_FILL
-        Toolkit.fillArea(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt(), memoryGaugeYpos, buttonHeight + 5, buttonHeight)
+        Toolkit.fillArea(batch, 16 + (memoryGaugeXpos - iconSizeGap + 10).toInt(), memoryGaugeYpos, buttonHeight + 5, buttonHeight)
         batch.color = Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt() - 1, memoryGaugeYpos - 1, buttonHeight + 7, buttonHeight + 2)
+        Toolkit.drawBoxBorder(batch, 16 + (memoryGaugeXpos - iconSizeGap + 10).toInt() - 1, memoryGaugeYpos - 1, buttonHeight + 7, buttonHeight + 2)
         batch.color = Color.WHITE
-        batch.draw(icons.get(2, 2), textXpos - iconSizeGap, memoryGaugeYpos + 2f)
+        batch.draw(icons.get(2, 2), 16 + textXpos - iconSizeGap, memoryGaugeYpos + 2f)
         // the gauge
         batch.color = barBack
-        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, memoryGaugeWidth, buttonHeight)
+        Toolkit.fillArea(batch, 16 + memoryGaugeXpos, memoryGaugeYpos, memoryGaugeWidth, buttonHeight)
         batch.color = barCol
-        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, gaugeUsedWidth, buttonHeight)
+        Toolkit.fillArea(batch, 16 + memoryGaugeXpos, memoryGaugeYpos, gaugeUsedWidth, buttonHeight)
         // extra gauge to show estimated memory usage
         batch.color = Color.WHITE
-        Toolkit.fillArea(batch, memoryGaugeXpos + gaugeUsedWidth, memoryGaugeYpos, gaugeExtraWidth, buttonHeight)
+        Toolkit.fillArea(batch, 16 + memoryGaugeXpos + gaugeUsedWidth, memoryGaugeYpos, gaugeExtraWidth, buttonHeight)
         // gauge border
         batch.color = Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, memoryGaugeXpos - 1, memoryGaugeYpos - 1, memoryGaugeWidth + 2, buttonHeight + 2)
+        Toolkit.drawBoxBorder(batch, 16 + memoryGaugeXpos - 1, memoryGaugeYpos - 1, memoryGaugeWidth + 2, buttonHeight + 2)
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, 16 + (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
 
         uiItems.forEach { it.render(batch, camera) }
 
