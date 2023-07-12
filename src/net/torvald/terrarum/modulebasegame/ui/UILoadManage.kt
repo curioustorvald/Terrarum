@@ -132,7 +132,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         full.playerButtonSelected?.let { button ->
             screencap?.texture?.tryDispose()
             button.savegameThumbnailPixmap?.let {
-                screencap = TextureRegion(Texture(it))
+                Texture(it).also {
+                    it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                    screencap = TextureRegion(it)
+                }
             }
         }
     }

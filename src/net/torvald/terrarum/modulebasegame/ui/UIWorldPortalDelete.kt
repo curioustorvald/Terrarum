@@ -61,6 +61,11 @@ class UIWorldPortalDelete(private val full: UIWorldPortal) : UICanvas() {
 
 //        Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_SAVE_WILL_BE_DELETED"], Toolkit.drawWidth, 0, (App.scr.tvSafeGraphicsHeight + 172 + 36) - 46)
         Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_ARE_YOU_SURE"], Toolkit.drawWidth, 0, (App.scr.tvSafeGraphicsHeight + 172 + 36) + UIItemWorldCellsSimple.height + 36)
+
+
+        // control hints
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
     }
 
     override fun dispose() {

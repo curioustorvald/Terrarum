@@ -46,8 +46,8 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    private val radioCellWidth = 116
-    private val inputWidth = 340
+    private val radioCellWidth = 120
+    private val inputWidth = 350
     private val radioX = (width - (radioCellWidth * NEW_WORLD_SIZE.size + 9)) / 2
     private val inputX = width - inputWidth
 
@@ -76,12 +76,15 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val rng = HQRNG()
 
+    private val inputLineY1 = 90
+    private val inputLineY2 = 130
+
     private val nameInput = UIItemTextLineInput(this,
-            drawX + width - inputWidth, drawY + sizeSelY + 80, inputWidth,
+            drawX + width - inputWidth + 5, drawY + sizeSelY + inputLineY1, inputWidth,
             { RandomWordsName(4) }, InputLenCap(VirtualDisk.NAME_LENGTH, InputLenCap.CharLenUnit.UTF8_BYTES))
 
     private val seedInput = UIItemTextLineInput(this,
-            drawX + width - inputWidth, drawY + sizeSelY + 120, inputWidth,
+            drawX + width - inputWidth + 5, drawY + sizeSelY + inputLineY2, inputWidth,
             { rng.nextLong().toString() }, InputLenCap(256, InputLenCap.CharLenUnit.CODEPOINTS))
 
     private val goButtonWidth = 180
@@ -161,8 +164,8 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         App.fontGame.draw(batch, sizestr, drawX + (width - App.fontGame.getWidth(sizestr)).div(2).toFloat(), drawY + sizeSelY - 40f)
 
         // name/seed input labels
-        App.fontGame.draw(batch, Lang["MENU_NAME"], drawX, drawY + sizeSelY + 80)
-        App.fontGame.draw(batch, Lang["CONTEXT_GENERATOR_SEED"], drawX, drawY + sizeSelY + 120)
+        App.fontGame.draw(batch, Lang["MENU_NAME"], drawX - 4, drawY + sizeSelY + inputLineY1)
+        App.fontGame.draw(batch, Lang["CONTEXT_GENERATOR_SEED"], drawX - 4, drawY + sizeSelY + inputLineY2)
 
         uiItems.forEach { it.render(batch, camera) }
     }

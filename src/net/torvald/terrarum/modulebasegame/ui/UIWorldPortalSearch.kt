@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
 import net.torvald.random.XXHash64
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -18,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VDFileID
 import net.torvald.terrarum.savegame.VirtualDisk
@@ -48,8 +47,8 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    private val radioCellWidth = 116
-    private val inputWidth = 340
+    private val radioCellWidth = 120
+    private val inputWidth = 350
     private val radioX = (width - (radioCellWidth * tex.size + 9)) / 2
 
     private val sizeSelY = 186 + 40
@@ -66,13 +65,16 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
     private val rng = HQRNG()
 
+    private val inputLineY1 = 90
+    private val inputLineY2 = 130
+
     private val nameInput = UIItemTextLineInput(this,
-        drawX + width - inputWidth, drawY + sizeSelY + 80, inputWidth,
+        drawX + width - inputWidth + 5, drawY + sizeSelY + inputLineY1, inputWidth,
         { RandomWordsName(4) }, InputLenCap(VirtualDisk.NAME_LENGTH, InputLenCap.CharLenUnit.UTF8_BYTES)
     )
 
     private val seedInput = UIItemTextLineInput(this,
-        drawX + width - inputWidth, drawY + sizeSelY + 120, inputWidth,
+        drawX + width - inputWidth + 5, drawY + sizeSelY + inputLineY2, inputWidth,
         { rng.nextLong().toString() }, InputLenCap(256, InputLenCap.CharLenUnit.CODEPOINTS)
     )
 
@@ -123,7 +125,20 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
+
+    private val memoryGaugeWidth = radioCellWidth * 4 + 3 * 3
+    private val hx = Toolkit.drawWidth.div(2)
+    private val iconGap = 12f
+    private val iconSize = 30f
+    private val iconSizeGap = iconSize + iconGap
+    private val buttonHeight = 24
+    val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
+
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        val memoryGaugeXpos = hx - memoryGaugeWidth/2
+        val memoryGaugeYpos = drawY + sizeSelY + buttonHeight + 10
+        val textXpos = memoryGaugeXpos + 3
         val posXDelta = posX - oldPosX
 
         // ugh why won't you just scroll along??
@@ -152,11 +167,44 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         App.fontGame.draw(batch, sizestr, drawX + (width - App.fontGame.getWidth(sizestr)).div(2).toFloat(), drawY + sizeSelY - 40f)
 
         // name/seed input labels
-        App.fontGame.draw(batch, Lang["MENU_NAME"], drawX, drawY + sizeSelY + 80)
-        App.fontGame.draw(batch, Lang["CONTEXT_PLACE_COORDINATE"], drawX, drawY + sizeSelY + 120)
+        App.fontGame.draw(batch, Lang["MENU_NAME"], drawX - 4, drawY + sizeSelY + inputLineY1)
+        App.fontGame.draw(batch, Lang["CONTEXT_PLACE_COORDINATE"], drawX - 4, drawY + sizeSelY + inputLineY2)
+
+
+        // memory gauge
+        val chunksUsed = full.chunksUsed
+        val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(full.chunksMax - chunksUsed, 0, full.chunksMax)
+        val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+        val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
+        val selectedSizeChunks = (wx / LandUtil.CHUNK_W) * (wy / LandUtil.CHUNK_H)
+        val gaugeUsedWidth = (memoryGaugeWidth * (chunksUsed / full.chunksMax.toFloat())).ceilToInt()
+        val gaugeEstimatedFullWidth = (memoryGaugeWidth * ((chunksUsed + selectedSizeChunks) / full.chunksMax.toFloat())).ceilToInt()
+        val gaugeExtraWidth = (gaugeEstimatedFullWidth - gaugeUsedWidth)//.coerceIn(0 .. (memoryGaugeWidth - gaugeUsedWidth)) // deliberately NOT coercing
+
+        // memory icon
+        batch.color = Toolkit.Theme.COL_CELL_FILL
+        Toolkit.fillArea(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt(), memoryGaugeYpos, buttonHeight + 5, buttonHeight)
+        batch.color = Toolkit.Theme.COL_INACTIVE
+        Toolkit.drawBoxBorder(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt() - 1, memoryGaugeYpos - 1, buttonHeight + 7, buttonHeight + 2)
+        batch.color = Color.WHITE
+        batch.draw(icons.get(2, 2), textXpos - iconSizeGap, memoryGaugeYpos + 2f)
+        // the gauge
+        batch.color = barBack
+        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, memoryGaugeWidth, buttonHeight)
+        batch.color = barCol
+        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, gaugeUsedWidth, buttonHeight)
+        // extra gauge to show estimated memory usage
+        batch.color = Color.WHITE
+        Toolkit.fillArea(batch, memoryGaugeXpos + gaugeUsedWidth, memoryGaugeYpos, gaugeExtraWidth, buttonHeight)
+        // gauge border
+        batch.color = Toolkit.Theme.COL_INACTIVE
+        Toolkit.drawBoxBorder(batch, memoryGaugeXpos - 1, memoryGaugeYpos - 1, memoryGaugeWidth + 2, buttonHeight + 2)
+
+        // control hints
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
 
         uiItems.forEach { it.render(batch, camera) }
-
 
         oldPosX = posX
     }

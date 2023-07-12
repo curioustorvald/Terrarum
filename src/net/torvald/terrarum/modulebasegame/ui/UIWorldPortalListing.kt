@@ -167,11 +167,6 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private var currentWorldSelected = false
 
     init {
-        CommonResourcePool.addToLoadingList("terrarum-basegame-worldportalicons") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/worldportal_catbar.tga"), 30, 20)
-        }
-        CommonResourcePool.loadAll()
-
         navRemoCon.scrollUpListener = { _,_ -> scrollItemPage(-1) }
         navRemoCon.scrollDownListener = { _,_ -> scrollItemPage(1) }
 
@@ -229,12 +224,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }.let {
             worldList.addAll(it)
         }
-        chunksUsed = worldList.sumOf { it.dimensionInChunks }
+        full.chunksUsed = worldList.sumOf { it.dimensionInChunks }
         listPageCount = ceil(worldList.size.toDouble() / listCount).toInt()
     }
-
-    private var chunksUsed = 0
-    private val chunksMax = 100000
 
     private lateinit var worldCells: Array<UIItemWorldCellsSimple>
 
@@ -365,11 +357,11 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
 
         // memory gauge
-        val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(chunksMax - chunksUsed, 0, chunksMax)
+        val barCol = UIItemInventoryCellCommonRes.getHealthMeterColour(full.chunksMax - full.chunksUsed, 0, full.chunksMax)
         val barBack = barCol mul UIItemInventoryCellCommonRes.meterBackDarkening
 
         batch.color = Toolkit.Theme.COL_CELL_FILL
-        Toolkit.fillArea(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt(), memoryGaugeYpos, buttonHeight + 6, buttonHeight)
+        Toolkit.fillArea(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt(), memoryGaugeYpos, buttonHeight + 5, buttonHeight)
         batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, (memoryGaugeXpos - iconSizeGap + 10).toInt() - 1, memoryGaugeYpos - 1, buttonHeight + 7, buttonHeight + 2)
         batch.color = Color.WHITE
@@ -380,7 +372,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         batch.color = barBack
         Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, memoryGaugeWidth, buttonHeight)
         batch.color = barCol
-        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (chunksUsed / chunksMax.toFloat())).ceilToInt(), buttonHeight)
+        Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (full.chunksUsed / full.chunksMax.toFloat())).ceilToInt(), buttonHeight)
 
         batch.color = Color.WHITE
         if (selected?.worldInfo != null) {
@@ -397,7 +389,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 App.fontGame.draw(batch, str, textXpos + 6f, y + thumbh + 3+10 + textualListHeight * index - 2f)
             }
             // size indicator on the memory gauge
-            Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (selected?.worldInfo!!.dimensionInChunks / chunksMax.toFloat())).ceilToInt(), buttonHeight)
+            Toolkit.fillArea(batch, memoryGaugeXpos, memoryGaugeYpos, (memoryGaugeWidth * (selected?.worldInfo!!.dimensionInChunks / full.chunksMax.toFloat())).ceilToInt(), buttonHeight)
 
             // thumbnail
             selected?.worldInfo?.screenshot?.let {

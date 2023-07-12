@@ -40,6 +40,13 @@ class UIWorldPortal : UICanvas(
 
     internal lateinit var host: FixtureWorldPortal
 
+    init {
+        CommonResourcePool.addToLoadingList("terrarum-basegame-worldportalicons") {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/worldportal_catbar.tga"), 30, 20)
+        }
+        CommonResourcePool.loadAll()
+    }
+
 
     val controlHelpHeight = App.fontGame.lineHeight
 
@@ -53,6 +60,10 @@ class UIWorldPortal : UICanvas(
                     "$SP${App.gamepadLabelLT} ${Lang["GAME_WORLD_SEARCH"]}" +
                     "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
 
+
+
+    internal var chunksUsed = 0
+    internal val chunksMax = 100000
 
     val transitionalSearch = UIWorldPortalSearch(this)
     val transitionalListing = UIWorldPortalListing(this)
@@ -250,13 +261,6 @@ class UIItemWorldPortalTopBar(
 
     override val width = 580
     override val height = 25
-
-    init {
-        CommonResourcePool.addToLoadingList("terrarum-basegame-worldportalicons") {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/worldportal_catbar.tga"), 30, 20)
-        }
-        CommonResourcePool.loadAll()
-    }
 
     private val genericIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category")
     private val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")

@@ -80,8 +80,11 @@ class UIWorldPortalRename(private val full: UIWorldPortal) : UICanvas() {
             it.render(batch, camera, buttonXdelta, buttonYdelta)
         }
 
-        uiItems.forEach { it.render(batch, camera) }
+        // control hints
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, full.portalListingControlHelp, (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
 
+        uiItems.forEach { it.render(batch, camera) }
 
         oldPosX = posX
     }
