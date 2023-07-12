@@ -513,8 +513,9 @@ class UIItemPlayerCells(
     lateinit var worldUUID: UUID; private set
 
     private val savegameStatus: Int
-    internal val pixmapManual: Pixmap?
-    internal val pixmapAuto: Pixmap?
+//    internal val pixmapManual: Pixmap?
+//    internal val pixmapAuto: Pixmap?
+    internal val savegameThumbnailPixmap: Pixmap?
 
     init {
         App.savegamePlayers[playerUUID]!!.loadable().getFile(SAVEGAMEINFO)?.bytes?.let {
@@ -537,8 +538,9 @@ class UIItemPlayerCells(
 
         val savegamePair = SavegameCollectionPair(App.savegamePlayers[playerUUID], App.savegameWorlds[worldUUID])
         savegameStatus = savegamePair.status
-        pixmapManual = savegamePair.getManualSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
-        pixmapAuto = savegamePair.getAutoSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
+//        pixmapManual = savegamePair.getManualSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
+//        pixmapAuto = savegamePair.getAutoSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
+        savegameThumbnailPixmap = savegamePair.getLoadableSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
     }
 
     private fun parseDuration(seconds: Long): String {
@@ -710,8 +712,9 @@ class UIItemPlayerCells(
 
     override fun dispose() {
         sprite?.texture?.dispose()
-        pixmapManual?.dispose()
-        pixmapAuto?.dispose()
+//        pixmapManual?.dispose()
+//        pixmapAuto?.dispose()
+        savegameThumbnailPixmap?.dispose()
     }
 
 

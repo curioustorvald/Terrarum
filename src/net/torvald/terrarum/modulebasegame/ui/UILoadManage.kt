@@ -45,16 +45,16 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         it.clickOnceListener = { _,_ ->
             App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
 
-            if (full.loadables.moreRecentAutosaveAvailable()) {
+            /*if (full.loadables.moreRecentAutosaveAvailable()) {
                 full.bringAutosaveSelectorUp()
                 full.changePanelTo(2)
             }
-            else if (full.loadables.saveAvaliable()) {
+            else */if (full.loadables.saveAvaliable()) {
                 if (full.loadables.newerSaveIsDamaged) {
                     UILoadGovernor.previousSaveWasLoaded = true
                 }
 
-                full.takeAutosaveSelectorDown()
+//                full.takeAutosaveSelectorDown()
                 full.loadManageSelectedGame = full.loadables.getLoadableSave()!!
 
                 mode = MODE_LOAD
@@ -131,7 +131,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         full.playerButtonSelected?.forceUnhighlight = true
         full.playerButtonSelected?.let { button ->
             screencap?.texture?.tryDispose()
-            (button.pixmapAuto ?: button.pixmapManual)?.let {
+            button.savegameThumbnailPixmap?.let {
                 screencap = TextureRegion(Texture(it))
             }
         }

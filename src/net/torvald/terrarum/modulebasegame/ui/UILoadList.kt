@@ -70,7 +70,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
         full.loadables = SavegameCollectionPair(App.savegamePlayers[UILoadGovernor.playerUUID], App.savegameWorlds[UILoadGovernor.worldUUID])
         full.queueUpManageScr()
-        full.takeAutosaveSelectorDown()
+//        full.takeAutosaveSelectorDown()
         full.changePanelTo(1)
     }
 

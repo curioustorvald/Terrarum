@@ -21,7 +21,7 @@ import java.util.zip.GZIPInputStream
 /**
  * Created by minjaesong on 2023-07-05.
  */
-class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
+/*class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
@@ -171,4 +171,4 @@ class UILoadAutosave(val full: UILoadSavegame) : UICanvas() {
             App.fontSmallNumbers.draw(batch, lastPlayedStamp, item.posX + 5f, item.posY + 3f)
         }
     }
-}
+}*/

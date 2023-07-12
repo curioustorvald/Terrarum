@@ -161,18 +161,71 @@ fun DiskSkimmer.getThumbnailPixmap(width: Int, height: Int, shrinkage: Double) =
 
 class SavegameCollectionPair(private val player: SavegameCollection?, private val world: SavegameCollection?) {
 
-    private var manualPlayer: DiskSkimmer? = null
-    private var manualWorld: DiskSkimmer? = null
-    private var autoPlayer: DiskSkimmer? = null
-    private var autoWorld: DiskSkimmer? = null
+//    private var manualPlayer: DiskSkimmer? = null
+//    private var manualWorld: DiskSkimmer? = null
+//    private var autoPlayer: DiskSkimmer? = null
+//    private var autoWorld: DiskSkimmer? = null
+
+    /* removing auto/manual discrimination: on Local Asynchronous Multiplayer, if newer autosave is available, there is
+     * no choice but loading one to preserve the data; then why bother having two? */
+    private var playerDisk: DiskSkimmer? = null; private set
+    private var worldDisk: DiskSkimmer? = null; private set
 
     var status = 0 // 0: none available, 1: loadable manual save is newer than loadable auto; 2: loadable autosave is newer than loadable manual
         private set
 
-    var newerSaveIsDamaged = false // only when most recent save is corrupted
-        private set
+    val newerSaveIsDamaged: Boolean // only when most recent save is corrupted
 
     init {
+        if (player != null && world != null) {
+            printdbg(this, "player files: " + player.files.joinToString { it.diskFile.name })
+            printdbg(this, "world files:" + world.files.joinToString { it.diskFile.name })
+
+            var pc = 0
+            var wc = 0
+
+            playerDisk = player.files[pc]
+            worldDisk = world.files[wc]
+
+            while (pc < player.files.size && wc < world.files.size) {
+                // 0b pw
+                val dmgflag = playerDiskNotDamaged(playerDisk!!).toInt(1) or worldDiskNotDamaged(worldDisk!!).toInt()
+
+                when (dmgflag) {
+                    3 -> break
+                    2 -> {
+                        worldDisk = world.files[++wc]
+                    }
+                    1 -> {
+                        playerDisk = player.files[++pc]
+                    }
+                    0 -> {
+                        worldDisk = world.files[++wc]
+                        playerDisk = player.files[++pc]
+                    }
+                }
+
+                // if it's time to exit the loop and all tested saves were damaged:
+                if (pc == player.files.size) playerDisk = null
+                if (wc == world.files.size) worldDisk = null
+            }
+
+            newerSaveIsDamaged = (pc + wc > 0)
+        }
+        else {
+            newerSaveIsDamaged = false
+        }
+
+        status = if (playerDisk != null && worldDisk != null && (playerDisk!!.isAutosaved() || worldDisk!!.isAutosaved()))
+                2
+        else (player != null && world != null).toInt()
+
+        printdbg(this, "playerDisk = ${playerDisk?.diskFile?.path}")
+        printdbg(this, "worldDisk = ${worldDisk?.diskFile?.path}")
+        printdbg(this, "status = $status")
+    }
+
+    /*init {
         printdbg(this, "init ($player, $world)")
 
         if (player != null && world != null) {
@@ -219,8 +272,11 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
                                 pc += 1
                                 wc += 1
                             }
-                            else
+                            // world is modified after another player playing on the same world but only left an autosave
+                            // there is no choice but loading the autosave in such scenario to preserve the data
+                            else {
                                 wc += 1
+                            }
                         }
                     }
                 }
@@ -247,7 +303,7 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
             printdbg(this, "autoWorld = ${autoWorld?.diskFile?.path}")
             printdbg(this, "status = $status")
         }
-    }
+    } */
 
     private fun DiskSkimmer.isAutosaved() = this.getSaveMode().and(0b0000_0010) != 0
 
@@ -262,7 +318,7 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
     fun moreRecentAutosaveAvailable() = (status == 2)
     fun saveAvaliable() = (status > 0)
 
-    fun getManualSave(): DiskPair? {
+    /*fun getManualSave(): DiskPair? {
         if (status == 0) return null
         return DiskPair(manualPlayer!!, manualWorld!!)
     }
@@ -278,6 +334,11 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
             DiskPair(manualPlayer!!, manualWorld!!)
         else
             DiskPair(autoPlayer!!, autoWorld!!)
+    }*/
+
+    fun getLoadableSave(): DiskPair? {
+        return if (status == 0) null
+        else DiskPair(playerDisk!!, worldDisk!!)
     }
 }
 
