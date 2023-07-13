@@ -70,7 +70,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     internal val buttonGap = 10
     internal val buttonWidth = 180
     internal val drawX = (Toolkit.drawWidth - 480) / 2
-    internal val drawY = (App.scr.height - 480) / 2
+    internal val buttonRowY = App.scr.height - App.scr.tvSafeGraphicsHeight - 24
+//    internal val drawY = (App.scr.height - 480) / 2
 
     private val transitionalListing = UILoadList(this)
 //    private val transitionalAutosave = UILoadAutosave(this)

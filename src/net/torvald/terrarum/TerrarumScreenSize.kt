@@ -7,7 +7,7 @@ import kotlin.math.roundToInt
 class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
 
     companion object {
-        const val minimumW = 1080
+        const val minimumW = 1024
         const val minimumH = 720
         const val defaultW = 1280
         const val defaultH = 720

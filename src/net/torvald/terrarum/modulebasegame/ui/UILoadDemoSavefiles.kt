@@ -43,10 +43,10 @@ import java.util.*
 import java.util.zip.GZIPInputStream
 import kotlin.math.roundToInt
 
-val SAVE_CELL_WIDTH = 480
+val SAVE_CELL_WIDTH = 560
 val SAVE_CELL_HEIGHT = 120
-val SAVE_THUMBNAIL_MAIN_WIDTH = 480
-val SAVE_THUMBNAIL_MAIN_HEIGHT = 320
+val SAVE_THUMBNAIL_MAIN_WIDTH = SAVE_CELL_WIDTH
+val SAVE_THUMBNAIL_MAIN_HEIGHT = 384
 
 /**
  * The pinnacle of the dirty coding! This object exists only because I couldn't make
@@ -578,77 +578,11 @@ class UIItemPlayerCells(
         highlightTextCol = if (mouseUp && !forceUnhighlight) litCol else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
+    private val avatarViewWidth = 120
+
     fun render(batch: SpriteBatch, camera: Camera, offX: Int, offY: Int) {
         // try to generate a texture
-        if (!hasTexture) {
-            val skimmer = App.savegamePlayers[playerUUID]!!.loadable()
-            skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
-                try {
-                    printdbg(this, "Generating portrait for $playerName")
-                    val frameName = "ANIM_IDLE_1"
-                    val animFile = skimmer.getFile(SPRITEDEF)!!
-                    val props = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
-
-                    val imagesSelfContained = skimmer.hasEntry(BODYPART_TO_ENTRY_MAP)
-                    val bodypartMapping = Properties().also { if (imagesSelfContained) it.load(ByteArray64Reader(skimmer.getFile(BODYPART_TO_ENTRY_MAP)!!.bytes, Common.CHARSET)) }
-
-                    val fileGetter = if (imagesSelfContained)
-                        AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, skimmer)
-                    else
-                        AssembleSheetPixmap.getAssetsDirFileGetter(props)
-
-//                    println(properties.transforms.keys)
-
-                    val canvas = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.SourceOver }
-                    val theAnim = props.getAnimByFrameName(frameName)
-                    val skeleton = theAnim.skeleton.joints.reversed()
-                    val transforms = props.getTransform(frameName)
-                    val bodypartOrigins = props.bodypartJoints
-                    val bodypartImages = props.bodypartJoints.keys.associate { partname ->
-                        fileGetter(partname).let { file ->
-                            if (file == null) {
-//                                printdbg(this, "   Partname $partname points to a null file!")
-                                partname to null
-                            }
-                            else {
-                                try {
-//                                    printdbg(this, "   Partname $partname successfully retrieved")
-                                    val bytes = file.readAllBytes()
-                                    partname to Pixmap(bytes, 0, bytes.size)
-                                }
-                                catch (e: GdxRuntimeException) {
-//                                    printdbg(this, "   Partname $partname failed to load: ${e.message}")
-                                    partname to null
-                                }
-                            }
-                        }
-                    }
-                    val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
-
-                    // manually draw 0th frame of ANIM_IDLE
-                    transformList.forEach { (name, bodypartPos) ->
-                        bodypartImages[name]?.let { image ->
-                            val imgCentre = bodypartOrigins[name]!!.invertX()
-                            val drawPos = props.origin + bodypartPos + imgCentre
-
-                            canvas.drawPixmap(image, drawPos.x, props.frameHeight - drawPos.y - 1)
-                        }
-                    }
-
-                    // dispose of temporary resources
-                    bodypartImages.values.forEach { it?.dispose() }
-
-//                    PixmapIO.writePNG(Gdx.files.absolute("${App.defaultDir}/Exports/Portrait-$playerName.tga"), canvas)
-
-                    this.sprite = TextureRegion(Texture(canvas))
-                }
-                catch (e: Throwable) {
-                    throw SaveLoadError(skimmer.diskFile, e)
-                }
-            }
-
-            hasTexture = true
-        }
+        if (!hasTexture) { acquirePlayerAvatar(); hasTexture = true }
 
         val x = posX + offX
         val y = posY + offY
@@ -660,47 +594,47 @@ class UIItemPlayerCells(
 
         // draw box backgrounds
         batch.color = cellCol
-        Toolkit.fillArea(batch, x, y, 106, height)
-        Toolkit.fillArea(batch, x + 116, y, width - 116, height)
+        Toolkit.fillArea(batch, x, y, avatarViewWidth, height)
+        Toolkit.fillArea(batch, x + avatarViewWidth + 10, y, width - avatarViewWidth - 10, height)
 
         // draw borders
         batch.color = highlightCol
         // avatar border
-        Toolkit.drawBoxBorder(batch, x - 1, y - 1, 106 + 2, height + 2)
+        Toolkit.drawBoxBorder(batch, x - 1, y - 1, avatarViewWidth + 2, height + 2)
         // infocell border
-        Toolkit.drawBoxBorder(batch, x + 115, y - 1, width - 114, height + 2)
+        Toolkit.drawBoxBorder(batch, x + avatarViewWidth + 9, y - 1, width - avatarViewWidth - 8, height + 2)
 
         // texts
         batch.color = highlightTextCol
         val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
-        App.fontGame.draw(batch, playerName, x + 146f, line1)
-        App.fontGame.draw(batch, worldName, x + 146f, line2)
-        App.fontGame.draw(batch, lastPlayTime, x + 146f, line3)
-        App.fontGame.draw(batch, versionString, x + 146f, line4)
+        App.fontGame.draw(batch, playerName, x + avatarViewWidth + 40f, line1)
+        App.fontGame.draw(batch, worldName, x + avatarViewWidth + 40f, line2)
+        App.fontGame.draw(batch, lastPlayTime, x + avatarViewWidth + 40f, line3)
+        App.fontGame.draw(batch, versionString, x + avatarViewWidth + 40f, line4)
         App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, line4)
         // icons
-        batch.draw(icons.get(24,0), x + 120f, line1 + 2f) // player name
-        batch.draw(icons.get(12,0), x + 119f, line2 + 2f) // world map
-        batch.draw(icons.get(13,0), x + 120f, line3 + 2f) // journal
-        batch.draw(icons.get(22,1), x + 119f, line4 + 2f) // version(?)
+        batch.draw(icons.get(24,0), x + avatarViewWidth + 14f - 0, line1 + 2f) // player name
+        batch.draw(icons.get(12,0), x + avatarViewWidth + 14f - 1, line2 + 2f) // world map
+        batch.draw(icons.get(13,0), x + avatarViewWidth + 14f - 0, line3 + 2f) // journal
+        batch.draw(icons.get(22,1), x + avatarViewWidth + 14f - 1, line4 + 2f) // version(?)
         batch.draw(icons.get(23,0), x + width - 4f - playTimeTextLen - 24f, line4 + 2f) // stopwatch
         // autosave marker
         if (savegameStatus == 2)
-            batch.draw(icons.get(24,1), x + 457f, line1 + 2f)
+            batch.draw(icons.get(24,1), x + width - 23f, line1 + 2f)
         else if (savegameStatus == 0)
-            batch.draw(icons.get(23,1), x + 457f, line1 + 2f)
+            batch.draw(icons.get(23,1), x + width - 23f, line1 + 2f)
 
         // infocell divider
         batch.color = if (mouseUp) hruleColLit else hruleCol
-        Toolkit.fillArea(batch, x + 118, y + 29, width - 120, 1)
-        Toolkit.fillArea(batch, x + 118, y + 59, width - 120, 1)
-        Toolkit.fillArea(batch, x + 118, y + 89, width - 120, 1)
+        Toolkit.fillArea(batch, x + avatarViewWidth + 12, y + 29, width - avatarViewWidth - 14, 1)
+        Toolkit.fillArea(batch, x + avatarViewWidth + 12, y + 59, width - avatarViewWidth - 14, 1)
+        Toolkit.fillArea(batch, x + avatarViewWidth + 12, y + 89, width - avatarViewWidth - 14, 1)
 
         // player avatar
         batch.color = Color.WHITE
         this.sprite?.let {
             batch.draw(it,
-                    x.toFloat() + FastMath.ceil((106f - it.regionWidth) / 2f) + EXTRA_HEADROOM_X / 2,
+                    x.toFloat() + FastMath.ceil((avatarViewWidth - it.regionWidth) / 2f) + EXTRA_HEADROOM_X / 2,
                     y.toFloat() + FastMath.ceil((height - it.regionHeight) / 2f) - EXTRA_HEADROOM_Y / 2
             )
         }
@@ -708,6 +642,74 @@ class UIItemPlayerCells(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         render(batch, camera, 0, 0)
+    }
+
+    private fun acquirePlayerAvatar() {
+        val skimmer = App.savegamePlayers[playerUUID]!!.loadable()
+        skimmer.getFile(SAVEGAMEINFO)?.bytes?.let {
+            try {
+                printdbg(this, "Generating portrait for $playerName")
+                val frameName = "ANIM_IDLE_1"
+                val animFile = skimmer.getFile(SPRITEDEF)!!
+                val props = ADProperties(ByteArray64Reader(animFile.bytes, Common.CHARSET))
+
+                val imagesSelfContained = skimmer.hasEntry(BODYPART_TO_ENTRY_MAP)
+                val bodypartMapping = Properties().also { if (imagesSelfContained) it.load(ByteArray64Reader(skimmer.getFile(BODYPART_TO_ENTRY_MAP)!!.bytes, Common.CHARSET)) }
+
+                val fileGetter = if (imagesSelfContained)
+                    AssembleSheetPixmap.getVirtualDiskFileGetter(bodypartMapping, skimmer)
+                else
+                    AssembleSheetPixmap.getAssetsDirFileGetter(props)
+
+//                    println(properties.transforms.keys)
+
+                val canvas = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.SourceOver }
+                val theAnim = props.getAnimByFrameName(frameName)
+                val skeleton = theAnim.skeleton.joints.reversed()
+                val transforms = props.getTransform(frameName)
+                val bodypartOrigins = props.bodypartJoints
+                val bodypartImages = props.bodypartJoints.keys.associate { partname ->
+                    fileGetter(partname).let { file ->
+                        if (file == null) {
+//                                printdbg(this, "   Partname $partname points to a null file!")
+                            partname to null
+                        }
+                        else {
+                            try {
+//                                    printdbg(this, "   Partname $partname successfully retrieved")
+                                val bytes = file.readAllBytes()
+                                partname to Pixmap(bytes, 0, bytes.size)
+                            }
+                            catch (e: GdxRuntimeException) {
+//                                    printdbg(this, "   Partname $partname failed to load: ${e.message}")
+                                partname to null
+                            }
+                        }
+                    }
+                }
+                val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
+
+                // manually draw 0th frame of ANIM_IDLE
+                transformList.forEach { (name, bodypartPos) ->
+                    bodypartImages[name]?.let { image ->
+                        val imgCentre = bodypartOrigins[name]!!.invertX()
+                        val drawPos = props.origin + bodypartPos + imgCentre
+
+                        canvas.drawPixmap(image, drawPos.x, props.frameHeight - drawPos.y - 1)
+                    }
+                }
+
+                // dispose of temporary resources
+                bodypartImages.values.forEach { it?.dispose() }
+
+//                    PixmapIO.writePNG(Gdx.files.absolute("${App.defaultDir}/Exports/Portrait-$playerName.tga"), canvas)
+
+                this.sprite = TextureRegion(Texture(canvas))
+            }
+            catch (e: Throwable) {
+                throw SaveLoadError(skimmer.diskFile, e)
+            }
+        }
     }
 
     override fun dispose() {

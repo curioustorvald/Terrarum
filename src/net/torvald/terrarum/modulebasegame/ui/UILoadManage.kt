@@ -27,7 +27,6 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val buttonGap = full.buttonGap
     private val buttonWidth = full.buttonWidth
     private val drawX = full.drawX
-    private val drawY = full.drawY
     private val hx = Toolkit.hdrawWidth
 
     private val buttonX1third = hx - (buttonWidth * 1.5).toInt() - buttonGap
@@ -37,7 +36,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val buttonXleft = drawX + (240 - buttonWidth) / 2
     private val buttonXright = drawX + 240 + (240 - buttonWidth) / 2
 
-    private val buttonRowY = drawY + 480 - buttonHeight
+    private val buttonRowY = full.buttonRowY - buttonHeight
     private val buttonRowY2 = buttonRowY - buttonHeight - buttonGap
 
     private val mainGoButton = UIItemTextButton(this,
@@ -175,12 +174,15 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
 
                 val tx = (Toolkit.drawWidth - screencapW) / 2
-                val ty = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
+                val tys = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
+                val tye = buttonRowY2 - buttonGap
+                val ty = tys + (tye - tys - SAVE_THUMBNAIL_MAIN_HEIGHT) / 2
 
                 batch.color = Toolkit.Theme.COL_INACTIVE
                 Toolkit.drawBoxBorder(batch, tx - 1, ty - 1, screencapW + 2, screencapH + 2)
                 batch.color = UIInventoryFull.CELL_COL
                 Toolkit.fillArea(batch, tx, ty, screencapW, screencapH)
+
                 batch.color = Color.WHITE
                 batch.draw(tex, tx.toFloat(), ty.toFloat(), screencapW.toFloat(), screencapH.toFloat())
 
