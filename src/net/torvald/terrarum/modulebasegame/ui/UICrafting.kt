@@ -63,7 +63,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
     private var halfSlotOffset = (UIItemInventoryElemSimple.height + listGap) / 2
 
-    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height - halfSlotOffset
+    private val thisOffsetX = UIInventoryFull.INVENTORY_CELLS_OFFSET_X() + UIItemInventoryElemSimple.height + listGap - halfSlotOffset
     private val thisOffsetX2 = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 7
     private val thisXend = thisOffsetX + (listGap + UIItemInventoryElemWide.height) * 13 - listGap
     private val thisOffsetY =  UIInventoryFull.INVENTORY_CELLS_OFFSET_Y()
