@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 
 open class UIItemTransitionContainer(
     private val parent: UICanvas,
@@ -123,6 +124,10 @@ open class UIItemTransitionContainer(
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.scrolled(amountX, amountY) }
         return true
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.inputStrobed(e) }
     }
 
     override fun show() {
