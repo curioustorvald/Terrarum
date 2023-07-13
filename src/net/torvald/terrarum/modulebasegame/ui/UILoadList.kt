@@ -291,6 +291,12 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         return true
     }
 
+    internal fun resetScroll() {
+        scrollFrom = 0
+        scrollTarget = 0
+        scrollAnimCounter = 0f
+    }
+
     override fun hide() {
         showCalled = false
         cellLoadThread.interrupt()

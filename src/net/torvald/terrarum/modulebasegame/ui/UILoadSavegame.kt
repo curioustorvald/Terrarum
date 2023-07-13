@@ -96,6 +96,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 //    internal fun bringAutosaveSelectorUp() { transitionPanel.setRightUIto(1) }
 //    internal fun takeAutosaveSelectorDown() { transitionPanel.setRightUIto(0) }
 
+    internal fun resetScroll() {
+        transitionalListing.resetScroll()
+    }
+
     internal fun changePanelTo(index: Int) {
         transitionPanel.requestTransition(index)
     }

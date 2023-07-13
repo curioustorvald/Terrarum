@@ -75,6 +75,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val mainBackButton = UIItemTextButton(this,
         { Lang["MENU_LABEL_BACK"] }, buttonXcentre, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
+            full.resetScroll()
             full.changePanelTo(0)
         }
     }
