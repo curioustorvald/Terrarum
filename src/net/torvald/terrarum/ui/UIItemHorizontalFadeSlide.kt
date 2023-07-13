@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.modulebasegame.ui.NullUI
 import net.torvald.terrarum.tryDispose
 import kotlin.math.absoluteValue
@@ -87,24 +88,4 @@ class UIItemHorizontalFadeSlide(
         uisOnRight.forEach { it.tryDispose() }
     }
 
-    override fun keyDown(keycode: Int): Boolean {
-        return super.keyDown(keycode)
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        return super.keyUp(keycode)
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        printdbg(this, "touchDown UIs: ${uis.joinToString { it.javaClass.simpleName }}")
-        return super.touchDown(screenX, screenY, pointer, button)
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
-    }
-
-    override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        return super.scrolled(amountX, amountY)
-    }
 }

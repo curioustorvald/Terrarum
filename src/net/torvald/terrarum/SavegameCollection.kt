@@ -88,7 +88,8 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
             skimmer.rebuild()
             skimmer.getFile(SAVEGAMEINFO)!!.let { file ->
                 val json = JsonFetcher.readFromJsonString(ByteArray64Reader(file.bytes, Common.CHARSET))
-                json.getChild("actorValue").getChild(AVKey.NAME).set(name)
+
+                json["actorValue"]["hashMap"]["name"]["value"].set(name) // getChild() does NOT work as [] does
 
                 val jsonBytes = json.prettyPrint(JsonWriter.OutputType.json, 0).encodeToByteArray().toByteArray64()
                 val newEntry = DiskEntry(SAVEGAMEINFO, ROOT, skimmer.requestFile(SAVEGAMEINFO)!!.creationDate, App.getTIME_T(), EntryFile(jsonBytes))

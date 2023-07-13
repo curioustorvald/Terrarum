@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
@@ -14,6 +15,7 @@ import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
+import net.torvald.terrarum.ui.UIItemTextLineInput
 
 /**
  * Created by minjaesong on 2023-07-05.
@@ -104,11 +106,35 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         }
     }
 
+    private val renameInput = UIItemTextLineInput(this, buttonXleft, App.scr.halfh, 240 + buttonWidth)
+    private val renameCancelButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_CANCEL"] }, buttonXleft, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            mode = MODE_INIT
+        }
+    }
+    private val renameRenameButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_RENAME"] }, buttonXright, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            val newName = renameInput.getText().trim()
+            if (newName.isNotBlank()) {
+                full.playerButtonSelected!!.playerUUID.let { uuid ->
+                    App.savegamePlayersName[uuid] = newName
+                    App.savegamePlayers[uuid]!!.renamePlayer(newName)
+                    full.playerButtonSelected!!.playerName = newName
+                }
+            }
+
+            mode = MODE_INIT
+        }
+    }
+
     private var mode = 0
 
     private var mainButtons0 = listOf(mainGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
     private var mainButtons1 = listOf(mainNoGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
     private var delButtons = listOf(confirmCancelButton, confirmDeleteButton)
+    private var renameButtons = listOf(renameRenameButton, renameCancelButton)
 
     private val mainButtons: List<UIItemTextButton>
         get() = if (full.loadables.saveAvaliable()) mainButtons0 else mainButtons1
@@ -156,6 +182,18 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             MODE_DELETE -> {
                 delButtons.forEach { it.update(delta) }
             }
+            MODE_RENAME -> {
+                renameButtons.forEach { it.update(delta) }
+                renameInput.update(delta)
+            }
+        }
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        when (mode) {
+            MODE_RENAME -> {
+                renameInput.inputStrobed(e)
+            }
         }
     }
 
@@ -193,6 +231,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
                 delButtons.forEach { it.render(batch, camera) }
             }
+            MODE_RENAME -> {
+                renameInput.render(batch, camera)
+                renameButtons.forEach { it.render(batch, camera) }
+            }
             MODE_LOAD -> {
                 loadFiredFrameCounter += 1
                 StaticLoadScreenSubstitute(batch)
@@ -213,6 +255,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             MODE_DELETE -> {
                 delButtons.forEach { it.touchDown(screenX, screenY, pointer, button) }
             }
+            MODE_RENAME -> {
+                renameInput.touchDown(screenX, screenY, pointer, button)
+                renameButtons.forEach { it.touchDown(screenX, screenY, pointer, button) }
+            }
         }
 
         return true
@@ -225,6 +271,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             }
             MODE_DELETE -> {
                 delButtons.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            }
+            MODE_RENAME -> {
+                renameInput.touchUp(screenX, screenY, pointer, button)
+                renameButtons.forEach { it.touchUp(screenX, screenY, pointer, button) }
             }
         }
 

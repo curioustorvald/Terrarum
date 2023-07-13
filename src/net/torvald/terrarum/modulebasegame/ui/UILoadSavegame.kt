@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.internalWidth
 import net.torvald.terrarum.ui.*
@@ -125,6 +126,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         transitionPanel.render(batch, camera)
+    }
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        transitionPanel.inputStrobed(e)
     }
 
     override fun keyDown(keycode: Int): Boolean {

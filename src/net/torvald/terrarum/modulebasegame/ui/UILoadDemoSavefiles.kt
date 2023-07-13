@@ -503,7 +503,7 @@ class UIItemPlayerCells(
         parent.advanceMode(this)
     }
 
-    private var playerName: String = "$EMDASH"
+    internal var playerName: String = "$EMDASH"
     private var worldName: String = "$EMDASH"
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
