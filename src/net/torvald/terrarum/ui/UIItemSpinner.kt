@@ -6,6 +6,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ceilToInt
+import kotlin.math.absoluteValue
 
 /**
  * Internal properties, namely initialValue, min, max, step; have the type of [Double] regardless of their input type.
@@ -16,7 +17,7 @@ import net.torvald.terrarum.ceilToInt
 class UIItemSpinner(
         parentUI: UICanvas,
         initialX: Int, initialY: Int,
-        initialValue: Number,
+        private var initialValue: Number,
         val min: Number,
         val max: Number,
         val step: Number,
@@ -24,6 +25,29 @@ class UIItemSpinner(
         private val drawBorder: Boolean = true,
         private val numberToTextFunction: (Number) -> String = { "$it" }
 ) : UIItem(parentUI, initialX, initialY) {
+
+    // to alleviate floating point errors adding up as the spinner is being used
+    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilToInt()) {
+//        printdbg(this, "$min..$max step $step; index [$it] = ${min.toDouble() + (step.toDouble() * it)}")
+        min.toDouble() + (step.toDouble() * it)
+    }
+
+    init {
+//        println("valueType=${valueType.canonicalName} for UI ${parentUI.javaClass.canonicalName}")
+
+        // if the initial value cannot be derived from the settings, round to nearest
+        if (values.indexOfFirst { it == initialValue.toDouble() } < 0) {
+//            throw IllegalArgumentException("Initial value $initialValue cannot be derived from given ($min..$max step $step) settings")
+            val mind = min.toDouble()
+            val maxd = max.toDouble()
+            val stepd = step.toDouble()
+            val id = initialValue.toDouble()
+
+            initialValue = (0..(maxd - mind).div(stepd).ceilToInt()).map {
+                it to ((mind + stepd * it) - id).absoluteValue
+            }.minBy { it.second }.first * stepd + mind
+        }
+    }
 
     private val valueType = initialValue.javaClass // should be java.lang.Double or java.lang.Integer
 
@@ -42,20 +66,8 @@ class UIItemSpinner(
     private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
 
     var selectionChangeListener: (Number) -> Unit = {}
-
-    // to alleviate floating point errors adding up as the spinner is being used
-    private val values = DoubleArray(1 + ((max.toDouble() - min.toDouble()).div(step.toDouble())).ceilToInt()) {
-//        printdbg(this, "$min..$max step $step; index [$it] = ${min.toDouble() + (step.toDouble() * it)}")
-        min.toDouble() + (step.toDouble() * it)
-    }
     private var currentIndex = values.indexOfFirst { it == initialValue.toDouble() }
 
-    init {
-//        println("valueType=${valueType.canonicalName} for UI ${parentUI.javaClass.canonicalName}")
-
-        if (currentIndex < 0)
-            throw IllegalArgumentException("Initial value $initialValue cannot be derived from given ($min..$max step $step) settings")
-    }
 
     private fun changeValueBy(diff: Int) {
         currentIndex = (currentIndex + diff).coerceIn(values.indices)
