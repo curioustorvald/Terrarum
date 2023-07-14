@@ -451,6 +451,8 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
             parent.setControlOf(parent.keycapClicked, selected)
             parent.keycapClicked = -13372
         }
+
+        if (!mouseDown) mouseLatched = false
     }
 }
 

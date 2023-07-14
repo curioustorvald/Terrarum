@@ -14,6 +14,8 @@ import kotlin.math.roundToInt
  * [-]--|--|--[]--|--[+]
  * ```
  *
+ *
+ *
  * Created by minjaesong on 2023-07-14.
  */
 
@@ -25,7 +27,8 @@ class UIItemHorzSlider(
     val max: Double,
     override val width: Int,
     val handleWidth: Int = 12,
-    private val backgroundTexture: TextureRegion? = null
+    private val backgroundTexture: TextureRegion? = null,
+    private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
     override val height = 24
@@ -35,7 +38,6 @@ class UIItemHorzSlider(
     private var handlePos = 0.0
 
     var value: Double = initialValue; private set
-
     var selectionChangeListener: (Double) -> Unit = {}
 
     override fun update(delta: Float) {
@@ -44,15 +46,20 @@ class UIItemHorzSlider(
         mouseOnHandle = itemRelativeMouseX in handlePos.roundToInt() until handlePos.roundToInt() + handleWidth && itemRelativeMouseY in 0 until height
 
         // update handle position and value
-        if (mouseUp && mousePushed) {
+        if (mouseUp && Terrarum.mouseDown || mouseLatched) {
+            mouseLatched = true
             handlePos = (itemRelativeMouseX - handleWidth/2.0).coerceIn(0.0, handleTravelDist.toDouble())
             value = interpolateLinear(handlePos / handleTravelDist, min, max)
             selectionChangeListener(value)
         }
+
+        if (!Terrarum.mouseDown) {
+            mouseLatched = false
+        }
     }
 
-    val troughBorderCol: Color; get() = if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
-    val handleCol: Color; get() = if (mouseOnHandle && mousePushed) Toolkit.Theme.COL_SELECTED
+    val troughBorderCol: Color; get() = if (mouseUp || mouseLatched) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
+    val handleCol: Color; get() = if (mouseOnHandle && mousePushed || mouseLatched) Toolkit.Theme.COL_SELECTED
     else if (mouseOnHandle) Toolkit.Theme.COL_MOUSE_UP else Color.WHITE
 
 
@@ -95,6 +102,7 @@ class UIItemHorzSlider(
     }
 
     override fun dispose() {
+        if (disposeTexture) backgroundTexture?.texture?.tryDispose()
     }
 
 

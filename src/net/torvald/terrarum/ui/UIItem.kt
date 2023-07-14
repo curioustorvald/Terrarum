@@ -89,11 +89,14 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     open val mouseUp: Boolean
         get() = itemRelativeMouseX in 0 until width && itemRelativeMouseY in 0 until height
     /** If mouse is hovering over it and mouse is down */
-    open val mousePushed: Boolean
+    val mousePushed: Boolean
         get() = mouseUp && Terrarum.mouseDown
+    val mouseDown: Boolean
+        get() = Terrarum.mouseDown
 
 
-    protected var mouseLatched = Terrarum.mouseDown
+    /** to be used by customised mouse handling */
+    protected var mouseLatched = false
 
     /** UI to call (show up) while mouse is up */
     open var mouseOverCall: UICanvas? = null
@@ -164,7 +167,6 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
                     }
                 }
 
-                if (!mouseUp) mouseLatched = false
             }
         }
     }
