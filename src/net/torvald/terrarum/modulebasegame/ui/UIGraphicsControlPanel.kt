@@ -9,6 +9,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.ui.ControlPanelCommon.makeButton
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.TIMES
@@ -78,78 +79,8 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
 
-    // @return Pair of <UIItem, Init job for the item>
-    private fun makeButton(args: String, x: Int, y: Int, optionName: String): Pair<UIItem, (UIItem, String) -> Unit> {
-        return if (args.startsWith("h1") || args.startsWith("p")) {
-            (object : UIItem(this, x, y) {
-                override val width = 1
-                override val height = 1
-                override fun dispose() {}
-            }) to { _, _ -> }
-        }
-        else if (args.startsWith("toggle")) {
-            UIItemToggleButton(this, x, y, spinnerWidth, App.getConfigBoolean(optionName)) to { it: UIItem, optionStr: String ->
-                (it as UIItemToggleButton).clickOnceListener = { _, _ ->
-                    it.toggle()
-                    App.setConfig(optionStr, it.getStatus())
-                }
-            }
-        }
-        else if (args.startsWith("spinner,")) {
-            val arg = args.split(',')
-            UIItemSpinner(this, x, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), spinnerWidth, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
-                (it as UIItemSpinner).selectionChangeListener = {
-                    App.setConfig(optionStr, it)
-                }
-            }
-        }
-        else if (args.startsWith("spinnerd,")) {
-            val arg = args.split(',')
-            UIItemSpinner(this, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" }) to { it: UIItem, optionStr: String ->
-                (it as UIItemSpinner).selectionChangeListener = {
-                    App.setConfig(optionStr, it)
-                }
-            }
-        }
-        else if (args.startsWith("typeinint")) {
-//            val arg = args.split(',') // args: none
-            UIItemTextLineInput(this, x, y, spinnerWidth,
-                defaultValue = { "${App.getConfigInt(optionName)}" },
-                maxLen = InputLenCap(4, InputLenCap.CharLenUnit.CODEPOINTS),
-                keyFilter = { it.headkey in Input.Keys.NUM_0..Input.Keys.NUM_9 || it.headkey == Input.Keys.BACKSPACE }
-            ) to { it: UIItem, optionStr: String ->
-                (it as UIItemTextLineInput).textCommitListener = {
-                    App.setConfig(optionStr, it.toInt()) // HAXXX!!!
-                }
-            }
-        }
-        else if (args.startsWith("typeinres")) {
-            val keyWidth = optionName.substringBefore(',')
-            val keyHeight = optionName.substringAfter(',')
-            UIItemTextLineInput(this, x, y, spinnerWidth,
-                defaultValue = { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" },
-                maxLen = InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS),
-                keyFilter = { it.headkey == Input.Keys.ENTER || it.headkey == Input.Keys.BACKSPACE || it.character?.matches(Regex("[0-9xX]")) == true },
-                alignment = UIItemTextButton.Companion.Alignment.CENTRE
-            ) to { it: UIItem, optionStr: String ->
-                (it as UIItemTextLineInput).textCommitListener = { text ->
-                    val text = text.lowercase()
-                    if (text.matches(Regex("""[0-9]+x[0-9]+"""))) {
-                        it.markAsNormal()
-                        val width = text.substringBefore('x').toInt()
-                        val height = text.substringAfter('x').toInt()
-                        App.setConfig(keyWidth, width)
-                        App.setConfig(keyHeight, height)
-                    }
-                    else it.markAsInvalid()
-                }
-            }
-        }
-        else throw IllegalArgumentException(args)
-    }
-
     private val optionControllers: List<Pair<UIItem, (UIItem, String) -> Unit>> = options.mapIndexed { index, strings ->
-        makeButton(options[index][2] as String,
+        makeButton(this, options[index][2] as String,
                 drawX + width / 2 + panelgap,
                 drawY - 2 + optionsYpos[index],
                 options[index][0] as String
