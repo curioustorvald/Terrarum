@@ -1,12 +1,14 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ceilToInt
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * Internal properties, namely initialValue, min, max, step; have the type of [Double] regardless of their input type.
@@ -43,9 +45,13 @@ class UIItemSpinner(
             val stepd = step.toDouble()
             val id = initialValue.toDouble()
 
-            initialValue = (0..(maxd - mind).div(stepd).ceilToInt()).map {
+            val intermediate = (0..(maxd - mind).div(stepd).ceilToInt()).map {
                 it to ((mind + stepd * it) - id).absoluteValue
             }.minBy { it.second }.first * stepd + mind
+            initialValue = when (initialValue.javaClass.simpleName) {
+                "Integer" -> intermediate.toInt()
+                else -> intermediate
+            }
         }
     }
 
@@ -173,6 +179,9 @@ class UIItemSpinner(
         App.fontGame.draw(batch, textCache, posX + buttonW + 3f + (fboWidth - textCacheLen).div(2), posY.toFloat())
 
         super.render(batch, camera)
+
+//        batch.color = Color.WHITE
+//        App.fontSmallNumbers.draw(batch, "${valueType.simpleName}", posX.toFloat(), posY.toFloat()) // draws "Integer" or "Double"
     }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {

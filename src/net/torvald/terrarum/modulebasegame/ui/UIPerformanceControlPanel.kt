@@ -31,6 +31,7 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
             arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,1,120,1,60000"),
             arrayOf("notificationshowuptime", { Lang["MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION"] + " (${Lang["CONTEXT_TIME_SECOND_PLURAL"]})" }, "spinnerimul,2,10,1,1000"),
+//            arrayOf("testvalue", { "TestValue" }, "sliderd,1,100,1"),
         arrayOf("", { Lang["MENU_LABEL_JVM_DNT"] }, "h1"),
             arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX"] + " (GB)" }, "spinner,2,32,1"),
             arrayOf("jvm_extra_cmd", { Lang["MENU_LABEL_EXTRA_JVM_ARGUMENTS"] }, "typein"),
@@ -103,6 +104,14 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             val arg = args.split(',')
             UIItemSpinner(this, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), spinnerWidth, numberToTextFunction = { "${((it as Double)*100).toInt()}%" }) to { it: UIItem, optionStr: String ->
                 (it as UIItemSpinner).selectionChangeListener = {
+                    App.setConfig(optionStr, it)
+                }
+            }
+        }
+        else if (args.startsWith("sliderd,")) {
+            val arg = args.split(',')
+            UIItemHorzSlider(this, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), spinnerWidth) to { it: UIItem, optionStr: String ->
+                (it as UIItemHorzSlider).selectionChangeListener = {
                     App.setConfig(optionStr, it)
                 }
             }

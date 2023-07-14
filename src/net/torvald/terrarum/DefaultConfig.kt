@@ -12,6 +12,7 @@ object DefaultConfig {
     val hashMap = hashMapOf<String, Any>(
             "jvm_xmx" to 4,
             "jvm_extra_cmd" to "",
+            "testvalue" to 1,
 
             "displayfps" to 0, // 0: no limit, non-zero: limit
             "displayfpsidle" to 0, // 0: no limit, non-zero: limit
@@ -24,7 +25,7 @@ object DefaultConfig {
             "language" to App.getSysLang(),
             "notificationshowuptime" to 4000, // 4s
             "selecteditemnameshowuptime" to 4000, // 4s
-            "autosaveinterval" to 300000, // 5s
+            "autosaveinterval" to 300000, // 5m
             "multithread" to true,
 
             "showhealthmessageonstartup" to true,
