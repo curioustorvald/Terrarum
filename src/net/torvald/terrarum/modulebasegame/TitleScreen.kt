@@ -176,7 +176,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
 
 
-        // set time to summer
+        // set initial time to summer
         demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
 
         // construct camera nodes
@@ -194,13 +194,14 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
         // apply gaussian blur to the camera nodes
         for (i in cameraNodes.indices) {
-            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 1f
-            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 4f
-            val off0 = cameraNodes[i] * 6f
-            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 4f
-            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 1f
+//            val offM2 = cameraNodes[(i-2) fmod cameraNodes.size] * 1f
+            val offM1 = cameraNodes[(i-1) fmod cameraNodes.size] * 1f
+            val off0 = cameraNodes[i] * 2f
+            val off1 = cameraNodes[(i+1) fmod cameraNodes.size] * 1f
+//            val off2 = cameraNodes[(i+2) fmod cameraNodes.size] * 1f
 
-            cameraNodes[i] = (offM2 + offM1 + off0 + off1 + off2) / 16f
+//            cameraNodes[i] = (offM2 + offM1 + off0 + off1 + off2) / 16f
+            cameraNodes[i] = (offM1 + off0 + off1) / 4f
         }
 
 
@@ -285,9 +286,9 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private val updateScreen = { delta: Float ->
         // TODO: desynched weather and time-of-day change
 
-        val forcedTime = 39693
-//        demoWorld.globalLight = WeatherMixer.globalLightNow
-        demoWorld.globalLight = WeatherMixer.getGlobalLightOfTimeOfNoon()
+        val forcedTime = 32880 // 9h08m
+        demoWorld.globalLight = WeatherMixer.globalLightNow
+//        demoWorld.globalLight = WeatherMixer.getGlobalLightOfTimeOfNoon()
         demoWorld.updateWorldTime(delta)
 //        WeatherMixer.update(delta, cameraPlayer, demoWorld)
         WeatherMixer.forceTimeAt = forcedTime

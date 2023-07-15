@@ -20,9 +20,10 @@ object Skybox : Disposable {
 
     const val gradSize = 128
 
-    private val gradTexBin: Array<Texture>
+    private val gradTexBinLowAlbedo: Array<Texture>
+    private val gradTexBinHighAlbedo: Array<Texture>
 
-    operator fun get(elevationDeg: Double, turbidity: Double): Texture {
+    operator fun get(elevationDeg: Double, turbidity: Double, highAlbedo: Boolean = false): Texture {
 //        if (elevationDeg !in elevationsD) {
 //            throw IllegalArgumentException("Elevation not in ±75° (got $elevationDeg)")
 //        }
@@ -31,11 +32,11 @@ object Skybox : Disposable {
 //        }
 
         val elev = elevationDeg.coerceIn(elevationsD).toInt() - elevations.first
-        val turb = ((turbidity.coerceIn(turbiditiesD) - turbiditiesD.start) / (turbidities.step / 100.0)).toInt()
+        val turb = ((turbidity.coerceIn(turbiditiesD) - turbiditiesD.start) / (turbidities.step / 10.0)).toInt()
 
 //        printdbg(this, "$elevationDeg $turbidity ; $elev $turb")
 
-        return gradTexBin[elev * turbCnt + turb]
+        return (if (highAlbedo) gradTexBinHighAlbedo else gradTexBinLowAlbedo)[elev * turbCnt + turb]
     }
 
     private fun Float.scaleFun() =
@@ -66,11 +67,12 @@ object Skybox : Disposable {
 
     private val elevations = (-75..75) // 151
     private val elevationsD = (elevations.first.toDouble() .. elevations.last.toDouble())
-    private val turbidities = (1_00..10_00 step 50) // 19
-    private val turbiditiesD = (turbidities.first / 100.0..turbidities.last / 100.0)
+    private val turbidities = (1_0..10_0 step 1) // 99
+    private val turbiditiesD = (turbidities.first / 10.0..turbidities.last / 10.0)
     private val elevCnt = elevations.count()
     private val turbCnt = turbidities.count()
-    private val albedo = 0.1
+    private val albedoLow = 0.1
+    private val albedoHight = 0.8 // for theoretical "winter wonderland"?
     private val gamma = HALF_PI
 
     private fun Double.mapCircle() = sin(HALF_PI * this)
@@ -78,11 +80,20 @@ object Skybox : Disposable {
     init {
         printdbg(this, "Initialising skybox model")
 
-        gradTexBin = Array(elevCnt * turbCnt) {
+        gradTexBinLowAlbedo = getTexturmaps(albedoLow)
+        gradTexBinHighAlbedo = getTexturmaps(albedoHight)
+
+        App.disposables.add(this)
+
+        printdbg(this, "Skybox model generated!")
+    }
+
+    private fun getTexturmaps(albedo: Double): Array<Texture> {
+        return Array(elevCnt * turbCnt) {
 
             val elevationDeg = (it / turbCnt).plus(elevations.first).toDouble()
             val elevationRad = Math.toRadians(elevationDeg)
-            val turbidity = 1.0 + (it % turbCnt) / 2.0
+            val turbidity = 1.0 + (it % turbCnt) / 10.0
 
             val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
             val pixmap = Pixmap(1, gradSize, Pixmap.Format.RGBA8888)
@@ -111,13 +122,10 @@ object Skybox : Disposable {
             pixmap.dispose()
             texture
         }
-
-        App.disposables.add(this)
-
-        printdbg(this, "Skybox model generated!")
     }
 
     override fun dispose() {
-        gradTexBin.forEach { it.dispose() }
+        gradTexBinLowAlbedo.forEach { it.dispose() }
+        gradTexBinHighAlbedo.forEach { it.dispose() }
     }
 }

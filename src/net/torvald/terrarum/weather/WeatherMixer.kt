@@ -160,9 +160,13 @@ internal object WeatherMixer : RNGConsumer {
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
+        val solarElev = if (forceTimeAt != null)
+            world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
+        else
+            world.worldTime.solarElevationDeg
         val daylightClut = currentWeather.daylightClut
         // calculate global light
-        val globalLight = getGradientColour2(daylightClut, world.worldTime.solarElevationDeg, timeNow)
+        val globalLight = getGradientColour2(daylightClut, solarElev, timeNow)
         globalLightNow.set(globalLight)
 
         /* (copied from the shader source)
@@ -180,17 +184,13 @@ internal object WeatherMixer : RNGConsumer {
 //        println(parallax) // parallax value works as intended.
 
         gdxBlendNormalStraightAlpha()
-
-        val deg = if (forceTimeAt != null)
-            world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
-        else
-            world.worldTime.solarElevationDeg
-        val degThis = deg.floorToDouble()
+        
+        val degThis = solarElev.floorToDouble()
         val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 
         val texture1 = Skybox[degThis, turbidity]
         val texture2 = Skybox[degNext, turbidity]
-        val lerpScale = (if (timeNow < HALF_DAY) deg - degThis else 1f - (deg - degThis)).toFloat()
+        val lerpScale = (if (timeNow < HALF_DAY) solarElev - degThis else 1f - (solarElev - degThis)).toFloat()
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
         batch.inUse {
