@@ -19,119 +19,33 @@ import net.torvald.unicode.TIMES
  */
 class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
+    override var width = 560
 
-    private val linegap = 14
-    private val panelgap = 20
-
-    private val rowheight = 20 + linegap
-
-    private val h1MarginTop = 16
-    private val h1MarginBottom = 4
-
-    private val options = arrayOf(
-        arrayOf("", { Lang["CREDITS_VFX"] }, "h1"),
+    init {
+        ControlPanelCommon.register(this, width, "basegame.graphicscontrolpanel", arrayOf(
+            arrayOf("", { Lang["CREDITS_VFX"] }, "h1"),
             arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
             arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
             arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
-        arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
+            arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
             arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
             arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"] }, "spinnerd,1.0,2.0,0.05"),
             arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
             arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
-        arrayOf("", { Lang["MENU_LABEL_STREAMING"] }, "h1"),
+            arrayOf("", { Lang["MENU_LABEL_STREAMING"] }, "h1"),
             arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT"] }, "toggle"),
-    )
-
-    private val optionsYpos = IntArray(options.size + 1)
-
-    init {
-        CommonResourcePool.addToLoadingList("gui_hrule") {
-            TextureRegionPack(Gdx.files.internal("assets/graphics/gui/hrule.tga"), 216, 20)
-        }
-        CommonResourcePool.loadAll()
-
-
-
-        var akku = 0
-        options.forEachIndexed { index, row ->
-            val option = row[2]
-
-            if (index > 0 && option == "h1") {
-                akku += h1MarginTop
-            }
-
-            optionsYpos[index] = akku
-
-            akku += when (option) {
-                "h1" -> rowheight + h1MarginBottom
-                else -> rowheight
-            }
-        }
-        optionsYpos[optionsYpos.lastIndex] = akku
-    }
-    override var width = 560
-    override var height = optionsYpos.last()
-
-    private val hrule = CommonResourcePool.getAsTextureRegionPack("gui_hrule")
-
-    private val spinnerWidth = 140
-    private val drawX = (Toolkit.drawWidth - width) / 2
-    private val drawY = (App.scr.height - height) / 2
-
-    private val optionControllers: List<Pair<UIItem, (UIItem, String) -> Unit>> = options.mapIndexed { index, strings ->
-        makeButton(this, options[index][2] as String,
-                drawX + width / 2 + panelgap,
-                drawY - 2 + optionsYpos[index],
-                options[index][0] as String
-        )
+        ))
     }
 
-    init {
-        optionControllers.forEachIndexed { i, it ->
-            it.second.invoke(it.first, options[i][0] as String)
-            addUIitem(it.first)
-        }
-    }
+    override var height = ControlPanelCommon.getMenuHeight("basegame.graphicscontrolpanel")
 
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        /*batch.color = Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
-
-        batch.color = CELL_COL
-        Toolkit.fillArea(batch, drawX, drawY, width, height)*/
-
-        options.forEachIndexed { index, strings ->
-            val mode = strings[2]
-
-            val font = if (mode == "h1") App.fontUITitle else App.fontGame
-
-            val label = (strings[1] as () -> String).invoke()
-            val labelWidth = font.getWidth(label)
-            batch.color = when (mode) {
-                "h1" -> Toolkit.Theme.COL_MOUSE_UP
-                "p" -> Color.LIGHT_GRAY
-                else -> Color.WHITE
-            }
-
-            val xpos = if (mode == "p" || mode == "h1")
-                drawX + (width - labelWidth)/2 // centre-aligned
-            else
-                drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
-
-            font.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index] - 2f)
-
-            // draw hrule
-            if (mode == "h1") {
-                val ruleWidth = ((width - 24 - labelWidth) / 2).toFloat()
-                batch.draw(hrule.get(0,0), xpos - 24f - ruleWidth, drawY + optionsYpos[index].toFloat(), ruleWidth, hrule.tileH.toFloat())
-                batch.draw(hrule.get(0,1), xpos + 24f + labelWidth, drawY + optionsYpos[index].toFloat(), ruleWidth, hrule.tileH.toFloat())
-            }
-        }
+        ControlPanelCommon.render("basegame.graphicscontrolpanel", width, batch)
         uiItems.forEach { it.render(batch, camera) }
 
         if (App.getConfigBoolean("fx_streamerslayout")) {
@@ -150,14 +64,6 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                     ((App.scr.height - App.fontGame.lineHeight) / 2).toFloat()
             )
         }
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchDown(screenX, screenY, pointer, button)
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
     }
 
     override fun dispose() {

@@ -12,7 +12,6 @@ object DefaultConfig {
     val hashMap = hashMapOf<String, Any>(
             "jvm_xmx" to 4,
             "jvm_extra_cmd" to "",
-            "testvalue" to 1,
 
             "displayfps" to 0, // 0: no limit, non-zero: limit
             "displayfpsidle" to 0, // 0: no limit, non-zero: limit
@@ -118,6 +117,12 @@ object DefaultConfig {
 
             "debug_key_deltat_benchmark" to Input.Keys.SLASH,
             "debug_deltat_benchmark_sample_sizes" to 2048,
+
+
+            "mastervolume" to 1.0,
+            "musicvolume" to 1.0,
+            "bgmvolume" to 1.0,
+            "sfxvolume" to 1.0,
 
 
 

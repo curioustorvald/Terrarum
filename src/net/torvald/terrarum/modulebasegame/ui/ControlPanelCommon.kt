@@ -1,20 +1,35 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.ui.*
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+
+typealias ControlPanelOptions = Array<Array<Any>>
 
 /**
  * Created by minjaesong on 2023-07-14.
  */
 object ControlPanelCommon {
 
+    init {
+        CommonResourcePool.addToLoadingList("gui_hrule") {
+            TextureRegionPack(Gdx.files.internal("assets/graphics/gui/hrule.tga"), 216, 20)
+        }
+        CommonResourcePool.loadAll()
+    }
+
     var CONFIG_SPINNER_WIDTH = 140
     var CONFIG_TYPEIN_WIDTH = 240
+    var CONFIG_SLIDER_WIDTH = 240
 
     // @return Pair of <UIItem, Init job for the item>
     fun makeButton(parent: UICanvas, args: String, x: Int, y: Int, optionName: String): Pair<UIItem, (UIItem, String) -> Unit> {
-        return if (args.startsWith("h1") || args.startsWith("p")) {
+        return if (args.equals("h1") || args.equals("p")) {
             (object : UIItem(parent, x, y) {
                 override val width = 1
                 override val height = 1
@@ -47,7 +62,7 @@ object ControlPanelCommon {
         }
         else if (args.startsWith("sliderd,")) {
             val arg = args.split(',')
-            UIItemHorzSlider(parent, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), CONFIG_SPINNER_WIDTH) to { it: UIItem, optionStr: String ->
+            UIItemHorzSlider(parent, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), CONFIG_SLIDER_WIDTH) to { it: UIItem, optionStr: String ->
                 (it as UIItemHorzSlider).selectionChangeListener = {
                     App.setConfig(optionStr, it)
                 }
@@ -105,6 +120,93 @@ object ControlPanelCommon {
             }
         }
         else throw IllegalArgumentException(args)
+    }
+
+    private val linegap = 14
+    private val panelgap = 20
+
+    private val rowheight = 20 + linegap
+
+    private val h1MarginTop = 16
+    private val h1MarginBottom = 4
+
+    private val optionsYposCache = HashMap<String, IntArray>()
+    private val optionsCache = HashMap<String, ControlPanelOptions>()
+
+    fun register(ui: UICanvas, width: Int, identifier: String, options: ControlPanelOptions) {
+        optionsCache[identifier] = options
+        val optionsYpos = IntArray(options.size + 1)
+        var akku = 0
+        options.forEachIndexed { index, row ->
+            val option = row[2]
+
+            if (index > 0 && option == "h1") {
+                akku += h1MarginTop
+            }
+
+            optionsYpos[index] = akku
+
+            akku += when (option) {
+                "h1" -> rowheight + h1MarginBottom
+                else -> rowheight
+            }
+        }
+        optionsYpos[optionsYpos.lastIndex] = akku
+        optionsYposCache[identifier] = optionsYpos
+
+        val height = optionsYpos.last()
+        val drawX = (App.scr.width - width) / 2
+        val drawY = (App.scr.height - height) / 2
+
+        options.forEachIndexed { index, args ->
+            val (item, job) = makeButton(
+                ui, args[2] as String,
+                drawX + width / 2 + panelgap,
+                drawY - 2 + optionsYpos[index],
+                args[0] as String
+            )
+            job.invoke(item, args[0] as String)
+            ui.addUIitem(item)
+        }
+    }
+
+    private val hrule = CommonResourcePool.getAsTextureRegionPack("gui_hrule")
+
+    fun getMenuHeight(identifier: String) = optionsYposCache[identifier]!!.last()
+
+    fun render(identifier: String, width: Int, batch: SpriteBatch) {
+        val height = optionsYposCache[identifier]!!.last()
+        val drawX = (App.scr.width - width) / 2
+        val drawY = (App.scr.height - height) / 2
+
+        val optionsYpos = optionsYposCache[identifier]!!
+        optionsCache[identifier]!!.forEachIndexed { index, args ->
+            val mode = args[2]
+
+            val font = if (mode == "h1") App.fontUITitle else App.fontGame
+
+            val label = (args[1] as () -> String).invoke()
+            val labelWidth = font.getWidth(label)
+            batch.color = when (mode) {
+                "h1" -> Toolkit.Theme.COL_MOUSE_UP
+                "p" -> Color.LIGHT_GRAY
+                else -> Color.WHITE
+            }
+
+            val xpos = if (mode == "p" || mode == "h1")
+                drawX + (width - labelWidth)/2 // centre-aligned
+            else
+                drawX + width/2 - panelgap - labelWidth // right aligned at the middle of the panel, offsetted by panelgap
+
+            font.draw(batch, label, xpos.toFloat(), drawY + optionsYpos[index] - 2f)
+
+            // draw hrule
+            if (mode == "h1") {
+                val ruleWidth = ((width - 24 - labelWidth) / 2).toFloat()
+                batch.draw(hrule.get(0,0), xpos - 24f - ruleWidth, drawY + optionsYpos[index].toFloat(), ruleWidth, hrule.tileH.toFloat())
+                batch.draw(hrule.get(0,1), xpos + 24f + labelWidth, drawY + optionsYpos[index].toFloat(), ruleWidth, hrule.tileH.toFloat())
+            }
+        }
     }
 
 }

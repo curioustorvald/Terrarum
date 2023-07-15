@@ -184,7 +184,7 @@ internal object WeatherMixer : RNGConsumer {
 //        println(parallax) // parallax value works as intended.
 
         gdxBlendNormalStraightAlpha()
-        
+
         val degThis = solarElev.floorToDouble()
         val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 

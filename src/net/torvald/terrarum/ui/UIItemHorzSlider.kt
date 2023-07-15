@@ -35,7 +35,7 @@ class UIItemHorzSlider(
     private var mouseOnHandle = false
 
     private val handleTravelDist = width - handleWidth
-    private var handlePos = 0.0
+    private var handlePos = (initialValue / max).times(handleTravelDist).coerceIn(0.0, handleTravelDist.toDouble())
 
     var value: Double = initialValue; private set
     var selectionChangeListener: (Double) -> Unit = {}
