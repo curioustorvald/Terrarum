@@ -239,13 +239,11 @@ public class App implements ApplicationListener {
     public static ShaderProgram shaderColLUT;
     public static ShaderProgram shaderReflect;
     public static ShaderProgram shaderGhastlyWhite;
-    public static ShaderProgram shaderHQ2x;
-
-    private static Texture hq2xLut;
+    public static Hq2x hq2x;
 
     public static Mesh fullscreenQuad;
     public static Mesh fullscreenQuad2x;
-    public static Mesh fullscreenQuad2d;
+    public static Mesh fullscreenQuadHQnX;
     private static OrthographicCamera camera;
     private static FlippingSpriteBatch logoBatch;
     public static TextureRegion logo;
@@ -478,9 +476,7 @@ public class App implements ApplicationListener {
         );
         shaderPassthruRGBA = loadShaderFromClasspath("shaders/gl32spritebatch.vert", "shaders/gl32spritebatch.frag");
         shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
-        shaderHQ2x = loadShaderFromClasspath("shaders/hq2x.vert", "shaders/hq2x.frag");
-
-        hq2xLut = new Texture(Gdx.files.classpath("shaders/hq2x.tga"));
+        hq2x = new Hq2x(2);
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -494,7 +490,7 @@ public class App implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-        fullscreenQuad2d = new Mesh(
+        fullscreenQuadHQnX = new Mesh(
                 true, 4, 6,
                 VertexAttribute.Position(),
                 VertexAttribute.ColorUnpacked(),
@@ -502,7 +498,7 @@ public class App implements ApplicationListener {
         );
         updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(fullscreenQuad2x, scr.getWidth() * 2, scr.getHeight() * 2);
-        updateFullscreenQuad(fullscreenQuad2d, scr.getWidth() / 2, scr.getHeight() / 2);
+        updateFullscreenQuad(fullscreenQuadHQnX, Math.round(scr.getWf() * 1280f / 2028f), Math.round(scr.getHf() * 720f / 982f));
 
         // set up renderer info variables
         renderer = Gdx.graphics.getGLVersion().getRendererString();
@@ -594,55 +590,18 @@ public class App implements ApplicationListener {
         }*/
 
 
-        if (getConfigString("screenmagnifyingfilter").equals("hq2x")) {
-            int canvasWidth = postProcessorOutFBO.getWidth(); // not zoomed dimension
-            int canvasHeight = postProcessorOutFBO.getHeight();
-
+        if (getConfigString("screenmagnifyingfilter").equals("hq2x") ) {
             FrameBufferManager.begin(postProcessorOutFBO2);
-
-            shaderHQ2x.bind();
-            shaderHQ2x.setUniformMatrix("u_projTrans", camera.combined);
-            shaderHQ2x.setUniformi("u_lut", 1);
-            shaderHQ2x.setUniformi("u_texture", 0);
-            shaderHQ2x.setUniformf("u_textureSize", canvasWidth, canvasHeight);
-            hq2xLut.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            hq2xLut.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-            hq2xLut.bind(1);
-            postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-            postProcessorOutFBO.getColorBufferTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-            postProcessorOutFBO.getColorBufferTexture().bind(0);
-            fullscreenQuad.render(shaderHQ2x, GL20.GL_TRIANGLES); // the shader expects the target texture size to be 2x the input dimension
-
+            hq2x.renderToScreen(postProcessorOutFBO.getColorBufferTexture());
             FrameBufferManager.end();
 
 
 
-            if (screenshotRequested) {
-                FrameBufferManager.begin(postProcessorOutFBO2);
-                try {
-                    Pixmap p = Pixmap.createFromFrameBuffer(0, 0, postProcessorOutFBO2.getWidth(), postProcessorOutFBO2.getHeight());
-                    PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
-                    p.dispose();
-                    Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
-                }
-                catch (Throwable e) {
-                    e.printStackTrace();
-                    Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
-                }
-                FrameBufferManager.end();
-                screenshotRequested = false;
-            }
-
-
-
-
             shaderPassthruRGBA.bind();
-            shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
             shaderPassthruRGBA.setUniformi("u_texture", 0);
             postProcessorOutFBO2.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-            postProcessorOutFBO2.getColorBufferTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             postProcessorOutFBO2.getColorBufferTexture().bind(0);
-            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+            fullscreenQuadHQnX.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
         }
         else if (getConfigDouble("screenmagnifying") < 1.01 || getConfigString("screenmagnifyingfilter").equals("none")) {
             shaderPassthruRGBA.bind();
@@ -796,7 +755,7 @@ public class App implements ApplicationListener {
         TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(fullscreenQuad2x, scr.getWidth() * 2, scr.getHeight() * 2);
-        updateFullscreenQuad(fullscreenQuad2d, scr.getWidth() / 2, scr.getHeight() / 2);
+        updateFullscreenQuad(fullscreenQuadHQnX, Math.round(scr.getWf() * 1280f / 2028f), Math.round(scr.getHf() * 720f / 982f));
 
 
         if (renderFBO == null ||
@@ -865,14 +824,12 @@ public class App implements ApplicationListener {
         shaderColLUT.dispose();
         shaderReflect.dispose();
         shaderGhastlyWhite.dispose();
-        shaderHQ2x.dispose();
-
-        hq2xLut.dispose();
+        hq2x.dispose();
 
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
         fullscreenQuad2x.dispose();
-        fullscreenQuad2d.dispose();
+        fullscreenQuadHQnX.dispose();
         logoBatch.dispose();
         batch.dispose();
 //        shapeRender.dispose();
