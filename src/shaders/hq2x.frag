@@ -3,11 +3,7 @@
 
 #version 150
 #ifdef GL_ES
-    #define PRECISION mediump
-    precision PRECISION float;
-    precision PRECISION int;
-#else
-    #define PRECISION
+    precision mediump float;
 #endif
 #define SCALE 2.0
 
@@ -83,5 +79,9 @@ void main() {
     float sum = dot(weights, vec4(1));
     vec3 res = (pixels * (weights / sum)).rgb;
 
-    fragColor.rgb = res;
+    fragColor = vec4(res.rgb, 1.0);
+
+
+
+//    fragColor = vec4(v_texCoord[0].x, v_texCoord[0].y, 0.0, 1.0);
 }

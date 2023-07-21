@@ -245,6 +245,7 @@ public class App implements ApplicationListener {
 
     public static Mesh fullscreenQuad;
     public static Mesh fullscreenQuad2x;
+    public static Mesh fullscreenQuad2d;
     private static OrthographicCamera camera;
     private static FlippingSpriteBatch logoBatch;
     public static TextureRegion logo;
@@ -493,8 +494,15 @@ public class App implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
+        fullscreenQuad2d = new Mesh(
+                true, 4, 6,
+                VertexAttribute.Position(),
+                VertexAttribute.ColorUnpacked(),
+                VertexAttribute.TexCoords(0)
+        );
         updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
-        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth(), scr.getHeight());
+        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth() * 2, scr.getHeight() * 2);
+        updateFullscreenQuad(fullscreenQuad2d, scr.getWidth() / 2, scr.getHeight() / 2);
 
         // set up renderer info variables
         renderer = Gdx.graphics.getGLVersion().getRendererString();
@@ -508,6 +516,7 @@ public class App implements ApplicationListener {
     }
 
     private FrameBuffer postProcessorOutFBO;
+    private FrameBuffer postProcessorOutFBO2;
 
     @Override
     public void render() {
@@ -568,10 +577,10 @@ public class App implements ApplicationListener {
 
 
         // process screenshot request
-        if (screenshotRequested) {
+        /*if (screenshotRequested) {
             FrameBufferManager.begin(postProcessorOutFBO);
             try {
-                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, scr.getWidth(), scr.getHeight());
+                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, postProcessorOutFBO.getWidth(), postProcessorOutFBO.getHeight());
                 PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
                 p.dispose();
                 Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
@@ -582,23 +591,58 @@ public class App implements ApplicationListener {
             }
             FrameBufferManager.end();
             screenshotRequested = false;
-        }
+        }*/
 
 
         if (getConfigString("screenmagnifyingfilter").equals("hq2x")) {
-            int canvasWidth = scr.getWidth() * 2;
-            int canvasHeight = scr.getHeight() * 2;
+            int canvasWidth = postProcessorOutFBO.getWidth(); // not zoomed dimension
+            int canvasHeight = postProcessorOutFBO.getHeight();
+
+            FrameBufferManager.begin(postProcessorOutFBO2);
 
             shaderHQ2x.bind();
             shaderHQ2x.setUniformMatrix("u_projTrans", camera.combined);
             shaderHQ2x.setUniformi("u_lut", 1);
             shaderHQ2x.setUniformi("u_texture", 0);
-            shaderHQ2x.setUniformf("u_textureSize", canvasWidth / 2f, canvasHeight / 2f);
+            shaderHQ2x.setUniformf("u_textureSize", canvasWidth, canvasHeight);
             hq2xLut.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            hq2xLut.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             hq2xLut.bind(1);
             postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            postProcessorOutFBO.getColorBufferTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             postProcessorOutFBO.getColorBufferTexture().bind(0);
-            fullscreenQuad2x.render(shaderHQ2x, GL20.GL_TRIANGLES);
+            fullscreenQuad.render(shaderHQ2x, GL20.GL_TRIANGLES); // the shader expects the target texture size to be 2x the input dimension
+
+            FrameBufferManager.end();
+
+
+
+            if (screenshotRequested) {
+                FrameBufferManager.begin(postProcessorOutFBO2);
+                try {
+                    Pixmap p = Pixmap.createFromFrameBuffer(0, 0, postProcessorOutFBO2.getWidth(), postProcessorOutFBO2.getHeight());
+                    PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
+                    p.dispose();
+                    Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
+                }
+                catch (Throwable e) {
+                    e.printStackTrace();
+                    Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
+                }
+                FrameBufferManager.end();
+                screenshotRequested = false;
+            }
+
+
+
+
+            shaderPassthruRGBA.bind();
+            shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
+            shaderPassthruRGBA.setUniformi("u_texture", 0);
+            postProcessorOutFBO2.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            postProcessorOutFBO2.getColorBufferTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            postProcessorOutFBO2.getColorBufferTexture().bind(0);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
         }
         else if (getConfigDouble("screenmagnifying") < 1.01 || getConfigString("screenmagnifyingfilter").equals("none")) {
             shaderPassthruRGBA.bind();
@@ -751,7 +795,8 @@ public class App implements ApplicationListener {
         if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
         TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
-        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth(), scr.getHeight());
+        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth() * 2, scr.getHeight() * 2);
+        updateFullscreenQuad(fullscreenQuad2d, scr.getWidth() / 2, scr.getHeight() / 2);
 
 
         if (renderFBO == null ||
@@ -761,6 +806,11 @@ public class App implements ApplicationListener {
             renderFBO = new FloatFrameBuffer(
                     scr.getWidth(),
                     scr.getHeight(),
+                    false
+            );
+            postProcessorOutFBO2 = new FloatFrameBuffer(
+                    scr.getWidth() * 2,
+                    scr.getHeight() * 2,
                     false
             );
 
@@ -822,6 +872,7 @@ public class App implements ApplicationListener {
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
         fullscreenQuad2x.dispose();
+        fullscreenQuad2d.dispose();
         logoBatch.dispose();
         batch.dispose();
 //        shapeRender.dispose();
