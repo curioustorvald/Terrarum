@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -26,9 +27,14 @@ object ControlPanelCommon {
     var CONFIG_SPINNER_WIDTH = 140
     var CONFIG_TYPEIN_WIDTH = 240
     var CONFIG_SLIDER_WIDTH = 240
+    var CONFIG_TEXTSEL_WIDTH = 240
 
     // @return Pair of <UIItem, Init job for the item>
-    fun makeButton(parent: UICanvas, args: String, x: Int, y: Int, optionName: String): Pair<UIItem, (UIItem, String) -> Unit> {
+    fun makeButton(parent: UICanvas, args: String, x: Int, y: Int, optionNames0: String): Pair<UIItem, (UIItem, String) -> Unit> {
+        val optionNames = optionNames0.split(",")
+        val optionName = optionNames.first()
+        val arg = args.split(',')
+
         return if (args.equals("h1") || args.equals("p")) {
             (object : UIItem(parent, x, y) {
                 override val width = 1
@@ -44,8 +50,26 @@ object ControlPanelCommon {
                 }
             }
         }
+        else if (args.startsWith("textsel,")) {
+            val labelFuns = arg.subList(1, arg.size).map { { Lang[it.substringAfter("=")] } }
+            val optionsList = arg.subList(1, arg.size).map { it.substringBefore("=") }
+
+            val initialSel = optionsList.indexOf(App.getConfigString(optionName))
+
+            println("labelFuns = ${labelFuns.map { it.invoke() }}")
+            println("optionsList = $optionsList")
+            println("optionName = $optionName; value = ${App.getConfigString(optionName)}")
+            println("initialSel = $initialSel")
+
+            if (initialSel < 0) throw IllegalArgumentException("config value '${App.getConfigString(optionName)}' for option '$optionName' is not found on the options list")
+
+            UIItemTextSelector(parent, x, y, labelFuns, initialSel, CONFIG_TEXTSEL_WIDTH, clickToShowPalette = false) to { it: UIItem, optionStr: String ->
+                (it as UIItemTextSelector).selectionChangeListener = {
+                    App.setConfig(optionStr, optionsList[it])
+                }
+            }
+        }
         else if (args.startsWith("spinner,")) {
-            val arg = args.split(',')
             UIItemSpinner(parent, x, y, App.getConfigInt(optionName), arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), CONFIG_SPINNER_WIDTH, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
                 (it as UIItemSpinner).selectionChangeListener = {
                     App.setConfig(optionStr, it)
@@ -53,7 +77,6 @@ object ControlPanelCommon {
             }
         }
         else if (args.startsWith("spinnerd,")) {
-            val arg = args.split(',')
             UIItemSpinner(parent, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), arg[3].toDouble(), CONFIG_SPINNER_WIDTH, numberToTextFunction = { "${((it as Double)*100).toInt()}%" }) to { it: UIItem, optionStr: String ->
                 (it as UIItemSpinner).selectionChangeListener = {
                     App.setConfig(optionStr, it)
@@ -61,7 +84,6 @@ object ControlPanelCommon {
             }
         }
         else if (args.startsWith("sliderd,")) {
-            val arg = args.split(',')
             UIItemHorzSlider(parent, x, y, App.getConfigDouble(optionName), arg[1].toDouble(), arg[2].toDouble(), CONFIG_SLIDER_WIDTH) to { it: UIItem, optionStr: String ->
                 (it as UIItemHorzSlider).selectionChangeListener = {
                     App.setConfig(optionStr, it)
@@ -69,7 +91,6 @@ object ControlPanelCommon {
             }
         }
         else if (args.startsWith("spinnerimul,")) {
-            val arg = args.split(',')
             val mult = arg[4].toInt()
             UIItemSpinner(parent, x, y, App.getConfigInt(optionName) / mult, arg[1].toInt(), arg[2].toInt(), arg[3].toInt(), CONFIG_SPINNER_WIDTH, numberToTextFunction = { "${it.toLong()}" }) to { it: UIItem, optionStr: String ->
                 (it as UIItemSpinner).selectionChangeListener = {
@@ -90,8 +111,8 @@ object ControlPanelCommon {
             }
         }
         else if (args.startsWith("typeinres")) {
-            val keyWidth = optionName.substringBefore(',')
-            val keyHeight = optionName.substringAfter(',')
+            val keyWidth = optionNames[0]
+            val keyHeight = optionNames[1]
             UIItemTextLineInput(parent, x, y, CONFIG_SPINNER_WIDTH,
                 defaultValue = { "${App.getConfigInt(keyWidth)}x${App.getConfigInt(keyHeight)}" },
                 maxLen = InputLenCap(9, InputLenCap.CharLenUnit.CODEPOINTS),

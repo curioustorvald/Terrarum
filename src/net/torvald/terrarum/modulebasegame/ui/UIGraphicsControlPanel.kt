@@ -30,6 +30,7 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
             arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
             arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"] }, "spinnerd,1.0,2.0,0.05"),
+            arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE"] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
             arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
             arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
             arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),

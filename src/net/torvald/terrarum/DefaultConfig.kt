@@ -112,6 +112,7 @@ object DefaultConfig {
             "inputmethod" to "none",
 
             "screenmagnifying" to 1.0,
+            "screenmagnifyingfilter" to "none", // "none", "bilinear", "hq2x"
 
             "fx_newlight" to false,
 

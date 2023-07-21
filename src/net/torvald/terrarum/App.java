@@ -31,7 +31,6 @@ import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
-import net.torvald.terrarum.savegame.DiskSkimmer;
 import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.ui.Toolkit;
 import net.torvald.terrarum.utils.JsonFetcher;
@@ -240,8 +239,12 @@ public class App implements ApplicationListener {
     public static ShaderProgram shaderColLUT;
     public static ShaderProgram shaderReflect;
     public static ShaderProgram shaderGhastlyWhite;
+    public static ShaderProgram shaderHQ2x;
+
+    private static Texture hq2xLut;
 
     public static Mesh fullscreenQuad;
+    public static Mesh fullscreenQuad2x;
     private static OrthographicCamera camera;
     private static FlippingSpriteBatch logoBatch;
     public static TextureRegion logo;
@@ -392,6 +395,7 @@ public class App implements ApplicationListener {
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
             appConfig.setWindowedMode(width, height);
+            appConfig.setTransparentFramebuffer(false);
             int fpsActive = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
             if (fpsActive <= 0) fpsActive = GLOBAL_FRAMERATE_LIMIT;
             int fpsBack = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfpsidle"));
@@ -473,6 +477,9 @@ public class App implements ApplicationListener {
         );
         shaderPassthruRGBA = loadShaderFromClasspath("shaders/gl32spritebatch.vert", "shaders/gl32spritebatch.frag");
         shaderReflect = loadShaderFromClasspath("shaders/default.vert", "shaders/reflect.frag");
+        shaderHQ2x = loadShaderFromClasspath("shaders/hq2x.vert", "shaders/hq2x.frag");
+
+        hq2xLut = new Texture(Gdx.files.classpath("shaders/hq2x.tga"));
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -480,7 +487,14 @@ public class App implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-        updateFullscreenQuad(scr.getWidth(), scr.getHeight());
+        fullscreenQuad2x = new Mesh(
+                true, 4, 6,
+                VertexAttribute.Position(),
+                VertexAttribute.ColorUnpacked(),
+                VertexAttribute.TexCoords(0)
+        );
+        updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
+        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth(), scr.getHeight());
 
         // set up renderer info variables
         renderer = Gdx.graphics.getGLVersion().getRendererString();
@@ -571,11 +585,39 @@ public class App implements ApplicationListener {
         }
 
 
-        shaderPassthruRGBA.bind();
-        shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
-        shaderPassthruRGBA.setUniformi("u_texture", 0);
-        postProcessorOutFBO.getColorBufferTexture().bind(0);
-        fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+        if (getConfigString("screenmagnifyingfilter").equals("hq2x")) {
+            int canvasWidth = scr.getWidth() * 2;
+            int canvasHeight = scr.getHeight() * 2;
+
+            shaderHQ2x.bind();
+            shaderHQ2x.setUniformMatrix("u_projTrans", camera.combined);
+            shaderHQ2x.setUniformi("u_lut", 1);
+            shaderHQ2x.setUniformi("u_texture", 0);
+            shaderHQ2x.setUniformf("u_textureSize", canvasWidth / 2f, canvasHeight / 2f);
+            hq2xLut.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            hq2xLut.bind(1);
+            postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            postProcessorOutFBO.getColorBufferTexture().bind(0);
+            fullscreenQuad2x.render(shaderHQ2x, GL20.GL_TRIANGLES);
+        }
+        else if (getConfigDouble("screenmagnifying") < 1.01 || getConfigString("screenmagnifyingfilter").equals("none")) {
+            shaderPassthruRGBA.bind();
+            shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
+            shaderPassthruRGBA.setUniformi("u_texture", 0);
+            postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            postProcessorOutFBO.getColorBufferTexture().bind(0);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+        }
+        else if (getConfigString("screenmagnifyingfilter").equals("bilinear")) {
+            shaderPassthruRGBA.bind();
+            shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
+            shaderPassthruRGBA.setUniformi("u_texture", 0);
+            postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            postProcessorOutFBO.getColorBufferTexture().bind(0);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+        }
+
+
 
         // process resize request
         if (resizeRequested) {
@@ -708,7 +750,8 @@ public class App implements ApplicationListener {
 
         if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
         TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());
-        updateFullscreenQuad(scr.getWidth(), scr.getHeight());
+        updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
+        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth(), scr.getHeight());
 
 
         if (renderFBO == null ||
@@ -772,9 +815,13 @@ public class App implements ApplicationListener {
         shaderColLUT.dispose();
         shaderReflect.dispose();
         shaderGhastlyWhite.dispose();
+        shaderHQ2x.dispose();
+
+        hq2xLut.dispose();
 
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
+        fullscreenQuad2x.dispose();
         logoBatch.dispose();
         batch.dispose();
 //        shapeRender.dispose();
@@ -881,7 +928,6 @@ public class App implements ApplicationListener {
         shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
         shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
         shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
-
 
         // make gamepad(s)
         if (App.getConfigBoolean("usexinput")) {
@@ -1036,14 +1082,14 @@ public class App implements ApplicationListener {
         logoBatch.setProjectionMatrix(camera.combined);
     }
 
-    private void updateFullscreenQuad(int WIDTH, int HEIGHT) { // NOT y-flipped quads!
-        fullscreenQuad.setVertices(new float[]{
+    private void updateFullscreenQuad(Mesh mesh, int WIDTH, int HEIGHT) { // NOT y-flipped quads!
+        mesh.setVertices(new float[]{
                 0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
                 WIDTH, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
                 WIDTH, HEIGHT, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
                 0f, HEIGHT, 0f, 1f, 1f, 1f, 1f, 0f, 0f
         });
-        fullscreenQuad.setIndices(new short[]{0, 1, 2, 2, 3, 0});
+        mesh.setIndices(new short[]{0, 1, 2, 2, 3, 0});
     }
 
     public static void setGamepadButtonLabels() {
