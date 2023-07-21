@@ -45,24 +45,24 @@ void main() {
 
     float dx = v_texCoord[0].z;
     float dy = v_texCoord[0].w;
-    vec3 p1  = texture2D(u_texture, v_texCoord[0].xy).rgb;
-    vec3 p2  = texture2D(u_texture, v_texCoord[0].xy + vec2(dx, dy) * quad).rgb;
-    vec3 p3  = texture2D(u_texture, v_texCoord[0].xy + vec2(dx, 0) * quad).rgb;
-    vec3 p4  = texture2D(u_texture, v_texCoord[0].xy + vec2(0, dy) * quad).rgb;
+    vec3 p1  = texture(u_texture, v_texCoord[0].xy).rgb;
+    vec3 p2  = texture(u_texture, v_texCoord[0].xy + vec2(dx, dy) * quad).rgb;
+    vec3 p3  = texture(u_texture, v_texCoord[0].xy + vec2(dx, 0) * quad).rgb;
+    vec3 p4  = texture(u_texture, v_texCoord[0].xy + vec2(0, dy) * quad).rgb;
     // Use mat4 instead of mat4x3 here to support GLES.
     mat4 pixels = mat4(vec4(p1, 0.0), vec4(p2, 0.0), vec4(p3, 0.0), vec4(p4, 0.0));
 
-    vec3 w1  = yuv * texture2D(u_texture, v_texCoord[1].xw).rgb;
-    vec3 w2  = yuv * texture2D(u_texture, v_texCoord[1].yw).rgb;
-    vec3 w3  = yuv * texture2D(u_texture, v_texCoord[1].zw).rgb;
+    vec3 w1  = yuv * texture(u_texture, v_texCoord[1].xw).rgb;
+    vec3 w2  = yuv * texture(u_texture, v_texCoord[1].yw).rgb;
+    vec3 w3  = yuv * texture(u_texture, v_texCoord[1].zw).rgb;
 
-    vec3 w4  = yuv * texture2D(u_texture, v_texCoord[2].xw).rgb;
+    vec3 w4  = yuv * texture(u_texture, v_texCoord[2].xw).rgb;
     vec3 w5  = yuv * p1;
-    vec3 w6  = yuv * texture2D(u_texture, v_texCoord[2].zw).rgb;
+    vec3 w6  = yuv * texture(u_texture, v_texCoord[2].zw).rgb;
 
-    vec3 w7  = yuv * texture2D(u_texture, v_texCoord[3].xw).rgb;
-    vec3 w8  = yuv * texture2D(u_texture, v_texCoord[3].yw).rgb;
-    vec3 w9  = yuv * texture2D(u_texture, v_texCoord[3].zw).rgb;
+    vec3 w7  = yuv * texture(u_texture, v_texCoord[3].xw).rgb;
+    vec3 w8  = yuv * texture(u_texture, v_texCoord[3].yw).rgb;
+    vec3 w9  = yuv * texture(u_texture, v_texCoord[3].zw).rgb;
 
     bvec3 pattern[3];
     pattern[0] =  bvec3(diff(w5, w1), diff(w5, w2), diff(w5, w3));
@@ -79,7 +79,7 @@ void main() {
 
     vec2 step = vec2(1.0) / vec2(256.0, 16.0 * (SCALE * SCALE));
     vec2 offset = step / vec2(2.0);
-    vec4 weights = texture2D(u_lut, index * step + offset);
+    vec4 weights = texture(u_lut, index * step + offset);
     float sum = dot(weights, vec4(1));
     vec3 res = (pixels * (weights / sum)).rgb;
 
