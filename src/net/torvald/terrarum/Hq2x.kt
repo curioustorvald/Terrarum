@@ -47,7 +47,7 @@ class Hq2x : Disposable {
         program = compileShader(
             Gdx.files.classpath("shaders/hq2x.vert"),
             Gdx.files.classpath("shaders/hq2x.frag"),
-            "#define SCALE ${scaleFactor}.0")
+            "")
 
         lutTexture = Texture(Gdx.files.classpath("shaders/hq${scaleFactor}x.png"))
 

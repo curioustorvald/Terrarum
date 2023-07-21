@@ -1,6 +1,8 @@
+#version 150
 // This float value should be defined from the compiling code.
 // #define SCALE [2, 3, 4].0
 
+#define SCALE 2.0
 #ifdef GL_ES
 #define PRECISION mediump
 precision PRECISION float;
@@ -13,11 +15,13 @@ uniform sampler2D u_texture;
 uniform sampler2D u_lut;
 uniform vec2 u_textureSize;
 
-varying vec4 v_texCoord[4];
+in vec4 v_texCoord[4];
 
 const mat3 YUV_MATRIX = mat3(0.299, 0.587, 0.114, -0.169, -0.331, 0.5, 0.5, -0.419, -0.081);
 const vec3 YUV_THRESHOLD = vec3(48.0/255.0, 7.0/255.0, 6.0/255.0);
 const vec3 YUV_OFFSET = vec3(0, 0.5, 0.5);
+
+out vec4 fragColor;
 
 bool diff(vec3 yuv1, vec3 yuv2) {
     return any(greaterThan(abs((yuv1 + YUV_OFFSET) - (yuv2 + YUV_OFFSET)), YUV_THRESHOLD));
@@ -79,5 +83,5 @@ void main() {
     float sum = dot(weights, vec4(1));
     vec3 res = (pixels * (weights / sum)).rgb;
 
-    gl_FragColor.rgb = res;
+    fragColor.rgb = res;
 }

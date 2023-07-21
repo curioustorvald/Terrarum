@@ -1,17 +1,11 @@
-#ifdef GL_ES
-#define PRECISION mediump
-precision PRECISION float;
-precision PRECISION int;
-#else
-#define PRECISION
-#endif
+#version 150
 
-attribute vec4 a_position;
-attribute vec2 a_texCoord0;
+in vec4 a_position;
+in vec2 a_texCoord0;
 
 uniform vec2 u_textureSize;
 
-varying vec4 v_texCoord[4];
+out vec4 v_texCoord[4];
 
 void main() {
     gl_Position = a_position;
