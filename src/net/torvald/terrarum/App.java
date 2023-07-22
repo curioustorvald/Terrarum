@@ -571,31 +571,15 @@ public class App implements ApplicationListener {
         FrameBufferManager.end();
 
 
-
         // process screenshot request
-        /*if (screenshotRequested) {
-            FrameBufferManager.begin(postProcessorOutFBO);
-            try {
-                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, postProcessorOutFBO.getWidth(), postProcessorOutFBO.getHeight());
-                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
-                p.dispose();
-                Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
-            }
-            catch (Throwable e) {
-                e.printStackTrace();
-                Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
-            }
-            FrameBufferManager.end();
-            screenshotRequested = false;
-        }*/
+        processScreenshotRequest(postProcessorOutFBO);
+
 
 
         if (getConfigString("screenmagnifyingfilter").equals("hq2x") ) {
             FrameBufferManager.begin(postProcessorOutFBO2);
             hq2x.renderToScreen(postProcessorOutFBO.getColorBufferTexture());
             FrameBufferManager.end();
-
-
 
             shaderPassthruRGBA.bind();
             shaderPassthruRGBA.setUniformi("u_texture", 0);
@@ -633,6 +617,24 @@ public class App implements ApplicationListener {
         splashDisplayed = true;
         GLOBAL_RENDER_TIMER += 1;
 
+    }
+
+    private static void processScreenshotRequest(FrameBuffer fb) {
+        if (screenshotRequested) {
+            FrameBufferManager.begin(fb);
+            try {
+                Pixmap p = Pixmap.createFromFrameBuffer(0, 0, fb.getWidth(), fb.getHeight());
+                PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
+                p.dispose();
+                Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
+            }
+            catch (Throwable e) {
+                e.printStackTrace();
+                Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
+            }
+            FrameBufferManager.end();
+            screenshotRequested = false;
+        }
     }
 
     public static Texture getCurrentDitherTex() {
