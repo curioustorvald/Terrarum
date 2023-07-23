@@ -1,3 +1,3 @@
 #!/bin/bash
 cd "${0%/*}"
-./out/runtime-osx-x86/bin/java -jar ./out/TerrarumBuild.jar
+./out/runtime-osx-x86/bin/Terrarum -jar ./out/TerrarumBuild.jar

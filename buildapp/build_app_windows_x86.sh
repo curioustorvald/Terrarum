@@ -27,6 +27,7 @@ x86_64-w64-mingw32-gcc -Os -s -o $DESTDIR/Terrarum.exe $SRCFILES/Terrarum.c || {
 # Copy over a Java runtime
 mkdir $DESTDIR/out
 cp -r "../out/$RUNTIME" $DESTDIR/out/
+mv $DESTDIR/out/$RUNTIME/bin/java.exe $DESTDIR/out/$RUNTIME/bin/Terrarum.exe
 
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/

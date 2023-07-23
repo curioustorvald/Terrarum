@@ -25,6 +25,7 @@ chmod +x $DESTDIR/AppRun
 # Copy over a Java runtime
 mkdir $DESTDIR/out
 cp -r "../out/$RUNTIME" $DESTDIR/out/
+mv $DESTDIR/out/$RUNTIME/bin/java $DESTDIR/out/$RUNTIME/bin/Terrarum
 
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/

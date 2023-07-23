@@ -27,6 +27,7 @@ chmod +x $DESTDIR/Contents/MacOS/Terrarum.sh
 # Copy over a Java runtime
 mkdir $DESTDIR/Contents/MacOS/out
 cp -r "../out/$RUNTIME" $DESTDIR/Contents/MacOS/out/
+mv $DESTDIR/Contents/MacOS/out/$RUNTIME/bin/java $DESTDIR/Contents/MacOS/out/$RUNTIME/bin/Terrarum
 
 # Copy over all the assets and a jarfile
 cp -r "../assets_release" $DESTDIR/Contents/MacOS/
