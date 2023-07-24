@@ -30,7 +30,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
             }
 
         }
-        else if (args.size == 2 && args[1].trim().toLowerCase() == "none") {
+        else if (args.size == 2 && args[1].trim().lowercase() == "none") {
             WeatherMixer.globalLightOverridden = false
         }
         else {

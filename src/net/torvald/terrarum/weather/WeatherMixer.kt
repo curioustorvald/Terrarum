@@ -59,6 +59,8 @@ internal object WeatherMixer : RNGConsumer {
     // TODO to save from GL overhead, store lightmap to array; use GdxColorMap
 
     var forceTimeAt: Int? = null
+    var forceSolarElev: Double? = null
+    var forceTurbidity: Double? = null
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -68,6 +70,8 @@ internal object WeatherMixer : RNGConsumer {
     fun internalReset() {
         globalLightOverridden = false
         forceTimeAt = null
+        forceSolarElev = null
+        forceTurbidity = null
     }
 
     init {
@@ -160,7 +164,9 @@ internal object WeatherMixer : RNGConsumer {
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
-        val solarElev = if (forceTimeAt != null)
+        val solarElev = if (forceSolarElev != null)
+            forceSolarElev!!
+        else if (forceTimeAt != null)
             world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
         else
             world.worldTime.solarElevationDeg
@@ -185,12 +191,16 @@ internal object WeatherMixer : RNGConsumer {
 
         gdxBlendNormalStraightAlpha()
 
-        val degThis = solarElev.floorToDouble()
+        val degThis = if (timeNow < HALF_DAY) solarElev.floorToDouble() else solarElev.ceilToDouble()
         val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
 
-        val texture1 = Skybox[degThis, turbidity]
-        val texture2 = Skybox[degNext, turbidity]
-        val lerpScale = (if (timeNow < HALF_DAY) solarElev - degThis else 1f - (solarElev - degThis)).toFloat()
+        val thisTurbidity = forceTurbidity ?: turbidity
+
+        val texture1 = Skybox[degThis, thisTurbidity]
+        val texture2 = Skybox[degNext, thisTurbidity]
+        val lerpScale = (if (timeNow < HALF_DAY) solarElev - degThis else -(solarElev - degThis)).toFloat()
+
+//        println("degThis=$degThis, degNext=$degNext, lerp=$lerpScale")
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
         batch.inUse {

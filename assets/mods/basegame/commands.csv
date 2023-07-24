@@ -22,6 +22,8 @@ Seed
 SetAV
 SetBulletin
 SetScale
+SetSol
+SetTurb
 SetTime
 SetTimeDelta
 SpawnPhysTestBall

@@ -52,8 +52,9 @@ object Skybox : Disposable {
             )
         }
         else {
-            val elevation1 = -elevationDeg
-            val elevation2 = -elevationDeg / 28.5
+            val deg1 = (-elevationDeg / 75.0).pow(0.8).times(-75.0)
+            val elevation1 = -deg1
+            val elevation2 = -deg1 / 28.5
             val scale = (1f - (1f - 1f / 1.8.pow(elevation1)) * 0.97f).toFloat()
             val scale2 = (1.0 - (elevation2.pow(E) / E.pow(elevation2))*0.8).toFloat()
             CIEXYZ(
@@ -65,7 +66,7 @@ object Skybox : Disposable {
         }
     }
 
-    private val elevations = (-75..75) // 151
+    private val elevations = (-75..75) //zw 151
     private val elevationsD = (elevations.first.toDouble() .. elevations.last.toDouble())
     private val turbidities = (1_0..10_0 step 1) // 99
     private val turbiditiesD = (turbidities.first / 10.0..turbidities.last / 10.0)

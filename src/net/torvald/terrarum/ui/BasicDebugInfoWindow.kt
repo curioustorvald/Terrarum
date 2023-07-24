@@ -197,12 +197,16 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
         // sun and weather
-        val soldeg = world?.worldTime?.solarElevationDeg
+        val soldeg = WeatherMixer.forceSolarElev ?: world?.worldTime?.solarElevationDeg
         val soldegStr = (soldeg ?: 0.0).toIntAndFrac(3,2)
         val soldegNeg = ((soldeg ?: 0.0) >= 0.0).toInt()
-        val turbidity = WeatherMixer.turbidity
-        App.fontSmallNumbers.draw(batch, "$SOL $ccG$soldegStr", gap + 7f*(sol), line(mvY))
-        App.fontSmallNumbers.draw(batch, "$TAU   $ccG$turbidity", gap + 7f*(sol), line(mvY + 1))
+        val turbidity = WeatherMixer.forceTurbidity ?: WeatherMixer.turbidity
+
+        val soldegCol = if (WeatherMixer.forceSolarElev != null) ccO else ccG
+        val turbCol = if (WeatherMixer.forceTurbidity != null) ccO else ccG
+
+        App.fontSmallNumbers.draw(batch, "$SOL $soldegCol$soldegStr", gap + 7f*(sol), line(mvY))
+        App.fontSmallNumbers.draw(batch, "$TAU   $turbCol$turbidity", gap + 7f*(sol), line(mvY + 1))
 
 
 
