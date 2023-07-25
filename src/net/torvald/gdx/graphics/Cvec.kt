@@ -55,6 +55,13 @@ class Cvec {
         this.a = color.a
     }
 
+    constructor(rgb: Color, alpha: Float) {
+        this.r = rgb.r
+        this.g = rgb.g
+        this.b = rgb.b
+        this.a = alpha
+    }
+
     /** Constructor, sets the components of the color
      *
      * @param r the red component

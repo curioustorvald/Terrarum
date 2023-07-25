@@ -282,16 +282,19 @@ internal object WeatherMixer : RNGConsumer {
             else          { pNx = pSx - 1; pNy = 1 }
         }
 
-        val colourThis = colorMap.get(pSx, pSy)
-        val colourNext = colorMap.get(pNx, pNy)
+        val colourThisRGB = colorMap.get(pSx, pSy)
+        val colourNextRGB = colorMap.get(pNx, pNy)
+        val colourThisUV = colorMap.get(pSx, pSy + 2)
+        val colourNextUV = colorMap.get(pNx, pNy + 2)
 
         // interpolate R, G, B and A
         var scale = (pNowRaw - pStartRaw).toFloat()
         if (timeOfDay >= HALF_DAY) scale = 1f - scale
 
-        val newCol = colourThis.cpy().lerp(colourNext, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newColUV = colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
 
-        return Cvec(newCol)
+        return Cvec(newColRGB, newColUV.r)
     }
 
     fun getWeatherList(classification: String) = weatherList[classification]!!
