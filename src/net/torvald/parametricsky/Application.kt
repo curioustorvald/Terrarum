@@ -23,10 +23,12 @@ import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.GridLayout
 import javax.swing.*
-import kotlin.math.E
-import kotlin.math.PI
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import kotlin.math.*
+
+
+val INITIAL_TURBIDITY = 4.0
+val INITIAL_ALBEDO = 0.1
+val INITIAL_ELEV = 0.0
 
 
 /**
@@ -64,9 +66,9 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
     private lateinit var oneScreen: Pixmap
     private lateinit var batch: SpriteBatch
 
-    var turbidity = 2.0
-    var albedo = 0.1
-    var elevation = Math.toRadians(45.0)
+    var turbidity = INITIAL_TURBIDITY
+    var albedo = INITIAL_ALBEDO
+    var elevation = Math.toRadians(INITIAL_ELEV)
 
     var solarBearing = Math.toRadians(90.0)
     var cameraHeading = Math.toRadians(90.0)
@@ -79,13 +81,19 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         super.setScreen(screen)
     }
 
+    var model = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs())
+
+    fun regenerateModel() {
+        model = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs())
+    }
+
     override fun render() {
         Gdx.graphics.setTitle("Daylight Model $EMDASH F: ${Gdx.graphics.framesPerSecond}")
 
         if (turbidity <= 0) throw IllegalStateException()
 
         // we need to use different model-state to accommodate different albedo for each spectral band but oh well...
-        genTexLoop(ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs()))
+        genTexLoop(model)
 
 
         val tex = Texture(oneScreen)
@@ -117,8 +125,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         oneScreen.dispose()
     }
 
-    val outTexWidth = 2
-    val outTexHeight = 64
+    val outTexWidth = 1
+    val outTexHeight = 256
 
     private fun Float.scaleFun() =
             (1f - 1f / 2f.pow(this/6f)) * 0.97f
@@ -146,6 +154,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         }
     }
 
+    private fun Double.mapCircle() = sin(HALF_PI * this)
+
     /**
      * Generated texture is as if you took the panorama picture of sky: up 70deg to horizon, east-south-west;
      * with sun not moving (sun is at exact south, sun's height is adjustable)
@@ -163,14 +173,21 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         val ys = ArrayList<Float>()
         val ys2 = ArrayList<Float>()
 
-        for (x in 0 until oneScreen.width) {
-//            val elevation = Math.toRadians((x.toDouble() / oneScreen.width * 2.0 - 1.0) * 75)
-//            val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs())
-//            val gamma = (x / oneScreen.width.toDouble()) * PI // bearing, where 0 is right at the sun
-            val gamma = HALF_PI
+        val halfHeight = oneScreen.height * 0.5
 
+        for (x in 0 until oneScreen.width) {
             for (y in 0 until oneScreen.height) {
-                val theta = (y / oneScreen.height.toDouble()) * HALF_PI // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
+
+                // sky-sphere mapping
+                /*val xf = ((x + 0.5) / oneScreen.width) * 2.0 - 1.0
+                val yf = ((y + 0.5) / oneScreen.height) * 2.0 - 1.0
+                val gamma = atan2(yf, xf) + PI
+                val theta = sqrt(xf*xf + yf*yf) * HALF_PI*/
+
+                // AM-PM mapping (use with WIDTH=1)
+                val yf = (y * 2.0 / oneScreen.height) % 1.0
+                val gamma = if (y < halfHeight) HALF_PI else 3 * HALF_PI
+                val theta = yf.mapCircle() * HALF_PI
 
 
 
@@ -229,22 +246,25 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
         val dialSize = Dimension(45, 20)
 
-        val turbidityControl = JSpinner(SpinnerNumberModel(2.0, 1.0, 10.0, 0.1)).also {
+        val turbidityControl = JSpinner(SpinnerNumberModel(INITIAL_TURBIDITY, 1.0, 10.0, 0.1)).also {
             it.preferredSize = dialSize
             it.addChangeListener { _ ->
                 app.turbidity = it.value as Double
+                app.regenerateModel()
             }
         }
-        val albedoControl = JSpinner(SpinnerNumberModel(0.1, 0.0, 1.0, 0.05)).also {
+        val albedoControl = JSpinner(SpinnerNumberModel(INITIAL_ALBEDO, 0.0, 1.0, 0.05)).also {
             it.preferredSize = dialSize
             it.addChangeListener { _ ->
                 app.albedo = it.value as Double
+                app.regenerateModel()
             }
         }
-        val elevationControl = JSpinner(SpinnerNumberModel(45.0, -75.0, 75.0, 0.5)).also {
+        val elevationControl = JSpinner(SpinnerNumberModel(INITIAL_ELEV, -75.0, 75.0, 0.5)).also {
             it.preferredSize = dialSize
             it.addChangeListener { _ ->
                 app.elevation = Math.toRadians(it.value as Double)
+                app.regenerateModel()
             }
         }
         val solarBearing = JSpinner(SpinnerNumberModel(90.0, 0.0, 180.0, 1.0)).also {
