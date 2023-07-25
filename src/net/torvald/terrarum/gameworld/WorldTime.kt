@@ -125,21 +125,17 @@ class WorldTime(initTime: Long = 0L) {
         val TIME_T = DAY_LENGTH * ordinalDay + second
 
         val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
-        val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
-
         // 51.56 and 23.44 will make yearly min/max elevation to be 75deg
-        // -0.2504264: a number that makes y=min when x=0 (x=0 is midnight)
-        return 51.56 * sin(TWO_PI * (x - 0.2504264)) + d
+        val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
+        return -51.56 * cos(TWO_PI * x) + d
     }
 
     val solarElevationDeg: Double
         get() {
             val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
-            val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
-
             // 51.56 and 23.44 will make yearly min/max elevation to be 75deg
-            // -0.2504264: a number that makes y=min when x=0 (x=0 is midnight)
-            return 51.56 * sin(TWO_PI * (x - 0.2504264)) + d
+            val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
+            return -51.56 * cos(TWO_PI * x) + d
         }
     val solarElevationRad: Double
         get() = Math.toRadians(solarElevationDeg)

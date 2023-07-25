@@ -101,8 +101,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private infix fun Double.pow(b: Double) = Math.pow(this, b)
 
     private fun Double?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
-            if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this.sign >= 0) '+' else '-'}Inf" else
-                "${this.toInt().toString().padStart(intLen)}." +
+            if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
+                "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
             (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padEnd(fracLen) }
 
     private val gap = 14f

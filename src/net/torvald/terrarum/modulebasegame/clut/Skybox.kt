@@ -52,7 +52,7 @@ object Skybox : Disposable {
             )
         }
         else {
-            val deg1 = (-elevationDeg / 75.0).pow(0.8).times(-75.0)
+            val deg1 = (-elevationDeg / 75.0).pow(0.93).times(-75.0)
             val elevation1 = -deg1
             val elevation2 = -deg1 / 28.5
             val scale = (1f - (1f - 1f / 1.8.pow(elevation1)) * 0.97f).toFloat()
@@ -68,7 +68,8 @@ object Skybox : Disposable {
 
     private val elevations = (-75..75) //zw 151
     private val elevationsD = (elevations.first.toDouble() .. elevations.last.toDouble())
-    private val turbidities = (1_0..10_0 step 1) // 99
+    private val turbidityStep = 5
+    private val turbidities = (1_0..10_0 step turbidityStep) // (100 / turbidityStep) - 1
     private val turbiditiesD = (turbidities.first / 10.0..turbidities.last / 10.0)
     private val elevCnt = elevations.count()
     private val turbCnt = turbidities.count()
@@ -94,7 +95,7 @@ object Skybox : Disposable {
 
             val elevationDeg = (it / turbCnt).plus(elevations.first).toDouble()
             val elevationRad = Math.toRadians(elevationDeg)
-            val turbidity = 1.0 + (it % turbCnt) / 10.0
+            val turbidity = 1.0 + (it % turbCnt) / (10.0 / turbidityStep)
 
             val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
             val pixmap = Pixmap(1, gradSize, Pixmap.Format.RGBA8888)
