@@ -152,7 +152,7 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     var turbidity = 4.0; private set
-    private var gH = 2f * App.scr.height
+    private var gH = 1.5f * App.scr.height
 
     private val HALF_DAY = DAY_LENGTH / 2
     /**
@@ -160,7 +160,7 @@ internal object WeatherMixer : RNGConsumer {
      */
     internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3f)
-        val parallaxDomainSize = world.height / 6f
+        val parallaxDomainSize = 300f
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
@@ -206,10 +206,10 @@ internal object WeatherMixer : RNGConsumer {
         batch.inUse {
             batch.shader = null
             batch.color = Color.WHITE
-            batch.drawFlipped(texture1, 0f, gradY, App.scr.wf, gH)
+            batch.draw(texture1, 0f, gradY, App.scr.wf, gH)
 
             batch.color = Color(1f, 1f, 1f, lerpScale)
-            batch.drawFlipped(texture2, 0f, gradY, App.scr.wf, gH)
+            batch.draw(texture2, 0f, gradY, App.scr.wf, gH)
 
             batch.color = Color.WHITE
         }

@@ -22,6 +22,7 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.GridLayout
+import java.lang.Math.pow
 import javax.swing.*
 import kotlin.math.*
 
@@ -186,7 +187,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
 
                 // AM-PM mapping (use with WIDTH=1)
                 var yf = (y * 2.0 / oneScreen.height) % 1.0
-                if (elevation < 0) yf -= (elevation / HALF_PI)
+                if (elevation < 0) yf *= 1.0 - pow(-elevation / HALF_PI, 0.333)
                 val gamma = if (y < halfHeight) HALF_PI else 3 * HALF_PI
                 val theta = yf.mapCircle() * HALF_PI
 

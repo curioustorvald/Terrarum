@@ -11,6 +11,7 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
+import java.lang.Math.pow
 import kotlin.math.*
 
 /**
@@ -103,8 +104,8 @@ object Skybox : Disposable {
 //            printdbg(this, "elev $elevationDeg turb $turbidity")
 
             for (y in 0 until gradSize) {
-                var yf = (y.toDouble() / gradSize * 1.0).coerceIn(0.0, 1.0)
-                if (elevationDeg < 0) yf += (elevationDeg / 90.0)
+                var yf = (y + 0.5) / gradSize.toDouble()
+                if (elevationDeg < 0) yf *= 1.0 - pow(-elevationDeg / 90.0, 0.333)
                 val theta = yf.mapCircle() * HALF_PI
                 // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 
@@ -117,7 +118,7 @@ object Skybox : Disposable {
                 val rgb = xyz2.toRGB().toColor()
 
                 pixmap.setColor(rgb)
-                pixmap.drawPixel(0, gradSize - 1 - y)
+                pixmap.drawPixel(0, y)
             }
 
             val texture = Texture(pixmap).also {
