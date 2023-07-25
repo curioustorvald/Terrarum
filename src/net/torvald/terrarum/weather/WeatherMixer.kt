@@ -270,12 +270,14 @@ internal object WeatherMixer : RNGConsumer {
 
         val pSx: Int; val pSy: Int; val pNx: Int; val pNy: Int
         if (timeOfDay < HALF_DAY) {
-            pSx = pStartRaw; pSy = 0
+            pSx = pStartRaw.coerceIn(0 until colorMap.width)
+            pSy = 0
             if (pSx == colorMap.width-1) { pNx = pSx; pNy = 1 }
-            else                         { pNx = pNextRaw; pNy = 0 }
+            else                         { pNx = pSx + 1; pNy = 0 }
         }
         else {
-            pSx = pStartRaw; pSy = 1
+            pSx = (pStartRaw + 1).coerceIn(0 until colorMap.width)
+            pSy = 1
             if (pSx == 0) { pNx = 0; pNy = 0 }
             else          { pNx = pSx - 1; pNy = 1 }
         }
