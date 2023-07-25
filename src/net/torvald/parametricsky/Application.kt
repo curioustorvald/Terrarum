@@ -185,7 +185,8 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 val theta = sqrt(xf*xf + yf*yf) * HALF_PI*/
 
                 // AM-PM mapping (use with WIDTH=1)
-                val yf = (y * 2.0 / oneScreen.height) % 1.0
+                var yf = (y * 2.0 / oneScreen.height) % 1.0
+                if (elevation < 0) yf -= (elevation / HALF_PI)
                 val gamma = if (y < halfHeight) HALF_PI else 3 * HALF_PI
                 val theta = yf.mapCircle() * HALF_PI
 

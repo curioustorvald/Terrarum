@@ -103,7 +103,9 @@ object Skybox : Disposable {
 //            printdbg(this, "elev $elevationDeg turb $turbidity")
 
             for (y in 0 until gradSize) {
-                val theta = (y.toDouble() / gradSize * 1.0).coerceIn(0.0, 1.0).mapCircle() * HALF_PI
+                var yf = (y.toDouble() / gradSize * 1.0).coerceIn(0.0, 1.0)
+                if (elevationDeg < 0) yf += (elevationDeg / 90.0)
+                val theta = yf.mapCircle() * HALF_PI
                 // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 
                 val xyz = CIEXYZ(
