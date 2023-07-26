@@ -91,6 +91,27 @@ object Skybox : Disposable {
         printdbg(this, "Skybox model generated!")
     }
 
+    /**
+     * See https://www.desmos.com/calculator/lcvvsju3p1 for mathematical definition
+     * @param p decay point. 0.0..1.0
+     * @param q polynomial degree. 2+. Larger value means sharper transition around the point p
+     * @param x the 'x' value of the function, as in `y=f(x)`. 0.0..1.0
+     */
+    private fun polynomialDecay(p: Double, q: Int, x: Double): Double {
+        val sign = if (q % 2 == 1) -1 else 1
+        val a1 = -1.0 / p
+        val a2 = -1.0 / (1.0 - p)
+        val q = q.toDouble()
+        return if (x < p)
+            sign * a1.pow(q - 1.0) * x.pow(q) + 1.0
+        else
+            sign * a1.pow(q - 1.0) * (x - 1.0).pow(q)
+    }
+
+    private fun superellipsoidDecay(p: Double, x: Double): Double {
+        return 1.0 - (1.0 - (1.0 - x).pow(1.0 / p)).pow(p)
+    }
+
     private fun getTexturmaps(albedo: Double): Array<Texture> {
         return Array(elevCnt * turbCnt) {
 
@@ -104,8 +125,12 @@ object Skybox : Disposable {
 //            printdbg(this, "elev $elevationDeg turb $turbidity")
 
             for (y in 0 until gradSize) {
+                val xf = -elevationDeg / 90.0
                 var yf = (y + 0.5) / gradSize.toDouble()
-                if (elevationDeg < 0) yf *= 1.0 - pow(-elevationDeg / 90.0, 0.333)
+                // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
+//                if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
+//                if (elevationDeg < 0) yf *= -2.0 * asin(xf - 1.0) / PI
+                if (elevationDeg < 0) yf *= superellipsoidDecay(1.0 / 3.0, xf)
                 val theta = yf.mapCircle() * HALF_PI
                 // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 
