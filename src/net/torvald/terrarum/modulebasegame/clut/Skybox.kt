@@ -1,8 +1,10 @@
 package net.torvald.terrarum.modulebasegame.clut
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
+import com.jme3.math.FastMath
 import net.torvald.colourutil.CIEXYZ
 import net.torvald.colourutil.toColor
 import net.torvald.colourutil.toRGB
@@ -100,16 +102,33 @@ object Skybox : Disposable {
     private fun polynomialDecay(p: Double, q: Int, x: Double): Double {
         val sign = if (q % 2 == 1) -1 else 1
         val a1 = -1.0 / p
-        val a2 = -1.0 / (1.0 - p)
+        val a2 = 1.0 / (1.0 - p)
         val q = q.toDouble()
         return if (x < p)
             sign * a1.pow(q - 1.0) * x.pow(q) + 1.0
         else
-            sign * a1.pow(q - 1.0) * (x - 1.0).pow(q)
+            sign * a2.pow(q - 1.0) * (x - 1.0).pow(q)
+    }
+
+    private fun polynomialDecay2(p: Double, q: Int, x: Double): Double {
+        val sign = if (q % 2 == 1) 1 else -1
+        val a1 = -1.0 / p
+        val a2 = 1.0 / (1.0 - p)
+        val q = q.toDouble()
+        return if (x < p)
+            sign * a1.pow(q - 1.0) * x.pow(q)
+        else
+            sign * a2.pow(q - 1.0) * (x - 1.0).pow(q) + 1.0
     }
 
     private fun superellipsoidDecay(p: Double, x: Double): Double {
         return 1.0 - (1.0 - (1.0 - x).pow(1.0 / p)).pow(p)
+    }
+
+    private fun Double.coerceInSmoothly(low: Double, high: Double): Double {
+        val x = this.coerceIn(low, high)
+        val x2 = ((x - low) * (high - low).pow(-1.0))
+        return FastMath.interpolateLinear(polynomialDecay2(0.5, 2, x2), low, high)
     }
 
     private fun getTexturmaps(albedo: Double): Array<Texture> {
@@ -124,14 +143,16 @@ object Skybox : Disposable {
 
 //            printdbg(this, "elev $elevationDeg turb $turbidity")
 
-            for (y in 0 until gradSize) {
+            for (yp in 0 until gradSize) {
+                val yi = yp - 6
                 val xf = -elevationDeg / 90.0
-                var yf = (y + 0.5) / gradSize.toDouble()
+                var yf = (yi / 116.0).coerceInSmoothly(0.0, 0.95)
+
                 // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
 //                if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
 //                if (elevationDeg < 0) yf *= -2.0 * asin(xf - 1.0) / PI
                 if (elevationDeg < 0) yf *= superellipsoidDecay(1.0 / 3.0, xf)
-                val theta = yf.mapCircle() * HALF_PI
+                val theta = (yf.mapCircle() * HALF_PI)
                 // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 
                 val xyz = CIEXYZ(
@@ -142,8 +163,9 @@ object Skybox : Disposable {
                 val xyz2 = xyz.scaleToFit(elevationDeg)
                 val rgb = xyz2.toRGB().toColor()
 
+//                pixmap.setColor(if (yp in 17 until 17 + 94) Color.LIME else Color.CORAL)
                 pixmap.setColor(rgb)
-                pixmap.drawPixel(0, y)
+                pixmap.drawPixel(0, yp)
             }
 
             val texture = Texture(pixmap).also {

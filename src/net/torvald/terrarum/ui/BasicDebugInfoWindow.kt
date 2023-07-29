@@ -208,7 +208,7 @@ class BasicDebugInfoWindow : UICanvas() {
         App.fontSmallNumbers.draw(batch, "$SOL $soldegCol$soldegStr", gap + 7f*(sol), line(mvY))
         App.fontSmallNumbers.draw(batch, "$TAU   $turbCol$turbidity", gap + 7f*(sol), line(mvY + 1))
 
-
+        App.fontSmallNumbers.draw(batch, "${ccG}p ${WeatherMixer.parallaxPos.toDouble().toIntAndFrac(1,2)}", gap + 7f*51, line(mvY))
 
         try {
             world?.let {

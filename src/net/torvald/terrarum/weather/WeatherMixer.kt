@@ -152,7 +152,9 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     var turbidity = 4.0; private set
-    private var gH = 1.5f * App.scr.height
+    private var gH = (4f/3f) * App.scr.height
+
+    internal var parallaxPos = 0f; private set
 
     private val HALF_DAY = DAY_LENGTH / 2
     /**
@@ -187,6 +189,7 @@ internal object WeatherMixer : RNGConsumer {
          -+ <- 0.0  =
          */
         val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
+        parallaxPos = parallax
 //        println(parallax) // parallax value works as intended.
 
         gdxBlendNormalStraightAlpha()
