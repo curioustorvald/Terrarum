@@ -21,7 +21,7 @@ import kotlin.math.*
  */
 object Skybox : Disposable {
 
-    const val gradSize = 128
+    const val gradSize = 64
 
     private val gradTexBinLowAlbedo: Array<Texture>
     private val gradTexBinHighAlbedo: Array<Texture>
@@ -144,9 +144,9 @@ object Skybox : Disposable {
 //            printdbg(this, "elev $elevationDeg turb $turbidity")
 
             for (yp in 0 until gradSize) {
-                val yi = yp - 6
+                val yi = yp - 3
                 val xf = -elevationDeg / 90.0
-                var yf = (yi / 116.0).coerceInSmoothly(0.0, 0.95)
+                var yf = (yi / 58.0).coerceInSmoothly(0.0, 0.95)
 
                 // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
 //                if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
