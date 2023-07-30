@@ -153,6 +153,7 @@ internal object WeatherMixer : RNGConsumer {
 
     var turbidity = 4.0; private set
     private var gH = (4f/3f) * App.scr.height
+//    private var gH = 0.8f * App.scr.height
 
     internal var parallaxPos = 0f; private set
 

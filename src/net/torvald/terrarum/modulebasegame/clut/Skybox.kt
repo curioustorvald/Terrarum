@@ -127,22 +127,23 @@ object Skybox : Disposable {
         val x = this.coerceIn(low, high)
         val x2 = ((x - low) * (high - low).pow(-1.0))
 //        return FastMath.interpolateLinear(polynomialDecay2(0.5, 2, x2), low, high)
-        return FastMath.interpolateLinear(smoothLinear(x2), low, high)
+        return FastMath.interpolateLinear(smoothLinear(0.2, x2), low, high)
     }
 
     /**
-     * To get the idea what the fuck is going on here, please refer to https://www.desmos.com/calculator/d2otu5deub
+     * To get the idea what the fuck is going on here, please refer to https://www.desmos.com/calculator/snqglcu2wl
      */
-    private fun smoothLinear(x: Double): Double {
-        val k = 0.11269 // a magic number
-        val d = 1.127016653 // also a magic number
-        val a = -1.0 / 0.2
-        return if (x < k)
-            -a.pow(1) * x.pow(2)
-        else if (x > 1.0 - k)
-            a.pow(1) * (1.0 - x).pow(2) + 1.0
+    private fun smoothLinear(p: Double, x0: Double): Double {
+        val x = x0 - 0.5
+        val t = 0.5 * sqrt(1.0 - 2.0 * p)
+        val y0 = if (x < -t)
+            (1.0 / p) * (x + 0.5).pow(2) - 0.5
+        else if (x > t)
+            -(1.0 / p) * (x - 0.5).pow(2) + 0.5
         else
-            d * (x - 0.5) + 0.5
+            x * 2.0 / (1.0 + sqrt(1.0 - 2.0 * p))
+
+        return y0 + 0.5
     }
 
     private fun getTexturmaps(albedo: Double): Array<Texture> {
