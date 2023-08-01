@@ -203,7 +203,7 @@ internal object WeatherMixer : RNGConsumer {
 //        println("degThis=$degThis, degNext=$degNext, lerp=$lerpScale")
 
         val stripXcentre = ((solarElev + 75.0) / 150.0).toFloat()
-        val backMag = texture1.regionWidth * App.scr.wf * 2f
+        val backMag = 16777216f
         val backX = -stripXcentre * backMag
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
