@@ -241,7 +241,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiRemoCon)
 
         CommandDict // invoke
-        Skybox // invoke
+        Skybox.loadlut() // invoke
+//        Skybox.initiate() // invoke the lengthy calculation
         // TODO add console here
 
 

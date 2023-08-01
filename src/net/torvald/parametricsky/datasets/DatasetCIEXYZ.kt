@@ -107,13 +107,13 @@ import kotlin.test.assertEquals
 
 object DatasetCIEXYZ {
 
-    val datasetXYZ1 = DatasetOp.readDatasetFromFile("./assets/clut/hosek/datasetXYZ1.bin")
-    val datasetXYZ2 = DatasetOp.readDatasetFromFile("./assets/clut/hosek/datasetXYZ2.bin")
-    val datasetXYZ3 = DatasetOp.readDatasetFromFile("./assets/clut/hosek/datasetXYZ3.bin")
+    val datasetXYZ1 = DatasetOp.readDatasetFromFile("./work_files/skylight/hosek_model_source/datasetXYZ1.bin")
+    val datasetXYZ2 = DatasetOp.readDatasetFromFile("./work_files/skylight/hosek_model_source/datasetXYZ2.bin")
+    val datasetXYZ3 = DatasetOp.readDatasetFromFile("./work_files/skylight/hosek_model_source/datasetXYZ3.bin")
 
-    val datasetXYZRad1 = DatasetOp.readDatasetFromFile("./assets/clut/hosek/datasetXYZRad1.bin")
-    val datasetXYZRad2 = DatasetOp.readDatasetFromFile("./assets/clut/hosek/datasetXYZRad2.bin")
-    val datasetXYZRad3 = DatasetOp.readDatasetFromFile("./assets/clut/hosek/datasetXYZRad3.bin")
+    val datasetXYZRad1 = DatasetOp.readDatasetFromFile("./work_files/skylight/hosek_model_source/datasetXYZRad1.bin")
+    val datasetXYZRad2 = DatasetOp.readDatasetFromFile("./work_files/skylight/hosek_model_source/datasetXYZRad2.bin")
+    val datasetXYZRad3 = DatasetOp.readDatasetFromFile("./work_files/skylight/hosek_model_source/datasetXYZRad3.bin")
 
     init {
         assertEquals(1080, datasetXYZ2.size, "Dataset size mismatch: expected 1080, got ${datasetXYZ2.size}")

@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.clut
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.colourutil.CIEXYZ
@@ -10,8 +11,10 @@ import net.torvald.colourutil.toRGB
 import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.*
 
 /**
@@ -21,29 +24,39 @@ object Skybox : Disposable {
 
     const val gradSize = 64
 
-    private val gradTexBinLowAlbedo: Array<Texture>
-    private val gradTexBinHighAlbedo: Array<Texture>
+    private lateinit var gradTexBinLowAlbedo: Array<TextureRegion>
+    private lateinit var gradTexBinHighAlbedo: Array<TextureRegion>
 
-    operator fun get(elevationDeg: Double, turbidity: Double, highAlbedo: Boolean = false): Texture {
-//        if (elevationDeg !in elevationsD) {
-//            throw IllegalArgumentException("Elevation not in ±75° (got $elevationDeg)")
-//        }
-//        if (turbidity !in turbiditiesD) {
-//            throw IllegalArgumentException("Turbidity not in 1..10 (got $turbidity)")
-//        }
+    private lateinit var tex: Texture
+    private lateinit var texRegions: TextureRegionPack
 
-        val elev = elevationDeg.coerceIn(elevationsD).toInt() - elevations.first
-        val turb = ((turbidity.coerceIn(turbiditiesD) - turbiditiesD.start) / (turbidities.step / 10.0)).toInt()
+    fun loadlut() {
+        tex = Texture(ModMgr.getGdxFile("basegame", "weathers/main_skybox.png"))
+        tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        texRegions = TextureRegionPack(tex, 2, gradSize - 2, 0, 2, 0, 1)
+    }
 
-//        printdbg(this, "$elevationDeg $turbidity ; $elev $turb")
+    // use internal LUT
+    /*operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
+        val elev = elevationDeg.coerceIn(-75.0, 75.0).times(2.0).roundToInt().plus(150)
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
+        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
+        return gradTexBinLowAlbedo[elev * turbCnt + turb]
+    }*/
 
-        return (if (highAlbedo) gradTexBinHighAlbedo else gradTexBinLowAlbedo)[elev * turbCnt + turb]
+    // use external LUT
+    operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
+        val elev = elevationDeg.coerceIn(-75.0, 75.0).roundToInt().plus(75)
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
+        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
+        //printdbg(this, "elev $elevationDeg->$elev; turb $turbidity->$turb; alb $albedo->$alb")
+        return texRegions.get(alb * elevCnt + elev, turb)
     }
 
     private fun Float.scaleFun() =
         (1f - 1f / 2f.pow(this/6f)) * 0.97f
 
-    private fun CIEXYZ.scaleToFit(elevationDeg: Double): CIEXYZ {
+    internal fun CIEXYZ.scaleToFit(elevationDeg: Double): CIEXYZ {
         return if (elevationDeg >= 0) {
             CIEXYZ(
                 this.X.scaleFun(),
@@ -67,20 +80,21 @@ object Skybox : Disposable {
         }
     }
 
-    private val elevations = (-75..75) //zw 151
-    private val elevationsD = (elevations.first.toDouble() .. elevations.last.toDouble())
-    private val turbidityStep = 5
-    private val turbidities = (1_0..10_0 step turbidityStep) // (100 / turbidityStep) - 1
-    private val turbiditiesD = (turbidities.first / 10.0..turbidities.last / 10.0)
-    private val elevCnt = elevations.count()
-    private val turbCnt = turbidities.count()
-    private val albedoLow = 0.1
-    private val albedoHight = 0.8 // for theoretical "winter wonderland"?
-    private val gamma = HALF_PI
+    val elevations = (0..150) //
+    val elevationsD = elevations.map { -75.0 + it } // -75, -74, -73, ..., 74, 75 // (specifically using whole number of angles because angle units any finer than 1.0 would make "hack" sunsut happen too fast)
+    val turbidities = (0..27) // 1, 1.333, 1.666, 2, 2,333, ... , 10.0
+    val turbiditiesD = turbidities.map { 1.0 + it / 3.0 }
+    val albedos = arrayOf(0.1, 0.3, 0.5, 0.7, 0.9)
+    val elevCnt = elevations.count()
+    val turbCnt = turbidities.count()
+    val albedoCnt = albedos.size
+    val albedoLow = 0.1
+    val albedoHight = 0.8 // for theoretical "winter wonderland"?
+    val gamma = HALF_PI
 
-    private fun Double.mapCircle() = sin(HALF_PI * this)
+    internal fun Double.mapCircle() = sin(HALF_PI * this)
 
-    init {
+    internal fun initiate() {
         printdbg(this, "Initialising skybox model")
 
         gradTexBinLowAlbedo = getTexturmaps(albedoLow)
@@ -97,7 +111,7 @@ object Skybox : Disposable {
      * @param q polynomial degree. 2+. Larger value means sharper transition around the point p
      * @param x the 'x' value of the function, as in `y=f(x)`. 0.0..1.0
      */
-    private fun polynomialDecay(p: Double, q: Int, x: Double): Double {
+    internal fun polynomialDecay(p: Double, q: Int, x: Double): Double {
         val sign = if (q % 2 == 1) -1 else 1
         val a1 = -1.0 / p
         val a2 = 1.0 / (1.0 - p)
@@ -108,7 +122,7 @@ object Skybox : Disposable {
             sign * a2.pow(q - 1.0) * (x - 1.0).pow(q)
     }
 
-    private fun polynomialDecay2(p: Double, q: Int, x: Double): Double {
+    internal fun polynomialDecay2(p: Double, q: Int, x: Double): Double {
         val sign = if (q % 2 == 1) 1 else -1
         val a1 = -1.0 / p
         val a2 = 1.0 / (1.0 - p)
@@ -119,11 +133,11 @@ object Skybox : Disposable {
             sign * a2.pow(q - 1.0) * (x - 1.0).pow(q) + 1.0
     }
 
-    private fun superellipsoidDecay(p: Double, x: Double): Double {
+    internal fun superellipsoidDecay(p: Double, x: Double): Double {
         return 1.0 - (1.0 - (1.0 - x).pow(1.0 / p)).pow(p)
     }
 
-    private fun Double.coerceInSmoothly(low: Double, high: Double): Double {
+    internal fun Double.coerceInSmoothly(low: Double, high: Double): Double {
         val x = this.coerceIn(low, high)
         val x2 = ((x - low) * (high - low).pow(-1.0))
 //        return FastMath.interpolateLinear(polynomialDecay2(0.5, 2, x2), low, high)
@@ -133,25 +147,26 @@ object Skybox : Disposable {
     /**
      * To get the idea what the fuck is going on here, please refer to https://www.desmos.com/calculator/snqglcu2wl
      */
-    private fun smoothLinear(p: Double, x0: Double): Double {
+    internal fun smoothLinear(p: Double, x0: Double): Double {
         val x = x0 - 0.5
-        val t = 0.5 * sqrt(1.0 - 2.0 * p)
+        val p1 = sqrt(1.0 - 2.0 * p)
+        val t = 0.5 * p1
         val y0 = if (x < -t)
             (1.0 / p) * (x + 0.5).pow(2) - 0.5
         else if (x > t)
             -(1.0 / p) * (x - 0.5).pow(2) + 0.5
         else
-            x * 2.0 / (1.0 + sqrt(1.0 - 2.0 * p))
+            x * 2.0 / (1.0 + p1)
 
         return y0 + 0.5
     }
 
-    private fun getTexturmaps(albedo: Double): Array<Texture> {
+    private fun getTexturmaps(albedo: Double): Array<TextureRegion> {
         return Array(elevCnt * turbCnt) {
 
-            val elevationDeg = (it / turbCnt).plus(elevations.first).toDouble()
+            val elevationDeg = elevationsD[it / turbCnt]
             val elevationRad = Math.toRadians(elevationDeg)
-            val turbidity = 1.0 + (it % turbCnt) / (10.0 / turbidityStep)
+            val turbidity = turbiditiesD[it % turbCnt]
 
             val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
             val pixmap = Pixmap(1, gradSize, Pixmap.Format.RGBA8888)
@@ -161,14 +176,16 @@ object Skybox : Disposable {
             for (yp in 0 until gradSize) {
                 val yi = yp - 3
                 val xf = -elevationDeg / 90.0
-                var yf = (yi / 58.0).coerceInSmoothly(0.0, 0.95)
+                var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
 
                 // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
 //                if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
 //                if (elevationDeg < 0) yf *= -2.0 * asin(xf - 1.0) / PI
                 if (elevationDeg < 0) yf *= superellipsoidDecay(1.0 / 3.0, xf)
-                val theta = (yf.mapCircle() * HALF_PI)
+                val theta = yf * HALF_PI
                 // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
+
+//                println("$yp\t$theta")
 
                 val xyz = CIEXYZ(
                     ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat(),
@@ -187,12 +204,13 @@ object Skybox : Disposable {
                 it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             }
             pixmap.dispose()
-            texture
+            TextureRegion(texture)
         }
     }
 
     override fun dispose() {
-        gradTexBinLowAlbedo.forEach { it.dispose() }
-        gradTexBinHighAlbedo.forEach { it.dispose() }
+        if (::gradTexBinLowAlbedo.isInitialized) gradTexBinLowAlbedo.forEach { it.texture.dispose() }
+        if (::gradTexBinHighAlbedo.isInitialized) gradTexBinHighAlbedo.forEach { it.texture.dispose() }
+        if (::tex.isInitialized) tex.dispose()
     }
 }
