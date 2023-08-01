@@ -195,29 +195,22 @@ internal object WeatherMixer : RNGConsumer {
 
         gdxBlendNormalStraightAlpha()
 
-        val degThis = if (timeNow < HALF_DAY)
-            solarElev.floorToDouble()
-        else
-            solarElev.ceilToDouble()
-        val degNext = degThis + if (timeNow < HALF_DAY) 1 else -1 // Skybox.get has internal coerceIn
-
         val thisTurbidity = forceTurbidity ?: turbidity
 
         // TODO trilinear with (deg, turb, alb)
-        val texture1 = Skybox[degThis, thisTurbidity, 0.1]
-        val texture2 = Skybox[degNext, thisTurbidity, 0.1]
-        val lerpScale = (if (timeNow < HALF_DAY) solarElev - degThis else -(solarElev - degThis)).toFloat()
+        val texture1 = Skybox.getStrip(thisTurbidity, 0.3)
 
 //        println("degThis=$degThis, degNext=$degNext, lerp=$lerpScale")
+
+        val stripXcentre = ((solarElev + 75.0) / 150.0).toFloat()
+        val backMag = texture1.regionWidth * App.scr.wf * 2f
+        val backX = -stripXcentre * backMag
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
         batch.inUse {
             batch.shader = null
             batch.color = Color.WHITE
-            batch.draw(texture1, -App.scr.halfwf, gradY, 2f * App.scr.wf, gH)
-
-            batch.color = Color(1f, 1f, 1f, lerpScale)
-            batch.draw(texture2, -App.scr.halfwf, gradY, 2f * App.scr.wf, gH)
+            batch.draw(texture1, backX, gradY, backMag + App.scr.wf, gH)
 
             batch.color = Color.WHITE
         }

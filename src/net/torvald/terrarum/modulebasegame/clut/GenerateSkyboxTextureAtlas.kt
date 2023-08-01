@@ -22,7 +22,7 @@ fun main() {
     // y: increasing turbidity (1.0 .. 10.0, in steps of 0.333)
     // x: elevations (-75 .. 75 in steps of 1, then albedo of [0.1, 0.3, 0.5, 0.7, 0.9])
     val texh = Skybox.gradSize * Skybox.turbCnt
-    val texw = 2 * Skybox.elevCnt * 5
+    val texw = Skybox.elevCnt * Skybox.albedoCnt
     val TGA_HEADER_SIZE = 18
 
     val bytes = ByteArray(TGA_HEADER_SIZE + texw * texh * 4 + 26)
@@ -83,10 +83,10 @@ fun main() {
                     val rgb = xyz2.toRGB().toColor()
                     val colour = rgb.toIntBits().toLittle()
 
-                    val imgOffX = 2 * (albedo0 * Skybox.elevCnt + elev0)
+                    val imgOffX = (albedo0 * Skybox.elevCnt + elev0)
                     val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
                     val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
-                    for (i in 0..7) {
+                    for (i in 0..3) {
                         bytes[fileOffset + i] = colour[bytesLut[i]]
                     }
                 }

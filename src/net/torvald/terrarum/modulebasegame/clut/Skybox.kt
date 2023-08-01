@@ -29,11 +29,13 @@ object Skybox : Disposable {
 
     private lateinit var tex: Texture
     private lateinit var texRegions: TextureRegionPack
+    private lateinit var texStripRegions: TextureRegionPack
 
     fun loadlut() {
         tex = Texture(ModMgr.getGdxFile("basegame", "weathers/main_skybox.png"))
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         texRegions = TextureRegionPack(tex, 2, gradSize - 2, 0, 2, 0, 1)
+        texStripRegions = TextureRegionPack(tex, elevCnt - 2, gradSize - 2, 2, 2, 1, 1)
     }
 
     // use internal LUT
@@ -47,10 +49,16 @@ object Skybox : Disposable {
     // use external LUT
     operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
         val elev = elevationDeg.coerceIn(-75.0, 75.0).roundToInt().plus(75)
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(5.0).roundToInt()
         val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
         //printdbg(this, "elev $elevationDeg->$elev; turb $turbidity->$turb; alb $albedo->$alb")
         return texRegions.get(alb * elevCnt + elev, turb)
+    }
+
+    fun getStrip(turbidity: Double, albedo: Double): TextureRegion {
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
+        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
+        return texStripRegions.get(alb, turb)
     }
 
     private fun Float.scaleFun() =
@@ -82,8 +90,8 @@ object Skybox : Disposable {
 
     val elevations = (0..150) //
     val elevationsD = elevations.map { -75.0 + it } // -75, -74, -73, ..., 74, 75 // (specifically using whole number of angles because angle units any finer than 1.0 would make "hack" sunsut happen too fast)
-    val turbidities = (0..27) // 1, 1.333, 1.666, 2, 2,333, ... , 10.0
-    val turbiditiesD = turbidities.map { 1.0 + it / 3.0 }
+    val turbidities = (0..45) // 1, 1.2, 1.4, 1.6, ..., 10.0
+    val turbiditiesD = turbidities.map { 1.0 + it / 5.0 }
     val albedos = arrayOf(0.1, 0.3, 0.5, 0.7, 0.9)
     val elevCnt = elevations.count()
     val turbCnt = turbidities.count()
