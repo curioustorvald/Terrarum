@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
-import com.jme3.math.Vector2f
 import net.torvald.colourutil.CIEXYZ
 import net.torvald.colourutil.toColor
 import net.torvald.colourutil.toRGB
@@ -36,34 +35,34 @@ object Skybox : Disposable {
         tex = Texture(ModMgr.getGdxFile("basegame", "weathers/main_skybox.png"))
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         texRegions = TextureRegionPack(tex, 2, gradSize - 2, 0, 2, 0, 1)
-        texStripRegions = TextureRegionPack(tex, elevCnt - 2, gradSize - 2, 2, 2, 1, 1)
+        texStripRegions = TextureRegionPack(tex, elevCnt, gradSize - 2, 0, 2, 0, 1)
     }
 
     // use internal LUT
     /*operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
-        val elev = elevationDeg.coerceIn(-75.0, 75.0).times(2.0).roundToInt().plus(150)
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(5.0).roundToInt()
-        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
+        val elev = elevationDeg.coerceIn(-elevBias, elevBias).times(2.0).roundToInt().plus(150)
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(turbDivisor).roundToInt()
+        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(turbDivisor).roundToInt()
         return gradTexBinLowAlbedo[elev * turbCnt + turb]
     }*/
 
     // use external LUT
     operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
-        val elev = elevationDeg.coerceIn(-75.0, 75.0).roundToInt().plus(75)
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(5.0).roundToInt()
-        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
+        val elev = elevationDeg.coerceIn(-elevMax, elevMax).roundToInt().plus(elevMax).roundToInt()
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(turbDivisor).roundToInt()
+        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(turbDivisor).roundToInt()
         //printdbg(this, "elev $elevationDeg->$elev; turb $turbidity->$turb; alb $albedo->$alb")
         return texRegions.get(alb * elevCnt + elev, turb)
     }
 
     fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): Pair<Texture, FloatArray> {
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(5.0).roundToInt()
-        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(turbDivisor).roundToInt()
+        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(turbDivisor).roundToInt()
         val region = texStripRegions.get(alb, turb)
 
-        val elev = elevationDeg.coerceIn(-75.0, 75.0).plus(75.0).div(150.0)
+        val elev = elevationDeg.coerceIn(-elevMax, elevMax).plus(elevMax).div(elevations.last.toDouble()).div(albedoCnt).times((elevCnt - 1.0) / elevCnt)
 
-        val u = region.u + (elev / albedoCnt).toFloat()
+        val u = region.u + (0.5f / tex.width) + elev.toFloat() // because of the nature of bilinear interpolation, half pixels from the edges must be discarded
 
         return tex to floatArrayOf(
             u,
@@ -72,8 +71,6 @@ object Skybox : Disposable {
             region.v2
         )
     }
-
-    private val texcoordEpsilon = 1f / 131072f
 
     private fun Float.scaleFun() =
         (1f - 1f / 2f.pow(this/6f)) * 0.97f
@@ -88,7 +85,7 @@ object Skybox : Disposable {
             )
         }
         else {
-            val deg1 = (-elevationDeg / 75.0).pow(0.93).times(-75.0)
+            val deg1 = (-elevationDeg / elevMax).pow(0.93).times(-elevMax)
             val elevation1 = -deg1
             val elevation2 = -deg1 / 28.5
             val scale = (1f - (1f - 1f / 1.8.pow(elevation1)) * 0.97f).toFloat()
@@ -102,10 +99,12 @@ object Skybox : Disposable {
         }
     }
 
-    val elevations = (0..150) //
-    val elevationsD = elevations.map { -75.0 + it } // -75, -74, -73, ..., 74, 75 // (specifically using whole number of angles because angle units any finer than 1.0 would make "hack" sunsut happen too fast)
+    val elevations = (0..150)
+    val elevMax = elevations.last / 2.0
+    val elevationsD = elevations.map { -elevMax + it } // -75, -74, -73, ..., 74, 75 // (specifically using whole number of angles because angle units any finer than 1.0 would make "hack" sunsut happen too fast)
     val turbidities = (0..45) // 1, 1.2, 1.4, 1.6, ..., 10.0
-    val turbiditiesD = turbidities.map { 1.0 + it / 5.0 }
+    val turbDivisor = 5.0
+    val turbiditiesD = turbidities.map { 1.0 + it / turbDivisor }
     val albedos = arrayOf(0.1, 0.3, 0.5, 0.7, 0.9)
     val elevCnt = elevations.count()
     val turbCnt = turbidities.count()
