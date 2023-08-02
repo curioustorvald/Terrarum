@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -15,7 +16,6 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
-import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.clut.Skybox
@@ -67,9 +67,12 @@ internal object WeatherMixer : RNGConsumer {
     var forceSolarElev: Double? = null
     var forceTurbidity: Double? = null
 
-    val starmapTex: TextureRegion = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/astrum.png")))
+    val starmapTex: TextureRegion = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/astrum.png"))).also {
+//        it.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
+    }
 
-    private val shaderBlendMax = App.loadShaderFromClasspath("shaders/blendMax.vert", "shaders/blendMax.frag")
+    private val shaderBlendMax = App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -214,10 +217,22 @@ internal object WeatherMixer : RNGConsumer {
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
         val (tex, uvs) = Skybox.getUV(solarElev, thisTurbidity, 0.3)
 
+
+        starmapTex.texture.bind(1)
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
+
         batch.inUse {
-            batch.shader = null
+            batch.shader = shaderBlendMax
+            shaderBlendMax.setUniformi("tex1", 1)
+            shaderBlendMax.setUniformf("screenSize", App.scr.wf, App.scr.hf)
+            shaderBlendMax.setUniformf("drawOffset", 0f, gradY)
+            shaderBlendMax.setUniformf("drawOffsetSize", App.scr.wf, gH)
+            shaderBlendMax.setUniform2fv("skyboxUV1", uvs, 0, 2)
+            shaderBlendMax.setUniform2fv("skyboxUV2", uvs, 2, 2)
+
             batch.color = Color.WHITE
-            batch.draw(tex, 0f, gradY, App.scr.wf, gH, uvs[0], uvs[1], uvs[2], uvs[3])
+            batch.draw(tex, 0f, gradY, App.scr.wf, gH, 0f, 0f, 1f, 1f)
 
             batch.color = Color.WHITE
         }

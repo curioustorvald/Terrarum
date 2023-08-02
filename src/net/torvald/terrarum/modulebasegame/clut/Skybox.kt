@@ -42,7 +42,7 @@ object Skybox : Disposable {
     // use internal LUT
     /*operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
         val elev = elevationDeg.coerceIn(-75.0, 75.0).times(2.0).roundToInt().plus(150)
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(5.0).roundToInt()
         val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
         return gradTexBinLowAlbedo[elev * turbCnt + turb]
     }*/
@@ -57,7 +57,7 @@ object Skybox : Disposable {
     }
 
     fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): Pair<Texture, FloatArray> {
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
+        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(5.0).roundToInt()
         val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
         val region = texStripRegions.get(alb, turb)
 
