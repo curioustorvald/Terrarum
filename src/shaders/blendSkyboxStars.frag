@@ -13,7 +13,6 @@ out vec4 fragColor;
 
 vec2 boolean = vec2(0.0, 1.0);
 
-uniform vec2 screenSize;
 uniform vec2 drawOffset; // value of the 'gradY'
 uniform vec2 drawOffsetSize; // value of the 'gradH'
 uniform vec2 skyboxUV1; // (u, v) for the skybox drawing
@@ -28,11 +27,11 @@ void main(void) {
     vec2 astrumTexCoord = (v_texCoords * drawOffsetSize + drawOffset + astrumScroll) / tex1Size;
 
 
-    vec4 colorTex0 = texture(u_texture, skyboxTexCoord); // lightmap (RGB) pre-mixed
-    vec4 colorTex1 = texture(tex1, astrumTexCoord); // lightmap (A) pre-mixed
+    vec4 colorTex0 = texture(u_texture, skyboxTexCoord);
+    vec4 colorTex1 = texture(tex1, astrumTexCoord);
 
 
 
-//    fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + boolean.xxxy;
-    fragColor = colorTex0;
+    fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + boolean.xxxy;
+//    fragColor = colorTex1;
 }

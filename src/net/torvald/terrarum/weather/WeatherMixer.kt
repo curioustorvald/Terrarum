@@ -67,8 +67,9 @@ internal object WeatherMixer : RNGConsumer {
     var forceSolarElev: Double? = null
     var forceTurbidity: Double? = null
 
+    // doesn't work if the png is in greyscale/indexed mode
     val starmapTex: TextureRegion = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/astrum.png"))).also {
-//        it.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        it.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
 
@@ -225,7 +226,6 @@ internal object WeatherMixer : RNGConsumer {
         batch.inUse {
             batch.shader = shaderBlendMax
             shaderBlendMax.setUniformi("tex1", 1)
-            shaderBlendMax.setUniformf("screenSize", App.scr.wf, App.scr.hf)
             shaderBlendMax.setUniformf("drawOffset", 0f, gradY)
             shaderBlendMax.setUniformf("drawOffsetSize", App.scr.wf, gH)
             shaderBlendMax.setUniform2fv("skyboxUV1", uvs, 0, 2)
