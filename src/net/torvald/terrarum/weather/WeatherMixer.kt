@@ -240,6 +240,12 @@ internal object WeatherMixer : RNGConsumer {
             shaderBlendMax.setUniform2fv("skyboxUV1", uvs, 0, 2)
             shaderBlendMax.setUniform2fv("skyboxUV2", uvs, 2, 2)
             shaderBlendMax.setUniformf("astrumScroll", astrumOffX, astrumOffY + astrumY)
+            shaderBlendMax.setUniformf("randomNumber",
+                (world.worldTime.TIME_T.plus(31L) xor 1453L + 31L).and(1023).toFloat(),
+                (world.worldTime.TIME_T.plus(37L) xor  862L + 31L).and(1023).toFloat(),
+                (world.worldTime.TIME_T.plus(37L) xor 1639L + 29L).and(1023).toFloat(),
+                (world.worldTime.TIME_T.plus(37L) xor 2971L + 41L).and(1023).toFloat(),
+            )
 
             batch.color = Color.WHITE
             batch.draw(tex, 0f, gradY, App.scr.wf, gH, 0f, 0f, 1f, 1f)
