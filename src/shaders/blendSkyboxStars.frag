@@ -84,10 +84,10 @@ float snoise(vec2 v)
 
 vec4 snoise4(vec2 v) {
     return vec4(
-        snoise(v + randomNumber.xy),
-        snoise(v + randomNumber.zw),
-        snoise(v + randomNumber.xz),
-        snoise(v + randomNumber.yw)
+        (snoise(v + randomNumber.xy) + snoise(v + randomNumber.zx)) * 0.5,
+        (snoise(v + randomNumber.zw) + snoise(v + randomNumber.yw)) * 0.5,
+        (snoise(v + randomNumber.xz) + snoise(v + randomNumber.yx)) * 0.5,
+        (snoise(v + randomNumber.yw) + snoise(v + randomNumber.wz)) * 0.5 // triangular distribution
     );
 }
 
