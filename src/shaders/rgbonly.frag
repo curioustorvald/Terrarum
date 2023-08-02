@@ -8,5 +8,5 @@ vec2 boolean = vec2(0.0, 1.0);
 out vec4 fragColor;
 
 void main(void) {
-    fragColor = texture(u_texture, v_texCoords).rgba * boolean.yyyx + boolean.xxxy;
+    fragColor = texture(u_texture, v_texCoords) * boolean.yyyx + boolean.xxxy;
 }

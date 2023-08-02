@@ -1,7 +1,9 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -13,6 +15,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.clut.Skybox
@@ -21,6 +24,10 @@ import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.FileFilter
+
+/**
+ * Currently there is a debate whether this module must be part of the engine or the basegame
+ */
 
 /**
  *
@@ -37,8 +44,6 @@ import java.io.FileFilter
 internal object WeatherMixer : RNGConsumer {
 
     override val RNG = HQRNG()
-
-    private val renderng = HQRNG()
 
     var globalLightOverridden = false
 
@@ -61,6 +66,10 @@ internal object WeatherMixer : RNGConsumer {
     var forceTimeAt: Int? = null
     var forceSolarElev: Double? = null
     var forceTurbidity: Double? = null
+
+    val starmapTex: TextureRegion = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/astrum.png")))
+
+    private val shaderBlendMax = App.loadShaderFromClasspath("shaders/blendMax.vert", "shaders/blendMax.frag")
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -162,6 +171,10 @@ internal object WeatherMixer : RNGConsumer {
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
     internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
+        drawSkybox(camera, batch, world)
+    }
+
+    private fun drawSkybox(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3f)
         val parallaxDomainSize = 300f
 
@@ -198,24 +211,16 @@ internal object WeatherMixer : RNGConsumer {
         val thisTurbidity = forceTurbidity ?: turbidity
 
         // TODO trilinear with (deg, turb, alb)
-        val texture1 = Skybox.getStrip(thisTurbidity, 0.3)
-
-//        println("degThis=$degThis, degNext=$degNext, lerp=$lerpScale")
-
-        val stripXcentre = ((solarElev + 75.0) / 150.0).toFloat()
-        val backMag = 16777216f
-        val backX = -stripXcentre * backMag
-
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
+        val (tex, uvs) = Skybox.getUV(solarElev, thisTurbidity, 0.3)
+
         batch.inUse {
             batch.shader = null
             batch.color = Color.WHITE
-            batch.draw(texture1, backX, gradY, backMag + App.scr.wf, gH)
+            batch.draw(tex, 0f, gradY, App.scr.wf, gH, uvs[0], uvs[1], uvs[2], uvs[3])
 
             batch.color = Color.WHITE
         }
-
-
     }
 
     private operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
@@ -300,7 +305,7 @@ internal object WeatherMixer : RNGConsumer {
 
     fun getWeatherList(classification: String) = weatherList[classification]!!
     fun getRandomWeather(classification: String) =
-            getWeatherList(classification)[HQRNG().nextInt(getWeatherList(classification).size)]
+            getWeatherList(classification)[RNG.nextInt(getWeatherList(classification).size)]
 
     fun readFromJson(file: File): BaseModularWeather = readFromJson(file.path)
 
@@ -360,6 +365,12 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     fun dispose() {
-
+        weatherList.values.forEach { list ->
+            list.forEach { weather ->
+                weather.extraImages.forEach { it.tryDispose() }
+            }
+        }
+        starmapTex.texture.dispose()
+        shaderBlendMax.dispose()
     }
 }

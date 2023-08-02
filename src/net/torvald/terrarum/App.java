@@ -936,7 +936,7 @@ public class App implements ApplicationListener {
 
         shaderHicolour = loadShaderFromClasspath("shaders/default.vert", "shaders/hicolour.frag");
         shaderDebugDiff = loadShaderFromClasspath("shaders/default.vert", "shaders/diff.frag");
-        shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/passthrurgb.frag");
+        shaderColLUT = loadShaderFromClasspath("shaders/default.vert", "shaders/rgbonly.frag");
         shaderGhastlyWhite = loadShaderFromClasspath("shaders/default.vert", "shaders/ghastlywhite.frag");
 
         // make gamepad(s)

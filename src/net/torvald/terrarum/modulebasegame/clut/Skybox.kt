@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
+import com.jme3.math.Vector2f
 import net.torvald.colourutil.CIEXYZ
 import net.torvald.colourutil.toColor
 import net.torvald.colourutil.toRGB
@@ -55,11 +56,24 @@ object Skybox : Disposable {
         return texRegions.get(alb * elevCnt + elev, turb)
     }
 
-    fun getStrip(turbidity: Double, albedo: Double): TextureRegion {
+    fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): Pair<Texture, FloatArray> {
         val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(3.0).roundToInt()
         val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(5.0).roundToInt()
-        return texStripRegions.get(alb, turb)
+        val region = texStripRegions.get(alb, turb)
+
+        val elev = elevationDeg.coerceIn(-75.0, 75.0).plus(75.0).div(150.0)
+
+        val u = region.u + (elev / albedoCnt).toFloat()
+
+        return tex to floatArrayOf(
+            u,
+            region.v,
+            u,
+            region.v2
+        )
     }
+
+    private val texcoordEpsilon = 1f / 131072f
 
     private fun Float.scaleFun() =
         (1f - 1f / 2f.pow(this/6f)) * 0.97f
