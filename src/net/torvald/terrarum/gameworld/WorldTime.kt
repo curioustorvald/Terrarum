@@ -195,6 +195,7 @@ class WorldTime(initTime: Long = 0L) {
 
 
         val LUNAR_CYCLE: Int = 29 * DAY_LENGTH + 12 * HOUR_SEC + 44 * MINUTE_SEC + 3 // 29 days, 12 hours, 44 minutes, and 3 seconds in-game calendar
+        const val DIURNAL_MOTION_LENGTH = 86636f
     }
 
     fun update(delta: Float) {

@@ -75,16 +75,24 @@ internal object WeatherMixer : RNGConsumer {
 
     private val shaderBlendMax = App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
 
+    private var astrumOffX = 0f
+    private var astrumOffY = 0f
+
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
-        internalReset()
+        internalReset(s0, s1)
     }
 
-    fun internalReset() {
+    fun internalReset() = internalReset(RNG.state0, RNG.state1)
+
+    fun internalReset(s0: Long, s1: Long) {
         globalLightOverridden = false
         forceTimeAt = null
         forceSolarElev = null
         forceTurbidity = null
+
+        astrumOffX = s0.and(0xFFFFL).toFloat() / 65535f * starmapTex.regionWidth
+        astrumOffY = s1.and(0xFFFFL).toFloat() / 65535f * starmapTex.regionHeight
     }
 
     init {
@@ -222,6 +230,7 @@ internal object WeatherMixer : RNGConsumer {
         starmapTex.texture.bind(1)
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
+        val astrumY = ((world.worldTime.TIME_T / WorldTime.DIURNAL_MOTION_LENGTH) % 1f) * starmapTex.regionHeight
 
         batch.inUse {
             batch.shader = shaderBlendMax
@@ -230,6 +239,7 @@ internal object WeatherMixer : RNGConsumer {
             shaderBlendMax.setUniformf("drawOffsetSize", App.scr.wf, gH)
             shaderBlendMax.setUniform2fv("skyboxUV1", uvs, 0, 2)
             shaderBlendMax.setUniform2fv("skyboxUV2", uvs, 2, 2)
+            shaderBlendMax.setUniformf("astrumScroll", astrumOffX, astrumOffY + astrumY)
 
             batch.color = Color.WHITE
             batch.draw(tex, 0f, gradY, App.scr.wf, gH, 0f, 0f, 1f, 1f)
