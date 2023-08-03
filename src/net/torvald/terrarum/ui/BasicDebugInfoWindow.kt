@@ -103,7 +103,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private fun Double?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
             if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
                 "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
-            (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padEnd(fracLen) }
+            (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
 
     private val gap = 14f
 
