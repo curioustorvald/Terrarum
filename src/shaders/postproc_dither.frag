@@ -23,7 +23,7 @@ in vec2 v_texCoords;
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
 uniform ivec2 rnd = ivec2(0,0);
-uniform mat4 swizzler = mat4(
+const mat4 swizzler = mat4(
 1.0,0.0,0.0,0.0,
 0.0,1.0,0.0,0.0,
 0.0,0.0,1.0,0.0,
@@ -33,19 +33,19 @@ uniform float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 
 out vec4 fragColor;
 
-vec2 boolean = vec2(0.0, 1.0);
-vec4 matrixNormaliser = vec4(0.5 / 256.0);
+const vec2 boolean = vec2(0.0, 1.0);
+const vec4 matrixNormaliser = vec4(0.5 / 256.0);
 
-vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
+const vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
-mat4 rgb_to_ycocg = mat4(
+const mat4 rgb_to_ycocg = mat4(
     0.25,  1.0, -0.5, 0.0,
      0.5,  0.0,  1.0, 0.0,
     0.25, -1.0, -0.5, 0.0,
      0.0,  0.0,  0.0, 1.0
 );
 
-mat4 ycocg_to_rgb = mat4(
+const mat4 ycocg_to_rgb = mat4(
      1.0, 1.0,  1.0, 0.0,
      0.5, 0.0, -0.5, 0.0,
     -0.5, 0.5, -0.5, 0.0,

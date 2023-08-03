@@ -42,14 +42,14 @@ const vec2 bc = vec2(1.0, 0.0); //binary constant
 out vec4 fragColor;
 
 // man the traditional bayer crosshatch pattern looks really good on tiles...
-int bayer[16] = int[](
+const int bayer[16] = int[](
 0,8,2,10,
 12,4,14,6,
 3,11,1,9,
 15,7,13,5
 );
-float bayerSize = 4.0;
-float bayerDivider = 16;
+const float bayerSize = 4.0;
+const float bayerDivider = 16;
 
 ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));

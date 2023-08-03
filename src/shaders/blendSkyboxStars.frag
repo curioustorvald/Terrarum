@@ -11,7 +11,7 @@ uniform sampler2D u_texture; // world texture, has alpha value that is meaningfu
 uniform sampler2D tex1; // glow texture, SHOULD contain alpha of all 1.0
 out vec4 fragColor;
 
-vec2 boolean = vec2(0.0, 1.0);
+const vec2 boolean = vec2(0.0, 1.0);
 
 uniform vec2 drawOffset; // value of the 'gradY'
 uniform vec2 drawOffsetSize; // value of the 'gradH'

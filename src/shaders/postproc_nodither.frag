@@ -26,16 +26,16 @@ uniform ivec2 rnd = ivec2(0,0);
 
 uniform float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 
-vec2 boolean = vec2(0.0, 1.0);
+const vec2 boolean = vec2(0.0, 1.0);
 
-mat4 rgb_to_ycocg = mat4(
+const mat4 rgb_to_ycocg = mat4(
     0.25,  1.0, -0.5, 0.0,
      0.5,  0.0,  1.0, 0.0,
     0.25, -1.0, -0.5, 0.0,
      0.0,  0.0,  0.0, 1.0
 );
 
-mat4 ycocg_to_rgb = mat4(
+const mat4 ycocg_to_rgb = mat4(
      1.0, 1.0,  1.0, 0.0,
      0.5, 0.0, -0.5, 0.0,
     -0.5, 0.5, -0.5, 0.0,

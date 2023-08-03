@@ -11,7 +11,7 @@ uniform sampler2D u_texture; // world texture, has alpha value that is meaningfu
 uniform sampler2D tex1; // glow texture, SHOULD contain alpha of all 1.0
 out vec4 fragColor;
 
-vec2 boolean = vec2(0.0, 1.0);
+const vec2 boolean = vec2(0.0, 1.0);
 
 void main(void) {
     vec4 colorTex0 = texture(u_texture, v_texCoords); // lightmap (RGB) pre-mixed

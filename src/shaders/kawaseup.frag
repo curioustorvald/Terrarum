@@ -13,9 +13,9 @@ uniform sampler2D u_texture;
 uniform vec2 halfpixel = vec2(0.0, 0.0);
 out vec4 fragColor;
 
-vec2 doublex = vec2(2.0, 0.0);
-vec2 doubley = vec2(0.0, 2.0);
-vec2 twister = vec2(1.0, -1.0);
+const vec2 doublex = vec2(2.0, 0.0);
+const vec2 doubley = vec2(0.0, 2.0);
+const vec2 twister = vec2(1.0, -1.0);
 
 void main() {
     vec4 sum = texture(u_texture, v_texCoords - halfpixel * doublex);

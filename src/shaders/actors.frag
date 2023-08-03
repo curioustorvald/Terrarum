@@ -7,7 +7,7 @@ in vec4 v_color;
 in vec2 v_texCoords;
 uniform sampler2D u_texture;
 
-int bayer[36] = int[](
+const int bayer[36] = int[](
 192,78,21,120,163,14,
 234,142,184,248,56,106,
 64,7,92,35,149,206,
@@ -15,10 +15,10 @@ int bayer[36] = int[](
 241,49,113,0,135,177,
 42,156,213,71,227,99
 );
-float bayerSize = 6.0;
-float bayerDivider = 256;
+const float bayerSize = 6.0;
+const float bayerDivider = 256;
 
-vec2 boolean = vec2(0.0, 1.0);
+const vec2 boolean = vec2(0.0, 1.0);
 out vec4 fragColor;
 
 void main() {

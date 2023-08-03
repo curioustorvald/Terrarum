@@ -12,10 +12,10 @@ uniform sampler2D u_texture;
 // that, or simply 0.5, depending on how your uv coord works
 uniform vec2 halfpixel = vec2(0.0, 0.0);
 
-vec2 doublex = vec2(2.0, 0.0);
-vec2 doubley = vec2(0.0, 2.0);
-vec2 twister = vec2(1.0, -1.0);
-vec2 boolean = vec2(1.0, 0.0);
+const vec2 doublex = vec2(2.0, 0.0);
+const vec2 doubley = vec2(0.0, 2.0);
+const vec2 twister = vec2(1.0, -1.0);
+const vec2 boolean = vec2(1.0, 0.0);
 
 out vec4 fragColor;
 

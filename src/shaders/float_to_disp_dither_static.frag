@@ -21,14 +21,14 @@ uniform float zoomInv = 1.0;
 
 out vec4 fragColor;
 
-float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
-vec4 quantiser = vec4(quant);
-vec4 quantiserDivider = vec4(1.0 / quant);
+const float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
+const vec4 quantiser = vec4(quant);
+const vec4 quantiserDivider = vec4(1.0 / quant);
 
-vec2 boolean = vec2(0.0, 1.0);
-vec4 halfvec = vec4(0.5);
+const vec2 boolean = vec2(0.0, 1.0);
+const vec4 halfvec = vec4(0.5);
 
-vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
+const vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
 vec4 nearestColour(vec4 inColor) {
     return floor(quantiser * inColor + halfvec) * quantiserDivider;
