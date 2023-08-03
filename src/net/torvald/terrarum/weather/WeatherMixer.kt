@@ -230,6 +230,7 @@ internal object WeatherMixer : RNGConsumer {
         starmapTex.texture.bind(1)
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
+        val astrumX = world.worldTime.axialTiltDeg.toFloat() * starmapTex.regionWidth / 150f
         val astrumY = ((world.worldTime.TIME_T / WorldTime.DIURNAL_MOTION_LENGTH) % 1f) * starmapTex.regionHeight
 
         batch.inUse {
@@ -239,16 +240,16 @@ internal object WeatherMixer : RNGConsumer {
             shaderBlendMax.setUniformf("drawOffsetSize", App.scr.wf, gH)
             shaderBlendMax.setUniform2fv("skyboxUV1", uvs, 0, 2)
             shaderBlendMax.setUniform2fv("skyboxUV2", uvs, 2, 2)
-            shaderBlendMax.setUniformf("astrumScroll", astrumOffX, astrumOffY + astrumY)
+            shaderBlendMax.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
             shaderBlendMax.setUniformf("randomNumber",
 //                (world.worldTime.TIME_T.plus(31L) xor 1453L + 31L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(37L) xor  862L + 31L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(23L) xor 1639L + 29L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(29L) xor 2971L + 41L).and(1023).toFloat(),
-                world.worldTime.TIME_T.div(4.1f).plus(31L),
-                world.worldTime.TIME_T.div(-3.8f).plus(37L),
-                world.worldTime.TIME_T.div(3.9f).plus(23L),
-                world.worldTime.TIME_T.div(-4.3f).plus(29L),
+                world.worldTime.TIME_T.div(+12.1f).plus(31L),
+                world.worldTime.TIME_T.div(-11.8f).plus(37L),
+                world.worldTime.TIME_T.div(+11.9f).plus(23L),
+                world.worldTime.TIME_T.div(-12.3f).plus(29L),
             )
 
             batch.color = Color.WHITE
@@ -256,6 +257,7 @@ internal object WeatherMixer : RNGConsumer {
 
             batch.color = Color.WHITE
         }
+
     }
 
     private operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)

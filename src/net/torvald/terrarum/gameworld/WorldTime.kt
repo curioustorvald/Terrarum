@@ -135,10 +135,17 @@ class WorldTime(initTime: Long = 0L) {
             val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
             // 51.56 and 23.44 will make yearly min/max elevation to be 75deg
             val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
-            return -51.56 * cos(TWO_PI * x) + d
+            val p = -51.56 * cos(TWO_PI * x)
+            return d + p
         }
     val solarElevationRad: Double
         get() = Math.toRadians(solarElevationDeg)
+
+    val axialTiltDeg: Double
+        get() {
+            val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
+            return -23.44 * cos(TWO_PI * x / YEAR_DAYS)
+        }
 
     @Transient private var realSecAcc: Double = 0.0
     @Transient private val REAL_SEC_TO_GAME_SECS = 1.0 / GAME_MIN_TO_REAL_SEC // how slow is real-life clock (second-wise) relative to the ingame one

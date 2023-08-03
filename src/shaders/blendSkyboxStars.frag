@@ -19,7 +19,7 @@ uniform vec2 skyboxUV1; // (u, v) for the skybox drawing
 uniform vec2 skyboxUV2; // (u2, v2) for the skybox drawing
 uniform vec2 tex1Size = vec2(4096.0);
 uniform vec2 astrumScroll = vec2(0.0);
-uniform vec4 randomNumber = vec4(0.0);
+uniform vec4 randomNumber = vec4(1.0, -2.0, 3.0, -4.0);
 
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -83,11 +83,17 @@ float snoise(vec2 v)
 }
 
 vec4 snoise4(vec2 v) {
-    return vec4(
+    /*return vec4(
         (snoise(v + randomNumber.xy) + snoise(v + randomNumber.zx)) * 0.5,
         (snoise(v + randomNumber.zw) + snoise(v + randomNumber.yw)) * 0.5,
         (snoise(v + randomNumber.xz) + snoise(v + randomNumber.yx)) * 0.5,
         (snoise(v + randomNumber.yw) + snoise(v + randomNumber.wz)) * 0.5 // triangular distribution
+    );*/
+    return vec4(
+        (snoise(v + randomNumber.xy) + snoise(v + randomNumber.zx) + snoise(v + randomNumber.zw) + snoise(v + randomNumber.yw)) * 0.25,
+        (snoise(v + randomNumber.zw) + snoise(v + randomNumber.yw) + snoise(v + randomNumber.xz) + snoise(v + randomNumber.yx)) * 0.25,
+        (snoise(v + randomNumber.xz) + snoise(v + randomNumber.yx) + snoise(v + randomNumber.yw) + snoise(v + randomNumber.wz)) * 0.25,
+        (snoise(v + randomNumber.yw) + snoise(v + randomNumber.wz) + snoise(v + randomNumber.xy) + snoise(v + randomNumber.zx)) * 0.25
     );
 }
 
@@ -109,7 +115,7 @@ void main(void) {
     vec2 skyboxTexCoord = mix(skyboxUV1, skyboxUV2, v_texCoords);
     vec2 astrumTexCoord = (v_texCoords * drawOffsetSize + drawOffset + astrumScroll) / tex1Size;
 
-    vec4 randomness = snoise4(gl_FragCoord.xy * 0.16) * 2.0; // multiply by 2 so that the "density" of the stars would be same as the non-random version
+    vec4 randomness = snoise4((gl_FragCoord.xy - astrumScroll) * 0.16) * 2.0; // multiply by 2 so that the "density" of the stars would be same as the non-random version
 
 
     vec4 colorTex0 = texture(u_texture, skyboxTexCoord);
@@ -120,4 +126,5 @@ void main(void) {
     fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + boolean.xxxy;
 //    fragColor = colorTex1;
 //    fragColor = randomness * boolean.yyyx + boolean.xxxy;
+//    fragColor = (randomness.rrrr + (colorTex1 * vec4(2.0, -2.0, 2.0, 1.0))) * boolean.yyyx + boolean.xxxy;
 }
