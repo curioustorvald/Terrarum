@@ -292,8 +292,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         val occupyingTileHasPlatform = bodyTiles.filterNotNull().any { it.isPlatform }
         val feetTileHasPlatform = feetTiles.filterNotNull().any { it.isPlatform }
         val feetTileIsAllPlatform = feetTiles.filterNotNull().all { it.isPlatform }
-        if (isDownDown && feetTileIsAllPlatform && (controllerV?.y ?: 0.0) >= 0.0 ||
-            occupyingTileHasPlatform && !feetTileHasPlatform) { // FIXME this does not account for reverse gravity
+        if (isDownDown && feetTileIsAllPlatform && (controllerV?.y ?: 0.0) >= 0.0) {// ||
+//            occupyingTileHasPlatform && !feetTileHasPlatform) { // FIXME commenting this out enables platform-ladder but falldown gets slowed down if the body passes thru the platform but I think this behav might be beneficial for player?
             downDownVirtually = true
         }
         if (downDownVirtually && !occupyingTileHasPlatform && !feetTileIsAllPlatform) {
