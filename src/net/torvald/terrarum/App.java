@@ -242,8 +242,6 @@ public class App implements ApplicationListener {
     public static Hq2x hq2x;
 
     public static Mesh fullscreenQuad;
-    public static Mesh fullscreenQuad2x;
-    public static Mesh fullscreenQuadHQnX;
     private static OrthographicCamera camera;
     private static FlippingSpriteBatch logoBatch;
     public static TextureRegion logo;
@@ -484,21 +482,7 @@ public class App implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-        fullscreenQuad2x = new Mesh(
-                true, 4, 6,
-                VertexAttribute.Position(),
-                VertexAttribute.ColorUnpacked(),
-                VertexAttribute.TexCoords(0)
-        );
-        fullscreenQuadHQnX = new Mesh(
-                true, 4, 6,
-                VertexAttribute.Position(),
-                VertexAttribute.ColorUnpacked(),
-                VertexAttribute.TexCoords(0)
-        );
         updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
-        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth() * 2, scr.getHeight() * 2);
-        updateFullscreenQuad(fullscreenQuadHQnX, Math.round(scr.getWf() * 1280f / 2028f), Math.round(scr.getHf() * 720f / 982f));
 
         // set up renderer info variables
         renderer = Gdx.graphics.getGLVersion().getRendererString();
@@ -578,14 +562,18 @@ public class App implements ApplicationListener {
 
         if (getConfigString("screenmagnifyingfilter").equals("hq2x") ) {
             FrameBufferManager.begin(postProcessorOutFBO2);
-            hq2x.renderToScreen(postProcessorOutFBO.getColorBufferTexture());
+                shaderPassthruRGBA.bind();
+                shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
+                shaderPassthruRGBA.setUniformi("u_texture", 0);
+                hq2x.renderToScreen(postProcessorOutFBO.getColorBufferTexture());
             FrameBufferManager.end();
 
             shaderPassthruRGBA.bind();
+            shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined);
             shaderPassthruRGBA.setUniformi("u_texture", 0);
             postProcessorOutFBO2.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             postProcessorOutFBO2.getColorBufferTexture().bind(0);
-            fullscreenQuadHQnX.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
         }
         else if (getConfigDouble("screenmagnifying") < 1.01 || getConfigString("screenmagnifyingfilter").equals("none")) {
             shaderPassthruRGBA.bind();
@@ -756,8 +744,6 @@ public class App implements ApplicationListener {
         if (currentScreen != null) currentScreen.resize(scr.getWidth(), scr.getHeight());
         TerrarumPostProcessor.INSTANCE.resize(scr.getWidth(), scr.getHeight());
         updateFullscreenQuad(fullscreenQuad, scr.getWidth(), scr.getHeight());
-        updateFullscreenQuad(fullscreenQuad2x, scr.getWidth() * 2, scr.getHeight() * 2);
-        updateFullscreenQuad(fullscreenQuadHQnX, Math.round(scr.getWf() * 1280f / 2028f), Math.round(scr.getHf() * 720f / 982f));
 
 
         if (renderFBO == null ||
@@ -830,8 +816,6 @@ public class App implements ApplicationListener {
 
         CommonResourcePool.INSTANCE.dispose();
         fullscreenQuad.dispose();
-        fullscreenQuad2x.dispose();
-        fullscreenQuadHQnX.dispose();
         logoBatch.dispose();
         batch.dispose();
 //        shapeRender.dispose();
