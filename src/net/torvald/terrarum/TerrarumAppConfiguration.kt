@@ -62,9 +62,10 @@ basegame
      * e.g. 0x02010034 will be translated as 2.1.52
      *
      */
-    const val VERSION_RAW: Long = 0x0000_000003_000002
+    const val VERSION_RAW: Long = 0x0000_000003_000003
     // Commit counts up to the Release 0.3.0: 2259
     // Commit counts up to the Release 0.3.1: 2278
+    // Commit counts up to the Release 0.3.2: 2732
 
     //////////////////////////////////////////////////////////
     //             CONFIGURATION FOR TILE MAKER             //
