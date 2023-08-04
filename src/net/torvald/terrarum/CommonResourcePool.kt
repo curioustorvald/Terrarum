@@ -33,9 +33,9 @@ object CommonResourcePool {
         addToLoadingList("itemplaceholder_48") {
             TextureRegion(Texture("assets/item_kari_48.tga")).also { it.flip(false, false) }
         }
-        addToLoadingList("test_texture") {
+        /*addToLoadingList("test_texture") {
             TextureRegion(Texture("assets/test_texture.tga")).also { it.flip(false, false) }
-        }
+        }*/
         loadAll()
     }
 
