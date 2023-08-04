@@ -119,7 +119,7 @@ class WorldTime(initTime: Long = 0L) {
         }
 
     inline val moonPhase: Double
-        get() = (TIME_T.plus(1700000L) % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
+        get() = (TIME_T.plus(700000L) % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
 
     fun getSolarElevationAt(ordinalDay: Int, second: Int): Double {
         val TIME_T = DAY_LENGTH * ordinalDay + second

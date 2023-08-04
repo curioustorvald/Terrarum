@@ -22,7 +22,6 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.absoluteValue
 import kotlin.math.max
-import kotlin.math.sign
 
 /**
  * Created by minjaesong on 2016-03-14.

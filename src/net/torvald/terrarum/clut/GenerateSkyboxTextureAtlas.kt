@@ -1,19 +1,16 @@
-package net.torvald.terrarum.modulebasegame.clut
+package net.torvald.terrarum.clut
 
 import net.torvald.colourutil.CIEXYZ
 import net.torvald.colourutil.toColor
 import net.torvald.colourutil.toRGB
 import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.abs
-import net.torvald.terrarum.modulebasegame.clut.Skybox.coerceInSmoothly
-import net.torvald.terrarum.modulebasegame.clut.Skybox.mapCircle
-import net.torvald.terrarum.modulebasegame.clut.Skybox.scaleToFit
+import net.torvald.terrarum.clut.Skybox.coerceInSmoothly
+import net.torvald.terrarum.clut.Skybox.mapCircle
+import net.torvald.terrarum.clut.Skybox.scaleToFit
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.serialise.toLittle
 import java.io.File
-import kotlin.math.PI
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2023-08-01.

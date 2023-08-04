@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.util.IntArrayStack
 import net.torvald.colourutil.Col4096
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.modulebasegame.RNGConsumer
+import net.torvald.terrarum.RNGConsumer
 import java.util.*
 
 /**

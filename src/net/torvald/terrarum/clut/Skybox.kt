@@ -1,5 +1,6 @@
-package net.torvald.terrarum.modulebasegame.clut
+package net.torvald.terrarum.clut
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -11,9 +12,7 @@ import net.torvald.colourutil.toRGB
 import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.abs
-import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.*
 
@@ -21,6 +20,10 @@ import kotlin.math.*
  * Created by minjaesong on 2023-07-09.
  */
 object Skybox : Disposable {
+
+    private const val HALF_PI = 1.5707963267948966
+    private const val PI = 3.141592653589793
+    private const val TWO_PI = 6.283185307179586
 
     const val gradSize = 64
 
@@ -32,7 +35,7 @@ object Skybox : Disposable {
     private lateinit var texStripRegions: TextureRegionPack
 
     fun loadlut() {
-        tex = Texture(ModMgr.getGdxFile("basegame", "weathers/main_skybox.png"))
+        tex = Texture(Gdx.files.internal("assets/clut/skybox.png"))
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         texRegions = TextureRegionPack(tex, 2, gradSize - 2, 0, 2, 0, 1)
         texStripRegions = TextureRegionPack(tex, elevCnt, gradSize - 2, 0, 2, 0, 1)
@@ -230,8 +233,8 @@ object Skybox : Disposable {
     }
 
     override fun dispose() {
-        if (::gradTexBinLowAlbedo.isInitialized) gradTexBinLowAlbedo.forEach { it.texture.dispose() }
-        if (::gradTexBinHighAlbedo.isInitialized) gradTexBinHighAlbedo.forEach { it.texture.dispose() }
-        if (::tex.isInitialized) tex.dispose()
+        if (Skybox::gradTexBinLowAlbedo.isInitialized) gradTexBinLowAlbedo.forEach { it.texture.dispose() }
+        if (Skybox::gradTexBinHighAlbedo.isInitialized) gradTexBinHighAlbedo.forEach { it.texture.dispose() }
+        if (Skybox::tex.isInitialized) tex.dispose()
     }
 }

@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame
+package net.torvald.terrarum
 
 import net.torvald.random.HQRNG
 import java.util.*

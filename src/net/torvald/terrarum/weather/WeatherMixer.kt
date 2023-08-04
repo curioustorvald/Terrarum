@@ -1,10 +1,8 @@
 package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Vector2
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -12,14 +10,11 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
-import net.torvald.terrarum.modulebasegame.RNGConsumer
-import net.torvald.terrarum.modulebasegame.TerrarumIngame
-import net.torvald.terrarum.modulebasegame.clut.Skybox
-import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
+import net.torvald.terrarum.RNGConsumer
+import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
@@ -68,7 +63,7 @@ internal object WeatherMixer : RNGConsumer {
     var forceTurbidity: Double? = null
 
     // doesn't work if the png is in greyscale/indexed mode
-    val starmapTex: TextureRegion = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/astrum.png"))).also {
+    val starmapTex: TextureRegion = TextureRegion(Texture(Gdx.files.internal("./assets/graphics/astrum.png"))).also {
         it.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
@@ -77,6 +72,8 @@ internal object WeatherMixer : RNGConsumer {
 
     private var astrumOffX = 0f
     private var astrumOffY = 0f
+
+    private val moonlightMax = Cvec(0.23f, 0.24f, 0.25f, 0.21f) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -100,18 +97,18 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // read weather descriptions from assets/weather (modular weather)
-        val weatherRawValidList = ArrayList<File>()
+        val weatherRawValidList = ArrayList<Pair<String, File>>()
         val weatherRawsDir = ModMgr.getFilesFromEveryMod("weathers")
         weatherRawsDir.forEach { (modname, parentdir) ->
             printdbg(this, "Scanning dir $parentdir")
             parentdir.listFiles(FileFilter { !it.isDirectory && it.name.endsWith(".json") })?.forEach {
-                weatherRawValidList.add(it)
+                weatherRawValidList.add(modname to it)
                 printdbg(this, "Registering weather '$it' from module $modname")
             }
         }
         // --> read from directory and store file that looks like RAW
-        for (raw in weatherRawValidList) {
-            val weather = readFromJson(raw)
+        for ((modname, raw) in weatherRawValidList) {
+            val weather = readFromJson(modname, raw)
 
             // if List for the classification does not exist, make one
             if (!weatherList.containsKey(weather.classification))
@@ -151,21 +148,6 @@ internal object WeatherMixer : RNGConsumer {
 //        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
 
 
-        // test rain toggled by F2
-        if (KeyToggler.isOn(Input.Keys.F2) && Terrarum.ingame is TerrarumIngame) {
-            val playerPosX = player.hitbox.centeredX
-            val playerPosY = player.hitbox.centeredY
-            kotlin.repeat(7) {
-                val rainParticle = ParticleMegaRain(
-                        playerPosX + HQRNG().nextInt(App.scr.width) - App.scr.halfw,
-                        playerPosY - App.scr.height
-                )
-                (Terrarum.ingame!! as TerrarumIngame).addParticle(rainParticle)
-            }
-            //globalLightNow.set(getGlobalLightOfTime((INGAME.world).time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
-        }
-
-
         if (!globalLightOverridden) {
             world.globalLight = WeatherMixer.globalLightNow
         }
@@ -200,8 +182,10 @@ internal object WeatherMixer : RNGConsumer {
             world.worldTime.solarElevationDeg
         val daylightClut = currentWeather.daylightClut
         // calculate global light
-        val globalLight = getGradientColour2(daylightClut, solarElev, timeNow)
-        globalLightNow.set(globalLight)
+        val moonSize = (-(2.0 * world.worldTime.moonPhase - 1.0).abs() + 1.0).toFloat()
+        val globalLightBySun: Cvec = getGradientColour2(daylightClut, solarElev, timeNow)
+        val globalLightByMoon: Cvec = moonlightMax * moonSize
+        globalLightNow.set(globalLightBySun max globalLightByMoon)
 
         /* (copied from the shader source)
          UV mapping coord.y
@@ -260,7 +244,13 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
-    private operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
+    private operator fun Cvec.times(other: Float) = Cvec(this.r * other, this.g * other, this.b * other, this.a * other)
+    private infix fun Cvec.max(other: Cvec) = Cvec(
+        if (this.r > other.r) this.r else other.r,
+        if (this.g > other.g) this.g else other.g,
+        if (this.b > other.b) this.b else other.b,
+        if (this.a > other.a) this.a else other.a
+    )
 
     fun colorMix(one: Color, two: Color, scale: Float): Color {
         return Color(
@@ -344,9 +334,9 @@ internal object WeatherMixer : RNGConsumer {
     fun getRandomWeather(classification: String) =
             getWeatherList(classification)[RNG.nextInt(getWeatherList(classification).size)]
 
-    fun readFromJson(file: File): BaseModularWeather = readFromJson(file.path)
+    fun readFromJson(modname: String, file: File): BaseModularWeather = readFromJson(modname, file.path)
 
-    fun readFromJson(path: String): BaseModularWeather {
+    fun readFromJson(modname: String, path: String): BaseModularWeather {
         /* JSON structure:
 {
   "skyboxGradColourMap": "colourmap/sky_colour.tga", // string (path to image) for dynamic. Image must be RGBA8888 or RGB888
@@ -367,14 +357,13 @@ internal object WeatherMixer : RNGConsumer {
         val lightbox = JSON.getString("daylightClut")
         val extraImagesPath = JSON.get("extraImages").asStringArray()
 
-        val skybox = GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${skyboxInJson}"))
-
-        val daylight = GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${lightbox}"))
+        val skybox = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}"))
+        val daylight = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}"))
 
 
         val extraImages = ArrayList<Texture>()
         for (i in extraImagesPath)
-            extraImages.add(Texture(ModMgr.getGdxFile("basegame", "$pathToImage/${i}")))
+            extraImages.add(Texture(ModMgr.getGdxFile(modname, "$pathToImage/${i}")))
 
 
         val classification = JSON.getString("classification")
