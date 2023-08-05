@@ -12,16 +12,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.unicode.EMDASH
 import net.torvald.colourutil.*
 import net.torvald.parametricsky.datasets.DatasetCIEXYZ
-import net.torvald.parametricsky.datasets.DatasetRGB
-import net.torvald.parametricsky.datasets.DatasetSpectral
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
-import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.FlowLayout
-import java.awt.GridLayout
 import java.lang.Math.pow
 import javax.swing.*
 import kotlin.math.*
@@ -94,7 +89,16 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         if (turbidity <= 0) throw IllegalStateException()
 
         // we need to use different model-state to accommodate different albedo for each spectral band but oh well...
-        genTexLoop(model)
+        genTexLoop(model, elevation)
+//        println("$elevation\t${ymaxDisp.text}\t${ymaxDisp2.text}")
+
+
+        /*for (elev in -75..75) {
+            val elevation = Math.toRadians(elev.toDouble())
+            val model = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevation.abs())
+            genTexLoop(model, elevation)
+            println("$elev\t${ymaxDisp.text}\t${ymaxDisp2.text}")
+        }*/
 
 
         val tex = Texture(oneScreen)
@@ -142,14 +146,20 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
             )
         }
         else {
-            val elevation1 = -Math.toDegrees(elevation)
-            val elevation2 = -Math.toDegrees(elevation) / 28.5
-            val scale = (1f - (1f - 1f / 1.8.pow(elevation1)) * 0.97f).toFloat()
-            val scale2 = (1.0 - (elevation2.pow(E) / E.pow(elevation2))*0.8).toFloat()
+            // maths model: https://www.desmos.com/calculator/cwi7iyzygg
+
+            val x = -Math.toDegrees(elevation).toFloat()
+//            val elevation2 = -Math.toDegrees(elevation) / 28.5
+            val p = 3.5f
+            val q = 7.5f
+            val s = -0.2f
+            val f = (1f - (1f - 1f / 1.8f.pow(x)) * 0.97f).toFloat()
+//            val g = (1.0 - (elevation2.pow(E) / E.pow(elevation2))*0.8).toFloat()
+            val h = ((x / q).pow(p) + 1f).pow(s)
             CIEXYZ(
-                this.X.scaleFun() * scale * scale2,
-                this.Y.scaleFun() * scale * scale2,
-                this.Z.scaleFun() * scale * scale2,
+                this.X.scaleFun() * f * h,
+                this.Y.scaleFun() * f * h,
+                this.Z.scaleFun() * f * h,
                 this.alpha
             )
         }
@@ -161,7 +171,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
      * Generated texture is as if you took the panorama picture of sky: up 70deg to horizon, east-south-west;
      * with sun not moving (sun is at exact south, sun's height is adjustable)
      */
-    private fun genTexLoop(state: ArHosekSkyModelState) {
+    private fun genTexLoop(state: ArHosekSkyModelState, elevation: Double) {
 
         fun normaliseY(y: Double): Float {
             var v = y.coerceAtLeast(0.0)

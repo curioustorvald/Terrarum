@@ -192,6 +192,16 @@ fun CIEXYZ.toColorRaw(): Color {
     return Color(rgb.r, rgb.g, rgb.b, rgb.alpha)
 }
 
+fun CIEXYZ.toYXY(): CIEYXY {
+    val dot = this.X + this.Y + this.Z
+    return CIEYXY(
+        this.Y,
+        this.X / dot,
+        this.Y / dot,
+        this.alpha
+    )
+}
+
 fun CIEYXY.toXYZ(): CIEXYZ {
     return CIEXYZ(x * yy / y, yy, (1f - x - y) * yy / y)
 }

@@ -88,15 +88,20 @@ object Skybox : Disposable {
             )
         }
         else {
-            val deg1 = (-elevationDeg / elevMax).pow(0.93).times(-elevMax)
-            val elevation1 = -deg1
-            val elevation2 = -deg1 / 28.5
-            val scale = (1f - (1f - 1f / 1.8.pow(elevation1)) * 0.97f).toFloat()
-            val scale2 = (1.0 - (elevation2.pow(E) / E.pow(elevation2))*0.8).toFloat()
+            // maths model: https://www.desmos.com/calculator/cwi7iyzygg
+
+            val x = -elevationDeg.toFloat()
+//            val elevation2 = elevationDeg.toFloat() / 28.5f
+            val p = 3.5f
+            val q = 7.5f
+            val s = -0.2f
+            val f = (1f - (1f - 1f / 1.8f.pow(x)) * 0.97f).toFloat()
+//            val g = (1.0 - (elevation2.pow(E) / E.pow(elevation2))*0.8).toFloat()
+            val h = ((x / q).pow(p) + 1f).pow(s)
             CIEXYZ(
-                this.X.scaleFun() * scale * scale2,
-                this.Y.scaleFun() * scale * scale2,
-                this.Z.scaleFun() * scale * scale2,
+                this.X.scaleFun() * f * h,
+                this.Y.scaleFun() * f * h,
+                this.Z.scaleFun() * f * h,
                 this.alpha
             )
         }

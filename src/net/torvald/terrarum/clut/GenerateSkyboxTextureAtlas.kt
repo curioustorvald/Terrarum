@@ -93,7 +93,7 @@ fun main() {
 
     println("Atlas generation done!")
 
-    File("./assets/mods/basegame/weathers/main_skybox.tga").writeBytes(bytes)
+    File("./assets/clut/skybox.tga").writeBytes(bytes)
 }
 
 private val bytesLut = arrayOf(2,1,0,3,2,1,0,3) // For some reason BGRA order is what makes it work
