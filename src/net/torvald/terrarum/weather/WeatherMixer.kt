@@ -208,8 +208,10 @@ internal object WeatherMixer : RNGConsumer {
 
         // TODO trilinear with (deg, turb, alb)
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
+
         val (tex, uvs) = Skybox.getUV(solarElev, thisTurbidity, 0.3)
 
+        val texBlend = (1f/4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
 
         starmapTex.texture.bind(1)
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
@@ -220,20 +222,20 @@ internal object WeatherMixer : RNGConsumer {
         batch.inUse {
             batch.shader = shaderBlendMax
             shaderBlendMax.setUniformi("tex1", 1)
-            shaderBlendMax.setUniformf("drawOffset", 0f, gradY)
-            shaderBlendMax.setUniformf("drawOffsetSize", App.scr.wf, gH)
-            shaderBlendMax.setUniform2fv("skyboxUV1", uvs, 0, 2)
-            shaderBlendMax.setUniform2fv("skyboxUV2", uvs, 2, 2)
+            shaderBlendMax.setUniformf("drawOffsetSize", 0f, gradY, App.scr.wf, gH)
+            shaderBlendMax.setUniform4fv("skyboxUV1", uvs, 0, 4)
+            shaderBlendMax.setUniform4fv("skyboxUV2", uvs, 4, 4)
+            shaderBlendMax.setUniformf("texBlend", texBlend)
             shaderBlendMax.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
             shaderBlendMax.setUniformf("randomNumber",
 //                (world.worldTime.TIME_T.plus(31L) xor 1453L + 31L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(37L) xor  862L + 31L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(23L) xor 1639L + 29L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(29L) xor 2971L + 41L).and(1023).toFloat(),
-                world.worldTime.TIME_T.div(+12.1f).plus(31L),
-                world.worldTime.TIME_T.div(-11.8f).plus(37L),
-                world.worldTime.TIME_T.div(+11.9f).plus(23L),
-                world.worldTime.TIME_T.div(-12.3f).plus(29L),
+                world.worldTime.TIME_T.div(+14.1f).plus(31L),
+                world.worldTime.TIME_T.div(-13.8f).plus(37L),
+                world.worldTime.TIME_T.div(+13.9f).plus(23L),
+                world.worldTime.TIME_T.div(-14.3f).plus(29L),
             )
 
             batch.color = Color.WHITE

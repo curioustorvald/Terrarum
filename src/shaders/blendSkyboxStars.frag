@@ -13,10 +13,10 @@ out vec4 fragColor;
 
 const vec2 boolean = vec2(0.0, 1.0);
 
-uniform vec2 drawOffset; // value of the 'gradY'
-uniform vec2 drawOffsetSize; // value of the 'gradH'
-uniform vec2 skyboxUV1; // (u, v) for the skybox drawing
-uniform vec2 skyboxUV2; // (u2, v2) for the skybox drawing
+uniform vec4 drawOffsetSize; // (gradX, gradY, gradW, gradH)
+uniform vec4 skyboxUV1; // (u, v, u2, v2) for the skybox drawing (morning)
+uniform vec4 skyboxUV2; // (u, v, u2, v2) for the skybox drawing (afternoon)
+uniform float texBlend;
 uniform vec2 tex1Size = vec2(4096.0);
 uniform vec2 astrumScroll = vec2(0.0);
 uniform vec4 randomNumber = vec4(1.0, -2.0, 3.0, -4.0);
@@ -112,13 +112,17 @@ vec4 random(vec2 p) {
 
 // draw call to this function must use UV coord of (0,0,1,1)!
 void main(void) {
-    vec2 skyboxTexCoord = mix(skyboxUV1, skyboxUV2, v_texCoords);
-    vec2 astrumTexCoord = (v_texCoords * drawOffsetSize + drawOffset + astrumScroll) / tex1Size;
+    vec2 skyboxTexCoordMorning = mix(skyboxUV1.xy, skyboxUV1.zw, v_texCoords);
+    vec2 skyboxTexCoordAfternoon = mix(skyboxUV2.xy, skyboxUV2.zw, v_texCoords);
+
+    vec2 astrumTexCoord = (v_texCoords * drawOffsetSize.zw + drawOffsetSize.xy + astrumScroll) / tex1Size;
 
     vec4 randomness = snoise4((gl_FragCoord.xy - astrumScroll) * 0.16) * 2.0; // multiply by 2 so that the "density" of the stars would be same as the non-random version
 
 
-    vec4 colorTex0 = texture(u_texture, skyboxTexCoord);
+    vec4 colorTex0Morining = texture(u_texture, skyboxTexCoordMorning);
+    vec4 colorTex0Afternoon = texture(u_texture, skyboxTexCoordAfternoon);
+    vec4 colorTex0 = mix(colorTex0Morining, colorTex0Afternoon, texBlend);
     vec4 colorTex1 = texture(tex1, astrumTexCoord) * randomness;
 
 

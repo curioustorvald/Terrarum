@@ -19,7 +19,7 @@ fun main() {
     // y: increasing turbidity (1.0 .. 10.0, in steps of 0.333)
     // x: elevations (-75 .. 75 in steps of 1, then albedo of [0.1, 0.3, 0.5, 0.7, 0.9])
     val texh = Skybox.gradSize * Skybox.turbCnt
-    val texw = Skybox.elevCnt * Skybox.albedoCnt
+    val texw = Skybox.elevCnt * Skybox.albedoCnt * 2
     val TGA_HEADER_SIZE = 18
 
     val bytes = ByteArray(TGA_HEADER_SIZE + texw * texh * 4 + 26)
@@ -44,47 +44,50 @@ fun main() {
     println("Generating texture atlas ($texw x $texh)...")
 
     // write pixels
-    for (albedo0 in 0 until Skybox.albedoCnt) {
-        val albedo = Skybox.albedos[albedo0]
-        println("Albedo=$albedo")
-        for (turb0 in 0 until Skybox.turbCnt) {
-            val turbidity = Skybox.turbiditiesD[turb0]
-            println("....... Turbidity=$turbidity")
-            for (elev0 in 0 until Skybox.elevCnt) {
-                val elevationDeg = Skybox.elevationsD[elev0]
-                val elevationRad = Math.toRadians(elevationDeg)
+    for (gammaPair in 0..1) {
+        for (albedo0 in 0 until Skybox.albedoCnt) {
+            val albedo = Skybox.albedos[albedo0]
+            println("Albedo=$albedo")
+            for (turb0 in 0 until Skybox.turbCnt) {
+                val turbidity = Skybox.turbiditiesD[turb0]
+                println("....... Turbidity=$turbidity")
+                for (elev0 in 0 until Skybox.elevCnt) {
+                    val elevationDeg = Skybox.elevationsD[elev0]
+                    val elevationRad = Math.toRadians(elevationDeg)
 //                println("... Elevation: $elevationDeg")
 
-                val state = ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
+                    val state =
+                        ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
 
-                for (yp in 0 until Skybox.gradSize) {
-                    val yi = yp - 3
-                    val xf = -elevationDeg / 90.0
-                    var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
+                    for (yp in 0 until Skybox.gradSize) {
+                        val yi = yp - 3
+                        val xf = -elevationDeg / 90.0
+                        var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
 
-                    // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
+                        // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
 //                    if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
 //                    if (elevationDeg < 0) yf *= -2.0 * asin(xf - 1.0) / PI
-                    if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
-                    val theta = yf * HALF_PI
-                    // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
+                        if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
+                        val theta = yf * HALF_PI
+                        // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 
 //                    println("$yp\t$theta")
 
-                    val xyz = CIEXYZ(
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 0).toFloat(),
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 1).toFloat(),
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 2).toFloat()
-                    )
-                    val xyz2 = xyz.scaleToFit(elevationDeg)
-                    val rgb = xyz2.toRGB().toColor()
-                    val colour = rgb.toIntBits().toLittle()
+                        val xyz = CIEXYZ(
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, (gammaPair * 2f + 1f) * HALF_PI, 0).toFloat(),
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, (gammaPair * 2f + 1f) * HALF_PI, 1).toFloat(),
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, (gammaPair * 2f + 1f) * HALF_PI, 2).toFloat()
+                        )
+                        val xyz2 = xyz.scaleToFit(elevationDeg)
+                        val rgb = xyz2.toRGB().toColor()
+                        val colour = rgb.toIntBits().toLittle()
 
-                    val imgOffX = (albedo0 * Skybox.elevCnt + elev0)
-                    val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
-                    val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
-                    for (i in 0..3) {
-                        bytes[fileOffset + i] = colour[bytesLut[i]]
+                        val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
+                        val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
+                        val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
+                        for (i in 0..3) {
+                            bytes[fileOffset + i] = colour[bytesLut[i]]
+                        }
                     }
                 }
             }

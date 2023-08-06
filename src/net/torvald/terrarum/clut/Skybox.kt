@@ -13,6 +13,7 @@ import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.abs
+import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.*
 
@@ -50,28 +51,24 @@ object Skybox : Disposable {
     }*/
 
     // use external LUT
-    operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double): TextureRegion {
-        val elev = elevationDeg.coerceIn(-elevMax, elevMax).roundToInt().plus(elevMax).roundToInt()
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(turbDivisor).roundToInt()
-        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(turbDivisor).roundToInt()
-        //printdbg(this, "elev $elevationDeg->$elev; turb $turbidity->$turb; alb $albedo->$alb")
-        return texRegions.get(alb * elevCnt + elev, turb)
+    operator fun get(elevationDeg: Double, turbidity: Double, albedo: Double, isAfternoon: Boolean): TextureRegion {
+       TODO()
     }
 
     fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): Pair<Texture, FloatArray> {
         val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(turbDivisor).roundToInt()
-        val alb = albedo.coerceIn(0.1, 0.9).minus(0.1).times(turbDivisor).roundToInt()
-        val region = texStripRegions.get(alb, turb)
+        val alb = albedo.coerceIn(0.0, 1.0).times(turbDivisor).roundToInt()
+        val region1 = texStripRegions.get(alb + albedoCnt * 0, turb) // left half of the sheet
+        val region2 = texStripRegions.get(alb + albedoCnt * 1, turb) // right half of the sheet
 
-        val elev = elevationDeg.coerceIn(-elevMax, elevMax).plus(elevMax).div(elevations.last.toDouble()).div(albedoCnt).times((elevCnt - 1.0) / elevCnt)
+        val elev = elevationDeg.coerceIn(-elevMax, elevMax).plus(elevMax).div(elevations.last.toDouble()).div(albedoCnt * 2).times((elevCnt - 1.0) / elevCnt)
 
-        val u = region.u + (0.5f / tex.width) + elev.toFloat() // because of the nature of bilinear interpolation, half pixels from the edges must be discarded
+        val uA = region1.u + (0.5f / tex.width) + elev.toFloat() // because of the nature of bilinear interpolation, half pixels from the edges must be discarded
+        val uB = region2.u + (0.5f / tex.width) + elev.toFloat() // because of the nature of bilinear interpolation, half pixels from the edges must be discarded
 
         return tex to floatArrayOf(
-            u,
-            region.v,
-            u,
-            region.v2
+            uA, region1.v, uA, region1.v2,
+            uB, region2.v, uB, region2.v2,
         )
     }
 
@@ -113,7 +110,7 @@ object Skybox : Disposable {
     val turbidities = (0..45) // 1, 1.2, 1.4, 1.6, ..., 10.0
     val turbDivisor = 5.0
     val turbiditiesD = turbidities.map { 1.0 + it / turbDivisor }
-    val albedos = arrayOf(0.1, 0.3, 0.5, 0.7, 0.9)
+    val albedos = arrayOf(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
     val elevCnt = elevations.count()
     val turbCnt = turbidities.count()
     val albedoCnt = albedos.size
