@@ -60,7 +60,7 @@ fun main() {
                         ArHosekSkyModel.arhosek_xyz_skymodelstate_alloc_init(turbidity, albedo, elevationRad.abs())
 
                     for (yp in 0 until Skybox.gradSize) {
-                        val yi = yp - 3
+                        val yi = yp - 10
                         val xf = -elevationDeg / 90.0
                         var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
 

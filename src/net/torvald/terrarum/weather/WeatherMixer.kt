@@ -154,7 +154,7 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
-    var turbidity = 4.0; private set
+    var turbidity = 1.0; private set
     private var gH = 1.4f * App.scr.height
 //    private var gH = 0.8f * App.scr.height
 
@@ -168,9 +168,11 @@ internal object WeatherMixer : RNGConsumer {
         drawSkybox(camera, batch, world)
     }
 
+    private val parallaxDomainSize = 400f
+    private val turbidityDomainSize = 533.3333f
+
     private fun drawSkybox(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3f)
-        val parallaxDomainSize = 300f
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
@@ -199,19 +201,20 @@ internal object WeatherMixer : RNGConsumer {
          -+ <- 0.0  =
          */
         val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
+        val turbidityCoeff = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / turbidityDomainSize).times(-1f).coerceIn(-1f, 1f)
         parallaxPos = parallax
 //        println(parallax) // parallax value works as intended.
 
         gdxBlendNormalStraightAlpha()
 
+        turbidity = (3.5 + turbidityCoeff * 2.5).coerceIn(1.0, 6.0)
         val thisTurbidity = forceTurbidity ?: turbidity
 
-        // TODO trilinear with (deg, turb, alb)
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
 
-        val (tex, uvs) = Skybox.getUV(solarElev, thisTurbidity, 0.3)
+        val (tex, uvs, turbX, albX) = Skybox.getUV(solarElev, thisTurbidity, 0.3)
 
-        val texBlend = (1f/4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
+        val mornNoonBlend = (1f/4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
 
         starmapTex.texture.bind(1)
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
@@ -223,9 +226,15 @@ internal object WeatherMixer : RNGConsumer {
             batch.shader = shaderBlendMax
             shaderBlendMax.setUniformi("tex1", 1)
             shaderBlendMax.setUniformf("drawOffsetSize", 0f, gradY, App.scr.wf, gH)
-            shaderBlendMax.setUniform4fv("skyboxUV1", uvs, 0, 4)
-            shaderBlendMax.setUniform4fv("skyboxUV2", uvs, 4, 4)
-            shaderBlendMax.setUniformf("texBlend", texBlend)
+            shaderBlendMax.setUniform4fv("uvA", uvs, 0, 4)
+            shaderBlendMax.setUniform4fv("uvB", uvs, 4, 4)
+            shaderBlendMax.setUniform4fv("uvC", uvs, 8, 4)
+            shaderBlendMax.setUniform4fv("uvD", uvs, 12, 4)
+            shaderBlendMax.setUniform4fv("uvE", uvs, 16, 4)
+            shaderBlendMax.setUniform4fv("uvF", uvs, 20, 4)
+            shaderBlendMax.setUniform4fv("uvG", uvs, 24, 4)
+            shaderBlendMax.setUniform4fv("uvH", uvs, 28, 4)
+            shaderBlendMax.setUniformf("texBlend", mornNoonBlend, turbX, albX, 0f)
             shaderBlendMax.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
             shaderBlendMax.setUniformf("randomNumber",
 //                (world.worldTime.TIME_T.plus(31L) xor 1453L + 31L).and(1023).toFloat(),

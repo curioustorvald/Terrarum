@@ -13,6 +13,7 @@ import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.abs
+import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.*
@@ -26,7 +27,7 @@ object Skybox : Disposable {
     private const val PI = 3.141592653589793
     private const val TWO_PI = 6.283185307179586
 
-    const val gradSize = 64
+    const val gradSize = 78
 
     private lateinit var gradTexBinLowAlbedo: Array<TextureRegion>
     private lateinit var gradTexBinHighAlbedo: Array<TextureRegion>
@@ -38,6 +39,7 @@ object Skybox : Disposable {
     fun loadlut() {
         tex = Texture(Gdx.files.internal("assets/clut/skybox.png"))
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        tex.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
         texRegions = TextureRegionPack(tex, 2, gradSize - 2, 0, 2, 0, 1)
         texStripRegions = TextureRegionPack(tex, elevCnt, gradSize - 2, 0, 2, 0, 1)
     }
@@ -55,20 +57,63 @@ object Skybox : Disposable {
        TODO()
     }
 
-    fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): Pair<Texture, FloatArray> {
-        val turb = turbidity.coerceIn(1.0, 10.0).minus(1.0).times(turbDivisor).roundToInt()
-        val alb = albedo.coerceIn(0.0, 1.0).times(turbDivisor).roundToInt()
-        val region1 = texStripRegions.get(alb + albedoCnt * 0, turb) // left half of the sheet
-        val region2 = texStripRegions.get(alb + albedoCnt * 1, turb) // right half of the sheet
+    data class SkyboxRenderInfo(
+        val texture: Texture,
+        val uvs: FloatArray,
+        val turbidityPoint: Float,
+        val albedoPoint: Float,
+    )
 
+    fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): SkyboxRenderInfo {
+        val turb = turbidity.coerceIn(turbiditiesD.first(), turbiditiesD.last()).minus(1.0).times(turbDivisor)
+        val turbLo = turb.floorToInt()
+        val turbHi = min(turbCnt - 1, turbLo + 1)
+        val alb = albedo.coerceIn(albedos.first(), albedos.last()).times(5.0)
+        val albLo = alb.floorToInt()
+        val albHi = min(albedoCnt - 1, albLo + 1)
         val elev = elevationDeg.coerceIn(-elevMax, elevMax).plus(elevMax).div(elevations.last.toDouble()).div(albedoCnt * 2).times((elevCnt - 1.0) / elevCnt)
 
-        val uA = region1.u + (0.5f / tex.width) + elev.toFloat() // because of the nature of bilinear interpolation, half pixels from the edges must be discarded
-        val uB = region2.u + (0.5f / tex.width) + elev.toFloat() // because of the nature of bilinear interpolation, half pixels from the edges must be discarded
+        // A: morn, turbLow, albLow
+        // B: noon, turbLow, albLow
+        // C: morn, turbHigh, albLow
+        // D: noon, turbHigh, albLow
+        // E: morn, turbLow, albHigh
+        // F: noon, turbLow, albHigh
+        // G: morn, turbHigh, albHigh
+        // H: noon, turbHigh, albHigh
 
-        return tex to floatArrayOf(
-            uA, region1.v, uA, region1.v2,
-            uB, region2.v, uB, region2.v2,
+        val regionA = texStripRegions.get(albLo + albedoCnt * 0, turbLo)
+        val regionB = texStripRegions.get(albLo + albedoCnt * 1, turbLo)
+        val regionC = texStripRegions.get(albLo + albedoCnt * 0, turbHi)
+        val regionD = texStripRegions.get(albLo + albedoCnt * 1, turbHi)
+        val regionE = texStripRegions.get(albHi + albedoCnt * 0, turbLo)
+        val regionF = texStripRegions.get(albHi + albedoCnt * 1, turbLo)
+        val regionG = texStripRegions.get(albHi + albedoCnt * 0, turbHi)
+        val regionH = texStripRegions.get(albHi + albedoCnt * 1, turbHi)
+        // (0.5f / tex.width): because of the nature of bilinear interpolation, half pixels from the edges must be discarded
+        val uA = regionA.u + (0.5f / tex.width) + elev.toFloat()
+        val uB = regionB.u + (0.5f / tex.width) + elev.toFloat()
+        val uC = regionC.u + (0.5f / tex.width) + elev.toFloat()
+        val uD = regionD.u + (0.5f / tex.width) + elev.toFloat()
+        val uE = regionE.u + (0.5f / tex.width) + elev.toFloat()
+        val uF = regionF.u + (0.5f / tex.width) + elev.toFloat()
+        val uG = regionG.u + (0.5f / tex.width) + elev.toFloat()
+        val uH = regionH.u + (0.5f / tex.width) + elev.toFloat()
+
+        return SkyboxRenderInfo(
+            tex,
+            floatArrayOf(
+                uA, regionA.v, uA, regionA.v2,
+                uB, regionB.v, uB, regionB.v2,
+                uC, regionC.v, uC, regionC.v2,
+                uD, regionD.v, uD, regionD.v2,
+                uE, regionE.v, uE, regionE.v2,
+                uF, regionF.v, uF, regionF.v2,
+                uG, regionG.v, uG, regionG.v2,
+                uH, regionH.v, uH, regionH.v2,
+            ),
+            (turb - turbLo).toFloat(),
+            (alb - albLo).toFloat(),
         )
     }
 
@@ -107,15 +152,13 @@ object Skybox : Disposable {
     val elevations = (0..150)
     val elevMax = elevations.last / 2.0
     val elevationsD = elevations.map { -elevMax + it } // -75, -74, -73, ..., 74, 75 // (specifically using whole number of angles because angle units any finer than 1.0 would make "hack" sunsut happen too fast)
-    val turbidities = (0..45) // 1, 1.2, 1.4, 1.6, ..., 10.0
+    val turbidities = (0..25) // 1, 1.2, 1.4, 1.6, ..., 6.0
     val turbDivisor = 5.0
     val turbiditiesD = turbidities.map { 1.0 + it / turbDivisor }
-    val albedos = arrayOf(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
+    val albedos = arrayOf(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
     val elevCnt = elevations.count()
     val turbCnt = turbidities.count()
     val albedoCnt = albedos.size
-    val albedoLow = 0.1
-    val albedoHight = 0.8 // for theoretical "winter wonderland"?
     val gamma = HALF_PI
 
     internal fun Double.mapCircle() = sin(HALF_PI * this)
@@ -123,8 +166,7 @@ object Skybox : Disposable {
     internal fun initiate() {
         printdbg(this, "Initialising skybox model")
 
-        gradTexBinLowAlbedo = getTexturmaps(albedoLow)
-        gradTexBinHighAlbedo = getTexturmaps(albedoHight)
+        TODO()
 
         App.disposables.add(this)
 
@@ -200,7 +242,7 @@ object Skybox : Disposable {
 //            printdbg(this, "elev $elevationDeg turb $turbidity")
 
             for (yp in 0 until gradSize) {
-                val yi = yp - 3
+                val yi = yp - 10
                 val xf = -elevationDeg / 90.0
                 var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
 

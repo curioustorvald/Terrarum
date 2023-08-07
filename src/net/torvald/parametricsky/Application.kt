@@ -13,6 +13,9 @@ import net.torvald.unicode.EMDASH
 import net.torvald.colourutil.*
 import net.torvald.parametricsky.datasets.DatasetCIEXYZ
 import net.torvald.terrarum.abs
+import net.torvald.terrarum.clut.Skybox
+import net.torvald.terrarum.clut.Skybox.coerceInSmoothly
+import net.torvald.terrarum.clut.Skybox.mapCircle
 import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import java.awt.BorderLayout
@@ -131,7 +134,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
     }
 
     val outTexWidth = 1
-    val outTexHeight = 256
+    val outTexHeight = 128
 
     private fun Float.scaleFun() =
             (1f - 1f / 2f.pow(this/6f)) * 0.97f
@@ -185,6 +188,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         val ys2 = ArrayList<Float>()
 
         val halfHeight = oneScreen.height * 0.5
+        val elevationDeg = Math.toDegrees(elevation)
 
         for (x in 0 until oneScreen.width) {
             for (y in 0 until oneScreen.height) {
@@ -196,17 +200,19 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 val theta = sqrt(xf*xf + yf*yf) * HALF_PI*/
 
                 // AM-PM mapping (use with WIDTH=1)
-                var yf = (y * 2.0 / oneScreen.height) % 1.0
-                if (elevation < 0) yf *= 1.0 - pow(-elevation / HALF_PI, 0.333)
+                val yp = y % (oneScreen.height / 2)
+                val yi = yp - 3
+                val xf = -elevationDeg / 90.0
+                var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
+                if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
+                val theta = yf * HALF_PI
                 val gamma = if (y < halfHeight) HALF_PI else 3 * HALF_PI
-                val theta = yf.mapCircle() * HALF_PI
-
 
 
                 val xyz = CIEXYZ(
                         ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat(),
                         ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 1).toFloat(),
-                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat()
+                        ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat(),
                 )
                 val xyz2 = xyz.scaleToFit(elevation)
                 ys.add(xyz.Y)
@@ -214,12 +220,12 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 val rgb = xyz2.toRGB().toColor()
                 rgb.a = 1f
 
-                val rgb2 = Color(
+                /*val rgb2 = Color(
                     ((rgb.r * 255f).roundToInt() xor 0xAA) / 255f,
                     ((rgb.g * 255f).roundToInt() xor 0xAA) / 255f,
                     ((rgb.b * 255f).roundToInt() xor 0xAA) / 255f,
                     rgb.a
-                )
+                )*/
 
                 oneScreen.setColor(rgb)
                 oneScreen.drawPixel(x, y)
