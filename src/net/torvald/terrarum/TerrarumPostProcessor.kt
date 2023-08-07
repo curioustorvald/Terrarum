@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
@@ -150,9 +151,10 @@ object TerrarumPostProcessor : Disposable {
                 }
 
                 // draw dev build notifiers
-                if (App.IS_DEVELOPMENT_BUILD && Terrarum.ingame != null) {
+                // omitting this screws up HQ2X render for some reason
+                if (Terrarum.ingame != null) {
                     batch.inUse {
-                        batch.color = safeAreaCol
+                        batch.color = if (IS_DEVELOPMENT_BUILD) safeAreaCol else colourNull
                         App.fontGame.draw(it, thisIsDebugStr, 5f, App.scr.height - 24f)
                     }
                 }
@@ -192,6 +194,7 @@ object TerrarumPostProcessor : Disposable {
         return outFBO
     }
     private val rng = HQRNG()
+    private val colourNull = Color(0)
 
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
     private fun Float.format(digits: Int) = "%.${digits}f".format(this)
