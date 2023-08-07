@@ -1745,8 +1745,8 @@ open class ActorWithBody : Actor {
         if (KeyToggler.isOn(Input.Keys.F9)) {
             val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
-            batch.color = HITBOX_COLOURS0
-            for (y in 0..intTilewiseHitbox.height.toInt()) {
+            for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
+                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) Color.LIME else HITBOX_COLOURS0
                 for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
                             (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
@@ -1915,10 +1915,10 @@ open class ActorWithBody : Actor {
         val tiles = ArrayList<ItemID?>()
 
         // offset 1 pixel to the down so that friction would work
-        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
+        val y = intTilewiseHitbox.height.toInt() + 1
 
-        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
-            tiles.add(world!!.getTileFromTerrain(x, y))
+        for (x in 0..intTilewiseHitbox.width.toInt()) {
+            tiles.add(world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt()))
         }
 
         return tiles.forEach(consumer)
@@ -1931,10 +1931,11 @@ open class ActorWithBody : Actor {
         val tileProps = ArrayList<BlockProp?>()
 
         // offset 1 pixel to the down so that friction would work
-        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
+//        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
+        val y = intTilewiseHitbox.height.toInt() + 1
 
-        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
-            tileProps.add(BlockCodex[world!!.getTileFromTerrain(x, y)])
+        for (x in 0..intTilewiseHitbox.width.toInt()) {
+            tileProps.add(BlockCodex[world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt())])
         }
 
         return tileProps.forEach(consumer)
