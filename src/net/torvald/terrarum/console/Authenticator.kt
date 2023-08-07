@@ -36,7 +36,7 @@ internal object Authenticator : ConsoleCommand {
             println("auth passwd: '$pwd'")
             println("hash: $hashedPwd")
 
-            if ("09ccf5067db6f58265b004829e33e715e819ba0984f1e1fcef49c36fcd5f745f".equals(hashedPwd, ignoreCase = true)) {
+            if ("2d962f949f55906ac47f16095ded190c9e44d95920259b8f36c2e54bd75df173".equals(hashedPwd, ignoreCase = true)) {
                 // beedle
                 val msg = if (a) "Locked" else "Authenticated"
                 Echo(msg)
