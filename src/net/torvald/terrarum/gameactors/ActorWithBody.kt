@@ -1132,17 +1132,17 @@ open class ActorWithBody : Actor {
         // detectors are inside of the bounding box
         // CONFIRMED
         val x1 = hitbox.startX
-        val x2 = hitbox.endX - A_PIXEL
         val y1 = hitbox.startY
-        val y2 = hitbox.endY - A_PIXEL
+        val x2 = hitbox.endX - PHYS_EPSILON_DIST
+        val y2 = hitbox.endY - PHYS_EPSILON_DIST
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
 
-        val txStart = x1.plus(HALF_PIXEL).floorToInt()
-        val txEnd =   x2.plus(HALF_PIXEL).floorToInt()
-        val tyStart = y1.plus(HALF_PIXEL).floorToInt()
-        val tyEnd =   y2.plus(HALF_PIXEL).floorToInt()
+        val txStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
+        val txEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
+        val tyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
+        val tyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
 
-        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, feet).first > 0
+        return isCollidingInternalStairs(txStart, if (feet) tyEnd else tyStart, txEnd, tyEnd, feet).first > 0
     }
 
     /**
@@ -1169,27 +1169,27 @@ open class ActorWithBody : Actor {
         // AT LEAST THESE ARE CONFIRMED
         if (option == COLLIDING_TOP) {
             x1 = hitbox.startX
-            x2 = hitbox.endX - A_PIXEL
+            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
             y1 = hitbox.startY - A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
             x1 = hitbox.startX
-            x2 = hitbox.endX - A_PIXEL
-            y1 = hitbox.endY + A_PIXEL
+            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
+            y1 = hitbox.endY - PHYS_EPSILON_DIST + A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
             x1 = hitbox.startX - A_PIXEL
             x2 = x1
             y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
+            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
         }
         else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endX + A_PIXEL
+            x1 = hitbox.endX - PHYS_EPSILON_DIST + A_PIXEL
             x2 = x1
             y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
+            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
             return isWalled(hitbox, COLLIDING_LEFT) || isWalled(hitbox, COLLIDING_RIGHT) ||
@@ -1204,10 +1204,10 @@ open class ActorWithBody : Actor {
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(HALF_PIXEL).floorToInt()
-        val txEnd =   x2.plus(HALF_PIXEL).floorToInt()
-        val tyStart = y1.plus(HALF_PIXEL).floorToInt()
-        val tyEnd =   y2.plus(HALF_PIXEL).floorToInt()
+        val txStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
+        val txEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
+        val tyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
+        val tyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
 
         return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first == 2
     }
@@ -1236,27 +1236,27 @@ open class ActorWithBody : Actor {
         // AT LEAST THESE ARE CONFIRMED
         if (option == COLLIDING_TOP) {
             x1 = hitbox.startX
-            x2 = hitbox.endX - A_PIXEL
+            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
             y1 = hitbox.startY - A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
             x1 = hitbox.startX
-            x2 = hitbox.endX - A_PIXEL
-            y1 = hitbox.endY + A_PIXEL
+            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
+            y1 = hitbox.endY - PHYS_EPSILON_DIST + A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
             x1 = hitbox.startX - A_PIXEL
             x2 = x1
             y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
+            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
         }
         else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endX + A_PIXEL
+            x1 = hitbox.endX - PHYS_EPSILON_DIST + A_PIXEL
             x2 = x1
             y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
+            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
             return max(max(isWalledStairs(hitbox, COLLIDING_LEFT).first,
@@ -1276,10 +1276,10 @@ open class ActorWithBody : Actor {
         }
         else throw IllegalArgumentException("$option")
 
-        val pxStart = x1.plus(0.5f).floorToInt()
-        val pxEnd =   x2.plus(0.5f).floorToInt()
-        val pyStart = y1.plus(0.5f).floorToInt()
-        val pyEnd =   y2.plus(0.5f).floorToInt()
+        val pxStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
+        val pxEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
+        val pyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
+        val pyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
 
         return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, gravitation.y >= 0.0 && option == COLLIDING_BOTTOM || gravitation.y < 0.0 && option == COLLIDING_TOP)
     }
@@ -1323,6 +1323,8 @@ open class ActorWithBody : Actor {
         val yheight = (ys.last - ys.first).absoluteValue
         var stairHeight = 0
         var hitFloor = false
+
+        if (ys.last != ys.first && feet) throw InternalError("Feet mode collision but pyStart != pyEnd ($pyStart .. $pyEnd)")
 
         for (y in ys) {
 
@@ -1404,11 +1406,11 @@ open class ActorWithBody : Actor {
             //(this is ActorHumanoid && BlockCodex[tile].isPlatform && !standingOnIgnoredPlatform())
             // platforms, moving downward AND not "going down"
             (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
-            externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
-            !downDownVirtually && !this.isDownDown && this.axisY <= 0f) ||
+             externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
+             !this.isDownDown && this.axisY <= 0f) ||
             // platforms, moving downward, for the case of NOT ActorHumanoid
             (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
-            externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
+             externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
     // TODO: as for the platform, only apply it when it's a feet tile
 
 
