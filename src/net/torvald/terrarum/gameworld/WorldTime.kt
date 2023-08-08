@@ -234,14 +234,20 @@ class WorldTime(initTime: Long = 0L) {
     fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
     fun Long.abs() = Math.abs(this)
 
-    /** Format: "%A, %Y %B %d %X" */
-    fun getFormattedTime() = "${getDayNameShort()}, " +
-                             "$years " +
-                             "${getMonthNameFull()} " +
-                             "$calendarDay " +
-                             "${String.format("%02d", hours)}:" +
-                             "${String.format("%02d", minutes)}:" +
-                             "${String.format("%02d", seconds)}"
+    /** Format: "ɣ%Y %B %d %A, %X" */
+    fun getFormattedTime() =
+        "ɣ$years " +
+        "${getMonthNameFull()} " +
+        "$calendarDay " +
+        "${getDayNameFull()}, " +
+        "${String.format("%02d", hours)}:" +
+        "${String.format("%02d", minutes)}:" +
+        "${String.format("%02d", seconds)}"
+    fun getFormattedCalendarDay() =
+        "ɣ$years " +
+        "${getMonthNameFull()} " +
+        "$calendarDay " +
+        "${getDayNameFull()}"
     fun getShortTime() = "${years.toString().padStart(4, '0')}-${getMonthNameShort()}-${calendarDay.toString().padStart(2, '0')}"
     fun getFilenameTime() = "${years.toString().padStart(4, '0')}${calendarMonth.toString().padStart(2, '0')}${calendarDay.toString().padStart(2, '0')}"
 

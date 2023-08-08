@@ -609,19 +609,21 @@ public class App implements ApplicationListener {
 
     private static void processScreenshotRequest(FrameBuffer fb) {
         if (screenshotRequested) {
+            String msg = "Screenshot taken";
             FrameBufferManager.begin(fb);
             try {
                 Pixmap p = Pixmap.createFromFrameBuffer(0, 0, fb.getWidth(), fb.getHeight());
                 PixmapIO.writePNG(Gdx.files.absolute(defaultDir+"/Screenshot-"+String.valueOf(System.currentTimeMillis())+".png"), p, 9, true);
                 p.dispose();
-                Terrarum.INSTANCE.getIngame().sendNotification("Screenshot taken");
             }
             catch (Throwable e) {
                 e.printStackTrace();
-                Terrarum.INSTANCE.getIngame().sendNotification("Failed to take screenshot: "+e.getMessage());
+                msg = ("Failed to take screenshot: "+e.getMessage());
             }
             FrameBufferManager.end();
             screenshotRequested = false;
+
+            Terrarum.INSTANCE.getIngame().sendNotification(msg);
         }
     }
 
