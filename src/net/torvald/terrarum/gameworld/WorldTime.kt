@@ -58,7 +58,7 @@ import kotlin.math.sin
 class WorldTime(initTime: Long = 0L) {
 
     /** It is not recommended to directly modify the TIME_T. Use provided methods instead. */
-    var TIME_T = 0L // Epoch: Year 125 Spring 1st, 0h00:00 (Mondag) // 125-01-01
+    var TIME_T = 0L // Epoch: Year 1 Spring 1st, 0h00:00 (Mondag) // 0001-01-01
 
     init {
         TIME_T = initTime
@@ -181,7 +181,7 @@ class WorldTime(initTime: Long = 0L) {
 
         const val MONTH_LENGTH = 30 // ingame calendar specific
 
-        const val EPOCH_YEAR = 125
+        const val EPOCH_YEAR = 1
 
         val YEAR_SECONDS = DAY_LENGTH * YEAR_DAYS
 

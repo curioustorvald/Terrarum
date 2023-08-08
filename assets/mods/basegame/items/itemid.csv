@@ -8,6 +8,7 @@ id;classname
 8;net.torvald.terrarum.modulebasegame.gameitems.ItemLogicSignalEmitter
 9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll
 10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter
+11;net.torvald.terrarum.modulebasegame.gameitems.ItemWallCalendar
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony

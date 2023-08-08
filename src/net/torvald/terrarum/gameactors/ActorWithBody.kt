@@ -1367,7 +1367,7 @@ open class ActorWithBody : Actor {
         //println("-> $stairHeight")
 
                // edge-detect mode
-        return if (yheight == 0) hitFloor.toInt() * 2 to stairHeight
+        return if (yheight == 0) hitFloor.toInt(1) to stairHeight
                // not an edge-detect && no collision
                else if (stairHeight == 0) 0 to 0
                // there was collision and stairHeight <= AUTO_CLIMB_STRIDE
