@@ -90,8 +90,17 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         listOf(NullUI/*, transitionalAutosave*/)
     )
 
-    internal fun queueUpManageScr() { transitionPanel.setCentreUIto(0) }
-    internal fun queueUpNewCharScr() { transitionPanel.setCentreUIto(1) }
+    private val nodesForListing = Yaml(UITitleRemoConYaml.injectedMenuSingleCharSel).parse()
+    private val nodesForManage = Yaml(UITitleRemoConYaml.injectedMenuSingleSaveManage).parse()
+
+    internal fun queueUpManageScr() {
+        transitionPanel.setCentreUIto(0)
+        remoCon.setNewRemoConContents(nodesForManage)
+    }
+    internal fun queueUpNewCharScr() {
+        transitionPanel.setCentreUIto(1)
+        remoCon.setNewRemoConContents(nodesForListing)
+    }
 
 //    internal fun bringAutosaveSelectorUp() { transitionPanel.setRightUIto(1) }
 //    internal fun takeAutosaveSelectorDown() { transitionPanel.setRightUIto(0) }
@@ -102,6 +111,10 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 
     internal fun changePanelTo(index: Int) {
         transitionPanel.requestTransition(index)
+        if (index == 1)
+            remoCon.setNewRemoConContents(nodesForManage)
+        else
+            remoCon.setNewRemoConContents(nodesForListing)
     }
 
     override fun advanceMode(button: UIItem) {
@@ -117,6 +130,9 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
     override fun show() {
 //        takeAutosaveSelectorDown()
         transitionPanel.show()
+
+        nodesForListing.parent = remoCon.treeRoot
+        nodesForManage.parent = remoCon.treeRoot
 
     }
 

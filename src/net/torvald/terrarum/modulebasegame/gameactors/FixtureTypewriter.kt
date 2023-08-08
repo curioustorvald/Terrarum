@@ -24,7 +24,7 @@ class FixtureTypewriter : FixtureBase {
     // constructor used when the game loads from the savefile
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
-            nameFun = { Lang["GAME_ITEM_TYPEWRITER"] }
+            nameFun = { Lang["ITEM_TYPEWRITER"] }
     ) {
 
         density = 2000.0

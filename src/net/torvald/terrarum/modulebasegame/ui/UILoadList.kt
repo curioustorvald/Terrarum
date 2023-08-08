@@ -235,7 +235,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         if (showSpinner) {
             val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
             val offX = UIRemoCon.menubarOffX - UIRemoCon.UIRemoConElement.paddingLeft + 72 + 1
-            val offY = UIRemoCon.menubarOffY - UIRemoCon.UIRemoConElement.lineHeight * 3 + 16
+            val offY = UIRemoCon.menubarOffY - UIRemoCon.UIRemoConElement.lineHeight * 4 + 16
             batch.draw(spin, offX.toFloat(), offY.toFloat())
         }
     }

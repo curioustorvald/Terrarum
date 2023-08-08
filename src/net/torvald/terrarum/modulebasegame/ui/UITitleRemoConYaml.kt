@@ -41,6 +41,7 @@ object UITitleRemoConYaml {
 
     // todo add MENU_IO_IMPORT
     val injectedMenuSingleCharSel = """
+- MENU_IO_IMPORT
 - CONTEXT_CHARACTER_NEW : net.torvald.terrarum.modulebasegame.ui.UINewCharacter
 - MENU_LABEL_RETURN
 """
@@ -48,6 +49,12 @@ object UITitleRemoConYaml {
     val injectedMenuSingleWorldSel = """
 - CONTEXT_WORLD_NEW : net.torvald.terrarum.modulebasegame.ui.UINewWorld
 - MENU_LABEL_RETURN
+"""
+
+    val injectedMenuSingleSaveManage = """
+- MENU_MODULES
+- MENU_LABEL_PREV_SAVES
+- MENU_LABEL_RETURN     
 """
 
     operator fun invoke(hasSave: Boolean) =

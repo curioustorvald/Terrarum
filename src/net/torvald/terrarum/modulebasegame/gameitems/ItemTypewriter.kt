@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 class ItemTypewriter(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureTypewriter") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "GAME_ITEM_TYPEWRITER"
+    override val originalName = "ITEM_TYPEWRITER"
     override var baseMass = FixtureTikiTorch.MASS
     override var stackable = true
     override var inventoryCategory = Category.MISC

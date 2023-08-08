@@ -14,7 +14,7 @@ class FixtureWallCalendar : FixtureBase {
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
-            nameFun = { Lang["GAME_ITEM_CALENDAR"] }
+            nameFun = { Lang["ITEM_CALENDAR"] }
     ) {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/calendar.tga")
 

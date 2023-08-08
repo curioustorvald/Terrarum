@@ -10,7 +10,7 @@ import net.torvald.terrarum.gameitems.ItemID
 class ItemWallCalendar(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureWallCalendar") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "GAME_ITEM_CALENDAR"
+    override val originalName = "ITEM_CALENDAR"
     override var baseMass = 1.0
     override var stackable = true
     override var inventoryCategory = Category.MISC

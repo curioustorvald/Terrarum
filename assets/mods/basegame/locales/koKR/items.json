@@ -3,9 +3,11 @@
   "BLOCK_SCAFFOLDING_NORMAL": "발판",
   "BLOCK_STONE_MARBLE": "대리석",
 
-  "ITEM_STORAGE_CHEST": "보관상자",
-  "ITEM_WIRE": "전선",
-  "ITEM_WIRE_CUTTER": "전선 절단기",
+  "ITEM_CALENDAR": "달력",
   "ITEM_LOGIC_SIGNAL_EMITTER": "신호발생기",
-  "ITEM_TIKI_TORCH": "티키 토치"
+  "ITEM_STORAGE_CHEST": "보관상자",
+  "ITEM_TIKI_TORCH": "티키 토치",
+  "ITEM_TYPEWRITER": "타자기",
+  "ITEM_WIRE": "전선",
+  "ITEM_WIRE_CUTTER": "전선 절단기"
 }
