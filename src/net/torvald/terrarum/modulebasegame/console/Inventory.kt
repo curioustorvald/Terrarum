@@ -14,16 +14,21 @@ import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
  */
 internal object Inventory : ConsoleCommand {
 
-    private var targetID: ActorID = INGAME.actorNowPlaying?.referenceID ?: PLAYER_REF_ID
+    private var targetID: ActorID = 0
+
+    private fun tryTargetActivePlayer() {
+        targetID = INGAME.actorNowPlaying?.referenceID ?: 0
+    }
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
             printUsage()
         }
         else if (args[1] == "target") {
-            targetID = if (args[2].lowercase() == "player") (INGAME.actorNowPlaying?.referenceID ?: PLAYER_REF_ID) else args[2].toInt()
+            if (args[2].lowercase() == "player") tryTargetActivePlayer() else targetID = args[2].toInt()
         }
         else {
+            if (targetID == 0) tryTargetActivePlayer()
             val actor = getActor()
             if (actor != null) {
                 when (args[1]) {
@@ -36,7 +41,7 @@ internal object Inventory : ConsoleCommand {
                 }
             }
             else {
-                Echo("Actor $targetID is not Pocketed or does not exists")
+                Echo("Actor $targetID is not Pocketed or does not exist")
             }
         }
     }

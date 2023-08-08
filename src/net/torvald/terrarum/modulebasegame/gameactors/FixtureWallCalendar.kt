@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
@@ -27,5 +28,7 @@ class FixtureWallCalendar : FixtureBase {
         actorValue[AVKey.BASEMASS] = 1.0
     }
 
-
+    override var tooltipText: String?
+        get() = INGAME.world.worldTime.getFormattedCalendarDay()
+        set(value) {}
 }

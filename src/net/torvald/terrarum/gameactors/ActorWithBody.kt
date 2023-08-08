@@ -1764,9 +1764,12 @@ open class ActorWithBody : Actor {
         if (world == null) return
 
         val offsetX = 0f
-        val offsetY = 1f // plant to the ground
+        val offsetY = 0f // for some reason this value must be zero to draw the actor planted to the ground
 
-        drawBodyInGoodPosition(hitbox.startX.toFloat(), hitbox.startY.toFloat()) { x, y ->
+        val posX = hitbox.startX.plus(PHYS_EPSILON_DIST).toFloat()
+        val posY = hitbox.startY.plus(PHYS_EPSILON_DIST).toFloat()
+
+        drawBodyInGoodPosition(posX, posY) { x, y ->
             sprite.render(batch, x + offsetX, y + offsetY, scale.toFloat())
         }
     }
