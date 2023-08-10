@@ -802,20 +802,13 @@ open class ActorWithBody : Actor {
 
                 val stepBox = sixteenStep[step]
 
-                debug2("stepbox[$step]=$stepBox; feet?=${vectorSum.y > PHYS_EPSILON_DIST}")
+                val downDown = if (this is ActorHumanoid) this.isDownDown else false
+                val goingDown = (vectorSum.y > PHYS_EPSILON_DIST) || (vectorSum.y >= 0.0 && !isWalled(stepBox, if (gravitation.y >= 0.0) COLLIDING_BOTTOM else COLLIDING_TOP))
 
-                /*forEachOccupyingTilePos(stepBox) {
-                    val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
-                    val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
+                debug2("stepbox[$step]=$stepBox; goingDown=$goingDown, downDown=$downDown")
 
-                    if (shouldICollideWithThis(tile) || (it.isFeetTile(stepBox) && shouldICollideWithThisFeet(tile))) {
-                        collidingStep = step
-                    }
-                }*/
-
-                // trying to use same function as the others, in an effort to eliminate the "contradiction" mentioned below
-                if (isColliding(stepBox, vectorSum.y > PHYS_EPSILON_DIST)) {
-                    // not registering collision sometimes?
+                // careful when using feet mode, as it will only look for collision on feet tiles!
+                if (isColliding(stepBox, goingDown && !downDown)) {
                     collidingStep = step
                 }
 
@@ -826,24 +819,13 @@ open class ActorWithBody : Actor {
             var bounceY = false
             var zeroX = false
             var zeroY = false
-            // collision NOT detected
-            if (collidingStep == null) {
-                debug1("== Collision step: no collision")
-                hitbox.translate(vectorSum)
-                // grounded = false
-            }
-            // collision detected
-            else {
-                debug1("== Collision step: $collidingStep / $ccdSteps")
 
-                debug1("CCD hitbox: ${sixteenStep[collidingStep]}")
-
-                val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
-
-                var staircaseStatus = 0
-                var stairHeightLeft = 0.0
-                var stairHeightRight = 0.0
-                val selfCollisionStatus = intArrayOf(1,2,4,8).fold(0) { acc, state ->
+            val newHitbox = if (collidingStep == null) null else hitbox.clone().reassign(sixteenStep[collidingStep])
+            var staircaseStatus = 0
+            var stairHeightLeft = 0.0
+            var stairHeightRight = 0.0
+            val selfCollisionStatus = if (newHitbox == null) 0 else
+                intArrayOf(1,2,4,8).fold(0) { acc, state ->
                     // also update staircaseStatus while we're iterating
                     if (state and 5 != 0) {
                         isWalledStairs(newHitbox, state).let {
@@ -857,6 +839,19 @@ open class ActorWithBody : Actor {
                     acc or (state * isWalledStairs(newHitbox, state).first.coerceAtMost(1))
                 }
 
+            // collision NOT detected
+            if (collidingStep == null) {
+                debug1("== Collision step: no collision")
+                hitbox.translate(vectorSum)
+                // grounded = false
+            }
+            // collision detected
+            else {
+                debug1("== Collision step: $collidingStep / $ccdSteps")
+                debug1("CCD hitbox: ${sixteenStep[collidingStep]}")
+
+                val newHitbox = newHitbox!!
+
                 // superseded by isWalledStairs-related codes
                 //if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
                 //if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
@@ -868,9 +863,9 @@ open class ActorWithBody : Actor {
                 debug1("collision: $selfCollisionStatus\tstaircasing: $staircaseStatus")
 
                 when (selfCollisionStatus) {
-                    0     -> {
+                    /*0     -> {
                         debug1("Contradiction -- collision detected by CCD, but isWalled() says otherwise")
-                    }
+                    }*/
                     5     -> {
                         zeroX = true
                     }
@@ -896,177 +891,207 @@ open class ActorWithBody : Actor {
                 }
 
 
-                // fire Collision Event with one/two/three-side collision
-                // for the ease of writing, this jumptable is separated from above.
-                when (selfCollisionStatus) {
-                    // TODO compose CollisionInfo and fire collided()
+                if (selfCollisionStatus == 0) {
+                    debug1("== selfCollisionStatus was zero, behaving as if (collidingStep = null)")
+                    hitbox.translate(vectorSum)
                 }
+                else {
+                    // fire Collision Event with one/two/three-side collision
+                    // for the ease of writing, this jumptable is separated from above.
+                    when (selfCollisionStatus) {
+                        // TODO compose CollisionInfo and fire collided()
+                    }
 
 
-                // two-side collision
-                if (selfCollisionStatus in listOf(3, 6, 9, 12)) {
-                    debug1("twoside collision $selfCollisionStatus")
+                    // two-side collision
+                    if (selfCollisionStatus in listOf(3, 6, 9, 12)) {
+                        debug1("twoside collision $selfCollisionStatus")
 
-                    // !! this code is based on Dyn4j Vector's coord system; V(1,0) -> 0, V(0,1) -> pi, V(0,-1) -> -pi !! //
+                        // !! this code is based on Dyn4j Vector's coord system; V(1,0) -> 0, V(0,1) -> pi, V(0,-1) -> -pi !! //
 
-                    // we can use selfCollisionStatus to tell which of those four side we care
+                        // we can use selfCollisionStatus to tell which of those four side we care
 
-                    // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
-                    val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
-                        newHitbox.endX.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
-                    else
-                        newHitbox.startX.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
+                        // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
+                        val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
+                            newHitbox.endX.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
+                        else
+                            newHitbox.startX.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
 
-                    // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
-                    val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
-                        newHitbox.endY.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
-                    else
-                        newHitbox.startY.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
+                        // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
+                        val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
+                            newHitbox.endY.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
+                        else
+                            newHitbox.startY.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
 
-                    val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
-                        newHitbox.endX
-                    else
-                        newHitbox.startX
+                        val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
+                            newHitbox.endX
+                        else
+                            newHitbox.startX
 
-                    val offendingHitboxPointY = if (selfCollisionStatus in listOf(3, 6))
-                        newHitbox.endY
-                    else
-                        newHitbox.startY
+                        val offendingHitboxPointY = if (selfCollisionStatus in listOf(3, 6))
+                            newHitbox.endY
+                        else
+                            newHitbox.startY
 
 
-
-                    val angleOfIncidence =
+                        val angleOfIncidence =
                             if (selfCollisionStatus in listOf(3, 9))
                                 vectorSum.direction.toPositiveRad()
                             else
                                 vectorSum.direction
 
-                    val angleThreshold =
+                        val angleThreshold =
                             if (selfCollisionStatus in listOf(3, 9))
                                 (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
-                                 Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
+                                        Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
                             else
                                 (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
-                                 Vector2(offendingTileWorldX, offendingTileWorldY)).direction
+                                        Vector2(offendingTileWorldX, offendingTileWorldY)).direction
 
-                    debug1("incidentAngle: ${Math.toDegrees(angleOfIncidence)}°, threshold: ${Math.toDegrees(angleThreshold)}°")
+                        debug1(
+                            "incidentAngle: ${Math.toDegrees(angleOfIncidence)}°, threshold: ${
+                                Math.toDegrees(
+                                    angleThreshold
+                                )
+                            }°"
+                        )
 
-                    debug1("offendingTileWorldY=$offendingTileWorldY, offendingHitboxPointY=$offendingHitboxPointY")
+                        debug1("offendingTileWorldY=$offendingTileWorldY, offendingHitboxPointY=$offendingHitboxPointY")
 
-                    val displacementAbs = Vector2(
+                        val displacementAbs = Vector2(
                             (offendingTileWorldX - offendingHitboxPointX).abs(),
                             (offendingTileWorldY - offendingHitboxPointY).abs()
-                    )
+                        )
 
-                    // FIXME jump-thru-ceil bug on 1px-wide (the edge), case-9 collision (does not occur on case-12 coll.)
+                        // FIXME jump-thru-ceil bug on 1px-wide (the edge), case-9 collision (does not occur on case-12 coll.)
 
 
-                    val displacementUnitVector =
+                        val displacementUnitVector =
                             if (angleOfIncidence == angleThreshold)
                                 -vectorSum.signum
                             else {
                                 when (selfCollisionStatus) {
-                                    3    -> if (angleOfIncidence > angleThreshold) Vector2(1.0, 0.0) else Vector2(0.0, -1.0)
-                                    6    -> if (angleOfIncidence > angleThreshold) Vector2(0.0, -1.0) else Vector2(-1.0, 0.0)
-                                    9    -> if (angleOfIncidence > angleThreshold) Vector2(0.0, 1.0) else Vector2(1.0, 0.0)
-                                    12   -> if (angleOfIncidence > angleThreshold) Vector2(-1.0, 0.0) else Vector2(0.0, 1.0)
+                                    3 -> if (angleOfIncidence > angleThreshold) Vector2(1.0, 0.0)
+                                    else Vector2(
+                                        0.0,
+                                        -1.0
+                                    )
+
+                                    6 -> if (angleOfIncidence > angleThreshold) Vector2(0.0, -1.0)
+                                    else Vector2(
+                                        -1.0,
+                                        0.0
+                                    )
+
+                                    9 -> if (angleOfIncidence > angleThreshold) Vector2(0.0, 1.0) else Vector2(1.0, 0.0)
+                                    12 -> if (angleOfIncidence > angleThreshold) Vector2(-1.0, 0.0)
+                                    else Vector2(
+                                        0.0,
+                                        1.0
+                                    )
+
                                     else -> throw InternalError("Blame hardware or universe")
                                 }
                             }
 
-                    val finalDisplacement =
+                        val finalDisplacement =
 //                            if (angleOfIncidence == angleThreshold)
 //                                displacementUnitVector
 //                            else
-                                Vector2(
-                                        displacementAbs.x * displacementUnitVector.x,
-                                        displacementAbs.y * displacementUnitVector.y
-                                )
+                            Vector2(
+                                displacementAbs.x * displacementUnitVector.x,
+                                displacementAbs.y * displacementUnitVector.y
+                            )
 
-                    debug1("displacementAbs=$displacementAbs")
-                    debug1("displacementUnitVector=$displacementUnitVector")
-                    debug1("finalDisplacement=$finalDisplacement")
+                        debug1("displacementAbs=$displacementAbs")
+                        debug1("displacementUnitVector=$displacementUnitVector")
+                        debug1("finalDisplacement=$finalDisplacement")
 
-                    // adjust finalDisplacement for honest-to-god staircasing
-                    if (physProp.useStairs && vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
-                        // remove Y displacement
-                        // let original X velocity to pass-thru instead of snapping to tiles coded above
-                        // pass-thru values are held by the vectorSum
+                        // adjust finalDisplacement for honest-to-god staircasing
+                        if (physProp.useStairs && vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) &&
+                            selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3, 6) else listOf(9, 12))
+                        ) {
+                            // remove Y displacement
+                            // let original X velocity to pass-thru instead of snapping to tiles coded above
+                            // pass-thru values are held by the vectorSum
 
-                        debug1("staircasing: $staircaseStatus for $selfCollisionStatus")
+                            debug1("staircasing: $staircaseStatus for $selfCollisionStatus")
 
-                        val stairHeight = if (staircaseStatus == COLLIDING_LEFT) stairHeightLeft else stairHeightRight
-                        finalDisplacement.y = -stairHeight
-                        finalDisplacement.x = vectorSum.x
+                            val stairHeight =
+                                if (staircaseStatus == COLLIDING_LEFT) stairHeightLeft else stairHeightRight
+                            finalDisplacement.y = -stairHeight
+                            finalDisplacement.x = vectorSum.x
 
-                        bounceX = false
-                        bounceY = false
+                            bounceX = false
+                            bounceY = false
 
-                        // this will slow down the player, but its main purpose is to hide a bug
-                        // that when player happens to be "walled" (which zeroes the x velo) they can keep
-                        // move left/right as long as "buried depth" <= stairheight
-                        // so we also zero the same exact value here for perfect hiding
-                        if (controllerV != null) {
-                            val stairRatio = stairHeight / hitbox.height
-                            stairPenaltyVector = Math.pow(1.0 - (stairRatio), 90 * stairRatio).times(10).coerceIn(0.00005, 1.0)
-                            controllerV!!.x = 0.0
-                            stairPenaltyCounter = 0
-                            stairPenaltyMax = Math.pow(stairRatio, 2.4).times(166).roundToInt().coerceAtMost(64)
+                            // this will slow down the player, but its main purpose is to hide a bug
+                            // that when player happens to be "walled" (which zeroes the x velo) they can keep
+                            // move left/right as long as "buried depth" <= stairheight
+                            // so we also zero the same exact value here for perfect hiding
+                            if (controllerV != null) {
+                                val stairRatio = stairHeight / hitbox.height
+                                stairPenaltyVector =
+                                    Math.pow(1.0 - (stairRatio), 90 * stairRatio).times(10).coerceIn(0.00005, 1.0)
+                                controllerV!!.x = 0.0
+                                stairPenaltyCounter = 0
+                                stairPenaltyMax = Math.pow(stairRatio, 2.4).times(166).roundToInt().coerceAtMost(64)
+                            }
                         }
+                        else {
+                            bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
+                            bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
+                        }
+
+
+                        newHitbox.translate(finalDisplacement)
+
+
+                        debug1("displacement: $finalDisplacement")
+
+
+                        // TODO: translate other axis proportionally to the incident vector
+
+
                     }
-                    else {
-                        bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
-                        bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
+
+                    // bounce X/Y
+                    if (bounceX) {
+                        externalV.x *= elasticity
+                        controllerV?.let { controllerV!!.x *= elasticity }
+                    }
+                    if (bounceY) {
+                        externalV.y *= elasticity
+                        controllerV?.let { controllerV!!.y *= elasticity }
+                    }
+                    if (zeroX) {
+                        externalV.x = 0.0
+                        controllerV?.let { controllerV!!.x = 0.0 }
+                    }
+                    if (zeroY) {
+                        externalV.y = 0.0
+                        controllerV?.let { controllerV!!.y = 0.0 }
                     }
 
 
-                    newHitbox.translate(finalDisplacement)
+                    hitbox.reassign(newHitbox)
+                    debug1("resulting hitbox: $newHitbox")
 
 
-                    debug1("displacement: $finalDisplacement")
+                    // slam-into-whatever damage (such dirty; much hack; wow)
+                    //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
+                    val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+                    // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
+                    if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
+                    // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
 
 
-                    // TODO: translate other axis proportionally to the incident vector
+                    // grounded = true
 
+                    // another platform-related hacks
+                    if (this is ActorHumanoid) downDownVirtually = false
 
                 }
-
-
-                // bounce X/Y
-                if (bounceX) {
-                    externalV.x *= elasticity
-                    controllerV?.let { controllerV!!.x *= elasticity }
-                }
-                if (bounceY) {
-                    externalV.y *= elasticity
-                    controllerV?.let { controllerV!!.y *= elasticity }
-                }
-                if (zeroX) {
-                    externalV.x = 0.0
-                    controllerV?.let { controllerV!!.x = 0.0 }
-                }
-                if (zeroY) {
-                    externalV.y = 0.0
-                    controllerV?.let { controllerV!!.y = 0.0 }
-                }
-
-
-                hitbox.reassign(newHitbox)
-                debug1("resulting hitbox: $newHitbox")
-
-
-                // slam-into-whatever damage (such dirty; much hack; wow)
-                //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-                val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
-                // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
-                if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
-                // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
-
-
-                // grounded = true
-
-                // another platform-related hacks
-                if (this is ActorHumanoid) downDownVirtually = false
             }// end of collision not detected
 
 
@@ -1129,7 +1154,7 @@ open class ActorWithBody : Actor {
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg
      */
-    private fun isColliding(hitbox: Hitbox, feet: Boolean = false): Boolean {
+    private fun isColliding(hitbox: Hitbox, usePlatformDetection: Boolean = false): Boolean {
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
@@ -1145,7 +1170,8 @@ open class ActorWithBody : Actor {
         val tyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
         val tyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
 
-        return isCollidingInternalStairs(txStart, if (feet) tyEnd else tyStart, txEnd, tyEnd, feet).first > 0
+//        return isCollidingInternalStairs(txStart, if (feet) tyEnd else tyStart, txEnd, tyEnd, feet).first > 0
+        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, usePlatformDetection).first > 0
     }
 
     /**
@@ -1327,7 +1353,7 @@ open class ActorWithBody : Actor {
         var stairHeight = 0
         var hitFloor = false
 
-        if (ys.last != ys.first && feet) throw InternalError("Feet mode collision but pyStart != pyEnd ($pyStart .. $pyEnd)")
+//        if (ys.last != ys.first && feet) throw InternalError("Feet mode collision but pyStart != pyEnd ($pyStart .. $pyEnd)")
 
         for (y in ys) {
 
