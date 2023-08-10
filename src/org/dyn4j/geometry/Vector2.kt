@@ -28,6 +28,7 @@
 package org.dyn4j.geometry
 
 import org.dyn4j.Epsilon
+import kotlin.math.sign
 
 /**
  * This class represents a vector or point in 2D space.
@@ -698,6 +699,9 @@ class Vector2 {
         if (a < -Math.PI) return a + 2.0 * Math.PI
         return a
     }
+
+    val signum: Vector2
+        get() = Vector2(this.x.sign, this.y.sign)
 
     companion object {
         /** A vector representing the x-axis; this vector should not be changed at runtime; used internally  */

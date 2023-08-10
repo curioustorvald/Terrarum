@@ -698,6 +698,7 @@ open class ActorWithBody : Actor {
     }
 
     private fun displaceHitbox() {
+        val printdbg1 = true
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -724,25 +725,6 @@ open class ActorWithBody : Actor {
 
         if (world != null) {
 
-            fun debug1(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
-            }
-
-            fun debug2(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
-            }
-
-            fun debug3(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
-            }
-
-            fun debug4(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
-            }
 
             fun BlockAddress.isFeetTile(hitbox: Hitbox): Boolean {
                 val (x, y) = LandUtil.resolveBlockAddr(world!!, this)
@@ -763,6 +745,8 @@ open class ActorWithBody : Actor {
                        (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
             }
 
+
+
             fun Double.modTile() = this.div(TILE_SIZE).floorToInt().times(TILE_SIZE)
             fun Double.modTileDelta() = this - this.modTile()
 
@@ -777,8 +761,25 @@ open class ActorWithBody : Actor {
             // the job of the ccd is that the "next hitbox" would not dig into the terrain greater than the tile size,
             // in which the modTileDelta returns a wrong value
             val vectorSum = (externalV + controllerV)
-            val ccdSteps = (vectorSum.magnitude / TILE_SIZE).floorToInt().coerceIn(2, 16) // adaptive
+            val ccdSteps = (vectorSum.magnitude / TILE_SIZE).ceilToInt().plus(1).times(2).coerceIn(0, 64) // adaptive
 
+
+
+            fun debug1(wut: Any?) {
+                //  vvvvv  set it true to make debug print work
+                if (printdbg1 && vectorSum.magnitudeSquared != 0.0) printdbg(this, wut)
+            }
+
+            fun debug2(wut: Any?) {
+                //  vvvvv  set it true to make debug print work
+                if (true && vectorSum.magnitudeSquared != 0.0) printdbg(this, wut)
+            }
+
+            if (printdbg1 && vectorSum.magnitudeSquared != 0.0) println("")
+            debug1("Update Frame: ${INGAME.WORLD_UPDATE_TIMER}")
+            debug1("Hitbox: ${hitbox}")
+
+            debug1("vec dir: ${Math.toDegrees(vectorSum.direction)}°, value: $vectorSum")
 
 
             // * NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake) *
@@ -793,13 +794,15 @@ open class ActorWithBody : Actor {
             // ignore MOST of the codes below (it might be possible to recycle the structure??)
             // and the idea above has not yet implemented, and may never will. --Torvald, 2018-12-30
 
-            val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) } // zeroth step is for special condition
+            val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) }
 
             var collidingStep: Int? = null
 
-            for (step in 1..ccdSteps) {
+            for (step in 0..ccdSteps) {
 
                 val stepBox = sixteenStep[step]
+
+                debug2("stepbox[$step]=$stepBox; feet?=${vectorSum.y > PHYS_EPSILON_DIST}")
 
                 /*forEachOccupyingTilePos(stepBox) {
                     val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
@@ -812,10 +815,11 @@ open class ActorWithBody : Actor {
 
                 // trying to use same function as the others, in an effort to eliminate the "contradiction" mentioned below
                 if (isColliding(stepBox, vectorSum.y > PHYS_EPSILON_DIST)) {
+                    // not registering collision sometimes?
                     collidingStep = step
                 }
 
-                if (collidingStep != null) break
+//                if (collidingStep != null) break
             }
 
             var bounceX = false
@@ -824,6 +828,7 @@ open class ActorWithBody : Actor {
             var zeroY = false
             // collision NOT detected
             if (collidingStep == null) {
+                debug1("== Collision step: no collision")
                 hitbox.translate(vectorSum)
                 // grounded = false
             }
@@ -831,6 +836,7 @@ open class ActorWithBody : Actor {
             else {
                 debug1("== Collision step: $collidingStep / $ccdSteps")
 
+                debug1("CCD hitbox: ${sixteenStep[collidingStep]}")
 
                 val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
 
@@ -859,11 +865,11 @@ open class ActorWithBody : Actor {
 
                 // fixme UP and RIGHT && LEFT and DOWN bug
 
-                //println("collision: $selfCollisionStatus\tstaircasing: $staircaseStatus")
+                debug1("collision: $selfCollisionStatus\tstaircasing: $staircaseStatus")
 
                 when (selfCollisionStatus) {
                     0     -> {
-                        debug1("[ActorWBMovable] Contradiction -- collision detected by CCD, but isWalled() says otherwise")
+                        debug1("Contradiction -- collision detected by CCD, but isWalled() says otherwise")
                     }
                     5     -> {
                         zeroX = true
@@ -943,10 +949,9 @@ open class ActorWithBody : Actor {
                                 (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
                                  Vector2(offendingTileWorldX, offendingTileWorldY)).direction
 
+                    debug1("incidentAngle: ${Math.toDegrees(angleOfIncidence)}°, threshold: ${Math.toDegrees(angleThreshold)}°")
 
-                    debug1("vectorSum: $vectorSum, vectorDirRaw: ${vectorSum.direction / Math.PI}pi")
-                    debug1("incidentAngle: ${angleOfIncidence / Math.PI}pi, threshold: ${angleThreshold / Math.PI}pi")
-
+                    debug1("offendingTileWorldY=$offendingTileWorldY, offendingHitboxPointY=$offendingHitboxPointY")
 
                     val displacementAbs = Vector2(
                             (offendingTileWorldX - offendingHitboxPointX).abs(),
@@ -958,7 +963,7 @@ open class ActorWithBody : Actor {
 
                     val displacementUnitVector =
                             if (angleOfIncidence == angleThreshold)
-                                -vectorSum
+                                -vectorSum.signum
                             else {
                                 when (selfCollisionStatus) {
                                     3    -> if (angleOfIncidence > angleThreshold) Vector2(1.0, 0.0) else Vector2(0.0, -1.0)
@@ -970,13 +975,17 @@ open class ActorWithBody : Actor {
                             }
 
                     val finalDisplacement =
-                            if (angleOfIncidence == angleThreshold)
-                                displacementUnitVector
-                            else
+//                            if (angleOfIncidence == angleThreshold)
+//                                displacementUnitVector
+//                            else
                                 Vector2(
                                         displacementAbs.x * displacementUnitVector.x,
                                         displacementAbs.y * displacementUnitVector.y
                                 )
+
+                    debug1("displacementAbs=$displacementAbs")
+                    debug1("displacementUnitVector=$displacementUnitVector")
+                    debug1("finalDisplacement=$finalDisplacement")
 
                     // adjust finalDisplacement for honest-to-god staircasing
                     if (physProp.useStairs && vectorSum.y <= 0.0 && staircaseStatus in listOf(1, 4) && selfCollisionStatus in (if (gravitation.y >= 0.0) listOf(3,6) else listOf(9, 12))) {
@@ -984,7 +993,7 @@ open class ActorWithBody : Actor {
                         // let original X velocity to pass-thru instead of snapping to tiles coded above
                         // pass-thru values are held by the vectorSum
 
-                        //println("staircasing: $staircaseStatus for $selfCollisionStatus")
+                        debug1("staircasing: $staircaseStatus for $selfCollisionStatus")
 
                         val stairHeight = if (staircaseStatus == COLLIDING_LEFT) stairHeightLeft else stairHeightRight
                         finalDisplacement.y = -stairHeight
@@ -1043,6 +1052,7 @@ open class ActorWithBody : Actor {
 
 
                 hitbox.reassign(newHitbox)
+                debug1("resulting hitbox: $newHitbox")
 
 
                 // slam-into-whatever damage (such dirty; much hack; wow)
@@ -1069,7 +1079,7 @@ open class ActorWithBody : Actor {
         }
     }
 
-    fun collisionInterpolatorRun() {
+    /*fun collisionInterpolatorRun() {
 
         fun isWalled2(hitbox: Hitbox, option: Int): Boolean {
             val newHB = Hitbox.fromTwoPoints(
@@ -1086,18 +1096,16 @@ open class ActorWithBody : Actor {
             val intpStep = 64.0
 
             // make interpolation even if the "next" position is clear of collision
-            val testHitbox = hitbox.clone()
+            var testHitbox = hitbox.clone()
 
-            // divide the vectors by the constant
-            externalV /= intpStep
-            controllerV?.let { controllerV!! /= intpStep }
+            val vecSum = (externalV + controllerV)
 
             repeat(intpStep.toInt()) { // basically we don't care if we're already been encased (e.g. entrapped by falling sand)
 
                 // change the order and the player gets stuck in the vertical wall
                 // so leave as-is
 
-                testHitbox.translate(externalV + controllerV)
+                testHitbox = hitbox.clone().translate(vecSum * ((it + 1.0) / intpStep)) // <- this would not accumulate errors
 
                 // vertical collision
                 if (isWalled2(testHitbox, COLLIDING_UD)) {
@@ -1114,14 +1122,9 @@ open class ActorWithBody : Actor {
 
             hitbox.reassign(testHitbox)
 
-            // revert the division because the Acceleration depends on being able to integrate onto the velo values
-            // don't want to mess up with the value they're expecting
-            externalV *= intpStep
-            controllerV?.let { controllerV!! *= intpStep }
-
             // TODO collision damage
         }
-    }
+    }*/
 
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg

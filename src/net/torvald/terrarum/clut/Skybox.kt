@@ -214,6 +214,11 @@ object Skybox : Disposable {
 
     /**
      * To get the idea what the fuck is going on here, please refer to https://www.desmos.com/calculator/snqglcu2wl
+     *
+     * Sidenote: the original model involved two cosine curves, but since its Taylor series begins with x^2, I figured
+     * quadratic curve ought to be good enough, and the error against the original model was below 1/255 for
+     * reasonable range of p, and that's the reason I stopped at x^2 rather than also taking x^4 into the approximated
+     * model that is the code below.
      */
     internal fun smoothLinear(p: Double, x0: Double): Double {
         val x = x0 - 0.5
