@@ -794,16 +794,15 @@ open class ActorWithBody : Actor {
             // ignore MOST of the codes below (it might be possible to recycle the structure??)
             // and the idea above has not yet implemented, and may never will. --Torvald, 2018-12-30
 
-            val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) }
+            val downDown = if (this is ActorHumanoid) this.isDownDown else false
 
+            val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) }
             var collidingStep: Int? = null
 
             for (step in 0..ccdSteps) {
 
                 val stepBox = sixteenStep[step]
-
-                val downDown = if (this is ActorHumanoid) this.isDownDown else false
-                val goingDown = (vectorSum.y > PHYS_EPSILON_DIST) || (vectorSum.y >= 0.0 && !isWalled(stepBox, if (gravitation.y >= 0.0) COLLIDING_BOTTOM else COLLIDING_TOP))
+                val goingDown = (vectorSum.y > PHYS_EPSILON_DIST) || (vectorSum.y >= 0.0 && !isWalled(stepBox, COLLIDING_BOTTOM)) // TODO reverse gravity adaptation?
 
                 debug2("stepbox[$step]=$stepBox; goingDown=$goingDown, downDown=$downDown")
 
@@ -824,11 +823,13 @@ open class ActorWithBody : Actor {
             var staircaseStatus = 0
             var stairHeightLeft = 0.0
             var stairHeightRight = 0.0
-            val selfCollisionStatus = if (newHitbox == null) 0 else
-                intArrayOf(1,2,4,8).fold(0) { acc, state ->
+            val selfCollisionStatus = if (newHitbox == null) 0 else {
+                val goingDown = (vectorSum.y > PHYS_EPSILON_DIST) || (vectorSum.y >= 0.0 && !isWalled(newHitbox, COLLIDING_BOTTOM)) // TODO reverse gravity adaptation?
+
+                intArrayOf(1, 2, 4, 8).fold(0) { acc, state ->
                     // also update staircaseStatus while we're iterating
-                    if (state and 5 != 0) {
-                        isWalledStairs(newHitbox, state).let {
+                    if (state and COLLIDING_LR != 0) {
+                        isWalledStairs(newHitbox, state, false).let {
                             staircaseStatus = staircaseStatus or (state * (it.first == 1).toInt())
                             if (state == COLLIDING_LEFT)
                                 stairHeightLeft = it.second.toDouble()
@@ -836,8 +837,9 @@ open class ActorWithBody : Actor {
                                 stairHeightRight = it.second.toDouble()
                         }
                     }
-                    acc or (state * isWalledStairs(newHitbox, state).first.coerceAtMost(1))
+                    acc or (state * isWalledStairs(newHitbox, state, state == COLLIDING_BOTTOM && goingDown && !downDown).first.coerceAtMost(1))  // TODO reverse gravity adaptation?
                 }
+            }
 
             // collision NOT detected
             if (collidingStep == null) {
@@ -848,7 +850,7 @@ open class ActorWithBody : Actor {
             // collision detected
             else {
                 debug1("== Collision step: $collidingStep / $ccdSteps")
-                debug1("CCD hitbox: ${sixteenStep[collidingStep]}")
+                debug1("CCD hitbox: ${newHitbox}")
 
                 val newHitbox = newHitbox!!
 
@@ -866,26 +868,26 @@ open class ActorWithBody : Actor {
                     /*0     -> {
                         debug1("Contradiction -- collision detected by CCD, but isWalled() says otherwise")
                     }*/
-                    5     -> {
+                    /* 5 */ COLLIDING_LR -> {
                         zeroX = true
                     }
-                    10    -> {
+                    /* 10 */ COLLIDING_UD -> {
                         zeroY = true
                     }
-                    15    -> {
+                    /* 15  */ COLLIDING_ALLSIDE -> {
                         newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true
                     }
                     // one-side collision
-                    1, 11 -> {
+                    /* 1, 11 */ COLLIDING_LEFT, COLLIDING_LEFT or COLLIDING_UD -> {
                         newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta()); bounceX = true
                     }
-                    4, 14 -> {
+                    /* 4, 14 */ COLLIDING_RIGHT, COLLIDING_RIGHT or COLLIDING_UD -> {
                         newHitbox.translatePosX(-newHitbox.endX.modTileDelta()); bounceX = true
                     }
-                    8, 13 -> {
+                    /* 8, 13 */ COLLIDING_TOP, COLLIDING_TOP or COLLIDING_LR -> {
                         newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true
                     }
-                    2, 7  -> {
+                    /* 2, 7 */ COLLIDING_BOTTOM, COLLIDING_BOTTOM or COLLIDING_LR -> {
                         newHitbox.translatePosY(-newHitbox.endY.modTileDelta()); bounceY = true
                     }
                 }
@@ -1244,7 +1246,7 @@ open class ActorWithBody : Actor {
     /**
      * @return First int: 0 - no collision, 1 - staircasing, 2 - "bonk" to the wall; Second int: stair height
      */
-    private fun isWalledStairs(hitbox: Hitbox, option: Int): Pair<Int, Int> {
+    private fun isWalledStairs(hitbox: Hitbox, option: Int, usePlatformDetection: Boolean): Pair<Int, Int> {
         val x1: Double
         val x2: Double
         val y1: Double
@@ -1288,20 +1290,20 @@ open class ActorWithBody : Actor {
             y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
-            return max(max(isWalledStairs(hitbox, COLLIDING_LEFT).first,
-                    isWalledStairs(hitbox, COLLIDING_RIGHT).first),
-                    max(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
-                            isWalledStairs(hitbox, COLLIDING_TOP).first)) to 0
+            return max(max(isWalledStairs(hitbox, COLLIDING_LEFT, usePlatformDetection).first,
+                           isWalledStairs(hitbox, COLLIDING_RIGHT, usePlatformDetection).first),
+                    max(isWalledStairs(hitbox, COLLIDING_BOTTOM, usePlatformDetection).first,
+                        isWalledStairs(hitbox, COLLIDING_TOP, usePlatformDetection).first)) to 0
 
         }
         else if (option == COLLIDING_LR) {
-            val v1 = isWalledStairs(hitbox, COLLIDING_LEFT)
-            val v2 = isWalledStairs(hitbox, COLLIDING_RIGHT)
+            val v1 = isWalledStairs(hitbox, COLLIDING_LEFT, usePlatformDetection)
+            val v2 = isWalledStairs(hitbox, COLLIDING_RIGHT, usePlatformDetection)
             return max(v1.first, v2.first) to max(v2.first, v2.second)
         }
         else if (option == COLLIDING_UD) {
-            return max(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
-                    isWalledStairs(hitbox, COLLIDING_TOP).first) to 0
+            return max(isWalledStairs(hitbox, COLLIDING_BOTTOM, usePlatformDetection).first,
+                       isWalledStairs(hitbox, COLLIDING_TOP, usePlatformDetection).first) to 0
         }
         else throw IllegalArgumentException("$option")
 
@@ -1310,7 +1312,7 @@ open class ActorWithBody : Actor {
         val pyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
         val pyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
 
-        return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, gravitation.y >= 0.0 && option == COLLIDING_BOTTOM || gravitation.y < 0.0 && option == COLLIDING_TOP)
+        return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, usePlatformDetection)
     }
 
     /*private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
