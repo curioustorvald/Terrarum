@@ -250,7 +250,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     }
 
     private val downDownMinLength: Int
-        get() = (downDownMinLengthBase * gravitation.y.abs() / 9.8).ceilToInt()
+        get() = (downDownMinLengthBase * (gravitation.y.abs() / 9.8).sqrt()).ceilToInt()
 
     private fun updateGamerControlBox() {
         if (isGamer) {
