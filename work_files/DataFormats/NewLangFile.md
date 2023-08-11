@@ -30,7 +30,7 @@ PlainText = ? regular string but does not contain { c U r L y } brackets ? ;
 function ShowMsg(string: String, vararg args: String) { ... } // pre-defined
 
 val m = "Give {0} {P.0 1} to {2.ACC}"
-ShowMsg(m, 42, "GAME_ITEM_COAL", conversationTarget.actorValue.name)
+ShowMsg(m, 42, "ITEM_COAL", conversationTarget.actorValue.name)
 
 val m2 = "{0}{G.0 을 를} 찾을 수 없습니다"
 ShowMsg(m2, something)

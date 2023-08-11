@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.jme3.math.FastMath
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
@@ -829,7 +830,7 @@ open class ActorWithBody : Actor {
                 intArrayOf(1, 2, 4, 8).fold(0) { acc, state ->
                     // also update staircaseStatus while we're iterating
                     if (state and COLLIDING_LR != 0) {
-                        isWalledStairs(newHitbox, state, false).let {
+                        isWalledStairs(newHitbox, state).let {
                             staircaseStatus = staircaseStatus or (state * (it.first == 1).toInt())
                             if (state == COLLIDING_LEFT)
                                 stairHeightLeft = it.second.toDouble()
@@ -837,7 +838,7 @@ open class ActorWithBody : Actor {
                                 stairHeightRight = it.second.toDouble()
                         }
                     }
-                    acc or (state * isWalledStairs(newHitbox, state, state == COLLIDING_BOTTOM).first.coerceAtMost(1))  // TODO reverse gravity adaptation?
+                    acc or (state * isWalledStairs(newHitbox, state).first.coerceAtMost(1))  // TODO reverse gravity adaptation?
                 }
             }
 
@@ -1160,8 +1161,8 @@ open class ActorWithBody : Actor {
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
-        val x1 = hitbox.startX + PHYS_EPSILON_DIST
-        val y1 = hitbox.startY + PHYS_EPSILON_DIST
+        val x1 = hitbox.startX
+        val y1 = hitbox.startY
         val x2 = hitbox.endX - PHYS_EPSILON_DIST
         val y2 = hitbox.endY - PHYS_EPSILON_DIST
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
@@ -1175,15 +1176,47 @@ open class ActorWithBody : Actor {
         return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, usePlatformDetection).first > 0
     }
 
-    /**
-     * @see /work_files/hitbox_collision_detection_compensation.jpg
-     */
-    fun isWalled(hitbox: Hitbox, option: Int): Boolean {
+    private fun Hitbox.getWallDetection(option: Int): List<Double> {
         val x1: Double
         val x2: Double
         val y1: Double
         val y2: Double
+        when (option) {
+            COLLIDING_TOP -> {
+                x1 = this.startX
+                x2 = this.endX - PHYS_EPSILON_DIST
+                y1 = this.startY - A_PIXEL
+                y2 = y1
+            }
+            COLLIDING_BOTTOM -> {
+                x1 = this.startX
+                x2 = this.endX - PHYS_EPSILON_DIST
+                y1 = this.endY - PHYS_EPSILON_DIST + A_PIXEL
+                y2 = y1
+            }
+            COLLIDING_LEFT -> {
+                x1 = this.startX - A_PIXEL
+                x2 = x1
+                y1 = this.startY
+                y2 = this.endY - PHYS_EPSILON_DIST
+            }
+            COLLIDING_RIGHT -> {
+                x1 = this.endX - PHYS_EPSILON_DIST + A_PIXEL
+                x2 = x1
+                y1 = this.startY
+                y2 = this.endY - PHYS_EPSILON_DIST
+            }
+            else -> throw IllegalArgumentException("Unknown option $option")
+        }
+        return listOf(x1, x2, y1, y2)
+    }
 
+    private fun Int.popcnt() = Integer.bitCount(this)
+
+    /**
+     * @see /work_files/hitbox_collision_detection_compensation.jpg
+     */
+    fun isWalled(hitbox: Hitbox, option: Int): Boolean {
         /*
         The structure:
 
@@ -1196,29 +1229,15 @@ open class ActorWithBody : Actor {
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
-        if (option == COLLIDING_TOP) {
-            x1 = hitbox.startX + PHYS_EPSILON_DIST
-            x2 = hitbox.endX - PHYS_EPSILON_DIST
-            y1 = hitbox.startY
-            y2 = y1
-        }
-        else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.startX + PHYS_EPSILON_DIST
-            x2 = hitbox.endX - PHYS_EPSILON_DIST
-            y1 = hitbox.endY - PHYS_EPSILON_DIST
-            y2 = y1
-        }
-        else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.startX + PHYS_EPSILON_DIST
-            x2 = x1
-            y1 = hitbox.startY + PHYS_EPSILON_DIST
-            y2 = hitbox.endY - PHYS_EPSILON_DIST
-        }
-        else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endX - PHYS_EPSILON_DIST
-            x2 = x1
-            y1 = hitbox.startY + PHYS_EPSILON_DIST
-            y2 = hitbox.endY - PHYS_EPSILON_DIST
+        if (option.popcnt() == 1) {
+            val (x1, x2, y1, y2) = hitbox.getWallDetection(option)
+
+            val txStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
+            val txEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
+            val tyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
+            val tyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
+
+            return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first == 2
         }
         else if (option == COLLIDING_ALLSIDE) {
             return isWalled(hitbox, COLLIDING_LEFT) || isWalled(hitbox, COLLIDING_RIGHT) ||
@@ -1231,25 +1250,14 @@ open class ActorWithBody : Actor {
         else if (option == COLLIDING_UD) {
             return isWalled(hitbox, COLLIDING_BOTTOM) || isWalled(hitbox, COLLIDING_TOP)
         }
-        else throw IllegalArgumentException()
+        else throw IllegalArgumentException("$option")
 
-        val txStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
-        val txEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
-        val tyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
-        val tyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
-
-        return isCollidingInternalStairs(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM).first == 2
     }
 
     /**
      * @return First int: 0 - no collision, 1 - staircasing, 2 - "bonk" to the wall; Second int: stair height
      */
-    private fun isWalledStairs(hitbox: Hitbox, option: Int, usePlatformDetection: Boolean): Pair<Int, Int> {
-        val x1: Double
-        val x2: Double
-        val y1: Double
-        val y2: Double
-
+    private fun isWalledStairs(hitbox: Hitbox, option: Int): Pair<Int, Int> {
         /*
         The structure:
 
@@ -1262,79 +1270,35 @@ open class ActorWithBody : Actor {
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
-        if (option == COLLIDING_TOP) {
-            x1 = hitbox.startX + PHYS_EPSILON_DIST
-            x2 = hitbox.endX - PHYS_EPSILON_DIST
-            y1 = hitbox.startY
-            y2 = y1
-        }
-        else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.startX + PHYS_EPSILON_DIST
-            x2 = hitbox.endX - PHYS_EPSILON_DIST
-            y1 = hitbox.endY - PHYS_EPSILON_DIST
-            y2 = y1
-        }
-        else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.startX + PHYS_EPSILON_DIST
-            x2 = x1
-            y1 = hitbox.startY + PHYS_EPSILON_DIST
-            y2 = hitbox.endY - PHYS_EPSILON_DIST
-        }
-        else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endX - PHYS_EPSILON_DIST
-            x2 = x1
-            y1 = hitbox.startY + PHYS_EPSILON_DIST
-            y2 = hitbox.endY - PHYS_EPSILON_DIST
+        if (option.popcnt() == 1) {
+            val (x1, x2, y1, y2) = hitbox.getWallDetection(option)
+
+            val pxStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
+            val pxEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
+            val pyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
+            val pyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
+
+            return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, option == COLLIDING_BOTTOM)
         }
         else if (option == COLLIDING_ALLSIDE) {
-            return max(max(isWalledStairs(hitbox, COLLIDING_LEFT, usePlatformDetection).first,
-                           isWalledStairs(hitbox, COLLIDING_RIGHT, usePlatformDetection).first),
-                    max(isWalledStairs(hitbox, COLLIDING_BOTTOM, usePlatformDetection).first,
-                        isWalledStairs(hitbox, COLLIDING_TOP, usePlatformDetection).first)) to 0
+            return max(max(isWalledStairs(hitbox, COLLIDING_LEFT).first,
+                           isWalledStairs(hitbox, COLLIDING_RIGHT).first),
+                    max(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
+                        isWalledStairs(hitbox, COLLIDING_TOP).first)) to 0
 
         }
         else if (option == COLLIDING_LR) {
-            val v1 = isWalledStairs(hitbox, COLLIDING_LEFT, usePlatformDetection)
-            val v2 = isWalledStairs(hitbox, COLLIDING_RIGHT, usePlatformDetection)
+            val v1 = isWalledStairs(hitbox, COLLIDING_LEFT)
+            val v2 = isWalledStairs(hitbox, COLLIDING_RIGHT)
             return max(v1.first, v2.first) to max(v2.first, v2.second)
         }
         else if (option == COLLIDING_UD) {
-            return max(isWalledStairs(hitbox, COLLIDING_BOTTOM, usePlatformDetection).first,
-                       isWalledStairs(hitbox, COLLIDING_TOP, usePlatformDetection).first) to 0
+            return max(isWalledStairs(hitbox, COLLIDING_BOTTOM).first,
+                       isWalledStairs(hitbox, COLLIDING_TOP).first) to 0
         }
         else throw IllegalArgumentException("$option")
 
-        val pxStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
-        val pxEnd =   x2/*.plus(HALF_PIXEL)*/.floorToInt()
-        val pyStart = y1/*.plus(HALF_PIXEL)*/.floorToInt()
-        val pyEnd =   y2/*.plus(HALF_PIXEL)*/.floorToInt()
-
-        return isCollidingInternalStairs(pxStart, pyStart, pxEnd, pyEnd, usePlatformDetection)
     }
-
-    /*private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
-        if (world == null) return false
-
-        for (y in tyStart..tyEnd) {
-            for (x in txStart..txEnd) {
-                val tile = world!!.getTileFromTerrain(x, y)
-
-                if (feet) {
-                    if (shouldICollideWithThisFeet(tile))
-                        return true
-                }
-                else {
-                    if (shouldICollideWithThis(tile))
-                        return true
-                }
-
-                // this weird statement means that if's the condition is TRUE, return TRUE;
-                // if the condition is FALSE, do nothing and let succeeding code handle it.
-            }
-        }
-
-        return false
-    }*/
 
     private val AUTO_CLIMB_STRIDE: Int
         get() = ((actorValue.getAsInt(AVKey.VERTSTRIDE) ?: 8) * scale).toInt()
@@ -1354,16 +1318,19 @@ open class ActorWithBody : Actor {
 
 //        if (ys.last != ys.first && feet) throw InternalError("Feet mode collision but pyStart != pyEnd ($pyStart .. $pyEnd)")
 
+        val feetY = (pyEnd / TILE_SIZE) - (if (pyEnd < 0) 1 else 0) // round down toward negative infinity // TODO reverse gravity adaptation?
+
         for (y in ys) {
 
+            val ty = (y / TILE_SIZE) - (if (y < 0) 1 else 0) // round down toward negative infinity
+            val isFeetTileHeight = (ty == feetY)
             var hasFloor = false
 
             for (x in pxStart..pxEnd) {
                 val tx = (x / TILE_SIZE) - (if (x < 0) 1 else 0) // round down toward negative infinity
-                val ty = (y / TILE_SIZE) - (if (y < 0) 1 else 0) // round down toward negative infinity
                 val tile = world!!.getTileFromTerrain(tx, ty)
 
-                if (feet) {
+                if (feet && isFeetTileHeight) {
                     if (shouldICollideWithThisFeet(tile)) {
                         hasFloor = true
                         hitFloor = true
@@ -1775,8 +1742,8 @@ open class ActorWithBody : Actor {
         if (KeyToggler.isOn(Input.Keys.F9)) {
             val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
-            for (y in 0..intTilewiseHitbox.height.toInt()) {
-                batch.color = if (y == intTilewiseHitbox.height.toInt()) Color.LIME else HITBOX_COLOURS0
+            for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
+                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) Color.LIME else HITBOX_COLOURS0
                 for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
                             (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
@@ -1949,7 +1916,7 @@ open class ActorWithBody : Actor {
         val tiles = ArrayList<ItemID?>()
 
         // offset 1 pixel to the down so that friction would work
-        val y = intTilewiseHitbox.height.toInt()
+        val y = intTilewiseHitbox.height.toInt() + 1
 
         for (x in 0..intTilewiseHitbox.width.toInt()) {
             tiles.add(world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt()))
@@ -1966,7 +1933,7 @@ open class ActorWithBody : Actor {
 
         // offset 1 pixel to the down so that friction would work
 //        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
-        val y = intTilewiseHitbox.height.toInt()
+        val y = intTilewiseHitbox.height.toInt() + 1
 
         for (x in 0..intTilewiseHitbox.width.toInt()) {
             tileProps.add(BlockCodex[world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt())])
