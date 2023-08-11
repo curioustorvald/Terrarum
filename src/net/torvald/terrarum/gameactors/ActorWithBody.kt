@@ -1785,6 +1785,7 @@ open class ActorWithBody : Actor {
                 }
             }
 
+            batch.color = Color.WHITE
         }
     }
 
