@@ -837,7 +837,7 @@ open class ActorWithBody : Actor {
                                 stairHeightRight = it.second.toDouble()
                         }
                     }
-                    acc or (state * isWalledStairs(newHitbox, state, state == COLLIDING_BOTTOM && goingDown && !downDown).first.coerceAtMost(1))  // TODO reverse gravity adaptation?
+                    acc or (state * isWalledStairs(newHitbox, state, state == COLLIDING_BOTTOM).first.coerceAtMost(1))  // TODO reverse gravity adaptation?
                 }
             }
 
@@ -1160,9 +1160,8 @@ open class ActorWithBody : Actor {
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
-        // CONFIRMED
-        val x1 = hitbox.startX
-        val y1 = hitbox.startY
+        val x1 = hitbox.startX + PHYS_EPSILON_DIST
+        val y1 = hitbox.startY + PHYS_EPSILON_DIST
         val x2 = hitbox.endX - PHYS_EPSILON_DIST
         val y2 = hitbox.endY - PHYS_EPSILON_DIST
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
@@ -1197,30 +1196,29 @@ open class ActorWithBody : Actor {
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
-        // AT LEAST THESE ARE CONFIRMED
         if (option == COLLIDING_TOP) {
-            x1 = hitbox.startX
-            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
-            y1 = hitbox.startY - A_PIXEL
+            x1 = hitbox.startX + PHYS_EPSILON_DIST
+            x2 = hitbox.endX - PHYS_EPSILON_DIST
+            y1 = hitbox.startY
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.startX
-            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
-            y1 = hitbox.endY - PHYS_EPSILON_DIST + A_PIXEL
+            x1 = hitbox.startX + PHYS_EPSILON_DIST
+            x2 = hitbox.endX - PHYS_EPSILON_DIST
+            y1 = hitbox.endY - PHYS_EPSILON_DIST
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.startX - A_PIXEL
+            x1 = hitbox.startX + PHYS_EPSILON_DIST
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
+            y1 = hitbox.startY + PHYS_EPSILON_DIST
+            y2 = hitbox.endY - PHYS_EPSILON_DIST
         }
         else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endX - PHYS_EPSILON_DIST + A_PIXEL
+            x1 = hitbox.endX - PHYS_EPSILON_DIST
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
+            y1 = hitbox.startY + PHYS_EPSILON_DIST
+            y2 = hitbox.endY - PHYS_EPSILON_DIST
         }
         else if (option == COLLIDING_ALLSIDE) {
             return isWalled(hitbox, COLLIDING_LEFT) || isWalled(hitbox, COLLIDING_RIGHT) ||
@@ -1264,30 +1262,29 @@ open class ActorWithBody : Actor {
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
-        // AT LEAST THESE ARE CONFIRMED
         if (option == COLLIDING_TOP) {
-            x1 = hitbox.startX
-            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
-            y1 = hitbox.startY - A_PIXEL
+            x1 = hitbox.startX + PHYS_EPSILON_DIST
+            x2 = hitbox.endX - PHYS_EPSILON_DIST
+            y1 = hitbox.startY
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.startX
-            x2 = hitbox.endX - PHYS_EPSILON_DIST - A_PIXEL
-            y1 = hitbox.endY - PHYS_EPSILON_DIST + A_PIXEL
+            x1 = hitbox.startX + PHYS_EPSILON_DIST
+            x2 = hitbox.endX - PHYS_EPSILON_DIST
+            y1 = hitbox.endY - PHYS_EPSILON_DIST
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.startX - A_PIXEL
+            x1 = hitbox.startX + PHYS_EPSILON_DIST
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
+            y1 = hitbox.startY + PHYS_EPSILON_DIST
+            y2 = hitbox.endY - PHYS_EPSILON_DIST
         }
         else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endX - PHYS_EPSILON_DIST + A_PIXEL
+            x1 = hitbox.endX - PHYS_EPSILON_DIST
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - PHYS_EPSILON_DIST - A_PIXEL
+            y1 = hitbox.startY + PHYS_EPSILON_DIST
+            y2 = hitbox.endY - PHYS_EPSILON_DIST
         }
         else if (option == COLLIDING_ALLSIDE) {
             return max(max(isWalledStairs(hitbox, COLLIDING_LEFT, usePlatformDetection).first,
@@ -1778,8 +1775,8 @@ open class ActorWithBody : Actor {
         if (KeyToggler.isOn(Input.Keys.F9)) {
             val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
-            for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
-                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) Color.LIME else HITBOX_COLOURS0
+            for (y in 0..intTilewiseHitbox.height.toInt()) {
+                batch.color = if (y == intTilewiseHitbox.height.toInt()) Color.LIME else HITBOX_COLOURS0
                 for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
                             (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
@@ -1951,7 +1948,7 @@ open class ActorWithBody : Actor {
         val tiles = ArrayList<ItemID?>()
 
         // offset 1 pixel to the down so that friction would work
-        val y = intTilewiseHitbox.height.toInt() + 1
+        val y = intTilewiseHitbox.height.toInt()
 
         for (x in 0..intTilewiseHitbox.width.toInt()) {
             tiles.add(world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt()))
@@ -1968,7 +1965,7 @@ open class ActorWithBody : Actor {
 
         // offset 1 pixel to the down so that friction would work
 //        val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorToInt()
-        val y = intTilewiseHitbox.height.toInt() + 1
+        val y = intTilewiseHitbox.height.toInt()
 
         for (x in 0..intTilewiseHitbox.width.toInt()) {
             tileProps.add(BlockCodex[world!!.getTileFromTerrain(x + intTilewiseHitbox.startX.toInt(), y + intTilewiseHitbox.startY.toInt())])
