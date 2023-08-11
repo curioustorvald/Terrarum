@@ -4,7 +4,6 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.jme3.math.FastMath
 import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
@@ -795,7 +794,7 @@ open class ActorWithBody : Actor {
             // ignore MOST of the codes below (it might be possible to recycle the structure??)
             // and the idea above has not yet implemented, and may never will. --Torvald, 2018-12-30
 
-            val downDown = if (this is ActorHumanoid) this.isDownDown else false
+            val downDown = if (this is ActorHumanoid) this.downButtonHeld > 0 else false
 
             val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) }
             var collidingStep: Int? = null
@@ -1092,7 +1091,7 @@ open class ActorWithBody : Actor {
                     // grounded = true
 
                     // another platform-related hacks
-                    if (this is ActorHumanoid) downDownVirtually = false
+//                    if (this is ActorHumanoid) downButtonHeld = false
 
                 }
             }// end of collision not detected
@@ -1402,7 +1401,7 @@ open class ActorWithBody : Actor {
             // platforms, moving downward AND not "going down"
             (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
              externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
-             !this.isDownDown && this.axisY <= 0f) ||
+             this.downButtonHeld == 0 && this.axisY <= 0f) ||
             // platforms, moving downward, for the case of NOT ActorHumanoid
             (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
              externalV.y + (controllerV?.y ?: 0.0) >= 0.0)

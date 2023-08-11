@@ -12,7 +12,6 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitems.GameItem
-import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import org.dyn4j.geometry.Vector2
 
@@ -116,6 +115,8 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
         @Transient const val SPRITE_ROW_IDLE = 0
         @Transient const val SPRITE_ROW_WALK = 1
+
+        @Transient const val downDownMinLengthBase = 12
     }
 
     ////////////////////////////////
@@ -173,7 +174,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     var isUpDown = false; protected set
     var isDownDown = false; protected set
-    var downDownVirtually = false; internal set
+    var downButtonHeld = 0; internal set
     var isLeftDown = false; protected set
     var isRightDown = false; protected set
     var isJumpDown = false; protected set
@@ -221,7 +222,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         if (isNoClip) {
             //grounded = true
 //            platformToIgnore = null
-            downDownVirtually = false
+            downButtonHeld = 0
         }
 
         // reset control box of AI
@@ -247,6 +248,9 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             }
         }
     }
+
+    private val downDownMinLength: Int
+        get() = (downDownMinLengthBase * gravitation.y.abs() / 9.8).ceilToInt()
 
     private fun updateGamerControlBox() {
         if (isGamer) {
@@ -288,16 +292,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
 
         // platform-related hacks
-        // allow latching down downDownVirtually only when standing on a platform AND not jumping upwards
-        val occupyingTileHasPlatform = bodyTiles.filterNotNull().any { it.isPlatform }
-        val feetTileHasPlatform = feetTiles.filterNotNull().any { it.isPlatform }
-        val feetTileIsAllPlatform = feetTiles.filterNotNull().all { it.isPlatform }
-        if (isDownDown && feetTileIsAllPlatform && (controllerV?.y ?: 0.0) >= 0.0) {// ||
-//            occupyingTileHasPlatform && !feetTileHasPlatform) { // FIXME commenting this out enables platform-ladder but falldown gets slowed down if the body passes thru the platform but I think this behav might be beneficial for player?
-//            downDownVirtually = true
+        if (isDownDown || downButtonHeld in 1 until downDownMinLength) {
+            downButtonHeld += 1
         }
-        if (downDownVirtually && !occupyingTileHasPlatform && !feetTileIsAllPlatform) {
-//            downDownVirtually = false
+        else {
+            downButtonHeld = 0
         }
         // TODO just disable "snap to ground" on collision solver if {player's body overlaps with the platform/downDownVirtually}?
         // the point is: disable snap (or don't consider offending tiles as solid) for certain Y-pos only, tiles on Y+1 are still solid
