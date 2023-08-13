@@ -698,7 +698,7 @@ open class ActorWithBody : Actor {
     }
 
     private fun displaceHitbox() {
-        val printdbg1 = true
+        val printdbg1 = false && App.IS_DEVELOPMENT_BUILD
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -772,7 +772,7 @@ open class ActorWithBody : Actor {
 
             fun debug2(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (true && vectorSum.magnitudeSquared != 0.0) printdbg(this, wut)
+                if (false && printdbg1 && vectorSum.magnitudeSquared != 0.0) printdbg(this, wut)
             }
 
             if (printdbg1 && vectorSum.magnitudeSquared != 0.0) println("")

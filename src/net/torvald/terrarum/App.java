@@ -267,7 +267,8 @@ public class App implements ApplicationListener {
         Gdx.gl20.glViewport(0, 0, width, height);
     }
 
-    public static final float UPDATE_RATE = 1f / 64f; // apparent framerate will be limited by update rate
+    public static final int TICKS = 64;
+    public static final float UPDATE_RATE = 1f / TICKS; // apparent framerate will be limited by update rate
 
     private static float loadTimer = 0f;
     private static final float showupTime = 100f / 1000f;
