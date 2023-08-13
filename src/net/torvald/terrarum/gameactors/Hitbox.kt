@@ -145,6 +145,9 @@ class Hitbox {
         return this
     }
 
+    /**
+     * Resize the hitbox centred around the "canonical" point.
+     */
     fun canonicalResize(w: Double, h: Double): Hitbox {
         // sx_1 + 0.5w_1 = sx_2 + 0.5w_2 // equals because the final point must not move. sx_1: old start-x, sx_2: new start-x which is what we want
         // sx_2 = sx_1 + 0.5w_1 - 0.5w_2 // move variables to right-hand side to derive final value sx_2

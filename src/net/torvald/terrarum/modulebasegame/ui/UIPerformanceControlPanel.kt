@@ -26,11 +26,14 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
             arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
                 arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,1,120,1,60000"),
                 arrayOf("notificationshowuptime", { Lang["MENU_OPTIONS_NOTIFICATION_DISPLAY_DURATION"] + " (${Lang["CONTEXT_TIME_SECOND_PLURAL"]})" }, "spinnerimul,2,10,1,1000"),
+            arrayOf("", { Lang["MENU_LABEL_GRAPHICS"] }, "h1"),
+                arrayOf("atlastexsize", { Lang["MENU_OPTIONS_ATLAS_TEXTURE_SIZE"] }, "spinnersel,2048,4096,8192"),
             arrayOf("", { Lang["MENU_LABEL_JVM_DNT"] }, "h1"),
                 arrayOf("jvm_xmx", { Lang["MENU_OPTIONS_JVM_HEAP_MAX"] + " (GB)" }, "spinner,2,32,1"),
                 arrayOf("jvm_extra_cmd", { Lang["MENU_LABEL_EXTRA_JVM_ARGUMENTS"] }, "typein"),
                 arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
-        ))
+            )
+        )
     }
 
     override var height = ControlPanelCommon.getMenuHeight("basegame.performancecontrolpanel")

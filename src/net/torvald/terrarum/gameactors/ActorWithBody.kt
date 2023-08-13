@@ -18,6 +18,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -698,7 +699,7 @@ open class ActorWithBody : Actor {
     }
 
     private fun displaceHitbox() {
-        val printdbg1 = false && App.IS_DEVELOPMENT_BUILD
+        val printdbg1 = true && App.IS_DEVELOPMENT_BUILD
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -772,14 +773,14 @@ open class ActorWithBody : Actor {
 
             fun debug2(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (false && printdbg1 && vectorSum.magnitudeSquared != 0.0) printdbg(this, wut)
+                if (true && printdbg1 && vectorSum.magnitudeSquared != 0.0) printdbg(this, wut)
             }
 
             if (printdbg1 && vectorSum.magnitudeSquared != 0.0) println("")
             debug1("Update Frame: ${INGAME.WORLD_UPDATE_TIMER}")
             debug1("Hitbox: ${hitbox}")
 
-            debug1("vec dir: ${Math.toDegrees(vectorSum.direction)}°, value: $vectorSum, magnitude: ${vectorSum.magnitude}")
+            debug1("vec dir: ${if (vectorSum.isZero) "." else Math.toDegrees(vectorSum.direction)} deg, value: $vectorSum, magnitude: ${vectorSum.magnitude}")
 
 
             // * NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake) *
@@ -802,11 +803,13 @@ open class ActorWithBody : Actor {
             for (step in 0..ccdSteps) {
 
                 val stepBox = sixteenStep[step]
-                val goingDown = (vectorSum.y > PHYS_EPSILON_DIST) || (vectorSum.y >= 0.0 && !isWalled(stepBox, COLLIDING_BOTTOM)) // TODO reverse gravity adaptation?
 
-                debug2("stepbox[$step]=$stepBox; goingDown=$goingDown, downDown=$downDown")
+                val goingDownwardDirection = true//Math.toDegrees(vectorSum.direction).let { it > 0.0 && it < 180.0 } // commenting out: weird  better bounce off than making players stuck :/
+                val goingDown = (vectorSum.y >= PHYS_EPSILON_VELO || (vectorSum.y.absoluteValue < PHYS_EPSILON_VELO && !isWalled(stepBox, COLLIDING_BOTTOM))) // TODO reverse gravity adaptation?
 
-                if (collidingStep == null && isColliding(stepBox, goingDown && !downDown)) {
+                debug2("stepbox[$step]=$stepBox; goingDown=$goingDown, downDown=$downDown, goingDownwardDirection=$goingDownwardDirection")
+
+                if (collidingStep == null && isColliding(stepBox, goingDown && !downDown && goingDownwardDirection)) {
                     collidingStep = step
                 }
 
@@ -823,20 +826,17 @@ open class ActorWithBody : Actor {
             var stairHeightLeft = 0.0
             var stairHeightRight = 0.0
             val selfCollisionStatus = if (newHitbox == null) 0 else {
-                val goingDown = (vectorSum.y > PHYS_EPSILON_DIST) || (vectorSum.y >= 0.0 && !isWalled(newHitbox, COLLIDING_BOTTOM)) // TODO reverse gravity adaptation?
-
                 intArrayOf(1, 2, 4, 8).fold(0) { acc, state ->
+                    val (isWalled, stairHeight) = isWalledStairs(newHitbox, state)
                     // also update staircaseStatus while we're iterating
                     if (state and COLLIDING_LR != 0) {
-                        isWalledStairs(newHitbox, state).let {
-                            staircaseStatus = staircaseStatus or (state * (it.first == 1).toInt())
-                            if (state == COLLIDING_LEFT)
-                                stairHeightLeft = it.second.toDouble()
-                            else
-                                stairHeightRight = it.second.toDouble()
-                        }
+                        staircaseStatus = staircaseStatus or (state * (isWalled == 1).toInt())
+                        if (state == COLLIDING_LEFT)
+                            stairHeightLeft = stairHeight.toDouble()
+                        else
+                            stairHeightRight = stairHeight.toDouble()
                     }
-                    acc or (state * isWalledStairs(newHitbox, state).first.coerceAtMost(1))  // TODO reverse gravity adaptation?
+                    acc or (state * isWalled.coerceAtMost(1))  // TODO reverse gravity adaptation?
                 }
             }
 
@@ -875,19 +875,28 @@ open class ActorWithBody : Actor {
                     }
                     /* 15  */ COLLIDING_ALLSIDE -> {
                         newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true
+                        debug1("reassining hitbox to ${sixteenStep[0]}")
                     }
                     // one-side collision
                     /* 1, 11 */ COLLIDING_LEFT, COLLIDING_LEFT or COLLIDING_UD -> {
-                        newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta()); bounceX = true
+                        val t = TILE_SIZE - newHitbox.startX.modTileDelta()
+                        newHitbox.translatePosX(t); bounceX = true
+                        debug1("translate x by $t")
                     }
                     /* 4, 14 */ COLLIDING_RIGHT, COLLIDING_RIGHT or COLLIDING_UD -> {
-                        newHitbox.translatePosX(-newHitbox.endX.modTileDelta()); bounceX = true
+                        val t = -newHitbox.endX.modTileDelta()
+                        newHitbox.translatePosX(t); bounceX = true
+                        debug1("translate x by $t")
                     }
                     /* 8, 13 */ COLLIDING_TOP, COLLIDING_TOP or COLLIDING_LR -> {
-                        newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true
+                        val t = TILE_SIZE - newHitbox.startY.modTileDelta()
+                        newHitbox.translatePosY(t); bounceY = true
+                        debug1("translate y by $t")
                     }
                     /* 2, 7 */ COLLIDING_BOTTOM, COLLIDING_BOTTOM or COLLIDING_LR -> {
-                        newHitbox.translatePosY(-newHitbox.endY.modTileDelta()); bounceY = true
+                        val t = -newHitbox.endY.modTileDelta()
+                        newHitbox.translatePosY(t); bounceY = true
+                        debug1("translate y by $t")
                     }
                 }
 
@@ -1316,16 +1325,18 @@ open class ActorWithBody : Actor {
 
 //        if (ys.last != ys.first && feet) throw InternalError("Feet mode collision but pyStart != pyEnd ($pyStart .. $pyEnd)")
 
-        val feetY = (pyEnd / TILE_SIZE) - (if (pyEnd < 0) 1 else 0) // round down toward negative infinity // TODO reverse gravity adaptation?
+        val feetY = (pyEnd / TILE_SIZED).floorToInt() // round down toward negative infinity // TODO reverse gravity adaptation?
+
+//        if (feet && this is IngamePlayer) printdbg(this, "feetY=$feetY")
 
         for (y in ys) {
 
-            val ty = (y / TILE_SIZE) - (if (y < 0) 1 else 0) // round down toward negative infinity
+            val ty = (y / TILE_SIZED).floorToInt() // round down toward negative infinity
             val isFeetTileHeight = (ty == feetY)
             var hasFloor = false
 
             for (x in pxStart..pxEnd) {
-                val tx = (x / TILE_SIZE) - (if (x < 0) 1 else 0) // round down toward negative infinity
+                val tx = (x / TILE_SIZED).floorToInt() // round down toward negative infinity
                 val tile = world!!.getTileFromTerrain(tx, ty)
 
                 if (feet && isFeetTileHeight) {
@@ -1741,7 +1752,7 @@ open class ActorWithBody : Actor {
             val blockMark = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common").get(0, 0)
 
             for (y in 0..intTilewiseHitbox.height.toInt() + 1) {
-                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) Color.LIME else HITBOX_COLOURS0
+                batch.color = if (y == intTilewiseHitbox.height.toInt() + 1) HITBOX_COLOURS1 else HITBOX_COLOURS0
                 for (x in 0..intTilewiseHitbox.width.toInt()) {
                     batch.draw(blockMark,
                             (intTilewiseHitbox.startX.toFloat() + x) * TILE_SIZEF,
@@ -1964,7 +1975,7 @@ open class ActorWithBody : Actor {
         @Transient const val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
 
         @Transient const val PHYS_EPSILON_DIST = 1.0 / 65536.0
-//        @Transient const val PHYS_EPSILON_VELO = 1.0 / 8192.0
+        @Transient const val PHYS_EPSILON_VELO = 1.0 / 8192.0
 
 
         /**
@@ -2004,6 +2015,7 @@ open class ActorWithBody : Actor {
 
         @Transient private val HITBOX_COLOURS0 = Color(0xFF00FF88.toInt())
         @Transient private val HITBOX_COLOURS1 = Color(0xFFFF0088.toInt())
+
 
         fun isCloseEnough(a: Double, b: Double) = ((a / b).let { if (it.isNaN()) 0.0 else it } - 1).absoluteValue < PHYS_EPSILON_DIST
     }

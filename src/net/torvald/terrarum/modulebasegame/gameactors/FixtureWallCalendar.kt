@@ -29,6 +29,11 @@ class FixtureWallCalendar : FixtureBase {
     }
 
     override var tooltipText: String?
-        get() = INGAME.world.worldTime.getFormattedCalendarDay()
+        get() = Lang.getAndUseTemplate("CONTEXT_CALENDAR_DATE_FORMAT_YMD_DDD", false,
+            world!!.worldTime.years,
+            world!!.worldTime.getMonthNameFull(),
+            world!!.worldTime.calendarDay,
+            world!!.worldTime.getDayNameFull()
+        )//INGAME.world.worldTime.getFormattedCalendarDay()
         set(value) {}
 }

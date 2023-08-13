@@ -56,14 +56,27 @@ object ControlPanelCommon {
 
             val initialSel = optionsList.indexOf(App.getConfigString(optionName))
 
-            println("labelFuns = ${labelFuns.map { it.invoke() }}")
-            println("optionsList = $optionsList")
-            println("optionName = $optionName; value = ${App.getConfigString(optionName)}")
-            println("initialSel = $initialSel")
+//            println("labelFuns = ${labelFuns.map { it.invoke() }}")
+//            println("optionsList = $optionsList")
+//            println("optionName = $optionName; value = ${App.getConfigString(optionName)}")
+//            println("initialSel = $initialSel")
 
             if (initialSel < 0) throw IllegalArgumentException("config value '${App.getConfigString(optionName)}' for option '$optionName' is not found on the options list")
 
             UIItemTextSelector(parent, x, y, labelFuns, initialSel, CONFIG_TEXTSEL_WIDTH, clickToShowPalette = false) to { it: UIItem, optionStr: String ->
+                (it as UIItemTextSelector).selectionChangeListener = {
+                    App.setConfig(optionStr, optionsList[it])
+                }
+            }
+        }
+        else if (args.startsWith("spinnersel,")) {
+            val labelFuns = arg.subList(1, arg.size).map { { it } }
+            val optionsList = arg.subList(1, arg.size).map { it.toInt() }
+
+            val initialSel = optionsList.indexOf(App.getConfigInt(optionName))
+            if (initialSel < 0) throw IllegalArgumentException("config value '${App.getConfigString(optionName)}' for option '$optionName' is not found on the options list")
+
+            UIItemTextSelector(parent, x, y, labelFuns, initialSel, CONFIG_SPINNER_WIDTH, clickToShowPalette = false, useSpinnerButtons = true) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextSelector).selectionChangeListener = {
                     App.setConfig(optionStr, optionsList[it])
                 }

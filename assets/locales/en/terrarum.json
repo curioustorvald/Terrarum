@@ -23,6 +23,7 @@
   "MENU_LABEL_STREAMING": "Livestreaming",
   "MENU_LABEL_SYSTEM_INFO": "System Info",
   "MENU_MODULES" : "Modules",
+  "MENU_OPTIONS_ATLAS_TEXTURE_SIZE": "Atlas Texture Size",
   "MENU_OPTIONS_AUTOSAVE": "Autosave",
   "MENU_OPTIONS_BLUR": "Blur",
   "MENU_OPTIONS_DEBUG_CONSOLE": "Debug Console",

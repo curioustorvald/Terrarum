@@ -152,6 +152,15 @@ object Lang {
         return sb.toString()
     }
 
+    fun getAndUseTemplate(key: String, capitalise: Boolean = true, vararg arguments: Any?): String {
+        var raw = get(key, capitalise)
+        arguments.forEachIndexed { index, it0 ->
+            val it = if (capitalise) it0.toString().capitalize() else it0.toString()
+            raw = raw.replace("{${index}}", it)
+        }
+        return raw
+    }
+
     /**
      * Does NOT parse the operators
      */

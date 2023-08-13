@@ -24,18 +24,18 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     init {
         ControlPanelCommon.register(this, width, "basegame.graphicscontrolpanel", arrayOf(
             arrayOf("", { Lang["CREDITS_VFX"] }, "h1"),
-            arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
-            arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
-            arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
+                arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),
+                arrayOf("fx_backgroundblur", { Lang["MENU_OPTIONS_BLUR"] }, "toggle"),
+                arrayOf("maxparticles", { Lang["MENU_OPTIONS_PARTICLES"] }, "spinner,256,1024,256"),
             arrayOf("", { Lang["MENU_OPTIONS_DISPLAY"] }, "h1"),
-            arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
-            arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"] }, "spinnerd,1.0,2.0,0.05"),
-            arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE"] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
-            arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
-            arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
-            arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
+                arrayOf("screenwidth,screenheight", { Lang["MENU_OPTIONS_RESOLUTION"] }, "typeinres"),
+                arrayOf("screenmagnifying", { Lang["GAME_ACTION_ZOOM"] }, "spinnerd,1.0,2.0,0.05"),
+                arrayOf("screenmagnifyingfilter", { Lang["MENU_OPTIONS_FILTERING_MODE"] }, "textsel,none=MENU_OPTIONS_NONE,bilinear=MENU_OPTIONS_FILTERING_BILINEAR,hq2x=MENU_OPTIONS_FILTERING_HQ2X_DNT"),
+                arrayOf("displayfps", { Lang["MENU_LABEL_FRAMESPERSEC"] }, "spinner,0,300,2"),
+                arrayOf("usevsync", { Lang["MENU_OPTIONS_VSYNC"] }, "toggle"),
+                arrayOf("", { "(${Lang["MENU_LABEL_RESTART_REQUIRED"]})" }, "p"),
             arrayOf("", { Lang["MENU_LABEL_STREAMING"] }, "h1"),
-            arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT"] }, "toggle"),
+                arrayOf("fx_streamerslayout", { Lang["MENU_OPTIONS_STREAMERS_LAYOUT"] }, "toggle"),
         ))
     }
 

@@ -1,8 +1,7 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
+import net.torvald.terrarum.langpack.Lang
 import kotlin.math.cos
-import kotlin.math.sin
 
 
 /**
@@ -56,6 +55,8 @@ import kotlin.math.sin
  * Created by minjaesong on 2016-01-24.
  */
 class WorldTime(initTime: Long = 0L) {
+
+    @Transient private val TWO_PI = Math.PI * 2.0
 
     /** It is not recommended to directly modify the TIME_T. Use provided methods instead. */
     var TIME_T = 0L // Epoch: Year 1 Spring 1st, 0h00:00 (Mondag) // 0001-01-01
@@ -152,10 +153,10 @@ class WorldTime(initTime: Long = 0L) {
 
     // NOTE: ingame calendars (the fixture with GUI) should use symbols AND fullnames; the watch already uses shot daynames
     val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
-            "Mondag", "Tysdag", "Midtveke" //middle-week
-            , "Torsdag", "Fredag", "Laurdag", "Sundag", "Verddag" //From Norsk word 'verd'
+            "MONDAG", "TYSDAG", "MIDTVEKE" //middle-week
+            , "TORSDAG", "FREDAG", "LAURDAG", "SUNDAG", "VERDDAG" //From Norsk word 'verd'
     )
-    val DAY_NAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
+    val DAY_NAMES_SHORT = arrayOf("MON", "TYS", "MID", "TOR", "FRE", "LAU", "SUN", "VER")
 
     // dwarven calendar of 12 monthes
     /*val MONTH_NAMES = arrayOf(
@@ -164,8 +165,8 @@ class WorldTime(initTime: Long = 0L) {
     )
     val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
             "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")*/
-    val MONTH_NAMES = arrayOf("Spring", "Summer", "Autumn", "Winter")
-    val MONTH_NAMES_SHORT = arrayOf("Spri", "Summ", "Autm", "Wint")
+    val MONTH_NAMES = arrayOf("SPRING", "SUMMER", "AUTUMN", "WINTER")
+    val MONTH_NAMES_SHORT = arrayOf("SPRI", "SUMM", "AUTM", "WINT")
 
     companion object {
         /** Each day is displayed as 24 hours, but in real-life clock it's 22 mins long */
@@ -251,10 +252,10 @@ class WorldTime(initTime: Long = 0L) {
     fun getShortTime() = "${years.toString().padStart(4, '0')}-${getMonthNameShort()}-${calendarDay.toString().padStart(2, '0')}"
     fun getFilenameTime() = "${years.toString().padStart(4, '0')}${calendarMonth.toString().padStart(2, '0')}${calendarDay.toString().padStart(2, '0')}"
 
-    fun getDayNameFull() = DAY_NAMES[dayOfWeek]
-    fun getDayNameShort() = DAY_NAMES_SHORT[dayOfWeek]
-    fun getMonthNameFull() = MONTH_NAMES[calendarMonth - 1]
-    fun getMonthNameShort() = MONTH_NAMES_SHORT[calendarMonth - 1]
+    fun getDayNameFull() = Lang["CONTEXT_CALENDAR_DAY_${DAY_NAMES[dayOfWeek]}_DNT"]
+    fun getDayNameShort() = Lang["CONTEXT_CALENDAR_DAY_${DAY_NAMES_SHORT[dayOfWeek]}_DNT"]
+    fun getMonthNameFull() = Lang["CONTEXT_CALENDAR_SEASON_${MONTH_NAMES[calendarMonth - 1]}"]
+    fun getMonthNameShort() = Lang["CONTEXT_CALENDAR_SEASON_${MONTH_NAMES_SHORT[calendarMonth - 1]}"]
 
     override fun toString() = getFormattedTime()
 }

@@ -17,15 +17,15 @@ import kotlin.math.roundToInt
  */
 
 class UIItemSpinner(
-        parentUI: UICanvas,
-        initialX: Int, initialY: Int,
-        private var initialValue: Number,
-        val min: Number,
-        val max: Number,
-        val step: Number,
-        override val width: Int,
-        private val drawBorder: Boolean = true,
-        private val numberToTextFunction: (Number) -> String = { "$it" }
+    parentUI: UICanvas,
+    initialX: Int, initialY: Int,
+    private var initialValue: Number,
+    val min: Number,
+    val max: Number,
+    val step: Number,
+    override val width: Int,
+    private val drawBorder: Boolean = true,
+    private val numberToTextFunction: (Number) -> String = { "$it" }
 ) : UIItem(parentUI, initialX, initialY) {
 
     // to alleviate floating point errors adding up as the spinner is being used

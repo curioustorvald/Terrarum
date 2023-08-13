@@ -23,6 +23,7 @@
   "MENU_LABEL_STREAMING": "실시간 방송",
   "MENU_LABEL_SYSTEM_INFO": "시스템 정보",
   "MENU_MODULES" : "모듈",
+  "MENU_OPTIONS_ATLAS_TEXTURE_SIZE": "아틀라스 텍스처 크기",
   "MENU_OPTIONS_AUTOSAVE": "자동 저장",
   "MENU_OPTIONS_BLUR": "흐림",
   "MENU_OPTIONS_DEBUG_CONSOLE": "디버그 콘솔",

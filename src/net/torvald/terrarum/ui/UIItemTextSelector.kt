@@ -17,13 +17,14 @@ import net.torvald.terrarum.gameworld.fmod
  * Created by minjaesong on 2021-10-21.
  */
 class UIItemTextSelector(
-        parentUI: UICanvas,
-        initialX: Int, initialY: Int,
-        val labelfuns: List<() -> String>,
-        initialSelection: Int,
-        override val width: Int,
-        private val drawBorder: Boolean = true,
-        private val clickToShowPalette: Boolean = true
+    parentUI: UICanvas,
+    initialX: Int, initialY: Int,
+    val labelfuns: List<() -> String>,
+    initialSelection: Int,
+    override val width: Int,
+    private val drawBorder: Boolean = true,
+    private val clickToShowPalette: Boolean = true,
+    private val useSpinnerButtons: Boolean = false,
 ) : UIItem(parentUI, initialX, initialY) {
 
     init {
@@ -127,6 +128,9 @@ class UIItemTextSelector(
         else if (!Terrarum.mouseDown) mouseLatched = false
     }
 
+    private val leftIcon = if (useSpinnerButtons) labels.get(9,2) else labels.get(16,0)
+    private val rightIcon = if (useSpinnerButtons) labels.get(10,2) else labels.get(17,0)
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         labelCache = labelfuns.map { it() }
 
@@ -184,12 +188,12 @@ class UIItemTextSelector(
         // left button icon
         batch.color = if (mouseOnButton == 1 && mousePushed) Toolkit.Theme.COL_SELECTED
         else if (mouseOnButton == 1) Toolkit.Theme.COL_MOUSE_UP else UIItemTextLineInput.TEXTINPUT_COL_TEXT
-        batch.draw(labels.get(16,0), posX + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
+        batch.draw(leftIcon, posX + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // right button icon
         batch.color = if (mouseOnButton == 2 && mousePushed) Toolkit.Theme.COL_SELECTED
         else if (mouseOnButton == 2) Toolkit.Theme.COL_MOUSE_UP else UIItemTextLineInput.TEXTINPUT_COL_TEXT
-        batch.draw(labels.get(17,0), posX + width - buttonW + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
+        batch.draw(rightIcon, posX + width - buttonW + (buttonW - labels.tileW) / 2f, posY + (height - labels.tileH) / 2f)
 
         // draw text
         if (!paletteShowing) {

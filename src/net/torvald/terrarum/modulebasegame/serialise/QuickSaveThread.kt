@@ -133,7 +133,7 @@ class QuickSingleplayerWorldSavingThread(
 
         // Write Actors //
         actorsList.forEachIndexed { count, it ->
-            printdbg(this, "Writing actors... ${count+1}/${actorsList.size}")
+            printdbg(this, "Writing actors... ${count+1}/${actorsList.size} (${it.javaClass.canonicalName})")
 
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
             val actor = DiskEntry(it.referenceID.toLong(), ROOT, creation_t, time_t, actorContent)
