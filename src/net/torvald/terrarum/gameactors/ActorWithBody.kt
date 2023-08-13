@@ -804,7 +804,7 @@ open class ActorWithBody : Actor {
 
                 val stepBox = sixteenStep[step]
 
-                val goingDownwardDirection = true//Math.toDegrees(vectorSum.direction).let { it > 0.0 && it < 180.0 } // commenting out: weird  better bounce off than making players stuck :/
+                val goingDownwardDirection = Math.toDegrees(vectorSum.direction).let { it > 0.0 && it < 180.0 }
                 val goingDown = (vectorSum.y >= PHYS_EPSILON_VELO || (vectorSum.y.absoluteValue < PHYS_EPSILON_VELO && !isWalled(stepBox, COLLIDING_BOTTOM))) // TODO reverse gravity adaptation?
 
                 debug2("stepbox[$step]=$stepBox; goingDown=$goingDown, downDown=$downDown, goingDownwardDirection=$goingDownwardDirection")
@@ -1171,7 +1171,11 @@ open class ActorWithBody : Actor {
         val x1 = hitbox.startX
         val y1 = hitbox.startY
         val x2 = hitbox.endX - PHYS_EPSILON_DIST
-        val y2 = hitbox.endY - PHYS_EPSILON_DIST
+        val y2 = hitbox.endY /*- PHYS_EPSILON_DIST*/ // to fix the weird platform arrangement of:
+        // ..@..
+        // %=@=%
+        // ..=.. where = is a platform, . is an air, @ is a player AND a platform, % is a solid
+
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
 
         val txStart = x1/*.plus(HALF_PIXEL)*/.floorToInt()
@@ -1327,11 +1331,12 @@ open class ActorWithBody : Actor {
 
         val feetY = (pyEnd / TILE_SIZED).floorToInt() // round down toward negative infinity // TODO reverse gravity adaptation?
 
-//        if (feet && this is IngamePlayer) printdbg(this, "feetY=$feetY")
+//        if (feet && this is IngamePlayer) printdbg(this, "dim=($pxStart,$pyStart)-($pxEnd,$pyEnd), feetY=$feetY")
 
         for (y in ys) {
 
             val ty = (y / TILE_SIZED).floorToInt() // round down toward negative infinity
+//            if (this is IngamePlayer) printdbg(this, "ty=${ty}")
             val isFeetTileHeight = (ty == feetY)
             var hasFloor = false
 
