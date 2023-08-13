@@ -779,7 +779,7 @@ open class ActorWithBody : Actor {
             debug1("Update Frame: ${INGAME.WORLD_UPDATE_TIMER}")
             debug1("Hitbox: ${hitbox}")
 
-            debug1("vec dir: ${Math.toDegrees(vectorSum.direction)}°, value: $vectorSum")
+            debug1("vec dir: ${Math.toDegrees(vectorSum.direction)}°, value: $vectorSum, magnitude: ${vectorSum.magnitude}")
 
 
             // * NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake) *
@@ -806,8 +806,7 @@ open class ActorWithBody : Actor {
 
                 debug2("stepbox[$step]=$stepBox; goingDown=$goingDown, downDown=$downDown")
 
-                // careful when using feet mode, as it will only look for collision on feet tiles!
-                if (isColliding(stepBox, goingDown && !downDown)) {
+                if (collidingStep == null && isColliding(stepBox, goingDown && !downDown)) {
                     collidingStep = step
                 }
 
