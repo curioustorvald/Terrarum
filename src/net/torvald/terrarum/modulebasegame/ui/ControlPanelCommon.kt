@@ -74,7 +74,7 @@ object ControlPanelCommon {
             val optionsList = arg.subList(1, arg.size).map { it.toInt() }
 
             val initialSel = optionsList.indexOf(App.getConfigInt(optionName))
-            if (initialSel < 0) throw IllegalArgumentException("config value '${App.getConfigString(optionName)}' for option '$optionName' is not found on the options list")
+            if (initialSel < 0) throw IllegalArgumentException("config value '${App.getConfigInt(optionName)}' for option '$optionName' is not found on the options list")
 
             UIItemTextSelector(parent, x, y, labelFuns, initialSel, CONFIG_SPINNER_WIDTH, clickToShowPalette = false, useSpinnerButtons = true) to { it: UIItem, optionStr: String ->
                 (it as UIItemTextSelector).selectionChangeListener = {

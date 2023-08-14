@@ -51,7 +51,7 @@ object BlockBase {
 
         // return false if there is a "solid" tile already
         if (isWall && BlockCodex[wallUnderCursor].isSolid ||
-            !isWall && (BlockCodex[terrainUnderCursor].isSolid || BlockCodex[terrainUnderCursor].isActorBlock))
+            !isWall && !BlockCodex[terrainUnderCursor].hasTag("INCONSEQUENTIAL"))
             return@mouseInInteractableRange -1L
 
         // filter passed, do the job

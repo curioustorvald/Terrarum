@@ -75,6 +75,8 @@ class BlockProp {
         BlockCodex[BlockCodex.tileToVirtual[id]!![offset]]._lumCol.lane(channel)
     }
 
+    fun hasTag(s: String) = tags.contains(s)
+
     /**
      * @param luminosity
      */

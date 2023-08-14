@@ -1,5 +1,5 @@
 "id";"drop";"spawn";"name";"shdr";"shdg";"shdb";"shduv";"str";"dsty";"mate";"solid";"wall";"grav";"dlfn";"fv";"fr";"lumr";"lumg";"lumb";"lumuv";"colour";"vscs";"refl";"tags"
-"0";"0";"0";"BLOCK_AIR";"0.0312";"0.0312";"0.0312";"0.0312";"1";"1";"NULL";"0";"1";"N/A";"0";"0";"4";"0.0000";"0.0000";"0.0000";"0.0000";"N/A";"N/A";"0.0";""
+"0";"0";"0";"BLOCK_AIR";"0.0312";"0.0312";"0.0312";"0.0312";"1";"1";"NULL";"0";"1";"N/A";"0";"0";"4";"0.0000";"0.0000";"0.0000";"0.0000";"N/A";"N/A";"0.0";"INCONSEQUENTIAL"
 "16";"17";"17";"BLOCK_STONE";"0.1252";"0.1252";"0.1252";"0.1252";"48";"2400";"ROCK";"1";"1";"N/A";"0";"4";"16";"0.0000";"0.0000";"0.0000";"0.0000";"N/A";"N/A";"0.0";"ROCK,NATURAL"
 "17";"17";"17";"BLOCK_STONE_QUARRIED";"0.1252";"0.1252";"0.1252";"0.1252";"48";"2400";"ROCK";"1";"1";"N/A";"0";"4";"16";"0.0000";"0.0000";"0.0000";"0.0000";"N/A";"N/A";"0.0";"ROCK"
 "18";"18";"18";"BLOCK_STONE_TILE_WHITE";"0.1252";"0.1252";"0.1252";"0.1252";"48";"2400";"ROCK";"1";"1";"N/A";"0";"4";"16";"0.0000";"0.0000";"0.0000";"0.0000";"N/A";"N/A";"0.18";"STONE"
@@ -188,6 +188,7 @@
 ## Some tags are reserved for internal use, which are:
 ## - INTERNAL: denotes that the tile is internal-use. Will not be rendered unless debug window is on.
 ## - DORENDER: this internal tile must go through the standard-issue tile drawing routine.
+## - INCONSEQUENTIAL: denotes that this tile can be overwritten without dropping it. Usually used with flower tiles.
 #
 #
 ## References ##

@@ -248,7 +248,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         forEachBlockbox { x, y, _, _ ->
             if (!hasCollision) {
                 val tile = world!!.getTileFromTerrain(x, y)
-                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
+                if (!BlockCodex[tile].hasTag("INCONSEQUENTIAL")) {
                     hasCollision = true
                 }
             }
@@ -311,7 +311,7 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         forEachBlockbox { x, y, _, _ ->
             if (!hasCollision) {
                 val tile = world!!.getTileFromTerrain(x, y)
-                if (BlockCodex[tile].isSolid || BlockCodex[tile].isActorBlock) {
+                if (!BlockCodex[tile].hasTag("INCONSEQUENTIAL")) {
                     hasCollision = true
                 }
             }

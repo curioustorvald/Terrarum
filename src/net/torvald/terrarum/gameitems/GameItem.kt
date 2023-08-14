@@ -359,6 +359,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         return this
     }
 
+    fun hasTag(s: String) = tags.contains(s)
+
 
     companion object {
 

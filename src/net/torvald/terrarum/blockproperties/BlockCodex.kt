@@ -209,8 +209,8 @@ class BlockCodex {
         prop.isSolid = record.boolVal("solid")
         //prop.isClear = record.boolVal("clear")
 
-        prop.isPlatform = prop.tags.contains("PLATFORM")
-        prop.isActorBlock = prop.tags.contains("ACTORBLOCK")
+        prop.isPlatform = prop.hasTag("PLATFORM")
+        prop.isActorBlock = prop.hasTag("ACTORBLOCK")
 
         prop.isWallable = record.boolVal("wall")
         prop.maxSupport = record.intVal("grav")
