@@ -699,7 +699,7 @@ open class ActorWithBody : Actor {
     }
 
     private fun displaceHitbox() {
-        val printdbg1 = true && App.IS_DEVELOPMENT_BUILD
+        val printdbg1 = false && App.IS_DEVELOPMENT_BUILD
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now

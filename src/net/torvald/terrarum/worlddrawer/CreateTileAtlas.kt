@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -15,6 +17,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 /**
  * This class implements work_files/dynamic_shape_2_0.psd
@@ -28,13 +31,12 @@ import kotlin.math.roundToInt
  */
 class CreateTileAtlas {
 
-    // min size 1024 = tile_size 16 * atlasCursor 64
-    val MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE)
-    val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
+    var MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE); private set
+    var TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE; private set
 
-    val SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
+    var SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat()); private set
 
-    private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
+    private var TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
     val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
 
@@ -66,11 +68,53 @@ class CreateTileAtlas {
     private val atlasInit = "./assets/graphics/blocks/init.tga"
     private var itemSheetCursor = 16
 
-    internal val itemTerrainPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-    internal val itemTerrainPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-    internal val itemWallPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-    internal val itemWallPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+    internal lateinit var itemTerrainPixmap: Pixmap
+    internal lateinit var itemTerrainPixmapGlow: Pixmap
+    internal lateinit var itemWallPixmap: Pixmap
+    internal lateinit var itemWallPixmapGlow: Pixmap
 
+
+    private fun drawInitPixmap() {
+        val initPixmap = Pixmap(Gdx.files.internal(atlasInit))
+
+        val tilesInInitPixmap = (initPixmap.width * initPixmap.height) / (TILE_SIZE * TILE_SIZE)
+        val tilesPossibleInCurrentPixmap = (atlas.width * atlas.height) / (TILE_SIZE * TILE_SIZE)
+
+        if (tilesInInitPixmap > tilesPossibleInCurrentPixmap) throw Error("Atlas size too small -- can't even fit the init.tga (MAX_TEX_SIZE must be at least ${FastMath.nextPowerOfTwo((sqrt(tilesInInitPixmap.toFloat()) * TILE_SIZE).ceilToInt())})")
+
+        if (MAX_TEX_SIZE >= initPixmap.width) {
+            atlas.drawPixmap(initPixmap, 0, 0)
+            atlasAutumn.drawPixmap(initPixmap, 0, 0)
+            atlasWinter.drawPixmap(initPixmap, 0, 0)
+            atlasSpring.drawPixmap(initPixmap, 0, 0)
+        }
+        else {
+        /*
+        What's happening:
+
+        src:                dest:
+        AAAABBBBCCCCDDDD    AAAA
+                            BBBB
+                            CCCC
+                            DDDD
+         */
+            val destX = 0
+            val srcY = 0
+            val scanW = MAX_TEX_SIZE
+            val scanH = TILE_SIZE
+            for (scantile in 0 until (initPixmap.width.toFloat() / MAX_TEX_SIZE).ceilToInt()) {
+                val srcX = scantile * scanW
+                val destY = scantile * TILE_SIZE
+
+                atlas.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasAutumn.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasWinter.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasSpring.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+            }
+        }
+
+        initPixmap.dispose()
+    }
 
     /**
      * Must be called AFTER mods' loading so that all the block props are loaded
@@ -80,27 +124,17 @@ class CreateTileAtlas {
         tags = HashMap<ItemID, RenderTag>()
         itemSheetNumbers = HashMap<ItemID, Int>()
 
-        atlas = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasAutumn = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasWinter = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-
-        atlas.blending = Pixmap.Blending.None
-        atlasAutumn.blending = Pixmap.Blending.None
-        atlasWinter.blending = Pixmap.Blending.None
-        atlasSpring.blending = Pixmap.Blending.None
-        atlasFluid.blending = Pixmap.Blending.None
-        atlasGlow.blending = Pixmap.Blending.None
+        atlas = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasAutumn = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasWinter = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
 
         // populate the atlantes with atlasInit
         // this just directly copies the image to the atlantes :p
-        val initPixmap = Pixmap(Gdx.files.internal(atlasInit))
-        atlas.drawPixmap(initPixmap, 0, 0)
-        atlasAutumn.drawPixmap(initPixmap, 0, 0)
-        atlasWinter.drawPixmap(initPixmap, 0, 0)
-        atlasSpring.drawPixmap(initPixmap, 0, 0)
+        drawInitPixmap()
+
 
         // get all the files applicable
         // first, get all the '/blocks' directory, and add all the files, regardless of their extension, to the list
@@ -135,8 +169,8 @@ class CreateTileAtlas {
         }
 
         // test print
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), atlas, false)
-        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${App.defaultDir}/atlas.tga"), atlas, false)
+//        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasGlow.tga"), atlasGlow, false)
 
 
 
@@ -160,6 +194,11 @@ class CreateTileAtlas {
 
 //        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 //        val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+
+        itemTerrainPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        itemTerrainPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        itemWallPixmap = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        itemWallPixmapGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         tags.toMap().forEach { id, tag ->
             val tilePosFromAtlas = tag.tileNumber + maskTypetoTileIDForItemImage(tag.maskType)
@@ -217,7 +256,6 @@ class CreateTileAtlas {
         itemWallTextureGlow = Texture(itemWallPixmapGlow)
 //        itemTerrainPixmap.dispose()
 //        itemWallPixmap.dispose()
-        initPixmap.dispose()
 
         initialised = true
     } }
@@ -241,6 +279,7 @@ class CreateTileAtlas {
         val tilesGlowPixmap = if (glow != null) Pixmap(glow) else nullTile
         val blockName = matte.nameWithoutExtension().split('-').last().toInt() // basically a filename
         val blockID = "$modname:$blockName"
+
 
         // determine the type of the block (populate tags list)
         // predefined by the image dimension: 16x16 for (1,0)
@@ -307,8 +346,10 @@ class CreateTileAtlas {
     }
 
     private fun drawToAtlantes(matte: Pixmap, glow: Pixmap, tilesCount: Int) {
-        if (atlasCursor >= TOTAL_TILES) {
-            throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
+        if (atlasCursor + tilesCount >= TOTAL_TILES) {
+//            throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
+            println("[CreateTileAtlas] Too much tiles for atlas of ${MAX_TEX_SIZE}x$MAX_TEX_SIZE (tiles so far: $atlasCursor/${(MAX_TEX_SIZE*MAX_TEX_SIZE)/(TILE_SIZE* TILE_SIZE)}, tiles to be added: $tilesCount), trying to expand the atlas...")
+            expandAtlantes()
         }
 
         val seasonal = matte.width == matte.height && matte.width == 14 * TILE_SIZE
@@ -412,5 +453,61 @@ class CreateTileAtlas {
 
     private enum class AtlasSource {
         FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING, FLUID, GLOW
+    }
+
+    private fun expandAtlantes() {
+        if (MAX_TEX_SIZE >= App.glInfo.GL_MAX_TEXTURE_SIZE) {
+            throw RuntimeException("Cannot expand atlas: texture size is already at its maximum possible size allowed by the graphics processor (${MAX_TEX_SIZE}x${MAX_TEX_SIZE})")
+        }
+
+        val oldTexSize = MAX_TEX_SIZE
+        val newTexSize = oldTexSize * 2
+
+
+        MAX_TEX_SIZE = newTexSize
+        TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
+        SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat())
+        TOTAL_TILES = TILES_IN_X * TILES_IN_X
+
+
+        val newAtlantes = Array<Pixmap>(5) {
+            Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also {
+                it.blending = Pixmap.Blending.None
+                it.filter = Pixmap.Filter.NearestNeighbour
+            }
+        }
+        listOf(atlas, atlasAutumn, atlasWinter, atlasSpring, atlasGlow).forEachIndexed { index, pixmap ->
+        /*
+        How it works:
+
+        old:        new:
+        AAAAAAAA    AAAAAAAABBBBBBBB
+        BBBBBBBB    CCCCCCCCDDDDDDDD
+        CCCCCCCC    ...
+        DDDDDDDD
+        ...
+
+         */
+            for (scantile in 0 until pixmap.height / TILE_SIZE) {
+                val srcX = 0
+                val srcY = scantile * TILE_SIZE
+                val destX = (scantile % 2) * oldTexSize
+                val destY = (scantile / 2) * TILE_SIZE
+                val scanW = pixmap.width
+                val scanH = TILE_SIZE
+
+                newAtlantes[index].drawPixmap(pixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+            }
+            pixmap.dispose()
+        }
+
+        atlas = newAtlantes[0]
+        atlasAutumn = newAtlantes[1]
+        atlasWinter = newAtlantes[2]
+        atlasSpring = newAtlantes[3]
+        atlasGlow = newAtlantes[4]
+
+
+        App.setConfig("atlastexsize", newTexSize)
     }
 }

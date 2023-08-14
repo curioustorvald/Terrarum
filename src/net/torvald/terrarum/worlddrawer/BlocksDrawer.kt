@@ -349,7 +349,7 @@ internal object BlocksDrawer {
                 val tileNumber = if (thisTile == Block.AIR) 0
                     // special case: actorblocks and F3 key
                     else if (BlockCodex.hasProp(thisTile) && BlockCodex[thisTile].isActorBlock &&
-                             !BlockCodex[thisTile].tags.contains("DORENDER") && !KeyToggler.isOn(Keys.F3))
+                             !BlockCodex[thisTile].hasTag("DORENDER") && !KeyToggler.isOn(Keys.F3))
                         0
                     // special case: fluids
                     else if (mode == FLUID)

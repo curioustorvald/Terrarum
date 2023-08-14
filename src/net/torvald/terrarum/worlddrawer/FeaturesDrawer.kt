@@ -33,12 +33,12 @@ object FeaturesDrawer {
         TileSurvey.submitProposal(
             TileSurvey.SurveyProposal(
                 "basegame.FeaturesDrawer.coldTiles", 72, 48, 2, 2
-            ) { world, x, y -> BlockCodex[world.getTileFromTerrain(x, y)].tags.contains("COLD") }
+            ) { world, x, y -> BlockCodex[world.getTileFromTerrain(x, y)].hasTag("COLD") }
         )
         TileSurvey.submitProposal(
             TileSurvey.SurveyProposal(
                 "basegame.FeaturesDrawer.warmTiles", 72, 48, 2, 2
-            ) { world, x, y -> BlockCodex[world.getTileFromTerrain(x, y)].tags.contains("WARM") }
+            ) { world, x, y -> BlockCodex[world.getTileFromTerrain(x, y)].hasTag("WARM") }
         )
     }
 
