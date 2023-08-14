@@ -152,21 +152,7 @@ class WorldTime(initTime: Long = 0L) {
     @Transient private val REAL_SEC_TO_GAME_SECS = 1.0 / GAME_MIN_TO_REAL_SEC // how slow is real-life clock (second-wise) relative to the ingame one
 
     // NOTE: ingame calendars (the fixture with GUI) should use symbols AND fullnames; the watch already uses shot daynames
-    val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
-            "MONDAG", "TYSDAG", "MIDTVEKE" //middle-week
-            , "TORSDAG", "FREDAG", "LAURDAG", "SUNDAG", "VERDDAG" //From Norsk word 'verd'
-    )
-    val DAY_NAMES_SHORT = arrayOf("MON", "TYS", "MID", "TOR", "FRE", "LAU", "SUN", "VER")
 
-    // dwarven calendar of 12 monthes
-    /*val MONTH_NAMES = arrayOf(
-            "Opal", "Obsidian", "Granite", "Slate", "Felsite", "Hematite",
-            "Malachite", "Galena", "Limestone", "Sandstone", "Timber", "Moonstone"
-    )
-    val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
-            "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")*/
-    val MONTH_NAMES = arrayOf("SPRING", "SUMMER", "AUTUMN", "WINTER")
-    val MONTH_NAMES_SHORT = arrayOf("SPRI", "SUMM", "AUTM", "WINT")
 
     companion object {
         /** Each day is displayed as 24 hours, but in real-life clock it's 22 mins long */
@@ -204,6 +190,31 @@ class WorldTime(initTime: Long = 0L) {
 
         val LUNAR_CYCLE: Int = 29 * DAY_LENGTH + 12 * HOUR_SEC + 44 * MINUTE_SEC + 3 // 29 days, 12 hours, 44 minutes, and 3 seconds in-game calendar
         const val DIURNAL_MOTION_LENGTH = 86636f
+
+        val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
+                "MONDAG", "TYSDAG", "MIDTVEKE" //middle-week
+                , "TORSDAG", "FREDAG", "LAURDAG", "SUNDAG", "VERDDAG" //From Norsk word 'verd'
+        )
+        val DAY_NAMES_SHORT = arrayOf("MON", "TYS", "MID", "TOR", "FRE", "LAU", "SUN", "VER")
+        // dwarven calendar of 12 monthes
+        /*val MONTH_NAMES = arrayOf(
+                "Opal", "Obsidian", "Granite", "Slate", "Felsite", "Hematite",
+                "Malachite", "Galena", "Limestone", "Sandstone", "Timber", "Moonstone"
+        )
+        val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
+                "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")*/
+        val MONTH_NAMES = arrayOf("SPRING", "SUMMER", "AUTUMN", "WINTER")
+        val MONTH_NAMES_SHORT = arrayOf("SPRI", "SUMM", "AUTM", "WINT")
+
+        val DAY_NAMES_LANG_KEYS = DAY_NAMES.map { "CONTEXT_CALENDAR_DAY_${it}_DNT" }
+        val DAY_NAMES_SHORT_LANG_KEYS = DAY_NAMES_SHORT.map { "CONTEXT_CALENDAR_DAY_${it}_DNT" }
+        val MONTH_NAMES_LANG_KEYS = MONTH_NAMES.map { "CONTEXT_CALENDAR_SEASON_${it}" }
+        val MONTH_NAMES_SHORT_LANG_KEYS = MONTH_NAMES_SHORT.map { "CONTEXT_CALENDAR_SEASON_${it}" }
+
+        fun getDayName(index: Int) = Lang[DAY_NAMES_LANG_KEYS[index]]
+        fun getDayNameShort(index: Int) = Lang[DAY_NAMES_SHORT_LANG_KEYS[index]]
+        fun getMonthName(index: Int) = Lang[MONTH_NAMES_LANG_KEYS[index - 1]]
+        fun getMonthNameShort(index: Int) = Lang[MONTH_NAMES_SHORT_LANG_KEYS[index - 1]]
     }
 
     fun update(delta: Float) {
@@ -229,9 +240,6 @@ class WorldTime(initTime: Long = 0L) {
         TIME_T += t
     }
 
-    val dayName: String
-        get() = DAY_NAMES[dayOfWeek]
-
     fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
     fun Long.abs() = Math.abs(this)
 
@@ -252,10 +260,10 @@ class WorldTime(initTime: Long = 0L) {
     fun getShortTime() = "${years.toString().padStart(4, '0')}-${getMonthNameShort()}-${calendarDay.toString().padStart(2, '0')}"
     fun getFilenameTime() = "${years.toString().padStart(4, '0')}${calendarMonth.toString().padStart(2, '0')}${calendarDay.toString().padStart(2, '0')}"
 
-    fun getDayNameFull() = Lang["CONTEXT_CALENDAR_DAY_${DAY_NAMES[dayOfWeek]}_DNT"]
-    fun getDayNameShort() = Lang["CONTEXT_CALENDAR_DAY_${DAY_NAMES_SHORT[dayOfWeek]}_DNT"]
-    fun getMonthNameFull() = Lang["CONTEXT_CALENDAR_SEASON_${MONTH_NAMES[calendarMonth - 1]}"]
-    fun getMonthNameShort() = Lang["CONTEXT_CALENDAR_SEASON_${MONTH_NAMES_SHORT[calendarMonth - 1]}"]
+    fun getDayNameFull() = getDayName(dayOfWeek)
+    fun getDayNameShort() = getDayNameShort(dayOfWeek)
+    fun getMonthNameFull() = getMonthName(calendarMonth)
+    fun getMonthNameShort() = getMonthNameShort(calendarMonth)
 
     override fun toString() = getFormattedTime()
 }

@@ -5,6 +5,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.ui.UIWallCalendar
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -14,7 +15,8 @@ class FixtureWallCalendar : FixtureBase {
 
     constructor() : super(
             BlockBox(BlockBox.NO_COLLISION, 1, 1),
-            nameFun = { Lang["ITEM_CALENDAR"] }
+            nameFun = { Lang["ITEM_CALENDAR"] },
+            mainUI = UIWallCalendar()
     ) {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/calendar.tga")
 
