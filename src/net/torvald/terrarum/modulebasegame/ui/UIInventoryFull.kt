@@ -157,7 +157,6 @@ class UIInventoryFull(
     //val INVENTORY_CELLS_OFFSET_Y: Int = 107 + (AppLoader.terrarumAppConfig.screenH - internalHeight) / 2
 
     init {
-        handler.allowESCtoClose = true
     }
 
     private val SP = "\u3000 "

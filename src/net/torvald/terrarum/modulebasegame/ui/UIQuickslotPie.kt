@@ -21,6 +21,11 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2016-07-20.
  */
 class UIQuickslotPie : UICanvas() {
+
+    init {
+        handler.allowESCtoClose = false
+    }
+
     private val cellSize = ItemSlotImageFactory.slotImage.tileW
 
     private val slotCount = UIQuickslotBar.SLOT_COUNT

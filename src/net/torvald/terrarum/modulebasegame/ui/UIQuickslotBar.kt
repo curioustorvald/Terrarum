@@ -18,6 +18,11 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2016-07-20.
  */
 class UIQuickslotBar : UICanvas() {
+
+    init {
+        handler.allowESCtoClose = false
+    }
+
     private val cellSize = ItemSlotImageFactory.slotImage.tileW // 38
 
     private val gutter = 10 - 6 // do -6 to get a gutter size of not-enlarged cells

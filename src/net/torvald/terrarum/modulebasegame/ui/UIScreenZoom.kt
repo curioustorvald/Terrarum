@@ -21,6 +21,10 @@ class UIScreenZoom : UICanvas(
         App.getConfigInt("control_key_zoom")
 ) {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     val zoomText = "${getKeycapPC(handler.toggleKeyLiteral!!)} $EMDASH Zoom Out"
 
     override var width = App.fontGame.getWidth(zoomText)

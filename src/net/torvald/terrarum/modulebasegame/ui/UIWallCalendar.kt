@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
@@ -19,7 +20,8 @@ class UIWallCalendar : UICanvas(
     toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
     toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
 ) {
-    private val cellWidth = 96
+    private val yearCellWidth = 200
+    private val cellWidth = 80
     private val cellHeight = 24
 
     override var width: Int = Toolkit.drawWidth
@@ -37,43 +39,96 @@ class UIWallCalendar : UICanvas(
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 
+
+    private var todayCell = -1
+
+    private val cellBackCols = listOf(
+        Color(0x3f1e22_C8), // OKLCh  14, 5, 18
+        Color(0x022f3a_C8), // OKLCh 218, 5, 18
+        Color(0x2d2b09_C8), // OKLCh 105, 5, 18
+        Color(0x252934_C8)  // OKLCh 265, 2, 18
+    )
+    private val seasonMarkers = listOf(
+        7 to "CONTEXT_CALENDAR_SEASON_SPRING",
+        39 to "CONTEXT_CALENDAR_SEASON_SUMMER",
+        71 to "CONTEXT_CALENDAR_SEASON_AUTUMN",
+        103 to "CONTEXT_CALENDAR_SEASON_WINTER"
+    )
+
+    private var mouseOverCell = -1
+
     override fun updateUI(delta: Float) {
+        mouseOverCell = if (relativeMouseX in drawStartX until drawStartX + 8 * (cellWidth + 1) &&
+            relativeMouseY in cellsStartY - 1 until cellsStartY - 1 + 17 * (cellHeight + 3)) {
 
+            val x = (relativeMouseX - drawStartX) / (cellWidth + 1)
+            val y = (relativeMouseY - cellsStartY + 1) / (cellHeight + 3)
+
+            // disable highlighting on invalid date (verddag and not winter 30)
+            if (x == 7 && y < 16) -1
+            else y * 8 + x
+        }
+        else -1
     }
-
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         UIInventoryFull.drawBackground(batch, 1f)
 
+        val thisYear = INGAME.world.worldTime.years
         val today = INGAME.world.worldTime.ordinalDay + 1
         val todayOfWeek = INGAME.world.worldTime.dayOfWeek
 
         // cell background
-        batch.color = UIInventoryFull.CELL_COL
+        batch.color = Toolkit.Theme.COL_CELL_FILL
+        Toolkit.fillArea(batch, (width - yearCellWidth) / 2, y - 34, yearCellWidth, 24)
         for (week in 0..7) {
             Toolkit.fillArea(batch, drawStartX + (cellWidth + 1) * week + 1, y, cellWidth - 2, 24)
         }
         for (cellNum in 0 until 17 * 8) {
+            batch.color = when (cellNum) {
+                in 0 until 34 -> cellBackCols[0]
+                in 34 until 68 -> cellBackCols[1]
+                in 68 until 102 -> cellBackCols[2]
+                else -> cellBackCols[3]
+            }
+
             Toolkit.fillArea(batch, drawStartX + (cellWidth + 1) * (cellNum % 8) + 1, cellsStartY + (cellHeight + 3) * (cellNum / 8), cellWidth - 2, cellHeight)
         }
 
 
         // cell border
         batch.color = Toolkit.Theme.COL_INACTIVE
+        Toolkit.drawBoxBorder(batch, (width - yearCellWidth) / 2 - 1, y - 35, yearCellWidth + 2, 26)
         Toolkit.drawBoxBorder(batch, drawStartX, y - 1, 8 * (cellWidth + 1) - 1, 26)
         for (week in 0..7) {
             Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * week, y - 1, cellWidth, 26)
         }
+        // highlight a day name of mouse-up
+        batch.color = Toolkit.Theme.COL_MOUSE_UP
+        if (mouseOverCell >= 0) Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (mouseOverCell % 8), y - 1, cellWidth, 26)
+        // highlight today's week name
+        batch.color = Toolkit.Theme.COL_SELECTED
+        Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * todayOfWeek, y - 1, cellWidth, 26)
 
+
+        // draw days grid
+        batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, drawStartX, cellsStartY - 1, 8 * (cellWidth + 1) - 1, 17 * (cellHeight + 3) - 1)
         for (cellNum in 0 until 17 * 8) {
             Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (cellNum % 8), cellsStartY + (cellHeight + 3) * (cellNum / 8) - 1, cellWidth, cellHeight + 2)
         }
+        // highlight a day of mouse-up
+        batch.color = Toolkit.Theme.COL_MOUSE_UP
+        if (mouseOverCell >= 0) Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (mouseOverCell % 8), cellsStartY + (cellHeight + 3) * (mouseOverCell / 8) - 1, cellWidth, cellHeight + 2)
 
 
         // cell texts
+        batch.color = Toolkit.Theme.COL_LIST_DEFAULT
+        Toolkit.drawTextCentered(batch, App.fontGame, Lang.getAndUseTemplate("CONTEXT_CALENDAR_DATE_FORMAT_Y", false, thisYear), yearCellWidth, (width - yearCellWidth) / 2, y - 34)
         for (week in 0..7) {
-            batch.color = if (week == todayOfWeek) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
+            // highlight this week and the mouse-up
+            batch.color = if (week == todayOfWeek) Toolkit.Theme.COL_SELECTED else if (week == mouseOverCell % 8) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
+
             val t = WorldTime.getDayName(week)
             val tlen = App.fontGame.getWidth(t)
             App.fontGame.draw(batch, t, drawStartX + (cellWidth + 1) * week + (cellWidth - tlen) / 2, y)
@@ -83,13 +138,31 @@ class UIWallCalendar : UICanvas(
             val day = if (cellNum == 17*8-1) 120 else if (cellNum % 8 == 7) 0 else dayAkku
 
             if (day > 0) {
-                batch.color = if (day == today) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_LIST_DEFAULT
+                // highlight today and the mouse-up
+                batch.color = if (day == today) Toolkit.Theme.COL_SELECTED else if (cellNum == mouseOverCell) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
+
                 val t = "${(day % MONTH_LENGTH).let { if (it == 0) MONTH_LENGTH else it }}".padStart(2, '\u2007')
-                App.fontGame.draw(batch, t, drawStartX + (cellWidth + 1) * (cellNum % 8) + 1 + cellWidth - 23, cellsStartY + (cellHeight + 3) * (cellNum / 8))
+                App.fontGame.draw(batch, t, drawStartX + (cellWidth + 1) * (cellNum % 8) - 20 + cellWidth - 4, cellsStartY + (cellHeight + 3) * (cellNum / 8))
+
+                if (day == today) todayCell = cellNum
+
                 dayAkku += 1
             }
         }
+        batch.color = Toolkit.Theme.COL_INACTIVE
+        seasonMarkers.forEach { (cellNum, key) ->
+            App.fontGame.draw(batch, Lang[key], drawStartX + (cellWidth + 1) * (cellNum % 8) + 1 + 4, cellsStartY + (cellHeight + 3) * (cellNum / 8))
+        }
 
+        // highlight today cell
+        if (todayCell >= 0) {
+            batch.color = Toolkit.Theme.COL_SELECTED
+            Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (todayCell % 8), cellsStartY + (cellHeight + 3) * (todayCell / 8) - 1, cellWidth, cellHeight + 2)
+        }
+
+        // control hints
+        batch.color = Color.WHITE
+        App.fontGame.draw(batch, controlHelp, drawStartX + 2, cellsStartY+ 17 * (cellHeight + 3) + 6)
     }
 
     override fun doOpening(delta: Float) {

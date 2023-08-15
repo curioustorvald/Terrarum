@@ -30,7 +30,7 @@ class UIHandler(//var UI: UICanvas,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         var customPositioning: Boolean = false, // mainly used by vital meter
         var doNotWarnConstant: Boolean = false,
-        internal var allowESCtoClose: Boolean = false,
+        internal var allowESCtoClose: Boolean = true,
         var uiTogglerFunctionDefault: ((UIHandler) -> Unit)? = null
 ): Disposable {
 
@@ -214,7 +214,7 @@ void main() {
             }
 
             // ESC is a master key for closing
-            if (allowESCtoClose && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && isOpened) {
+            if (!alwaysVisible && allowESCtoClose && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && isOpened) {
                 setAsClose()
             }
         }

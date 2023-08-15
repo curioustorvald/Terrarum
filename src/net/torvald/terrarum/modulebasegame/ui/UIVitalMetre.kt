@@ -22,6 +22,10 @@ class UIVitalMetre(
 ) : UICanvas() {
 
     init {
+        handler.allowESCtoClose = false
+    }
+
+    init {
         // semitransparent
         color?.a = 0.91f
     }

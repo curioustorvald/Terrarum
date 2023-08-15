@@ -17,6 +17,10 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class UIBasicInfo() : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     val player: ActorHumanoid?
         get() = Terrarum.ingame?.actorNowPlaying
 

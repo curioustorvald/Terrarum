@@ -14,6 +14,10 @@ import net.torvald.terrarum.ui.UICanvas
  */
 class UICheatDetected : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     override var width: Int
         get() = App.scr.width
         set(value) { throw UnsupportedOperationException() }

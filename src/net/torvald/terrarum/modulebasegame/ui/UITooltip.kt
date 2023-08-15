@@ -14,6 +14,10 @@ import net.torvald.terrarum.ui.UICanvas
  */
 class UITooltip : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     override var openCloseTime: Second = 0f
 
     private val tooltipBackCol = Color.WHITE
