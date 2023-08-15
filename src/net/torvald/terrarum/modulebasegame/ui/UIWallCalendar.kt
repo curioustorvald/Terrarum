@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.RunningEnvironment
+import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.MONTH_LENGTH
 import net.torvald.terrarum.langpack.Lang
@@ -56,6 +57,7 @@ class UIWallCalendar : UICanvas(
     )
 
     private var mouseOverCell = -1
+    private var mouseOverSeason = -1
 
     override fun updateUI(delta: Float) {
         mouseOverCell = if (relativeMouseX in drawStartX until drawStartX + 8 * (cellWidth + 1) &&
@@ -69,6 +71,14 @@ class UIWallCalendar : UICanvas(
             else y * 8 + x
         }
         else -1
+
+        mouseOverSeason = when (mouseOverCell) {
+            -1 -> -1
+            in 0 until 34 -> 0
+            in 34 until 68 -> 1
+            in 68 until 102 -> 2
+            else -> 3
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -91,8 +101,14 @@ class UIWallCalendar : UICanvas(
                 in 68 until 102 -> cellBackCols[2]
                 else -> cellBackCols[3]
             }
-
-            Toolkit.fillArea(batch, drawStartX + (cellWidth + 1) * (cellNum % 8) + 1, cellsStartY + (cellHeight + 3) * (cellNum / 8), cellWidth - 2, cellHeight)
+            if (cellNum % 8 != 7 || cellNum == 17 * 8 - 1) {
+                Toolkit.fillArea(batch, drawStartX + (cellWidth + 1) * (cellNum % 8) + 1, cellsStartY + (cellHeight + 3) * (cellNum / 8), cellWidth - 2, cellHeight)
+            }
+        }
+        // season name cell background
+        for (k in 0..3) {
+            batch.color = cellBackCols[k]
+            Toolkit.fillArea(batch, drawStartX + (cellWidth + 1) * 7 + 1, cellsStartY + (cellHeight + 3) * (k * 4), cellWidth - 2, (cellHeight + 3) * 4 - 3)
         }
 
 
@@ -114,13 +130,187 @@ class UIWallCalendar : UICanvas(
         // draw days grid
         batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, drawStartX, cellsStartY - 1, 8 * (cellWidth + 1) - 1, 17 * (cellHeight + 3) - 1)
+        // non-season-name-cells
         for (cellNum in 0 until 17 * 8) {
-            Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (cellNum % 8), cellsStartY + (cellHeight + 3) * (cellNum / 8) - 1, cellWidth, cellHeight + 2)
+            if (cellNum % 8 != 7 || cellNum == 17 * 8 - 1) {
+                Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (cellNum % 8), cellsStartY + (cellHeight + 3) * (cellNum / 8) - 1, cellWidth, cellHeight + 2)
+            }
+        }
+        // season-name-cells
+        for (k in 0..3) {
+            Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * 7, cellsStartY + (cellHeight + 3) * (k * 4) - 1, cellWidth, (cellHeight + 3) * 4 - 1)
         }
         // highlight a day of mouse-up
         batch.color = Toolkit.Theme.COL_MOUSE_UP
         if (mouseOverCell >= 0) Toolkit.drawBoxBorder(batch, drawStartX + (cellWidth + 1) * (mouseOverCell % 8), cellsStartY + (cellHeight + 3) * (mouseOverCell / 8) - 1, cellWidth, cellHeight + 2)
 
+
+        // season border
+        batch.color = Toolkit.Theme.COL_MOUSE_UP
+        if (mouseOverSeason == 0) {
+            Toolkit.drawStraightLine(batch,
+                drawStartX,
+                cellsStartY - 2,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                1,
+                false
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX - 1,
+                cellsStartY - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 5 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                cellsStartY - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 4 - 3,
+                1,
+                true
+            )
+        }
+        if (mouseOverSeason in 0..1) {
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX,
+                cellsStartY + 1 + (cellHeight + 3) * 5 - 3,
+                drawStartX + (cellWidth + 1) * 2 - 1,
+                1,
+                false
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 2 - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 4 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 5 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 2,
+                cellsStartY + 1 + (cellHeight + 3) * 4 - 3,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                1,
+                false
+            )
+        }
+        if (mouseOverSeason == 1) {
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 5 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 9 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 4 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 8 - 3,
+                1,
+                true
+            )
+        }
+        if (mouseOverSeason in 1..2) {
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX,
+                cellsStartY + 1 + (cellHeight + 3) * 9 - 3,
+                drawStartX + (cellWidth + 1) * 4 - 1,
+                1,
+                false
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 4 - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 8 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 9 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 4,
+                cellsStartY + 1 + (cellHeight + 3) * 8 - 3,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                1,
+                false
+            )
+        }
+        if (mouseOverSeason == 2) {
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 9 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 13 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 8 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 12 - 3,
+                1,
+                true
+            )
+        }
+        if (mouseOverSeason in 2..3) {
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX,
+                cellsStartY + 1 + (cellHeight + 3) * 13 - 3,
+                drawStartX + (cellWidth + 1) * 6 - 1,
+                1,
+                false
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 6 - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 12 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 13 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 6,
+                cellsStartY + 1 + (cellHeight + 3) * 12 - 3,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                1,
+                false
+            )
+        }
+        if (mouseOverSeason == 3) {
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 13 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 17 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(
+                batch,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                cellsStartY + 1 + (cellHeight + 3) * 12 - 2,
+                cellsStartY + 1 + (cellHeight + 3) * 17 - 3,
+                1,
+                true
+            )
+            Toolkit.drawStraightLine(batch,
+                drawStartX,
+                cellsStartY + 1 + (cellHeight + 3) * 17 - 3,
+                drawStartX + (cellWidth + 1) * 8 - 1,
+                1,
+                false
+            )
+        }
 
         // cell texts
         batch.color = Toolkit.Theme.COL_LIST_DEFAULT
@@ -149,9 +339,10 @@ class UIWallCalendar : UICanvas(
                 dayAkku += 1
             }
         }
-        batch.color = Toolkit.Theme.COL_INACTIVE
-        seasonMarkers.forEach { (cellNum, key) ->
-            App.fontGame.draw(batch, Lang[key], drawStartX + (cellWidth + 1) * (cellNum % 8) + 1 + 4, cellsStartY + (cellHeight + 3) * (cellNum / 8))
+        // draw seasonal names
+        seasonMarkers.forEachIndexed { index, (cellNum, key) ->
+            batch.color = if (index == mouseOverSeason) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
+            Toolkit.drawTextCentered(batch, App.fontGame, Lang[key], cellWidth, drawStartX + (cellWidth + 1) * (cellNum % 8), cellsStartY + (cellHeight + 3) * (cellNum / 8) + ((cellHeight + 3) * 1.5f).floorToInt())
         }
 
         // highlight today cell
