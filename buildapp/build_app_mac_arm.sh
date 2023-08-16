@@ -3,7 +3,8 @@ if (( $EUID == 0 )); then echo "The build process is not meant to be run with ro
 
 cd "${0%/*}"
 SRCFILES="terrarummac_arm"
-DESTDIR="out/TerrarumMac.arm.app"
+APPDIR="./TerrarumMac.arm.app"
+DESTDIR="out/$APPDIR"
 RUNTIME="runtime-osx-arm"
 
 if [ ! -d "../assets_release" ]; then
@@ -33,5 +34,9 @@ mv $DESTDIR/Contents/MacOS/out/$RUNTIME/bin/java $DESTDIR/Contents/MacOS/out/$RU
 cp -r "../assets_release" $DESTDIR/Contents/MacOS/
 mv $DESTDIR/Contents/MacOS/assets_release $DESTDIR/Contents/MacOS/assets
 cp "../out/TerrarumBuild.jar" $DESTDIR/Contents/MacOS/out/
+
+cd "out"
+rm $APPDIR.zip
+7z a -tzip $APPDIR.zip $APPDIR
 
 echo "Build successful: $DESTDIR"
