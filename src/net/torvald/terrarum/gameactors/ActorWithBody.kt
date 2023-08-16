@@ -555,7 +555,6 @@ open class ActorWithBody : Actor {
                  */
                 if (!isNoCollideWorld) {
                     displaceHitbox()
-                    //collisionInterpolatorRun()
                 }
                 else {
                     stairPenaltyCounter = 999
@@ -675,16 +674,6 @@ open class ActorWithBody : Actor {
     }
 
     /**
-     * Event for collision (event gets fired when it collided with the world or other actors)
-     *
-     * This event may fired two or more times per update.
-     */
-    open fun collided(other: Array<CollisionMessage>) {
-    }
-
-    data class CollisionMessage(val targetID: Int, val AkspfisWorld: Boolean)
-
-    /**
      * Apply gravitation to the every falling body (unless not levitating)
      *
      * Apply only if not grounded; normal force is precessed separately.
@@ -699,7 +688,7 @@ open class ActorWithBody : Actor {
     }
 
     private fun displaceHitbox() {
-        val printdbg1 = false && App.IS_DEVELOPMENT_BUILD
+        val printdbg1 = true && App.IS_DEVELOPMENT_BUILD
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -725,27 +714,6 @@ open class ActorWithBody : Actor {
         // ((comments))  [Label]
 
         if (world != null) {
-
-
-            fun BlockAddress.isFeetTile(hitbox: Hitbox): Boolean {
-                val (x, y) = LandUtil.resolveBlockAddr(world!!, this)
-                val newTilewiseHitbox = Hitbox.fromTwoPoints(
-                        hitbox.startX.div(TILE_SIZE).floorToDouble(),
-                        hitbox.startY.div(TILE_SIZE).floorToDouble(),
-                        hitbox.endX.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
-                        hitbox.endY.minus(PHYS_EPSILON_DIST).div(TILE_SIZE).floorToDouble(),
-                        true
-                )
-
-                // offset 1 pixel to the down so that friction would work
-                val yMatch = if (gravitation.y >= 0.0)
-                    hitbox.endY.plus(A_PIXEL).div(TILE_SIZE).floorToInt()
-                else
-                    hitbox.startY.minus(A_PIXEL).div(TILE_SIZE).floorToInt()
-                return y == yMatch && // copied from forEachFeetTileNum
-                       (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
-            }
-
 
 
             fun Double.modTile() = this.div(TILE_SIZE).floorToInt().times(TILE_SIZE)
@@ -1105,61 +1073,16 @@ open class ActorWithBody : Actor {
             }// end of collision not detected
 
 
+
+
             return
 
 
 
             // if collision not detected, just don't care; it's not your job to apply moveDelta
 
-        }
+        } // end of (world != null)
     }
-
-    /*fun collisionInterpolatorRun() {
-
-        fun isWalled2(hitbox: Hitbox, option: Int): Boolean {
-            val newHB = Hitbox.fromTwoPoints(
-                    hitbox.startX + A_PIXEL, hitbox.startY + A_PIXEL,
-                    hitbox.endX - A_PIXEL, hitbox.endY - A_PIXEL
-            )
-
-            return isWalled(newHB, option)
-        }
-
-        // kinda works but the jump is inconsistent because of the nondeterministic nature of the values (doesn't get fixed to the integer value when collided)
-
-        if (world != null) {
-            val intpStep = 64.0
-
-            // make interpolation even if the "next" position is clear of collision
-            var testHitbox = hitbox.clone()
-
-            val vecSum = (externalV + controllerV)
-
-            repeat(intpStep.toInt()) { // basically we don't care if we're already been encased (e.g. entrapped by falling sand)
-
-                // change the order and the player gets stuck in the vertical wall
-                // so leave as-is
-
-                testHitbox = hitbox.clone().translate(vecSum * ((it + 1.0) / intpStep)) // <- this would not accumulate errors
-
-                // vertical collision
-                if (isWalled2(testHitbox, COLLIDING_UD)) {
-                    externalV.y *= elasticity // TODO also multiply the friction value
-                    controllerV?.let { controllerV!!.y *= elasticity } // TODO also multiply the friction value
-                }
-                // horizontal collision
-                if (isWalled2(testHitbox, COLLIDING_LR)) {
-                    externalV.x *= elasticity // TODO also multiply the friction value
-                    controllerV?.let { controllerV!!.x *= elasticity } // TODO also multiply the friction value
-                }
-
-            }
-
-            hitbox.reassign(testHitbox)
-
-            // TODO collision damage
-        }
-    }*/
 
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg
@@ -1171,10 +1094,7 @@ open class ActorWithBody : Actor {
         val x1 = hitbox.startX
         val y1 = hitbox.startY
         val x2 = hitbox.endX - PHYS_EPSILON_DIST
-        val y2 = hitbox.endY /*- PHYS_EPSILON_DIST*/ // to fix the weird platform arrangement of:
-        // ..@..
-        // %=@=%
-        // ..=.. where = is a platform, . is an air, @ is a player AND a platform, % is a solid
+        val y2 = hitbox.endY + HALF_PIXEL // PLUS HALF PIXEL AND NOT MINUS EPSILON to fix issue #48 and #49
 
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
 
@@ -1979,8 +1899,8 @@ open class ActorWithBody : Actor {
          */
         @Transient const val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
 
-        @Transient const val PHYS_EPSILON_DIST = 1.0 / 65536.0
-        @Transient const val PHYS_EPSILON_VELO = 1.0 / 8192.0
+        @Transient const val PHYS_EPSILON_DIST = 1.0 / 4096.0
+        @Transient const val PHYS_EPSILON_VELO = 1.0 / 65536.0
 
 
         /**
