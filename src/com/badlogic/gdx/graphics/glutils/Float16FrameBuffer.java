@@ -51,12 +51,22 @@ public class Float16FrameBuffer extends FrameBuffer {
 
     @Override
     protected Texture createTexture (FrameBufferTextureAttachmentSpec attachmentSpec) {
-        FloatTextureData data = new FloatTextureData(bufferBuilder.width, bufferBuilder.height, attachmentSpec.internalFormat,
-                attachmentSpec.format, attachmentSpec.type, attachmentSpec.isGpuOnly);
-        Texture result = new Texture(data);
-        result.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-        return result;
+        if (App.isAppleM) {
+            GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
+                    attachmentSpec.format, attachmentSpec.type);
+            Texture result = new Texture(data);
+            result.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+            return result;
+        }
+        else {
+            FloatTextureData data = new FloatTextureData(bufferBuilder.width, bufferBuilder.height, attachmentSpec.internalFormat,
+                    attachmentSpec.format, attachmentSpec.type, attachmentSpec.isGpuOnly);
+            Texture result = new Texture(data);
+            result.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+            return result;
+        }
     }
 
 }
