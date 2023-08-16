@@ -1092,9 +1092,9 @@ open class ActorWithBody : Actor {
 
         // detectors are inside of the bounding box
         val x1 = hitbox.startX
-        val y1 = hitbox.startY
+        val y1 = hitbox.startY - if (gravitation.y < 0) HALF_PIXEL else 0.0
         val x2 = hitbox.endX - PHYS_EPSILON_DIST
-        val y2 = hitbox.endY + HALF_PIXEL // PLUS HALF PIXEL AND NOT MINUS EPSILON to fix issue #48 and #49
+        val y2 = hitbox.endY + if (gravitation.y >= 0) HALF_PIXEL else 0.0 // PLUS HALF PIXEL AND NOT MINUS EPSILON to fix issue #48 and #49
 
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENTIONAL!
 
