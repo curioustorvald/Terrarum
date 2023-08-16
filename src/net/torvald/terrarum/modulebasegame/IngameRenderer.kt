@@ -4,11 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
+import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
@@ -53,20 +52,20 @@ object IngameRenderer : Disposable {
     private lateinit var blurWriteQuad2: Mesh
 //    private lateinit var blurWriteQuad4: Mesh
 
-    private lateinit var lightmapFbo: FloatFrameBuffer
-    private lateinit var fboRGB: FloatFrameBuffer
-    private lateinit var fboRGB_lightMixed: FloatFrameBuffer
-    private lateinit var fboA: FloatFrameBuffer
-    private lateinit var fboA_lightMixed: FloatFrameBuffer
-    private lateinit var fboMixedOut: FloatFrameBuffer
+    private lateinit var lightmapFbo: Float16FrameBuffer
+    private lateinit var fboRGB: Float16FrameBuffer
+    private lateinit var fboRGB_lightMixed: Float16FrameBuffer
+    private lateinit var fboA: Float16FrameBuffer
+    private lateinit var fboA_lightMixed: Float16FrameBuffer
+    private lateinit var fboMixedOut: Float16FrameBuffer
     private lateinit var rgbTex: TextureRegion
     private lateinit var aTex: TextureRegion
     private lateinit var mixedOutTex: TextureRegion
     private lateinit var lightTex: TextureRegion
     private lateinit var blurTex: TextureRegion
 
-    private lateinit var fboBlurHalf: FloatFrameBuffer
-//    private lateinit var fboBlurQuarter: FloatFrameBuffer
+    private lateinit var fboBlurHalf: Float16FrameBuffer
+//    private lateinit var fboBlurQuarter: Float16FrameBuffer
 
     // you must have lightMixed FBO; otherwise you'll be reading from unbaked FBO and it freaks out GPU
 
@@ -694,7 +693,7 @@ object IngameRenderer : Disposable {
 
     private const val KAWASE_POWER = 1.5f
 
-    fun processNoBlur(outFbo: FloatFrameBuffer) {
+    fun processNoBlur(outFbo: Float16FrameBuffer) {
 
         blurtex0.dispose()
 
@@ -710,7 +709,7 @@ object IngameRenderer : Disposable {
         }
     }
 
-    fun processKawaseBlur(outFbo: FloatFrameBuffer) {
+    fun processKawaseBlur(outFbo: Float16FrameBuffer) {
 
         blurtex0.dispose()
 
@@ -807,12 +806,12 @@ object IngameRenderer : Disposable {
             //fboBlurQuarter.dispose()
         }
 
-        fboRGB = FloatFrameBuffer(width, height, false)
-        fboRGB_lightMixed = FloatFrameBuffer(width, height, false)
-        fboA = FloatFrameBuffer(width, height, false)
-        fboA_lightMixed = FloatFrameBuffer(width, height, false)
-        fboMixedOut = FloatFrameBuffer(width, height, false)
-        lightmapFbo = FloatFrameBuffer(
+        fboRGB = Float16FrameBuffer(width, height, false)
+        fboRGB_lightMixed = Float16FrameBuffer(width, height, false)
+        fboA = Float16FrameBuffer(width, height, false)
+        fboA_lightMixed = Float16FrameBuffer(width, height, false)
+        fboMixedOut = Float16FrameBuffer(width, height, false)
+        lightmapFbo = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 false
@@ -823,13 +822,13 @@ object IngameRenderer : Disposable {
         blurTex = TextureRegion()
         mixedOutTex = TextureRegion(fboMixedOut.colorBufferTexture)
 
-        fboBlurHalf = FloatFrameBuffer(
+        fboBlurHalf = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 2,
                 false
         )
 
-        /*fboBlurQuarter = FloatFrameBuffer(
+        /*fboBlurQuarter = Float16FrameBuffer(
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt() / 4,
                 false

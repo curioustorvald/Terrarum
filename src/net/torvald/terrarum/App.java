@@ -273,7 +273,7 @@ public class App implements ApplicationListener {
     private static float loadTimer = 0f;
     private static final float showupTime = 100f / 1000f;
 
-    private static FloatFrameBuffer renderFBO;
+    private static Float16FrameBuffer renderFBO;
 
     public static HashSet<File> tempFilePool = new HashSet<>();
 
@@ -753,12 +753,12 @@ public class App implements ApplicationListener {
                 (renderFBO.getWidth() != scr.getWidth() ||
                         renderFBO.getHeight() != scr.getHeight())
         ) {
-            renderFBO = new FloatFrameBuffer(
+            renderFBO = new Float16FrameBuffer(
                     scr.getWidth(),
                     scr.getHeight(),
                     false
             );
-            postProcessorOutFBO2 = new FloatFrameBuffer(
+            postProcessorOutFBO2 = new Float16FrameBuffer(
                     scr.getWidth() * 2,
                     scr.getHeight() * 2,
                     false

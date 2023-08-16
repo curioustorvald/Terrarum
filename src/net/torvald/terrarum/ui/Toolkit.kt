@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
+import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
@@ -48,9 +48,9 @@ object Toolkit : Disposable {
     private val shaderBoxDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/boxdown.frag")
     private val shaderBoxUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/boxup.frag")
 
-    private lateinit var fboBlur: FloatFrameBuffer
-    private lateinit var fboBlurHalf: FloatFrameBuffer
-    private lateinit var fboBlurQuarter: FloatFrameBuffer
+    private lateinit var fboBlur: Float16FrameBuffer
+    private lateinit var fboBlurHalf: Float16FrameBuffer
+    private lateinit var fboBlurQuarter: Float16FrameBuffer
     private lateinit var blurWriteQuad: Mesh
     private lateinit var blurWriteQuad2: Mesh
     private lateinit var blurWriteQuad4: Mesh
@@ -326,17 +326,17 @@ object Toolkit : Disposable {
         val fw = App.scr.width//MathUtils.nextPowerOfTwo(App.scr.width)
         val fh = App.scr.height//MathUtils.nextPowerOfTwo(App.scr.height)
 
-        fboBlur = FloatFrameBuffer(
+        fboBlur = Float16FrameBuffer(
                 fw,
                 fh,
                 false
         )
-        fboBlurHalf = FloatFrameBuffer(
+        fboBlurHalf = Float16FrameBuffer(
                 fw / 2,
                 fh / 2,
                 false
         )
-        fboBlurQuarter = FloatFrameBuffer(
+        fboBlurQuarter = Float16FrameBuffer(
                 fw / 4,
                 fh / 4,
                 false

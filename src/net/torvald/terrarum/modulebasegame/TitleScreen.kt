@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FloatFrameBuffer
+import com.badlogic.gdx.graphics.glutils.Float16FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
@@ -147,7 +147,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     internal lateinit var uiRemoCon: UIRemoCon
     internal lateinit var uiFakeBlurOverlay: UICanvas
 
-    private lateinit var worldFBO: FloatFrameBuffer
+    private lateinit var worldFBO: Float16FrameBuffer
 
     private val warning32bitJavaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/32_bit_warning.tga")))
     private val warningAppleRosettaIcon = TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/apple_rosetta_warning.tga")))
@@ -262,7 +262,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         Gdx.input.inputProcessor = TitleScreenController(this)
 
 
-        worldFBO = FloatFrameBuffer(App.scr.width, App.scr.height, false)
+        worldFBO = Float16FrameBuffer(App.scr.width, App.scr.height, false)
 
         // load list of savegames
         printdbg(this, "update list of savegames")
