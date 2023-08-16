@@ -2,9 +2,13 @@ package com.badlogic.gdx.graphics.glutils;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import net.torvald.terrarum.App;
+
+// typealias Float16FrameBuffer = FloatFrameBuffer
 
 /**
  * Created by minjaesong on 2023-08-16.
@@ -29,10 +33,18 @@ public class Float16FrameBuffer extends FrameBuffer {
      * @param hasDepth whether to attach a depth buffer
      * @throws GdxRuntimeException in case the FrameBuffer could not be created */
     public Float16FrameBuffer (int width, int height, boolean hasDepth) {
-        FloatFrameBufferBuilder bufferBuilder = new FloatFrameBufferBuilder(width, height);
-        bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
-        if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
-        this.bufferBuilder = bufferBuilder;
+        if (App.isAppleM) { // disable float framebuffer for Apple M chips
+            FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
+            bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE);
+            if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
+            this.bufferBuilder = bufferBuilder;
+        }
+        else {
+            FloatFrameBufferBuilder bufferBuilder = new FloatFrameBufferBuilder(width, height);
+            bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
+            if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
+            this.bufferBuilder = bufferBuilder;
+        }
 
         build();
     }
