@@ -67,6 +67,8 @@ basegame
     // Commit counts up to the Release 0.3.1: 2278
     // Commit counts up to the Release 0.3.2: 2732
 
+    const val VERSION_TAG: String = "test001"
+
     //////////////////////////////////////////////////////////
     //             CONFIGURATION FOR TILE MAKER             //
     // MAKE SURE THESE VALUES ARE UNIQUE IN THE SOURCE CODE //

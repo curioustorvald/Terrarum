@@ -62,9 +62,11 @@ public class App implements ApplicationListener {
 
     public static final String GAME_NAME = TerrarumAppConfiguration.GAME_NAME;
     public static final long VERSION_RAW = TerrarumAppConfiguration.VERSION_RAW;
+    public static final String VERSION_TAG = TerrarumAppConfiguration.VERSION_TAG;
 
     public static final String getVERSION_STRING() {
-        return String.format("%d.%d.%d", VERSION_RAW >>> 48, (VERSION_RAW & 0xffff000000L) >>> 24, VERSION_RAW & 0xffffffL);
+        return String.format("%d.%d.%d", VERSION_RAW >>> 48, (VERSION_RAW & 0xffff000000L) >>> 24, VERSION_RAW & 0xffffffL) +
+                (VERSION_TAG.isBlank() ? "" : "-"+VERSION_TAG);
     }
 
     /**
