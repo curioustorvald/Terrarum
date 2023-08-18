@@ -35,6 +35,7 @@ mv $DESTDIR/assets_release $DESTDIR/assets
 cp  "../out/TerrarumBuild.jar" $DESTDIR/out/
 
 # Temporary solution: zip everything
+rm "out/TerrarumWindows.x86.zip"
 zip -r -9 -l "out/TerrarumWindows.x86.zip" $DESTDIR
 rm -rf $DESTDIR || true
 echo "Build successful: $DESTDIR"
