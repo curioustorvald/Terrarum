@@ -18,6 +18,9 @@ rm $DESTDIR/graphics/*.bat
 rm $DESTDIR/keylayout/*.not_ime
 rm $DESTDIR/mods/basegame/blocks/*.gz
 rm $DESTDIR/mods/basegame/blocks/*.txt
+rm $DESTDIR/mods/basegame/weathers/*.txt
+rm $DESTDIR/mods/basegame/weathers/*.md
+rm $DESTDIR/mods/basegame/weathers/*.kra
 rm -r $DESTDIR/mods/basegame/sounds
 rm -r $DESTDIR/mods/dwarventech
 

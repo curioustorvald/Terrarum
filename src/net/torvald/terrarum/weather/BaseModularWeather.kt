@@ -2,6 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.GdxColorMap
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
@@ -15,7 +16,7 @@ data class BaseModularWeather(
         var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
         val daylightClut: GdxColorMap,
         val classification: String,
-        var extraImages: ArrayList<Texture>,
+        var clouds: HashMap<String, TextureRegionPack>,
         val mixFrom: String? = null,
         val mixPercentage: Double? = null
 )

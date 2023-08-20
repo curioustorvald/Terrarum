@@ -16,7 +16,9 @@ import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
 import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.File
 import java.io.FileFilter
 
@@ -68,7 +70,8 @@ internal object WeatherMixer : RNGConsumer {
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
 
-    private val shaderBlendMax = App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
+    private val shaderAstrum = App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
+    private val shaderClouds = App.loadShaderFromClasspath("shaders/default.vert", "shaders/clouds.frag")
 
     private var astrumOffX = 0f
     private var astrumOffY = 0f
@@ -131,7 +134,7 @@ internal object WeatherMixer : RNGConsumer {
                 GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
                 GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
                 "default",
-                ArrayList<Texture>()
+                HashMap()
             )
 
             currentWeather = defaultWeather
@@ -166,6 +169,23 @@ internal object WeatherMixer : RNGConsumer {
      */
     internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
         drawSkybox(camera, batch, world)
+
+
+
+
+        batch.color = globalLightNow.toGdxColor().also {
+            it.a = 1f
+        } // TODO add cloud-only colour strip on the CLUT
+        batch.shader = shaderClouds
+        batch.inUse {
+            currentWeather.clouds["normal"]?.get(0, 0)?.let {
+                batch.draw(it, 0f, -150f)
+            }
+        }
+
+
+
+        batch.color = Color.WHITE
     }
 
     private val parallaxDomainSize = 400f
@@ -223,20 +243,20 @@ internal object WeatherMixer : RNGConsumer {
         val astrumY = ((world.worldTime.TIME_T / WorldTime.DIURNAL_MOTION_LENGTH) % 1f) * starmapTex.regionHeight
 
         batch.inUse {
-            batch.shader = shaderBlendMax
-            shaderBlendMax.setUniformi("tex1", 1)
-            shaderBlendMax.setUniformf("drawOffsetSize", 0f, gradY, App.scr.wf, gH)
-            shaderBlendMax.setUniform4fv("uvA", uvs, 0, 4)
-            shaderBlendMax.setUniform4fv("uvB", uvs, 4, 4)
-            shaderBlendMax.setUniform4fv("uvC", uvs, 8, 4)
-            shaderBlendMax.setUniform4fv("uvD", uvs, 12, 4)
-            shaderBlendMax.setUniform4fv("uvE", uvs, 16, 4)
-            shaderBlendMax.setUniform4fv("uvF", uvs, 20, 4)
-            shaderBlendMax.setUniform4fv("uvG", uvs, 24, 4)
-            shaderBlendMax.setUniform4fv("uvH", uvs, 28, 4)
-            shaderBlendMax.setUniformf("texBlend", mornNoonBlend, turbX, albX, 0f)
-            shaderBlendMax.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
-            shaderBlendMax.setUniformf("randomNumber",
+            batch.shader = shaderAstrum
+            shaderAstrum.setUniformi("tex1", 1)
+            shaderAstrum.setUniformf("drawOffsetSize", 0f, gradY, App.scr.wf, gH)
+            shaderAstrum.setUniform4fv("uvA", uvs, 0, 4)
+            shaderAstrum.setUniform4fv("uvB", uvs, 4, 4)
+            shaderAstrum.setUniform4fv("uvC", uvs, 8, 4)
+            shaderAstrum.setUniform4fv("uvD", uvs, 12, 4)
+            shaderAstrum.setUniform4fv("uvE", uvs, 16, 4)
+            shaderAstrum.setUniform4fv("uvF", uvs, 20, 4)
+            shaderAstrum.setUniform4fv("uvG", uvs, 24, 4)
+            shaderAstrum.setUniform4fv("uvH", uvs, 28, 4)
+            shaderAstrum.setUniformf("texBlend", mornNoonBlend, turbX, albX, 0f)
+            shaderAstrum.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
+            shaderAstrum.setUniformf("randomNumber",
 //                (world.worldTime.TIME_T.plus(31L) xor 1453L + 31L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(37L) xor  862L + 31L).and(1023).toFloat(),
 //                (world.worldTime.TIME_T.plus(23L) xor 1639L + 29L).and(1023).toFloat(),
@@ -366,20 +386,18 @@ internal object WeatherMixer : RNGConsumer {
 
         val skyboxInJson = JSON.getString("skyboxGradColourMap")
         val lightbox = JSON.getString("daylightClut")
-        val extraImagesPath = JSON.get("extraImages").asStringArray()
 
         val skybox = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}"))
         val daylight = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}"))
 
 
-        val extraImages = ArrayList<Texture>()
-        for (i in extraImagesPath)
-            extraImages.add(Texture(ModMgr.getGdxFile(modname, "$pathToImage/${i}")))
-
-
         val classification = JSON.getString("classification")
 
-
+        val cloudsMap = HashMap<String, TextureRegionPack>()
+        val clouds = JSON["clouds"]
+        clouds.forEachSiblings { name, json ->
+            cloudsMap[name] = TextureRegionPack(ModMgr.getGdxFile(modname, "$pathToImage/${json.getString("filename")}"), json.getInt("tw"), json.getInt("th"))
+        }
 
         var mixFrom: String?
         try { mixFrom = JSON.getString("mixFrom") }
@@ -397,17 +415,18 @@ internal object WeatherMixer : RNGConsumer {
             skyboxGradColourMap = skybox,
             daylightClut = daylight,
             classification = classification,
-            extraImages = extraImages
+            clouds = cloudsMap
         )
     }
 
     fun dispose() {
         weatherList.values.forEach { list ->
             list.forEach { weather ->
-                weather.extraImages.forEach { it.tryDispose() }
+                weather.clouds.forEach { it.value.dispose() }
             }
         }
         starmapTex.texture.dispose()
-        shaderBlendMax.dispose()
+        shaderAstrum.dispose()
+        shaderClouds.dispose()
     }
 }
