@@ -2,10 +2,15 @@
   "skyboxGradColourMap": "generic_skybox.tga",
   "daylightClut": "clut_daylight.tga",
   "classification": "generic",
+  "cloudGamma": [0.44, 2.0],
   "clouds": {
     "normal": {
       "filename": "cloud_normal.png",
       "tw": 1024, "th": 512
+    },
+    "large": {
+      "filename": "cloud_large.png",
+      "tw": 2048, "th": 1024
     }
   }
 }

@@ -76,6 +76,9 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffX = 0f
     private var astrumOffY = 0f
 
+    private var cloudGamma1 = 0.5f
+    private var cloudGamma2 = 2f
+
     private val moonlightMax = Cvec(0.23f, 0.24f, 0.25f, 0.21f) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
 
     override fun loadFromSave(s0: Long, s1: Long) {
@@ -134,6 +137,7 @@ internal object WeatherMixer : RNGConsumer {
                 GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
                 GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
                 "default",
+                floatArrayOf(1f, 1f),
                 HashMap()
             )
 
@@ -149,6 +153,10 @@ internal object WeatherMixer : RNGConsumer {
         if (player == null) return
 
 //        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
+
+        // update clouds
+        cloudGamma1 = currentWeather.cloudGamma[0]
+        cloudGamma2 = currentWeather.cloudGamma[1]
 
 
         if (!globalLightOverridden) {
@@ -178,9 +186,10 @@ internal object WeatherMixer : RNGConsumer {
         } // TODO add cloud-only colour strip on the CLUT
         batch.shader = shaderClouds
         batch.inUse {
-            currentWeather.clouds["normal"]?.get(0, 0)?.let {
-                batch.draw(it, 0f, -150f)
-            }
+            batch.shader.setUniformf("inverseGamma", cloudGamma1, cloudGamma2)
+            currentWeather.clouds["large"]?.get(0, 0)?.let { batch.draw(it, -400f - INGAME.WORLD_UPDATE_TIMER * 0.06f, -600f) }
+            currentWeather.clouds["normal"]?.get(0, 1)?.let { batch.draw(it, 600f - INGAME.WORLD_UPDATE_TIMER * 0.09f, -300f) }
+            currentWeather.clouds["normal"]?.get(0, 0)?.let { batch.draw(it, 200f - INGAME.WORLD_UPDATE_TIMER * 0.13f, -150f) }
         }
 
 
@@ -393,6 +402,8 @@ internal object WeatherMixer : RNGConsumer {
 
         val classification = JSON.getString("classification")
 
+        val cloudGamma = JSON["cloudGamma"].asFloatArray()
+
         val cloudsMap = HashMap<String, TextureRegionPack>()
         val clouds = JSON["clouds"]
         clouds.forEachSiblings { name, json ->
@@ -415,7 +426,8 @@ internal object WeatherMixer : RNGConsumer {
             skyboxGradColourMap = skybox,
             daylightClut = daylight,
             classification = classification,
-            clouds = cloudsMap
+            cloudGamma = cloudGamma,
+            clouds = cloudsMap,
         )
     }
 

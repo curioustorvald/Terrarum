@@ -16,6 +16,7 @@ data class BaseModularWeather(
         var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
         val daylightClut: GdxColorMap,
         val classification: String,
+        val cloudGamma: FloatArray,
         var clouds: HashMap<String, TextureRegionPack>,
         val mixFrom: String? = null,
         val mixPercentage: Double? = null
