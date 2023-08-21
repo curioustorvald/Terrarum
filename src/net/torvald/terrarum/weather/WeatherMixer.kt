@@ -2,6 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -192,7 +193,9 @@ internal object WeatherMixer : RNGConsumer {
             it?.let {
                 it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
 
-                if (it.posX < -1500f || it.posX > App.scr.width + 1500f || it.scale < 1f / 2048f) {
+                val pjx = it.posX / it.posZ
+
+                if (pjx !in -1500f..App.scr.wf + 1500f || it.scale < 1f / 2048f) {
                     it.flagToDespawn = true
                 }
             }
@@ -211,11 +214,20 @@ internal object WeatherMixer : RNGConsumer {
 
     private val scrHscaler = App.scr.height / 720f
 
+    /**
+     * @param range: range of the randomised number
+     * @param random: random number in the range of `[-1, 1]`
+     */
+    private fun randomPosWithin(range: ClosedFloatingPointRange<Float>, random: Float) =
+        ((range.start + range.endInclusive) / 2f) + random * (range.endInclusive - range.start) / 2f
+
     private fun tryToSpawnCloud(currentWeather: BaseModularWeather) {
         printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${clouds.size})")
 
         if (cloudsSpawned < clouds.size) {
+            val flip = Math.random() < 0.5
             val rC = Math.random().toFloat()
+            val rZ = (Math.random() * 3.0 + 1.0).toFloat() // 1..4
             val r0 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
             val r1 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
             val r2 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
@@ -237,15 +249,15 @@ internal object WeatherMixer : RNGConsumer {
             cloudsToSpawn?.let { cloud ->
                 val scaleVariance = 1f + rT1.absoluteValue * cloud.scaleVariance
                 val cloudScale = cloud.baseScale * (if (rT1 < 0) 1f / scaleVariance else scaleVariance)
-                val hCloudSize = cloud.spriteSheet.tileW * cloudScale + 1f
-                val posX = if (cloudDriftVector.x < 0) App.scr.width + hCloudSize else -hCloudSize
+                val hCloudSize = (cloud.spriteSheet.tileW * cloudScale) + 1f
+                val posX = if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) * rZ else -hCloudSize * rZ
                 val posY = when (cloud.category) {
-                    "large" -> (100f + r0 * 80f) * scrHscaler
-                    else -> (150f + r0 * 50f) * scrHscaler
+                    "large" -> randomPosWithin(-10f..120f, r0) * scrHscaler
+                    else -> randomPosWithin(-50f..150f, r0) * scrHscaler // -50..150
                 }
                 val sheetX = rA % cloud.spriteSheet.horizontalCount
                 val sheetY = rB % cloud.spriteSheet.verticalCount
-                WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY)).also {
+                WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
                     it.scale = cloudScale
 
                     it.darkness.set(currentWeather.cloudGamma)
@@ -255,12 +267,13 @@ internal object WeatherMixer : RNGConsumer {
 
                     it.posX = posX
                     it.posY = posY
+                    it.posZ = rZ
 
                     clouds.addAtFreeSpot(it)
                     cloudsSpawned += 1
 
 
-                    printdbg(this, "... Spawning ${cloud.category}($sheetX, $sheetY) cloud at pos ${it.pos}, invGamma ${it.darkness}")
+                    printdbg(this, "... Spawning ${cloud.category}($sheetX, $sheetY) cloud at pos ${it.pos}, scale ${it.scale}, invGamma ${it.darkness}")
                 }
 
             }
@@ -289,25 +302,21 @@ internal object WeatherMixer : RNGConsumer {
      */
     internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
         drawSkybox(camera, batch, world)
+        drawClouds(batch)
+        batch.color = Color.WHITE
+    }
 
-
-
-
+    private fun drawClouds(batch: SpriteBatch) {
         batch.color = globalLightNow.toGdxColor().also {
             it.a = 1f
         } // TODO add cloud-only colour strip on the CLUT
         batch.shader = shaderClouds
-        clouds.forEach {
-            it?.let {
-                batch.inUse { _ ->
-                    batch.shader.setUniformf("gamma", it.darkness)
-                    it.render(batch, 0f, 0f) // TODO parallax
-                }
+        clouds.filterNotNull().sortedByDescending { it.posZ }.forEach {
+            batch.inUse { _ ->
+                batch.shader.setUniformf("gamma", it.darkness)
+                it.render(batch, 0f, 0f) // TODO parallax
             }
         }
-
-
-        batch.color = Color.WHITE
     }
 
     private val parallaxDomainSize = 400f

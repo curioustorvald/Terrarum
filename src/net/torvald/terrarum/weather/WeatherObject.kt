@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Disposable
 abstract class WeatherObject : Disposable {
 
     /** vec3(posX, posY, scale) */
-    var pos: Vector3 = Vector3()
+    var pos: Vector3 = Vector3(0f, 0f, 1f)
 
     var posX: Float
         get() = pos.x
@@ -18,9 +18,10 @@ abstract class WeatherObject : Disposable {
     var posY: Float
         get() = pos.y
         set(value) { pos.y = value }
-    var scale: Float
+    var posZ: Float
         get() = pos.z
         set(value) { pos.z = value }
+    var scale: Float = 1f
 
     var flagToDespawn = false
 

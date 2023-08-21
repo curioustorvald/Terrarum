@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import net.torvald.terrarum.App
 import kotlin.math.sign
 
 /**
  * Created by minjaesong on 2023-08-21.
  */
-class WeatherObjectCloud(private val texture: TextureRegion) : WeatherObject() {
+class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: Boolean) : WeatherObject() {
 
     /**
      * To actually utilise this value, your render code must begin the spritebatch per-object, like so:
@@ -32,8 +33,8 @@ class WeatherObjectCloud(private val texture: TextureRegion) : WeatherObject() {
      * Resulting vector: (x + dX, y + dY, scale * dScale)
      */
     fun update(flowVector: Vector3, gait: Float) {
-        posX += flowVector.x * gait * scale * scale
-        posY += flowVector.y * gait * scale * scale
+        posX += flowVector.x * gait * scale
+        posY += flowVector.y * gait * scale
         scale *= flowVector.z
     }
 
@@ -44,8 +45,18 @@ class WeatherObjectCloud(private val texture: TextureRegion) : WeatherObject() {
     override fun render(batch: SpriteBatch, offsetX: Float, offsetY: Float) {
         val x = posX + offsetX - texture.regionWidth * scale * 0.5f
         val y = posY + offsetY - texture.regionHeight * scale
+        val z = posZ // must be at least 1.0
+        val w = App.scr.halfwf
+        val h = App.scr.halfhf // 50% to the screen height, or 35%?
 
-        batch.draw(texture, x, y, texture.regionWidth * scale, texture.regionHeight * scale)
+        val drawX = (x + w * (z-1)) / z
+        val drawY = (y + h * (z-1)) / z
+        val drawScale = scale / z
+
+        if (flipW)
+            batch.draw(texture, drawX + texture.regionWidth / z, drawY, -texture.regionWidth * drawScale, texture.regionHeight * drawScale)
+        else
+            batch.draw(texture, drawX, drawY, texture.regionWidth * drawScale, texture.regionHeight * drawScale)
     }
 
     override fun dispose() { /* cloud texture will be disposed of by the WeatherMixer */ }
