@@ -47,7 +47,7 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
         val y = posY + offsetY - texture.regionHeight * scale
         val z = posZ // must be at least 1.0
         val w = App.scr.halfwf
-        val h = App.scr.halfhf // 50% to the screen height, or 35%?
+        val h = App.scr.hf * 0.35f
 
         val drawX = (x + w * (z-1)) / z
         val drawY = (y + h * (z-1)) / z

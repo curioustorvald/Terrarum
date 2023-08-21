@@ -86,7 +86,7 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffX = 0f
     private var astrumOffY = 0f
 
-    private val clouds = Array<WeatherObjectCloud?>(256) { null }
+    private val clouds = Array<WeatherObjectCloud?>(4096) { null }
     private var cloudsSpawned = 0
     private var cloudDriftVector = Vector3(-1f, 0f, 1f) // this is a direction vector
 
@@ -94,6 +94,7 @@ internal object WeatherMixer : RNGConsumer {
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
         internalReset(s0, s1)
+        initClouds()
     }
 
     fun internalReset() = internalReset(RNG.state0, RNG.state1)
@@ -155,6 +156,7 @@ internal object WeatherMixer : RNGConsumer {
                 0f,
                 0f,
                 Vector2(1f, 1f),
+                Vector2(0f, 0f),
                 listOf()
             )
 
@@ -221,14 +223,14 @@ internal object WeatherMixer : RNGConsumer {
     private fun randomPosWithin(range: ClosedFloatingPointRange<Float>, random: Float) =
         ((range.start + range.endInclusive) / 2f) + random * (range.endInclusive - range.start) / 2f
 
-    private fun tryToSpawnCloud(currentWeather: BaseModularWeather) {
+    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, initX: Float? = null) {
         printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${clouds.size})")
 
         if (cloudsSpawned < clouds.size) {
             val flip = Math.random() < 0.5
             val rC = Math.random().toFloat()
-            val rZ = (Math.random() * 3.0 + 1.0).toFloat() // 1..4
-            val r0 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
+            val rZ = (Math.random() * 9 + 1.0).toFloat() // 1..10 uniformly
+            val rY = ((Math.random() + Math.random()) - 1.0).toFloat() // -1..1
             val r1 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
             val r2 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
             val rT1 = ((Math.random() + Math.random()) - 1.0).toFloat() // -1..1
@@ -249,11 +251,11 @@ internal object WeatherMixer : RNGConsumer {
             cloudsToSpawn?.let { cloud ->
                 val scaleVariance = 1f + rT1.absoluteValue * cloud.scaleVariance
                 val cloudScale = cloud.baseScale * (if (rT1 < 0) 1f / scaleVariance else scaleVariance)
-                val hCloudSize = (cloud.spriteSheet.tileW * cloudScale) + 1f
-                val posX = if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) * rZ else -hCloudSize * rZ
+                val hCloudSize = (cloud.spriteSheet.tileW * cloudScale) / 2f + 1f
+                val posX = if (initX != null) initX * rZ else if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) * rZ else -hCloudSize * rZ
                 val posY = when (cloud.category) {
-                    "large" -> randomPosWithin(-10f..120f, r0) * scrHscaler
-                    else -> randomPosWithin(-50f..150f, r0) * scrHscaler // -50..150
+                    "large" -> randomPosWithin(-120f..120f, rY) * scrHscaler * (rZ * 0.5f)
+                    else -> randomPosWithin(-150f..150f, rY) * scrHscaler * (rZ * 0.5f)
                 }
                 val sheetX = rA % cloud.spriteSheet.horizontalCount
                 val sheetY = rB % cloud.spriteSheet.verticalCount
@@ -262,8 +264,12 @@ internal object WeatherMixer : RNGConsumer {
 
                     it.darkness.set(currentWeather.cloudGamma)
                     it.darkness.x *= it.scale
-                    it.darkness.x *= 1f + r1 * 0.1f
-                    it.darkness.y *= 1f + r2 * 0.1f
+
+                    val varX = 1f + r1.absoluteValue * currentWeather.cloudGammaVariance.x
+                    val varY = 1f + r2.absoluteValue * currentWeather.cloudGammaVariance.y
+
+                    it.darkness.x *= if (r1 < 0) 1f / varX else varX
+                    it.darkness.y *= if (r2 < 0) 1f / varY else varY
 
                     it.posX = posX
                     it.posY = posY
@@ -278,6 +284,13 @@ internal object WeatherMixer : RNGConsumer {
 
             }
         }
+    }
+
+    private fun initClouds() {
+        repeat((currentWeather.cloudChance * 6.8f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
+            tryToSpawnCloud(currentWeather, ((Math.random() * 2.0 - 1.0) * App.scr.wf).toFloat())
+        }
+
     }
 
     private fun <T> Array<T?>.addAtFreeSpot(obj: T) {
@@ -566,6 +579,7 @@ internal object WeatherMixer : RNGConsumer {
             cloudChance = JSON.getFloat("cloudChance"),
             cloudDriftSpeed = JSON.getFloat("cloudDriftSpeed"),
             cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
+            cloudGammaVariance = JSON["cloudGammaVariance"].asFloatArray().let { Vector2(it[0], it[1]) },
             clouds = cloudsMap,
         )
     }

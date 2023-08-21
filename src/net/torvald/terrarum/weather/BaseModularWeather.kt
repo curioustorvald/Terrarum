@@ -20,6 +20,7 @@ data class BaseModularWeather(
         val cloudChance: Float,
         val cloudDriftSpeed: Float,
         val cloudGamma: Vector2,
+        val cloudGammaVariance: Vector2,
         var clouds: List<CloudProps>, // sorted by CloudProps.probability
 
         val mixFrom: String? = null,

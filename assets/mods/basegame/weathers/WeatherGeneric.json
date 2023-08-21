@@ -2,17 +2,18 @@
   "skyboxGradColourMap": "generic_skybox.tga",
   "daylightClut": "clut_daylight.tga",
   "classification": "generic",
-  "cloudChance": 10,
-  "cloudGamma": [0.59, 2.0],
-  "cloudDriftSpeed": 10.4,
+  "cloudChance": 20,
+  "cloudGamma": [0.48, 1.8],
+  "cloudGammaVariance": [0.1, 0.1],
+  "cloudDriftSpeed": 0.3,
   "clouds": {
     "large": {
       "filename": "cloud_large.png",
-      "tw": 2048, "th": 1024, "probability": 0.2, "baseScale": 0.45, "scaleVariance": 0.7
+      "tw": 2048, "th": 1024, "probability": 0.2, "baseScale": 0.666, "scaleVariance": 0.7
     },
     "normal": {
       "filename": "cloud_normal.png",
-      "tw": 1024, "th": 512, "probability": 1.0, "baseScale": 0.5, "scaleVariance": 0.8
+      "tw": 1024, "th": 512, "probability": 1.0, "baseScale": 0.75, "scaleVariance": 0.8
     }
   }
 }
