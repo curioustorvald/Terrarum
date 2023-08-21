@@ -302,6 +302,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         IngameRenderer.setRenderedWorld(gameWorld)
+        WeatherMixer.internalReset()
     }
 
     override fun show() {

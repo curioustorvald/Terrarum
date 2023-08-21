@@ -3,6 +3,9 @@ package net.torvald.terrarum.weather
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.JsonValue
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.random.HQRNG
@@ -21,6 +24,11 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.File
 import java.io.FileFilter
+import java.lang.Double.doubleToLongBits
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.math.absoluteValue
 
 /**
  * Currently there is a debate whether this module must be part of the engine or the basegame
@@ -52,6 +60,7 @@ internal object WeatherMixer : RNGConsumer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Cvec(0)
+    private val moonlightMax = Cvec(0.23f, 0.24f, 0.25f, 0.21f) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -76,10 +85,10 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffX = 0f
     private var astrumOffY = 0f
 
-    private var cloudGamma1 = 0.5f
-    private var cloudGamma2 = 2f
+    private val clouds = Array<WeatherObjectCloud?>(256) { null }
+    private var cloudsSpawned = 0
+    private var cloudDriftVector = Vector3(-1f, 0f, 1f) // this is a direction vector
 
-    private val moonlightMax = Cvec(0.23f, 0.24f, 0.25f, 0.21f) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -96,6 +105,10 @@ internal object WeatherMixer : RNGConsumer {
 
         astrumOffX = s0.and(0xFFFFL).toFloat() / 65535f * starmapTex.regionWidth
         astrumOffY = s1.and(0xFFFFL).toFloat() / 65535f * starmapTex.regionHeight
+
+        Arrays.fill(clouds, null)
+        cloudsSpawned = 0
+        cloudDriftVector = Vector3(-1f, 0f, 1f)
     }
 
     init {
@@ -134,11 +147,14 @@ internal object WeatherMixer : RNGConsumer {
             e.printStackTrace()
 
             val defaultWeather = BaseModularWeather(
+                JsonValue(JsonValue.ValueType.`object`),
                 GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
                 GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
                 "default",
-                floatArrayOf(1f, 1f),
-                HashMap()
+                0f,
+                0f,
+                Vector2(1f, 1f),
+                listOf()
             )
 
             currentWeather = defaultWeather
@@ -154,9 +170,7 @@ internal object WeatherMixer : RNGConsumer {
 
 //        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
 
-        // update clouds
-        cloudGamma1 = currentWeather.cloudGamma[0]
-        cloudGamma2 = currentWeather.cloudGamma[1]
+        updateClouds(delta, world)
 
 
         if (!globalLightOverridden) {
@@ -164,6 +178,104 @@ internal object WeatherMixer : RNGConsumer {
         }
 
     }
+
+    private var cloudUpdateAkku = 0f
+    private fun updateClouds(delta: Float, world: GameWorld) {
+        val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.cloudDriftSpeed) // if chance = 0, the result will be +inf
+
+        if (cloudUpdateAkku >= cloudChanceEveryMin) {
+            cloudUpdateAkku -= cloudChanceEveryMin
+            tryToSpawnCloud(currentWeather)
+        }
+
+        clouds.forEach {
+            it?.let {
+                it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
+
+                if (it.posX < -1500f || it.posX > App.scr.width + 1500f || it.scale < 1f / 2048f) {
+                    it.flagToDespawn = true
+                }
+            }
+        }
+
+        clouds.indices.forEach { i ->
+            if (clouds[i]?.flagToDespawn == true) {
+                clouds[i]?.dispose()
+                clouds[i] = null
+                cloudsSpawned -= 1
+            }
+        }
+
+        cloudUpdateAkku += delta
+    }
+
+    private val scrHscaler = App.scr.height / 720f
+
+    private fun tryToSpawnCloud(currentWeather: BaseModularWeather) {
+        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${clouds.size})")
+
+        if (cloudsSpawned < clouds.size) {
+            val rC = Math.random().toFloat()
+            val r0 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
+            val r1 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
+            val r2 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
+            val rT1 = ((Math.random() + Math.random()) - 1.0).toFloat() // -1..1
+            val (rA, rB) = doubleToLongBits(Math.random()).let {
+                it.ushr(20).and(0xFFFF).toInt() to it.ushr(36).and(0xFFFF).toInt()
+            }
+
+            var cloudsToSpawn: CloudProps? = null
+            var c = 0
+            while (c < currentWeather.clouds.size) {
+                if (rC < currentWeather.clouds[c].probability) {
+                    cloudsToSpawn = currentWeather.clouds[c]
+                    break
+                }
+                c += 1
+            }
+
+            cloudsToSpawn?.let { cloud ->
+                val scaleVariance = 1f + rT1.absoluteValue * cloud.scaleVariance
+                val cloudScale = cloud.baseScale * (if (rT1 < 0) 1f / scaleVariance else scaleVariance)
+                val hCloudSize = cloud.spriteSheet.tileW * cloudScale + 1f
+                val posX = if (cloudDriftVector.x < 0) App.scr.width + hCloudSize else -hCloudSize
+                val posY = when (cloud.category) {
+                    "large" -> (100f + r0 * 80f) * scrHscaler
+                    else -> (150f + r0 * 50f) * scrHscaler
+                }
+                val sheetX = rA % cloud.spriteSheet.horizontalCount
+                val sheetY = rB % cloud.spriteSheet.verticalCount
+                WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY)).also {
+                    it.scale = cloudScale
+
+                    it.darkness.set(currentWeather.cloudGamma)
+                    it.darkness.x *= it.scale
+                    it.darkness.x *= 1f + r1 * 0.1f
+                    it.darkness.y *= 1f + r2 * 0.1f
+
+                    it.posX = posX
+                    it.posY = posY
+
+                    clouds.addAtFreeSpot(it)
+                    cloudsSpawned += 1
+
+
+                    printdbg(this, "... Spawning ${cloud.category}($sheetX, $sheetY) cloud at pos ${it.pos}, invGamma ${it.darkness}")
+                }
+
+            }
+        }
+    }
+
+    private fun <T> Array<T?>.addAtFreeSpot(obj: T) {
+        var c = 0
+        while (true) {
+            if (this[c] == null) break
+            c += 1
+        }
+        this[c] = obj
+    }
+
 
     var turbidity = 1.0; private set
     private var gH = 1.8f * App.scr.height
@@ -185,13 +297,14 @@ internal object WeatherMixer : RNGConsumer {
             it.a = 1f
         } // TODO add cloud-only colour strip on the CLUT
         batch.shader = shaderClouds
-        batch.inUse {
-            batch.shader.setUniformf("inverseGamma", cloudGamma1, cloudGamma2)
-            currentWeather.clouds["large"]?.get(0, 0)?.let { batch.draw(it, -400f - INGAME.WORLD_UPDATE_TIMER * 0.06f, -600f) }
-            currentWeather.clouds["normal"]?.get(0, 1)?.let { batch.draw(it, 600f - INGAME.WORLD_UPDATE_TIMER * 0.09f, -300f) }
-            currentWeather.clouds["normal"]?.get(0, 0)?.let { batch.draw(it, 200f - INGAME.WORLD_UPDATE_TIMER * 0.13f, -150f) }
+        clouds.forEach {
+            it?.let {
+                batch.inUse { _ ->
+                    batch.shader.setUniformf("gamma", it.darkness)
+                    it.render(batch, 0f, 0f) // TODO parallax
+                }
+            }
         }
-
 
 
         batch.color = Color.WHITE
@@ -402,13 +515,27 @@ internal object WeatherMixer : RNGConsumer {
 
         val classification = JSON.getString("classification")
 
-        val cloudGamma = JSON["cloudGamma"].asFloatArray()
 
-        val cloudsMap = HashMap<String, TextureRegionPack>()
+        val cloudsMap = ArrayList<CloudProps>()
         val clouds = JSON["clouds"]
         clouds.forEachSiblings { name, json ->
-            cloudsMap[name] = TextureRegionPack(ModMgr.getGdxFile(modname, "$pathToImage/${json.getString("filename")}"), json.getInt("tw"), json.getInt("th"))
+            cloudsMap.add(CloudProps(
+                name,
+                TextureRegionPack(ModMgr.getGdxFile(modname, "$pathToImage/${json.getString("filename")}"), json.getInt("tw"), json.getInt("th")),
+                json.getFloat("probability"),
+                json.getFloat("baseScale"),
+                json.getFloat("scaleVariance")
+            ))
         }
+        cloudsMap.sortBy { it.probability }
+
+
+
+
+
+
+
+
 
         var mixFrom: String?
         try { mixFrom = JSON.getString("mixFrom") }
@@ -423,10 +550,13 @@ internal object WeatherMixer : RNGConsumer {
 
 
         return BaseModularWeather(
+            json = JSON,
             skyboxGradColourMap = skybox,
             daylightClut = daylight,
             classification = classification,
-            cloudGamma = cloudGamma,
+            cloudChance = JSON.getFloat("cloudChance"),
+            cloudDriftSpeed = JSON.getFloat("cloudDriftSpeed"),
+            cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
             clouds = cloudsMap,
         )
     }
@@ -434,7 +564,7 @@ internal object WeatherMixer : RNGConsumer {
     fun dispose() {
         weatherList.values.forEach { list ->
             list.forEach { weather ->
-                weather.clouds.forEach { it.value.dispose() }
+                weather.clouds.forEach { it.spriteSheet.dispose() }
             }
         }
         starmapTex.texture.dispose()
@@ -442,3 +572,4 @@ internal object WeatherMixer : RNGConsumer {
         shaderClouds.dispose()
     }
 }
+

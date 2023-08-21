@@ -14,12 +14,12 @@ out vec4 fragColor;
 
 const vec2 boolean = vec2(0.0, 1.0);
 
-uniform vec2 inverseGamma = vec2(10, 2.0); // vec2(inverse gamma RGB, inverse gamma RGA)
+uniform vec2 gamma = vec2(10, 2.0); // vec2(gamma for RGB, gamma for A)
 
 void main() {
-    vec4 inCol = v_color * texture(u_texture, v_texCoords);
+    vec4 inCol = texture(u_texture, v_texCoords);
 
-    vec4 outCol = pow(inCol, inverseGamma.xxxy);
+    vec4 outCol = pow(inCol, gamma.xxxy);
 
-    fragColor = outCol;
+    fragColor = outCol * v_color;
 }
