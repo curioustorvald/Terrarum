@@ -300,10 +300,9 @@ class BasicDebugInfoWindow : UICanvas() {
             if (ingame is TerrarumIngame) {
                 App.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}$ccY/$ccG${(ingame as TerrarumIngame).PARTICLES_MAX}",
                     TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 4f)
-                App.fontSmallNumbers.draw(batch, "${ccM}Clouds $ccG${WeatherMixer.cloudsSpawned}$ccY/$ccG${WeatherMixer.cloudSpawnMax}",
-                    TinyAlphNum.W * 2f + (18 * 8), App.scr.height - TinyAlphNum.H * 4f)
-
             }
+            App.fontSmallNumbers.draw(batch, "${ccM}Clouds $ccG${WeatherMixer.cloudsSpawned}$ccY/$ccG${WeatherMixer.cloudSpawnMax}",
+                TinyAlphNum.W * 2f + (18 * 8), App.scr.height - TinyAlphNum.H * 4f)
         }
 
         App.fontSmallNumbers.draw(batch, "${ccY}Actors rendering $ccG${IngameRenderer.renderingActorsCount}",
