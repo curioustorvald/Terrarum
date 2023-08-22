@@ -2,7 +2,7 @@
 
 */
 
-#version 150
+#version 400
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -107,7 +107,7 @@ void main() {
 
     vec4 finalBreakage = drawBreakage * texture(tilesAtlas, finalUVCoordForBreakage); // drawBreakeage = 0 to not draw, = 1 to draw
 
-    vec4 finalColor =mix(finalTile, finalBreakage, finalBreakage.a) * bc.xxxy + (finalTile * bc.yyyx);
+    vec4 finalColor = fma(mix(finalTile, finalBreakage, finalBreakage.a), bc.xxxy, finalTile * bc.yyyx);
 
     fragColor = mix(colourFilter, colourFilter * finalColor, mulBlendIntensity);
 

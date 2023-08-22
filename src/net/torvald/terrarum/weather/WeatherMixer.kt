@@ -310,15 +310,6 @@ internal object WeatherMixer : RNGConsumer {
                 WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
                     it.scale = cloudScale
 
-                    it.darkness.set(currentWeather.cloudGamma)
-                    it.darkness.x *= it.scale
-
-                    val varX = 1f + r1.absoluteValue * currentWeather.cloudGammaVariance.x
-                    val varY = 1f + r2.absoluteValue * currentWeather.cloudGammaVariance.y
-
-                    it.darkness.x *= if (r1 < 0) 1f / varX else varX
-                    it.darkness.y *= if (r2 < 0) 1f / varY else varY
-
                     it.posX = posX
                     it.posY = posY
                     it.posZ = rZ
@@ -369,13 +360,13 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun drawClouds(batch: SpriteBatch) {
-        batch.shader = shaderClouds
-        clouds.forEach {
-            batch.inUse { _ ->
-                batch.color = globalLightNow.toGdxColor().also { col ->
-                    col.a = it.alpha
-                } // TODO add cloud-only colour strip on the CLUT
-                batch.shader.setUniformf("gamma", it.darkness)
+        batch.inUse { _ ->
+            batch.shader = shaderClouds
+            batch.shader.setUniformf("gamma", currentWeather.cloudGamma)
+            batch.shader.setUniformf("shadeCol", 0.06f, 0.07f, 0.08f, 1f) // TODO temporary value
+
+            clouds.forEach {
+                batch.color = Color(globalLightNow.r, globalLightNow.g, globalLightNow.b, it.alpha)
                 it.render(batch, 0f, 0f)
             }
         }

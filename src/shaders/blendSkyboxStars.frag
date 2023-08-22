@@ -1,4 +1,4 @@
-#version 150
+#version 400
 #ifdef GL_ES
     precision mediump float;
 #endif
@@ -150,7 +150,10 @@ void main(void) {
     ); // c = c0..c1
 
 
-    fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + boolean.xxxy;
+//    fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + boolean.xxxy;
+    fragColor = fma(max(colorTex0, colorTex1), boolean.yyyx, boolean.xxxy);
+
+
 //    fragColor = colorTex1;
 //    fragColor = randomness * boolean.yyyx + boolean.xxxy;
 //    fragColor = (randomness.rrrr + (colorTex1 * vec4(2.0, -2.0, 2.0, 1.0))) * boolean.yyyx + boolean.xxxy;

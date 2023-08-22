@@ -2,7 +2,7 @@
 
 */
 
-#version 150
+#version 400
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -121,5 +121,5 @@ void main() {
     vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
     float bayerThreshold = float(bayer[int(entry.y) * int(bayerSize) + int(entry.x)]) / bayerDivider;
 
-    fragColor = undithered * bc.xxxy + vec4((undithered.a > bayerThreshold) ? 1.0 : 0.0) * bc.yyyx;
+    fragColor = fma(undithered, bc.xxxy, vec4((undithered.a > bayerThreshold) ? 1.0 : 0.0) * bc.yyyx);
 }

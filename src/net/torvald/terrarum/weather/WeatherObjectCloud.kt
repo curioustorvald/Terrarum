@@ -13,19 +13,6 @@ import kotlin.math.sign
  */
 class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: Boolean) : WeatherObject(), Comparable<WeatherObjectCloud> {
 
-    /**
-     * To actually utilise this value, your render code must begin the spritebatch per-object, like so:
-     * ```
-     * batch.shader = cloudShader
-     * for (it in clouds) {
-     *     batch.begin()
-     *     batch.shader.setUniformf("gamma", it.darkness)
-     *     batch.draw(it, ...)
-     *     batch.end()
-     * }
-     */
-    var darkness: Vector2 = Vector2(0.5f, 2.0f) // the "gamma" value fed into the clouds shader
-
     override fun update() {
         throw UnsupportedOperationException()
     }

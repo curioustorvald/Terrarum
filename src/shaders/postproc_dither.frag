@@ -3,7 +3,7 @@
  * http://momentsingraphics.de/BlueNoise.html
  */
 
-#version 150
+#version 400
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -79,7 +79,7 @@ void main(void) {
     // Dither the output
     vec4 graded = ycocg_to_rgb * newColour;
     vec4 selvec = getDitherredDot(graded);
-    vec4 outcol = selvec * boolean.yyyx + boolean.xxxy; // use quantised RGB but not the A
+    vec4 outcol = fma(selvec, boolean.yyyx, boolean.xxxy); // use quantised RGB but not the A
 
     fragColor = outcol;
 //    ivec4 bytes = ivec4(255.0 * outcol);

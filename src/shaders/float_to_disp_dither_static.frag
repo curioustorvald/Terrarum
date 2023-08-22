@@ -1,4 +1,4 @@
-#version 150
+#version 400
 #ifdef GL_ES
     precision mediump float;
 #endif
@@ -41,7 +41,8 @@ vec4 getDitherredDot(vec4 inColor) {
 
 
 void main(void) {
-    float scale = v_texCoords.y * (1.0 - parallax_size) + (parallax_size / 2.0) + (parallax * parallax_size / 2.0);
+    float parallaxAdder = 0.5 * (parallax + 1.0) * parallax_size;
+    float scale = fma(v_texCoords.y, 1.0 - parallax_size, parallaxAdder);
 
     float zoomSamplePoint = (1.0 - zoomInv) / 2.0;// will never quite exceed 0.5
 
