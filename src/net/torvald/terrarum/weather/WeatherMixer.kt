@@ -100,6 +100,7 @@ internal object WeatherMixer : RNGConsumer {
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
+        currentWeather = weatherList[WEATHER_GENERIC]!![0]
         internalReset(s0, s1)
         initClouds()
     }
@@ -117,7 +118,7 @@ internal object WeatherMixer : RNGConsumer {
 
         clouds.clear()
         cloudsSpawned = 0
-        cloudDriftVector = Vector3(-0.98f, -0.02f, 0.21f)
+        cloudDriftVector = Vector3(-0.98f, 0f, 0.21f)
 
         oldCamPos.set(WorldCamera.camVector)
     }
@@ -151,6 +152,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // initialise
         try {
+            weatherList["titlescreen"] = arrayListOf(weatherList[WEATHER_GENERIC]!![0].copy(cloudDriftSpeed = 1f))
             currentWeather = weatherList[WEATHER_GENERIC]!![0]
             nextWeather = getRandomWeather(WEATHER_GENERIC)
         }
@@ -330,6 +332,14 @@ internal object WeatherMixer : RNGConsumer {
             tryToSpawnCloud(currentWeather, takeUniformRand(-hCloudSize..App.scr.width + hCloudSize))
         }
 
+    }
+
+    internal fun titleScreenInitWeather() {
+        val hCloudSize = 1024f
+        currentWeather = weatherList["titlescreen"]!![0]
+        repeat((currentWeather.cloudChance * 3.3f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
+            tryToSpawnCloud(currentWeather, takeUniformRand(-hCloudSize..App.scr.width + hCloudSize))
+        }
     }
 
     private fun <T> Array<T?>.addAtFreeSpot(obj: T) {

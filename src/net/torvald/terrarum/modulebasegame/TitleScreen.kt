@@ -211,6 +211,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.setRenderedWorld(demoWorld)
         WeatherMixer.internalReset()
+        WeatherMixer.titleScreenInitWeather()
 
 
         // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs
@@ -292,13 +293,12 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         demoWorld.globalLight = WeatherMixer.globalLightNow
 //        demoWorld.globalLight = WeatherMixer.getGlobalLightOfTimeOfNoon()
         demoWorld.updateWorldTime(delta)
-//        WeatherMixer.update(delta, cameraPlayer, demoWorld)
+        WeatherMixer.update(delta, cameraPlayer, demoWorld)
         WeatherMixer.forceTimeAt = forcedTime
         cameraPlayer.update(delta)
 
         // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
         WorldCamera.update(demoWorld, cameraPlayer)
-
 
         // update UIs //
         uiContainer.forEach { it?.update(delta) }
