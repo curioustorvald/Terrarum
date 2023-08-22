@@ -292,16 +292,16 @@ class BasicDebugInfoWindow : UICanvas() {
 
         if (ingame != null) {
             App.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
-                    TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 2f)
+                TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 2f)
             App.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
-                    (TinyAlphNum.W * 2 + 17 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+                TinyAlphNum.W * 2f + (17 * 8), App.scr.height - TinyAlphNum.H * 2f)
             App.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
-                    (TinyAlphNum.W * 2 + 28 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+                TinyAlphNum.W * 2f + (28 * 8), App.scr.height - TinyAlphNum.H * 2f)
             if (ingame is TerrarumIngame) {
-                App.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}",
-                        (TinyAlphNum.W * 2 + 41 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
-                App.fontSmallNumbers.draw(batch, "${ccM}Clouds $ccG${WeatherMixer.cloudsSpawned}",
-                    (TinyAlphNum.W * 2 + 53 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+                App.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}$ccY/$ccG${(ingame as TerrarumIngame).PARTICLES_MAX}",
+                    TinyAlphNum.W * 2f, App.scr.height - TinyAlphNum.H * 4f)
+                App.fontSmallNumbers.draw(batch, "${ccM}Clouds $ccG${WeatherMixer.cloudsSpawned}$ccY/$ccG${WeatherMixer.cloudSpawnMax}",
+                    TinyAlphNum.W * 2f + (18 * 8), App.scr.height - TinyAlphNum.H * 4f)
 
             }
         }

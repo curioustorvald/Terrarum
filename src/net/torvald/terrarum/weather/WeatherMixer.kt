@@ -95,8 +95,8 @@ internal object WeatherMixer : RNGConsumer {
     private val clouds = SortedArrayList<WeatherObjectCloud>()
     var cloudsSpawned = 0; private set
     private var cloudDriftVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
-    private val cloudSpawnMax: Int
-        get() = App.getConfigInt("maxparticles") * 2
+    val cloudSpawnMax: Int
+        get() = 256 shl (App.getConfigInt("maxparticles") / 256)
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -220,7 +220,7 @@ internal object WeatherMixer : RNGConsumer {
 
         val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.cloudDriftSpeed) // if chance = 0, the result will be +inf
 
-        if (cloudUpdateAkku >= cloudChanceEveryMin) {
+        while (cloudUpdateAkku >= cloudChanceEveryMin) {
             cloudUpdateAkku -= cloudChanceEveryMin
             tryToSpawnCloud(currentWeather)
         }
@@ -257,6 +257,7 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private val scrHscaler = App.scr.height / 720f
+    private val cloudSizeMult = App.scr.wf / TerrarumScreenSize.defaultW
 
     /**
      * @param range: range of the randomised number
@@ -281,8 +282,6 @@ internal object WeatherMixer : RNGConsumer {
             val rC = takeUniformRand(0f..1f)
             val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
             val rY = takeUniformRand(-1f..1f)
-            val r1 = takeUniformRand(-1f..1f)
-            val r2 = takeUniformRand(-1f..1f)
             val rT1 = takeTriangularRand(-1f..1f)
             val (rA, rB) = doubleToLongBits(Math.random()).let {
                 it.ushr(20).and(0xFFFF).toInt() to it.ushr(36).and(0xFFFF).toInt()
@@ -308,7 +307,7 @@ internal object WeatherMixer : RNGConsumer {
                 val sheetX = rA % cloud.spriteSheet.horizontalCount
                 val sheetY = rB % cloud.spriteSheet.verticalCount
                 WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
-                    it.scale = cloudScale
+                    it.scale = cloudScale * cloudSizeMult
 
                     it.posX = posX
                     it.posY = posY

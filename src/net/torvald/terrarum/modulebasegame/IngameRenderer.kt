@@ -255,7 +255,9 @@ object IngameRenderer : Disposable {
             gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
             // draw sky
-            WeatherMixer.render(camera, batch, world)
+            measureDebugTime("WeatherMixer.render") {
+                WeatherMixer.render(camera, batch, world)
+            }
 
 
             // normal behaviour
