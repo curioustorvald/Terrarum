@@ -18,7 +18,10 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.clut.Skybox
+import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -110,7 +113,9 @@ internal object WeatherMixer : RNGConsumer {
 
         Arrays.fill(clouds, null)
         cloudsSpawned = 0
-        cloudDriftVector = Vector3(-1f, 0f, 1f)
+        cloudDriftVector = Vector3(1f, 0f, 0f).rotate(Vector3(0f,1f,0f), 192f)
+
+        oldCamPos.set(WorldCamera.camVector)
     }
 
     init {
@@ -182,8 +187,29 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
+    private val cloudParallaxMultY = -0.035f
+    private val cloudParallaxMultX = -0.035f
     private var cloudUpdateAkku = 0f
+    private val oldCamPos = Vector2(0f, 0f)
+    private val camDelta = Vector2(0f, 0f)
+
     private fun updateClouds(delta: Float, world: GameWorld) {
+        val camvec = WorldCamera.camVector
+        val camvec2 = camvec.cpy()
+        val testCamDelta = camvec.cpy().sub(oldCamPos)
+
+        if (testCamDelta.x.absoluteValue > world.width * TILE_SIZEF / 2f) {
+            if (testCamDelta.x >= 0)
+                camvec2.x -= world.width * TILE_SIZEF
+            else
+                camvec2.x += world.width * TILE_SIZEF
+
+            testCamDelta.set(camvec2.sub(oldCamPos))
+        }
+
+        camDelta.set(testCamDelta)
+
+
         val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.cloudDriftSpeed) // if chance = 0, the result will be +inf
 
         if (cloudUpdateAkku >= cloudChanceEveryMin) {
@@ -193,11 +219,15 @@ internal object WeatherMixer : RNGConsumer {
 
         clouds.forEach {
             it?.let {
+                // do parallax scrolling
+                it.posX += camDelta.x * cloudParallaxMultX
+                it.posY += camDelta.y * cloudParallaxMultY
+
                 it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
 
                 val pjx = it.posX / it.posZ
 
-                if (pjx !in -1500f..App.scr.wf + 1500f || it.scale < 1f / 2048f) {
+                if (pjx !in -1500f..App.scr.wf + 1500f || it.scale < 1f / 2048f || it.posZ !in 0.001f..100f) {
                     it.flagToDespawn = true
                 }
             }
@@ -212,6 +242,9 @@ internal object WeatherMixer : RNGConsumer {
         }
 
         cloudUpdateAkku += delta
+
+
+        oldCamPos.set(camvec)
     }
 
     private val scrHscaler = App.scr.height / 720f

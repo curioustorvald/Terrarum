@@ -70,6 +70,9 @@ object WorldCamera {
     var worldHeight = 0
         private set
 
+    inline val camVector: com.badlogic.gdx.math.Vector2
+        get() = com.badlogic.gdx.math.Vector2(gdxCamX, gdxCamY)
+
     fun update(world: GameWorld, player: ActorWithBody?) {
         if (player == null) return
 

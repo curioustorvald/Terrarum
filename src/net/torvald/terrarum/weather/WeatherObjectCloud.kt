@@ -33,9 +33,8 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
      * Resulting vector: (x + dX, y + dY, scale * dScale)
      */
     fun update(flowVector: Vector3, gait: Float) {
-        posX += flowVector.x * gait * scale
-        posY += flowVector.y * gait * scale
-        scale *= flowVector.z
+        val vecMult = Vector3(1f, 1f, 1f / (2f * App.scr.hf * 0.35f))
+        pos.add(flowVector.cpy().scl(vecMult).scl(gait))
     }
 
     /**

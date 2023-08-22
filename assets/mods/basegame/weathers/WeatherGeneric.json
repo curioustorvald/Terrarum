@@ -5,7 +5,7 @@
   "cloudChance": 20,
   "cloudGamma": [0.48, 1.8],
   "cloudGammaVariance": [0.1, 0.1],
-  "cloudDriftSpeed": 0.3,
+  "cloudDriftSpeed": 0.08,
   "clouds": {
     "large": {
       "filename": "cloud_large.png",
