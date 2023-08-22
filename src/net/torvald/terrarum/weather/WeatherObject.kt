@@ -23,6 +23,8 @@ abstract class WeatherObject : Disposable {
         set(value) { pos.z = value }
     var scale: Float = 1f
 
+    var alpha: Float = 1f
+
     var flagToDespawn = false
 
     abstract fun update()

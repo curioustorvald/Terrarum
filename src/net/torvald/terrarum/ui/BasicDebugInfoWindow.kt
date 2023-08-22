@@ -199,7 +199,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val soldeg = WeatherMixer.forceSolarElev ?: world?.worldTime?.solarElevationDeg
         val soldegStr = (soldeg ?: 0.0).toIntAndFrac(3,2)
         val soldegNeg = ((soldeg ?: 0.0) >= 0.0).toInt()
-        val turbidity = WeatherMixer.forceTurbidity ?: WeatherMixer.turbidity
+        val turbidity = (WeatherMixer.forceTurbidity ?: WeatherMixer.turbidity).toIntAndFrac(1, 4)
 
         val soldegCol = if (WeatherMixer.forceSolarElev != null) ccO else ccG
         val turbCol = if (WeatherMixer.forceTurbidity != null) ccO else ccG
@@ -300,6 +300,9 @@ class BasicDebugInfoWindow : UICanvas() {
             if (ingame is TerrarumIngame) {
                 App.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as TerrarumIngame).particlesActive}",
                         (TinyAlphNum.W * 2 + 41 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+                App.fontSmallNumbers.draw(batch, "${ccM}Clouds $ccG${WeatherMixer.cloudsSpawned}",
+                    (TinyAlphNum.W * 2 + 53 * 8).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+
             }
         }
 

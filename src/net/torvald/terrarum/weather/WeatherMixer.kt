@@ -24,8 +24,10 @@ import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
+import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import net.torvald.util.SortedArrayList
 import java.io.File
 import java.io.FileFilter
 import java.lang.Double.doubleToLongBits
@@ -89,10 +91,11 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffX = 0f
     private var astrumOffY = 0f
 
-    private val clouds = Array<WeatherObjectCloud?>(4096) { null }
-    private var cloudsSpawned = 0
-    private var cloudDriftVector = Vector3(-1f, 0f, 1f) // this is a direction vector
-
+    private val clouds = SortedArrayList<WeatherObjectCloud>()
+    var cloudsSpawned = 0; private set
+    private var cloudDriftVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
+    private val cloudSpawnMax: Int
+        get() = App.getConfigInt("maxparticles") * 2
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
@@ -111,9 +114,9 @@ internal object WeatherMixer : RNGConsumer {
         astrumOffX = s0.and(0xFFFFL).toFloat() / 65535f * starmapTex.regionWidth
         astrumOffY = s1.and(0xFFFFL).toFloat() / 65535f * starmapTex.regionHeight
 
-        Arrays.fill(clouds, null)
+        clouds.clear()
         cloudsSpawned = 0
-        cloudDriftVector = Vector3(1f, 0f, 0f).rotate(Vector3(0f,1f,0f), 192f)
+        cloudDriftVector = Vector3(-0.98f, -0.02f, 0.21f)
 
         oldCamPos.set(WorldCamera.camVector)
     }
@@ -193,6 +196,10 @@ internal object WeatherMixer : RNGConsumer {
     private val oldCamPos = Vector2(0f, 0f)
     private val camDelta = Vector2(0f, 0f)
 
+    val oobMarginR =  1.5f * App.scr.wf
+    val oobMarginL = -0.5f * App.scr.wf
+    private val oobMarginY = -0.5f * App.scr.hf
+
     private fun updateClouds(delta: Float, world: GameWorld) {
         val camvec = WorldCamera.camVector
         val camvec2 = camvec.cpy()
@@ -218,28 +225,29 @@ internal object WeatherMixer : RNGConsumer {
         }
 
         clouds.forEach {
-            it?.let {
-                // do parallax scrolling
-                it.posX += camDelta.x * cloudParallaxMultX
-                it.posY += camDelta.y * cloudParallaxMultY
+            // do parallax scrolling
+            it.posX += camDelta.x * cloudParallaxMultX
+            it.posY += camDelta.y * cloudParallaxMultY
 
-                it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
 
-                val pjx = it.posX / it.posZ
-
-                if (pjx !in -1500f..App.scr.wf + 1500f || it.scale < 1f / 2048f || it.posZ !in 0.001f..100f) {
-                    it.flagToDespawn = true
-                }
-            }
+            it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
         }
 
-        clouds.indices.forEach { i ->
-            if (clouds[i]?.flagToDespawn == true) {
-                clouds[i]?.dispose()
-                clouds[i] = null
+
+        // remove clouds that are marked to be despawn
+        var i = 0
+        while (true) {
+            if (i >= clouds.size) break
+
+            if (clouds[i].flagToDespawn) {
+                clouds.removeAt(i)
+                i -= 1
                 cloudsSpawned -= 1
             }
+
+            i += 1
         }
+
 
         cloudUpdateAkku += delta
 
@@ -256,17 +264,25 @@ internal object WeatherMixer : RNGConsumer {
     private fun randomPosWithin(range: ClosedFloatingPointRange<Float>, random: Float) =
         ((range.start + range.endInclusive) / 2f) + random * (range.endInclusive - range.start) / 2f
 
-    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, initX: Float? = null) {
-        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${clouds.size})")
+    private fun takeUniformRand(range: ClosedFloatingPointRange<Float>) =
+        FastMath.interpolateLinear(Math.random().toFloat(), range.start, range.endInclusive)
+    private fun takeTriangularRand(range: ClosedFloatingPointRange<Float>) =
+        FastMath.interpolateLinear((Math.random() + Math.random()).div(2f).toFloat(), range.start, range.endInclusive)
+    private fun takeGaussianRand(range: ClosedFloatingPointRange<Float>) =
+        FastMath.interpolateLinear((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()).div(8f).toFloat(), range.start, range.endInclusive)
 
-        if (cloudsSpawned < clouds.size) {
+
+    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, initX: Float? = null) {
+//        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${cloudSpawnMax})")
+
+        if (cloudsSpawned < cloudSpawnMax) {
             val flip = Math.random() < 0.5
-            val rC = Math.random().toFloat()
-            val rZ = (Math.random() * 9 + 1.0).toFloat() // 1..10 uniformly
-            val rY = ((Math.random() + Math.random()) - 1.0).toFloat() // -1..1
-            val r1 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
-            val r2 = (Math.random() * 2.0 - 1.0).toFloat() // -1..1
-            val rT1 = ((Math.random() + Math.random()) - 1.0).toFloat() // -1..1
+            val rC = takeUniformRand(0f..1f)
+            val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z)
+            val rY = takeUniformRand(-1f..1f)
+            val r1 = takeUniformRand(-1f..1f)
+            val r2 = takeUniformRand(-1f..1f)
+            val rT1 = takeTriangularRand(-1f..1f)
             val (rA, rB) = doubleToLongBits(Math.random()).let {
                 it.ushr(20).and(0xFFFF).toInt() to it.ushr(36).and(0xFFFF).toInt()
             }
@@ -285,11 +301,9 @@ internal object WeatherMixer : RNGConsumer {
                 val scaleVariance = 1f + rT1.absoluteValue * cloud.scaleVariance
                 val cloudScale = cloud.baseScale * (if (rT1 < 0) 1f / scaleVariance else scaleVariance)
                 val hCloudSize = (cloud.spriteSheet.tileW * cloudScale) / 2f + 1f
-                val posX = if (initX != null) initX * rZ else if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) * rZ else -hCloudSize * rZ
-                val posY = when (cloud.category) {
-                    "large" -> randomPosWithin(-120f..120f, rY) * scrHscaler * (rZ * 0.5f)
-                    else -> randomPosWithin(-150f..150f, rY) * scrHscaler * (rZ * 0.5f)
-                }
+                val posXscr = initX ?: if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) else -hCloudSize
+                val posX = WeatherObjectCloud.screenXtoWorldX(posXscr, rZ)
+                val posY = randomPosWithin(-cloud.altHigh..-cloud.altLow, rY) * scrHscaler
                 val sheetX = rA % cloud.spriteSheet.horizontalCount
                 val sheetY = rB % cloud.spriteSheet.verticalCount
                 WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
@@ -308,11 +322,11 @@ internal object WeatherMixer : RNGConsumer {
                     it.posY = posY
                     it.posZ = rZ
 
-                    clouds.addAtFreeSpot(it)
+                    clouds.add(it)
                     cloudsSpawned += 1
 
 
-                    printdbg(this, "... Spawning ${cloud.category}($sheetX, $sheetY) cloud at pos ${it.pos}, scale ${it.scale}, invGamma ${it.darkness}")
+//                    printdbg(this, "... Spawning ${cloud.category}($sheetX, $sheetY) cloud at pos ${it.pos}, scale ${it.scale}, invGamma ${it.darkness}")
                 }
 
             }
@@ -320,8 +334,9 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun initClouds() {
-        repeat((currentWeather.cloudChance * 6.8f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
-            tryToSpawnCloud(currentWeather, ((Math.random() * 2.0 - 1.0) * App.scr.wf).toFloat())
+        val hCloudSize = 1024f
+        repeat((currentWeather.cloudChance * 3.3f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
+            tryToSpawnCloud(currentWeather, takeUniformRand(-hCloudSize..App.scr.width + hCloudSize))
         }
 
     }
@@ -353,14 +368,14 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun drawClouds(batch: SpriteBatch) {
-        batch.color = globalLightNow.toGdxColor().also {
-            it.a = 1f
-        } // TODO add cloud-only colour strip on the CLUT
         batch.shader = shaderClouds
-        clouds.filterNotNull().sortedByDescending { it.posZ }.forEach {
+        clouds.forEach {
             batch.inUse { _ ->
+                batch.color = globalLightNow.toGdxColor().also { col ->
+                    col.a = it.alpha
+                } // TODO add cloud-only colour strip on the CLUT
                 batch.shader.setUniformf("gamma", it.darkness)
-                it.render(batch, 0f, 0f) // TODO parallax
+                it.render(batch, 0f, 0f)
             }
         }
     }
@@ -579,7 +594,9 @@ internal object WeatherMixer : RNGConsumer {
                 TextureRegionPack(ModMgr.getGdxFile(modname, "$pathToImage/${json.getString("filename")}"), json.getInt("tw"), json.getInt("th")),
                 json.getFloat("probability"),
                 json.getFloat("baseScale"),
-                json.getFloat("scaleVariance")
+                json.getFloat("scaleVariance"),
+                json.getFloat("altLow"),
+                json.getFloat("altHigh"),
             ))
         }
         cloudsMap.sortBy { it.probability }

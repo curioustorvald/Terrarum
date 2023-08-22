@@ -32,5 +32,8 @@ data class CloudProps(
         val spriteSheet: TextureRegionPack,
         val probability: Float,
         val baseScale: Float,
-        val scaleVariance: Float
-)
+        val scaleVariance: Float,
+        val altLow: Float,
+        val altHigh: Float,
+) {
+}
