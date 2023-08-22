@@ -35,6 +35,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
+import kotlin.math.pow
 
 /**
  * Currently there is a debate whether this module must be part of the engine or the basegame
@@ -278,7 +279,7 @@ internal object WeatherMixer : RNGConsumer {
         if (cloudsSpawned < cloudSpawnMax) {
             val flip = Math.random() < 0.5
             val rC = takeUniformRand(0f..1f)
-            val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z)
+            val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
             val rY = takeUniformRand(-1f..1f)
             val r1 = takeUniformRand(-1f..1f)
             val r2 = takeUniformRand(-1f..1f)

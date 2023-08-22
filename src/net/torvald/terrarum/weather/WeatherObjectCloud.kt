@@ -37,7 +37,7 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
     fun update(flowVector: Vector3, gait: Float) {
         pos.add(flowVector.cpy().scl(vecMult).scl(gait))
 
-        alpha = -(posZ / ALPHA_ROLLOFF_Z).pow(1.703f) + 1f
+        alpha = -(posZ / ALPHA_ROLLOFF_Z).pow(1f) + 1f
 
         val lrCoord = screenCoordBottomLR
         if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.05f..ALPHA_ROLLOFF_Z || alpha < 1f / 255f) {
@@ -100,6 +100,6 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
 
     companion object {
         fun screenXtoWorldX(screenX: Float, z: Float) = screenX * z - App.scr.halfwf * (z - 1f)
-        const val ALPHA_ROLLOFF_Z = 16f
+        const val ALPHA_ROLLOFF_Z = 64f
     }
 }
