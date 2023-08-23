@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import com.jme3.math.FastMath
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import kotlin.math.pow
 import kotlin.math.sign
 
@@ -17,18 +19,29 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
         throw UnsupportedOperationException()
     }
 
+    var life = 0; private set
+
+    private fun getZflowMult(z: Float) = z / ((z / 4f).pow(1.5f))
+
     /**
      * FlowVector: In which direction the cloud flows. Vec3(dX, dY, dScale)
      * Resulting vector: (x + dX, y + dY, scale * dScale)
      */
     fun update(flowVector: Vector3, gait: Float) {
-        pos.add(flowVector.cpy().scl(vecMult).scl(gait))
+        pos.add(
+            flowVector.cpy().
+            scl(1f, 1f, getZflowMult(posZ)). // this will break the perspective if flowVector.z.abs() is close to 1, but it has to be here to "keep the distance"
+            scl(vecMult).scl(gait)
+        )
 
-        alpha = -(posZ / ALPHA_ROLLOFF_Z).pow(1f) + 1f
+        alpha = if (posZ < 1f) posZ.pow(0.5f) else -(posZ / ALPHA_ROLLOFF_Z) + 1f
 
-        val lrCoord = screenCoordBottomLR
-        if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.05f..ALPHA_ROLLOFF_Z || alpha < 1f / 255f) {
+        val lrCoord = screenCoordBottomLRforDespawnCalculation
+        if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.05f..ALPHA_ROLLOFF_Z + 1f || alpha < 0f) {
             flagToDespawn = true
+        }
+        else {
+            life += 1
         }
     }
 
@@ -73,7 +86,21 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
             val xL = posX - texture.regionWidth * scale * 0.5f
             val xR = posX + texture.regionWidth * scale * 0.5f
             val y = posY - texture.regionHeight * scale
-            val z = posZ // must be at least 1.0
+            val z = posZ // must be larger than 0
+
+            val drawXL = (xL + w * (z-1)) / z
+            val drawXR = (xR + w * (z-1)) / z
+            val drawY = (y + h * (z-1)) / z
+
+            return Vector3(drawXL, drawY, drawXR)
+        }
+
+    private val screenCoordBottomLRforDespawnCalculation: Vector3
+        get() {
+            val xL = posX - texture.regionWidth * scale * 0.5f
+            val xR = posX + texture.regionWidth * scale * 0.5f
+            val y = posY - texture.regionHeight * scale
+            val z = FastMath.interpolateLinear(posZ / ALPHA_ROLLOFF_Z, ALPHA_ROLLOFF_Z / 4f, ALPHA_ROLLOFF_Z)
 
             val drawXL = (xL + w * (z-1)) / z
             val drawXR = (xR + w * (z-1)) / z

@@ -31,10 +31,12 @@ import net.torvald.util.SortedArrayList
 import java.io.File
 import java.io.FileFilter
 import java.lang.Double.doubleToLongBits
+import java.lang.Math.toDegrees
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
+import kotlin.math.atan2
 import kotlin.math.pow
 
 /**
@@ -119,6 +121,7 @@ internal object WeatherMixer : RNGConsumer {
         clouds.clear()
         cloudsSpawned = 0
         cloudDriftVector = Vector3(-0.98f, 0f, 0.21f)
+//        cloudDriftVector = Vector3(-1f, 0f, -1f)
 
         oldCamPos.set(WorldCamera.camVector)
     }
@@ -227,6 +230,8 @@ internal object WeatherMixer : RNGConsumer {
             tryToSpawnCloud(currentWeather)
         }
 
+
+        var immDespawnCount = 0
         clouds.forEach {
             // do parallax scrolling
             it.posX += camDelta.x * cloudParallaxMultX
@@ -234,7 +239,11 @@ internal object WeatherMixer : RNGConsumer {
 
 
             it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
+
+            if (it.life == 0) immDespawnCount += 1
         }
+
+//        printdbg(this, "Newborn cloud death rate: $immDespawnCount/$cloudsSpawned")
 
 
         // remove clouds that are marked to be despawn
@@ -275,15 +284,62 @@ internal object WeatherMixer : RNGConsumer {
     private fun takeGaussianRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()).div(8f).toFloat(), range.start, range.endInclusive)
 
+    /**
+     * Returns random point for clouds to spawn from, in the opposite side of the current wind vector
+     */
+    private fun getCloudSpawningPosition(cloud: CloudProps, halfCloudSize: Float, windVector: Vector3): Vector3 {
+        val y = randomPosWithin(-cloud.altHigh..-cloud.altLow, takeUniformRand(-1f..1f)) * scrHscaler
 
-    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, initX: Float? = null) {
+        var windVectorDir = toDegrees(atan2(windVector.z.toDouble(), windVector.x.toDouble())).toFloat() + 180f
+        if (windVectorDir < 0f) windVectorDir += 360f
+        windVectorDir /= 90f // full circle: 4
+
+        // an "edge" is a line of length 1 drawn into the edge of the square of size 1 (its total edge length will be 4)
+        // when the windVectorDir is not an integer, the "edge" will take the shape similar to this: ¬
+        // 'rr' is a point on the "edge", where 0.5 is a middle point in its length
+        val rl = (windVectorDir % 1f).let { if (it < 0.5f) -it else it - 1f }
+        val rh = 1f + (windVectorDir % 1f).let { if (it < 0.5f) it else 1f - it }
+        val rr = windVectorDir + takeUniformRand(rl..rh)
+        println("${windVectorDir + rl}..${windVectorDir + rh} / $rr")
+        val Z_LIM = ALPHA_ROLLOFF_Z/2f
+        return when (rr.toInt()) {
+            0, 4 -> { // right side of the screen
+                val z = FastMath.interpolateLinear(rr % 1f, 1f, ALPHA_ROLLOFF_Z).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val posXscr = App.scr.width + halfCloudSize
+                val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
+                Vector3(x, y, z)
+            }
+            1, 5 -> { // z = inf
+                val z = ALPHA_ROLLOFF_Z
+                val posXscr = FastMath.interpolateLinear(rr % 1f, App.scr.width + halfCloudSize, -halfCloudSize)
+                val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
+                Vector3(x, y, z)
+            }
+            2, 6 -> { // left side of the screen
+                val z = FastMath.interpolateLinear(rr % 1f, ALPHA_ROLLOFF_Z, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val posXscr = -halfCloudSize
+                val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
+                Vector3(x, y, z)
+            }
+            3, 7 -> { // z = 0
+                val z = 0.1f
+                val posXscr = FastMath.interpolateLinear(rr % 1f, -halfCloudSize, App.scr.width + halfCloudSize)
+                val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
+                Vector3(x, y, z)
+            }
+            else -> throw InternalError()
+        }
+
+    }
+
+    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, precalculatedPos: Vector3? = null) {
 //        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${cloudSpawnMax})")
 
         if (cloudsSpawned < cloudSpawnMax) {
             val flip = Math.random() < 0.5
             val rC = takeUniformRand(0f..1f)
-            val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
-            val rY = takeUniformRand(-1f..1f)
+//            val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+//            val rY = takeUniformRand(-1f..1f)
             val rT1 = takeTriangularRand(-1f..1f)
             val (rA, rB) = doubleToLongBits(Math.random()).let {
                 it.ushr(20).and(0xFFFF).toInt() to it.ushr(36).and(0xFFFF).toInt()
@@ -303,17 +359,22 @@ internal object WeatherMixer : RNGConsumer {
                 val scaleVariance = 1f + rT1.absoluteValue * cloud.scaleVariance
                 val cloudScale = cloud.baseScale * (if (rT1 < 0) 1f / scaleVariance else scaleVariance)
                 val hCloudSize = (cloud.spriteSheet.tileW * cloudScale) / 2f + 1f
-                val posXscr = initX ?: if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) else -hCloudSize
-                val posX = WeatherObjectCloud.screenXtoWorldX(posXscr, rZ)
-                val posY = randomPosWithin(-cloud.altHigh..-cloud.altLow, rY) * scrHscaler
+
+//                val posXscr = initX ?: if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) else -hCloudSize
+//                val posX = WeatherObjectCloud.screenXtoWorldX(posXscr, rZ)
+//                val posY = randomPosWithin(-cloud.altHigh..-cloud.altLow, rY) * scrHscaler
+
                 val sheetX = rA % cloud.spriteSheet.horizontalCount
                 val sheetY = rB % cloud.spriteSheet.verticalCount
                 WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
                     it.scale = cloudScale * cloudSizeMult
 
-                    it.posX = posX
-                    it.posY = posY
-                    it.posZ = rZ
+                    it.pos.set(precalculatedPos ?: getCloudSpawningPosition(cloud, hCloudSize, cloudDriftVector))
+
+                    // further set the random altitude if required
+                    if (precalculatedPos != null) {
+                        it.pos.y = randomPosWithin(-cloud.altHigh..-cloud.altLow, takeUniformRand(-1f..1f)) * scrHscaler
+                    }
 
                     clouds.add(it)
                     cloudsSpawned += 1
@@ -327,19 +388,20 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun initClouds() {
-        val hCloudSize = 1024f
+        /*val hCloudSize = 1024f
         repeat((currentWeather.cloudChance * 3.3f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
-            tryToSpawnCloud(currentWeather, takeUniformRand(-hCloudSize..App.scr.width + hCloudSize))
-        }
 
+            val posXscr = FastMath.interpolateLinear(takeUniformRand(0f..1f), -hCloudSize, App.scr.width + hCloudSize)
+            val z = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+            val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
+
+            tryToSpawnCloud(currentWeather, Vector3(x, 0f, z))
+        }*/
     }
 
     internal fun titleScreenInitWeather() {
-        val hCloudSize = 1024f
         currentWeather = weatherList["titlescreen"]!![0]
-        repeat((currentWeather.cloudChance * 3.3f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
-            tryToSpawnCloud(currentWeather, takeUniformRand(-hCloudSize..App.scr.width + hCloudSize))
-        }
+        initClouds()
     }
 
     private fun <T> Array<T?>.addAtFreeSpot(obj: T) {
