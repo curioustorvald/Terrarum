@@ -280,6 +280,8 @@ internal object WeatherMixer : RNGConsumer {
     val oobMarginL = -0.5f * App.scr.wf
     private val oobMarginY = -0.5f * App.scr.hf
 
+    private val DEBUG_CAUSE_OF_DESPAWN = false
+
     private fun updateClouds(delta: Float, world: GameWorld) {
         val camvec = WorldCamera.camVector
         val camvec2 = camvec.cpy()
@@ -306,6 +308,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
         var immDespawnCount = 0
+        val immDespawnCauses = ArrayList<String>()
         clouds.forEach {
             // do parallax scrolling
             it.posX += camDelta.x * cloudParallaxMultX
@@ -314,10 +317,30 @@ internal object WeatherMixer : RNGConsumer {
 
             it.update(windVector)
 
-            if (it.life == 0) immDespawnCount += 1
+            if (DEBUG_CAUSE_OF_DESPAWN && it.life == 0) {
+                immDespawnCount += 1
+                immDespawnCauses.add(it.despawnCode)
+            }
         }
 
 //        printdbg(this, "Newborn cloud death rate: $immDespawnCount/$cloudsSpawned")
+
+
+        if (DEBUG_CAUSE_OF_DESPAWN && App.IS_DEVELOPMENT_BUILD && immDespawnCount > cloudsSpawned / 4) {
+            val despawnCauseStats = HashMap<String, Int>()
+            immDespawnCauses.forEach {
+                if (despawnCauseStats[it] != null) {
+                    despawnCauseStats[it] = despawnCauseStats[it]!! + 1
+                }
+                else {
+                    despawnCauseStats[it] = 1
+                }
+            }
+            despawnCauseStats.forEach { s, i ->
+                printdbg(this, "Cause of death -- $s: $i")
+            }
+            System.exit(0)
+        }
 
 
         // remove clouds that are marked to be despawn
@@ -467,9 +490,12 @@ internal object WeatherMixer : RNGConsumer {
         // it does converge at ~6, but having it as an initial state does not make it stay converged
         repeat((currentWeather.cloudChance * 1.333f).ceilToInt()) {
 
-            val posXscr = FastMath.interpolateLinear(takeUniformRand(0f..1f), -hCloudSize, App.scr.width + hCloudSize)
-            val z = takeUniformRand(0.1f..ALPHA_ROLLOFF_Z - 0.1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
-            val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
+            val z = takeUniformRand(0.1f..ALPHA_ROLLOFF_Z / 4f - 0.1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+
+            val zz = FastMath.interpolateLinear((z / ALPHA_ROLLOFF_Z) * 0.8f + 0.1f, ALPHA_ROLLOFF_Z / 4f, ALPHA_ROLLOFF_Z)
+
+            val x = WeatherObjectCloud.screenXtoWorldX(takeUniformRand(0f..App.scr.wf), zz)
+
 
             tryToSpawnCloud(currentWeather, Vector3(x, 0f, z))
         }

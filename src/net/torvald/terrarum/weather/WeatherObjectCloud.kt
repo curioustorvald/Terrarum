@@ -8,6 +8,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sign
 
 /**
@@ -20,8 +21,13 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
     }
 
     var life = 0; private set
+    var despawnCode = ""; private set
+
+    private val lifespan = 40000 + ((Math.random() + Math.random()) * 20000).roundToInt() // triangular distibution of 40000..80000
 
     private fun getZflowMult(z: Float) = z / ((z / 4f).pow(1.5f))
+
+    private var eigenAlpha = 0f
 
     /**
      * FlowVector: In which direction the cloud flows. Vec3(dX, dY, dScale)
@@ -34,11 +40,22 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
             scl(vecMult)
         )
 
-        alpha = if (posZ < 1f) posZ.pow(0.5f) else -((posZ - 1f) / ALPHA_ROLLOFF_Z) + 1f
+        eigenAlpha = if (posZ < 1f) posZ.pow(0.5f) else -((posZ - 1f) / ALPHA_ROLLOFF_Z) + 1f
+
+        alpha = eigenAlpha * if (life < lifespan) 1f else 1f - (life - lifespan) / OLD_AGE_DECAY
+
 
         val lrCoord = screenCoordBottomLRforDespawnCalculation
         if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.0001f..ALPHA_ROLLOFF_Z + 1f || alpha < 0f) {
             flagToDespawn = true
+
+            despawnCode = if (lrCoord.x > WeatherMixer.oobMarginR) "OUT_OF_SCREEN_RIGHT"
+            else if (lrCoord.z < WeatherMixer.oobMarginL) "OUT_OF_SCREEN_LEFT"
+            else if (posZ < 0.0001f) "OUT_OF_SCREEN_TOO_CLOSE"
+            else if (posZ > ALPHA_ROLLOFF_Z + 1f) "OUT_OF_SCREEN_TOO_FAR"
+            else if (life >= lifespan + OLD_AGE_DECAY) "OLD_AGE"
+            else if (alpha < 0f) "ALPHA_BELOW_ZERO"
+            else "UNKNOWN"
         }
         else {
             life += 1
@@ -115,5 +132,6 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
     companion object {
         fun screenXtoWorldX(screenX: Float, z: Float) = screenX * z - App.scr.halfwf * (z - 1f)
         const val ALPHA_ROLLOFF_Z = 64f
+        const val OLD_AGE_DECAY = 4000f
     }
 }
