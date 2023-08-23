@@ -37,7 +37,7 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
         alpha = if (posZ < 1f) posZ.pow(0.5f) else -(posZ / ALPHA_ROLLOFF_Z) + 1f
 
         val lrCoord = screenCoordBottomLRforDespawnCalculation
-        if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.05f..ALPHA_ROLLOFF_Z + 1f || alpha < 0f) {
+        if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.0001f..ALPHA_ROLLOFF_Z + 1f || alpha < 0f) {
             flagToDespawn = true
         }
         else {

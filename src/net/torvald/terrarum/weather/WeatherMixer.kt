@@ -18,10 +18,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
-import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.clut.Skybox
-import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
@@ -32,7 +29,6 @@ import java.io.File
 import java.io.FileFilter
 import java.lang.Double.doubleToLongBits
 import java.lang.Math.toDegrees
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
@@ -155,7 +151,7 @@ internal object WeatherMixer : RNGConsumer {
 
         // initialise
         try {
-            weatherList["titlescreen"] = arrayListOf(weatherList[WEATHER_GENERIC]!![0].copy(cloudDriftSpeed = 1f))
+            weatherList["titlescreen"] = arrayListOf(weatherList[WEATHER_GENERIC]!![0].copy(windSpeed = 1f))
             currentWeather = weatherList[WEATHER_GENERIC]!![0]
             nextWeather = getRandomWeather(WEATHER_GENERIC)
         }
@@ -223,7 +219,7 @@ internal object WeatherMixer : RNGConsumer {
         camDelta.set(testCamDelta)
 
 
-        val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.cloudDriftSpeed) // if chance = 0, the result will be +inf
+        val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.windSpeed) // if chance = 0, the result will be +inf
 
         while (cloudUpdateAkku >= cloudChanceEveryMin) {
             cloudUpdateAkku -= cloudChanceEveryMin
@@ -238,7 +234,7 @@ internal object WeatherMixer : RNGConsumer {
             it.posY += camDelta.y * cloudParallaxMultY
 
 
-            it.update(cloudDriftVector, currentWeather.cloudDriftSpeed)
+            it.update(cloudDriftVector, currentWeather.windSpeed)
 
             if (it.life == 0) immDespawnCount += 1
         }
@@ -300,7 +296,7 @@ internal object WeatherMixer : RNGConsumer {
         val rl = (windVectorDir % 1f).let { if (it < 0.5f) -it else it - 1f }
         val rh = 1f + (windVectorDir % 1f).let { if (it < 0.5f) it else 1f - it }
         val rr = windVectorDir + takeUniformRand(rl..rh)
-        println("${windVectorDir + rl}..${windVectorDir + rh} / $rr")
+//        printdbg(this, "${windVectorDir + rl}..${windVectorDir + rh} / $rr")
         val Z_LIM = ALPHA_ROLLOFF_Z/2f
         return when (rr.toInt()) {
             0, 4 -> { // right side of the screen
@@ -388,7 +384,7 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun initClouds() {
-        /*val hCloudSize = 1024f
+        val hCloudSize = 1024f
         repeat((currentWeather.cloudChance * 3.3f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
 
             val posXscr = FastMath.interpolateLinear(takeUniformRand(0f..1f), -hCloudSize, App.scr.width + hCloudSize)
@@ -396,7 +392,7 @@ internal object WeatherMixer : RNGConsumer {
             val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
 
             tryToSpawnCloud(currentWeather, Vector3(x, 0f, z))
-        }*/
+        }
     }
 
     internal fun titleScreenInitWeather() {
@@ -690,7 +686,7 @@ internal object WeatherMixer : RNGConsumer {
             daylightClut = daylight,
             classification = classification,
             cloudChance = JSON.getFloat("cloudChance"),
-            cloudDriftSpeed = JSON.getFloat("cloudDriftSpeed"),
+            windSpeed = JSON.getFloat("windSpeed"),
             cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
             cloudGammaVariance = JSON["cloudGammaVariance"].asFloatArray().let { Vector2(it[0], it[1]) },
             clouds = cloudsMap,

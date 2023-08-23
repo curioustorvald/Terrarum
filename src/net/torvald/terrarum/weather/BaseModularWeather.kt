@@ -18,7 +18,7 @@ data class BaseModularWeather(
         val daylightClut: GdxColorMap,
         val classification: String,
         val cloudChance: Float,
-        val cloudDriftSpeed: Float,
+        val windSpeed: Float,
         val cloudGamma: Vector2,
         val cloudGammaVariance: Vector2,
         var clouds: List<CloudProps>, // sorted by CloudProps.probability

@@ -5,7 +5,7 @@
   "cloudChance": 133,
   "cloudGamma": [0.48, 1.8],
   "cloudGammaVariance": [0.1, 0.1],
-  "cloudDriftSpeed": 20.16,
+  "windSpeed": 0.16,
   "clouds": {
     "cumulonimbus": {
       "filename": "cloud_large.png", "tw": 2048, "th": 1024, "probability": 0.25,
