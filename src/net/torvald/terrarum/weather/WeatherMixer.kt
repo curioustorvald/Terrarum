@@ -19,6 +19,7 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
 import net.torvald.terrarum.clut.Skybox
+import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
@@ -31,9 +32,7 @@ import java.lang.Double.doubleToLongBits
 import java.lang.Math.toDegrees
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.math.absoluteValue
-import kotlin.math.atan2
-import kotlin.math.pow
+import kotlin.math.*
 
 /**
  * Currently there is a debate whether this module must be part of the engine or the basegame
@@ -92,7 +91,7 @@ internal object WeatherMixer : RNGConsumer {
 
     private val clouds = SortedArrayList<WeatherObjectCloud>()
     var cloudsSpawned = 0; private set
-    private var cloudDriftVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
+    private var windVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
     val cloudSpawnMax: Int
         get() = 256 shl (App.getConfigInt("maxparticles") / 256)
 
@@ -116,8 +115,10 @@ internal object WeatherMixer : RNGConsumer {
 
         clouds.clear()
         cloudsSpawned = 0
-        cloudDriftVector = Vector3(-0.98f, 0f, 0.21f)
-//        cloudDriftVector = Vector3(-1f, 0f, -1f)
+        windVector = Vector3(-0.98f, 0f, 0.21f)
+
+        windDirWindow = null
+        windSpeedWindow = null
 
         oldCamPos.set(WorldCamera.camVector)
     }
@@ -165,6 +166,7 @@ internal object WeatherMixer : RNGConsumer {
                 "default",
                 0f,
                 0f,
+                0f,
                 Vector2(1f, 1f),
                 Vector2(0f, 0f),
                 listOf()
@@ -183,6 +185,7 @@ internal object WeatherMixer : RNGConsumer {
 
 //        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
 
+        updateWind(delta, world)
         updateClouds(delta, world)
 
 
@@ -190,6 +193,81 @@ internal object WeatherMixer : RNGConsumer {
             world.globalLight = WeatherMixer.globalLightNow
         }
 
+    }
+
+    private fun FloatArray.shiftAndPut(f: Float) {
+        for (k in 1 until this.size) {
+            this[k-1] = this[k]
+        }
+        this[this.lastIndex] = f
+    }
+
+    private val PI = 3.1415927f
+    private val TWO_PI = 6.2831855f
+    private val THREE_PI = 9.424778f
+
+    private var windDirWindow: FloatArray? = null
+    private var windSpeedWindow: FloatArray? = null
+    private val WIND_DIR_TIME_UNIT = 14400 // every 4hr
+    private val WIND_SPEED_TIME_UNIT = 3600 // every 1hr
+    private var windDirAkku = 0 // only needed if timeDelta is not divisible by WIND_TIME_UNIT
+    private var windSpeedAkku = 0
+
+    // see: https://stackoverflow.com/questions/2708476/rotation-interpolation/14498790#14498790
+    private fun getShortestAngle(start: Float, end: Float) =
+        (((((end - if (start < 0f) TWO_PI + start else start) % TWO_PI) + THREE_PI) % TWO_PI) - PI).let {
+            if (it > PI) it - TWO_PI else it
+        }
+
+    private fun updateWind(delta: Float, world: GameWorld) {
+        if (windDirWindow == null) {
+            windDirWindow = FloatArray(4) { takeUniformRand(-PI..PI) } // completely random regardless of the seed
+        }
+        if (windSpeedWindow == null) {
+            windSpeedWindow = FloatArray(4) { currentWeather.getRandomWindSpeed(takeTriangularRand(-1f..1f)) } // completely random regardless of the seed
+        }
+
+        val windDirStep = windDirAkku / WIND_DIR_TIME_UNIT.toFloat()
+        val windSpeedStep = windSpeedAkku / WIND_SPEED_TIME_UNIT.toFloat()
+
+//        val angle0 = windDirWindow[0]
+//        val angle1 = getShortestAngle(angle0, windDirWindow[1])
+//        val angle2 = getShortestAngle(angle1, windDirWindow[2])
+//        val angle3 = getShortestAngle(angle2, windDirWindow[3])
+//        val fixedAngles = floatArrayOf(angle0, angle1, angle2, angle3)
+
+        val currentWindDir = FastMath.interpolateCatmullRom(windDirStep, windDirWindow)
+        val currentWindSpeed = FastMath.interpolateCatmullRom(windSpeedStep, windSpeedWindow)
+
+        printdbg(this,
+            "dir ${Math.toDegrees(currentWindDir.toDouble()).roundToInt()}\t" +
+                    "spd ${currentWindSpeed.times(10f).roundToInt().div(10f)}\t   " +
+                    "dirs ${windDirWindow!!.map { Math.toDegrees(it.toDouble()).roundToInt() }} ${windDirStep.times(100).roundToInt()}\t" +
+                    "spds ${windSpeedWindow!!.map { it.times(10f).roundToInt().div(10f) }} ${windSpeedStep.times(100).roundToInt()}"
+        )
+
+        if (currentWeather.forceWindVec != null) {
+            windVector.set(currentWeather.forceWindVec)
+        }
+        else {
+            windVector.set(
+                cos(currentWindDir) * currentWindSpeed,
+                0f,
+                sin(currentWindDir) * currentWindSpeed
+            )
+        }
+
+        while (windDirAkku >= WIND_DIR_TIME_UNIT) {
+            windDirAkku -= WIND_DIR_TIME_UNIT
+            windDirWindow!!.shiftAndPut(takeUniformRand(-PI..PI))
+        }
+        while (windSpeedAkku >= WIND_SPEED_TIME_UNIT) {
+            windSpeedAkku -= WIND_SPEED_TIME_UNIT
+            windSpeedWindow!!.shiftAndPut(currentWeather.getRandomWindSpeed(takeTriangularRand(-1f..1f)))
+        }
+
+        windDirAkku += world.worldTime.timeDelta
+        windSpeedAkku += world.worldTime.timeDelta
     }
 
     private val cloudParallaxMultY = -0.035f
@@ -234,7 +312,7 @@ internal object WeatherMixer : RNGConsumer {
             it.posY += camDelta.y * cloudParallaxMultY
 
 
-            it.update(cloudDriftVector, currentWeather.windSpeed)
+            it.update(windVector)
 
             if (it.life == 0) immDespawnCount += 1
         }
@@ -266,13 +344,6 @@ internal object WeatherMixer : RNGConsumer {
     private val scrHscaler = App.scr.height / 720f
     private val cloudSizeMult = App.scr.wf / TerrarumScreenSize.defaultW
 
-    /**
-     * @param range: range of the randomised number
-     * @param random: random number in the range of `[-1, 1]`
-     */
-    private fun randomPosWithin(range: ClosedFloatingPointRange<Float>, random: Float) =
-        ((range.start + range.endInclusive) / 2f) + random * (range.endInclusive - range.start) / 2f
-
     private fun takeUniformRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear(Math.random().toFloat(), range.start, range.endInclusive)
     private fun takeTriangularRand(range: ClosedFloatingPointRange<Float>) =
@@ -284,7 +355,8 @@ internal object WeatherMixer : RNGConsumer {
      * Returns random point for clouds to spawn from, in the opposite side of the current wind vector
      */
     private fun getCloudSpawningPosition(cloud: CloudProps, halfCloudSize: Float, windVector: Vector3): Vector3 {
-        val y = randomPosWithin(-cloud.altHigh..-cloud.altLow, takeUniformRand(-1f..1f)) * scrHscaler
+        val Z_LIM = ALPHA_ROLLOFF_Z/2f
+        val y = takeUniformRand(-cloud.altHigh..-cloud.altLow) * scrHscaler
 
         var windVectorDir = toDegrees(atan2(windVector.z.toDouble(), windVector.x.toDouble())).toFloat() + 180f
         if (windVectorDir < 0f) windVectorDir += 360f
@@ -293,33 +365,40 @@ internal object WeatherMixer : RNGConsumer {
         // an "edge" is a line of length 1 drawn into the edge of the square of size 1 (its total edge length will be 4)
         // when the windVectorDir is not an integer, the "edge" will take the shape similar to this: ¬
         // 'rr' is a point on the "edge", where 0.5 is a middle point in its length
-        val rl = (windVectorDir % 1f).let { if (it < 0.5f) -it else it - 1f }
-        val rh = 1f + (windVectorDir % 1f).let { if (it < 0.5f) it else 1f - it }
-        val rr = windVectorDir + takeUniformRand(rl..rh)
-//        printdbg(this, "${windVectorDir + rl}..${windVectorDir + rh} / $rr")
-        val Z_LIM = ALPHA_ROLLOFF_Z/2f
-        return when (rr.toInt()) {
+//        val rl = (windVectorDir % 1f).let { if (it < 0.5f) -it else it - 1f }.toInt()
+//        val rh = 1 + (windVectorDir % 1f).let { if (it < 0.5f) it else 1f - it }.toInt()
+
+        // choose between rl and rh using (windVectorDir % 1f) as a pivot
+        // if pivot = 0.3, rL is 70%, and rR is 30% likely
+        // plug the vote result into the when()
+        val selectedQuadrant = takeUniformRand((windVectorDir % 1f)..(windVectorDir % 1f) + 1f)
+
+//        printdbg(this, "Dir: $windVectorDir, Rand(${windVectorDir % 1f}..${(windVectorDir % 1f) + 1f}) = $selectedQuadrant")
+
+        val rr = takeUniformRand(0f..1f)
+
+        return when (selectedQuadrant.toInt()) {
             0, 4 -> { // right side of the screen
-                val z = FastMath.interpolateLinear(rr % 1f, 1f, ALPHA_ROLLOFF_Z).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val z = FastMath.interpolateLinear(rr, 1f, ALPHA_ROLLOFF_Z).pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = App.scr.width + halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
             1, 5 -> { // z = inf
                 val z = ALPHA_ROLLOFF_Z
-                val posXscr = FastMath.interpolateLinear(rr % 1f, App.scr.width + halfCloudSize, -halfCloudSize)
+                val posXscr = FastMath.interpolateLinear(rr, App.scr.width + halfCloudSize, -halfCloudSize)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
                 Vector3(x, y, z)
             }
             2, 6 -> { // left side of the screen
-                val z = FastMath.interpolateLinear(rr % 1f, ALPHA_ROLLOFF_Z, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val z = FastMath.interpolateLinear(rr, ALPHA_ROLLOFF_Z, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = -halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
             3, 7 -> { // z = 0
                 val z = 0.1f
-                val posXscr = FastMath.interpolateLinear(rr % 1f, -halfCloudSize, App.scr.width + halfCloudSize)
+                val posXscr = FastMath.interpolateLinear(rr, -halfCloudSize, App.scr.width + halfCloudSize)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
                 Vector3(x, y, z)
             }
@@ -352,8 +431,7 @@ internal object WeatherMixer : RNGConsumer {
             }
 
             cloudsToSpawn?.let { cloud ->
-                val scaleVariance = 1f + rT1.absoluteValue * cloud.scaleVariance
-                val cloudScale = cloud.baseScale * (if (rT1 < 0) 1f / scaleVariance else scaleVariance)
+                val cloudScale = cloud.getCloudScaleVariance(rT1)
                 val hCloudSize = (cloud.spriteSheet.tileW * cloudScale) / 2f + 1f
 
 //                val posXscr = initX ?: if (cloudDriftVector.x < 0) (App.scr.width + hCloudSize) else -hCloudSize
@@ -365,11 +443,11 @@ internal object WeatherMixer : RNGConsumer {
                 WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
                     it.scale = cloudScale * cloudSizeMult
 
-                    it.pos.set(precalculatedPos ?: getCloudSpawningPosition(cloud, hCloudSize, cloudDriftVector))
+                    it.pos.set(precalculatedPos ?: getCloudSpawningPosition(cloud, hCloudSize, windVector))
 
                     // further set the random altitude if required
                     if (precalculatedPos != null) {
-                        it.pos.y = randomPosWithin(-cloud.altHigh..-cloud.altLow, takeUniformRand(-1f..1f)) * scrHscaler
+                        it.pos.y = takeUniformRand(-cloud.altHigh..-cloud.altLow) * scrHscaler
                     }
 
                     clouds.add(it)
@@ -385,10 +463,12 @@ internal object WeatherMixer : RNGConsumer {
 
     private fun initClouds() {
         val hCloudSize = 1024f
-        repeat((currentWeather.cloudChance * 3.3f).ceilToInt()) { // multiplier is an empirical value that depends on the 'rZ'
+        // multiplier is an empirical value that depends on the 'rZ'
+        // it does converge at ~6, but having it as an initial state does not make it stay converged
+        repeat((currentWeather.cloudChance * 1.333f).ceilToInt()) {
 
             val posXscr = FastMath.interpolateLinear(takeUniformRand(0f..1f), -hCloudSize, App.scr.width + hCloudSize)
-            val z = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+            val z = takeUniformRand(0.1f..ALPHA_ROLLOFF_Z - 0.1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
             val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
 
             tryToSpawnCloud(currentWeather, Vector3(x, 0f, z))
@@ -397,6 +477,7 @@ internal object WeatherMixer : RNGConsumer {
 
     internal fun titleScreenInitWeather() {
         currentWeather = weatherList["titlescreen"]!![0]
+        currentWeather.forceWindVec = Vector3(-0.98f, 0f, 0.21f)
         initClouds()
     }
 
@@ -687,6 +768,7 @@ internal object WeatherMixer : RNGConsumer {
             classification = classification,
             cloudChance = JSON.getFloat("cloudChance"),
             windSpeed = JSON.getFloat("windSpeed"),
+            windSpeedVariance = JSON.getFloat("windSpeedVariance"),
             cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
             cloudGammaVariance = JSON["cloudGammaVariance"].asFloatArray().let { Vector2(it[0], it[1]) },
             clouds = cloudsMap,

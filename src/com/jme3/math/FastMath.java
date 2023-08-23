@@ -248,6 +248,10 @@ final public class FastMath {
         return interpolateCatmullRom(u, 0.5f, p0, p1, p2, p3);
     }
 
+    public static float interpolateCatmullRom(float u, float[] ps) {
+        return interpolateCatmullRom(u, 0.5f, ps[0], ps[1], ps[2], ps[3]);
+    }
+
     /**Interpolate a spline between at least 4 control points following the Catmull-Rom equation.
      * here is the interpolation matrix
      * m = [ 0.0  1.0  0.0   0.0 ]
@@ -331,8 +335,7 @@ final public class FastMath {
         return l;
     }
 
-
-    public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3) {
+    /*public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3) {
 //        return interpolateHermite(scale, p0, p1, p2, p3, 0f, 0f);
         float mu2 = scale * scale;
         float mu3 = mu2 * scale;
@@ -350,7 +353,7 @@ final public class FastMath {
         float a3 = -2*mu3 + 3*mu2 + 0;
 
         return a0*p1 + a1*m0 + a2*m1 + a3*p2;
-    }
+    }*/
     //public static float interpolateHermite(float scale, float p0, float p1, float p2, float p3, float tension, float bias) {}
 
 

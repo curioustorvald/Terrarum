@@ -27,14 +27,14 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
      * FlowVector: In which direction the cloud flows. Vec3(dX, dY, dScale)
      * Resulting vector: (x + dX, y + dY, scale * dScale)
      */
-    fun update(flowVector: Vector3, gait: Float) {
+    fun update(flowVector: Vector3) {
         pos.add(
             flowVector.cpy().
             scl(1f, 1f, getZflowMult(posZ)). // this will break the perspective if flowVector.z.abs() is close to 1, but it has to be here to "keep the distance"
-            scl(vecMult).scl(gait)
+            scl(vecMult)
         )
 
-        alpha = if (posZ < 1f) posZ.pow(0.5f) else -(posZ / ALPHA_ROLLOFF_Z) + 1f
+        alpha = if (posZ < 1f) posZ.pow(0.5f) else -((posZ - 1f) / ALPHA_ROLLOFF_Z) + 1f
 
         val lrCoord = screenCoordBottomLRforDespawnCalculation
         if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.0001f..ALPHA_ROLLOFF_Z + 1f || alpha < 0f) {
@@ -47,7 +47,7 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
 
     private val w = App.scr.halfwf
     private val h = App.scr.hf * 0.5f
-    private val vecMult = Vector3(1f, 1f, 1f / (2f * h))
+    private val vecMult = Vector3(1f, 1f, 1f / (4f * h))
 
     /**
      * X/Y position is a bottom-centre point of the image
