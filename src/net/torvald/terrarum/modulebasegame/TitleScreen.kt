@@ -166,12 +166,12 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             //ReadWorld.readWorldAndSetNewWorld(Terrarum.ingame!! as TerrarumIngame, reader)
             val world = ReadSimpleWorld(reader, file)
             demoWorld = world
-            demoWorld.worldTime.timeDelta = 330 // a year = 8 minutes
+            demoWorld.worldTime.timeDelta = 30
             printdbg(this, "Demo world loaded")
         }
         catch (e: IOException) {
             demoWorld = GameWorld(LandUtil.CHUNK_W, LandUtil.CHUNK_H, 0L, 0L)
-            demoWorld.worldTime.timeDelta = 330
+            demoWorld.worldTime.timeDelta = 30
             printdbg(this, "Demo world not found, using empty world")
         }
 
@@ -286,14 +286,11 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         gameUpdateGovernor.update(Gdx.graphics.deltaTime, App.UPDATE_RATE, updateScreen, renderScreen)
     }
 
-    private var timeflowCounter = 32880 // 9h08m
-
     private val updateScreen = { delta: Float ->
 
         demoWorld.globalLight = WeatherMixer.globalLightNow
         demoWorld.updateWorldTime(delta)
         WeatherMixer.update(delta, cameraPlayer, demoWorld)
-        WeatherMixer.forceTimeAt = timeflowCounter
         cameraPlayer.update(delta)
 
         // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
@@ -301,11 +298,6 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // update UIs //
         uiContainer.forEach { it?.update(delta) }
-
-
-        // desynched weather and time-of-day change
-        timeflowCounter += 30 // must be divisible by demoWorld.worldTime.timeDelta
-        if (timeflowCounter >= WorldTime.DAY_LENGTH) timeflowCounter -= WorldTime.DAY_LENGTH
     }
 
     private val particles = CircularArray<ParticleBase>(16, true)
