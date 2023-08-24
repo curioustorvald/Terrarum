@@ -7,6 +7,7 @@
     <option name="ALTERNATIVE_JRE_PATH" value="17" />
     <module name="TerrarumBuild" />
     <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build Version Number" run_configuration_type="Application" />
       <option name="BuildArtifacts" enabled="true">
         <artifact name="ModuleComputers" />
         <artifact name="TerrarumBuild" />
