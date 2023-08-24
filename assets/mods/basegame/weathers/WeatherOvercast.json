@@ -1,0 +1,27 @@
+{
+  "skyboxGradColourMap": "generic_skybox.tga",
+  "daylightClut": "clut_daylight.tga",
+  "classification": "overcast",
+  "cloudChance": 300,
+  "cloudGamma": [2.2, 2.0],
+  "cloudGammaVariance": [0.1, 0.1],
+  "windSpeed": 10.45,
+  "windSpeedVariance": 1.0,
+  "clouds": {
+    "cumulus": {
+      "filename": "cloud_normal.png", "tw": 1024, "th": 512, "probability": 0.1,
+      "baseScale": 0.8, "scaleVariance": 0.6,
+      "altLow": 80, "altHigh": 800
+    },
+    "cumulonimbus": {
+      "filename": "cloud_large.png", "tw": 2048, "th": 1024, "probability": 0.4,
+      "baseScale": 2.0, "scaleVariance": 0.3333333,
+      "altLow": 90, "altHigh": 120
+    },
+    "nimbostratus": {
+      "filename": "cloud_wide.png", "tw": 4096, "th": 1024, "probability": 1.0,
+      "baseScale": 4.0, "scaleVariance": 0.1,
+      "altLow": 100, "altHigh": 100
+    }
+  }
+}

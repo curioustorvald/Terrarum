@@ -19,7 +19,6 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
 import net.torvald.terrarum.clut.Skybox
-import net.torvald.terrarum.modulebasegame.worldgenerator.TWO_PI
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
@@ -68,7 +67,7 @@ internal object WeatherMixer : RNGConsumer {
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
-    const val WEATHER_GENERIC_RAIN = "genericrain"
+    const val WEATHER_OVERCAST = "overcast"
     // TODO add weather classification indices manually
 
     // TODO to save from GL overhead, store lightmap to array; use GdxColorMap
