@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
+import net.torvald.terrarum.ControlPresets
 import net.torvald.terrarum.FlippingSpriteBatch
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -130,13 +131,13 @@ void main() {
         //UI.handler = this
     }
 
-    // getConfigInt(toggleKeyLiteral)
-    val toggleKey: Int?; get() = App.getConfigInt(toggleKeyLiteral).let { if (it == -1) null else it } // to support in-screen keybind changing
-    // getConfigInt(toggleButtonLiteral)
-    val toggleButton: Int?; get() = App.getConfigInt(toggleButtonLiteral).let { if (it == -1) null else it } // to support in-screen keybind changing
+    // ControlPresets.getKey(toggleKeyLiteral)
+    val toggleKey: Int?; get() = ControlPresets.getKey(toggleKeyLiteral).let { if (it == -1) null else it } // to support in-screen keybind changing
+    // ControlPresets.getKey(toggleButtonLiteral)
+    val toggleButton: Int?; get() = ControlPresets.getKey(toggleButtonLiteral).let { if (it == -1) null else it } // to support in-screen keybind changing
 
 
-    val toggleKeyExtra: ArrayList<() -> Int> = arrayListOf()
+    val toggleKeyExtra: ArrayList<String> = arrayListOf()
 
     /**
      * Takes a function that works with UIHandler.
@@ -208,8 +209,8 @@ void main() {
                 else uiTogglerFunctionDefault!!.invoke(this)
             }
 
-            toggleKeyExtra.forEachIndexed { index, getKey ->
-                if (Gdx.input.isKeyJustPressed(getKey())) {
+            toggleKeyExtra.forEachIndexed { index, control ->
+                if (Gdx.input.isKeyJustPressed(ControlPresets.getKey(control))) {
                     toggleKeyExtraAction[index].invoke(this)
                 }
             }

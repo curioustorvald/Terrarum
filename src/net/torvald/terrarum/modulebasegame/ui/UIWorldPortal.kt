@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
@@ -54,7 +53,7 @@ class UIWorldPortal : UICanvas(
     private val SP = "\u3000 "
     val portalListingControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-                    "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+                    "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
                     "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" +
                     "$SP${App.gamepadLabelLT} ${Lang["GAME_WORLD_SEARCH"]}" +

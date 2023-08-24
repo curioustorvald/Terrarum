@@ -254,11 +254,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
 
     private fun updateGamerControlBox() {
         if (isGamer) {
-            isUpDown = Gdx.input.isKeyPressed(App.getConfigInt("control_key_up"))
-            isLeftDown = Gdx.input.isKeyPressed(App.getConfigInt("control_key_left"))
-            isDownDown = Gdx.input.isKeyPressed(App.getConfigInt("control_key_down"))
-            isRightDown = Gdx.input.isKeyPressed(App.getConfigInt("control_key_right"))
-            isJumpDown = Gdx.input.isKeyPressed(App.getConfigInt("control_key_jump"))
+            isUpDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_up"))
+            isLeftDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_left"))
+            isDownDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_down"))
+            isRightDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_right"))
+            isJumpDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_jump"))
 
             val gamepad = App.gamepad
 
@@ -268,7 +268,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 axisRX = gamepad.getAxis(App.getConfigInt("control_gamepad_axisrx"))
                 axisRY = gamepad.getAxis(App.getConfigInt("control_gamepad_axisry"))
 
-                isJumpDown = Gdx.input.isKeyPressed(App.getConfigInt("control_key_jump")) ||
+                isJumpDown = Gdx.input.isKeyPressed(ControlPresets.getKey("control_key_jump")) ||
                              gamepad.getButton(App.getConfigInt("control_gamepad_ltrigger"))
             }
 
@@ -348,11 +348,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = App.getConfigInt("control_key_right")
+            prevHMoveKey = ControlPresets.getKey("control_key_right")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = App.getConfigInt("control_key_left")
+            prevHMoveKey = ControlPresets.getKey("control_key_left")
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
@@ -376,11 +376,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = App.getConfigInt("control_key_down")
+                prevVMoveKey = ControlPresets.getKey("control_key_down")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = App.getConfigInt("control_key_up")
+                prevVMoveKey = ControlPresets.getKey("control_key_up")
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {

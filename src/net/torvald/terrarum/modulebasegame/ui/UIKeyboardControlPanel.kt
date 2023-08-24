@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
-import net.torvald.terrarum.DefaultConfig
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 
@@ -38,16 +35,16 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     private val keycaps = hashMapOf(
             Input.Keys.GRAVE to UIItemKeycap(this, 1, 1, null, oneu, ""),
-            Input.Keys.NUM_1 to UIItemKeycap(this, 33,1,  Input.Keys.NUM_1, oneu, "1,3"),
-            Input.Keys.NUM_2 to UIItemKeycap(this, 65,1,  Input.Keys.NUM_2, oneu, "2,3"),
-            Input.Keys.NUM_3 to UIItemKeycap(this, 97,1,  Input.Keys.NUM_3, oneu, "3,3"),
-            Input.Keys.NUM_4 to UIItemKeycap(this, 129,1, Input.Keys.NUM_4, oneu, "4,3"),
-            Input.Keys.NUM_5 to UIItemKeycap(this, 161,1, Input.Keys.NUM_5, oneu, "5,3"),
-            Input.Keys.NUM_6 to UIItemKeycap(this, 193,1, Input.Keys.NUM_6, oneu, "6,3"),
-            Input.Keys.NUM_7 to UIItemKeycap(this, 225,1, Input.Keys.NUM_7, oneu, "7,3"),
-            Input.Keys.NUM_8 to UIItemKeycap(this, 257,1, Input.Keys.NUM_8, oneu, "8,3"),
-            Input.Keys.NUM_9 to UIItemKeycap(this, 289,1, Input.Keys.NUM_9, oneu, "9,3"),
-            Input.Keys.NUM_0 to UIItemKeycap(this, 321,1, Input.Keys.NUM_0, oneu, "0,3"),
+            Input.Keys.NUM_1 to UIItemKeycap(this, 33,1,  null, oneu, "1,3"),
+            Input.Keys.NUM_2 to UIItemKeycap(this, 65,1,  null, oneu, "2,3"),
+            Input.Keys.NUM_3 to UIItemKeycap(this, 97,1,  null, oneu, "3,3"),
+            Input.Keys.NUM_4 to UIItemKeycap(this, 129,1, null, oneu, "4,3"),
+            Input.Keys.NUM_5 to UIItemKeycap(this, 161,1, null, oneu, "5,3"),
+            Input.Keys.NUM_6 to UIItemKeycap(this, 193,1, null, oneu, "6,3"),
+            Input.Keys.NUM_7 to UIItemKeycap(this, 225,1, null, oneu, "7,3"),
+            Input.Keys.NUM_8 to UIItemKeycap(this, 257,1, null, oneu, "8,3"),
+            Input.Keys.NUM_9 to UIItemKeycap(this, 289,1, null, oneu, "9,3"),
+            Input.Keys.NUM_0 to UIItemKeycap(this, 321,1, null, oneu, "0,3"),
             Input.Keys.MINUS to UIItemKeycap(this, 353,1, Input.Keys.MINUS, oneu, "10,3"),
             Input.Keys.EQUALS to UIItemKeycap(this, 385,1, Input.Keys.EQUALS, oneu, "11,3"),
             Input.Keys.BACKSPACE to UIItemKeycap(this, 417,1, Input.Keys.BACKSPACE, 60, "24,5"),
@@ -106,13 +103,22 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     ) // end of keycaps
 
     private val resetButtonWidth = 140
-    private val buttonReset = UIItemTextButton(this,
+    private val presetButtonWidth = 200
+    /*private val buttonReset = UIItemTextButton(this,
         { Lang["MENU_LABEL_RESET"] },
         kbx + (width - resetButtonWidth) / 2,
         kby + 162 + 16,
         resetButtonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
+    )*/
+    private val presetSelector = UIItemTextSelector(this,
+        kbx + (width - presetButtonWidth) / 2,
+        kby + 162 + 16,
+        ControlPresets.presetLabels.map { { it } },
+        ControlPresets.presetLabels.indexOf(App.getConfigString("control_preset_keyboard")),
+        presetButtonWidth,
+        clickToShowPalette = false,
     )
 
     private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 500) / 2, kby + 227)
@@ -122,8 +128,13 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         keycaps.values.forEach { addUIitem(it) }
         updateKeycaps()
 
-        buttonReset.clickOnceListener = { x, y ->
+        /*buttonReset.clickOnceListener = { x, y ->
             resetKeyConfig()
+            updateKeycaps()
+        }*/
+
+        presetSelector.selectionChangeListener = { index ->
+            App.setConfig("control_preset_keyboard", ControlPresets.presetLabels[index])
             updateKeycaps()
         }
 
@@ -153,18 +164,18 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private fun updateKeycaps() {
         keycaps.values.forEach { it.symbolControl = null }
         // read config and put icons. Item order irrelevant
-        keycaps[App.getConfigInt("control_key_up")]?.symbolControl = Keebsym.UP
-        keycaps[App.getConfigInt("control_key_left")]?.symbolControl = Keebsym.LEFT
-        keycaps[App.getConfigInt("control_key_down")]?.symbolControl = Keebsym.DOWN
-        keycaps[App.getConfigInt("control_key_right")]?.symbolControl = Keebsym.RIGHT
-        keycaps[App.getConfigInt("control_key_jump")]?.symbolControl = Keebsym.JUMP
-        keycaps[App.getConfigInt("control_key_zoom")]?.symbolControl = Keebsym.ZOOM
-        keycaps[App.getConfigInt("control_key_inventory")]?.symbolControl = Keebsym.INVENTORY
-        keycaps[App.getConfigInt("control_key_movementaux")]?.symbolControl = Keebsym.HOOK
-        keycaps[App.getConfigInt("control_key_quicksel")]?.symbolControl = Keebsym.PIE
-        keycaps[App.getConfigInt("control_key_gamemenu")]?.symbolControl = Keebsym.MENU
-        keycaps[App.getConfigInt("control_key_toggleime")]?.symbolControl = Keebsym.IME()
-        keycaps[App.getConfigInt("control_key_crafting")]?.symbolControl = Keebsym.CRAFTING
+        keycaps[ControlPresets.getKey("control_key_up")]?.symbolControl = Keebsym.UP
+        keycaps[ControlPresets.getKey("control_key_left")]?.symbolControl = Keebsym.LEFT
+        keycaps[ControlPresets.getKey("control_key_down")]?.symbolControl = Keebsym.DOWN
+        keycaps[ControlPresets.getKey("control_key_right")]?.symbolControl = Keebsym.RIGHT
+        keycaps[ControlPresets.getKey("control_key_jump")]?.symbolControl = Keebsym.JUMP
+        keycaps[ControlPresets.getKey("control_key_zoom")]?.symbolControl = Keebsym.ZOOM
+        keycaps[ControlPresets.getKey("control_key_inventory")]?.symbolControl = Keebsym.INVENTORY
+        keycaps[ControlPresets.getKey("control_key_movementaux")]?.symbolControl = Keebsym.HOOK
+        keycaps[ControlPresets.getKey("control_key_quicksel")]?.symbolControl = Keebsym.PIE
+        keycaps[ControlPresets.getKey("control_key_gamemenu")]?.symbolControl = Keebsym.MENU
+        keycaps[ControlPresets.getKey("control_key_toggleime")]?.symbolControl = Keebsym.IME()
+        keycaps[ControlPresets.getKey("control_key_crafting")]?.symbolControl = Keebsym.CRAFTING
     }
 
     internal var keycapClicked = -13372
@@ -177,14 +188,14 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override fun updateUI(delta: Float) {
         uiItems.forEach {
             it.update(delta)
-            if (it is UIItemKeycap && it.mousePushed) {
+            if (it is UIItemKeycap && it.mousePushed && ControlPresets.presetLabels[presetSelector.selection] == "Custom") {
                 it.selected = true
 //                println("key ${it.key}; selected = ${it.selected}")
                 keycapClicked = it.key ?: -13372
             }
         }
 
-        buttonReset.update(delta)
+        presetSelector.update(delta)
 
         controlPalette.update(delta)
     }
@@ -195,7 +206,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 //        batch.color = fillCol
 //        Toolkit.fillArea(batch, drawX, drawY, width, height)
         uiItems.forEach { it.render(batch, camera) }
-        buttonReset.render(batch, camera)
+        presetSelector.render(batch, camera)
 
         // title
         // todo show "Keyboard"/"Gamepad" accordingly
@@ -216,6 +227,10 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     }
 
     fun setControlOf(key: Int, control: Int) {
+        if (App.getConfigString("control_preset_keyboard") != "Custom") {
+            System.err.println("[UIKeyboardControlPanel] cannot set a control if the preset is not 'Custom' (current preset: ${App.getConfigString("control_preset_keyboard")})")
+            return
+        }
         if (control >= 0) {
             val controlName = UIItemControlPaletteBaloon.indexToConfigKey[control]!!
 
@@ -249,13 +264,19 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         super.touchDown(screenX, screenY, pointer, button)
-        buttonReset.touchDown(screenX, screenY, pointer, button)
+        presetSelector.touchDown(screenX, screenY, pointer, button)
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         super.touchUp(screenX, screenY, pointer, button)
-        buttonReset.touchUp(screenX, screenY, pointer, button)
+        presetSelector.touchUp(screenX, screenY, pointer, button)
+        return true
+    }
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        super.scrolled(amountX, amountY)
+        presetSelector.scrolled(amountX, amountY)
         return true
     }
 

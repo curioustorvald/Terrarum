@@ -53,7 +53,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
 
     private val controlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_up"))}${getKeycapPC(App.getConfigInt("control_key_down"))}" +
+            "${getKeycapPC(ControlPresets.getKey("control_key_up"))}${getKeycapPC(ControlPresets.getKey("control_key_down"))}" +
             " ${Lang["MENU_CONTROLS_SCROLL"]}"
         else
             "${getKeycapConsole('R')} ${Lang["MENU_CONTROLS_SCROLL"]}"
@@ -206,12 +206,12 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
 
     override fun keyDown(keycode: Int): Boolean {
         if (this.isVisible) {
-            if ((keycode == Input.Keys.UP || keycode == App.getConfigInt("control_key_up")) && scrollTarget > 0) {
+            if ((keycode == Input.Keys.UP || keycode == ControlPresets.getKey("control_key_up")) && scrollTarget > 0) {
                 scrollFrom = listScroll
                 scrollTarget -= 1
                 scrollAnimCounter = 0f
             }
-            else if ((keycode == Input.Keys.DOWN || keycode == App.getConfigInt("control_key_down")) && scrollTarget < moduleCells.size - savesVisible) {
+            else if ((keycode == Input.Keys.DOWN || keycode == ControlPresets.getKey("control_key_down")) && scrollTarget < moduleCells.size - savesVisible) {
                 scrollFrom = listScroll
                 scrollTarget += 1
                 scrollAnimCounter = 0f

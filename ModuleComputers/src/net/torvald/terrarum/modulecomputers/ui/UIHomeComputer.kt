@@ -5,10 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import net.torvald.terrarum.App
-import net.torvald.terrarum.FlippingSpriteBatch
-import net.torvald.terrarum.blendNormalStraightAlpha
-import net.torvald.terrarum.inAction
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulecomputers.gameactors.FixtureHomeComputer
 import net.torvald.terrarum.ui.Toolkit
@@ -45,7 +42,7 @@ internal class UIHomeComputer : UICanvas(
     private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
 
     private val controlHelp =
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}\u3000 " +
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}\u3000 " +
             "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_T$KEYCAP_R Terminate\u3000" +
             "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_R$KEYCAP_S Reset\u3000" +
             "$KEYCAP_CTRL$KEYCAP_SHIFT$KEYCAP_R$KEYCAP_Q SysRq"

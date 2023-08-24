@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
@@ -162,10 +161,10 @@ class UIInventoryFull(
     private val SP = "\u3000 "
     val listControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$KEYCAP_LEFT_MOUSE ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "$KEYCAP_1$ENDASH\u2009$KEYCAP_0 ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "${getKeycapPC(App.getConfigInt("control_key_discard"))} ${Lang["GAME_INVENTORY_DROP"]}"
+            "${getKeycapPC(ControlPresets.getKey("control_key_discard"))} ${Lang["GAME_INVENTORY_DROP"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["CONTEXT_ITEM_MAP"]}$SP" +
@@ -175,7 +174,7 @@ class UIInventoryFull(
             "$gamepadLabelEast ${Lang["GAME_INVENTORY_DROP"]}"
     val minimapControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$KEYCAP_LEFT_MOUSE$KEYCAP_MOVE ${Lang["GAME_ACTION_MOVE_VERB"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
@@ -183,7 +182,7 @@ class UIInventoryFull(
             "$gamepadLabelRT ${Lang["GAME_INVENTORY"]}"
     val gameMenuControlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "$gamepadLabelLT ${Lang["GAME_INVENTORY"]}"
@@ -249,7 +248,7 @@ class UIInventoryFull(
         }
 
         // allow "control_key_gamemenu" to open this UI and bring system menu immediately
-        this.handler.toggleKeyExtra.add { App.getConfigInt("control_key_gamemenu") }
+        this.handler.toggleKeyExtra.add("control_key_gamemenu" )
         this.handler.toggleKeyExtraAction.add {
             if (it.isClosed) {
                 INGAME.setTooltipMessage(null)
@@ -263,7 +262,7 @@ class UIInventoryFull(
         }
 
         // allow "control_key_crafting" to open this UI and bring system menu immediately
-        this.handler.toggleKeyExtra.add { App.getConfigInt("control_key_crafting") }
+        this.handler.toggleKeyExtra.add("control_key_crafting")
         this.handler.toggleKeyExtraAction.add {
             if (it.isClosed) {
                 INGAME.setTooltipMessage(null)

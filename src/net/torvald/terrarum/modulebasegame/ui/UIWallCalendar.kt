@@ -3,10 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.RunningEnvironment
-import net.torvald.terrarum.floorToInt
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.MONTH_LENGTH
 import net.torvald.terrarum.langpack.Lang
@@ -36,7 +33,7 @@ class UIWallCalendar : UICanvas(
     private val SP = "\u3000 "
     val controlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 

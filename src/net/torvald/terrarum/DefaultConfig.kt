@@ -31,6 +31,8 @@ object DefaultConfig {
 
             "usexinput" to true, // when FALSE, LT+RT input on xbox controller is impossible
 
+            "control_preset_keyboard" to "WASD",
+
             "control_gamepad_keyn" to 3,
             "control_gamepad_keyw" to 2,
             "control_gamepad_keys" to 0,

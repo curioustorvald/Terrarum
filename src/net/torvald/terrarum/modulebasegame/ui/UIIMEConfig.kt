@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.ControlPresets
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.linearSearch
@@ -318,7 +319,7 @@ private class UIItemInputKeycap(
                     else if (parent.shiftin && keysymsLow[1]?.isNotEmpty() == true) keysymsLow[1]
                     else keysymsLow[0]) ?: ""
 
-            val keysym0: Array<String?> = if (KeyToggler.isOn(App.getConfigInt("control_key_toggleime"))) {
+            val keysym0: Array<String?> = if (KeyToggler.isOn(ControlPresets.getKey("control_key_toggleime"))) {
                 if (parent.highlayer == null) arrayOf(keysymLow,keysymLow,keysymLow,keysymLow)
                 else {
                     val keysyms = parent.highlayer!!.config.symbols

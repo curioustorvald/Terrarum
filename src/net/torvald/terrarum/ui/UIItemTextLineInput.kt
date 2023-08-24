@@ -443,7 +443,7 @@ class UIItemTextLineInput(
 
             if (!mouseDown) mouseLatched = false
 
-            imeOn = KeyToggler.isOn(App.getConfigInt("control_key_toggleime"))
+            imeOn = KeyToggler.isOn(ControlPresets.getKey("control_key_toggleime"))
         }
     }
 
@@ -468,7 +468,7 @@ class UIItemTextLineInput(
         endComposing()
 
         imeOn = !imeOn
-        KeyToggler.forceSet(App.getConfigInt("control_key_toggleime"), imeOn)
+        KeyToggler.forceSet(ControlPresets.getKey("control_key_toggleime"), imeOn)
     }
 
     private fun resetIME() {

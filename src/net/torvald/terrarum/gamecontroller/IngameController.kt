@@ -5,14 +5,11 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.App.printdbgerr
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
-import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameworld.fmod
@@ -168,7 +165,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
             // pie menu
             if (App.getConfigIntArray("control_key_quickselalt").contains(keycode)
-                || keycode == App.getConfigInt("control_key_quicksel")) {
+                || keycode == ControlPresets.getKey("control_key_quicksel")) {
                 terrarumIngame.uiPieMenu.setAsOpen()
                 terrarumIngame.uiQuickBar.setAsClose()
             }
@@ -194,7 +191,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
 
     private fun tKeyUp(keycode: Int): Boolean {
         if (App.getConfigIntArray("control_key_quickselalt").contains(keycode)
-            || keycode == App.getConfigInt("control_key_quicksel")) {
+            || keycode == ControlPresets.getKey("control_key_quicksel")) {
             terrarumIngame.uiPieMenu.setAsClose()
             terrarumIngame.uiQuickBar.setAsOpen()
         }

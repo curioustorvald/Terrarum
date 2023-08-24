@@ -175,7 +175,7 @@ internal class UIStorageChest : UICanvas(
 
     private val controlHelp: String
         get() = if (App.environment == RunningEnvironment.PC)
-            "${getKeycapPC(App.getConfigInt("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
             "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]} "
 
