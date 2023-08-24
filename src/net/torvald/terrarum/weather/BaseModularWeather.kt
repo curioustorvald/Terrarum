@@ -1,5 +1,6 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.JsonValue
@@ -50,6 +51,10 @@ data class CloudProps(
     val altLow: Float,
     val altHigh: Float,
 ) {
+    init {
+        spriteSheet.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+    }
+
     /**
      * @param rnd random number between -1 and +1
      */
