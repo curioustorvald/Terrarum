@@ -393,32 +393,32 @@ internal object WeatherMixer : RNGConsumer {
         // choose between rl and rh using (windVectorDir % 1f) as a pivot
         // if pivot = 0.3, rL is 70%, and rR is 30% likely
         // plug the vote result into the when()
-        val selectedQuadrant = takeUniformRand((windVectorDir % 1f)..(windVectorDir % 1f) + 1f)
+        val selectedQuadrant = takeUniformRand(windVectorDir..windVectorDir + 1f)
 
-//        printdbg(this, "Dir: $windVectorDir, Rand(${windVectorDir % 1f}..${(windVectorDir % 1f) + 1f}) = $selectedQuadrant")
+//        printdbg(this, "Dir: $windVectorDir, Rand(${windVectorDir}..${windVectorDir + 1f}) = ${selectedQuadrant.floorToInt()}($selectedQuadrant)")
 
         val rr = takeUniformRand(0f..1f)
 
-        return when (selectedQuadrant.toInt()) {
-            0, 4 -> { // right side of the screen
+        return when (selectedQuadrant.floorToInt()) {
+            -4, 0, 4 -> { // right side of the screen
                 val z = FastMath.interpolateLinear(rr, 1f, ALPHA_ROLLOFF_Z).pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = App.scr.width + halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
-            1, 5 -> { // z = inf
+            -3, 1, 5 -> { // z = inf
                 val z = ALPHA_ROLLOFF_Z
                 val posXscr = FastMath.interpolateLinear(rr, App.scr.width + halfCloudSize, -halfCloudSize)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
                 Vector3(x, y, z)
             }
-            2, 6 -> { // left side of the screen
+            -2, 2, 6 -> { // left side of the screen
                 val z = FastMath.interpolateLinear(rr, ALPHA_ROLLOFF_Z, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = -halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
-            3, 7 -> { // z = 0
+            -1, 3, 7 -> { // z = 0
                 val z = 0.1f
                 val posXscr = FastMath.interpolateLinear(rr, -halfCloudSize, App.scr.width + halfCloudSize)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
@@ -502,7 +502,7 @@ internal object WeatherMixer : RNGConsumer {
 
     internal fun titleScreenInitWeather() {
         currentWeather = weatherList["titlescreen"]!![0]
-        currentWeather.forceWindVec = Vector3(-0.98f, 0f, 0.21f)
+        currentWeather.forceWindVec = Vector3(-0.98f, 0f, -0.21f)
         initClouds()
     }
 
