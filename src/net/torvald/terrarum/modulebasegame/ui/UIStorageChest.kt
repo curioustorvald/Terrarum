@@ -19,8 +19,8 @@ import kotlin.math.min
  * Created by minjaesong on 2019-07-08.
  */
 internal class UIStorageChest : UICanvas(
-        toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
-        toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
+        toggleKeyLiteral = "control_key_inventory",
+        toggleButtonLiteral = "control_gamepad_start",
 ), HasInventory {
 
     lateinit var chestInventory: FixtureInventory

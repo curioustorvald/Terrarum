@@ -531,6 +531,9 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
         else
             null
     }
+
+    fun onConfigChange() {
+    }
 }
 
 inline fun Lock.lock(body: () -> Unit) {

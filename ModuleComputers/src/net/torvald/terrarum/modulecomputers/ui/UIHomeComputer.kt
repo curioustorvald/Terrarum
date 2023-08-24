@@ -18,8 +18,8 @@ import net.torvald.tsvm.peripheral.GraphicsAdapter
 import net.torvald.unicode.*
 
 internal class UIHomeComputer : UICanvas(
-        toggleKeyLiteral = Input.Keys.ESCAPE, // FIXME why do I have specify ESC for it to function? ESC should be work as the default key
-        toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
+        toggleKeyLiteral = null,
+        toggleButtonLiteral = "control_gamepad_start",
 ) {
     override var width = 640
     override var height = 480

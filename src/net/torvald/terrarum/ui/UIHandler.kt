@@ -25,8 +25,8 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
  * Created by minjaesong on 2015-12-31.
  */
 class UIHandler(//var UI: UICanvas,
-        var toggleKeyLiteral: Int? = null,
-        var toggleButtonLiteral: Int? = null,
+        var toggleKeyLiteral: String? = null, // string key of the config
+        var toggleButtonLiteral: String? = null, // string key of the config
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         var customPositioning: Boolean = false, // mainly used by vital meter
         var doNotWarnConstant: Boolean = false,
@@ -130,9 +130,10 @@ void main() {
         //UI.handler = this
     }
 
-
-    private val toggleKey: Int?; get() = toggleKeyLiteral // to support in-screen keybind changing
-    private val toggleButton: Int?; get() = toggleButtonLiteral // to support in-screen keybind changing
+    // getConfigInt(toggleKeyLiteral)
+    val toggleKey: Int?; get() = App.getConfigInt(toggleKeyLiteral).let { if (it == -1) null else it } // to support in-screen keybind changing
+    // getConfigInt(toggleButtonLiteral)
+    val toggleButton: Int?; get() = App.getConfigInt(toggleButtonLiteral).let { if (it == -1) null else it } // to support in-screen keybind changing
 
 
     val toggleKeyExtra: ArrayList<() -> Int> = arrayListOf()

@@ -18,14 +18,14 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2019-08-11.
  */
 class UIScreenZoom : UICanvas(
-        App.getConfigInt("control_key_zoom")
+        "control_key_zoom"
 ) {
 
     init {
         handler.allowESCtoClose = false
     }
 
-    val zoomText = "${getKeycapPC(handler.toggleKeyLiteral!!)} $EMDASH Zoom Out"
+    val zoomText = "${getKeycapPC(handler.toggleKey!!)} $EMDASH Zoom Out"
 
     override var width = App.fontGame.getWidth(zoomText)
     override var height = App.fontGame.lineHeight.toInt()

@@ -31,8 +31,8 @@ import java.util.UUID
  * Created by minjaesong on 2023-05-19.
  */
 class UIWorldPortal : UICanvas(
-    toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
-    toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
+    toggleKeyLiteral = "control_key_inventory",
+    toggleButtonLiteral = "control_gamepad_start",
 ) {
 
     override var width: Int = Toolkit.drawWidth

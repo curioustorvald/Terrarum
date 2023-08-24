@@ -18,8 +18,8 @@ import net.torvald.unicode.getKeycapPC
  * Created by minjaesong on 2023-08-15.
  */
 class UIWallCalendar : UICanvas(
-    toggleKeyLiteral = App.getConfigInt("control_key_inventory"),
-    toggleButtonLiteral = App.getConfigInt("control_gamepad_start"),
+    toggleKeyLiteral = "control_key_inventory",
+    toggleButtonLiteral = "control_gamepad_start",
 ) {
     private val yearCellWidth = 200
     private val cellWidth = 80

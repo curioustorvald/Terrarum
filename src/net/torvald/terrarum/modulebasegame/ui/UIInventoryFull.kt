@@ -19,7 +19,7 @@ import net.torvald.unicode.*
  * Created by minjaesong on 2017-10-21.
  */
 class UIInventoryFull(
-        toggleKeyLiteral: Int? = App.getConfigInt("control_key_inventory"), toggleButtonLiteral: Int? = App.getConfigInt("control_gamepad_start"),
+        toggleKeyLiteral: String? = "control_key_inventory", toggleButtonLiteral: String? = "control_gamepad_start",
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false

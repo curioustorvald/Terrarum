@@ -59,7 +59,7 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2015-12-31.
  */
 abstract class UICanvas(
-        toggleKeyLiteral: Int? = null, toggleButtonLiteral: Int? = null,
+        toggleKeyLiteral: String? = null, toggleButtonLiteral: String? = null,
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false

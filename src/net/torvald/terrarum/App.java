@@ -1378,6 +1378,8 @@ public class App implements ApplicationListener {
      * @throws NullPointerException if the specified config simply does not exist.
      */
     public static int getConfigInt(String key) {
+        if (key == null) return -1;
+
         Object cfg = getConfigMaster(key);
 
         if (cfg instanceof Integer) return ((int) cfg);

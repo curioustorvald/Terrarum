@@ -237,13 +237,13 @@ internal object WeatherMixer : RNGConsumer {
 
         val currentWindDir = FastMath.interpolateCatmullRom(windDirStep, windDirWindow)
         val currentWindSpeed = FastMath.interpolateCatmullRom(windSpeedStep, windSpeedWindow)
-
+        /*
         printdbg(this,
             "dir ${Math.toDegrees(currentWindDir.toDouble()).roundToInt()}\t" +
                     "spd ${currentWindSpeed.times(10f).roundToInt().div(10f)}\t   " +
                     "dirs ${windDirWindow!!.map { Math.toDegrees(it.toDouble()).roundToInt() }} ${windDirStep.times(100).roundToInt()}\t" +
                     "spds ${windSpeedWindow!!.map { it.times(10f).roundToInt().div(10f) }} ${windSpeedStep.times(100).roundToInt()}"
-        )
+        )*/
 
         if (currentWeather.forceWindVec != null) {
             windVector.set(currentWeather.forceWindVec)

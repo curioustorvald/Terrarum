@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.DefaultConfig
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.*
 
@@ -108,13 +109,13 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     private val buttonReset = UIItemTextButton(this,
         { Lang["MENU_LABEL_RESET"] },
         kbx + (width - resetButtonWidth) / 2,
-        kby + 162 + 12,
+        kby + 162 + 16,
         resetButtonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     )
 
-    private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 500) / 2, kby + 219)
+    private val controlPalette = UIItemControlPaletteBaloon(this, (Toolkit.drawWidth - 500) / 2, kby + 227)
 
     init {
 
@@ -216,9 +217,34 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
 
     fun setControlOf(key: Int, control: Int) {
         if (control >= 0) {
-            App.setConfig(UIItemControlPaletteBaloon.indexToConfigKey[control]!!, key)
+            val controlName = UIItemControlPaletteBaloon.indexToConfigKey[control]!!
+
+            val conflicts = App.gameConfig.keySet.filter {
+                    (it as String).startsWith("control_key_")
+            }.map {
+                (it as String).let { it to
+                        try { (App.getConfigInt(it) == key) }
+                        catch (_: ClassCastException) { false }
+                }
+            }.filter { it.second }.map { it.first }.firstOrNull()
+
+            println("[UIKeyboardControlPanel] key=$key, control=$controlName")
+
+            if (conflicts != null) {
+                val oldValue = App.getConfigInt(controlName)
+                App.setConfig(conflicts, oldValue)
+
+                println("[UIKeyboardControlPanel] set config $conflicts=$oldValue")
+            }
+
+            App.setConfig(controlName, key)
+            println("[UIKeyboardControlPanel] set config $controlName=$key")
         }
         updateKeycaps()
+
+        Terrarum.ingame?.let {
+            it.onConfigChange()
+        }
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
