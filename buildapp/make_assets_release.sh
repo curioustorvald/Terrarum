@@ -24,5 +24,13 @@ rm $DESTDIR/mods/basegame/weathers/*.kra
 rm -r $DESTDIR/mods/basegame/sounds
 rm -r $DESTDIR/mods/dwarventech
 
-
-
+for s in .directory .DS_Store Thumbs.db thumbs.db; do
+  rm $DESTDIR/$s
+  rm $DESTDIR/*/$s
+  rm $DESTDIR/*/*/$s
+  rm $DESTDIR/*/*/*/$s
+  rm $DESTDIR/*/*/*/*/$s
+  rm $DESTDIR/*/*/*/*/*/$s
+  rm $DESTDIR/*/*/*/*/*/*/$s
+  rm $DESTDIR/*/*/*/*/*/*/*/$s
+done
