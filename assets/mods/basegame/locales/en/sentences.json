@@ -1,3 +1,5 @@
 {
-  "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "This is a world currently playing."
+  "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "This is a world currently playing.",
+  "CONTEXT_IMPORT_AVATAR_INSTRUCTION_1": "Copy the Avatar Code into the clipboard, then hit the Paste button below.",
+  "CONTEXT_IMPORT_AVATAR_INSTRUCTION_2": ""
 }

@@ -4,27 +4,26 @@ import net.torvald.terrarum.savegame.toBigEndian
 import java.util.UUID
 import kotlin.math.ceil
 
-/**
- * Ascii85 implementation with my own character table based on RFC 1924. Will NOT truncate '00000' into something else;
- * just gzip the inputstream instead!
+/** My own string set that:
+ * - no "/": avoids nonstandard JSON comment key which GDX will happily parse away
+ * - no "\": you know what I mean\\intention
+ * - no "$": avoids Kotlin string template
+ * - no "[{]},": even the dumbest parser can comprehend the output
  */
-object Ascii85 {
-    /** My own string set that:
-     * - no "/": avoids nonstandard JSON comment key which GDX will happily parse away
-     * - no "\": you know what I mean\\intention
-     * - no "$": avoids Kotlin string template
-     * - no "[{]},": even the dumbest parser can comprehend the output
-     */
-    private const val CHAR_TABLE = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#%&'()*+-.:;<=>?@^_`|~"
+open class Ascii85Codec(private val CHAR_TABLE: String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#%&'()*+-.:;<=>?@^_`|~") {
+    init {
+        if (CHAR_TABLE.length != 85) throw IllegalArgumentException("CHAR_TABLE is not 85 chars long")
+    }
+
     /** As per Adobe standard */
     //private val CHAR_TABLE = (33 until (33+85)).toList().map { it.toChar() }.joinToString("") // testing only!
 
     private val INVERSE_TABLE = LongArray(127)
 
     /** Int of `-1` */
-    const val PAD_BYTE = -1
+    val PAD_BYTE = -1
     /** Null-character (`\0`) */
-    const val PAD_CHAR = 0.toChar()
+    val PAD_CHAR = 0.toChar()
 
     private val INTERNAL_PAD_BYTE = 0
     private val INTERNAL_PAD_CHAR = CHAR_TABLE.last()
@@ -97,10 +96,10 @@ object Ascii85 {
         }
 
         val sum = (INVERSE_TABLE[s1.toInt()] * 52200625) +
-                  (INVERSE_TABLE[s2.toInt()] * 614125) +
-                  (INVERSE_TABLE[s3.toInt()] * 7225) +
-                  (INVERSE_TABLE[s4.toInt()] * 85) +
-                  INVERSE_TABLE[s5.toInt()]
+                (INVERSE_TABLE[s2.toInt()] * 614125) +
+                (INVERSE_TABLE[s3.toInt()] * 7225) +
+                (INVERSE_TABLE[s4.toInt()] * 85) +
+                INVERSE_TABLE[s5.toInt()]
         return ByteArray(4 - padLen) { sum.ushr((3 - it) * 8).and(255).toByte() }
     }
 
@@ -136,6 +135,12 @@ object Ascii85 {
         return bytes
     }
 }
+
+/**
+ * Ascii85 implementation with my own character table based on RFC 1924. Will NOT truncate '00000' into something else;
+ * just gzip the inputstream instead!
+ */
+object Ascii85 : Ascii85Codec()
 
 fun UUID.toAscii85() =
     Ascii85.encodeBytes(this.mostSignificantBits.toBigEndian() + this.leastSignificantBits.toBigEndian())

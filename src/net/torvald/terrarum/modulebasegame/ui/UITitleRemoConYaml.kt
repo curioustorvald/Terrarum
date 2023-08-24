@@ -41,7 +41,7 @@ object UITitleRemoConYaml {
 
     // todo add MENU_IO_IMPORT
     val injectedMenuSingleCharSel = """
-- MENU_IO_IMPORT
+- MENU_IO_IMPORT : net.torvald.terrarum.modulebasegame.ui.UIImportAvatar
 - CONTEXT_CHARACTER_NEW : net.torvald.terrarum.modulebasegame.ui.UINewCharacter
 - MENU_LABEL_RETURN
 """

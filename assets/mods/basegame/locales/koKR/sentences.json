@@ -1,3 +1,5 @@
 {
-  "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "현재 플레이 중인 월드입니다."
+  "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "현재 플레이 중인 월드입니다.",
+  "CONTEXT_IMPORT_AVATAR_INSTRUCTION_1": "아바타 코드를 클립보드에 복사한 다음, 아래의 붙여넣기 버튼을 눌러주세요.",
+  "CONTEXT_IMPORT_AVATAR_INSTRUCTION_2": ""
 }
