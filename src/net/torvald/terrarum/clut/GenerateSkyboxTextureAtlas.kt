@@ -74,9 +74,9 @@ fun main() {
 //                    println("$yp\t$theta")
 
                         val xyz = CIEXYZ(
-                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, (gammaPair * 2f + 1f) * HALF_PI, 0).toFloat(),
-                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, (gammaPair * 2f + 1f) * HALF_PI, 1).toFloat(),
-                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, (gammaPair * 2f + 1f) * HALF_PI, 2).toFloat()
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 0).toFloat(),
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 1).toFloat(),
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 2).toFloat()
                         )
                         val xyz2 = xyz.scaleToFit(elevationDeg)
                         val rgb = xyz2.toRGB().toColor()
