@@ -6,6 +6,7 @@ SRCFILES="terrarummac_x86"
 APPDIR="./TerrarumMac.x86.app"
 DESTDIR="out/$APPDIR"
 RUNTIME="runtime-osx-x86"
+VERSIONNUMFILE="../out/build_version_string.autogen"
 
 if [ ! -d "../assets_release" ]; then
     echo "'assets_release' does not exist; prepare the assets for the release and put them into the assets_release directory, exiting now." >&2
@@ -21,9 +22,14 @@ mkdir $DESTDIR/Contents/Resources
 
 # Prepare an application
 cp AppIcon.icns $DESTDIR/Contents/Resources/AppIcon.icns
-cp $SRCFILES/Info.plist $DESTDIR/Contents/
 cp $SRCFILES/Terrarum.sh $DESTDIR/Contents/MacOS/
 chmod +x $DESTDIR/Contents/MacOS/Terrarum.sh
+
+# Prepare an plist
+cp $SRCFILES/Info.plist $DESTDIR/Contents/
+printf "\n<key>CFBundleVersion</key><string>" >> $DESTDIR/Contents/Info.plist
+cat $VERSIONNUMFILE >> $DESTDIR/Contents/Info.plist
+printf "</string>\n</dict></plist>" >> $DESTDIR/Contents/Info.plist
 
 # Copy over a Java runtime
 mkdir $DESTDIR/Contents/MacOS/out
