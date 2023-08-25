@@ -66,6 +66,13 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         { Lang["ERROR_SAVE_CORRUPTED"].replace(".","") }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.isEnabled = false
     }
+    private val mainImportedPlayerCreateNewWorldButton = UIItemTextButton(this,
+        { Lang["CONTEXT_WORLD_NEW"].replace(".","") }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.clickOnceListener = { _,_ ->
+            val playerDisk = full.loadables.getImportedPlayer()!!
+            full.remoCon.openUI(UINewWorld(full.remoCon, playerDisk))
+        }
+    }
     private val mainRenameButton = UIItemTextButton(this,
         { Lang["MENU_LABEL_RENAME"] }, buttonX1third, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
@@ -134,11 +141,12 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private var mainButtons0 = listOf(mainGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
     private var mainButtons1 = listOf(mainNoGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
+    private var mainButtons2 = listOf(mainImportedPlayerCreateNewWorldButton, mainBackButton, mainRenameButton, mainDeleteButton)
     private var delButtons = listOf(confirmCancelButton, confirmDeleteButton)
     private var renameButtons = listOf(renameRenameButton, renameCancelButton)
 
     private val mainButtons: List<UIItemTextButton>
-        get() = if (full.loadables.saveAvaliable()) mainButtons0 else mainButtons1
+        get() = if (full.loadables.saveAvaliable()) mainButtons0 else if (full.loadables.isImported) mainButtons2 else mainButtons1
 
     private val MODE_INIT = 0
     private val MODE_DELETE = 16 // are you sure?
@@ -212,18 +220,20 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 val tex = screencap ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
 
 
-                val tx = (Toolkit.drawWidth - screencapW) / 2
-                val tys = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
-                val tye = buttonRowY2 - buttonGap
-                val ty = tys + (tye - tys - SAVE_THUMBNAIL_MAIN_HEIGHT) / 2
+                if (full.loadables.saveAvaliable()) {
+                    val tx = (Toolkit.drawWidth - screencapW) / 2
+                    val tys = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
+                    val tye = buttonRowY2 - buttonGap
+                    val ty = tys + (tye - tys - SAVE_THUMBNAIL_MAIN_HEIGHT) / 2
 
-                batch.color = Toolkit.Theme.COL_INACTIVE
-                Toolkit.drawBoxBorder(batch, tx - 1, ty - 1, screencapW + 2, screencapH + 2)
-                batch.color = UIInventoryFull.CELL_COL
-                Toolkit.fillArea(batch, tx, ty, screencapW, screencapH)
+                    batch.color = Toolkit.Theme.COL_INACTIVE
+                    Toolkit.drawBoxBorder(batch, tx - 1, ty - 1, screencapW + 2, screencapH + 2)
+                    batch.color = UIInventoryFull.CELL_COL
+                    Toolkit.fillArea(batch, tx, ty, screencapW, screencapH)
 
-                batch.color = Color.WHITE
-                batch.draw(tex, tx.toFloat(), ty.toFloat(), screencapW.toFloat(), screencapH.toFloat())
+                    batch.color = Color.WHITE
+                    batch.draw(tex, tx.toFloat(), ty.toFloat(), screencapW.toFloat(), screencapH.toFloat())
+                }
 
             }
             MODE_DELETE -> {

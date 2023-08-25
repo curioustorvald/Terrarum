@@ -18,6 +18,7 @@ import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
@@ -28,9 +29,14 @@ import net.torvald.terrarum.utils.RandomWordsName
 class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private var newPlayerCreationThread = Thread {}
+    private var existingPlayer: DiskSkimmer? = null
 
     constructor(remoCon: UIRemoCon, playerCreationThread: Thread) : this(remoCon) {
         newPlayerCreationThread = playerCreationThread
+    }
+
+    constructor(remoCon: UIRemoCon, importedPlayer: DiskSkimmer) : this(remoCon) {
+        existingPlayer = importedPlayer
     }
 
     private val hugeTex = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "gui/huge.png")))
@@ -98,14 +104,16 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
         goButton.clickOnceListener = { _, _ ->
 
             // after the save is complete, proceed to new world generation
-            newPlayerCreationThread.start()
-            newPlayerCreationThread.join()
+            if (existingPlayer == null) {
+                newPlayerCreationThread.start()
+                newPlayerCreationThread.join()
+            }
 
 
             printdbg(this, "generate! Size=${sizeSelector.selection}, Name=${nameInput.getTextOrPlaceholder()}, Seed=${seedInput.getTextOrPlaceholder()}")
 
             val ingame = TerrarumIngame(App.batch)
-            val playerDisk = App.savegamePlayers[UILoadGovernor.playerUUID]!!.loadable()
+            val playerDisk = existingPlayer ?: App.savegamePlayers[UILoadGovernor.playerUUID]!!.loadable()
             val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
             val seed = try {
                 seedInput.getTextOrPlaceholder().toLong()

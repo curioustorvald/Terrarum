@@ -15,6 +15,7 @@ import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.modulebasegame.serialise.WritePlayer
+import net.torvald.terrarum.savegame.VDSaveOrigin
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
 import java.io.File
@@ -71,6 +72,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
 
                 disk.saveMode = 2 // auto, no quick
                 disk.capacity = 0L
+                disk.saveOrigin = VDSaveOrigin.INGAME
 
                 WritePlayer(player, disk, null, time_t)
                 VDUtil.dumpToRealMachine(disk, outFile)

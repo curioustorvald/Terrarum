@@ -39,6 +39,7 @@ class PlayerSavingThread(
 
         disk.saveMode = 2 * isAuto.toInt() // no quick
         disk.saveKind = VDSaveKind.PLAYER_DATA
+        disk.saveOrigin = disk.saveOrigin and 15 // remove flag "imported" if applicable
         disk.capacity = 0L
 
         WriteSavegame.saveProgress = 0f

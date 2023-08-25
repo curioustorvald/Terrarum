@@ -74,7 +74,6 @@ object WritePlayer {
         player.lastPlayTime = time_t
         player.totalPlayTime += time_t - (ingame?.loadedTime_t ?: time_t)
 
-
         // restore player prop backup created on load-time for multiplayer
         if (ingame?.isMultiplayer == true) {
             player.setPosition(player.unauthorisedPlayerProps.physics.position)

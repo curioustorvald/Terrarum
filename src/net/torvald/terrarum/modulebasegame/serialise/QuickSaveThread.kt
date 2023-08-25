@@ -149,6 +149,7 @@ class QuickSingleplayerWorldSavingThread(
         skimmer.injectDiskCRC(disk.hashCode())
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
         skimmer.setSaveKind(VDSaveKind.WORLD_DATA)
+        skimmer.setSaveOrigin(skimmer.getSaveOrigin() and 15) // remove flag "imported" if applicable
 
         printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 

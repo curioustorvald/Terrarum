@@ -41,6 +41,7 @@ class WorldSavingThread(
 
         disk.saveMode = 2 * isAuto.toInt() // no quick
         disk.saveKind = VDSaveKind.WORLD_DATA
+        disk.saveOrigin = disk.saveOrigin and 15 // remove flag "imported" if applicable
 
         // wait for screencap
         var emergencyStopCnt = 0

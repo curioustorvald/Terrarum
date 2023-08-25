@@ -76,9 +76,9 @@ Version 254 is a customised version of TEVD tailored to be used as a savegame fo
                   0: Undefined (or very old version of the game)
                   1: Player Data
                   2: World Data
-    Int8        Savefile Origin Flags
+    Int8        Savefile Origin Flags (lower nybble: persistent, upper nybble: can be removed if conditions are met)
                   0: Created in-game
-                 16: Imported
+                 16: Imported (will be removed once the file is loaded by the player and saved in-game)
     Int8[12]    Extra info bytes reserved for future usage
     -- END extraInfoBytes --
     UInt8[236]  Rest of the long disk name (268 bytes total)

@@ -347,6 +347,10 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
         return if (status == 0) null
         else DiskPair(playerDisk!!, worldDisk!!)
     }
+
+    fun getImportedPlayer(): DiskSkimmer? {
+        return if (isImported) player!!.loadable() else null
+    }
 }
 
 data class DiskPair(val player: DiskSkimmer, val world: DiskSkimmer) {
