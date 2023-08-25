@@ -101,7 +101,11 @@ internal object WeatherMixer : RNGConsumer {
         initClouds()
     }
 
-    fun internalReset() = internalReset(RNG.state0, RNG.state1)
+    fun internalReset() {
+        currentWeather = weatherList[WEATHER_GENERIC]!![0]
+        internalReset(RNG.state0, RNG.state1)
+        initClouds()
+    }
 
     fun internalReset(s0: Long, s1: Long) {
         globalLightOverridden = false
