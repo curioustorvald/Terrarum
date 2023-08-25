@@ -517,6 +517,8 @@ class UIItemPlayerCells(
 //    internal val pixmapAuto: Pixmap?
     internal val savegameThumbnailPixmap: Pixmap?
 
+    private val isImported: Boolean
+
     init {
         App.savegamePlayers[playerUUID]!!.loadable().getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
@@ -541,6 +543,8 @@ class UIItemPlayerCells(
 //        pixmapManual = savegamePair.getManualSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
 //        pixmapAuto = savegamePair.getAutoSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
         savegameThumbnailPixmap = savegamePair.getLoadableSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
+
+        isImported = savegamePair.isImported
     }
 
     private fun parseDuration(seconds: Long): String {
@@ -618,11 +622,19 @@ class UIItemPlayerCells(
         batch.draw(icons.get(13,0), x + avatarViewWidth + 14f - 0, line3 + 2f) // journal
         batch.draw(icons.get(22,1), x + avatarViewWidth + 14f - 1, line4 + 2f) // version(?)
         batch.draw(icons.get(23,0), x + width - 4f - playTimeTextLen - 24f, line4 + 2f) // stopwatch
-        // autosave marker
-        if (savegameStatus == 2)
-            batch.draw(icons.get(24,1), x + width - 23f, line1 + 2f)
-        else if (savegameStatus == 0)
-            batch.draw(icons.get(23,1), x + width - 23f, line1 + 2f)
+
+        // save status marker
+        (if (isImported)
+            icons.get(21,1)
+        else if (savegameStatus == 2) // newer autosave
+            icons.get(24,1)
+        else if (savegameStatus == 0) // no world data found
+            icons.get(23,1)
+        else null)?.let {
+            batch.draw(it, x + width - 25f, line1 + 2f)
+        }
+
+
 
         // infocell divider
         batch.color = if (mouseUp) hruleColLit else hruleCol

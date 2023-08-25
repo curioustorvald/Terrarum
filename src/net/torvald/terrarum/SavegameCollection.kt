@@ -167,8 +167,10 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
 //    private var autoPlayer: DiskSkimmer? = null
 //    private var autoWorld: DiskSkimmer? = null
 
+    var isImported: Boolean = false; private set
+
     /* removing auto/manual discrimination: on Local Asynchronous Multiplayer, if newer autosave is available, there is
-     * no choice but loading one to preserve the data; then why bother having two? */
+         * no choice but loading one to preserve the data; then why bother having two? */
     private var playerDisk: DiskSkimmer? = null; private set
     private var worldDisk: DiskSkimmer? = null; private set
 
@@ -220,6 +222,10 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
         status = if (playerDisk != null && worldDisk != null && (playerDisk!!.isAutosaved() || worldDisk!!.isAutosaved()))
                 2
         else (player != null && world != null).toInt()
+
+        if (player != null) {
+            isImported = (player.loadable().getSaveOrigin() and VDSaveOrigin.IMPORTED != 0)
+        }
 
         printdbg(this, "playerDisk = ${playerDisk?.diskFile?.path}")
         printdbg(this, "worldDisk = ${worldDisk?.diskFile?.path}")
