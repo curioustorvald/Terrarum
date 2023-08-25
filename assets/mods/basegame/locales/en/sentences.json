@@ -2,5 +2,6 @@
   "CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING": "This is a world currently playing.",
   "CONTEXT_IMPORT_AVATAR_INSTRUCTION_1": "1. Place the Avatar file into the following directory:",
   "CONTEXT_IMPORT_AVATAR_INSTRUCTION_2": "",
-  "CONTEXT_IMPORT_AVATAR_INSTRUCTION_3": "2. Enter the name of the file below, then press Import"
+  "CONTEXT_IMPORT_AVATAR_INSTRUCTION_3": "2. Enter the name of the file below, then press Import",
+  "ERROR_AVATAR_ALREADY_EXISTS": "The Avatar already exists."
 }

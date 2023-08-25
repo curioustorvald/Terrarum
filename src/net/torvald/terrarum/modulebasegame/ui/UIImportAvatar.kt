@@ -61,6 +61,8 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     private val goButton = UIItemTextButton(this,
         { Lang["MENU_IO_IMPORT"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
+    private var importReturnCode = 0
+
     init {
 //        addUIitem(codeBox)
 //        addUIitem(clearButton)
@@ -79,8 +81,15 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
             remoCon.openUI(UILoadSavegame(remoCon))
         }
         goButton.clickOnceListener = { _,_ ->
-            val returnCode = doImport()
-            if (returnCode == 0) remoCon.openUI(UILoadSavegame(remoCon))
+            if (filenameInput.getText().isNotBlank()) {
+                importReturnCode = doImport()
+                if (importReturnCode == 0) remoCon.openUI(UILoadSavegame(remoCon))
+            }
+        }
+
+        // reset importReturnCode if the text input has changed
+        filenameInput.onKeyDown = { _ ->
+            importReturnCode = 0
         }
     }
 
@@ -92,7 +101,6 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
 
-
         pathW = App.fontGame.getWidth(App.importDir)
         val textX = (Toolkit.drawWidth - pathW) / 2
         textY = (App.scr.height - height) / 2 + descStartY + (1) * lh
@@ -102,9 +110,17 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         if (mouseOnLink && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             OpenFile(File(App.importDir))
         }
+
     }
 
     private val textboxIndices = (1..3)
+
+    private val errorMessages = listOf(
+        Lang["ERROR_GENERIC_TEXT"], // -1
+        "", // 0
+        Lang["ERROR_FILE_NOT_FOUND"], // 1
+        Lang["ERROR_AVATAR_ALREADY_EXISTS"], // 2
+    )
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
@@ -120,6 +136,14 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
 
 
         uiItems.forEach { it.render(batch, camera) }
+
+
+        if (importReturnCode != 0) {
+            batch.color = Toolkit.Theme.COL_RED
+            val tby = filenameInput.posY
+            val btny = backButton.posY
+            Toolkit.drawTextCentered(batch, App.fontGame, errorMessages[importReturnCode + 1], Toolkit.drawWidth, 0, (tby + btny) / 2)
+        }
     }
 
     override fun dispose() {
@@ -129,7 +153,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     }
 
     private fun doImport(): Int {
-        val file = File("${App.importDir}/${filenameInput.getText()}")
+        val file = File("${App.importDir}/${filenameInput.getText().trim()}")
 
         // check file's existence
         if (!file.exists()) {

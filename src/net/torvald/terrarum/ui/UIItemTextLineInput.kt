@@ -73,6 +73,8 @@ class UIItemTextLineInput(
     init {
     }
 
+    var onKeyDown: (TerrarumKeyboardEvent) -> Unit = {}
+
     private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
 
     override val height = 24
@@ -394,6 +396,8 @@ class UIItemTextLineInput(
                 if (textbuf.size == 0) {
                     currentPlaceholderText = CodepointSequence(placeholder().toCodePoints())
                 }
+
+                onKeyDown(e)
             }
         }
         else if (oldActive) { // just became deactivated
