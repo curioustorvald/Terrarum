@@ -5,11 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.AppUpdateListOfSavegames
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.savegame.*
@@ -104,8 +101,8 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         pathW = App.fontGame.getWidth(App.importDir)
         val textX = (Toolkit.drawWidth - pathW) / 2
         textY = (App.scr.height - height) / 2 + descStartY + (1) * lh
-        mouseOnLink = (Gdx.input.x in textX - 48..textX + 48 + pathW &&
-                Gdx.input.y in textY - 12..textY + lh + 12)
+        mouseOnLink = (Terrarum.mouseScreenX in textX - 48..textX + 48 + pathW &&
+                Terrarum.mouseScreenY in textY - 12..textY + lh + 12)
 
         if (mouseOnLink && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             OpenFile(File(App.importDir))
