@@ -391,8 +391,10 @@ object IngameRenderer : Disposable {
             batch.shader = null
             batch.color = Color.WHITE
 
-            uiContainer?.forEach {
-                it?.render(batch, camera)
+            if (!KeyToggler.isOn(Input.Keys.F4)) {
+                uiContainer?.forEach {
+                    it?.render(batch, camera)
+                }
             }
         }
 

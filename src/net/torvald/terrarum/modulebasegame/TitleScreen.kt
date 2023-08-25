@@ -258,6 +258,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun show() {
         printdbg(this, "show() called")
 
+        KeyToggler.forceSet(Input.Keys.F4, false)
+
         initViewPort(App.scr.width, App.scr.height)
 
 

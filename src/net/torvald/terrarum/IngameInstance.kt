@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.App.printdbg
@@ -9,6 +10,7 @@ import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ActorWithBody.Companion.PHYS_EPSILON_DIST
 import net.torvald.terrarum.gameactors.BlockMarkerActor
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
@@ -165,6 +167,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     override fun show() {
         // the very basic show() implementation
+        KeyToggler.forceSet(Input.Keys.F4, false)
 
         // add blockmarking_actor into the actorlist
         (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor).let {
