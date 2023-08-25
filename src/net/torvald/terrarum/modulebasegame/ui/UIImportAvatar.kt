@@ -6,15 +6,22 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.AppUpdateListOfSavegames
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.serialise.Ascii85Codec
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UIItem
-import net.torvald.terrarum.ui.UIItemTextButton
+import net.torvald.terrarum.savegame.*
+import net.torvald.terrarum.savegame.VDFileID.ROOT
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.Clipboard
+import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.OpenFile
+import java.awt.Desktop
+import java.io.File
 
 /**
  * Created by minjaesong on 2023-08-24.
@@ -31,14 +38,23 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     private val rows = 30
     private val goButtonWidth = 180
 
+    private val descStartY = 24 * 4
+    private val lh = App.fontGame.lineHeight.toInt()
 
-    private val codeBox = UIItemCodeBox(this, (Toolkit.drawWidth - App.fontSmallNumbers.W * cols) / 2, drawY, cols, rows)
+//    private val codeBox = UIItemCodeBox(this, (Toolkit.drawWidth - App.fontSmallNumbers.W * cols) / 2, drawY, cols, rows)
 
+    private val inputWidth = 340
+    private val filenameInput = UIItemTextLineInput(this,
+        (Toolkit.drawWidth - inputWidth) / 2, (App.scr.height - height) / 2 + descStartY + (5) * lh, inputWidth,
+        maxLen = InputLenCap(256, InputLenCap.CharLenUnit.UTF8_BYTES)
+    )
+
+    /*
     private val clearButton = UIItemTextButton(this,
         { Lang["MENU_IO_CLEAR"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24 - 34, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
     private val pasteButton = UIItemTextButton(this,
         { Lang["MENU_LABEL_PASTE"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24 - 34, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-
+    */
 
     private val backButton = UIItemTextButton(this,
         { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
@@ -46,32 +62,63 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         { Lang["MENU_IO_IMPORT"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
 
     init {
-        addUIitem(codeBox)
-        addUIitem(clearButton)
-        addUIitem(pasteButton)
+//        addUIitem(codeBox)
+//        addUIitem(clearButton)
+//        addUIitem(pasteButton)
+        addUIitem(filenameInput)
         addUIitem(backButton)
         addUIitem(goButton)
 
-        clearButton.clickOnceListener = { _,_ ->
+        /*clearButton.clickOnceListener = { _,_ ->
             codeBox.clearTextBuffer()
         }
         pasteButton.clickOnceListener = { _,_ ->
             codeBox.pasteFromClipboard()
-        }
+        }*/
         backButton.clickOnceListener = { _,_ ->
             remoCon.openUI(UILoadSavegame(remoCon))
         }
         goButton.clickOnceListener = { _,_ ->
-            doImport()
+            val returnCode = doImport()
+            if (returnCode == 0) remoCon.openUI(UILoadSavegame(remoCon))
         }
     }
 
+//    private var textX = 0
+    private var textY = 0
+    private var mouseOnLink = false
+    private var pathW = 0
 
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
+
+
+        pathW = App.fontGame.getWidth(App.importDir)
+        val textX = (Toolkit.drawWidth - pathW) / 2
+        textY = (App.scr.height - height) / 2 + descStartY + (1) * lh
+        mouseOnLink = (Gdx.input.x in textX - 48..textX + 48 + pathW &&
+                Gdx.input.y in textY - 12..textY + lh + 12)
+
+        if (mouseOnLink && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            OpenFile(File(App.importDir))
+        }
     }
 
+    private val textboxIndices = (1..3)
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        batch.color = Color.WHITE
+        val textboxWidth = textboxIndices.maxOf { App.fontGame.getWidth(Lang["CONTEXT_IMPORT_AVATAR_INSTRUCTION_$it"]) }
+        val textX = (Toolkit.drawWidth - textboxWidth) / 2
+        // draw texts
+        for (i in textboxIndices) {
+            App.fontGame.draw(batch, Lang["CONTEXT_IMPORT_AVATAR_INSTRUCTION_$i"], textX, (App.scr.height - height) / 2 + descStartY + (i - 1) * lh)
+        }
+        // draw path
+        batch.color = if (mouseOnLink) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP
+        App.fontGame.draw(batch, App.importDir, (Toolkit.drawWidth - pathW) / 2, textY)
+
+
         uiItems.forEach { it.render(batch, camera) }
     }
 
@@ -81,13 +128,68 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
     override fun advanceMode(button: UIItem) {
     }
 
-    private fun doImport() {
-        val rawStr = codeBox.textBuffer.toString()
-        // sanity check
+    private fun doImport(): Int {
+        val file = File("${App.importDir}/${filenameInput.getText()}")
+
+        // check file's existence
+        if (!file.exists()) {
+            return 1
+        }
+
+        // try to mount the TEVd
+        try {
+            val dom = VDUtil.readDiskArchive(file)
+            val timeNow = App.getTIME_T()
+
+            // get the uuid
+            val oldPlayerInfoFile = dom.getEntry(SAVEGAMEINFO)!!
+            val playerInfo = JsonFetcher.readFromJsonString(ByteArray64Reader(VDUtil.getAsNormalFile(dom, SAVEGAMEINFO).bytes, Common.CHARSET))
+            val uuid = playerInfo.getString("uuid")
+            val newFile = File("${App.playersDir}/$uuid")
+
+            printdbg(this, "Avatar uuid: $uuid")
+
+            if (newFile.exists()) return 2
+
+            // update playerinfo so that:
+            // totalPlayTime to zero
+            // lastPlayedTime to now
+            // playerinfofile's lastModifiedTime to now
+            // root's lastModifiedTime to now
+            printdbg(this, "avatar old lastPlayTime: ${playerInfo.getLong("lastPlayTime")}")
+            printdbg(this, "avatar old totalPlayTime: ${playerInfo.getLong("totalPlayTime")}")
+            playerInfo.get("lastPlayTime").set(timeNow, null)
+            playerInfo.get("totalPlayTime").set(0, null)
+            printdbg(this, "avatar new lastPlayTime: ${playerInfo.getLong("lastPlayTime")}")
+            printdbg(this, "avatar new totalPlayTime: ${playerInfo.getLong("totalPlayTime")}")
+
+            val newJsonBytes = ByteArray64Writer(Common.CHARSET).let {
+//                println(playerInfo.toString())
+                it.write(playerInfo.toString())
+                it.close()
+                it.toByteArray64()
+            }
+            val newPlayerInfo = DiskEntry(SAVEGAMEINFO, ROOT, oldPlayerInfoFile.creationDate, timeNow, EntryFile(newJsonBytes))
+            VDUtil.addFile(dom, newPlayerInfo)
+
+            dom.getEntry(ROOT)!!.modificationDate = timeNow
+
+            // mark the file as Imported
+            dom.saveOrigin = VDSaveOrigin.IMPORTED
+
+            // write modified file to the Players dir
+            VDUtil.dumpToRealMachine(dom, newFile)
 
 
-        val ascii85codec = Ascii85Codec((33..117).map { it.toChar() }.joinToString(""))
-        val ascii85str = rawStr.substring(2 until rawStr.length - 2).replace("z", "!!!!!")
+            AppUpdateListOfSavegames()
+        }
+        catch (e: Throwable) {
+            // format error
+            e.printStackTrace()
+            return -1
+        }
+
+        return 0
     }
 }
 

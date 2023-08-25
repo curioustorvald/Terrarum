@@ -1185,6 +1185,8 @@ public class App implements ApplicationListener {
     public static String configDir;
     /** defaultDir + "/LoadOrder.txt" */
     public static String loadOrderDir;
+    /** defaultDir + "/Imported" */
+    public static String importDir;
 
     public static RunningEnvironment environment;
 
@@ -1224,6 +1226,7 @@ public class App implements ApplicationListener {
         loadOrderDir = defaultDir + "/LoadOrder.txt";
         recycledPlayersDir = defaultDir + "/Recycled/Players";
         recycledWorldsDir = defaultDir + "/Recycled/Worlds";
+        importDir = defaultDir + "/Imports";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));
@@ -1239,6 +1242,7 @@ public class App implements ApplicationListener {
                 new File(worldsDir),
                 new File(recycledPlayersDir),
                 new File(recycledWorldsDir),
+                new File(importDir)
         };
 
         for (File it : dirs) {

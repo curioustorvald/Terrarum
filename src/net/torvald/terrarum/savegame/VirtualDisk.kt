@@ -76,8 +76,11 @@ Version 254 is a customised version of TEVD tailored to be used as a savegame fo
                   0: Undefined (or very old version of the game)
                   1: Player Data
                   2: World Data
-    Int8[13]    Extra info bytes reserved for future usage
-    /* END extraInfoBytes */
+    Int8        Savefile Origin Flags
+                  0: Created in-game
+                 16: Imported
+    Int8[12]    Extra info bytes reserved for future usage
+    -- END extraInfoBytes --
     UInt8[236]  Rest of the long disk name (268 bytes total)
 
     (Header size: 300 bytes)
@@ -150,6 +153,9 @@ class VirtualDisk(
     var saveKind: Int
         set(value) { extraInfoBytes[2] = value.toByte() }
         get() = extraInfoBytes[2].toUint()
+    var saveOrigin: Int
+        set(value) { extraInfoBytes[3] = value.toByte() }
+        get() = extraInfoBytes[3].toUint()
     override fun getDiskName(charset: Charset) = diskName.toCanonicalString(charset)
     val root: DiskEntry
         get() = entries[0]!!
@@ -247,6 +253,11 @@ object VDSaveKind {
     const val UNDEFINED = 0
     const val PLAYER_DATA = 1
     const val WORLD_DATA = 2
+}
+
+object VDSaveOrigin {
+    const val INGAME = 0
+    const val IMPORTED = 16
 }
 
 object VDFileID {

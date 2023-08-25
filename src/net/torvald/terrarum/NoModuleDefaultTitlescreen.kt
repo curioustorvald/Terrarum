@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.utils.OpenFile
 import java.awt.Desktop
 import java.io.File
 
@@ -90,7 +91,7 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
                     App.scr.hf - Gdx.input.y in pathButtonY - 12..pathButtonY + pathButtonH + 12)
 
             if (mouseOnLink && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                Desktop.getDesktop().open(pathFile)
+                OpenFile(pathFile)
             }
 
             fbatch.inUse {

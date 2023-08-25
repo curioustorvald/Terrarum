@@ -447,6 +447,13 @@ removefile:
         fa.close()
     }
 
+    fun setSaveOrigin(bits: Int) {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        fa.seek(51L)
+        fa.writeByte(bits)
+        fa.close()
+    }
+
     /**
      * @return Save type (0b 0000 00ab)
      *                   b: unset - full save; set - quicksave (only applicable to worlds -- quicksave just means the disk is in dirty state)
@@ -464,6 +471,15 @@ removefile:
     fun getSaveKind(): Int {
         val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(50L)
+        return fa.read().also { fa.close() }
+    }
+
+    /**
+     * @return 16 if the savegame was imported, 0 if the savegame was generated in-game
+     */
+    fun getSaveOrigin(): Int {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        fa.seek(51L)
         return fa.read().also { fa.close() }
     }
 
