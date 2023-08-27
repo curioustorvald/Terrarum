@@ -353,11 +353,15 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
     }
 
     fun getPlayerThumbnailPixmap(width: Int, height: Int, shrinkage: Double): Pixmap? {
-        return player?.loadable()?.getThumbnailPixmap(width, height, shrinkage)
+        return player?.loadable()?.getThumbnailPixmap(width, height, shrinkage)?.let {
+            if (it.isDisposed) null else it
+        }
     }
 
     fun getWorldThumbnailPixmap(width: Int, height: Int, shrinkage: Double): Pixmap? {
-        return world?.loadable()?.getThumbnailPixmap(width, height, shrinkage)
+        return world?.loadable()?.getThumbnailPixmap(width, height, shrinkage)?.let {
+            if (it.isDisposed) null else it
+        }
     }
 }
 

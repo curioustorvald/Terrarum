@@ -167,7 +167,9 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     override fun show() {
         // the very basic show() implementation
-        KeyToggler.forceSet(Input.Keys.F4, false)
+        for (k in Input.Keys.F1..Input.Keys.F12) {
+            KeyToggler.forceSet(k, false)
+        }
 
         // add blockmarking_actor into the actorlist
         (CommonResourcePool.get("blockmarking_actor") as BlockMarkerActor).let {

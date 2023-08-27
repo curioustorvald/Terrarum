@@ -63,6 +63,7 @@ internal object WeatherMixer : RNGConsumer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Cvec(0)
+    private val cloudDrawColour = Color()
     private val moonlightMax = Cvec(0.23f, 0.24f, 0.25f, 0.21f) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
 
     // Weather indices
@@ -546,7 +547,7 @@ internal object WeatherMixer : RNGConsumer {
             batch.shader.setUniformf("shadeCol", 0.06f, 0.07f, 0.08f, 1f) // TODO temporary value
 
             clouds.forEach {
-                batch.color = Color(globalLightNow.r, globalLightNow.g, globalLightNow.b, it.alpha)
+                batch.color = Color(cloudDrawColour.r, cloudDrawColour.g, cloudDrawColour.b, it.alpha)
                 it.render(batch, 0f, 0f)
             }
         }
@@ -569,9 +570,11 @@ internal object WeatherMixer : RNGConsumer {
         val daylightClut = currentWeather.daylightClut
         // calculate global light
         val moonSize = (-(2.0 * world.worldTime.moonPhase - 1.0).abs() + 1.0).toFloat()
-        val globalLightBySun: Cvec = getGradientColour2(daylightClut, solarElev, timeNow)
+        val globalLightBySun: Cvec = getGradientColour2(daylightClut, solarElev, timeNow, GradientColourMode.DAYLIGHT)
         val globalLightByMoon: Cvec = moonlightMax * moonSize
+        val cloudCol = getGradientColour2(daylightClut, solarElev, timeNow, GradientColourMode.CLOUD_COLOUR)
         globalLightNow.set(globalLightBySun max globalLightByMoon)
+        cloudDrawColour.set(cloudCol max globalLightByMoon)
 
         /* (copied from the shader source)
          UV mapping coord.y
@@ -690,7 +693,7 @@ internal object WeatherMixer : RNGConsumer {
         return Cvec(newCol)
     }
 
-    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int): Cvec {
+    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int, mode: GradientColourMode): Cvec {
         val pNowRaw = (solarAngleInDeg + 75.0) / 150.0 * colorMap.width
 
         val pStartRaw = pNowRaw.floorToInt()
@@ -709,20 +712,31 @@ internal object WeatherMixer : RNGConsumer {
             if (pSx == 0) { pNx = 0; pNy = 0 }
             else          { pNx = pSx - 1; pNy = 1 }
         }
-
-        val colourThisRGB = colorMap.get(pSx, pSy)
-        val colourNextRGB = colorMap.get(pNx, pNy)
-        val colourThisUV = colorMap.get(pSx, pSy + 2)
-        val colourNextUV = colorMap.get(pNx, pNy + 2)
-
         // interpolate R, G, B and A
         var scale = (pNowRaw - pStartRaw).toFloat()
         if (timeOfDay >= HALF_DAY) scale = 1f - scale
 
-        val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
-        val newColUV = colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        return when (mode) {
+            GradientColourMode.DAYLIGHT -> {
+                val colourThisRGB = colorMap.get(pSx, pSy)
+                val colourNextRGB = colorMap.get(pNx, pNy)
+                val colourThisUV = colorMap.get(pSx, pSy + 2)
+                val colourNextUV = colorMap.get(pNx, pNy + 2)
 
-        return Cvec(newColRGB, newColUV.r)
+                val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+                val newColUV = colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+
+                Cvec(newColRGB, newColUV.r)
+            }
+            GradientColourMode.CLOUD_COLOUR -> {
+                val colourThisRGB = colorMap.get(pSx, pSy + 4)
+                val colourNextRGB = colorMap.get(pNx, pNy + 4)
+
+                val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+
+                Cvec(newColRGB)
+            }
+        }
     }
 
     fun getWeatherList(classification: String) = weatherList[classification]!!
@@ -817,5 +831,16 @@ internal object WeatherMixer : RNGConsumer {
         shaderAstrum.dispose()
         shaderClouds.dispose()
     }
+}
+
+enum class GradientColourMode {
+    DAYLIGHT, CLOUD_COLOUR
+}
+
+private fun Color.set(cvec: Cvec) {
+    this.r = cvec.r
+    this.g = cvec.g
+    this.b = cvec.b
+    this.a = cvec.a
 }
 
