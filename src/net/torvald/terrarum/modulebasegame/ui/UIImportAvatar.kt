@@ -202,7 +202,22 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
             VDUtil.dumpToRealMachine(dom, newFile)
 
 
-            AppUpdateListOfSavegames()
+            // add imported character to the  list of savegames
+//            AppUpdateListOfSavegames()
+            try {
+                val it = DiskSkimmer(newFile, true)
+
+                val collection = SavegameCollection.collectFromBaseFilename(File(App.playersDir), it.diskFile.name)
+                val playerUUID = collection.getUUID()
+
+                // if multiple valid savegames with same UUID exist, only the most recent one is retained
+                if (!App.savegamePlayers.contains(playerUUID)) {
+                    App.savegamePlayers[playerUUID] = collection
+                    App.sortedPlayers.add(0, playerUUID)
+                    App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
+                }
+            }
+            catch (_: Throwable) {}
         }
         catch (e: Throwable) {
             // format error
