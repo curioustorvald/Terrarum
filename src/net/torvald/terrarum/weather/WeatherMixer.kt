@@ -381,7 +381,8 @@ internal object WeatherMixer : RNGConsumer {
      * Returns random point for clouds to spawn from, in the opposite side of the current wind vector
      */
     private fun getCloudSpawningPosition(cloud: CloudProps, halfCloudSize: Float, windVector: Vector3): Vector3 {
-        val Z_LIM = ALPHA_ROLLOFF_Z/2f
+        val Z_LIM = ALPHA_ROLLOFF_Z
+        val Z_POW_BASE = ALPHA_ROLLOFF_Z / 4f
         val y = takeUniformRand(-cloud.altHigh..-cloud.altLow) * scrHscaler
 
         var windVectorDir = toDegrees(atan2(windVector.z.toDouble(), windVector.x.toDouble())).toFloat() + 180f
@@ -405,19 +406,19 @@ internal object WeatherMixer : RNGConsumer {
 
         return when (selectedQuadrant.floorToInt()) {
             -4, 0, 4 -> { // right side of the screen
-                val z = FastMath.interpolateLinear(rr, 1f, ALPHA_ROLLOFF_Z).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val z = FastMath.interpolateLinear(rr, 1f, Z_POW_BASE).pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = App.scr.width + halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
             -3, 1, 5 -> { // z = inf
                 val z = ALPHA_ROLLOFF_Z
-                val posXscr = FastMath.interpolateLinear(rr, App.scr.width + halfCloudSize, -halfCloudSize)
+                val posXscr = FastMath.interpolateLinear(rr, -halfCloudSize, App.scr.width + halfCloudSize)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
                 Vector3(x, y, z)
             }
             -2, 2, 6 -> { // left side of the screen
-                val z = FastMath.interpolateLinear(rr, ALPHA_ROLLOFF_Z, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val z = FastMath.interpolateLinear(rr, Z_POW_BASE, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = -halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
@@ -470,6 +471,8 @@ internal object WeatherMixer : RNGConsumer {
                     it.scale = cloudScale * cloudSizeMult
 
                     it.pos.set(precalculatedPos ?: getCloudSpawningPosition(cloud, hCloudSize, windVector))
+
+//                    if (precalculatedPos == null) printdbg(this, "Z=${it.posZ}")
 
                     // further set the random altitude if required
                     if (precalculatedPos != null) {
