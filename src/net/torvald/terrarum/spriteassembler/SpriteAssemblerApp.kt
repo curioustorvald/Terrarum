@@ -320,7 +320,7 @@ class SpriteAssemblerPreview: Game() {
 
 fun main(args: Array<String>) {
     val appConfig = Lwjgl3ApplicationConfiguration()
-    appConfig.setWindowedMode(1024, 1024)
+    appConfig.setWindowedMode(1536, 1024)
     appConfig.setIdleFPS(5)
     appConfig.setForegroundFPS(5)
     appConfig.setResizable(false)

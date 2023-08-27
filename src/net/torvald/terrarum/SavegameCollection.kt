@@ -351,6 +351,14 @@ class SavegameCollectionPair(private val player: SavegameCollection?, private va
     fun getImportedPlayer(): DiskSkimmer? {
         return if (isImported) player!!.loadable() else null
     }
+
+    fun getPlayerThumbnailPixmap(width: Int, height: Int, shrinkage: Double): Pixmap? {
+        return player?.loadable()?.getThumbnailPixmap(width, height, shrinkage)
+    }
+
+    fun getWorldThumbnailPixmap(width: Int, height: Int, shrinkage: Double): Pixmap? {
+        return world?.loadable()?.getThumbnailPixmap(width, height, shrinkage)
+    }
 }
 
 data class DiskPair(val player: DiskSkimmer, val world: DiskSkimmer) {

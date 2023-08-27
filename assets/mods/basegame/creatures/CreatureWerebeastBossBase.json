@@ -1,0 +1,34 @@
+{
+  "racename": "",
+  "racenameplural": "",
+  "baseheight": 90,
+  "basemass": 600.0,
+
+  "strength": 65535,
+  "strengthmult": [100,100,100,100,100,100,100],
+
+  "accel": 0.67,
+
+  "speed": 6.0,
+  "speedmult": [100,100,100,100,100,100,100],
+
+  "vertstride": 40,
+
+  "jumppower": 17.6,
+  "jumppowermult": [100,100,100,100,100,100,100],
+
+  "scale": 1.0,
+  "scalemult": [100,100,100,100,100,100,100],
+
+  "encumbrance": 2147483647,
+  "defence": 65535,
+  "reach": 226,
+
+  "toolsize": 40,
+
+  "intelligent": true,
+  "barehandactionminheight": 40,
+  "basebarehanddiggingsize": 16,
+
+  "__comments__": "This RAW is intended to test the theoretical maximum values for properties (strength, defence, etc.)"
+}

@@ -9,6 +9,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderTestSubject1
+import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderWerebeastTest
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDUtil
 import net.torvald.terrarum.savegame.VirtualDisk
@@ -55,7 +56,8 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
             uiLocked = true
 
 
-            val player = PlayerBuilderTestSubject1()
+//            val player = PlayerBuilderTestSubject1()
+            val player = PlayerBuilderWerebeastTest()
             player.actorValue[AVKey.NAME] = nameInput.getTextOrPlaceholder()
 
             val disk = VDUtil.createNewDisk(

@@ -542,7 +542,7 @@ class UIItemPlayerCells(
         savegameStatus = savegamePair.status
 //        pixmapManual = savegamePair.getManualSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
 //        pixmapAuto = savegamePair.getAutoSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
-        savegameThumbnailPixmap = savegamePair.getLoadableSave()?.player?.getThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
+        savegameThumbnailPixmap = savegamePair.getPlayerThumbnailPixmap(SAVE_THUMBNAIL_MAIN_WIDTH, SAVE_THUMBNAIL_MAIN_HEIGHT, 2.0)
 
         isImported = savegamePair.isImported
     }

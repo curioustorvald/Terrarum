@@ -217,10 +217,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 mainButtons.forEach { it.render(batch, camera) }
 
                 // draw thumbnails of the most recent game
-                val tex = screencap ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
+//                val tex = screencap ?: CommonResourcePool.getAsTextureRegion("terrarum-defaultsavegamethumb")
 
 
-                if (full.loadables.saveAvaliable()) {
+                if (screencap != null) {
                     val tx = (Toolkit.drawWidth - screencapW) / 2
                     val tys = full.titleTopGradEnd + SAVE_CELL_HEIGHT + buttonGap
                     val tye = buttonRowY2 - buttonGap
@@ -232,7 +232,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                     Toolkit.fillArea(batch, tx, ty, screencapW, screencapH)
 
                     batch.color = Color.WHITE
-                    batch.draw(tex, tx.toFloat(), ty.toFloat(), screencapW.toFloat(), screencapH.toFloat())
+                    batch.draw(screencap, tx.toFloat(), ty.toFloat(), screencapW.toFloat(), screencapH.toFloat())
                 }
 
             }

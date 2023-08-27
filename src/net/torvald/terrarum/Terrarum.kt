@@ -813,8 +813,8 @@ fun AppUpdateListOfSavegames() {
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegameWorlds.contains(worldUUID)) {
             App.savegameWorlds[worldUUID] = collection
-            App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
             App.sortedSavegameWorlds.add(worldUUID)
+            App.savegameWorldsName[worldUUID] = it.getDiskName(Common.CHARSET)
         }
     }
 
@@ -848,8 +848,8 @@ fun AppUpdateListOfSavegames() {
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegamePlayers.contains(playerUUID)) {
             App.savegamePlayers[playerUUID] = collection
-            App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
             App.sortedPlayers.add(playerUUID)
+            App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
         }
     }
 

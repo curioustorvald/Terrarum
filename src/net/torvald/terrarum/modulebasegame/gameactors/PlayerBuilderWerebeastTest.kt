@@ -12,11 +12,11 @@ import net.torvald.terrarum.gameactors.AVKey
 object PlayerBuilderWerebeastTest {
     operator fun invoke(): IngamePlayer {
         val p: IngamePlayer = IngamePlayer(
-                ModMgr.getGdxFile("basegame", "sprites/taimu.properties").path(),
-                ModMgr.getGdxFile("basegame", "sprites/taimu_glow.properties").path(),
+                ModMgr.getGdxFile("basegame", "sprites/taimu2.properties").path(),
+                ModMgr.getGdxFile("basegame", "sprites/taimu2_glow.properties").path(),
                 -589141658L // random value thrown
         )
-        InjectCreatureRaw(p.actorValue, "basegame", "CreatureWerebeastBase.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreatureWerebeastBossBase.json")
 
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
@@ -24,14 +24,8 @@ object PlayerBuilderWerebeastTest {
         p.actorValue[AVKey.ACTION_INTERVAL] = ActorHumanoid.BASE_ACTION_INTERVAL
         p.actorValue[AVKey.NAME] = "Taimu"
 
-
-        /*p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/npc_template_anim_prototype.tga"), 48, 52))
-        p.sprite!!.delays = floatArrayOf(2f, 1f/12f) // second value does nothing -- overridden by ActorHumanoid.updateSprite(float)
-        p.sprite!!.setRowsAndFrames(2, 4)*/
-
         p.animDesc?.let { p.sprite = AssembledSpriteAnimation(it, p, false) }
         p.animDescGlow?.let { p.spriteGlow = AssembledSpriteAnimation(it, p, true) }
-        //p.reassembleSprite(p.sprite, p.spriteGlow, null)
         p.setHitboxDimension(22, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 30, 0)
 
         p.setPosition(3.0 * TILE_SIZE, 3.0 * TILE_SIZE)
