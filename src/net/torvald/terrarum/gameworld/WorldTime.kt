@@ -1,6 +1,8 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
+import kotlin.math.PI
 import kotlin.math.cos
 
 
@@ -56,7 +58,8 @@ import kotlin.math.cos
  */
 class WorldTime(initTime: Long = 0L) {
 
-    @Transient private val TWO_PI = Math.PI * 2.0
+    @Transient private val TWO_PI = 6.283185307179586
+
 
     /** It is not recommended to directly modify the TIME_T. Use provided methods instead. */
     var TIME_T = 0L // Epoch: Year 1 Spring 1st, 0h00:00 (Mondag) // 0001-01-01
@@ -122,23 +125,27 @@ class WorldTime(initTime: Long = 0L) {
     inline val moonPhase: Double
         get() = (TIME_T.plus(700000L) % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
 
-    fun getSolarElevationAt(ordinalDay: Int, second: Int): Double {
-        val TIME_T = DAY_LENGTH * ordinalDay + second
+    private fun kos(x: Double) = x.fmod(TWO_PI).let { x ->
+        if (x < PI) 1.0 - (2.0 * x) / PI
+        else (2.0 * x) / PI - 3.0
+    }
 
+    fun getSolarElevationAt(TIME_T: Long): Double {
         val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
         // 51.56 and 23.44 will make yearly min/max elevation to be 75deg
-        val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
-        return -51.56 * cos(TWO_PI * x) + d
+        val d = -23.44 * kos(TWO_PI * x / YEAR_DAYS)
+        val p = -51.56 * kos(TWO_PI * x)
+        return d + p
+    }
+
+    fun getSolarElevationAt(ordinalDay: Int, second: Int): Double {
+        val TIME_T = DAY_LENGTH.toLong() * ordinalDay + second
+        return getSolarElevationAt(TIME_T)
     }
 
     val solarElevationDeg: Double
-        get() {
-            val x = (TIME_T % YEAR_SECONDS).toDouble() / DAY_LENGTH + 15 // decimal days. One full day = 1.0
-            // 51.56 and 23.44 will make yearly min/max elevation to be 75deg
-            val d = -23.44 * cos(TWO_PI * x / YEAR_DAYS)
-            val p = -51.56 * cos(TWO_PI * x)
-            return d + p
-        }
+        get() = getSolarElevationAt(TIME_T)
+
     val solarElevationRad: Double
         get() = Math.toRadians(solarElevationDeg)
 
