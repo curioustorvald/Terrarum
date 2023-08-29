@@ -56,8 +56,8 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
             uiLocked = true
 
 
-//            val player = PlayerBuilderTestSubject1()
-            val player = PlayerBuilderWerebeastTest()
+            val player = PlayerBuilderTestSubject1()
+//            val player = PlayerBuilderWerebeastTest()
             player.actorValue[AVKey.NAME] = nameInput.getTextOrPlaceholder()
 
             val disk = VDUtil.createNewDisk(
