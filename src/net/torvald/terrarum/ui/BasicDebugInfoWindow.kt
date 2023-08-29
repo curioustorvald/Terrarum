@@ -39,11 +39,8 @@ class BasicDebugInfoWindow : UICanvas() {
     private var xdelta = 0.0
     private var ydelta = 0.0
 
-    private val ingame: IngameInstance?
-        get() = Terrarum.ingame
-
-    private val world: GameWorld?
-        get() = Terrarum.ingame?.world
+    private var ingame: IngameInstance? = null
+    private var world: GameWorld? = null
 
     private val icons = TextureRegionPack(Gdx.files.internal("assets/graphics/gui/debug_window_symbols.tga"), 21, 26)
     private val back = Texture(Gdx.files.internal("assets/graphics/gui/debug_window_background.tga"))
@@ -68,6 +65,11 @@ class BasicDebugInfoWindow : UICanvas() {
     private val KEY_TIMERS = Input.Keys.U
 
     private var showTimers = false
+
+    override fun show() {
+        ingame = Terrarum.ingame
+        world = ingame?.world
+    }
 
     override fun updateUI(delta: Float) {
         val player = ingame?.actorNowPlaying
