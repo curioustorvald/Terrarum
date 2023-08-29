@@ -39,34 +39,20 @@ To build, **cd into the "(project root)/buildapp/", then execute the appropriate
 
 The packaged application can be found on `(project root)/buildapp/out/`
 
-#### OSX .app Packaging
-
-```
-Terrarum.*.app
-+.icns          /* 512x512 PNG */
-+Contents 
-`Info.plist
- +MacOS
-  `start_game_mac_*.sh    * permission: +x */
-```
-
-`assets/TerrarumBuild.jar` is the artifact built using the TerrarumBuild.
-
-`start_game_*` files are on the root directory of the project; use them to build executable apps.
-
-Hide the `.jar` within the subdirectory; users will think this file is the main executable and will try to execute it using whatever JVM they may (or may not) have.
-
 ### OSX .icns creation
 
+Details: https://gist.github.com/jamieweavis/b4c394607641e1280d447deed5fc85fc
 0. Do this on a real macOS
 1. Create a folder `icon.iconset`, then cp the .png file as `icon_512x512.png`
 2. On Terminal, `iconutil -c icns icon.iconset`
 
-https://gist.github.com/jamieweavis/b4c394607641e1280d447deed5fc85fc
+It might be possible to create .icns on Linux, haven't tried though. https://dentrassi.de/2014/02/25/creating-mac-os-x-icons-icns-on-linux/
 
-#### Some Notes
+### Windows .ico creation
 
-- Windows EXE creation is not there yet. Maybe use one of [these?](https://sourceforge.net/projects/batch-compiler/)
+0. Open up the icon (png) file using GIMP
+1. Export As... -> *.ico, make sure to select either of 24 bpp (1 bit alpha) or 32 bpp (8 bit alpha)
+
 
 ### Notes to Terrarum Programmers
 
