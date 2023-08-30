@@ -36,6 +36,8 @@ import net.torvald.terrarum.serialise.ReadSimpleWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.weather.WeatherStateBox
+import net.torvald.terrarum.weather.Weatherbox
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import java.io.IOException
@@ -82,7 +84,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val xperc: Double = (x - xwstart) / xw
 
 //        return FastMath.interpolateLinear(xperc.toFloat(), cameraNodes[indexThis fmod cameraNodes.size], cameraNodes[(indexThis + 1) fmod cameraNodes.size]).toDouble()
-        return FastMath.interpolateCatmullRom(xperc.toFloat(),
+        return FastMath.interpolateCatmullRom(xperc.toFloat(), 1.0f, // somehow T=1 works really well thanks to my other smoothing technique
             cameraNodes[(indexThis - 1) fmod cameraNodes.size],
             cameraNodes[(indexThis - 0) fmod cameraNodes.size],
             cameraNodes[(indexThis + 1) fmod cameraNodes.size],

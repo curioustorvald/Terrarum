@@ -90,6 +90,9 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffY = 0f
 
     private val clouds = SortedArrayList<WeatherObjectCloud>()
+
+//    val weatherbox: Weatherbox
+
     var cloudsSpawned = 0; private set
     private var windVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
     val cloudSpawnMax: Int

@@ -13,7 +13,7 @@ import net.torvald.terrarum.weather.WeatherMixer
  */
 object BlockPropUtil {
     //var flickerFuncX: Second = 0f // saves current status (time) of func
-    val flickerFuncDomain: Second = 0.06f // time between two noise sample
+    val flickerFuncDomain: Second = 8f/64f // time between two noise sample
     val flickerFuncRange = 0.036f // intensity [0, 1]
 
     //var breathFuncX = 0f
@@ -50,7 +50,7 @@ object BlockPropUtil {
 
 
     /**
-     * Using our own timer so that they flickers for same duration regardless of game's FPS
+     * Must be using ConsistentUpdateRate update governor
      */
     internal fun dynamicLumFuncTickClock() {
 
@@ -80,7 +80,7 @@ object BlockPropUtil {
 
             // FPS-time compensation
             if (Gdx.graphics.framesPerSecond > 0) {
-                prop.rngBase0 += Gdx.graphics.deltaTime
+                prop.rngBase0 += App.UPDATE_RATE
             }
 
             // reset timer

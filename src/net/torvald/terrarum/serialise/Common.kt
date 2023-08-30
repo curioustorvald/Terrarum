@@ -14,6 +14,7 @@ import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
+import net.torvald.terrarum.weather.WeatherStateBox
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.io.InputStream
@@ -211,6 +212,18 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): ByteArray? {
                 return if (jsonData.isNull) return null else strToBytes(StringReader(jsonData.asString())).toByteArray()
+            }
+        })
+        // WeatherStateBox
+        jsoner.setSerializer(WeatherStateBox::class.java, object : Json.Serializer<WeatherStateBox> {
+            override fun write(json: Json, obj: WeatherStateBox, knownType: Class<*>?) {
+                json.writeValue("${obj.x};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherStateBox {
+                return jsonData.asString().split(';').map { it.toDouble() }.let {
+                    WeatherStateBox(it[0], it[1], it[2], it[3], it[4])
+                }
             }
         })
     }
