@@ -891,15 +891,15 @@ open class ActorWithBody : Actor {
 
                         // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                         val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
-                            newHitbox.endX.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
+                            newHitbox.endX.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST // adding/subbing fixes a bug where player stops midair when L/R is held and moving down from the platform
                         else
-                            newHitbox.startX.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
+                            newHitbox.startX.div(TILE_SIZE).ceilToDouble() * TILE_SIZE + PHYS_EPSILON_DIST // adding/subbing fixes a bug where player stops midair when L/R is held and moving down from the platform
 
                         // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                         val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
-                            newHitbox.endY.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST
+                            newHitbox.endY.div(TILE_SIZE).floorToDouble() * TILE_SIZE - PHYS_EPSILON_DIST // adding/subbing fixes a bug where player stops midair when L/R is held and moving down from the platform
                         else
-                            newHitbox.startY.div(TILE_SIZE).ceilToDouble() * TILE_SIZE
+                            newHitbox.startY.div(TILE_SIZE).ceilToDouble() * TILE_SIZE + PHYS_EPSILON_DIST // adding/subbing fixes a bug where player stops midair when L/R is held and moving down from the platform
 
                         val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
                             newHitbox.endX

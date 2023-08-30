@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.printStackTrace
 import org.dyn4j.geometry.Vector2
@@ -190,6 +191,15 @@ class Hitbox {
     companion object {
         fun fromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double, nowarn: Boolean = false) =
                 Hitbox(x1, y1, x2 - x1, y2 - y1, nowarn)
+
+        fun lerp(fraction: Double, a: Hitbox, b: Hitbox): Hitbox {
+            return Hitbox(
+                FastMath.interpolateLinear(fraction, a.startX, b.startX),
+                FastMath.interpolateLinear(fraction, a.startY, b.startY),
+                FastMath.interpolateLinear(fraction, a.width,  b.width),
+                FastMath.interpolateLinear(fraction, a.height, b.height)
+            )
+        }
     }
 
     operator fun minus(other: Hitbox): Vector2 {
