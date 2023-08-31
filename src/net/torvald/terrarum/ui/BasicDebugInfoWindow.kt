@@ -3,7 +3,6 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -353,13 +352,16 @@ class BasicDebugInfoWindow : UICanvas() {
     private val colGraphFore = Color(1f, 1f, 1f, 0.5f)
     private val colGraphForf = Color(1f, 1f, 1f, 0.25f)
     private val colGraphForg = Color(1f, 1f, 1f, 0.125f)
+    private val MIN_RULE_GAP = 5.0
+
+    private val GRAPH_CW = 50
+    private val GRAPH_CH = 100
 
     private fun drawWeatherStateBox(batch: SpriteBatch, box: WeatherStateBox, label: String, x: Int, y: Int, ymax: Double = 1.0) {
-        val bw = 50*3 + 1
-        val bh = 100
-        val xstart = (bw/3)*1
-        val xw = (bw/3)
-        val MIN_RULE_GAP = 5.0
+        val bw = GRAPH_CW * 3 + 1
+        val bh = GRAPH_CH
+        val xw = GRAPH_CW
+        val xi = (box.x * xw).roundToInt()
 
         // back
         batch.color = colGraphBack
@@ -368,8 +370,10 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.color = colGraphFore
         Toolkit.drawBoxBorder(batch, x + 1, y + 1, bw - 1, bh - 1)
         // x grids
-        Toolkit.drawStraightLine(batch, x + (bw/3)*1, y, y+bh, 1, true)
-        Toolkit.drawStraightLine(batch, x + (bw/3)*2, y, y+bh, 1, true)
+        if (box.x < 0.5) Toolkit.drawStraightLine(batch, x + (GRAPH_CW * 0.5).toInt() - xi, y, y+bh, 1, true)
+                         Toolkit.drawStraightLine(batch, x + (GRAPH_CW * 1.5).toInt() - xi, y, y+bh, 1, true)
+                         Toolkit.drawStraightLine(batch, x + (GRAPH_CW * 2.5).toInt() - xi, y, y+bh, 1, true)
+        if (box.x > 0.5) Toolkit.drawStraightLine(batch, x + (GRAPH_CW * 3.5).toInt() - xi, y, y+bh, 1, true)
         // y grids
         val yrange =
         //// ymax small and bh tall enought to fit the 0.25 rules?
@@ -402,39 +406,60 @@ class BasicDebugInfoWindow : UICanvas() {
             }
             Toolkit.drawStraightLine(batch, x, y + yc, x + bw, 1, false)
         }
-
-        // graph points
-        batch.color = colGraph
-        Toolkit.fillArea(batch, x +          - 1, y + bh-(box.p0 * bh / ymax).roundToInt(), 3, 3)
-        Toolkit.fillArea(batch, x + (bw/3)*1 - 1, y + bh-(box.p1 * bh / ymax).roundToInt(), 3, 3)
-        Toolkit.fillArea(batch, x + (bw/3)*2 - 1, y + bh-(box.p2 * bh / ymax).roundToInt(), 3, 3)
-        Toolkit.fillArea(batch, x +  bw      - 1, y + bh-(box.p3 * bh / ymax).roundToInt(), 3, 3)
         batch.end()
-        // interpolated values
-        val pys = (0 until xw).map {
-            val px = it.toFloat() / xw
-            bh - (bh * WeatherStateBox.interpolateCatmullRom(px, box.p0, box.p1, box.p2, box.p3) / ymax).toFloat()
-        }
 
+        // here draws actual data
         App.shapeRender.inUse {
+            val pysM1 = (0 until xw).map {
+                val px = it.toFloat() / xw
+                bh - (bh * WeatherStateBox.interpolate(px, box.pM2, box.pM1, box.p0, box.p1) / ymax).toFloat()
+            }
+            val pys0 = (0 until xw).map {
+                val px = it.toFloat() / xw
+                bh - (bh * WeatherStateBox.interpolate(px, box.pM1, box.p0, box.p1, box.p2) / ymax).toFloat()
+            }
+            val pys1 = (0 until xw).map {
+                val px = it.toFloat() / xw
+                bh - (bh * WeatherStateBox.interpolate(px, box.p0, box.p1, box.p2, box.p3) / ymax).toFloat()
+            }
+            val pys2 = (0 until xw).map {
+                val px = it.toFloat() / xw
+                bh - (bh * WeatherStateBox.interpolate(px, box.p1, box.p2, box.p3, box.p4) / ymax).toFloat()
+            }
+            val pys3 = (0 until xw).map {
+                val px = it.toFloat() / xw
+                bh - (bh * WeatherStateBox.interpolate(px, box.p2, box.p3, box.p4, box.p5) / ymax).toFloat()
+            }
+            val pys = pysM1 + pys0 + pys1 + pys2 + pys3 + box.p4
+
+
+            // interpolated values
             it.color = colGraph
-            for (index in 0 until pys.lastIndex) {
-                val px = x + xstart + index.toFloat()
+            val xis = xi + (xw / 2)
+            for (index in xis until xis + bw - 1) {
+                val px = x - xis + index + 1f
                 it.rectLine(
                     px,
                     App.scr.hf - 1 - (y + pys[index]),
                     px + 1f,
                     App.scr.hf - 1 - (y + pys[index + 1]),
-                    1.5f
+                    1f
                 )
             }
+
+            // graph points
+            it.color = colGraph
+            if (box.x < 0.5) it.circle(x + (GRAPH_CW * 0.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p0 * bh / ymax).toFloat()), 2.5f)
+                             it.circle(x + (GRAPH_CW * 1.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p1 * bh / ymax).toFloat()), 2.5f)
+                             it.circle(x + (GRAPH_CW * 2.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p2 * bh / ymax).toFloat()), 2.5f)
+            if (box.x > 0.5) it.circle(x + (GRAPH_CW * 3.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p3 * bh / ymax).toFloat()), 2.5f)
         }
 
 
         // hairline
         batch.begin()
         batch.color = colHairline
-        Toolkit.drawStraightLine(batch, x + xstart + (box.x * xw).roundToInt(), y, y+bh, 1, true)
+        Toolkit.drawStraightLine(batch, x + bw / 2, y, y+bh, 1, true)
 
         // text
         batch.color = Color.WHITE

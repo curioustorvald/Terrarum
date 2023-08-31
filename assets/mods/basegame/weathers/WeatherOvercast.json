@@ -6,7 +6,7 @@
   "cloudGamma": [2.2, 2.0],
   "cloudGammaVariance": [0.1, 0.1],
   "windSpeed": 10.45,
-  "windSpeedVariance": 1.0,
+  "windSpeedVariance": 0.5,
   "clouds": {
     "cumulus": {
       "filename": "cloud_normal.png", "tw": 1024, "th": 512, "probability": 0.1,
@@ -23,5 +23,6 @@
       "baseScale": 4.0, "scaleVariance": 0.1,
       "altLow": 100, "altHigh": 100
     }
-  }
+  },
+  "atmoTurbidity": 9.5
 }

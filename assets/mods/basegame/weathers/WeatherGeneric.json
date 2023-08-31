@@ -18,5 +18,6 @@
       "baseScale": 1.0, "scaleVariance": 0.6,
       "altLow": 80, "altHigh": 800
     }
-  }
+  },
+  "atmoTurbidity": 3.5
 }

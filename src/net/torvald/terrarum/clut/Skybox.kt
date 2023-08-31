@@ -152,7 +152,7 @@ object Skybox : Disposable {
     val elevations = (0..150)
     val elevMax = elevations.last / 2.0
     val elevationsD = elevations.map { -elevMax + it } // -75, -74, -73, ..., 74, 75 // (specifically using whole number of angles because angle units any finer than 1.0 would make "hack" sunsut happen too fast)
-    val turbidities = (0..25) // 1, 1.2, 1.4, 1.6, ..., 6.0
+    val turbidities = (0..45) // 1, 1.2, 1.4, 1.6, ..., 10.0
     val turbDivisor = 5.0
     val turbiditiesD = turbidities.map { 1.0 + it / turbDivisor }
     val albedos = arrayOf(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)

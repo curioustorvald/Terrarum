@@ -24,5 +24,6 @@
       "altLow": 1600, "altHigh": 2400
     }
   },
+  "atmoTurbidity": 3.5,
   "__comment__": "Make a texture for altocumulus so that this weather can be realised with less than 1000 sprites"
 }

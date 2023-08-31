@@ -133,17 +133,21 @@ internal object WeatherMixer : RNGConsumer {
 
         weatherbox = Weatherbox()
         // TEST FILL WITH RANDOM VALUES
-        (0..3).map { takeUniformRand(0f..1f) }.let {
-            weatherbox.windDir.p0 = it[0]
-            weatherbox.windDir.p1 = it[1]
-            weatherbox.windDir.p2 = it[2]
-            weatherbox.windDir.p3 = it[3]
+        (0..5).map { takeUniformRand(0f..1f) }.let {
+            weatherbox.windDir.pM1 = it[0]
+            weatherbox.windDir.p0  = it[1]
+            weatherbox.windDir.p1  = it[2]
+            weatherbox.windDir.p2  = it[3]
+            weatherbox.windDir.p3  = it[4]
+            weatherbox.windDir.p4  = it[5]
         }
-        (0..3).map { takeUniformRand(-1f..1f) }.let {
-            weatherbox.windSpeed.p0 = currentWeather.getRandomWindSpeed(it[0])
-            weatherbox.windSpeed.p1 = currentWeather.getRandomWindSpeed(it[1])
-            weatherbox.windSpeed.p2 = currentWeather.getRandomWindSpeed(it[2])
-            weatherbox.windSpeed.p3 = currentWeather.getRandomWindSpeed(it[3])
+        (0..5).map { takeUniformRand(-1f..1f) }.let {
+            weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(it[0])
+            weatherbox.windSpeed.p0  = currentWeather.getRandomWindSpeed(it[1])
+            weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(it[2])
+            weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(it[3])
+            weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(it[4])
+            weatherbox.windSpeed.p4  = currentWeather.getRandomWindSpeed(it[5])
         }
     }
 
@@ -579,7 +583,7 @@ internal object WeatherMixer : RNGConsumer {
 
         gdxBlendNormalStraightAlpha()
 
-        turbidity = (3.5 + turbidityCoeff * 2.5).coerceIn(1.0, 6.0)
+        turbidity = (currentWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
         val thisTurbidity = forceTurbidity ?: turbidity
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
