@@ -139,7 +139,7 @@ internal object WeatherMixer : RNGConsumer {
             weatherbox.windDir.p1  = it[2]
             weatherbox.windDir.p2  = it[3]
             weatherbox.windDir.p3  = it[4]
-            weatherbox.windDir.p4  = it[5]
+//            weatherbox.windDir.p4  = it[5]
         }
         (0..5).map { takeUniformRand(-1f..1f) }.let {
             weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(it[0])
@@ -147,7 +147,7 @@ internal object WeatherMixer : RNGConsumer {
             weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(it[2])
             weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(it[3])
             weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(it[4])
-            weatherbox.windSpeed.p4  = currentWeather.getRandomWindSpeed(it[5])
+//            weatherbox.windSpeed.p4  = currentWeather.getRandomWindSpeed(it[5])
         }
     }
 

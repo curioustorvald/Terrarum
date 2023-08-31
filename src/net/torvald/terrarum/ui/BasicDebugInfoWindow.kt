@@ -348,6 +348,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val colHairline = Color(0xf22100ff.toInt())
     private val colGraph = Toolkit.Theme.COL_SELECTED
+    private val colGrapi = Toolkit.Theme.COL_SELECTED.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
     private val colGraphBack = Toolkit.Theme.COL_CELL_FILL
     private val colGraphFore = Color(1f, 1f, 1f, 0.5f)
     private val colGraphForf = Color(1f, 1f, 1f, 0.25f)
@@ -424,19 +425,22 @@ class BasicDebugInfoWindow : UICanvas() {
             }
             val pys2 = (0 until xw).map {
                 val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.p1, box.p2, box.p3, box.p4) / ymax).toFloat()
+                bh - (bh * WeatherStateBox.interpolate(px, box.p1, box.p2, box.p3, box.p3) / ymax).toFloat()
             }
             val pys3 = (0 until xw).map {
                 val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.p2, box.p3, box.p4, box.p5) / ymax).toFloat()
+                bh - (bh * WeatherStateBox.interpolate(px, box.p2, box.p3, box.p3, box.p3) / ymax).toFloat()
             }
-            val pys = pysM1 + pys0 + pys1 + pys2 + pys3 + box.p4
+            val pys = pysM1 + pys0 + pys1 + pys2 + pys3 + box.p3
 
 
             // interpolated values
             it.color = colGraph
             val xis = xi + (xw / 2)
             for (index in xis until xis + bw - 1) {
+
+                if (index == xw * 3) it.color = colGrapi // uncertain points will get darker
+
                 val px = x - xis + index + 1f
                 it.rectLine(
                     px,
@@ -452,6 +456,7 @@ class BasicDebugInfoWindow : UICanvas() {
             if (box.x < 0.5) it.circle(x + (GRAPH_CW * 0.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p0 * bh / ymax).toFloat()), 2.5f)
                              it.circle(x + (GRAPH_CW * 1.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p1 * bh / ymax).toFloat()), 2.5f)
                              it.circle(x + (GRAPH_CW * 2.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p2 * bh / ymax).toFloat()), 2.5f)
+            it.color = colGrapi
             if (box.x > 0.5) it.circle(x + (GRAPH_CW * 3.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p3 * bh / ymax).toFloat()), 2.5f)
         }
 

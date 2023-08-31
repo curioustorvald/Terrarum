@@ -17,9 +17,10 @@ data class WeatherStateBox(
     var p1: Float = 0f,
     var p2: Float = 0f,
     var p3: Float = 0f,
-    var p4: Float = 0f,
-    var p5: Float = 0f,
+//    var p4: Float = 0f,
+//    var p5: Float = 0f,
     // pM1 and p4 only exists for the sake of better weather forecasting
+    // - removing p4 and beyond: for faster response to the changing weather schedule and make the forecasting less accurate like irl
 ) {
 
     fun get() = interpolate(x, p0, p1, p2, p3)
@@ -35,9 +36,12 @@ data class WeatherStateBox(
                 p0 = p1
                 p1 = p2
                 p2 = p3
-                p3 = p4
-                p4 = p5
-                p5 = next()
+                p3 = next()
+
+
+//                p3 = p4
+//                p4 = p5
+//                p5 = next()
             }
             return y
         }
