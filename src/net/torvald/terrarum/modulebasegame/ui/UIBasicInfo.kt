@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -86,7 +87,7 @@ class UIBasicInfo() : UICanvas() {
 
     private val lcdLitCol: Color = lcdLitColELoff
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = drawCol
         batch.draw(atlas.get(0, 0), 0f, 0f)
 

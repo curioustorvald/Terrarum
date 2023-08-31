@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulecomputers.gameitems
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
@@ -118,7 +119,7 @@ class WearableWorldRadarUI(val device: VM) : UICanvas() {
         device.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         batch.color = Color.WHITE

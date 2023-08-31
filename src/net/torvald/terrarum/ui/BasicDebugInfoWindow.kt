@@ -5,9 +5,9 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
@@ -20,7 +20,6 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
-import net.torvald.terrarum.weather.Weatherbox
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -126,7 +125,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
     private val tileCursX = 0; private val tileCursY = 4
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+        TerrarumIngame.setCameraPosition(batch, App.shapeRender, camera, 0f, 0f)
+
+
         // toggle show-something
         showTimers = showTimers xor (Gdx.input.isKeyJustPressed(KEY_TIMERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
         showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
@@ -137,7 +139,6 @@ class BasicDebugInfoWindow : UICanvas() {
         if (showWeatherInfo) drawWeatherInfo(batch)
 
 
-        testBox.getAndUpdate(0.001, testBoxRng)
     }
 
     private fun drawMain(batch: SpriteBatch) {
@@ -340,78 +341,104 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
-    private val testBox = WeatherStateBox(Math.random(), Math.random(), Math.random(), Math.random(), Math.random())
-    private val testBoxRng = HQRNG()
 
     private fun drawWeatherInfo(batch: SpriteBatch) {
-        drawWeatherStateBox(batch, testBox, "Test", App.scr.width - 170, App.scr.height - 120)
+        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windSpeed, "WindSpd", App.scr.width - 170, App.scr.height - 140 - 120, WeatherMixer.currentWeather.windSpeed * (1.0 + WeatherMixer.currentWeather.windSpeedVariance))
+        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windDir, "WindDir", App.scr.width - 170, App.scr.height - 140)
     }
 
     private val colHairline = Color(0xf22100ff.toInt())
     private val colGraph = Toolkit.Theme.COL_SELECTED
     private val colGraphBack = Toolkit.Theme.COL_CELL_FILL
     private val colGraphFore = Color(1f, 1f, 1f, 0.5f)
+    private val colGraphForf = Color(1f, 1f, 1f, 0.25f)
+    private val colGraphForg = Color(1f, 1f, 1f, 0.125f)
 
-    private fun drawWeatherStateBox(batch: SpriteBatch, box: WeatherStateBox, label: String, x: Int, y: Int) {
+    private fun drawWeatherStateBox(batch: SpriteBatch, box: WeatherStateBox, label: String, x: Int, y: Int, ymax: Double = 1.0) {
         val bw = 50*3 + 1
-        val bh = 40*2 + 1
-        val yc = bh/2
-        val yh = yc
+        val bh = 100
         val xstart = (bw/3)*1
         val xw = (bw/3)
+        val MIN_RULE_GAP = 5.0
 
         // back
         batch.color = colGraphBack
-        Toolkit.fillArea(batch, x, y, bw, bh)
+        Toolkit.fillArea(batch, x, y + 1, bw, bh - 1)
         // frame
         batch.color = colGraphFore
-        Toolkit.drawBoxBorder(batch, x + 1, y, bw - 1, bh)
-        // grid
+        Toolkit.drawBoxBorder(batch, x + 1, y + 1, bw - 1, bh - 1)
+        // x grids
         Toolkit.drawStraightLine(batch, x + (bw/3)*1, y, y+bh, 1, true)
         Toolkit.drawStraightLine(batch, x + (bw/3)*2, y, y+bh, 1, true)
-        // centreline
-        Toolkit.drawStraightLine(batch, x, y + yc, x + bw, 1, false)
+        // y grids
+        val yrange =
+        //// ymax small and bh tall enought to fit the 0.25 rules?
+        if (bh / ymax * 0.25 >= MIN_RULE_GAP)
+            (ymax.toInt() * 4 downTo 0).map { it * 0.25 }
+        //// ymax small and bh tall enought to fit the 0.5 rules?
+        else if (bh / ymax * 0.5 >= MIN_RULE_GAP)
+            (ymax.toInt() * 2 downTo 0).map { it * 0.5 }
+        //// ymax small and bh tall enought to fit the 1.0 rules?
+        else if (bh / ymax >= MIN_RULE_GAP)
+            (ymax.toInt() downTo 0).map { it * 1.0 }
+        //// ymax small and bh tall enought to fit the 2.0 rules?
+        else if (bh / ymax * 2.0 >= MIN_RULE_GAP)
+            (ymax.toInt() / 2 downTo 0).map { it * 2.0 }
+        //// ymax small and bh tall enought to fit the 5.0 rules?
+        else if (bh / ymax * 5.0 >= MIN_RULE_GAP)
+            (ymax.toInt() / 5 downTo 0).map { it * 5.0 }
+        //// ymax small and bh tall enought to fit the 10.0 rules?
+        else if (bh / ymax * 10.0 >= MIN_RULE_GAP)
+            (ymax.toInt() / 10 downTo 0).map { it * 10.0 }
+        else
+            (ymax.toInt() / 20 downTo 0).map { it * 20.0 }
+
+        yrange.forEach { d ->
+            val yc = bh - (bh / ymax * d).roundToInt()
+            batch.color = when (d % 1.0) {
+                0.0 -> colGraphFore
+                0.5 -> colGraphForf
+                else-> colGraphForg
+            }
+            Toolkit.drawStraightLine(batch, x, y + yc, x + bw, 1, false)
+        }
+
         // graph points
         batch.color = colGraph
-        Toolkit.fillArea(batch, x +          - 1, y + yc-(box.p0 * yh).roundToInt(), 3, 3)
-        Toolkit.fillArea(batch, x + (bw/3)*1 - 1, y + yc-(box.p1 * yh).roundToInt(), 3, 3)
-        Toolkit.fillArea(batch, x + (bw/3)*2 - 1, y + yc-(box.p2 * yh).roundToInt(), 3, 3)
-        Toolkit.fillArea(batch, x +  bw      - 1, y + yc-(box.p3 * yh).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x +          - 1, y + bh-(box.p0 * bh / ymax).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x + (bw/3)*1 - 1, y + bh-(box.p1 * bh / ymax).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x + (bw/3)*2 - 1, y + bh-(box.p2 * bh / ymax).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x +  bw      - 1, y + bh-(box.p3 * bh / ymax).roundToInt(), 3, 3)
+        batch.end()
         // interpolated values
         val pys = (0 until xw).map {
-            val px = it.toDouble() / xw
-            1 * yc - (yh * WeatherStateBox.interpolateCatmullRom(px, box.p0, box.p1, box.p2, box.p3)).roundToInt()
+            val px = it.toFloat() / xw
+            bh - (bh * WeatherStateBox.interpolateCatmullRom(px, box.p0, box.p1, box.p2, box.p3) / ymax).toFloat()
         }
-        pys.forEachIndexed { index, py ->
-            val px = x + xstart + index
-            if (index in 1 until pys.lastIndex) {
-                val py0 = pys[index - 1]
-                val py2 = pys[index + 1]
-                val pys = ((py0 + py) / 2.0).roundToInt()
-                var pye = ((py + py2) / 2.0).roundToInt()
-                if (pye - pys < 1) pye = pys + 1
-                Toolkit.drawStraightLine(batch, px, y + pys, y + pye, 1, true)
-            }
-            else if (index == pys.lastIndex) {
-                val py0 = pys[index - 1]
-                val pys = ((py0 + py) / 2.0).roundToInt()
-                val pye = if (py - pys < 1) pys + 1 else py
-                Toolkit.drawStraightLine(batch, px, y + pys, y + pye, 1, true)
-            }
-            else {
-                val py2 = pys[index + 1]
-                var pye = ((py + py2) / 2.0).roundToInt()
-                if (pye - py < 1) pye = py + 1
-                Toolkit.drawStraightLine(batch, px, y + py, y + pye, 1, true)
+
+        App.shapeRender.inUse {
+            it.color = colGraph
+            for (index in 0 until pys.lastIndex) {
+                val px = x + xstart + index.toFloat()
+                it.rectLine(
+                    px,
+                    App.scr.hf - 1 - (y + pys[index]),
+                    px + 1f,
+                    App.scr.hf - 1 - (y + pys[index + 1]),
+                    1.5f
+                )
             }
         }
+
+
         // hairline
+        batch.begin()
         batch.color = colHairline
         Toolkit.drawStraightLine(batch, x + xstart + (box.x * xw).roundToInt(), y, y+bh, 1, true)
 
         // text
         batch.color = Color.WHITE
-        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.get().toIntAndFrac(3)}", x.toFloat(), y - 14f)
+        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.get().toDouble().toIntAndFrac(3)}", x.toFloat(), y - 14f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""

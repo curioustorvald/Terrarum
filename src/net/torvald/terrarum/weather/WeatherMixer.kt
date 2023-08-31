@@ -29,6 +29,7 @@ import java.io.File
 import java.io.FileFilter
 import java.lang.Double.doubleToLongBits
 import java.lang.Math.toDegrees
+import java.lang.Math.toRadians
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.*
@@ -89,9 +90,13 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffX = 0f
     private var astrumOffY = 0f
 
-    private val clouds = SortedArrayList<WeatherObjectCloud>()
 
-//    val weatherbox: Weatherbox
+    var weatherbox = Weatherbox()
+
+
+    // Clouds are merely a response to the current Weatherbox status //
+
+    private val clouds = SortedArrayList<WeatherObjectCloud>()
 
     var cloudsSpawned = 0; private set
     private var windVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
@@ -124,10 +129,22 @@ internal object WeatherMixer : RNGConsumer {
         cloudsSpawned = 0
         windVector = Vector3(-0.98f, 0f, 0.21f)
 
-        windDirWindow = null
-        windSpeedWindow = null
-
         oldCamPos.set(WorldCamera.camVector)
+
+        weatherbox = Weatherbox()
+        // TEST FILL WITH RANDOM VALUES
+        (0..3).map { takeUniformRand(0f..1f) }.let {
+            weatherbox.windDir.p0 = it[0]
+            weatherbox.windDir.p1 = it[1]
+            weatherbox.windDir.p2 = it[2]
+            weatherbox.windDir.p3 = it[3]
+        }
+        (0..3).map { takeUniformRand(-1f..1f) }.let {
+            weatherbox.windSpeed.p0 = currentWeather.getRandomWindSpeed(it[0])
+            weatherbox.windSpeed.p1 = currentWeather.getRandomWindSpeed(it[1])
+            weatherbox.windSpeed.p2 = currentWeather.getRandomWindSpeed(it[2])
+            weatherbox.windSpeed.p3 = currentWeather.getRandomWindSpeed(it[3])
+        }
     }
 
     init {
@@ -213,12 +230,8 @@ internal object WeatherMixer : RNGConsumer {
     private val TWO_PI = 6.2831855f
     private val THREE_PI = 9.424778f
 
-    private var windDirWindow: FloatArray? = null
-    private var windSpeedWindow: FloatArray? = null
-    private val WIND_DIR_TIME_UNIT = 14400 // every 4hr
-    private val WIND_SPEED_TIME_UNIT = 3600 // every 1hr
-    private var windDirAkku = 0 // only needed if timeDelta is not divisible by WIND_TIME_UNIT
-    private var windSpeedAkku = 0
+    private val WIND_DIR_TIME_UNIT = 14400f // every 4hr
+    private val WIND_SPEED_TIME_UNIT = 3600f // every 1hr
 
     // see: https://stackoverflow.com/questions/2708476/rotation-interpolation/14498790#14498790
     private fun getShortestAngle(start: Float, end: Float) =
@@ -227,54 +240,23 @@ internal object WeatherMixer : RNGConsumer {
         }
 
     private fun updateWind(delta: Float, world: GameWorld) {
-        if (windDirWindow == null) {
-            windDirWindow = FloatArray(4) { takeUniformRand(-PI..PI) } // completely random regardless of the seed
+
+        val currentWindSpeed = weatherbox.windSpeed.getAndUpdate( world.worldTime.timeDelta / WIND_SPEED_TIME_UNIT) {
+            currentWeather.getRandomWindSpeed(takeUniformRand(-1f..1f))
         }
-        if (windSpeedWindow == null) {
-            windSpeedWindow = FloatArray(4) { currentWeather.getRandomWindSpeed(takeTriangularRand(-1f..1f)) } // completely random regardless of the seed
-        }
+        val currentWindDir = weatherbox.windDir.getAndUpdate( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() } * 2.0 * Math.PI
 
-        val windDirStep = windDirAkku / WIND_DIR_TIME_UNIT.toFloat()
-        val windSpeedStep = windSpeedAkku / WIND_SPEED_TIME_UNIT.toFloat()
-
-//        val angle0 = windDirWindow[0]
-//        val angle1 = getShortestAngle(angle0, windDirWindow[1])
-//        val angle2 = getShortestAngle(angle1, windDirWindow[2])
-//        val angle3 = getShortestAngle(angle2, windDirWindow[3])
-//        val fixedAngles = floatArrayOf(angle0, angle1, angle2, angle3)
-
-        val currentWindDir = FastMath.interpolateCatmullRom(windDirStep, windDirWindow)
-        val currentWindSpeed = FastMath.interpolateCatmullRom(windSpeedStep, windSpeedWindow)
-        /*
-        printdbg(this,
-            "dir ${Math.toDegrees(currentWindDir.toDouble()).roundToInt()}\t" +
-                    "spd ${currentWindSpeed.times(10f).roundToInt().div(10f)}\t   " +
-                    "dirs ${windDirWindow!!.map { Math.toDegrees(it.toDouble()).roundToInt() }} ${windDirStep.times(100).roundToInt()}\t" +
-                    "spds ${windSpeedWindow!!.map { it.times(10f).roundToInt().div(10f) }} ${windSpeedStep.times(100).roundToInt()}"
-        )*/
 
         if (currentWeather.forceWindVec != null) {
             windVector.set(currentWeather.forceWindVec)
         }
         else {
             windVector.set(
-                cos(currentWindDir) * currentWindSpeed,
+                (cos(currentWindDir) * currentWindSpeed).toFloat(),
                 0f,
-                sin(currentWindDir) * currentWindSpeed
+                (sin(currentWindDir) * currentWindSpeed).toFloat()
             )
         }
-
-        while (windDirAkku >= WIND_DIR_TIME_UNIT) {
-            windDirAkku -= WIND_DIR_TIME_UNIT
-            windDirWindow!!.shiftAndPut(takeUniformRand(-PI..PI))
-        }
-        while (windSpeedAkku >= WIND_SPEED_TIME_UNIT) {
-            windSpeedAkku -= WIND_SPEED_TIME_UNIT
-            windSpeedWindow!!.shiftAndPut(currentWeather.getRandomWindSpeed(takeTriangularRand(-1f..1f)))
-        }
-
-        windDirAkku += world.worldTime.timeDelta
-        windSpeedAkku += world.worldTime.timeDelta
     }
 
     private val cloudParallaxMultY = -0.035f
@@ -537,7 +519,7 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
-    internal fun render(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
+    internal fun render(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
         drawSkybox(camera, batch, world)
         drawClouds(batch)
         batch.color = Color.WHITE
@@ -559,7 +541,7 @@ internal object WeatherMixer : RNGConsumer {
     private val parallaxDomainSize = 400f
     private val turbidityDomainSize = 533.3333f
 
-    private fun drawSkybox(camera: Camera, batch: FlippingSpriteBatch, world: GameWorld) {
+    private fun drawSkybox(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
         val parallaxZeroPos = (world.height / 3f)
 
         // we will not care for nextSkybox for now

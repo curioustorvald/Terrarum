@@ -124,7 +124,7 @@ package net.torvald.terrarum.modulebasegame.ui
         //println("UITitleRemoConRoot bro u even updatez")
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         menubar.render(batch, camera)
     }
 

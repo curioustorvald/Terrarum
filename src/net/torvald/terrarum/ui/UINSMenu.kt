@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import kotlin.math.max
@@ -167,7 +168,7 @@ class UINSMenu(
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         listStack.forEach {
             // draw title bar
             batch.color = titleBackCol

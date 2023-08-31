@@ -131,7 +131,7 @@ class UIItemTextSelector(
     private val leftIcon = if (useSpinnerButtons) labels.get(9,2) else labels.get(16,0)
     private val rightIcon = if (useSpinnerButtons) labels.get(10,2) else labels.get(17,0)
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         labelCache = labelfuns.map { it() }
 
         batch.end()

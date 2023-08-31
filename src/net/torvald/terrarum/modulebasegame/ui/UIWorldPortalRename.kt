@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.langpack.Lang
@@ -63,7 +64,7 @@ class UIWorldPortalRename(private val full: UIWorldPortal) : UICanvas() {
 
     private var oldPosX = full.posX
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
 
         // ugh why won't you just scroll along??

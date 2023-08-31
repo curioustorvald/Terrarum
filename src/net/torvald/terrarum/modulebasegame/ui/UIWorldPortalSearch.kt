@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -153,7 +154,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
 
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth/2
         val memoryGaugeYpos = drawY + sizeSelY + buttonHeight + 10
         val textXpos = memoryGaugeXpos + 3

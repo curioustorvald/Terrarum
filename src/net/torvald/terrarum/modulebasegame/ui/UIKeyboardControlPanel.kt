@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
@@ -200,7 +201,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         controlPalette.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
 //        batch.color = borderNormal
 //        Toolkit.drawBoxBorder(batch, drawX, drawY, width, height)
 //        batch.color = fillCol
@@ -336,7 +337,7 @@ private class UIItemKeycap(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         super.render(batch, camera)
 
         batch.color = if (key == null)
@@ -446,7 +447,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         )
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         super.render(batch, camera)
 
         Toolkit.drawBaloon(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
@@ -278,7 +279,7 @@ void main() {
         subUIs.forEach { it.update(delta) }
     }
 
-    fun render(ui: UICanvas, batch: SpriteBatch, camera: Camera, parentOpacity: Float) {
+    fun render(ui: UICanvas, batch: SpriteBatch, camera: OrthographicCamera, parentOpacity: Float) {
 
         if (isVisible) {
             // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
@@ -390,7 +391,7 @@ void main() {
             return isVisible && !isOpening
         }
 
-    fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+    fun setCameraPosition(batch: SpriteBatch, camera: OrthographicCamera, newX: Float, newY: Float) {
         TerrarumIngame.setCameraPosition(batch, camera, newX, newY)
     }
 

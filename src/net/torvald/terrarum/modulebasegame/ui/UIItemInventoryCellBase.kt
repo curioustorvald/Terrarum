@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.GdxColorMap
@@ -33,7 +34,7 @@ abstract class UIItemInventoryCellBase(
         open protected val highlightEquippedItem: Boolean = true // for some UIs that only cares about getting equipped slot number but not highlighting
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
-    abstract override fun render(batch: SpriteBatch, camera: Camera)
+    abstract override fun render(batch: SpriteBatch, camera: OrthographicCamera)
 
     /** Custom highlight rule to highlight tihs button to primary accent colour (blue by default).
      * Set to `null` to use default rule:

@@ -511,7 +511,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
     fun setCameraPosition(newX: Float, newY: Float) {
-        TerrarumIngame.setCameraPosition(batch, camera, newX, newY)
+        TerrarumIngame.setCameraPosition(batch, App.shapeRender, camera, newX, newY)
     }
 
 

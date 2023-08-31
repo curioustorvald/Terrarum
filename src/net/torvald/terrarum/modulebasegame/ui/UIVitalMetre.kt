@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.darkerLab
@@ -62,7 +63,7 @@ class UIVitalMetre(
     /**
      * g must be same as World Graphics!
      */
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         // TODO now that we just can't draw arcs, we need to re-think about this
         
         /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {

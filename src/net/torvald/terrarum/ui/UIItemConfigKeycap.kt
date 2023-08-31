@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -39,7 +40,7 @@ class UIItemConfigKeycap(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         // draw keycap
         batch.draw(capTex.get(0, 0), posX.toFloat(), posY.toFloat())
         batch.draw(capTex.get(1, 0), (posX + capTex.tileW).toFloat(), posY.toFloat(),

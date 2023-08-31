@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
@@ -134,7 +135,7 @@ class UIItemToggleButton(
         Color(0x00E800FF)
     )
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
 

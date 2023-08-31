@@ -35,7 +35,7 @@ class UIFakeGradOverlay : UICanvas() {
     }
 
     override fun updateUI(delta: Float) {}
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
         val dither = App.getConfigBoolean("fx_dither")
 
@@ -84,7 +84,7 @@ class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas
     private val batchDrawCol = Color(-1)
 
     override fun updateUI(delta: Float) {}
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batchDrawCol.a = openness
         batch.color = batchDrawCol
         if (App.getConfigBoolean("fx_backgroundblur")) {

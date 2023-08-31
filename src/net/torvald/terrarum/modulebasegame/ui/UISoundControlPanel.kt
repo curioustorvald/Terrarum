@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
@@ -31,7 +32,7 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         ControlPanelCommon.render("basegame.soundcontrolpanel", width, batch)
         uiItems.forEach { it.render(batch, camera) }
     }

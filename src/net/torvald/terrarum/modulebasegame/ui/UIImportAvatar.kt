@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -119,7 +120,7 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         Lang["ERROR_AVATAR_ALREADY_EXISTS"], // 2
     )
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         val textboxWidth = textboxIndices.maxOf { App.fontGame.getWidth(Lang["CONTEXT_IMPORT_AVATAR_INSTRUCTION_$it"]) }
         val textX = (Toolkit.drawWidth - textboxWidth) / 2
@@ -264,7 +265,7 @@ class UIItemCodeBox(parent: UIImportAvatar, initialX: Int, initialY: Int, val co
         }
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         // draw box backgrounds
         batch.color = UIInventoryFull.CELL_COL
         Toolkit.fillArea(batch, posX, posY, width, height)

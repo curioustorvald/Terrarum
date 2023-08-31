@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.Terrarum.getPlayerSaveFiledesc
@@ -12,8 +14,8 @@ import net.torvald.terrarum.Terrarum.getWorldSaveFiledesc
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockPropUtil
-import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.blockstats.MinimapComposer
+import net.torvald.terrarum.blockstats.TileSurvey
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.console.AVTracker
 import net.torvald.terrarum.console.ActorsList
@@ -95,12 +97,24 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     companion object {
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
-        fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+        fun setCameraPosition(batch: SpriteBatch, camera: OrthographicCamera, newX: Float, newY: Float) {
             camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
         }
+        fun setCameraPosition(batch: SpriteBatch, shape: ShapeRenderer, camera: OrthographicCamera, newX: Float, newY: Float) {
+            camera.setToOrtho(false, App.scr.wf, App.scr.hf)
+            camera.update()
+            camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
+            camera.update()
+            shape.projectionMatrix = camera.combined
 
+            camera.setToOrtho(true, App.scr.wf, App.scr.hf)
+            camera.update()
+            camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
+            camera.update()
+            batch.projectionMatrix = camera.combined
+        }
         fun getCanonicalTitle() = App.GAME_NAME +
                                   " $EMDASH F: ${Gdx.graphics.framesPerSecond}" +
                                   if (App.IS_DEVELOPMENT_BUILD)

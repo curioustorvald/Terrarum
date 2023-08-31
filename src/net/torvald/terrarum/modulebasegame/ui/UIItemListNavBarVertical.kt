@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.CommonResourcePool
@@ -110,7 +111,7 @@ class UIItemListNavBarVertical(
     var itemPage = 0
 
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
 
         gridModeButtons.forEach { it.posX += posXDelta }

@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.BlendMode
@@ -53,7 +54,7 @@ open class UIItemImageButton(
     var highlighted = false
     var extraDrawOp: (UIItem, SpriteBatch) -> Unit = { _,_ -> }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         // draw background
         if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode, batch)

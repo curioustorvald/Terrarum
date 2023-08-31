@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.ui.UICanvas
@@ -17,7 +18,7 @@ class UIProxyLoadLatestSave(val remoCon: UIRemoCon) : UICanvas() {
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
     }
 
     override fun doOpening(delta: Float) {

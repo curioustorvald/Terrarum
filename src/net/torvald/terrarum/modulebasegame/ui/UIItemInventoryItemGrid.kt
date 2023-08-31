@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
@@ -289,7 +290,7 @@ open class UIItemInventoryItemGrid(
 //    private fun getIconPosY(index: Int) =
 //        posY + 8 + 26 * index
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         val posXDelta = posX - oldPosX
         itemGrid.forEach { it.posX += posXDelta }
         itemList.forEach { it.posX += posXDelta }

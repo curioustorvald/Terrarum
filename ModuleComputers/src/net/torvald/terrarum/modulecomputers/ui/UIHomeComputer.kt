@@ -50,7 +50,7 @@ internal class UIHomeComputer : UICanvas(
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(otherBatch: SpriteBatch, otherCamera: Camera) {
+    override fun renderUI(otherBatch: SpriteBatch, otherCamera: OrthographicCamera) {
         otherBatch.end()
 
         fbo.inAction(camera, batch) {

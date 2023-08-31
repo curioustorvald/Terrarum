@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.gameitems.GameItem
@@ -78,7 +79,7 @@ class UIItemInventoryElemWide(
     var textHighlightMouseUpCol = Toolkit.Theme.COL_MOUSE_UP
     var textHighlightNormalCol = Color.WHITE
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
 
         highlightToMainCol = customHighlightRuleMain?.invoke(this) ?: (equippedSlot != null && highlightEquippedItem) || forceHighlighted

@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
@@ -84,7 +85,7 @@ class UIQuickslotBar : UICanvas() {
 
     private val itemCntTextCol = Color(0x404040ff)
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
 
         (Terrarum.ingame!! as TerrarumIngame).actorNowPlaying?.let { actor ->
             for (i in 0 until SLOT_COUNT) {

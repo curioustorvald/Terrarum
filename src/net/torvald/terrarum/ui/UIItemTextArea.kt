@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.roundToFloat
@@ -33,7 +34,7 @@ class UIItemTextArea(
         if (scrollPos < 0) scrollPos = 0
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         for (i in scrollPos until min(lineCount + scrollPos, entireText.size)) {
             val yPtr = i - scrollPos
 

@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
@@ -94,7 +95,7 @@ class UIItemHorzSlider(
 
     private val renderOrderMouseUp = arrayOf(0,2,3,1).map { renderJobs[it] }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         renderOrderMouseUp.forEach { it(batch) }
 

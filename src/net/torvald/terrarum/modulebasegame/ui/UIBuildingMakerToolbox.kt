@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Second
@@ -37,7 +38,7 @@ class UIBuildingMakerToolbox : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         tools.forEach { it.render(batch, camera) }
     }
 

@@ -32,7 +32,7 @@ class UICheatDetected : UICanvas() {
 
     private val backgroundCol = Color(0x00000080)
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         Terrarum.ingame?.consoleHandler?.setAsClose()
         Terrarum.ingame?.consoleHandler?.isVisible = false
 

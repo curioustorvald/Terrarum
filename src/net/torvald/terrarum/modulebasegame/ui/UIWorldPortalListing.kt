@@ -1,9 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
@@ -339,7 +336,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private var selectedWorldThumb: TextureRegion? = null
 
     val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         val memoryGaugeXpos = hx - memoryGaugeWidth - gridGap/2
         val memoryGaugeYpos = y + listHeight - buttonHeight
         val textXpos = memoryGaugeXpos + 3
@@ -511,7 +508,7 @@ class UIItemWorldCellsSimple(
         super.update(delta)
     }
 
-    fun render(batch: SpriteBatch, camera: Camera, offX: Int, offY: Int) {
+    fun render(batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
         super.render(batch, camera)
 
         val posX = posX + offX
@@ -543,7 +540,7 @@ class UIItemWorldCellsSimple(
     }
 
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         render(batch, camera, 0, 0)
     }
 

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 
@@ -51,7 +52,7 @@ class UIItemInlineRadioButtons(
         super.update(delta)
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         // backgrounds
         batch.color = UIItemTextLineInput.TEXTINPUT_COL_BACKGROUND
         for (i in labelfuns.indices) {

@@ -135,7 +135,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         moduleCells.clear()
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         lateinit var savePixmap: Pixmap
@@ -260,7 +260,7 @@ class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
         sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, true)
     }
 
-    private fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+    private fun setCameraPosition(batch: SpriteBatch, camera: OrthographicCamera, newX: Float, newY: Float) {
         camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined

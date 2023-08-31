@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
@@ -118,7 +119,7 @@ abstract class UICanvas(
         handler.update(this, delta)
     }
     /** Called by the screen */
-    fun render(batch: SpriteBatch, camera: Camera, parentOpacity: Float = 1f) {
+    fun render(batch: SpriteBatch, camera: OrthographicCamera, parentOpacity: Float = 1f) {
         handler.render(this, batch, camera, parentOpacity)
     }
 
@@ -154,7 +155,7 @@ abstract class UICanvas(
      * The transparency of the handler is independent of the draw, you must set the drawing color yourself
      * (use handler.opacity or handler.opacityColour)
      */
-    abstract fun renderUI(batch: SpriteBatch, camera: Camera)
+    abstract fun renderUI(batch: SpriteBatch, camera: OrthographicCamera)
 
     /**
      * Do not modify ui.handler.openCloseCounter here.

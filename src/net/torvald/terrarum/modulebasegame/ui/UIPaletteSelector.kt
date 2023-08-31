@@ -1,9 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.ItemCodex
@@ -71,7 +68,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         // draw title bar
         batch.color = UINSMenu.DEFAULT_TITLEBACKCOL
         blendNormalStraightAlpha(batch)

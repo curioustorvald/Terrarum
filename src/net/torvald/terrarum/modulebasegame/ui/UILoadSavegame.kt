@@ -144,7 +144,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         transitionPanel.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         transitionPanel.render(batch, camera)
     }
 
@@ -182,7 +182,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         super.resize(width, height)
     }
 
-    internal fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+    internal fun setCameraPosition(batch: SpriteBatch, camera: OrthographicCamera, newX: Float, newY: Float) {
         camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined

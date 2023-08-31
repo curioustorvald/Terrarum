@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.unicode.EMDASH
 import net.torvald.terrarum.App
@@ -168,7 +169,7 @@ class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
         uiItems.forEach { it.update(delta) }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
         val txt1 = Lang["MENU_LABEL_KEYBOARD_LAYOUT"]; val tw1 = App.fontGame.getWidth(txt1)
@@ -266,7 +267,7 @@ private class UIItemInputKeycap(
             c in 0x1DC0..0x1DFF || c in 0x20D0..0x20FF || c in 0xFE20..0xFE2F ||
             c == 0xE31 || c in 0xE33..0xE3A || c in 0xE47..0xE4E
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         super.render(batch, camera)
 
         // key background

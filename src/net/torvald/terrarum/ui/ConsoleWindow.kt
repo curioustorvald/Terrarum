@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
@@ -102,7 +103,7 @@ class ConsoleWindow : UICanvas() {
         textinput.isEnabled = (isOpened && !isClosing)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         // background
         batch.color = UIColour
         Toolkit.fillArea(batch, drawOffX, drawOffY, width.toFloat(), height.toFloat())

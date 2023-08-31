@@ -26,7 +26,7 @@ package net.torvald.terrarum.modulebasegame.ui
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormal(batch)
 
         val textWidth = messagesList.map { AppLoader.fontGame.getWidth(it) }.sorted()[1]

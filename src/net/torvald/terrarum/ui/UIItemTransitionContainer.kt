@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
@@ -54,7 +55,7 @@ open class UIItemTransitionContainer(
 
     open fun onTransition(currentPosition: Float, uis: List<UICanvas>) {}
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         super.render(batch, camera)
 
         if (transitionRequested && !transitionOngoing) {

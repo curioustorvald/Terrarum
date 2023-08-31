@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
@@ -174,7 +175,7 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     /**
      * In this time, you do write like: ```draw(posX + 4, posY + 32)```, unlike UICanvas, because posX/posY comes from the parent UI.
      */
-    open fun render(batch: SpriteBatch, camera: Camera) {
+    open fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         if (parentUI.isVisible) {
 //            if (isActive) {
                 mouseOverCall?.render(batch, camera)

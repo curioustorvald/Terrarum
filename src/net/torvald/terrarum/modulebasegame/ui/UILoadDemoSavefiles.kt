@@ -304,7 +304,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
 
         if (mode == 2) {
             loadFired += 1
@@ -475,7 +475,7 @@ class UILoadDemoSavefiles(val remoCon: UIRemoCon) : Advanceable() {
         sliderFBO = FrameBuffer(Pixmap.Format.RGBA8888, uiWidth + 10, height, false)
     }
 
-    private fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+    private fun setCameraPosition(batch: SpriteBatch, camera: OrthographicCamera, newX: Float, newY: Float) {
         camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
@@ -584,7 +584,7 @@ class UIItemPlayerCells(
 
     private val avatarViewWidth = 120
 
-    fun render(batch: SpriteBatch, camera: Camera, offX: Int, offY: Int) {
+    fun render(batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
         // try to generate a texture
         if (!hasTexture) { acquirePlayerAvatar(); hasTexture = true }
 
@@ -652,7 +652,7 @@ class UIItemPlayerCells(
         }
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         render(batch, camera, 0, 0)
     }
 
@@ -819,7 +819,7 @@ class UIItemWorldCells(
         highlightCol = if (mouseUp) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_LIST_DEFAULT
     }
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         // try to generate a texture
         if (skimmer.initialised && !hasTexture) {
             // load thumbnail or use stock if the file is not there

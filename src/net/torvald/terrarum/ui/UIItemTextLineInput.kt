@@ -511,7 +511,7 @@ class UIItemTextLineInput(
 
     private var textDrawOffset = 0
 
-    override fun render(batch: SpriteBatch, camera: Camera) {
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
 
         val posXDelta = posX - oldPosX
 

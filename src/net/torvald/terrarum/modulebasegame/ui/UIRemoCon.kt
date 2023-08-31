@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.*
@@ -213,7 +214,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
         openUI = external
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         remoConTray.render(batch, camera)
         openUI?.render(batch, camera)
     }
@@ -307,7 +308,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
             menubar.update(delta)
         }
 
-        fun render(batch: SpriteBatch, camera: Camera) {
+        fun render(batch: SpriteBatch, camera: OrthographicCamera) {
             menubar.render(batch, camera)
         }
 

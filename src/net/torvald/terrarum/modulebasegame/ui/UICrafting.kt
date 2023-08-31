@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.gamepadLabelLEFTRIGHT
@@ -450,7 +451,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         if (openingClickLatched && !Terrarum.mouseDown) openingClickLatched = false
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         // NO super.render due to an infinite recursion
         this.uiItems.forEach { it.render(batch, camera) }
 

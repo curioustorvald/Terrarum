@@ -221,7 +221,7 @@ object Common {
             }
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherStateBox {
-                return jsonData.asString().split(';').map { it.toDouble() }.let {
+                return jsonData.asString().split(';').map { it.toFloat() }.let {
                     WeatherStateBox(it[0], it[1], it[2], it[3], it[4])
                 }
             }

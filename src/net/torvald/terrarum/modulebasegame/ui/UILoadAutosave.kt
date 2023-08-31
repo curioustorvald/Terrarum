@@ -122,7 +122,7 @@ import java.util.zip.GZIPInputStream
 
     private var loadFiredFrameCounter = 0
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         if (mode == MODE_INIT) {
             // "The Autosave is more recent than the manual save"
             Toolkit.drawTextCentered(batch, App.fontGame, Lang["GAME_MORE_RECENT_AUTOSAVE1"], Toolkit.drawWidth, 0, altSelDrawY)

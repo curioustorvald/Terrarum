@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
@@ -178,31 +179,31 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     // `screens` order
     private val screenRenders = arrayOf(
-            { batch: SpriteBatch, camera: Camera ->
+            { batch: SpriteBatch, camera: OrthographicCamera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
                 // text buttons
                 gameMenuButtons.render(batch, camera)
             },
-            { batch: SpriteBatch, camera: Camera ->
+            { batch: SpriteBatch, camera: OrthographicCamera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
                 keyboardSetupUI.render(batch, camera)
             },
-            { batch: SpriteBatch, camera: Camera ->
+            { batch: SpriteBatch, camera: OrthographicCamera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
                 areYouSureMainMenuButtons.render(batch, camera)
             },
-            { batch: SpriteBatch, camera: Camera ->
+            { batch: SpriteBatch, camera: OrthographicCamera ->
                 savingUI.render(batch, camera)
             },
-            { batch: SpriteBatch, camera: Camera ->
+            { batch: SpriteBatch, camera: OrthographicCamera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
                 keyConfigUI.render(batch, camera)
             },
-            { batch: SpriteBatch, camera: Camera ->
+            { batch: SpriteBatch, camera: OrthographicCamera ->
                 // control hints
                 App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
                 languageUI.render(batch, camera)
@@ -281,7 +282,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
             yeet.update(delta)
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         blendNormalStraightAlpha(batch)
         batch.color = Color.WHITE
         screenRenders[screen](batch, camera)

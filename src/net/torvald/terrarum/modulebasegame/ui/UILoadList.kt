@@ -161,7 +161,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.end()
 
         val cells = playerCells

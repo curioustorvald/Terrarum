@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
@@ -50,7 +51,7 @@ class UIAutosaveNotifier : UICanvas() {
         }
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
         val offX = App.scr.width - WIDTH - (App.scr.tvSafeGraphicsWidth * 1.25f).roundToInt().toFloat()
         val offY = App.scr.height - HEIGHT - App.scr.tvSafeGraphicsHeight - 9f // +9 to align to quickslot and watch UI

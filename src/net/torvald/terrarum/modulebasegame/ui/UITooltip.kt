@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Second
@@ -45,7 +46,7 @@ class UITooltip : UICanvas() {
         get() = 36 * 2 + font.lineHeight.toInt()
         set(value) { throw Error("You are not supposed to set the height of the tooltip manually.") }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         val mouseXoff = 28f
         val mouseYoff = 0f
         val txtW = msgWidth + 2f * textMarginX

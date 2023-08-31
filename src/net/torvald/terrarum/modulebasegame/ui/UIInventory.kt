@@ -213,7 +213,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
     private val weightBarWidth = 60f
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         // background
         blendNormal()
         batch.color = backgroundColour

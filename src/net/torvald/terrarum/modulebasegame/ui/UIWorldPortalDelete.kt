@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.langpack.Lang
@@ -44,7 +45,7 @@ class UIWorldPortalDelete(private val full: UIWorldPortal) : UICanvas() {
     }
 
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         full.selectedButton?.let {
             val buttonYdelta = (App.scr.tvSafeGraphicsHeight + 172 + 36) - it.posY
             val buttonXdelta = (Toolkit.drawWidth - it.width) / 2 - it.posX

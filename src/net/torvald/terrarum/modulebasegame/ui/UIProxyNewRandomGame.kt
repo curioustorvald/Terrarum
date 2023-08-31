@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.App
@@ -26,7 +27,7 @@ class UIProxyNewRandomGame(val remoCon: UIRemoCon) : UICanvas() {
     override fun updateUI(delta: Float) {
     }
 
-    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+    override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
     }
 
     override fun doOpening(delta: Float) {
