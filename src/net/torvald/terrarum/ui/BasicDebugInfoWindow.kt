@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -62,9 +63,11 @@ class BasicDebugInfoWindow : UICanvas() {
     private val HEIGHT = 0xC7.toChar()
     private val WIDTH = 0xCD.toChar()
 
-    private val KEY_TIMERS = Input.Keys.U
+    private val KEY_TIMERS = Input.Keys.T // + CONTROL_LEFT
+    private val KEY_WEATHERS = Input.Keys.W // + CONTROL_LEFT
 
     private var showTimers = false
+    private var showWeatherInfo = false
 
     override fun show() {
         ingame = Terrarum.ingame
@@ -120,6 +123,16 @@ class BasicDebugInfoWindow : UICanvas() {
     private val tileCursX = 0; private val tileCursY = 4
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        // toggle show-something
+        showTimers = showTimers xor (Gdx.input.isKeyJustPressed(KEY_TIMERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+        showWeatherInfo = showWeatherInfo xor (Gdx.input.isKeyJustPressed(KEY_WEATHERS) && Gdx.input.isKeyPressed(Keys.CONTROL_LEFT))
+
+
+        drawMain(batch)
+        if (showTimers) drawTimers(batch)
+    }
+
+    private fun drawMain(batch: SpriteBatch) {
         val windowWidth = Toolkit.drawWidth
         val player = ingame?.actorNowPlaying
         val hitbox = player?.hitbox
@@ -133,7 +146,6 @@ class BasicDebugInfoWindow : UICanvas() {
         batch.draw(back, gap - 4f, gap - 4f - 1f)
         batch.draw(back2, windowWidth - back2.width - (gap - 4f), gap - 4f - 1f)
 
-        showTimers = showTimers xor Gdx.input.isKeyJustPressed(KEY_TIMERS)
 
         batch.color = Color(0xFFEE88FF.toInt())
 
@@ -250,16 +262,6 @@ class BasicDebugInfoWindow : UICanvas() {
         }
 
 
-        // print time
-        if (showTimers) {
-            var dbgCnt = 10
-            App.debugTimers.forEach { t, u ->
-                printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
-                dbgCnt++
-            }
-        }
-
-
         /**
          * Top right
          */
@@ -319,6 +321,15 @@ class BasicDebugInfoWindow : UICanvas() {
         // processor and renderer
         App.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
                 (windowWidth - (totalHardwareName.length+2) * TinyAlphNum.W).toFloat(), App.scr.height - TinyAlphNum.H * 2f)
+
+    }
+
+    private fun drawTimers(batch: SpriteBatch) {
+        var dbgCnt = 10
+        App.debugTimers.forEach { t, u ->
+            printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
+            dbgCnt++
+        }
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""
@@ -336,6 +347,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 s, column(col), line(row)
         )
     }
+
 
 
     val histogramW = 256
