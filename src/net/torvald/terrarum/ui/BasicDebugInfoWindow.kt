@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
@@ -18,11 +19,14 @@ import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.weather.WeatherStateBox
+import net.torvald.terrarum.weather.Weatherbox
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.absoluteValue
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -130,6 +134,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
         drawMain(batch)
         if (showTimers) drawTimers(batch)
+        if (showWeatherInfo) drawWeatherInfo(batch)
+
+
+        testBox.getAndUpdate(0.001, testBoxRng)
     }
 
     private fun drawMain(batch: SpriteBatch) {
@@ -246,7 +254,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 batch.draw(icons.get(4,0), gap + 7f*tileCursX, line(tileCursY + 1) + 7)
             }
         }
-        catch (e: NullPointerException) {}
+        catch (e: Throwable) {}
 
 
         batch.color = Color.WHITE
@@ -330,6 +338,80 @@ class BasicDebugInfoWindow : UICanvas() {
             printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
             dbgCnt++
         }
+    }
+
+    private val testBox = WeatherStateBox(Math.random(), Math.random(), Math.random(), Math.random(), Math.random())
+    private val testBoxRng = HQRNG()
+
+    private fun drawWeatherInfo(batch: SpriteBatch) {
+        drawWeatherStateBox(batch, testBox, "Test", App.scr.width - 170, App.scr.height - 120)
+    }
+
+    private val colHairline = Color(0xf22100ff.toInt())
+    private val colGraph = Toolkit.Theme.COL_SELECTED
+    private val colGraphBack = Toolkit.Theme.COL_CELL_FILL
+    private val colGraphFore = Color(1f, 1f, 1f, 0.5f)
+
+    private fun drawWeatherStateBox(batch: SpriteBatch, box: WeatherStateBox, label: String, x: Int, y: Int) {
+        val bw = 50*3 + 1
+        val bh = 40*2 + 1
+        val yc = bh/2
+        val yh = yc
+        val xstart = (bw/3)*1
+        val xw = (bw/3)
+
+        // back
+        batch.color = colGraphBack
+        Toolkit.fillArea(batch, x, y, bw, bh)
+        // frame
+        batch.color = colGraphFore
+        Toolkit.drawBoxBorder(batch, x + 1, y, bw - 1, bh)
+        // grid
+        Toolkit.drawStraightLine(batch, x + (bw/3)*1, y, y+bh, 1, true)
+        Toolkit.drawStraightLine(batch, x + (bw/3)*2, y, y+bh, 1, true)
+        // centreline
+        Toolkit.drawStraightLine(batch, x, y + yc, x + bw, 1, false)
+        // graph points
+        batch.color = colGraph
+        Toolkit.fillArea(batch, x +          - 1, y + yc-(box.p0 * yh).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x + (bw/3)*1 - 1, y + yc-(box.p1 * yh).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x + (bw/3)*2 - 1, y + yc-(box.p2 * yh).roundToInt(), 3, 3)
+        Toolkit.fillArea(batch, x +  bw      - 1, y + yc-(box.p3 * yh).roundToInt(), 3, 3)
+        // interpolated values
+        val pys = (0 until xw).map {
+            val px = it.toDouble() / xw
+            1 * yc - (yh * WeatherStateBox.interpolateCatmullRom(px, box.p0, box.p1, box.p2, box.p3)).roundToInt()
+        }
+        pys.forEachIndexed { index, py ->
+            val px = x + xstart + index
+            if (index in 1 until pys.lastIndex) {
+                val py0 = pys[index - 1]
+                val py2 = pys[index + 1]
+                val pys = ((py0 + py) / 2.0).roundToInt()
+                var pye = ((py + py2) / 2.0).roundToInt()
+                if (pye - pys < 1) pye = pys + 1
+                Toolkit.drawStraightLine(batch, px, y + pys, y + pye, 1, true)
+            }
+            else if (index == pys.lastIndex) {
+                val py0 = pys[index - 1]
+                val pys = ((py0 + py) / 2.0).roundToInt()
+                val pye = if (py - pys < 1) pys + 1 else py
+                Toolkit.drawStraightLine(batch, px, y + pys, y + pye, 1, true)
+            }
+            else {
+                val py2 = pys[index + 1]
+                var pye = ((py + py2) / 2.0).roundToInt()
+                if (pye - py < 1) pye = py + 1
+                Toolkit.drawStraightLine(batch, px, y + py, y + pye, 1, true)
+            }
+        }
+        // hairline
+        batch.color = colHairline
+        Toolkit.drawStraightLine(batch, x + xstart + (box.x * xw).roundToInt(), y, y+bh, 1, true)
+
+        // text
+        batch.color = Color.WHITE
+        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.get().toIntAndFrac(3)}", x.toFloat(), y - 14f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""
