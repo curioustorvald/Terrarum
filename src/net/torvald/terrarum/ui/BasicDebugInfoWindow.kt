@@ -13,10 +13,12 @@ import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
+import net.torvald.terrarum.weather.WeatherDirBox
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -359,6 +361,10 @@ class BasicDebugInfoWindow : UICanvas() {
     private val GRAPH_CH = 100
 
     private fun drawWeatherStateBox(batch: SpriteBatch, box: WeatherStateBox, label: String, x: Int, y: Int, ymax: Double = 1.0) {
+        val ymax = if (box is WeatherDirBox) 4.0 else ymax
+        fun Float.goff() = if (box is WeatherDirBox) this + 2.0 else this + 0.0
+        fun Float.mod() = if (box is WeatherDirBox) this.plus(2f).fmod(4f).minus(2f) else this
+
         val bw = GRAPH_CW * 3 + 1
         val bh = GRAPH_CH
         val xw = GRAPH_CW
@@ -411,28 +417,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // here draws actual data
         App.shapeRender.inUse {
-            val pysM1 = (0 until xw).map {
+            val pys = (-2*xw..xw*3).map {
                 val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.pM2, box.pM1, box.p0, box.p1) / ymax).toFloat()
+                bh - (bh * box.valueAt(px).goff() / ymax).toFloat()
             }
-            val pys0 = (0 until xw).map {
-                val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.pM1, box.p0, box.p1, box.p2) / ymax).toFloat()
-            }
-            val pys1 = (0 until xw).map {
-                val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.p0, box.p1, box.p2, box.p3) / ymax).toFloat()
-            }
-            val pys2 = (0 until xw).map {
-                val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.p1, box.p2, box.p3, box.p3) / ymax).toFloat()
-            }
-            val pys3 = (0 until xw).map {
-                val px = it.toFloat() / xw
-                bh - (bh * WeatherStateBox.interpolate(px, box.p2, box.p3, box.p3, box.p3) / ymax).toFloat()
-            }
-            val pys = pysM1 + pys0 + pys1 + pys2 + pys3 + box.p3
-
 
             // interpolated values
             it.color = colGraph
@@ -453,11 +441,11 @@ class BasicDebugInfoWindow : UICanvas() {
 
             // graph points
             it.color = colGraph
-            if (box.x < 0.5) it.circle(x + (GRAPH_CW * 0.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p0 * bh / ymax).toFloat()), 2.5f)
-                             it.circle(x + (GRAPH_CW * 1.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p1 * bh / ymax).toFloat()), 2.5f)
-                             it.circle(x + (GRAPH_CW * 2.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p2 * bh / ymax).toFloat()), 2.5f)
+            if (box.x < 0.5) it.circle(x + (GRAPH_CW * 0.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p0.mod().goff() * bh / ymax).toFloat()), 2.5f)
+                             it.circle(x + (GRAPH_CW * 1.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p1.mod().goff() * bh / ymax).toFloat()), 2.5f)
+                             it.circle(x + (GRAPH_CW * 2.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p2.mod().goff() * bh / ymax).toFloat()), 2.5f)
             it.color = colGrapi
-            if (box.x > 0.5) it.circle(x + (GRAPH_CW * 3.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p3 * bh / ymax).toFloat()), 2.5f)
+            if (box.x > 0.5) it.circle(x + (GRAPH_CW * 3.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p3.mod().goff() * bh / ymax).toFloat()), 2.5f)
         }
 
 
@@ -468,7 +456,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // text
         batch.color = Color.WHITE
-        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.get().toDouble().toIntAndFrac(3)}", x.toFloat(), y - 14f)
+        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.value().toDouble().toIntAndFrac(3)}", x.toFloat(), y - 14f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""

@@ -248,7 +248,7 @@ internal object WeatherMixer : RNGConsumer {
         val currentWindSpeed = weatherbox.windSpeed.getAndUpdate( world.worldTime.timeDelta / WIND_SPEED_TIME_UNIT) {
             currentWeather.getRandomWindSpeed(takeUniformRand(-1f..1f))
         }
-        val currentWindDir = weatherbox.windDir.getAndUpdate( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() } * 2.0 * Math.PI
+        val currentWindDir = weatherbox.windDir.getAndUpdate( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() * 4f } * Math.PI * 0.5
 
 
         if (currentWeather.forceWindVec != null) {
