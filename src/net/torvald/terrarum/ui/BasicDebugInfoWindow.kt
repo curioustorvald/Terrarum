@@ -355,6 +355,7 @@ class BasicDebugInfoWindow : UICanvas() {
     private val colGraphFore = Color(1f, 1f, 1f, 0.5f)
     private val colGraphForf = Color(1f, 1f, 1f, 0.25f)
     private val colGraphForg = Color(1f, 1f, 1f, 0.125f)
+    private val colGraphForh = Color(1f, 1f, 1f, 0.0625f)
     private val MIN_RULE_GAP = 5.0
 
     private val GRAPH_CW = 50
@@ -383,33 +384,44 @@ class BasicDebugInfoWindow : UICanvas() {
         if (box.x > 0.5) Toolkit.drawStraightLine(batch, x + (GRAPH_CW * 3.5).toInt() - xi, y, y+bh, 1, true)
         // y grids
         val yrange =
+        //// ymax small and bh tall enought to fit the 0.125 rules?
+        if (bh / ymax * 0.125 >= MIN_RULE_GAP)
+            ((ymax * 8).toInt() downTo 0).map { it * 0.125 }
         //// ymax small and bh tall enought to fit the 0.25 rules?
-        if (bh / ymax * 0.25 >= MIN_RULE_GAP)
-            (ymax.toInt() * 4 downTo 0).map { it * 0.25 }
+        else if (bh / ymax * 0.25 >= MIN_RULE_GAP)
+            ((ymax * 4).toInt() downTo 0).map { it * 0.25 }
         //// ymax small and bh tall enought to fit the 0.5 rules?
         else if (bh / ymax * 0.5 >= MIN_RULE_GAP)
-            (ymax.toInt() * 2 downTo 0).map { it * 0.5 }
+            ((ymax * 2).toInt() downTo 0).map { it * 0.5 }
         //// ymax small and bh tall enought to fit the 1.0 rules?
         else if (bh / ymax >= MIN_RULE_GAP)
-            (ymax.toInt() downTo 0).map { it * 1.0 }
+            ((ymax).toInt() downTo 0).map { it * 1.0 }
         //// ymax small and bh tall enought to fit the 2.0 rules?
         else if (bh / ymax * 2.0 >= MIN_RULE_GAP)
-            (ymax.toInt() / 2 downTo 0).map { it * 2.0 }
+            ((ymax / 2).toInt() downTo 0).map { it * 2.0 }
         //// ymax small and bh tall enought to fit the 5.0 rules?
         else if (bh / ymax * 5.0 >= MIN_RULE_GAP)
-            (ymax.toInt() / 5 downTo 0).map { it * 5.0 }
+            ((ymax / 5).toInt() downTo 0).map { it * 5.0 }
         //// ymax small and bh tall enought to fit the 10.0 rules?
         else if (bh / ymax * 10.0 >= MIN_RULE_GAP)
-            (ymax.toInt() / 10 downTo 0).map { it * 10.0 }
-        else
-            (ymax.toInt() / 20 downTo 0).map { it * 20.0 }
+            ((ymax / 10).toInt() downTo 0).map { it * 10.0 }
+        //// ymax small and bh tall enought to fit the 20.0 rules?
+        else if (bh / ymax * 20.0 >= MIN_RULE_GAP)
+            ((ymax / 20).toInt() downTo 0).map { it * 20.0 }
+        //// ymax small and bh tall enought to fit the 50.0 rules?
+        else if (bh / ymax * 50.0 >= MIN_RULE_GAP)
+            ((ymax / 50).toInt() downTo 0).map { it * 50.0 }
+        //// ymax small and bh tall enought to fit the 100.0 rules?
+        else //if (bh / ymax * 100.0 >= MIN_RULE_GAP)
+            ((ymax / 100).toInt() downTo 0).map { it * 100.0 }
 
         yrange.forEach { d ->
             val yc = bh - (bh / ymax * d).roundToInt()
             batch.color = when (d % 1.0) {
                 0.0 -> colGraphFore
                 0.5 -> colGraphForf
-                else-> colGraphForg
+                0.25-> colGraphForg
+                else-> colGraphForh
             }
             Toolkit.drawStraightLine(batch, x, y + yc, x + bw, 1, false)
         }
@@ -456,7 +468,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // text
         batch.color = Color.WHITE
-        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.value().toDouble().toIntAndFrac(3)}", x.toFloat(), y - 14f)
+        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.value().toDouble().toIntAndFrac(3)}", x.toFloat(), y - 16f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""
