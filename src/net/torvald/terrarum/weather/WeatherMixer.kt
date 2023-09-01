@@ -240,7 +240,7 @@ internal object WeatherMixer : RNGConsumer {
         val currentWindSpeed = weatherbox.windSpeed.value
         val currentWindDir = weatherbox.windDir.value * HALF_PI
 
-        printdbg(this, "Wind speed = $currentWindSpeed")
+//        printdbg(this, "Wind speed = $currentWindSpeed")
 
         if (forceWindVec != null) {
             windVector.set(forceWindVec)
@@ -294,7 +294,7 @@ internal object WeatherMixer : RNGConsumer {
 
         var immDespawnCount = 0
         val immDespawnCauses = ArrayList<String>()
-        printdbg(this, "Wind vector = $windVector")
+//        printdbg(this, "Wind vector = $windVector")
         // move the clouds
         clouds.forEach {
             // do parallax scrolling
