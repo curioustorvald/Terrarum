@@ -4,8 +4,8 @@
   "daylightClut": "clut_daylight.tga",
   "classification": "generic",
   "cloudChance": 125,
-  "cloudGamma": [0.48, 2.4],
-  "cloudGammaVariance": [0.1, 0.1],
+  "cloudGamma": [0.45, 2.4],
+  "cloudGammaVariance": [0.1, 0.0],
   "windSpeed": 0.25,
   "windSpeedVariance": 1.0,
   "clouds": {

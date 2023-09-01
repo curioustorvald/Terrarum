@@ -1,12 +1,14 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.gameworld.GameWorld
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sign
@@ -14,7 +16,12 @@ import kotlin.math.sign
 /**
  * Created by minjaesong on 2023-08-21.
  */
-class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: Boolean) : WeatherObject(), Comparable<WeatherObjectCloud> {
+class WeatherObjectCloud(
+    private val texture: TextureRegion,
+    private val flipW: Boolean,
+    private val rgbGamma: Float,
+    private val aGamma: Float
+) : WeatherObject(), Comparable<WeatherObjectCloud> {
 
     override fun update() {
         throw UnsupportedOperationException()
@@ -33,11 +40,12 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
      * FlowVector: In which direction the cloud flows. Vec3(dX, dY, dScale)
      * Resulting vector: (x + dX, y + dY, scale * dScale)
      */
-    fun update(flowVector: Vector3) {
+    fun update(world: GameWorld, flowVector: Vector3) {
         pos.add(
             flowVector.cpy().
             scl(1f, 1f, getZflowMult(posZ)). // this will break the perspective if flowVector.z.abs() is close to 1, but it has to be here to "keep the distance"
-            scl(vecMult)
+            scl(vecMult).
+            scl(world.worldTime.timeDelta.toFloat())
         )
 
         eigenAlpha = if (posZ < 1f) posZ.pow(0.5f) else -((posZ - 1f) / ALPHA_ROLLOFF_Z) + 1f
@@ -66,17 +74,41 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
     private val h = App.scr.hf * 0.5f
     private val vecMult = Vector3(1f, 1f, 1f / (4f * h))
 
-    /**
-     * X/Y position is a bottom-centre point of the image
-     * Shader must be prepared prior to the render() call
-     */
-    override fun render(batch: SpriteBatch, offsetX: Float, offsetY: Float) {
+    private fun roundRgbGamma(x: Float): Int {
+        return RGB_GAMMA_TABLE.mapIndexed { i, f -> (f - x).absoluteValue to i }.minBy { it.first }.second
+    }
+    private fun roundAgamma(x: Float): Int {
+        return A_GAMMA_TABLE.mapIndexed { i, f -> (f - x).absoluteValue to i }.minBy { it.first }.second
+    }
+
+    fun render(batch: SpriteBatch, cloudDrawColour: Color) {
         val sc = screenCoord
+
+        val rgbGammaIndex = roundRgbGamma(rgbGamma)
+        val aGammaIndex = roundAgamma(aGamma)
+
+//        printdbg(this, "gamma: (${rgbGamma}, ${aGamma}) index: ($rgbGammaIndex, $aGammaIndex)")
+
+        val lightBits = cloudDrawColour.toIntBits()
+        val rbits = lightBits.ushr( 0).and(252) or rgbGammaIndex.ushr(2).and(3)
+        val gbits = lightBits.ushr( 8).and(252) or rgbGammaIndex.ushr(0).and(3)
+        val bbits = lightBits.ushr(16).and(252) or aGammaIndex
+        val abits = (alpha * 255).toInt()
+
+        batch.color = Color(rbits.shl(24) or gbits.shl(16) or bbits.shl(8) or abits)
 
         if (flipW)
             batch.draw(texture, sc.x + texture.regionWidth / posZ, sc.y, -texture.regionWidth * sc.z, texture.regionHeight * sc.z)
         else
             batch.draw(texture, sc.x, sc.y, texture.regionWidth * sc.z, texture.regionHeight * sc.z)
+    }
+
+    /**
+     * X/Y position is a bottom-centre point of the image
+     * Shader must be prepared prior to the render() call
+     */
+    override fun render(batch: SpriteBatch, offsetX: Float, offsetY: Float) {
+        throw UnsupportedOperationException()
     }
 
     /**
@@ -133,5 +165,34 @@ class WeatherObjectCloud(private val texture: TextureRegion, private val flipW: 
         fun screenXtoWorldX(screenX: Float, z: Float) = screenX * z - App.scr.halfwf * (z - 1f)
         const val ALPHA_ROLLOFF_Z = 64f
         const val OLD_AGE_DECAY = 4000f
+
+        val RGB_GAMMA_TABLE = floatArrayOf(
+            0.2f,
+            0.3f,
+            0.4f,
+            0.5f,
+
+            0.7f,
+            0.9f,
+            1.1f,
+            1.3f,
+
+            1.7f,
+            2.1f,
+            2.5f,
+            2.9f,
+
+            3.7f,
+            4.5f,
+            5.3f,
+            6.1f
+        )
+
+        val A_GAMMA_TABLE = floatArrayOf(
+            1.6f,
+            2.0f,
+            2.4f,
+            2.8f
+        )
     }
 }

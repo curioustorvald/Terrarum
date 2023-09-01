@@ -40,6 +40,16 @@ data class BaseModularWeather(
         val v = 1f + rnd.absoluteValue * windSpeedVariance
         return if (rnd < 0) windSpeed / v else windSpeed * v
     }
+
+    fun getRandomCloudGamma(rnd1: Float, rnd2: Float): Vector2 {
+        val v = 1f + rnd1.absoluteValue * cloudGammaVariance.x
+        val gx = if (rnd1 < 0) cloudGamma.x / v else cloudGamma.x * v
+
+        val u = 1f + rnd2.absoluteValue * cloudGammaVariance.y
+        val gy = if (rnd2 < 0) cloudGamma.y / u else cloudGamma.y * u
+
+        return Vector2(gx, gy)
+    }
 }
 
 data class CloudProps(

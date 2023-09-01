@@ -1,6 +1,7 @@
 package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
@@ -11,7 +12,7 @@ data class WeatherSchedule(val weather: BaseModularWeather = WeatherMixer.DEFAUL
 class Weatherbox {
 
     companion object {
-        private val WIND_DIR_TIME_UNIT = 3600f * 5 // every 5hr
+        private val WIND_DIR_TIME_UNIT = 3600f * 6 // every 6hr
         private val WIND_SPEED_TIME_UNIT = 3600f * 2 // every 2hr
 
         private val HALF_PIF = 1.5707964f
@@ -53,10 +54,10 @@ class Weatherbox {
             // TODO add more random weathers
             if (weatherSchedule.size == 1) {
                 val newName = if (currentWeather.identifier == "generic01") "overcast01" else "generic01"
-                val newDuration = 3600L
+                val newDuration = 7200L
                 weatherSchedule.add(WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration))
 
-                println("Queueing next weather '$newName' that will last $newDuration seconds")
+//                printdbg(this, "Queueing next weather '$newName' that will last $newDuration seconds")
             }
 
             // subtract akku by old currentWeatherDuration

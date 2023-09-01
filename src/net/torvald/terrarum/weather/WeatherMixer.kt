@@ -146,24 +146,22 @@ internal object WeatherMixer : RNGConsumer {
         oldCamPos.set(WorldCamera.camVector)
 
         weatherbox = Weatherbox()
-        weatherbox.initWith(weatherDict["generic01"]!!, 3600L)
+        weatherbox.initWith(weatherDict["generic01"]!!, 7200L)
 
         // TEST FILL WITH RANDOM VALUES
-        (0..5).map { takeUniformRand(0f..1f) }.let {
+        (0..4).map { takeUniformRand(0f..1f) }.let {
             weatherbox.windDir.pM1 = it[0]
             weatherbox.windDir.p0  = it[1]
             weatherbox.windDir.p1  = it[2]
             weatherbox.windDir.p2  = it[3]
             weatherbox.windDir.p3  = it[4]
-//            weatherbox.windDir.p4  = it[5]
         }
-        (0..5).map { takeUniformRand(-1f..1f) }.let {
+        (0..4).map { takeUniformRand(-1f..1f) }.let {
             weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(it[0])
             weatherbox.windSpeed.p0  = currentWeather.getRandomWindSpeed(it[1])
             weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(it[2])
             weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(it[3])
             weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(it[4])
-//            weatherbox.windSpeed.p4  = currentWeather.getRandomWindSpeed(it[5])
         }
     }
 
@@ -301,7 +299,7 @@ internal object WeatherMixer : RNGConsumer {
             it.posX += camDelta.x * cloudParallaxMultX
             it.posY += camDelta.y * cloudParallaxMultY
 
-            it.update(windVector)
+            it.update(world, windVector)
 
             if (DEBUG_CAUSE_OF_DESPAWN && it.life == 0) {
                 immDespawnCount += 1
@@ -450,7 +448,15 @@ internal object WeatherMixer : RNGConsumer {
 
                 val sheetX = rA % cloud.spriteSheet.horizontalCount
                 val sheetY = rB % cloud.spriteSheet.verticalCount
-                WeatherObjectCloud(cloud.spriteSheet.get(sheetX, sheetY), flip).also {
+
+                val cloudGamma = currentWeather.getRandomCloudGamma(takeUniformRand(-1f..1f), takeUniformRand(-1f..1f))
+
+                WeatherObjectCloud(
+                    cloud.spriteSheet.get(sheetX, sheetY),
+                    flip,
+                    cloudGamma.x,
+                    cloudGamma.y
+                ).also {
                     it.scale = cloudScale * cloudSizeMult
 
                     it.pos.set(precalculatedPos ?: getCloudSpawningPosition(cloud, hCloudSize, windVector))
@@ -492,7 +498,7 @@ internal object WeatherMixer : RNGConsumer {
 
     internal fun titleScreenInitWeather() {
         weatherbox.initWith(weatherDict["titlescreen"]!!, Long.MAX_VALUE)
-        forceWindVec = Vector3(-0.98f, 0f, -0.21f)
+        forceWindVec = Vector3(-0.98f, 0f, -0.21f).scl(1f/30f) // value taken from TitleScreen.kt; search for 'demoWorld.worldTime.timeDelta = '
         initClouds()
     }
 
@@ -525,12 +531,10 @@ internal object WeatherMixer : RNGConsumer {
     private fun drawClouds(batch: SpriteBatch) {
         batch.inUse { _ ->
             batch.shader = shaderClouds
-            batch.shader.setUniformf("gamma", currentWeather.cloudGamma)
             batch.shader.setUniformf("shadeCol", 0.06f, 0.07f, 0.08f, 1f) // TODO temporary value
 
             clouds.forEach {
-                batch.color = Color(cloudDrawColour.r, cloudDrawColour.g, cloudDrawColour.b, it.alpha)
-                it.render(batch, 0f, 0f)
+                it.render(batch, cloudDrawColour)
             }
         }
     }
