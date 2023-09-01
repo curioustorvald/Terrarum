@@ -1,15 +1,77 @@
 package net.torvald.terrarum.weather
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.floorToInt
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import kotlin.math.absoluteValue
+import java.util.*
 
+data class WeatherSchedule(val weather: BaseModularWeather = WeatherMixer.DEFAULT_WEATHER, val duration: Long = 3600)
 
 class Weatherbox {
+
+    companion object {
+        private val WIND_DIR_TIME_UNIT = 3600f * 5 // every 5hr
+        private val WIND_SPEED_TIME_UNIT = 3600f * 2 // every 2hr
+
+        private val HALF_PIF = 1.5707964f
+        private val PIF = 3.1415927f
+        private val TWO_PIF = 6.2831855f
+        private val THREE_PIF = 9.424778f
+    }
+
+
+    private fun takeUniformRand(range: ClosedFloatingPointRange<Float>) =
+        FastMath.interpolateLinear(RNG.nextFloat(), range.start, range.endInclusive)
+    private fun takeTriangularRand(range: ClosedFloatingPointRange<Float>) =
+        FastMath.interpolateLinear((RNG.nextFloat() + RNG.nextFloat()) / 2f, range.start, range.endInclusive)
+    private fun takeGaussianRand(range: ClosedFloatingPointRange<Float>) =
+        FastMath.interpolateLinear((RNG.nextFloat() + RNG.nextFloat() + RNG.nextFloat() + RNG.nextFloat() + RNG.nextFloat() + RNG.nextFloat() + RNG.nextFloat() + RNG.nextFloat()) / 8f, range.start, range.endInclusive)
+
+    val RNG: Random
+        get() = WeatherMixer.RNG
 
     val windDir = WeatherDirBox() // 0 .. 1.0
     val windSpeed = WeatherStateBox() // 0 .. arbitrarily large number
 
+    val weatherSchedule: MutableList<WeatherSchedule> = mutableListOf<WeatherSchedule>()
+    val currentWeather: BaseModularWeather
+        get() = weatherSchedule[0].weather
+    val currentWeatherDuration: Long
+        get() = weatherSchedule[0].duration
+
+    fun initWith(initWeather: BaseModularWeather, duration: Long) {
+        weatherSchedule.add(WeatherSchedule(initWeather, duration))
+    }
+
+    var updateAkku = 0L; private set
+
+    fun update(world: GameWorld) {
+        updateWind(world)
+
+        if (updateAkku >= currentWeatherDuration) {
+            // TODO add more random weathers
+            if (weatherSchedule.size == 1) {
+                val newName = if (currentWeather.identifier == "generic01") "overcast01" else "generic01"
+                val newDuration = 3600L
+                weatherSchedule.add(WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration))
+
+                println("Queueing next weather '$newName' that will last $newDuration seconds")
+            }
+
+            // subtract akku by old currentWeatherDuration
+            updateAkku -= weatherSchedule.removeAt(0).duration
+        }
+
+        updateAkku += world.worldTime.timeDelta
+    }
+
+    private fun updateWind(world: GameWorld) {
+        windSpeed.update(world.worldTime.timeDelta / WIND_SPEED_TIME_UNIT) {
+            currentWeather.getRandomWindSpeed(takeUniformRand(-1f..1f))
+        }
+        windDir.update( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() * 4f }
+    }
 }
 
 
@@ -27,7 +89,7 @@ open class WeatherStateBox(
     // - removing p4 and beyond: for faster response to the changing weather schedule and make the forecasting less accurate like irl
 ) {
 
-    open fun value() = interpolate(x, p0, p1, p2, p3)
+    open val value: Float; get() = interpolate(x, p0, p1, p2, p3)
     open fun valueAt(x: Float) = when (x.floorToInt()) {
         -2 -> interpolate(x + 2, pM2,pM1, p0, p1)
         -1 -> interpolate(x + 1, pM1, p0, p1, p2)
@@ -38,9 +100,8 @@ open class WeatherStateBox(
         else -> throw IllegalArgumentException()
     }
 
-    open fun getAndUpdate(xdelta: Float, next: () -> Float): Float {
+    open fun update(xdelta: Float, next: () -> Float) {
         synchronized(WeatherMixer.RNG) {
-            val y = value()
             x += xdelta
             while (x >= 1.0) {
                 x -= 1.0f
@@ -56,7 +117,6 @@ open class WeatherStateBox(
 //                p4 = p5
 //                p5 = next()
             }
-            return y
         }
     }
     protected fun interpolate(u: Float, p0: Float, p1: Float, p2: Float, p3: Float): Float {
@@ -85,7 +145,7 @@ class WeatherDirBox(
     p2: Float = 0f,
     p3: Float = 0f,
 ) : WeatherStateBox(x, pM2, pM1, p0, p1, p2, p3) {
-    override fun value() = valueAt(x)
+    override val value; get() = valueAt(x)
 
     override fun valueAt(x: Float): Float {
         var pM2 = pM2

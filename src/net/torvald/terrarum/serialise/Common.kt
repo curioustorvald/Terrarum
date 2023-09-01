@@ -14,6 +14,8 @@ import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
+import net.torvald.terrarum.weather.BaseModularWeather
+import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
@@ -217,13 +219,23 @@ object Common {
         // WeatherStateBox
         jsoner.setSerializer(WeatherStateBox::class.java, object : Json.Serializer<WeatherStateBox> {
             override fun write(json: Json, obj: WeatherStateBox, knownType: Class<*>?) {
-                json.writeValue("${obj.x};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
+                json.writeValue("${obj.x};${obj.pM2};${obj.pM1};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
             }
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherStateBox {
                 return jsonData.asString().split(';').map { it.toFloat() }.let {
-                    WeatherStateBox(it[0], it[1], it[2], it[3], it[4])
+                    WeatherStateBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
                 }
+            }
+        })
+        // BaseModularWeather
+        jsoner.setSerializer(BaseModularWeather::class.java, object : Json.Serializer<BaseModularWeather> {
+            override fun write(json: Json, obj: BaseModularWeather, knownType: Class<*>?) {
+                json.writeValue(obj.identifier)
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BaseModularWeather {
+                return WeatherMixer.weatherDict[jsonData.asString()]!!
             }
         })
     }

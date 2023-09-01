@@ -1,8 +1,9 @@
 {
+  "identifier": "generic01",
   "skyboxGradColourMap": "generic_skybox.tga",
   "daylightClut": "clut_daylight.tga",
   "classification": "generic",
-  "cloudChance": 250,
+  "cloudChance": 125,
   "cloudGamma": [0.48, 2.4],
   "cloudGammaVariance": [0.1, 0.1],
   "windSpeed": 0.25,
@@ -10,13 +11,13 @@
   "clouds": {
     "cumulonimbus": {
       "filename": "cloud_large.png", "tw": 2048, "th": 1024, "probability": 0.2,
-      "baseScale": 2.0, "scaleVariance": 0.3333333,
-      "altLow": 80, "altHigh": 120
+      "baseScale": 4.0, "scaleVariance": 0.3333333,
+      "altLow": 1080, "altHigh": 1120
     },
     "cumulus": {
       "filename": "cloud_normal.png", "tw": 1024, "th": 512, "probability": 1.0,
-      "baseScale": 1.0, "scaleVariance": 0.6,
-      "altLow": 80, "altHigh": 800
+      "baseScale": 2.0, "scaleVariance": 0.6,
+      "altLow": 1080, "altHigh": 1800
     }
   },
   "atmoTurbidity": 3.5

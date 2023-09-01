@@ -112,6 +112,10 @@ class BasicDebugInfoWindow : UICanvas() {
             if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
                 "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
             (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
+    private fun Float?.toIntAndFrac(intLen: Int, fracLen: Int = 4): String =
+        if (this == null) "null" else if (this.isNaN()) "NaN" else if (this.isInfinite()) "${if (this >= 0.0) '+' else '-'}Inf" else
+            "${((if (this >= 0.0) "" else "-") + "${this.absoluteValue.toInt()}").padStart(intLen)}." +
+                    (10.0 pow fracLen.toDouble()).let { d -> (this.absoluteValue.times(d) % d).toInt().toString().padStart(fracLen, '0').padEnd(fracLen) }
 
     private val gap = 14f
 
@@ -236,10 +240,10 @@ class BasicDebugInfoWindow : UICanvas() {
         try {
             world?.let {
                 val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
-                val rawR = valRaw?.r?.toDouble().toIntAndFrac(1,3)
-                val rawG = valRaw?.g?.toDouble().toIntAndFrac(1,3)
-                val rawB = valRaw?.b?.toDouble().toIntAndFrac(1,3)
-                val rawA = valRaw?.a?.toDouble().toIntAndFrac(1,3)
+                val rawR = valRaw?.r?.toIntAndFrac(1,3)
+                val rawG = valRaw?.g?.toIntAndFrac(1,3)
+                val rawB = valRaw?.b?.toIntAndFrac(1,3)
+                val rawA = valRaw?.a?.toIntAndFrac(1,3)
 
                 val wallNum = it.getTileFromWall(mouseTileX, mouseTileY)
                 val tileNum = it.getTileFromTerrain(mouseTileX, mouseTileY)
@@ -249,7 +253,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
                 App.fontSmallNumbers.draw(batch, "$ccO$TERRAIN$ccG$tileNum", gap + 7f*(tileCursX + 3), line(tileCursY))
                 App.fontSmallNumbers.draw(batch, "$ccO$WALL$ccG$wallNum", gap + 7f*(tileCursX + 3), line(tileCursY + 1))
-                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.value.toString().padEnd(3)}$ccO$BEAKER$ccG${fluid.amount}f", gap + 7f*(tileCursX + 3), line(tileCursY + 2))
+                App.fontSmallNumbers.draw(batch, "$ccO$LIQUID$ccG${fluid.type.value.toString().padEnd(3)}$ccO$BEAKER$ccG${fluid.amount.toIntAndFrac(2)}", gap + 7f*(tileCursX + 3), line(tileCursY + 2))
                 App.fontSmallNumbers.draw(batch, "$ccO$WIRE$ccG$wireCount ${ccY}X$ccO$mouseTileX ${ccY}Y$ccO$mouseTileY", gap + 7f*(tileCursX + 3), line(tileCursY + 3))
                 App.fontSmallNumbers.draw(batch, "$ccR$rawR $ccG$rawG $ccB$rawB $ccW$rawA", gap + 7f*(tileCursX + 3), line(tileCursY + 4))
 
@@ -344,8 +348,19 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
     private fun drawWeatherInfo(batch: SpriteBatch) {
-        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windSpeed, "WindSpd", App.scr.width - 170, App.scr.height - 140 - 120, WeatherMixer.currentWeather.windSpeed * (1.0 + WeatherMixer.currentWeather.windSpeedVariance))
-        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windDir, "WindDir", App.scr.width - 170, App.scr.height - 140)
+        val drawX = App.scr.width - 170
+        val drawXf = drawX.toFloat()
+
+        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windSpeed, "WindSpd", drawX, App.scr.height - 140 - 120, WeatherMixer.currentWeather.windSpeed * (1.0 + WeatherMixer.currentWeather.windSpeedVariance))
+        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windDir, "WindDir", drawX, App.scr.height - 140)
+
+        // draw weather schedule
+        val schedYstart = App.scr.height - 140 - 120 - 13f * (WeatherMixer.weatherbox.weatherSchedule.size + 3)
+        App.fontSmallNumbers.draw(batch, "$ccY== WeatherSched [${WeatherMixer.weatherbox.weatherSchedule.size}] ==", drawXf, schedYstart)
+        WeatherMixer.weatherbox.weatherSchedule.forEachIndexed { index, weather ->
+            val sek = if (index == 0) WeatherMixer.weatherbox.updateAkku else 0
+            App.fontSmallNumbers.draw(batch, "$ccY${weather.weather.identifier} $ccG${weather.duration - sek}", drawXf, schedYstart + 13 * (index + 1))
+        }
     }
 
     private val colHairline = Color(0xf22100ff.toInt())
@@ -468,7 +483,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         // text
         batch.color = Color.WHITE
-        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.value().toDouble().toIntAndFrac(3)}", x.toFloat(), y - 16f)
+        App.fontSmallNumbers.draw(batch, "$ccY$label $ccG${box.value.toDouble().toIntAndFrac(3)}", x.toFloat(), y - 15f)
     }
 
     private val processorName = App.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (App.is32BitJVM) " (32-bit)" else ""

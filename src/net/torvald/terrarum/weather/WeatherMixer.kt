@@ -29,7 +29,6 @@ import java.io.File
 import java.io.FileFilter
 import java.lang.Double.doubleToLongBits
 import java.lang.Math.toDegrees
-import java.lang.Math.toRadians
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.*
@@ -52,16 +51,32 @@ import kotlin.math.*
  */
 internal object WeatherMixer : RNGConsumer {
 
+    val DEFAULT_WEATHER = BaseModularWeather(
+        "default",
+        JsonValue(JsonValue.ValueType.`object`),
+        GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
+        GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
+        "default",
+        0f,
+        0f,
+        0f,
+        Vector2(1f, 1f),
+        Vector2(0f, 0f),
+        listOf()
+    )
+
     override val RNG = HQRNG()
 
     var globalLightOverridden = false
 
-    var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
+    val weatherDB: HashMap<String, ArrayList<BaseModularWeather>> // search by classification
+    val weatherDict: HashMap<String, BaseModularWeather> // search by identifier
 
-    var currentWeather: BaseModularWeather
-    var nextWeather: BaseModularWeather
+    val currentWeather: BaseModularWeather
+        get() = weatherbox.currentWeather
+//    var nextWeather: BaseModularWeather
 
-    lateinit var mixedWeather: BaseModularWeather
+    private var forceWindVec: Vector3? = null
 
     val globalLightNow = Cvec(0)
     private val cloudDrawColour = Color()
@@ -105,13 +120,11 @@ internal object WeatherMixer : RNGConsumer {
 
     override fun loadFromSave(s0: Long, s1: Long) {
         super.loadFromSave(s0, s1)
-        currentWeather = weatherList[WEATHER_GENERIC]!![0]
         internalReset(s0, s1)
         initClouds()
     }
 
     fun internalReset() {
-        currentWeather = weatherList[WEATHER_GENERIC]!![0]
         internalReset(RNG.state0, RNG.state1)
         initClouds()
     }
@@ -127,11 +140,14 @@ internal object WeatherMixer : RNGConsumer {
 
         clouds.clear()
         cloudsSpawned = 0
+        forceWindVec = null
         windVector = Vector3(-0.98f, 0f, 0.21f)
 
         oldCamPos.set(WorldCamera.camVector)
 
         weatherbox = Weatherbox()
+        weatherbox.initWith(weatherDict["generic01"]!!, 3600L)
+
         // TEST FILL WITH RANDOM VALUES
         (0..5).map { takeUniformRand(0f..1f) }.let {
             weatherbox.windDir.pM1 = it[0]
@@ -152,7 +168,8 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     init {
-        weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
+        weatherDB = HashMap<String, ArrayList<BaseModularWeather>>()
+        weatherDict = HashMap<String, BaseModularWeather>()
 
 
         // read weather descriptions from assets/weather (modular weather)
@@ -169,40 +186,16 @@ internal object WeatherMixer : RNGConsumer {
         for ((modname, raw) in weatherRawValidList) {
             val weather = readFromJson(modname, raw)
 
+            weatherDict[weather.identifier] = weather
+
             // if List for the classification does not exist, make one
-            if (!weatherList.containsKey(weather.classification))
-                weatherList.put(weather.classification, ArrayList())
+            if (!weatherDB.containsKey(weather.classification))
+                weatherDB.put(weather.classification, ArrayList())
 
-            weatherList[weather.classification]!!.add(weather)
+            weatherDB[weather.classification]!!.add(weather)
         }
 
-
-
-        // initialise
-        try {
-            weatherList["titlescreen"] = arrayListOf(weatherList[WEATHER_GENERIC]!![0].copy(windSpeed = 1f))
-            currentWeather = weatherList[WEATHER_GENERIC]!![0]
-            nextWeather = getRandomWeather(WEATHER_GENERIC)
-        }
-        catch (e: NullPointerException) {
-            e.printStackTrace()
-
-            val defaultWeather = BaseModularWeather(
-                JsonValue(JsonValue.ValueType.`object`),
-                GdxColorMap(1, 3, Color(0x55aaffff), Color(0xaaffffff.toInt()), Color.WHITE),
-                GdxColorMap(2, 2, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE),
-                "default",
-                0f,
-                0f,
-                0f,
-                Vector2(1f, 1f),
-                Vector2(0f, 0f),
-                listOf()
-            )
-
-            currentWeather = defaultWeather
-            nextWeather = defaultWeather
-        }
+        weatherDict["titlescreen"] = weatherDB[WEATHER_GENERIC]!![0].copy(windSpeed = 1f)
     }
 
     /**
@@ -213,7 +206,8 @@ internal object WeatherMixer : RNGConsumer {
 
 //        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
 
-        updateWind(delta, world)
+        weatherbox.update(world)
+        updateWind()
         updateClouds(delta, world)
 
 
@@ -230,12 +224,11 @@ internal object WeatherMixer : RNGConsumer {
         this[this.lastIndex] = f
     }
 
+    private val HALF_PI = 1.5707964f
     private val PI = 3.1415927f
     private val TWO_PI = 6.2831855f
     private val THREE_PI = 9.424778f
 
-    private val WIND_DIR_TIME_UNIT = 14400f // every 4hr
-    private val WIND_SPEED_TIME_UNIT = 3600f // every 1hr
 
     // see: https://stackoverflow.com/questions/2708476/rotation-interpolation/14498790#14498790
     private fun getShortestAngle(start: Float, end: Float) =
@@ -243,22 +236,20 @@ internal object WeatherMixer : RNGConsumer {
             if (it > PI) it - TWO_PI else it
         }
 
-    private fun updateWind(delta: Float, world: GameWorld) {
+    private fun updateWind() {
+        val currentWindSpeed = weatherbox.windSpeed.value
+        val currentWindDir = weatherbox.windDir.value * HALF_PI
 
-        val currentWindSpeed = weatherbox.windSpeed.getAndUpdate( world.worldTime.timeDelta / WIND_SPEED_TIME_UNIT) {
-            currentWeather.getRandomWindSpeed(takeUniformRand(-1f..1f))
-        }
-        val currentWindDir = weatherbox.windDir.getAndUpdate( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() * 4f } * Math.PI * 0.5
+        printdbg(this, "Wind speed = $currentWindSpeed")
 
-
-        if (currentWeather.forceWindVec != null) {
-            windVector.set(currentWeather.forceWindVec)
+        if (forceWindVec != null) {
+            windVector.set(forceWindVec)
         }
         else {
             windVector.set(
-                (cos(currentWindDir) * currentWindSpeed).toFloat(),
+                (cos(currentWindDir) * currentWindSpeed),
                 0f,
-                (sin(currentWindDir) * currentWindSpeed).toFloat()
+                (sin(currentWindDir) * currentWindSpeed)
             )
         }
     }
@@ -280,6 +271,7 @@ internal object WeatherMixer : RNGConsumer {
         val camvec2 = camvec.cpy()
         val testCamDelta = camvec.cpy().sub(oldCamPos)
 
+        // adjust camDelta to accomodate ROUNDWORLD
         if (testCamDelta.x.absoluteValue > world.width * TILE_SIZEF / 2f) {
             if (testCamDelta.x >= 0)
                 camvec2.x -= world.width * TILE_SIZEF
@@ -291,7 +283,7 @@ internal object WeatherMixer : RNGConsumer {
 
         camDelta.set(testCamDelta)
 
-
+        // try to spawn an cloud
         val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.windSpeed) // if chance = 0, the result will be +inf
 
         while (cloudUpdateAkku >= cloudChanceEveryMin) {
@@ -302,11 +294,12 @@ internal object WeatherMixer : RNGConsumer {
 
         var immDespawnCount = 0
         val immDespawnCauses = ArrayList<String>()
+        printdbg(this, "Wind vector = $windVector")
+        // move the clouds
         clouds.forEach {
             // do parallax scrolling
             it.posX += camDelta.x * cloudParallaxMultX
             it.posY += camDelta.y * cloudParallaxMultY
-
 
             it.update(windVector)
 
@@ -498,8 +491,8 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     internal fun titleScreenInitWeather() {
-        currentWeather = weatherList["titlescreen"]!![0]
-        currentWeather.forceWindVec = Vector3(-0.98f, 0f, -0.21f)
+        weatherbox.initWith(weatherDict["titlescreen"]!!, Long.MAX_VALUE)
+        forceWindVec = Vector3(-0.98f, 0f, -0.21f)
         initClouds()
     }
 
@@ -728,7 +721,7 @@ internal object WeatherMixer : RNGConsumer {
         }
     }
 
-    fun getWeatherList(classification: String) = weatherList[classification]!!
+    fun getWeatherList(classification: String) = weatherDB[classification]!!
     fun getRandomWeather(classification: String) =
             getWeatherList(classification)[RNG.nextInt(getWeatherList(classification).size)]
 
@@ -757,7 +750,7 @@ internal object WeatherMixer : RNGConsumer {
         val skybox = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}"))
         val daylight = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}"))
 
-
+        val identifier = JSON.getString("identifier")
         val classification = JSON.getString("classification")
 
 
@@ -797,6 +790,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
         return BaseModularWeather(
+            identifier = identifier,
             json = JSON,
             skyboxGradColourMap = skybox,
             daylightClut = daylight,
@@ -811,7 +805,7 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     fun dispose() {
-        weatherList.values.forEach { list ->
+        weatherDB.values.forEach { list ->
             list.forEach { weather ->
                 weather.clouds.forEach { it.spriteSheet.dispose() }
             }

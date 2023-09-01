@@ -17,6 +17,7 @@ import kotlin.math.absoluteValue
  * Created by minjaesong on 2016-07-11.
  */
 data class BaseModularWeather(
+    val identifier: String,
     val json: JsonValue,
     var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
     val daylightClut: GdxColorMap,
@@ -30,9 +31,8 @@ data class BaseModularWeather(
 
     val mixFrom: String? = null,
     val mixPercentage: Double? = null,
-
-    var forceWindVec: Vector3? = null
 ) {
+
     /**
      * @param rnd random number between -1 and +1
      */
