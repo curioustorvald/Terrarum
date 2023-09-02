@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
 import com.jme3.math.FastMath
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
 import kotlin.math.absoluteValue
 import kotlin.math.pow
@@ -70,9 +69,7 @@ class WeatherObjectCloud(
         }
     }
 
-    private val w = App.scr.halfwf
-    private val h = App.scr.hf * 0.5f
-    private val vecMult = Vector3(1f, 1f, 1f / (4f * h))
+    private val vecMult = Vector3(1f, 1f, 1f / (4f * H))
 
     private fun roundRgbGamma(x: Float): Int {
         return RGB_GAMMA_TABLE.mapIndexed { i, f -> (f - x).absoluteValue to i }.minBy { it.first }.second
@@ -118,10 +115,10 @@ class WeatherObjectCloud(
         get() {
             val x = posX - texture.regionWidth * scale * 0.5f
             val y = posY - texture.regionHeight * scale
-            val z = posZ // must be at least 1.0
+            val z = posZ // must be larger than 0
 
-            val drawX = (x + w * (z-1)) / z
-            val drawY = (y + h * (z-1)) / z
+            val drawX = (x + W * (z-1)) / z
+            val drawY = (y + H * (z-1)) / z
             val drawScale = scale / z
 
             return Vector3(drawX, drawY, drawScale)
@@ -137,9 +134,9 @@ class WeatherObjectCloud(
             val y = posY - texture.regionHeight * scale
             val z = posZ // must be larger than 0
 
-            val drawXL = (xL + w * (z-1)) / z
-            val drawXR = (xR + w * (z-1)) / z
-            val drawY = (y + h * (z-1)) / z
+            val drawXL = (xL + W * (z-1)) / z
+            val drawXR = (xR + W * (z-1)) / z
+            val drawY = (y + H * (z-1)) / z
 
             return Vector3(drawXL, drawY, drawXR)
         }
@@ -151,9 +148,9 @@ class WeatherObjectCloud(
             val y = posY - texture.regionHeight * scale
             val z = FastMath.interpolateLinear(posZ / ALPHA_ROLLOFF_Z, ALPHA_ROLLOFF_Z / 4f, ALPHA_ROLLOFF_Z)
 
-            val drawXL = (xL + w * (z-1)) / z
-            val drawXR = (xR + w * (z-1)) / z
-            val drawY = (y + h * (z-1)) / z
+            val drawXL = (xL + W * (z-1)) / z
+            val drawXR = (xR + W * (z-1)) / z
+            val drawY = (y + H * (z-1)) / z
 
             return Vector3(drawXL, drawY, drawXR)
         }
@@ -162,7 +159,19 @@ class WeatherObjectCloud(
     override fun compareTo(other: WeatherObjectCloud): Int = (other.posZ - this.posZ).sign.toInt()
 
     companion object {
-        fun screenXtoWorldX(screenX: Float, z: Float) = screenX * z - App.scr.halfwf * (z - 1f)
+        private val W = App.scr.halfwf
+        private val H = App.scr.hf * 0.5f
+
+        /**
+         * Given screen-x and world-z position, calculates a world-x position that would make the cloud appear at the given screen-x position
+         */
+        fun screenXtoWorldX(screenX: Float, z: Float) = screenX * z - W * (z - 1f) // rearrange screenCoord equations to derive this eq :p
+
+        /**
+         * Given a world-y position, calculates a world-z position that would put the cloud to screen-y of zero
+         */
+        fun worldYtoWorldZforScreenYof0(y: Float) = 1f - (y / H) // rearrange screenCoord equations to derive this eq :p
+
         const val ALPHA_ROLLOFF_Z = 64f
         const val OLD_AGE_DECAY = 4000f
 

@@ -87,6 +87,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/regex-22.3.1-edit.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/js-22.3.1-edit.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/graal-sdk-22.3.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-math3-3.6.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
