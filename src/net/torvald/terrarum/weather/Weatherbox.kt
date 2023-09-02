@@ -6,6 +6,8 @@ import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import java.util.*
+import kotlin.math.max
+import kotlin.math.pow
 
 data class WeatherSchedule(val weather: BaseModularWeather = WeatherMixer.DEFAULT_WEATHER, val duration: Long = 3600)
 
@@ -13,7 +15,7 @@ class Weatherbox {
 
     companion object {
         private val WIND_DIR_TIME_UNIT = 3600f * 6 // every 6hr
-        private val WIND_SPEED_TIME_UNIT = 3600f * 2 // every 2hr
+        private val WIND_SPEED_TIME_UNIT = 3600f * 1 // every 2hr
 
         private val HALF_PIF = 1.5707964f
         private val PIF = 3.1415927f
@@ -121,16 +123,15 @@ open class WeatherStateBox(
         }
     }
     protected fun interpolate(u: Float, p0: Float, p1: Float, p2: Float, p3: Float): Float {
-        val c1: Float = p1
-        val c2: Float = -0.5f * p0 + 0.5f * p2
-        val c3: Float = p0 - 2.5f * p1 + 2.0f * p2 - 0.5f * p3
-        val c4: Float = -0.5f * p0 + 1.5f * p1 - 1.5f * p2 + 0.5f * p3
-        return (((c4 * u + c3) * u + c2) * u + c1)
-    }
+        val T = FastMath.interpolateLinear(u, p1, p2).div(max(p0, p3).coerceAtLeast(1f)).toDouble().coerceIn(0.0, 0.5)
+//        if (u == x) printdbg(this, "u=$u, p1=$p1, p2=$p2; T=$T")
 
-    companion object {
-        // fixed with T=0.5
+        val c1 = p1.toDouble()
+        val c2 = -1.0 * T * p0 + T * p2
+        val c3 = 2 * T * p0 + (T - 3) * p1 + (3 - 2 * T) * p2 + -T * p3
+        val c4 = -T * p0 + (2 - T) * p1 + (T - 2) * p2 + T * p3
 
+        return (((c4 * u + c3) * u + c2) * u + c1).toFloat()
     }
 }
 
@@ -235,13 +236,24 @@ class WeatherDirBox(
         }
 
         return when (x.floorToInt()) {
-            -2 -> interpolate(x + 2, pM2,pM1, p0, p1)
-            -1 -> interpolate(x + 1, pM1, p0, p1, p2)
-             0 -> interpolate(x - 0,  p0, p1, p2, p3)
-             1 -> interpolate(x - 1,  p1, p2, p3, p3)
-             2 -> interpolate(x - 2,  p2, p3, p3, p3)
-             3 -> interpolate(x - 3,  p3, p3, p3, p3)
+            -2 -> interpolate2(x + 2, pM2,pM1, p0, p1)
+            -1 -> interpolate2(x + 1, pM1, p0, p1, p2)
+             0 -> interpolate2(x - 0,  p0, p1, p2, p3)
+             1 -> interpolate2(x - 1,  p1, p2, p3, p3)
+             2 -> interpolate2(x - 2,  p2, p3, p3, p3)
+             3 -> interpolate2(x - 3,  p3, p3, p3, p3)
             else -> throw IllegalArgumentException()
         }.plus(2f).fmod(4f).minus(2f)
+    }
+
+    private fun interpolate2(u: Float, p0: Float, p1: Float, p2: Float, p3: Float): Float {
+        val T = 0.5
+
+        val c1 = p1.toDouble()
+        val c2 = -1.0 * T * p0 + T * p2
+        val c3 = 2 * T * p0 + (T - 3) * p1 + (3 - 2 * T) * p2 + -T * p3
+        val c4 = -T * p0 + (2 - T) * p1 + (T - 2) * p2 + T * p3
+
+        return (((c4 * u + c3) * u + c2) * u + c1).toFloat()
     }
 }
