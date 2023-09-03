@@ -78,9 +78,22 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             full.requestTransition(1)
         }
     }
+    private val buttonRename = UIItemTextButton(this,
+        { Lang["MENU_LABEL_RENAME"] },
+        screencapX + buttonWidth + gridGap,
+        buttonsY,
+        buttonWidth,
+        hasBorder = true,
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            full.queueUpRenameScr()
+            full.changePanelTo(1)
+        }
+    }
     private val buttonTeleport = UIItemTextButton(this,
         { Lang["GAME_ACTION_TELEPORT"] },
-        screencapX + buttonWidth + gridGap,
+        screencapX + (buttonWidth + gridGap) * 2,
         buttonsY,
         buttonWidth,
         hasBorder = true,
@@ -96,22 +109,22 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             }
         }
     }
-    private val buttonRename = UIItemTextButton(this,
-        { Lang["MENU_LABEL_RENAME"] },
-        screencapX + (buttonWidth + gridGap) * 2,
+    private val buttonShare = UIItemTextButton(this,
+        { Lang["MENU_LABEL_SHARE"] },
+        screencapX + (buttonWidth + gridGap) * 3,
         buttonsY,
         buttonWidth,
         hasBorder = true,
-        alignment = UIItemTextButton.Companion.Alignment.CENTRE
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE,
     ).also {
         it.clickOnceListener = { _,_ ->
-            full.queueUpRenameScr()
+            full.queueUpShareScr()
             full.changePanelTo(1)
         }
     }
     private val buttonDelete = UIItemTextButton(this,
         { Lang["MENU_LABEL_DELETE_WORLD"] },
-        screencapX + (buttonWidth + gridGap) * 3,
+        screencapX + (buttonWidth + gridGap) * 4,
         buttonsY,
         buttonWidth,
         hasBorder = true,
@@ -120,19 +133,6 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     ).also {
         it.clickOnceListener = { _,_ ->
             full.queueUpDeleteScr()
-            full.changePanelTo(1)
-        }
-    }
-    private val buttonShare = UIItemTextButton(this,
-        { Lang["MENU_LABEL_SHARE"] },
-        screencapX + (buttonWidth + gridGap) * 4,
-        buttonsY,
-        buttonWidth,
-        hasBorder = true,
-        alignment = UIItemTextButton.Companion.Alignment.CENTRE,
-    ).also {
-        it.clickOnceListener = { _,_ ->
-            full.queueUpShareScr()
             full.changePanelTo(1)
         }
     }

@@ -111,8 +111,6 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
 
     }
 
-    private val textboxIndices = (1..3)
-
     private val errorMessages = listOf(
         Lang["ERROR_GENERIC_TEXT"], // -1
         "", // 0
@@ -120,13 +118,19 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
         Lang["ERROR_AVATAR_ALREADY_EXISTS"], // 2
     )
 
+    override fun show() {
+        super.show()
+        wotKeys = (1..3).map { Lang["CONTEXT_IMPORT_AVATAR_INSTRUCTION_$it", false] }
+    }
+    private lateinit var wotKeys: List<String>
+
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
-        val textboxWidth = textboxIndices.maxOf { App.fontGame.getWidth(Lang["CONTEXT_IMPORT_AVATAR_INSTRUCTION_$it"]) }
+        val textboxWidth = wotKeys.maxOf { App.fontGame.getWidth(it) }
         val textX = (Toolkit.drawWidth - textboxWidth) / 2
         // draw texts
-        for (i in textboxIndices) {
-            App.fontGame.draw(batch, Lang["CONTEXT_IMPORT_AVATAR_INSTRUCTION_$i"], textX, (App.scr.height - height) / 2 + descStartY + (i - 1) * lh)
+        wotKeys.forEachIndexed { i, s ->
+            App.fontGame.draw(batch, s, textX, (App.scr.height - height) / 2 + descStartY + i * lh)
         }
         // draw path
         batch.color = if (mouseOnLink) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP

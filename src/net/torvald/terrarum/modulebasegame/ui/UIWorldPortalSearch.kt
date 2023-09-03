@@ -74,17 +74,36 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val radioX = (width - (radioCellWidth * tex.size + 9)) / 2
     private var selectedSizeChunks = 0
 
+    private val gridGap = 10
+    private val buttonBaseX = (Toolkit.drawWidth - 3 * goButtonWidth - 2 * gridGap) / 2
+
+
     private val backButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { Lang["MENU_LABEL_BACK"] }, buttonBaseX, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
         it.clickOnceListener = { _, _ ->
             full.requestTransition(0)
         }
     }
-    private val goButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+    private val useInvitationButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_USE_CODE"] }, buttonBaseX + goButtonWidth + gridGap, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
+    }
+    private val goButton: UIItemTextButton = UIItemTextButton(this,
+        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, buttonBaseX + (goButtonWidth + gridGap) * 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
+        it.clickOnceListener = { _, _ ->
+            val seed = try {
+                seedInput.getTextOrPlaceholder().toLong()
+            }
+            catch (e: NumberFormatException) {
+                XXHash64.hash(seedInput.getTextOrPlaceholder().toByteArray(Charsets.UTF_8), 10000)
+            }
+            val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
+            val worldParam = TerrarumIngame.NewWorldParameters(wx, wy, seed, nameInput.getTextOrPlaceholder())
+            full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(null, worldParam)
+            full.setAsClose()
+        }
     }
 
     private val sizeSelector = UIItemInlineRadioButtons(this,
@@ -108,22 +127,9 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         selectedSizeChunks = (wx / LandUtil.CHUNK_W) * (wy / LandUtil.CHUNK_H)
         goButton.isEnabled = (full.chunksUsed + selectedSizeChunks) <= full.chunksMax
 
-        goButton.clickOnceListener = { _, _ ->
-            val seed = try {
-                seedInput.getTextOrPlaceholder().toLong()
-            }
-            catch (e: NumberFormatException) {
-                XXHash64.hash(seedInput.getTextOrPlaceholder().toByteArray(Charsets.UTF_8), 10000)
-            }
-            val (wx, wy) = TerrarumIngame.WORLDPORTAL_NEW_WORLD_SIZE[sizeSelector.selection]
-            val worldParam = TerrarumIngame.NewWorldParameters(wx, wy, seed, nameInput.getTextOrPlaceholder())
-            full.host.teleportRequest = FixtureWorldPortal.TeleportRequest(null, worldParam)
-            full.setAsClose()
-        }
-
-
         addUIitem(sizeSelector)
         addUIitem(goButton)
+        addUIitem(useInvitationButton)
         addUIitem(backButton)
         addUIitem(seedInput)  // order is important
         addUIitem(nameInput) // because of the IME candidates overlay

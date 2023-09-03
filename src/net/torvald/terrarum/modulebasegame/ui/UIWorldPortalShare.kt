@@ -54,23 +54,39 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
         }
 
         printdbg(this, shareCode)
+
+        wotKeys = (1..4).map { Lang["CONTEXT_WORLD_CODE_SHARE_$it", false] }
     }
+
+    private lateinit var wotKeys: List<String>
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
+        val textY = drawY + (height/2) - App.fontGame.lineHeight.toInt() * 4
+        val codeY = textY + App.fontGame.lineHeight.toInt() * 5
+
         // share code background
         batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
-        Toolkit.drawBoxBorder(batch, drawX - 1, drawY + (height / 2) - 6, width + 2, BigAlphNum.H + 12)
+        Toolkit.drawBoxBorder(batch, drawX - 1, codeY - 1, width + 2, BigAlphNum.H + 12)
         batch.color = Toolkit.Theme.COL_CELL_FILL
-        Toolkit.fillArea(batch, drawX, drawY + (height / 2) - 5, width, BigAlphNum.H + 10)
+        Toolkit.fillArea(batch, drawX, codeY, width, BigAlphNum.H + 10)
 
         // share code
         batch.color = Toolkit.Theme.COL_MOUSE_UP
-        Toolkit.drawTextCentered(batch, App.fontBigNumbers, shareCode, width, drawX, drawY + (height / 2))
+        Toolkit.drawTextCentered(batch, App.fontBigNumbers, shareCode, width, drawX, codeY + 5)
+
+        // texts
+        batch.color = Color.WHITE
+
+        val textboxWidth = wotKeys.maxOf { App.fontGame.getWidth(it) }
+        val tx = drawX + (width - textboxWidth) / 2
+        wotKeys.forEachIndexed { i, s ->
+            App.fontGame.draw(batch, s, tx, textY + App.fontGame.lineHeight.toInt() * i)
+        }
+
 
         // ui title
-        batch.color = Color.WHITE
         val titlestr = Lang["MENU_LABEL_SHARE"]
         App.fontUITitle.draw(batch, titlestr, drawX + (width - App.fontUITitle.getWidth(titlestr)).div(2).toFloat(), UIInventoryFull.INVENTORY_CELLS_OFFSET_Y() - 36f)
 
