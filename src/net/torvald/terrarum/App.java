@@ -26,6 +26,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent;
 import net.torvald.terrarum.gameitems.GameItem;
 import net.torvald.terrarum.gameworld.GameWorld;
+import net.torvald.terrarum.imagefont.BigAlphNum;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
@@ -198,6 +199,7 @@ public class App implements ApplicationListener {
     /** Big interchar */
     public static TerrarumSansBitmap fontUITitle;
     public static TinyAlphNum fontSmallNumbers;
+    public static BigAlphNum fontBigNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
     public static TerrarumController gamepad = null;
@@ -828,6 +830,7 @@ public class App implements ApplicationListener {
         fontGame.dispose();
         fontGameFBO.dispose();
         fontSmallNumbers.dispose();
+        fontBigNumbers.dispose();
         ItemSlotImageFactory.INSTANCE.dispose();
 
         logo.getTexture().dispose();
@@ -1007,6 +1010,7 @@ public class App implements ApplicationListener {
 
 
         fontSmallNumbers = TinyAlphNum.INSTANCE;
+        fontBigNumbers = BigAlphNum.INSTANCE;
 
         IME.invoke();
         inputStrober = InputStrober.INSTANCE;

@@ -2,6 +2,7 @@ package net.torvald.terrarum.tests
 
 import net.torvald.terrarum.savegame.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.serialise.toLittle
+import net.torvald.terrarum.serialise.toLittle64
 import net.torvald.terrarum.serialise.toULittle48
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
@@ -27,7 +28,7 @@ Ooh, black and yellow! Let's shake it up a little.""".trimIndent().toByteArray()
         //fun wb(byte: Int) { outputStream.write(byte) }
         fun wi32(int: Int) { wb(int.toLittle()) }
         fun wi48(long: Long) { wb(long.toULittle48()) }
-        fun wi64(long: Long) { wb(long.toLittle()) }
+        fun wi64(long: Long) { wb(long.toLittle64()) }
         fun wf32(float: Float) { wi32(float.toRawBits()) }
 
 

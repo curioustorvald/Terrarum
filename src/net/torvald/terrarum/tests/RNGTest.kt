@@ -2,7 +2,6 @@ package net.torvald.terrarum.tests
 
 import net.torvald.random.HQRNG
 import net.torvald.random.XXHash32
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.serialise.toLittle
 import java.util.*

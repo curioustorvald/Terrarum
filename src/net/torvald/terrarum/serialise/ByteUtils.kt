@@ -16,7 +16,8 @@ fun Int.toLittleShort() = byteArrayOf(
         this.and(0xFF).toByte(),
         this.shr(8).and(0xFF).toByte()
 )
-fun Long.toLittle() = byteArrayOf(
+/** Converts long as 8-byte array */
+fun Long.toLittle64() = byteArrayOf(
         this.and(0xFF).toByte(),
         this.ushr(8).and(0xFF).toByte(),
         this.ushr(16).and(0xFF).toByte(),
@@ -24,7 +25,7 @@ fun Long.toLittle() = byteArrayOf(
         this.ushr(32).and(0xFF).toByte(),
         this.ushr(40).and(0xFF).toByte(),
         this.ushr(48).and(0xFF).toByte(),
-        this.ushr(56).and(0xFF).toByte()
+        this.ushr(56).and(0xFF).toByte(),
 )
 /** Converts long as 6-byte array, discarding the sign. */
 fun Long.toULittle48() = byteArrayOf(
@@ -33,9 +34,21 @@ fun Long.toULittle48() = byteArrayOf(
         this.ushr(16).and(0xFF).toByte(),
         this.ushr(24).and(0xFF).toByte(),
         this.ushr(32).and(0xFF).toByte(),
-        this.ushr(40).and(0xFF).toByte()
+        this.ushr(40).and(0xFF).toByte(),
 )
-fun Double.toLittle() = java.lang.Double.doubleToRawLongBits(this).toLittle()
+
+fun Long.toBig64() = byteArrayOf(
+        this.ushr(56).and(0xFF).toByte(),
+        this.ushr(48).and(0xFF).toByte(),
+        this.ushr(40).and(0xFF).toByte(),
+        this.ushr(32).and(0xFF).toByte(),
+        this.ushr(24).and(0xFF).toByte(),
+        this.ushr(16).and(0xFF).toByte(),
+        this.ushr(8).and(0xFF).toByte(),
+        this.and(0xFF).toByte(),
+)
+
+fun Double.toLittle() = java.lang.Double.doubleToRawLongBits(this).toLittle64()
 fun Boolean.toLittle() = byteArrayOf(if (this) 0xFF.toByte() else 0.toByte())
 
 fun ByteArray.toLittleInt32(offset: Int = 0) =

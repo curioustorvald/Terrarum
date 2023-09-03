@@ -10,6 +10,8 @@ import com.badlogic.gdx.utils.Disposable
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.imagefont.BigAlphNum
+import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
@@ -125,6 +127,14 @@ object Toolkit : Disposable {
     fun drawTextCentered(batch: SpriteBatch, font: TerrarumSansBitmap, text: String, tbw: Int, tbx: Int, tby: Int) {
         val tw = font.getWidth(text)
         font.draw(batch, text, tbx + (tbw - tw) / 2, tby)
+    }
+    fun drawTextCentered(batch: SpriteBatch, font: TinyAlphNum, text: String, tbw: Int, tbx: Int, tby: Int) {
+        val tw = font.getWidth(text)
+        font.draw(batch, text, (tbx + (tbw - tw) / 2).toFloat(), tby.toFloat())
+    }
+    fun drawTextCentered(batch: SpriteBatch, font: BigAlphNum, text: String, tbw: Int, tbx: Int, tby: Int) {
+        val tw = font.getWidth(text)
+        font.draw(batch, text, (tbx + (tbw - tw) / 2).toFloat(), tby.toFloat())
     }
 
     fun fillArea(batch: SpriteBatch, x: Int, y: Int, w: Int, h: Int) {

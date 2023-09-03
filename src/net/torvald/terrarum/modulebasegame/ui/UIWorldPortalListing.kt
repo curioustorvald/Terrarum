@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
@@ -23,7 +22,6 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.EMDASH
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -52,9 +50,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
 
 
-    private val thumbw = 378
+    private val thumbw = 400
     private val textAreaW = thumbw - 32
-    private val thumbh = 252
+    private val thumbh = 268
     private val hx = Toolkit.drawWidth.div(2)
     private val y = INVENTORY_CELLS_OFFSET_Y() + 1 - 34
 
@@ -62,14 +60,16 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val listHeight = UIItemWorldCellsSimple.height + (listCount - 1) * (UIItemWorldCellsSimple.height + gridGap)
 
     private val memoryGaugeWidth = textAreaW
-    private val deleteButtonWidth = (thumbw - gridGap) / 2
+    private val buttonWidth = (UIItemWorldCellsSimple.width + thumbw - 3 * gridGap) / 5 // thumbw + cellw + gridgap = 4*gridgap + 5x
     private val buttonsY = y + listHeight + gridGap
 
+    private val screencapX = hx - thumbw - gridGap/2
+    
     private val buttonSearch = UIItemTextButton(this,
         { Lang["CONTEXT_WORLD_NEW"] },
-        hx - gridGap/2 - 2*deleteButtonWidth - gridGap,
+        screencapX,
         buttonsY,
-        deleteButtonWidth,
+        buttonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     ).also {
@@ -80,9 +80,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     }
     private val buttonTeleport = UIItemTextButton(this,
         { Lang["GAME_ACTION_TELEPORT"] },
-        hx - gridGap/2 - deleteButtonWidth,
+        screencapX + buttonWidth + gridGap,
         buttonsY,
-        deleteButtonWidth,
+        buttonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     ).also {
@@ -98,9 +98,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     }
     private val buttonRename = UIItemTextButton(this,
         { Lang["MENU_LABEL_RENAME"] },
-        hx + gridGap/2,
+        screencapX + (buttonWidth + gridGap) * 2,
         buttonsY,
-        deleteButtonWidth,
+        buttonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE
     ).also {
@@ -111,15 +111,28 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     }
     private val buttonDelete = UIItemTextButton(this,
         { Lang["MENU_LABEL_DELETE_WORLD"] },
-        hx + gridGap/2 + deleteButtonWidth + gridGap,
+        screencapX + (buttonWidth + gridGap) * 3,
         buttonsY,
-        deleteButtonWidth,
+        buttonWidth,
         hasBorder = true,
         alignment = UIItemTextButton.Companion.Alignment.CENTRE,
         inactiveCol = Toolkit.Theme.COL_RED, activeCol = Toolkit.Theme.COL_REDD
     ).also {
         it.clickOnceListener = { _,_ ->
             full.queueUpDeleteScr()
+            full.changePanelTo(1)
+        }
+    }
+    private val buttonShare = UIItemTextButton(this,
+        { Lang["MENU_LABEL_SHARE"] },
+        screencapX + (buttonWidth + gridGap) * 4,
+        buttonsY,
+        buttonWidth,
+        hasBorder = true,
+        alignment = UIItemTextButton.Companion.Alignment.CENTRE,
+    ).also {
+        it.clickOnceListener = { _,_ ->
+            full.queueUpShareScr()
             full.changePanelTo(1)
         }
     }
@@ -146,6 +159,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         buttonRename.isEnabled = false
         buttonDelete.isEnabled = false
         buttonTeleport.isEnabled = false
+        buttonShare.isEnabled = false
         currentWorldSelected = false
     }
 
@@ -157,6 +171,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             buttonRename.isEnabled = true
             buttonDelete.isEnabled = info.uuid != INGAME.world.worldIndex
             buttonTeleport.isEnabled = info.uuid != INGAME.world.worldIndex
+            buttonShare.isEnabled = true
             currentWorldSelected = info.uuid == INGAME.world.worldIndex
         }
     }
@@ -171,6 +186,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         addUIitem(buttonRename)
         addUIitem(buttonTeleport)
         addUIitem(buttonSearch)
+        addUIitem(buttonShare)
         addUIitem(navRemoCon)
     }
 
@@ -344,13 +360,13 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         // draw background //
         // screencap panel
         batch.color = UIInventoryFull.CELL_COL
-        Toolkit.fillArea(batch, hx - thumbw - gridGap/2, y, thumbw, thumbh)
+        Toolkit.fillArea(batch, screencapX, y, thumbw, thumbh)
 
 
         // draw border //
         // screencap panel
         batch.color = if (selected?.worldInfo == null) Toolkit.Theme.COL_INVENTORY_CELL_BORDER else Toolkit.Theme.COL_INACTIVE
-        Toolkit.drawBoxBorder(batch, hx - thumbw - gridGap/2 - 1, y - 1, thumbw + 2, thumbh + 2)
+        Toolkit.drawBoxBorder(batch, screencapX - 1, y - 1, thumbw + 2, thumbh + 2)
 
 
         // memory gauge
@@ -375,9 +391,9 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         if (selected?.worldInfo != null) {
             // background for texts panel
             batch.color = Toolkit.Theme.COL_CELL_FILL
-            Toolkit.fillArea(batch, hx - thumbw - gridGap/2, y + thumbh + 3, thumbw, 10 + worldTexts.size * textualListHeight.toInt())
+            Toolkit.fillArea(batch, screencapX, y + thumbh + 3, thumbw, 10 + worldTexts.size * textualListHeight.toInt())
             batch.color = Toolkit.Theme.COL_INACTIVE
-            Toolkit.drawBoxBorder(batch, hx - thumbw - gridGap/2 - 1, y + thumbh + 2, thumbw + 2, 10 + worldTexts.size * textualListHeight.toInt() + 2)
+            Toolkit.drawBoxBorder(batch, screencapX - 1, y + thumbh + 2, thumbw + 2, 10 + worldTexts.size * textualListHeight.toInt() + 2)
 
             // some texts
             batch.color = Color.WHITE
@@ -390,7 +406,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
             // thumbnail
             selected?.worldInfo?.screenshot?.let {
-                batch.draw(it, (hx - thumbw - gridGap/2).toFloat(), y.toFloat(), thumbw.toFloat(), thumbh.toFloat())
+                batch.draw(it, (screencapX).toFloat(), y.toFloat(), thumbw.toFloat(), thumbh.toFloat())
             }
         }
 
@@ -402,7 +418,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, hx - thumbw - gridGap/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, screencapX + 2, (full.yEnd - 20).toInt())
     }
 
     override fun hide() {
@@ -485,11 +501,11 @@ class UIItemWorldCellsSimple(
     var forceMouseDown = false
 
     companion object {
-        const val width = 378
+        const val width = 400
         const val height = 46
     }
 
-    override val width: Int = 378
+    override val width: Int = 400
     override val height: Int = 46
 
     private val icons = CommonResourcePool.getAsTextureRegionPack("terrarum-basegame-worldportalicons")

@@ -8,15 +8,17 @@ import net.torvald.terrarum.roundToFloat
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by minjaesong on 2016-04-15.
+ * Created by minjaesong on 2023-09-03.
  */
-object TinyAlphNum : BitmapFont() {
+object BigAlphNum : BitmapFont() {
 
-    internal const val W = 7
-    internal const val H = 13
+    internal const val W = 12
+    internal const val H = 16
 
-    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/7x13_Tamzen7x14b.tga", W, H)
+    internal val fontSheet = TextureRegionPack("./assets/graphics/fonts/code.tga", W, H)
 
+
+    private const val interchar = 1
 
     init {
         setOwnsTexture(true)
@@ -30,7 +32,7 @@ object TinyAlphNum : BitmapFont() {
                 l += 1
             }
         }
-        return W * l
+        return (W + interchar) * l
     }
 
     lateinit var colMain: Color
@@ -55,14 +57,18 @@ object TinyAlphNum : BitmapFont() {
                 colShadow = colMain.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
             }
             else if (c in 0.toChar()..255.toChar()) {
-                batch.color = colShadow
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W + 1, y)
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W, y + 1)
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W + 1, y + 1)
+                val ccode = c.code - 48
+
+                if (ccode in 0..47) {
+                    batch.color = colShadow
+                    batch.draw(fontSheet.get(ccode % 16, ccode / 16), x + charsPrinted * (W + interchar) + 1, y)
+                    batch.draw(fontSheet.get(ccode % 16, ccode / 16), x + charsPrinted * (W + interchar), y + 1)
+                    batch.draw(fontSheet.get(ccode % 16, ccode / 16), x + charsPrinted * (W + interchar) + 1, y + 1)
 
 
-                batch.color = colMain
-                batch.draw(fontSheet.get(c.code % 16, c.code / 16), x + charsPrinted * W, y)
+                    batch.color = colMain
+                    batch.draw(fontSheet.get(ccode % 16, ccode / 16), x + charsPrinted * (W + interchar), y)
+                }
 
                 charsPrinted += 1
             }

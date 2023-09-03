@@ -10,7 +10,7 @@ import kotlin.experimental.xor
  */
 object PasswordBase32 {
 
-    private val stringSet = "YBNDRFG8EJKMCPQXOTLVWIS2A345H769="
+    private val stringSet = "YBNDRFG8EJKMCP2XOTLVUIS2A345H769="
 
     private val substituteSet = hashMapOf(
             Pair('0', 'O'),
@@ -128,7 +128,7 @@ object PasswordBase32 {
             buffer[appendCount] = byte.toByte() xor (password[appendCount % password.size])
             appendCount++
         }
-        fun sbyteOf(i: Int) = stringSet.indexOf(input[i]).and(0x1F)
+        fun sbyteOf(i: Int) = stringSet.indexOf(input.getOrElse(i) { '=' }).and(0x1F)
 
         try {
             /*

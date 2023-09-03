@@ -9,7 +9,7 @@ object Base32Test {
         val testStr = "정 참판 양반댁 규수 혼례 치른 날. 123456709".toByteArray()
         val pwd = "béchamel".toByteArray()
 
-        val enc = PasswordBase32.encode(testStr, pwd)
+        val enc = PasswordBase32.encode(testStr, pwd).let { it.substring(0, it.indexOf('=')) }
         val dec = PasswordBase32.decode(enc, testStr.size, pwd)
 
         println("Encoded text: $enc")

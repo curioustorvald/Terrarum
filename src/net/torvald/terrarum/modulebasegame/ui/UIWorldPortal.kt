@@ -69,6 +69,7 @@ class UIWorldPortal : UICanvas(
     val transitionalListing = UIWorldPortalListing(this)
     val transitionalDelete = UIWorldPortalDelete(this)
     val transitionalRename = UIWorldPortalRename(this)
+    val transitionalShare = UIWorldPortalShare(this)
 //    val transitionalCargo = UIWorldPortalCargo(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
@@ -78,7 +79,7 @@ class UIWorldPortal : UICanvas(
         App.scr.height,
         0f,
          listOf(transitionalListing),
-        listOf(transitionalSearch, transitionalDelete, transitionalRename),
+        listOf(transitionalSearch, transitionalDelete, transitionalRename, transitionalShare),
         listOf()
     )
 
@@ -87,6 +88,7 @@ class UIWorldPortal : UICanvas(
     internal fun queueUpSearchScr() { transitionPanel.setCentreUIto(0) }
     internal fun queueUpDeleteScr() { transitionPanel.setCentreUIto(1) }
     internal fun queueUpRenameScr() { transitionPanel.setCentreUIto(2) }
+    internal fun queueUpShareScr()  { transitionPanel.setCentreUIto(3) }
 
     internal fun changePanelTo(index: Int) {
         transitionPanel.requestTransition(index)
