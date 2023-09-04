@@ -96,13 +96,16 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val goButtonWidth = 180
     private val backButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+
+        it.clickOnceListener = { _, _ ->
+            remoCon.openUI(UILoadSavegame(remoCon))
+        }
+    }
     private val goButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
-
-    init {
-        goButton.clickOnceListener = { _, _ ->
+        it.clickOnceListener = { _, _ ->
 
             // after the save is complete, proceed to new world generation
             if (existingPlayer == null) {
@@ -136,10 +139,11 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             App.setLoadScreen(loadScreen)
 
         }
-        backButton.clickOnceListener = { _, _ ->
-            remoCon.openUI(UILoadSavegame(remoCon))
-        }
 
+    }
+
+
+    init {
         addUIitem(sizeSelector)
         addUIitem(seedInput)  // order is important
         addUIitem(nameInput) // because of the IME candidates overlay

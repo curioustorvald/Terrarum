@@ -88,6 +88,10 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val useInvitationButton = UIItemTextButton(this,
         { Lang["MENU_LABEL_USE_CODE"] }, buttonBaseX + goButtonWidth + gridGap, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
+        it.clickOnceListener = { _, _ ->
+            full.queueUpUseInvitationScr()
+            full.requestTransition(2)
+        }
     }
     private val goButton: UIItemTextButton = UIItemTextButton(this,
         { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, buttonBaseX + (goButtonWidth + gridGap) * 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
@@ -225,15 +229,11 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
 
         // control hints
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, full.portalListingControlHelp, 16 + (Toolkit.drawWidth - width)/2 + 2, (full.yEnd - 20).toInt())
+        App.fontGame.draw(batch, full.portalListingControlHelp, 2 + (Toolkit.drawWidth - 560)/2 + 2, (full.yEnd - 20).toInt())
 
         uiItems.forEach { it.render(batch, camera) }
 
         oldPosX = posX
-    }
-
-    override fun hide() {
-        uiItems.forEach { it.hide() }
     }
 
     override fun dispose() {

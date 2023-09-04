@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
+import kotlin.math.roundToInt
 
 open class UIItemTransitionContainer(
     private val parent: UICanvas,
@@ -55,6 +56,9 @@ open class UIItemTransitionContainer(
 
     open fun onTransition(currentPosition: Float, uis: List<UICanvas>) {}
 
+    open val currentUI: UICanvas
+        get() = uis[currentPosition.roundToInt()]
+
     override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         super.render(batch, camera)
 
@@ -98,17 +102,17 @@ open class UIItemTransitionContainer(
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.keyDown(keycode) }
+        currentUI.keyDown(keycode)
         return true
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.keyUp(keycode) }
+        currentUI.keyUp(keycode)
         return true
     }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.touchDragged(screenX, screenY, pointer) }
+        currentUI.touchDragged(screenX, screenY, pointer)
         return true
     }
 
@@ -128,7 +132,7 @@ open class UIItemTransitionContainer(
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
-        uis.forEachIndexed { index, ui -> if (timeToUpdate(index)) ui.inputStrobed(e) }
+        currentUI.inputStrobed(e)
     }
 
     override fun show() {

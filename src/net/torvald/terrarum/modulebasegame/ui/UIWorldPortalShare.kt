@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.imagefont.BigAlphNum
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.toBig64
@@ -16,7 +17,7 @@ import net.torvald.terrarum.utils.PasswordBase32
 
 class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
 
-    override var width = 426
+    override var width = 434
     override var height = 400
 
     private val drawX = (Toolkit.drawWidth - width) / 2
@@ -63,7 +64,7 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
 
-        val textY = drawY + (height/2) - App.fontGame.lineHeight.toInt() * 4
+        val textY = drawY + (height/2) - App.fontGame.lineHeight.toInt() * 4 - 2
         val codeY = textY + App.fontGame.lineHeight.toInt() * 5
 
         // share code background
@@ -107,4 +108,5 @@ class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
     override fun doClosing(delta: Float) {
         full.selectedButton?.forceMouseDown = false
     }
+
 }

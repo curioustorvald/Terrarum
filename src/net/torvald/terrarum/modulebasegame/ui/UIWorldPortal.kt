@@ -56,9 +56,7 @@ class UIWorldPortal : UICanvas(
         get() = if (App.environment == RunningEnvironment.PC)
                     "${getKeycapPC(ControlPresets.getKey("control_key_inventory"))} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-                    "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}" +
-                    "$SP${App.gamepadLabelLT} ${Lang["GAME_WORLD_SEARCH"]}" +
-                    "$SP${App.gamepadLabelRT} ${Lang["GAME_INVENTORY"]}"
+                    "${App.gamepadLabelStart} ${Lang["GAME_ACTION_CLOSE"]}"
 
 
 
@@ -70,6 +68,7 @@ class UIWorldPortal : UICanvas(
     val transitionalDelete = UIWorldPortalDelete(this)
     val transitionalRename = UIWorldPortalRename(this)
     val transitionalShare = UIWorldPortalShare(this)
+    val transitionalUseInvitation = UIWorldPortalUseInvitation(this)
 //    val transitionalCargo = UIWorldPortalCargo(this)
     private val transitionPanel = UIItemHorizontalFadeSlide(
         this,
@@ -78,9 +77,9 @@ class UIWorldPortal : UICanvas(
         width,
         App.scr.height,
         0f,
-         listOf(transitionalListing),
+        listOf(transitionalListing),
         listOf(transitionalSearch, transitionalDelete, transitionalRename, transitionalShare),
-        listOf()
+        listOf(transitionalUseInvitation)
     )
 
     internal var selectedButton: UIItemWorldCellsSimple? = null
@@ -89,6 +88,7 @@ class UIWorldPortal : UICanvas(
     internal fun queueUpDeleteScr() { transitionPanel.setCentreUIto(1) }
     internal fun queueUpRenameScr() { transitionPanel.setCentreUIto(2) }
     internal fun queueUpShareScr()  { transitionPanel.setCentreUIto(3) }
+    internal fun queueUpUseInvitationScr() { transitionPanel.setRightUIto(0) }
 
     internal fun changePanelTo(index: Int) {
         transitionPanel.requestTransition(index)
@@ -199,58 +199,6 @@ class UIWorldPortal : UICanvas(
         transitionPanel.uis.forEach { it.opacity = FastMath.pow(opacity, 0.5f) }
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null) // required!
-    }
-
-    override fun inputStrobed(e: TerrarumKeyboardEvent) {
-        super.inputStrobed(e)
-        transitionPanel.uis.forEach { it.inputStrobed(e) }
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        super.touchDragged(screenX, screenY, pointer)
-        transitionPanel.uis.forEach { it.touchDragged(screenX, screenY, pointer) }
-        return true
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        super.touchDown(screenX, screenY, pointer, button)
-        transitionPanel.uis.forEach { it.touchDown(screenX, screenY, pointer, button) }
-        return true
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        super.touchUp(screenX, screenY, pointer, button)
-        transitionPanel.uis.forEach { it.touchUp(screenX, screenY, pointer, button) }
-        return true
-    }
-
-    override fun scrolled(amountX: Float, amountY: Float): Boolean {
-        super.scrolled(amountX, amountY)
-        transitionPanel.uis.forEach { it.scrolled(amountX, amountY) }
-        return true
-    }
-
-    override fun keyDown(keycode: Int): Boolean {
-        super.keyDown(keycode)
-        transitionPanel.uis.forEach { it.keyDown(keycode) }
-        return true
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        super.keyUp(keycode)
-        transitionPanel.uis.forEach { it.keyUp(keycode) }
-        return true
-    }
-
-    override fun keyTyped(character: Char): Boolean {
-        super.keyTyped(character)
-        transitionPanel.uis.forEach { it.keyTyped(character) }
-        return true
-    }
-
-    override fun resize(width: Int, height: Int) {
-        super.resize(width, height)
-        transitionPanel.uis.forEach { it.resize(width, height) }
     }
 }
 
