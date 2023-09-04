@@ -15,6 +15,9 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.utils.PasswordBase32
 
+/**
+ * Created by minjaesong on 2023-09-03.
+ */
 class UIWorldPortalShare(private val full: UIWorldPortal) : UICanvas() {
 
     override var width = 434

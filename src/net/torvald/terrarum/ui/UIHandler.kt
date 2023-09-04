@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
-import net.torvald.terrarum.App
-import net.torvald.terrarum.ControlPresets
-import net.torvald.terrarum.FlippingSpriteBatch
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
@@ -189,7 +186,7 @@ void main() {
         // open/close UI by key pressed
         // some UIs will pause the game, and they still need to be closed
         if (!uiToggleLocked && (Terrarum.ingame?.consoleOpened == false && (Terrarum.ingame?.paused == false || isOpened))) {
-            if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!)) {
+            if (toggleKey != null && Gdx.input.isKeyJustPressed(toggleKey!!) && TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.isOff()) {
                 if (uiTogglerFunctionDefault == null) {
                     if (isClosed)
                         setAsOpen()
@@ -200,7 +197,7 @@ void main() {
 
                 // for the case of intermediate states, do nothing.
             }
-            if (toggleButton != null && Gdx.input.isButtonJustPressed(toggleButton!!)) {
+            if (toggleButton != null && Gdx.input.isButtonJustPressed(toggleButton!!) && TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.isOff()) {
                 if (uiTogglerFunctionDefault == null) {
                     if (isClosed)
                         setAsOpen()
@@ -211,7 +208,7 @@ void main() {
             }
 
             toggleKeyExtra.forEachIndexed { index, control ->
-                if (Gdx.input.isKeyJustPressed(ControlPresets.getKey(control))) {
+                if (Gdx.input.isKeyJustPressed(ControlPresets.getKey(control)) && TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.isOff()) {
                     toggleKeyExtraAction[index].invoke(this)
                 }
             }
@@ -219,6 +216,9 @@ void main() {
             // ESC is a master key for closing
             if (!alwaysVisible && allowESCtoClose && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && isOpened) {
                 setAsClose()
+
+                // just in case...
+                TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.unset()
             }
         }
 

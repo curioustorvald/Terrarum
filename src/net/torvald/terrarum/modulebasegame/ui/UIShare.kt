@@ -12,6 +12,9 @@ import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.PasswordBase32
 
+/**
+ * Created by minjaesong on 2023-09-04.
+ */
 class UIShare : UICanvas() {
 
     override var width = 434

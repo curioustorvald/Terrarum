@@ -415,13 +415,25 @@ class UIItemTextLineInput(
         fboUpdateLatch = true
     }
 
+    override fun hide() {
+        super.hide()
+        if (this.isEnabled) {
+            this.isEnabled = false
+            TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.unset()
+        }
+    }
+
     override fun update(delta: Float) {
         if (mouseoverUpdateLatch) {
             super.update(delta)
             val mouseDown = Terrarum.mouseDown
 
             if (mouseDown) {
+                val oldEnabled = isEnabled
                 isEnabled = mouseUp
+
+                if (oldEnabled && !isEnabled) TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.unset()
+                if (!oldEnabled && isEnabled) TerrarumGlobalState.HAS_KEYBOARD_INPUT_FOCUS.set()
             }
 
             if (App.getConfigString("inputmethod") == "none") imeOn = false

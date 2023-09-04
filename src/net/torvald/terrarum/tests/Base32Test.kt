@@ -11,10 +11,10 @@ object Base32Test {
         val testStr = UUID.fromString("145efab2-d465-4e1e-abae-db6c809817a9").let {
             it.mostSignificantBits.toBig64() + it.leastSignificantBits.toBig64()
         }
-//        val pwd = "béchamel".toByteArray()
+        val pwd = "béchamel".toByteArray()
 
-        val enc = PasswordBase32.encode(testStr)
-        val dec = PasswordBase32.decode(enc, testStr.size)
+        val enc = PasswordBase32.encode(testStr, pwd)
+        val dec = PasswordBase32.decode(enc, testStr.size, pwd)
 
         println("Encoded text: $enc")
         println("Encoded bytes: ${testStr.joinToString(" ") { it.toInt().and(255).toString(16).padStart(2, '0') }}")
