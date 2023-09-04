@@ -32,63 +32,47 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
 
     private val drawX = (Toolkit.drawWidth - width) / 2
     private val drawY = (App.scr.height - height) / 2
-    private val cols = 80
-    private val rows = 30
     private val goButtonWidth = 180
 
     private val descStartY = 24 * 4
     private val lh = App.fontGame.lineHeight.toInt()
 
-//    private val codeBox = UIItemCodeBox(this, (Toolkit.drawWidth - App.fontSmallNumbers.W * cols) / 2, drawY, cols, rows)
-
     private val inputWidth = 340
     private val filenameInput = UIItemTextLineInput(this,
         (Toolkit.drawWidth - inputWidth) / 2, (App.scr.height - height) / 2 + descStartY + (5) * lh, inputWidth,
         maxLen = InputLenCap(256, InputLenCap.CharLenUnit.UTF8_BYTES)
-    )
-
-    /*
-    private val clearButton = UIItemTextButton(this,
-        { Lang["MENU_IO_CLEAR"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24 - 34, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val pasteButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_PASTE"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24 - 34, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    */
+    ).also {
+        // reset importReturnCode if the text input has changed
+        it.onKeyDown = { _ ->
+            importReturnCode = 0
+        }
+    }
 
     private val backButton = UIItemTextButton(this,
-        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
-    private val goButton = UIItemTextButton(this,
-        { Lang["MENU_IO_IMPORT"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true)
+        { Lang["MENU_LABEL_BACK"] }, drawX + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
-    private var importReturnCode = 0
-
-    init {
-//        addUIitem(codeBox)
-//        addUIitem(clearButton)
-//        addUIitem(pasteButton)
-        addUIitem(filenameInput)
-        addUIitem(backButton)
-        addUIitem(goButton)
-
-        /*clearButton.clickOnceListener = { _,_ ->
-            codeBox.clearTextBuffer()
-        }
-        pasteButton.clickOnceListener = { _,_ ->
-            codeBox.pasteFromClipboard()
-        }*/
-        backButton.clickOnceListener = { _,_ ->
+        it.clickOnceListener = { _,_ ->
             remoCon.openUI(UILoadSavegame(remoCon))
         }
-        goButton.clickOnceListener = { _,_ ->
+    }
+    private val goButton = UIItemTextButton(this,
+        { Lang["MENU_IO_IMPORT"] }, drawX + width/2 + (width/2 - goButtonWidth) / 2, drawY + height - 24, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+
+        it.clickOnceListener = { _,_ ->
             if (filenameInput.getText().isNotBlank()) {
                 importReturnCode = doImport()
                 if (importReturnCode == 0) remoCon.openUI(UILoadSavegame(remoCon))
             }
         }
+    }
 
-        // reset importReturnCode if the text input has changed
-        filenameInput.onKeyDown = { _ ->
-            importReturnCode = 0
-        }
+    private var importReturnCode = 0
+
+    init {
+        addUIitem(filenameInput)
+        addUIitem(backButton)
+        addUIitem(goButton)
+
     }
 
 //    private var textX = 0

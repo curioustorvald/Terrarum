@@ -17,7 +17,7 @@ import net.torvald.terrarum.langpack.Lang
 open class UIItemTextButton(
         parentUI: UICanvas,
         /** Stored text (independent to the Langpack) */
-        val textfun: () -> String,
+        var textfun: () -> String,
         initialX: Int,
         initialY: Int,
         override val width: Int,

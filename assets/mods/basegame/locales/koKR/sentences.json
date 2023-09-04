@@ -6,5 +6,6 @@
   "CONTEXT_WORLD_CODE_SHARE_2": "플레이할 수 있도록 합니다.",
   "CONTEXT_WORLD_CODE_SHARE_3": "",
   "CONTEXT_WORLD_CODE_SHARE_4": "아래의 코드를 공유해 다른 사람을 초대하세요!",
-  "ERROR_AVATAR_ALREADY_EXISTS": "이미 존재하는 아바타입니다."
+  "ERROR_AVATAR_ALREADY_EXISTS": "이미 존재하는 아바타입니다.",
+  "ERROR_WORLD_NOT_FOUND": "월드를 찾을 수 없습니다."
 }

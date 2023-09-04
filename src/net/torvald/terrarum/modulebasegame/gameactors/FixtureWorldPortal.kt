@@ -120,5 +120,9 @@ class FixtureWorldPortal : Electric {
     internal data class TeleportRequest(
         val worldDiskToLoad: DiskSkimmer?, // for loading existing worlds
         val worldLoadParam: TerrarumIngame.NewWorldParameters? // for creating new world
-    )
+    ) {
+        override fun toString(): String {
+            return "TeleportRequest(disk: ${worldDiskToLoad?.diskFile?.name}, param: $worldLoadParam)"
+        }
+    }
 }

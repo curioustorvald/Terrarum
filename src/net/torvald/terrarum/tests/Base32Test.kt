@@ -1,19 +1,24 @@
 package net.torvald.terrarum.tests
 
+import net.torvald.terrarum.serialise.toBig64
 import net.torvald.terrarum.utils.PasswordBase32
 import java.nio.charset.Charset
+import java.util.*
 
 object Base32Test {
 
     operator fun invoke() {
-        val testStr = "정 참판 양반댁 규수 혼례 치른 날. 123456709".toByteArray()
-        val pwd = "béchamel".toByteArray()
+        val testStr = UUID.fromString("145efab2-d465-4e1e-abae-db6c809817a9").let {
+            it.mostSignificantBits.toBig64() + it.leastSignificantBits.toBig64()
+        }
+//        val pwd = "béchamel".toByteArray()
 
-        val enc = PasswordBase32.encode(testStr, pwd).let { it.substring(0, it.indexOf('=')) }
-        val dec = PasswordBase32.decode(enc, testStr.size, pwd)
+        val enc = PasswordBase32.encode(testStr)
+        val dec = PasswordBase32.decode(enc, testStr.size)
 
         println("Encoded text: $enc")
-        println("Decoded text: ${dec.toString(Charset.defaultCharset())}")
+        println("Encoded bytes: ${testStr.joinToString(" ") { it.toInt().and(255).toString(16).padStart(2, '0') }}")
+        println("Decoded bytes: ${dec.joinToString(" ") { it.toInt().and(255).toString(16).padStart(2, '0') }}")
     }
 
 }

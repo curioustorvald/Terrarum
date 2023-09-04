@@ -7,5 +7,6 @@
   "CONTEXT_WORLD_CODE_SHARE_2": "world when you are away.",
   "CONTEXT_WORLD_CODE_SHARE_3": "",
   "CONTEXT_WORLD_CODE_SHARE_4": "Share the code below so the other people can join!",
-  "ERROR_AVATAR_ALREADY_EXISTS": "The Avatar already exists."
+  "ERROR_AVATAR_ALREADY_EXISTS": "The Avatar already exists.",
+  "ERROR_WORLD_NOT_FOUND": "World not found."
 }

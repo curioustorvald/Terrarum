@@ -4,12 +4,16 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.savegame.VirtualDisk
+import net.torvald.terrarum.serialise.toBigInt64
 import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.utils.PasswordBase32
 import net.torvald.terrarum.utils.RandomWordsName
+import java.util.*
 
 /**
  * Created by minjaesong on 2023-09-03.
@@ -34,9 +38,14 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
 
 
     private val codeInput = UIItemTextLineInput(this,
-        drawX + width - inputWidth + 5, drawY + sizeSelY + inputLineY1, inputWidth,
-        { "AAAA BB CCCCC DDDDD EEEEE FFFFF" }, InputLenCap(VirtualDisk.NAME_LENGTH, InputLenCap.CharLenUnit.UTF8_BYTES)
-    )
+        drawX + width - inputWidth + 5, drawY + sizeSelY, inputWidth,
+        { "AAAA BB CCCCC DDDDD EEEEE FFFFF" }, InputLenCap(31, InputLenCap.CharLenUnit.CODEPOINTS)
+    ).also {
+        // reset importReturnCode if the text input has changed
+        it.onKeyDown = { _ ->
+            importReturnCode = 0
+        }
+    }
 
 
 
@@ -59,9 +68,34 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
         { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, buttonBaseX + (goButtonWidth + gridGap) * 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
         it.clickOnceListener = { _, _ ->
+            val code = codeInput.getText().replace(" ", "")
+            val uuid = PasswordBase32.decode(code, 16).let {
+                UUID(it.toBigInt64(0), it.toBigInt64(8))
+            }
+            val world = App.savegameWorlds[uuid]
 
+            App.printdbg(this, "Decoded UUID=$uuid")
+
+            // world exists?
+            if (world == null) {
+                importReturnCode = 1
+            }
+            else {
+                // add the world to the player's worldbook
+                // TODO memory cap check? or disable check against shared worlds?
+                full.addWorldToPlayersDict(uuid)
+                full.cleanUpWorldDict()
+
+                full.requestTransition(0)
+            }
         }
     }
+
+    private var importReturnCode = 0
+    private val errorMessages = listOf(
+        "", // 0
+        Lang["ERROR_WORLD_NOT_FOUND"], // 1
+    )
 
     init {
         addUIitem(backButton)
@@ -70,19 +104,31 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
         addUIitem(codeInput)
     }
 
+    override fun show() {
+        super.show()
+        codeInput.clearText()
+        importReturnCode = 0
+    }
+
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
+        // error messages
+        if (importReturnCode != 0) {
+            batch.color = Toolkit.Theme.COL_RED
+            val tby = codeInput.posY
+            val btny = backButton.posY
+            Toolkit.drawTextCentered(batch, App.fontGame, errorMessages[importReturnCode], Toolkit.drawWidth, 0, (tby + btny) / 2)
+        }
 
         // input labels
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, Lang["CREDITS_CODE"], drawX - 4, drawY + sizeSelY + inputLineY1)
+        App.fontGame.draw(batch, Lang["CREDITS_CODE"], drawX - 4, drawY + sizeSelY)
 
         // control hints
         App.fontGame.draw(batch, full.portalListingControlHelp, 2 + (Toolkit.drawWidth - 560)/2 + 2, (full.yEnd - 20).toInt())
-
 
         uiItems.forEach { it.render(batch, camera) }
     }

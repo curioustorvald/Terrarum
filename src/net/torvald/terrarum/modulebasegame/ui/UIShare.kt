@@ -30,12 +30,13 @@ class UIShare : UICanvas() {
     override fun show() {
         shareCode = PasswordBase32.encode(
             INGAME.world.worldIndex.mostSignificantBits.toBig64() +
-                    INGAME.world.worldIndex.mostSignificantBits.toBig64()
-        ).let { it.substring(0, it.indexOf('=')) }.let {
+                    INGAME.world.worldIndex.leastSignificantBits.toBig64()
+        ).let {
             "${it.substring(0..3)}$dash${it.substring(4..5)}$dash${it.substring(6..10)}$dash${it.substring(11..15)}$dash${it.substring(16..20)}$dash${it.substring(21)}"
         }
 
         App.printdbg(this, shareCode)
+        App.printdbg(this, INGAME.world.worldIndex)
 
         wotKeys = (1..4).map { Lang["CONTEXT_WORLD_CODE_SHARE_$it", false] }
     }
