@@ -1,11 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.random.XXHash64
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.INGAME
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.WireCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
@@ -109,6 +106,10 @@ class FixtureWorldPortal : Electric {
 
             teleportRequest = null
         }
+    }
+
+    override fun onSpawn(tx: Int, ty: Int) {
+        INGAME.world.portalPoint = Point2i(tx, ty)
     }
 
     override fun reload() {

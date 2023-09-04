@@ -122,4 +122,6 @@ class Point2i() {
 
     operator fun component1() = x
     operator fun component2() = y
+
+    fun toVector() = Vector2(this.x.toDouble(), this.y.toDouble())
 }

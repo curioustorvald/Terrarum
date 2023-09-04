@@ -909,6 +909,7 @@ public class App implements ApplicationListener {
         currentScreen.show();
         currentScreen.resize(scr.getWidth(), scr.getHeight());
 
+        TerrarumGlobalState.INSTANCE.getHAS_KEYBOARD_INPUT_FOCUS().unset();
 
         System.gc();
 

@@ -150,6 +150,13 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
     protected constructor() : super(RenderOrder.BEHIND, PhysProperties.IMMOBILE, null)
     protected constructor(renderOrder: RenderOrder, physProp: PhysProperties, id: ActorID?) : super(renderOrder, physProp, id)
 
+    /**
+     * Callend whenever the fixture was spawned successfully.
+     *
+     * @param tx bottom-centre tilewise point of the spawned fixture
+     * @param ty bottom-centre tilewise point of the spawned fixture
+     */
+    open fun onSpawn(tx: Int, ty: Int) {}
 
     /**
      * Making the sprite: do not address the CommonResourcePool directly; just do it like this snippet:
@@ -277,6 +284,8 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         spawnRequestedTime = System.nanoTime()
 
         actorThatInstalledThisFixture = installersUUID
+
+        onSpawn(posX0, posY0)
 
         return true
     }

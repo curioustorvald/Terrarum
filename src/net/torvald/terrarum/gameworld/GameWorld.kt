@@ -87,6 +87,14 @@ open class GameWorld(
     /** Tilewise spawn point */
     var spawnY: Int = 0
 
+    var spawnPoint: Point2i
+        get() = Point2i(spawnX, spawnY)
+        set(value) {
+            spawnX = value.x
+            spawnY = value.y
+        }
+    var portalPoint: Point2i? = null
+
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
     val fluidTypes = HashedFluidType()

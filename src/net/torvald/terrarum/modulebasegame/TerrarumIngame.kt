@@ -390,7 +390,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 printdbg(this, "No mapping found")
                 printdbg(this, "Changing XY Position ${codices.player.hitbox.canonVec} -> (${world.spawnX * TILE_SIZED}, ${world.spawnY * TILE_SIZED})")
 
-                codices.player.setPosition(world.spawnX * TILE_SIZED, world.spawnY * TILE_SIZED)
+                codices.player.setPosition((world.portalPoint ?: world.spawnPoint).toVector() * TILE_SIZED)
             }
         }
 
@@ -424,10 +424,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // go to spawn position
         printdbg(this, "World Spawn position: (${world.spawnX}, ${world.spawnY})")
-        actorGamer.setPosition(
-                world.spawnX * TILE_SIZED,
-                world.spawnY * TILE_SIZED
-        )
+        actorGamer.setPosition(world.spawnPoint.toVector() * TILE_SIZED)
         actorGamer.backupPlayerProps(isMultiplayer)
 
         // make initial savefile

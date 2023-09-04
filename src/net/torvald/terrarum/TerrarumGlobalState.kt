@@ -5,7 +5,7 @@ package net.torvald.terrarum
  */
 object TerrarumGlobalState {
 
-    var HAS_KEYBOARD_INPUT_FOCUS = CountedBool()
+    val HAS_KEYBOARD_INPUT_FOCUS = CountedBool()
 
 }
 
