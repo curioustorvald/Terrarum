@@ -212,8 +212,8 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         IngameRenderer.setRenderedWorld(demoWorld)
-        WeatherMixer.internalReset()
-        WeatherMixer.titleScreenInitWeather()
+        WeatherMixer.internalReset(this)
+        WeatherMixer.titleScreenInitWeather(this.world.weatherbox)
 
 
         // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs

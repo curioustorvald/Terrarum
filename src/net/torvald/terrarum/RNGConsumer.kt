@@ -7,7 +7,7 @@ internal interface RNGConsumer {
 
     val RNG: HQRNG
 
-    fun loadFromSave(s0: Long, s1: Long) {
+    fun loadFromSave(ingame: IngameInstance, s0: Long, s1: Long) {
         RNG.setSeed(s0, s1)
     }
 

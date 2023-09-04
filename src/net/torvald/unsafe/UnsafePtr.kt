@@ -113,8 +113,8 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
         // appear (e.g. getting garbage values when it fucking shouldn't)
 
         // using ifs instead of assertions: inactive assert statements still slows down the app
-//        if (destroyed) { throw DanglingPointerException("The pointer is already destroyed ($this)") }
-//        if (index !in 0 until size) { throw AddressOverflowException("Index: $index; alloc size: $size") }
+        if (destroyed) { throw DanglingPointerException("The pointer is already destroyed ($this)") }
+        if (index !in 0 until size) { throw AddressOverflowException("Index: $index; alloc size: $size") }
     }
 
     operator fun get(index: Long): Byte {

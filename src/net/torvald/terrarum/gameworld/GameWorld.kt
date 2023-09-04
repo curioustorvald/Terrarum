@@ -14,6 +14,9 @@ import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*
+import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.weather.WeatherSchedule
+import net.torvald.terrarum.weather.Weatherbox
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -138,6 +141,33 @@ open class GameWorld(
 
     @Deprecated("This value is only used for savegames; DO NOT USE THIS", ReplaceWith("INGAME.actorContainerActive", "net.torvald.terrarum.INGAME"))
     internal val actors = ArrayList<ActorID>() // only filled up on save and load; DO NOT USE THIS
+
+    var weatherbox = Weatherbox()
+
+    init {
+        weatherbox.initWith(WeatherMixer.weatherDict["generic01"]!!, 7200L)
+        val currentWeather = weatherbox.currentWeather
+        // TEST FILL WITH RANDOM VALUES
+        (0..6).map { WeatherMixer.takeUniformRand(0f..1f) }.let {
+            weatherbox.windDir.pM2 = it[1]
+            weatherbox.windDir.pM1 = it[2]
+            weatherbox.windDir.p0  = it[3]
+            weatherbox.windDir.p1  = it[4]
+            weatherbox.windDir.p2  = it[5]
+            weatherbox.windDir.p3  = it[6]
+        }
+        (0..6).map { WeatherMixer.takeUniformRand(-1f..1f) }.let {
+            weatherbox.windSpeed.pM2 = currentWeather.getRandomWindSpeed(it[0], it[1])
+            weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(it[1], it[2])
+            weatherbox.windSpeed.p0  = currentWeather.getRandomWindSpeed(it[2], it[3])
+            weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(it[3], it[4])
+            weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(it[4], it[5])
+            weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(it[5], it[6])
+        }
+
+        // the savegame loader will overwrite whatever the initial value we have here
+    }
+
 
     /**
      * Create new world

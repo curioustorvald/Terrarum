@@ -60,6 +60,7 @@ internal object WeatherMixer : RNGConsumer {
         0f,
         0f,
         0f,
+        0f,
         Vector2(1f, 1f),
         Vector2(0f, 0f),
         listOf()
@@ -71,10 +72,6 @@ internal object WeatherMixer : RNGConsumer {
 
     val weatherDB: HashMap<String, ArrayList<BaseModularWeather>> // search by classification
     val weatherDict: HashMap<String, BaseModularWeather> // search by identifier
-
-    val currentWeather: BaseModularWeather
-        get() = weatherbox.currentWeather
-//    var nextWeather: BaseModularWeather
 
     private var forceWindVec: Vector3? = null
 
@@ -106,9 +103,6 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffY = 0f
 
 
-    var weatherbox = Weatherbox()
-
-
     // Clouds are merely a response to the current Weatherbox status //
 
     private val clouds = SortedArrayList<WeatherObjectCloud>()
@@ -118,15 +112,15 @@ internal object WeatherMixer : RNGConsumer {
     val cloudSpawnMax: Int
         get() = 256 shl (App.getConfigInt("maxparticles") / 256)
 
-    override fun loadFromSave(s0: Long, s1: Long) {
-        super.loadFromSave(s0, s1)
+    override fun loadFromSave(ingame: IngameInstance, s0: Long, s1: Long) {
+        super.loadFromSave(ingame, s0, s1)
         internalReset(s0, s1)
-        initClouds()
+        initClouds(ingame.world.weatherbox.currentWeather)
     }
 
-    fun internalReset() {
+    fun internalReset(ingame: IngameInstance) {
         internalReset(RNG.state0, RNG.state1)
-        initClouds()
+        initClouds(ingame.world.weatherbox.currentWeather)
     }
 
     fun internalReset(s0: Long, s1: Long) {
@@ -144,27 +138,6 @@ internal object WeatherMixer : RNGConsumer {
         windVector = Vector3(-0.98f, 0f, 0.21f)
 
         oldCamPos.set(WorldCamera.camVector)
-
-        weatherbox = Weatherbox()
-        weatherbox.initWith(weatherDict["generic01"]!!, 7200L)
-
-        // TEST FILL WITH RANDOM VALUES
-        (0..6).map { takeUniformRand(0f..1f) }.let {
-            weatherbox.windDir.pM2 = it[1]
-            weatherbox.windDir.pM1 = it[2]
-            weatherbox.windDir.p0  = it[3]
-            weatherbox.windDir.p1  = it[4]
-            weatherbox.windDir.p2  = it[5]
-            weatherbox.windDir.p3  = it[6]
-        }
-        (0..6).map { takeUniformRand(-1f..1f) }.let {
-            weatherbox.windSpeed.pM2 = currentWeather.getRandomWindSpeed(it[1])
-            weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(it[2])
-            weatherbox.windSpeed.p0  = currentWeather.getRandomWindSpeed(it[3])
-            weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(it[4])
-            weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(it[5])
-            weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(it[6])
-        }
     }
 
     init {
@@ -206,8 +179,8 @@ internal object WeatherMixer : RNGConsumer {
 
 //        currentWeather = weatherList[WEATHER_GENERIC]!![0] // force set weather
 
-        weatherbox.update(world)
-        updateWind()
+        world.weatherbox.update(world)
+        updateWind(world.weatherbox)
         updateClouds(delta, world)
 
 
@@ -236,7 +209,7 @@ internal object WeatherMixer : RNGConsumer {
             if (it > PI) it - TWO_PI else it
         }
 
-    private fun updateWind() {
+    private fun updateWind(weatherbox: Weatherbox) {
         val currentWindSpeed = weatherbox.windSpeed.value
         val currentWindDir = weatherbox.windDir.value * HALF_PI
 
@@ -270,6 +243,7 @@ internal object WeatherMixer : RNGConsumer {
         val camvec = WorldCamera.camVector
         val camvec2 = camvec.cpy()
         val testCamDelta = camvec.cpy().sub(oldCamPos)
+        val currentWeather = world.weatherbox.currentWeather
 
         // adjust camDelta to accomodate ROUNDWORLD
         if (testCamDelta.x.absoluteValue > world.width * TILE_SIZEF / 2f) {
@@ -353,11 +327,11 @@ internal object WeatherMixer : RNGConsumer {
     private val scrHscaler = App.scr.height / 720f
     private val cloudSizeMult = App.scr.wf / TerrarumScreenSize.defaultW
 
-    private fun takeUniformRand(range: ClosedFloatingPointRange<Float>) =
+    fun takeUniformRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear(Math.random().toFloat(), range.start, range.endInclusive)
-    private fun takeTriangularRand(range: ClosedFloatingPointRange<Float>) =
+    fun takeTriangularRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear((Math.random() + Math.random()).div(2f).toFloat(), range.start, range.endInclusive)
-    private fun takeGaussianRand(range: ClosedFloatingPointRange<Float>) =
+    fun takeGaussianRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()).div(8f).toFloat(), range.start, range.endInclusive)
 
     /**
@@ -481,7 +455,7 @@ internal object WeatherMixer : RNGConsumer {
         }
     }
 
-    private fun initClouds() {
+    private fun initClouds(currentWeather: BaseModularWeather) {
         val hCloudSize = 1024f
         // multiplier is an empirical value that depends on the 'rZ'
         // it does converge at ~6, but having it as an initial state does not make it stay converged
@@ -498,10 +472,10 @@ internal object WeatherMixer : RNGConsumer {
         }
     }
 
-    internal fun titleScreenInitWeather() {
+    internal fun titleScreenInitWeather(weatherbox: Weatherbox) {
         weatherbox.initWith(weatherDict["titlescreen"]!!, Long.MAX_VALUE)
         forceWindVec = Vector3(-0.98f, 0f, -0.21f).scl(1f/30f) // value taken from TitleScreen.kt; search for 'demoWorld.worldTime.timeDelta = '
-        initClouds()
+        initClouds(weatherbox.currentWeather)
     }
 
     private fun <T> Array<T?>.addAtFreeSpot(obj: T) {
@@ -545,6 +519,7 @@ internal object WeatherMixer : RNGConsumer {
     private val turbidityDomainSize = 533.3333f
 
     private fun drawSkybox(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
+        val currentWeather = world.weatherbox.currentWeather
         val parallaxZeroPos = (world.height / 3f)
 
         // we will not care for nextSkybox for now
@@ -650,7 +625,7 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Get a GL of specific time
      */
-    fun getGlobalLightOfTimeOfNoon(): Cvec {
+    fun getGlobalLightOfTimeOfNoon(currentWeather: BaseModularWeather): Cvec {
         currentWeather.daylightClut.let { it.get(it.width - 1, 0) }.let {
             return Cvec(it.r, it.g, it.b, it.a)
         }
@@ -804,6 +779,7 @@ internal object WeatherMixer : RNGConsumer {
             cloudChance = JSON.getFloat("cloudChance"),
             windSpeed = JSON.getFloat("windSpeed"),
             windSpeedVariance = JSON.getFloat("windSpeedVariance"),
+            windSpeedDamping = JSON.getFloat("windSpeedDamping"),
             cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
             cloudGammaVariance = JSON["cloudGammaVariance"].asFloatArray().let { Vector2(it[0], it[1]) },
             clouds = cloudsMap,

@@ -60,7 +60,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
     private val listHeight = UIItemWorldCellsSimple.height + (listCount - 1) * (UIItemWorldCellsSimple.height + gridGap)
 
     private val memoryGaugeWidth = textAreaW
-    private val buttonWidth = (UIItemWorldCellsSimple.width + thumbw - 3 * gridGap) / 5 // thumbw + cellw + gridgap = 4*gridgap + 5x
+    private val buttonWidth = (UIItemWorldCellsSimple.width + thumbw - 2 * gridGap) / 4 // thumbw + cellw + gridgap = 4*gridgap + 5x
     private val buttonsY = y + listHeight + gridGap
 
     private val screencapX = hx - thumbw - gridGap/2
@@ -109,7 +109,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             }
         }
     }
-    private val buttonShare = UIItemTextButton(this,
+    /*private val buttonShare = UIItemTextButton(this,
         { Lang["MENU_LABEL_SHARE"] },
         screencapX + (buttonWidth + gridGap) * 3,
         buttonsY,
@@ -121,10 +121,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             full.queueUpShareScr()
             full.changePanelTo(1)
         }
-    }
+    }*/
     private val buttonDelete = UIItemTextButton(this,
         { Lang["MENU_LABEL_DELETE_WORLD"] },
-        screencapX + (buttonWidth + gridGap) * 4,
+        screencapX + (buttonWidth + gridGap) * 3,
         buttonsY,
         buttonWidth,
         hasBorder = true,
@@ -159,7 +159,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         buttonRename.isEnabled = false
         buttonDelete.isEnabled = false
         buttonTeleport.isEnabled = false
-        buttonShare.isEnabled = false
+//        buttonShare.isEnabled = false
         currentWorldSelected = false
     }
 
@@ -171,7 +171,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             buttonRename.isEnabled = true
             buttonDelete.isEnabled = info.uuid != INGAME.world.worldIndex
             buttonTeleport.isEnabled = info.uuid != INGAME.world.worldIndex
-            buttonShare.isEnabled = true
+//            buttonShare.isEnabled = true
             currentWorldSelected = info.uuid == INGAME.world.worldIndex
         }
     }
@@ -186,7 +186,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         addUIitem(buttonRename)
         addUIitem(buttonTeleport)
         addUIitem(buttonSearch)
-        addUIitem(buttonShare)
+//        addUIitem(buttonShare)
         addUIitem(navRemoCon)
     }
 

@@ -332,8 +332,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         else {
             printdbg(this, "Ingame setting things up from the savegame")
 
-            RoguelikeRandomiser.loadFromSave(codices.world.randSeeds[0], codices.world.randSeeds[1])
-            WeatherMixer.loadFromSave(codices.world.randSeeds[2], codices.world.randSeeds[3])
+            RoguelikeRandomiser.loadFromSave(this, codices.world.randSeeds[0], codices.world.randSeeds[1])
+            WeatherMixer.loadFromSave(this, codices.world.randSeeds[2], codices.world.randSeeds[3])
 
 //            Terrarum.itemCodex.loadFromSave(codices.item)
 //            Terrarum.apocryphas = HashMap(codices.apocryphas)
@@ -503,7 +503,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             actorGamer = player
             forceAddActor(player)
 
-            WeatherMixer.internalReset()
+            WeatherMixer.internalReset(this)
 
             UILoadGovernor.worldUUID = world.worldIndex
         }

@@ -348,17 +348,18 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
     private fun drawWeatherInfo(batch: SpriteBatch) {
+        val weatherbox = INGAME.world.weatherbox
         val drawX = App.scr.width - 170
         val drawXf = drawX.toFloat()
 
-        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windSpeed, "WindSpd", drawX, App.scr.height - 140 - 120, WeatherMixer.currentWeather.windSpeed * (1.0 + WeatherMixer.currentWeather.windSpeedVariance))
-        drawWeatherStateBox(batch, WeatherMixer.weatherbox.windDir, "WindDir", drawX, App.scr.height - 140)
+        drawWeatherStateBox(batch, weatherbox.windSpeed, "WindSpd", drawX, App.scr.height - 140 - 120, weatherbox.currentWeather.windSpeed * (1.0 + weatherbox.currentWeather.windSpeedVariance))
+        drawWeatherStateBox(batch, weatherbox.windDir, "WindDir", drawX, App.scr.height - 140)
 
         // draw weather schedule
-        val schedYstart = App.scr.height - 140 - 120 - 13f * (WeatherMixer.weatherbox.weatherSchedule.size + 3)
-        App.fontSmallNumbers.draw(batch, "$ccY== WeatherSched [${WeatherMixer.weatherbox.weatherSchedule.size}] ==", drawXf, schedYstart)
-        WeatherMixer.weatherbox.weatherSchedule.forEachIndexed { index, weather ->
-            val sek = if (index == 0) WeatherMixer.weatherbox.updateAkku else 0
+        val schedYstart = App.scr.height - 140 - 120 - 13f * (weatherbox.weatherSchedule.size + 3)
+        App.fontSmallNumbers.draw(batch, "$ccY== WeatherSched [${weatherbox.weatherSchedule.size}] ==", drawXf, schedYstart)
+        weatherbox.weatherSchedule.forEachIndexed { index, weather ->
+            val sek = if (index == 0) weatherbox.updateAkku else 0
             App.fontSmallNumbers.draw(batch, "$ccY${weather.weather.identifier} $ccG${weather.duration - sek}", drawXf, schedYstart + 13 * (index + 1))
         }
     }

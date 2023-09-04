@@ -15,7 +15,7 @@ class Weatherbox {
 
     companion object {
         private val WIND_DIR_TIME_UNIT = 3600f * 6 // every 6hr
-        private val WIND_SPEED_TIME_UNIT = 3600f * 1 // every 2hr
+        private val WIND_SPEED_TIME_UNIT = 360f * 5 // every 0.5hr
 
         private val HALF_PIF = 1.5707964f
         private val PIF = 3.1415927f
@@ -44,6 +44,7 @@ class Weatherbox {
         get() = weatherSchedule[0].duration
 
     fun initWith(initWeather: BaseModularWeather, duration: Long) {
+        weatherSchedule.clear()
         weatherSchedule.add(WeatherSchedule(initWeather, duration))
     }
 
@@ -70,8 +71,8 @@ class Weatherbox {
     }
 
     private fun updateWind(world: GameWorld) {
-        windSpeed.update(world.worldTime.timeDelta / WIND_SPEED_TIME_UNIT) {
-            currentWeather.getRandomWindSpeed(takeUniformRand(-1f..1f))
+        windSpeed.update(world.worldTime.timeDelta / WIND_SPEED_TIME_UNIT) { lastValue ->
+            currentWeather.getRandomWindSpeed(lastValue, takeUniformRand(-1f..1f))
         }
         windDir.update( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() * 4f }
     }
@@ -120,7 +121,7 @@ open class WeatherStateBox(
 
     }
 
-    open fun update(xdelta: Float, next: () -> Float) {
+    open fun update(xdelta: Float, next: (Float) -> Float) {
 //        if (!::polynomial.isInitialized) updatePolynomials()
 
         synchronized(WeatherMixer.RNG) {
@@ -132,7 +133,7 @@ open class WeatherStateBox(
                 p0 = p1
                 p1 = p2
                 p2 = p3
-                p3 = next()
+                p3 = next(p2)
             }
 //            updatePolynomials()
         }

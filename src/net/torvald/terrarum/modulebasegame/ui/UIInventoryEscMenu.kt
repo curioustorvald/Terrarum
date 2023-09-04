@@ -30,11 +30,12 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     override var height: Int = App.scr.height
 
     private val gameMenu = arrayOf(
-            "MENU_IO_SAVE_GAME",
-            "MENU_OPTIONS_CONTROLS",
-            "MENU_LABEL_IME",
-            "MENU_LABEL_LANGUAGE",
-            "MENU_LABEL_QUIT",
+        "MENU_IO_SAVE_GAME",
+        "MENU_OPTIONS_CONTROLS",
+        "MENU_LABEL_IME",
+        "MENU_LABEL_LANGUAGE",
+        "MENU_LABEL_SHARE",
+        "MENU_LABEL_QUIT",
     )
     private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
@@ -83,6 +84,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     private val keyConfigUI = UIKeyboardControlPanel(null)
     private val languageUI = UITitleLanguage(null)
     private val keyboardSetupUI = UIIMEConfig(null)
+    private val shareUI = UIShare()
 
     private var oldScreen = 0
     private var screen = 0
@@ -155,6 +157,9 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
                     screen = 5; gameMenuButtons.deselect()
                 }
                 4 -> {
+                    screen = 6; gameMenuButtons.deselect()
+                }
+                5 -> {
                     screen = 2; gameMenuButtons.deselect()
                 }
             }
@@ -172,82 +177,92 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
         }
     }
 
+    private val controlHintX = ((width - 480) / 2).toFloat()
+
     // Completely unrelated to the gameMenuButtons order
     private val screens = arrayOf(
-            gameMenuButtons, keyboardSetupUI, areYouSureMainMenuButtons, savingUI, keyConfigUI, languageUI
+        gameMenuButtons, keyboardSetupUI, areYouSureMainMenuButtons, savingUI, keyConfigUI, languageUI, shareUI
     )
 
     // `screens` order
     private val screenRenders = arrayOf(
-            { batch: SpriteBatch, camera: OrthographicCamera ->
-                // control hints
-                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-                // text buttons
-                gameMenuButtons.render(batch, camera)
-            },
-            { batch: SpriteBatch, camera: OrthographicCamera ->
-                // control hints
-                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-                keyboardSetupUI.render(batch, camera)
-            },
-            { batch: SpriteBatch, camera: OrthographicCamera ->
-                // control hints
-                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-                areYouSureMainMenuButtons.render(batch, camera)
-            },
-            { batch: SpriteBatch, camera: OrthographicCamera ->
-                savingUI.render(batch, camera)
-            },
-            { batch: SpriteBatch, camera: OrthographicCamera ->
-                // control hints
-                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-                keyConfigUI.render(batch, camera)
-            },
-            { batch: SpriteBatch, camera: OrthographicCamera ->
-                // control hints
-                App.fontGame.draw(batch, full.gameMenuControlHelp, full.offsetX, full.yEnd - 20)
-                languageUI.render(batch, camera)
-            },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            // text buttons
+            gameMenuButtons.render(batch, camera)
+        },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            keyboardSetupUI.render(batch, camera)
+        },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            areYouSureMainMenuButtons.render(batch, camera)
+        },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            savingUI.render(batch, camera)
+        },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            keyConfigUI.render(batch, camera)
+        },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            languageUI.render(batch, camera)
+        },
+        { batch: SpriteBatch, camera: OrthographicCamera ->
+            // control hints
+            App.fontGame.draw(batch, full.gameMenuControlHelp, controlHintX, full.yEnd - 20)
+            shareUI.render(batch, camera)
+        },
     )
 
     // `screens` order
     private val screenTouchDowns = arrayOf(
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
-                keyboardSetupUI.touchDown(screenX, screenY, pointer, button)
-            },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
-                keyConfigUI.touchDown(screenX, screenY, pointer, button)
-            },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-        )
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+            keyboardSetupUI.touchDown(screenX, screenY, pointer, button)
+        },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+            keyConfigUI.touchDown(screenX, screenY, pointer, button)
+        },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+    )
 
     // `screens` order
     private val screenTouchUps = arrayOf(
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
-                keyboardSetupUI.touchUp(screenX, screenY, pointer, button)
-            },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->
-                keyConfigUI.touchUp(screenX, screenY, pointer, button)
-            },
-            { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
-        )
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+            keyboardSetupUI.touchUp(screenX, screenY, pointer, button)
+        },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->
+            keyConfigUI.touchUp(screenX, screenY, pointer, button)
+        },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+        { screenX: Int, screenY: Int, pointer: Int, button: Int ->  },
+    )
 
     // `screens` order
     private val screenScrolls = arrayOf(
-            { amountX: Float, amountY: Float ->  },
-            { amountX: Float, amountY: Float ->
-                keyboardSetupUI.scrolled(amountX, amountY)
-            },
-            { amountX: Float, amountY: Float ->  },
-            { amountX: Float, amountY: Float ->  },
-            { amountX: Float, amountY: Float ->  },
-            { amountX: Float, amountY: Float ->  },
+        { amountX: Float, amountY: Float ->  },
+        { amountX: Float, amountY: Float ->
+            keyboardSetupUI.scrolled(amountX, amountY)
+        },
+        { amountX: Float, amountY: Float ->  },
+        { amountX: Float, amountY: Float ->  },
+        { amountX: Float, amountY: Float ->  },
+        { amountX: Float, amountY: Float ->  },
+        { amountX: Float, amountY: Float ->  },
     )
 
     override fun show() {

@@ -41,7 +41,7 @@ public class Float16FrameBuffer extends FrameBuffer {
         }
         else {
             FloatFrameBufferBuilder bufferBuilder = new FloatFrameBufferBuilder(width, height);
-            bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false); // FIXME sporadic black screen on GL_RGBA16F? or maybe it was Plasma bugging out?
+            bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
             if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
             this.bufferBuilder = bufferBuilder;
         }
