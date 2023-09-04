@@ -22,20 +22,20 @@ const float rgbGammas[16] = float[](
 0.4,
 0.5,
 
+0.6,
 0.7,
+0.8,
 0.9,
-1.1,
-1.3,
 
-1.7,
-2.1,
+1.0,
+1.25,
+1.5,
+1.75,
+
+2.0,
 2.5,
-2.9,
-
-3.7,
-4.5,
-5.3,
-6.1
+3.0,
+3.5
 );
 
 const float aGammas[4] = float[](
@@ -64,10 +64,13 @@ void main() {
     float aGamma = aGammas[int(v_color.b * 255) & 3];
     vec4 gamma = vec4(rgbGamma, rgbGamma, rgbGamma, aGamma);
 
+    vec4 range = vec4(vec3(min(rgbGamma, 1.0 / rgbGamma)), 1.0);
+    vec4 offset = vec4(vec3(max(0.0, 1.0 - rgbGamma)), 0.0);
+
     // cloud colour format:
     // r: bw diffuse map, g: normal, b: normal, a: bw diffuse alpha
     vec4 inCol = texture(u_texture, v_texCoords);
-    vec4 rawCol = pow(inCol, gamma);
+    vec4 rawCol = range * pow(inCol, gamma) + offset;
 
     // do gradient mapping here
     vec4 outCol = fma(mix(shadeCol, cloudCol, rawCol.r), boolean.yyyx, rawCol * boolean.xxxy);

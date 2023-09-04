@@ -180,21 +180,18 @@ class WeatherObjectCloud(
             0.3f,
             0.4f,
             0.5f,
-
+            0.6f,
             0.7f,
+            0.8f,
             0.9f,
-            1.1f,
-            1.3f,
-
-            1.7f,
-            2.1f,
+            1.0f,
+            1.25f,
+            1.5f,
+            1.75f,
+            2.0f,
             2.5f,
-            2.9f,
-
-            3.7f,
-            4.5f,
-            5.3f,
-            6.1f
+            3.0f,
+            3.5f
         )
 
         val A_GAMMA_TABLE = floatArrayOf(

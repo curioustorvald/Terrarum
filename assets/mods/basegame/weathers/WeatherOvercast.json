@@ -4,7 +4,7 @@
   "daylightClut": "clut_daylight.tga",
   "classification": "overcast",
   "cloudChance": 300,
-  "cloudGamma": [3.7, 1.6],
+  "cloudGamma": [2.0, 1.6],
   "cloudGammaVariance": [0.0, 0.0],
   "windSpeed": 10.45,
   "windSpeedVariance": 0.5,
