@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.TerrarumIngame.Companion.NEW_WORLD_SIZE
 import net.torvald.terrarum.modulebasegame.WorldgenLoadScreen
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
@@ -206,13 +207,24 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
                     importReturnCode = 1
                 }
                 else {
-                    TODO()
 
                     // after the save is complete, proceed to importing
                     if (existingPlayer == null) {
                         newPlayerCreationThread.start()
                         newPlayerCreationThread.join()
                     }
+
+                    val playerDisk = existingPlayer ?: App.savegamePlayers[UILoadGovernor.playerUUID]!!.loadable()
+                    val player = ReadActor.invoke(
+                        playerDisk,
+                        ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)
+                    ) as IngamePlayer
+
+
+                    LoadSavegame(
+                        App.savegamePlayers[player.uuid]!!.files[0],
+                        world.loadable()
+                    )
                 }
             }
         }
