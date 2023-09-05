@@ -2,6 +2,7 @@ id;classname
 1;net.torvald.terrarum.modulebasegame.gameitems.PickaxeCopper
 2;net.torvald.terrarum.modulebasegame.gameitems.PickaxeIron
 3;net.torvald.terrarum.modulebasegame.gameitems.PickaxeSteel
+4;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerIron
 5;net.torvald.terrarum.modulebasegame.gameitems.ItemTikiTorch
 6;net.torvald.terrarum.modulebasegame.gameitems.ItemStorageChest
 7;net.torvald.terrarum.modulebasegame.gameitems.WireGraphDebugger
@@ -9,6 +10,9 @@ id;classname
 9;net.torvald.terrarum.modulebasegame.gameitems.WireCutterAll
 10;net.torvald.terrarum.modulebasegame.gameitems.ItemTypewriter
 11;net.torvald.terrarum.modulebasegame.gameitems.ItemWallCalendar
+12;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCopper
+13;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerSteel
+
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony

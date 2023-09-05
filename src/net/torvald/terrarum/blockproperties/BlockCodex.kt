@@ -146,7 +146,10 @@ class BlockCodex {
         }
 
         try {
-            return blockProps[blockID]!!
+            return if (blockID.startsWith("wall@"))
+                blockProps[blockID.substring(5)]!!
+            else
+                blockProps[blockID]!!
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with id $blockID does not exist.")

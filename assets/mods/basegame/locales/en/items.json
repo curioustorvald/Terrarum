@@ -5,6 +5,12 @@
 
   "ITEM_CALENDAR": "Calendar",
   "ITEM_LOGIC_SIGNAL_EMITTER": "Logic Signal Emitter",
+  "ITEM_PICK_COPPER": "Copper Pickaxe",
+  "ITEM_PICK_IRON": "Iron Pickaxe",
+  "ITEM_PICK_STEEL": "Steel Pickaxe",
+  "ITEM_SLEDGEHAMMER_COPPER": "Copper Sledgehammer",
+  "ITEM_SLEDGEHAMMER_IRON": "Iron Sledgehammer",
+  "ITEM_SLEDGEHAMMER_STEEL": "Steel Sledgehammer",
   "ITEM_STORAGE_CHEST": "Storage Chest",
   "ITEM_TIKI_TORCH": "Tiki Torch",
   "ITEM_TYPEWRITER": "Typewriter",

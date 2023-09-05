@@ -83,7 +83,7 @@ fun getKeycapFkeys(n: Int) = when (n) {
 
 fun List<Int>.toJavaString(): String {
     val sb = StringBuilder()
-    this.forEach {
+    this.subList(0, this.size).forEach {
         if (it > 65535) {
             val u = it - 65536
             sb.append((0xD800 or (u ushr 10).and(1023)).toChar())

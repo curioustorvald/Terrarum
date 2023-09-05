@@ -5,6 +5,12 @@
 
   "ITEM_CALENDAR": "달력",
   "ITEM_LOGIC_SIGNAL_EMITTER": "신호발생기",
+  "ITEM_PICK_COPPER": "구리 곡괭이",
+  "ITEM_PICK_IRON": "철 곡괭이",
+  "ITEM_PICK_STEEL": "강철 곡괭이",
+  "ITEM_SLEDGEHAMMER_COPPER": "구리 해머",
+  "ITEM_SLEDGEHAMMER_IRON": "철 해머",
+  "ITEM_SLEDGEHAMMER_STEEL": "강철 해머",
   "ITEM_STORAGE_CHEST": "보관상자",
   "ITEM_TIKI_TORCH": "티키 토치",
   "ITEM_TYPEWRITER": "타자기",
