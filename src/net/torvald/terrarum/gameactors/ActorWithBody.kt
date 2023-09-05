@@ -1108,6 +1108,7 @@ open class ActorWithBody : Actor {
     }
 
     private fun Hitbox.getWallDetection(option: Int): List<Double> {
+        val SOME_PIXEL = 1.0 // it really does NOT work if the value is not 1.0
         val x1: Double
         val x2: Double
         val y1: Double
@@ -1116,23 +1117,23 @@ open class ActorWithBody : Actor {
             COLLIDING_TOP -> {
                 x1 = this.startX
                 x2 = this.endX - PHYS_EPSILON_DIST
-                y1 = this.startY - A_PIXEL
+                y1 = this.startY - SOME_PIXEL
                 y2 = y1
             }
             COLLIDING_BOTTOM -> {
                 x1 = this.startX
                 x2 = this.endX - PHYS_EPSILON_DIST
-                y1 = this.endY - PHYS_EPSILON_DIST + A_PIXEL
+                y1 = this.endY - PHYS_EPSILON_DIST + SOME_PIXEL
                 y2 = y1
             }
             COLLIDING_LEFT -> {
-                x1 = this.startX - A_PIXEL
+                x1 = this.startX - SOME_PIXEL
                 x2 = x1
                 y1 = this.startY
                 y2 = this.endY - PHYS_EPSILON_DIST
             }
             COLLIDING_RIGHT -> {
-                x1 = this.endX - PHYS_EPSILON_DIST + A_PIXEL
+                x1 = this.endX - PHYS_EPSILON_DIST + SOME_PIXEL
                 x2 = x1
                 y1 = this.startY
                 y2 = this.endY - PHYS_EPSILON_DIST
@@ -1242,6 +1243,8 @@ open class ActorWithBody : Actor {
     private fun isCollidingInternalStairs(pxStart: Int, pyStart: Int, pxEnd: Int, pyEnd: Int, feet: Boolean = false): Pair<Int, Int> {
         if (world == null) return 0 to 0
 
+        val cornerSize = minOf((pyEnd - pyStart) / 3, (pxEnd - pyStart) / 3)
+
         val ys = if (gravitation.y >= 0) pyEnd downTo pyStart else pyStart..pyEnd
         val yheight = (ys.last - ys.first).absoluteValue
         var stairHeight = 0
@@ -1260,7 +1263,19 @@ open class ActorWithBody : Actor {
             val isFeetTileHeight = (ty == feetY)
             var hasFloor = false
 
-            for (x in pxStart..pxEnd) {
+            // octagonal shape
+            val xs = /*if (y < cornerSize) {
+                val sub = cornerSize - y
+                (pxStart + sub)..(pxEnd - sub)
+            }
+            else if (y > pyEnd - cornerSize) {
+                val sub = y - (pyEnd - cornerSize)
+                (pxStart + sub)..(pxEnd - sub)
+            }
+            else*/
+                pxStart..pxEnd
+
+            for (x in xs) {
                 val tx = (x / TILE_SIZED).floorToInt() // round down toward negative infinity
                 val tile = world!!.getTileFromTerrain(tx, ty)
 

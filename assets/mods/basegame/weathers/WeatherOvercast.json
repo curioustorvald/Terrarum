@@ -18,12 +18,12 @@
     "cumulonimbus": {
       "filename": "cloud_large.png", "tw": 2048, "th": 1024, "probability": 0.4,
       "baseScale": 4.0, "scaleVariance": 0.3333333,
-      "altLow": 590, "altHigh":60
+      "altLow": 1080, "altHigh":1800
     },
     "nimbostratus": {
       "filename": "cloud_wide.png", "tw": 4096, "th": 1024, "probability": 1.0,
       "baseScale": 8.0, "scaleVariance": 0.1,
-      "altLow": 600, "altHigh": 700
+      "altLow": 1100, "altHigh": 1500
     }
   },
   "atmoTurbidity": 9.5
