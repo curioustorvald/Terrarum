@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.ui.Movement
 import net.torvald.terrarum.ui.UICanvas
@@ -26,7 +27,7 @@ class UIScreenZoom : UICanvas(
         handler.allowESCtoClose = false
     }
 
-    val zoomText = "${getKeycapPC(handler.toggleKey!!)} $EMDASH Zoom Out"
+    val zoomText = "${getKeycapPC(handler.toggleKey!!)} ${Lang["GAME_ACTION_ZOOM_OUT"]}"
 
     override var width = App.fontGame.getWidth(zoomText)
     override var height = App.fontGame.lineHeight.toInt()

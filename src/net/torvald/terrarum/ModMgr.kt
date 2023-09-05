@@ -211,6 +211,12 @@ object ModMgr {
                         GameRetextureLoader(moduleName)
                     }
 
+                    // add locales if exists
+                    if (hasFile(moduleName, "locales")) {
+                        printdbg(this, "Trying to load Locales on ${moduleName}")
+                        GameLanguageLoader(moduleName)
+                    }
+
                     // run entry script in entry point
                     if (entryPoint.isNotBlank()) {
                         var newClass: Class<*>? = null

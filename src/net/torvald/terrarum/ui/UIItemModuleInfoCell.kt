@@ -86,7 +86,7 @@ class UIItemModuleInfoCell(
         batch.draw(modIcon, initialX + 35f, initialY + 12f)
         batch.shader = null
         batch.color = Color.WHITE
-        App.fontGame.draw(batch, "$ccZero${modName.toUpperCase()}$ccNum $modVer", initialX + 86f + 3f, initialY.toFloat())
+        App.fontGame.draw(batch, "$ccZero${modProp.properName}$ccNum $modVer", initialX + 86f + 3f, initialY.toFloat())
         if (modErrored)
             App.fontGame.draw(batch, "$emphRed${modErrors.first().cause?.message}", initialX + 86f + 3f, initialY + 24f)
         else
