@@ -26,7 +26,7 @@ class WeatherObjectCloud(
         throw UnsupportedOperationException()
     }
 
-    var life = 0; private set
+    var life = 0
     var despawnCode = ""; private set
 
     private val lifespan = 40000 + ((Math.random() + Math.random()) * 20000).roundToInt() // triangular distibution of 40000..80000
@@ -49,7 +49,14 @@ class WeatherObjectCloud(
 
         eigenAlpha = if (posZ < 1f) posZ.pow(0.5f) else -((posZ - 1f) / ALPHA_ROLLOFF_Z) + 1f
 
-        alpha = eigenAlpha * if (life < lifespan) 1f else 1f - (life - lifespan) / OLD_AGE_DECAY
+        val alphaMult = if (life < NEWBORN_GROWTH_TIME)
+            life / NEWBORN_GROWTH_TIME
+        else if (life < lifespan)
+            1f
+        else
+            1f - (life - lifespan) / OLD_AGE_DECAY
+
+        alpha = eigenAlpha * alphaMult
 
 
         val lrCoord = screenCoordBottomLRforDespawnCalculation
@@ -173,7 +180,8 @@ class WeatherObjectCloud(
         fun worldYtoWorldZforScreenYof0(y: Float) = 1f - (y / H) // rearrange screenCoord equations to derive this eq :p
 
         const val ALPHA_ROLLOFF_Z = 64f
-        const val OLD_AGE_DECAY = 4000f
+        const val OLD_AGE_DECAY = 5000f
+        const val NEWBORN_GROWTH_TIME = 1000f
 
         val RGB_GAMMA_TABLE = floatArrayOf(
             0.2f,

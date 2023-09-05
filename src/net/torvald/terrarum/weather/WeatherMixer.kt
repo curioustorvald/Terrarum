@@ -22,6 +22,7 @@ import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
+import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.NEWBORN_GROWTH_TIME
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.util.SortedArrayList
@@ -391,7 +392,7 @@ internal object WeatherMixer : RNGConsumer {
 
     }
 
-    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, precalculatedPos: Vector3? = null) {
+    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, precalculatedPos: Vector3? = null, ageOverride: Int = 0) {
 //        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${cloudSpawnMax})")
 
         if (cloudsSpawned < cloudSpawnMax) {
@@ -444,6 +445,8 @@ internal object WeatherMixer : RNGConsumer {
                         it.pos.y = takeUniformRand(-cloud.altHigh..-cloud.altLow) * scrHscaler
                     }
 
+                    it.life = ageOverride
+
                     clouds.add(it)
                     cloudsSpawned += 1
 
@@ -468,7 +471,7 @@ internal object WeatherMixer : RNGConsumer {
             val x = WeatherObjectCloud.screenXtoWorldX(takeUniformRand(0f..App.scr.wf), zz)
 
 
-            tryToSpawnCloud(currentWeather, Vector3(x, 0f, z))
+            tryToSpawnCloud(currentWeather, Vector3(x, 0f, z), NEWBORN_GROWTH_TIME.toInt())
         }
     }
 
@@ -750,23 +753,6 @@ internal object WeatherMixer : RNGConsumer {
         }
         cloudsMap.sortBy { it.probability }
 
-
-
-
-
-
-
-
-
-        var mixFrom: String?
-        try { mixFrom = JSON.getString("mixFrom") }
-        catch (e: IllegalArgumentException) { mixFrom = null }
-
-
-
-        var mixPercentage: Double?
-        try { mixPercentage = JSON.getDouble("mixPercentage") }
-        catch (e: IllegalArgumentException) { mixPercentage = null }
 
 
 
