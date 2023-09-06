@@ -153,7 +153,7 @@ open class GameWorld(
     var weatherbox = Weatherbox()
 
     init {
-        weatherbox.initWith(WeatherMixer.weatherDict["generic01"]!!, 7200L)
+        weatherbox.initWith(WeatherMixer.weatherDict["generic01"]!!, 3600L)
         val currentWeather = weatherbox.currentWeather
         // TEST FILL WITH RANDOM VALUES
         (0..6).map { WeatherMixer.takeUniformRand(0f..1f) }.let {
@@ -165,12 +165,13 @@ open class GameWorld(
             weatherbox.windDir.p3  = it[6]
         }
         (0..6).map { WeatherMixer.takeUniformRand(-1f..1f) }.let {
-            weatherbox.windSpeed.pM2 = currentWeather.getRandomWindSpeed(it[0], it[1])
-            weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(it[1], it[2])
-            weatherbox.windSpeed.p0  = currentWeather.getRandomWindSpeed(it[2], it[3])
-            weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(it[3], it[4])
-            weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(it[4], it[5])
-            weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(it[5], it[6])
+            val pM3 = currentWeather.getRandomWindSpeed(it[1])
+            weatherbox.windSpeed.pM2 = currentWeather.getRandomWindSpeed(pM3, it[1])
+            weatherbox.windSpeed.pM1 = currentWeather.getRandomWindSpeed(weatherbox.windSpeed.pM2, it[2])
+            weatherbox.windSpeed.p0  = currentWeather.getRandomWindSpeed(weatherbox.windSpeed.pM1, it[3])
+            weatherbox.windSpeed.p1  = currentWeather.getRandomWindSpeed(weatherbox.windSpeed.p0, it[4])
+            weatherbox.windSpeed.p2  = currentWeather.getRandomWindSpeed(weatherbox.windSpeed.p1, it[5])
+            weatherbox.windSpeed.p3  = currentWeather.getRandomWindSpeed(weatherbox.windSpeed.p2, it[6])
         }
 
         // the savegame loader will overwrite whatever the initial value we have here

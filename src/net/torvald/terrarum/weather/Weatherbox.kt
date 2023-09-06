@@ -1,12 +1,11 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.math.Vector2
 import com.jme3.math.FastMath
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
-import org.apache.commons.math3.analysis.UnivariateFunction
-import org.apache.commons.math3.analysis.interpolation.NevilleInterpolator
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator
 import java.util.*
 
 data class WeatherSchedule(val weather: BaseModularWeather = WeatherMixer.DEFAULT_WEATHER, val duration: Long = 3600)
@@ -37,25 +36,37 @@ class Weatherbox {
     val windDir = WeatherDirBox() // 0 .. 1.0
     val windSpeed = WeatherStateBox() // 0 .. arbitrarily large number
 
-    val weatherSchedule: MutableList<WeatherSchedule> = mutableListOf<WeatherSchedule>()
-    val currentWeather: BaseModularWeather
+    val weatherSchedule = ArrayList<WeatherSchedule>()
+    val oldWeather: BaseModularWeather
         get() = weatherSchedule[0].weather
-    val currentWeatherDuration: Long
+    val currentWeather: BaseModularWeather
+        get() = weatherSchedule[1].weather
+//    val nextWeather: BaseModularWeather
+//        get() = weatherSchedule[2].weather
+    val oldWeatherDuration: Long
         get() = weatherSchedule[0].duration
+    val currentWeatherDuration: Long
+        get() = weatherSchedule[1].duration
+
+    @Transient val currentVibrancy = Vector2(1f, 1f)
+    val weatherBlend: Float
+        get() = updateAkku.toFloat() / currentWeatherDuration
 
     fun initWith(initWeather: BaseModularWeather, duration: Long) {
         weatherSchedule.clear()
+        weatherSchedule.add(WeatherSchedule(initWeather, duration))
         weatherSchedule.add(WeatherSchedule(initWeather, duration))
     }
 
     var updateAkku = 0L; private set
 
     fun update(world: GameWorld) {
+        updateShaderParams()
         updateWind(world)
 
         if (updateAkku >= currentWeatherDuration) {
             // TODO add more random weathers
-            if (weatherSchedule.size == 1) {
+            while (weatherSchedule.size < 3) {
                 val newName = if (currentWeather.identifier == "generic01") "overcast01" else "generic01"
                 val newDuration = 7200L
                 weatherSchedule.add(WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration))
@@ -64,7 +75,10 @@ class Weatherbox {
             }
 
             // subtract akku by old currentWeatherDuration
-            updateAkku -= weatherSchedule.removeAt(0).duration
+//            printdbg(this, "Dequeueing a weather")
+
+            weatherSchedule.removeAt(0)
+            updateAkku -= oldWeatherDuration
         }
 
         updateAkku += world.worldTime.timeDelta
@@ -75,6 +89,15 @@ class Weatherbox {
             currentWeather.getRandomWindSpeed(lastValue, takeUniformRand(-1f..1f))
         }
         windDir.update( world.worldTime.timeDelta / WIND_DIR_TIME_UNIT) { RNG.nextFloat() * 4f }
+    }
+
+    private fun updateShaderParams() {
+        val (co, cg) = oldWeather.shaderVibrancy
+        val (no, ng) = currentWeather.shaderVibrancy
+        currentVibrancy.set(
+            FastMath.interpolateLinear(weatherBlend * 2, co, no),
+            FastMath.interpolateLinear(weatherBlend * 2, cg, ng),
+        )
     }
 }
 

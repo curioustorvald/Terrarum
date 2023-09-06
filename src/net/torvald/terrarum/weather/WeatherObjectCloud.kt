@@ -5,12 +5,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
 import com.jme3.math.FastMath
+import com.jme3.math.FastMath.PI
+import com.jme3.math.FastMath.sin
 import net.torvald.terrarum.App
 import net.torvald.terrarum.gameworld.GameWorld
-import kotlin.math.absoluteValue
-import kotlin.math.pow
-import kotlin.math.roundToInt
-import kotlin.math.sign
+import kotlin.math.*
 
 /**
  * Created by minjaesong on 2023-08-21.
@@ -47,7 +46,7 @@ class WeatherObjectCloud(
             scl(world.worldTime.timeDelta.toFloat())
         )
 
-        eigenAlpha = if (posZ < 1f) posZ.pow(0.5f) else -((posZ - 1f) / ALPHA_ROLLOFF_Z) + 1f
+        eigenAlpha = if (posZ < 1f) posZ.pow(0.5f) else cosh((posZ - CLOUD_STAGE_DEPTH) / (0.75636f * CLOUD_STAGE_DEPTH)) - 1f //-((posZ - 1f) / CLOUD_STAGE_DEPTH) + 1f
 
         val alphaMult = if (life < NEWBORN_GROWTH_TIME)
             life / NEWBORN_GROWTH_TIME
@@ -60,13 +59,13 @@ class WeatherObjectCloud(
 
 
         val lrCoord = screenCoordBottomLRforDespawnCalculation
-        if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.0001f..ALPHA_ROLLOFF_Z + 1f || alpha < 0f) {
+        if (lrCoord.x > WeatherMixer.oobMarginR || lrCoord.z < WeatherMixer.oobMarginL || posZ !in 0.0001f..CLOUD_STAGE_DEPTH + 1f || alpha < 0f) {
             flagToDespawn = true
 
             despawnCode = if (lrCoord.x > WeatherMixer.oobMarginR) "OUT_OF_SCREEN_RIGHT"
             else if (lrCoord.z < WeatherMixer.oobMarginL) "OUT_OF_SCREEN_LEFT"
             else if (posZ < 0.0001f) "OUT_OF_SCREEN_TOO_CLOSE"
-            else if (posZ > ALPHA_ROLLOFF_Z + 1f) "OUT_OF_SCREEN_TOO_FAR"
+            else if (posZ > CLOUD_STAGE_DEPTH + 1f) "OUT_OF_SCREEN_TOO_FAR"
             else if (life >= lifespan + OLD_AGE_DECAY) "OLD_AGE"
             else if (alpha < 0f) "ALPHA_BELOW_ZERO"
             else "UNKNOWN"
@@ -180,6 +179,7 @@ class WeatherObjectCloud(
         fun worldYtoWorldZforScreenYof0(y: Float) = 1f - (y / H) // rearrange screenCoord equations to derive this eq :p
 
         const val ALPHA_ROLLOFF_Z = 64f
+        const val CLOUD_STAGE_DEPTH = 256f
         const val OLD_AGE_DECAY = 5000f
         const val NEWBORN_GROWTH_TIME = 1000f
 

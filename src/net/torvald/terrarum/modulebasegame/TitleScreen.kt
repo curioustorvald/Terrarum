@@ -177,6 +177,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             printdbg(this, "Demo world not found, using empty world")
         }
 
+        this.world = demoWorld
 
         // set initial time to summer
         demoWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
@@ -213,7 +214,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         IngameRenderer.setRenderedWorld(demoWorld)
         WeatherMixer.internalReset(this)
-        WeatherMixer.titleScreenInitWeather(this.world.weatherbox)
+        WeatherMixer.titleScreenInitWeather(demoWorld.weatherbox)
 
 
         // load a half-gradient texture that would be used throughout the titlescreen and its sub UIs

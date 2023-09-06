@@ -64,7 +64,8 @@ internal object WeatherMixer : RNGConsumer {
         0f,
         Vector2(1f, 1f),
         Vector2(0f, 0f),
-        listOf()
+        listOf(),
+        floatArrayOf(1f, 1f)
     )
 
     override val RNG = HQRNG()
@@ -169,7 +170,7 @@ internal object WeatherMixer : RNGConsumer {
             weatherDB[weather.classification]!!.add(weather)
         }
 
-        weatherDict["titlescreen"] = weatherDB[WEATHER_GENERIC]!![0].copy(windSpeed = 1f)
+        weatherDict["titlescreen"] = weatherDB[WEATHER_GENERIC]!![0].copy(identifier = "titlescreen", windSpeed = 1f)
     }
 
     /**
@@ -459,7 +460,8 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun initClouds(currentWeather: BaseModularWeather) {
-        val hCloudSize = 1024f
+        clouds.clear()
+        cloudsSpawned = 0
         // multiplier is an empirical value that depends on the 'rZ'
         // it does converge at ~6, but having it as an initial state does not make it stay converged
         repeat((currentWeather.cloudChance * 1.333f).ceilToInt()) {
@@ -731,13 +733,6 @@ internal object WeatherMixer : RNGConsumer {
         val skyboxInJson = JSON.getString("skyboxGradColourMap")
         val lightbox = JSON.getString("daylightClut")
 
-        val skybox = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}"))
-        val daylight = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}"))
-
-        val identifier = JSON.getString("identifier")
-        val classification = JSON.getString("classification")
-
-
         val cloudsMap = ArrayList<CloudProps>()
         val clouds = JSON["clouds"]
         clouds.forEachSiblings { name, json ->
@@ -755,13 +750,12 @@ internal object WeatherMixer : RNGConsumer {
 
 
 
-
         return BaseModularWeather(
-            identifier = identifier,
+            identifier = JSON.getString("identifier"),
             json = JSON,
-            skyboxGradColourMap = skybox,
-            daylightClut = daylight,
-            classification = classification,
+            skyboxGradColourMap = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${skyboxInJson}")),
+            daylightClut = GdxColorMap(ModMgr.getGdxFile(modname, "$pathToImage/${lightbox}")),
+            classification = JSON.getString("classification"),
             cloudChance = JSON.getFloat("cloudChance"),
             windSpeed = JSON.getFloat("windSpeed"),
             windSpeedVariance = JSON.getFloat("windSpeedVariance"),
@@ -769,6 +763,7 @@ internal object WeatherMixer : RNGConsumer {
             cloudGamma = JSON["cloudGamma"].asFloatArray().let { Vector2(it[0], it[1]) },
             cloudGammaVariance = JSON["cloudGammaVariance"].asFloatArray().let { Vector2(it[0], it[1]) },
             clouds = cloudsMap,
+            shaderVibrancy = JSON["shaderVibrancy"].asFloatArray()
         )
     }
 

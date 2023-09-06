@@ -13,6 +13,7 @@ import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.Toolkit
+import net.torvald.terrarum.weather.WeatherMixer
 
 /**
  * Must be called by the App Loader
@@ -236,6 +237,13 @@ object TerrarumPostProcessor : Disposable {
         else
             shaderPostNoDither
 
+        val (vo, vg) = INGAME.world.weatherbox.let {
+            if (it.currentWeather.identifier == "titlescreen")
+                1f to 1f
+            else
+                it.currentVibrancy.x to it.currentVibrancy.y
+        }
+
         App.getCurrentDitherTex().bind(1)
         fbo.colorBufferTexture.bind(0)
 
@@ -245,6 +253,7 @@ object TerrarumPostProcessor : Disposable {
         shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
         shader.setUniformi("u_pattern", 1)
         shader.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
+        shader.setUniformf("vibrancy", 1f, vo, vg, 1f)
         shader.setUniformMatrix4fv("swizzler", swizzler, rng.nextInt(24), 16*4)
         App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
 

@@ -21,5 +21,6 @@
       "altLow": 1080, "altHigh": 1800
     }
   },
-  "atmoTurbidity": 3.5
+  "atmoTurbidity": 3.5,
+  "shaderVibrancy": [1.0, 1.0]
 }

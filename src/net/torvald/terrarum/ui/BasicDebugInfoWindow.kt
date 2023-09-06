@@ -359,8 +359,10 @@ class BasicDebugInfoWindow : UICanvas() {
         val schedYstart = App.scr.height - 140 - 120 - 13f * (weatherbox.weatherSchedule.size + 3)
         App.fontSmallNumbers.draw(batch, "$ccY== WeatherSched [${weatherbox.weatherSchedule.size}] ==", drawXf, schedYstart)
         weatherbox.weatherSchedule.forEachIndexed { index, weather ->
-            val sek = if (index == 0) weatherbox.updateAkku else 0
-            App.fontSmallNumbers.draw(batch, "$ccY${weather.weather.identifier} $ccG${weather.duration - sek}", drawXf, schedYstart + 13 * (index + 1))
+            val sek = if (index == 1) weatherbox.updateAkku else 0
+            val cc1 = if (index == 0) ccK else ccY
+            val cc2 = if (index == 0) ccK else ccG
+            App.fontSmallNumbers.draw(batch, "$cc1${weather.weather.identifier} $cc2${weather.duration - sek}", drawXf, schedYstart + 13 * (index + 1))
         }
     }
 

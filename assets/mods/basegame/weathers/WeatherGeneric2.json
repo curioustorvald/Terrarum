@@ -27,5 +27,6 @@
     }
   },
   "atmoTurbidity": 3.5,
+  "shaderVibrancy": [1.0, 1.0],
   "__comment__": "Make a texture for altocumulus so that this weather can be realised with less than 1000 sprites"
 }

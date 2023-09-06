@@ -29,10 +29,12 @@ data class BaseModularWeather(
     val cloudGamma: Vector2,
     val cloudGammaVariance: Vector2,
     var clouds: List<CloudProps>, // sorted by CloudProps.probability
+    val shaderVibrancy: FloatArray,
 
     val mixFrom: String? = null,
     val mixPercentage: Double? = null,
 ) {
+
 
     /**
      * @param rnd random number between -1 and +1
@@ -40,7 +42,13 @@ data class BaseModularWeather(
     fun getRandomWindSpeed(old: Float, rnd: Float): Float {
         val v = 1f + rnd.absoluteValue * windSpeedVariance
         val r = if (rnd < 0) windSpeed / v else windSpeed * v
-        return FastMath.interpolateLinear(windSpeedDamping, old, r)
+        return FastMath.interpolateLinear(1f - windSpeedDamping, old, r)
+    }
+
+    fun getRandomWindSpeed(rnd: Float): Float {
+        val v = 1f + rnd.absoluteValue * windSpeedVariance
+        val r = if (rnd < 0) windSpeed / v else windSpeed * v
+        return r
     }
 
     fun getRandomCloudGamma(rnd1: Float, rnd2: Float): Vector2 {

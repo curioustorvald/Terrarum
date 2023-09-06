@@ -31,6 +31,9 @@ const mat4 swizzler = mat4(
 );
 uniform float quant = 255.0; // 64 steps -> 63.0; 256 steps -> 255.0
 
+vec4 quantVec = vec4(quant);
+vec4 invQuant = vec4(1.0 / quant);
+
 out vec4 fragColor;
 
 const vec2 boolean = vec2(0.0, 1.0);
@@ -54,12 +57,12 @@ const mat4 ycocg_to_rgb = mat4(
 
 
 vec4 nearestColour(vec4 inColor) {
-    return floor(vec4(quant) * inColor) * vec4(1.0 / quant);
+    return floor(quantVec * inColor) * invQuant;
 }
 
 vec4 getDitherredDot(vec4 inColor) {
     vec4 bayerThreshold = swizzler * vec4(matrixNormaliser + texture(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
-    return nearestColour(bayerThreshold * vec4(1.0 / quant) + inColor);
+    return nearestColour(fma(bayerThreshold, invQuant, inColor));
 }
 
 
