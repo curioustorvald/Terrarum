@@ -41,7 +41,8 @@ class Weatherbox {
         get() = weatherSchedule[0].weather
     val currentWeather: BaseModularWeather
         get() = weatherSchedule[1].weather
-//    val nextWeather: BaseModularWeather
+
+    //    val nextWeather: BaseModularWeather
 //        get() = weatherSchedule[2].weather
     val oldWeatherDuration: Long
         get() = weatherSchedule[0].duration
@@ -60,6 +61,12 @@ class Weatherbox {
 
     var updateAkku = 0L; private set
 
+    private fun pickNextWeather(): WeatherSchedule {
+        val newName = if (currentWeather.identifier == "generic01") "overcast01" else "generic01"
+        val newDuration = 7200L
+        return WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration)
+    }
+
     fun update(world: GameWorld) {
         updateShaderParams()
         updateWind(world)
@@ -67,9 +74,7 @@ class Weatherbox {
         if (updateAkku >= currentWeatherDuration) {
             // TODO add more random weathers
             while (weatherSchedule.size < 3) {
-                val newName = if (currentWeather.identifier == "generic01") "overcast01" else "generic01"
-                val newDuration = 7200L
-                weatherSchedule.add(WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration))
+                weatherSchedule.add(pickNextWeather())
 
 //                printdbg(this, "Queueing next weather '$newName' that will last $newDuration seconds")
             }
