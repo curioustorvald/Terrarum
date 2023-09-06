@@ -14,15 +14,16 @@ out vec4 fragColor;
 const vec2 boolean = vec2(0.0, 1.0);
 
 uniform vec4 drawOffsetSize; // (gradX, gradY, gradW, gradH)
-uniform vec4 uvA; // (u, v, u2, v2) for morn, turbLow, albLow
-uniform vec4 uvB; // (u, v, u2, v2) for noon, turbLow, albLow
-uniform vec4 uvC; // (u, v, u2, v2) for morn, turbHigh, albLow
-uniform vec4 uvD; // (u, v, u2, v2) for noon, turbHigh, albLow
-uniform vec4 uvE; // (u, v, u2, v2) for morn, turbLow, albHigh
-uniform vec4 uvF; // (u, v, u2, v2) for noon, turbLow, albHigh
-uniform vec4 uvG; // (u, v, u2, v2) for morn, turbHigh, albHigh
-uniform vec4 uvH; // (u, v, u2, v2) for noon, turbHigh, albHigh
-uniform vec4 texBlend; // (morn/noon, turbidity, albedo, unused)
+uniform vec4 uvA; // (u, v, u2, v2) for now, turbLow, albLow
+uniform vec4 uvB; // (u, v, u2, v2) for old, turbLow, albLow
+uniform vec4 uvC; // (u, v, u2, v2) for now, turbHigh, albLow
+uniform vec4 uvD; // (u, v, u2, v2) for old, turbHigh, albLow
+uniform vec4 uvE; // (u, v, u2, v2) for now, turbLow, albHigh
+uniform vec4 uvF; // (u, v, u2, v2) for old, turbLow, albHigh
+uniform vec4 uvG; // (u, v, u2, v2) for now, turbHigh, albHigh
+uniform vec4 uvH; // (u, v, u2, v2) for old, turbHigh, albHigh
+uniform vec4 texBlend1; // (turbidity now, albedo now, turbidity old, albedo old)
+uniform vec4 texBlend2; // (old-now blend, unused, unused, unused)
 uniform vec2 tex1Size = vec2(4096.0);
 uniform vec2 astrumScroll = vec2(0.0);
 uniform vec4 randomNumber = vec4(1.0, -2.0, 3.0, -4.0);
@@ -136,17 +137,17 @@ void main(void) {
 
     // notations used: https://en.wikipedia.org/wiki/File:Enclosing_points.svg and https://en.wikipedia.org/wiki/File:3D_interpolation2.svg
     vec4 colorTex0 = mix(
-        mix(
-            mix(colorTexA, colorTexE, texBlend.z), // c00 = c000..c100
-            mix(colorTexC, colorTexG, texBlend.z), // c10 = c010..c110
-            texBlend.y
+        mix( // now-values
+            mix(colorTexA, colorTexE, texBlend1.y), // c00 = c000..c100
+            mix(colorTexC, colorTexG, texBlend1.y), // c10 = c010..c110
+            texBlend1.x
         ), // c0 = c00..c10
-        mix(
-            mix(colorTexB, colorTexF, texBlend.z), // c01 = c001..c101
-            mix(colorTexD, colorTexH, texBlend.z), // c11 = c011..c111
-            texBlend.y
+        mix( // old-values
+            mix(colorTexB, colorTexF, texBlend1.w), // c01 = c001..c101
+            mix(colorTexD, colorTexH, texBlend1.w), // c11 = c011..c111
+            texBlend1.z
         ), // c1 = c01..c11
-        texBlend.x
+        texBlend2.x
     ); // c = c0..c1
 
 

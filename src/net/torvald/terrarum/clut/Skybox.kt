@@ -60,17 +60,27 @@ object Skybox : Disposable {
     data class SkyboxRenderInfo(
         val texture: Texture,
         val uvs: FloatArray,
-        val turbidityPoint: Float,
-        val albedoPoint: Float,
+        val turbidityThisBlend: Float,
+        val albedoThisBlend: Float,
+        val turbidityOldBlend: Float,
+        val albedoOldBlend: Float,
     )
 
-    fun getUV(elevationDeg: Double, turbidity: Double, albedo: Double): SkyboxRenderInfo {
-        val turb = turbidity.coerceIn(turbiditiesD.first(), turbiditiesD.last()).minus(1.0).times(turbDivisor)
-        val turbLo = turb.floorToInt()
-        val turbHi = min(turbCnt - 1, turbLo + 1)
-        val alb = albedo.coerceIn(albedos.first(), albedos.last()).times(5.0)
-        val albLo = alb.floorToInt()
-        val albHi = min(albedoCnt - 1, albLo + 1)
+    fun getUV(elevationDeg: Double, oldTurbidity: Double, oldAlbedo: Double, thisTurbidity: Double, thisAlbedo: Double): SkyboxRenderInfo {
+        val turb2 = thisTurbidity.coerceIn(turbiditiesD.first(), turbiditiesD.last()).minus(1.0).times(turbDivisor)
+        val turb2Lo = turb2.floorToInt()
+        val turb2Hi = min(turbCnt - 1, turb2Lo + 1)
+        val alb2 = thisAlbedo.coerceIn(albedos.first(), albedos.last()).times(5.0)
+        val alb2Lo = alb2.floorToInt()
+        val alb2Hi = min(albedoCnt - 1, alb2Lo + 1)
+
+        val turb1 = oldTurbidity.coerceIn(turbiditiesD.first(), turbiditiesD.last()).minus(1.0).times(turbDivisor)
+        val turb1Lo = turb1.floorToInt()
+        val turb1Hi = min(turbCnt - 1, turb1Lo + 1)
+        val alb1 = oldAlbedo.coerceIn(albedos.first(), albedos.last()).times(5.0)
+        val alb1Lo = alb1.floorToInt()
+        val alb1Hi = min(albedoCnt - 1, alb1Lo + 1)
+
         val elev = elevationDeg.coerceIn(-elevMax, elevMax).plus(elevMax).div(elevations.last.toDouble()).div(albedoCnt * 2).times((elevCnt - 1.0) / elevCnt)
 
         // A: morn, turbLow, albLow
@@ -82,14 +92,14 @@ object Skybox : Disposable {
         // G: morn, turbHigh, albHigh
         // H: noon, turbHigh, albHigh
 
-        val regionA = texStripRegions.get(albLo + albedoCnt * 0, turbLo)
-        val regionB = texStripRegions.get(albLo + albedoCnt * 1, turbLo)
-        val regionC = texStripRegions.get(albLo + albedoCnt * 0, turbHi)
-        val regionD = texStripRegions.get(albLo + albedoCnt * 1, turbHi)
-        val regionE = texStripRegions.get(albHi + albedoCnt * 0, turbLo)
-        val regionF = texStripRegions.get(albHi + albedoCnt * 1, turbLo)
-        val regionG = texStripRegions.get(albHi + albedoCnt * 0, turbHi)
-        val regionH = texStripRegions.get(albHi + albedoCnt * 1, turbHi)
+        val regionA = texStripRegions.get(alb1Lo, turb1Lo)
+        val regionB = texStripRegions.get(alb2Lo, turb2Lo)
+        val regionC = texStripRegions.get(alb1Lo, turb1Hi)
+        val regionD = texStripRegions.get(alb2Lo, turb2Hi)
+        val regionE = texStripRegions.get(alb1Hi, turb1Lo)
+        val regionF = texStripRegions.get(alb2Hi, turb2Lo)
+        val regionG = texStripRegions.get(alb1Hi, turb1Hi)
+        val regionH = texStripRegions.get(alb2Hi, turb2Hi)
         // (0.5f / tex.width): because of the nature of bilinear interpolation, half pixels from the edges must be discarded
         val uA = regionA.u + (0.5f / tex.width) + elev.toFloat()
         val uB = regionB.u + (0.5f / tex.width) + elev.toFloat()
@@ -112,8 +122,10 @@ object Skybox : Disposable {
                 uG, regionG.v, uG, regionG.v2,
                 uH, regionH.v, uH, regionH.v2,
             ),
-            (turb - turbLo).toFloat(),
-            (alb - albLo).toFloat(),
+            (turb2 - turb2Lo).toFloat(),
+            (alb2 - alb2Lo).toFloat(),
+            (turb1 - turb1Lo).toFloat(),
+            (alb1 - alb1Lo).toFloat(),
         )
     }
 
