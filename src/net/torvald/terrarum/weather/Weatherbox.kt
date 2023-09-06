@@ -7,6 +7,7 @@ import net.torvald.terrarum.floorToInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import java.util.*
+import kotlin.math.roundToLong
 
 data class WeatherSchedule(val weather: BaseModularWeather = WeatherMixer.DEFAULT_WEATHER, val duration: Long = 3600)
 
@@ -62,8 +63,9 @@ class Weatherbox {
     var updateAkku = 0L; private set
 
     private fun pickNextWeather(): WeatherSchedule {
-        val newName = if (currentWeather.identifier == "generic01") "overcast01" else "generic01"
-        val newDuration = 7200L
+        // temporary setup for the release
+        val newName = if (takeUniformRand(0f..1f) < 0.5f) "generic01" else "generic02"
+        val newDuration = takeTriangularRand(3600f..10800f).roundToLong()
         return WeatherSchedule(WeatherMixer.weatherDict[newName]!!, newDuration)
     }
 
