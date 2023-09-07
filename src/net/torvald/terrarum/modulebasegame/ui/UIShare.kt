@@ -7,7 +7,9 @@ import net.torvald.terrarum.App
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.imagefont.BigAlphNum
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.toBig64
+import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.utils.PasswordBase32
@@ -28,15 +30,9 @@ class UIShare : UICanvas() {
     }
 
     private var shareCode = ""
-    private var dash = ' '
 
     override fun show() {
-        shareCode = PasswordBase32.encode(
-            INGAME.world.worldIndex.mostSignificantBits.toBig64() +
-                    INGAME.world.worldIndex.leastSignificantBits.toBig64()
-        ).let {
-            "${it.substring(0..3)}$dash${it.substring(4..5)}$dash${it.substring(6..10)}$dash${it.substring(11..15)}$dash${it.substring(16..20)}$dash${it.substring(21)}"
-        }
+        shareCode = Common.encodeUUID(INGAME.world.worldIndex)
 
         App.printdbg(this, shareCode)
         App.printdbg(this, INGAME.world.worldIndex)

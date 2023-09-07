@@ -1,6 +1,8 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.random.XXHash64
+import net.torvald.spriteanimation.SheetSpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
@@ -48,7 +50,7 @@ class FixtureWorldPortal : Electric {
         density = 2900.0
         setHitboxDimension(80, 32, 0, 0)
         makeNewSprite(TextureRegionPack(itemImage.texture, 80, 32)).let {
-            it.setRowsAndFrames(1,1)
+            it.setRowsAndFrames(1,3)
         }
 
         actorValue[AVKey.BASEMASS] = FixtureLogicSignalEmitter.MASS
@@ -58,8 +60,9 @@ class FixtureWorldPortal : Electric {
 
     @Transient internal var teleportRequest: TeleportRequest? = null
 
-    override fun update(delta: Float) {
-        super.update(delta)
+    override fun drawBody(batch: SpriteBatch) {
+        (sprite as SheetSpriteAnimation).currentFrame = (Math.random() * 3).toInt()
+        super.drawBody(batch)
     }
 
     override fun onRisingEdge(readFrom: BlockBoxIndex) {

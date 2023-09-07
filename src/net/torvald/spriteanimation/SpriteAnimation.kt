@@ -34,6 +34,10 @@ abstract class SpriteAnimation(@Transient val parentActor: ActorWithBody) : Disp
 
 /**
  * This class should not be serialised; save its Animation Description Language instead.
+ *
+ * Maximum rows: 64
+ *
+ * Maximum frames: unlimited
  */
 class SheetSpriteAnimation(parentActor: ActorWithBody) : SpriteAnimation(parentActor) {
 

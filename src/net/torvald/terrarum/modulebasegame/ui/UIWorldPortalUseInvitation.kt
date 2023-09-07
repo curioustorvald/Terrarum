@@ -9,6 +9,7 @@ import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.printStackTrace
 import net.torvald.terrarum.savegame.VirtualDisk
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.toBigInt64
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.PasswordBase32
@@ -68,10 +69,7 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
         { Lang["MENU_LABEL_CONFIRM_BUTTON"] }, buttonBaseX + (goButtonWidth + gridGap) * 2, buttonY, goButtonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
 
         it.clickOnceListener = { _, _ ->
-            val code = codeInput.getText().replace(" ", "")
-            val uuid = PasswordBase32.decode(code, 16).let {
-                UUID(it.toBigInt64(0), it.toBigInt64(8))
-            }
+            val uuid = Common.decodeToUUID(codeInput.getText())
             val world = App.savegameWorlds[uuid]
 
             App.printdbg(this, "Decoded UUID=$uuid")

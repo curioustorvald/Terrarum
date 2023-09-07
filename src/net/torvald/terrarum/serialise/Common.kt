@@ -503,6 +503,70 @@ object Common {
         return ByteArray64Reader(strToBytes(StringReader(s)), CHARSET).readText()
     }
 
+    fun encodeUUID(uuid: UUID): String {
+        val dash = ' '
+        val useShort = (uuid.mostSignificantBits.and(0xF000L) == 0x4000L && uuid.leastSignificantBits.ushr(62) == 0b10L)
+
+        /*(uuid.mostSignificantBits.toBig64() + uuid.leastSignificantBits.toBig64()).forEach {
+            print("${it.toUint().toString(2).padStart(8,'0')} ")
+        }
+        println()*/
+
+        val bytes = if (useShort) {
+            (uuid.mostSignificantBits.toBig64() +
+                    uuid.leastSignificantBits.toBig64()).let {
+                it.sliceArray(0..5) +
+                        (it[6].toUint().and(15).shl(4) or it[8].toUint().and(0x0F)).toByte() +
+                        it[7] +
+                        it.sliceArray(9..15) +
+                        (it[8].toUint().and(0x30).shl(2)).toByte()
+            }
+        }
+        else {
+            uuid.mostSignificantBits.toBig64() +
+                    uuid.leastSignificantBits.toBig64()
+        }
+
+        /*bytes.forEach {
+            print("${it.toUint().toString(2).padStart(8,'0')} ")
+        }
+        println()*/
+
+        return PasswordBase32.encode(bytes).let {
+            if (useShort)
+                "${it.substring(0..4)} ${it.substring(5..9)} ${it.substring(10..14)} ${it.substring(15..19)} ${it.substring(20..24)}"
+            else
+                "${it.substring(0..3)}$dash${it.substring(4..5)}$dash${it.substring(6..10)}$dash${it.substring(11..15)}$dash${it.substring(16..20)}$dash${it.substring(21)}"
+        }
+    }
+
+    fun decodeToUUID(str: String): UUID {
+        val code = str.replace(" ", "").trim()
+        val b = PasswordBase32.decode(code + (if (code.length == 25) "Y" else ""), 16)
+
+        /*b.forEach {
+            print("${it.toUint().toString(2).padStart(8,'0')} ")
+        }
+        println()*/
+
+        val bytes = if (code.length == 25) {
+            val b6 = b[6].toUint()
+            val jh = b[15].toUint().ushr(2) // 0b JJ00 0000 -> 0b 00JJ 0000
+            b.sliceArray(0..5) +
+            (b6.and(0xF0).ushr(4) or 0x40).toByte() +
+            b[7] +
+            (b6.and(0x0F) or jh or 0x80).toByte() +
+            b.sliceArray(8..14)
+        }
+        else b
+
+        /*bytes.forEach {
+            print("${it.toUint().toString(2).padStart(8,'0')} ")
+        }
+        println()*/
+
+        return UUID(bytes.toBigInt64(0), bytes.toBigInt64(8))
+    }
 }
 
 class SaveLoadError(file: File?, cause: Throwable) : RuntimeException("An error occured while loading save file '${file?.absolutePath}'", cause)
