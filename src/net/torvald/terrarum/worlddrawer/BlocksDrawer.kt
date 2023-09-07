@@ -45,7 +45,8 @@ internal object BlocksDrawer {
     /** Index zero: spring */
     val weatherTerrains: Array<TextureRegionPack>
     lateinit var tilesTerrain: TextureRegionPack; private set
-    lateinit var tilesTerrainBlend: TextureRegionPack; private set
+    lateinit var tilesTerrainNext: TextureRegionPack; private set
+    private var tilesTerrainBlendDegree = 0f
     //val tilesWire: TextureRegionPack
     val tileItemTerrain: TextureRegionPack
     val tileItemTerrainGlow: TextureRegionPack
@@ -103,10 +104,12 @@ internal object BlocksDrawer {
 
         // create terrain texture from pixmaps
         weatherTerrains = arrayOf(
-                TextureRegionPack(Texture(App.tileMaker.atlasSpring), TILE_SIZE, TILE_SIZE),
-                TextureRegionPack(Texture(App.tileMaker.atlas), TILE_SIZE, TILE_SIZE),
-                TextureRegionPack(Texture(App.tileMaker.atlasAutumn), TILE_SIZE, TILE_SIZE),
-                TextureRegionPack(Texture(App.tileMaker.atlasWinter), TILE_SIZE, TILE_SIZE)
+            TextureRegionPack(Texture(App.tileMaker.atlas), TILE_SIZE, TILE_SIZE),
+            TextureRegionPack(Texture(App.tileMaker.atlasVernal), TILE_SIZE, TILE_SIZE),
+            TextureRegionPack(Texture(App.tileMaker.atlasAestival), TILE_SIZE, TILE_SIZE),
+            TextureRegionPack(Texture(App.tileMaker.atlasSerotinal), TILE_SIZE, TILE_SIZE),
+            TextureRegionPack(Texture(App.tileMaker.atlasAutumnal), TILE_SIZE, TILE_SIZE),
+            TextureRegionPack(Texture(App.tileMaker.atlasHibernal), TILE_SIZE, TILE_SIZE),
         )
 
         //tilesWire = TextureRegionPack(ModMgr.getGdxFile("basegame", "wires/wire.tga"), TILE_SIZE, TILE_SIZE)
@@ -193,11 +196,12 @@ internal object BlocksDrawer {
     internal fun renderData() {
 
         try {
-            drawTIME_T = world.worldTime.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
-            val seasonalMonth = (drawTIME_T.div(WorldTime.DAY_LENGTH) fmod WorldTime.YEAR_DAYS.toLong()).toInt() / WorldTime.MONTH_LENGTH + 1
+            drawTIME_T = world.worldTime.TIME_T - (WorldTime.DAY_LENGTH * 10) // offset by -10 days
+            val seasonalMonth = (drawTIME_T fmod (WorldTime.DAY_LENGTH * WorldTime.YEAR_DAYS).toLong()).toFloat() / (WorldTime.DAY_LENGTH * WorldTime.YEAR_DAYS / weatherTerrains.size)
 
-            tilesTerrain = weatherTerrains[seasonalMonth - 1]
-            tilesTerrainBlend = weatherTerrains[seasonalMonth fmod 4]
+            tilesTerrain = weatherTerrains[seasonalMonth.floorToInt()]
+            tilesTerrainNext = weatherTerrains[(seasonalMonth + 1).floorToInt() fmod weatherTerrains.size]
+            tilesTerrainBlendDegree = seasonalMonth % 1f
         }
         catch (e: ClassCastException) { }
 
@@ -616,7 +620,7 @@ internal object BlocksDrawer {
             tilesGlow.texture.bind(0) // for some fuck reason, it must be bound as last
         }
         else {
-            tilesTerrainBlend.texture.bind(2)
+            tilesTerrainNext.texture.bind(2)
             _tilesBufferAsTex.bind(1) // trying 1 and 0...
             tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
         }
@@ -639,7 +643,7 @@ internal object BlocksDrawer {
         shader.setUniformf("atlasTexSize", tileAtlas.texture.width.toFloat(), tileAtlas.texture.height.toFloat()) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
         shader.setUniformf("tilesBlend", if (mode == TERRAIN || mode == WALL)
-            drawTIME_T.fmod(SECONDS_IN_MONTH) / SECONDS_IN_MONTH.toFloat()
+            tilesTerrainBlendDegree
         else
             0f
         )

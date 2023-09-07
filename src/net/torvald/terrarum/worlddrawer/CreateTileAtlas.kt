@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
-import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -40,10 +39,12 @@ class CreateTileAtlas {
 
     val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
 
-    lateinit var atlas: Pixmap
-    lateinit var atlasAutumn: Pixmap
-    lateinit var atlasWinter: Pixmap
-    lateinit var atlasSpring: Pixmap
+    lateinit var atlas: Pixmap // prevernal
+    lateinit var atlasVernal: Pixmap
+    lateinit var atlasAestival: Pixmap
+    lateinit var atlasSerotinal: Pixmap
+    lateinit var atlasAutumnal: Pixmap
+    lateinit var atlasHibernal: Pixmap
     lateinit var atlasFluid: Pixmap
     lateinit var atlasGlow: Pixmap // glowing won't be affected by the season... for now
     lateinit var itemTerrainTexture: Texture
@@ -84,9 +85,11 @@ class CreateTileAtlas {
 
         if (MAX_TEX_SIZE >= initPixmap.width) {
             atlas.drawPixmap(initPixmap, 0, 0)
-            atlasAutumn.drawPixmap(initPixmap, 0, 0)
-            atlasWinter.drawPixmap(initPixmap, 0, 0)
-            atlasSpring.drawPixmap(initPixmap, 0, 0)
+            atlasVernal.drawPixmap(initPixmap, 0, 0)
+            atlasAestival.drawPixmap(initPixmap, 0, 0)
+            atlasSerotinal.drawPixmap(initPixmap, 0, 0)
+            atlasAutumnal.drawPixmap(initPixmap, 0, 0)
+            atlasHibernal.drawPixmap(initPixmap, 0, 0)
         }
         else {
         /*
@@ -107,9 +110,11 @@ class CreateTileAtlas {
                 val destY = scantile * TILE_SIZE
 
                 atlas.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
-                atlasAutumn.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
-                atlasWinter.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
-                atlasSpring.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasVernal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasAestival.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasSerotinal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasAutumnal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasHibernal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
             }
         }
 
@@ -125,9 +130,11 @@ class CreateTileAtlas {
         itemSheetNumbers = HashMap<ItemID, Int>()
 
         atlas = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
-        atlasAutumn = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
-        atlasWinter = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
-        atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasVernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasAestival = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasSerotinal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasAutumnal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasHibernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasGlow = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
 
@@ -352,25 +359,29 @@ class CreateTileAtlas {
             expandAtlantes()
         }
 
-        val seasonal = matte.width == matte.height && matte.width == 14 * TILE_SIZE
+        val sixSeasonal = matte.width == 21 * TILE_SIZE && matte.height == 14 * TILE_SIZE
         val txOfPixmap = matte.width / TILE_SIZE
         val txOfPixmapGlow = glow.width / TILE_SIZE
         for (i in 0 until tilesCount) {
             //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
 
             // different texture for different seasons (224x224)
-            if (seasonal) {
+            if (sixSeasonal) {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7, SUMMER)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7, AUTUMN)
-                _drawToAtlantes(matte, atlasCursor, i % 7 + 7, i / 7 + 7, WINTER)
-                _drawToAtlantes(matte, atlasCursor, i % 7, i / 7 + 7, SPRING)
+                _drawToAtlantes(matte, atlasCursor, i % 7     , i / 7, PREVERNAL)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 7 , i / 7, VERNAL)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 14, i / 7, AESTIVAL)
+
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 14, i / 7 + 7, SEROTINAL)
+                _drawToAtlantes(matte, atlasCursor, i % 7 + 7 , i / 7 + 7, AUTUMNAL)
+                _drawToAtlantes(matte, atlasCursor, i % 7     , i / 7 + 7, HIBERNAL)
+
                 _drawToAtlantes(glow, atlasCursor, i % 7, i / 7, GLOW)
                 atlasCursor += 1
             }
             else {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, FOUR_SEASONS)
+                _drawToAtlantes(matte, atlasCursor, i % txOfPixmap, i / txOfPixmap, SIX_SEASONS)
                 _drawToAtlantes(glow, atlasCursor, i % txOfPixmapGlow, i / txOfPixmapGlow, GLOW)
                 atlasCursor += 1
             }
@@ -381,11 +392,13 @@ class CreateTileAtlas {
      * mode: 0 for all the atlantes, 1-4 for summer/autumn/winter/spring atlas
      */
     private fun _drawToAtlantes(pixmap: Pixmap, destTileNum: Int, srcTileX: Int, srcTileY: Int, source: AtlasSource) {
-        if (source == FOUR_SEASONS) {
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, SUMMER)
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, AUTUMN)
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, WINTER)
-            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, SPRING)
+        if (source == SIX_SEASONS) {
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, PREVERNAL)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, VERNAL)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, AESTIVAL)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, SEROTINAL)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, AUTUMNAL)
+            _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, HIBERNAL)
         }
         else {
             val atlasX = (destTileNum % TILES_IN_X) * TILE_SIZE
@@ -396,10 +409,12 @@ class CreateTileAtlas {
             //if (mode == 1) printdbg(this, "atlaspos: ($atlasX, $atlasY), srcpos: ($sourceX, $sourceY), srcpixmap = $pixmap")
 
             when (source) {
-                SUMMER -> atlas.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                AUTUMN -> atlasAutumn.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                WINTER -> atlasWinter.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
-                SPRING -> atlasSpring.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                PREVERNAL -> atlas.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                VERNAL -> atlasVernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                AESTIVAL -> atlasAestival.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                SEROTINAL -> atlasSerotinal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                AUTUMNAL -> atlasAutumnal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                HIBERNAL -> atlasHibernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 FLUID -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 GLOW -> atlasGlow.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 else -> throw IllegalArgumentException("Unknown draw source $source")
@@ -436,9 +451,11 @@ class CreateTileAtlas {
 
     fun dispose() {
         atlas.dispose()
-        atlasAutumn.dispose()
-        atlasWinter.dispose()
-        atlasSpring.dispose()
+        atlasVernal.dispose()
+        atlasAestival.dispose()
+        atlasSerotinal.dispose()
+        atlasAutumnal.dispose()
+        atlasHibernal.dispose()
         atlasFluid.dispose()
         atlasGlow.dispose()
         //itemTerrainTexture.dispose() //BlocksDrawer will dispose of it as it disposes of 'tileItemTerrain (TextureRegionPack)'
@@ -452,7 +469,8 @@ class CreateTileAtlas {
     }
 
     private enum class AtlasSource {
-        FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING, FLUID, GLOW
+        /*FOUR_SEASONS, SUMMER, AUTUMN, WINTER, SPRING,*/ FLUID, GLOW,
+        SIX_SEASONS, PREVERNAL, VERNAL, AESTIVAL, SEROTINAL, AUTUMNAL, HIBERNAL,
     }
 
     private fun expandAtlantes() {
@@ -470,13 +488,13 @@ class CreateTileAtlas {
         TOTAL_TILES = TILES_IN_X * TILES_IN_X
 
 
-        val newAtlantes = Array<Pixmap>(5) {
+        val newAtlantes = Array(7) {
             Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also {
                 it.blending = Pixmap.Blending.None
                 it.filter = Pixmap.Filter.NearestNeighbour
             }
         }
-        listOf(atlas, atlasAutumn, atlasWinter, atlasSpring, atlasGlow).forEachIndexed { index, pixmap ->
+        listOf(atlas, atlasVernal, atlasAestival, atlasSerotinal, atlasAutumnal, atlasHibernal, atlasGlow).forEachIndexed { index, pixmap ->
         /*
         How it works:
 
@@ -502,10 +520,12 @@ class CreateTileAtlas {
         }
 
         atlas = newAtlantes[0]
-        atlasAutumn = newAtlantes[1]
-        atlasWinter = newAtlantes[2]
-        atlasSpring = newAtlantes[3]
-        atlasGlow = newAtlantes[4]
+        atlasVernal = newAtlantes[1]
+        atlasAestival = newAtlantes[2]
+        atlasSerotinal = newAtlantes[3]
+        atlasAutumnal = newAtlantes[4]
+        atlasHibernal = newAtlantes[5]
+        atlasGlow = newAtlantes[6]
 
 
         App.setConfig("atlastexsize", newTexSize)

@@ -14,7 +14,7 @@ data class WeatherSchedule(val weather: BaseModularWeather = WeatherMixer.DEFAUL
 class Weatherbox {
 
     companion object {
-        private val WIND_DIR_TIME_UNIT = 3600f * 6 // every 6hr
+        private val WIND_DIR_TIME_UNIT = 3600f * 15 // every 15hr
         private val WIND_SPEED_TIME_UNIT = 360f * 5 // every 0.5hr
 
         private val HALF_PIF = 1.5707964f
