@@ -155,6 +155,17 @@ class WorldTime(initTime: Long = 0L) {
             return -23.44 * cos(TWO_PI * x / YEAR_DAYS)
         }
 
+    /**
+     * Ecological season, defined as Prevernal, Vernal, Aestival, Serotinal, Autumnal and Hibernal.
+     *
+     * @return yearly progress of the six seasons, 0f (inclusve) to 6f (exclusive)
+     */
+    val ecologicalSeason: Float
+        get() {
+            val drawTIME_T = TIME_T - (WorldTime.DAY_LENGTH * 10) // offset by -10 days
+            return (drawTIME_T fmod (WorldTime.DAY_LENGTH * WorldTime.YEAR_DAYS).toLong()).toFloat() / (WorldTime.DAY_LENGTH * WorldTime.YEAR_DAYS / 6)
+        }
+
     @Transient private var realSecAcc: Double = 0.0
     @Transient private val REAL_SEC_TO_GAME_SECS = 1.0 / GAME_MIN_TO_REAL_SEC // how slow is real-life clock (second-wise) relative to the ingame one
 

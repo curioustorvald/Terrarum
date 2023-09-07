@@ -181,9 +181,6 @@ internal object BlocksDrawer {
         return TILES_BLEND_MUL.add(blockID)
     }
 
-    private var drawTIME_T = 0L
-    private val SECONDS_IN_MONTH = WorldTime.MONTH_LENGTH * WorldTime.DAY_LENGTH.toLong()
-
     ///////////////////////////////////////////
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
@@ -196,8 +193,7 @@ internal object BlocksDrawer {
     internal fun renderData() {
 
         try {
-            drawTIME_T = world.worldTime.TIME_T - (WorldTime.DAY_LENGTH * 10) // offset by -10 days
-            val seasonalMonth = (drawTIME_T fmod (WorldTime.DAY_LENGTH * WorldTime.YEAR_DAYS).toLong()).toFloat() / (WorldTime.DAY_LENGTH * WorldTime.YEAR_DAYS / weatherTerrains.size)
+            val seasonalMonth = world.worldTime.ecologicalSeason
 
             tilesTerrain = weatherTerrains[seasonalMonth.floorToInt()]
             tilesTerrainNext = weatherTerrains[(seasonalMonth + 1).floorToInt() fmod weatherTerrains.size]
