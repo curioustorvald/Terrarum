@@ -107,7 +107,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val codeInput = UIItemTextLineInput(this,
         inputX, drawY + sizeSelY, inputWidth,
-        { "AAAA BB CCCCC DDDDD EEEEE FFFFF" }, InputLenCap(31, InputLenCap.CharLenUnit.CODEPOINTS)).also {
+        { "AAAAA BBBBB CCCCC DDDDD EEEEE" }, InputLenCap(31, InputLenCap.CharLenUnit.CODEPOINTS)).also {
 
         // reset importReturnCode if the text input has changed
         it.onKeyDown = { _ ->

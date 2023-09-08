@@ -299,7 +299,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             }
         }
     }
-    
+
     private var threadFired = false
 
     override fun show() {

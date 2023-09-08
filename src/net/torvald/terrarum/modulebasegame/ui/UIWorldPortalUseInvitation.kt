@@ -40,7 +40,7 @@ class UIWorldPortalUseInvitation(val full: UIWorldPortal) : UICanvas() {
 
     private val codeInput = UIItemTextLineInput(this,
         drawX + width - inputWidth + 5, drawY + sizeSelY, inputWidth,
-        { "AAAA BB CCCCC DDDDD EEEEE FFFFF" }, InputLenCap(31, InputLenCap.CharLenUnit.CODEPOINTS)
+        { "AAAAA BBBBB CCCCC DDDDD EEEEE" }, InputLenCap(31, InputLenCap.CharLenUnit.CODEPOINTS)
     ).also {
         // reset importReturnCode if the text input has changed
         it.onKeyDown = { _ ->
