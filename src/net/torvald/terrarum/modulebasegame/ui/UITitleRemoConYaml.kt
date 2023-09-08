@@ -52,8 +52,6 @@ object UITitleRemoConYaml {
 """
 
     val injectedMenuSingleSaveManage = """
-- MENU_MODULES
-- MENU_LABEL_PREV_SAVES
 - MENU_LABEL_RETURN     
 """
 
