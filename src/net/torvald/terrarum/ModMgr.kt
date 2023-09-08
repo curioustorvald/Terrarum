@@ -2,11 +2,13 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.App.setToGameConfig
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
+import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -15,6 +17,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
@@ -215,6 +218,12 @@ object ModMgr {
                     if (hasFile(moduleName, "locales")) {
                         printdbg(this, "Trying to load Locales on ${moduleName}")
                         GameLanguageLoader(moduleName)
+                    }
+
+                    // add keylayouts if exists
+                    if (hasFile(moduleName, "keylayout")) {
+                        printdbg(this, "Trying to load Keyboard Layouts on ${moduleName}")
+                        GameIMELoader(moduleName)
                     }
 
                     // run entry script in entry point
@@ -516,6 +525,56 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             Lang.load(getFile(module, langPath))
+        }
+    }
+
+    object GameIMELoader {
+        const val keebPath = "keylayout/"
+
+        @JvmStatic operator fun invoke(module: String) {
+            val FILE = getFile(module, keebPath)
+
+            FILE.listFiles { file, s -> s.endsWith(".${IME.KEYLAYOUT_EXTENSION}") }.sortedBy { it.name }.forEach {
+                printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
+                IME.registerLowLayer(it.nameWithoutExtension.lowercase(), IME.parseKeylayoutFile(it))
+            }
+
+            FILE.listFiles { file, s -> s.endsWith(".${IME.IME_EXTENSION}") }.sortedBy { it.name }.forEach {
+                printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
+                IME.registerHighLayer(it.nameWithoutExtension.lowercase(), IME.parseImeFile(it))
+            }
+
+            val iconFile = getFile(module, keebPath + "icons.tga").let {
+                if (it.exists()) it else getFile(module, keebPath + "icons.png")
+            }
+
+            if (iconFile.exists()) {
+                val iconSheet = TextureRegionPack(iconFile.path, 20, 20)
+                val iconPixmap = Pixmap(Gdx.files.internal(iconFile.path))
+                for (k in 0 until iconPixmap.height step 20) {
+                    val langCode = StringBuilder()
+                    for (c in 0 until 20) {
+                        val x = c
+                        var charnum = 0
+                        for (b in 0 until 7) {
+                            val y = k + b
+                            if (iconPixmap.getPixel(x, y) and 255 != 0) {
+                                charnum = charnum or (1 shl b)
+                            }
+                        }
+                        if (charnum != 0) langCode.append(charnum.toChar())
+                    }
+
+                    if (langCode.isNotEmpty()) {
+                        printdbg(this, "Icon order #${(k+1) / 20} - icons[\"$langCode\"] = iconSheet.get(1, ${k/20})")
+                        IME.icons["$langCode"] = iconSheet.get(1, k / 20).also { it.flip(false, false) }
+                    }
+                }
+
+                App.disposables.add(iconSheet)
+                iconPixmap.dispose()
+            }
+
         }
     }
 

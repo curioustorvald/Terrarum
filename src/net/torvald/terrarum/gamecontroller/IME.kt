@@ -97,12 +97,12 @@ object IME {
 
         File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$KEYLAYOUT_EXTENSION") }.sortedBy { it.name }.forEach {
             printdbg(this, "Registering Low layer ${it.nameWithoutExtension.lowercase()}")
-            lowLayers[it.nameWithoutExtension.lowercase()] = parseKeylayoutFile(it)
+            registerLowLayer(it.nameWithoutExtension.lowercase(), parseKeylayoutFile(it))
         }
 
         File(KEYLAYOUT_DIR).listFiles { file, s -> s.endsWith(".$IME_EXTENSION") }.sortedBy { it.name }.forEach {
             printdbg(this, "Registering High layer ${it.nameWithoutExtension.lowercase()}")
-            highLayers[it.nameWithoutExtension.lowercase()] = parseImeFile(it)
+            registerHighLayer(it.nameWithoutExtension.lowercase(), parseImeFile(it))
         }
 
 
@@ -130,6 +130,14 @@ object IME {
 
         App.disposables.add(iconSheet)
         iconPixmap.dispose()
+    }
+
+    fun registerLowLayer(name: String, layout: TerrarumKeyLayout) {
+        lowLayers[name] = layout
+    }
+
+    fun registerHighLayer(name: String, ime: TerrarumIME) {
+        highLayers[name] = ime
     }
 
     @JvmStatic fun invoke() {}
@@ -164,7 +172,7 @@ object IME {
         else -> throw IllegalArgumentException("Unknown candidates mode: $this")
     }
 
-    private fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
+    fun parseKeylayoutFile(file: File): TerrarumKeyLayout {
         val src = file.readText(Charsets.UTF_8)
         val jsval = context.eval("js", "'use strict';Object.freeze($src)")
         val name = jsval.getMember("n").asString()
@@ -200,7 +208,7 @@ object IME {
                 else -> throw IllegalArgumentException("Unknown operation mode: $this")
             }
 
-    private fun parseImeFile(file: File): TerrarumIME {
+    fun parseImeFile(file: File): TerrarumIME {
         val code = file.readText(Charsets.UTF_8)
         val jsval = context.eval("js", "\"use strict\";(function(){$code})()")
         val name = jsval.getMember("n").asString()
