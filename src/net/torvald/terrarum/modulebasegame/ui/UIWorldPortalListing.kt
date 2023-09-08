@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.AVKey
@@ -22,6 +23,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.PasswordBase32
 import net.torvald.unicode.EMDASH
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -148,12 +150,31 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         val seed: Long,
         val lastPlayedString: String,
         val totalPlayedString: String,
-        val screenshot: TextureRegion?,
+        val rawThumbnail: Pixmap?,
     ): Disposable {
+
+        private var screenshot0: TextureRegion? = null
+
+        val screenshot: TextureRegion
+            get() {
+                if (screenshot0 == null) {
+                    val thumbTex = Texture(rawThumbnail)
+                    thumbTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                    screenshot0 = TextureRegion(thumbTex)
+                }
+                return screenshot0!!
+            }
+
         override fun dispose() {
-            screenshot?.texture?.dispose()
+            screenshot0?.texture?.dispose()
         }
     }
+
+    private var showSpinner = true
+    private val spinner = CommonResourcePool.getAsTextureRegionPack("inline_loading_spinner")
+    private var spinnerTimer = 0f
+    private var spinnerFrame = 0
+    private val spinnerInterval = 1f / 60
 
     private fun disableListEditButtons() {
         buttonRename.isEnabled = false
@@ -194,6 +215,24 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         listPage = if (listPageCount == 0) 0 else (listPage + relativeAmount).fmod(listPageCount)
     }
 
+    private lateinit var worldCells: Array<UIItemWorldCellsSimple>
+
+    private var selected: UIItemWorldCellsSimple? = null
+    private var selectedIndex: Int? = null
+
+    var listPage
+        set(value) {
+            navRemoCon.itemPage = if (listPageCount == 0) 0 else (value).fmod(listPageCount)
+            rebuildList()
+        }
+        get() = navRemoCon.itemPage
+
+    var listPageCount // TODO total size of current category / items.size
+        protected set(value) {
+            navRemoCon.itemPageCount = value
+        }
+        get() = navRemoCon.itemPageCount
+
     private fun readWorldList() {
         worldList.clear()
         (INGAME.actorGamer.actorValue.getAsString(AVKey.WORLD_PORTAL_DICT) ?: "").split(",").filter { it.isNotBlank() }.map {
@@ -207,7 +246,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             var totalPlayed = 0L
             var w = 0
             var h = 0
-            var thumb: TextureRegion? = null
+            var thumb: Pixmap? = null
 
             disk.rebuild()
 
@@ -227,10 +266,7 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
                 val gzin = GZIPInputStream(ByteArray64InputStream(zippedTga))
                 val tgaFileContents = gzin.readAllBytes(); gzin.close()
 
-                val thumbPixmap = Pixmap(tgaFileContents, 0, tgaFileContents.size)
-                val thumbTex = Texture(thumbPixmap)
-                thumbTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-                thumb = TextureRegion(thumbTex)
+                thumb = Pixmap(tgaFileContents, 0, tgaFileContents.size)
             }
 
             WorldInfo(uuid, disk, chunksCount, seed, lastPlayed.toTimestamp(), totalPlayed.toDurationStamp(), thumb)
@@ -239,26 +275,10 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
         }
         full.chunksUsed = worldList.sumOf { it.dimensionInChunks }
         listPageCount = ceil(worldList.size.toDouble() / listCount).toInt()
+
+
+        printdbg(this, "worldList.size=${worldList.size}")
     }
-
-    private lateinit var worldCells: Array<UIItemWorldCellsSimple>
-
-    private var selected: UIItemWorldCellsSimple? = null
-    private var selectedIndex: Int? = null
-
-    var listPage
-        set(value) {
-            navRemoCon.itemPage = if (listPageCount == 0) 0 else (value).fmod(listPageCount)
-            rebuildList()
-        }
-        get() = navRemoCon.itemPage
-
-    var listPageCount // TODO total size of current category / items.size
-        protected set(value) {
-            navRemoCon.itemPageCount = value
-        }
-        get() = navRemoCon.itemPageCount
-
     private fun rebuildList() {
         worldCells = Array(listCount) { it0 ->
             val it = it0 + listCount * listPage
@@ -279,13 +299,12 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             }
         }
     }
+    
+    private var threadFired = false
 
     override fun show() {
         listPage = 0
-
-        readWorldList()
-
-        rebuildList()
+        showSpinner = true
 
         uiItems.forEach { it.show() }
         worldCells.forEach { it.show() }
@@ -293,6 +312,16 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         disableListEditButtons()
         updateUIbyButtonSelection()
+
+        if (!threadFired) {
+            threadFired = true
+            Thread {
+                readWorldList()
+                rebuildList()
+                showSpinner = false
+                threadFired = false
+            }.start()
+        }
     }
 
     private fun Long.toTimestamp() = Instant.ofEpochSecond(this)
@@ -323,6 +352,14 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
 
         if (currentWorldSelected) {
             INGAME.setTooltipMessage(if (buttonTeleport.mouseUp || buttonDelete.mouseUp) Lang["CONTEXT_THIS_IS_A_WORLD_CURRENTLY_PLAYING"] else null)
+        }
+
+        if (showSpinner) {
+            spinnerTimer += delta
+            while (spinnerTimer > spinnerInterval) {
+                spinnerFrame = (spinnerFrame + 1) % 32
+                spinnerTimer -= spinnerInterval
+            }
         }
     }
 
@@ -410,7 +447,11 @@ class UIWorldPortalListing(val full: UIWorldPortal) : UICanvas() {
             }
         }
 
-
+        // loading spinner
+        if (showSpinner) {
+            val spin = spinner.get(spinnerFrame % 8, spinnerFrame / 8)
+            batch.draw(spin, screencapX + (thumbw - spin.regionWidth) / 2f, y + (thumbh - spin.regionHeight) / 2f)
+        }
 
 
         uiItems.forEach { it.render(batch, camera) }

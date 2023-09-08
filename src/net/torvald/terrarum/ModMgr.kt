@@ -550,7 +550,7 @@ object ModMgr {
 
             if (iconFile.exists()) {
                 val iconSheet = TextureRegionPack(iconFile.path, 20, 20)
-                val iconPixmap = Pixmap(Gdx.files.internal(iconFile.path))
+                val iconPixmap = Pixmap(Gdx.files.absolute(iconFile.path))
                 for (k in 0 until iconPixmap.height step 20) {
                     val langCode = StringBuilder()
                     for (c in 0 until 20) {
