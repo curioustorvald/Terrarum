@@ -562,7 +562,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiBlur = UIFakeBlurOverlay(1f, true)
         uiBlur.setPosition(0,0)
 
-        uiWatchTierOne = UIWatchLargeAnalogue()//UIWatchLargeDigital()
+        uiWatchTierOne = UIWatchLargeAnalogue()
+//        uiWatchTierOne = UIWatchLargeDigital()
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
                 ((drawWidth - App.scr.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),

@@ -3,7 +3,9 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
@@ -15,23 +17,33 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2017-06-11.
  */
 class UIWatchLargeDigital() : UICanvas() {
-    override var width = 160
-    override var height = 23
+    override var width = 162
+    override var height = 25
     override var openCloseTime: Second = 0f
 
     private var ELuptimer = 10f // init value higher than uptime: to make the light turned off by default
     private val ELuptime = 4f
     private var ELon = false
 
-    private val atlas = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/watchface_atlas.tga"), width, height)
+    private val atlas = Texture(ModMgr.getGdxFile("basegame", "gui/watchface_large_digital.tga"))
+
+    private val watchface = TextureRegion(atlas, 0, 0, 162, 25)
+    private val seasonIcon = Array(4) {
+        TextureRegion(atlas, 12 * it, 25, 12, 7)
+    }
+    private val seasonPos = arrayOf(
+        143 to 4,
+        131 to 4,
+        131 to 12,
+        143 to 12,
+    )
 
     private val watchFont = WatchFont
     private val moonDial = TextureRegionPack(ModMgr.getGdxFile("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
     private val moonDialCount = moonDial.horizontalCount
 
-    private val drawCol = Color(1f, 1f, 1f, UIQuickslotBar.DISPLAY_OPACITY)
-    private val lcdLitColELoff = Color(0xc0c0c0ff.toInt()) mul drawCol
-    private val lcdLitColELon = Color(0x404040ff) mul drawCol
+    private val lcdLitColELoff = Color(0xc0c0c0ff.toInt())
+    private val lcdLitColELon = Color(0x404040ff)
 
     private val lcdLitCol: Color = lcdLitColELoff
         //get() = if (ELon) lcdLitColELon else lcdLitColELoff
@@ -56,18 +68,9 @@ class UIWatchLargeDigital() : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        // light overlay or EL
-        /*blendNormal(batch)
-        if (ELon) {
-            batch.draw(atlas.get(0, 2), 0f, 0f)
-        }
-        else {
-            // backplate
-            batch.draw(atlas.get(0, 0), 0f, 0f)
-        }*/
         // disabling light button
-        batch.color = drawCol
-        batch.draw(atlas.get(0, 0), 0f, 0f)
+        batch.color = Color.WHITE
+        batch.draw(watchface, -1f, -1f)
 
         
         // day name
@@ -83,7 +86,10 @@ class UIWatchLargeDigital() : UICanvas() {
         watchFont.draw(batch, worldTime.minutes.toString().padStart(2, '0'), 49f, 7f)
 
         // season marker
-        batch.draw(atlas.get(1, worldTime.calendarMonth - 1), 0f, 0f)
+        val season = worldTime.calendarMonth - 1
+        seasonPos[season].let { (x, y) ->
+            batch.draw(seasonIcon[season], x.toFloat(), y.toFloat())
+        }
 
 
         // moon dial
