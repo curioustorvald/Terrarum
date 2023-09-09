@@ -37,7 +37,7 @@ class UIWatchLargeAnalogue() : UICanvas() {
 
     private val minuteHandCol = Toolkit.Theme.COL_MOUSE_UP
     private val hourHandCol = Toolkit.Theme.COL_SELECTED
-    private val seasonHandCol = Color(0xec468aff.toInt())
+    private val seasonHandCol = Color(0xfd0b88ff.toInt())
 
     private val moondialOffX = 38f
     private val moondialOffY = 38f
@@ -62,8 +62,8 @@ class UIWatchLargeAnalogue() : UICanvas() {
         val seasonY = -(7.0 * sin(seasonAngle)).toFloat() + seasonHandOffY
 
         val minAngle = ((INGAME.world.worldTime.TIME_T % WorldTime.HOUR_SEC) / WorldTime.HOUR_SEC.toDouble() + 0.25) * TWO_PI
-        val minX = -(28.0 * cos(minAngle)).toFloat() + moondialOffX
-        val minY = -(28.0 * sin(minAngle)).toFloat() + moondialOffY
+        val minX = -(35.0 * cos(minAngle)).toFloat() + moondialOffX
+        val minY = -(35.0 * sin(minAngle)).toFloat() + moondialOffY
 
         val hourAngle = ((INGAME.world.worldTime.TIME_T % (WorldTime.HOUR_SEC * 12)) / (WorldTime.HOUR_SEC * 12).toDouble() + 0.25) * TWO_PI
         val hourX = -(21.0 * cos(hourAngle)).toFloat() + moondialOffX
