@@ -58,6 +58,7 @@ object ModMgr {
             val iconFile: FileHandle,
             val properName: String,
             val description: String,
+            val descTranslations: Map<String, String>,
             val author: String,
             val packageName: String,
             val entryPoint: String,
@@ -136,6 +137,7 @@ object ModMgr {
                 val moduleName = it[0]
                 this.loadOrder.add(moduleName)
                 printmsg(this, "Loading module $moduleName")
+                var module: ModuleMetadata? = null
 
                 try {
                     val modMetadata = Properties()
@@ -171,6 +173,11 @@ object ModMgr {
                     }
 
 
+                    val descTranslations = HashMap<String, String>()
+                    modMetadata.stringPropertyNames().filter { it.startsWith("description_") }.forEach { key ->
+                        val langCode = key.substringAfter('_')
+                        descTranslations[langCode] = modMetadata.getProperty(key)
+                    }
 
                     val properName = modMetadata.getProperty("propername")
                     val description = modMetadata.getProperty("description")
@@ -184,9 +191,11 @@ object ModMgr {
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
                     val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
+                    module = ModuleMetadata(index, isDir, getGdxFile("$modDir/$moduleName/icon.png"), properName, description, descTranslations, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal)
 
                     val versionNumeral = version.split('.')
                     val versionNumber = versionNumeral.toVersionNumber()
+
 
                     dependency.forEach { nameAndVersionStr ->
                         val (moduleName, moduleVersionStr) = nameAndVersionStr.split(' ')
@@ -204,9 +213,9 @@ object ModMgr {
                     }
 
 
-                    moduleInfo[moduleName] = ModuleMetadata(index, isDir, getGdxFile("$modDir/$moduleName/icon.png"), properName, description, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal)
+                    moduleInfo[moduleName] = module
 
-                    printdbg(this, moduleInfo[moduleName])
+                    printdbg(this, module)
 
                     // do retexturing if retextures directory exists
                     if (hasFile(moduleName, "retextures")) {
@@ -268,7 +277,8 @@ object ModMgr {
 
                             logError(LoadErrorType.YOUR_FAULT, moduleName, e)
 
-                            moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                            moduleInfo.remove(moduleName)
+                            moduleInfoErrored[moduleName] = module
                         }
 
                         if (newClass != null) {
@@ -281,7 +291,8 @@ object ModMgr {
                             printdbg(this, "$moduleName loaded successfully")
                         }
                         else {
-                            moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                            moduleInfo.remove(moduleName)
+                            moduleInfoErrored[moduleName] = module
                             printdbg(this, "$moduleName did not load...")
                         }
 
@@ -294,14 +305,16 @@ object ModMgr {
 
                     logError(LoadErrorType.NOT_EVEN_THERE, moduleName, noSuchModule)
 
-                    moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                    moduleInfo.remove(moduleName)
+                    if (module != null) moduleInfoErrored[moduleName] = module
                 }
                 catch (noSuchModule2: ModuleDependencyNotSatisfied) {
                     printmsgerr(this, noSuchModule2.message)
 
                     logError(LoadErrorType.NOT_EVEN_THERE, moduleName, noSuchModule2)
 
-                    moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                    moduleInfo.remove(moduleName)
+                    if (module != null) moduleInfoErrored[moduleName] = module
                 }
                 catch (e: Throwable) {
                     // TODO: Instead of skipping module with error, just display the error message onto the face?
@@ -313,7 +326,8 @@ object ModMgr {
 
                     logError(LoadErrorType.YOUR_FAULT, moduleName, e)
 
-                    moduleInfo.remove(moduleName)?.let { moduleInfoErrored[moduleName] = it }
+                    moduleInfo.remove(moduleName)
+                    if (module != null) moduleInfoErrored[moduleName] = module
                 }
                 finally {
 

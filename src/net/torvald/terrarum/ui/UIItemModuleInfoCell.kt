@@ -37,7 +37,16 @@ class UIItemModuleInfoCell(
     private val modVer = modProp.version
     private val modDate = modProp.releaseDate
     private val modAuthor = modProp.author
-    private val modDesc = modProp.description
+
+    private val modDesc = App.getConfigString("language").let { lang ->
+        val la = lang.substring(0..1)
+        if (modProp.descTranslations.contains(lang))
+            modProp.descTranslations[lang]
+        else if (modProp.descTranslations.contains(la))
+            modProp.descTranslations[la]
+        else
+            modProp.description
+    }
 
     init {
         modIcon.flip(false, false)
