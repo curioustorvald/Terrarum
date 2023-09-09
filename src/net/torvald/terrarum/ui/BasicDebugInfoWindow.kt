@@ -462,20 +462,20 @@ class BasicDebugInfoWindow : UICanvas() {
                 val px = x - xis + index + 1f
                 it.rectLine(
                     px,
-                    App.scr.hf - 1 - (y + pys[index]),
+                    1 + (y + pys[index]),
                     px + 1f,
-                    App.scr.hf - 1 - (y + pys[index + 1]),
+                    1 + (y + pys[index + 1]),
                     1f
                 )
             }
 
             // graph points
             it.color = colGraph
-            if (box.x < 0.5) it.circle(x + (GRAPH_CW * 0.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p0.mod().goff() * bh / ymax).toFloat()), 2.5f)
-                             it.circle(x + (GRAPH_CW * 1.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p1.mod().goff() * bh / ymax).toFloat()), 2.5f)
-                             it.circle(x + (GRAPH_CW * 2.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p2.mod().goff() * bh / ymax).toFloat()), 2.5f)
+            if (box.x < 0.5) it.circle(x + (GRAPH_CW * 0.5f) - xi, 1 + (y + bh-(box.p0.mod().goff() * bh / ymax).toFloat()), 2.5f)
+                             it.circle(x + (GRAPH_CW * 1.5f) - xi, 1 + (y + bh-(box.p1.mod().goff() * bh / ymax).toFloat()), 2.5f)
+                             it.circle(x + (GRAPH_CW * 2.5f) - xi, 1 + (y + bh-(box.p2.mod().goff() * bh / ymax).toFloat()), 2.5f)
             it.color = colGrapi
-            if (box.x > 0.5) it.circle(x + (GRAPH_CW * 3.5f) - xi, App.scr.hf - 1 - (y + bh-(box.p3.mod().goff() * bh / ymax).toFloat()), 2.5f)
+            if (box.x > 0.5) it.circle(x + (GRAPH_CW * 3.5f) - xi, 1 + (y + bh-(box.p3.mod().goff() * bh / ymax).toFloat()), 2.5f)
         }
 
 

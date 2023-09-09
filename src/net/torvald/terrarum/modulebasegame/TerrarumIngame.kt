@@ -2,7 +2,6 @@ package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -103,7 +102,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             batch.projectionMatrix = camera.combined
         }
         fun setCameraPosition(batch: SpriteBatch, shape: ShapeRenderer, camera: OrthographicCamera, newX: Float, newY: Float) {
-            camera.setToOrtho(false, App.scr.wf, App.scr.hf)
+            camera.setToOrtho(true, App.scr.wf, App.scr.hf)
             camera.update()
             camera.position.set((-newX + App.scr.halfw).roundToFloat(), (-newY + App.scr.halfh).roundToFloat(), 0f)
             camera.update()
@@ -563,7 +562,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiBlur = UIFakeBlurOverlay(1f, true)
         uiBlur.setPosition(0,0)
 
-        uiWatchTierOne = UITierOneWatch()
+        uiWatchTierOne = UIWatchLargeAnalogue()//UIWatchLargeDigital()
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
                 ((drawWidth - App.scr.tvSafeActionWidth) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),

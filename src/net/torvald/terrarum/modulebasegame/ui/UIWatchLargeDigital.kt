@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -15,7 +14,7 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2017-06-11.
  */
-class UITierOneWatch() : UICanvas() {
+class UIWatchLargeDigital() : UICanvas() {
     override var width = 160
     override var height = 23
     override var openCloseTime: Second = 0f
@@ -24,11 +23,11 @@ class UITierOneWatch() : UICanvas() {
     private val ELuptime = 4f
     private var ELon = false
 
-    private var atlas = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/watchface_atlas.tga"), width, height)
+    private val atlas = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/watchface_atlas.tga"), width, height)
 
-    private var watchFont = WatchFont
-    private var moonDial = TextureRegionPack(ModMgr.getGdxFile("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
-    private var moonDialCount = moonDial.horizontalCount
+    private val watchFont = WatchFont
+    private val moonDial = TextureRegionPack(ModMgr.getGdxFile("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
+    private val moonDialCount = moonDial.horizontalCount
 
     private val drawCol = Color(1f, 1f, 1f, UIQuickslotBar.DISPLAY_OPACITY)
     private val lcdLitColELoff = Color(0xc0c0c0ff.toInt()) mul drawCol
