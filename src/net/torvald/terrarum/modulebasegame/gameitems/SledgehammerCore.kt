@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
@@ -45,14 +44,23 @@ object SledgehammerCore {
 
         var usageStatus = false
 
+
+
         for (oy in 0 until mh) for (ox in 0 until mw) {
             val x = mx + xoff + ox
             val y = my + yoff + oy
 
             val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
-            val tile = INGAME.world.getTileFromWall(x, y)
+            val wall = INGAME.world.getTileFromWall(x, y)
             val tileTerrain = INGAME.world.getTileFromTerrain(x, y)
+
+            val wallNear = listOf(
+                INGAME.world.getTileFromWall(x, (y - 1).coerceAtLeast(0)),
+                INGAME.world.getTileFromWall(x, (y + 1).coerceAtMost(INGAME.world.height - 1)),
+                INGAME.world.getTileFromWall(x - 1, y),
+                INGAME.world.getTileFromWall(x + 1, y)
+            )
 
             item?.using = true
 
@@ -66,8 +74,9 @@ object SledgehammerCore {
             }
             if (!ret1) return ret1*/
 
+            // return false if there is no open tile nearby (to prevent making hole on deep underground)
             // return false if here's no tile, or if the wall is covered by a solid tile
-            if (Block.AIR == tile || BlockCodex[tile].isActorBlock || BlockCodex[tileTerrain].isSolid) {
+            if (wallNear.none { BlockCodex[it].hasTag("INCONSEQUENTIAL") } || Block.AIR == wall || BlockCodex[wall].isActorBlock || BlockCodex[tileTerrain].isSolid) {
                 usageStatus = usageStatus or false
                 continue
             }
