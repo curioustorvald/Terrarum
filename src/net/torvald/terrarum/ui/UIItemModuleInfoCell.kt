@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.ui.MODULEINFO_CELL_HEIGHT
 import net.torvald.terrarum.modulebasegame.ui.MODULEINFO_CELL_WIDTH
+import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 
 class UIItemModuleInfoCell(
         parent: UICanvas,
@@ -40,12 +41,16 @@ class UIItemModuleInfoCell(
 
     private val modDesc = App.getConfigString("language").let { lang ->
         val la = lang.substring(0..1)
-        if (modProp.descTranslations.contains(lang))
+        val r = if (modProp.descTranslations.contains(lang))
             modProp.descTranslations[lang]
         else if (modProp.descTranslations.contains(la))
             modProp.descTranslations[la]
         else
             modProp.description
+
+        if (la == "bg") "${TerrarumSansBitmap.charsetOverrideBulgarian}$r${TerrarumSansBitmap.charsetOverrideDefault}"
+        else if (la == "sr") "${TerrarumSansBitmap.charsetOverrideSerbian}$r${TerrarumSansBitmap.charsetOverrideDefault}"
+        else r
     }
 
     init {
