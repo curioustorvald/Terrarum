@@ -709,7 +709,7 @@ object IngameRenderer : Disposable {
             App.shaderPassthruRGBA.bind()
             App.shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined)
             App.shaderPassthruRGBA.setUniformi("u_texture", 0)
-            blurWriteQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLES)
+            blurWriteQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLE_FAN)
         }
     }
 
@@ -726,7 +726,7 @@ object IngameRenderer : Disposable {
             App.shaderPassthruRGBA.bind()
             App.shaderPassthruRGBA.setUniformMatrix("u_projTrans", camera.combined)
             App.shaderPassthruRGBA.setUniformi("u_texture", 0)
-            blurWriteQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLES)
+            blurWriteQuad.render(App.shaderPassthruRGBA, GL20.GL_TRIANGLE_FAN)
         }
 
         fboBlurHalf.inAction(camera, batch) {
@@ -737,7 +737,7 @@ object IngameRenderer : Disposable {
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
             shaderKawaseDown.setUniformf("halfpixel", KAWASE_POWER / fboBlurHalf.width, KAWASE_POWER / fboBlurHalf.height)
-            blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+            blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLE_FAN)
         }
 
         /*fboBlurQuarter.inAction(camera, batch) {
@@ -748,7 +748,7 @@ object IngameRenderer : Disposable {
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
             shaderKawaseDown.setUniformf("halfpixel", KAWASE_POWER / fboBlurQuarter.width, KAWASE_POWER / fboBlurQuarter.height)
-            blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+            blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLE_FAN)
         }
 
         fboBlurHalf.inAction(camera, batch) {
@@ -759,7 +759,7 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", KAWASE_POWER / fboBlurQuarter.width, KAWASE_POWER / fboBlurQuarter.height)
-            blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+            blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
         }*/
 
         outFbo.inAction(camera, batch) {
@@ -770,7 +770,7 @@ object IngameRenderer : Disposable {
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", KAWASE_POWER / fboBlurHalf.width, KAWASE_POWER / fboBlurHalf.height)
-            blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+            blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
         }
 
     }
@@ -780,19 +780,19 @@ object IngameRenderer : Disposable {
     fun resize(width: Int, height: Int) {
         if (!init) {
             blurWriteQuad = Mesh(
-                    true, 4, 6,
+                    true, 4, 4,
                     VertexAttribute.Position(),
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
             )
             blurWriteQuad2 = Mesh(
-                    true, 4, 6,
+                    true, 4, 4,
                     VertexAttribute.Position(),
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
             )
             /*blurWriteQuad4 = Mesh(
-                    true, 4, 6,
+                    true, 4, 4,
                     VertexAttribute.Position(),
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
@@ -847,21 +847,21 @@ object IngameRenderer : Disposable {
                 lightmapFbo.width.toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
                 lightmapFbo.width.toFloat(),lightmapFbo.height.toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
                 0f,lightmapFbo.height.toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+        blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 3))
 
         blurWriteQuad2.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
                 lightmapFbo.width.div(2).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
                 lightmapFbo.width.div(2).toFloat(),lightmapFbo.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
                 0f,lightmapFbo.height.div(2).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad2.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+        blurWriteQuad2.setIndices(shortArrayOf(0, 1, 2, 3))
 
         /*blurWriteQuad4.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
                 lightmapFbo.width.div(4).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
                 lightmapFbo.width.div(4).toFloat(),lightmapFbo.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
                 0f,lightmapFbo.height.div(4).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))*/
+        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 3))*/
     }
 
     override fun dispose() {

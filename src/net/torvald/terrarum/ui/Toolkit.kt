@@ -205,7 +205,7 @@ object Toolkit : Disposable {
                 shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
                 shaderKawaseDown.setUniformi("u_texture", 0)
                 shaderKawaseDown.setUniformf("halfpixel", radius3 / fboBlurHalf.width, radius3 / fboBlurHalf.height)
-                blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+                blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLE_FAN)
             }
 
             fboBlurQuarter.inAction(camera, batch) {
@@ -216,7 +216,7 @@ object Toolkit : Disposable {
                 shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
                 shaderKawaseDown.setUniformi("u_texture", 0)
                 shaderKawaseDown.setUniformf("halfpixel", radius3 / fboBlurQuarter.width, radius3 / fboBlurQuarter.height)
-                blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+                blurWriteQuad4.render(shaderKawaseDown, GL20.GL_TRIANGLE_FAN)
             }
 
             fboBlurHalf.inAction(camera, batch) {
@@ -227,7 +227,7 @@ object Toolkit : Disposable {
                 shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
                 shaderKawaseUp.setUniformi("u_texture", 0)
                 shaderKawaseUp.setUniformf("halfpixel", radius3 / fboBlurQuarter.width, radius3 / fboBlurQuarter.height)
-                blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+                blurWriteQuad2.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
             }
 
             fboBlur.inAction(camera,  batch) {
@@ -238,7 +238,7 @@ object Toolkit : Disposable {
                 shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
                 shaderKawaseUp.setUniformi("u_texture", 0)
                 shaderKawaseUp.setUniformf("halfpixel", radius3 / fboBlurHalf.width, radius3 / fboBlurHalf.height)
-                blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+                blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
             }
         }*/
 
@@ -250,7 +250,7 @@ object Toolkit : Disposable {
             shaderKawaseDown.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseDown.setUniformi("u_texture", 0)
             shaderKawaseDown.setUniformf("halfpixel", blurRadius / fboBlurHalf.width, blurRadius / fboBlurHalf.height)
-            blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLES)
+            blurWriteQuad2.render(shaderKawaseDown, GL20.GL_TRIANGLE_FAN)
         }
 
         fboBlur.inAction(camera, batch) {
@@ -261,7 +261,7 @@ object Toolkit : Disposable {
             shaderKawaseUp.setUniformMatrix("u_projTrans", camera.combined)
             shaderKawaseUp.setUniformi("u_texture", 0)
             shaderKawaseUp.setUniformf("halfpixel", blurRadius / fboBlurHalf.width, blurRadius / fboBlurHalf.height)
-            blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLES)
+            blurWriteQuad.render(shaderKawaseUp, GL20.GL_TRIANGLE_FAN)
         }
 
 
@@ -315,19 +315,19 @@ object Toolkit : Disposable {
         }
 
         blurWriteQuad = Mesh(
-                true, 4, 6,
+                true, 4, 4,
                 VertexAttribute.Position(),
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         )
         blurWriteQuad2 = Mesh(
-                true, 4, 6,
+                true, 4, 4,
                 VertexAttribute.Position(),
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         )
         blurWriteQuad4 = Mesh(
-                true, 4, 6,
+                true, 4, 4,
                 VertexAttribute.Position(),
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
@@ -357,20 +357,20 @@ object Toolkit : Disposable {
                 fw.toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
                 fw.toFloat(), fh.toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
                 0f, fh.toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+        blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 3))
 
         blurWriteQuad2.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
                 fw.div(2).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
                 fw.div(2).toFloat(), fh.div(2).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
                 0f, fh.div(2).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad2.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+        blurWriteQuad2.setIndices(shortArrayOf(0, 1, 2, 3))
 
         blurWriteQuad4.setVertices(floatArrayOf(
                 0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
                 fw.div(4).toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
                 fw.div(4).toFloat(), fh.div(4).toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
                 0f, fh.div(4).toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
-        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+        blurWriteQuad4.setIndices(shortArrayOf(0, 1, 2, 3))
     }
 }

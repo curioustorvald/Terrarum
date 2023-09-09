@@ -482,7 +482,7 @@ public class App implements ApplicationListener {
         hq2x = new Hq2x(2);
 
         fullscreenQuad = new Mesh(
-                true, 4, 6,
+                true, 4, 4,
                 VertexAttribute.Position(),
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
@@ -578,7 +578,7 @@ public class App implements ApplicationListener {
             shaderPassthruRGBA.setUniformi("u_texture", 0);
             postProcessorOutFBO2.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             postProcessorOutFBO2.getColorBufferTexture().bind(0);
-            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLE_FAN);
         }
         else if (getConfigDouble("screenmagnifying") < 1.01 || getConfigString("screenmagnifyingfilter").equals("none")) {
             shaderPassthruRGBA.bind();
@@ -586,7 +586,7 @@ public class App implements ApplicationListener {
             shaderPassthruRGBA.setUniformi("u_texture", 0);
             postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
             postProcessorOutFBO.getColorBufferTexture().bind(0);
-            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLE_FAN);
         }
         else if (getConfigString("screenmagnifyingfilter").equals("bilinear")) {
             shaderPassthruRGBA.bind();
@@ -594,7 +594,7 @@ public class App implements ApplicationListener {
             shaderPassthruRGBA.setUniformi("u_texture", 0);
             postProcessorOutFBO.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             postProcessorOutFBO.getColorBufferTexture().bind(0);
-            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLES);
+            fullscreenQuad.render(shaderPassthruRGBA, GL20.GL_TRIANGLE_FAN);
         }
 
 
@@ -653,7 +653,7 @@ public class App implements ApplicationListener {
         shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
         shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b, 1f);
         shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b, 1f);
-        fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
+        fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLE_FAN);
 
 
         setCameraPosition(0f, 0f);
@@ -1093,7 +1093,7 @@ public class App implements ApplicationListener {
                 WIDTH, HEIGHT, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
                 0f, HEIGHT, 0f, 1f, 1f, 1f, 1f, 0f, 0f
         });
-        mesh.setIndices(new short[]{0, 1, 2, 2, 3, 0});
+        mesh.setIndices(new short[]{0, 1, 2, 3});
     }
 
     public static void setGamepadButtonLabels() {

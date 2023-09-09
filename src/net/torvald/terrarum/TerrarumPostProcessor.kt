@@ -255,7 +255,7 @@ object TerrarumPostProcessor : Disposable {
         shader.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
         shader.setUniformf("vibrancy", 1f, vo, vg, 1f)
         shader.setUniformMatrix4fv("swizzler", swizzler, rng.nextInt(24), 16*4)
-        App.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
+        App.fullscreenQuad.render(shader, GL20.GL_TRIANGLE_FAN)
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 

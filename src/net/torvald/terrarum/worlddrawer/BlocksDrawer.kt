@@ -645,7 +645,7 @@ internal object BlocksDrawer {
         )
         shader.setUniformf("mulBlendIntensity", if (mode == OCCLUSION) occlusionIntensity else 1f)
         //shader.setUniformf("drawBreakage", if (mode == WIRE) 0f else 1f)
-        tilesQuad.render(shader, GL20.GL_TRIANGLES)
+        tilesQuad.render(shader, GL20.GL_TRIANGLE_FAN)
 
         //tilesBufferAsTex.dispose()
     }
@@ -676,7 +676,7 @@ internal object BlocksDrawer {
 
         if (oldScreenW != screenW || oldScreenH != screenH) {
             tilesQuad = Mesh(
-                    true, 4, 6,
+                    true, 4, 4,
                     VertexAttribute.Position(),
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
@@ -688,7 +688,7 @@ internal object BlocksDrawer {
                     App.scr.wf, App.scr.hf, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
                     0f, App.scr.hf, 0f, 1f, 1f, 1f, 1f, 0f, 1f
             ))
-            tilesQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+            tilesQuad.setIndices(shortArrayOf(0, 1, 2, 3))
         }
 
         oldScreenW = screenW
