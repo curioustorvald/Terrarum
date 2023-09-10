@@ -274,6 +274,10 @@ internal object BlocksDrawer {
         return k
     }
 
+    private val occlusionRenderTag = CreateTileAtlas.RenderTag(
+        OCCLUSION_TILE_NUM_BASE, CreateTileAtlas.RenderTag.CONNECT_SELF, CreateTileAtlas.RenderTag.MASK_47
+    )
+
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.
      *
@@ -338,11 +342,9 @@ internal object BlocksDrawer {
                     0
                 }
 
-                val renderTag = App.tileMaker.getRenderTag(thisTile)
+                val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(thisTile)
                 val tileNumberBase =
-                        if (mode == OCCLUSION)
-                            OCCLUSION_TILE_NUM_BASE
-                        else if (mode == FLUID)
+                        if (mode == FLUID)
                             App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
                         else
                             renderTag.tileNumber
@@ -353,9 +355,6 @@ internal object BlocksDrawer {
                         0
                     // special case: fluids
                     else if (mode == FLUID)
-                        tileNumberBase + connectLut47[nearbyTilesInfo]
-                    // special case: occlusion
-                    else if (mode == OCCLUSION)
                         tileNumberBase + connectLut47[nearbyTilesInfo]
                     // rest of the cases: terrain and walls
                     else tileNumberBase + when (renderTag.maskType) {
