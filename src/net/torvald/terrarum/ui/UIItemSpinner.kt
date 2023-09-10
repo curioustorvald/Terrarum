@@ -1,7 +1,5 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
@@ -9,7 +7,6 @@ import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ceilToInt
 import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 
 /**
  * Internal properties, namely initialValue, min, max, step; have the type of [Double] regardless of their input type.
@@ -38,6 +35,29 @@ class UIItemSpinner(
     init {
 //        println("valueType=${valueType.canonicalName} for UI ${parentUI.javaClass.canonicalName}")
 
+        resetToInitial()
+    }
+
+    private val valueType = initialValue.javaClass // should be java.lang.Double or java.lang.Integer
+
+    private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+
+    override val height = 24
+    private val buttonW = 30
+
+    private val fboWidth = width - 2*buttonW - 6
+    private val fboHeight = height - 4
+//    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
+
+    var value = initialValue.toDouble().coerceIn(min.toDouble(), max.toDouble()) as Number; private set
+    var fboUpdateLatch = true
+
+    private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
+
+    var selectionChangeListener: (Number) -> Unit = {}
+    private var currentIndex = values.indexOfFirst { it == initialValue.toDouble() }
+
+    fun resetToInitial() {
         // if the initial value cannot be derived from the settings, round to nearest
         if (values.indexOfFirst { it == initialValue.toDouble() } < 0) {
 //            throw IllegalArgumentException("Initial value $initialValue cannot be derived from given ($min..$max step $step) settings")
@@ -54,27 +74,14 @@ class UIItemSpinner(
                 else -> intermediate
             }
         }
+        fboUpdateLatch = true
     }
 
-    private val valueType = initialValue.javaClass // should be java.lang.Double or java.lang.Integer
-
-    private val labels = CommonResourcePool.getAsTextureRegionPack("inventory_category")
-
-    override val height = 24
-    private val buttonW = 30
-
-    private val fboWidth = width - 2*buttonW - 6
-    private val fboHeight = height - 4
-//    private val fbo = FrameBuffer(Pixmap.Format.RGBA8888, width - 2*buttonW - 6, height - 4, false)
-
-    var value = initialValue.toDouble().coerceIn(min.toDouble(), max.toDouble()) as Number
-    var fboUpdateLatch = true
-
-    private var mouseOnButton = 0 // 0: nothing, 1: left, 2: right
-
-    var selectionChangeListener: (Number) -> Unit = {}
-    private var currentIndex = values.indexOfFirst { it == initialValue.toDouble() }
-
+    fun resetToSmallest() {
+        currentIndex = 0
+        value = values[currentIndex]
+        fboUpdateLatch = true
+    }
 
     private fun changeValueBy(diff: Int) {
         currentIndex = (currentIndex + diff).coerceIn(values.indices)
