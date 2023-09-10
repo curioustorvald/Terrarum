@@ -1,0 +1,39 @@
+{
+  "item@basegame:5": {
+    "workbench": "",
+    "ingredients": [
+      [1, 3, "$WOOD", 1, "basegame:176"]
+    ]
+  },
+  "item@basegame:5": {
+    "workbench": "",
+    "ingredients": [
+      [1, 3, "$WOOD", 1, "basegame:192"]
+    ]
+  },
+
+  "item@basegame:256": {
+    "workbench": "",
+    "ingredients": [
+      [1, 4, "basegame:48"]
+    ]
+  },
+  "item@basegame:257": {
+    "workbench": "",
+    "ingredients": [
+      [1, 4, "basegame:49"]
+    ]
+  },
+  "item@basegame:258": {
+    "workbench": "",
+    "ingredients": [
+      [1, 4, "basegame:50"]
+    ]
+  },
+  "item@basegame:259": {
+    "workbench": "",
+    "ingredients": [
+      [1, 4, "basegame:51"]
+    ]
+  }
+}

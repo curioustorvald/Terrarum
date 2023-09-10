@@ -1,0 +1,32 @@
+{
+  "basegame:160": {
+    "workbench": "",
+    "ingredients": [
+      [4, 2, "$ROCK"]
+    ]
+  },
+  "basegame:161": {
+    "workbench": "",
+    "ingredients": [
+      [4, 2, "basegame:48"]
+    ]
+  },
+  "basegame:162": {
+    "workbench": "",
+    "ingredients": [
+      [4, 2, "basegame:49"]
+    ]
+  },
+  "basegame:163": {
+    "workbench": "",
+    "ingredients": [
+      [4, 2, "basegame:50"]
+    ]
+  },
+  "basegame:164": {
+    "workbench": "",
+    "ingredients": [
+      [4, 2, "basegame:51"]
+    ]
+  }
+}
