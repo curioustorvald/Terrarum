@@ -39,7 +39,7 @@ class CreateTileAtlas {
 
     val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
 
-    lateinit var atlas: Pixmap // prevernal
+    lateinit var atlasPrevernal: Pixmap
     lateinit var atlasVernal: Pixmap
     lateinit var atlasAestival: Pixmap
     lateinit var atlasSerotinal: Pixmap
@@ -74,6 +74,8 @@ class CreateTileAtlas {
     internal lateinit var itemWallPixmap: Pixmap
     internal lateinit var itemWallPixmapGlow: Pixmap
 
+    val atlas: Pixmap
+        get() = atlasVernal
 
     private fun drawInitPixmap() {
         val initPixmap = Pixmap(Gdx.files.internal(atlasInit))
@@ -84,7 +86,7 @@ class CreateTileAtlas {
         if (tilesInInitPixmap > tilesPossibleInCurrentPixmap) throw Error("Atlas size too small -- can't even fit the init.tga (MAX_TEX_SIZE must be at least ${FastMath.nextPowerOfTwo((sqrt(tilesInInitPixmap.toFloat()) * TILE_SIZE).ceilToInt())})")
 
         if (MAX_TEX_SIZE >= initPixmap.width) {
-            atlas.drawPixmap(initPixmap, 0, 0)
+            atlasPrevernal.drawPixmap(initPixmap, 0, 0)
             atlasVernal.drawPixmap(initPixmap, 0, 0)
             atlasAestival.drawPixmap(initPixmap, 0, 0)
             atlasSerotinal.drawPixmap(initPixmap, 0, 0)
@@ -109,7 +111,7 @@ class CreateTileAtlas {
                 val srcX = scantile * scanW
                 val destY = scantile * TILE_SIZE
 
-                atlas.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
+                atlasPrevernal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
                 atlasVernal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
                 atlasAestival.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
                 atlasSerotinal.drawPixmap(initPixmap, srcX, srcY, scanW, scanH, destX, destY, scanW, scanH)
@@ -129,7 +131,7 @@ class CreateTileAtlas {
         tags = HashMap<ItemID, RenderTag>()
         itemSheetNumbers = HashMap<ItemID, Int>()
 
-        atlas = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
+        atlasPrevernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasVernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasAestival = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
         atlasSerotinal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
@@ -409,7 +411,7 @@ class CreateTileAtlas {
             //if (mode == 1) printdbg(this, "atlaspos: ($atlasX, $atlasY), srcpos: ($sourceX, $sourceY), srcpixmap = $pixmap")
 
             when (source) {
-                PREVERNAL -> atlas.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                PREVERNAL -> atlasPrevernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 VERNAL -> atlasVernal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 AESTIVAL -> atlasAestival.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 SEROTINAL -> atlasSerotinal.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
@@ -450,7 +452,7 @@ class CreateTileAtlas {
     }
 
     fun dispose() {
-        atlas.dispose()
+        atlasPrevernal.dispose()
         atlasVernal.dispose()
         atlasAestival.dispose()
         atlasSerotinal.dispose()
@@ -494,7 +496,7 @@ class CreateTileAtlas {
                 it.filter = Pixmap.Filter.NearestNeighbour
             }
         }
-        listOf(atlas, atlasVernal, atlasAestival, atlasSerotinal, atlasAutumnal, atlasHibernal, atlasGlow).forEachIndexed { index, pixmap ->
+        listOf(atlasPrevernal, atlasVernal, atlasAestival, atlasSerotinal, atlasAutumnal, atlasHibernal, atlasGlow).forEachIndexed { index, pixmap ->
         /*
         How it works:
 
@@ -519,7 +521,7 @@ class CreateTileAtlas {
             pixmap.dispose()
         }
 
-        atlas = newAtlantes[0]
+        atlasPrevernal = newAtlantes[0]
         atlasVernal = newAtlantes[1]
         atlasAestival = newAtlantes[2]
         atlasSerotinal = newAtlantes[3]

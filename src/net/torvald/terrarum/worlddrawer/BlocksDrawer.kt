@@ -104,7 +104,7 @@ internal object BlocksDrawer {
 
         // create terrain texture from pixmaps
         weatherTerrains = arrayOf(
-            TextureRegionPack(Texture(App.tileMaker.atlas), TILE_SIZE, TILE_SIZE),
+            TextureRegionPack(Texture(App.tileMaker.atlasPrevernal), TILE_SIZE, TILE_SIZE),
             TextureRegionPack(Texture(App.tileMaker.atlasVernal), TILE_SIZE, TILE_SIZE),
             TextureRegionPack(Texture(App.tileMaker.atlasAestival), TILE_SIZE, TILE_SIZE),
             TextureRegionPack(Texture(App.tileMaker.atlasSerotinal), TILE_SIZE, TILE_SIZE),

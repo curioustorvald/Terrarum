@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -42,8 +44,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val buttonRowY = full.buttonRowY - buttonHeight
     private val buttonRowY2 = buttonRowY - buttonHeight - buttonGap
 
+    private var altDown = false
+
     private val mainGoButton = UIItemTextButton(this,
-        { Lang["MENU_IO_LOAD_GAME"] }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { if (altDown) Lang["MENU_LABEL_PREV_SAVES"] else Lang["MENU_IO_LOAD_GAME"] }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
             App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
 
@@ -51,15 +55,22 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 full.bringAutosaveSelectorUp()
                 full.changePanelTo(2)
             }
-            else */if (full.loadables.saveAvaliable()) {
-                if (full.loadables.newerSaveIsDamaged) {
-                    UILoadGovernor.previousSaveWasLoaded = true
-                }
+            else */
+
+            if (!altDown) {
+                if (full.loadables.saveAvaliable()) {
+                    if (full.loadables.newerSaveIsDamaged) {
+                        UILoadGovernor.previousSaveWasLoaded = true
+                    }
 
 //                full.takeAutosaveSelectorDown()
-                full.loadManageSelectedGame = full.loadables.getLoadableSave()!!
+                    full.loadManageSelectedGame = full.loadables.getLoadableSave()!!
 
-                mode = MODE_LOAD
+                    mode = MODE_LOAD
+                }
+            }
+            else {
+                mode = MODE_PREV_SAVES
             }
         }
     }
@@ -152,6 +163,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private val MODE_INIT = 0
     private val MODE_DELETE = 16 // are you sure?
     private val MODE_RENAME = 32 // show rename dialogue
+    private val MODE_PREV_SAVES = 48
     private val MODE_LOAD = 256 // is needed to make the static loading screen
 
     init {
@@ -185,6 +197,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun updateUI(delta: Float) {
+        altDown = Gdx.input.isKeyPressed(Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Keys.ALT_RIGHT)
+
         when (mode) {
             MODE_INIT -> {
                 mainButtons.forEach { it.update(delta) }
