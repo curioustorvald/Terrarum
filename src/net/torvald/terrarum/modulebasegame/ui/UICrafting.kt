@@ -541,7 +541,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
          * For each ingredient of the recipe, returns list of (ingredient, how many the player has the ingredient, how many the recipe wants)
          */
         fun recipeToIngredientRecord(inventory: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): List<RecipeIngredientRecord> {
-            val hasStation = if (nearbyCraftingStations.isEmpty()) true else nearbyCraftingStations.contains(recipe.workbench)
+            val hasStation = if (recipe.workbench.isEmpty()) true else nearbyCraftingStations.contains(recipe.workbench)
             return recipe.ingredients.map { ingredient ->
                 val selectedItem = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
                     // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
