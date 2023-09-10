@@ -90,7 +90,9 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:12", 16) // copper sledgehammer
         inventory.add("item@basegame:4", 16) // iron sledgehammer
         inventory.add("item@basegame:13", 16) // steel sledgehammer
-        inventory.add("item@basegame:5", 995) // test tiki torch
+
+//        inventory.add("item@basegame:5", 995) // test tiki torch
+
         inventory.add("item@basegame:6", 95) // storage chest
         inventory.add("item@basegame:7", 1) // wire debugger
         inventory.add("item@basegame:8", 9995) // power source
@@ -98,12 +100,12 @@ object PlayerBuilderSigrid {
 
         inventory.add("item@basegame:11", 10) // calendar
 
-        inventory.add("item@basegame:256", 995) // doors
-        inventory.add("item@basegame:257", 995) // doors
-        inventory.add("item@basegame:258", 995) // doors
-        inventory.add("item@basegame:259", 995) // doors
+//        inventory.add("item@basegame:256", 995) // doors
+//        inventory.add("item@basegame:257", 995) // doors
+//        inventory.add("item@basegame:258", 995) // doors
+//        inventory.add("item@basegame:259", 995) // doors
 
-        inventory.add("item@basegame:320", 1) // portal
+        inventory.add("item@basegame:320", 5) // portal
 
         WireCodex.getAll().forEach {
             try {

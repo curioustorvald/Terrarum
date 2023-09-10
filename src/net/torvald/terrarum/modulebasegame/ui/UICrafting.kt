@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -121,26 +120,10 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         // list of [Score, Ingredients, Recipe]
                         recipes.map { recipe ->
                             // list of (Item, How many player has, How many the recipe requires)
-                            val items = recipe.ingredients.map { ingredient ->
-                                val selectedItem = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
-                                    // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
-                                    player.itemList.filter { (itm, qty) ->
-                                        ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
-                                    }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
-                                }
-                                else {
-                                    ingredient.key
-                                }
-
-                                val howManyPlayerHas = player.searchByID(selectedItem)?.qty ?: 0L
-
-                                val howManyTheRecipeWants = ingredient.qty
-
-                                listOf(selectedItem, howManyPlayerHas, howManyTheRecipeWants)
-                            }
+                            val items = recipeToIngredientRecord(player, recipe, listOf(/*todo: nearby crafting stations*/))
 
                             val score = items.fold(1L) { acc, item ->
-                                (item[1] as Long).times(16L) + 1L
+                                (item.howManyPlayerHas).times(16L) + 1L
                             }
 
                             listOf(score, items, recipe)
@@ -544,5 +527,37 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
 
     override fun dispose() {
+    }
+
+    companion object {
+        data class RecipeIngredientRecord(
+            val selectedItem: ItemID,
+            val howManyPlayerHas: Long,
+            val howManyRecipeWants: Long,
+            val craftingStationAvailable: Boolean,
+        )
+
+        /**
+         * For each ingredient of the recipe, returns list of (ingredient, how many the player has the ingredient, how many the recipe wants)
+         */
+        fun recipeToIngredientRecord(inventory: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): List<RecipeIngredientRecord> {
+            val hasStation = if (nearbyCraftingStations.isEmpty()) true else nearbyCraftingStations.contains(recipe.workbench)
+            return recipe.ingredients.map { ingredient ->
+                val selectedItem = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
+                    // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
+                    inventory.itemList.filter { (itm, qty) ->
+                        ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
+                    }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
+                }
+                else {
+                    ingredient.key
+                }
+
+                val howManyPlayerHas = inventory.searchByID(selectedItem)?.qty ?: 0L
+                val howManyTheRecipeWants = ingredient.qty
+
+                RecipeIngredientRecord(selectedItem, howManyPlayerHas, howManyTheRecipeWants, hasStation)
+            }
+        }
     }
 }

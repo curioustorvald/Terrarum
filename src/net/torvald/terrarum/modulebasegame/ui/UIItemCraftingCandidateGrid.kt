@@ -7,6 +7,7 @@ import net.torvald.terrarum.UIItemInventoryCatBar
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 
 /**
  * Created by minjaesong on 2022-06-28.
@@ -44,12 +45,19 @@ class UIItemCraftingCandidateGrid(
         }
     }
 
+    private fun isCraftable(player: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): Boolean {
+        return UICrafting.recipeToIngredientRecord(player, recipe, nearbyCraftingStations).none { it.howManyPlayerHas <= 0L || !it.craftingStationAvailable }
+    }
+
     override fun rebuild(filter: Array<String>) {
-        // TODO test fill craftingRecipes with every possible recipes in the game
         // filtering policy: if the player have all the ingredient item (regardless of the amount!), make the recipe visible
         craftingRecipes.clear()
-        CraftingRecipeCodex.props.forEach { (_, recipes) -> craftingRecipes.addAll(recipes) }
-        // end of test fill
+        CraftingRecipeCodex.props.forEach { (_, recipes) ->
+            recipes.forEach {
+                // TODO check for nearby crafting stations
+                if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, listOf(/*todo: nearby crafting stations*/))) craftingRecipes.add(it)
+            }
+        }
 
         recipesSortList.clear() // kinda like the output list
 
