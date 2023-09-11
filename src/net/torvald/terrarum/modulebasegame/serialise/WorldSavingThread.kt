@@ -160,7 +160,7 @@ class WorldSavingThread(
 
         // write loadorder //
         val loadOrderBa64Writer = ByteArray64Writer(Common.CHARSET)
-        loadOrderBa64Writer.write(ModMgr.loadOrder.joinToString("\n"))
+        loadOrderBa64Writer.write(ModMgr.getLoadOrderTextForSavegame())
         loadOrderBa64Writer.flush(); loadOrderBa64Writer.close()
         val loadOrderText = loadOrderBa64Writer.toByteArray64()
         val loadOrderContents = EntryFile(loadOrderText)

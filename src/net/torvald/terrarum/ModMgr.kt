@@ -474,6 +474,10 @@ object ModMgr {
         entryPointClasses.forEach { it.dispose() }
     }
 
+    fun getLoadOrderTextForSavegame(): String {
+        return loadOrder.map { "$it ${moduleInfo[it]!!.version}" }.joinToString("\n")
+    }
+
 
     object GameBlockLoader {
         init {
