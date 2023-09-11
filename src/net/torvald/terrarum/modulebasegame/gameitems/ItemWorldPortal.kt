@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 
@@ -18,7 +19,7 @@ class ItemWorldPortal(originalID: ItemID) : FixtureItemBase(originalID, "net.tor
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
-        get() = getItemImageFromSheet("basegame", "sprites/fixtures/portal_device.tga", 80, 32)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,3)
 
     override var baseToolSize: Double? = baseMass
 

@@ -58,7 +58,7 @@ data class ItemSlotImage(val baseTex: TextureRegion, val itemTex: TextureRegion?
 
         batch.draw(baseTex, cx - (baseTex.regionWidth).div(2).toFloat(), cy - (baseTex.regionWidth).div(2).toFloat())
         if (itemTex != null)
-            batch.draw(itemTex, cx - (itemTex.regionWidth).div(2).toFloat(), cy - (itemTex.regionWidth).div(2).toFloat())
+            batch.draw(itemTex, cx - (itemTex.regionWidth).div(2).toFloat(), cy - (itemTex.regionHeight).div(2).toFloat())
 
     }
 }
