@@ -227,7 +227,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 renameButtons.forEach { it.update(delta) }
                 renameInput.update(delta)
             }
-            MODE_SHOW_LOAD_ORDER -> {
+            MODE_SHOW_LOAD_ORDER, MODE_PREV_SAVES -> {
                 modulesBackButton.update(delta)
             }
         }
@@ -308,29 +308,49 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                         it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }
                     } ?: listOf("$EMDASH")
 
-                Toolkit.drawTextCentered(batch, App.fontGame, playerName, modulesTextboxW, playerModTextboxX, full.titleTopGradEnd + 32)
-                Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, full.titleTopGradEnd + 32)
-
                 val playerTBW = loadOrderPlayer.maxOfOrNull { App.fontGame.getWidth(it) } ?: 0
                 val worldTBW = loadOrderWorld.maxOfOrNull { App.fontGame.getWidth(it) } ?: 0
 
                 val px = playerModTextboxX + (modulesTextboxW - playerTBW) / 2
                 val wx = worldModTextboxX + (modulesTextboxW - worldTBW) / 2
 
-                // TODO box background
+                val totalTBH = maxOf(loadOrderPlayer.size, loadOrderWorld.size) * App.fontGame.lineHeight.toInt()
+
+                batch.color = Toolkit.Theme.COL_CELL_FILL
+                Toolkit.fillArea(batch, playerModTextboxX, modulesBoxBaseY - 4, modulesTextboxW, 36 + totalTBH)
+                Toolkit.fillArea(batch, worldModTextboxX, modulesBoxBaseY - 4, modulesTextboxW, 36 + totalTBH)
+                batch.color = Toolkit.Theme.COL_INACTIVE
+                Toolkit.drawBoxBorder(batch, playerModTextboxX - 1, modulesBoxBaseY - 4 - 1, modulesTextboxW + 2, 36 + totalTBH + 2)
+                Toolkit.drawBoxBorder(batch, worldModTextboxX - 1, modulesBoxBaseY - 4 - 1, modulesTextboxW + 2, 36 + totalTBH + 2)
+
+                batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
+                for (i in 0 until maxOf(loadOrderPlayer.size, loadOrderWorld.size)) {
+                    Toolkit.drawStraightLine(batch, playerModTextboxX + boxTextMargin, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * i, playerModTextboxX + modulesTextboxW - boxTextMargin, 1, false)
+                    Toolkit.drawStraightLine(batch, worldModTextboxX + boxTextMargin, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * i, worldModTextboxX + modulesTextboxW - boxTextMargin, 1, false)
+                }
+
+
+                batch.color = Color.WHITE
+                Toolkit.drawTextCentered(batch, App.fontGame, playerName, modulesTextboxW, playerModTextboxX, modulesBoxBaseY)
+                Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, modulesBoxBaseY)
 
                 loadOrderPlayer.forEachIndexed { index, s ->
-                    App.fontGame.draw(batch, s, px, full.titleTopGradEnd + 64 + App.fontGame.lineHeight.toInt() * index)
+                    App.fontGame.draw(batch, s, px, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
                 }
                 loadOrderWorld.forEachIndexed { index, s ->
-                    App.fontGame.draw(batch, s, wx, full.titleTopGradEnd + 64 + App.fontGame.lineHeight.toInt() * index)
+                    App.fontGame.draw(batch, s, wx, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
                 }
 
                 modulesBackButton.render(batch, camera)
             }
+            MODE_PREV_SAVES -> {
+                modulesBackButton.render(batch, camera)
+
+            }
         }
     }
 
+    private val modulesBoxBaseY = full.titleTopGradEnd + 48
     private val modulesTextboxW = 280
     private val boxTextMargin = 3
     private val listGap = 10
@@ -355,7 +375,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 renameInput.touchDown(screenX, screenY, pointer, button)
                 renameButtons.forEach { it.touchDown(screenX, screenY, pointer, button) }
             }
-            MODE_SHOW_LOAD_ORDER -> {
+            MODE_SHOW_LOAD_ORDER, MODE_PREV_SAVES -> {
                 modulesBackButton.touchDown(screenX, screenY, pointer, button)
             }
         }
@@ -375,7 +395,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 renameInput.touchUp(screenX, screenY, pointer, button)
                 renameButtons.forEach { it.touchUp(screenX, screenY, pointer, button) }
             }
-            MODE_SHOW_LOAD_ORDER -> {
+            MODE_SHOW_LOAD_ORDER, MODE_PREV_SAVES -> {
                 modulesBackButton.touchUp(screenX, screenY, pointer, button)
             }
         }
