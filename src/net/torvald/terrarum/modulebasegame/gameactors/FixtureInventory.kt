@@ -31,11 +31,11 @@ open class FixtureInventory() {
     /**
      * Sorted by referenceID.
      */
-    val itemList = SortedArrayList<InventoryPair>()
+    protected val itemList = SortedArrayList<InventoryPair>()
     var wallet = BigInteger("0") // unified currency for whole civs; Dwarf Fortress approach seems too complicated
 
-    fun isEmpty() = getTotalCount() == 0L
-    fun isNotEmpty() = getTotalCount() > 0
+    fun isEmpty() = totalCount == 0L
+    fun isNotEmpty() = totalCount > 0
 
     open fun add(itemID: ItemID, count: Long = 1) {
         if (ItemCodex[itemID] == null)
@@ -81,6 +81,8 @@ open class FixtureInventory() {
             itemList.add(InventoryPair(item.dynamicID, count))
         }
 //        insertionSortLastElem(itemList)
+
+        updateEncumbrance()
     }
 
     open fun remove(itemID: ItemID, count: Long) = remove(ItemCodex[itemID]!!, count) {}
@@ -124,12 +126,26 @@ open class FixtureInventory() {
         else {
 //            throw InventoryFailedTransactionError("[${this.javaClass.canonicalName}] Tried to remove $item, but the inventory does not have it.")
         }
+
+        itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
+
+        updateEncumbrance()
     }
     
     /**
      * HashMap<GameItem, Amounts>
      */
-    inline fun forEach(consumer: (InventoryPair) -> Unit) = itemList.forEach(consumer)
+    fun forEach(consumer: (InventoryPair) -> Unit) {
+        itemList.forEach(consumer)
+        updateEncumbrance()
+    }
+
+    fun first(predicate: (InventoryPair) -> Boolean) = itemList.first(predicate)
+    fun all(predicate: (InventoryPair) -> Boolean) = itemList.all(predicate)
+    fun any(predicate: (InventoryPair) -> Boolean) = itemList.any(predicate)
+    fun none(predicate: (InventoryPair) -> Boolean) = itemList.none()
+    fun filter(predicate: (InventoryPair) -> Boolean) = itemList.filter(predicate)
+    fun map(transformation: (InventoryPair) -> Any) = itemList.map(transformation)
 
     /**
      * Get capacity of inventory
@@ -139,33 +155,52 @@ open class FixtureInventory() {
         get() = if (capacityMode == CAPACITY_MODE_NO_ENCUMBER)
             maxCapacity.toDouble()
         else if (capacityMode == CAPACITY_MODE_WEIGHT)
-            getTotalWeight()
+            totalWeight
         else
-            getTotalCount().toDouble()
+            totalCount.toDouble()
 
-    fun getTotalWeight(): Double = itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
+    @Transient private var totalWeight0 = -1.0
+
+    val totalWeight: Double// = itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
+        get() {
+            if (totalWeight0 < 0.0) updateEncumbrance()
+            return totalWeight0
+        }
+
+    @Transient private var totalCount0 = -1L
 
     /**
      * Real amount
      */
-    fun getTotalCount(): Long = itemList.sumOf { it.qty }
+    val totalCount: Long
+        get() {
+            if (totalCount0 < 0) updateEncumbrance()
+            return totalCount0
+        }
 
     /**
      * Unique amount, multiple items are calculated as one
      */
-    fun getTotalUniqueCount(): Long = itemList.size.toLong()
+    val totalUniqueCount: Long
+        get() = itemList.size.toLong()
 
     /**
      * Check whether the itemList contains too many items
      * @return
      */
     val isEncumbered: Boolean
+        get() = encumberment >= 1.0
+
+    /**
+     * How encumbered the actor is. 1.0 if weight of the items are exactly same as the capacity limit, >1.0 if encumbered.
+     */
+    val encumberment: Double
         get() = if (capacityMode == CAPACITY_MODE_NO_ENCUMBER)
-            false
+            0.0
         else if (capacityMode == CAPACITY_MODE_WEIGHT)
-            maxCapacity < capacity
+            capacity / maxCapacity
         else
-            false
+            0.0
     
     fun contains(item: GameItem) = contains(item.dynamicID)
     fun contains(id: ItemID) =
@@ -217,6 +252,11 @@ open class FixtureInventory() {
 
     open fun clear() {
         itemList.clear()
+    }
+
+    fun updateEncumbrance() {
+        totalWeight0 = itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
+        totalCount0 = itemList.sumOf { it.qty }
     }
 }
 

@@ -14,6 +14,7 @@ import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.realestate.LandUtil
 import org.dyn4j.geometry.Vector2
+import kotlin.math.pow
 
 /**
  * Humanoid actor class to provide same controlling function (such as work, jump)
@@ -592,7 +593,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     }
 
     private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {
-        return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.pow(scale, 0.25) // positive value
+        return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD
     }
 
     @Transient private var oldMAX_JUMP_LENGTH = -1 // init
@@ -652,7 +653,11 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         }
 
     private val jumpPower: Double
-        get() = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0)
+        get() = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * // base stat
+                (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0) * // buffed stat
+                jumpMultByTile * // tile-specific
+                scale.pow(0.25)
+//                ((encumberment / avStrengthNormalised).pow(-1.0/3.0)).coerceIn(0.1, 1.0) // encumbered actors move slower
 
     private fun jumpFunc(len: Int, counter: Int): Double {
         // linear time mode
@@ -661,6 +666,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
         if (timedJumpCharge < 0) timedJumpCharge = 0.0
         return timedJumpCharge
     }
+
 
     /**
      * See ./work_files/Jump power by pressing time.gcx

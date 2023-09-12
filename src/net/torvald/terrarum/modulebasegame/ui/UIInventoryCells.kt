@@ -71,7 +71,7 @@ internal class UIInventoryCells(
         itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.selectedIcon])
         equipped.rebuild()
 
-        encumbrancePerc = full.actor.inventory.capacity.toFloat() / full.actor.inventory.maxCapacity
+        encumbrancePerc = full.actor.inventory.encumberment.toFloat()
         isEncumbered = full.actor.inventory.isEncumbered
     }
 
@@ -135,7 +135,7 @@ internal class UIInventoryCells(
         batch.color = Color.LIGHT_GRAY
         if (App.IS_DEVELOPMENT_BUILD) {
             App.fontSmallNumbers.draw(batch,
-                    "${full.actor.inventory.capacity}/${full.actor.inventory.maxCapacity}",
+                    "enc: ${full.actor.inventory.encumberment}",
                     encumbBarTextXPos,
                     encumbBarYPos + controlHelpHeight - 4f
             )

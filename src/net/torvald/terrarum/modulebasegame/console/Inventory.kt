@@ -49,7 +49,7 @@ internal object Inventory : ConsoleCommand {
     private fun getActor() = Terrarum.ingame?.getActorByID(targetID) as? Pocketed
 
     private fun listInventory(actor: Pocketed) {
-        if (actor.inventory.getTotalUniqueCount() == 0L) {
+        if (actor.inventory.totalUniqueCount == 0L) {
             Echo("(inventory empty)")
         }
         else {

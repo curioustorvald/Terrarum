@@ -228,7 +228,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                     }
 
                     targetItemToAlter?.let {
-                        val oldItem = _getItemListIngredients().getInventory().itemList.first { itemPair ->
+                        val oldItem = _getItemListIngredients().getInventory().first { itemPair ->
                             (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itemPair.itm]!!.hasTag(it.key))
                         }
                         changeIngredient(oldItem, itemID)
@@ -261,7 +261,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         recipe.ingredients.forEach { ingredient ->
                             val selectedItem: ItemID = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
                                 // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
-                                val selectedItem = playerInventory.itemList.filter { (itm, qty) ->
+                                val selectedItem = playerInventory.filter { (itm, qty) ->
                                     ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
                                 }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
 
@@ -306,13 +306,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         buttonCraft.clickOnceListener = { _,_ ->
             getPlayerInventory().let { player -> recipeClicked?.let { recipe ->
                 // check if player has enough amount of ingredients
-                val itemCraftable = itemListIngredients.getInventory().itemList.all { (itm, qty) ->
+                val itemCraftable = itemListIngredients.getInventory().all { (itm, qty) ->
                     (player.searchByID(itm)?.qty ?: -1) >= qty * craftMult
                 }
 
 
                 if (itemCraftable) {
-                    itemListIngredients.getInventory().itemList.forEach { (itm, qty) ->
+                    itemListIngredients.getInventory().forEach { (itm, qty) ->
                         player.remove(itm, qty * craftMult)
                     }
                     player.add(recipe.product, recipe.moq * craftMult)
@@ -365,10 +365,10 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
      * Updates Craft! button so that the button is correctly highlighted
      */
     fun refreshCraftButtonStatus() {
-        val itemCraftable = if (itemListIngredients.getInventory().itemList.size < 1) false
+        val itemCraftable = if (itemListIngredients.getInventory().totalUniqueCount < 1) false
         else getPlayerInventory().let { player ->
             // check if player has enough amount of ingredients
-            itemListIngredients.getInventory().itemList.all { (itm, qty) ->
+            itemListIngredients.getInventory().all { (itm, qty) ->
                 (player.searchByID(itm)?.qty ?: -1) >= qty * craftMult
             }
         }
@@ -544,7 +544,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             return recipe.ingredients.map { ingredient ->
                 val selectedItem = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
                     // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
-                    inventory.itemList.filter { (itm, qty) ->
+                    inventory.filter { (itm, qty) ->
                         ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
                     }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
                 }

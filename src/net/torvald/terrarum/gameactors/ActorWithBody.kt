@@ -19,6 +19,7 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -26,6 +27,7 @@ import org.dyn4j.geometry.Vector2
 import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.max
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 
@@ -243,6 +245,11 @@ open class ActorWithBody : Actor {
     val avStrength: Double
         get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 1000.0) *
                 (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * scale
+    /**
+     * Apparent strength scaled so that 1.0 is default value
+     */
+    val avStrengthNormalised: Double
+        get() = avStrength / 1000.0
     var avBaseStrength: Double?
         get() = actorValue.getAsDouble(AVKey.STRENGTH)
         set(value) {
@@ -262,11 +269,15 @@ open class ActorWithBody : Actor {
                    accelMultMovement *
                    scale.sqrt()
         }
+    val encumberment: Double
+        get() = if (this is Pocketed) this.inventory.encumberment else 0.0
+
     val avSpeedCap: Double
-        get() = actorValue.getAsDouble(AVKey.SPEED)!! *
-                (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) *
-                speedMultByTile *
-                scale.sqrt()
+        get() = actorValue.getAsDouble(AVKey.SPEED)!! * // base stat
+                (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) * // buffed stat
+                speedMultByTile * // tile-specific
+                scale.sqrt()  // taller actors have longer legs but also receives relatively weaker gravity -> pow(0.5)
+//                ((encumberment / avStrengthNormalised).pow(-2.0/3.0)).coerceIn(0.1, 1.0) // encumbered actors move slower
 
     /**
      * Flags and Properties
@@ -1556,6 +1567,16 @@ open class ActorWithBody : Actor {
     fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
 
     internal inline val speedMultByTile: Double
+        get() {
+            val notSubmergedCap = if (grounded)
+                feetViscosity.viscosityToMult()
+            else
+                bodyViscosity.viscosityToMult()
+            val normalisedViscocity = bodyViscosity.viscosityToMult()
+
+            return interpolateLinear(submergedRatio, notSubmergedCap, normalisedViscocity)
+        }
+    internal inline val jumpMultByTile: Double
         get() {
             val notSubmergedCap = if (grounded)
                 feetViscosity.viscosityToMult()
