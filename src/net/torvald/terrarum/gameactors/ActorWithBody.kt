@@ -269,15 +269,20 @@ open class ActorWithBody : Actor {
                    accelMultMovement *
                    scale.sqrt()
         }
+    val ingamePlayersCanBeEncumbered: Boolean
+        get() = if (this is IngamePlayer)
+            !actorValue.getAsString(AVKey.GAMEMODE).isNullOrBlank()
+        else true
+
     val encumberment: Double
-        get() = if (this is Pocketed) this.inventory.encumberment else 0.0
+        get() = if (this is Pocketed && ingamePlayersCanBeEncumbered) this.inventory.encumberment else 0.0
 
     val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! * // base stat
                 (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) * // buffed stat
                 speedMultByTile * // tile-specific
-                scale.sqrt()  // taller actors have longer legs but also receives relatively weaker gravity -> pow(0.5)
-//                ((encumberment / avStrengthNormalised).pow(-2.0/3.0)).coerceIn(0.1, 1.0) // encumbered actors move slower
+                scale.sqrt() * // taller actors have longer legs but also receives relatively weaker gravity -> pow(0.5)
+                ((encumberment / avStrengthNormalised).pow(-2.0/3.0)).coerceIn(0.1, 1.0) // encumbered actors move slower
 
     /**
      * Flags and Properties

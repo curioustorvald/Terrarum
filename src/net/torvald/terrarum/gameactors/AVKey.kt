@@ -149,4 +149,13 @@ object AVKey {
      * example value: `"SIxM+kGlrjZgLx5Zeqz7,;:UIZ5Q=2WT35SgKpOp.,vvf'fNW3G<ROimy(Y;E<,-mdtr5|^RGOqr0x*T*lC,YABr1oQwErKG)pGC'gUG"`
      */
     const val WORLD_PORTAL_DICT = "worldportaldict"
+
+    /** String
+     * Reserved values:
+     * - `survival`: future use for the basegame
+     * - empty value: creative mode for basegame
+     *
+     * This value is only used for IngamePlayers
+     */
+    const val GAMEMODE = "gamemode"
 }

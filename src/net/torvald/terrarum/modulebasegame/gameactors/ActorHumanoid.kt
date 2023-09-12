@@ -657,7 +657,7 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
                 (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0) * // buffed stat
                 jumpMultByTile * // tile-specific
                 scale.pow(0.25) *
-//                ((encumberment / avStrengthNormalised).pow(-1.0/3.0)).coerceIn(0.48, 1.0) // encumbered actors move slower
+                ((encumberment / avStrengthNormalised).pow(-1.0/3.0)).coerceIn(0.48, 1.0) // encumbered actors move slower
 
     private fun jumpFunc(len: Int, counter: Int): Double {
         // linear time mode
