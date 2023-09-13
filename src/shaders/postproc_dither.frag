@@ -41,20 +41,6 @@ const vec4 matrixNormaliser = vec4(0.5 / 256.0);
 
 const vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
-const mat4 rgb_to_ycocg = mat4(
-    0.25,  1.0, -0.5, 0.0,
-     0.5,  0.0,  1.0, 0.0,
-    0.25, -1.0, -0.5, 0.0,
-     0.0,  0.0,  0.0, 1.0
-);
-
-const mat4 ycocg_to_rgb = mat4(
-     1.0, 1.0,  1.0, 0.0,
-     0.5, 0.0, -0.5, 0.0,
-    -0.5, 0.5, -0.5, 0.0,
-     0.0, 0.0,  0.0, 1.0
-);
-
 
 vec4 nearestColour(vec4 inColor) {
     return floor(quantVec * inColor) * invQuant;
@@ -65,23 +51,9 @@ vec4 getDitherredDot(vec4 inColor) {
     return nearestColour(fma(bayerThreshold, invQuant, inColor));
 }
 
-
-uniform vec4 vibrancy = vec4(1.0);//vec4(1.0, 1.4, 1.2, 1.0);
-
 void main(void) {
-    // convert input RGB into YCoCg
     vec4 incolour = texture(u_texture, v_texCoords);
-    vec4 yog = rgb_to_ycocg * incolour; // vec4(Y, Co, Cg, A) where Y,A=[0,1]; Co,Cg=[-1,1]
-
-    // Do colour-grading magic
-    vec4 sgn = sign(yog);
-    vec4 absval = abs(yog);
-    vec4 raised = pow(absval, boolean.yyyy / vibrancy);
-    vec4 newColour = sgn * raised;
-
-    // Dither the output
-    vec4 graded = ycocg_to_rgb * newColour;
-    vec4 selvec = getDitherredDot(graded);
+    vec4 selvec = getDitherredDot(incolour);
     vec4 outcol = fma(selvec, boolean.yyyx, boolean.xxxy); // use quantised RGB but not the A
 
     fragColor = outcol;

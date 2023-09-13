@@ -88,6 +88,8 @@ object IngameRenderer : Disposable {
     val shaderForActors: ShaderProgram
     val shaderDemultiply: ShaderProgram
 
+    val shaderVibrancy: ShaderProgram
+
     private val WIDTH = App.scr.width
     private val HEIGHT = App.scr.height
     private val WIDTHF = WIDTH.toFloat()
@@ -130,6 +132,8 @@ object IngameRenderer : Disposable {
 
         shaderKawaseDown = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawasedown.frag")
         shaderKawaseUp = App.loadShaderFromClasspath("shaders/default.vert", "shaders/kawaseup.frag")
+
+        shaderVibrancy = App.loadShaderFromClasspath("shaders/default.vert", "shaders/vibrancy.frag")
 
         if (!shaderBlendGlow.isCompiled) {
             Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
@@ -352,16 +356,19 @@ object IngameRenderer : Disposable {
 
         blendNormalStraightAlpha(batch)
 
-        batch.inUse {
-            // it's no use applying dithering here: colours are no longer "floats" once they're written to the FBO
-            // proof: disable dithering on skybox and enable dither here -- banding is still visible
-            // it would work if GDX supported HDR, or GL_RGBA32F as a texture format, but alas.
-            // but mixedOutTex is still needed for the screen capturing
-
-            //batch.shader = if (App.getConfigBoolean("fx_dither")) IngameRenderer.shaderBayer else null
-            batch.shader = null
-            batch.drawFlipped(mixedOutTex, 0f, 0f)
+        val (vo, vg) = world.weatherbox.let {
+            if (it.currentWeather.identifier == "titlescreen")
+                1f to 1f
+            else
+                it.currentVibrancy.x to it.currentVibrancy.y
         }
+
+        mixedOutTex.texture.bind(0)
+        shaderVibrancy.bind()
+        shaderVibrancy.setUniformMatrix("u_projTrans", camera.combined)
+        shaderVibrancy.setUniformi("u_texture", 0)
+        shaderVibrancy.setUniformf("vibrancy", 1f, vo, vg, 1f)
+        fullscreenQuad.render(shaderVibrancy, GL20.GL_TRIANGLE_FAN)
 
 
         ///////////////////////////////////////////////////////////////////////
@@ -898,6 +905,8 @@ object IngameRenderer : Disposable {
         shaderBlendGlow.dispose()
         shaderForActors.dispose()
         shaderDemultiply.dispose()
+
+        shaderVibrancy.dispose()
 
         if (::fboRGBexport.isInitialized) fboRGBexport.tryDispose()
     }

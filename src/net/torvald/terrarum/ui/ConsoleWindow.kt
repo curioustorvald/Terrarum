@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.ccE
@@ -249,7 +250,7 @@ class ConsoleWindow : UICanvas() {
 
     override fun doOpening(delta: Float) {
         Terrarum.ingame?.let {
-            println("Game was paused beforehand: ${it.paused}")
+//            printdbg(this, "Game was paused beforehand: ${it.paused}")
             if (!it.paused) {
                 iMadeTheGameToPause = true
                 it.pause()
@@ -257,7 +258,7 @@ class ConsoleWindow : UICanvas() {
             else {
                 iMadeTheGameToPause = false
             }
-            println("I made the game to pause: $iMadeTheGameToPause")
+//            printdbg(this, "I made the game to pause: $iMadeTheGameToPause")
         }
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
@@ -282,10 +283,10 @@ class ConsoleWindow : UICanvas() {
     }
 
     override fun endClosing(delta: Float) {
-        println("Close -- I made the game to pause: $iMadeTheGameToPause")
+//        printdbg(this, "Close -- I made the game to pause: $iMadeTheGameToPause")
         if (iMadeTheGameToPause) {
             Terrarum.ingame?.resume()
-            println("Close -- resume game")
+//            printdbg(this, "Close -- resume game")
         }
         iMadeTheGameToPause = false
         Terrarum.ingame?.setTooltipMessage(null)

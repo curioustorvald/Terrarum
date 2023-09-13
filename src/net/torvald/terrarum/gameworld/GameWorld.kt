@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemRemapTable

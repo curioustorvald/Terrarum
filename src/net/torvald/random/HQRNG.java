@@ -191,4 +191,25 @@ public class HQRNG extends Random {
             state0 = 1L;
     }
 
+    /**
+     * Returns a random value whose probability is distributed in triangular manner, of which 0.5 is the most and 0.0 and 1.0 are the least likely.
+     */
+    public double nextTriangular() {
+        return (nextDouble() + nextDouble()) / 2.0;
+    }
+
+    /**
+     * Returns a random value whose probability is distributed in triangular manner, of which 0.0 is the most and 1.0 is the least likely.
+     */
+    public double nextBrown() {
+        return Math.abs(nextDouble() + nextDouble() - 1);
+    }
+
+    /**
+     * Returns a random value whose probability is distributed in triangular manner, of which 1.0 is the most and 0.0 is the least likely.
+     */
+    public double nextBlue() {
+        return 1.0 - nextBrown();
+    }
+
 }
