@@ -51,7 +51,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private var altDown = false
 
     private val mainGoButton = UIItemTextButton(this,
-        { if (altDown) Lang["MENU_LABEL_PREV_SAVES"] else Lang["MENU_IO_LOAD_GAME"] }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { if (altDown && savegameIsNotNew) Lang["MENU_LABEL_PREV_SAVES"] else Lang["MENU_IO_LOAD_GAME"] }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
             App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
 
@@ -61,7 +61,10 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             }
             else */
 
-            if (!altDown) {
+            if (altDown && savegameIsNotNew) {
+                mode = MODE_PREV_SAVES
+            }
+            else {
                 if (full.loadables.saveAvaliable()) {
                     if (full.loadables.newerSaveIsDamaged) {
                         UILoadGovernor.previousSaveWasLoaded = true
@@ -72,9 +75,6 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
                     mode = MODE_LOAD
                 }
-            }
-            else {
-                mode = MODE_PREV_SAVES
             }
         }
     }
@@ -90,13 +90,13 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         }
     }
     private val mainRenameButton = UIItemTextButton(this,
-        { if (altDown) Lang["MENU_MODULES"] else Lang["MENU_LABEL_RENAME"] }, buttonX1third, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        { if (altDown && savegameIsNotNew) Lang["MENU_MODULES"] else Lang["MENU_LABEL_RENAME"] }, buttonX1third, buttonRowY, buttonWidth, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
-            if (!altDown) {
-                mode = MODE_RENAME
+            if (altDown && savegameIsNotNew) {
+                mode = MODE_SHOW_LOAD_ORDER
             }
             else {
-                mode = MODE_SHOW_LOAD_ORDER
+                mode = MODE_RENAME
             }
         }
     }
@@ -173,6 +173,11 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private var delButtons = listOf(confirmCancelButton, confirmDeleteButton)
     private var renameButtons = listOf(renameRenameButton, renameCancelButton)
 
+    private val savegameHasError: Boolean
+        get() = (!full.loadables.saveAvaliable() && !full.loadables.isImported)
+    private val savegameIsNotNew: Boolean
+        get() = full.loadables.saveAvaliable()
+
     private val mainButtons: List<UIItemTextButton>
         get() = if (full.loadables.saveAvaliable()) mainButtons0 else if (full.loadables.isImported) mainButtons2 else mainButtons1
 
@@ -210,7 +215,6 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     override fun show() {
         super.show()
-
     }
 
     override fun updateUI(delta: Float) {
@@ -331,8 +335,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
 
                 batch.color = Color.WHITE
-                Toolkit.drawTextCentered(batch, App.fontGame, playerName, modulesTextboxW, playerModTextboxX, modulesBoxBaseY)
-                Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, modulesBoxBaseY)
+                Toolkit.drawTextCentered(batch, App.fontGame, playerName, modulesTextboxW, playerModTextboxX, modulesBoxBaseY + 1)
+                Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, modulesBoxBaseY + 1)
 
                 loadOrderPlayer.forEachIndexed { index, s ->
                     App.fontGame.draw(batch, s, px, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
