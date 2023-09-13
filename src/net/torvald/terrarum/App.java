@@ -339,8 +339,8 @@ public class App implements ApplicationListener {
             sc = System.nanoTime();
         }
         bogoflops = Math.round((double)(bogoflops) * (1000000000.0 / (sc - st)));
-        System.out.println(sc - st);
-        System.out.println(bogoflops);
+//        System.out.println(sc - st);
+//        System.out.println(bogoflops);
 
         // if -ea flag is set, turn on all the debug prints
         try {

@@ -71,7 +71,7 @@ class UISystemInfo(val remoCon: UIRemoCon) : UICanvas() {
         v.add("OS" to "${App.OSName} ${App.OSVersion}")
         v.add("Processor" to App.processor)
         v.add("Architecture" to App.systemArch)
-        v.add("CPUID" to App.processorVendor.let { if (it == "null") "n/a" else it })
+        v.add("CPUID" to App.processorVendor.let { if (it == "null" || it == null) "n/a" else it })
         v.add("OpenGL" to "${Gdx.graphics.glVersion.majorVersion}.${Gdx.graphics.glVersion.minorVersion}.${Gdx.graphics.glVersion.releaseVersion}")
         v.add("GL Vendor" to Gdx.graphics.glVersion.vendorString)
         v.add("GL Renderer" to Gdx.graphics.glVersion.rendererString)
