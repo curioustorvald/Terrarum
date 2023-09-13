@@ -233,11 +233,13 @@ Copyright (c) 2015, 2019, Oracle and/or its affiliates. All rights reserved.
     private val glinfo = Gdx.graphics.glVersion.debugVersionString
 
     val systeminfo: List<String>; get() = """
+${App.GAME_NAME} Version: ${App.getVERSION_STRING()}
 JRE Version: $javaVersion
+Gdx Version: ${com.badlogic.gdx.Version.VERSION}
 Operation System: $osName $osVersion
 Architecture: $sysArch
 Processor: $processor ($processorVendor)
-GL Info: $glinfo
+GL $glinfo
 """.split('\n')
 
 

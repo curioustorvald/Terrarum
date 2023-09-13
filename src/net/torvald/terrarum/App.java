@@ -318,6 +318,9 @@ public class App implements ApplicationListener {
 
     public static InputStrober inputStrober;
 
+    public static long bogoflops = 0L;
+    private static double bogoflopf = Math.random();
+
     public static Screen getCurrentScreen() {
         return currentScreen;
     }
@@ -327,6 +330,17 @@ public class App implements ApplicationListener {
     }
 
     public static void main(String[] args) {
+
+        long st = System.nanoTime();
+        long sc = st;
+        while (sc - st < 100000000L) {
+            bogoflopf = Math.random() * bogoflopf;
+            bogoflops++;
+            sc = System.nanoTime();
+        }
+        bogoflops = Math.round((double)(bogoflops) * (1000000000.0 / (sc - st)));
+        System.out.println(sc - st);
+        System.out.println(bogoflops);
 
         // if -ea flag is set, turn on all the debug prints
         try {

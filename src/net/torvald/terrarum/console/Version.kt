@@ -12,7 +12,8 @@ internal object Version : ConsoleCommand {
     override fun execute(args: Array<String>) {
 
         Echo("${App.GAME_NAME} ${App.getVERSION_STRING()}")
-        Echo("Java version: ${System.getProperty("java.version")}")
+        Echo("JRE Version: ${System.getProperty("java.version")}")
+        Echo("Gdx Version: ${com.badlogic.gdx.Version.VERSION}")
         Echo("Polyglot language pack version: ${Lang.POLYGLOT_VERSION}")
         Echo("GL version: ${Terrarum.GL_VERSION}")
         Echo("Renderer: ${Gdx.graphics.glVersion.rendererString}, ${Gdx.graphics.glVersion.vendorString}")
