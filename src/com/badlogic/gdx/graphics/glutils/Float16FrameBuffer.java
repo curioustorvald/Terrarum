@@ -33,7 +33,7 @@ public class Float16FrameBuffer extends FrameBuffer {
      * @param hasDepth whether to attach a depth buffer
      * @throws GdxRuntimeException in case the FrameBuffer could not be created */
     public Float16FrameBuffer (int width, int height, boolean hasDepth) {
-        if (App.isAppleM) { // disable float framebuffer for Apple M chips
+        if (App.operationSystem.equals("OSX")) { // disable float framebuffer for Apple M chips
             FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
             bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp int works perfectly?!
             if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
@@ -51,7 +51,7 @@ public class Float16FrameBuffer extends FrameBuffer {
 
     @Override
     protected Texture createTexture (FrameBufferTextureAttachmentSpec attachmentSpec) {
-        if (App.isAppleM) {
+        if (App.operationSystem.equals("OSX")) {
             GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
                     attachmentSpec.format, attachmentSpec.type);
             Texture result = new Texture(data);
