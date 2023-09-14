@@ -52,6 +52,8 @@ class WorldgenLoadScreen(screenToBeLoaded: IngameInstance, private val worldwidt
 
         previewPixmap.setColor(Color.BLACK)
         previewPixmap.fill()
+
+        IngameRenderer.setRenderedWorld(world)
     }
 
     override fun render(delta: Float) {

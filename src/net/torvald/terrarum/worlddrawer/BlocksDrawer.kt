@@ -201,12 +201,14 @@ internal object BlocksDrawer {
         }
         catch (e: ClassCastException) { }
 
-        measureDebugTime("Renderer.Tiling") {
-            drawTiles(WALL)
-            drawTiles(TERRAIN) // regular tiles
-            drawTiles(FLUID)
-            drawTiles(OCCLUSION)
-            //drawTiles(WIRE)
+        if (!world.layerTerrain.ptrDestroyed) {
+            measureDebugTime("Renderer.Tiling") {
+                drawTiles(WALL)
+                drawTiles(TERRAIN) // regular tiles
+                drawTiles(FLUID)
+                drawTiles(OCCLUSION)
+                //drawTiles(WIRE)
+            }
         }
     }
 

@@ -139,7 +139,9 @@ object LightmapRenderer {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
     }
 
-    fun recalculate(actorContainer: List<ActorWithBody>) = _recalculate(actorContainer, lightmap)
+    fun recalculate(actorContainer: List<ActorWithBody>) {
+        if (!world.layerTerrain.ptrDestroyed) _recalculate(actorContainer, lightmap)
+    }
 
     private fun _recalculate(actorContainer: List<ActorWithBody>, lightmap: UnsafeCvecArray) {
         try {
@@ -661,35 +663,37 @@ object LightmapRenderer {
 
     internal fun draw(): Texture {
 
-        // when shader is not used: 0.5 ms on 6700K
-        App.measureDebugTime("Renderer.LightToScreen") {
+        if (!world.layerTerrain.ptrDestroyed) {
+            // when shader is not used: 0.5 ms on 6700K
+            App.measureDebugTime("Renderer.LightToScreen") {
 
-            val this_x_start = for_draw_x_start
-            val this_y_start = for_draw_y_start
-            val this_x_end = for_draw_x_end
-            val this_y_end = for_draw_y_end
+                val this_x_start = for_draw_x_start
+                val this_y_start = for_draw_y_start
+                val this_x_end = for_draw_x_end
+                val this_y_end = for_draw_y_end
 
-            // wipe out beforehand. You DO need this
-            lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
-            lightBuffer.setColor(0)
-            lightBuffer.fill()
+                // wipe out beforehand. You DO need this
+                lightBuffer.blending =
+                    Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
+                lightBuffer.setColor(0)
+                lightBuffer.fill()
 
 
-            // write to colour buffer
-            for (y in this_y_start..this_y_end) {
-                //println("y: $y, this_y_start: $this_y_start")
-                //if (y == this_y_start && this_y_start == 0) {
-                //    throw Error("Fuck hits again...")
-                //}
+                // write to colour buffer
+                for (y in this_y_start..this_y_end) {
+                    //println("y: $y, this_y_start: $this_y_start")
+                    //if (y == this_y_start && this_y_start == 0) {
+                    //    throw Error("Fuck hits again...")
+                    //}
 
-                for (x in this_x_start..this_x_end) {
+                    for (x in this_x_start..this_x_end) {
 
-                    val solidMultMagic = isSolid(x, y) // one of {1.2f, 1f, null}
+                        val solidMultMagic = isSolid(x, y) // one of {1.2f, 1f, null}
 
-                    val arrayX = x.convX()
-                    val arrayY = y.convY()
+                        val arrayX = x.convX()
+                        val arrayY = y.convY()
 
-                    val (red, grn, blu, uvl) = lightmap.getVec(arrayX, arrayY)
+                        val (red, grn, blu, uvl) = lightmap.getVec(arrayX, arrayY)
 //                    val redw = (red.sqrt() - 1f) * (7f / 24f)
 //                    val grnw = (grn.sqrt() - 1f)
 //                    val bluw = (blu.sqrt() - 1f) * (7f / 72f)
@@ -698,13 +702,13 @@ object LightmapRenderer {
 //                    val uvlwg = (uvl.sqrt() - 1f) * (1f / 10f)
 //                    val uvlwb = (uvl.sqrt() - 1f) * (1f / 8f)
 
-                    if (solidMultMagic == null)
-                        lightBuffer.drawPixel(
-                            x - this_x_start,
-                            lightBuffer.height - 1 - y + this_y_start, // flip Y
-                            0
-                        )
-                    else
+                        if (solidMultMagic == null)
+                            lightBuffer.drawPixel(
+                                x - this_x_start,
+                                lightBuffer.height - 1 - y + this_y_start, // flip Y
+                                0
+                            )
+                        else
                         /*lightBuffer.drawPixel(
                             x - this_x_start,
                             lightBuffer.height - 1 - y + this_y_start, // flip Y
@@ -713,28 +717,29 @@ object LightmapRenderer {
                                         (max(redw,grnw,blu,uvlwb) * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
                                         (max(bluwv,uvl) * solidMultMagic).hdnorm().times(255f).roundToInt()
                         )*/
-                        lightBuffer.drawPixel(
+                            lightBuffer.drawPixel(
                                 x - this_x_start,
                                 lightBuffer.height - 1 - y + this_y_start, // flip Y
                                 (red * solidMultMagic).hdnorm().times(255f).roundToInt().shl(24) or
                                         (grn * solidMultMagic).hdnorm().times(255f).roundToInt().shl(16) or
                                         (blu * solidMultMagic).hdnorm().times(255f).roundToInt().shl(8) or
                                         (uvl * solidMultMagic).hdnorm().times(255f).roundToInt()
-                        )
+                            )
+                    }
                 }
-            }
 
 
-            // draw to the batch
-            _lightBufferAsTex.dispose()
-            _lightBufferAsTex = Texture(lightBuffer)
-            _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                // draw to the batch
+                _lightBufferAsTex.dispose()
+                _lightBufferAsTex = Texture(lightBuffer)
+                _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-            /*Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+                /*Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
             //      we might not need shader here...
             //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
             batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
             */
+            }
         }
 
         return _lightBufferAsTex
