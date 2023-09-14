@@ -62,7 +62,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
     private boolean blendingDisabled = false;
     private int blendSrcFunc = GL20.GL_SRC_ALPHA;
     private int blendDstFunc = GL20.GL_ONE_MINUS_SRC_ALPHA;
-    private int blendSrcFuncAlpha = GL20.GL_SRC_ALPHA;
+    private int blendSrcFuncAlpha = GL20.GL_ONE;
     private int blendDstFuncAlpha = GL20.GL_ONE_MINUS_SRC_ALPHA;
 
     private final ShaderProgram shader;
