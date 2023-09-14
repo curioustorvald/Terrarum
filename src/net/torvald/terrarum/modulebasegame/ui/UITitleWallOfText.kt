@@ -69,7 +69,7 @@ class UISystemInfo(val remoCon: UIRemoCon) : UICanvas() {
         v.add("JRE" to System.getProperty("java.version"))
         v.add("Gdx" to com.badlogic.gdx.Version.VERSION)
         v.add("OS" to "${App.OSName} ${App.OSVersion}")
-        v.add("Processor" to App.processor)
+        v.add("Processor" to "${App.THREAD_COUNT}\u2009\u00D7\u2009${App.processor}")
         v.add("Architecture" to App.systemArch)
         v.add("CPUID" to App.processorVendor.let { if (it == "null" || it == null) "n/a" else it })
         v.add("OpenGL" to "${Gdx.graphics.glVersion.majorVersion}.${Gdx.graphics.glVersion.minorVersion}.${Gdx.graphics.glVersion.releaseVersion}")

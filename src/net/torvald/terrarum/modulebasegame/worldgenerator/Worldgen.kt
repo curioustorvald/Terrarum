@@ -64,7 +64,7 @@ object Worldgen {
     private data class Work(val loadingScreenName: String, val theWork: Gen)
 
     fun getEstimationSec(width: Int, height: Int): Long {
-        return (23.05 * 1.25 * (47500000.0 / bogoflops) * ((width * height) / 40095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
+        return (23.05 * 1.25 * (48600000.0 / bogoflops) * ((width * height) / 40095000.0) * (32.0 / THREAD_COUNT)).roundToLong()
     }
 }
 

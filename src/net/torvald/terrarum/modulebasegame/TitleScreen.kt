@@ -17,6 +17,7 @@ import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZEF
+import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.console.CommandDict
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
@@ -27,7 +28,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.modulebasegame.ui.UILoadGovernor
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
@@ -36,8 +36,6 @@ import net.torvald.terrarum.serialise.ReadSimpleWorld
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.weather.WeatherStateBox
-import net.torvald.terrarum.weather.Weatherbox
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
 import java.io.IOException
@@ -252,6 +250,20 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         //loadDone = true
+
+        // measure bogoflops here
+        val st = System.nanoTime()
+        var sc = st
+        var bogoflopf = Math.random()
+        var bogoflops = 0L
+        while (sc - st < 100000000L) {
+            bogoflopf *= Math.random()
+            bogoflops++
+            sc = System.nanoTime()
+        }
+        bogoflops = Math.round(bogoflops.toDouble() * (1000000000.0 / (sc - st)))
+        printdbg(this, "Bogoflops old: ${App.bogoflops} new: $bogoflops")
+        App.bogoflops = maxOf(App.bogoflops, bogoflops)
     }
 
 
