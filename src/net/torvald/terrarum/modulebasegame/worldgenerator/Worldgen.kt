@@ -1,9 +1,10 @@
 package net.torvald.terrarum.modulebasegame.worldgenerator
 
 import net.torvald.terrarum.App
-import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.gameworld.GameWorld
+import kotlin.math.roundToLong
 
 /**
  * New world generator.
@@ -62,6 +63,9 @@ object Worldgen {
 
     private data class Work(val loadingScreenName: String, val theWork: Gen)
 
+    fun getEstimationSec(width: Int, height: Int): Long {
+        return (23.05 * 1.25 * (bogoflops / 47500000.0) * (width * height / 40095000.0) * (THREAD_COUNT / 32.0)).roundToLong()
+    }
 }
 
 abstract class Gen(val world: GameWorld, val seed: Long, val params: Any) {

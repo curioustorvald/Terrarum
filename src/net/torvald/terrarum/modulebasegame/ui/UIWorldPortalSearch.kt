@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.INVENTORY_CELLS_OFFSET_Y
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VDFileID
@@ -24,6 +25,7 @@ import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.RandomWordsName
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2023-05-19.
@@ -53,6 +55,7 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
     private val inputWidth = 350
     private val inputLineY1 = 90
     private val inputLineY2 = 130
+    private val inputLineY3 = 170
 
     private val sizeSelY = 186 + 40
 
@@ -199,6 +202,11 @@ class UIWorldPortalSearch(val full: UIWorldPortal) : UICanvas() {
         App.fontGame.draw(batch, Lang["MENU_NAME"], drawX - 4, drawY + sizeSelY + inputLineY1)
         App.fontGame.draw(batch, Lang["CONTEXT_PLACE_COORDINATE"], drawX - 4, drawY + sizeSelY + inputLineY2)
 
+        val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
+        val etaMin = Worldgen.getEstimationSec(wx, wy).div(60f).roundToInt().coerceAtLeast(1)
+        val etaText = Lang.getAndUseTemplate("CONTEXT_ESTIMATED_MINUTES_PLURAL", true, etaMin)
+
+        Toolkit.drawTextCentered(batch, App.fontGame, etaText, width, drawX, drawY + sizeSelY + inputLineY3)
 
         // memory gauge
         val chunksUsed = full.chunksUsed

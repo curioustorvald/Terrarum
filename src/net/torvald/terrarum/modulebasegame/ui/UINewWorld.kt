@@ -19,6 +19,7 @@ import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.modulebasegame.serialise.ReadActor
+import net.torvald.terrarum.modulebasegame.worldgenerator.Worldgen
 import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.toBigInt64
@@ -26,6 +27,7 @@ import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.utils.PasswordBase32
 import net.torvald.terrarum.utils.RandomWordsName
 import java.util.UUID
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2021-10-25.
@@ -88,6 +90,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
     private val inputLineY1 = 90
     private val inputLineY2 = 130
+    private val inputLineY3 = 170
     private val goButtonWidth = 180
     private val gridGap = 10
     private val buttonBaseX = (Toolkit.drawWidth - 3 * goButtonWidth - 2 * gridGap) / 2
@@ -291,6 +294,12 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
             // name/seed input labels
             App.fontGame.draw(batch, Lang["MENU_NAME"], drawX - 4, drawY + sizeSelY + inputLineY1)
             App.fontGame.draw(batch, Lang["CONTEXT_GENERATOR_SEED"], drawX - 4, drawY + sizeSelY + inputLineY2)
+
+            val (wx, wy) = TerrarumIngame.NEW_WORLD_SIZE[sizeSelector.selection]
+            val etaMin = Worldgen.getEstimationSec(wx, wy).div(60f).roundToInt().coerceAtLeast(1)
+            val etaText = Lang.getAndUseTemplate("CONTEXT_ESTIMATED_MINUTES_PLURAL", true, etaMin)
+
+            Toolkit.drawTextCentered(batch, App.fontGame, etaText, width, drawX, drawY + sizeSelY + inputLineY3)
         }
         else if (mode == 1) {
             // code input labels
