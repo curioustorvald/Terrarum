@@ -2,7 +2,7 @@
 
 
 in vec4 v_color; // lightCol
-in vec4 v_generic; // gamma values
+in vec4 v_generic; // gamma values [rgb gam, a gam, 0, 0]
 in vec2 v_texCoords;
 uniform sampler2D u_texture;
 out vec4 fragColor;
@@ -12,14 +12,6 @@ const vec2 boolean = vec2(0.0, 1.0);
 uniform vec4 shadeCol;
 
 void main() {
-    // vertex colour format:
-    // rrrrrrMM ggggggLL bbbbbbAA aaaaaaaa
-    // where:
-    //    rrrrrr: 6-bit red component
-    //    gggggg: 6-bit green component
-    //    bbbbbb: 6-bit blue component
-    //      MMLL: index to the rgbGammas
-    //        AA: index to the aGammas
     vec4 cloudCol = v_color;
     float rgbGamma = v_generic.x;
     float aGamma = v_generic.y;

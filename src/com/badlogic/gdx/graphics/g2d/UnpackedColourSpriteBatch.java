@@ -103,6 +103,8 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
      * @param size The max number of sprites in a single batch. Max of 8191.
      * @param defaultShader The default shader to use. This is not owned by the SpriteBatch and must be disposed separately. */
     public UnpackedColourSpriteBatch (int size, ShaderProgram defaultShader) {
+        super(size, defaultShader);
+
         // 32767 is max vertex index, so 32767 / 4 vertices per sprite = 8191 sprites max.
         if (size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
 
@@ -116,7 +118,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
 
         projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        vertices = new float[size * 4 * 8];
+        vertices = new float[size * 48];
 
         int len = size * 6;
         short[] indices = new short[len];
@@ -1222,7 +1224,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
 
         renderCalls++;
         totalRenderCalls++;
-        int spritesInBatch = idx / 20;
+        int spritesInBatch = idx / 48;
         if (spritesInBatch > maxSpritesInBatch) maxSpritesInBatch = spritesInBatch;
         int count = spritesInBatch * 6;
 
