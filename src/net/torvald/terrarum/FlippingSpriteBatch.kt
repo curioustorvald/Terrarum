@@ -3,13 +3,14 @@ package net.torvald.terrarum
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.UnpackedColourSpriteBatch
 
 /**
  * Don't flip the assets! Flip the draw command instead!
  *
  * Created by minjaesong on 2021-12-13.
  */
-class FlippingSpriteBatch(size: Int = 1000) : SpriteBatch(size, DefaultGL32Shaders.createSpriteBatchShader()) {
+class FlippingSpriteBatch(size: Int = 1000) : UnpackedColourSpriteBatch(size, DefaultGL32Shaders.createSpriteBatchShader()) {
 
     /**
      * This function draws the flipped version of the image by giving flipped uv-coord to the SpriteBatch
@@ -40,6 +41,7 @@ class FlippingSpriteBatch(size: Int = 1000) : SpriteBatch(size, DefaultGL32Shade
             draw(region.texture, x, y, width, height, region.u, region.v2, region.u2, region.v)
     fun drawFlipped(region: TextureRegion, x: Float, y: Float) =
             draw(region.texture, x, y, region.regionWidth.toFloat(), region.regionHeight.toFloat(), region.u, region.v2, region.u2, region.v)
+
 
 
     /**

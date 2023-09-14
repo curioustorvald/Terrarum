@@ -3,6 +3,7 @@ package net.torvald.terrarum.weather
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.UnpackedColourSpriteBatch
 import com.badlogic.gdx.math.Vector3
 import com.jme3.math.FastMath
 import com.jme3.math.FastMath.PI
@@ -77,28 +78,13 @@ class WeatherObjectCloud(
 
     private val vecMult = Vector3(1f, 1f, 1f / (4f * H))
 
-    private fun roundRgbGamma(x: Float): Int {
-        return RGB_GAMMA_TABLE.mapIndexed { i, f -> (f - x).absoluteValue to i }.minBy { it.first }.second
-    }
-    private fun roundAgamma(x: Float): Int {
-        return A_GAMMA_TABLE.mapIndexed { i, f -> (f - x).absoluteValue to i }.minBy { it.first }.second
-    }
-
-    fun render(batch: SpriteBatch, cloudDrawColour: Color) {
+    fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour: Color) {
         val sc = screenCoord
-
-        val rgbGammaIndex = roundRgbGamma(rgbGamma)
-        val aGammaIndex = roundAgamma(aGamma)
 
 //        printdbg(this, "gamma: (${rgbGamma}, ${aGamma}) index: ($rgbGammaIndex, $aGammaIndex)")
 
-        val lightBits = cloudDrawColour.toIntBits()
-        val rbits = lightBits.ushr( 0).and(252) or rgbGammaIndex.ushr(2).and(3)
-        val gbits = lightBits.ushr( 8).and(252) or rgbGammaIndex.ushr(0).and(3)
-        val bbits = lightBits.ushr(16).and(252) or aGammaIndex
-        val abits = (alpha * 255).toInt()
-
-        batch.color = Color(rbits.shl(24) or gbits.shl(16) or bbits.shl(8) or abits)
+        batch.color = cloudDrawColour
+        batch.generic.set(rgbGamma, aGamma, 0f, 0f)
 
         if (flipW)
             batch.draw(texture, sc.x + texture.regionWidth / posZ, sc.y, -texture.regionWidth * sc.z, texture.regionHeight * sc.z)
@@ -182,31 +168,5 @@ class WeatherObjectCloud(
         const val CLOUD_STAGE_DEPTH = 256f
         const val OLD_AGE_DECAY = 5000f
         const val NEWBORN_GROWTH_TIME = 1000f
-
-        val RGB_GAMMA_TABLE = floatArrayOf(
-            0.2f,
-            0.3f,
-            0.4f,
-            0.5f,
-            0.6f,
-            0.7f,
-            0.8f,
-            0.9f,
-            1.0f,
-            1.25f,
-            1.5f,
-            1.75f,
-            2.0f,
-            2.5f,
-            3.0f,
-            3.5f
-        )
-
-        val A_GAMMA_TABLE = floatArrayOf(
-            1.6f,
-            2.0f,
-            2.4f,
-            2.8f
-        )
     }
 }

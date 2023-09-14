@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.UnpackedColourSpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.JsonValue
@@ -518,7 +519,7 @@ internal object WeatherMixer : RNGConsumer {
             batch.shader.setUniformf("shadeCol", 0.06f, 0.07f, 0.08f, 1f) // TODO temporary value
 
             clouds.forEach {
-                it.render(batch, cloudDrawColour)
+                it.render(batch as UnpackedColourSpriteBatch, cloudDrawColour)
             }
         }
     }

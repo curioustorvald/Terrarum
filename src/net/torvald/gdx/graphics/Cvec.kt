@@ -34,10 +34,15 @@ import com.badlogic.gdx.utils.NumberUtils
 class Cvec {
 
     /** the red, green, blue and alpha components  */
-    var r: Float = 0f
-    var g: Float = 0f
-    var b: Float = 0f
-    var a: Float = 0f
+    @kotlin.jvm.JvmField var r: Float = 0f
+    @kotlin.jvm.JvmField var g: Float = 0f
+    @kotlin.jvm.JvmField var b: Float = 0f
+    @kotlin.jvm.JvmField var a: Float = 0f
+
+    var x: Float; get() = r; set(value) { r = value }
+    var y: Float; get() = g; set(value) { g = value }
+    var z: Float; get() = b; set(value) { b = value }
+    var w: Float; get() = a; set(value) { a = value }
 
     /** Constructs a new Cvec with all components set to 0.  */
     constructor() {}
