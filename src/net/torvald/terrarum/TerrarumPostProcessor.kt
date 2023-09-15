@@ -51,6 +51,10 @@ object TerrarumPostProcessor : Disposable {
 
     private val recommendRatio = 1.5f
 
+    /*private val testfill = Texture("./assets/test_fill.tga").also {
+        it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+    }*/
+
     private val shaderQuant = mapOf(
             8 to 255f,
             10 to 1023f,
@@ -77,6 +81,7 @@ object TerrarumPostProcessor : Disposable {
         shaderPostNoDither.dispose()
         if (::lutTex.isInitialized) lutTex.tryDispose()
         if (::outFBO.isInitialized) outFBO.dispose()
+//        testfill.dispose()
     }
 
     private var deltatBenchStr = "ΔF: Gathering data"
@@ -239,6 +244,7 @@ object TerrarumPostProcessor : Disposable {
 
         App.getCurrentDitherTex().bind(1)
         fbo.colorBufferTexture.bind(0)
+//        testfill.bind(0)
 
         shader.bind()
         shader.setUniformMatrix("u_projTrans", projMat)
@@ -246,6 +252,7 @@ object TerrarumPostProcessor : Disposable {
         shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
         shader.setUniformi("u_pattern", 1)
         shader.setUniformf("quant", shaderQuant[App.getConfigInt("displaycolourdepth")] ?: 255f)
+//        shader.setUniformf("quant", 1f)
         shader.setUniformMatrix4fv("swizzler", swizzler, rng.nextInt(24), 16*4)
         App.fullscreenQuad.render(shader, GL20.GL_TRIANGLE_FAN)
 

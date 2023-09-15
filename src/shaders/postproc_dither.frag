@@ -37,7 +37,8 @@ vec4 invQuant = vec4(1.0 / quant);
 out vec4 fragColor;
 
 const vec2 boolean = vec2(0.0, 1.0);
-
+const vec4 halfPulldown = vec4(0.5 / 255.0); // 255.0 comes from the dithering pattern, not the quantiser
+const vec4 halfPullUp = vec4(255.0 / 254.5); // 255.0 comes from the dithering pattern, not the quantiser
 const vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
 
@@ -46,8 +47,8 @@ vec4 nearestColour(vec4 inColor) {
 }
 
 vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = swizzler * vec4(texture(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
-    return nearestColour(fma(bayerThreshold, invQuant, inColor));
+    vec4 bayerThreshold = swizzler * vec4(texture(u_pattern, (gl_FragCoord.xy + rnd) * patternsize) - halfPulldown);
+    return nearestColour(fma(bayerThreshold, invQuant, inColor * halfPullUp));
 }
 
 void main(void) {
