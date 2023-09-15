@@ -8,6 +8,7 @@
   "COPYRIGHT_GNU_GPL_3": "Distributed under GNU GPL 3",
   "GAME_ACTION_MOVE_VERB" : "Move",
   "GAME_ACTION_ZOOM" : "Zoom",
+  "GAME_ACTION_ZOOM_OUT" : "Zoom out",
   "MENU_IO_AUTOSAVE": "Autosave",
   "MENU_IO_CLEAR": "Clear",
   "MENU_IO_IMPORT": "Import",

@@ -23,7 +23,7 @@ in vec2 v_texCoords;
 uniform sampler2D u_texture;
 uniform sampler2D u_pattern;
 uniform ivec2 rnd = ivec2(0,0);
-const mat4 swizzler = mat4(
+uniform mat4 swizzler = mat4(
 1.0,0.0,0.0,0.0,
 0.0,1.0,0.0,0.0,
 0.0,0.0,1.0,0.0,
@@ -37,7 +37,6 @@ vec4 invQuant = vec4(1.0 / quant);
 out vec4 fragColor;
 
 const vec2 boolean = vec2(0.0, 1.0);
-const vec4 matrixNormaliser = vec4(0.5 / 256.0);
 
 const vec2 patternsize = vec2(1.0/512.0, 1.0/512.0);
 
@@ -47,7 +46,7 @@ vec4 nearestColour(vec4 inColor) {
 }
 
 vec4 getDitherredDot(vec4 inColor) {
-    vec4 bayerThreshold = swizzler * vec4(matrixNormaliser + texture(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
+    vec4 bayerThreshold = swizzler * vec4(texture(u_pattern, (gl_FragCoord.xy + rnd) * patternsize));
     return nearestColour(fma(bayerThreshold, invQuant, inColor));
 }
 

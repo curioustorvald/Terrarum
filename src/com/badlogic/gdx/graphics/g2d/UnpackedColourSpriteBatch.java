@@ -35,7 +35,11 @@ import net.torvald.gdx.graphics.Cvec;
 import java.nio.Buffer;
 
 /** Draws batched quads using indices.
- *  Created by minjaesong on 2023-09-14.
+ *
+ * This version of SpriteBatch assigns full non-packed float32 colour attribute to the vertices, as well as extra
+ * float32 "colour" attribute under the name 'a_generic' (accessible via 'vec4 v_generic').
+ *
+ * Created by minjaesong on 2023-09-14.
  * @see Batch
  * @author mzechner
  * @author Nathan Sweet
@@ -71,7 +75,6 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
 
     private final Color color = new Color(1, 1, 1, 1);
     private final Cvec generic = new Cvec(0);
-    float colorPacked = Color.WHITE_FLOAT_BITS;
 
     /** Number of render calls since the last {@link #begin()}. **/
     public int renderCalls = 0;
@@ -94,6 +97,8 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         this(size, null);
     }
 
+    private static int VERTEX_ATTR_SIZE = 48;
+
     /** Constructs a new SpriteBatch. Sets the projection matrix to an orthographic projection with y-axis point upwards, x-axis
      * point to the right and the origin being in the bottom left corner of the screen. The projection will be pixel perfect with
      * respect to the current screen resolution.
@@ -103,7 +108,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
      * @param size The max number of sprites in a single batch. Max of 8191.
      * @param defaultShader The default shader to use. This is not owned by the SpriteBatch and must be disposed separately. */
     public UnpackedColourSpriteBatch (int size, ShaderProgram defaultShader) {
-        super(size, defaultShader);
+        super(size, (defaultShader == null) ? createDefaultShader() : defaultShader);
 
         // 32767 is max vertex index, so 32767 / 4 vertices per sprite = 8191 sprites max.
         if (size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
@@ -118,7 +123,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
 
         projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        vertices = new float[size * 48];
+        vertices = new float[size * VERTEX_ATTR_SIZE];
 
         int len = size * 6;
         short[] indices = new short[len];
@@ -214,13 +219,11 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
     @Override
     public void setColor (Color tint) {
         color.set(tint);
-        colorPacked = tint.toFloatBits();
     }
 
     @Override
     public void setColor (float r, float g, float b, float a) {
         color.set(r, g, b, a);
-        colorPacked = color.toFloatBits();
     }
 
     @Override
@@ -243,13 +246,73 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
 
     @Override
     public void setPackedColor (float packedColor) {
-        Color.abgr8888ToColor(color, packedColor);
-        this.colorPacked = packedColor;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public float getPackedColor () {
-        return colorPacked;
+        throw new UnsupportedOperationException();
+    }
+
+    private void appendVertices(float x1, float y1, float u1, float v1,
+                                float x2, float y2, float u2, float v2,
+                                float x3, float y3, float u3, float v3,
+                                float x4, float y4, float u4, float v4) {
+
+        int idx = this.idx;
+        vertices[idx] = x1;
+        vertices[idx +  1] = y1;
+        vertices[idx +  2] = color.r;
+        vertices[idx +  3] = color.g;
+        vertices[idx +  4] = color.b;
+        vertices[idx +  5] = color.a;
+        vertices[idx +  6] = u1;
+        vertices[idx +  7] = v1;
+        vertices[idx +  8] = generic.r;
+        vertices[idx +  9] = generic.g;
+        vertices[idx + 10] = generic.b;
+        vertices[idx + 11] = generic.a;
+
+        vertices[idx + 12] = x2;
+        vertices[idx + 13] = y2;
+        vertices[idx + 14] = color.r;
+        vertices[idx + 15] = color.g;
+        vertices[idx + 16] = color.b;
+        vertices[idx + 17] = color.a;
+        vertices[idx + 18] = u2;
+        vertices[idx + 19] = v2;
+        vertices[idx + 20] = generic.r;
+        vertices[idx + 21] = generic.g;
+        vertices[idx + 22] = generic.b;
+        vertices[idx + 23] = generic.a;
+
+        vertices[idx + 24] = x3;
+        vertices[idx + 25] = y3;
+        vertices[idx + 26] = color.r;
+        vertices[idx + 27] = color.g;
+        vertices[idx + 28] = color.b;
+        vertices[idx + 29] = color.a;
+        vertices[idx + 30] = u3;
+        vertices[idx + 31] = v3;
+        vertices[idx + 32] = generic.r;
+        vertices[idx + 33] = generic.g;
+        vertices[idx + 34] = generic.b;
+        vertices[idx + 35] = generic.a;
+
+        vertices[idx + 36] = x4;
+        vertices[idx + 37] = y4;
+        vertices[idx + 38] = color.r;
+        vertices[idx + 39] = color.g;
+        vertices[idx + 40] = color.b;
+        vertices[idx + 41] = color.a;
+        vertices[idx + 42] = u4;
+        vertices[idx + 43] = v4;
+        vertices[idx + 44] = generic.r;
+        vertices[idx + 45] = generic.g;
+        vertices[idx + 46] = generic.b;
+        vertices[idx + 47] = generic.a;
+        this.idx = idx + 48;
+
     }
 
     @Override
@@ -355,59 +418,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
             v2 = tmp;
         }
 
-        int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx +  1] = y1;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x2;
-        vertices[idx + 13] = y2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = x3;
-        vertices[idx + 25] = y3;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = x4;
-        vertices[idx + 37] = y4;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x1, y1, u, v,
+                       x2, y2, u, v2,
+                       x3, y3, u2, v2,
+                       x4, y4, u2, v);
     }
 
     @Override
@@ -441,59 +455,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
             v2 = tmp;
         }
 
-        int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx +  1] = y;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = fx2;
-        vertices[idx + 25] = fy2;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = fx2;
-        vertices[idx + 37] = y;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x, y, u, v,
+                       x, fy2, u, v2,
+                       fx2, fy2, u2, v2,
+                       fx2, y, u2, v2);
     }
 
     @Override
@@ -514,59 +479,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         final float fx2 = x + srcWidth;
         final float fy2 = y + srcHeight;
 
-        int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx +  1] = y;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = fx2;
-        vertices[idx + 25] = fy2;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = fx2;
-        vertices[idx + 37] = y;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x, y, u, v,
+                       x, fy2, u, v2,
+                       fx2, fy2, u2, v2,
+                       fx2, y, u2, v);
     }
 
     @Override
@@ -583,59 +499,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         final float fx2 = x + width;
         final float fy2 = y + height;
 
-        int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx +  1] = y;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = fx2;
-        vertices[idx + 25] = fy2;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = fx2;
-        vertices[idx + 37] = y;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x, y, u, v,
+                       x, fy2, u, v2,
+                       fx2, fy2, u2, v2,
+                       fx2, y, u2, v);
     }
 
     @Override
@@ -661,59 +528,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         final float u2 = 1;
         final float v2 = 0;
 
-        int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx +  1] = y;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = fx2;
-        vertices[idx + 25] = fy2;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = fx2;
-        vertices[idx + 37] = y;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x, y, u, v,
+                       x, fy2, u, v2,
+                       fx2, fy2, u2, v2,
+                       fx2, y, u2, v);
     }
 
     @Override
@@ -770,59 +588,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         final float u2 = region.u2;
         final float v2 = region.v;
 
-        int idx = this.idx;
-        vertices[idx] = x;
-        vertices[idx +  1] = y;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x;
-        vertices[idx + 13] = fy2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = fx2;
-        vertices[idx + 25] = fy2;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = fx2;
-        vertices[idx + 37] = y;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x, y, u, v,
+                       x, fy2, u, v2,
+                       fx2, fy2, u2, v2,
+                       fx2, y, u2, v);
     }
 
     @Override
@@ -917,59 +686,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         final float u2 = region.u2;
         final float v2 = region.v;
 
-        int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx +  1] = y1;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x2;
-        vertices[idx + 13] = y2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = x3;
-        vertices[idx + 25] = y3;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = x4;
-        vertices[idx + 37] = y4;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x1, y1, u, v,
+                       x2, y2, u, v2,
+                       x3, y3, u2, v2,
+                       x4, y4, u2, v);
     }
 
     @Override
@@ -1080,59 +800,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
             v4 = region.v2;
         }
 
-        int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx +  1] = y1;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u1;
-        vertices[idx +  7] = v1;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x2;
-        vertices[idx + 13] = y2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u2;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = x3;
-        vertices[idx + 25] = y3;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u3;
-        vertices[idx + 31] = v3;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = x4;
-        vertices[idx + 37] = y4;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u4;
-        vertices[idx + 43] = v4;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x1, y1, u1, v1,
+                       x2, y2, u2, v2,
+                       x3, y3, u3, v3,
+                       x4, y4, u4, v4);
     }
 
     @Override
@@ -1163,59 +834,10 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         float u2 = region.u2;
         float v2 = region.v;
 
-        int idx = this.idx;
-        vertices[idx] = x1;
-        vertices[idx +  1] = y1;
-        vertices[idx +  2] = color.r;
-        vertices[idx +  3] = color.g;
-        vertices[idx +  4] = color.b;
-        vertices[idx +  5] = color.a;
-        vertices[idx +  6] = u;
-        vertices[idx +  7] = v;
-        vertices[idx +  8] = generic.r;
-        vertices[idx +  9] = generic.g;
-        vertices[idx + 10] = generic.b;
-        vertices[idx + 11] = generic.a;
-
-        vertices[idx + 12] = x2;
-        vertices[idx + 13] = y2;
-        vertices[idx + 14] = color.r;
-        vertices[idx + 15] = color.g;
-        vertices[idx + 16] = color.b;
-        vertices[idx + 17] = color.a;
-        vertices[idx + 18] = u;
-        vertices[idx + 19] = v2;
-        vertices[idx + 20] = generic.r;
-        vertices[idx + 21] = generic.g;
-        vertices[idx + 22] = generic.b;
-        vertices[idx + 23] = generic.a;
-
-        vertices[idx + 24] = x3;
-        vertices[idx + 25] = y3;
-        vertices[idx + 26] = color.r;
-        vertices[idx + 27] = color.g;
-        vertices[idx + 28] = color.b;
-        vertices[idx + 29] = color.a;
-        vertices[idx + 30] = u2;
-        vertices[idx + 31] = v2;
-        vertices[idx + 32] = generic.r;
-        vertices[idx + 33] = generic.g;
-        vertices[idx + 34] = generic.b;
-        vertices[idx + 35] = generic.a;
-
-        vertices[idx + 36] = x4;
-        vertices[idx + 37] = y4;
-        vertices[idx + 38] = color.r;
-        vertices[idx + 39] = color.g;
-        vertices[idx + 40] = color.b;
-        vertices[idx + 41] = color.a;
-        vertices[idx + 42] = u2;
-        vertices[idx + 43] = v;
-        vertices[idx + 44] = generic.r;
-        vertices[idx + 45] = generic.g;
-        vertices[idx + 46] = generic.b;
-        vertices[idx + 47] = generic.a;
-        this.idx = idx + 48;
+        appendVertices(x1, y1, u, v,
+                       x2, y2, u, v2,
+                       x3, y3, u2, v2,
+                       x4, y4, u2, v);
     }
 
     @Override
@@ -1224,7 +846,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
 
         renderCalls++;
         totalRenderCalls++;
-        int spritesInBatch = idx / 48;
+        int spritesInBatch = idx / VERTEX_ATTR_SIZE;
         if (spritesInBatch > maxSpritesInBatch) maxSpritesInBatch = spritesInBatch;
         int count = spritesInBatch * 6;
 
