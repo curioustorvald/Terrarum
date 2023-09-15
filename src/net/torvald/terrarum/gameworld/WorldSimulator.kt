@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.utils.Queue
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
@@ -34,10 +35,10 @@ object WorldSimulator {
     const private val DOUBLE_RADIUS = FLUID_UPDATING_SQUARE_RADIUS * 2
 
     // maps are separated as old-new for obvious reason, also it'll allow concurrent modification
-    private val fluidMap = Array(DOUBLE_RADIUS, { FloatArray(DOUBLE_RADIUS) })
-    private val fluidTypeMap = Array(DOUBLE_RADIUS, { Array<FluidType>(DOUBLE_RADIUS) { Fluid.NULL } })
-    private val fluidNewMap = Array(DOUBLE_RADIUS, { FloatArray(DOUBLE_RADIUS) })
-    private val fluidNewTypeMap = Array(DOUBLE_RADIUS, { Array<FluidType>(DOUBLE_RADIUS) { Fluid.NULL } })
+    private val fluidMap = Array(DOUBLE_RADIUS) { FloatArray(DOUBLE_RADIUS) }
+    private val fluidTypeMap = Array(DOUBLE_RADIUS) { Array(DOUBLE_RADIUS) { Fluid.NULL } }
+    private val fluidNewMap = Array(DOUBLE_RADIUS) { FloatArray(DOUBLE_RADIUS) }
+    private val fluidNewTypeMap = Array(DOUBLE_RADIUS) { Array(DOUBLE_RADIUS) { Fluid.NULL } }
 
     const val FLUID_MAX_MASS = 1f // The normal, un-pressurized mass of a full water cell
     const val FLUID_MAX_COMP = 0.02f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
@@ -67,6 +68,8 @@ object WorldSimulator {
 
     }
 
+    private val rng = HQRNG()
+
     /** Must be called BEFORE the actors update -- actors depend on the R-Tree for various things */
     operator fun invoke(player: ActorHumanoid?, delta: Float) {
 
@@ -80,75 +83,85 @@ object WorldSimulator {
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }
 
-        degrass()
-
-        App.measureDebugTime("WorldSimulator.fluids") {
-            //moveFluids(delta)
-        }
-        App.measureDebugTime("WorldSimulator.fallables") {
-            displaceFallables(delta)
-        }
+        if (ingame.terrainChangeQueue.isNotEmpty()) { App.measureDebugTime("WorldSimulator.degrass") { buryGrassImmediately() } }
+        App.measureDebugTime("WorldSimulator.growGrass") { growOrKillGrass() }
+        App.measureDebugTime("WorldSimulator.fluids") { /*moveFluids(delta)*/ }
+        App.measureDebugTime("WorldSimulator.fallables") { displaceFallables(delta) }
         if (ingame.WORLD_UPDATE_TIMER % 2 == 1) {
-            App.measureDebugTime("WorldSimulator.wires") {
-                simulateWires(delta)
-            }
+            App.measureDebugTime("WorldSimulator.wires") { simulateWires(delta) }
         }
         else {
             // TODO update logic
         }
-        App.measureDebugTime("WorldSimulator.collisionDroppedItem") {
-            collideDroppedItems()
-        }
+        App.measureDebugTime("WorldSimulator.collisionDroppedItem") { collideDroppedItems() }
 
         //printdbg(this, "============================")
     }
 
 
 
-    fun degrass() {
-        if (ingame.terrainChangeQueue.isNotEmpty()) { App.measureDebugTime("WorldSimulator.degrass") {
+    fun buryGrassImmediately() {
+        //val grassPlacedByPlayer = ArrayList<IngameInstance.BlockChangeQueueItem>()
 
-            //val grassPlacedByPlayer = ArrayList<IngameInstance.BlockChangeQueueItem>()
-
-            ingame.terrainChangeQueue.forEach {
-                if (BlockCodex[it.new].isSolid) {
-                    if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
-                        //grassPlacedByPlayer.add(it)
-                        world.setTileTerrain(it.posX, it.posY + 1, Block.DIRT, true)
-                    }
+        ingame.terrainChangeQueue.forEach {
+            if (BlockCodex[it.new].isSolid) {
+                if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
+                    //grassPlacedByPlayer.add(it)
+                    world.setTileTerrain(it.posX, it.posY + 1, Block.DIRT, true)
                 }
             }
+        }
 
-            // kill grasses surrounded by dirts in cruciform formation
-            // NOPE this part would not work; environment-depending degrassing must be done by the "grass spread simulator"
-            /*val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
-            val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
+        // kill grasses surrounded by dirts in cruciform formation
+        // NOPE this part would not work; environment-depending degrassing must be done by the "grass spread simulator"
+        /*val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
+        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
 
-            val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
-            val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
-            for (y in for_y_start..for_y_end) {
-                for (x in for_x_start..for_x_end) {
-                    // do not de-grass ones placed by player
-                    var nogo = false
-                    grassPlacedByPlayer.forEach {
-                        if (x == it.posX && y == it.posY) nogo = true
-                    }
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
+        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
+        for (y in for_y_start..for_y_end) {
+            for (x in for_x_start..for_x_end) {
+                // do not de-grass ones placed by player
+                var nogo = false
+                grassPlacedByPlayer.forEach {
+                    if (x == it.posX && y == it.posY) nogo = true
+                }
 
-                    if (!nogo) {
-                        val tile = world.getTileFromTerrain(x, y)
-                        if (tile == Block.GRASS) {
-                            if (world.getTileFromTerrain(x - 1, y) != Block.GRASS &&
-                                world.getTileFromTerrain(x + 1, y) != Block.GRASS &&
-                                world.getTileFromTerrain(x, y - 1) != Block.GRASS &&
-                                world.getTileFromTerrain(x, y + 1) != Block.GRASS) {
-                                world.setTileTerrain(x, y, Block.DIRT, true)
-                            }
+                if (!nogo) {
+                    val tile = world.getTileFromTerrain(x, y)
+                    if (tile == Block.GRASS) {
+                        if (world.getTileFromTerrain(x - 1, y) != Block.GRASS &&
+                            world.getTileFromTerrain(x + 1, y) != Block.GRASS &&
+                            world.getTileFromTerrain(x, y - 1) != Block.GRASS &&
+                            world.getTileFromTerrain(x, y + 1) != Block.GRASS) {
+                            world.setTileTerrain(x, y, Block.DIRT, true)
                         }
                     }
                 }
-            }*/
+            }
+        }*/
+    }
 
-        } }
+    fun growOrKillGrass() {
+        repeat(2) {
+            val rx = rng.nextInt(updateXFrom, updateXTo + 1)
+            val ry = rng.nextInt(updateYFrom, updateYTo + 1)
+            val tile = world.getTileFromTerrain(rx, ry)
+            // if the dirt tile has a grass and an air tile nearby, put grass to it
+            if (tile == Block.DIRT) {
+                val nearby = getNearbyTiles8(rx, ry)
+                if (nearby.any { !BlockCodex[it].isSolid } && nearby.any { it == Block.GRASS }) {
+                    world.setTileTerrain(rx, ry, Block.GRASS, false)
+                }
+            }
+            // if the grass tile is confined, kill it
+            else if (tile == Block.GRASS) {
+                val nearby = getNearbyTiles8(rx, ry)
+                if (nearby.all { BlockCodex[it].isSolid }) {
+                    world.setTileTerrain(rx, ry, Block.DIRT, false)
+                }
+            }
+        }
     }
 
     fun collideDroppedItems() {
@@ -585,6 +598,31 @@ object WorldSimulator {
                 Point2i(x - 1, y),
                 Point2i(x, y + 1) // don't know why but it doesn't work if I don't flip Y
         )
+    }
+
+    private fun getNearbyTilesPos8(x: Int, y: Int): Array<Point2i> {
+        return arrayOf(
+            Point2i(x + 1, y),
+            Point2i(x + 1, y + 1),
+            Point2i(x, y + 1),
+            Point2i(x - 1, y + 1),
+            Point2i(x - 1, y),
+            Point2i(x - 1, y - 1),
+            Point2i(x, y - 1),
+            Point2i(x + 1, y - 1)
+        )
+    }
+    private fun getNearbyTiles(x: Int, y: Int): List<ItemID> {
+        return getNearbyTilesPos(x, y).map { world.getTileFromTerrain(it.x, it.y) }
+    }
+    private fun getNearbyTiles8(x: Int, y: Int): List<ItemID> {
+        return getNearbyTilesPos8(x, y).map { world.getTileFromTerrain(it.x, it.y) }
+    }
+    private fun getNearbyWalls(x: Int, y: Int): List<ItemID> {
+        return getNearbyTilesPos(x, y).map { world.getTileFromWall(it.x, it.y) }
+    }
+    private fun getNearbyWalls8(x: Int, y: Int): List<ItemID> {
+        return getNearbyTilesPos8(x, y).map { world.getTileFromWall(it.x, it.y) }
     }
 
     data class WireGraphCursor(

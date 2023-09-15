@@ -97,7 +97,7 @@ public class UnpackedColourSpriteBatch extends SpriteBatch {
         this(size, null);
     }
 
-    private static int VERTEX_ATTR_SIZE = 48;
+    private static final int VERTEX_ATTR_SIZE = 48;
 
     /** Constructs a new SpriteBatch. Sets the projection matrix to an orthographic projection with y-axis point upwards, x-axis
      * point to the right and the origin being in the bottom left corner of the screen. The projection will be pixel perfect with
