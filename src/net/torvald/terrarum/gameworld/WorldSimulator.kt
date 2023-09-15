@@ -143,14 +143,15 @@ object WorldSimulator {
     }
 
     fun growOrKillGrass() {
-        repeat(2) {
+        repeat(200) {
             val rx = rng.nextInt(updateXFrom, updateXTo + 1)
             val ry = rng.nextInt(updateYFrom, updateYTo + 1)
             val tile = world.getTileFromTerrain(rx, ry)
             // if the dirt tile has a grass and an air tile nearby, put grass to it
             if (tile == Block.DIRT) {
-                val nearby = getNearbyTiles8(rx, ry)
-                if (nearby.any { !BlockCodex[it].isSolid } && nearby.any { it == Block.GRASS }) {
+                val nearby8 = getNearbyTiles8(rx, ry)
+                val nearby4 = listOf(nearby8[0], nearby8[2], nearby8[4], nearby8[6])
+                if (nearby8.any { !BlockCodex[it].isSolid } && nearby4.any { it == Block.GRASS }) {
                     world.setTileTerrain(rx, ry, Block.GRASS, false)
                 }
             }
