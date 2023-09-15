@@ -143,7 +143,7 @@ object WorldSimulator {
     }
 
     fun growOrKillGrass() {
-        repeat(200) {
+        repeat(2) {
             val rx = rng.nextInt(updateXFrom, updateXTo + 1)
             val ry = rng.nextInt(updateYFrom, updateYTo + 1)
             val tile = world.getTileFromTerrain(rx, ry)
