@@ -57,8 +57,8 @@ class TerrarumScreenSize(scrw: Int = defaultW, scrh: Int = defaultH) {
 
         this.magn = magn
 
-        windowW = (scrw * magn).ceilToInt() and 0x7FFFFFFE
-        windowH = (scrh * magn).ceilToInt() and 0x7FFFFFFE
+        windowW = (scrw * magn + 1).ceilToInt() and 0x7FFFFFFE
+        windowH = (scrh * magn + 1).ceilToInt() and 0x7FFFFFFE
 
 
         printdbg(this, "Window dim: $windowW x $windowH, called by:")
