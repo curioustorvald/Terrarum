@@ -19,6 +19,7 @@ object DefaultConfig {
             "usevsync" to false,
             "screenwidth" to TerrarumScreenSize.defaultW,
             "screenheight" to TerrarumScreenSize.defaultH,
+            "fullscreen" to false,
             "atlastexsize" to 2048,
 
             "language" to App.getSysLang(),

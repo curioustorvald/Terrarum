@@ -1,14 +1,14 @@
 package net.torvald.terrarum;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.Disposable;
@@ -43,6 +43,7 @@ import net.torvald.unsafe.DanglingPointerException;
 import net.torvald.unsafe.UnsafeHelper;
 import net.torvald.util.DebugTimers;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -404,13 +405,27 @@ public class App implements ApplicationListener {
             scr = new TerrarumScreenSize(getConfigInt("screenwidth"), getConfigInt("screenheight"));
             int width = scr.getWindowW();
             int height = scr.getWindowH();
+            boolean useFullscreen = getConfigBoolean("fullscreen");
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
             appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
-            appConfig.setWindowedMode(width, height);
+
+            if (useFullscreen) {
+                // auto resize for fullscreen
+                var disp = Lwjgl3ApplicationConfiguration.getDisplayMode();
+                float magn = (float) getConfigDouble("screenmagnifying");
+                var newWidth = ((int)(disp.width / magn)) & 0x7FFFFFFE;
+                var newHeight = ((int)(disp.height / magn)) & 0x7FFFFFFE;
+                scr.setDimension(newWidth, newHeight, magn);
+
+                appConfig.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+            }
+            else
+                appConfig.setWindowedMode(width, height);
+
             appConfig.setTransparentFramebuffer(false);
             int fpsActive = Math.min(GLOBAL_FRAMERATE_LIMIT, getConfigInt("displayfps"));
             if (fpsActive <= 0) fpsActive = GLOBAL_FRAMERATE_LIMIT;
