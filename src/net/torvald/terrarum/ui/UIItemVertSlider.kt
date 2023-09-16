@@ -1,55 +1,50 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
-import kotlin.math.absoluteValue
+import net.torvald.terrarum.App.printdbg
 import kotlin.math.roundToInt
 
 /**
- * For stepped values use UIItemHorzSliderStep (has different design tho:
- * ```
- * [-]--|--|--[]--|--[+]
- * ```
- *
- *
- *
- * Created by minjaesong on 2023-07-14.
+ * Created by minjaesong on 2023-09-17.
  */
-
-class UIItemHorzSlider(
+class UIItemVertSlider(
     parentUI: UICanvas,
     initialX: Int, initialY: Int,
     private var initialValue: Double,
     val min: Double,
     val max: Double,
-    override val width: Int,
-    val handleWidth: Int = 12,
+    override val height: Int,
+    val handleHeight: Int = 12,
     private val backgroundTexture: TextureRegion? = null,
     private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
-    override val height = 24
+    override val width = 16
     private var mouseOnHandle = false
 
-    private val handleTravelDist = width - handleWidth
+    private val handleTravelDist = height - handleHeight
     private var handlePos = (initialValue / max).times(handleTravelDist).coerceIn(0.0, handleTravelDist.toDouble())
 
     var value: Double = initialValue; private set
     var selectionChangeListener: (Double) -> Unit = {}
 
+    init {
+        printdbg(this, "slider max=$max")
+    }
+
     override fun update(delta: Float) {
         super.update(delta)
 
-        mouseOnHandle = itemRelativeMouseX in handlePos.roundToInt() until handlePos.roundToInt() + handleWidth && itemRelativeMouseY in 0 until height
+        mouseOnHandle = itemRelativeMouseY in handlePos.roundToInt() until handlePos.roundToInt() + handleHeight && itemRelativeMouseX in 0 until width
 
         // update handle position and value
         if (mouseUp && Terrarum.mouseDown || mouseLatched) {
             mouseLatched = true
-            handlePos = (itemRelativeMouseX - handleWidth/2.0).coerceIn(0.0, handleTravelDist.toDouble())
+            handlePos = (itemRelativeMouseY - handleHeight/2.0).coerceIn(0.0, handleTravelDist.toDouble())
             value = interpolateLinear(handlePos / handleTravelDist, min, max)
             selectionChangeListener(value)
         }
@@ -62,7 +57,6 @@ class UIItemHorzSlider(
     val troughBorderCol: Color; get() = if (mouseUp || mouseLatched) Toolkit.Theme.COL_MOUSE_UP else Toolkit.Theme.COL_INACTIVE
     val handleCol: Color; get() = if (mouseOnHandle && mousePushed || mouseLatched) Toolkit.Theme.COL_SELECTED
     else if (mouseOnHandle) Toolkit.Theme.COL_MOUSE_UP else Color.WHITE
-
 
     private val renderJobs = arrayOf(
         // trough fill
@@ -84,12 +78,12 @@ class UIItemHorzSlider(
         // handle fill
         { batch: SpriteBatch ->
             batch.color = handleCol.cpy().mul(Color.LIGHT_GRAY)
-            Toolkit.fillArea(batch, posX + handlePos.roundToInt(), posY, handleWidth, height)
+            Toolkit.fillArea(batch, posX, posY + handlePos.roundToInt(), width, handleHeight)
         },
         // handle border
         { batch: SpriteBatch ->
             batch.color = handleCol
-            Toolkit.drawBoxBorder(batch, posX + handlePos.roundToInt() - 1, posY - 1, handleWidth + 2, height + 2)
+            Toolkit.drawBoxBorder(batch, posX - 1, posY + handlePos.roundToInt() - 1, width + 2, handleHeight + 2)
         },
     )
 
@@ -107,9 +101,7 @@ class UIItemHorzSlider(
     }
 
     fun scrolledForce(amountX: Float, amountY: Float): Boolean {
-        val scroll = if (amountY == 0f) amountX else if (amountX == 0f) amountY else (amountX + amountY) / 2f
-
-        val move = Math.round(scroll)
+        val move = Math.round(amountY)
         val newValue = (value + move).coerceIn(min, max)
 
         handlePos = interpolateLinear(newValue / max, 0.0, handleTravelDist.toDouble())

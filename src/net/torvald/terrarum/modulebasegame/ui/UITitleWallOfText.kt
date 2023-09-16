@@ -6,9 +6,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CreditSingleton
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemTextArea
+import net.torvald.terrarum.ceilToInt
+import net.torvald.terrarum.ui.*
 import java.util.TreeMap
 
 open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
@@ -17,30 +16,56 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
     private val textAreaHMargin = 48
     override var width = 600
     override var height = App.scr.height - textAreaHMargin * 2
-    private val textArea = UIItemTextArea(this,
-            (App.scr.width - width) / 2, textAreaHMargin,
-            width, height
-    )
 
+    private val textArea: UIItemTextArea = UIItemTextArea(
+        this,
+        (App.scr.width - width) / 2 + 32, textAreaHMargin,
+        width, height
+    ).also {
+        it.setWallOfText(text)
+        it.scrolledListener = { x, y ->
+            scrollbar?.scrolledForce(5*x, 5*y)
+        }
+    }
+
+    private val scrollbar: UIItemVertSlider? = if (true) {
+        UIItemVertSlider(
+            this,
+            (App.scr.width - width) / 2 - 16, textAreaHMargin,
+            0.0, 0.0, text.size - textArea.lineCount.toDouble(),
+            height, ((textArea.lineCount.toDouble() / text.size) * height).ceilToInt()
+        ).also {
+            it.selectionChangeListener = { value ->
+                textArea.scrollPos = value.toInt()
+            }
+        }
+    }
+    else null
 
     init {
-        uiItems.add(textArea)
-
-        textArea.setWallOfText(text)
     }
 
     override fun updateUI(delta: Float) {
         textArea.update(delta)
+        scrollbar?.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         batch.color = Color.WHITE
         textArea.render(batch, camera)
+        scrollbar?.render(batch, camera)
 
         //AppLoader.printdbg(this, "Rendering texts of length ${text.size}")
     }
 
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        textArea.scrolled(amountX, amountY)
+        return true
+    }
+
     override fun dispose() {
+        textArea.dispose()
+        scrollbar?.dispose()
     }
 }
 

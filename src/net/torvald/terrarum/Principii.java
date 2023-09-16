@@ -78,7 +78,7 @@ public class Principii {
         if (OS.contains("WIN")) {
             runtimeRoot = "runtime-windows-" + runtimeArch;
         }
-        else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", even on Big Sur and beyond
+        else if (OS.contains("OS X") || OS.contains("MACOS")) { // OpenJDK for mac will still report "Mac OS X" with version number "10.16", "11.x", "12.x", "13.x", ...
             runtimeRoot = "runtime-osx-" + runtimeArch;
             extracmd0 += " -XstartOnFirstThread";
         }

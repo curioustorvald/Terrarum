@@ -101,8 +101,6 @@ object WorldSimulator {
 
 
     fun buryGrassImmediately() {
-        //val grassPlacedByPlayer = ArrayList<IngameInstance.BlockChangeQueueItem>()
-
         ingame.terrainChangeQueue.forEach {
             if (BlockCodex[it.new].isSolid) {
                 if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
@@ -111,39 +109,10 @@ object WorldSimulator {
                 }
             }
         }
-
-        // kill grasses surrounded by dirts in cruciform formation
-        // NOPE this part would not work; environment-depending degrassing must be done by the "grass spread simulator"
-        /*val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorToInt()
-        val for_y_end = for_y_start + BlocksDrawer.tilesInVertical - 1
-
-        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorToInt()
-        val for_x_end = for_x_start + BlocksDrawer.tilesInHorizontal - 1
-        for (y in for_y_start..for_y_end) {
-            for (x in for_x_start..for_x_end) {
-                // do not de-grass ones placed by player
-                var nogo = false
-                grassPlacedByPlayer.forEach {
-                    if (x == it.posX && y == it.posY) nogo = true
-                }
-
-                if (!nogo) {
-                    val tile = world.getTileFromTerrain(x, y)
-                    if (tile == Block.GRASS) {
-                        if (world.getTileFromTerrain(x - 1, y) != Block.GRASS &&
-                            world.getTileFromTerrain(x + 1, y) != Block.GRASS &&
-                            world.getTileFromTerrain(x, y - 1) != Block.GRASS &&
-                            world.getTileFromTerrain(x, y + 1) != Block.GRASS) {
-                            world.setTileTerrain(x, y, Block.DIRT, true)
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     fun growOrKillGrass() {
-        repeat(2) {
+        repeat(2 * world.worldTime.timeDelta) {
             val rx = rng.nextInt(updateXFrom, updateXTo + 1)
             val ry = rng.nextInt(updateYFrom, updateYTo + 1)
             val tile = world.getTileFromTerrain(rx, ry)
