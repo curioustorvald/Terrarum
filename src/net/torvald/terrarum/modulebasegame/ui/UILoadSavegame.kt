@@ -123,6 +123,7 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
         if (button.javaClass.simpleName == "UIItemPlayerCells") {
             transitionalListing.advanceMode()
             playerButtonSelected = button as UIItemPlayerCells
+            transitionalManage.loadSavegameInfo()
         }
 
     }

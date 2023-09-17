@@ -93,6 +93,8 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
                 showSpinner = true
 
                 cellLoadThread = Thread {
+                    Thread.sleep(50L, 0) // to prevent ConcurrentModificationException
+
                     // read savegames
                     var savegamesCount = 0
                     printdbg(this, "============== ${this.hashCode()} ============== ")
@@ -264,7 +266,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        playerCells.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        playerCells.slice(playerCells.indices).forEach { it.touchDown(screenX, screenY, pointer, button) } // to prevent ConcurrentModificationException
         return true
     }
 

@@ -217,8 +217,63 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         full.playerButtonSelected?.forceUnhighlight = false
     }
 
+
+    private val modulesBoxBaseY = full.titleTopGradEnd + 48
+    private val modulesTextboxW = 280
+    private val boxTextMargin = 3
+    private val listGap = 10
+    private val playerModTextboxX = Toolkit.drawWidth / 2 - (2 * boxTextMargin + listGap) - modulesTextboxW
+    private val worldModTextboxX = Toolkit.drawWidth / 2 + (2 * boxTextMargin + listGap)
+
+
+    private lateinit var sortedPlayerWorldList: List<Pair<SavegameMeta?, SavegameMeta?>>
+    private lateinit var loadOrderPlayer: List<String>
+    private lateinit var loadOrderWorld: List<String>
+    private var playerName = ""
+    private var px64 = 0
+    private var wx64 = 0
+    private var px48 = 0
+    private var wx48 = 0
+    private var totalTBH48 = 0
+    private var totalTBH64 = 0
+
     override fun show() {
         super.show()
+    }
+
+    internal fun loadSavegameInfo() {
+        val players = App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files
+        val worlds = App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files
+
+        val playerSavesInfo = players.map { it.getSavegameMeta() }
+        val worldSavesInfo = worlds.map { it.getSavegameMeta() }
+        sortedPlayerWorldList = getChronologicalPair(playerSavesInfo, worldSavesInfo)
+
+        px48 = playerModTextboxX + (modulesTextboxW - tbw48) / 2
+        wx48 = worldModTextboxX + (modulesTextboxW - tbw48) / 2
+        totalTBH48 = sortedPlayerWorldList.size * 32
+
+
+        playerName = App.savegamePlayersName[full.playerButtonSelected!!.playerUUID] ?: "Player"
+
+        loadOrderPlayer =
+            App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files[selectedRevision].getFile(
+                VDFileID.LOADORDER
+            )?.getContent()?.toByteArray()?.toString(Common.CHARSET)?.split('\n')?.let {
+                it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }
+            } ?: listOf("$EMDASH")
+        loadOrderWorld =
+            App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files[selectedRevision].getFile(
+                VDFileID.LOADORDER
+            )?.getContent()?.toByteArray()?.toString(Common.CHARSET)?.split('\n')?.let {
+                it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }
+            } ?: listOf("$EMDASH")
+
+        val playerTBW64 = loadOrderPlayer.maxOfOrNull { App.fontGame.getWidth(it) } ?: 0
+        val worldTBW64 = loadOrderWorld.maxOfOrNull { App.fontGame.getWidth(it) } ?: 0
+        px64 = playerModTextboxX + (modulesTextboxW - playerTBW64) / 2
+        wx64 = worldModTextboxX + (modulesTextboxW - worldTBW64) / 2
+        totalTBH64 = maxOf(loadOrderPlayer.size, loadOrderWorld.size) * App.fontGame.lineHeight.toInt()
     }
 
     override fun updateUI(delta: Float) {
@@ -301,36 +356,12 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             MODE_SHOW_LOAD_ORDER -> {
                 Toolkit.drawTextCentered(batch, App.fontUITitle, Lang["MENU_MODULES"], Toolkit.drawWidth, 0, full.titleTopGradEnd)
 
-                // TODO move into the show()
-                val playerName = App.savegamePlayersName[full.playerButtonSelected!!.playerUUID] ?: "Player"
-
-                val loadOrderPlayer =
-                    App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files[selectedRevision].getFile(
-                        VDFileID.LOADORDER
-                    )?.getContent()?.toByteArray()?.toString(Common.CHARSET)?.split('\n')?.let {
-                        it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }
-                    } ?: listOf("$EMDASH")
-                val loadOrderWorld =
-                    App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files[selectedRevision].getFile(
-                        VDFileID.LOADORDER
-                    )?.getContent()?.toByteArray()?.toString(Common.CHARSET)?.split('\n')?.let {
-                        it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }
-                    } ?: listOf("$EMDASH")
-
-                val playerTBW = loadOrderPlayer.maxOfOrNull { App.fontGame.getWidth(it) } ?: 0
-                val worldTBW = loadOrderWorld.maxOfOrNull { App.fontGame.getWidth(it) } ?: 0
-
-                val px = playerModTextboxX + (modulesTextboxW - playerTBW) / 2
-                val wx = worldModTextboxX + (modulesTextboxW - worldTBW) / 2
-
-                val totalTBH = maxOf(loadOrderPlayer.size, loadOrderWorld.size) * App.fontGame.lineHeight.toInt()
-
                 batch.color = Toolkit.Theme.COL_CELL_FILL
-                Toolkit.fillArea(batch, playerModTextboxX, modulesBoxBaseY - 4, modulesTextboxW, 36 + totalTBH)
-                Toolkit.fillArea(batch, worldModTextboxX, modulesBoxBaseY - 4, modulesTextboxW, 36 + totalTBH)
+                Toolkit.fillArea(batch, playerModTextboxX, modulesBoxBaseY - 4, modulesTextboxW, 36 + totalTBH64)
+                Toolkit.fillArea(batch, worldModTextboxX, modulesBoxBaseY - 4, modulesTextboxW, 36 + totalTBH64)
                 batch.color = Toolkit.Theme.COL_INACTIVE
-                Toolkit.drawBoxBorder(batch, playerModTextboxX - 1, modulesBoxBaseY - 4 - 1, modulesTextboxW + 2, 36 + totalTBH + 2)
-                Toolkit.drawBoxBorder(batch, worldModTextboxX - 1, modulesBoxBaseY - 4 - 1, modulesTextboxW + 2, 36 + totalTBH + 2)
+                Toolkit.drawBoxBorder(batch, playerModTextboxX - 1, modulesBoxBaseY - 4 - 1, modulesTextboxW + 2, 36 + totalTBH64 + 2)
+                Toolkit.drawBoxBorder(batch, worldModTextboxX - 1, modulesBoxBaseY - 4 - 1, modulesTextboxW + 2, 36 + totalTBH64 + 2)
 
                 batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
                 for (i in 0 until maxOf(loadOrderPlayer.size, loadOrderWorld.size)) {
@@ -344,40 +375,45 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, modulesBoxBaseY + 1)
 
                 loadOrderPlayer.forEachIndexed { index, s ->
-                    App.fontGame.draw(batch, s, px, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
+                    App.fontGame.draw(batch, s, px64, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
                 }
                 loadOrderWorld.forEachIndexed { index, s ->
-                    App.fontGame.draw(batch, s, wx, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
+                    App.fontGame.draw(batch, s, wx64, modulesBoxBaseY + 32 + App.fontGame.lineHeight.toInt() * index)
                 }
 
                 modulesBackButton.render(batch, camera)
             }
             MODE_PREV_SAVES -> {
-                modulesBackButton.render(batch, camera)
+                val modulesBoxBaseY2 = full.titleTopGradEnd + SAVE_CELL_HEIGHT + listGap + 4
 
-                // TODO move into the show()
-                val players = App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files
-                val worlds = App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files
+                batch.color = Toolkit.Theme.COL_CELL_FILL
+                Toolkit.fillArea(batch, playerModTextboxX, modulesBoxBaseY2 - 4, modulesTextboxW, 36 + totalTBH48)
+                Toolkit.fillArea(batch, worldModTextboxX, modulesBoxBaseY2 - 4, modulesTextboxW, 36 + totalTBH48)
+                batch.color = Toolkit.Theme.COL_INACTIVE
+                Toolkit.drawBoxBorder(batch, playerModTextboxX - 1, modulesBoxBaseY2 - 4 - 1, modulesTextboxW + 2, 36 + totalTBH48 + 2)
+                Toolkit.drawBoxBorder(batch, worldModTextboxX - 1, modulesBoxBaseY2 - 4 - 1, modulesTextboxW + 2, 36 + totalTBH48 + 2)
 
-                val playerSavesInfo = players.map { it.getSavegameMeta() }
-                val worldSavesInfo = worlds.map { it.getSavegameMeta() }
-
-                val tbw = App.fontGame.getWidth("8888-88-88 88:88:88 (8.8.88)")
-
-                val px = playerModTextboxX + (modulesTextboxW - tbw) / 2
-                val wx = worldModTextboxX + (modulesTextboxW - tbw) / 2
-
-                batch.color = Color.WHITE
-                val sortedPlayerWorldList = getChronologicalPair(playerSavesInfo, worldSavesInfo)
-
-                sortedPlayerWorldList.forEachIndexed { index, (pmeta, wmeta) ->
-                    if (pmeta != null) App.fontGame.draw(batch, "$pmeta", px, modulesBoxBaseY + 100 + 36 * index)
-                    if (wmeta != null) App.fontGame.draw(batch, "$wmeta", wx, modulesBoxBaseY + 100 + 36 * index)
+                batch.color = Toolkit.Theme.COL_INVENTORY_CELL_BORDER
+                for (i in 0 until sortedPlayerWorldList.size) {
+                    Toolkit.drawStraightLine(batch, playerModTextboxX + boxTextMargin, modulesBoxBaseY2 + 32 + 32 * i, playerModTextboxX + modulesTextboxW - boxTextMargin, 1, false)
+                    Toolkit.drawStraightLine(batch, worldModTextboxX + boxTextMargin, modulesBoxBaseY2 + 32 + 32 * i, worldModTextboxX + modulesTextboxW - boxTextMargin, 1, false)
                 }
 
+                batch.color = Color.WHITE
+                Toolkit.drawTextCentered(batch, App.fontGame, playerName, modulesTextboxW, playerModTextboxX, modulesBoxBaseY2 + 1)
+                Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, modulesBoxBaseY2 + 1)
+                sortedPlayerWorldList.forEachIndexed { index, (pmeta, wmeta) ->
+                    if (pmeta != null) App.fontGame.draw(batch, "$pmeta", px48, modulesBoxBaseY2 + 36 + 32 * index)
+                    if (wmeta != null) App.fontGame.draw(batch, "$wmeta", wx48, modulesBoxBaseY2 + 36 + 32 * index)
+                }
+
+                modulesBackButton.render(batch, camera)
             }
         }
     }
+
+    val tbw48 = App.fontGame.getWidth("8888-88-88 88:88:88 (8.8.88)")
+
 
     private data class SavegameMeta(
         val lastPlayTime: Long,
@@ -448,15 +484,6 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
         return li
     }
-
-    private val modulesBoxBaseY = full.titleTopGradEnd + 48
-    private val modulesTextboxW = 280
-    private val boxTextMargin = 3
-    private val listGap = 10
-    private val playerModTextboxX = Toolkit.drawWidth / 2 - (2 * boxTextMargin + listGap) - modulesTextboxW
-    private val worldModTextboxX = Toolkit.drawWidth / 2 + (2 * boxTextMargin + listGap)
-
-
 
     override fun dispose() {
         screencap?.texture?.tryDispose()
