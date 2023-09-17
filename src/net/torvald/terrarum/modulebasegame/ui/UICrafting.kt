@@ -274,7 +274,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         _getItemListPlayer().rebuild(catAll)
                         _getItemListIngredients().rebuild(catAll)
 
-                        highlightCraftingCandidateButton(button)
+                        highlightCraftingCandidateButton(recipe)
 
                         oldSelectedItems.clear()
                         oldSelectedItems.addAll(selectedItems)
@@ -348,8 +348,8 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         itemListIngredients.rebuild(catAll)
     }
 
-    private fun highlightCraftingCandidateButton(button: UIItemInventoryCellBase?) { // a proxy function
-        itemListCraftable.highlightButton(button)
+    private fun highlightCraftingCandidateButton(recipe: CraftingCodex.CraftingRecipe?) { // a proxy function
+        itemListCraftable.highlightRecipe(recipe)
         itemListCraftable.rebuild(catAll)
     }
 

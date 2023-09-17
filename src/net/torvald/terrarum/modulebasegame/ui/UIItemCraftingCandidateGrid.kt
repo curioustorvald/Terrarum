@@ -36,17 +36,37 @@ class UIItemCraftingCandidateGrid(
 
     internal val recipesSortList = ArrayList<CraftingCodex.CraftingRecipe>() // a dual to the [inventorySortList] which contains the actual recipes instead of crafting recipes
 
-    fun highlightButton(button: UIItemInventoryCellBase?) {
-        items.forEach { it.forceHighlighted = false }
-        button?.forceHighlighted = true
+    private var highlightedRecipe: CraftingCodex.CraftingRecipe? = null
 
-        button?.let {
-            printdbg(this, "highlighting button UIItemInventoryCellBase: ${it.item?.dynamicID}, ${it.amount}")
+    fun highlightRecipe(recipe: CraftingCodex.CraftingRecipe?) {
+        items.forEach { it.forceHighlighted = false }
+
+        highlightedRecipe = recipe
+
+        recipe?.let {
+            items.find { it.extraInfo == recipe }?.let { buttonFound ->
+                buttonFound.forceHighlighted = true
+            }
         }
     }
 
+    override var isCompactMode = false // this is INIT code
+        set(value) {
+            field = value
+            items = if (value) itemGrid else itemList
+            highlightRecipe(highlightedRecipe)
+            rebuild(currentFilter)
+        }
+
     private fun isCraftable(player: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): Boolean {
         return UICrafting.recipeToIngredientRecord(player, recipe, nearbyCraftingStations).none { it.howManyPlayerHas <= 0L || !it.craftingStationAvailable }
+    }
+
+    override fun scrollItemPage(relativeAmount: Int) {
+        super.scrollItemPage(relativeAmount)
+
+        // update highlighter status
+        highlightRecipe(highlightedRecipe)
     }
 
     override fun rebuild(filter: Array<String>) {
@@ -68,28 +88,41 @@ class UIItemCraftingCandidateGrid(
 
         // map sortList to item list
         for (k in items.indices) {
+            val item = items[k]
             // we have an item
             try {
                 val sortListItem = recipesSortList[k + itemPage * items.size]
-                items[k].item = ItemCodex[sortListItem.product]
-                items[k].amount = sortListItem.moq * numberMultiplier
-                items[k].itemImage = ItemCodex.getItemImage(sortListItem.product)
-                items[k].extraInfo = sortListItem
+                item.item = ItemCodex[sortListItem.product]
+                item.amount = sortListItem.moq * numberMultiplier
+                item.itemImage = ItemCodex.getItemImage(sortListItem.product)
+                item.extraInfo = sortListItem
+                item.forceHighlighted = (item.extraInfo == highlightedRecipe)
             }
             // we do not have an item, empty the slot
             catch (e: IndexOutOfBoundsException) {
-                items[k].item = null
-                items[k].amount = 0
-                items[k].itemImage = null
-                items[k].quickslot = null
-                items[k].equippedSlot = null
-                items[k].extraInfo = null
+                item.item = null
+                item.amount = 0
+                item.itemImage = null
+                item.quickslot = null
+                item.equippedSlot = null
+                item.extraInfo = null
+                item.forceHighlighted = false
             }
         }
 
 
         itemPageCount = (recipesSortList.size.toFloat() / items.size.toFloat()).ceilToInt()
 
+
+
         rebuildList = false
+    }
+
+
+
+
+    override fun scrolled(amountX: Float, amountY: Float): Boolean {
+        super.scrolled(amountX, amountY)
+        return true
     }
 }

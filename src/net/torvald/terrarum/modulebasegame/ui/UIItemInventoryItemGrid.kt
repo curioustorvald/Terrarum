@@ -81,7 +81,7 @@ open class UIItemInventoryItemGrid(
             arrayOf(GameItem.Category.MISC),
             arrayOf(CAT_ALL)
     )*/
-    private var currentFilter = arrayOf(CAT_ALL)
+    protected var currentFilter = arrayOf(CAT_ALL)
 
     private val inventoryUI = parentUI
 
@@ -183,7 +183,7 @@ open class UIItemInventoryItemGrid(
         val tooltipShowing = HashMap<Long, Boolean>() // Long: `hash` field on UIItemInventoryItemGrid
     }
 
-    private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
+    protected val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
         UIItemInventoryElemSimple(
                 parentUI = inventoryUI,
                 initialX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
@@ -202,7 +202,7 @@ open class UIItemInventoryItemGrid(
     private val itemListColumnCount = floor(horizontalCells / 5f).toInt().coerceAtLeast(1)
     private val actualItemCellWidth = (listGap + UIItemInventoryElemSimple.height) * horizontalCells - listGap // in pixels
     private val largeListWidth = ((listGap + actualItemCellWidth) / itemListColumnCount) - (itemListColumnCount - 1).coerceAtLeast(1) * listGap
-    private val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
+    protected val itemList = Array<UIItemInventoryCellBase>(verticalCells * itemListColumnCount) {
         UIItemInventoryElemWide(
                 parentUI = inventoryUI,
                 initialX = this.posX + (largeListWidth + listGap) * (it % itemListColumnCount),
@@ -221,11 +221,11 @@ open class UIItemInventoryItemGrid(
 
     var items: Array<UIItemInventoryCellBase> = itemList
 
-    var isCompactMode = false // this is INIT code
+    open var isCompactMode = false // this is INIT code
         set(value) {
+            field = value
             items = if (value) itemGrid else itemList
             rebuild(currentFilter)
-            field = value
         }
 
     private val iconPosX = if (drawScrollOnRightside)
@@ -243,7 +243,7 @@ open class UIItemInventoryItemGrid(
         itemList.forEach { it.customHighlightRule2 = predicate }
     }
 
-    fun scrollItemPage(relativeAmount: Int) {
+    open fun scrollItemPage(relativeAmount: Int) {
         itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)
     }
 
