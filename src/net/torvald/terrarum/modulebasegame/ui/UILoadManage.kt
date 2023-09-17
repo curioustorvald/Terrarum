@@ -2,27 +2,31 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
-import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
+import net.torvald.terrarum.savegame.ByteArray64Reader
+import net.torvald.terrarum.savegame.DiskSkimmer
 import net.torvald.terrarum.savegame.VDFileID
-import net.torvald.terrarum.savegame.VDFileID.PLAYER_SCREENSHOT
-import net.torvald.terrarum.savegame.VirtualDisk
+import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.tryDispose
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextLineInput
+import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.unicode.EMDASH
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 /**
  * Created by minjaesong on 2023-07-05.
@@ -297,6 +301,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             MODE_SHOW_LOAD_ORDER -> {
                 Toolkit.drawTextCentered(batch, App.fontUITitle, Lang["MENU_MODULES"], Toolkit.drawWidth, 0, full.titleTopGradEnd)
 
+                // TODO move into the show()
                 val playerName = App.savegamePlayersName[full.playerButtonSelected!!.playerUUID] ?: "Player"
 
                 val loadOrderPlayer =
@@ -350,8 +355,98 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
             MODE_PREV_SAVES -> {
                 modulesBackButton.render(batch, camera)
 
+                // TODO move into the show()
+                val players = App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files
+                val worlds = App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files
+
+                val playerSavesInfo = players.map { it.getSavegameMeta() }
+                val worldSavesInfo = worlds.map { it.getSavegameMeta() }
+
+                val tbw = App.fontGame.getWidth("8888-88-88 88:88:88 (8.8.88)")
+
+                val px = playerModTextboxX + (modulesTextboxW - tbw) / 2
+                val wx = worldModTextboxX + (modulesTextboxW - tbw) / 2
+
+                batch.color = Color.WHITE
+                val sortedPlayerWorldList = getChronologicalPair(playerSavesInfo, worldSavesInfo)
+
+                sortedPlayerWorldList.forEachIndexed { index, (pmeta, wmeta) ->
+                    if (pmeta != null) App.fontGame.draw(batch, "$pmeta", px, modulesBoxBaseY + 100 + 36 * index)
+                    if (wmeta != null) App.fontGame.draw(batch, "$wmeta", wx, modulesBoxBaseY + 100 + 36 * index)
+                }
+
             }
         }
+    }
+
+    private data class SavegameMeta(
+        val lastPlayTime: Long,
+        val genver: String
+    ) {
+        private val lastPlayTimeS = Instant.ofEpochSecond(lastPlayTime)
+            .atZone(TimeZone.getDefault().toZoneId())
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
+        override fun toString() = "$lastPlayTimeS\u3000($genver)"
+    }
+
+    private fun DiskSkimmer.getSavegameMeta(): SavegameMeta {
+        this.getFile(SAVEGAMEINFO)!!.bytes.let {
+            var lastPlayTime = 0L
+            var versionString = ""
+            JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
+                if (name == "lastPlayTime") lastPlayTime = value.asLong()
+                if (name == "genver") versionString = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
+            }
+
+            return SavegameMeta(
+                lastPlayTime,
+                versionString
+            )
+        }
+    }
+
+    private fun getChronologicalPair(ps: List<SavegameMeta>, ws: List<SavegameMeta>): List<Pair<SavegameMeta?, SavegameMeta?>> {
+        val li = ArrayList<Pair<SavegameMeta?, SavegameMeta?>>()
+        var pc = 0
+        var wc = 0
+        var breakStatus = -1 // 0: ps ran out, 1: ws ran out
+        while (true) {
+            if (ps.size == pc) {
+                breakStatus = 0
+                break
+            }
+            else if (ws.size == wc) {
+                breakStatus = 1
+                break
+            }
+
+            if (ps[pc].lastPlayTime == ws[wc].lastPlayTime) {
+                li.add(ps[pc] to ws[wc])
+                pc++; wc++
+            }
+            else if (ps[pc].lastPlayTime > ws[wc].lastPlayTime) {
+                li.add(ps[pc] to null)
+                pc++
+            }
+            else {
+                li.add(null to ws[wc])
+                wc++
+            }
+        }
+
+        val remainder = if (breakStatus == 0) ws else ps
+        var rc = if (breakStatus == 0) wc else pc
+        while (rc < remainder.size) {
+            if (breakStatus == 0)
+                li.add(null to ws[rc])
+            else
+                li.add(ps[pc] to null)
+
+            rc++
+        }
+
+        return li
     }
 
     private val modulesBoxBaseY = full.titleTopGradEnd + 48
