@@ -6,6 +6,7 @@ import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.modulebasegame.gameitems.BlockBase
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -42,7 +43,7 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
 
         println("Crafting Recipes: ")
-        Terrarum.craftingCodex.props.forEach { item, recipes ->
+        CraftingRecipeCodex.props.forEach { item, recipes ->
             println("$item ->")
             recipes.forEach {
                 print("    ")
@@ -69,6 +70,19 @@ class EntryPoint : ModuleEntryPoint() {
                 }
                 if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
             }
+        }
+
+        // crafting recipes: tile -> 2x wall
+        BlockCodex.getAll().filter { it.isWallable && it.isSolid && !it.isActorBlock }.forEach { tile ->
+            CraftingRecipeCodex.addRecipe(CraftingCodex.CraftingRecipe(
+                "",
+                arrayOf(CraftingCodex.CraftingIngredients(
+                    tile.id, CraftingCodex.CraftingItemKeyMode.VERBATIM, 1
+                )),
+                2,
+                "wall@"+tile.id,
+                moduleName
+            ))
         }
 
         println("\n[Basegame.EntryPoint] Welcome back!")

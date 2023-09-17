@@ -12,6 +12,16 @@ class CraftingCodex {
 
     @Transient internal val props = HashMap<ItemID, ArrayList<CraftingRecipe>>() // the key ItemID and value.product must be equal
 
+    fun addRecipe(recipe: CraftingRecipe) {
+        val product = recipe.product
+        if (props.containsKey(product)) {
+            props[product]?.add(recipe)
+        }
+        else {
+            props[product] = arrayListOf(recipe)
+        }
+    }
+
     fun addFromJson(json: JsonValue, moduleName: String, fileName:String) {
 
         if (moduleName.filter { it.code in 33..127 } .length < 5)
