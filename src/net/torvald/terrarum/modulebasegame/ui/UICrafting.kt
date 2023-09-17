@@ -10,6 +10,7 @@ import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
@@ -217,8 +218,10 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                     val itemID = gameItem.dynamicID
                     // don't rely on highlightedness of the button to determine the item on the button is the selected
                     // ingredient (because I don't fully trust my code lol)
-                    val targetItemToAlter = recipe.ingredients.filter { // altering recipe doesn't make sense if player selected a recipe that requires no tag-ingredients
-                        (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && gameItem.hasTag(it.key))
+                    val targetItemToAlter = recipe.ingredients.filter { (key, mode) -> // altering recipe doesn't make sense if player selected a recipe that requires no tag-ingredients
+                        val tags = key.split(',')
+                        val wantsWall = tags.contains("WALL")
+                        (mode == CraftingCodex.CraftingItemKeyMode.TAG && gameItem.hasAllTags(tags) && (wantsWall == gameItem.originalID.isWall())) // true if (wants wall and is wall) or (wants no wall and is not wall)
                     }.let {
                         if (it.size > 1)
                             println("[UICrafting] Your recipe seems to have two similar ingredients defined\n" +
@@ -227,9 +230,11 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         it.firstOrNull()
                     }
 
-                    targetItemToAlter?.let {
-                        val oldItem = _getItemListIngredients().getInventory().first { itemPair ->
-                            (it.keyMode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itemPair.itm]!!.hasTag(it.key))
+                    targetItemToAlter?.let { (key, mode) ->
+                        val oldItem = _getItemListIngredients().getInventory().first { (itm, qty) ->
+                            val tags = key.split(',')
+                            val wantsWall = tags.contains("WALL")
+                            (mode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itm]!!.hasAllTags(tags) && (wantsWall == itm.isWall())) // true if (wants wall and is wall) or (wants no wall and is not wall)
                         }
                         changeIngredient(oldItem, itemID)
                         refreshCraftButtonStatus()
@@ -259,20 +264,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         recipeClicked = recipe
 //                        printdbg(this, "Recipe selected: $recipe")
                         recipe.ingredients.forEach { ingredient ->
-                            val selectedItem: ItemID = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
-                                // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
-                                val selectedItem = playerInventory.filter { (itm, qty) ->
-                                    ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
-                                }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
-
-//                                printdbg(this, "Adding ingredients by tag ${selectedItem} (${ingredient.qty})")
-                                selectedItem
-                            }
-                            else {
-//                                printdbg(this, "Adding ingredients by name ${ingredient.key} (${ingredient.qty})")
-                                ingredient.key
-                            }
-
+                            val selectedItem = getItemForIngredient(playerInventory, ingredient)
                             selectedItems.add(selectedItem)
                             ingredients.add(selectedItem, ingredient.qty)
                         }
@@ -536,22 +528,27 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             val craftingStationAvailable: Boolean,
         )
 
+        fun getItemForIngredient(inventory: FixtureInventory, ingredient: CraftingCodex.CraftingIngredients): ItemID {
+            return if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
+                val tags = ingredient.key.split(',')
+                val wantsWall = tags.contains("WALL")
+                // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
+                inventory.filter { (itm, qty) ->
+                    ItemCodex[itm]?.hasAllTags(tags) == true && qty >= ingredient.qty && (wantsWall == itm.isWall()) // true if (wants wall and is wall) or (wants no wall and is not wall)
+                }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
+            }
+            else {
+                ingredient.key
+            }
+        }
+
         /**
          * For each ingredient of the recipe, returns list of (ingredient, how many the player has the ingredient, how many the recipe wants)
          */
         fun recipeToIngredientRecord(inventory: FixtureInventory, recipe: CraftingCodex.CraftingRecipe, nearbyCraftingStations: List<String>): List<RecipeIngredientRecord> {
             val hasStation = if (recipe.workbench.isBlank()) true else nearbyCraftingStations.contains(recipe.workbench)
             return recipe.ingredients.map { ingredient ->
-                val selectedItem = if (ingredient.keyMode == CraftingCodex.CraftingItemKeyMode.TAG) {
-                    // If the player has the required item, use it; otherwise, will take an item from the ItemCodex
-                    inventory.filter { (itm, qty) ->
-                        ItemCodex[itm]?.tags?.contains(ingredient.key) == true && qty >= ingredient.qty
-                    }.maxByOrNull { it.qty }?.itm ?: ((ItemCodex.itemCodex.firstNotNullOfOrNull { if (it.value.hasTag(ingredient.key)) it.key else null }) ?: throw NullPointerException("Item with tag '${ingredient.key}' not found. Possible cause: game or a module not updated or installed"))
-                }
-                else {
-                    ingredient.key
-                }
-
+                val selectedItem = getItemForIngredient(inventory, ingredient)
                 val howManyPlayerHas = inventory.searchByID(selectedItem)?.qty ?: 0L
                 val howManyTheRecipeWants = ingredient.qty
 

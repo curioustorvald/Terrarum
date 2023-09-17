@@ -360,6 +360,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     }
 
     fun hasTag(s: String) = tags.contains(s)
+    fun hasAllTags(s: List<String>) = tags.containsAll(s)
 
 
     companion object {

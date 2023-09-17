@@ -64,7 +64,9 @@ class EntryPoint : ModuleEntryPoint() {
             if (IS_DEVELOPMENT_BUILD) print(tile.id+" ")
 
             if (BlockCodex[tile.id].isWallable) {
-                ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true)
+                ItemCodex["wall@" + tile.id] = makeNewItemObj(tile, true).also {
+                    it.tags.add("WALL")
+                }
                 if (IS_DEVELOPMENT_BUILD) print("wall@" + tile.id + " ")
             }
         }

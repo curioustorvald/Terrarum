@@ -47,7 +47,7 @@ class CraftingCodex {
                 itemsStr.forEachIndexed { i, itemStr ->
                     ingredients.add(CraftingIngredients(
                             if (itemStr.startsWith("$"))
-                                itemStr.substring(1)
+                                itemStr.substring(1).replace('$',',')
                             else
                                 itemStr
                             ,

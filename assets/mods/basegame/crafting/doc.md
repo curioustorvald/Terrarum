@@ -29,10 +29,13 @@ Each entry is interpreted as:
 
 For example:
 
-```[2, 1, "$WOOD", 1, "$ROCK"]```
+```[2, 1, "$WOOD$WALL", 1, "$ROCK"]```
 
-This line is interpreted as: this item requires 1 tagged-as-wood ingredient and 1 tagged-as-rock ingredient,
-and returns 2 of crafted items.
+This line is interpreted as: this item requires 1 tagged-as-wood and tagged-as-wall ingredient and
+1 tagged-as-rock ingredient, and returns 2 of crafted items.
+
+$WALL tag is treated specially as state of "having $WALL tag" and "not having $WALL tag" is mutually exclusive;
+Ingredient Resolver will NOT look for walls if there is no $WALL tag
 
 ```[20, 1, "ITEM_PLATFORM_BUILDING_KIT"]```
 
