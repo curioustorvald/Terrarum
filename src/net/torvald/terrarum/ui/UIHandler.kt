@@ -35,45 +35,43 @@ class UIHandler(//var UI: UICanvas,
 
     companion object {
         private val SHADER_PROG_FRAG = """
-#version 150
 #ifdef GL_ES
-    precision mediump float;
+precision mediump float;
 #endif
 
 in vec4 v_color;
+in vec4 v_generic;
 in vec2 v_texCoords;
-uniform sampler2D u_texture;
-
 uniform float opacity;
-
+uniform sampler2D u_texture;
 out vec4 fragColor;
+const vec2 boolean = vec2(0.0, 1.0);
 
-void main(void) {
-    vec4 color = texture(u_texture, v_texCoords).rgba;
-    
+void main() {
+    vec4 color = texture(u_texture, v_texCoords);
     fragColor = v_color * vec4(color.rgb, color.a * opacity);
 }
 """.trimIndent()
 
         private val SHADER_PROG_VERT = """
-#version 150
-
 in vec4 a_position;
 in vec4 a_color;
+in vec4 a_generic;
 in vec2 a_texCoord0;
 
 uniform mat4 u_projTrans;
 
 out vec4 v_color;
 out vec2 v_texCoords;
+out vec4 v_generic;
 
 void main() {
     v_color = a_color;
-    v_color.a = v_color.a * (255.0/254.0);
     v_texCoords = a_texCoord0;
+    v_generic = a_generic;
     gl_Position = u_projTrans * a_position;
 }
-        """.trimIndent()
+""".trimIndent()
     }
 
     // X/Y Position relative to the game window.

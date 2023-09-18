@@ -1,4 +1,3 @@
-#version 150
 
 in vec4 v_color;
 in vec2 v_texCoords;

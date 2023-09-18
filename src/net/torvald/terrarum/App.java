@@ -32,6 +32,7 @@ import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
+import net.torvald.terrarum.serialise.Common;
 import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.ui.Toolkit;
 import net.torvald.terrarum.utils.JsonFetcher;
@@ -330,6 +331,8 @@ public class App implements ApplicationListener {
         return new ShapeRenderer(5000, DefaultGL32Shaders.INSTANCE.createShapeRendererShader());
     }
 
+    public static boolean gl40capable = false;
+
     public static void main(String[] args) {
 
         long st = System.nanoTime();
@@ -473,6 +476,8 @@ public class App implements ApplicationListener {
 
 
         glInfo.create();
+        gl40capable = (Gdx.graphics.getGLVersion().getMajorVersion() >= 4);
+        printdbg(this, "GL40 capable? "+gl40capable);
 
         CommonResourcePool.INSTANCE.addToLoadingList("title_health1", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_take_a_break.tga")));
         CommonResourcePool.INSTANCE.addToLoadingList("title_health2", () -> new Texture(Gdx.files.internal("./assets/graphics/gui/health_distance.tga")));
@@ -1613,26 +1618,29 @@ public class App implements ApplicationListener {
     }
 
     public static ShaderProgram loadShaderFromClasspath(String vert, String frag) {
-        ShaderProgram s = new ShaderProgram(Gdx.files.classpath(vert), Gdx.files.classpath(frag));
-
-        if (s.getLog().toLowerCase().contains("error")) {
-            throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
-        }
-
-        return s;
+        String v = Gdx.files.classpath(vert).readString("utf-8");
+        String f = Gdx.files.classpath(frag).readString("utf-8");
+        return loadShaderInline(v, f);
     }
 
     public static ShaderProgram loadShaderFromFile(String vert, String frag) {
-        ShaderProgram s = new ShaderProgram(Gdx.files.internal(vert), Gdx.files.internal(frag));
-
-        if (s.getLog().toLowerCase().contains("error")) {
-            throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
-        }
-
-        return s;
+        String v = Gdx.files.internal(vert).readString("utf-8");
+        String f = Gdx.files.internal(frag).readString("utf-8");
+        return loadShaderInline(v, f);
     }
 
-    public static ShaderProgram loadShaderInline(String vert, String frag) {
+    public static ShaderProgram loadShaderInline(String vert0, String frag0) {
+        // insert version code
+        String vert, frag;
+        if (gl40capable) {
+            vert = "#version 400\n"+vert0;
+            frag = "#version 400\n"+frag0;
+        }
+        else {
+            vert = "#version 150\n#define fma(a,b,c) ((a*b)+c)\n"+vert0;
+            frag = "#version 150\n#define fma(a,b,c) ((a*b)+c)\n"+frag0;
+        }
+
         ShaderProgram s = new ShaderProgram(vert, frag);
 
         if (s.getLog().toLowerCase().contains("error")) {
