@@ -354,15 +354,19 @@ object LightmapRenderer {
             val scale = it.scale
 
             // put lanterns to the area the lightBox is occupying
-            lightBoxCopy.forEach { (lightBox, colour) ->
-                val lightBoxX = it.hitbox.startX + (lightBox.startX * scale)
-                val lightBoxY = it.hitbox.startY + (lightBox.startY * scale)
-                val lightBoxW = lightBox.width * scale - 1
-                val lightBoxH = lightBox.height * scale - 1
-                for (y in lightBoxY.div(TILE_SIZE).floorToInt()
-                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorToInt()) {
-                    for (x in lightBoxX.div(TILE_SIZE).floorToInt()
-                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorToInt()) {
+            lightBoxCopy.forEach { (box, colour) ->
+                val boxX = it.hitbox.startX + (box.startX * scale)
+                val boxY = it.hitbox.startY + (box.startY * scale)
+                val boxW = box.width * scale
+                val boxH = box.height * scale
+
+                val x0 = boxX.div(TILE_SIZE).floorToInt()
+                val x1 = (boxX + boxW).div(TILE_SIZE).floorToInt().coerceAtLeast(x0+1)
+                val y0 = boxY.div(TILE_SIZE).floorToInt()
+                val y1 = (boxY + boxH).div(TILE_SIZE).floorToInt().coerceAtLeast(y0+1)
+
+                for (y in y0 until y1) {
+                    for (x in x0 until x1) {
 
                         val oldLight = lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
                         val actorLight = colour
@@ -373,15 +377,19 @@ object LightmapRenderer {
             }
 
             // put shades to the area the shadeBox is occupying
-            shadeBoxCopy.forEach { (shadeBox, colour) ->
-                val lightBoxX = it.hitbox.startX + (shadeBox.startX * scale)
-                val lightBoxY = it.hitbox.startY + (shadeBox.startY * scale)
-                val lightBoxW = shadeBox.width * scale - 1
-                val lightBoxH = shadeBox.height * scale - 1
-                for (y in lightBoxY.div(TILE_SIZE).floorToInt()
-                        ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorToInt()) {
-                    for (x in lightBoxX.div(TILE_SIZE).floorToInt()
-                            ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorToInt()) {
+            shadeBoxCopy.forEach { (box, colour) ->
+                val boxX = it.hitbox.startX + (box.startX * scale)
+                val boxY = it.hitbox.startY + (box.startY * scale)
+                val boxW = box.width * scale
+                val boxH = box.height * scale
+
+                val x0 = boxX.div(TILE_SIZE).floorToInt()
+                val x1 = (boxX + boxW).div(TILE_SIZE).floorToInt().coerceAtLeast(x0+1)
+                val y0 = boxY.div(TILE_SIZE).floorToInt()
+                val y1 = (boxY + boxH).div(TILE_SIZE).floorToInt().coerceAtLeast(y0+1)
+
+                for (y in y0 until y1) {
+                    for (x in x0 until x1) {
 
                         val oldLight = shadowMap[LandUtil.getBlockAddr(world, x, y)] ?: Cvec(0) // if two or more luminous actors share the same block, mix the light
                         val actorLight = colour
