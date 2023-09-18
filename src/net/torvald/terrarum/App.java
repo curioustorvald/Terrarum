@@ -136,6 +136,10 @@ public class App implements ApplicationListener {
     public static String renderer = "(a super-fancy virtual photoradiator)";
     public static String rendererVendor = "(aperture science psychovisualcomputation laboratory)";
 
+    /**
+     * True if the processor's name starts with "Apple M" and not running through Rosetta.
+     * To detect the presence of the M-chips only, use App.processor.startsWith("Apple M")
+     */
     public static boolean isAppleM = false;
 
     public static int THREAD_COUNT = Runtime.getRuntime().availableProcessors();
@@ -412,7 +416,7 @@ public class App implements ApplicationListener {
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
-            appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+            if (processor.startsWith("Apple M")) appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
 
