@@ -47,7 +47,7 @@ class WeatherObjectCloud(
             scl(world.worldTime.timeDelta.toFloat())
         )
 
-        eigenAlpha = if (posZ < 1f) posZ.pow(0.5f) else cosh((posZ - CLOUD_STAGE_DEPTH) / (0.75636f * CLOUD_STAGE_DEPTH)) - 1f //-((posZ - 1f) / CLOUD_STAGE_DEPTH) + 1f
+        eigenAlpha = if (posZ >= CLOUD_STAGE_DEPTH) 0f else if (posZ < 1f) posZ.pow(0.5f) else cosh((posZ - CLOUD_STAGE_DEPTH) / (0.75636f * CLOUD_STAGE_DEPTH)) - 1f //-((posZ - 1f) / CLOUD_STAGE_DEPTH) + 1f
 
         val alphaMult = if (life < NEWBORN_GROWTH_TIME)
             life / NEWBORN_GROWTH_TIME
@@ -78,12 +78,15 @@ class WeatherObjectCloud(
 
     private val vecMult = Vector3(1f, 1f, 1f / (4f * H))
 
-    fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour: Color) {
+    fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour0: Color) {
         val sc = screenCoord
 
 //        printdbg(this, "gamma: (${rgbGamma}, ${aGamma}) index: ($rgbGammaIndex, $aGammaIndex)")
 
-        batch.color = cloudDrawColour
+        val cloudCol = cloudDrawColour0.cpy().also {
+            it.a = alpha
+        }
+        batch.color = cloudCol
         batch.generic.set(rgbGamma, aGamma, 0f, 0f)
 
         if (flipW)
