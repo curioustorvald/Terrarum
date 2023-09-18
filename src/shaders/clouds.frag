@@ -10,6 +10,9 @@ out vec4 fragColor;
 const vec2 boolean = vec2(0.0, 1.0);
 
 uniform vec4 shadeCol;
+uniform float shadiness = 1.0;
+
+vec4 shadeVec = vec4(1.0 + 3.333 * shadiness, 1.0 + 3.333 * shadiness, 1.0 + 3.333 * shadiness, 1.0);
 
 void main() {
     vec4 cloudCol = v_color;
@@ -23,10 +26,12 @@ void main() {
     // cloud colour format:
     // r: bw diffuse map, g: normal, b: normal, a: bw diffuse alpha
     vec4 inCol = texture(u_texture, v_texCoords);
-    vec4 rawCol = range * pow(inCol, gamma) + offset;
+    vec4 rawCol0 = range * pow(inCol, gamma) + offset;
+    vec4 rawCol = pow(rawCol0, shadeVec);
 
     // do gradient mapping here
-    vec4 outCol = fma(mix(shadeCol, cloudCol, rawCol.r), boolean.yyyx, rawCol * boolean.xxxy);
+    vec4 ccol = mix(shadeCol, cloudCol, rawCol.r);
+    vec4 outCol = fma(ccol, boolean.yyyx, rawCol * boolean.xxxy);
 
     fragColor = outCol * fma(cloudCol, boolean.xxxy, boolean.yyyx);
 }

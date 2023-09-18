@@ -502,12 +502,19 @@ internal object WeatherMixer : RNGConsumer {
 //    private var gH = 0.8f * App.scr.height
 
     internal var parallaxPos = 0f; private set
-
+    private var solarElev = 0.0
     private val HALF_DAY = DAY_LENGTH / 2
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
     internal fun render(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
+        solarElev = if (forceSolarElev != null)
+            forceSolarElev!!
+        else if (forceTimeAt != null)
+            world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
+        else
+            world.worldTime.solarElevationDeg
+
         drawSkybox(camera, batch, world)
         drawClouds(batch)
         batch.color = Color.WHITE
@@ -516,7 +523,9 @@ internal object WeatherMixer : RNGConsumer {
     private fun drawClouds(batch: SpriteBatch) {
         batch.inUse { _ ->
             batch.shader = shaderClouds
-            batch.shader.setUniformf("shadeCol", 0.06f, 0.07f, 0.08f, 1f) // TODO temporary value
+            val shadeLum = (globalLightNow.r * 3f + globalLightNow.g * 4f + globalLightNow.b * 1f) / 8f * 0.5f
+            batch.shader.setUniformf("shadeCol", shadeLum * 1.05f, shadeLum, shadeLum / 1.05f, 1f)
+            batch.shader.setUniformf("shadiness", (1.0 / cosh(solarElev * 0.5)).toFloat().coerceAtLeast(if (solarElev < 0) 0.6666f else 0f))
 
             clouds.forEach {
                 it.render(batch as UnpackedColourSpriteBatch, cloudDrawColour)
@@ -534,12 +543,6 @@ internal object WeatherMixer : RNGConsumer {
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
-        val solarElev = if (forceSolarElev != null)
-            forceSolarElev!!
-        else if (forceTimeAt != null)
-            world.worldTime.getSolarElevationAt(world.worldTime.ordinalDay, forceTimeAt!!)
-        else
-            world.worldTime.solarElevationDeg
         val daylightClut = currentWeather.daylightClut
         // calculate global light
         val moonSize = (-(2.0 * world.worldTime.moonPhase - 1.0).abs() + 1.0).toFloat()

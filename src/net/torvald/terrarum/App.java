@@ -1641,8 +1641,8 @@ public class App implements ApplicationListener {
             frag = "#version 400\n"+frag0;
         }
         else {
-            vert = "#version 150\n#define fma(a,b,c) ((a*b)+c)\n"+vert0;
-            frag = "#version 150\n#define fma(a,b,c) ((a*b)+c)\n"+frag0;
+            vert = "#version 150\n#define fma(a,b,c) (((a)*(b))+(c))\n"+vert0;
+            frag = "#version 150\n#define fma(a,b,c) (((a)*(b))+(c))\n"+frag0;
         }
 
         ShaderProgram s = new ShaderProgram(vert, frag);
