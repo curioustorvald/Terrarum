@@ -5,7 +5,7 @@
   "CONTEXT_PLACE_COORDINATE": "Coordinate",
   "CONTEXT_WORLD_COUNT": "Worlds: ",
   "CONTEXT_WORLD_NEW": "New World",
-  "MENU_IO_WAITING_AUTOSAVE_TO_FINISH": "Waiting Autosave to finish...",
+  "MENU_IO_WAITING_AUTOSAVE_TO_FINISH": "Waiting for Autosave to finish...",
   "MENU_LABEL_DELETE_WORLD": "Delete World",
   "MENU_LABEL_MENU": "Menu",
   "MENU_LABEL_PREV_SAVES": "Previous Saves",
