@@ -170,10 +170,12 @@ class WorldSavingThread(
 
 //        Echo("Writing file to disk...")
 
+        disk.entries[0]!!.creationDate = creation_t
         disk.entries[0]!!.modificationDate = time_t
         // entry zero MUST NOT be used to get lastPlayDate, but we'll update it anyway
         // use entry -1 for that purpose!
         disk.capacity = 0
+
         VDUtil.dumpToRealMachine(disk, outFile)
 
 

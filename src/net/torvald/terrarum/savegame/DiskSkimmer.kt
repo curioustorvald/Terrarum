@@ -348,56 +348,6 @@ removefile:
     override fun getEntry(id: EntryID) = requestFile(id)
     override fun getFile(id: EntryID) = requestFile(id)?.contents as? EntryFile
 
-    /**
-     * Try to find a file with given path (which uses '/' as a separator). Is search is failed for whatever reason,
-     * `null` is returned.
-     *
-     * @param path A path to the file from the root, directory separated with '/' (and not '\')
-     * @return DiskEntry if the search was successful, `null` otherwise
-     */
-    /*fun requestFile(path: String): DiskEntry? {
-        // fixme pretty much untested
-
-        val path = path.split(dirDelim)
-        //debugPrintln(path)
-
-        // bunch-of-io-access approach (for reading)
-        var traversedDir = 0L // entry ID
-        var dirFile: DiskEntry? = null
-        path.forEachIndexed { index, dirName ->
-            debugPrintln("[DiskSkimmer.requestFile] $index\t$dirName, traversedDir = $traversedDir")
-
-            dirFile = requestFile(traversedDir)
-            if (dirFile == null) {
-                debugPrintln("[DiskSkimmer.requestFile] requestFile($traversedDir) came up null")
-                return null
-            } // outright null
-            if (dirFile!!.contents !is EntryDirectory && index < path.lastIndex) { // unexpectedly encountered non-directory
-                return null // because other than the last path, everything should be directory (think about it!)
-            }
-            //if (index == path.lastIndex) return dirFile // reached the end of the search strings
-
-            // still got more paths behind to traverse
-            var dirGotcha = false
-            // loop for current dir contents
-            (dirFile!!.contents as EntryDirectory).forEach {
-                if (!dirGotcha) { // alternative impl of 'break' as it's not allowed
-                    // get name of the file
-                    val childDirFile = requestFile(it)!!
-                    if (childDirFile.filename.toCanonicalString(charset) == dirName) {
-                        //debugPrintln("[DiskSkimmer] found, $traversedDir -> $it")
-                        dirGotcha = true
-                        traversedDir = it
-                    }
-                }
-            }
-
-            if (!dirGotcha) return null // got null || directory empty ||
-        }
-
-        return requestFile(traversedDir)
-    }*/
-
     fun invalidateEntry(id: EntryID) {
         val fa = RandomAccessFile(diskFile, "rwd")
         entryToOffsetTable[id]?.let {
@@ -417,21 +367,6 @@ removefile:
         fa.write(crc.toBigEndian())
         fa.close()
     }
-
-    //private val modifiedDirectories = TreeSet<DiskEntry>()
-
-    /*fun rewriteDirectories() {
-        modifiedDirectories.forEach {
-            invalidateEntry(it.entryID)
-
-            val appendAt = fa.length()
-            fa.seek(appendAt)
-
-            // append new file
-            entryToOffsetTable[it.entryID] = appendAt + 8
-            it.serialize().forEach { fa.writeByte(it.toInt()) }
-        }
-    }*/
 
     fun setSaveMode(bits: Int) {
         val fa = RandomAccessFile(diskFile, "rwd")
@@ -585,28 +520,7 @@ removefile:
     }
 
     fun deleteEntry(id: EntryID) {
-        val fa = RandomAccessFile(diskFile, "rwd")
-
-
-        val entry = requestFile(id)!!
-//        val parentDir = requestFile(entry.parentEntryID)!!
-//        val parent = entry.parentEntryID
-
-//        invalidateEntry(parent)
         invalidateEntry(id)
-
-        // remove the entry
-//        val dirContent = (parentDir.contents as EntryDirectory)
-//        dirContent.remove(id)
-
-        val appendAt = fa.length()
-        fa.seek(appendAt)
-
-        // append modified directory
-//        entryToOffsetTable[id] = appendAt + 8
-//        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
-
-        fa.close()
     }
 
     fun appendEntries(entries: List<DiskEntry>) = entries.forEach { appendEntry(it) }

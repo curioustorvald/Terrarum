@@ -151,6 +151,8 @@ class QuickSingleplayerWorldSavingThread(
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
         skimmer.setSaveKind(VDSaveKind.WORLD_DATA)
         skimmer.setSaveOrigin(skimmer.getSaveOrigin() and 15) // remove flag "imported" if applicable
+        skimmer.setLastModifiedTime(time_t)
+        skimmer.setCreationTime(creation_t)
 
         printdbg(this, "Game saved with size of ${outFile.length()} bytes")
 
