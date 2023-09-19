@@ -1580,16 +1580,20 @@ public class App implements ApplicationListener {
 
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
+            var timeNow = getTIME_T();
+            var ss = timeNow % 60;
+            var mm = (timeNow / 60) % 60;
+            var hh = (timeNow / 3600) % 24;
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+            String prompt = csiG+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csi0,out);
             if (message == null) {
-                System.out.println("[" + out + "] null");
-                return;
+                System.out.println(prompt+"null");
             }
             else {
-                String indentation = " ".repeat(out.length() + 3);
+                String indentation = " ".repeat(out.length() + 11);
                 String[] msgLines = message.toString().split("\\n");
                 for (int i = 0; i < msgLines.length; i++) {
-                    System.out.println((i == 0 ? "[" + out + "] " : indentation) + msgLines[i]);
+                    System.out.println((i == 0 ? prompt : indentation) + msgLines[i]);
                 }
             }
         }
@@ -1597,28 +1601,49 @@ public class App implements ApplicationListener {
 
     public static void printdbgerr(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
+            var timeNow = getTIME_T();
+            var ss = timeNow % 60;
+            var mm = (timeNow / 60) % 60;
+            var hh = (timeNow / 3600) % 24;
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            if (message == null)
-                System.out.println(csiR + "[" + out + "] null" + csi0);
-            else
-                System.out.println(csiR + "[" + out + "] " + message + csi0);
+            String prompt = csiB+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csiR,out);
+            if (message == null) {
+                System.out.println(prompt+"null"+csi0);
+            }
+            else {
+                String indentation = " ".repeat(out.length() + 11);
+                String[] msgLines = message.toString().split("\\n");
+                for (int i = 0; i < msgLines.length; i++) {
+                    System.out.println((i == 0 ? prompt : indentation) + msgLines[i] + csi0);
+                }
+            }
         }
     }
 
     public static void printmsg(Object obj, Object message) {
+        var timeNow = getTIME_T();
+        var ss = timeNow % 60;
+        var mm = (timeNow / 60) % 60;
+        var hh = (timeNow / 3600) % 24;
         String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+        String prompt = csiG+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csi0,out);
         if (message == null)
-            System.out.println("[" + out + "] null");
+            System.out.println(prompt+"null");
         else
-            System.out.println("[" + out + "] " + message);
+            System.out.println(prompt+message);
     }
 
     public static void printmsgerr(Object obj, Object message) {
+        var timeNow = getTIME_T();
+        var ss = timeNow % 60;
+        var mm = (timeNow / 60) % 60;
+        var hh = (timeNow / 3600) % 24;
         String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
+        String prompt = csiB+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csiR,out);
         if (message == null)
-            System.out.println(csiR + "[" + out + "] null" + csi0);
+            System.out.println(prompt+"null"+csi0);
         else
-            System.out.println(csiR + "[" + out + "] " + message + csi0);
+            System.out.println(prompt+message+csi0);
     }
 
     public static ShaderProgram loadShaderFromClasspath(String vert, String frag) {
