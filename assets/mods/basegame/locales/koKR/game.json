@@ -5,6 +5,7 @@
   "CONTEXT_PLACE_COORDINATE": "좌표",
   "CONTEXT_WORLD_COUNT": "새계: ",
   "CONTEXT_WORLD_NEW": "새 세계",
+  "MENU_IO_WAITING_AUTOSAVE_TO_FINISH": "자동 저장이 끝나기를 기다리는 중...",
   "MENU_LABEL_DELETE_WORLD": "새계 삭제",
   "MENU_LABEL_MENU": "메뉴",
   "MENU_LABEL_PREV_SAVES": "이전 세이브",

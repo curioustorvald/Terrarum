@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.App
 import net.torvald.terrarum.CommonResourcePool
+import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.serialise.WriteSavegame
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
@@ -33,7 +35,7 @@ class UIItemSaving(parentUI: UICanvas, initialX: Int, initialY: Int) : UIItem(pa
 
     override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
         // these things will not scroll along with the parent GUI!
-        val t = Lang["MENU_IO_SAVING"]
+        val t = if ((INGAME as TerrarumIngame).uiAutosaveNotifier.isVisible) Lang["MENU_IO_WAITING_AUTOSAVE_TO_FINISH"] else Lang["MENU_IO_SAVING"]
         val tlen = App.fontGame.getWidth(t)
         App.fontGame.draw(batch, t, (posX + (width - tlen) / 2).toFloat(), ((App.scr.height - circleSheet.tileH) / 2) - 40f)
 

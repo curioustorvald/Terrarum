@@ -720,7 +720,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private var updateAkku = 0f
     internal var autosaveTimer = 0f
 
     override fun render(`_`: Float) {
@@ -755,7 +754,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         /** UPDATE CODE GOES HERE */
         val dt = Gdx.graphics.deltaTime
-        autosaveTimer += dt
+        if (!uiAutosaveNotifier.isVisible) {
+            autosaveTimer += dt
+        }
 
         gameUpdateGovernor.update(dt, App.UPDATE_RATE, updateGame, renderGame)
 
@@ -1261,8 +1262,10 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
                 // return to normal state
                 uiAutosaveNotifier.setAsClose()
+                autosaveTimer = 0f
 
                 debugTimers.put("Last Autosave Duration", System.nanoTime() - start)
+                printdbg(this, "Last Autosave Duration: ${(System.nanoTime() - start) / 1000000000} s")
             }
         }
 
