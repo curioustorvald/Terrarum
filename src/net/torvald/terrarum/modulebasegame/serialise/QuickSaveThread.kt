@@ -135,13 +135,9 @@ class QuickSingleplayerWorldSavingThread(
         actorsList.forEachIndexed { count, it ->
             printdbg(this, "Writing actors... ${count+1}/${actorsList.size} (${it.javaClass.canonicalName})")
 
-            printdbg(this, "    Serialising")
             val actorContent = EntryFile(WriteActor.encodeToByteArray64(it))
-            printdbg(this, "    Preparing disk entry")
             val actor = DiskEntry(it.referenceID.toLong(), ROOT, creation_t, time_t, actorContent)
-            printdbg(this, "    DOM add entry (${actor.entryID})")
             addFile(disk, actor)
-            printdbg(this, "    Skimmer append entry") // FIXME too slow!
             skimmer.appendEntry(actor)
 
             WriteSavegame.saveProgress += actorProgressMultiplier

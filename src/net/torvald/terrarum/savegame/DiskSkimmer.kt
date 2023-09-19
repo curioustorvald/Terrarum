@@ -568,27 +568,18 @@ removefile:
     fun appendEntry(entry: DiskEntry) {
         val fa = RandomAccessFile(diskFile, "rwd")
 
-
-//        val parentDir = requestFile(entry.parentEntryID)!!
         val id = entry.entryID
-//        val parent = entry.parentEntryID
-
-        // add the entry to its parent directory if there was none
-//        val dirContent = (parentDir.contents as EntryDirectory)
-//        if (!dirContent.contains(id)) dirContent.add(id)
-
-//        invalidateEntry(parent)
-//        invalidateEntry(id)
 
         val appendAt = fa.length()
         fa.seek(appendAt)
 
         // append new file
         entryToOffsetTable[id] = appendAt + 8
-        entry.serialize().forEach { fa.writeByte(it.toInt()) }
-        // append modified directory
-//        entryToOffsetTable[parent] = fa.filePointer + 8
-//        parentDir.serialize().forEach { fa.writeByte(it.toInt()) }
+        entry.serialize().let { ba ->
+            ba.forEachUsedBanks { count, bytes ->
+                fa.write(bytes, 0, count)
+            }
+        }
 
         fa.close()
     }
