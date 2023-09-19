@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.App
+import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.serialise.LoadSavegame
@@ -308,6 +309,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private var selectedRevision = 0 // 0: most recent, 1: second most recent, etc.
 
+    private val icons = CommonResourcePool.getAsTextureRegionPack("inventory_category")
+
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         if (mode != MODE_SHOW_LOAD_ORDER) {
             val buttonYdelta = (full.titleTopGradEnd) - full.playerButtonSelected!!.posY
@@ -403,8 +406,14 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 Toolkit.drawTextCentered(batch, App.fontGame, playerName, modulesTextboxW, playerModTextboxX, modulesBoxBaseY2 + 1)
                 Toolkit.drawTextCentered(batch, App.fontGame, Lang["MENU_LABEL_WORLD"], modulesTextboxW, worldModTextboxX, modulesBoxBaseY2 + 1)
                 sortedPlayerWorldList.forEachIndexed { index, (pmeta, wmeta) ->
-                    if (pmeta != null) App.fontGame.draw(batch, "$pmeta", px48, modulesBoxBaseY2 + 36 + 32 * index)
-                    if (wmeta != null) App.fontGame.draw(batch, "$wmeta", wx48, modulesBoxBaseY2 + 36 + 32 * index)
+                    if (pmeta != null) {
+                        if (pmeta.isAuto) batch.draw(icons.get(24,1), playerModTextboxX + 4f, modulesBoxBaseY2 + 38f + 32 * index)
+                        App.fontGame.draw(batch, "$pmeta", px48, modulesBoxBaseY2 + 36 + 32 * index)
+                    }
+                    if (wmeta != null) {
+                        if (wmeta.isAuto) batch.draw(icons.get(24,1), worldModTextboxX + 4f, modulesBoxBaseY2 + 38f + 32 * index)
+                        App.fontGame.draw(batch, "$wmeta", wx48, modulesBoxBaseY2 + 36 + 32 * index)
+                    }
                 }
 
                 modulesBackButton.render(batch, camera)
@@ -417,7 +426,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
     private data class SavegameMeta(
         val lastPlayTime: Long,
-        val genver: String
+        val genver: String,
+        val isAuto: Boolean,
     ) {
         private val lastPlayTimeS = Instant.ofEpochSecond(lastPlayTime)
             .atZone(TimeZone.getDefault().toZoneId())
@@ -430,6 +440,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         this.getFile(SAVEGAMEINFO)!!.bytes.let {
             var lastPlayTime = 0L
             var versionString = ""
+            val isAuto = (this.getSaveMode() and 0b10 != 0)
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
                 if (name == "lastPlayTime") lastPlayTime = value.asLong()
                 if (name == "genver") versionString = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
@@ -437,7 +448,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
             return SavegameMeta(
                 lastPlayTime,
-                versionString
+                versionString,
+                isAuto
             )
         }
     }

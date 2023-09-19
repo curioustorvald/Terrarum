@@ -169,7 +169,7 @@ class UILoadList(val full: UILoadSavegame) : UICanvas() {
         val cells = playerCells
 
         lateinit var savePixmap: Pixmap
-        sliderFBO.inAction(camera as OrthographicCamera, batch) {
+        sliderFBO.inAction(camera, batch) {
             gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
             full.setCameraPosition(batch, camera, 0f, 0f)
