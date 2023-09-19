@@ -20,7 +20,20 @@ This game engine aims to provide following features:
 
 *Terrarum* is a side-view tilemap platformer-adventure-sandbox game.
 
-## Setup ##
+## Player Setup ##
+
+### System Requirements ###
+Requires 64 bit processor and operation system.
+| | Minimum | Recommended |
+|---|---|---|
+|OS|Windows 7/macOS Sierra/Ubuntu 16.04|Windows 10/macOS Big Sur/Linux with Kernel 5.4|
+|CPU|Phenom X4 9600/Intel Core 2 Duo E8400|AMD Ryzen 5 2500X/Intel Core i7-4770K|
+|Memory|4GB RAM|8GB RAM|
+|OpenGL|3.2|4.0|
+|Graphics|GeForce 9600 GT|Anything that supports OpenGL 4.0|
+|Storage|5 GB available|5 GB available but faster|
+
+## Dev Setup ##
 
 - Requirements:
     - JDK 17 or higher
