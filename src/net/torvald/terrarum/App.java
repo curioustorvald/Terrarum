@@ -405,6 +405,7 @@ public class App implements ApplicationListener {
             initialiseConfig();
             readConfigJson();
             setGamepadButtonLabels();
+            rectifyConfigs();
 
 
             ShaderProgram.pedantic = false;
@@ -1709,5 +1710,15 @@ public class App implements ApplicationListener {
      */
     public static void inputStrobed(TerrarumKeyboardEvent event) {
         currentScreen.inputStrobed(event);
+    }
+
+    /**
+     * Corrects out-of-range config values
+     */
+    private static void rectifyConfigs() {
+        // force set min autosave interval to 5 minutes
+        if (getConfigInt("autosaveinterval") < 5 * 60000) {
+            setConfig("autosaveinterval", 5 * 60000);
+        }
     }
 }
