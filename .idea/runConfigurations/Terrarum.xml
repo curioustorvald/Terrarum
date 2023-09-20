@@ -12,6 +12,7 @@
         <artifact name="ModuleComputers" />
         <artifact name="TerrarumBuild" />
       </option>
+      <option name="RunConfigurationTask" enabled="false" run_configuration_name="QuickDirtyLint" run_configuration_type="Application" />
     </method>
   </configuration>
 </component>

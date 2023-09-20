@@ -1,16 +1,18 @@
 package net.torvald.terrarum
 
 import io.github.classgraph.ClassGraph
-import io.github.classgraph.ClassInfo
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitems.GameItem
-import java.util.*
+import kotlin.system.exitProcess
 
 /**
  * Created by minjaesong on 2023-05-22.
  */
 fun main() {
+
+    val csiR = "\u001B[31m"
+    val csiG = "\u001B[32m"
+    val csi0 = "\u001B[m"
 
     val superClasses = listOf(
         Actor::class.java,
@@ -86,8 +88,19 @@ fun main() {
     ).flatMap { listOf(it, "[$it") }
 
     val classaNonGrata = listOf(
-        "net.torvald.terrarum.modulebasegame.MovableWorldCamera"
+        "net.torvald.terrarum.modulebasegame.MovableWorldCamera",
+        "net.torvald.terrarum.modulebasegame.TitleScreen\$CameraPlayer"
     )
+
+    val classaNomenNonGrata = listOf(
+        "Companion", "bulletDatabase"
+    )
+
+    val remarks = mapOf(
+        "Ljava/util/List" to "java.util.List has no zero-arg constructor."
+    )
+
+    var retcode = 0
 
     ClassGraph().acceptPackages("net.torvald.terrarum")/*.verbose()*/.enableAllInfo().scan().let { scan ->
         val offendingFields = scan.allClasses.filter { classinfo ->
@@ -100,14 +113,24 @@ fun main() {
                 !serialisablePrimitives.contains(field.typeSignatureOrTypeDescriptorStr) &&
                 serialisableTypes.none { field.typeSignatureOrTypeDescriptorStr.startsWith(it) }
             }
+        }.filter {
+            !classaNomenNonGrata.contains(it.name) && !it.name.startsWith("this") && !it.name.contains("\$delegate")
         }
 
 //        println(offendingFields)
 
         offendingFields.forEach {
-            println("\u001B[1m${it.name}\u001B[m\n\t\u001B[32mfrom: \u001B[m${it.className}\n\t\u001B[32mtype: \u001B[m${it.typeSignatureOrTypeDescriptorStr}")
+            println("\u001B[1m${it.name}\u001B[m\n" +
+                    "\t${csiG}from: ${csi0}${it.className}\n" +
+                    "\t${csiG}type: ${csi0}${it.typeSignatureOrTypeDescriptorStr}\n" +
+                    "\t${csiG}remarks: ${csi0}${remarks.keys.filter { key -> it.typeSignatureOrTypeDescriptorStr.startsWith(key) }.map { remarks[it] }.joinToString(" ")}")
+            retcode = 1
         }
     }
 
+    if (retcode != 0) {
+        println("\n${csiR}Having above classes as non-@Transient may cause savegame to not load!$csi0")
+    }
 
+    exitProcess(retcode)
 }
