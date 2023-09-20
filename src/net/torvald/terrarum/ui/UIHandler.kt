@@ -229,6 +229,7 @@ void main() {
         }
 
         if (isOpening) {
+            if (openFired) ui.show()
             openFired = false
 
             isVisible = true
@@ -270,6 +271,7 @@ void main() {
                 isOpened = false
                 isVisible = false
                 openCloseCounter = 0f
+                ui.hide()
             }
         }
 

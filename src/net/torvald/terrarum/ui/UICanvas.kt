@@ -50,11 +50,11 @@ import kotlin.math.roundToInt
  * endOpening()
  * ...
  * (close has triggered)
- * hide()
  * doClosing()
  * doClosing()
  * ...
  * endClosing()
+ * hide()
  * ```
  * NOTE: show/hide is a UICanvas function, while do/endSomething() is UIHandler function.
  *
@@ -280,17 +280,14 @@ abstract class UICanvas(
 
     fun setAsAlwaysVisible() {
         handler.setAsAlwaysVisible()
-        show()
     }
 
     open fun setAsOpen() {
         handler.setAsOpen()
-        show()
     }
 
     open fun setAsClose() {
         handler.setAsClose()
-        hide()
     }
 
     open fun toggleOpening() {
@@ -301,13 +298,11 @@ abstract class UICanvas(
         if (isVisible) {
             if (!isClosing) {
                 setAsClose()
-                hide()
             }
         }
         else {
             if (!isOpening) {
                 setAsOpen()
-                show()
             }
         }
     }
