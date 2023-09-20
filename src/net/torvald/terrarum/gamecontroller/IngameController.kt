@@ -113,6 +113,13 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         inputMouseY = newmy
     }
 
+    private val inventoryCategoryAllowClickAndDrag = listOf(
+        GameItem.Category.TOOL,
+        GameItem.Category.WALL,
+        GameItem.Category.WIRE,
+        GameItem.Category.BLOCK
+    )
+
     fun update() {
 
         ///////////////////
@@ -140,7 +147,7 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
             // - not clicking anymore
             // - using any item that is not fixture (blocks, picks)
             if (!Terrarum.mouseDown ||
-                GameItem.Category.MISC != ItemCodex.get(terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP))?.inventoryCategory) {
+                inventoryCategoryAllowClickAndDrag.contains(ItemCodex[terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)]?.inventoryCategory)) {
                 worldPrimaryClickLatched = false
             }
 

@@ -340,7 +340,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
         @JvmStatic val BLOCK = "block"
         @JvmStatic val WALL = "wall"
         @JvmStatic val WIRE = "wire"
-//        @JvmStatic val FIXTURE = "fixture"
+        @JvmStatic val FIXTURE = "fixture"
         @JvmStatic val MISC = "misc"
     }
 
@@ -389,12 +389,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
  */
 fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Long): Long {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
-    val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
-    val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
-    val actorPos = actor.centrePosVector
-    val dist = min(min(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2)), actorPos.distanceSquared(mousePos3))
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale // perform some error checking here
-    if (dist <= distMax.sqr()) return action() else return -1
+    return if (distBetween(actor, mousePos1) <= distMax) action() else -1
 }
 
 /**
@@ -410,16 +406,10 @@ fun mouseInInteractableRange(actor: ActorWithBody, action: () -> Long): Long {
  */
 fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMultiplierInTiles: (Int) -> Double = { it.toDouble() }, action: () -> Boolean): Boolean {
     val mousePos1 = Vector2(Terrarum.mouseX, Terrarum.mouseY)
-    val mousePos2 = Vector2(Terrarum.mouseX + INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
-    val mousePos3 = Vector2(Terrarum.mouseX - INGAME.world.width * TILE_SIZED, Terrarum.mouseY)
-    val actorPos = actor.centrePosVector
-    val dist = min(min(actorPos.distanceSquared(mousePos1), actorPos.distanceSquared(mousePos2)), actorPos.distanceSquared(mousePos3))
-
     val reachBonus = (actor.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * actor.scale
     val distMax = actor.actorValue.getAsDouble(AVKey.REACH)!! * reachBonus // perform some error checking here
     val toolDistMax = (TILE_SIZED * reachMultiplierInTiles(item?.material?.toolReach ?: Int.MAX_VALUE)) * reachBonus
-
-    if (dist <= min(toolDistMax, distMax).sqr()) return action() else return false
+    return if (distBetween(actor, mousePos1) <= min(toolDistMax, distMax)) action() else false
 }
 //fun IntRange.pickRandom() = HQRNG().nextInt(this.last - this.first + 1) + this.first // count() on 200 million entries? Se on vitun hyvää idea
 //fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]

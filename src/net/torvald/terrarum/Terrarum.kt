@@ -21,6 +21,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -33,6 +34,7 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TerrarumSansBitmap
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.util.CircularArray
+import org.dyn4j.geometry.Vector2
 import java.io.File
 import java.io.PrintStream
 import java.util.*
@@ -904,4 +906,22 @@ fun checkForSavegameDamage(skimmer: DiskSkimmer): Boolean {
 inline fun Disposable.tryDispose() {
     try { this.dispose() }
     catch (_: Throwable) {}
+}
+
+fun distBetweenActors(a: ActorWithBody, b: ActorWithBody): Double {
+    val ww = INGAME.world.width * TILE_SIZED
+    val apos1 = a.centrePosVector
+    val apos2 = Vector2(apos1.x + ww, apos1.y)
+    val apos3 = Vector2(apos1.x - ww, apos1.y)
+    val bpos = b.centrePosVector
+    val dist = min(min(bpos.distanceSquared(apos1), bpos.distanceSquared(apos2)), bpos.distanceSquared(apos3))
+    return dist.sqrt()
+}
+fun distBetween(a: ActorWithBody, bpos: Vector2): Double {
+    val ww = INGAME.world.width * TILE_SIZED
+    val apos1 = a.centrePosVector
+    val apos2 = Vector2(apos1.x + ww, apos1.y)
+    val apos3 = Vector2(apos1.x - ww, apos1.y)
+    val dist = min(min(bpos.distanceSquared(apos1), bpos.distanceSquared(apos2)), bpos.distanceSquared(apos3))
+    return dist.sqrt()
 }

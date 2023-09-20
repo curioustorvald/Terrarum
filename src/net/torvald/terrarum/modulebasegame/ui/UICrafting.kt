@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.App.gamepadLabelLEFTRIGHT
-import net.torvald.terrarum.App.gamepadLabelStart
+import net.torvald.terrarum.App.*
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
@@ -13,6 +12,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.CraftingStation
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.listGap
@@ -121,7 +121,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
                         // list of [Score, Ingredients, Recipe]
                         recipes.map { recipe ->
                             // list of (Item, How many player has, How many the recipe requires)
-                            val items = recipeToIngredientRecord(player, recipe, listOf(/*todo: nearby crafting stations*/))
+                            val items = recipeToIngredientRecord(player, recipe, nearbyCraftingStations)
 
                             val score = items.fold(1L) { acc, item ->
                                 (item.howManyPlayerHas).times(16L) + 1L
@@ -330,6 +330,16 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         addUIitem(buttonCraft)
     }
 
+    var nearbyCraftingStations = emptyList<String>(); protected set
+
+    fun getCraftingStationsWithinReach(): List<String> {
+        val reach = INGAME.actorNowPlaying!!.actorValue.getAsDouble(AVKey.REACH)!! * (INGAME.actorNowPlaying!!.actorValue.getAsDouble(AVKey.REACHBUFF) ?: 1.0) * INGAME.actorNowPlaying!!.scale
+        val nearbyCraftingStations = INGAME.findKNearestActors(INGAME.actorNowPlaying!!, 256) {
+            it is CraftingStation && (distBetweenActors(it, INGAME.actorNowPlaying!!) < reach)
+        }
+        return nearbyCraftingStations.flatMap { (it.get() as CraftingStation).tags }
+    }
+
     private fun changeIngredient(old: InventoryPair, new: ItemID) {
         itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
 
@@ -391,6 +401,9 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private var openingClickLatched = false
 
     override fun show() {
+        nearbyCraftingStations = getCraftingStationsWithinReach()
+//        printdbg(this, "Nearby crafting stations: $nearbyCraftingStations")
+
         itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
         itemListUpdate()
 

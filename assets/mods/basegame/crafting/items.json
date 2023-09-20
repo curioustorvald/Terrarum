@@ -13,25 +13,25 @@
   },
 
   "item@basegame:256": {
-    "workbench": "",
+    "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:48"]
     ]
   },
   "item@basegame:257": {
-    "workbench": "",
+    "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:49"]
     ]
   },
   "item@basegame:258": {
-    "workbench": "",
+    "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:50"]
     ]
   },
   "item@basegame:259": {
-    "workbench": "",
+    "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:51"]
     ]

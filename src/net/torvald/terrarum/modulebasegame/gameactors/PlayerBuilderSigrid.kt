@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.App
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.WireCodex
 
 /**
@@ -72,13 +73,20 @@ object PlayerBuilderSigrid {
 
     fun fillTestInventory(inventory: ActorInventory) {
 
-        App.tileMaker.tags.forEach { t, _ ->
-            inventory.add(t, 9995)
-            try {
-                inventory.add("wall@$t", 9995) // this code will try to add nonexisting wall items, do not get surprised with NPEs
-            }
-            catch (e: Throwable) {
-                System.err.println("[PlayerBuilder] $e")
+        App.tileMaker.tags.forEach { (t, _) ->
+            if (!BlockCodex[t].isActorBlock) {
+
+                inventory.add(t, 9995)
+                try {
+                    inventory.add(
+                        "wall@$t",
+                        9995
+                    ) // this code will try to add nonexisting wall items, do not get surprised with NPEs
+                }
+                catch (e: NullPointerException) { /* tHiS iS fInE */ }
+                catch (e: Throwable) {
+                    System.err.println("[PlayerBuilder] $e")
+                }
             }
         }
 
@@ -99,6 +107,8 @@ object PlayerBuilderSigrid {
         inventory.add("item@basegame:9", 1) // wire cutter
 
         inventory.add("item@basegame:11", 10) // calendar
+
+        inventory.add("item@basegame:16", 10) // workbench
 
 //        inventory.add("item@basegame:256", 995) // doors
 //        inventory.add("item@basegame:257", 995) // doors

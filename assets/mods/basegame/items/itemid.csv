@@ -13,6 +13,7 @@ id;classname
 12;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCopper
 13;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerSteel
 
+16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
 
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony

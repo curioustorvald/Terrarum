@@ -74,8 +74,7 @@ class UIItemCraftingCandidateGrid(
         craftingRecipes.clear()
         CraftingRecipeCodex.props.forEach { (_, recipes) ->
             recipes.forEach {
-                // TODO check for nearby crafting stations
-                if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, listOf(/*todo: nearby crafting stations*/))) craftingRecipes.add(it)
+                if (isCraftable((parentUI as UICrafting).getPlayerInventory(), it, (parentUI as UICrafting).nearbyCraftingStations)) craftingRecipes.add(it)
             }
         }
 
