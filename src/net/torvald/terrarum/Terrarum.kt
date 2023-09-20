@@ -189,7 +189,7 @@ object Terrarum : Disposable {
     fun setCurrentIngameInstance(ingame: IngameInstance) {
         this.ingame = ingame
 
-        printdbg(this, "Accepting new ingame instance '${ingame.javaClass.canonicalName}', called by:")
+        printdbg("ListSavegames", "Accepting new ingame instance '${ingame.javaClass.canonicalName}', called by:")
         printStackTrace(this)
     }
 
@@ -204,7 +204,7 @@ object Terrarum : Disposable {
     /*fun resize(width: Int, height: Int) {
         ingame?.resize(width, height)
 
-        printdbg(this, "newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
+        printdbg("ListSavegames", "newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
     }*/
 
 
@@ -786,11 +786,10 @@ fun AppUpdateListOfSavegames() {
     App.savegamePlayers.clear()
     App.savegamePlayersName.clear()
 
-    println("Listing saved worlds...")
-
 
     // create list of worlds
-    File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
+    printdbg("ListSavegames", "Listing saved worlds...")
+    val worldsDirLs = File(worldsDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, true)
         }
@@ -799,19 +798,30 @@ fun AppUpdateListOfSavegames() {
             e.printStackTrace()
             null
         }
-    }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
-        println("${index+1}.\t${it.diskFile.absolutePath}")
-//        it.rebuild()
+    }.sortedByDescending { it.getLastModifiedTime() }
+    val filteringResults = arrayListOf<List<DiskSkimmer>>()
+    worldsDirLs.forEach {
+        val li = arrayListOf(it)
+        listOf(".1",".2",".3",".a",".b",".c").forEach { suffix ->
+            val file = File(it.diskFile.absolutePath + suffix)
+            try {
+                val d = DiskSkimmer(file, true)
+                li.add(d)
+            }
+            catch (e: Throwable) {}
+        }
+        filteringResults.add(li)
+    }
+    filteringResults.forEachIndexed { index, list ->
+        val it = list.first()
+        printdbg("ListSavegames", " ${index+1}.\t${it.diskFile.absolutePath}")
 
-//        val jsonFile = it.getFile(SAVEGAMEINFO)!!
-//        var worldUUID: UUID? = null
-//        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
-//            if (name == "worldIndex") worldUUID = UUID.fromString(value.asString())
-//        }
-
-        val collection = SavegameCollection.collectFromBaseFilename(File(worldsDir), it.diskFile.name)
+        printdbg("ListSavegames", "    collecting...")
+        val collection = SavegameCollection.collectFromBaseFilename(list, it.diskFile.name)
+        printdbg("ListSavegames", "    get UUID...")
         val worldUUID = collection.getUUID()
 
+        printdbg("ListSavegames", "    registration...")
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegameWorlds.contains(worldUUID)) {
             App.savegameWorlds[worldUUID] = collection
@@ -821,32 +831,41 @@ fun AppUpdateListOfSavegames() {
     }
 
 
-
-    println("Listing saved players...")
-
     // create list of players
-    File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
+    printdbg("ListSavegames", "Listing saved players...")
+    val playersDirLs = File(playersDir).listFiles().filter { !it.isDirectory && !it.name.contains('.') }.mapNotNull { file ->
         try {
             DiskSkimmer(file, true)
         }
         catch (e: Throwable) {
-            System.err.println("Unable to load a player file ${file.absolutePath}")
+            System.err.println("Unable to load a world file ${file.absolutePath}")
             e.printStackTrace()
             null
         }
-    }.sortedByDescending { it.getLastModifiedTime() }.forEachIndexed { index, it ->
-        println("${index+1}.\t${it.diskFile.absolutePath}")
-//        it.rebuild()
+    }.sortedByDescending { it.getLastModifiedTime() }
+    val filteringResults2 = arrayListOf<List<DiskSkimmer>>()
+    playersDirLs.forEach {
+        val li = arrayListOf(it)
+        listOf(".1",".2",".3",".a",".b",".c").forEach { suffix ->
+            val file = File(it.diskFile.absolutePath + suffix)
+            try {
+                val d = DiskSkimmer(file, true)
+                li.add(d)
+            }
+            catch (e: Throwable) {}
+        }
+        filteringResults2.add(li)
+    }
+    filteringResults2.forEachIndexed { index, list ->
+        val it = list.first()
+        printdbg("ListSavegames", " ${index+1}.\t${it.diskFile.absolutePath}")
 
-//        val jsonFile = it.getFile(SAVEGAMEINFO)!!
-//        var playerUUID: UUID? = null
-//        JsonFetcher.readFromJsonString(ByteArray64Reader(jsonFile.bytes, Common.CHARSET)).forEachSiblings { name, value ->
-//            if (name == "uuid") playerUUID = UUID.fromString(value.asString())
-//        }
-
-        val collection = SavegameCollection.collectFromBaseFilename(File(playersDir), it.diskFile.name)
+        printdbg("ListSavegames", "    collecting...")
+        val collection = SavegameCollection.collectFromBaseFilename(list, it.diskFile.name)
+        printdbg("ListSavegames", "    get UUID...")
         val playerUUID = collection.getUUID()
 
+        printdbg("ListSavegames", "    registration...")
         // if multiple valid savegames with same UUID exist, only the most recent one is retained
         if (!App.savegamePlayers.contains(playerUUID)) {
             App.savegamePlayers[playerUUID] = collection

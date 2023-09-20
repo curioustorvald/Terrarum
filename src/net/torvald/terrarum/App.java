@@ -1581,17 +1581,18 @@ public class App implements ApplicationListener {
 
     public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
-            var timeNow = getTIME_T();
-            var ss = timeNow % 60;
-            var mm = (timeNow / 60) % 60;
-            var hh = (timeNow / 3600) % 24;
+            var timeNow = System.currentTimeMillis();
+            var ss = (timeNow / 1000) % 60;
+            var mm = (timeNow / 60000) % 60;
+            var hh = (timeNow / 3600000) % 24;
+            var ms = timeNow % 1000;
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            String prompt = csiG+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csi0,out);
+            String prompt = csiG+String.format("%02d:%02d:%02d.%03d%s [%s] ",hh,mm,ss,ms,csi0,out);
             if (message == null) {
                 System.out.println(prompt+"null");
             }
             else {
-                String indentation = " ".repeat(out.length() + 11);
+                String indentation = " ".repeat(out.length() + 15);
                 String[] msgLines = message.toString().split("\\n");
                 for (int i = 0; i < msgLines.length; i++) {
                     System.out.println((i == 0 ? prompt : indentation) + msgLines[i]);
@@ -1602,12 +1603,13 @@ public class App implements ApplicationListener {
 
     public static void printdbgerr(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD) {
-            var timeNow = getTIME_T();
-            var ss = timeNow % 60;
-            var mm = (timeNow / 60) % 60;
-            var hh = (timeNow / 3600) % 24;
+            var timeNow = System.currentTimeMillis();
+            var ss = (timeNow / 1000) % 60;
+            var mm = (timeNow / 60000) % 60;
+            var hh = (timeNow / 3600000) % 24;
+            var ms = timeNow % 1000;
             String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-            String prompt = csiB+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csiR,out);
+            String prompt = csiB+String.format("%02d:%02d:%02d.%03d%s [%s] ",hh,mm,ss,ms,csiR,out);
             if (message == null) {
                 System.out.println(prompt+"null"+csi0);
             }
@@ -1622,12 +1624,13 @@ public class App implements ApplicationListener {
     }
 
     public static void printmsg(Object obj, Object message) {
-        var timeNow = getTIME_T();
-        var ss = timeNow % 60;
-        var mm = (timeNow / 60) % 60;
-        var hh = (timeNow / 3600) % 24;
+        var timeNow = System.currentTimeMillis();
+        var ss = (timeNow / 1000) % 60;
+        var mm = (timeNow / 60000) % 60;
+        var hh = (timeNow / 3600000) % 24;
+        var ms = timeNow % 1000;
         String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-        String prompt = csiG+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csi0,out);
+        String prompt = csiG+String.format("%02d:%02d:%02d.%03d%s [%s] ",hh,mm,ss,ms,csi0,out);
         if (message == null)
             System.out.println(prompt+"null");
         else
@@ -1635,12 +1638,13 @@ public class App implements ApplicationListener {
     }
 
     public static void printmsgerr(Object obj, Object message) {
-        var timeNow = getTIME_T();
-        var ss = timeNow % 60;
-        var mm = (timeNow / 60) % 60;
-        var hh = (timeNow / 3600) % 24;
+        var timeNow = System.currentTimeMillis();
+        var ss = (timeNow / 1000) % 60;
+        var mm = (timeNow / 60000) % 60;
+        var hh = (timeNow / 3600000) % 24;
+        var ms = timeNow % 1000;
         String out = (obj instanceof String) ? (String) obj : obj.getClass().getSimpleName();
-        String prompt = csiB+String.format("%02d:%02d:%02d%s [%s] ",hh,mm,ss,csiR,out);
+        String prompt = csiB+String.format("%02d:%02d:%02d.%03d%s [%s] ",hh,mm,ss,ms,csiR,out);
         if (message == null)
             System.out.println(prompt+"null"+csi0);
         else

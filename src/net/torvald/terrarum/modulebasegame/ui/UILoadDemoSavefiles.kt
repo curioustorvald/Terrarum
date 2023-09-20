@@ -520,7 +520,10 @@ class UIItemPlayerCells(
     private val isImported: Boolean
 
     init {
-        App.savegamePlayers[playerUUID]!!.loadable().getFile(SAVEGAMEINFO)?.bytes?.let {
+        val loadable = App.savegamePlayers[playerUUID]!!.loadable()
+        printdbg(this, "UUID: ${playerUUID}")
+        printdbg(this, "File: ${loadable.diskFile.absolutePath}")
+        loadable.getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
 
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
@@ -536,7 +539,7 @@ class UIItemPlayerCells(
                     .atZone(TimeZone.getDefault().toZoneId())
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
-        }
+        } ?: throw Error("SAVEGAMEINFO not found on Skimmer:${loadable.diskFile}")
 
         val savegamePair = SavegameCollectionPair(App.savegamePlayers[playerUUID], App.savegameWorlds[worldUUID])
         savegameStatus = savegamePair.status

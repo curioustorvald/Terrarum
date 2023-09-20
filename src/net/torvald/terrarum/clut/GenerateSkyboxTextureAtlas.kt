@@ -45,6 +45,8 @@ fun main() {
 
     // write pixels
     for (gammaPair in 0..1) {
+        val gamma = if (gammaPair == 0) HALF_PI else 3* HALF_PI
+
         for (albedo0 in 0 until Skybox.albedoCnt) {
             val albedo = Skybox.albedos[albedo0]
             println("Albedo=$albedo")
@@ -74,9 +76,9 @@ fun main() {
 //                    println("$yp\t$theta")
 
                         val xyz = CIEXYZ(
-                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 0).toFloat(),
-                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 1).toFloat(),
-                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, HALF_PI, 2).toFloat()
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 0).toFloat(),
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 1).toFloat(),
+                            ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat()
                         )
                         val xyz2 = xyz.scaleToFit(elevationDeg)
                         val rgb = xyz2.toRGB().toColor()

@@ -44,8 +44,13 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
     }
 
     companion object {
-        fun collectFromBaseFilename(basedir: File, name: String): SavegameCollection {
-            val files = basedir.listFiles().filter { it.name.startsWith(name) }
+        fun collectFromBaseFilename(skimmers: List<DiskSkimmer>, name: String): SavegameCollection {
+            return SavegameCollection(skimmers)
+        }
+
+
+        fun collectFromBaseFilename(dir: File, name: String): SavegameCollection {
+            val files = dir.listFiles().filter { it.name.startsWith(name) }
                 .mapNotNull { try { DiskSkimmer(it, true) } catch (e: Throwable) { null } }
             return SavegameCollection(files)
         }
