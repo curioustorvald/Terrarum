@@ -12,6 +12,7 @@ uniform sampler2D tex1; // glow texture, SHOULD contain alpha of all 1.0
 out vec4 fragColor;
 
 const vec2 boolean = vec2(0.0, 1.0);
+const vec2 halfx = vec2(0.5, 0.0);
 
 uniform vec4 drawOffsetSize; // (gradX, gradY, gradW, gradH)
 uniform vec4 uvA; // (u, v, u2, v2) for now, turbLow, albLow
@@ -23,10 +24,11 @@ uniform vec4 uvF; // (u, v, u2, v2) for old, turbLow, albHigh
 uniform vec4 uvG; // (u, v, u2, v2) for now, turbHigh, albHigh
 uniform vec4 uvH; // (u, v, u2, v2) for old, turbHigh, albHigh
 uniform vec4 texBlend1; // (turbidity now, albedo now, turbidity old, albedo old)
-uniform vec4 texBlend2; // (old-now blend, unused, unused, unused)
+uniform vec4 texBlend2; // (old-now blend, morn-noon blend, unused, unused)
 uniform vec2 tex1Size = vec2(4096.0);
 uniform vec2 astrumScroll = vec2(0.0);
 uniform vec4 randomNumber = vec4(1.0, -2.0, 3.0, -4.0);
+
 
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -128,6 +130,15 @@ void main(void) {
     vec4 colorTexG = texture(u_texture, mix(uvG.xy, uvG.zw, v_texCoords));
     vec4 colorTexH = texture(u_texture, mix(uvH.xy, uvH.zw, v_texCoords));
 
+    vec4 colorTexA2 = texture(u_texture, mix(uvA.xy, uvA.zw, v_texCoords) + halfx);
+    vec4 colorTexB2 = texture(u_texture, mix(uvB.xy, uvB.zw, v_texCoords) + halfx);
+    vec4 colorTexC2 = texture(u_texture, mix(uvC.xy, uvC.zw, v_texCoords) + halfx);
+    vec4 colorTexD2 = texture(u_texture, mix(uvD.xy, uvD.zw, v_texCoords) + halfx);
+    vec4 colorTexE2 = texture(u_texture, mix(uvE.xy, uvE.zw, v_texCoords) + halfx);
+    vec4 colorTexF2 = texture(u_texture, mix(uvF.xy, uvF.zw, v_texCoords) + halfx);
+    vec4 colorTexG2 = texture(u_texture, mix(uvG.xy, uvG.zw, v_texCoords) + halfx);
+    vec4 colorTexH2 = texture(u_texture, mix(uvH.xy, uvH.zw, v_texCoords) + halfx);
+
 
     vec2 astrumTexCoord = (v_texCoords * drawOffsetSize.zw + drawOffsetSize.xy + astrumScroll) / tex1Size;
     vec4 randomness = snoise4((gl_FragCoord.xy - astrumScroll) * 0.16) * 2.0; // multiply by 2 so that the "density" of the stars would be same as the non-random version
@@ -136,7 +147,7 @@ void main(void) {
     vec4 colorTex1 = texture(tex1, astrumTexCoord) * randomness;
 
     // notations used: https://en.wikipedia.org/wiki/File:Enclosing_points.svg and https://en.wikipedia.org/wiki/File:3D_interpolation2.svg
-    vec4 colorTex0 = mix(
+    vec4 colorTex0Morn = mix(
         mix( // now-values
             mix(colorTexA, colorTexE, texBlend1.y), // c00 = c000..c100
             mix(colorTexC, colorTexG, texBlend1.y), // c10 = c010..c110
@@ -149,6 +160,22 @@ void main(void) {
         ), // c1 = c01..c11
         texBlend2.x
     ); // c = c0..c1
+
+    vec4 colorTex0Noon = mix(
+        mix( // now-values
+            mix(colorTexA2, colorTexE2, texBlend1.y), // c00 = c000..c100
+            mix(colorTexC2, colorTexG2, texBlend1.y), // c10 = c010..c110
+            texBlend1.x
+        ), // c0 = c00..c10
+        mix( // old-values
+            mix(colorTexB2, colorTexF2, texBlend1.w), // c01 = c001..c101
+            mix(colorTexD2, colorTexH2, texBlend1.w), // c11 = c011..c111
+            texBlend1.z
+        ), // c1 = c01..c11
+        texBlend2.x
+    ); // c = c0..c1
+
+    vec4 colorTex0 = mix(colorTex0Morn, colorTex0Noon, texBlend2.y);
 
 
 //    fragColor = (max(colorTex0, colorTex1) * boolean.yyyx) + boolean.xxxy;

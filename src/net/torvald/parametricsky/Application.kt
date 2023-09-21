@@ -206,7 +206,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
                 if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
                 val theta = yf * HALF_PI
-                val gamma = if (y < halfHeight) HALF_PI else 3 * HALF_PI
+                val gamma = if (y < halfHeight) Math.toRadians(cameraHeading) else Math.toRadians(cameraHeading + 180)
 
 
                 val xyz = CIEXYZ(
@@ -291,7 +291,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 app.solarBearing = (it.value as Double)
             }
         }
-        val cameraHeading = JSpinner(SpinnerNumberModel(90.0, 0.0, 180.0, 1.0)).also {
+        val cameraHeading = JSpinner(SpinnerNumberModel(90.0, -360.0, 360.0, 1.0)).also {
             it.preferredSize = dialSize
             it.addChangeListener { _ ->
                 app.cameraHeading = (it.value as Double)

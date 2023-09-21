@@ -571,6 +571,7 @@ internal object WeatherMixer : RNGConsumer {
         gdxBlendNormalStraightAlpha()
 
         val oldNewBlend = weatherbox.weatherBlend.times(2f).coerceAtMost(1f)
+        val mornNoonBlend = (1f/4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
 
         turbidity0 = (world.weatherbox.oldWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
         turbidity1  = (currentWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
@@ -603,7 +604,7 @@ internal object WeatherMixer : RNGConsumer {
             shaderAstrum.setUniform4fv("uvG", uvs, 24, 4)
             shaderAstrum.setUniform4fv("uvH", uvs, 28, 4)
             shaderAstrum.setUniformf("texBlend1", turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend)
-            shaderAstrum.setUniformf("texBlend2", oldNewBlend, 0f, 0f, 0f)
+            shaderAstrum.setUniformf("texBlend2", oldNewBlend, mornNoonBlend, 0f, 0f)
             shaderAstrum.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
             shaderAstrum.setUniformf("randomNumber",
                 world.worldTime.TIME_T.div(+14.1f).plus(31L),
