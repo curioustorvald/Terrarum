@@ -68,6 +68,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
 
             if (altDown && savegameIsNotNew) {
                 mode = MODE_PREV_SAVES
+                loadPrevGameInfo()
             }
             else {
                 if (full.loadables.saveAvaliable()) {
@@ -242,19 +243,20 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         super.show()
     }
 
-    internal fun loadSavegameInfo() {
+    private fun loadPrevGameInfo() {
         val players = App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files
         val worlds = App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files
-
         val playerSavesInfo = players.map { it.getSavegameMeta() }
         val worldSavesInfo = worlds.map { it.getSavegameMeta() }
+
         sortedPlayerWorldList = getChronologicalPair(playerSavesInfo, worldSavesInfo)
 
         px48 = playerModTextboxX + (modulesTextboxW - tbw48) / 2
         wx48 = worldModTextboxX + (modulesTextboxW - tbw48) / 2
         totalTBH48 = sortedPlayerWorldList.size * 32
+    }
 
-
+    internal fun loadSavegameInfo() {
         playerName = App.savegamePlayersName[full.playerButtonSelected!!.playerUUID] ?: "Player"
 
         loadOrderPlayer =
@@ -437,6 +439,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     }
 
     private fun DiskSkimmer.getSavegameMeta(): SavegameMeta {
+        if (!this.initialised) this.rebuild()
         this.getFile(SAVEGAMEINFO)!!.bytes.let {
             var lastPlayTime = 0L
             var versionString = ""

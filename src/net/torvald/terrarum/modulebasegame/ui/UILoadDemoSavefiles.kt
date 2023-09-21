@@ -523,6 +523,7 @@ class UIItemPlayerCells(
         val loadable = App.savegamePlayers[playerUUID]!!.loadable()
         printdbg(this, "UUID: ${playerUUID}")
         printdbg(this, "File: ${loadable.diskFile.absolutePath}")
+        loadable.rebuild()
         loadable.getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
 

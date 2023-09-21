@@ -26,10 +26,10 @@ import kotlin.math.roundToInt
 /**
  * Created by minjaesong on 2023-06-24.
  */
-class SavegameCollection(files0: List<DiskSkimmer>) {
+class SavegameCollection(files0: List<DiskSkimmer>, prefiltered: Boolean) {
 
     /** Sorted in reverse by the last modified time of the files, index zero being the most recent */
-    val files = files0.sortedBy { it.diskFile.name }.sortedByDescending {
+    val files = if (prefiltered) files0 else files0.sortedBy { it.diskFile.name }.sortedByDescending {
         it.getLastModifiedTime().shl(2) or
         it.diskFile.extension.matches(Regex("^[abc]${'$'}")).toLong(1) or
         it.diskFile.extension.isBlank().toLong(0)
@@ -40,19 +40,28 @@ class SavegameCollection(files0: List<DiskSkimmer>) {
     val manualSaves = files.filter { !it.diskFile.extension.matches(Regex("[a-z]")) }
 
     init {
+        printdbg(this, "Rebuilding skimmers (${files.size})")
+//        files.forEach { it.rebuild() }
+    }
+
+    fun rebuildLoadable() {
+        loadable().rebuild()
+    }
+
+    fun rebuildAll() {
         files.forEach { it.rebuild() }
     }
 
     companion object {
         fun collectFromBaseFilename(skimmers: List<DiskSkimmer>, name: String): SavegameCollection {
-            return SavegameCollection(skimmers)
+            return SavegameCollection(skimmers, true)
         }
 
 
         fun collectFromBaseFilename(dir: File, name: String): SavegameCollection {
             val files = dir.listFiles().filter { it.name.startsWith(name) }
                 .mapNotNull { try { DiskSkimmer(it, true) } catch (e: Throwable) { null } }
-            return SavegameCollection(files)
+            return SavegameCollection(files, false)
         }
     }
 

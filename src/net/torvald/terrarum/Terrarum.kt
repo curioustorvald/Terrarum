@@ -799,7 +799,7 @@ fun AppUpdateListOfSavegames() {
             null
         }
     }.sortedByDescending { it.getLastModifiedTime() }
-    val filteringResults = arrayListOf<List<DiskSkimmer>>()
+    val filteringResults = arrayListOf<List<DiskSkimmer>>() // first element of the list is always file with no suffix
     worldsDirLs.forEach {
         val li = arrayListOf(it)
         listOf(".1",".2",".3",".a",".b",".c").forEach { suffix ->
@@ -818,6 +818,8 @@ fun AppUpdateListOfSavegames() {
 
         printdbg("ListSavegames", "    collecting...")
         val collection = SavegameCollection.collectFromBaseFilename(list, it.diskFile.name)
+        printdbg("ListSavegames", "    disk rebuilding...")
+        collection.rebuildLoadable()
         printdbg("ListSavegames", "    get UUID...")
         val worldUUID = collection.getUUID()
 
@@ -862,6 +864,8 @@ fun AppUpdateListOfSavegames() {
 
         printdbg("ListSavegames", "    collecting...")
         val collection = SavegameCollection.collectFromBaseFilename(list, it.diskFile.name)
+        printdbg("ListSavegames", "    disk rebuilding...")
+        collection.rebuildLoadable()
         printdbg("ListSavegames", "    get UUID...")
         val playerUUID = collection.getUUID()
 
