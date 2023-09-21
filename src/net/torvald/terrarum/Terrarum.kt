@@ -878,10 +878,10 @@ fun AppUpdateListOfSavegames() {
         }
     }
 
-    println("SortedPlayers...")
+    /*println("SortedPlayers...")
     App.sortedPlayers.forEach {
         println(it)
-    }
+    }*/
 
 }
 
