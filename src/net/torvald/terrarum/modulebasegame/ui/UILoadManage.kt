@@ -246,8 +246,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private fun loadPrevGameInfo() {
         val players = App.savegamePlayers[full.playerButtonSelected!!.playerUUID]!!.files
         val worlds = App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files
-        val playerSavesInfo = players.map { it.getSavegameMeta() }
-        val worldSavesInfo = worlds.map { it.getSavegameMeta() }
+        val playerSavesInfo = players.map { it.getSavegameMeta() }.sortedByDescending { it.lastPlayTime }
+        val worldSavesInfo = worlds.map { it.getSavegameMeta() }.sortedByDescending { it.lastPlayTime }
 
         sortedPlayerWorldList = getChronologicalPair(playerSavesInfo, worldSavesInfo)
 
