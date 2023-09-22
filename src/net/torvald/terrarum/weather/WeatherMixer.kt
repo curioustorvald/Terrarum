@@ -82,7 +82,12 @@ internal object WeatherMixer : RNGConsumer {
 
     val globalLightNow = Cvec(0)
     private val cloudDrawColour = Color()
-    private val moonlightMax = Cvec(0.23f, 0.24f, 0.25f, 0.21f) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
+    private val moonlightMax = Cvec(
+        0.23f,
+        0.24f,
+        0.25f,
+        0.21f
+    ) // actual moonlight is around ~4100K but our mesopic vision makes it appear blueish (wikipedia: Purkinje effect)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -101,7 +106,8 @@ internal object WeatherMixer : RNGConsumer {
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
 
-    private val shaderAstrum = App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
+    private val shaderAstrum =
+        App.loadShaderFromClasspath("shaders/blendSkyboxStars.vert", "shaders/blendSkyboxStars.frag")
     private val shaderClouds = App.loadShaderFromClasspath("shaders/default.vert", "shaders/clouds.frag")
 
     private var astrumOffX = 0f
@@ -200,7 +206,7 @@ internal object WeatherMixer : RNGConsumer {
 
     private fun FloatArray.shiftAndPut(f: Float) {
         for (k in 1 until this.size) {
-            this[k-1] = this[k]
+            this[k - 1] = this[k]
         }
         this[this.lastIndex] = f
     }
@@ -241,7 +247,7 @@ internal object WeatherMixer : RNGConsumer {
     private val oldCamPos = Vector2(0f, 0f)
     private val camDelta = Vector2(0f, 0f)
 
-    val oobMarginR =  1.5f * App.scr.wf
+    val oobMarginR = 1.5f * App.scr.wf
     val oobMarginL = -0.5f * App.scr.wf
     private val oobMarginY = -0.5f * App.scr.hf
 
@@ -266,7 +272,8 @@ internal object WeatherMixer : RNGConsumer {
         camDelta.set(testCamDelta)
 
         // try to spawn an cloud
-        val cloudChanceEveryMin = 60f / (currentWeather.cloudChance * currentWeather.windSpeed) // if chance = 0, the result will be +inf
+        val cloudChanceEveryMin =
+            60f / (currentWeather.cloudChance * currentWeather.windSpeed) // if chance = 0, the result will be +inf
 
         while (cloudUpdateAkku >= cloudChanceEveryMin) {
             cloudUpdateAkku -= cloudChanceEveryMin
@@ -337,10 +344,16 @@ internal object WeatherMixer : RNGConsumer {
 
     fun takeUniformRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear(Math.random().toFloat(), range.start, range.endInclusive)
+
     fun takeTriangularRand(range: ClosedFloatingPointRange<Float>) =
         FastMath.interpolateLinear((Math.random() + Math.random()).div(2f).toFloat(), range.start, range.endInclusive)
+
     fun takeGaussianRand(range: ClosedFloatingPointRange<Float>) =
-        FastMath.interpolateLinear((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()).div(8f).toFloat(), range.start, range.endInclusive)
+        FastMath.interpolateLinear(
+            (Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random()).div(
+                8f
+            ).toFloat(), range.start, range.endInclusive
+        )
 
     /**
      * Returns random point for clouds to spawn from, in the opposite side of the current wind vector
@@ -371,35 +384,45 @@ internal object WeatherMixer : RNGConsumer {
 
         return when (selectedQuadrant.floorToInt()) {
             -4, 0, 4 -> { // right side of the screen
-                val z = FastMath.interpolateLinear(rr, 1f, Z_POW_BASE).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val z = FastMath.interpolateLinear(rr, 1f, Z_POW_BASE)
+                    .pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = App.scr.width + halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
+
             -3, 1, 5 -> { // z = inf
                 val z = ALPHA_ROLLOFF_Z
                 val posXscr = FastMath.interpolateLinear(rr, -halfCloudSize, App.scr.width + halfCloudSize)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
                 Vector3(x, y, z)
             }
+
             -2, 2, 6 -> { // left side of the screen
-                val z = FastMath.interpolateLinear(rr, Z_POW_BASE, 1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+                val z = FastMath.interpolateLinear(rr, Z_POW_BASE, 1f)
+                    .pow(1.5f) // clouds are more likely to spawn with low Z-value
                 val posXscr = -halfCloudSize
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, z)
                 Vector3(x, y, z)
             }
+
             -1, 3, 7 -> { // z = 0
                 val posXscr = FastMath.interpolateLinear(rr, -halfCloudSize, App.scr.width + halfCloudSize)
                 val z = WeatherObjectCloud.worldYtoWorldZforScreenYof0(y)
                 val x = WeatherObjectCloud.screenXtoWorldX(posXscr, Z_LIM)
                 Vector3(x, y, z)
             }
+
             else -> throw InternalError()
         }
 
     }
 
-    private fun tryToSpawnCloud(currentWeather: BaseModularWeather, precalculatedPos: Vector3? = null, ageOverride: Int = 0) {
+    private fun tryToSpawnCloud(
+        currentWeather: BaseModularWeather,
+        precalculatedPos: Vector3? = null,
+        ageOverride: Int = 0
+    ) {
 //        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${cloudSpawnMax})")
 
         if (cloudsSpawned < cloudSpawnMax) {
@@ -472,9 +495,11 @@ internal object WeatherMixer : RNGConsumer {
         // it does converge at ~6, but having it as an initial state does not make it stay converged
         repeat((currentWeather.cloudChance * 1.333f).ceilToInt()) {
 
-            val z = takeUniformRand(0.1f..ALPHA_ROLLOFF_Z / 4f - 0.1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
+            val z =
+                takeUniformRand(0.1f..ALPHA_ROLLOFF_Z / 4f - 0.1f).pow(1.5f) // clouds are more likely to spawn with low Z-value
 
-            val zz = FastMath.interpolateLinear((z / ALPHA_ROLLOFF_Z) * 0.8f + 0.1f, ALPHA_ROLLOFF_Z / 4f, ALPHA_ROLLOFF_Z)
+            val zz =
+                FastMath.interpolateLinear((z / ALPHA_ROLLOFF_Z) * 0.8f + 0.1f, ALPHA_ROLLOFF_Z / 4f, ALPHA_ROLLOFF_Z)
 
             val x = WeatherObjectCloud.screenXtoWorldX(takeUniformRand(0f..App.scr.wf), zz)
 
@@ -485,7 +510,11 @@ internal object WeatherMixer : RNGConsumer {
 
     internal fun titleScreenInitWeather(weatherbox: Weatherbox) {
         weatherbox.initWith(weatherDict["titlescreen"]!!, Long.MAX_VALUE)
-        forceWindVec = Vector3(-0.98f, 0f, -0.21f).scl(1f/30f) // value taken from TitleScreen.kt; search for 'demoWorld.worldTime.timeDelta = '
+        forceWindVec = Vector3(
+            -0.98f,
+            0f,
+            -0.21f
+        ).scl(1f / 30f) // value taken from TitleScreen.kt; search for 'demoWorld.worldTime.timeDelta = '
         initClouds(weatherbox.currentWeather)
     }
 
@@ -501,6 +530,7 @@ internal object WeatherMixer : RNGConsumer {
 
     private var turbidity0 = 1.0
     private var turbidity1 = 1.0
+
     /** Interpolated value, controlled by the weatherbox */
     var turbidity = 1.0; private set
 
@@ -513,6 +543,7 @@ internal object WeatherMixer : RNGConsumer {
     internal var parallaxPos = 0f; private set
     private var solarElev = 0.0
     private val HALF_DAY = DAY_LENGTH / 2
+
     /**
      * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
      */
@@ -538,7 +569,10 @@ internal object WeatherMixer : RNGConsumer {
             batch.shader = shaderClouds
             val shadeLum = (globalLightNow.r * 3f + globalLightNow.g * 4f + globalLightNow.b * 1f) / 8f * 0.5f
             batch.shader.setUniformf("shadeCol", shadeLum * 1.05f, shadeLum, shadeLum / 1.05f, 1f)
-            batch.shader.setUniformf("shadiness", (1.0 / cosh(solarElev * 0.5)).toFloat().coerceAtLeast(if (solarElev < 0) 0.6666f else 0f))
+            batch.shader.setUniformf(
+                "shadiness",
+                (1.0 / cosh(solarElev * 0.5)).toFloat().coerceAtLeast(if (solarElev < 0) 0.6666f else 0f)
+            )
 
             clouds.forEach {
                 it.render(batch as UnpackedColourSpriteBatch, cloudDrawColour)
@@ -581,17 +615,21 @@ internal object WeatherMixer : RNGConsumer {
          .|         = // parallax of +1
          -+ <- 0.0  =
          */
-        val parallax = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
-        val turbidityCoeff = ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / turbidityDomainSize).times(-1f).coerceIn(-1f, 1f)
+        val parallax =
+            ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / parallaxDomainSize).times(-1f).coerceIn(-1f, 1f)
+        val turbidityCoeff =
+            ((parallaxZeroPos - WorldCamera.gdxCamY.div(TILE_SIZEF)) / turbidityDomainSize).times(-1f).coerceIn(-1f, 1f)
         parallaxPos = parallax
 //        println(parallax) // parallax value works as intended.
 
         gdxBlendNormalStraightAlpha()
 
         val oldNewBlend = weatherbox.weatherBlend.times(2f).coerceAtMost(1f)
-        val mornNoonBlend = (1f/4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
+        val mornNoonBlend =
+            (1f / 4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
 
-        turbidity0 = (world.weatherbox.oldWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
+        turbidity0 =
+            (world.weatherbox.oldWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
         turbidity1 = (currentWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
         turbidity = FastMath.interpolateLinear(oldNewBlend.toDouble(), turbidity0, turbidity1)
         val oldTurbidity = forceTurbidity ?: turbidity0
@@ -606,14 +644,25 @@ internal object WeatherMixer : RNGConsumer {
 
 
         cloudCol1.set(getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo))
-        cloudCol2.set(getGradientColour2(daylightClut, solarElev + CLOUD_SOLARDEG_OFFSET, timeNow) max globalLightByMoon)
-        cloudDrawColour.set(lerp(0.5, cloudCol1, cloudCol2))
-
+        cloudCol2.set(
+            getGradientColour2(
+                daylightClut,
+                solarElev + CLOUD_SOLARDEG_OFFSET,
+                timeNow
+            ) max globalLightByMoon
+        )
+        cloudDrawColour.set(srgblerp(0.7, cloudCol1, cloudCol2))
 
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
 
-        val (tex, uvs, turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend) = Skybox.getUV(solarElev, oldTurbidity, oldAlbedo, thisTurbidity, thisAlbedo)
+        val (tex, uvs, turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend) = Skybox.getUV(
+            solarElev,
+            oldTurbidity,
+            oldAlbedo,
+            thisTurbidity,
+            thisAlbedo
+        )
 
         starmapTex.texture.bind(1)
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
@@ -636,7 +685,8 @@ internal object WeatherMixer : RNGConsumer {
             shaderAstrum.setUniformf("texBlend1", turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend)
             shaderAstrum.setUniformf("texBlend2", oldNewBlend, mornNoonBlend, 0f, 0f)
             shaderAstrum.setUniformf("astrumScroll", astrumOffX + astrumX, astrumOffY + astrumY)
-            shaderAstrum.setUniformf("randomNumber",
+            shaderAstrum.setUniformf(
+                "randomNumber",
                 world.worldTime.TIME_T.div(+14.1f).plus(31L),
                 world.worldTime.TIME_T.div(-13.8f).plus(37L),
                 world.worldTime.TIME_T.div(+13.9f).plus(23L),
@@ -661,10 +711,10 @@ internal object WeatherMixer : RNGConsumer {
 
     fun colorMix(one: Color, two: Color, scale: Float): Color {
         return Color(
-                FastMath.interpolateLinear(scale, one.r, two.r),
-                FastMath.interpolateLinear(scale, one.g, two.g),
-                FastMath.interpolateLinear(scale, one.b, two.b),
-                FastMath.interpolateLinear(scale, one.a, two.a)
+            FastMath.interpolateLinear(scale, one.r, two.r),
+            FastMath.interpolateLinear(scale, one.g, two.g),
+            FastMath.interpolateLinear(scale, one.b, two.b),
+            FastMath.interpolateLinear(scale, one.a, two.a)
         )
     }
 
@@ -708,18 +758,29 @@ internal object WeatherMixer : RNGConsumer {
         val pStartRaw = pNowRaw.floorToInt()
         val pNextRaw = pStartRaw + 1
 
-        val pSx: Int; val pSy: Int; val pNx: Int; val pNy: Int
+        val pSx: Int;
+        val pSy: Int;
+        val pNx: Int;
+        val pNy: Int
         if (timeOfDay < HALF_DAY) {
             pSx = pStartRaw.coerceIn(0 until colorMap.width)
             pSy = 0
-            if (pSx == colorMap.width-1) { pNx = pSx; pNy = 1 }
-            else                         { pNx = pSx + 1; pNy = 0 }
+            if (pSx == colorMap.width - 1) {
+                pNx = pSx; pNy = 1
+            }
+            else {
+                pNx = pSx + 1; pNy = 0
+            }
         }
         else {
             pSx = (pStartRaw + 1).coerceIn(0 until colorMap.width)
             pSy = 1
-            if (pSx == 0) { pNx = 0; pNy = 0 }
-            else          { pNx = pSx - 1; pNy = 1 }
+            if (pSx == 0) {
+                pNx = 0; pNy = 0
+            }
+            else {
+                pNx = pSx - 1; pNy = 1
+            }
         }
         // interpolate R, G, B and A
         var scale = (pNowRaw - pStartRaw).toFloat()
@@ -730,13 +791,21 @@ internal object WeatherMixer : RNGConsumer {
         val colourThisUV = colorMap.get(pSx, pSy + 2)
         val colourNextUV = colorMap.get(pNx, pNy + 2)
 
-        val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
-        val newColUV = colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newColRGB =
+            colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newColUV =
+            colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
 
         return Cvec(newColRGB, newColUV.r)
     }
 
-    fun getGradientCloud(colorMap: GdxColorMap, solarAngleInDeg0: Double, mornNoonBlend: Double, turbidity: Double, albedo: Double): Cvec {
+    fun getGradientCloud(
+        colorMap: GdxColorMap,
+        solarAngleInDeg0: Double,
+        mornNoonBlend: Double,
+        turbidity: Double,
+        albedo: Double
+    ): Cvec {
         val solarAngleInDeg = solarAngleInDeg0 + CLOUD_SOLARDEG_OFFSET // add a small offset
         val solarAngleInDegInt = solarAngleInDeg.floorToInt()
 
@@ -745,12 +814,14 @@ internal object WeatherMixer : RNGConsumer {
         val angleX2 = (angleX1 + 1).coerceAtMost(150)
         val ax = solarAngleInDeg - solarAngleInDegInt
         // fine-grained
-        val turbY = turbidity.coerceIn(Skybox.turbiditiesD.first(), Skybox.turbiditiesD.last()).minus(1.0).times(Skybox.turbDivisor)
+        val turbY = turbidity.coerceIn(Skybox.turbiditiesD.first(), Skybox.turbiditiesD.last()).minus(1.0)
+            .times(Skybox.turbDivisor)
         val turbY1 = turbY.floorToInt()
         val turbY2 = (turbY1).coerceAtMost(Skybox.turbCnt - 1)
         val tx = turbY - turbY1
         // coarse-grained
-        val albX = albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) * Skybox.elevCnt // 0*151..5*151
+        val albX =
+            albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) * Skybox.elevCnt // 0*151..5*151
         val albX1 = albX.floorToInt()
         val albX2 = (albX1 + 1).coerceAtMost(5 * Skybox.elevCnt)
         val bx = albX - albX1
@@ -771,6 +842,8 @@ internal object WeatherMixer : RNGConsumer {
         val a2t1b2B = colorMap.getCvec(albX2 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
         val a1t2b2B = colorMap.getCvec(albX2 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
         val a2t2b2B = colorMap.getCvec(albX2 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
+
+        // no srgblerp here to match the skybox shader's behaviour
 
         val t1b1A = lerp(ax, a1t1b1A, a2t1b1A)
         val t2b1A = lerp(ax, a1t2b1A, a2t2b1A)
@@ -793,11 +866,16 @@ internal object WeatherMixer : RNGConsumer {
     }
 
     private fun lerp(x: Double, c1: Cvec, c2: Cvec): Cvec {
+        // yes I'm well aware that I must do gamma correction before lerping but it's just tooooo slowwww
         val r = (((1.0 - x) * c1.r) + (x * c2.r)).toFloat()
         val g = (((1.0 - x) * c1.g) + (x * c2.g)).toFloat()
         val b = (((1.0 - x) * c1.b) + (x * c2.b)).toFloat()
         val a = (((1.0 - x) * c1.a) + (x * c2.a)).toFloat()
         return Cvec(r, g, b, a)
+    }
+
+    private fun srgblerp(x: Double, c1: Cvec, c2: Cvec): Cvec {
+        return lerp(x, c1.linearise(), c2.linearise()).unlinearise()
     }
 
     fun getWeatherList(classification: String) = weatherDB[classification]!!
@@ -869,6 +947,37 @@ internal object WeatherMixer : RNGConsumer {
         starmapTex.texture.dispose()
         shaderAstrum.dispose()
         shaderClouds.dispose()
+    }
+
+    private fun Cvec.linearise(): Cvec {
+        val newR = if (r > 0.04045f)
+            ((r + 0.055f) / 1.055f).pow(2.4f)
+        else r / 12.92f
+        val newG = if (g > 0.04045f)
+            ((g + 0.055f) / 1.055f).pow(2.4f)
+        else g / 12.92f
+        val newB = if (b > 0.04045f)
+            ((b + 0.055f) / 1.055f).pow(2.4f)
+        else b / 12.92f
+
+        return Cvec(newR, newG, newB, a)
+    }
+
+    private fun Cvec.unlinearise(): Cvec {
+        val newR = if (r > 0.0031308f)
+            1.055f * r.pow(1f / 2.4f) - 0.055f
+        else
+            r * 12.92f
+        val newG = if (g > 0.0031308f)
+            1.055f * g.pow(1f / 2.4f) - 0.055f
+        else
+            g * 12.92f
+        val newB = if (b > 0.0031308f)
+            1.055f * b.pow(1f / 2.4f) - 0.055f
+        else
+            b * 12.92f
+
+        return Cvec(newR, newG, newB, a)
     }
 }
 
