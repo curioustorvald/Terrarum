@@ -1,5 +1,6 @@
 package net.torvald.terrarum.clut
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.colourutil.CIEXYZ
 import net.torvald.colourutil.HUSLColorConverter
 import net.torvald.colourutil.toColor
@@ -61,13 +62,20 @@ class GenerateSkyboxTextureAtlas {
                 ArHosekSkyModel.arhosek_tristim_skymodel_radiance(state, theta, gamma, 2).toFloat()
             )
             val xyz2 = xyz.scaleToFit(elevationDeg)
-            val rgb = xyz2.toRGB().toColor()
+            val rgb = xyz2.toRGB().toColor().gamma(1.2f)
             val colour = rgb.toIntBits().toLittle()
 
             for (i in 0..3) {
                 writefun(yp, i, colour[bytesLut[i]])
             }
         }
+    }
+
+    private fun Color.gamma(gam: Float): Color {
+        this.r = this.r.pow(gam)
+        this.g = this.g.pow(gam)
+        this.b = this.b.pow(gam)
+        return this
     }
 
     // y: increasing turbidity (1.0 .. 10.0, in steps of 0.333)
