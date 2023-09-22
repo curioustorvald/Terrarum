@@ -546,13 +546,13 @@ internal object WeatherMixer : RNGConsumer {
         }
     }
 
-    private val parallaxDomainSize = 400f
-    private val turbidityDomainSize = 533.3333f
+    private val parallaxDomainSize = 550f
+    private val turbidityDomainSize = parallaxDomainSize * 1.3333334f
 
     private fun drawSkybox(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
         val weatherbox = world.weatherbox
         val currentWeather = world.weatherbox.currentWeather
-        val parallaxZeroPos = (world.height / 3f)
+        val parallaxZeroPos = (world.height * 0.4f)
 
         // we will not care for nextSkybox for now
         val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
@@ -741,7 +741,7 @@ internal object WeatherMixer : RNGConsumer {
         // coarse-grained
         val albX = albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) * Skybox.elevCnt // 0*151..5*151
         val albX1 = albX.floorToInt()
-        val albX2 = (albX1 + elevCnt).coerceAtMost(5 * Skybox.elevCnt)
+        val albX2 = (albX1 + 1).coerceAtMost(5 * Skybox.elevCnt)
         val bx = albX - albX1
 
         val a1t1b1A = colorMap.getCvec(albX1 * elevCnt + angleX1, turbY1)
