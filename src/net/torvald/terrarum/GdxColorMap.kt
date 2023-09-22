@@ -73,6 +73,10 @@ class GdxColorMap {
     fun get(x: Int, y: Int): Color = dataGdxColor[y * width + x]
     operator fun get(x: Int): Color = if (is2D) throw UnsupportedOperationException("This is 2D color map") else dataGdxColor[x]
 
+    fun getCvec(x: Int, y: Int): Cvec = dataCvec[y * width + x]
+    fun getCvec(x: Int): Cvec = if (is2D) throw UnsupportedOperationException("This is 2D color map") else dataCvec[x]
+
+
     fun getRaw(x: Int, y: Int): RGBA8888 = dataRaw[y * width + x]
     fun getRaw(x: Int): RGBA8888 = if (is2D) throw UnsupportedOperationException("This is 2D color map") else dataRaw[x]
 

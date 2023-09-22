@@ -20,6 +20,8 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
 import net.torvald.terrarum.clut.Skybox
+import net.torvald.terrarum.clut.Skybox.elevCnt
+import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
@@ -94,7 +96,7 @@ internal object WeatherMixer : RNGConsumer {
     var forceTurbidity: Double? = null
 
     // doesn't work if the png is in greyscale/indexed mode
-    val starmapTex: TextureRegion = TextureRegion(Texture(Gdx.files.internal("./assets/graphics/astrum.png"))).also {
+    val starmapTex: TextureRegion = TextureRegion(Texture(Gdx.files.internal("assets/graphics/astrum.png"))).also {
         it.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         it.texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
     }
@@ -105,7 +107,6 @@ internal object WeatherMixer : RNGConsumer {
     private var astrumOffX = 0f
     private var astrumOffY = 0f
 
-
     // Clouds are merely a response to the current Weatherbox status //
 
     private val clouds = SortedArrayList<WeatherObjectCloud>()
@@ -114,6 +115,10 @@ internal object WeatherMixer : RNGConsumer {
     private var windVector = Vector3(-1f, 0f, 0.1f) // this is a direction vector
     val cloudSpawnMax: Int
         get() = 256 shl (App.getConfigInt("maxparticles") / 256)
+
+
+    private val skyboxavr = GdxColorMap(Gdx.files.internal("assets/clut/skyboxavr.png"))
+
 
     override fun loadFromSave(ingame: IngameInstance, s0: Long, s1: Long) {
         super.loadFromSave(ingame, s0, s1)
@@ -498,6 +503,10 @@ internal object WeatherMixer : RNGConsumer {
     private var turbidity1 = 1.0
     /** Interpolated value, controlled by the weatherbox */
     var turbidity = 1.0; private set
+
+    /** Controlled by todo: something that monitors ground tile compisition */
+    var albedo = 1.0; private set
+
     private var gH = 1.8f * App.scr.height
 //    private var gH = 0.8f * App.scr.height
 
@@ -520,6 +529,10 @@ internal object WeatherMixer : RNGConsumer {
         batch.color = Color.WHITE
     }
 
+    /**
+     * Dependent on the `drawSkybox(camera, batch, world)` for the `cloudDrawColour`
+     *
+     */
     private fun drawClouds(batch: SpriteBatch) {
         batch.inUse { _ ->
             batch.shader = shaderClouds
@@ -546,11 +559,9 @@ internal object WeatherMixer : RNGConsumer {
         val daylightClut = currentWeather.daylightClut
         // calculate global light
         val moonSize = (-(2.0 * world.worldTime.moonPhase - 1.0).abs() + 1.0).toFloat()
-        val globalLightBySun: Cvec = getGradientColour2(daylightClut, solarElev, timeNow, GradientColourMode.DAYLIGHT)
+        val globalLightBySun: Cvec = getGradientColour2(daylightClut, solarElev, timeNow)
         val globalLightByMoon: Cvec = moonlightMax * moonSize
-        val cloudCol = getGradientColour2(daylightClut, solarElev, timeNow, GradientColourMode.CLOUD_COLOUR)
         globalLightNow.set(globalLightBySun max globalLightByMoon)
-        cloudDrawColour.set(cloudCol max globalLightByMoon)
 
         /* (copied from the shader source)
          UV mapping coord.y
@@ -574,16 +585,27 @@ internal object WeatherMixer : RNGConsumer {
         val mornNoonBlend = (1f/4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
 
         turbidity0 = (world.weatherbox.oldWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
-        turbidity1  = (currentWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
+        turbidity1 = (currentWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
         turbidity = FastMath.interpolateLinear(oldNewBlend.toDouble(), turbidity0, turbidity1)
-
         val oldTurbidity = forceTurbidity ?: turbidity0
         val thisTurbidity = forceTurbidity ?: turbidity1
 
 
+        albedo = 0.3 // TODO() depends on the ground tile composition
+        val oldAlbedo = forceTurbidity ?: turbidity0
+        val thisAlbedo = forceTurbidity ?: turbidity1
+
+
+
+
+        val cloudCol1 = getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo)
+        cloudDrawColour.set(lerp(0.5, cloudCol1, globalLightNow))
+
+
+
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)
 
-        val (tex, uvs, turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend) = Skybox.getUV(solarElev, oldTurbidity, 0.3, thisTurbidity, 0.3)
+        val (tex, uvs, turbTihsBlend, albThisBlend, turbOldBlend, albOldBlend) = Skybox.getUV(solarElev, oldTurbidity, oldAlbedo, thisTurbidity, thisAlbedo)
 
         starmapTex.texture.bind(1)
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
@@ -672,7 +694,7 @@ internal object WeatherMixer : RNGConsumer {
         return Cvec(newCol)
     }
 
-    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int, mode: GradientColourMode): Cvec {
+    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int): Cvec {
         val pNowRaw = (solarAngleInDeg + 75.0) / 150.0 * colorMap.width
 
         val pStartRaw = pNowRaw.floorToInt()
@@ -695,27 +717,80 @@ internal object WeatherMixer : RNGConsumer {
         var scale = (pNowRaw - pStartRaw).toFloat()
         if (timeOfDay >= HALF_DAY) scale = 1f - scale
 
-        return when (mode) {
-            GradientColourMode.DAYLIGHT -> {
-                val colourThisRGB = colorMap.get(pSx, pSy)
-                val colourNextRGB = colorMap.get(pNx, pNy)
-                val colourThisUV = colorMap.get(pSx, pSy + 2)
-                val colourNextUV = colorMap.get(pNx, pNy + 2)
+        val colourThisRGB = colorMap.get(pSx, pSy)
+        val colourNextRGB = colorMap.get(pNx, pNy)
+        val colourThisUV = colorMap.get(pSx, pSy + 2)
+        val colourNextUV = colorMap.get(pNx, pNy + 2)
 
-                val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
-                val newColUV = colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+        val newColUV = colourThisUV.cpy().lerp(colourNextUV, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
 
-                Cvec(newColRGB, newColUV.r)
-            }
-            GradientColourMode.CLOUD_COLOUR -> {
-                val colourThisRGB = colorMap.get(pSx, pSy + 4)
-                val colourNextRGB = colorMap.get(pNx, pNy + 4)
+        return Cvec(newColRGB, newColUV.r)
+    }
 
-                val newColRGB = colourThisRGB.cpy().lerp(colourNextRGB, scale)//CIELuvUtil.getGradient(scale, colourThis, colourNext)
+    fun getGradientCloud(colorMap: GdxColorMap, solarAngleInDeg: Double, mornNoonBlend: Double, turbidity: Double, albedo: Double): Cvec {
+        // fine-grained
+        val angleX1 = solarAngleInDeg.toInt() + 75
+        val angleX2 = (angleX1 + 1).coerceAtMost(150)
+        val ax = solarAngleInDeg % 1.0
+        // fine-grained
+        val turbY = turbidity.coerceIn(Skybox.turbiditiesD.first(), Skybox.turbiditiesD.last()).minus(1.0).times(Skybox.turbDivisor)
+        val turbY1 = turbY.floorToInt()
+        val turbY2 = (turbY1).coerceAtMost(Skybox.turbCnt - 1)
+        val tx = turbY - turbY1
+        // coarse-grained
+        val albX = albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) * Skybox.elevCnt // 0*151..5*151
+        val albX1 = albX.floorToInt()
+        val albX2 = (albX1 + elevCnt).coerceAtMost(5 * Skybox.elevCnt)
+        val bx = albX - albX1
 
-                Cvec(newColRGB)
-            }
-        }
+        val a1t1b1A = colorMap.getCvec(albX1 * elevCnt + angleX1, turbY1)
+        val a2t1b1A = colorMap.getCvec(albX1 * elevCnt + angleX2, turbY1)
+        val a1t2b1A = colorMap.getCvec(albX1 * elevCnt + angleX1, turbY2)
+        val a2t2b1A = colorMap.getCvec(albX1 * elevCnt + angleX2, turbY2)
+        val a1t1b2A = colorMap.getCvec(albX2 * elevCnt + angleX1, turbY1)
+        val a2t1b2A = colorMap.getCvec(albX2 * elevCnt + angleX2, turbY1)
+        val a1t2b2A = colorMap.getCvec(albX2 * elevCnt + angleX1, turbY2)
+        val a2t2b2A = colorMap.getCvec(albX2 * elevCnt + angleX2, turbY2)
+
+        val a1t1b1B = colorMap.getCvec(albX1 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a2t1b1B = colorMap.getCvec(albX1 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a1t2b1B = colorMap.getCvec(albX1 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a2t2b1B = colorMap.getCvec(albX1 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a1t1b2B = colorMap.getCvec(albX2 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a2t1b2B = colorMap.getCvec(albX2 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a1t2b2B = colorMap.getCvec(albX2 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a2t2b2B = colorMap.getCvec(albX2 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
+
+        val t1b1A = lerp(ax, a1t1b1A, a2t1b1A)
+        val t2b1A = lerp(ax, a1t2b1A, a2t2b1A)
+        val t1b2A = lerp(ax, a1t1b2A, a2t1b2A)
+        val t2b2A = lerp(ax, a1t2b2A, a2t2b2A)
+
+        val b1A = lerp(tx, t1b1A, t2b1A)
+        val b2A = lerp(tx, t1b2A, t2b2A)
+
+        val A = lerp(bx, b1A, b2A)
+
+        val t1b1B = lerp(ax, a1t1b1B, a2t1b1B)
+        val t2b1B = lerp(ax, a1t2b1B, a2t2b1B)
+        val t1b2B = lerp(ax, a1t1b2B, a2t1b2B)
+        val t2b2B = lerp(ax, a1t2b2B, a2t2b2B)
+
+        val b1B = lerp(tx, t1b1B, t2b1B)
+        val b2B = lerp(tx, t1b2B, t2b2B)
+
+        val B = lerp(bx, b1B, b2B)
+
+        return lerp(mornNoonBlend, A, B)
+    }
+
+    private fun lerp(x: Double, c1: Cvec, c2: Cvec): Cvec {
+        val r = (((1.0 - x) * c1.r) + (x * c2.r)).toFloat()
+        val g = (((1.0 - x) * c1.g) + (x * c2.g)).toFloat()
+        val b = (((1.0 - x) * c1.b) + (x * c2.b)).toFloat()
+        val a = (((1.0 - x) * c1.a) + (x * c2.a)).toFloat()
+        return Cvec(r, g, b, a)
     }
 
     fun getWeatherList(classification: String) = weatherDB[classification]!!

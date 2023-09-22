@@ -10,27 +10,30 @@ import net.torvald.terrarum.clut.Skybox.mapCircle
 import net.torvald.terrarum.clut.Skybox.scaleToFit
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.serialise.toLittle
+import net.torvald.terrarum.serialise.toUint
+import net.torvald.terrarum.sqrt
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2023-08-01.
  */
-fun main() {
-    // y: increasing turbidity (1.0 .. 10.0, in steps of 0.333)
-    // x: elevations (-75 .. 75 in steps of 1, then albedo of [0.1, 0.3, 0.5, 0.7, 0.9])
-    val texh = Skybox.gradSize * Skybox.turbCnt
-    val texw = Skybox.elevCnt * Skybox.albedoCnt * 2
-    val TGA_HEADER_SIZE = 18
+class GenerateSkyboxTextureAtlas {
 
-    val bytes = ByteArray(TGA_HEADER_SIZE + texw * texh * 4 + 26)
-
-    fun generateStrip(gammaPair: Int, albedo: Double, turbidity: Double, elevationDeg: Double, writefun: (Int, Int, Byte) -> Unit) {
+    fun generateStrip(
+        gammaPair: Int,
+        albedo: Double,
+        turbidity: Double,
+        elevationDeg: Double,
+        writefun: (Int, Int, Byte) -> Unit
+    ) {
         val elevationRad = Math.toRadians(elevationDeg)
         /*val gamma = if (gammaPair == 0) HALF_PI else {
-            Math.toRadians(180 + 114 + 24 * cos(PI * elevationDeg / 40))
-        }*/
+        Math.toRadians(180 + 114 + 24 * cos(PI * elevationDeg / 40))
+    }*/
         val gamma = Math.toRadians(115 + 25 * cos(PI * elevationDeg / 40)) + (gammaPair * PI)
 //    println("... Elevation: $elevationDeg")
 
@@ -66,53 +69,147 @@ fun main() {
         }
     }
 
-    // write header
-    byteArrayOf(
-        0, // ID field
-        0, // colour map (none)
-        2, // colour type (unmapped RGB)
-        0,0,0,0,0, // colour map spec (empty)
-        0,0, // x origin (0)
-        0,0, // y origin (0)
-        (texw and 255).toByte(),(texw.ushr(8) and 255).toByte(), // width
-        (texh and 255).toByte(),(texh.ushr(8) and 255).toByte(), // height
-        32, // bits-per-pixel (8bpp RGBA)
-        8 // image descriptor
-    ).forEachIndexed { i,b -> bytes[i] = b }
-    // write footer
-    "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000TRUEVISION-XFILE\u002E\u0000".forEachIndexed { i, c -> bytes[18 + texw * texh * 4 + i] =
-        c.code.toByte()
-    }
+    // y: increasing turbidity (1.0 .. 10.0, in steps of 0.333)
+    // x: elevations (-75 .. 75 in steps of 1, then albedo of [0.1, 0.3, 0.5, 0.7, 0.9])
+    val TGA_HEADER_SIZE = 18
+    val texh = Skybox.gradSize * Skybox.turbCnt
+    val texh2 = Skybox.turbCnt
+    val texw = Skybox.elevCnt * Skybox.albedoCnt * 2
+    val bytesSize = texw * texh
+    val bytes2Size = texw * texh2
+    val bytes = ByteArray(TGA_HEADER_SIZE + bytesSize * 4 + 26)
+    val bytes2 = ByteArray(TGA_HEADER_SIZE + texw * bytes2Size * 4 + 26)
 
-    println("Generating texture atlas ($texw x $texh)...")
+    fun generateMainFile() {
+        // write header
+        byteArrayOf(
+            0, // ID field
+            0, // colour map (none)
+            2, // colour type (unmapped RGB)
+            0, 0, 0, 0, 0, // colour map spec (empty)
+            0, 0, 0, 0, // unused for modern purposes
+            (texw and 255).toByte(), (texw.ushr(8) and 255).toByte(), // width
+            (texh and 255).toByte(), (texh.ushr(8) and 255).toByte(), // height
+            32, // bits-per-pixel (8bpp RGBA)
+            8 // image descriptor (32bpp, bottom-left origin)
+        ).forEachIndexed { i, b -> bytes[i] = b }
+        // write footer
+        "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000TRUEVISION-XFILE\u002E\u0000".forEachIndexed { i, c ->
+            bytes[TGA_HEADER_SIZE + bytesSize * 4 + i] =
+                c.code.toByte()
+        }
 
-    // write pixels
-    for (gammaPair in 0..1) {
+        println("Generating texture atlas ($texw x $texh)...")
 
-        for (albedo0 in 0 until Skybox.albedoCnt) {
-            val albedo = Skybox.albedos[albedo0]
-            println("Albedo=$albedo")
-            for (turb0 in 0 until Skybox.turbCnt) {
-                val turbidity = Skybox.turbiditiesD[turb0]
-                println("....... Turbidity=$turbidity")
-                for (elev0 in 0 until Skybox.elevCnt) {
-                    var elevationDeg = Skybox.elevationsD[elev0]
-                    if (elevationDeg == 0.0) elevationDeg = 0.5 // dealing with the edge case
-                    generateStrip(gammaPair, albedo, turbidity, elevationDeg) { yp, i, colour ->
-                        val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
-                        val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
-                        val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
-                        bytes[fileOffset + i] = colour
+        // write pixels
+        for (gammaPair in 0..1) {
+
+            for (albedo0 in 0 until Skybox.albedoCnt) {
+                val albedo = Skybox.albedos[albedo0]
+                println("Albedo=$albedo")
+                for (turb0 in 0 until Skybox.turbCnt) {
+                    val turbidity = Skybox.turbiditiesD[turb0]
+                    println("....... Turbidity=$turbidity")
+                    for (elev0 in 0 until Skybox.elevCnt) {
+                        var elevationDeg = Skybox.elevationsD[elev0]
+                        if (elevationDeg == 0.0) elevationDeg = 0.5 // dealing with the edge case
+                        generateStrip(gammaPair, albedo, turbidity, elevationDeg) { yp, i, colour ->
+                            val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
+                            val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
+                            val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
+                            bytes[fileOffset + i] = colour
+                        }
                     }
                 }
             }
         }
+
+        println("Atlas generation done!")
+        File("./assets/clut/skybox.tga").writeBytes(bytes)
     }
 
-    println("Atlas generation done!")
+    private val gradSizes = (0 until Skybox.gradSize)
 
-    File("./assets/clut/skybox.tga").writeBytes(bytes)
+    private fun getByte(gammaPair: Int, albedo0: Int, turb0: Int, elev0: Int, yp: Int, channel: Int): Byte {
+        val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
+        val imgOffY = texh - 1 - (Skybox.gradSize * turb0 + yp)
+        val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
+        return bytes[fileOffset + channel]
+    }
+
+    fun generateCloudColourmap() {
+        if (bytes[TGA_HEADER_SIZE].toInt() == 0) throw IllegalStateException("Atlas not generated")
+
+        // write header
+        byteArrayOf(
+            0, // ID field
+            0, // colour map (none)
+            2, // colour type (unmapped RGB)
+            0, 0, 0, 0, 0, // colour map spec (empty)
+            0, 0, 0, 0, // unused for modern purposes
+            (texw and 255).toByte(), (texw.ushr(8) and 255).toByte(), // width
+            (texh2 and 255).toByte(), (texh2.ushr(8) and 255).toByte(), // height
+            32, // bits-per-pixel (8bpp RGBA)
+            8 // image descriptor (32bpp, bottom-left origin)
+        ).forEachIndexed { i, b -> bytes2[i] = b }
+        // write footer
+        "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000TRUEVISION-XFILE\u002E\u0000".forEachIndexed { i, c ->
+            bytes2[TGA_HEADER_SIZE + bytes2Size * 4 + i] =
+                c.code.toByte()
+        }
+
+        println("Generating cloud colour atlas ($texw x $texh2)...")
+
+        for (gammaPair in 0..1) {
+
+            for (albedo0 in 0 until Skybox.albedoCnt) {
+                val albedo = Skybox.albedos[albedo0]
+                println("Albedo=$albedo")
+                for (turb0 in 0 until Skybox.turbCnt) {
+                    val turbidity = Skybox.turbiditiesD[turb0]
+                    println("....... Turbidity=$turbidity")
+                    for (elev0 in 0 until Skybox.elevCnt) {
+
+                        val pixelValueAvrB = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 0).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
+                        val pixelValueAvrG = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 1).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
+                        val pixelValueAvrR = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 2).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
+                        val pixelValueAvrA = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 3).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
+
+                        val colour = arrayOf(pixelValueAvrB, pixelValueAvrG, pixelValueAvrR, pixelValueAvrA)
+
+                        val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
+                        val imgOffY = texh2 - 1 - turb0
+                        val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
+
+                        for (i in 0..3) {
+                            bytes2[fileOffset + i] = colour[i]
+                        }
+
+                    }
+                }
+            }
+        }
+
+        println("Colourmap generation done!")
+        File("./assets/clut/skyboxavr.tga").writeBytes(bytes2)
+    }
+
+
+    fun invoke() {
+        generateMainFile()
+        generateCloudColourmap()
+    }
+
+    private fun Double.srgbLinearise(): Double {
+        return if (this > 0.0031308)
+            1.055 * this.pow(1 / 2.4) - 0.055
+        else
+            this * 12.92
+    }
+
+    private val bytesLut = arrayOf(2, 1, 0, 3, 2, 1, 0, 3) // For some reason BGRA order is what makes it work
 }
 
-
-private val bytesLut = arrayOf(2,1,0,3,2,1,0,3) // For some reason BGRA order is what makes it work
+fun main() {
+    GenerateSkyboxTextureAtlas().invoke()
+}
