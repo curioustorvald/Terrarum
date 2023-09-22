@@ -549,6 +549,13 @@ internal object WeatherMixer : RNGConsumer {
     private val parallaxDomainSize = 550f
     private val turbidityDomainSize = parallaxDomainSize * 1.3333334f
 
+    private val CLOUD_SOLARDEG_OFFSET = 0.9f
+
+    private val globalLightBySun = Cvec()
+    private val globalLightByMoon = Cvec()
+    private val cloudCol1 = Cvec()
+    private val cloudCol2 = Cvec()
+
     private fun drawSkybox(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
         val weatherbox = world.weatherbox
         val currentWeather = world.weatherbox.currentWeather
@@ -559,8 +566,8 @@ internal object WeatherMixer : RNGConsumer {
         val daylightClut = currentWeather.daylightClut
         // calculate global light
         val moonSize = (-(2.0 * world.worldTime.moonPhase - 1.0).abs() + 1.0).toFloat()
-        val globalLightBySun: Cvec = getGradientColour2(daylightClut, solarElev, timeNow)
-        val globalLightByMoon: Cvec = moonlightMax * moonSize
+        globalLightBySun.set(getGradientColour2(daylightClut, solarElev, timeNow))
+        globalLightByMoon.set(moonlightMax * moonSize)
         globalLightNow.set(globalLightBySun max globalLightByMoon)
 
         /* (copied from the shader source)
@@ -598,8 +605,9 @@ internal object WeatherMixer : RNGConsumer {
 
 
 
-        val cloudCol1 = getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo)
-        cloudDrawColour.set(lerp(0.5, cloudCol1, globalLightNow))
+        cloudCol1.set(getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo))
+        cloudCol2.set(getGradientColour2(daylightClut, solarElev + CLOUD_SOLARDEG_OFFSET, timeNow) max globalLightByMoon)
+        cloudDrawColour.set(lerp(0.5, cloudCol1, cloudCol2))
 
 
 
@@ -728,11 +736,14 @@ internal object WeatherMixer : RNGConsumer {
         return Cvec(newColRGB, newColUV.r)
     }
 
-    fun getGradientCloud(colorMap: GdxColorMap, solarAngleInDeg: Double, mornNoonBlend: Double, turbidity: Double, albedo: Double): Cvec {
+    fun getGradientCloud(colorMap: GdxColorMap, solarAngleInDeg0: Double, mornNoonBlend: Double, turbidity: Double, albedo: Double): Cvec {
+        val solarAngleInDeg = solarAngleInDeg0 + CLOUD_SOLARDEG_OFFSET // add a small offset
+        val solarAngleInDegInt = solarAngleInDeg.floorToInt()
+
         // fine-grained
-        val angleX1 = solarAngleInDeg.toInt() + 75
+        val angleX1 = (solarAngleInDegInt + 75).coerceAtMost(150)
         val angleX2 = (angleX1 + 1).coerceAtMost(150)
-        val ax = solarAngleInDeg % 1.0
+        val ax = solarAngleInDeg - solarAngleInDegInt
         // fine-grained
         val turbY = turbidity.coerceIn(Skybox.turbiditiesD.first(), Skybox.turbiditiesD.last()).minus(1.0).times(Skybox.turbDivisor)
         val turbY1 = turbY.floorToInt()
@@ -752,7 +763,6 @@ internal object WeatherMixer : RNGConsumer {
         val a2t1b2A = colorMap.getCvec(albX2 * elevCnt + angleX2, turbY1)
         val a1t2b2A = colorMap.getCvec(albX2 * elevCnt + angleX1, turbY2)
         val a2t2b2A = colorMap.getCvec(albX2 * elevCnt + angleX2, turbY2)
-
         val a1t1b1B = colorMap.getCvec(albX1 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
         val a2t1b1B = colorMap.getCvec(albX1 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
         val a1t2b1B = colorMap.getCvec(albX1 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
@@ -766,20 +776,17 @@ internal object WeatherMixer : RNGConsumer {
         val t2b1A = lerp(ax, a1t2b1A, a2t2b1A)
         val t1b2A = lerp(ax, a1t1b2A, a2t1b2A)
         val t2b2A = lerp(ax, a1t2b2A, a2t2b2A)
-
-        val b1A = lerp(tx, t1b1A, t2b1A)
-        val b2A = lerp(tx, t1b2A, t2b2A)
-
-        val A = lerp(bx, b1A, b2A)
-
         val t1b1B = lerp(ax, a1t1b1B, a2t1b1B)
         val t2b1B = lerp(ax, a1t2b1B, a2t2b1B)
         val t1b2B = lerp(ax, a1t1b2B, a2t1b2B)
         val t2b2B = lerp(ax, a1t2b2B, a2t2b2B)
 
+        val b1A = lerp(tx, t1b1A, t2b1A)
+        val b2A = lerp(tx, t1b2A, t2b2A)
         val b1B = lerp(tx, t1b1B, t2b1B)
         val b2B = lerp(tx, t1b2B, t2b2B)
 
+        val A = lerp(bx, b1A, b2A)
         val B = lerp(bx, b1B, b2B)
 
         return lerp(mornNoonBlend, A, B)

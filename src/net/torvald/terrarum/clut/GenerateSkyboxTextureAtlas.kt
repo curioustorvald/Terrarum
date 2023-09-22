@@ -1,8 +1,10 @@
 package net.torvald.terrarum.clut
 
 import net.torvald.colourutil.CIEXYZ
+import net.torvald.colourutil.HUSLColorConverter
 import net.torvald.colourutil.toColor
 import net.torvald.colourutil.toRGB
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.parametricsky.ArHosekSkyModel
 import net.torvald.terrarum.abs
 import net.torvald.terrarum.clut.Skybox.coerceInSmoothly
@@ -11,7 +13,6 @@ import net.torvald.terrarum.clut.Skybox.scaleToFit
 import net.torvald.terrarum.modulebasegame.worldgenerator.HALF_PI
 import net.torvald.terrarum.serialise.toLittle
 import net.torvald.terrarum.serialise.toUint
-import net.torvald.terrarum.sqrt
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.cos
@@ -170,19 +171,26 @@ class GenerateSkyboxTextureAtlas {
                     println("....... Turbidity=$turbidity")
                     for (elev0 in 0 until Skybox.elevCnt) {
 
-                        val pixelValueAvrB = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 0).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
-                        val pixelValueAvrG = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 1).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
-                        val pixelValueAvrR = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 2).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
-                        val pixelValueAvrA = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 3).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().times(255.0).roundToInt().toByte()
+                        val avrB = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 0).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
+                        val avrG = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 1).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
+                        val avrR = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 2).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
+                        val avrA = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 3).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
 
-                        val colour = arrayOf(pixelValueAvrB, pixelValueAvrG, pixelValueAvrR, pixelValueAvrA)
+                        val colour = Cvec(avrR, avrG, avrB, avrA).saturate(1.6666667f)
+
+                        val colourBytes = arrayOf(
+                            colour.b.times(255f).roundToInt().coerceIn(0..255).toByte(),
+                            colour.g.times(255f).roundToInt().coerceIn(0..255).toByte(),
+                            colour.r.times(255f).roundToInt().coerceIn(0..255).toByte(),
+                            colour.a.times(255f).roundToInt().coerceIn(0..255).toByte()
+                        )
 
                         val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
                         val imgOffY = texh2 - 1 - turb0
                         val fileOffset = TGA_HEADER_SIZE + 4 * (imgOffY * texw + imgOffX)
 
                         for (i in 0..3) {
-                            bytes2[fileOffset + i] = colour[i]
+                            bytes2[fileOffset + i] = colourBytes[i]
                         }
 
                     }
@@ -205,6 +213,16 @@ class GenerateSkyboxTextureAtlas {
             1.055 * this.pow(1 / 2.4) - 0.055
         else
             this * 12.92
+    }
+
+    private fun Cvec.saturate(intensity: Float): Cvec {
+        val luv = HUSLColorConverter.rgbToHsluv(floatArrayOf(this.r, this.g, this.b))
+        luv[1] *= intensity
+        val rgb = HUSLColorConverter.hsluvToRgb(luv)
+        this.r = rgb[0]
+        this.g = rgb[1]
+        this.b = rgb[2]
+        return this
     }
 
     private val bytesLut = arrayOf(2, 1, 0, 3, 2, 1, 0, 3) // For some reason BGRA order is what makes it work
