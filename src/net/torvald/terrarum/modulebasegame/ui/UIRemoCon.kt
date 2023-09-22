@@ -24,7 +24,9 @@ import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGH
  * Created by minjaesong on 2018-08-29.
  */
 open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>) : UICanvas() {
-
+    init {
+        handler.allowESCtoClose = false
+    }
     override var openCloseTime = 0f
 
     private var remoConTray: UIRemoConElement // this remocon is dynamically generated
@@ -196,6 +198,7 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
             ui.setPosition(0,0)
             parent.uiFakeBlurOverlay.setAsOpen()
             ui.setAsOpen()
+            ui.handler.allowESCtoClose = false
             openUI = ui
         }
     }

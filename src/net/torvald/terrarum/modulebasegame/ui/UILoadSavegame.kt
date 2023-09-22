@@ -25,6 +25,8 @@ class UILoadSavegame(val remoCon: UIRemoCon) : Advanceable() {
 //    private val hash = RandomWordsName(3)
 
     init {
+        handler.allowESCtoClose = false
+
         CommonResourcePool.addToLoadingList("terrarum-defaultsavegamethumb") {
             TextureRegion(Texture(Gdx.files.internal("assets/graphics/gui/savegame_thumb_placeholder.png")))
         }

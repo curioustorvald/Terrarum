@@ -14,6 +14,10 @@ import kotlin.math.roundToInt
  */
 class UIAutosaveNotifier : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     companion object {
         const val WIDTH = 180
         const val HEIGHT = 24

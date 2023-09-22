@@ -15,7 +15,9 @@ import net.torvald.terrarum.ui.UICanvas
  * Created by minjaesong on 2021-09-09.
  */
 class UIFakeGradOverlay : UICanvas() {
-
+    init {
+        handler.allowESCtoClose = false
+    }
     override var width: Int
         get() = App.scr.width
         set(value) {}
@@ -67,7 +69,9 @@ class UIFakeGradOverlay : UICanvas() {
 }
 
 class UIFakeBlurOverlay(val blurRadius: Float, val nodarken: Boolean) : UICanvas() {
-
+    init {
+        handler.allowESCtoClose = false
+    }
     override var width: Int
         get() = App.scr.width
         set(value) {}

@@ -11,7 +11,9 @@ import net.torvald.terrarum.ui.*
 import java.util.TreeMap
 
 open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
-
+    init {
+        handler.allowESCtoClose = false
+    }
 
     private val textAreaHMargin = 48
     override var width = 600

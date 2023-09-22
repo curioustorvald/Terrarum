@@ -330,7 +330,6 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     override fun doClosing(delta: Float) {
         super.doClosing(delta)
-        screen = 0
     }
 
     override fun endOpening(delta: Float) {

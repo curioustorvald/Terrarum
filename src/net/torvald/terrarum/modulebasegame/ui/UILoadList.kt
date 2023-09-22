@@ -20,6 +20,10 @@ import kotlin.math.roundToInt
  */
 class UILoadList(val full: UILoadSavegame) : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height
 

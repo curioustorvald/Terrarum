@@ -67,6 +67,7 @@ class UINSMenu(
     var invocationArgument: Array<Any> = arrayOf(this)
 
     init {
+        handler.allowESCtoClose = false
         addSubMenu(tree)
     }
 

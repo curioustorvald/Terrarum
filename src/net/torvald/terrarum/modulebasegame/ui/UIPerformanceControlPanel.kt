@@ -23,6 +23,8 @@ class UIPerformanceControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override var width = 560
 
     init {
+        handler.allowESCtoClose = false
+
         ControlPanelCommon.register(this, width, "basegame.performancecontrolpanel", arrayOf(
             arrayOf("", { Lang["MENU_OPTIONS_GAMEPLAY"] }, "h1"),
                 arrayOf("autosaveinterval", { Lang["MENU_OPTIONS_AUTOSAVE"] + " (${Lang["CONTEXT_TIME_MINUTE_PLURAL"]})" }, "spinnerimul,5,120,5,60000"),

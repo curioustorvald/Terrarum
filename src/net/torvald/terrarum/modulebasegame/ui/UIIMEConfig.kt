@@ -20,6 +20,10 @@ import net.torvald.terrarum.ui.*
  */
 class UIIMEConfig(remoCon: UIRemoCon?) : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     override var width = 480
     override var height = 600
 

@@ -33,6 +33,9 @@ import kotlin.math.roundToInt
  * Created by minjaesong on 2021-10-25.
  */
 class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
+    init {
+        handler.allowESCtoClose = false
+    }
 
     private var newPlayerCreationThread = Thread {}
     private var existingPlayer: DiskSkimmer? = null

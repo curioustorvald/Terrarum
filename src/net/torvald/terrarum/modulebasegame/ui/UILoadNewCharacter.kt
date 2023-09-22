@@ -11,6 +11,9 @@ import net.torvald.terrarum.ui.UICanvas
  * Created by minjaesong on 2023-07-05.
  */
 class UILoadNewCharacter(val full: UILoadSavegame) : UICanvas() {
+    init {
+        handler.allowESCtoClose = false
+    }
 
     override var width: Int = Toolkit.drawWidth
     override var height: Int = App.scr.height

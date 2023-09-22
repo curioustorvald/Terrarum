@@ -25,6 +25,9 @@ import java.io.File
  * Created by minjaesong on 2023-08-24.
  */
 class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
+    init {
+        handler.allowESCtoClose = false
+    }
 
     override var width = 480 // SAVE_CELL_WIDTH
     override var height = 480

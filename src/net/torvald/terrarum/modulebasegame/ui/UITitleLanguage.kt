@@ -16,6 +16,10 @@ import kotlin.math.max
 
 class UITitleLanguage(remoCon: UIRemoCon?) : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     val menuLabels = arrayOf(
             "MENU_LABEL_RETURN"
     )

@@ -22,6 +22,9 @@ val MODULEINFO_CELL_HEIGHT = 24*3
  * Created by minjaesong on 2017-08-01.
  */
 class UITitleModules(val remoCon: UIRemoCon) : UICanvas() {
+    init {
+        handler.allowESCtoClose = false
+    }
 
     override var width: Int
         get() = Toolkit.drawWidth

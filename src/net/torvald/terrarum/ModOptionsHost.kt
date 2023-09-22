@@ -7,7 +7,9 @@ import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.ui.UICanvas
 
 class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
-
+    init {
+        handler.allowESCtoClose = false
+    }
 
     private val moduleAreaHMargin = 48
     private val moduleAreaBorder = 8

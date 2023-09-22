@@ -23,6 +23,8 @@ class UIGraphicsControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override var width = 560
 
     init {
+        handler.allowESCtoClose = false
+
         ControlPanelCommon.register(this, width, "basegame.graphicscontrolpanel", arrayOf(
             arrayOf("", { Lang["CREDITS_VFX"] }, "h1"),
                 arrayOf("fx_dither", { Lang["MENU_OPTIONS_DITHER"] }, "toggle"),

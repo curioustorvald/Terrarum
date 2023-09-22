@@ -14,6 +14,8 @@ class UISoundControlPanel(remoCon: UIRemoCon?) : UICanvas() {
     override var width = 560
 
     init {
+        handler.allowESCtoClose = false
+
         ControlPanelCommon.register(this, width, "basegame.soundcontrolpanel", arrayOf(
             arrayOf("mastervolume", { Lang["MENU_OPTIONS_SOUND_VOLUME"] }, "sliderd,0,1"),
             arrayOf("", { "" }, "p"),

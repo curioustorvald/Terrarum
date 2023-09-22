@@ -9,6 +9,10 @@ import net.torvald.terrarum.ui.UICanvas
  * Created by minjaesong on 2017-03-13.
  */
 object NullUI : UICanvas() {
+    init {
+        handler.allowESCtoClose = false
+    }
+
     override var width: Int = 0
     override var height: Int = 0
     override var openCloseTime = 0f

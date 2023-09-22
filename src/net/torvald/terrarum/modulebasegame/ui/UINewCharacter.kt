@@ -27,6 +27,10 @@ import java.io.File
  */
 class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
 
+    init {
+        handler.allowESCtoClose = false
+    }
+
     override var width = 480
     override var height = 480
 
