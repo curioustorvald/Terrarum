@@ -27,11 +27,11 @@ Requires 64 bit processor and operation system.
 | | Minimum | Recommended |
 |---|---|---|
 |OS|Windows 7/macOS Sierra/Ubuntu 16.04|Windows 10/macOS Big Sur/Linux with Kernel 5.4|
-|CPU|AMD Phenom X4 9600/Intel Core 2 Duo E8400|AMD Ryzen 5 1500X/Intel Core i7-4770K|
-|Memory|4GB RAM|8GB RAM|
+|CPU|AMD Phenom X4 9600/Intel Core 2 Duo E8400|AMD Ryzen 5 1500X/Intel Core i7-4770K/Apple M1|
+|Memory|4 GB RAM|8 GB RAM|
 |OpenGL|3.2|4.0|
 |Graphics|GeForce 9600 GT|Anything that supports OpenGL 4.0|
-|Storage|5 GB available|5 GB available but faster|
+|Storage|2 GB available|2 GB available but faster|
 
 - Playing the game on the Minimum Requirement is ill advised: framerate will be sub-20 and the world generation will take more than 10 minutes
 
