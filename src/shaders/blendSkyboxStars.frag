@@ -2,7 +2,7 @@
 #ifdef GL_ES
     precision mediump float;
 #endif
-
+#define srgbmix(c1, c2, control) unlinearise(mix(linearise(c1), linearise(c2), (control))) // wow this is slow...
 
 in vec4 v_color;
 in vec2 v_texCoords;
@@ -118,6 +118,20 @@ vec4 random(vec2 p) {
         fract(cos(dot(p + randomNumber.yw, K1)) * 12345.6789)
     );
 } // TODO the "grain" needs to be larger
+
+vec4 linearise(vec4 c) {
+    bvec3 cutoff = lessThan(c.rgb, vec3(0.04045));
+    vec3 higher = pow((c.rgb + vec3(0.055))/vec3(1.055), vec3(2.4));
+    vec3 lower = c.rgb / vec3(12.92);
+    return vec4(mix(higher, lower, cutoff), c.a);
+}
+
+vec4 unlinearise(vec4 c) {
+    bvec3 cutoff = lessThan(c.rgb, vec3(0.0031308));
+    vec3 higher = vec3(1.055) * pow(c.rgb, vec3(1.0 / 2.4)) - vec3(0.055);
+    vec3 lower = c.rgb * vec3(12.92);
+    return vec4(mix(higher, lower, cutoff), c.a);
+}
 
 // draw call to this function must use UV coord of (0,0,1,1)!
 void main(void) {

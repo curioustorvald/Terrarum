@@ -25,9 +25,6 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
         width, height
     ).also {
         it.setWallOfText(text)
-        it.scrolledListener = { x, y ->
-            scrollbar?.scrolledForce(5*x, 5*y)
-        }
     }
 
     private val scrollbar: UIItemVertSlider? = if (true) {
@@ -62,6 +59,7 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         textArea.scrolled(amountX, amountY)
+        scrollbar?.scrolledForce(5*amountX, 5*amountY)
         return true
     }
 
