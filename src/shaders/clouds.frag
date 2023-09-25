@@ -12,7 +12,7 @@ const vec2 boolean = vec2(0.0, 1.0);
 uniform vec4 shadeCol;
 //uniform float shadiness = 1.0;
 
-vec4 shadeVec = vec4(1.0 + 3.333 * v_generic.z, 1.0 + 3.333 * v_generic.z, 1.0 + 3.333 * v_generic.z, 1.0);
+vec4 shadeVec = vec4(vec3(1.0 + 3.333 * v_generic.y), 1.0);
 
 void main() {
     vec4 cloudCol = v_color;
