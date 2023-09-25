@@ -592,7 +592,7 @@ internal object WeatherMixer : RNGConsumer {
                 val altOfSolarRay = cloudYtoSolarAlt(it.posY*-1.0, solarElev)
 
                 val cloudCol1 = getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo)
-                val cloudCol2 = getGradientColour2(currentWeather.daylightClut, altOfSolarRay, timeNow)
+                val cloudCol2 = getGradientColour2(currentWeather.daylightClut, altOfSolarRay, timeNow, 4)
                 val cloudDrawColour = lerp(0.75, cloudCol1, cloudCol2) // no srgblerp for performance
 
                 val shadiness = (1.0 / cosh(altOfSolarRay * 0.5)).toFloat().coerceAtLeast(if (altOfSolarRay < 0) 0.6666f else 0f)
@@ -773,7 +773,7 @@ internal object WeatherMixer : RNGConsumer {
         return Cvec(newCol)
     }
 
-    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int): Cvec {
+    fun getGradientColour2(colorMap: GdxColorMap, solarAngleInDeg: Double, timeOfDay: Int, offY: Int = 0): Cvec {
         val pNowRaw = (solarAngleInDeg + 75.0) / 150.0 * colorMap.width
 
         val pStartRaw = pNowRaw.floorToInt()
@@ -807,8 +807,8 @@ internal object WeatherMixer : RNGConsumer {
         var scale = (pNowRaw - pStartRaw).toFloat()
         if (timeOfDay >= HALF_DAY) scale = 1f - scale
 
-        val colourThisRGB = colorMap.get(pSx, pSy)
-        val colourNextRGB = colorMap.get(pNx, pNy)
+        val colourThisRGB = colorMap.get(pSx, pSy + offY)
+        val colourNextRGB = colorMap.get(pNx, pNy + offY)
         val colourThisUV = colorMap.get(pSx, pSy + 2)
         val colourNextUV = colorMap.get(pNx, pNy + 2)
 
