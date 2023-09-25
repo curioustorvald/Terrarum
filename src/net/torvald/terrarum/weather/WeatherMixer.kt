@@ -562,7 +562,7 @@ internal object WeatherMixer : RNGConsumer {
         batch.color = Color.WHITE
     }
 
-    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG = 0.000005
+    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG = 0.0000085
 
     /**
      * Mathematical model: https://www.desmos.com/calculator/8dsgigfoys
