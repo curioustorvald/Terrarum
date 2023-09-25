@@ -81,7 +81,7 @@ internal object WeatherMixer : RNGConsumer {
     private var forceWindVec: Vector3? = null
 
     val globalLightNow = Cvec(0)
-    private val cloudDrawColour = Color()
+//    private val cloudDrawColour = Color()
     private val moonlightMax = Cvec(
         0.23f,
         0.24f,
@@ -531,6 +531,8 @@ internal object WeatherMixer : RNGConsumer {
     private var turbidity0 = 1.0
     private var turbidity1 = 1.0
 
+    private var mornNoonBlend = 0f
+
     /** Interpolated value, controlled by the weatherbox */
     var turbidity = 1.0; private set
 
@@ -556,26 +558,47 @@ internal object WeatherMixer : RNGConsumer {
             world.worldTime.solarElevationDeg
 
         drawSkybox(camera, batch, world)
-        drawClouds(batch)
+        drawClouds(batch, world)
         batch.color = Color.WHITE
+    }
+
+    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG = 0.000005
+
+    /**
+     * Mathematical model: https://www.desmos.com/calculator/8dsgigfoys
+     */
+    private fun cloudYtoSolarAlt(cloudY: Double, currentsolarDeg: Double): Double {
+        fun g(x: Double) = atan(RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG * x) / Math.PI
+        fun a(x: Double) = atan(0.0001 * x) / (0.5 * RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG * Math.PI)
+
+        val delta = (180.0 - 2.0 * currentsolarDeg).abs() * g(cloudY - a(currentsolarDeg.abs()))
+        return (currentsolarDeg + CLOUD_SOLARDEG_OFFSET + delta).bipolarClamp(Skybox.elevMax)
     }
 
     /**
      * Dependent on the `drawSkybox(camera, batch, world)` for the `cloudDrawColour`
      *
      */
-    private fun drawClouds(batch: SpriteBatch) {
+    private fun drawClouds(batch: SpriteBatch, world: GameWorld) {
+        val currentWeather = world.weatherbox.currentWeather
+        val timeNow = (forceTimeAt ?: world.worldTime.TIME_T.toInt()) % WorldTime.DAY_LENGTH
+
         batch.inUse { _ ->
             batch.shader = shaderClouds
             val shadeLum = (globalLightNow.r * 3f + globalLightNow.g * 4f + globalLightNow.b * 1f) / 8f * 0.5f
             batch.shader.setUniformf("shadeCol", shadeLum * 1.05f, shadeLum, shadeLum / 1.05f, 1f)
-            batch.shader.setUniformf(
-                "shadiness",
-                (1.0 / cosh(solarElev * 0.5)).toFloat().coerceAtLeast(if (solarElev < 0) 0.6666f else 0f)
-            )
 
             clouds.forEach {
-                it.render(batch as UnpackedColourSpriteBatch, cloudDrawColour)
+                val altOfSolarRay = cloudYtoSolarAlt(it.posY*-1.0, solarElev)
+
+                val cloudCol1 = getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo)
+                val cloudCol2 = getGradientColour2(currentWeather.daylightClut, altOfSolarRay, timeNow)
+                val cloudDrawColour = lerp(0.75, cloudCol1, cloudCol2) // no srgblerp for performance
+
+                val shadiness = (1.0 / cosh(altOfSolarRay * 0.5)).toFloat().coerceAtLeast(if (altOfSolarRay < 0) 0.6666f else 0f)
+
+//                printdbg(this, "cloudY=${-it.posY}\tsolarElev=$solarElev\trayAlt=$altOfSolarRay\tshady=$shadiness")
+                it.render(batch as UnpackedColourSpriteBatch, cloudDrawColour.toGdxColor(), shadiness)
             }
         }
     }
@@ -583,12 +606,10 @@ internal object WeatherMixer : RNGConsumer {
     private val parallaxDomainSize = 550f
     private val turbidityDomainSize = parallaxDomainSize * 1.3333334f
 
-    private val CLOUD_SOLARDEG_OFFSET = 0.9f
+    private val CLOUD_SOLARDEG_OFFSET = -0.0f
 
     private val globalLightBySun = Cvec()
     private val globalLightByMoon = Cvec()
-    private val cloudCol1 = Cvec()
-    private val cloudCol2 = Cvec()
 
     private fun drawSkybox(camera: OrthographicCamera, batch: FlippingSpriteBatch, world: GameWorld) {
         val weatherbox = world.weatherbox
@@ -625,7 +646,7 @@ internal object WeatherMixer : RNGConsumer {
         gdxBlendNormalStraightAlpha()
 
         val oldNewBlend = weatherbox.weatherBlend.times(2f).coerceAtMost(1f)
-        val mornNoonBlend =
+        mornNoonBlend =
             (1f / 4000f * (timeNow - 43200) + 0.5f).coerceIn(0f, 1f) // 0.0 at T41200; 0.5 at T43200; 1.0 at T45200;
 
         turbidity0 =
@@ -643,7 +664,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
 
-        cloudCol1.set(getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo))
+        /*cloudCol1.set(getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo))
         cloudCol2.set(
             getGradientColour2(
                 daylightClut,
@@ -651,7 +672,7 @@ internal object WeatherMixer : RNGConsumer {
                 timeNow
             ) max globalLightByMoon
         )
-        cloudDrawColour.set(srgblerp(0.7, cloudCol1, cloudCol2))
+        cloudDrawColour.set(srgblerp(0.7, cloudCol1, cloudCol2))*/
 
 
         val gradY = -(gH - App.scr.height) * ((parallax + 1f) / 2f)

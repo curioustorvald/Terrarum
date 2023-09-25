@@ -78,7 +78,7 @@ class WeatherObjectCloud(
 
     private val vecMult = Vector3(1f, 1f, 1f / (4f * H))
 
-    fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour0: Color) {
+    fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour0: Color, shadiness: Float) {
         val sc = screenCoord
 
 //        printdbg(this, "gamma: (${rgbGamma}, ${aGamma}) index: ($rgbGammaIndex, $aGammaIndex)")
@@ -87,7 +87,7 @@ class WeatherObjectCloud(
             it.a = alpha
         }
         batch.color = cloudCol
-        batch.generic.set(rgbGamma, aGamma, 0f, 0f)
+        batch.generic.set(rgbGamma, aGamma, shadiness, 0f)
 
         if (flipW)
             batch.draw(texture, sc.x + texture.regionWidth / posZ, sc.y, -texture.regionWidth * sc.z, texture.regionHeight * sc.z)

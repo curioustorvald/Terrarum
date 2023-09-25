@@ -2,7 +2,7 @@
 
 
 in vec4 v_color; // lightCol
-in vec4 v_generic; // gamma values [rgb gam, a gam, 0, 0]
+in vec4 v_generic; // [rgb gamma, a gamma, shadiness, 0]
 in vec2 v_texCoords;
 uniform sampler2D u_texture;
 out vec4 fragColor;
@@ -10,9 +10,9 @@ out vec4 fragColor;
 const vec2 boolean = vec2(0.0, 1.0);
 
 uniform vec4 shadeCol;
-uniform float shadiness = 1.0;
+//uniform float shadiness = 1.0;
 
-vec4 shadeVec = vec4(1.0 + 3.333 * shadiness, 1.0 + 3.333 * shadiness, 1.0 + 3.333 * shadiness, 1.0);
+vec4 shadeVec = vec4(1.0 + 3.333 * v_generic.z, 1.0 + 3.333 * v_generic.z, 1.0 + 3.333 * v_generic.z, 1.0);
 
 void main() {
     vec4 cloudCol = v_color;
