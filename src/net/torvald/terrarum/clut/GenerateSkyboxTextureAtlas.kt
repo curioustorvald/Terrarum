@@ -48,9 +48,9 @@ class GenerateSkyboxTextureAtlas {
             var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
 
             // experiments visualisation: https://www.desmos.com/calculator/5crifaekwa
-//        if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
-//        if (elevationDeg < 0) yf *= -2.0 * asin(xf - 1.0) / PI
-            if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
+//            if (elevationDeg < 0) yf *= 1.0 - pow(xf, 0.333)
+//            if (elevationDeg < 0) yf *= -2.0 * asin(xf - 1.0) / PI
+//            if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
             val theta = yf * HALF_PI
             // vertical angle, where 0 is zenith, ±90 is ground (which is odd)
 

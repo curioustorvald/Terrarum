@@ -188,7 +188,11 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         val ys2 = ArrayList<Float>()
 
         val halfHeight = oneScreen.height * 0.5
+
+        val elevation = if (elevation.abs() < 0.0001) Math.toRadians(0.5) else elevation // dealing with the edge case
         val elevationDeg = Math.toDegrees(elevation)
+
+
 
         for (x in 0 until oneScreen.width) {
             for (y in 0 until oneScreen.height) {
@@ -204,9 +208,10 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 val yi = yp - 3
                 val xf = -elevationDeg / 90.0
                 var yf = (yi / 58.0).coerceIn(0.0, 1.0).mapCircle().coerceInSmoothly(0.0, 0.95)
-                if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
+//                if (elevationDeg < 0) yf *= Skybox.superellipsoidDecay(1.0 / 3.0, xf)
                 val theta = yf * HALF_PI
-                val gamma = if (y < halfHeight) Math.toRadians(cameraHeading) else Math.toRadians(cameraHeading + 180)
+                val gammaPair = if (y < halfHeight) 0 else 1
+                val gamma = Math.toRadians(115 + 25 * cos(PI * elevationDeg / 40)) + (gammaPair * PI)
 
 
                 val xyz = CIEXYZ(
@@ -217,7 +222,7 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
                 val xyz2 = xyz.scaleToFit(elevation)
                 ys.add(xyz.Y)
                 ys2.add(xyz2.Y)
-                val rgb = xyz2.toRGB().toColor()
+                val rgb = xyz2.toRGB().toColor().gamma(1.2f)
                 rgb.a = 1f
 
                 /*val rgb2 = Color(
@@ -239,6 +244,13 @@ class Application(val WIDTH: Int, val HEIGHT: Int) : Game() {
         ymaxDisp2.text = "${ys2.max()}"
 
         //System.exit(0)
+    }
+
+    private fun Color.gamma(gam: Float): Color {
+        this.r = this.r.pow(gam)
+        this.g = this.g.pow(gam)
+        this.b = this.b.pow(gam)
+        return this
     }
 
     override fun create() {
