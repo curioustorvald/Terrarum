@@ -78,6 +78,13 @@ class WeatherObjectCloud(
 
     private val vecMult = Vector3(1f, 1f, 1f / (4f * H))
 
+    private fun packFloat(f: Float, g: Float): Float {
+        val fi = java.lang.Float.floatToRawIntBits(f)
+        val gi = java.lang.Float.floatToRawIntBits(g)
+        val hi = (fi and 0xffff0000.toInt()) or ((gi and 0xffff0000.toInt()) ushr 16)
+        return java.lang.Float.intBitsToFloat(hi)
+    }
+
     fun render(batch: UnpackedColourSpriteBatch, cloudDrawColour0: Color, shadiness: Float) {
         val sc = screenCoord
 
@@ -87,7 +94,7 @@ class WeatherObjectCloud(
             it.a = alpha
         }
         batch.color = cloudCol
-        batch.generic.set(rgbGamma, aGamma, shadiness, 0f)
+        batch.generic.set(packFloat(rgbGamma, aGamma), shadiness, 0f, 0f)
 
         if (flipW)
             batch.draw(texture, sc.x + texture.regionWidth / posZ, sc.y, -texture.regionWidth * sc.z, texture.regionHeight * sc.z)
