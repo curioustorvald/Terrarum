@@ -277,7 +277,8 @@ internal object WeatherMixer : RNGConsumer {
 
         while (cloudUpdateAkku >= cloudChanceEveryMin) {
             cloudUpdateAkku -= cloudChanceEveryMin
-            tryToSpawnCloud(currentWeather)
+            val newCloud = tryToSpawnCloud(currentWeather)
+//            printdbg(this, "New cloud: scrX,Y,Scale=${newCloud?.screenCoord};\tworldXYZ=${newCloud?.pos}")
         }
 
 
@@ -333,7 +334,7 @@ internal object WeatherMixer : RNGConsumer {
         }
 
 
-        cloudUpdateAkku += delta
+        cloudUpdateAkku += delta * world.worldTime.timeDelta
 
 
         oldCamPos.set(camvec)
@@ -422,10 +423,10 @@ internal object WeatherMixer : RNGConsumer {
         currentWeather: BaseModularWeather,
         precalculatedPos: Vector3? = null,
         ageOverride: Int = 0
-    ) {
+    ): WeatherObjectCloud? {
 //        printdbg(this, "Trying to spawn a cloud... (${cloudsSpawned} / ${cloudSpawnMax})")
 
-        if (cloudsSpawned < cloudSpawnMax) {
+        return if (cloudsSpawned < cloudSpawnMax) {
             val flip = Math.random() < 0.5
             val rC = takeUniformRand(0f..1f)
 //            val rZ = takeUniformRand(1f..ALPHA_ROLLOFF_Z/4f).pow(1.5f) // clouds are more likely to spawn with low Z-value
@@ -483,9 +484,9 @@ internal object WeatherMixer : RNGConsumer {
 
 //                    printdbg(this, "... Spawning ${cloud.category}($sheetX, $sheetY) cloud at pos ${it.pos}, scale ${it.scale}, invGamma ${it.darkness}")
                 }
-
             }
         }
+        else null
     }
 
     private fun initClouds(currentWeather: BaseModularWeather) {

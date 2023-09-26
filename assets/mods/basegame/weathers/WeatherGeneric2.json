@@ -18,12 +18,12 @@
     "cumulus": {
       "filename": "cloud_normal.png", "tw": 1024, "th": 512, "probability": 0.05,
       "baseScale": 2.0, "scaleVariance": 0.6,
-      "altLow": 1080, "altHigh": 1800
+      "altLow": 1080, "altHigh": 2400
     },
     "altocumulus": {
       "filename": "cloud_normal.png", "tw": 1024, "th": 512, "probability": 1.0,
       "baseScale": 1.0, "scaleVariance": 0.1,
-      "altLow": 2600, "altHigh": 3400
+      "altLow": 2600, "altHigh": 4800
     }
   },
   "atmoTurbidity": 3.5,
