@@ -632,12 +632,6 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val itemOnGrip = ItemCodex[(actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)]
         // bring up the UIs of the fixtures (e.g. crafting menu from a crafting table)
 
-        // TODO actorsUnderMouse: support ROUNDWORLD
-        val actorsUnderMouse: List<FixtureBase> = getActorsAt(Terrarum.mouseX, Terrarum.mouseY).filterIsInstance<FixtureBase>()
-        if (actorsUnderMouse.size > 1) {
-            App.printdbgerr(this, "Multiple fixtures at world coord ${Terrarum.mouseX}, ${Terrarum.mouseY}")
-        }
-
         ////////////////////////////////
 
         // #1. If ~~there is no UI under and~~ I'm holding an item, use it
@@ -659,6 +653,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun worldPrimaryClickEnd(actor: ActorWithBody, delta: Float) {
         val canPerformBarehandAction = actor.scale * actor.baseHitboxH >=
                                        (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
+
         val itemOnGrip = (actor as Pocketed).inventory.itemEquipped.get(GameItem.EquipPosition.HAND_GRIP)
         ItemCodex[itemOnGrip]?.endPrimaryUse(actor, delta)
 

@@ -117,7 +117,8 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         GameItem.Category.TOOL,
         GameItem.Category.WALL,
         GameItem.Category.WIRE,
-        GameItem.Category.BLOCK
+        GameItem.Category.BLOCK,
+        null // empty hands won't prevent dragging for barehand action
     )
 
     fun update() {
@@ -129,25 +130,28 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (!terrarumIngame.paused) {
+            val actor = terrarumIngame.actorNowPlaying
+            val itemOnGrip = terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
 
             // DON'T DO UI-FILTERING HERE; they're already done on ingame.worldPrimaryClickStart
             // also, some UIs should NOT affect item usage (e.g. quickslot) and ingame's uiOpened property is doing
             // the very job.
 
-            if (terrarumIngame.actorNowPlaying != null && Terrarum.mouseDown && !worldPrimaryClickLatched) {
-                terrarumIngame.worldPrimaryClickStart(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
+            if (actor != null && Terrarum.mouseDown && !worldPrimaryClickLatched) {
+                terrarumIngame.worldPrimaryClickStart(actor, App.UPDATE_RATE)
                 worldPrimaryClickLatched = true
             }
-            if (Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
-                terrarumIngame.worldSecondaryClickStart(terrarumIngame.actorNowPlaying!!, App.UPDATE_RATE)
+            if (actor != null && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
+                terrarumIngame.worldSecondaryClickStart(actor, App.UPDATE_RATE)
             }
 
             // unlatch when:
             // - not clicking anymore
             // - using any item that is not fixture (blocks, picks)
-            if (!Terrarum.mouseDown ||
-                inventoryCategoryAllowClickAndDrag.contains(ItemCodex[terrarumIngame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)]?.inventoryCategory)) {
+            // DON'T unlatch when:
+            // - performing barehand action
+            if (!Terrarum.mouseDown || inventoryCategoryAllowClickAndDrag.contains(ItemCodex[itemOnGrip]?.inventoryCategory)) {
                 worldPrimaryClickLatched = false
             }
 
