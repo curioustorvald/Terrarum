@@ -1,9 +1,9 @@
 {
-  "BLOCK_STONE_DEEP": "Deepstone",
-  "BLOCK_SCAFFOLDING_NORMAL": "Scaffolding",
-  "BLOCK_STONE_MARBLE": "Marble",
-
   "ITEM_CALENDAR": "Calendar",
+  "ITEM_DOOR_OAK": "Oak Door",
+  "ITEM_DOOR_EBONY": "Ebony Door",
+  "ITEM_DOOR_BIRCH": "Birch Door",
+  "ITEM_DOOR_ROSEWOOD": "Rosewood Door",
   "ITEM_LOGIC_SIGNAL_EMITTER": "Logic Signal Emitter",
   "ITEM_PICK_COPPER": "Copper Pickaxe",
   "ITEM_PICK_IRON": "Iron Pickaxe",
@@ -16,6 +16,8 @@
   "ITEM_TYPEWRITER": "Typewriter",
   "ITEM_WIRE": "Wire",
   "ITEM_WIRE_CUTTER": "Wire Cutter",
+  "ITEM_WORKBENCH": "Workbench",
+  "ITEM_WORLD_PORTAL": "Teleportation Station",
 
   "ACTORBLOCK_ALLOW_MOVE_DOWN": "Urist Arôlcustith",
   "ACTORBLOCK_FULL_COLLISION": "Urist Berdanrifot",

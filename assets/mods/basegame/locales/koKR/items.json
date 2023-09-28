@@ -1,9 +1,9 @@
 {
-  "BLOCK_STONE_DEEP": "심층석",
-  "BLOCK_SCAFFOLDING_NORMAL": "발판",
-  "BLOCK_STONE_MARBLE": "대리석",
-
   "ITEM_CALENDAR": "달력",
+  "ITEM_DOOR_OAK": "나무 문",
+  "ITEM_DOOR_EBONY": "흑단 문",
+  "ITEM_DOOR_BIRCH": "백단 문",
+  "ITEM_DOOR_ROSEWOOD": "자단 문",
   "ITEM_LOGIC_SIGNAL_EMITTER": "신호발생기",
   "ITEM_PICK_COPPER": "구리 곡괭이",
   "ITEM_PICK_IRON": "철 곡괭이",
@@ -15,5 +15,7 @@
   "ITEM_TIKI_TORCH": "티키 토치",
   "ITEM_TYPEWRITER": "타자기",
   "ITEM_WIRE": "전선",
-  "ITEM_WIRE_CUTTER": "전선 절단기"
+  "ITEM_WIRE_CUTTER": "전선 절단기",
+  "ITEM_WORKBENCH": "작업대",
+  "ITEM_WORLD_PORTAL": "텔레포트 스테이션"
 }

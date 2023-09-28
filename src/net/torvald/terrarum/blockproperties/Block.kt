@@ -21,12 +21,12 @@ object Block {
     const val PLANK_NORMAL = "basegame:48"
     const val PLANK_EBONY = "basegame:49"
     const val PLANK_BIRCH = "basegame:50"
-    const val PLANK_BLOODROSE = "basegame:51"
+    const val PLANK_ROSEWOOD = "basegame:51"
 
     const val TRUNK_NORMAL = "basegame:64"
     const val TRUNK_EBONY = "basegame:65"
     const val TRUNK_BIRCH = "basegame:66"
-    const val TRUNK_BLOODROSE = "basegame:67"
+    const val TRUNK_ROSEWOOD = "basegame:67"
 
     const val SAND = "basegame:80"
     const val SAND_WHITE = "basegame:81"
@@ -64,7 +64,7 @@ object Block {
     const val PLATFORM_WOODEN = "basegame:161"
     const val PLATFORM_EBONY = "basegame:162"
     const val PLATFORM_BIRCH = "basegame:163"
-    const val PLATFORM_BLOODROSE = "basegame:164"
+    const val PLATFORM_ROSEWOOD = "basegame:164"
 
     const val TORCH = "basegame:176"
     const val TORCH_FROST = "basegame:177"

@@ -1,80 +1,156 @@
 {
   "BLOCK_WALL_NAME_TEMPLATE": "%1$s 벽",
+  "BLOCK_UNLIT_TEMPLATE": "꺼진 %1$s",
+
+  "BLOCK_AIR": "공기",
 
   "BLOCK_STONE": "돌",
-  "BLOCK_STONE_PLURAL": "돌",
-  "BLOCK_DIRT": "흙",
-  "BLOCK_DIRT_PLURAL": "흙",
-  "BLOCK_GRASS": "잔디",
-  "BLOCK_GRAS_PLURALS": "잔디",
-  "BLOCK_PLANK_NORMAL": "나무판자",
-  "BLOCK_PLANK_NORMAL_PLURAL": "나무판자",
-  "BLOCK_PLANK_EBONY": "검정 나무판자",
-  "BLOCK_PLANK_EBONY_PLURAL": "검정 나무판자",
-  "BLOCK_PLANK_BIRCH": "하양 나무판자",
-  "BLOCK_PLANK_BIRCH_PLURAL": "하양 나무판자",
-  "BLOCK_PLANK_BLOODROSE": "빨강 나무판자",
-  "BLOCK_PLANK_BLOODROSE_PLURAL": "빨강 나무판자",
-  "BLOCK_TRUNK_NORMAL": "통나무",
-  "BLOCK_TRUNK_NORMAL_PLURAL": "통나무",
-  "BLOCK_TRUNK_EBONY": "흑단나무",
-  "BLOCK_TRUNK_EBONY_PLURAL": "흑단나무",
-  "BLOCK_TRUNK_BIRCH": "자작나무",
-  "BLOCK_TRUNK_BIRCH_PLURAL": "자작나무",
-  "BLOCK_TRUNK_BLOODROSE": "자단나무",
-  "BLOCK_TRUNK_BLOODROSE_PLURAL": "자단나무",
   "BLOCK_STONE_QUARRIED": "조약돌",
-  "BLOCK_STONE_QUARRIED_PLURAL": "조약돌",
+  "BLOCK_STONE_TILE_WHITE": "돌 타일",
+  "BLOCK_STONE_BRICKS": "돌 벽돌",
+  "BLOCK_STONE_DEEP": "심층석",
+  "BLOCK_STONE_MARBLE": "대리석",
+
+  "BLOCK_DIRT": "흙",
+  "BLOCK_GRASS": "잔디",
+  "BLOCK_GRASSWALL": "잔디",
+
+  "BLOCK_PLANK_NORMAL": "나무 판자",
+  "BLOCK_PLANK_EBONY": "흑단 판자",
+  "BLOCK_PLANK_BIRCH": "백단 판자",
+  "BLOCK_PLANK_ROSEWOOD": "자단 판자",
+
+  "BLOCK_TRUNK_NORMAL": "통나무",
+  "BLOCK_TRUNK_EBONY": "흑단목",
+  "BLOCK_TRUNK_BIRCH": "백단목",
+  "BLOCK_TRUNK_ROSEWOOD": "자단목",
+
   "BLOCK_SAND": "모래",
-  "BLOCK_SAND_PLURAL": "모래",
+  "BLOCK_SAND_WHITE": "흰 모래",
+  "BLOCK_SAND_RED": "붉은 모래",
+  "BLOCK_SAND_DESERT": "사막 모래",
+  "BLOCK_SAND_BLACK": "검은 모래",
+  "BLOCK_SAND_GREEN": "녹색 모래",
+
   "BLOCK_GRAVEL": "자갈",
-  "BLOCK_GRAVEL_PLURAL": "자갈",
+  "BLOCK_GRAVEL_GREY": "회색 자갈",
+
   "BLOCK_ORE_MALACHITE": "공작석",
-  "BLOCK_ORE_MALACHITES": "공작석",
   "BLOCK_ORE_HEMATITE": "적철석",
-  "BLOCK_ORE_HEMATITE_PLURAL": "적철석",
-  "BLOCK_ORE_NATURAL_GOLD": "자연금",
-  "BLOCK_ORE_NATERAL_GOLD_PLURAL": "자연금",
-  "BLOCK_ORE_NATURAL_SILVER": "자연은",
-  "BLOCK_ORE_NATURAL_SILVER_PLURAL": "자연은",
+  "BLOCK_ORE_NATURAL_GOLD": "금덩어리",
+  "BLOCK_ORE_NATURAL_SILVER": "은덩어리",
   "BLOCK_ORE_RUTILE": "금홍석",
-  "BLOCK_ORE_RUTILE_PLURAL": "금홍석",
   "BLOCK_ORE_AURICHALCUMITE": "진금석",
-  "BLOCK_ORE_AURICHALCUMITE_PLURAL": "진금석",
+
   "BLOCK_GEM_RUBY": "홍옥석",
-  "BLOCK_GEM_RUBY_PLURAL": "홍옥석",
   "BLOCK_GEM_EMERALD": "취옥석",
-  "BLOCK_GEM_EMERALD_PLURAL": "취옥석",
   "BLOCK_GEM_SAPPHIRE": "청옥석",
-  "BLOCK_GEM_SAPPHIRE_PLURAL": "청옥석",
   "BLOCK_GEM_TOPAZ": "황옥석",
-  "BLOCK_GEM_TOPAZ_PLURAL": "황옥석",
   "BLOCK_GEM_DIAMOND": "금강석",
-  "BLOCK_GEM_DIAMOND_PLURAL": "금강석",
   "BLOCK_GEM_AMETHYST": "자수정석",
-  "BLOCK_GEM_AMETHYST_PLURAL": "자수정석",
+
   "BLOCK_SNOW": "눈",
-  "BLOCK_SNOW_PLURAL": "눈",
+
   "BLOCK_ICE_FRAGILE": "살얼음",
-  "BLOCK_ICE_FRAGILE_PLURAL": "살얼음",
   "BLOCK_ICE_NATURAL": "얼음",
-  "BLOCK_ICE_NATURAL_PLURAL": "얼음",
-  "BLOCK_ICE_CLEAR_MAGICAL": "깨끗한 얼음",
-  "BLOCK_ICE_CLEAR_MAGICAL_PLURAL": "깨끗한 얼음",
+  "BLOCK_ICE_CLEAR_MAGICAL": "투명 얼음",
+
+  "BLOCK_GLASS_CRUDE": "유리",
+  "BLOCK_GLASS_CLEAN": "투명 유리",
+
   "BLOCK_PLATFORM_STONE": "돌 발판",
-  "BLOCK_PLATFORM_STONE_PLURAL": "돌 발판",
   "BLOCK_PLATFORM_WOODEN": "나무 발판",
-  "BLOCK_PLATFORM_WOODEN_PLURAL": "나무 발판",
   "BLOCK_PLATFORM_EBONY": "흑단 발판",
-  "BLOCK_PLATFORM_EBONY_PLURAL": "흑단 발판",
   "BLOCK_PLATFORM_BIRCH": "백단 발판",
-  "BLOCK_PLATFORM_BIRCH_PLURAL": "백단 발판",
-  "BLOCK_PLATFORM_BLOODROSE": "적단 발판",
-  "BLOCK_PLATFORM_BLOODROSE_PLURAL": "적단 발판",
+  "BLOCK_PLATFORM_ROSEWOOD": "자단 발판",
+
   "BLOCK_TORCH": "횃불",
-  "BLOCK_TORCH_PLURAL": "횃불",
-  "BLOCK_WATER": "물",
-  "BLOCK_WATER_PLURAL": "물",
-  "BLOCK_LAVA": "용암",
-  "BLOCK_LAVA_PLURAL": "용암"
+  "BLOCK_TORCH_FROST": "서리 횃불",
+
+  "BLOCK_ILLUMINATOR_WHITE"     : "백색 조명기",
+  "BLOCK_ILLUMINATOR_YELLOW"    : "황색 조명기",
+  "BLOCK_ILLUMINATOR_ORANGE"    : "주황색 조명기",
+  "BLOCK_ILLUMINATOR_RED"       : "적색 조명기",
+  "BLOCK_ILLUMINATOR_FUCHSIA"   : "분홍색 조명기",
+  "BLOCK_ILLUMINATOR_PURPLE"    : "보라색 조명기",
+  "BLOCK_ILLUMINATOR_BLUE"      : "청색 조명기",
+  "BLOCK_ILLUMINATOR_CYAN"      : "청록색 조명기",
+  "BLOCK_ILLUMINATOR_GREEN"     : "녹색 조명기",
+  "BLOCK_ILLUMINATOR_GREEN_DARK": "암록색 조명기",
+  "BLOCK_ILLUMINATOR_BROWN"     : "갈색 조명기",
+  "BLOCK_ILLUMINATOR_TAN"       : "황갈색 조명기",
+  "BLOCK_ILLUMINATOR_GREY_LIGHT": "연회색 조명기",
+  "BLOCK_ILLUMINATOR_GREY_MED"  : "회색 조명기",
+  "BLOCK_ILLUMINATOR_GREY_DARK" : "암회색 조명기",
+  "BLOCK_ILLUMINATOR_BLACK"     : "블랙라이트 조명기",
+
+  "BLOCK_SANDSTONE": "사암",
+  "BLOCK_SANDSTONE_WHITE": "흰 사암",
+  "BLOCK_SANDSTONE_RED": "붉은 사암",
+  "BLOCK_SANDSTONE_DESERT": "사막 사암",
+  "BLOCK_SANDSTONE_BLACK": "검은 사암",
+  "BLOCK_SANDSTONE_GREEN": "초록 사암",
+
+  "BLOCK_SCAFFOLDING_NORMAL": "사다리",
+
+  "BLOCK_LANTERN": "램프",
+  "BLOCK_SUNSTONE": "태양석",
+  "BLOCK_DAYLIGHT_CAPACITOR": "축광기",
+
+  "BLOCK_PLASTIC_WHITE"     : "백색 플라스틱 블록",
+  "BLOCK_PLASTIC_YELLOW"    : "황색 플라스틱 블록",
+  "BLOCK_PLASTIC_ORANGE"    : "주황색 플라스틱 블록",
+  "BLOCK_PLASTIC_RED"       : "적색 플라스틱 블록",
+  "BLOCK_PLASTIC_FUCHSIA"   : "분홍색 플라스틱 블록",
+  "BLOCK_PLASTIC_PURPLE"    : "보라색 플라스틱 블록",
+  "BLOCK_PLASTIC_BLUE"      : "청색 플라스틱 블록",
+  "BLOCK_PLASTIC_CYAN"      : "청록색 플라스틱 블록",
+  "BLOCK_PLASTIC_GREEN"     : "녹색 플라스틱 블록",
+  "BLOCK_PLASTIC_GREEN_DARK": "암록색 플라스틱 블록",
+  "BLOCK_PLASTIC_BROWN"     : "갈색 플라스틱 블록",
+  "BLOCK_PLASTIC_TAN"       : "황갈색 플라스틱 블록",
+  "BLOCK_PLASTIC_GREY_LIGHT": "연회색 플라스틱 블록",
+  "BLOCK_PLASTIC_GREY_MED"  : "회색 플라스틱 블록",
+  "BLOCK_PLASTIC_GREY_DARK" : "암회색 플라스틱 블록",
+  "BLOCK_PLASTIC_BLACK"     : "흑색 플라스틱 블록",
+
+  "BLOCK_WATER": "Water",
+  "BLOCK_LAVA": "Lava",
+
+  "WIRE_RED": "Red Wire",
+  "WIRE_GREEN": "Green Wire",
+  "WIRE_BLUE": "Blue Wire",
+  "WIRE_BUNDLE": "Wire Bundle"
+
+  /*
+# CODE OF CONDUCT
+
+## 색상명의 번역
+  - 16색 팔레트에 의한 색 이름의 경우, 다음의 단어를 사용한다:
+    - White -> 백색
+    - Yellow -> 황색
+    - Orange -> 주황색
+    - Red -> 적색
+    - Fuchsia -> 분홍색
+    - Purple -> 보라색
+    - Blue -> 청색
+    - Cyan -> 청록색
+    - Green -> 녹색
+    - Dark Green -> 암록색
+    - Brown -> 갈색
+    - Tan -> 황갈색
+    - Light Grey -> 연회색
+    - Grey -> 회색
+    - Dark Grey -> 암회색
+    - Black -> 흑색
+  - 자연색의 경우 (모래, 사암 등), 가급적 고유어 단어를 사용한다
+    - Grey는 가급적 '잿빛'으로 옮기지 않는다 (일상에서 사용되지 않는 단어)
+
+## 목재명의 번역
+  - 추가적 논의가 있기 전까지는 다음의 단어를 사용한다:
+    - Oak -> 나무
+    - Ebony -> 흑단
+    - Birch -> 적단
+    - Rosewood -> 자단
+  */
 }

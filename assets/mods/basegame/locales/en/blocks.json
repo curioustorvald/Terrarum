@@ -1,5 +1,6 @@
 {
   "BLOCK_WALL_NAME_TEMPLATE": "%1$s Wall",
+  "BLOCK_UNLIT_TEMPLATE": "Unlit %1$s",
 
   "BLOCK_AIR": "Air",
 
@@ -7,6 +8,8 @@
   "BLOCK_STONE_QUARRIED": "Quarried Stone",
   "BLOCK_STONE_TILE_WHITE": "Stone Tile",
   "BLOCK_STONE_BRICKS": "Stone Bricks",
+  "BLOCK_STONE_DEEP": "Deepstone",
+  "BLOCK_STONE_MARBLE": "Marble",
 
   "BLOCK_DIRT": "Dirt",
   "BLOCK_GRASS": "Grass",
@@ -15,12 +18,12 @@
   "BLOCK_PLANK_NORMAL": "Wooden Planks",
   "BLOCK_PLANK_EBONY": "Ebony Planks",
   "BLOCK_PLANK_BIRCH": "Birch Planks",
-  "BLOCK_PLANK_BLOODROSE": "Rosewood Planks",
+  "BLOCK_PLANK_ROSEWOOD": "Rosewood Planks",
 
   "BLOCK_TRUNK_NORMAL": "Oak Log",
   "BLOCK_TRUNK_EBONY": "Ebony Log",
   "BLOCK_TRUNK_BIRCH": "Birch Log",
-  "BLOCK_TRUNK_BLOODROSE": "Rosewood Log",
+  "BLOCK_TRUNK_ROSEWOOD": "Rosewood Log",
 
   "BLOCK_SAND": "Sand",
   "BLOCK_SAND_WHITE": "White Sand",
@@ -30,7 +33,7 @@
   "BLOCK_SAND_GREEN": "Green Sand",
 
   "BLOCK_GRAVEL": "Gravel",
-  "BLOCK_GRAVEL_GREY": "Grey gravel",
+  "BLOCK_GRAVEL_GREY": "Grey Gravel",
 
   "BLOCK_ORE_MALACHITE": "Malachite",
   "BLOCK_ORE_HEMATITE": "Hematite",
@@ -59,7 +62,7 @@
   "BLOCK_PLATFORM_WOODEN": "Wooden Platform",
   "BLOCK_PLATFORM_EBONY": "Ebony Platform",
   "BLOCK_PLATFORM_BIRCH": "Birch Platform",
-  "BLOCK_PLATFORM_BLOODROSE": "Rosewood Platform",
+  "BLOCK_PLATFORM_ROSEWOOD": "Rosewood Platform",
 
   "BLOCK_TORCH": "Torch",
   "BLOCK_TORCH_FROST": "Frost Torch",
@@ -87,6 +90,8 @@
   "BLOCK_SANDSTONE_DESERT": "Sandstone",
   "BLOCK_SANDSTONE_BLACK": "Black Sandstone",
   "BLOCK_SANDSTONE_GREEN": "Green Sandstone",
+
+  "BLOCK_SCAFFOLDING_NORMAL": "Scaffolding",
 
   "BLOCK_LANTERN": "Lantern",
   "BLOCK_SUNSTONE": "Sunstone",

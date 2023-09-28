@@ -94,7 +94,6 @@ class EntryPoint : ModuleEntryPoint() {
         override val isUnique: Boolean = false
         override var baseMass: Double = tile.density / 1000.0
         override var baseToolSize: Double? = null
-        override val originalName = if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE" else tile.nameKey
         override var stackable = true
         override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
         override var isDynamic = false
@@ -113,6 +112,12 @@ class EntryPoint : ModuleEntryPoint() {
             equipPosition = EquipPosition.HAND_GRIP
             tags.addAll(tile.tags)
         }
+
+        override val originalName: String =
+            if (isWall && tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE>>=BLOCK_WALL_NAME_TEMPLATE"
+            else if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE"
+            else if (tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE"
+            else tile.nameKey
 
         override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {
             return BlockBase.blockStartPrimaryUse(actor, this, dynamicID, delta)
