@@ -643,8 +643,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
         // #2. If I'm not holding any item and I can do barehandaction (size big enough that barehandactionminheight check passes), perform it
         else if (itemOnGrip == null) {
-            mouseInInteractableRange(actor) {
-                performBarehandAction(actor, delta)
+            mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+                performBarehandAction(actor, delta, mwx, mwy, mtx, mty)
                 0L
             }
         }
@@ -675,7 +675,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // scan for the one with non-null UI.
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
         for (kk in actorsUnderMouse.indices) {
-            if (mouseInInteractableRange(actor) {
+            if (mouseInInteractableRange(actor) { _, _, _, _ ->
                     actorsUnderMouse[kk].mainUI?.let {
                     uiOpened = true
 
@@ -1372,7 +1372,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         particlesContainer.appendHead(particle)
     }
 
-    fun performBarehandAction(actor: ActorWithBody, delta: Float) {
+    fun performBarehandAction(actor: ActorWithBody, delta: Float, mwx: Double, mwy: Double, mtx: Int, mty: Int) {
 
         val canAttackOrDig = actor.scale * actor.baseHitboxH >= (actor.actorValue.getAsDouble(AVKey.BAREHAND_MINHEIGHT) ?: 4294967296.0)
 
@@ -1391,8 +1391,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         val punchSize = actor.scale * actor.actorValue.getAsDouble(AVKey.BAREHAND_BASE_DIGSIZE)!!
 
         // if there are attackable actor or fixtures
-        val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(Terrarum.mouseX, Terrarum.mouseY, punchSize / 2.0).sortedBy {
-            (Terrarum.mouseX - it.hitbox.centeredX).sqr() + (Terrarum.mouseY - it.hitbox.centeredY).sqr()
+        val actorsUnderMouse: List<ActorWithBody> = getActorsAtVicinity(mwx, mwy, punchSize / 2.0).sortedBy {
+            (mwx - it.hitbox.centeredX).sqr() + (mwy - it.hitbox.centeredY).sqr()
         } // sorted by the distance from the mouse
 
         // prioritise actors
@@ -1407,10 +1407,12 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         // pickup a fixture
         if (fixturesUnderHand.size > 0 && fixturesUnderHand[0].canBeDespawned &&
-                System.nanoTime() - fixturesUnderHand[0].spawnRequestedTime > 500000000) { // don't pick up the fixture if it was recently placed (0.5 seconds)
+            System.nanoTime() - fixturesUnderHand[0].spawnRequestedTime > 500000000) { // don't pick up the fixture if it was recently placed (0.5 seconds)
             val fixture = fixturesUnderHand[0]
             val fixtureItem = ItemCodex.fixtureToItemID(fixture)
             printdbg(this, "Fixture pickup at F${WORLD_UPDATE_TIMER}: ${fixture.javaClass.canonicalName} -> $fixtureItem")
+            // 0. hide tooltips
+            setTooltipMessage(null)
             // 1. put the fixture to the inventory
             fixture.flagDespawn()
             // 2. register this item(fixture) to the quickslot so that the player sprite would be actually lifting the fixture
@@ -1433,7 +1435,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         else if (canAttackOrDig) {
             val punchBlockSize = punchSize.div(TILE_SIZED).floorToInt()
             if (punchBlockSize > 0) {
-                PickaxeCore.startPrimaryUse(actor, delta, null, Terrarum.mouseTileX, Terrarum.mouseTileY, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
+                PickaxeCore.startPrimaryUse(actor, delta, null, mtx, mty, 1.0 / punchBlockSize, punchBlockSize, punchBlockSize)
             }
         }
     }

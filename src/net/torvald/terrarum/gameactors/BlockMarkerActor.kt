@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.App
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.CommonResourcePool
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.Terrarum
@@ -53,19 +54,22 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
         if (isVisible) {
             if (markerMode == MarkerMode.FIXTURE_GHOST) {
                 if (INGAME.actorNowPlaying != null) {
-                    mouseInInteractableRange(INGAME.actorNowPlaying!!) {
+//                    mouseInInteractableRange(INGAME.actorNowPlaying!!) { _, _, _, _ ->
+
                         batch.shader = App.shaderGhastlyWhite
                         if (ghost != null) {
-                            batch.color = ghostColour
+//                            batch.color = ghostColour
+                            batch.shader.setUniformf("ghostColour", ghostColour.r, ghostColour.g, ghostColour.b, ghostColour.a)
                             drawSpriteInGoodPosition(ghost!!, batch)
                         }
-                        0L
-                    }
+//                        0L
+//                    }
                 }
                 else {
                     batch.shader = App.shaderGhastlyWhite
                     if (ghost != null) {
-                        batch.color = ghostColour
+//                        batch.color = ghostColour
+                        batch.shader.setUniformf("ghostColour", ghostColour.r, ghostColour.g, ghostColour.b, ghostColour.a)
                         drawSpriteInGoodPosition(ghost!!, batch)
                     }
                 }
@@ -114,5 +118,6 @@ class BlockMarkerActor : ActorWithBody(Actor.RenderOrder.OVERLAY, physProp = Phy
 
     fun setGhostColourNone() { ghostColour = Color.WHITE }
     fun setGhostColourAllow() { ghostColour = Color(-1) }
+    fun setGhostColourDeny() { ghostColour = Color(0xff8080ff.toInt()) }
     fun setGhostColourBlock() { ghostColour = Color(0) }
 }

@@ -223,23 +223,23 @@ open class FixtureSwingingDoorBase : FixtureBase {
 
     }
 
-    private fun mouseOnLeftSide(): Boolean {
+    private fun mouseOnLeftSide(mx: Double, my: Double): Boolean {
         val ww = INGAME.world.width * TILE_SIZED
         val pivot = this@FixtureSwingingDoorBase.hitbox.centeredX
         // note: this function uses startX while the dual other function uses endX; the "dist" must be same between two functions
-        val dist = pivot - Terrarum.mouseX // NOTE: order is different from the other function
-        val dist2 = pivot - (Terrarum.mouseX - ww)
+        val dist = pivot - mx // NOTE: order is different from the other function
+        val dist2 = pivot - (mx - ww)
         val distLim = this@FixtureSwingingDoorBase.hitbox.width
-        return (dist in 0.0..distLim || dist2 in 0.0..distLim) && (Terrarum.mouseY - hitbox.hitboxStart.y) in 0.0..hitbox.height
+        return (dist in 0.0..distLim || dist2 in 0.0..distLim) && (my - hitbox.hitboxStart.y) in 0.0..hitbox.height
     }
 
-    private fun mouseOnRightSide(): Boolean {
+    private fun mouseOnRightSide(mx: Double, my: Double): Boolean {
         val ww = INGAME.world.width * TILE_SIZED
         val pivot = this@FixtureSwingingDoorBase.hitbox.centeredX
-        val dist = Terrarum.mouseX - pivot // NOTE: order is different from the other function
-        val dist2 = (Terrarum.mouseX + ww) - pivot
+        val dist = mx - pivot // NOTE: order is different from the other function
+        val dist2 = (mx + ww) - pivot
         val distLim = this@FixtureSwingingDoorBase.hitbox.width
-        return dist in 0.0..distLim || dist2 in 0.0..distLim && (Terrarum.mouseY - hitbox.hitboxStart.y) in 0.0..hitbox.height
+        return dist in 0.0..distLim || dist2 in 0.0..distLim && (my - hitbox.hitboxStart.y) in 0.0..hitbox.height
     }
 
     private fun ActorWithBody.ontheLeftSideOfDoor(): Boolean {
@@ -313,16 +313,16 @@ open class FixtureSwingingDoorBase : FixtureBase {
             if (mouseUp && Gdx.input.isButtonPressed(App.getConfigInt("config_mousesecondary"))) {
 
                 INGAME.actorNowPlaying?.let { player ->
-                    mouseInInteractableRange(player) {
+                    mouseInInteractableRange(player) { mx, my, _, _ ->
                         // keep opened/closed as long as the mouse is down
                         if (doorStateTimer != 0f) {
                             oldStateBeforeMouseDown = doorState
                         }
 
                         if (oldStateBeforeMouseDown == 0) {
-                            if (mouseOnLeftSide())
+                            if (mouseOnLeftSide(mx, my))
                                 openToLeft(1)
-                            else if (mouseOnRightSide())
+                            else if (mouseOnRightSide(mx, my))
                                 openToRight(1)
                         }
                         else {

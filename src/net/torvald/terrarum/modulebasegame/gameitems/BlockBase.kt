@@ -20,61 +20,62 @@ object BlockBase {
      * @param dontEncaseActors when set to true, blocks won't be placed where Actors are. You will want to set it false
      * for wire items, otherwise you want it to be true.
      */
-    fun blockStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, itemID: ItemID, delta: Float) = mouseInInteractableRange(actor) {
-        val ingame = Terrarum.ingame!! as TerrarumIngame
-        val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
-        val mouseTile = Point2i(Terrarum.mouseTileX, Terrarum.mouseTileY)
+    fun blockStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, itemID: ItemID, delta: Float) =
+        mouseInInteractableRange(actor) { mwx, mwy, mtx, mty ->
+            val ingame = Terrarum.ingame!! as TerrarumIngame
+            val mousePoint = Point2d(mtx.toDouble(), mty.toDouble())
+            val mouseTile = Point2i(mtx, mty)
 
-        // check for collision with actors (BLOCK only)
-        // FIXME properly fix the collision detection: it OVERRIDES the tiki-torches which should not happen AT ALL
-        // FIXME (h)IntTilewiseHitbox is badly defined
-        // FIXME     actually it's this code: not recognising hitbox's starting point correctly. Use F9 for visualisation
-        // FIXME the above issue is resolved by using intTilewise instead of hInt, but the hitbox itself is still
-        // FIXME     badly defined
+            // check for collision with actors (BLOCK only)
+            // FIXME properly fix the collision detection: it OVERRIDES the tiki-torches which should not happen AT ALL
+            // FIXME (h)IntTilewiseHitbox is badly defined
+            // FIXME     actually it's this code: not recognising hitbox's starting point correctly. Use F9 for visualisation
+            // FIXME the above issue is resolved by using intTilewise instead of hInt, but the hitbox itself is still
+            // FIXME     badly defined
 
-        if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
-            var ret1 = true
-            ingame.actorContainerActive.filter { it is ActorWithBody }.forEach { val it = it as ActorWithBody
-                if ((it is FixtureBase || it.physProp.usePhysics) && it.intTilewiseHitbox.intersects(mousePoint))
-                    ret1 = false // return is not allowed here
+            if (gameItem.inventoryCategory == GameItem.Category.BLOCK) {
+                var ret1 = true
+                ingame.actorContainerActive.filter { it is ActorWithBody }.forEach { val it = it as ActorWithBody
+                    if ((it is FixtureBase || it.physProp.usePhysics) && it.intTilewiseHitbox.intersects(mousePoint))
+                        ret1 = false // return is not allowed here
+                }
+                if (!ret1) return@mouseInInteractableRange -1L
             }
-            if (!ret1) return@mouseInInteractableRange -1L
+
+            val isWall = itemID.isWall()
+            val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
+            val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
+
+            // return false if there is a same tile already (including non-solid!)
+            if (isWall && wallUnderCursor == itemID || !isWall && terrainUnderCursor == itemID)
+                return@mouseInInteractableRange -1L
+
+            // return false if there is a "solid" tile already
+            if (isWall && BlockCodex[wallUnderCursor].isSolid ||
+                !isWall && !BlockCodex[terrainUnderCursor].hasTag("INCONSEQUENTIAL"))
+                return@mouseInInteractableRange -1L
+
+            // filter passed, do the job
+            // FIXME this is only useful for Player
+            if (isWall) {
+                ingame.world.setTileWall(
+                        mouseTile.x,
+                        mouseTile.y,
+                        itemID.substring(5),
+                        false
+                )
+            }
+            else {
+                ingame.world.setTileTerrain(
+                        mouseTile.x,
+                        mouseTile.y,
+                        itemID,
+                        false
+                )
+            }
+
+            1L
         }
-
-        val isWall = itemID.isWall()
-        val terrainUnderCursor = ingame.world.getTileFromTerrain(mouseTile.x, mouseTile.y)
-        val wallUnderCursor = ingame.world.getTileFromWall(mouseTile.x, mouseTile.y)
-
-        // return false if there is a same tile already (including non-solid!)
-        if (isWall && wallUnderCursor == itemID || !isWall && terrainUnderCursor == itemID)
-            return@mouseInInteractableRange -1L
-
-        // return false if there is a "solid" tile already
-        if (isWall && BlockCodex[wallUnderCursor].isSolid ||
-            !isWall && !BlockCodex[terrainUnderCursor].hasTag("INCONSEQUENTIAL"))
-            return@mouseInInteractableRange -1L
-
-        // filter passed, do the job
-        // FIXME this is only useful for Player
-        if (isWall) {
-            ingame.world.setTileWall(
-                    mouseTile.x,
-                    mouseTile.y,
-                    itemID.substring(5),
-                    false
-            )
-        }
-        else {
-            ingame.world.setTileTerrain(
-                    mouseTile.x,
-                    mouseTile.y,
-                    itemID,
-                    false
-            )
-        }
-
-        1L
-    }
 
     fun blockEffectWhenEquipped(actor: ActorWithBody, delta: Float) {
         (Terrarum.ingame!! as TerrarumIngame).selectedWireRenderClass = ""
@@ -126,40 +127,38 @@ object BlockBase {
           else false
     }
 
-    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) {
+    fun wireStartPrimaryUse(actor: ActorWithBody, gameItem: GameItem, delta: Float) = mouseInInteractableRange(actor) { _, _, mtx, mty ->
 
         val itemID = gameItem.originalID
         val ingame = Terrarum.ingame!! as TerrarumIngame
-        val mouseTileX = Terrarum.mouseTileX
-        val mouseTileY = Terrarum.mouseTileY
         val ww = ingame.world.width
 
         if (Gdx.input.isButtonJustPressed(App.getConfigInt("config_mouseprimary")) ||
-                !isNeighbouring(ww, mouseTileX, mouseTileY, oldTileX, oldTileY)) {
-            initialMouseDownTileX = mouseTileX
-            initialMouseDownTileY = mouseTileY
-            oldTileX = mouseTileX
-            oldTileY = mouseTileY
+                !isNeighbouring(ww, mtx, mty, oldTileX, oldTileY)) {
+            initialMouseDownTileX = mtx
+            initialMouseDownTileY = mty
+            oldTileX = mtx
+            oldTileY = mty
         }
 
-        val thisTileWires = ingame.world.getAllWiresFrom(mouseTileX, mouseTileY)
+        val thisTileWires = ingame.world.getAllWiresFrom(mtx, mty)
         val oldTileWires = ingame.world.getAllWiresFrom(oldTileX, oldTileY)
-        val thisTileWireCnx = ingame.world.getWireGraphOf(mouseTileX, mouseTileY, itemID)
+        val thisTileWireCnx = ingame.world.getWireGraphOf(mtx, mty, itemID)
         val oldTileWireCnx = ingame.world.getWireGraphOf(oldTileX, oldTileY, itemID)
 
         val thisTileOccupied = thisTileWires.first?.searchFor(itemID) != null
         val oldTileOccupied = oldTileWires.first?.searchFor(itemID) != null
 
-        val oldToNewVector = if (mouseTileX == ww - 1 && oldTileX == 0) 4
-                else if (mouseTileX == 0 && oldTileX == ww - 1) 1
-                else if (mouseTileX - oldTileX == 1) 1
-                else if (mouseTileX - oldTileX == -1) 4
-                else if (mouseTileY - oldTileY == 1) 2
-                else if (mouseTileY - oldTileY == -1) 8
+        val oldToNewVector = if (mtx == ww - 1 && oldTileX == 0) 4
+                else if (mtx == 0 && oldTileX == ww - 1) 1
+                else if (mtx - oldTileX == 1) 1
+                else if (mtx - oldTileX == -1) 4
+                else if (mty - oldTileY == 1) 2
+                else if (mty - oldTileY == -1) 8
                 else 0 // if xy == oxy, the vector will be 0
 
         val connectedEachOther = wireNodesConnectedEachOther(oldToNewVector, thisTileWireCnx, oldTileWireCnx)
-        val thisTileWasDraggedOn = initialMouseDownTileX != mouseTileX || initialMouseDownTileY != mouseTileY
+        val thisTileWasDraggedOn = initialMouseDownTileX != mtx || initialMouseDownTileY != mty
 
         var ret = -1L
 
@@ -176,7 +175,7 @@ object BlockBase {
         if (!thisTileWasDraggedOn) {
             if (thisTileOccupied) return@mouseInInteractableRange -1
             else {
-                placeWirePieceTo(ingame.world, itemID, mouseTileX, mouseTileY)
+                placeWirePieceTo(ingame.world, itemID, mtx, mty)
                 ret = 1
             }
         }
@@ -185,18 +184,18 @@ object BlockBase {
                 ret -1
             }
             else if (thisTileOccupied && oldTileOccupied) {
-                setConnectivity(ingame.world, oldToNewVector, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
+                setConnectivity(ingame.world, oldToNewVector, itemID, mtx, mty, oldTileX, oldTileY)
                 ret = 0
             }
             else {
-                placeWirePieceTo(ingame.world, itemID, mouseTileX, mouseTileY)
-                setConnectivity(ingame.world, oldToNewVector, itemID, mouseTileX, mouseTileY, oldTileX, oldTileY)
+                placeWirePieceTo(ingame.world, itemID, mtx, mty)
+                setConnectivity(ingame.world, oldToNewVector, itemID, mtx, mty, oldTileX, oldTileY)
                 ret = 1
             }
         }
 
-        oldTileX = mouseTileX
-        oldTileY = mouseTileY
+        oldTileX = mtx
+        oldTileY = mty
 
         ret
     }

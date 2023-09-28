@@ -225,6 +225,24 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         }
     }
 
+    fun canSpawnHere(posX0: Int, posY0: Int): Boolean {
+        val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
+        val posY = posY0 - blockBox.height + 1
+
+        // check for existing blocks (and fixtures)
+        var hasCollision = false
+        worldBlockPos = Point2i(posX, posY)
+        forEachBlockbox { x, y, _, _ ->
+            if (!hasCollision) {
+                val tile = world!!.getTileFromTerrain(x, y)
+                if (!BlockCodex[tile].hasTag("INCONSEQUENTIAL")) {
+                    hasCollision = true
+                }
+            }
+        }
+        return !hasCollision
+    }
+
     /**
      * Adds this instance of the fixture to the world. Physical dimension is derived from [blockBox].
      *
@@ -243,24 +261,10 @@ open class FixtureBase : ActorWithBody, CuedByTerrainChange {
         //     posY: bottom of the blockBox
         // using the actor's hitbox
 
-
         val posX = (posX0 - blockBox.width.minus(1).div(2)) fmod world!!.width // width.minus(1) so that spawning position would be same as the ghost's position
         val posY = posY0 - blockBox.height + 1
 
-        // set the position of this actor
-        worldBlockPos = Point2i(posX, posY)
-
-        // check for existing blocks (and fixtures)
-        var hasCollision = false
-        forEachBlockbox { x, y, _, _ ->
-            if (!hasCollision) {
-                val tile = world!!.getTileFromTerrain(x, y)
-                if (!BlockCodex[tile].hasTag("INCONSEQUENTIAL")) {
-                    hasCollision = true
-                }
-            }
-        }
-        if (hasCollision) {
+        if (!canSpawnHere(posX0, posY0)) {
             printdbg(this, "cannot spawn fixture ${nameFun()} at F${INGAME.WORLD_UPDATE_TIMER}, has tile collision; xy=($posX,$posY) tDim=(${blockBox.width},${blockBox.height})")
             return false
         }

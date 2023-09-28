@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
@@ -67,10 +68,20 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
 
 
         (INGAME as TerrarumIngame).blockMarkingActor.let {
-            it.setGhost(ghostItem.get())
+            val item = ghostItem.get()
+
+            it.setGhost(item)
             it.update(delta)
             it.setGhostColourBlock()
-            mouseInInteractableRange(actor) { it.setGhostColourAllow(); 0L }
+            mouseInInteractableRange(actor) { _, _, mx, my ->
+                if (item.canSpawnHere(mx, my)) {
+                    it.setGhostColourAllow()
+                }
+                else {
+                    it.setGhostColourDeny()
+                }
+                0L
+            }
         }
     }
 
@@ -83,10 +94,10 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         }
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { _, _, mx, my ->
         val item = ghostItem.getAndSet(makeFixture()) // renew the "ghost" otherwise you'll be spawning exactly the same fixture again; old ghost will be returned
 
-        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY, if (actor is IngamePlayer) actor.uuid else null)) 1 else -1
+        if (item.spawn(mx, my, if (actor is IngamePlayer) actor.uuid else null)) 1 else -1
         // return true when placed, false when cannot be placed
     }
 

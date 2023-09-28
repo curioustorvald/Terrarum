@@ -34,10 +34,10 @@ class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
         equipPosition = EquipPosition.HAND_GRIP
     }
 
-    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) {
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { _, _, mtx, mty ->
         val item = FixtureHomeComputer()
 
-        if (item.spawn(Terrarum.mouseTileX, Terrarum.mouseTileY, if (actor is IngamePlayer) actor.uuid else null)) 1L else -1L
+        if (item.spawn(mtx, mty, if (actor is IngamePlayer) actor.uuid else null)) 1L else -1L
         // return true when placed, false when cannot be placed
     }
 }
