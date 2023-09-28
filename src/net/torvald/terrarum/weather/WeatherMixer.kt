@@ -21,7 +21,6 @@ import net.torvald.terrarum.gameworld.WorldTime.Companion.DAY_LENGTH
 import net.torvald.terrarum.RNGConsumer
 import net.torvald.terrarum.clut.Skybox
 import net.torvald.terrarum.clut.Skybox.elevCnt
-import net.torvald.terrarum.spriteassembler.ADPropertyObject
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarum.weather.WeatherObjectCloud.Companion.ALPHA_ROLLOFF_Z
@@ -563,17 +562,18 @@ internal object WeatherMixer : RNGConsumer {
         batch.color = Color.WHITE
     }
 
-    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG = 0.0000077
+    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG = 0.0000077
+    private val APPARENT_SOLAR_Y_AT_45DEG = 1.0 / RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG
 
     /**
-     * Mathematical model: https://www.desmos.com/calculator/8dsgigfoys
+     * Mathematical model: https://www.desmos.com/calculator/cf6wqwltqq
      */
     private fun cloudYtoSolarAlt(cloudY: Double, currentsolarDeg: Double): Double {
-        fun g(x: Double) = atan(RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG * x) / Math.PI
-        fun a(x: Double) = atan(0.0001 * x) / (0.5 * RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_90DEG * Math.PI)
-
-        val delta = (180.0 - 2.0 * currentsolarDeg).abs() * g(cloudY - a(currentsolarDeg.abs()))
-        return (currentsolarDeg + CLOUD_SOLARDEG_OFFSET + delta).bipolarClamp(Skybox.elevMax)
+        fun a(x: Double) = APPARENT_SOLAR_Y_AT_45DEG * tan(Math.toRadians(x))
+        fun g(x: Double) = Math.toDegrees(atan(RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG * x))
+        val phi = currentsolarDeg + CLOUD_SOLARDEG_OFFSET
+        val x = cloudY
+        return g(x + a(phi)).bipolarClamp(Skybox.elevMax)
     }
 
     /**
