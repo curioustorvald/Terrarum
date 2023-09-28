@@ -562,7 +562,7 @@ internal object WeatherMixer : RNGConsumer {
         batch.color = Color.WHITE
     }
 
-    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG = 0.0000077
+    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG = 0.00000785
     private val APPARENT_SOLAR_Y_AT_45DEG = 1.0 / RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG
 
     /**
