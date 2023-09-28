@@ -67,20 +67,23 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
         }
 
 
-        (INGAME as TerrarumIngame).blockMarkingActor.let {
-            val item = ghostItem.get()
+        // update the ghost sparingly
+        if (INGAME.WORLD_UPDATE_TIMER % 2 == 0) {
+            (INGAME as TerrarumIngame).blockMarkingActor.let {
+                val item = ghostItem.get()
 
-            it.setGhost(item)
-            it.update(delta)
-            it.setGhostColourBlock()
-            mouseInInteractableRange(actor) { _, _, mx, my ->
-                if (item.canSpawnHere(mx, my)) {
-                    it.setGhostColourAllow()
+                it.setGhost(item)
+                it.update(delta)
+                it.setGhostColourBlock()
+                mouseInInteractableRange(actor) { _, _, mx, my ->
+                    if (item.canSpawnHere(mx, my)) {
+                        it.setGhostColourAllow()
+                    }
+                    else {
+                        it.setGhostColourDeny()
+                    }
+                    0L
                 }
-                else {
-                    it.setGhostColourDeny()
-                }
-                0L
             }
         }
     }
