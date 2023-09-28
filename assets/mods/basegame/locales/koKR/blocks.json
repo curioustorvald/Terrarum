@@ -114,13 +114,13 @@
   "BLOCK_PLASTIC_GREY_DARK" : "암회색 플라스틱 블록",
   "BLOCK_PLASTIC_BLACK"     : "흑색 플라스틱 블록",
 
-  "BLOCK_WATER": "Water",
-  "BLOCK_LAVA": "Lava",
+  "BLOCK_WATER": "물",
+  "BLOCK_LAVA": "용암",
 
-  "WIRE_RED": "Red Wire",
-  "WIRE_GREEN": "Green Wire",
-  "WIRE_BLUE": "Blue Wire",
-  "WIRE_BUNDLE": "Wire Bundle"
+  "WIRE_RED": "붉은 전선",
+  "WIRE_GREEN": "녹색 전선",
+  "WIRE_BLUE": "파란 전선",
+  "WIRE_BUNDLE": "전선 묶음"
 
   /*
 # CODE OF CONDUCT
