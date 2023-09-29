@@ -9,12 +9,14 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ChunkLoadingLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
+import net.torvald.terrarum.modulebasegame.SavegameMigrator
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.Reader
@@ -120,6 +122,8 @@ object LoadSavegame {
 
     operator fun invoke(diskPair: DiskPair) = invoke(diskPair.player, diskPair.world)
 
+    private val getGenver = Regex("""(?<="genver":)[0-9]+""")
+
     /**
      * @param playerDisk DiskSkimmer representing the Player.
      * @param worldDisk0 DiskSkimmer representing the World to be loaded.
@@ -128,14 +132,18 @@ object LoadSavegame {
     operator fun invoke(playerDisk: DiskSkimmer, worldDisk0: DiskSkimmer? = null) {
         val newIngame = TerrarumIngame(App.batch)
         playerDisk.rebuild()
-        val player = ReadActor.invoke(playerDisk, ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)) as IngamePlayer
+
+        val playerDiskSavegameInfo = ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)
+
+        val player = ReadActor.invoke(playerDisk, playerDiskSavegameInfo) as IngamePlayer
 
         printdbg(this, "Player localhash: ${player.localHashStr}, hasSprite: ${player.sprite != null}")
 
         val currentWorldId = player.worldCurrentlyPlaying
         val worldDisk = worldDisk0 ?: App.savegameWorlds[currentWorldId]!!.loadable()
         worldDisk.rebuild()
-        val world = ReadWorld(ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET), worldDisk.diskFile)
+        val worldDiskSavegameInfo = ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)
+        val world = ReadWorld(worldDiskSavegameInfo, worldDisk.diskFile)
 
         world.layerTerrain = BlockLayer(world.width, world.height)
         world.layerWall = BlockLayer(world.width, world.height)
@@ -150,13 +158,24 @@ object LoadSavegame {
 //        worldDisk.dispose()
 //        playerDisk.dispose()
 
+
         val loadJob = { it: LoadScreenBase ->
             val loadscreen = it as ChunkLoadingLoadScreen
             loadscreen.addMessage(Lang["MENU_IO_LOADING"])
 
 
+            val worldGenver = CharArray(128).let {
+                worldDiskSavegameInfo.read(it, 0, 128)
+                getGenver.find(String(it))?.value?.toLong()!!
+            }
+            val playerGenver = CharArray(128).let {
+                playerDiskSavegameInfo.read(it, 0, 128)
+                getGenver.find(String(it))?.value?.toLong()!!
+            }
+
+
             val actors = world.actors.distinct()
-            val worldParam = TerrarumIngame.Codices(newIngame.worldDisk, world, actors, player)
+            val worldParam = TerrarumIngame.Codices(newIngame.worldDisk, world, actors, player, worldGenver, playerGenver)
 
 
             newIngame.gameLoadInfoPayload = worldParam

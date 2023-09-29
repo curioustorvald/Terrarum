@@ -29,6 +29,45 @@ open class FixtureInventory() {
         val CAPACITY_MODE_NO_ENCUMBER = 0
         val CAPACITY_MODE_COUNT = 1
         val CAPACITY_MODE_WEIGHT = 2
+
+
+        private fun filterItem0(item: GameItem): GameItem {
+            return if (item.originalID.isBlock()) {
+                val drop = BlockCodex[item.originalID].drop.ifBlank { item.originalID }
+                ItemCodex[drop] ?: throw NullPointerException("Item: ${item.originalID}, drop: ${BlockCodex[item.originalID].drop}")
+            }
+            else if (item.originalID.isWall()) {
+                val blockID = item.originalID.substringAfter('@')
+                val drop = BlockCodex[blockID].drop.ifBlank { blockID }
+                ItemCodex["wall@$drop"] ?: throw NullPointerException("Item: ${item.originalID}, drop: ${BlockCodex[item.originalID].drop}")
+            }
+            else {
+                item
+            }
+        }
+
+        fun filterItem(item0: GameItem?): GameItem? {
+            if (item0 == null) return null
+
+            var item = item0
+            var recursionCount = 0
+            var breakNow = false
+            var item1: GameItem
+            while (!breakNow) {
+                if (recursionCount > 16) throw IllegalStateException("Item filter recursion is too deep, check the filtering code")
+
+                item1 = filterItem0(item!!)
+
+                if (item1 == item) {
+                    breakNow = true
+                }
+
+                item = item1
+
+                recursionCount++
+            }
+            return item
+        }
     }
     
     /**
@@ -40,19 +79,6 @@ open class FixtureInventory() {
     fun isEmpty() = totalCount == 0L
     fun isNotEmpty() = totalCount > 0
 
-    private fun filterItem(item: GameItem): GameItem {
-        return if (item.originalID.isBlock()) {
-            ItemCodex[BlockCodex[item.originalID].drop]!!
-        }
-        else if (item.originalID.isWall()) {
-            val blockID = item.originalID.substringAfter('@')
-            ItemCodex["wall@${BlockCodex[blockID].drop}"]!!
-        }
-        else {
-            item
-        }
-    }
-
     open fun add(itemID: ItemID, count: Long = 1) {
         if (ItemCodex[itemID] == null)
             throw NullPointerException("Item not found: $itemID")
@@ -61,23 +87,7 @@ open class FixtureInventory() {
     }
     open fun add(item0: GameItem, count: Long = 1L) {
 
-        var item = item0
-        var recursionCount = 0
-        var breakNow = false
-        var item1: GameItem
-        while (!breakNow) {
-            if (recursionCount > 16) throw IllegalStateException("Item filter recursion is too deep, check the filtering code")
-
-            item1 = filterItem(item)
-
-            if (item1 == item) {
-                breakNow = true
-            }
-
-            item = item1
-
-            recursionCount++
-        }
+        val item = filterItem(item0)!!
 
 
 //        println("[ActorInventory] add-by-elem $item, $count")
@@ -165,6 +175,12 @@ open class FixtureInventory() {
         itemList.sumOf { ItemCodex[it.itm]!!.mass * it.qty }
 
         updateEncumbrance()
+    }
+
+    open fun clear(): List<InventoryPair> {
+        val r = itemList.cloneToList()
+        itemList.clear()
+        return r
     }
     
     /**
@@ -283,10 +299,6 @@ open class FixtureInventory() {
                 return mid // key found
         }
         return -(low + 1)  // key not found
-    }
-
-    open fun clear() {
-        itemList.clear()
     }
 
     fun updateEncumbrance() {

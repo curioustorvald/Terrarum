@@ -194,4 +194,5 @@ class ItemCodex {
     }
 
     fun hasItem(itemID: ItemID): Boolean = dynamicItemInventory.containsKey(itemID)
+    fun isEmpty(): Boolean = itemCodex.isEmpty()
 }

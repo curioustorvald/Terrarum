@@ -122,10 +122,11 @@ class ActorInventory() : FixtureInventory() {
         }
     }
 
-    override fun clear() {
-        super.clear()
+    override fun clear(): List<InventoryPair> {
+        val r = super.clear()
         itemEquipped.fill(null)
         quickSlot.fill(null)
+        return r
     }
 }
 

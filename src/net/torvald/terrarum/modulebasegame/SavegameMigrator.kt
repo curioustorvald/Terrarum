@@ -1,7 +1,12 @@
 package net.torvald.terrarum.modulebasegame
 
+import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameitems.isDynamic
+import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.util.SortedArrayList
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
@@ -54,7 +59,7 @@ internal object SavegameMigrator {
 
                 if (from > to) throw IllegalArgumentException("Illegal query '$query'")
 
-                matched = matched or (from <= fileVersion && fileVersion <= to)
+                matched = matched or (fileVersion in from..to)
             }
             else if (query.endsWith('+') || query.endsWith('!')) {
                 val operator = query.last()
@@ -79,7 +84,8 @@ internal object SavegameMigrator {
             this::class.declaredFunctions.filter {
                 annotationMatches(worldVersion, it.findAnnotation())
             }.forEach { func ->
-                actors0.forEach { actor -> func.call(actor) }
+                printdbg(this, func.toString())
+                actors0.forEach { actor -> func.call(this, actor) }
             }
         }
         else {
@@ -93,19 +99,59 @@ internal object SavegameMigrator {
             this::class.declaredFunctions.filter {
                 annotationMatches(worldVersion, it.findAnnotation())
             }.forEach { func ->
-                nonPlayers.forEach { actor -> func.call(actor) }
+                nonPlayers.forEach { actor -> func.call(this, actor) }
             }
 
             this::class.declaredFunctions.filter {
                 annotationMatches(playerVersion, it.findAnnotation())
             }.forEach { func ->
-                players.forEach { player -> func.call(player) }
+                players.forEach { player -> func.call(this, player) }
             }
         }
     }
 
+
+
+
+    /***********************************/
+    /* INSERT MIGRATION FUNCTIONS HERE */
+    /***********************************/
+
+
     @AppliedVersion("all")
     fun mergeUnlitBlocks(actor: Actor) {
-        TODO()
+        if (ItemCodex.isEmpty()) throw Error("ItemCodex is empty")
+
+        if (actor is Pocketed) {
+            val oldItemEquipped = actor.inventory.itemEquipped.copyOf()
+            val oldQuickSlot = actor.inventory.quickSlot.copyOf()
+            val oldItems = actor.inventory.clear()
+
+            oldItems.forEach { (itm, qty) ->
+                actor.inventory.add(itm, qty)
+            }
+
+            oldItemEquipped.forEachIndexed { index, id0 ->
+                if (id0?.isDynamic() == true)
+                    actor.inventory.itemEquipped[index] = id0
+                else {
+                    val id = FixtureInventory.filterItem(ItemCodex[id0])
+                    actor.inventory.itemEquipped[index] = id?.dynamicID
+                }
+            }
+
+            oldQuickSlot.forEachIndexed { index, id0 ->
+                if (id0?.isDynamic() == true)
+                    actor.inventory.quickSlot[index] = id0
+                else {
+                    val id = FixtureInventory.filterItem(ItemCodex[id0])
+                    actor.inventory.quickSlot[index] = id?.dynamicID
+                }
+            }
+        }
     }
+
+
+
+
 }
