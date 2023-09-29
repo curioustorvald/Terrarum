@@ -306,17 +306,19 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     data class Codices(
-            val disk: VirtualDisk, // WORLD disk
-            val world: GameWorld,
-//            val meta: WriteMeta.WorldMeta,
-//            val block: BlockCodex,
-//            val item: ItemCodex,
-//            val wire: WireCodex,
-//            val material: MaterialCodex,
-//            val faction: FactionCodex,
-//            val apocryphas: Map<String, Any>,
-            val actors: List<ActorID>,
-            val player: IngamePlayer
+        val disk: VirtualDisk, // WORLD disk
+        val world: GameWorld,
+//        val meta: WriteMeta.WorldMeta,
+//        val block: BlockCodex,
+//        val item: ItemCodex,
+//        val wire: WireCodex,
+//        val material: MaterialCodex,
+//        val faction: FactionCodex,
+//        val apocryphas: Map<String, Any>,
+        val actors: List<ActorID>,
+        val player: IngamePlayer,
+        val worldGenver: Long,
+        val playerGenver: Long
     )
 
 
@@ -402,6 +404,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // by doing this, whatever the "possession" the player had will be broken by the game load
         actorNowPlaying = codices.player
         actorGamer = codices.player
+
+        SavegameMigrator.invoke(codices.worldGenver, codices.playerGenver, actorContainerActive)
 
         printdbg(this, "postInitForLoadFromSave exit")
     }
