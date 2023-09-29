@@ -1,9 +1,12 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isBlock
+import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.util.SortedArrayList
 import java.math.BigInteger
@@ -37,13 +40,45 @@ open class FixtureInventory() {
     fun isEmpty() = totalCount == 0L
     fun isNotEmpty() = totalCount > 0
 
+    private fun filterItem(item: GameItem): GameItem {
+        return if (item.originalID.isBlock()) {
+            ItemCodex[BlockCodex[item.originalID].drop]!!
+        }
+        else if (item.originalID.isWall()) {
+            val blockID = item.originalID.substringAfter('@')
+            ItemCodex["wall@${BlockCodex[blockID].drop}"]!!
+        }
+        else {
+            item
+        }
+    }
+
     open fun add(itemID: ItemID, count: Long = 1) {
         if (ItemCodex[itemID] == null)
             throw NullPointerException("Item not found: $itemID")
         else
             add(ItemCodex[itemID]!!, count)
     }
-    open fun add(item: GameItem, count: Long = 1L) {
+    open fun add(item0: GameItem, count: Long = 1L) {
+
+        var item = item0
+        var recursionCount = 0
+        var breakNow = false
+        var item1: GameItem
+        while (!breakNow) {
+            if (recursionCount > 16) throw IllegalStateException("Item filter recursion is too deep, check the filtering code")
+
+            item1 = filterItem(item)
+
+            if (item1 == item) {
+                breakNow = true
+            }
+
+            item = item1
+
+            recursionCount++
+        }
+
 
 //        println("[ActorInventory] add-by-elem $item, $count")
 
