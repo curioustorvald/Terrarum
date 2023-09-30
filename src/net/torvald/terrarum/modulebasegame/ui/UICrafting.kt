@@ -257,14 +257,14 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             6, UIInventoryFull.CELLS_VRT - 2, // decrease the internal height so that craft/cancel button would fit in
             keyDownFun = { _, _, _, _, _ -> },
             touchDownFun = { gameItem, amount, _, recipe0, button ->
-                (recipe0 as? CraftingCodex.CraftingRecipe)?.let { recipe ->
+                (recipe0 as? CraftingCodex.CraftingRecipe).let { recipe ->
                     val selectedItems = ArrayList<ItemID>()
 
                     val playerInventory = getPlayerInventory()
                     ingredients.clear()
                     recipeClicked = recipe
 //                        printdbg(this, "Recipe selected: $recipe")
-                    recipe.ingredients.forEach { ingredient ->
+                    recipe?.ingredients?.forEach { ingredient ->
                         val selectedItem = getItemForIngredient(playerInventory, ingredient)
                         selectedItems.add(selectedItem)
                         ingredients.add(selectedItem, ingredient.qty)
