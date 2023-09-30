@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.UIItemInventoryCatBar.Companion.CAT_ALL
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
@@ -54,6 +55,8 @@ open class UIItemInventoryItemGrid(
     //override var oldPosX = posX
     //override var oldPosY = posY
 
+    internal val instanceHash = getHashStr(5)
+
     var numberMultiplier = 1L
 
     private val hash = System.nanoTime()
@@ -81,7 +84,7 @@ open class UIItemInventoryItemGrid(
             arrayOf(GameItem.Category.MISC),
             arrayOf(CAT_ALL)
     )*/
-    protected var currentFilter = arrayOf(CAT_ALL)
+    protected var currentFilter: (InventoryPair) -> Boolean = { _: InventoryPair -> true }
 
     private val inventoryUI = parentUI
 
@@ -373,21 +376,21 @@ open class UIItemInventoryItemGrid(
         forceHighlightList.removeAll(items)
     }
 
-    open fun rebuild(filter: Array<String>) {
+    open fun rebuild(filterFun: (InventoryPair) -> Boolean) {
+        currentFilter = filterFun
+
         //println("Rebuilt inventory")
         //println("rebuild: actual itempage: $itemPage")
 
 
         //val filter = catIconsMeaning[selectedIcon]
-        currentFilter = filter
 
         inventorySortList.clear()
 
         // filter items
-        getInventory().forEach {
-            if ((filter.contains((ItemCodex[it.itm]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${it.itm}"))) || filter[0] == CAT_ALL))
-                inventorySortList.add(it)
-        }
+        val filteredItems = getInventory().filter(filterFun)
+        inventorySortList.addAll(filteredItems)
+
 
         // sort if needed
         // test sort by name
@@ -455,6 +458,12 @@ open class UIItemInventoryItemGrid(
         rebuildList = false
     }
 
+    open fun rebuild(filter: Array<String>) {
+        val filterFun = if (filter[0] == CAT_ALL) { item: InventoryPair -> true }
+        else { item: InventoryPair -> filter.contains(ItemCodex[item.itm]?.inventoryCategory ?: throw IllegalArgumentException("Unknown item: ${item.itm}")) }
+        rebuild(filterFun)
+    }
+
     override fun dispose() {
         tooltipShowing.remove(hash)
     }
@@ -485,7 +494,7 @@ open class UIItemInventoryItemGrid(
         super.keyDown(keycode)
 
         items.forEach { if (it.mouseUp) it.keyDown(keycode) }
-        rebuild(currentFilter)
+//        rebuild(currentFilter)
 
         return true
     }
@@ -494,7 +503,7 @@ open class UIItemInventoryItemGrid(
         super.keyUp(keycode)
 
         items.forEach { if (it.mouseUp) it.keyUp(keycode) }
-        rebuild(currentFilter)
+//        rebuild(currentFilter)
 
         return true
     }

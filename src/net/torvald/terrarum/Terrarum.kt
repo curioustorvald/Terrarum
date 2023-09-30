@@ -948,3 +948,5 @@ fun distBetween(a: ActorWithBody, bpos: Vector2): Double {
     val dist = min(min(bpos.distanceSquared(apos1), bpos.distanceSquared(apos2)), bpos.distanceSquared(apos3))
     return dist.sqrt()
 }
+
+fun getHashStr(length: Int = 5) = (0 until length).map { "YBNDRFG8EJKMCPQXOTLVWIS2A345H769"[Math.random().times(32).toInt()] }.joinToString("")

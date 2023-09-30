@@ -8,6 +8,7 @@ import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
+import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 
 /**
  * Created by minjaesong on 2022-06-28.
@@ -69,7 +70,11 @@ class UIItemCraftingCandidateGrid(
         highlightRecipe(highlightedRecipe)
     }
 
+    private var currentFilter1 = arrayOf("")
+
     override fun rebuild(filter: Array<String>) {
+        currentFilter1 = filter
+
         // filtering policy: if the player have all the ingredient item (regardless of the amount!), make the recipe visible
         craftingRecipes.clear()
         CraftingRecipeCodex.props.forEach { (_, recipes) ->
@@ -111,14 +116,12 @@ class UIItemCraftingCandidateGrid(
 
 
         itemPageCount = (recipesSortList.size.toFloat() / items.size.toFloat()).ceilToInt()
-
-
-
         rebuildList = false
     }
 
-
-
+    override fun rebuild(filterFun: (InventoryPair) -> Boolean) {
+        rebuild(currentFilter1)
+    }
 
     override fun scrolled(amountX: Float, amountY: Float): Boolean {
         super.scrolled(amountX, amountY)
