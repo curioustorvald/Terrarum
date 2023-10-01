@@ -115,6 +115,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         it.clickOnceListener = { _,_ ->
             full.resetScroll()
             full.changePanelTo(0)
+            full.playerButtonSelected?.forceUnhighlight = false
         }
     }
     private val mainDeleteButton = UIItemTextButton(this,
