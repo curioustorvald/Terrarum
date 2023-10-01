@@ -445,6 +445,8 @@ class Cvec {
         )
     }
 
+    fun fastLum() = (3*r + 4*g + b)/8f
+
     companion object {
         val WHITE = Cvec(1f, 1f, 1f, 1f)
 

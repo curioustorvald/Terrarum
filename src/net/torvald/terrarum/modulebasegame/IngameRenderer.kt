@@ -528,14 +528,19 @@ object IngameRenderer : Disposable {
                 else
                     blendMul(batch)
 
-                batch.shader = shaderRGBOnly
-                batch.shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
-                batch.shader.setUniformi("u_pattern", 1)
-                batch.draw(lightTex,
+//                if (!KeyToggler.isOn(Input.Keys.F9)) {
+                    batch.shader = shaderRGBOnly
+                    batch.shader.setUniformi("rnd", rng.nextInt(8192), rng.nextInt(8192))
+                    batch.shader.setUniformi("u_pattern", 1)
+                    batch.draw(
+                        lightTex,
                         xrem, yrem,
                         lightTex.regionWidth * lightmapDownsample,
                         lightTex.regionHeight * lightmapDownsample
-                )
+                    )
+//                }
+
+
 
                 // if right texture coord for lightTex and fboRGB are obtainable, you can try this:
                 /*

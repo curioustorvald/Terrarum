@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.math.Matrix4
 import com.jme3.math.FastMath
+import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.measureDebugTime
 import net.torvald.terrarum.App.printdbg
@@ -350,7 +351,7 @@ internal object BlocksDrawer {
                             App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
                         else
                             renderTag.tileNumber
-                val tileNumber = if (thisTile == Block.AIR) 0
+                var tileNumber = if (thisTile == Block.AIR) 0
                     // special case: actorblocks and F3 key
                     else if (BlockCodex.hasProp(thisTile) && BlockCodex[thisTile].isActorBlock &&
                              !BlockCodex[thisTile].hasTag("DORENDER") && !KeyToggler.isOn(Keys.F3))
@@ -366,6 +367,12 @@ internal object BlocksDrawer {
                             CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
                             else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
                         }
+
+                // hide tiles with super low lights, kinda like Minecraft's Orebfuscator
+                val lightAtXY = LightmapRenderer.getLight(x, y) ?: Cvec(0)
+                if (lightAtXY.fastLum() <= 2f / 255f) {
+                    tileNumber = 2 // black solid
+                }
 
                 var thisTileX = tileNumber % App.tileMaker.TILES_IN_X
                 var thisTileY = tileNumber / App.tileMaker.TILES_IN_X
