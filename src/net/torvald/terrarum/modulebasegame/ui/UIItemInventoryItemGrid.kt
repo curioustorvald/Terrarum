@@ -85,13 +85,14 @@ open class UIItemInventoryItemGrid(
             arrayOf(CAT_ALL)
     )*/
     protected var currentFilter: (InventoryPair) -> Boolean = { _: InventoryPair -> true }
+    protected var currentAppendix = ""
 
     private val inventoryUI = parentUI
 
     var itemPage
         set(value) {
             navRemoCon.itemPage = if (itemPageCount == 0) 0 else (value).fmod(itemPageCount)
-            rebuild(currentFilter)
+            rebuild(currentFilter, currentAppendix)
         }
         get() = navRemoCon.itemPage
 
@@ -228,7 +229,7 @@ open class UIItemInventoryItemGrid(
         set(value) {
             field = value
             items = if (value) itemGrid else itemList
-            rebuild(currentFilter)
+            rebuild(currentFilter, currentAppendix)
         }
 
     private val iconPosX = if (drawScrollOnRightside)
@@ -257,11 +258,11 @@ open class UIItemInventoryItemGrid(
         if (!hideSidebar) {
             navRemoCon.listButtonListener = { _, _ ->
                 isCompactMode = false
-                rebuild(currentFilter)
+                rebuild(currentFilter, currentAppendix)
             }
             navRemoCon.gridButtonListener = { _, _ ->
                 isCompactMode = true
-                rebuild(currentFilter)
+                rebuild(currentFilter, currentAppendix)
             }
             navRemoCon.scrollUpListener = { _, it ->
                 it.highlighted = false
@@ -376,8 +377,102 @@ open class UIItemInventoryItemGrid(
         forceHighlightList.removeAll(items)
     }
 
+    /**
+     * Special function for UICrafting to show how much the player already has the recipe's product
+     *
+     * TODO: special theming for the appendix cell?
+     */
+    open fun rebuild(filterFun: (InventoryPair) -> Boolean, itemAppendix: ItemID) {
+        currentFilter = filterFun
+        currentAppendix = itemAppendix
+
+        //println("Rebuilt inventory")
+        //println("rebuild: actual itempage: $itemPage")
+
+
+        //val filter = catIconsMeaning[selectedIcon]
+
+        inventorySortList.clear()
+
+        // filter items
+        val filteredItems = getInventory().filter(filterFun)
+        inventorySortList.addAll(filteredItems)
+
+
+        // sort if needed
+        // test sort by name
+        inventorySortList.sortBy { ItemCodex[it.itm]!!.name }
+
+        // add an appendix
+        if (itemAppendix.isNotBlank()) {
+            getInventory().filter { it.itm == itemAppendix }.let {
+                inventorySortList.addAll(it)
+            }
+        }
+
+        // map sortList to item list
+        for (k in items.indices) {
+            val item = items[k]
+            // we have an item
+            try {
+                val sortListItem = inventorySortList[k + itemPage * items.size]
+                item.item = ItemCodex[sortListItem.itm]
+                item.amount = sortListItem.qty * numberMultiplier
+                item.itemImage = ItemCodex.getItemImage(sortListItem.itm)
+
+                // set quickslot number
+                if (getInventory() is ActorInventory) {
+                    val ainv = getInventory() as ActorInventory
+
+                    for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
+                        if (sortListItem.itm == ainv.getQuickslotItem(qs - 1)?.itm) {
+                            item.quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
+                            break
+                        }
+                        else
+                            item.quickslot = null
+                    }
+
+                    // set equippedslot number
+                    for (eq in ainv.itemEquipped.indices) {
+                        if (eq < ainv.itemEquipped.size) {
+                            if (ainv.itemEquipped[eq] == item.item?.dynamicID) {
+                                item.equippedSlot = eq
+                                break
+                            }
+                            else
+                                item.equippedSlot = null
+                        }
+                    }
+                }
+            }
+            // we do not have an item, empty the slot
+            catch (e: IndexOutOfBoundsException) {
+                item.item = null
+                item.amount = 0
+                item.itemImage = null
+                item.quickslot = null
+                item.equippedSlot = null
+            }
+        }
+
+
+        itemPageCount = (inventorySortList.size.toFloat() / items.size.toFloat()).ceilToInt()
+
+
+        // ¤   42g
+        // ¤ 6969g
+        // ¤ 2147483647g
+        // g is read as "grave" /ɡraːv/ or /ɡɹeɪv/, because it isn't gram.
+        walletText = "<;?" + getInventory().wallet.toString().padStart(4, '?') + ":"
+
+
+        rebuildList = false
+    }
+
     open fun rebuild(filterFun: (InventoryPair) -> Boolean) {
         currentFilter = filterFun
+        currentAppendix = ""
 
         //println("Rebuilt inventory")
         //println("rebuild: actual itempage: $itemPage")
@@ -494,7 +589,7 @@ open class UIItemInventoryItemGrid(
         super.keyDown(keycode)
 
         items.forEach { if (it.mouseUp) it.keyDown(keycode) }
-//        rebuild(currentFilter)
+//        rebuild(currentFilter, currentAppendix)
 
         return true
     }
@@ -503,7 +598,7 @@ open class UIItemInventoryItemGrid(
         super.keyUp(keycode)
 
         items.forEach { if (it.mouseUp) it.keyUp(keycode) }
-//        rebuild(currentFilter)
+//        rebuild(currentFilter, currentAppendix)
 
         return true
     }

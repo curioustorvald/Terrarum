@@ -75,7 +75,7 @@ object PlayerBuilderSigrid {
 
         App.tileMaker.tags.forEach { (t, _) ->
             val prop = BlockCodex[t]
-            if (!prop.isActorBlock && !prop.hasTag("AIR")) {
+            if (!prop.isActorBlock && !prop.hasTag("AIR") && !prop.hasTag("INTERNAL")) {
 
                 inventory.add(t, 9995)
                 try {

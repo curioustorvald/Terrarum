@@ -6,6 +6,7 @@ import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.UIItemInventoryCatBar
 import net.torvald.terrarum.ceilToInt
 import net.torvald.terrarum.gameitems.GameItem
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.CraftingCodex
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
@@ -120,6 +121,10 @@ class UIItemCraftingCandidateGrid(
     }
 
     override fun rebuild(filterFun: (InventoryPair) -> Boolean) {
+        rebuild(currentFilter1)
+    }
+
+    override fun rebuild(filterFun: (InventoryPair) -> Boolean, itemAppendix: ItemID) {
         rebuild(currentFilter1)
     }
 

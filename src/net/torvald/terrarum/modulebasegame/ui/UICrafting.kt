@@ -272,6 +272,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
                     _getItemListPlayer().removeFromForceHighlightList(oldSelectedItems)
                     _getItemListPlayer().addToForceHighlightList(selectedItems)
+                    _getItemListPlayer().itemPage = 0
                     filterPlayerListUsing(recipeClicked)
                     _getItemListIngredients().rebuild(catAll)
 
@@ -335,11 +336,14 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         if (recipe == null)
             itemListPlayer.rebuild(catAll)
         else {
-            val items = recipe.ingredients.flatMap { getItemCandidatesForIngredient(getPlayerInventory(), it).map { it.itm } }.sorted()
+            val items = recipe.ingredients.flatMap {
+                getItemCandidatesForIngredient(getPlayerInventory(), it).map { it.itm }
+            }.sorted()
+
             val filterFun = { pair: InventoryPair ->
                 items.binarySearch(pair.itm) >= 0
             }
-            itemListPlayer.rebuild(filterFun)
+            itemListPlayer.rebuild(filterFun, recipe.product)
         }
     }
 
@@ -360,6 +364,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         oldSelectedItems.add(new)
 
         itemListPlayer.addToForceHighlightList(oldSelectedItems)
+        itemListPlayer.itemPage = 0
         filterPlayerListUsing(recipe)
 
         // change highlight status of itemListIngredients
