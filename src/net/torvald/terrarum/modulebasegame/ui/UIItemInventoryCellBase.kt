@@ -31,7 +31,8 @@ abstract class UIItemInventoryCellBase(
         val keyDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Keycode, extra info, self
         val touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         open var extraInfo: Any?,
-        open protected val highlightEquippedItem: Boolean = true // for some UIs that only cares about getting equipped slot number but not highlighting
+        open protected val highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
+        var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
 ) : UIItem(parentUI, initialX, initialY) {
     abstract override fun update(delta: Float)
     abstract override fun render(batch: SpriteBatch, camera: OrthographicCamera)
@@ -97,24 +98,27 @@ object UIItemInventoryCellCommonRes {
     }
 
     val defaultInventoryCellTheme = InventoryCellColourTheme(
-            Toolkit.Theme.COL_SELECTED,
-            Toolkit.Theme.COL_LIST_DEFAULT,
-            Toolkit.Theme.COL_MOUSE_UP,
-            Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
-            Toolkit.Theme.COL_SELECTED,
-            Color.WHITE,
-            Toolkit.Theme.COL_MOUSE_UP,
-            Color.WHITE,
+        Toolkit.Theme.COL_SELECTED,
+        Toolkit.Theme.COL_LIST_DEFAULT,
+        Toolkit.Theme.COL_MOUSE_UP,
+        Toolkit.Theme.COL_INVENTORY_CELL_BORDER,
+        Toolkit.Theme.COL_SELECTED,
+        Color.WHITE,
+        Toolkit.Theme.COL_MOUSE_UP,
+        Color.WHITE,
+        Toolkit.Theme.COL_CELL_FILL
     )
 }
 
 data class InventoryCellColourTheme(
-        val cellHighlightMainCol: Color,
-        val cellHighlightSubCol: Color,
-        val cellHighlightMouseUpCol: Color,
-        val cellHighlightNormalCol: Color,
-        val textHighlightMainCol: Color,
-        val textHighlightSubCol: Color,
-        val textHighlightMouseUpCol: Color,
-        val textHighlightNormalCol: Color,
-)
+    val cellHighlightMainCol: Color,
+    val cellHighlightSubCol: Color,
+    val cellHighlightMouseUpCol: Color,
+    val cellHighlightNormalCol: Color,
+    val textHighlightMainCol: Color,
+    val textHighlightSubCol: Color,
+    val textHighlightMouseUpCol: Color,
+    val textHighlightNormalCol: Color,
+    val cellBackgroundCol: Color?
+) {
+}

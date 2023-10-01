@@ -34,8 +34,8 @@ class UIItemInventoryElemWide(
         touchDownFun: (GameItem?, Long, Int, Any?, UIItemInventoryCellBase) -> Unit, // Item, Amount, Button, extra info, self
         extraInfo: Any? = null,
         highlightEquippedItem: Boolean = true, // for some UIs that only cares about getting equipped slot number but not highlighting
-        var colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
-) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem) {
+        colourTheme: InventoryCellColourTheme = UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+) : UIItemInventoryCellBase(parentUI, initialX, initialY, item, amount, itemImage, quickslot, equippedSlot, keyDownFun, touchDownFun, extraInfo, highlightEquippedItem, colourTheme) {
 
     companion object {
         val height = 48
@@ -87,7 +87,7 @@ class UIItemInventoryElemWide(
 
         // cell background
         if (item != null || drawBackOnNull) {
-            batch.color = Toolkit.Theme.COL_CELL_FILL
+            batch.color = colourTheme.cellBackgroundCol
             Toolkit.fillArea(batch, posX, posY, width, height)
         }
         // cell border

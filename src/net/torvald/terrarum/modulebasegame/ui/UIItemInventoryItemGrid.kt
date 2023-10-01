@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellCommonRes.defaultInventoryCellTheme
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -377,6 +378,19 @@ open class UIItemInventoryItemGrid(
         forceHighlightList.removeAll(items)
     }
 
+    private val itemGridDefaultColourTheme = defaultInventoryCellTheme
+    private val itemGridCraftingResultColourTheme = InventoryCellColourTheme(
+        Toolkit.Theme.COL_INACTIVE,
+        Toolkit.Theme.COL_INACTIVE,
+        Toolkit.Theme.COL_INACTIVE,
+        Toolkit.Theme.COL_INACTIVE,
+        Color.WHITE,
+        Color.WHITE,
+        Color.WHITE,
+        Color.WHITE,
+        Toolkit.Theme.COL_CELL_FILL_ALT
+    )
+
     /**
      * Special function for UICrafting to show how much the player already has the recipe's product
      *
@@ -404,21 +418,27 @@ open class UIItemInventoryItemGrid(
         inventorySortList.sortBy { ItemCodex[it.itm]!!.name }
 
         // add an appendix
+        var hasAppendix = false
         if (itemAppendix.isNotBlank()) {
             getInventory().filter { it.itm == itemAppendix }.let {
                 inventorySortList.addAll(it)
+                hasAppendix = it.isNotEmpty()
             }
         }
+
+        val appendixIndex = if (hasAppendix) inventorySortList.lastIndex else -1
 
         // map sortList to item list
         for (k in items.indices) {
             val item = items[k]
             // we have an item
             try {
-                val sortListItem = inventorySortList[k + itemPage * items.size]
+                val index = k + itemPage * items.size
+                val sortListItem = inventorySortList[index]
                 item.item = ItemCodex[sortListItem.itm]
                 item.amount = sortListItem.qty * numberMultiplier
                 item.itemImage = ItemCodex.getItemImage(sortListItem.itm)
+                item.colourTheme = if (k == appendixIndex) itemGridCraftingResultColourTheme else itemGridDefaultColourTheme
 
                 // set quickslot number
                 if (getInventory() is ActorInventory) {
@@ -453,6 +473,7 @@ open class UIItemInventoryItemGrid(
                 item.itemImage = null
                 item.quickslot = null
                 item.equippedSlot = null
+                item.colourTheme = itemGridDefaultColourTheme
             }
         }
 
@@ -502,6 +523,7 @@ open class UIItemInventoryItemGrid(
                 item.item = ItemCodex[sortListItem.itm]
                 item.amount = sortListItem.qty * numberMultiplier
                 item.itemImage = ItemCodex.getItemImage(sortListItem.itm)
+                item.colourTheme = itemGridDefaultColourTheme
 
                 // set quickslot number
                 if (getInventory() is ActorInventory) {
@@ -536,6 +558,7 @@ open class UIItemInventoryItemGrid(
                 item.itemImage = null
                 item.quickslot = null
                 item.equippedSlot = null
+                item.colourTheme = itemGridDefaultColourTheme
             }
         }
 
