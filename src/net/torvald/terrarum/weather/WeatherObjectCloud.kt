@@ -47,7 +47,8 @@ class WeatherObjectCloud(
             scl(world.worldTime.timeDelta.toFloat())
         )
 
-        eigenAlpha = if (posZ >= CLOUD_STAGE_DEPTH) 0f else if (posZ < 1f) posZ.pow(0.5f) else cosh((posZ - CLOUD_STAGE_DEPTH) / (0.75636f * CLOUD_STAGE_DEPTH)) - 1f //-((posZ - 1f) / CLOUD_STAGE_DEPTH) + 1f
+//        eigenAlpha = if (posZ >= CLOUD_STAGE_DEPTH) 0f else if (posZ < 1f) posZ.pow(0.5f) else cosh((posZ - CLOUD_STAGE_DEPTH) / (0.75636f * CLOUD_STAGE_DEPTH)) - 1f //-((posZ - 1f) / CLOUD_STAGE_DEPTH) + 1f
+        eigenAlpha = if (posZ >= CLOUD_STAGE_DEPTH) 0f else if (posZ < 1f) posZ.pow(0.5f) else ((posZ - CLOUD_STAGE_DEPTH) / (CLOUD_STAGE_DEPTH - 1)).pow(4f)
 
         val alphaMult = if (life < NEWBORN_GROWTH_TIME)
             life / NEWBORN_GROWTH_TIME
