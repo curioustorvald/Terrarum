@@ -562,7 +562,7 @@ internal object WeatherMixer : RNGConsumer {
         batch.color = Color.WHITE
     }
 
-    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG = 0.00000785
+    private val RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG = 0.000007
     private val APPARENT_SOLAR_Y_AT_45DEG = 1.0 / RECIPROCAL_OF_APPARENT_SOLAR_Y_AT_45DEG
 
     /**
@@ -592,7 +592,7 @@ internal object WeatherMixer : RNGConsumer {
             clouds.forEach {
                 val altOfSolarRay = cloudYtoSolarAlt(it.posY*-1.0, solarElev)
 
-                val cloudCol1 = getGradientCloud(skyboxavr, solarElev, 1.0, turbidity, albedo)
+                val cloudCol1 = getGradientCloud(skyboxavr, altOfSolarRay, mornNoonBlend.toDouble(), turbidity, albedo)
                 val cloudCol2 = getGradientColour2(currentWeather.daylightClut, altOfSolarRay, timeNow, 4)
                 val cloudDrawColour = lerp(0.7, cloudCol1, cloudCol2) // no srgblerp for performance
 
@@ -607,7 +607,7 @@ internal object WeatherMixer : RNGConsumer {
     private val parallaxDomainSize = 550f
     private val turbidityDomainSize = parallaxDomainSize * 1.3333334f
 
-    private val CLOUD_SOLARDEG_OFFSET = -0.0f
+    private val CLOUD_SOLARDEG_OFFSET = 0.3f
 
     private val globalLightBySun = Cvec()
     private val globalLightByMoon = Cvec()
@@ -889,7 +889,7 @@ internal object WeatherMixer : RNGConsumer {
         val A = lerp(bx, b1A, b2A)
         val B = lerp(bx, b1B, b2B)
 
-        return B//lerp(mornNoonBlend, A, B)
+        return lerp(mornNoonBlend, A, B)
     }
 
     private fun lerp(x: Double, c1: Cvec, c2: Cvec): Cvec {
