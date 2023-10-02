@@ -186,14 +186,16 @@ open class ActorHumanoid : ActorWithBody, Controllable, Pocketed, Factionable, L
     private var jumpJustPressedLatched = false
 
     @Transient private val nullItem = object : GameItem("item@basegame:0") {
-        override val isUnique: Boolean = false
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null
         override var inventoryCategory = "should_not_be_seen"
-        override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
-        override var stackable = false
         override val isDynamic = false
         override val materialId = ""
+
+        init {
+            stackable = false
+            originalName = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
+        }
     }
 
     override fun update(delta: Float) {

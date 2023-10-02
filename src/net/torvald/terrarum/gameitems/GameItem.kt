@@ -42,7 +42,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      *
      * e.g. Key Items (in a Pokémon sense); only the single instance of the item can exist in the pocket
      */
-    abstract val isUnique: Boolean
+    @Transient var isUnique: Boolean = false
     
     /**
      * OriginalName is always read from Language files.
@@ -52,10 +52,10 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * - `BLOCK_AIR` – Prints out `Lang.get("BLOCK_AIR")`
      * - `BLOCK_AIR>>=BLOCK_WALL_NAME_TEMPLATE` – Prints out `Formatter().format(Lang.get("BLOCK_WALL_NAME_TEMPLATE"), Lang.get("BLOCK_AIR")).toString()`
      */
-    abstract val originalName: String
+    @Transient var originalName: String = ""
 
 
-    var newName: String = "I AM VITUN PLACEHOLDER"
+    var newName: String = ""
         private set
 
     /**
@@ -84,7 +84,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     var itemProperties = ItemValue()
 
     /** Single-use then destroyed (e.g. Tiles), same as "consumable" */
-    abstract var stackable: Boolean
+    @Transient var stackable: Boolean = true
 
 
     /**
@@ -110,7 +110,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * }
      * ```
      */
-    var equipPosition: Int = EquipPosition.NULL
+    @Transient var equipPosition: Int = EquipPosition.NULL
 
     internal val material: Material
         get() = MaterialCodex.getOrDefault(materialId)
@@ -180,7 +180,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
     /**
      * Set to zero (GameItem.DURABILITY_NA) if durability not applicable
      */
-    open var maxDurability: Int = 0
+    @Transient open var maxDurability: Int = 0
 
     /**
      * Float. NOT A MISTAKE
@@ -189,7 +189,15 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
     @Transient var using = false // Always false when loaded from savegame
 
-    var tags = HashSet<String>()
+    /**
+     * Tags defined by the basegame
+     */
+    @Transient var tags = HashSet<String>()
+
+    /**
+     * Tags added/removed by dynamic items
+     */
+    var modifiers = HashSet<String>()
 
     /**
      * Mainly intended to be used by third-party modules

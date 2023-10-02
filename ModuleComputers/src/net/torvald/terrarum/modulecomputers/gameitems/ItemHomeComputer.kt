@@ -18,11 +18,8 @@ import net.torvald.terrarum.modulecomputers.gameactors.FixtureHomeComputer
 class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "Computer"
     override var baseMass = 20.0
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -32,6 +29,7 @@ class ItemHomeComputer(originalID: ItemID) : GameItem(originalID) {
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_DESKTOP_COMPUTER"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) = mouseInInteractableRange(actor) { _, _, mtx, mty ->

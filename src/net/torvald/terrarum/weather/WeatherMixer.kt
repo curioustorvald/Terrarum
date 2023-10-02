@@ -592,9 +592,9 @@ internal object WeatherMixer : RNGConsumer {
             clouds.forEach {
                 val altOfSolarRay = cloudYtoSolarAlt(it.posY*-1.0, solarElev)
 
-                val cloudCol1 = getGradientCloud(skyboxavr, solarElev, mornNoonBlend.toDouble(), turbidity, albedo)
+                val cloudCol1 = getGradientCloud(skyboxavr, solarElev, 1.0, turbidity, albedo)
                 val cloudCol2 = getGradientColour2(currentWeather.daylightClut, altOfSolarRay, timeNow, 4)
-                val cloudDrawColour = lerp(0.75, cloudCol1, cloudCol2) // no srgblerp for performance
+                val cloudDrawColour = lerp(0.7, cloudCol1, cloudCol2) // no srgblerp for performance
 
                 val shadiness = (1.0 / cosh(altOfSolarRay * 0.5)).toFloat().coerceAtLeast(if (altOfSolarRay < 0) 0.6666f else 0f)
 
@@ -653,7 +653,7 @@ internal object WeatherMixer : RNGConsumer {
         turbidity0 =
             (world.weatherbox.oldWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
         turbidity1 = (currentWeather.json.getDouble("atmoTurbidity") + turbidityCoeff * 2.5).coerceIn(1.0, 10.0)
-        turbidity = FastMath.interpolateLinear(oldNewBlend.toDouble(), turbidity0, turbidity1)
+        turbidity = forceTurbidity ?: FastMath.interpolateLinear(oldNewBlend.toDouble(), turbidity0, turbidity1)
         val oldTurbidity = forceTurbidity ?: turbidity0
         val thisTurbidity = forceTurbidity ?: turbidity1
 
@@ -839,31 +839,36 @@ internal object WeatherMixer : RNGConsumer {
         val turbY = turbidity.coerceIn(Skybox.turbiditiesD.first(), Skybox.turbiditiesD.last()).minus(1.0)
             .times(Skybox.turbDivisor)
         val turbY1 = turbY.floorToInt()
-        val turbY2 = (turbY1).coerceAtMost(Skybox.turbCnt - 1)
+        val turbY2 = (turbY1 + 1).coerceAtMost(Skybox.turbCnt - 1)
         val tx = turbY - turbY1
         // coarse-grained
         val albX =
-            albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) * Skybox.elevCnt // 0*151..5*151
-        val albX1 = albX.floorToInt()
-        val albX2 = (albX1 + 1).coerceAtMost(5 * Skybox.elevCnt)
-        val bx = albX - albX1
+            albedo.coerceIn(Skybox.albedos.first(), Skybox.albedos.last()).times(5.0) // 0..5
+        val albX1 = albX.floorToInt() * elevCnt
+        val albX2 = (albX + 1).floorToInt().coerceAtMost(5) * elevCnt
+        val bx = ((albX * elevCnt) - albX1) / elevCnt
 
-        val a1t1b1A = colorMap.getCvec(albX1 * elevCnt + angleX1, turbY1)
-        val a2t1b1A = colorMap.getCvec(albX1 * elevCnt + angleX2, turbY1)
-        val a1t2b1A = colorMap.getCvec(albX1 * elevCnt + angleX1, turbY2)
-        val a2t2b1A = colorMap.getCvec(albX1 * elevCnt + angleX2, turbY2)
-        val a1t1b2A = colorMap.getCvec(albX2 * elevCnt + angleX1, turbY1)
-        val a2t1b2A = colorMap.getCvec(albX2 * elevCnt + angleX2, turbY1)
-        val a1t2b2A = colorMap.getCvec(albX2 * elevCnt + angleX1, turbY2)
-        val a2t2b2A = colorMap.getCvec(albX2 * elevCnt + angleX2, turbY2)
-        val a1t1b1B = colorMap.getCvec(albX1 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a2t1b1B = colorMap.getCvec(albX1 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a1t2b1B = colorMap.getCvec(albX1 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
-        val a2t2b1B = colorMap.getCvec(albX1 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
-        val a1t1b2B = colorMap.getCvec(albX2 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a2t1b2B = colorMap.getCvec(albX2 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
-        val a1t2b2B = colorMap.getCvec(albX2 * elevCnt + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
-        val a2t2b2B = colorMap.getCvec(albX2 * elevCnt + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
+
+//        println("AngleX: ($angleX1,$angleX2); TurbY: ($turbY1,$turbY2); AlbX: ($albX1,$albX2); MornNoon=(0,${Skybox.albedoCnt * elevCnt}); Albedo: $albedo")
+//        println("ax=$ax; tx=$tx; bx=$bx")
+//        println("XY: ${albX1 + angleX1 + Skybox.albedoCnt * elevCnt}, $turbY1")
+
+        val a1t1b1A = colorMap.getCvec(albX1 + angleX1, turbY1)
+        val a2t1b1A = colorMap.getCvec(albX1 + angleX2, turbY1)
+        val a1t2b1A = colorMap.getCvec(albX1 + angleX1, turbY2)
+        val a2t2b1A = colorMap.getCvec(albX1 + angleX2, turbY2)
+        val a1t1b2A = colorMap.getCvec(albX2 + angleX1, turbY1)
+        val a2t1b2A = colorMap.getCvec(albX2 + angleX2, turbY1)
+        val a1t2b2A = colorMap.getCvec(albX2 + angleX1, turbY2)
+        val a2t2b2A = colorMap.getCvec(albX2 + angleX2, turbY2)
+        val a1t1b1B = colorMap.getCvec(albX1 + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a2t1b1B = colorMap.getCvec(albX1 + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a1t2b1B = colorMap.getCvec(albX1 + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a2t2b1B = colorMap.getCvec(albX1 + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a1t1b2B = colorMap.getCvec(albX2 + angleX1 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a2t1b2B = colorMap.getCvec(albX2 + angleX2 + Skybox.albedoCnt * elevCnt, turbY1)
+        val a1t2b2B = colorMap.getCvec(albX2 + angleX1 + Skybox.albedoCnt * elevCnt, turbY2)
+        val a2t2b2B = colorMap.getCvec(albX2 + angleX2 + Skybox.albedoCnt * elevCnt, turbY2)
 
         // no srgblerp here to match the skybox shader's behaviour
 
@@ -884,7 +889,7 @@ internal object WeatherMixer : RNGConsumer {
         val A = lerp(bx, b1A, b2A)
         val B = lerp(bx, b1B, b2B)
 
-        return lerp(mornNoonBlend, A, B)
+        return B//lerp(mornNoonBlend, A, B)
     }
 
     private fun lerp(x: Double, c1: Cvec, c2: Cvec): Cvec {

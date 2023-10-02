@@ -15,19 +15,17 @@ import net.torvald.terrarum.itemproperties.Material
 class WirePieceSignalWire(originalID: ItemID, private val atlasID: String, private val sheetX: Int, private val sheetY: Int) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_WIRE"
     override var baseMass = 0.001
     override var baseToolSize: Double? = null
-    override var stackable = true
     override var inventoryCategory = Category.WIRE
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet(atlasID).get(sheetX, sheetY)
 
     init {
-        super.equipPosition = GameItem.EquipPosition.HAND_GRIP
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        originalName = "ITEM_WIRE"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float): Long {

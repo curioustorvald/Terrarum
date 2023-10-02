@@ -112,11 +112,8 @@ object PickaxeCore {
 class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
     internal constructor() : this("-uninitialised-")
 
-    override val originalName = "ITEM_PICK_COPPER"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
-    override var stackable = true
     override var inventoryCategory = Category.TOOL
-    override val isUnique = false
     override val isDynamic = true
     override val materialId = "CUPR"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
@@ -124,10 +121,11 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,0)
 
     init {
-        super.equipPosition = GameItem.EquipPosition.HAND_GRIP
-        super.maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
-        super.durability = maxDurability.toFloat()
-        super.tags.add("PICK")
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("PICK")
+        originalName = "ITEM_PICK_COPPER"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
@@ -141,11 +139,8 @@ class PickaxeCopper(originalID: ItemID) : GameItem(originalID) {
 class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
     internal constructor() : this("-uninitialised-")
 
-    override val originalName = "ITEM_PICK_IRON"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
-    override var stackable = true
     override var inventoryCategory = Category.TOOL
-    override val isUnique = false
     override val isDynamic = true
     override val materialId = "IRON"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
@@ -153,10 +148,11 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,0)
 
     init {
-        super.equipPosition = GameItem.EquipPosition.HAND_GRIP
-        super.maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
-        super.durability = maxDurability.toFloat()
-        super.tags.add("PICK")
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("PICK")
+        originalName = "ITEM_PICK_IRON"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
@@ -170,11 +166,8 @@ class PickaxeIron(originalID: ItemID) : GameItem(originalID) {
 class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
     internal constructor() : this("-uninitialised-")
 
-    override val originalName = "ITEM_PICK_STEEL"
     override var baseToolSize: Double? = BASE_MASS_AND_SIZE
-    override var stackable = true
     override var inventoryCategory = Category.TOOL
-    override val isUnique = false
     override val isDynamic = true
     override val materialId = "STAL"
     override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
@@ -182,10 +175,11 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,0)
 
     init {
-        super.equipPosition = GameItem.EquipPosition.HAND_GRIP
-        super.maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
-        super.durability = maxDurability.toFloat()
-        super.tags.add("PICK")
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("PICK")
+        originalName = "ITEM_PICK_STEEL"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =

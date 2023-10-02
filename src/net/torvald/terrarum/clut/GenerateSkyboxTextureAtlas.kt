@@ -137,7 +137,7 @@ class GenerateSkyboxTextureAtlas {
         File("./assets/clut/skybox.tga").writeBytes(bytes)
     }
 
-    private val gradSizes = (0 until Skybox.gradSize)
+    private val gradSizes = listOf(50)
 
     private fun getByte(gammaPair: Int, albedo0: Int, turb0: Int, elev0: Int, yp: Int, channel: Int): Byte {
         val imgOffX = albedo0 * Skybox.elevCnt + elev0 + Skybox.elevCnt * Skybox.albedoCnt * gammaPair
@@ -179,12 +179,12 @@ class GenerateSkyboxTextureAtlas {
                     println("....... Turbidity=$turbidity")
                     for (elev0 in 0 until Skybox.elevCnt) {
 
-                        val avrB = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 0).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
-                        val avrG = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 1).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
-                        val avrR = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 2).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
-                        val avrA = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 3).toUint() }.toDouble() / Skybox.gradSize).div(255.0).srgbLinearise().toFloat()
+                        val avrB = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 0).toUint() }.toDouble() / gradSizes.size).div(255.0).toFloat()
+                        val avrG = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 1).toUint() }.toDouble() / gradSizes.size).div(255.0).toFloat()
+                        val avrR = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 2).toUint() }.toDouble() / gradSizes.size).div(255.0).toFloat()
+                        val avrA = (gradSizes.sumOf { getByte(gammaPair, albedo0, turb0, elev0, it, 3).toUint() }.toDouble() / gradSizes.size).div(255.0).toFloat()
 
-                        val colour = Cvec(avrR, avrG, avrB, avrA).saturate(1.6666667f)
+                        val colour = Cvec(avrR, avrG, avrB, avrA).mul(1.02f).vibrancy(1.1f)
 
                         val colourBytes = arrayOf(
                             colour.b.times(255f).roundToInt().coerceIn(0..255).toByte(),
@@ -223,9 +223,12 @@ class GenerateSkyboxTextureAtlas {
             this * 12.92
     }
 
-    private fun Cvec.saturate(intensity: Float): Cvec {
+    private fun Cvec.vibrancy(intensity: Float): Cvec {
         val luv = HUSLColorConverter.rgbToHsluv(floatArrayOf(this.r, this.g, this.b))
-        luv[1] *= intensity
+
+        val sat = luv[1] // 0..100
+        luv[1] = (sat / 100f).pow(1f / intensity) * 100f
+
         val rgb = HUSLColorConverter.hsluvToRgb(luv)
         this.r = rgb[0]
         this.g = rgb[1]

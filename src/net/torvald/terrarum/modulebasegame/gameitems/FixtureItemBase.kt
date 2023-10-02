@@ -39,11 +39,8 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     @Transient private var ghostInit = AtomicBoolean(false)
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "FIXTUREBASE"
     override var baseMass = 1.0
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
 

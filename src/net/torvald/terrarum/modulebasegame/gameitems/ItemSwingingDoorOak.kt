@@ -13,11 +13,8 @@ class ItemSwingingDoorOak(originalID: ItemID) :
     FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorOak") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_DOOR_OAK"
     override var baseMass = 20.0 // 360[L] * 0.1 * 0.56[SpecificGravity], rounded to the nearest integer
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -26,6 +23,7 @@ class ItemSwingingDoorOak(originalID: ItemID) :
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_DOOR_OAK"
     }
 
     @Transient override val makeFixture: () -> FixtureBase = {
@@ -38,11 +36,8 @@ class ItemSwingingDoorEbony(originalID: ItemID) :
     FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorEbony") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_DOOR_EBONY"
     override var baseMass = 30.0 // 360[L] * 0.1 * 0.82[SpecificGravity], rounded to the nearest integer
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -51,6 +46,7 @@ class ItemSwingingDoorEbony(originalID: ItemID) :
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_DOOR_EBONY"
     }
 
     @Transient override val makeFixture: () -> FixtureBase = {
@@ -63,11 +59,8 @@ class ItemSwingingDoorBirch(originalID: ItemID) :
     FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorBirch") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_DOOR_BIRCH"
     override var baseMass = 17.0 // 360[L] * 0.1 * 0.48[SpecificGravity], rounded to the nearest integer
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -76,6 +69,7 @@ class ItemSwingingDoorBirch(originalID: ItemID) :
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_DOOR_BIRCH"
     }
 
     @Transient override val makeFixture: () -> FixtureBase = {
@@ -88,11 +82,8 @@ class ItemSwingingDoorRosewood(originalID: ItemID) :
     FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureSwingingDoorRosewood") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_DOOR_ROSEWOOD"
     override var baseMass = 24.0 // 360[L] * 0.1 * 0.68[SpecificGravity], rounded to the nearest integer
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -101,6 +92,7 @@ class ItemSwingingDoorRosewood(originalID: ItemID) :
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_DOOR_ROSEWOOD"
     }
 
     @Transient override val makeFixture: () -> FixtureBase = {

@@ -1,29 +1,29 @@
 {
-  "basegame:160": {
+  "basegame:160": { /* stone platform */
     "workbench": "",
     "ingredients": [
       [2, 1, "$ROCK"]
     ]
   },
-  "basegame:161": {
+  "basegame:161": { /* wooden platform */
     "workbench": "",
     "ingredients": [
       [2, 1, "basegame:48"]
     ]
   },
-  "basegame:162": {
+  "basegame:162": { /* ebony platform */
     "workbench": "",
     "ingredients": [
       [2, 1, "basegame:49"]
     ]
   },
-  "basegame:163": {
+  "basegame:163": { /* birch platform */
     "workbench": "",
     "ingredients": [
       [2, 1, "basegame:50"]
     ]
   },
-  "basegame:164": {
+  "basegame:164": { /* rosewood platform */
     "workbench": "",
     "ingredients": [
       [2, 1, "basegame:51"]

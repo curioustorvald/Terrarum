@@ -1,5 +1,5 @@
 {
-  "item@basegame:5": {
+  "item@basegame:5": { /* tiki torch */
     "workbench": "",
     "ingredients": [
       [1, 3, "$WOOD", 1, "basegame:176"],
@@ -7,32 +7,32 @@
     ]
   },
 
-  "item@basegame:16": {
+  "item@basegame:16": { /* workbench */
     "workbench": "",
     "ingredients": [
-      [1, 6, "$WOOD"]
+      [1, 8, "$WOOD"]
     ]
   },
 
-  "item@basegame:256": {
+  "item@basegame:256": { /* oak door */
     "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:48"]
     ]
   },
-  "item@basegame:257": {
+  "item@basegame:257": { /* ebony door */
     "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:49"]
     ]
   },
-  "item@basegame:258": {
+  "item@basegame:258": { /* birch door */
     "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:50"]
     ]
   },
-  "item@basegame:259": {
+  "item@basegame:259": { /* rosewood door */
     "workbench": "basiccrafting",
     "ingredients": [
       [1, 4, "basegame:51"]

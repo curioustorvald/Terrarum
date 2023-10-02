@@ -9,11 +9,8 @@ import net.torvald.terrarum.gameitems.ItemID
 class ItemWorkbench(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureWorkbench") {
 
 
-    override val originalName = "ITEM_WORKBENCH"
     override var baseMass = 20.0
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -23,6 +20,7 @@ class ItemWorkbench(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_WORKBENCH"
     }
 
 

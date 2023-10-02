@@ -11,11 +11,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter
 class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureLogicSignalEmitter") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
     override var baseMass = FixtureLogicSignalEmitter.MASS
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -25,6 +22,7 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
     }
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {

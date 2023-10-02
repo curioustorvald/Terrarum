@@ -11,11 +11,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 class ItemWorldPortal(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureWorldPortal") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_WORLD_PORTAL"
     override var baseMass = 6000.0
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -25,6 +22,7 @@ class ItemWorldPortal(originalID: ItemID) : FixtureItemBase(originalID, "net.tor
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_WORLD_PORTAL"
     }
 
 }

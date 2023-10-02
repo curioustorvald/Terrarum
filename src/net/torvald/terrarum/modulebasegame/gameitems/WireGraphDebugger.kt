@@ -12,11 +12,8 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 
 class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
 
-    override val originalName = "WIRE_DEBUGGER"
     override var baseToolSize: Double? = PickaxeCore.BASE_MASS_AND_SIZE
-    override var stackable = false
     override var inventoryCategory = Category.TOOL
-    override val isUnique = true
     override val isDynamic = false
     override val materialId = "CUPR"
     override var baseMass = 2.0
@@ -24,8 +21,11 @@ class WireGraphDebugger(originalID: ItemID) : GameItem(originalID) {
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,3)
 
     init {
-        super.equipPosition = GameItem.EquipPosition.HAND_GRIP
-        super.name = "Wire Debugger"
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        name = "Wire Debugger"
+        stackable = false
+        isUnique = true
+        originalName = "WIRE_DEBUGGER"
     }
 
     private val sb = StringBuilder()

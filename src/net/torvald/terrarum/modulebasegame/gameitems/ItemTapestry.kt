@@ -15,11 +15,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTapestry
 class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureTapestry") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_TAPESTRY"
     override var baseMass = 6.0
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -28,6 +25,7 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_TAPESTRY"
     }
 
     @Transient override val makeFixture: () -> FixtureBase = {

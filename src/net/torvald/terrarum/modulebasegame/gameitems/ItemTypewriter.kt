@@ -11,11 +11,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.FixtureTikiTorch
 class ItemTypewriter(originalID: ItemID) : FixtureItemBase(originalID, "net.torvald.terrarum.modulebasegame.gameactors.FixtureTypewriter") {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_TYPEWRITER"
     override var baseMass = FixtureTikiTorch.MASS
-    override var stackable = true
     override var inventoryCategory = Category.MISC
-    override val isUnique = false
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
@@ -25,6 +22,7 @@ class ItemTypewriter(originalID: ItemID) : FixtureItemBase(originalID, "net.torv
 
     init {
         equipPosition = EquipPosition.HAND_GRIP
+        originalName = "ITEM_TYPEWRITER"
     }
 
 }

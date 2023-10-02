@@ -36,7 +36,6 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
 
     // we're having GameItem data so that this class could be somewhat universal
     override var itemData: GameItem = object : GameItem("actor:"+referenceID) {//GameItem(referenceID ?: forceAssignRefID!!) {
-        override val isUnique = true
         override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!
             set(value) { actorValue[AVKey.BASEMASS] = value }
@@ -47,8 +46,6 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
                 actorValue[AVKey.SCALE] = value
             }
         override var inventoryCategory = "npc"
-        override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
-        override var stackable = true
         override val isDynamic = false
         override val materialId = ""
 
@@ -64,6 +61,12 @@ open class HumanoidNPC : ActorHumanoid, AIControlled, CanBeAnItem {
                 e.printStackTrace()
                 return -1
             }
+        }
+
+        init {
+            isUnique = true
+            stackable = false
+            originalName = actorValue.getAsString(AVKey.NAME) ?: "NPC"
         }
     }
 

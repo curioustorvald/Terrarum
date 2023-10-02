@@ -85,19 +85,19 @@ object WireCutterBase {
 class WireCutterAll(originalID: ItemID) : GameItem(originalID) {
 
     override var dynamicID: ItemID = originalID
-    override val originalName = "ITEM_WIRE_CUTTER"
     override var baseMass = 0.1
     override var baseToolSize: Double? = baseMass
-    override var stackable = false
     override var inventoryCategory = Category.TOOL
-    override val isUnique = true
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1, 3)
 
     init {
-        super.equipPosition = GameItem.EquipPosition.HAND_GRIP
+        stackable = false
+        isUnique = true
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        originalName = "ITEM_WIRE_CUTTER"
     }
 
     override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
