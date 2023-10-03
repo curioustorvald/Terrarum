@@ -1,8 +1,10 @@
 package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameitems.isBlock
 import net.torvald.terrarum.gameitems.isDynamic
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -127,8 +129,11 @@ internal object SavegameMigrator {
             val oldQuickSlot = actor.inventory.quickSlot.copyOf()
             val oldItems = actor.inventory.clear()
 
+
             oldItems.forEach { (itm, qty) ->
-                actor.inventory.add(itm, qty)
+                if (itm.isBlock() && !BlockCodex[itm].hasTag("AIR") && !BlockCodex[itm].isActorBlock) {
+                    actor.inventory.add(itm, qty)
+                }
             }
 
             oldItemEquipped.forEachIndexed { index, id0 ->

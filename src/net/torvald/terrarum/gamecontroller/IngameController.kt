@@ -14,8 +14,10 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
+import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import org.dyn4j.geometry.Vector2
 import java.util.*
 
 /**
@@ -179,6 +181,24 @@ class IngameController(val terrarumIngame: TerrarumIngame) : InputAdapter() {
                 || keycode == ControlPresets.getKey("control_key_quicksel")) {
                 terrarumIngame.uiPieMenu.setAsOpen()
                 terrarumIngame.uiQuickBar.setAsClose()
+            }
+
+            // toss items
+            if (Gdx.input.isKeyJustPressed(ControlPresets.getKey("control_key_discard"))) {
+                val player = terrarumIngame.actorNowPlaying
+                val item = if (player != null) player.inventory.quickSlot[player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!!] else null
+                if (player != null && item != null) {
+                    // remove an item from the inventory
+                    player.inventory.remove(item, 1)
+                    // create and spawn the droppeditem
+                    DroppedItem(item,
+                        player.hitbox.centeredX,
+                        player.hitbox.centeredY,
+                        Vector2(-4.0 * player.scale.sqrt() * player.sprite!!.flipHorizontal.toInt(1).minus(1), -0.1)
+                    ).let { drop ->
+                        INGAME.queueActorAddition(drop)
+                    }
+                }
             }
         }
 

@@ -83,6 +83,8 @@ open class DroppedItem : ActorWithBody {
         else {
             externalV.set(spawnVelo)
         }
+
+        printdbg(this, "DroppedItem with itemID '${itemID}'")
     }
 
     override fun drawBody(batch: SpriteBatch) {
