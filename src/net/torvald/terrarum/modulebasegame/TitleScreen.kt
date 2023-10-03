@@ -449,11 +449,11 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         batch.color = Color.WHITE
 
-        // warn: 32-bit
         val linegap = 4
         val imgTxtGap = 10
         val yoff = App.scr.height - App.scr.tvSafeGraphicsHeight - 64 - (3*(20+linegap)) - imgTxtGap - 9
         if (uiRemoCon.currentRemoConContents.parent == null) {
+            // warn: 32-bit
             var texts = emptyList<String>()
             var textcols = emptyList<Color>()
             if (App.is32BitJVM) {
@@ -478,7 +478,20 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                     yoff + imgTxtGap + 64f + linegap + i * (20 + linegap)
                 )
             }
+
+
+            // update available!
+            if (App.hasUpdate) {
+                batch.color = Toolkit.Theme.COL_SELECTED
+                App.fontGame.draw(
+                    batch,
+                    Lang["MENU_UPDATE_UPDATE_AVAILABLE"],
+                    UIRemoCon.menubarOffX + UIRemoCon.UIRemoConElement.paddingLeft / 2 + uiRemoCon.posX,
+                    UIRemoCon.menubarOffY - uiRemoCon.height + uiRemoCon.posY
+                )
+            }
         }
+
     }
 
     override fun pause() {
