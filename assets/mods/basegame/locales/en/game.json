@@ -23,5 +23,7 @@
   "GAME_INVENTORY_INGREDIENTS": "Ingredients",
   "GAME_INVENTORY_POTIONS": "Potions",
   "GAME_INVENTORY_REGISTER": "Register",
-  "GAME_INVENTORY_WALLS": "Walls"
+  "GAME_INVENTORY_WALLS": "Walls",
+
+  "GAME_INVENTORY_DROP": "Toss" /* overwrites Polyglot; please don't include this line for translation */
 }

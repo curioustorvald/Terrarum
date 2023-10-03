@@ -159,7 +159,8 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
                 "control_key_toggleime",
                 "control_key_movementaux",
                 "control_key_quicksel",
-                "control_key_crafting"
+                "control_key_crafting",
+                "control_key_discard",
         ).forEach {
                     App.setConfig(it, DefaultConfig.hashMap[it]!! as Int)
         }
@@ -180,6 +181,7 @@ class UIKeyboardControlPanel(remoCon: UIRemoCon?) : UICanvas() {
         keycaps[ControlPresets.getKey("control_key_gamemenu")]?.symbolControl = Keebsym.MENU
         keycaps[ControlPresets.getKey("control_key_toggleime")]?.symbolControl = Keebsym.IME()
         keycaps[ControlPresets.getKey("control_key_crafting")]?.symbolControl = Keebsym.CRAFTING
+        keycaps[ControlPresets.getKey("control_key_discard")]?.symbolControl = Keebsym.DISCARD
     }
 
     internal var keycapClicked = -13372
@@ -398,30 +400,32 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
 
     // TEXT IS MANUALLY PRINTED ON render() !!
     private val iconButtons = arrayOf(
-            // left up right down
-            UIItemImageButton(parent, Keebsym.LEFT, initialX = col0 - 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, Keebsym.UP, initialX = col0, initialY = initialY + 26, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, Keebsym.DOWN, initialX = col0, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            UIItemImageButton(parent, Keebsym.RIGHT, initialX = col0 + 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // left up right down
+        UIItemImageButton(parent, Keebsym.LEFT, initialX = col0 - 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.UP, initialX = col0, initialY = initialY + 26, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.DOWN, initialX = col0, initialY = initialY + 60, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        UIItemImageButton(parent, Keebsym.RIGHT, initialX = col0 + 34, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
-            // jump
-            UIItemImageButton(parent, Keebsym.JUMP, initialX = col1, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // jump
+        UIItemImageButton(parent, Keebsym.JUMP, initialX = col1, initialY = initialY + 43, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
-            // inventory
-            UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // crafting
-            UIItemImageButton(parent, Keebsym.CRAFTING, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // hook
-            UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // quicksel
-            UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row4, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // inventory
+        UIItemImageButton(parent, Keebsym.INVENTORY, initialX = col0, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // crafting
+        UIItemImageButton(parent, Keebsym.CRAFTING, initialX = col0, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // hook
+        UIItemImageButton(parent, Keebsym.HOOK, initialX = col0, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // quicksel
+        UIItemImageButton(parent, Keebsym.PIE, initialX = col0, initialY = row4, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
-            // zoom
-            UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // IME
-            UIItemImageButton(parent, Keebsym.IME(), initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
-            // system menu
-            UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // zoom
+        UIItemImageButton(parent, Keebsym.ZOOM, initialX = col1, initialY = row1, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // IME
+        UIItemImageButton(parent, Keebsym.IME(), initialX = col1, initialY = row2, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // system menu
+        UIItemImageButton(parent, Keebsym.MENU, initialX = col1, initialY = row3, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
+        // toss item
+        UIItemImageButton(parent, Keebsym.DISCARD, initialX = col1, initialY = row4, highlightable = false, backgroundCol = Color(0), activeBackCol = Color(0), highlightBackCol = Color(0)),
 
     )
 
@@ -432,21 +436,22 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
     // indices must correspond with what's on the UIItemControlPaletteBaloon.iconButtons
     companion object {
         val indexToConfigKey = hashMapOf(
-                0 to "control_key_left",
-                1 to "control_key_up",
-                2 to "control_key_down",
-                3 to "control_key_right",
+            0 to "control_key_left",
+            1 to "control_key_up",
+            2 to "control_key_down",
+            3 to "control_key_right",
 
-                4 to "control_key_jump",
+            4 to "control_key_jump",
 
-                5 to "control_key_inventory",
-                6 to "control_key_crafting",
-                7 to "control_key_movementaux",
-                8 to "control_key_quicksel",
+            5 to "control_key_inventory",
+            6 to "control_key_crafting",
+            7 to "control_key_movementaux",
+            8 to "control_key_quicksel",
 
-                9 to "control_key_zoom",
-                10 to "control_key_toggleime",
-                11 to "control_key_gamemenu",
+            9 to "control_key_zoom",
+            10 to "control_key_toggleime",
+            11 to "control_key_gamemenu",
+            12 to "control_key_discard",
         )
     }
 
@@ -479,6 +484,7 @@ class UIItemControlPaletteBaloon(val parent: UIKeyboardControlPanel, initialX: I
         App.fontGame.draw(batch, Lang["GAME_ACTION_ZOOM"], col1 + 40, row1 - 2)
         App.fontGame.draw(batch, Lang["MENU_LABEL_IME_TOGGLE"], col1 + 40, row2 - 2)
         App.fontGame.draw(batch, Lang["MENU_LABEL_MENU"], col1 + 40, row3 - 2)
+        App.fontGame.draw(batch, Lang["GAME_INVENTORY_DROP"], col1 + 40, row4 - 2)
     }
 
 
@@ -530,4 +536,5 @@ private object Keebsym {
 
     }
     val CRAFTING = labels.get(9,1)
+    val DISCARD = labels.get(10, 1)
 }
