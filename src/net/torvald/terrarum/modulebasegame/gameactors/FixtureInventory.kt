@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.Terrarum
@@ -89,8 +90,7 @@ open class FixtureInventory() {
 
         val item = filterItem(item0)!!
 
-
-//        println("[ActorInventory] add-by-elem $item, $count")
+//        printdbg(this, "add-by-elem $item, $count")
 
         // other invalid values
         if (count == 0L)
@@ -139,7 +139,7 @@ open class FixtureInventory() {
      *      e.g. re-assign after this operation */
     open fun remove(item: GameItem, count: Long = 1, unequipFun: (InventoryPair) -> Unit) {
 
-        println("[ActorInventory] remove $item, $count")
+//        printdbg(this, "remove $item, $count")
 
         if (count == 0L)
 //            throw IllegalArgumentException("[${this.javaClass.canonicalName}] Item count is zero.")
