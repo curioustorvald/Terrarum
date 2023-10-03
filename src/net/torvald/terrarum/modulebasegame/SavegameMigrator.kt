@@ -6,6 +6,7 @@ import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameitems.isBlock
 import net.torvald.terrarum.gameitems.isDynamic
+import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
@@ -131,7 +132,12 @@ internal object SavegameMigrator {
 
 
             oldItems.forEach { (itm, qty) ->
-                if (itm.isBlock() && !BlockCodex[itm].hasTag("AIR") && !BlockCodex[itm].isActorBlock) {
+                if (itm.isBlock() || itm.isWall()) {
+                    if (!BlockCodex[itm].hasTag("AIR") && !BlockCodex[itm].isActorBlock) {
+                        actor.inventory.add(itm, qty)
+                    }
+                }
+                else {
                     actor.inventory.add(itm, qty)
                 }
             }
