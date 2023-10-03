@@ -82,7 +82,7 @@ object PickaxeCore {
                 if (Math.random() < dropProbability) {
                     val drop = BlockCodex[tileBroken].drop
                     if (drop.isNotBlank()) {
-                        INGAME.queueActorAddition(DroppedItem(drop, x * TILE_SIZED, y * TILE_SIZED))
+                        INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                     }
                 }
             }

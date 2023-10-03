@@ -636,4 +636,19 @@ open class UIItemInventoryItemGrid(
 
         return true
     }
+
+    fun find(predicate: (UIItemInventoryCellBase) -> Boolean): UIItemInventoryCellBase? {
+        var c = 0
+        var ret: UIItemInventoryCellBase? = null
+        while (c < items.size) {
+            if (predicate(items[c])) {
+                ret = items[c]
+                break
+            }
+
+            c++
+        }
+
+        return ret
+    }
 }

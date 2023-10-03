@@ -1,12 +1,15 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureInventory
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_HOR
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull.Companion.CELLS_VRT
@@ -18,6 +21,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryItemGrid.Companion.createInvCellGenericTouchDownFun
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import org.dyn4j.geometry.Vector2
 import kotlin.math.max
 import kotlin.math.min
 
@@ -83,6 +87,25 @@ internal class UIInventoryCells(
     override fun updateUI(delta: Float) {
         itemList.update(delta)
         equipped.update(delta)
+
+        // make tossing work on the inventory ui
+        if (Gdx.input.isKeyJustPressed(ControlPresets.getKey("control_key_discard"))) {
+            itemList.find { it.mouseUp }?.let { cell -> cell.item?.let { item ->
+                val player = full.actor
+                // remove an item from the inventory
+                player.inventory.remove(item, 1)
+                // create and spawn the droppeditem
+                DroppedItem(item.dynamicID,
+                    player.hitbox.centeredX,
+                    player.hitbox.centeredY,
+                    Vector2(-4.0 * player.scale.sqrt() * player.sprite!!.flipHorizontal.toInt(1).minus(1), -0.1)
+                ).let { drop ->
+                    INGAME.queueActorAddition(drop)
+                }
+                // update inventory
+                rebuildList()
+            } }
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {

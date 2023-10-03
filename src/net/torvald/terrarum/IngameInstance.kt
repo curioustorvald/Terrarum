@@ -352,6 +352,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
      * If the actor is null, this function will do nothing.
      */
     open fun queueActorAddition(actor: Actor?) {
+        printdbg(this, "New actor $actor")
         if (actor == null) return
         actorAdditionQueue.add(actor to StackTraceRecorder())
     }

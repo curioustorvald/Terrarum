@@ -2,6 +2,8 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -91,7 +93,7 @@ object SledgehammerCore {
                 if (Math.random() < dropProbability) {
                     val drop = BlockCodex[tileBroken].drop
                     if (drop.isNotBlank()) {
-                        INGAME.queueActorAddition(DroppedItem("wall@$drop", x * TerrarumAppConfiguration.TILE_SIZED, y * TerrarumAppConfiguration.TILE_SIZED))
+                        INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                     }
                 }
             }

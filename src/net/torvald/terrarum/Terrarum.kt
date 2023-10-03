@@ -48,6 +48,8 @@ typealias RGBA8888 = Int
  * Slick2d Version Created by minjaesong on 2015-12-30.
  *
  * LibGDX Version Created by minjaesong on 2017-06-15.
+ *
+ * Note: Blocks are NOT automatically added; they must be registered manually on the module's EntryPoint
  */
 object Terrarum : Disposable {
 

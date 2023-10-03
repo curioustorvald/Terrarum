@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.jme3.math.FastMath
 import net.torvald.gdx.graphics.Cvec
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.INGAME
 import net.torvald.terrarum.ItemCodex
@@ -11,6 +12,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitems.*
+import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -48,7 +50,7 @@ open class DroppedItem : ActorWithBody {
      * @param topLeftX world-wise coord
      * @param topLeftY world-wise coord
      */
-    constructor(itemID: ItemID, topLeftX: Double, topLeftY: Double) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
+    constructor(itemID: ItemID, centreX: Double, bottomY: Double, spawnVelo: Vector2? = null) : super(RenderOrder.MIDTOP, PhysProperties.PHYSICS_OBJECT) {
         this.itemID = itemID
 
         if (itemID.isActor())
@@ -56,10 +58,7 @@ open class DroppedItem : ActorWithBody {
 
         isVisible = true
 
-        avBaseMass = if (itemID.isItem() || itemID.isWire())
-            (ItemCodex[itemID]?.mass ?: 2.0).coerceAtMost(2.0)
-        else
-            BlockCodex[itemID].density / 1000.0 // block and wall
+        avBaseMass = (ItemCodex[itemID]?.mass ?: 2.0).coerceAtMost(2.0)
 
         actorValue[AVKey.SCALE] = ItemCodex[itemID]?.scale ?: 1.0
 
@@ -69,16 +68,21 @@ open class DroppedItem : ActorWithBody {
                 0, 0
         )
 
-        setPosition(topLeftX + (hitbox.width / 2.0), topLeftY + hitbox.height)
+        setPosition(centreX, bottomY)
 
         // random horizontal movement
-        val magn = Math.random() * 1.3
-        externalV.x = if (isWalled(hitbox, COLLIDING_LEFT))
-            Math.cos(Math.random() * Math.PI / 2) * magn
-        else if (isWalled(hitbox, COLLIDING_RIGHT))
-            Math.cos(Math.random() * Math.PI / 2 + Math.PI / 2) * magn
-        else
-            Math.cos(Math.random() * Math.PI) * magn
+        if (spawnVelo == null) {
+            val magn = Math.random() * 1.3
+            externalV.x = if (isWalled(hitbox, COLLIDING_LEFT))
+                Math.cos(Math.random() * Math.PI / 2) * magn
+            else if (isWalled(hitbox, COLLIDING_RIGHT))
+                Math.cos(Math.random() * Math.PI / 2 + Math.PI / 2) * magn
+            else
+                Math.cos(Math.random() * Math.PI) * magn
+        }
+        else {
+            externalV.set(spawnVelo)
+        }
     }
 
     override fun drawBody(batch: SpriteBatch) {
@@ -108,11 +112,23 @@ open class DroppedItem : ActorWithBody {
         }
     }
 
+    private fun getLum(itemID: ItemID): Cvec {
+        return if (itemID.isBlock() || itemID.isWall()) {
+            BlockCodex[itemID.substringAfter('@')].getLumCol(randKey1, randKey2)
+        }
+        else {
+            Cvec(
+                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMR) ?: 0f,
+                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMG) ?: 0f,
+                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMB) ?: 0f,
+                ItemCodex[itemID]?.itemProperties?.getAsFloat(AVKey.LUMA) ?: 0f,
+            )
+        }
+    }
+
     override fun update(delta: Float) {
         if (this.itemID.isBlock() || this.itemID.isItem()) {
-            BlockCodex[this.itemID].let {
-                this.lightBoxList[0].light = it.getLumCol(randKey1, randKey2)
-            }
+            this.lightBoxList[0].light = getLum(this.itemID)
         }
 
         super.update(delta)
@@ -121,8 +137,9 @@ open class DroppedItem : ActorWithBody {
 
         // merge into the already existing droppeditem with isStationary==true if one is detected
         if (!this.isStationary) {
-            INGAME.findNearestActor(this) { it is DroppedItem && it.itemID == this.itemID && it.isStationary }?.let {
+            INGAME.findNearestActor(this) { it is DroppedItem && it.itemID == this.itemID && it.isStationary && !it.flagDespawn }?.let {
                 if (it.distance <= MERGER_RANGE) {
+//                    printdbg(this, "Dropped merger $itemID (${(it.get() as DroppedItem).itemCount} -> ${(it.get() as DroppedItem).itemCount + this.itemCount})")
                     (it.get() as DroppedItem).itemCount += this.itemCount
                     this.flagDespawn()
                 }
