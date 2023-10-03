@@ -181,7 +181,7 @@ internal object WeatherMixer : RNGConsumer {
             weatherDB[weather.classification]!!.add(weather)
         }
 
-        weatherDict["titlescreen"] = weatherDB[WEATHER_GENERIC]!![0].copy(identifier = "titlescreen", windSpeed = 1f)
+        weatherDict["titlescreen"] = weatherDB[WEATHER_GENERIC]?.get(0)?.copy(identifier = "titlescreen", windSpeed = 1f) ?: DEFAULT_WEATHER
     }
 
     /**

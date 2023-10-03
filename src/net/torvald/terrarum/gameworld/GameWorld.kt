@@ -154,7 +154,7 @@ open class GameWorld(
     var weatherbox = Weatherbox()
 
     init {
-        weatherbox.initWith(WeatherMixer.weatherDict["generic01"]!!, 3600L)
+        weatherbox.initWith(WeatherMixer.weatherDict["generic01"] ?: WeatherMixer.DEFAULT_WEATHER, 3600L)
         val currentWeather = weatherbox.currentWeather
         // TEST FILL WITH RANDOM VALUES
         (0..6).map { WeatherMixer.takeUniformRand(0f..1f) }.let {

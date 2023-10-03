@@ -26,30 +26,33 @@ class UIItemInventoryCatBar(
     }
 
     internal val catIcons: TextureRegionPack = CommonResourcePool.getAsTextureRegionPack("inventory_category")
-    internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
+    private val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,1_011,3,4,5,8) // icon order
     internal val catIconsMeaning = listOf( // sortedBy: catArrangement
-            arrayOf(GameItem.Category.WEAPON),
-            arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
-            arrayOf(GameItem.Category.ARMOUR),
-            arrayOf(GameItem.Category.GENERIC),
-            arrayOf(GameItem.Category.POTION),
-            arrayOf(GameItem.Category.MAGIC),
-            arrayOf(GameItem.Category.BLOCK),
-            arrayOf(GameItem.Category.WALL),
-            arrayOf(GameItem.Category.MISC),
-            arrayOf(CAT_ALL)
+        arrayOf(CAT_ALL),
+        arrayOf(GameItem.Category.BLOCK),
+        arrayOf(GameItem.Category.WALL),
+        arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
+        arrayOf(GameItem.Category.WEAPON),
+        arrayOf(GameItem.Category.ARMOUR),
+        arrayOf(GameItem.Category.FIXTURE),
+        arrayOf(GameItem.Category.GENERIC),
+        arrayOf(GameItem.Category.POTION),
+        arrayOf(GameItem.Category.MAGIC),
+        arrayOf(GameItem.Category.MISC),
     )
+
     internal val catIconsLabels = listOf(
-        { Lang["GAME_INVENTORY_WEAPONS"] },
+        { Lang["MENU_LABEL_ALL"] },
+        { Lang["GAME_INVENTORY_BLOCKS"] },
+        { Lang["GAME_INVENTORY_WALLS"] },
         { Lang["CONTEXT_ITEM_TOOL_PLURAL"] },
+        { Lang["GAME_INVENTORY_WEAPONS"] },
         { Lang["CONTEXT_ITEM_ARMOR"] },
+        { Lang["CONTEXT_ITEM_FIXTURES"] },
         { Lang["GAME_INVENTORY_INGREDIENTS"] },
         { Lang["GAME_INVENTORY_POTIONS"] },
         { Lang["CONTEXT_ITEM_MAGIC"] },
-        { Lang["GAME_INVENTORY_BLOCKS"] },
-        { Lang["GAME_INVENTORY_WALLS"] },
         { Lang["GAME_GENRE_MISC"] },
-        { Lang["MENU_LABEL_ALL"] },
     )
 
 
@@ -60,11 +63,11 @@ class UIItemInventoryCatBar(
     private val mainButtons: Array<UIItemImageButton>
     private val buttonGapSize = (width.toFloat() - (catArrangement.size * catIcons.tileW)) / (catArrangement.size)
     /** raw order */
-    private var selectedIndex = 0 // default to ALL
+    var selectedIndex = 0 // default to ALL
         private set
     /** re-arranged order */
-    val selectedIcon: Int
-        get() = catArrangement[selectedIndex]
+//    val selectedIcon: Int
+//        get() = catArrangement[selectedIndex]
 
     private val sideButtons: Array<UIItemImageButton>
 
@@ -75,9 +78,13 @@ class UIItemInventoryCatBar(
             val iconPosX = ((buttonGapSize / 2) + index * (catIcons.tileW + buttonGapSize)).roundToInt()
             val iconPosY = 0
 
+            val iconIndex = catArrangement[index]
+            val iconIndexX = iconIndex % 1000
+            val iconIndexY = iconIndex / 1000
+
             UIItemImageButton(
                     inventoryUI,
-                    catIcons.get(catArrangement[index], 0),
+                    catIcons.get(iconIndexX, iconIndexY),
                     activeBackCol = Color(0),
                     backgroundCol = Color(0),
                     highlightBackCol = Color(0),
@@ -291,7 +298,7 @@ class UIItemInventoryCatBar(
 
             // label
             batch.color = Color.WHITE
-            catIconsLabels[selectedIcon]().let {
+            catIconsLabels[selectedIndex]().let {
                 App.fontGame.draw(batch, it, posX + ((width - App.fontGame.getWidth(it)) / 2), posY + highlighterYPos + 4)
             }
         }

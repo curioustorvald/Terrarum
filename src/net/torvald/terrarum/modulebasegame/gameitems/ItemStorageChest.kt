@@ -14,16 +14,11 @@ class ItemStorageChest(originalID: ItemID) : FixtureItemBase(originalID, "net.to
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureTikiTorch.MASS
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_48")
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_STORAGE_CHEST"
-    }
+    override var originalName = "ITEM_STORAGE_CHEST"
 
 }

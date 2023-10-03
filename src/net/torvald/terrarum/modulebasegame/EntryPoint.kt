@@ -107,8 +107,7 @@ class EntryPoint : ModuleEntryPoint() {
 //            }
 
         init {
-            equipPosition = EquipPosition.HAND_GRIP
-            tags.addAll(tile.tags)
+                tags.addAll(tile.tags)
             originalName =
                 if (isWall && tags.contains("UNLIT")) "${tile.nameKey}>>=BLOCK_UNLIT_TEMPLATE>>=BLOCK_WALL_NAME_TEMPLATE"
                 else if (isWall) "${tile.nameKey}>>=BLOCK_WALL_NAME_TEMPLATE"

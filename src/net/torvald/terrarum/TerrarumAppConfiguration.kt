@@ -39,7 +39,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #        Windows -- C:\Users\<username>\AppData\Roaming\Terrarum
 #        macOS   -- /Users/<username>/Library/Application Support/Terrarum
 #        Linux   -- /home/<username>/.Terrarum
-# Please refrain from removing 'basegame' on the load order -- it may render the game unpalyable.
+# Please refrain from removing 'basegame' on the load order -- it may render the game unplayable.
 
 basegame
 """
@@ -66,6 +66,7 @@ basegame
     // Commit counts up to the Release 0.3.0: 2259
     // Commit counts up to the Release 0.3.1: 2278
     // Commit counts up to the Release 0.3.2: 2732
+    // Commit counts up to the Release 0.3.3: ????
 
     const val VERSION_TAG: String = ""
 

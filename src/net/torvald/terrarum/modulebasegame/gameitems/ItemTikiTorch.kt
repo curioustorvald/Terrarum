@@ -12,17 +12,12 @@ class ItemTikiTorch(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureTikiTorch.MASS
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSheet("basegame", "sprites/fixtures/tiki_torch.tga", 16, 32)
 
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_TIKI_TORCH"
-    }
+    override var originalName = "ITEM_TIKI_TORCH"
 
 }

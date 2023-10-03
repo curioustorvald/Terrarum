@@ -123,8 +123,8 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
     }
 
     private fun itemListUpdate() {
-        itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
-        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIndex])
+        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIndex])
 
         encumbrancePerc = getPlayerInventory().capacity.toFloat() / getPlayerInventory().maxCapacity
         isEncumbered = getPlayerInventory().isEncumbered
@@ -135,13 +135,13 @@ class UIWorldPortalCargo(val full: UIWorldPortal) : UICanvas(), HasInventory {
         itemListChest.navRemoCon.gridModeButtons[0].highlighted = !yes
         itemListChest.navRemoCon.gridModeButtons[1].highlighted = yes
         itemListChest.itemPage = 0
-        itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListChest.rebuild(catBar.catIconsMeaning[catBar.selectedIndex])
 
         itemListPlayer.isCompactMode = yes
         itemListPlayer.navRemoCon.gridModeButtons[0].highlighted = !yes
         itemListPlayer.navRemoCon.gridModeButtons[1].highlighted = yes
         itemListPlayer.itemPage = 0
-        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIcon])
+        itemListPlayer.rebuild(catBar.catIconsMeaning[catBar.selectedIndex])
 
         itemListUpdate()
     }

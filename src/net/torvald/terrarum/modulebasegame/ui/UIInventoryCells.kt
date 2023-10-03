@@ -72,7 +72,7 @@ internal class UIInventoryCells(
     fun rebuildList() {
 //        App.printdbg(this, "rebuilding list")
 
-        itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.selectedIcon])
+        itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.selectedIndex])
         equipped.rebuild()
 
         encumbrancePerc = full.actor.inventory.encumberment.toFloat()
@@ -81,7 +81,7 @@ internal class UIInventoryCells(
 
     fun resetStatusAsCatChanges(oldcat: Int?, newcat: Int) {
         itemList.itemPage = 0 // set scroll to zero
-        itemList.rebuild(full.catBar.catIconsMeaning[full.catBar.catArrangement[newcat]]) // have to manually rebuild, too!
+        itemList.rebuild(full.catBar.catIconsMeaning[newcat]) // have to manually rebuild, too!
     }
 
     override fun updateUI(delta: Float) {

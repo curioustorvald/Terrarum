@@ -14,22 +14,12 @@ class ItemSwingingDoorOak(originalID: ItemID) :
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 20.0 // 360[L] * 0.1 * 0.56[SpecificGravity], rounded to the nearest integer
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,3)
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_DOOR_OAK"
-    }
-
-    @Transient override val makeFixture: () -> FixtureBase = {
-        FixtureSwingingDoorOak()
-    }
-
+    override var originalName = "ITEM_DOOR_OAK"
 }
 
 class ItemSwingingDoorEbony(originalID: ItemID) :
@@ -37,22 +27,12 @@ class ItemSwingingDoorEbony(originalID: ItemID) :
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 30.0 // 360[L] * 0.1 * 0.82[SpecificGravity], rounded to the nearest integer
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(9,3)
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_DOOR_EBONY"
-    }
-
-    @Transient override val makeFixture: () -> FixtureBase = {
-        FixtureSwingingDoorEbony()
-    }
-
+    override var originalName = "ITEM_DOOR_EBONY"
 }
 
 class ItemSwingingDoorBirch(originalID: ItemID) :
@@ -60,22 +40,12 @@ class ItemSwingingDoorBirch(originalID: ItemID) :
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 17.0 // 360[L] * 0.1 * 0.48[SpecificGravity], rounded to the nearest integer
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(10,3)
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_DOOR_BIRCH"
-    }
-
-    @Transient override val makeFixture: () -> FixtureBase = {
-        FixtureSwingingDoorBirch()
-    }
-
+    override var originalName = "ITEM_DOOR_BIRCH"
 }
 
 class ItemSwingingDoorRosewood(originalID: ItemID) :
@@ -83,20 +53,10 @@ class ItemSwingingDoorRosewood(originalID: ItemID) :
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 24.0 // 360[L] * 0.1 * 0.68[SpecificGravity], rounded to the nearest integer
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(11,3)
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_DOOR_ROSEWOOD"
-    }
-
-    @Transient override val makeFixture: () -> FixtureBase = {
-        FixtureSwingingDoorRosewood()
-    }
-
+    override var originalName = "ITEM_DOOR_ROSEWOOD"
 }

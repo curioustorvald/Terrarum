@@ -1,5 +1,6 @@
 {
   "CONTEXT_GENERATOR_SEED": "Seed",
+  "CONTEXT_ITEM_FIXTURES": "Fixtures",
   "CONTEXT_ITEM_MAP": "Map",
   "CONTEXT_ITEM_TOOL_PLURAL": "Tools",
   "CONTEXT_PLACE_COORDINATE": "Coordinate",

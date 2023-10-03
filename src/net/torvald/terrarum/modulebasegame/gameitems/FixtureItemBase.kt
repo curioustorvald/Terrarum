@@ -39,10 +39,13 @@ open class FixtureItemBase(originalID: ItemID, val fixtureClassName: String) : G
     @Transient private var ghostInit = AtomicBoolean(false)
 
     override var dynamicID: ItemID = originalID
-    override var baseMass = 1.0
-    override var inventoryCategory = Category.MISC
+    @Transient override var baseMass = 1.0
+    @Transient override var inventoryCategory = Category.FIXTURE
     override val isDynamic = false
-    override val materialId = ""
+    @Transient override val materialId = ""
+
+    @Transient override var equipPosition: Int = EquipPosition.HAND_GRIP
+
 
     /**
      * Do not address the CommonResourcePool directly; just do it like this snippet:

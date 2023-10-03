@@ -10,18 +10,12 @@ class ItemWorkbench(originalID: ItemID) : FixtureItemBase(originalID, "net.torva
 
 
     override var baseMass = 20.0
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/workbench.tga")
 
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_WORKBENCH"
-    }
-
+    override var originalName = "ITEM_WORKBENCH"
 
 }

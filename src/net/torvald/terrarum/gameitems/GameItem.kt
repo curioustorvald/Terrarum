@@ -52,7 +52,7 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
      * - `BLOCK_AIR` – Prints out `Lang.get("BLOCK_AIR")`
      * - `BLOCK_AIR>>=BLOCK_WALL_NAME_TEMPLATE` – Prints out `Formatter().format(Lang.get("BLOCK_WALL_NAME_TEMPLATE"), Lang.get("BLOCK_AIR")).toString()`
      */
-    @Transient var originalName: String = ""
+    @Transient open var originalName: String = ""
 
 
     var newName: String = ""
@@ -101,16 +101,8 @@ abstract class GameItem(val originalID: ItemID) : Comparable<GameItem>, Cloneabl
 
     /**
      * Where to equip the item.
-     *
-     * Can't use 'open val' as GSON doesn't like that. Initialise this property like:
-     *
-     * ```
-     * init {
-     *     equipPosition = EquipPosition.HAND_GRIP
-     * }
-     * ```
      */
-    @Transient var equipPosition: Int = EquipPosition.NULL
+    @Transient open var equipPosition: Int = EquipPosition.NULL
 
     internal val material: Material
         get() = MaterialCodex.getOrDefault(materialId)

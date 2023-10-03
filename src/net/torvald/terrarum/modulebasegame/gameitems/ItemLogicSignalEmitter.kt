@@ -12,18 +12,13 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
 
     override var dynamicID: ItemID = originalID
     override var baseMass = FixtureLogicSignalEmitter.MASS
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = getItemImageFromSingleImage("basegame", "sprites/fixtures/signal_source.tga")
 
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
-    }
+    override var originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         super.effectWhileEquipped(actor, delta)

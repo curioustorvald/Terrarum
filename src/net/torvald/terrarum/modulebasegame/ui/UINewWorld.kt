@@ -176,6 +176,7 @@ class UINewWorld(val remoCon: UIRemoCon) : UICanvas() {
 
                 val ingame = TerrarumIngame(App.batch)
                 val playerDisk = existingPlayer ?: App.savegamePlayers[UILoadGovernor.playerUUID]!!.loadable()
+                playerDisk.rebuild()
                 val player = ReadActor.invoke(
                     playerDisk,
                     ByteArray64Reader(playerDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)

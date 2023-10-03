@@ -12,17 +12,11 @@ class ItemWorldPortal(originalID: ItemID) : FixtureItemBase(originalID, "net.tor
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 6000.0
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(3,3)
 
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_WORLD_PORTAL"
-    }
-
+    override var originalName = "ITEM_WORLD_PORTAL"
 }

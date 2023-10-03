@@ -177,6 +177,11 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
             forceAddActor(it)
         }
 
+        blockMarkingActor.let {
+            it.unsetGhost()
+            it.setGhostColourNone()
+        }
+
         gameInitialised = true
     }
 

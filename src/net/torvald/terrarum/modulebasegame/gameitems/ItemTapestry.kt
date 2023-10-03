@@ -16,17 +16,12 @@ class ItemTapestry(originalID: ItemID) : FixtureItemBase(originalID, "net.torval
 
     override var dynamicID: ItemID = originalID
     override var baseMass = 6.0
-    override var inventoryCategory = Category.MISC
     override val isDynamic = false
     override val materialId = ""
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsTextureRegion("itemplaceholder_16")
     override var baseToolSize: Double? = baseMass
-
-    init {
-        equipPosition = EquipPosition.HAND_GRIP
-        originalName = "ITEM_TAPESTRY"
-    }
+    override var originalName = "ITEM_TAPESTRY"
 
     @Transient override val makeFixture: () -> FixtureBase = {
         FixtureTapestry(
