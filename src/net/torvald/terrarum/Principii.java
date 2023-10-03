@@ -111,6 +111,8 @@ public class Principii {
         cmd0.add(runtime);
         cmd0.addAll(extracmds);
         cmd0.addAll(userDefinedExtraCmds);
+//        cmd0.add("-Dhttps.protocols=SSLv3,TLSv1.2,TLSv1.1,TLSv1");
+//        cmd0.add("-Djavax.net.debug=ssl:handshake:verbose");
         cmd0.add("-Xms1G");
         cmd0.add("-Xmx"+xmx+"G");
         cmd0.add("-cp");

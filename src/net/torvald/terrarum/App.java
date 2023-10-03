@@ -1,11 +1,9 @@
 package net.torvald.terrarum;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
@@ -32,7 +30,6 @@ import net.torvald.terrarum.langpack.Lang;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.modulebasegame.TerrarumIngame;
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory;
-import net.torvald.terrarum.serialise.Common;
 import net.torvald.terrarum.serialise.WriteConfig;
 import net.torvald.terrarum.ui.Toolkit;
 import net.torvald.terrarum.utils.JsonFetcher;
@@ -44,7 +41,6 @@ import net.torvald.unsafe.DanglingPointerException;
 import net.torvald.unsafe.UnsafeHelper;
 import net.torvald.util.DebugTimers;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -326,6 +322,8 @@ public class App implements ApplicationListener {
 
     public static long bogoflops = 0L;
     private static double bogoflopf = Math.random();
+
+    public static boolean hasUpdate = true;
 
     public static Screen getCurrentScreen() {
         return currentScreen;
@@ -1113,6 +1111,10 @@ public class App implements ApplicationListener {
         else {
             IngameRenderer.initialise();
         }
+
+
+        hasUpdate = CheckUpdate.INSTANCE.hasUpdate();
+        printdbg(this, "Has update: " + hasUpdate);
 
 
         printdbg(this, "PostInit done");
