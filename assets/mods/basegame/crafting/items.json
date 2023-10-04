@@ -17,25 +17,25 @@
   "item@basegame:256": { /* oak door */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 4, "basegame:48"]
+      [1, 6, "basegame:48"]
     ]
   },
   "item@basegame:257": { /* ebony door */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 4, "basegame:49"]
+      [1, 6, "basegame:49"]
     ]
   },
   "item@basegame:258": { /* birch door */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 4, "basegame:50"]
+      [1, 6, "basegame:50"]
     ]
   },
   "item@basegame:259": { /* rosewood door */
     "workbench": "basiccrafting",
     "ingredients": [
-      [1, 4, "basegame:51"]
+      [1, 6, "basegame:51"]
     ]
   }
 }
