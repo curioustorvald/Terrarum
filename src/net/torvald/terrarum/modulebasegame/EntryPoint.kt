@@ -42,12 +42,14 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
 
-        println("Crafting Recipes: ")
-        CraftingRecipeCodex.props.forEach { item, recipes ->
-            println("$item ->")
-            recipes.forEach {
-                print("    ")
-                println(it)
+        if (App.IS_DEVELOPMENT_BUILD) {
+            println("[EntryPoint] Crafting Recipes: ")
+            CraftingRecipeCodex.props.forEach { item, recipes ->
+                println("[EntryPoint] $item ->")
+                recipes.forEach {
+                    print("    ")
+                    println(it)
+                }
             }
         }
 
