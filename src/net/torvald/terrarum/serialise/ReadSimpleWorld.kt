@@ -51,7 +51,8 @@ object WriteSimpleWorld {
 
     operator fun invoke(ingame: IngameInstance, world: SimpleGameWorld, actorsList: List<Actor>): String {
         val time_t = App.getTIME_T()
-        val s = Common.jsoner.toJson(preWrite(ingame, time_t, world, actorsList))
+        preWrite(ingame, time_t, world, actorsList)
+        val s = Common.jsoner.toJson(world)
         return """{"genver":${Common.GENVER},${s.substring(1)}"""
     }
 }

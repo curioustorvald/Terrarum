@@ -22,7 +22,7 @@ class BlockProp {
     var shadeColB = 0f
     var shadeColA = 0f
 
-    lateinit var opacity: Cvec
+    var opacity = Cvec()
 
     fun getOpacity(channel: Int) = when (channel) {
         0 -> shadeColR

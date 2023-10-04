@@ -38,9 +38,10 @@ class PhysicalStatus() {
 /**
  * Special version of GameWorld where everything, including layer data, are saved in a single JSON file (i.e. not chunked)
  */
-class SimpleGameWorld : GameWorld() {
+class SimpleGameWorld(width: Int, height: Int) : GameWorld(width, height) {
     override lateinit var layerWall: BlockLayer
     override lateinit var layerTerrain: BlockLayer
+    constructor() : this(0, 0)
 }
 
 open class GameWorld(
@@ -48,10 +49,14 @@ open class GameWorld(
 ) : Disposable {
 
     constructor() : this(UUID.randomUUID())
+    constructor(width: Int, height: Int) : this(UUID.randomUUID()) {
+        this.width = width
+        this.height = height
+    }
 
     var worldCreator: UUID = UUID(0L,0L) // TODO record a value to this
-    var width: Int = 999; private set
-    var height: Int = 999; private set
+    var width: Int = 0; private set
+    var height: Int = 0; private set
 
     var playersLastStatus = PlayersLastStatus() // only gets used when the game saves and loads
 
@@ -208,16 +213,23 @@ open class GameWorld(
 
         if (App.tileMaker != null) {
             App.tileMaker.tags.forEach {
-                printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+                if (!forcedTileNumberToNames.contains(it.key)) {
+                    printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
-                tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
-                tileNameToNumberMap[it.key] = it.value.tileNumber
+                    tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
+                    tileNameToNumberMap[it.key] = it.value.tileNumber
+                }
             }
 
             // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
             tileNumberToNameMap[0] = Block.AIR
+            tileNumberToNameMap[2] = Block.UPDATE
         }
     }
+
+    private val forcedTileNumberToNames = hashSetOf(
+        Block.AIR, Block.UPDATE
+    )
 
     fun coordInWorld(x: Int, y: Int) = y in 0 until height // ROUNDWORLD implementation
     fun coordInWorldStrict(x: Int, y: Int) = x in 0 until width && y in 0 until height // ROUNDWORLD implementation
@@ -242,6 +254,7 @@ open class GameWorld(
 
         // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
         tileNumberToNameMap[0] = Block.AIR
+        tileNumberToNameMap[2] = Block.UPDATE
     }
     
     /**
@@ -265,7 +278,7 @@ open class GameWorld(
      */
     fun getTileFromWall(rawX: Int, rawY: Int): ItemID {
         val (x, y) = coerceXY(rawX, rawY)
-        return tileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()] ?: throw NoSuchElementException("No tile name mapping for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y) from $layerWall")
+        return tileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()] ?: Block.UPDATE//throw NoSuchElementException("No tile name mapping for wall ${layerWall.unsafeGetTile(x, y)} in ($x, $y) from $layerWall")
     }
 
     /**
@@ -273,7 +286,7 @@ open class GameWorld(
      */
     fun getTileFromTerrain(rawX: Int, rawY: Int): ItemID {
         val (x, y) = coerceXY(rawX, rawY)
-        return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()] ?: throw NoSuchElementException("No tile name mapping for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y) from $layerTerrain")
+        return tileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()] ?: Block.UPDATE//throw NoSuchElementException("No tile name mapping for terrain ${layerTerrain.unsafeGetTile(x, y)} in ($x, $y) from $layerTerrain")
     }
 
     /**

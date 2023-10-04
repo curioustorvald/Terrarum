@@ -551,8 +551,8 @@ object LightmapRenderer {
         _thisTerrain = world.getTileFromTerrainRaw(worldX, worldY)
         _thisTerrainProp = BlockCodex[world.tileNumberToNameMap[_thisTerrain.toLong()]]
 
-        _reflectanceAccumulator.set(App.tileMaker.terrainTileColourMap[_thisTerrainProp.id]!!)
-        _reflectanceAccumulator.a = 0f // temporarily disabled
+        _reflectanceAccumulator.set(App.tileMaker.terrainTileColourMap[_thisTerrainProp.id] ?: Cvec())
+        _reflectanceAccumulator.a = 0f // TODO temporarily disabled
         _reflectanceAccumulator.mul(_thisTerrainProp.reflectance).mul(giScale)
 
         _mapLightLevelThis.max(lx, ly, _reflectanceAccumulator)

@@ -6,6 +6,7 @@ package net.torvald.terrarum.blockproperties
 object Block {
 
     const val AIR = "basegame:0" // hard coded; this is the standard
+    const val UPDATE = "basegame:1" // hard coded
 
     const val STONE = "basegame:16"
     const val STONE_QUARRIED = "basegame:17"

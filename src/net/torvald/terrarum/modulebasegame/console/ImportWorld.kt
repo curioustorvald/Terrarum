@@ -10,6 +10,8 @@ import java.io.File
 import java.io.IOException
 
 /**
+ * Used to debug the titlescreen world
+ *
  * Created by minjaesong on 2021-08-25.
  */
 object ImportWorld : ConsoleCommand {
