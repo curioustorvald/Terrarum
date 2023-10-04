@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.serialise
 
 import net.torvald.gdx.graphics.PixmapIO2
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -150,6 +151,7 @@ class QuickSingleplayerWorldSavingThread(
         skimmer.injectDiskCRC(disk.hashCode())
         skimmer.setSaveMode(1 + 2 * isAuto.toInt())
         skimmer.setSaveKind(VDSaveKind.WORLD_DATA)
+        skimmer.setSaveSnapshotVersion(TerrarumAppConfiguration.VERSION_SNAPSHOT)
         skimmer.setSaveOrigin(skimmer.getSaveOrigin() and 15) // remove flag "imported" if applicable
         skimmer.setLastModifiedTime(time_t)
         skimmer.setCreationTime(creation_t)

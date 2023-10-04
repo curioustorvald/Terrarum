@@ -80,6 +80,7 @@ class UINewCharacter(val remoCon: UIRemoCon) : UICanvas() {
                 disk.saveMode = 2 // auto, no quick
                 disk.capacity = 0L
                 disk.saveOrigin = VDSaveOrigin.INGAME
+                disk.snapshot = TerrarumAppConfiguration.VERSION_SNAPSHOT
 
                 WritePlayer(player, disk, null, time_t)
                 VDUtil.dumpToRealMachine(disk, outFile)

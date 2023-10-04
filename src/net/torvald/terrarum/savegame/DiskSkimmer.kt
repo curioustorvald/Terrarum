@@ -1,6 +1,7 @@
 package net.torvald.terrarum.savegame
 
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.Snapshot
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.terrarum.serialise.toUlong
 import java.io.*
@@ -389,6 +390,16 @@ removefile:
         fa.close()
     }
 
+    fun setSaveSnapshotVersion(snapshot: Snapshot?) {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        fa.seek(51L)
+        if (snapshot == null)
+            fa.write(byteArrayOf(0, 0))
+        else
+            fa.write(snapshot.toBytes())
+        fa.close()
+    }
+
     /**
      * @return Save type (0b 0000 00ab)
      *                   b: unset - full save; set - quicksave (only applicable to worlds -- quicksave just means the disk is in dirty state)
@@ -416,6 +427,17 @@ removefile:
         val fa = RandomAccessFile(diskFile, "rwd")
         fa.seek(51L)
         return fa.read().also { fa.close() }
+    }
+
+    fun getSaveSnapshotVersion(): Snapshot? {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        fa.seek(52L)
+
+        val b1 = fa.read().toByte()
+        val b2 = fa.read().toByte().also { fa.close() }
+
+        return if (b1 == b2 && b1 == 0.toByte()) null
+        else Snapshot(byteArrayOf(b1, b2))
     }
 
 

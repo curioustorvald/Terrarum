@@ -1,6 +1,8 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.toUint
+import java.util.*
 
 /**
  * You directly modify the source code to tune the engine to suit your needs.
@@ -68,6 +70,8 @@ basegame
     // Commit counts up to the Release 0.3.2: 2732
     // Commit counts up to the Release 0.3.3: ????
 
+    val VERSION_SNAPSHOT = if (App.IS_DEVELOPMENT_BUILD) Snapshot(0) else null
+
     const val VERSION_TAG: String = ""
 
     //////////////////////////////////////////////////////////
@@ -77,4 +81,35 @@ basegame
     const val TILE_SIZE = 16
     const val TILE_SIZEF = TILE_SIZE.toFloat()
     const val TILE_SIZED = TILE_SIZE.toDouble()
+}
+
+data class Snapshot(var revision: Int) {
+    private var today = Calendar.getInstance();
+    private var year = today.get(Calendar.YEAR) - 2000
+    private var week = today.get(Calendar.WEEK_OF_YEAR)
+
+    private var string = ""
+    private var bytes = byteArrayOf()
+
+    private fun update() {
+        string = "${year}w${week}${Char(0x61 + revision)}"
+        bytes = byteArrayOf(
+            revision.and(4).shl(7).or(year.and(127)).toByte(),
+            week.shl(2).or(revision.and(3)).toByte()
+        )
+    }
+
+    init {
+        update()
+    }
+
+    override fun toString() = string
+    fun toBytes() = bytes
+
+    constructor(b: ByteArray) : this(0) {
+        year = b[0].toUint() and 127
+        week = b[1].toUint() ushr 2
+        revision = (b[0].toUint() ushr 7 shl 2) or b[1].toUint().and(3)
+        update()
+    }
 }

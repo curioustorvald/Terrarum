@@ -1,6 +1,7 @@
 package net.torvald.terrarum.savegame
 
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.Snapshot
 import net.torvald.terrarum.savegame.VDSaveKind.PLAYER_DATA
 import net.torvald.terrarum.savegame.VDSaveKind.WORLD_DATA
 import net.torvald.terrarum.serialise.Common
@@ -79,7 +80,15 @@ Version 254 is a customised version of TEVD tailored to be used as a savegame fo
     Int8        Savefile Origin Flags (lower nybble: persistent, upper nybble: can be removed if conditions are met)
                   0: Created in-game
                  16: Imported (will be removed once the file is loaded by the player and saved in-game)
-    Int8[12]    Extra info bytes reserved for future usage
+    Int16       Snapshot Number
+                 0b A_yyyyyyy wwwwww_aa
+                 where:
+                   y: Current Year - 2000 (2023 -> 23)
+                   w: ISO Week Number (1-53)
+                   Aaa: Alphabet (a->000, b->001, ... e->100, f->101, ..., h->111)
+                 e.g. 23w40f is encoded as 1_0010111 101000_01
+    Int8[10]    Extra info bytes reserved for future usage
+
     -- END extraInfoBytes --
     UInt8[236]  Rest of the long disk name (268 bytes total)
 
@@ -156,6 +165,25 @@ class VirtualDisk(
     var saveOrigin: Int
         set(value) { extraInfoBytes[3] = value.toByte() }
         get() = extraInfoBytes[3].toUint()
+    var snapshot: Snapshot?
+        set(value) {
+            if (value == null) {
+                extraInfoBytes[4] = 0
+                extraInfoBytes[5] = 0
+            }
+            else {
+                value.toBytes().forEachIndexed { index, byte ->
+                    extraInfoBytes[4+index] = byte
+                }
+            }
+        }
+        get() {
+            return if (extraInfoBytes[4] == extraInfoBytes[5] && extraInfoBytes[4] == 0.toByte()) null
+            else {
+                Snapshot(extraInfoBytes.sliceArray(4..5))
+            }
+        }
+
     override fun getDiskName(charset: Charset) = diskName.toCanonicalString(charset)
     val root: DiskEntry
         get() = entries[0]!!

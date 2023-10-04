@@ -526,13 +526,17 @@ class UIItemPlayerCells(
         loadable.rebuild()
         loadable.getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
+            var genver = ""
 
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
                 if (name == "worldCurrentlyPlaying") worldUUID = UUID.fromString(value.asString())
                 if (name == "totalPlayTime") totalPlayTime = parseDuration(value.asLong())
                 if (name == "lastPlayTime") lastPlayTime0 = value.asLong()
-                if (name == "genver") versionString = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
+                if (name == "genver") genver = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
             }
+
+            val snap = loadable.getSaveSnapshotVersion()
+            versionString = genver + (if (snap != null) "-$snap" else "")
 
             App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
             App.savegameWorldsName[worldUUID]?.let { if (it.isNotBlank()) worldName = it }
@@ -749,6 +753,7 @@ class UIItemWorldCells(
     private val metaFile: EntryFile?
     private val saveName: String
     private val saveMode: Int
+    private val snapshot: String
     private val isQuick: Boolean
     private val isAuto: Boolean
     private var saveDamaged: Boolean = false
@@ -760,6 +765,7 @@ class UIItemWorldCells(
 
         saveName = skimmer.getDiskName(Common.CHARSET)
         saveMode = skimmer.getSaveMode()
+        snapshot = skimmer.getSaveSnapshotVersion()?.toString() ?: ""
         isQuick = (saveMode % 2 == 1)
         isAuto = (saveMode.ushr(1) != 0)
 

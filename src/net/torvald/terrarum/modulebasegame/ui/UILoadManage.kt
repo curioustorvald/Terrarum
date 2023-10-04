@@ -447,12 +447,16 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         if (!this.initialised) this.rebuild()
         this.getFile(SAVEGAMEINFO)!!.bytes.let {
             var lastPlayTime = 0L
-            var versionString = ""
+            var genver = ""
             val isAuto = (this.getSaveMode() and 0b10 != 0)
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
                 if (name == "lastPlayTime") lastPlayTime = value.asLong()
-                if (name == "genver") versionString = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
+                if (name == "genver") genver = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
             }
+            val snap = this.getSaveSnapshotVersion()?.toString()
+
+//            val versionString = genver + (if (snap != null) "-$snap" else "")
+            val versionString = if (snap != null) "$snap" else genver
 
             return SavegameMeta(
                 lastPlayTime,
