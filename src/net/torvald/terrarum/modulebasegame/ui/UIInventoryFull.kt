@@ -11,6 +11,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIHandler
 import net.torvald.terrarum.ui.UIItemHorizontalFadeSlide
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import net.torvald.unicode.*
@@ -251,12 +252,8 @@ class UIInventoryFull(
         // allow "control_key_gamemenu" to open this UI and bring system menu immediately
         this.handler.toggleKeyExtra.add("control_key_gamemenu" )
         this.handler.toggleKeyExtraAction.add {
-            if (it.isClosed) {
-                INGAME.setTooltipMessage(null)
-                transitionPanel.forcePosition(2)
-                catBar.setSelectedPanel(2)
-                it.setAsOpen()
-            }
+            if (it.isClosed)
+                openGamemenu(it)
             else if (it.isOpened)
                 setAsClose()
         }
@@ -264,20 +261,29 @@ class UIInventoryFull(
         // allow "control_key_crafting" to open this UI and bring system menu immediately
         this.handler.toggleKeyExtra.add("control_key_crafting")
         this.handler.toggleKeyExtraAction.add {
-            if (it.isClosed) {
-                INGAME.setTooltipMessage(null)
-                transitionPanel.forcePosition(0)
-                catBar.setSelectedPanel(0)
-                transitionalCraftingUI.resetUI()
-                it.setAsOpen()
-            }
+            if (it.isClosed)
+                openCrafting(it)
             else if (it.isOpened)
                 setAsClose()
         }
 
 
         rebuildList()
+    }
 
+    fun openGamemenu(it: UIHandler) {
+        INGAME.setTooltipMessage(null)
+        transitionPanel.forcePosition(2)
+        catBar.setSelectedPanel(2)
+        it.setAsOpen()
+    }
+
+    fun openCrafting(it: UIHandler) {
+        INGAME.setTooltipMessage(null)
+        transitionPanel.forcePosition(0)
+        catBar.setSelectedPanel(0)
+        transitionalCraftingUI.resetUI()
+        it.setAsOpen()
     }
 
     override fun show() {

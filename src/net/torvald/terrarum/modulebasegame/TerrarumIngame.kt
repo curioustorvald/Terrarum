@@ -680,18 +680,25 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         // what if there's multiple of such fixtures? whatever, you are supposed to DISALLOW such situation.
         for (kk in actorsUnderMouse.indices) {
             if (mouseInInteractableRange(actor) { _, _, _, _ ->
-                    actorsUnderMouse[kk].mainUI?.let {
-                    uiOpened = true
+                actorsUnderMouse[kk].let { fixture ->
+                    fixture.mainUI?.let { ui ->
+                        uiOpened = true
 
-                    // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
-                    // when it's not null, the UI will be updated and rendered
-                    // when the UI is closed, it'll be replaced with a null value
-                    uiFixture = it
-                    it.setPosition(
-                            (Toolkit.drawWidth - it.width) / 4,
-                            (App.scr.height - it.height) / 4 // what the fuck?
-                    )
-                    it.setAsOpen()
+                        // property 'uiFixture' is a dedicated property that the TerrarumIngame recognises.
+                        // when it's not null, the UI will be updated and rendered
+                        // when the UI is closed, it'll be replaced with a null value
+                        uiFixture = ui
+                        ui.setPosition(
+                                (Toolkit.drawWidth - ui.width) / 4,
+                                (App.scr.height - ui.height) / 4 // what the fuck?
+                        )
+                        if (fixture.mainUIopenFun == null) {
+                            ui.setAsOpen()
+                        }
+                        else {
+                            fixture.mainUIopenFun!!.invoke(ui)
+                        }
+                    }
                 }
                 0L
             } == 0L) break

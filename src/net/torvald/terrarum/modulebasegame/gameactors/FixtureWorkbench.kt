@@ -1,10 +1,14 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.BlockCodex
+import net.torvald.terrarum.INGAME
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameitems.FixtureItemBase
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIWallCalendar
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -18,7 +22,7 @@ class FixtureWorkbench : FixtureBase, CraftingStation {
     constructor() : super(
         BlockBox(BlockBox.ALLOW_MOVE_DOWN, 2, 1),
         nameFun = { Lang["ITEM_WORKBENCH"] },
-        mainUI = UIWallCalendar()
+        mainUI = (INGAME as? TerrarumIngame)?.uiInventoryPlayer
     ) {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/workbench.tga")
 
@@ -30,6 +34,10 @@ class FixtureWorkbench : FixtureBase, CraftingStation {
         }
 
         actorValue[AVKey.BASEMASS] = 20.0
+
+        mainUIopenFun = { ui ->
+            (mainUI as? UIInventoryFull)?.openCrafting(mainUI!!.handler)
+        }
     }
 
 }
