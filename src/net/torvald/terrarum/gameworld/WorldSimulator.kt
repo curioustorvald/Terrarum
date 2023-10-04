@@ -102,7 +102,8 @@ object WorldSimulator {
 
     fun buryGrassImmediately() {
         ingame.terrainChangeQueue.forEach {
-            if (BlockCodex[it.new].isSolid) {
+            val blockProp = BlockCodex[it.new]
+            if (blockProp.isSolid && !blockProp.isActorBlock) {
                 if (world.getTileFromTerrain(it.posX, it.posY + 1) == Block.GRASS) {
                     //grassPlacedByPlayer.add(it)
                     world.setTileTerrain(it.posX, it.posY + 1, Block.DIRT, true)
