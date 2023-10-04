@@ -92,6 +92,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
 
     fun toInitScreen() {
         screen = 0
+        oldScreen = 0
     }
 
     init {
@@ -269,6 +270,7 @@ class UIInventoryEscMenu(val full: UIInventoryFull) : UICanvas() {
     override fun show() {
         UIItemInventoryItemGrid.tooltipShowing.clear()
         INGAME.setTooltipMessage(null)
+        toInitScreen()
     }
 
 

@@ -255,7 +255,6 @@ class UIInventoryFull(
                 INGAME.setTooltipMessage(null)
                 transitionPanel.forcePosition(2)
                 catBar.setSelectedPanel(2)
-                transitionalEscMenu.toInitScreen()
                 it.setAsOpen()
             }
             else if (it.isOpened)

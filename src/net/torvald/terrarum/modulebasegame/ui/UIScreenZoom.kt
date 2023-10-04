@@ -27,7 +27,8 @@ class UIScreenZoom : UICanvas(
         handler.allowESCtoClose = false
     }
 
-    val zoomText = "${getKeycapPC(handler.toggleKey!!)} ${Lang["GAME_ACTION_ZOOM_OUT"]}"
+    val zoomText: String
+        get() = "${getKeycapPC(handler.toggleKey!!)} ${Lang["GAME_ACTION_ZOOM_OUT"]}"
 
     override var width = App.fontGame.getWidth(zoomText)
     override var height = App.fontGame.lineHeight.toInt()
