@@ -1,0 +1,50 @@
+\usepapersize{standard}
+\usecoverstyle{hardcover}
+\useinnerstyle{standard}
+
+\begin{cover}
+\title{The Way to Mastery of Lorem Ipsum\\Or, How To Write and Publish a Book}
+\author{Terran Publishing}
+\edition{Test Edition}
+\end{cover}
+
+\begin{toc}
+\tableofcontents
+\end{toc}
+
+\begin{manuscript}
+
+\chapter{What Is a Book}
+
+This example book is designed to give you the exampe of the Book Language.
+
+\section{What Really Is a Book}
+
+A book is a collection of texts printed in a special way that allows them to be read easily, with enumerable pages and insertion of other helpful resources, such as illustrations and hyperlinks.
+\newpage
+
+\fullpagebox{\colour{grey}{this page is intentionally left blank}}
+
+
+\chapter{Writing Book Using Pen and Papers}
+
+If you open a book on a writing table, you will be welcomed with a toolbar used to put other book elements, such as chapters, sections.
+
+\chapter{Writing Book Using Typewriter}
+
+Typewriters can only write single style of font, therefore chapters and sections are not available
+
+
+\chapter{Writing Book using Computer}
+
+Writing book using a computer requires a use of the Book Typesetting Engine Extended, or \BTeX.
+
+\section{Full Control of the Shape}
+
+With \BTeX\ you can fully control how your publishing would look like, from a pile of papers that look like they have been typed out using typewriter, a pile of papers but a fully-featured printouts that have illustrations in it, to a fully-featured hardcover book.
+
+This style is controlled with a \code{\backslash usecoverstyle} command with arguments: \code{typewriter}, \code{printout}, \code{hardcover}
+
+Typewriter and Printout are considered not bound and readers will only see one page at a time, while Hardcover is considered bound and two pages are presented to the readers.
+
+\end{manuscript}
