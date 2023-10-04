@@ -38,7 +38,35 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     override var width = App.scr.width
     override var height = App.scr.height
 
-    private val itemListPlayer: UIItemInventoryItemGrid
+    private val playerThings = CraftingPlayerInventory(full, this).also {
+        it.itemListTouchDownFun = { gameItem, _, _, _, _ -> recipeClicked?.let { recipe -> gameItem?.let { gameItem ->
+            val itemID = gameItem.dynamicID
+            // don't rely on highlightedness of the button to determine the item on the button is the selected
+            // ingredient (because I don't fully trust my code lol)
+            val targetItemToAlter = recipe.ingredients.filter { (key, mode) -> // altering recipe doesn't make sense if player selected a recipe that requires no tag-ingredients
+                val tags = key.split(',')
+                val wantsWall = tags.contains("WALL")
+                (mode == CraftingCodex.CraftingItemKeyMode.TAG && gameItem.hasAllTags(tags) && (wantsWall == gameItem.originalID.isWall())) // true if (wants wall and is wall) or (wants no wall and is not wall)
+            }.let {
+                if (it.size > 1)
+                    println("[UICrafting] Your recipe seems to have two similar ingredients defined\n" +
+                            "affected ingredients: ${it.joinToString()}\n" +
+                            "the recipe: ${recipe}")
+                it.firstOrNull()
+            }
+
+            targetItemToAlter?.let { (key, mode) ->
+                val oldItem = _getItemListIngredients().getInventory().first { (itm, qty) ->
+                    val tags = key.split(',')
+                    val wantsWall = tags.contains("WALL")
+                    (mode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itm]!!.hasAllTags(tags) && (wantsWall == itm.isWall())) // true if (wants wall and is wall) or (wants no wall and is not wall)
+                }
+                changeIngredient(recipe, oldItem, itemID)
+                refreshCraftButtonStatus()
+            }
+        } } }
+    }
+
     private val itemListCraftable: UIItemCraftingCandidateGrid // might be changed to something else
     private val itemListIngredients: UIItemInventoryItemGrid // this one is definitely not to be changed
     private val buttonCraft: UIItemTextButton
@@ -90,7 +118,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private val craftMult
         get() = spinnerCraftCount.value.toLong()
 
-    private fun _getItemListPlayer() = itemListPlayer
+    private fun _getItemListPlayer() = playerThings.itemList
     private fun _getItemListIngredients() = itemListIngredients
     private fun _getItemListCraftables() = itemListCraftable
 
@@ -203,50 +231,6 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         }
 
 
-        // player inventory to the right
-        itemListPlayer = UIItemInventoryItemGrid(
-            this,
-            catBar,
-            { INGAME.actorNowPlaying!!.inventory }, // literally a player's inventory
-            thisOffsetX2,
-            thisOffsetY,
-            6, UIInventoryFull.CELLS_VRT,
-            drawScrollOnRightside = true,
-            drawWallet = false,
-            highlightEquippedItem = false,
-            keyDownFun = { _, _, _, _, _ -> },
-            touchDownFun = { gameItem, amount, _, _, button -> recipeClicked?.let { recipe -> gameItem?.let { gameItem ->
-                val itemID = gameItem.dynamicID
-                // don't rely on highlightedness of the button to determine the item on the button is the selected
-                // ingredient (because I don't fully trust my code lol)
-                val targetItemToAlter = recipe.ingredients.filter { (key, mode) -> // altering recipe doesn't make sense if player selected a recipe that requires no tag-ingredients
-                    val tags = key.split(',')
-                    val wantsWall = tags.contains("WALL")
-                    (mode == CraftingCodex.CraftingItemKeyMode.TAG && gameItem.hasAllTags(tags) && (wantsWall == gameItem.originalID.isWall())) // true if (wants wall and is wall) or (wants no wall and is not wall)
-                }.let {
-                    if (it.size > 1)
-                        println("[UICrafting] Your recipe seems to have two similar ingredients defined\n" +
-                                "affected ingredients: ${it.joinToString()}\n" +
-                                "the recipe: ${recipe}")
-                    it.firstOrNull()
-                }
-
-                targetItemToAlter?.let { (key, mode) ->
-                    val oldItem = _getItemListIngredients().getInventory().first { (itm, qty) ->
-                        val tags = key.split(',')
-                        val wantsWall = tags.contains("WALL")
-                        (mode == CraftingCodex.CraftingItemKeyMode.TAG && ItemCodex[itm]!!.hasAllTags(tags) && (wantsWall == itm.isWall())) // true if (wants wall and is wall) or (wants no wall and is not wall)
-                    }
-                    changeIngredient(recipe, oldItem, itemID)
-                    refreshCraftButtonStatus()
-                }
-            } } }
-        )
-        // make grid mode buttons work together
-//        itemListPlayer.gridModeButtons[0].clickOnceListener = { _,_ -> setCompact(false) }
-//        itemListPlayer.gridModeButtons[1].clickOnceListener = { _,_ -> setCompact(true) }
-
-
 
         // crafting list to the left
         itemListCraftable = UIItemCraftingCandidateGrid(
@@ -313,7 +297,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
                     // reset selection status after a crafting to hide the possible artefact where no-longer-craftable items are still displayed due to ingredient depletion
                     resetUI() // also clears forcehighlightlist
-                    itemListPlayer.rebuild(catAll)
+                    playerThings.rebuild(catAll)
                     itemListCraftable.rebuild(catAll)
                 }
             } }
@@ -327,14 +311,14 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
 
         addUIitem(itemListCraftable)
         addUIitem(itemListIngredients)
-        addUIitem(itemListPlayer)
+        addUIitem(playerThings.itemList)
         addUIitem(spinnerCraftCount)
         addUIitem(buttonCraft)
     }
 
     private fun filterPlayerListUsing(recipe: CraftingCodex.CraftingRecipe?) {
         if (recipe == null)
-            itemListPlayer.rebuild(catAll)
+            playerThings.rebuild(catAll)
         else {
             val items = recipe.ingredients.flatMap {
                 getItemCandidatesForIngredient(getPlayerInventory(), it).map { it.itm }
@@ -343,7 +327,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
             val filterFun = { pair: InventoryPair ->
                 items.binarySearch(pair.itm) >= 0
             }
-            itemListPlayer.rebuild(filterFun, recipe.product)
+            playerThings.rebuild(filterFun, recipe.product)
         }
     }
 
@@ -358,13 +342,13 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     }
 
     private fun changeIngredient(recipe: CraftingCodex.CraftingRecipe?, old: InventoryPair, new: ItemID) {
-        itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
+        playerThings.itemList.removeFromForceHighlightList(oldSelectedItems)
 
         oldSelectedItems.remove(old.itm)
         oldSelectedItems.add(new)
 
-        itemListPlayer.addToForceHighlightList(oldSelectedItems)
-        itemListPlayer.itemPage = 0
+        playerThings.itemList.addToForceHighlightList(oldSelectedItems)
+        playerThings.itemList.itemPage = 0
         filterPlayerListUsing(recipe)
 
         // change highlight status of itemListIngredients
@@ -405,7 +389,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         filterPlayerListUsing(recipeClicked)
         highlightCraftingCandidateButton(null)
         ingredients.clear()
-        itemListPlayer.removeFromForceHighlightList(oldSelectedItems)
+        playerThings.removeFromForceHighlightList(oldSelectedItems)
         itemListIngredients.rebuild(catAll)
 
         refreshCraftButtonStatus()
@@ -423,7 +407,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
         nearbyCraftingStations = getCraftingStationsWithinReach()
 //        printdbg(this, "Nearby crafting stations: $nearbyCraftingStations")
 
-        itemListPlayer.getInventory = { INGAME.actorNowPlaying!!.inventory }
+        playerThings.setGetInventoryFun { INGAME.actorNowPlaying!!.inventory }
         itemListUpdate()
 
         openingClickLatched = Terrarum.mouseDown
@@ -439,7 +423,7 @@ class UICrafting(val full: UIInventoryFull) : UICanvas(), HasInventory {
     private fun itemListUpdate() {
         // let itemlists be sorted
         itemListCraftable.rebuild(catAll)
-        itemListPlayer.rebuild(catAll)
+        playerThings.rebuild(catAll)
         encumbrancePerc = getPlayerInventory().let {
             it.capacity.toFloat() / it.maxCapacity
         }
