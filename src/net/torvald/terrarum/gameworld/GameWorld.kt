@@ -230,7 +230,7 @@ open class GameWorld(
         }
     }
 
-    private val forcedTileNumberToNames = hashSetOf(
+    @Transient private val forcedTileNumberToNames = hashSetOf(
         Block.AIR, Block.UPDATE
     )
 
