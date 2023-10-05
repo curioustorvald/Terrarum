@@ -3,13 +3,13 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.utils.OpenFile
-import java.awt.Desktop
 import java.io.File
 
 /**
@@ -34,7 +34,9 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
 
     private var gamemode = 0
 
-    private val fbatch = SpriteBatch(1000, DefaultGL32Shaders.createSpriteBatchShader())
+    private val fbatch = FlippingSpriteBatch(1000)
+    private val camera = OrthographicCamera(App.scr.wf, App.scr.hf)
+
 
     private val genericBackdrop = Toolkit.Theme.COL_CELL_FILL.cpy().add(0f,0f,0f,1f)
     private val winTenBackdrop = Color(0x1070AAFF)
@@ -49,6 +51,11 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
         osxBackdrop
     else
         genericBackdrop
+
+    init {
+        fbatch.projectionMatrix = camera.combined
+        App.setConfig("screenmagnifyingfilter", "bilinear")
+    }
 
     override fun render(updateRate: Float) {
         gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
@@ -66,29 +73,30 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
             }
 
             // vertically centre the above
-            val centering = (App.scr.hf - heights.last() - App.fontGameFBO.lineHeight) / 2f
+            val centering = (App.scr.hf - heights.last() - App.fontGame.lineHeight) / 2f
 
-            fbo.inAction(null, null) {
+            fbo.inAction(camera, fbatch) {
                 gdxClearAndEnableBlend(backdrop)
-                batch.inUse {
-                    batch.color = Color.WHITE
-                    wot.reversed().forEachIndexed { index, s ->
-                        if (index == 0) {
+                fbatch.inUse {
+                    it.color = Color.WHITE
+                    wot.forEachIndexed { index, s ->
+                        if (index == wot.lastIndex) {
                             pathButtonX = (Toolkit.drawWidth - pathButtonW) / 2f
-                            pathButtonY = heights[index] + centering
+                            pathButtonY = (heights[index] + centering)
                         }
-                        else {
-                            batch.color = Color.WHITE
-                            App.fontGameFBO.draw(batch, s, (Toolkit.drawWidth - maxtw) / 2f, heights[index] + centering)
-                        }
+
+                        it.color = Color.WHITE
+                        App.fontGame.draw(it, s, (Toolkit.drawWidth - maxtw) / 2f, (heights[index] + centering))
                     }
                 }
             }
+
+//            fbatch.projectionMatrix = camera.combined
         }
 
         if (gamemode == 0) {
-            val mouseOnLink = (Gdx.input.x.toFloat() in pathButtonX - 48..pathButtonX + 48 + pathButtonW &&
-                    App.scr.hf - Gdx.input.y in pathButtonY - 12..pathButtonY + pathButtonH + 12)
+            val mouseOnLink = (Gdx.input.x / App.scr.magn in pathButtonX - 48..pathButtonX + 48 + pathButtonW &&
+                    Gdx.input.y / App.scr.magn in pathButtonY - 12..pathButtonY + pathButtonH + 12)
 
             if (mouseOnLink && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                 OpenFile(pathFile)
@@ -96,9 +104,9 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
 
             fbatch.inUse {
                 it.color = Color.WHITE
-                it.draw(fbo.colorBufferTexture, 0f, fbo.height.toFloat(), fbo.width.toFloat(), -fbo.height.toFloat())
+                it.draw(fbo.colorBufferTexture, -App.scr.halfwf, App.scr.halfhf, App.scr.wf, -App.scr.hf)
                 it.color = if (mouseOnLink) Toolkit.Theme.COL_SELECTED else Toolkit.Theme.COL_MOUSE_UP
-                App.fontGame.draw(it, pathText, pathButtonX, pathButtonY)
+                App.fontGame.draw(it, pathText, pathButtonX - App.scr.halfwf, pathButtonY - App.scr.halfhf)
             }
 
 //            if (Gdx.input.isKeyPressed(Keys.ESCAPE)) gamemode = 1

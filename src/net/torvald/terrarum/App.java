@@ -547,7 +547,7 @@ public class App implements ApplicationListener {
 
     @Override
     public void render() {
-        Gdx.gl.glDisable(GL20.GL_DITHER);
+//        Gdx.gl.glDisable(GL20.GL_DITHER);
 
         if (splashDisplayed && !postInitFired) {
             postInitFired = true;
