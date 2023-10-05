@@ -15,6 +15,7 @@ import net.torvald.terrarum.savegame.ByteArray64InputStream
 import net.torvald.terrarum.savegame.ByteArray64Reader
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.BaseModularWeather
+import net.torvald.terrarum.weather.WeatherDirBox
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.WeatherStateBox
 import org.apache.commons.codec.digest.DigestUtils
@@ -225,6 +226,32 @@ object Common {
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherStateBox {
                 return jsonData.asString().split(';').map { it.toFloat() }.let {
                     WeatherStateBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
+                }
+            }
+        })
+        // WeatherDirBox
+        jsoner.setSerializer(WeatherDirBox::class.java, object : Json.Serializer<WeatherDirBox> {
+            override fun write(json: Json, obj: WeatherDirBox, knownType: Class<*>?) {
+                json.writeValue("${obj.x};${obj.pM2};${obj.pM1};${obj.p0};${obj.p1};${obj.p2};${obj.p3}")
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): WeatherDirBox {
+                try {
+                    return jsonData.asString().split(';').map { it.toFloat() }.let {
+                        WeatherDirBox(it[0], it[1], it[2], it[3], it[4], it[5], it[6])
+                    }
+                }
+                // just for savegame compatibility
+                catch (_: IllegalStateException) {
+                    return WeatherDirBox(
+                        jsonData.getFloat("x"),
+                        jsonData.getFloat("pM2"),
+                        jsonData.getFloat("pM1"),
+                        jsonData.getFloat("p0"),
+                        jsonData.getFloat("p1"),
+                        jsonData.getFloat("p2"),
+                        jsonData.getFloat("p3")
+                    )
                 }
             }
         })
