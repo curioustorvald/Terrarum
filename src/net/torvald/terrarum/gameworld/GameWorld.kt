@@ -223,7 +223,10 @@ open class GameWorld(
 
             // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
             tileNumberToNameMap[0] = Block.AIR
+            tileNameToNumberMap[Block.AIR] = 0
+
             tileNumberToNameMap[2] = Block.UPDATE
+            tileNameToNumberMap[Block.UPDATE] = 2
         }
     }
 
@@ -254,7 +257,10 @@ open class GameWorld(
 
         // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
         tileNumberToNameMap[0] = Block.AIR
+        tileNameToNumberMap[Block.AIR] = 0
+
         tileNumberToNameMap[2] = Block.UPDATE
+        tileNameToNumberMap[Block.UPDATE] = 2
     }
     
     /**
