@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.github.strikerx3.jxinput.XInputDevice;
 import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
@@ -276,7 +277,7 @@ public class App implements ApplicationListener {
         Gdx.gl20.glViewport(0, 0, width, height);
     }
 
-    public static final int TICK_SPEED = 64;
+    public static final int TICK_SPEED = 60; // using 60 as it's highly composite number
     public static final float UPDATE_RATE = 1f / TICK_SPEED; // apparent framerate will be limited by update rate
 
     private static float loadTimer = 0f;
@@ -418,7 +419,8 @@ public class App implements ApplicationListener {
 
             Lwjgl3ApplicationConfiguration appConfig = new Lwjgl3ApplicationConfiguration();
             //appConfig.useGL30 = false; // https://stackoverflow.com/questions/46753218/libgdx-should-i-use-gl30
-            if (processor.startsWith("Apple M")) appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+            if (SharedLibraryLoader.isMac)
+                appConfig.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
             appConfig.useVsync(getConfigBoolean("usevsync"));
             appConfig.setResizable(false);
 

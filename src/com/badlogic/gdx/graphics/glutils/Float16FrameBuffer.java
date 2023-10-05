@@ -35,16 +35,18 @@ public class Float16FrameBuffer extends FrameBuffer {
     public Float16FrameBuffer (int width, int height, boolean hasDepth) {
         /*if (!App.gl40capable || App.operationSystem.equals("OSX")) { // disable float framebuffer for Apple M chips
             FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
-            bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp int works perfectly?!
+            bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp creates slight banding
             if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
             this.bufferBuilder = bufferBuilder;
         }
         else {
             FloatFrameBufferBuilder bufferBuilder = new FloatFrameBufferBuilder(width, height);
-            bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
+            bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false); // float16 will not create a banding
             if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
             this.bufferBuilder = bufferBuilder;
         }*/
+
+        // FIXME temporarily disabling Float16 -- has LWJGL bug that prevents setOpenGLEmulation on Windows (or is this Nvidia's issue?)
 
         FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
         bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp int works perfectly?!
