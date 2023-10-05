@@ -22,7 +22,7 @@ jlink --module-path ~/Documents/openjdk/jdk-17.0.1.jdk-arm/Contents/Home/jmods:m
 jlink --module-path ~/Documents/openjdk/jdk-17.0.1.jdk-x86/Contents/Home/jmods:mods  --add-modules java.base,java.desktop,java.net.http,jdk.crypto.ec,java.logging,java.scripting,jdk.unsupported --output ~/Documents/Terrarum/out/runtime-osx-x86 --no-header-files --no-man-pages --strip-debug --compress=2
 ```
 
-(note: matching the building machine with the target OS is highly recommended -- Use Linux for building linux x86/arm; Mac for building macOS x86/arm; Windows for building Windows Java Runtime)
+**Note: due to Apple being Apple, macOS runtimes must be created from the macOS**
 
 This process assumes that the game does NOT use the Java 9+ modules and every single required libraries are fat-jar'd (their contents extracted right into the Jar)
 

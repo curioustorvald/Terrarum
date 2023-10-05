@@ -13,7 +13,7 @@ rm $DESTDIR/batchtest.txt
 rm $DESTDIR/test_texture.tga
 rm $DESTDIR/worldbacktest.tga
 rm -r $DESTDIR/books
-rm $DESTDIR/clut/skybox.tga
+rm $DESTDIR/clut/skybox*.tga
 rm $DESTDIR/graphics/*.bat
 rm $DESTDIR/keylayout/*.not_ime
 rm $DESTDIR/mods/basegame/blocks/*.gz
