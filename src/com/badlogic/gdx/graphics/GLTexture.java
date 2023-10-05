@@ -34,6 +34,8 @@ import java.nio.FloatBuffer;
  *
  * This version of code is based on GDX 1.12.0 and was modified for the Terrarum project.
  *
+ * Created by minjaesong on 2023-10-05.
+ *
  * @author badlogic, Xoppa, CuriousTorvald */
 public abstract class GLTexture implements Disposable {
     /** The target of this texture, used when binding the texture, e.g. GL_TEXTURE_2D */

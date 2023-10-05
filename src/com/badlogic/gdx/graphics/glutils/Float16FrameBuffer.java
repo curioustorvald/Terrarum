@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2011 See AUTHORS file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
+
 package com.badlogic.gdx.graphics.glutils;
 
 import com.badlogic.gdx.Application;
@@ -11,11 +27,13 @@ import net.torvald.terrarum.App;
 // typealias Float16FrameBuffer = FloatFrameBuffer
 
 /**
+ * This version of code is based on GDX 1.12.0 and was modified for the Terrarum project.
+ *
  * Created by minjaesong on 2023-08-16.
  */
 public class Float16FrameBuffer extends FrameBuffer {
 
-    private static boolean floatFramebufferAvailable = true;
+    private static boolean floatFramebufferAvailable = !App.operationSystem.equals("OSX");
 
     Float16FrameBuffer () {
     }
@@ -35,7 +53,7 @@ public class Float16FrameBuffer extends FrameBuffer {
      * @param hasDepth whether to attach a depth buffer
      * @throws GdxRuntimeException in case the FrameBuffer could not be created */
     public Float16FrameBuffer (int width, int height, boolean hasDepth) {
-        if (!floatFramebufferAvailable || App.operationSystem.equals("OSX")) { // disable float framebuffer for Apple M chips
+        if (!floatFramebufferAvailable) {
             FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
             bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp creates slight banding
             if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
@@ -64,7 +82,7 @@ public class Float16FrameBuffer extends FrameBuffer {
 
     @Override
     protected Texture createTexture (FrameBufferTextureAttachmentSpec attachmentSpec) {
-        if (!floatFramebufferAvailable || App.operationSystem.equals("OSX")) {
+        if (!floatFramebufferAvailable) {
             GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
                     attachmentSpec.format, attachmentSpec.type);
             Texture result = new Texture(data);
@@ -80,13 +98,6 @@ public class Float16FrameBuffer extends FrameBuffer {
             result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
             return result;
         }
-
-        /*GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
-                attachmentSpec.format, attachmentSpec.type);
-        Texture result = new Texture(data);
-        result.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-        return result;*/
     }
 
 }
