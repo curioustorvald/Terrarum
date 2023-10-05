@@ -128,6 +128,7 @@ emph {
         printStream.println("<li>Engine version: ${App.getVERSION_STRING()}</li>")
         printStream.println("<li>JRE version: ${System.getProperty("java.version")}</li>")
         printStream.println("<li>Gdx version: ${com.badlogic.gdx.Version.VERSION}</li>")
+        printStream.println("<li>LWJGL version: ${org.lwjgl.Version.VERSION_MAJOR}.${org.lwjgl.Version.VERSION_MINOR}.${org.lwjgl.Version.VERSION_REVISION}</li>")
         printStream.println("<li>Uptime: ${uptime / 3600}h${(uptime % 3600) / 60}m${uptime % 60}s</li>")
         printStream.println("<li>BogoFlops: ${App.bogoflops}</li>")
         printStream.println("<li>OS Name: ${App.OSName}</li>")
