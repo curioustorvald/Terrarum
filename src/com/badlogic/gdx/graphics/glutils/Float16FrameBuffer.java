@@ -15,6 +15,8 @@ import net.torvald.terrarum.App;
  */
 public class Float16FrameBuffer extends FrameBuffer {
 
+    private static boolean floatFramebufferAvailable = true;
+
     Float16FrameBuffer () {
     }
 
@@ -33,32 +35,36 @@ public class Float16FrameBuffer extends FrameBuffer {
      * @param hasDepth whether to attach a depth buffer
      * @throws GdxRuntimeException in case the FrameBuffer could not be created */
     public Float16FrameBuffer (int width, int height, boolean hasDepth) {
-        /*if (!App.gl40capable || App.operationSystem.equals("OSX")) { // disable float framebuffer for Apple M chips
+        if (!floatFramebufferAvailable || App.operationSystem.equals("OSX")) { // disable float framebuffer for Apple M chips
             FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
             bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp creates slight banding
             if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
             this.bufferBuilder = bufferBuilder;
+            build();
         }
         else {
-            FloatFrameBufferBuilder bufferBuilder = new FloatFrameBufferBuilder(width, height);
-            bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false); // float16 will not create a banding
-            if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
-            this.bufferBuilder = bufferBuilder;
-        }*/
-
-        // FIXME temporarily disabling Float16 -- has LWJGL bug that prevents setOpenGLEmulation on Windows (or is this Nvidia's issue?)
-
-        FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
-        bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp int works perfectly?!
-        if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
-        this.bufferBuilder = bufferBuilder;
-
-        build();
+            try {
+                FloatFrameBufferBuilder bufferBuilder = new FloatFrameBufferBuilder(width, height);
+                bufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false); // float16 will not create a banding
+                if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
+                this.bufferBuilder = bufferBuilder;
+                build();
+            }
+            catch (GdxRuntimeException e) {
+                floatFramebufferAvailable = false;
+                System.out.println("[Float16FrameBuffer] WARNING: Float Framebuffer is not available, falling back to 16bpp...");
+                FrameBufferBuilder bufferBuilder = new FrameBufferBuilder(width, height);
+                bufferBuilder.addColorTextureAttachment(GL20.GL_RGBA, GL20.GL_RGBA, GL20.GL_UNSIGNED_SHORT); // but 16bpp creates slight banding
+                if (hasDepth) bufferBuilder.addBasicDepthRenderBuffer();
+                this.bufferBuilder = bufferBuilder;
+                build();
+            }
+        }
     }
 
     @Override
     protected Texture createTexture (FrameBufferTextureAttachmentSpec attachmentSpec) {
-        /*if (!App.gl40capable || App.operationSystem.equals("OSX")) {
+        if (!floatFramebufferAvailable || App.operationSystem.equals("OSX")) {
             GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
                     attachmentSpec.format, attachmentSpec.type);
             Texture result = new Texture(data);
@@ -73,14 +79,14 @@ public class Float16FrameBuffer extends FrameBuffer {
             result.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
             return result;
-        }*/
+        }
 
-        GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
+        /*GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat,
                 attachmentSpec.format, attachmentSpec.type);
         Texture result = new Texture(data);
         result.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         result.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-        return result;
+        return result;*/
     }
 
 }
