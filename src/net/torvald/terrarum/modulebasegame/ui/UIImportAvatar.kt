@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
+import net.torvald.terrarum.App.printdbgerr
 import net.torvald.terrarum.gamecontroller.*
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.savegame.*
@@ -20,6 +21,7 @@ import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.OpenFile
 import java.awt.Desktop
 import java.io.File
+import java.util.UUID
 
 /**
  * Created by minjaesong on 2023-08-24.
@@ -200,7 +202,9 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
                 val it = DiskSkimmer(newFile, true)
 
                 val collection = SavegameCollection.collectFromBaseFilename(File(App.playersDir), it.diskFile.name)
-                val playerUUID = collection.getUUID()
+                val playerUUID = UUID.fromString(uuid)
+
+                printdbg(this, "${filenameInput} existed before: ${App.savegamePlayers.contains(playerUUID)}")
 
                 // if multiple valid savegames with same UUID exist, only the most recent one is retained
                 if (!App.savegamePlayers.contains(playerUUID)) {
@@ -209,7 +213,9 @@ class UIImportAvatar(val remoCon: UIRemoCon) : Advanceable() {
                     App.savegamePlayersName[playerUUID] = it.getDiskName(Common.CHARSET)
                 }
             }
-            catch (_: Throwable) {}
+            catch (e: Throwable) {
+                printdbgerr(this, e.stackTraceToString())
+            }
         }
         catch (e: Throwable) {
             // format error
