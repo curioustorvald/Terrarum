@@ -16,13 +16,13 @@ object ControlPresets {
         "control_key_jump" to Input.Keys.SPACE,
         "control_key_movementaux" to Input.Keys.SHIFT_LEFT, // movement-auxiliary, or hookshot
         "control_key_inventory" to Input.Keys.Q,
-        "control_key_interact" to Input.Keys.R,
-        "control_key_discard" to Input.Keys.F,
+        "control_key_interact" to Input.Keys.E,
+        "control_key_discard" to Input.Keys.R,
         "control_key_close" to Input.Keys.X, // this or hard-coded ESC
         "control_key_zoom" to Input.Keys.Z,
 
         "control_key_gamemenu" to Input.Keys.TAB,
-        "control_key_crafting" to Input.Keys.E,
+        "control_key_crafting" to Input.Keys.F,
         "control_key_quicksel" to Input.Keys.CONTROL_LEFT, // pie menu is now LShift because CapsLock is actually used by the my bespoke keyboard input
     )
 
