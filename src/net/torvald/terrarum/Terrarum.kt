@@ -347,13 +347,7 @@ object Terrarum : Disposable {
      * override var referenceID: Int = generateUniqueReferenceID()
      */
     fun generateUniqueReferenceID(renderOrder: Actor.RenderOrder): ActorID {
-        fun renderOrderToRange(renderOrder: Actor.RenderOrder) = when (renderOrder) {
-            Actor.RenderOrder.BEHIND -> Actor.RANGE_BEHIND
-            Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
-            Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
-            Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
-            Actor.RenderOrder.OVERLAY-> Actor.RANGE_OVERLAY
-        }
+        // render orders can be changed arbitrarily so the whole "renderorder to actor id" is only there for an initial sorting
         fun hasCollision(value: ActorID) =
                 try {
                     Terrarum.ingame?.theGameHasActor(value) == true
@@ -364,7 +358,7 @@ object Terrarum : Disposable {
 
         var ret: Int
         do {
-            val range = renderOrderToRange(renderOrder)
+            val range = ReferencingRanges.ACTORS
             val size = range.last - range.first + 1
             ret = (HQRNG().nextInt().rem(size) + range.first) and 0x7FFF_FF00 // make room for sub-actors
         } while (hasCollision(ret)) // check for collision

@@ -44,21 +44,13 @@ abstract class Actor : Comparable<Actor>, Runnable {
         BEHIND, // tapestries, some particles (obstructed by terrain)
         MIDDLE, // actors
         MIDTOP, // bullets, thrown items
-        FRONT,  // fake tiles
+        FRONT,  // front walls ("blocks" that obstruct actors)
         OVERLAY // screen overlay, not affected by lightmap
-    }
-
-    companion object {
-        val RANGE_BEHIND = ReferencingRanges.ACTORS_BEHIND  // 1
-        val RANGE_MIDDLE = ReferencingRanges.ACTORS_MIDDLE  // 3
-        val RANGE_MIDTOP = ReferencingRanges.ACTORS_MIDTOP  // 1
-        val RANGE_FRONT  = ReferencingRanges.ACTORS_FRONT   // 0.9375
-        val RANGE_OVERLAY= ReferencingRanges.ACTORS_OVERLAY // 0.9375
     }
 
     abstract fun update(delta: Float)
 
-    var actorValue = ActorValue(this) // FIXME cyclic reference on GSON
+    var actorValue = ActorValue(this)
     @Volatile var flagDespawn = false
 
     override fun equals(other: Any?): Boolean {
