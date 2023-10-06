@@ -271,7 +271,7 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
                 it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }
             } ?: listOf("$EMDASH")
         loadOrderWorld =
-            App.savegameWorlds[full.playerButtonSelected!!.worldUUID]!!.files[selectedRevision].getFile(
+            App.savegameWorlds[full.playerButtonSelected!!.worldUUID]?.files?.get(selectedRevision)?.getFile( // it's null for freshly-imported avatars
                 VDFileID.LOADORDER
             )?.getContent()?.toByteArray()?.toString(Common.CHARSET)?.split('\n')?.let {
                 it.mapIndexed { index, s -> "${(index+1).toString().padStart(it.size.fastLen())}. $s" }

@@ -19,6 +19,7 @@ class ItemLogicSignalEmitter(originalID: ItemID) : FixtureItemBase(originalID, "
 
     override var baseToolSize: Double? = baseMass
     override var originalName = "ITEM_LOGIC_SIGNAL_EMITTER"
+    override var inventoryCategory = Category.MISC
 
     override fun effectWhileEquipped(actor: ActorWithBody, delta: Float) {
         super.effectWhileEquipped(actor, delta)

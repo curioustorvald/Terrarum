@@ -941,8 +941,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         uiContainer.forEach {
             when (it) {
-                is UICanvas -> it.update(Gdx.graphics.deltaTime)
                 is Id_UICanvasNullable -> it.get()?.update(Gdx.graphics.deltaTime)
+                is UICanvas -> it.update(Gdx.graphics.deltaTime)
             }
         }
         //uiFixture?.update(Gdx.graphics.deltaTime)
