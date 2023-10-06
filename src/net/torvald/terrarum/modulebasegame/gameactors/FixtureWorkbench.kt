@@ -39,7 +39,7 @@ class FixtureWorkbench : FixtureBase, CraftingStation {
         }
     }
 
-    private var mainUIhookHackInstalled = false
+    @Transient private var mainUIhookHackInstalled = false
     override fun update(delta: Float) {
         // adding UI to the fixture as players may right-click on the workbenches instead of pressing a keyboard key
         (INGAME as? TerrarumIngame)?.let { ingame ->
