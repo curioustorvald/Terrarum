@@ -189,6 +189,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     lateinit var uiPieMenu: UIQuickslotPie
     lateinit var uiQuickBar: UIQuickslotBar
     lateinit var uiInventoryPlayer: UIInventoryFull
+
+    internal val uiInventoryPlayerReady: Boolean get() = ::uiInventoryPlayer.isInitialized // this is some ugly hack but I didn't want to make uiInventoryPlayer nullable so bite me
+
     /**
      * This is a dedicated property for the fixtures' UI.
      *

@@ -21,8 +21,7 @@ class FixtureWorkbench : FixtureBase, CraftingStation {
 
     constructor() : super(
         BlockBox(BlockBox.ALLOW_MOVE_DOWN, 2, 1),
-        nameFun = { Lang["ITEM_WORKBENCH"] },
-        mainUI = (INGAME as? TerrarumIngame)?.uiInventoryPlayer
+        nameFun = { Lang["ITEM_WORKBENCH"] }
     ) {
         val itemImage = FixtureItemBase.getItemImageFromSingleImage("basegame", "sprites/fixtures/workbench.tga")
 
@@ -38,6 +37,19 @@ class FixtureWorkbench : FixtureBase, CraftingStation {
         mainUIopenFun = { ui ->
             (mainUI as? UIInventoryFull)?.openCrafting(mainUI!!.handler)
         }
+    }
+
+    private var mainUIhookHackInstalled = false
+    override fun update(delta: Float) {
+        // adding UI to the fixture as players may right-click on the workbenches instead of pressing a keyboard key
+        (INGAME as? TerrarumIngame)?.let { ingame ->
+            if (!mainUIhookHackInstalled && ingame.uiInventoryPlayerReady) {
+                mainUIhookHackInstalled = true
+                this.mainUI = ingame.uiInventoryPlayer // this field is initialised only after a full load so this hack is necessary
+            }
+        }
+
+        super.update(delta)
     }
 
 }
