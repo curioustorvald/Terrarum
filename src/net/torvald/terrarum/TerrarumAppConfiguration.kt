@@ -100,6 +100,9 @@ data class Snapshot(var revision: Int) {
     }
 
     init {
+        if (revision !in 0..7) {
+            throw IllegalArgumentException("Revision out of range -- expected 0..7 (a..h), got $revision")
+        }
         update()
     }
 
