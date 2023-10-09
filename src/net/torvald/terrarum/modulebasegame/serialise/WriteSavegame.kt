@@ -4,19 +4,17 @@ import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.gameworld.BlockLayer
+import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ChunkLoadingLoadScreen
 import net.torvald.terrarum.modulebasegame.IngameRenderer
-import net.torvald.terrarum.modulebasegame.SavegameMigrator
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.*
 import net.torvald.terrarum.savegame.VDFileID.SAVEGAMEINFO
 import net.torvald.terrarum.serialise.Common
-import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.io.Reader
@@ -145,8 +143,8 @@ object LoadSavegame {
         val worldDiskSavegameInfo = ByteArray64Reader(worldDisk.getFile(SAVEGAMEINFO)!!.bytes, Common.CHARSET)
         val world = ReadWorld(worldDiskSavegameInfo, worldDisk.diskFile)
 
-        world.layerTerrain = BlockLayer(world.width, world.height)
-        world.layerWall = BlockLayer(world.width, world.height)
+        world.layerTerrain = BlockLayerI16(world.width, world.height)
+        world.layerWall = BlockLayerI16(world.width, world.height)
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
         newIngame.worldDisk =  VDUtil.readDiskArchive(worldDisk.diskFile, Level.INFO)

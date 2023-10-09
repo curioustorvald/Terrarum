@@ -3,6 +3,8 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import net.torvald.terrarum.App
 import net.torvald.terrarum.BlockCodex
 import net.torvald.terrarum.WireCodex
+import net.torvald.terrarum.gameitems.isBlock
+import net.torvald.terrarum.gameitems.isWall
 
 /**
  * Created by minjaesong on 2016-02-03.
@@ -74,19 +76,22 @@ object PlayerBuilderSigrid {
     fun fillTestInventory(inventory: ActorInventory) {
 
         App.tileMaker.tags.forEach { (t, _) ->
-            val prop = BlockCodex[t]
-            if (!prop.isActorBlock && !prop.hasTag("AIR") && !prop.hasTag("INTERNAL")) {
+            if (t.isBlock() || t.isWall()) {
+                val prop = BlockCodex[t]
+                if (!prop.isActorBlock && !prop.hasTag("AIR") && !prop.hasTag("INTERNAL")) {
 
-                inventory.add(t, 9995)
-                try {
-                    inventory.add(
-                        "wall@$t",
-                        9995
-                    ) // this code will try to add nonexisting wall items, do not get surprised with NPEs
-                }
-                catch (e: NullPointerException) { /* tHiS iS fInE */ }
-                catch (e: Throwable) {
-                    System.err.println("[PlayerBuilder] $e")
+                    inventory.add(t, 9995)
+                    try {
+                        inventory.add(
+                            "wall@$t",
+                            9995
+                        ) // this code will try to add nonexisting wall items, do not get surprised with NPEs
+                    }
+                    catch (e: NullPointerException) { /* tHiS iS fInE */
+                    }
+                    catch (e: Throwable) {
+                        System.err.println("[PlayerBuilder] $e")
+                    }
                 }
             }
         }

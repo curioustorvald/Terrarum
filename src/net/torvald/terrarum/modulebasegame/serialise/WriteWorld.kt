@@ -4,6 +4,8 @@ import net.torvald.terrarum.ItemCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.NoSerialise
 import net.torvald.terrarum.gameworld.BlockLayer
+import net.torvald.terrarum.gameworld.BlockLayerI16
+import net.torvald.terrarum.gameworld.BlockLayerI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -82,9 +84,7 @@ object WriteWorld {
         val ba = ByteArray64()
         for (y in cy * LandUtil.CHUNK_H until (cy + 1) * LandUtil.CHUNK_H) {
             for (x in cx * LandUtil.CHUNK_W until (cx + 1) * LandUtil.CHUNK_W) {
-                val tilenum = layer.unsafeGetTile(x, y)
-                ba.appendByte(tilenum.ushr(8).and(255).toByte())
-                ba.appendByte(tilenum.and(255).toByte())
+                ba.appendBytes(layer.unsafeToBytes(x, y))
             }
         }
 
@@ -116,17 +116,19 @@ object ReadWorld {
 
     fun decodeChunkToLayer(chunk: ByteArray64, targetLayer: BlockLayer, cx: Int, cy: Int) {
         val bytes = Common.unzip(chunk)
-        if (bytes.size != cw * ch * 2L)
+        if (bytes.size != cw * ch * targetLayer.bytesPerBlock)
             throw UnsupportedOperationException("Chunk size mismatch: decoded chunk size is ${bytes.size} bytes " +
-                                                "where ${LandUtil.CHUNK_W * LandUtil.CHUNK_H * 2L} bytes (Int16 of ${LandUtil.CHUNK_W}x${LandUtil.CHUNK_H}) were expected")
+                                                "where ${LandUtil.CHUNK_W * LandUtil.CHUNK_H * targetLayer.bytesPerBlock} bytes (Int${8 * targetLayer.bytesPerBlock} of ${LandUtil.CHUNK_W}x${LandUtil.CHUNK_H}) were expected")
 
         for (k in 0 until cw * ch) {
-            val tilenum = bytes[2L*k].toUint().shl(8) or bytes[2L*k + 1].toUint()
             val offx = k % cw
             val offy = k / cw
+            val ba = ByteArray(targetLayer.bytesPerBlock.toInt()) {
+                bytes[targetLayer.bytesPerBlock * k + it]
+            }
 
 //            try {
-                targetLayer.unsafeSetTile(cx * cw + offx, cy * ch + offy, tilenum)
+                targetLayer.unsafeSetTile(cx * cw + offx, cy * ch + offy, ba)
 //            }
 //            catch (e: IndexOutOfBoundsException) {
 //                printdbgerr(this, "IndexOutOfBoundsException, cx = $cx, cy = $cy, k = $k, offx = $offx, offy = $offy")

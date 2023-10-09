@@ -198,6 +198,7 @@ internal class UnsafePtr(pointer: Long, allocSize: Long) {
     }
 
     override fun toString() = "0x${ptr.toString(16)} with size $size"
+    fun toString(prefix: String) = "$prefix 0x${ptr.toString(16)} with size $size"
     override fun equals(other: Any?) = this.ptr == (other as UnsafePtr).ptr && this.size == other.size
 }
 

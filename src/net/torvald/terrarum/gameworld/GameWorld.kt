@@ -7,22 +7,20 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isFluid
+import net.torvald.terrarum.gameitems.isOre
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.weather.WeatherSchedule
 import net.torvald.terrarum.weather.Weatherbox
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import java.util.*
-import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
 
@@ -40,8 +38,8 @@ class PhysicalStatus() {
  * Special version of GameWorld where everything, including layer data, are saved in a single JSON file (i.e. not chunked)
  */
 class SimpleGameWorld(width: Int, height: Int) : GameWorld(width, height) {
-    override lateinit var layerWall: BlockLayer
-    override lateinit var layerTerrain: BlockLayer
+    override lateinit var layerWall: BlockLayerI16
+    override lateinit var layerTerrain: BlockLayerI16
     constructor() : this(0, 0)
 }
 
@@ -83,12 +81,12 @@ open class GameWorld(
     }
 
     //layers
-    @Transient lateinit open var layerWall: BlockLayer
-    @Transient lateinit open var layerTerrain: BlockLayer
-    val layerOres = HashedOres() // damage to the block follows `terrainDamages`
+    @Transient lateinit open var layerWall: BlockLayerI16
+    @Transient lateinit open var layerTerrain: BlockLayerI16
+    @Transient lateinit open var layerOres: BlockLayerI16I8 // damage to the block follows `terrainDamages`
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
-    val layerFluids = HashedFluidTypeAndFills()
+    val layerFluids = HashedFluidTypeAndFills() // TODO: chunk them using BlockLayerI32
 
 
 
@@ -201,8 +199,8 @@ open class GameWorld(
         this.spawnX = width / 2
         this.spawnY = 150
 
-        layerTerrain = BlockLayer(width, height)
-        layerWall = BlockLayer(width, height)
+        layerTerrain = BlockLayerI16(width, height)
+        layerWall = BlockLayerI16(width, height)
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -277,6 +275,7 @@ open class GameWorld(
     fun getLayer(index: Int) = when(index) {
         0 -> layerTerrain
         1 -> layerWall
+        2 -> layerOres
         else -> null//throw IllegalArgumentException("Unknown layer index: $index")
     }
 
@@ -547,6 +546,21 @@ open class GameWorld(
         }
         else
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
+    }
+
+    fun getTileFromOre(rawX: Int, rawY: Int): OrePlacement? {
+        val (x, y) = coerceXY(rawX, rawY)
+        val (tileNum, placement) = layerOres.unsafeGetTile(x, y)
+        val tileName = tileNumberToNameMap[tileNum.toLong()]
+        if (tileName == Block.AIR)
+            return null
+        else
+            return OrePlacement(tileName ?: Block.UPDATE, placement)
+    }
+
+    fun setTileOre(rawX: Int, rawY: Int, ore: ItemID, placement: Int) {
+        val (x, y) = coerceXY(rawX, rawY)
+        layerOres.unsafeSetTile(x, y, tileNameToNumberMap[ore]!!, placement)
     }
 
     fun terrainIterator(): Iterator<ItemID> {

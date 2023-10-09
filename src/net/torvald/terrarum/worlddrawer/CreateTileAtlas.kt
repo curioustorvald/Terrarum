@@ -162,7 +162,7 @@ class CreateTileAtlas {
                 if (dirName == "blocks") {
                     // filter files that do not exist on the blockcodex
                     dir.list()
-                        .filter { tgaFile -> !tgaFile.isDirectory && (BlockCodex.getOrNull("$modname:${tgaFile.nameWithoutExtension()}") != null) }
+                        .filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory && (BlockCodex.getOrNull("$modname:${tgaFile.nameWithoutExtension()}") != null) }
                         .sortedBy { it.nameWithoutExtension().toInt() }
                         .forEach { tgaFile: FileHandle -> // toInt() to sort by the number, not lexicographically
                             // tgaFile be like: ./assets/mods/basegame/blocks/32.tga (which is not always .tga)
@@ -173,7 +173,7 @@ class CreateTileAtlas {
                 }
                 else {
                     // TODO test
-                    dir.list().filter { tgaFile -> !tgaFile.isDirectory }.sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile: FileHandle ->
+                    dir.list().filter { tgaFile -> tgaFile.extension() == "tga" && !tgaFile.isDirectory }.sortedBy { it.nameWithoutExtension().toInt() }.forEach { tgaFile: FileHandle ->
                         val newFile = ModMgr.GameRetextureLoader.altFilePaths.getOrDefault(tgaFile.path(), tgaFile)
                         tgaList[dirName]!!.add(modname to newFile)
                     }
