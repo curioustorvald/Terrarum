@@ -1,6 +1,8 @@
 package net.torvald.terrarum.utils
 
 
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
@@ -17,7 +19,6 @@ class HashArray<R>: HashMap<Long, R>() // primitives are working just fine tho
 
 // Oh for the fucks sake fuck you everyone; json shit won't work with generics
 class WiringGraphMap: HashMap<ItemID, GameWorld.WiringSimCell>()
-class HashedFluidType: HashMap<BlockAddress, ItemID>()
 class HashedWirings: HashMap<BlockAddress, GameWorld.WiringNode>()
 class HashedWiringGraph: HashMap<BlockAddress, WiringGraphMap>()
 class MetaModuleCSVPair: HashMap<String, ZipCodedStr>()
@@ -47,3 +48,15 @@ class PlayerLastStatus() {
 @JvmInline value class ZipCodedStr(val doc: String = "") {
     override fun toString() = doc
 }
+
+@Deprecated(
+    "Unused and only exists for the savegame compatibility",
+    ReplaceWith("HashedFluidTypeAndFills")
+) class HashedFluidType: HashMap<BlockAddress, ItemID>()
+
+
+data class Fill(var item: ItemID, var amount: Float)
+data class OrePlacement(var item: ItemID, var tilePlacement: Int)
+
+class HashedFluidTypeAndFills: HashMap<BlockAddress, Fill>()
+class HashedOres: HashMap<BlockAddress, OrePlacement>()

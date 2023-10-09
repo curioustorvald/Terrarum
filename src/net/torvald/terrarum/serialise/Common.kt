@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
 import com.badlogic.gdx.utils.JsonWriter
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameworld.BlockLayer
@@ -263,6 +264,28 @@ object Common {
 
             override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): BaseModularWeather {
                 return WeatherMixer.weatherDict[jsonData.asString()]!!
+            }
+        })
+        // Fill
+        jsoner.setSerializer(Fill::class.java, object : Json.Serializer<Fill> {
+            override fun write(json: Json, obj: Fill, knownType: Class<*>?) {
+                json.writeValue("${obj.item};${obj.amount}")
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): Fill {
+                val csv = jsonData.asString().split(',')
+                return Fill(csv[0], csv[1].toFloat())
+            }
+        })
+        // OrePlacement
+        jsoner.setSerializer(OrePlacement::class.java, object : Json.Serializer<OrePlacement> {
+            override fun write(json: Json, obj: OrePlacement, knownType: Class<*>?) {
+                json.writeValue("${obj.item};${obj.tilePlacement}")
+            }
+
+            override fun read(json: Json, jsonData: JsonValue, type: Class<*>?): OrePlacement {
+                val csv = jsonData.asString().split(',')
+                return OrePlacement(csv[0], csv[1].toInt())
             }
         })
     }

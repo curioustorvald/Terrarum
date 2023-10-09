@@ -85,6 +85,12 @@ open class GameWorld(
     //layers
     @Transient lateinit open var layerWall: BlockLayer
     @Transient lateinit open var layerTerrain: BlockLayer
+    val layerOres = HashedOres() // damage to the block follows `terrainDamages`
+    val wallDamages = HashArray<Float>()
+    val terrainDamages = HashArray<Float>()
+    val layerFluids = HashedFluidTypeAndFills();
+
+
 
     //val layerThermal: MapLayerHalfFloat // in Kelvins
     //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
@@ -102,10 +108,7 @@ open class GameWorld(
         }
     var portalPoint: Point2i? = null
 
-    val wallDamages = HashArray<Float>()
-    val terrainDamages = HashArray<Float>()
-    val fluidTypes = HashedFluidType()
-    val fluidFills = HashArray<Float>()
+
 
     /**
      * Single block can have multiple conduits, different types of conduits are stored separately.
@@ -358,8 +361,7 @@ open class GameWorld(
         terrainDamages.remove(blockAddr)
 
         if (BlockCodex[itemID].isSolid) {
-            fluidFills.remove(blockAddr)
-            fluidTypes.remove(blockAddr)
+            layerFluids.remove(blockAddr)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
@@ -669,13 +671,10 @@ open class GameWorld(
 
         if (fill > WorldSimulator.FLUID_MIN_MASS) {
             //setTileTerrain(x, y, fluidTypeToBlock(fluidType))
-            fluidFills[addr] = fill
-            fluidTypes[addr] = fluidType
+            layerFluids[addr] = Fill(fluidType, fill)
         }
         else {
-            fluidFills.remove(addr)
-            fluidTypes.remove(addr)
-
+            layerFluids.remove(addr)
         }
 
 
@@ -688,8 +687,8 @@ open class GameWorld(
 
     fun getFluid(x: Int, y: Int): FluidInfo {
         val addr = LandUtil.getBlockAddr(this, x, y)
-        val fill = fluidFills[addr]
-        val type = fluidTypes[addr]
+        val type = layerFluids[addr]?.item
+        val fill = layerFluids[addr]?.amount
         return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
     }
 
