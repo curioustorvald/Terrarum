@@ -109,7 +109,7 @@ class QuickSingleplayerWorldSavingThread(
                 ingame.world.getLayer(layerNum)?.let { layer ->
                     chunks.forEach { chunkNumber ->
 
-                        printdbg(this, "Writing chunks... $chunksWrote/$chunkCount")
+                        printdbg(this, "Writing chunks... $chunksWrote/$chunkCount (chunk# $chunkNumber at layer# $layerNum)")
 
                         val chunkXY = LandUtil.chunkNumToChunkXY(ingame.world, chunkNumber)
 

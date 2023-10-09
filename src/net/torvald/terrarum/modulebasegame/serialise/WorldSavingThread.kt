@@ -57,7 +57,7 @@ class WorldSavingThread(
 
         val playersList: List<IngamePlayer> = allTheActors.filterIsInstance<IngamePlayer>()
         val actorsList = allTheActors.filter { WriteWorld.actorAcceptable(it) }
-        val layers = intArrayOf(0,1).map { ingame.world.getLayer(it) }
+        val layers = intArrayOf(0,1,2).map { ingame.world.getLayer(it) }
         val cw = ingame.world.width / LandUtil.CHUNK_W
         val ch = ingame.world.height / LandUtil.CHUNK_H
 

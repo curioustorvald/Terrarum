@@ -201,6 +201,7 @@ open class GameWorld(
 
         layerTerrain = BlockLayerI16(width, height)
         layerWall = BlockLayerI16(width, height)
+        layerOres = BlockLayerI16I8(width, height)
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)

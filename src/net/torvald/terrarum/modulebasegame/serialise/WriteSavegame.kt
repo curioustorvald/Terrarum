@@ -5,6 +5,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.gameworld.BlockLayerI16
+import net.torvald.terrarum.gameworld.BlockLayerI16I8
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ChunkLoadingLoadScreen
@@ -145,6 +146,7 @@ object LoadSavegame {
 
         world.layerTerrain = BlockLayerI16(world.width, world.height)
         world.layerWall = BlockLayerI16(world.width, world.height)
+        world.layerOres = BlockLayerI16I8(world.width, world.height)
 
         newIngame.world = world // must be set before the loadscreen, otherwise the loadscreen will try to read from the NullWorld which is already destroyed
         newIngame.worldDisk =  VDUtil.readDiskArchive(worldDisk.diskFile, Level.INFO)
@@ -184,10 +186,12 @@ object LoadSavegame {
             val cw = LandUtil.CHUNK_W
             val ch = LandUtil.CHUNK_H
             val chunkCount = world.width * world.height / (cw * ch)
-            val worldLayer = arrayOf(world.getLayer(0), world.getLayer(1))
+            val hasOreLayer = (newIngame.worldDisk.getFile(0x1_0000_0000L or 2L.shl(24)) != null)
+            val worldLayer = (if (hasOreLayer) intArrayOf(0,1,2) else intArrayOf(0,1)).map { world.getLayer(it) }
+            val layerCount = worldLayer.size
             for (chunk in 0L until (world.width * world.height) / (cw * ch)) {
                 for (layer in worldLayer.indices) {
-                    loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*worldLayer.size+layer+1}/${chunkCount*2}")
+                    loadscreen.addMessage("${Lang["MENU_IO_LOADING"]}  ${chunk*layerCount+layer+1}/${chunkCount*layerCount}")
 
                     val chunkFile = newIngame.worldDisk.getFile(0x1_0000_0000L or layer.toLong().shl(24) or chunk)!!
                     val chunkXY = LandUtil.chunkNumToChunkXY(world, chunk.toInt())
