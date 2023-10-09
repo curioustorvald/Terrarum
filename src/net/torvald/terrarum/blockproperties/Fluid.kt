@@ -1,5 +1,7 @@
 package net.torvald.terrarum.blockproperties
 
+import net.torvald.terrarum.gameitems.ItemID
+
 
 /**
  * Created by minjaesong on 2016-08-06.

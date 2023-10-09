@@ -42,7 +42,7 @@ object WorldSimulator {
 
     const val FLUID_MAX_MASS = 1f // The normal, un-pressurized mass of a full water cell
     const val FLUID_MAX_COMP = 0.02f // How much excess water a cell can store, compared to the cell above it. A tile of fluid can contain more than MaxMass water.
-    const val FLUID_MIN_MASS = 0.0001f //Ignore cells that are almost dry
+    const val FLUID_MIN_MASS = 1f / 1024f //Ignore cells that are almost dry (smaller than epsilon of float16)
     const val WIRE_MIN_FLOW = 0.0001f
     const val minFlow = 0.01f
     const val maxSpeed = 1f // max units of water moved out of one block to another, per timestamp

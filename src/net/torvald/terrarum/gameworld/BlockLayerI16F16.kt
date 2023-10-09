@@ -1,20 +1,23 @@
 package net.torvald.terrarum.gameworld
 
-import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
+import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameworld.WorldSimulator.FLUID_MIN_MASS
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
 import net.torvald.unsafe.UnsafePtr
+import net.torvald.util.Float16
 
 /**
- * Memory layout:
- * ```
- *  a7 a6 a5 a4 a3 a2 a1 a0 | aF aE aD aC aB aA a9 a8 | p7 p6 p5 p4 p3 p2 p1 p0 ||
- * ```
- * where a_n is a tile number, p_n is a placement index
+ *  * Memory layout:
+ *  * ```
+ *  *  a7 a6 a5 a4 a3 a2 a1 a0 | aF aE aD aC aB aA a9 a8 | f7 f6 f5 f4 f3 f2 f1 f0 | fF fE fD fC fB fA f9 f8 ||
+ *  * ```
+ *  * where a_n is a fluid number, f_n is a fluid fill
+ *
  * Created by minjaesong on 2023-10-10.
  */
-class BlockLayerI16I8 (val width: Int, val height: Int) : BlockLayer {
+class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
     override val bytesPerBlock = BYTES_PER_BLOCK
 
     // for some reason, all the efforts of saving the memory space were futile.
@@ -55,43 +58,46 @@ class BlockLayerI16I8 (val width: Int, val height: Int) : BlockLayer {
         }
     }
 
-    internal fun unsafeGetTile(x: Int, y: Int): Pair<Int, Int> {
+    internal fun unsafeGetTile(x: Int, y: Int): Pair<Int, Float> {
         val offset = BYTES_PER_BLOCK * (y * width + x)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
-        val placement = ptr[offset + 2]
+        val hbits = (ptr[offset + 2].toUint() or ptr[offset + 3].toUint().shl(8)).toShort()
+        val fill = Float16.toFloat(hbits)
 
-        return lsb.toUint() + msb.toUint().shl(8) to placement.toUint()
+        return lsb.toUint() + msb.toUint().shl(8) to fill
     }
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {
         val offset = BYTES_PER_BLOCK * (y * width + x)
-        return byteArrayOf(ptr[offset + 1], ptr[offset + 0], ptr[offset + 2])
+        return byteArrayOf(ptr[offset + 1], ptr[offset + 0], ptr[offset + 3], ptr[offset + 2])
     }
 
-    internal fun unsafeSetTile(x: Int, y: Int, tile: Int, placement: Int) {
+    internal fun unsafeSetTile(x: Int, y: Int, tile0: Int, fill: Float) {
         val offset = BYTES_PER_BLOCK * (y * width + x)
+        val hbits = Float16.fromFloat(fill).toInt().and(0xFFFF)
+
+        val tile = if (fill < FLUID_MIN_MASS) 0 else tile0
 
         val lsb = tile.and(0xff).toByte()
         val msb = tile.ushr(8).and(0xff).toByte()
 
+        val hlsb = hbits.and(0xff).toByte()
+        val hmsb = hbits.ushr(8).and(0xff).toByte()
 
-//        try {
         ptr[offset] = lsb
         ptr[offset + 1] = msb
-        ptr[offset + 2] = placement.toByte()
-//        }
-//        catch (e: IndexOutOfBoundsException) {
-//            printdbgerr(this, "IndexOutOfBoundsException: x = $x, y = $y; offset = $offset")
-//            throw e
-//        }
+        ptr[offset + 2] = hlsb
+        ptr[offset + 3] = hmsb
+
     }
 
     override fun unsafeSetTile(x: Int, y: Int, bytes: ByteArray) {
         val offset = BYTES_PER_BLOCK * (y * width + x)
         ptr[offset] = bytes[1]
         ptr[offset + 1] = bytes[0]
-        ptr[offset + 2] = bytes[2]
+        ptr[offset + 2] = bytes[3]
+        ptr[offset + 3] = bytes[2]
     }
 
     /**
@@ -111,12 +117,12 @@ class BlockLayerI16I8 (val width: Int, val height: Int) : BlockLayer {
 
     override fun dispose() {
         ptr.destroy()
-        App.printdbg(this, "BlockLayerI16I8 with ptr ($ptr) successfully freed")
+        App.printdbg(this, "BlockLayerI16F16 with ptr ($ptr) successfully freed")
     }
 
-    override fun toString(): String = ptr.toString("BlockLayerI16I8")
+    override fun toString(): String = ptr.toString("BlockLayerI16F16")
 
     companion object {
-        @Transient val BYTES_PER_BLOCK = 3L
+        @Transient val BYTES_PER_BLOCK = 4L
     }
 }

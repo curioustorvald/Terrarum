@@ -84,6 +84,12 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
 
             world.setTileTerrain(x, y, terrBlock, true)
             world.setTileWall(x, y, wallBlock, true)
+
+
+            // TODO TEST CODE
+            if (terrBlock == Block.DIRT) {
+                world.setTileOre(x, y, "ores@basegame:1", 0)
+            }
         }
 
         // dither shits
@@ -111,12 +117,6 @@ class Terragen(world: GameWorld, seed: Long, params: Any) : Gen(world, seed, par
                 world.setTileTerrain(x, y, newTile, true)
 
             world.setTileWall(x, y, newTile, true)
-
-
-            // TODO TEST CODE
-            if (newTile == Block.DIRT) {
-                world.setTileOre(x, y, "ores@basegame:1", 0)
-            }
         }
 
         /*

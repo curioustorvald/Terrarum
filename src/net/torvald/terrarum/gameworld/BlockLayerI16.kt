@@ -69,10 +69,7 @@ open class BlockLayerI16(val width: Int, val height: Int) : BlockLayer {
 
     override fun unsafeToBytes(x: Int, y: Int): ByteArray {
         val offset = BYTES_PER_BLOCK * (y * width + x)
-        val lsb = ptr[offset]
-        val msb = ptr[offset + 1]
-
-        return byteArrayOf(msb, lsb)
+        return byteArrayOf(ptr[offset + 1], ptr[offset + 0])
     }
 
     internal fun unsafeSetTile(x: Int, y: Int, tile: Int) {

@@ -84,9 +84,9 @@ open class GameWorld(
     @Transient lateinit open var layerWall: BlockLayerI16
     @Transient lateinit open var layerTerrain: BlockLayerI16
     @Transient lateinit open var layerOres: BlockLayerI16I8 // damage to the block follows `terrainDamages`
+    @Transient lateinit open var layerFluids: BlockLayerI16F16
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
-    val layerFluids = HashedFluidTypeAndFills() // TODO: chunk them using BlockLayerI32
 
 
 
@@ -142,10 +142,27 @@ open class GameWorld(
             30L * WorldTime.MINUTE_SEC
     )
 
-
-    val tileNumberToNameMap = HashArray<ItemID>()
+    @Transient private val forcedTileNumberToNames = hashSetOf(
+        Block.AIR, Block.UPDATE
+    )
+    @Transient private val forcedFluidNumberToTiles = hashSetOf(
+        Fluid.NULL
+    )
+    val tileNumberToNameMap = HashArray<ItemID>().also {
+        it[0] = Block.AIR
+        it[2] = Block.UPDATE
+    }
+    val fluidNumberToNameMap = HashArray<ItemID>().also {
+        it[0] = Fluid.NULL
+    }
     // does not go to the savefile
-    @Transient val tileNameToNumberMap = HashMap<ItemID, Int>()
+    @Transient val tileNameToNumberMap = HashMap<ItemID, Int>().also {
+        it[Block.AIR] = 0
+        it[Block.UPDATE] = 2
+    }
+    @Transient val fluidNameToNumberMap = HashMap<ItemID, Int>().also {
+        it[Fluid.NULL] = 0
+    }
 
     val extraFields = HashMap<String, Any?>()
 
@@ -202,6 +219,7 @@ open class GameWorld(
         layerTerrain = BlockLayerI16(width, height)
         layerWall = BlockLayerI16(width, height)
         layerOres = BlockLayerI16I8(width, height)
+        layerFluids = BlockLayerI16F16(width, height)
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -223,19 +241,8 @@ open class GameWorld(
                     tileNameToNumberMap[it.key] = it.value.tileNumber
                 }
             }
-
-            // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
-            tileNumberToNameMap[0] = Block.AIR
-            tileNameToNumberMap[Block.AIR] = 0
-
-            tileNumberToNameMap[2] = Block.UPDATE
-            tileNameToNumberMap[Block.UPDATE] = 2
         }
     }
-
-    @Transient private val forcedTileNumberToNames = hashSetOf(
-        Block.AIR, Block.UPDATE
-    )
 
     fun coordInWorld(x: Int, y: Int) = y in 0 until height // ROUNDWORLD implementation
     fun coordInWorldStrict(x: Int, y: Int) = x in 0 until width && y in 0 until height // ROUNDWORLD implementation
@@ -258,12 +265,13 @@ open class GameWorld(
             }
         }
 
-        // AN EXCEPTIONAL TERM: tilenum 0 is always redirected to Air tile, even if the tilenum for actual Air tile is not zero
+        // force this rule to the old saves
         tileNumberToNameMap[0] = Block.AIR
-        tileNameToNumberMap[Block.AIR] = 0
-
         tileNumberToNameMap[2] = Block.UPDATE
+        tileNameToNumberMap[Block.AIR] = 0
         tileNameToNumberMap[Block.UPDATE] = 2
+        fluidNumberToNameMap[0] = Fluid.NULL
+        fluidNameToNumberMap[Fluid.NULL] = 0
     }
     
     /**
@@ -274,9 +282,9 @@ open class GameWorld(
     //    get() = layerWire.data
 
     fun getLayer(index: Int) = when(index) {
-        0 -> layerTerrain
-        1 -> layerWall
-        2 -> layerOres
+        TERRAIN -> layerTerrain
+        WALL -> layerWall
+        ORES -> layerOres
         else -> null//throw IllegalArgumentException("Unknown layer index: $index")
     }
 
@@ -361,7 +369,7 @@ open class GameWorld(
         terrainDamages.remove(blockAddr)
 
         if (BlockCodex[itemID].isSolid) {
-            layerFluids.remove(blockAddr)
+            layerFluids.unsafeSetTile(x, y, fluidNameToNumberMap[Fluid.NULL]!!, 0f)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
 
@@ -546,17 +554,14 @@ open class GameWorld(
             return getTileFromWall(x, y)
         }
         else
-            throw IllegalArgumentException("illegal mode input: " + mode.toString())
+            throw IllegalArgumentException("illegal mode input: $mode")
     }
 
-    fun getTileFromOre(rawX: Int, rawY: Int): OrePlacement? {
+    fun getTileFromOre(rawX: Int, rawY: Int): OrePlacement {
         val (x, y) = coerceXY(rawX, rawY)
         val (tileNum, placement) = layerOres.unsafeGetTile(x, y)
         val tileName = tileNumberToNameMap[tileNum.toLong()]
-        if (tileName == Block.AIR)
-            return null
-        else
-            return OrePlacement(tileName ?: Block.UPDATE, placement)
+        return OrePlacement(tileName ?: Block.UPDATE, placement)
     }
 
     fun setTileOre(rawX: Int, rawY: Int, ore: ItemID, placement: Int) {
@@ -684,12 +689,14 @@ open class GameWorld(
 
         val addr = LandUtil.getBlockAddr(this, x, y)
 
+        val fluidNumber = fluidNameToNumberMap[fluidType]!!
+
         if (fill > WorldSimulator.FLUID_MIN_MASS) {
             //setTileTerrain(x, y, fluidTypeToBlock(fluidType))
-            layerFluids[addr] = Fill(fluidType, fill)
+            layerFluids.unsafeSetTile(x, y, fluidNumber, fill)
         }
         else {
-            layerFluids.remove(addr)
+            layerFluids.unsafeSetTile(x, y, fluidNumber, 0f)
         }
 
 
@@ -701,10 +708,11 @@ open class GameWorld(
     }
 
     fun getFluid(x: Int, y: Int): FluidInfo {
-        val addr = LandUtil.getBlockAddr(this, x, y)
-        val type = layerFluids[addr]?.item
-        val fill = layerFluids[addr]?.amount
-        return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
+        val (x, y) = coerceXY(x, y)
+        val (type, fill) = layerFluids.unsafeGetTile(x, y)
+        val fluidID = fluidNumberToNameMap[type.toLong()] ?: throw NullPointerException("No such fluid: $type")
+
+        return FluidInfo(fluidID, fill)
     }
 
     /*private fun fluidTypeToBlock(type: FluidType) = when (type.abs()) {
@@ -764,9 +772,9 @@ open class GameWorld(
     override fun equals(other: Any?) = layerTerrain.ptr == (other as GameWorld).layerTerrain.ptr
 
     companion object {
-        @Transient const val WALL = 0
-        @Transient const val TERRAIN = 1
-        @Transient const val WIRE = 2
+        @Transient const val WALL = 1
+        @Transient const val TERRAIN = 0
+        @Transient const val ORES = 2
 
         @Transient val TILES_SUPPORTED = ReferencingRanges.TILES.last + 1
         //@Transient val SIZEOF: Byte = 2

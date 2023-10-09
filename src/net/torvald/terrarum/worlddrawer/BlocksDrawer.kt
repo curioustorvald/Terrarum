@@ -62,6 +62,7 @@ internal object BlocksDrawer {
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
+    val ORES = GameWorld.ORES
     //val WIRE = GameWorld.WIRE
     val FLUID = -2
     val OCCLUSION = 31337
@@ -295,6 +296,7 @@ internal object BlocksDrawer {
                 val thisTile: ItemID = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
+                    ORES -> world.getTileFromOre(x, y).item
                     FLUID -> "basegame:-1" // TODO need new wire storing format //world.getFluid(x, y).type.abs()
                     OCCLUSION -> "placeholder_occlusion"
                     else -> throw IllegalArgumentException()
@@ -338,6 +340,9 @@ internal object BlocksDrawer {
                     // special case: fluids
                     else if (mode == FLUID)
                         tileNumberBase + connectLut47[nearbyTilesInfo]
+                    // special case: ores
+                    else if (mode == ORES)
+                        tileNumberBase + world.getTileFromOre(x, y).tilePlacement
                     // rest of the cases: terrain and walls
                     else tileNumberBase + when (renderTag.maskType) {
                             CreateTileAtlas.RenderTag.MASK_NA -> 0
