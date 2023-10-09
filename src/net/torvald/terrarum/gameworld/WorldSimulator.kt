@@ -178,12 +178,12 @@ object WorldSimulator {
         fluidmapToWorld()
     }
 
-    fun isFlowable(type: FluidType, worldX: Int, worldY: Int): Boolean {
+    fun isFlowable(type: ItemID, worldX: Int, worldY: Int): Boolean {
         val fluid = world.getFluid(worldX, worldY)
         val tile = world.getTileFromTerrain(worldX, worldY)
 
         // true if target's type is the same as mine, or it's NULL (air)
-        return ((fluid.type sameAs type || fluid.type sameAs Fluid.NULL) && !BlockCodex[tile].isSolid)
+        return ((fluid.type == type || fluid.type == Fluid.NULL) && !BlockCodex[tile].isSolid)
     }
 
     /**

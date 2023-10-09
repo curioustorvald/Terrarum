@@ -4,7 +4,6 @@ package net.torvald.terrarum.utils
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockAddress
-import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.PhysicalStatus
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
@@ -18,7 +17,7 @@ class HashArray<R>: HashMap<Long, R>() // primitives are working just fine tho
 
 // Oh for the fucks sake fuck you everyone; json shit won't work with generics
 class WiringGraphMap: HashMap<ItemID, GameWorld.WiringSimCell>()
-class HashedFluidType: HashMap<BlockAddress, FluidType>()
+class HashedFluidType: HashMap<BlockAddress, ItemID>()
 class HashedWirings: HashMap<BlockAddress, GameWorld.WiringNode>()
 class HashedWiringGraph: HashMap<BlockAddress, WiringGraphMap>()
 class MetaModuleCSVPair: HashMap<String, ZipCodedStr>()

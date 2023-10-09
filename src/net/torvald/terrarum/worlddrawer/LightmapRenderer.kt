@@ -9,9 +9,7 @@ import net.torvald.gdx.graphics.UnsafeCvecArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.blockproperties.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
@@ -451,7 +449,7 @@ object LightmapRenderer {
     private val _thisTileLuminosity = Cvec(0)
     private var _thisTerrainProp: BlockProp = BlockProp()
     private var _thisWallProp: BlockProp = BlockProp()
-    private var _thisFluidProp: BlockProp = BlockProp()
+    private var _thisFluidProp: FluidProp = FluidProp()
 
     private fun precalculate(rawx: Int, rawy: Int) {
         val lx = rawx.convX(); val ly = rawy.convY()
@@ -470,7 +468,7 @@ object LightmapRenderer {
         _thisWall = world.getTileFromWallRaw(worldX, worldY)
         _thisWallProp = BlockCodex[world.tileNumberToNameMap[_thisWall.toLong()]]
         _thisFluid = world.getFluid(worldX, worldY)
-        _thisFluidProp = BlockCodex[_thisFluid.type]
+        _thisFluidProp = FluidCodex[_thisFluid.type]
 
 
         // regarding the issue #26
@@ -500,7 +498,7 @@ object LightmapRenderer {
             _fluidAmountToCol.set(_thisFluid.amount, _thisFluid.amount, _thisFluid.amount, _thisFluid.amount)
 
             _thisTileLuminosity.set(_thisTerrainProp.getLumCol(worldX, worldY))
-            _thisTileLuminosity.maxAndAssign(_thisFluidProp.getLumCol(worldX, worldY).mul(_fluidAmountToCol))
+            _thisTileLuminosity.maxAndAssign(_thisFluidProp.lumCol.mul(_fluidAmountToCol))
             _mapThisTileOpacity.setVec(lx, ly, _thisTerrainProp.opacity)
             _mapThisTileOpacity.max(lx, ly, _thisFluidProp.opacity.mul(_fluidAmountToCol))
         }

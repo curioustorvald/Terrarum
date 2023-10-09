@@ -4,8 +4,6 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitems.ItemID
-import net.torvald.terrarum.gameworld.FluidType
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.util.SortedArrayList
 import org.apache.commons.csv.CSVRecord
@@ -156,10 +154,10 @@ class BlockCodex {
         }
     }
 
-    operator fun get(fluidType: FluidType?): BlockProp {
+    /*operator fun get(fluidType: FluidType?): BlockProp {
         // TODO fluid from other mods
 
-        if (fluidType == null || fluidType.value == 0) {
+        if (fluidType == null || fluidType == Fluid.NULL) {
             return blockProps[Block.AIR]!!
         }
 
@@ -169,7 +167,7 @@ class BlockCodex {
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with id $fluidType does not exist.")
         }
-    }
+    }*/
 
     fun getOrNull(blockID: ItemID?): BlockProp? {//<O>
         return blockProps[blockID]

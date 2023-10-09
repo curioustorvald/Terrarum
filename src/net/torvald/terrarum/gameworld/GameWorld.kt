@@ -10,6 +10,7 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.ThreadExecutor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isFluid
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -651,7 +652,9 @@ open class GameWorld(
     fun getWallDamage(x: Int, y: Int): Float =
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
-    fun setFluid(x: Int, y: Int, fluidType: FluidType, fill: Float) {
+    fun setFluid(x: Int, y: Int, fluidType: ItemID, fill: Float) {
+        if (!fluidType.isFluid()) throw IllegalArgumentException("Fluid type is not actually fluid: $fluidType")
+
         /*if (x == 60 && y == 256) {
             printdbg(this, "Setting fluid $fill at ($x,$y)")
         }*/
@@ -690,17 +693,17 @@ open class GameWorld(
         return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
     }
 
-    private fun fluidTypeToBlock(type: FluidType) = when (type.abs()) {
+    /*private fun fluidTypeToBlock(type: FluidType) = when (type.abs()) {
         Fluid.NULL.value -> Block.AIR
         in Fluid.fluidRange -> GameWorld.TILES_SUPPORTED - type.abs()
         else -> throw IllegalArgumentException("Unsupported fluid type: $type")
-    }
+    }*/
 
-    data class FluidInfo(val type: FluidType = Fluid.NULL, val amount: Float = 0f) {
+    data class FluidInfo(val type: ItemID = Fluid.NULL, val amount: Float = 0f) {
         /** test if this fluid should be considered as one */
         fun isFluid() = type != Fluid.NULL && amount >= WorldSimulator.FLUID_MIN_MASS
-        fun getProp() = BlockCodex[type]
-        override fun toString() = "Fluid type: ${type.value}, amount: $amount"
+        fun getProp(): Nothing = TODO()
+        override fun toString() = "Fluid type: ${type}, amount: $amount"
     }
 
     /**
@@ -776,10 +779,3 @@ infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
 infix fun Long.fmod(other: Long) = Math.floorMod(this, other)
 infix fun Float.fmod(other: Float) = if (this >= 0f) this % other else (this % other) + other
 infix fun Double.fmod(other: Double) = if (this >= 0.0) this % other else (this % other) + other
-
-@JvmInline
-value class FluidType(val value: Int) {
-    infix fun sameAs(other: FluidType) = this.value.absoluteValue == other.value.absoluteValue
-    fun abs() = this.value.absoluteValue
-}
-

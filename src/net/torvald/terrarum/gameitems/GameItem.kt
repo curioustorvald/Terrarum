@@ -417,8 +417,9 @@ fun mouseInInteractableRangeTools(actor: ActorWithBody, item: GameItem?, reachMu
 
 fun ItemID.isItem() = this.startsWith("item@")
 fun ItemID.isWire() = this.startsWith("wire@")
-fun ItemID.isDynamic() = this.startsWith("$PREFIX_DYNAMICITEM:")
+fun ItemID.isDynamic() = this.startsWith("$PREFIX_DYNAMICITEM:") // aka module name 'dyn'
 fun ItemID.isActor() = this.startsWith("$PREFIX_ACTORITEM@")
 fun ItemID.isVirtual() = this.startsWith("$PREFIX_VIRTUALTILE@")
 fun ItemID.isBlock() = !this.contains('@') && !this.isDynamic()
 fun ItemID.isWall() = this.startsWith("wall@")
+fun ItemID.isFluid() = this.startsWith("fluid@")

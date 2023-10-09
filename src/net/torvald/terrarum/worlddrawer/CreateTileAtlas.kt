@@ -273,14 +273,6 @@ class CreateTileAtlas {
         return tags.getOrDefault(blockID, defaultRenderTag)
     }
 
-    fun fluidFillToTileLevel(fill: Float) = fill.times(8).roundToInt().coerceIn(0, 8)
-
-    fun fluidToTileNumber(fluid: GameWorld.FluidInfo): Int {
-        val fluidLevel = fluidFillToTileLevel(fluid.amount)
-        return if (fluid.type == Fluid.NULL || fluidLevel == 0) 0 else
-            16 + (376 * (fluid.type.abs() - 1)) + (47 * (fluidLevel - 1))
-    }
-
     val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
 
     private fun fileToAtlantes(modname: String, matte: FileHandle, glow: FileHandle?) {

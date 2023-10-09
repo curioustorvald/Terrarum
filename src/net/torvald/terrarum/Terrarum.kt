@@ -18,6 +18,7 @@ import net.torvald.terrarum.App.*
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.FluidCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
@@ -76,6 +77,7 @@ object Terrarum : Disposable {
     var factionCodex = FactionCodex(); internal set
     var craftingCodex = CraftingCodex(); internal set
     var apocryphas = HashMap<String, Any>(); internal set
+    var fluidCodex = FluidCodex(); internal set
 
 
     //////////////////////////////
@@ -761,6 +763,8 @@ val CraftingRecipeCodex: CraftingCodex
     get() = Terrarum.craftingCodex
 val Apocryphas: HashMap<String, Any>
     get() = Terrarum.apocryphas
+val FluidCodex: FluidCodex
+    get() = Terrarum.fluidCodex
 
 class Codex : KVHashMap() {
 

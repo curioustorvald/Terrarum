@@ -246,29 +246,6 @@ internal object BlocksDrawer {
     }
 
     /**
-     * Returns a tile number as if we're addressing tile number in the main atlas. That is, returning int of
-     * 18 means will point to the tile (32, 1) of the fluid atlas.
-     *
-     * This behaviour is to keep compatibility with World.getTile() method, this method need to mimic the World's
-     * behaviour to return "starting point" of the tile, so nearby information (int 0..15) can simply be added to
-     * the X-position that can be deduced from the tile number.
-     *
-     * As a consequence, fluids.tga must have the same width as tiles.tga.
-     */
-    private fun GameWorld.FluidInfo.toTileInFluidAtlas(): Int {
-        val fluidNum = this.type.abs()
-
-        if (this.amount >= WorldSimulator.FLUID_MIN_MASS) {
-            val fluidLevel = this.amount.coerceIn(0f,1f).times(15).roundToInt()
-
-            return fluidLevel * 16 + fluidNum
-        }
-        else {
-            return 0
-        }
-    }
-
-    /**
      * Turns bitmask-with-single-bit-set into its bit index. The LSB is counted as 1, and thus the index starts at one.
      * @return 0 -> -1, 1 -> 0, 2 -> 1, 4 -> 2, 8 -> 3, 16 -> 4, ...
      */
@@ -288,6 +265,8 @@ internal object BlocksDrawer {
      * @param wire coduitTypes bit that is selected to be drawn. Must be the power of two.
      */
     private fun drawTiles(mode: Int) {
+        if (mode == FLUID) return
+
         // can't be "WorldCamera.y / TILE_SIZE":
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
@@ -326,9 +305,9 @@ internal object BlocksDrawer {
                 val nearbyTilesInfo = if (mode == OCCLUSION) {
                     getNearbyTilesInfoFakeOcc(x, y)
                 }
-                else if (mode == FLUID) {
+                /*else if (mode == FLUID) {
                     getNearbyTilesInfoFluids(x, y)
-                }
+                }*/
                 else if (isPlatform(thisTile)) {
                     getNearbyTilesInfoPlatform(x, y)
                 }
@@ -347,9 +326,9 @@ internal object BlocksDrawer {
 
                 val renderTag = if (mode == OCCLUSION) occlusionRenderTag else App.tileMaker.getRenderTag(thisTile)
                 val tileNumberBase =
-                        if (mode == FLUID)
-                            App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
-                        else
+//                        if (mode == FLUID)
+//                            App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
+//                        else
                             renderTag.tileNumber
                 var tileNumber = if (thisTile == Block.AIR) 0
                     // special case: actorblocks and F3 key
@@ -451,7 +430,7 @@ internal object BlocksDrawer {
     /**
      * Basically getNearbyTilesInfoConMutual() but connects mutually with all the fluids
      */
-    private fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
+    /*private fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
         val nearbyPos = getNearbyTilesPos(x, y)
         val nearbyTiles: List<ItemID> = nearbyPos.map { world.getTileFromTerrain(it.x, it.y) }
 
@@ -464,7 +443,7 @@ internal object BlocksDrawer {
         }
 
         return ret
-    }
+    }*/
 
     private fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = arrayOf(Block.NULL, Block.NULL, Block.NULL, Block.NULL)
