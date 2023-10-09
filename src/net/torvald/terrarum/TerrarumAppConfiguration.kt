@@ -115,4 +115,8 @@ data class Snapshot(var revision: Int) {
         revision = (b[0].toUint() ushr 7 shl 2) or b[1].toUint().and(3)
         update()
     }
+
+    override fun hashCode(): Int {
+        return year.shl(24) or week.shl(16) or revision
+    }
 }

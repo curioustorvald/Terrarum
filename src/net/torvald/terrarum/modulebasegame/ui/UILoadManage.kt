@@ -92,6 +92,21 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         { Lang["ERROR_SAVE_CORRUPTED"].replace(".","") }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.isEnabled = false
     }
+    private val mainNoGoButtonSaveFromNewerVersion = UIItemTextButton(this,
+        { if (altDown && savegameIsNotNew) Lang["MENU_LABEL_PREV_SAVES"] else Lang["ERROR_SAVE_IS_FROM_NEWER_VERSION"].replace(".","") }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
+        it.isEnabled = false
+        it.clickOnceListener = { _,_ ->
+            App.printdbg(this, "Load playerUUID: ${UILoadGovernor.playerUUID}, worldUUID: ${UILoadGovernor.worldUUID}")
+
+            if (altDown && savegameIsNotNew) {
+                mode = MODE_PREV_SAVES
+                loadPrevGameInfo()
+            }
+        }
+        it.updateListener = { _ ->
+            it.isEnabled = altDown
+        }
+    }
     private val mainImportedPlayerCreateNewWorldButton = UIItemTextButton(this,
         { Lang["CONTEXT_WORLD_NEW"].replace(".","") }, buttonX1third, buttonRowY2, buttonWidth * 3 + buttonGap * 2, alignment = UIItemTextButton.Companion.Alignment.CENTRE, hasBorder = true).also {
         it.clickOnceListener = { _,_ ->
@@ -179,7 +194,8 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
     private var mode = 0
 
     private var mainButtons0 = listOf(mainGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
-    private var mainButtons1 = listOf(mainNoGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
+    private var mainButtonsNoGoSaveCorrupted = listOf(mainNoGoButton, mainBackButton, mainRenameButton, mainDeleteButton)
+    private var mainButtonsNoGoSaveFromNewer = listOf(mainNoGoButtonSaveFromNewerVersion, mainBackButton, mainRenameButton, mainDeleteButton)
     private var mainButtons2 = listOf(mainImportedPlayerCreateNewWorldButton, mainBackButton, mainRenameButton, mainDeleteButton)
     private var delButtons = listOf(confirmCancelButton, confirmDeleteButton)
     private var renameButtons = listOf(renameRenameButton, renameCancelButton)
@@ -190,7 +206,15 @@ class UILoadManage(val full: UILoadSavegame) : UICanvas() {
         get() = full.loadables.saveAvaliable()
 
     private val mainButtons: List<UIItemTextButton>
-        get() = if (full.loadables.saveAvaliable()) mainButtons0 else if (full.loadables.isImported) mainButtons2 else mainButtons1
+        get() =
+        if (full.playerButtonSelected?.isNewerVersion == true)
+            mainButtonsNoGoSaveFromNewer
+        else if (full.loadables.saveAvaliable())
+            mainButtons0
+        else if (full.loadables.isImported)
+            mainButtons2
+        else
+            mainButtonsNoGoSaveCorrupted
 
     private val MODE_INIT = 0
     private val MODE_DELETE = 16 // are you sure?

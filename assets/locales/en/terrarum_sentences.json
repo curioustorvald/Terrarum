@@ -1,5 +1,6 @@
 {
   "ERROR_FILE_NOT_FOUND": "File not found.",
+  "ERROR_SAVE_IS_FROM_NEWER_VERSION": "Saved game is newer than the current game version.",
   "GAME_32BIT_WARNING1": "It looks like you’re running a 32-Bit version of Java.",
   "GAME_32BIT_WARNING2": "Please download and install the latest 64-Bit Java at:",
   "GAME_32BIT_WARNING3": "https://www.java.com/en/download/",

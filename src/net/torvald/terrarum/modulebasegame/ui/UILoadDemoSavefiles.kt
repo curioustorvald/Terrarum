@@ -37,6 +37,7 @@ import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import java.math.BigInteger
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -508,6 +509,7 @@ class UIItemPlayerCells(
     private var lastPlayTime: String = "????-??-?? --:--:--"
     private var totalPlayTime: String = "--h--m--s"
     private var versionString: String = "0.0.0"
+    var isNewerVersion = false; private set
 
 //    lateinit var playerUUID: UUID; private set
     lateinit var worldUUID: UUID; private set
@@ -526,17 +528,28 @@ class UIItemPlayerCells(
         loadable.rebuild()
         loadable.getFile(SAVEGAMEINFO)?.bytes?.let {
             var lastPlayTime0 = 0L
+            var genverLong = 0L
             var genver = ""
 
             JsonFetcher.readFromJsonString(ByteArray64Reader(it, Common.CHARSET)).forEachSiblings { name, value ->
                 if (name == "worldCurrentlyPlaying") worldUUID = UUID.fromString(value.asString())
                 if (name == "totalPlayTime") totalPlayTime = parseDuration(value.asLong())
                 if (name == "lastPlayTime") lastPlayTime0 = value.asLong()
-                if (name == "genver") genver = value.asLong().let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
+                if (name == "genver") {
+                    genverLong = value.asLong()
+                    genver = genverLong.let { "${it.ushr(48)}.${it.ushr(24).and(0xFFFFFF)}.${it.and(0xFFFFFF)}" }
+                }
             }
 
             val snap = loadable.getSaveSnapshotVersion()
             versionString = genver + (if (snap != null) "-$snap" else "")
+
+            val savegameVersionNum = // 0x GGGG GGGGGG GGGGGG YY WW RR
+                BigInteger(genverLong.toString()) * BigInteger("16777216") + BigInteger(snap?.hashCode()?.toString() ?: "16777215")
+            val thisVersionNum =
+                BigInteger(TerrarumAppConfiguration.VERSION_RAW.toString()) * BigInteger("16777216") + BigInteger(TerrarumAppConfiguration.VERSION_SNAPSHOT?.hashCode()?.toString() ?: "16777215")
+
+            isNewerVersion = (savegameVersionNum > thisVersionNum)
 
             App.savegamePlayersName[playerUUID]?.let { if (it.isNotBlank()) playerName = it else "(name)" }
             App.savegameWorldsName[worldUUID]?.let { if (it.isNotBlank()) worldName = it }
@@ -617,12 +630,14 @@ class UIItemPlayerCells(
         Toolkit.drawBoxBorder(batch, x + avatarViewWidth + 9, y - 1, width - avatarViewWidth - 8, height + 2)
 
         // texts
+        batch.color = if (isNewerVersion) Toolkit.Theme.COL_RED else highlightTextCol
+        App.fontGame.draw(batch, versionString, x + avatarViewWidth + 40f, line4)
+
         batch.color = highlightTextCol
         val playTimeTextLen = App.fontGame.getWidth(totalPlayTime)
         App.fontGame.draw(batch, playerName, x + avatarViewWidth + 40f, line1)
         App.fontGame.draw(batch, worldName, x + avatarViewWidth + 40f, line2)
         App.fontGame.draw(batch, lastPlayTime, x + avatarViewWidth + 40f, line3)
-        App.fontGame.draw(batch, versionString, x + avatarViewWidth + 40f, line4)
         App.fontGame.draw(batch, totalPlayTime, x + width - 5f - playTimeTextLen, line4)
         // icons
         batch.draw(icons.get(24,0), x + avatarViewWidth + 14f - 0, line1 + 2f) // player name
