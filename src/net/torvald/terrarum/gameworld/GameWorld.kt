@@ -88,7 +88,7 @@ open class GameWorld(
     val layerOres = HashedOres() // damage to the block follows `terrainDamages`
     val wallDamages = HashArray<Float>()
     val terrainDamages = HashArray<Float>()
-    val layerFluids = HashedFluidTypeAndFills();
+    val layerFluids = HashedFluidTypeAndFills()
 
 
 
