@@ -373,7 +373,7 @@ internal object BlocksDrawer {
 //                            App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
 //                        else
                             renderTag.tileNumber
-                var tileNumber = if (thisTile == 0) 0
+                var tileNumber = if (thisTile == 0 && mode != OCCLUSION) 0
                     // special case: actorblocks and F3 key
                     else if (renderOnF3Only.binarySearch(thisTile) >= 0 && !KeyToggler.isOn(Keys.F3))
                         0
@@ -617,7 +617,7 @@ internal object BlocksDrawer {
     }
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
-    private val occlusionIntensity = 0.35f // too low value and dark-coloured walls won't darken enough
+    private val occlusionIntensity = 0.22222222f // too low value and dark-coloured walls won't darken enough
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, drawGlow: Boolean) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)

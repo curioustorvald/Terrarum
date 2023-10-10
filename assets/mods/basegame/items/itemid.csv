@@ -15,6 +15,8 @@ id;classname
 
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
 
+128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
+
 256;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorOak
 257;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorEbony
 258;net.torvald.terrarum.modulebasegame.gameitems.ItemSwingingDoorBirch
