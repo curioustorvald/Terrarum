@@ -341,7 +341,6 @@ internal object BlocksDrawer {
                     else -> throw IllegalArgumentException()
                 }
 
-
                 // draw a tile
                 val nearbyTilesInfo = if (mode == OCCLUSION) {
                     getNearbyTilesInfoFakeOcc(x, y)
@@ -406,9 +405,9 @@ internal object BlocksDrawer {
                     //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
                 }
 
-                val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
-                val maxHealth = if (mode == TERRAIN) BlockCodex[world.getTileFromTerrain(x, y)].strength else if (mode == WALL) BlockCodex[world.getTileFromWall(x, y)].strength else 1
-                val breakingStage = if (mode == TERRAIN || mode == WALL) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
+                val breakage =  if (mode == TERRAIN || mode == ORES) world.getTerrainDamage(x, y) else if (mode == WALL) world.getWallDamage(x, y) else 0f
+                val maxHealth = if (mode == TERRAIN || mode == ORES) BlockCodex[world.getTileFromTerrain(x, y)].strength else if (mode == WALL) BlockCodex[world.getTileFromWall(x, y)].strength else 1
+                val breakingStage = if (mode == TERRAIN || mode == WALL || mode == ORES) (breakage / maxHealth).coerceIn(0f, 1f).times(BREAKAGE_STEPS).roundToInt() else 0
 
                 // draw a tile
                 writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
