@@ -376,12 +376,24 @@ open class GameWorld(
 
         if (BlockCodex[itemID].isSolid) {
             layerFluids.unsafeSetTile(x, y, fluidNameToNumberMap[Fluid.NULL]!!, 0f)
+//            Terrarum.ingame?.modified(LandUtil.LAYER_FLUID, x, y)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
+
+        val oldOre = layerOres.unsafeGetTile(x, y)
+        val deleteOldOre = (oldOre != 0 && !BlockCodex[itemID].isSolid)
+
+        if (deleteOldOre) {
+            layerOres.unsafeSetTile(x, y, 0, 0)
+        }
 
         if (!bypassEvent && oldTerrain != itemID) {
             Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, itemID, x, y)
             Terrarum.ingame?.modified(LandUtil.LAYER_TERR, x, y)
+
+            if (deleteOldOre) {
+                Terrarum.ingame?.modified(LandUtil.LAYER_ORES, x, y)
+            }
         }
     }
 
@@ -398,7 +410,7 @@ open class GameWorld(
 
         if (!bypassEvent) {
             Terrarum.ingame?.queueWireChangedEvent(tile, false, x, y)
-            Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
+//            Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
         }
 
         /*
@@ -430,7 +442,7 @@ open class GameWorld(
         if (wireNode != null) {
             if (!bypassEvent) {
                 Terrarum.ingame?.queueWireChangedEvent(tile, true, x, y)
-                Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
+//                Terrarum.ingame?.modified(LandUtil.LAYER_WIRE, x, y)
             }
 
             // disconnect neighbouring nodes

@@ -16,7 +16,8 @@ object LandUtil {
 
     const val LAYER_TERR = 0
     const val LAYER_WALL = 1
-    const val LAYER_WIRE = 2
+    const val LAYER_ORES = 2
+    const val LAYER_WIRE = 20
     const val LAYER_FLUID = 3
 
     fun toChunkNum(world: GameWorld, x: Int, y: Int): Int {
