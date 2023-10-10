@@ -10,7 +10,6 @@ import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.isFluid
-import net.torvald.terrarum.gameitems.isOre
 import net.torvald.terrarum.itemproperties.ItemRemapTable
 import net.torvald.terrarum.itemproperties.ItemTable
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
@@ -18,6 +17,7 @@ import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.utils.*
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.weather.Weatherbox
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.util.SortedArrayList
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -235,7 +235,7 @@ open class GameWorld(
         if (App.tileMaker != null) {
             App.tileMaker.tags.forEach {
                 if (!forcedTileNumberToNames.contains(it.key)) {
-                    printdbg(this, "tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+                    printdbg(this, "newworld tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
 
                     tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
                     tileNameToNumberMap[it.key] = it.value.tileNumber
@@ -253,6 +253,8 @@ open class GameWorld(
         tileNumberToNameMap.clear()
         tileNameToNumberMap.clear()
         App.tileMaker.tags.forEach {
+            printdbg(this, "afterload tileNumber ${it.value.tileNumber} <-> tileName ${it.key}")
+
             tileNumberToNameMap[it.value.tileNumber.toLong()] = it.key
             tileNameToNumberMap[it.key] = it.value.tileNumber
         }
@@ -262,6 +264,7 @@ open class GameWorld(
             for (x in 0 until layerTerrain.width) {
                 layerTerrain.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerTerrain.unsafeGetTile(x, y).toLong()]]!!)
                 layerWall.unsafeSetTile(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerWall.unsafeGetTile(x, y).toLong()]]!!)
+                layerOres.unsafeSetTileKeepPlacement(x, y, tileNameToNumberMap[oldTileNumberToNameMap[layerOres.unsafeGetTile(x, y).toLong()]]!!)
             }
         }
 
@@ -272,6 +275,9 @@ open class GameWorld(
         tileNameToNumberMap[Block.UPDATE] = 2
         fluidNumberToNameMap[0] = Fluid.NULL
         fluidNameToNumberMap[Fluid.NULL] = 0
+
+
+        BlocksDrawer.rebuildInternalPrecalculations()
     }
     
     /**
@@ -559,7 +565,7 @@ open class GameWorld(
 
     fun getTileFromOre(rawX: Int, rawY: Int): OrePlacement {
         val (x, y) = coerceXY(rawX, rawY)
-        val (tileNum, placement) = layerOres.unsafeGetTile(x, y)
+        val (tileNum, placement) = layerOres.unsafeGetTile1(x, y)
         val tileName = tileNumberToNameMap[tileNum.toLong()]
         return OrePlacement(tileName ?: Block.UPDATE, placement)
     }
@@ -709,7 +715,7 @@ open class GameWorld(
 
     fun getFluid(x: Int, y: Int): FluidInfo {
         val (x, y) = coerceXY(x, y)
-        val (type, fill) = layerFluids.unsafeGetTile(x, y)
+        val (type, fill) = layerFluids.unsafeGetTile1(x, y)
         val fluidID = fluidNumberToNameMap[type.toLong()] ?: throw NullPointerException("No such fluid: $type")
 
         return FluidInfo(fluidID, fill)

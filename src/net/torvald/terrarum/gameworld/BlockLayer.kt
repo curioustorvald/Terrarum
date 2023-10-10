@@ -10,5 +10,6 @@ interface BlockLayer : Disposable {
     val bytesPerBlock: Long
     fun unsafeToBytes(x: Int, y: Int): ByteArray
     fun unsafeSetTile(x: Int, y: Int, bytes: ByteArray)
+    fun unsafeGetTile(x: Int, y: Int): Int
 
 }

@@ -175,6 +175,7 @@ class TitleScreen(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             printdbg(this, "Demo world not found, using empty world")
         }
 
+        demoWorld.renumberTilesAfterLoad()
         this.world = demoWorld
 
         // set initial time to summer

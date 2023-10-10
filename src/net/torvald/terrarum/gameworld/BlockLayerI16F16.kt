@@ -1,7 +1,6 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.App
-import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.WorldSimulator.FLUID_MIN_MASS
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
@@ -58,7 +57,17 @@ class BlockLayerI16F16(val width: Int, val height: Int) : BlockLayer {
         }
     }
 
-    internal fun unsafeGetTile(x: Int, y: Int): Pair<Int, Float> {
+    override fun unsafeGetTile(x: Int, y: Int): Int {
+        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val lsb = ptr[offset]
+        val msb = ptr[offset + 1]
+        val hbits = (ptr[offset + 2].toUint() or ptr[offset + 3].toUint().shl(8)).toShort()
+        val fill = Float16.toFloat(hbits)
+
+        return lsb.toUint() + msb.toUint().shl(8)
+    }
+
+    internal fun unsafeGetTile1(x: Int, y: Int): Pair<Int, Float> {
         val offset = BYTES_PER_BLOCK * (y * width + x)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]

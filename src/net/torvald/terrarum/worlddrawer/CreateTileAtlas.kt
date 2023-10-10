@@ -14,6 +14,7 @@ import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.utils.HashArray
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas.AtlasSource.*
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -54,6 +55,7 @@ class CreateTileAtlas {
     lateinit var terrainTileColourMap: HashMap<ItemID, Cvec>
     lateinit var tags: HashMap<ItemID, RenderTag> // TileID, RenderTag
         private set
+    lateinit var tagsByTileNum: HashArray<RenderTag>; private set
     lateinit var itemSheetNumbers: HashMap<ItemID, Int> // TileID, Int
         private set
     private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA) // 'update' block
@@ -129,6 +131,7 @@ class CreateTileAtlas {
     operator fun invoke(updateExisting: Boolean = false) { if (updateExisting || !initialised) {
 
         tags = HashMap<ItemID, RenderTag>()
+        tagsByTileNum = HashArray()
         itemSheetNumbers = HashMap<ItemID, Int>()
 
         atlasPrevernal = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888).also { it.blending = Pixmap.Blending.None }
@@ -296,6 +299,11 @@ class CreateTileAtlas {
         return tags.getOrDefault(blockID, defaultRenderTag)
     }
 
+    fun getRenderTag(tilenum: Int): RenderTag {
+        return tagsByTileNum.getOrDefault(tilenum.toLong(), defaultRenderTag)
+    }
+
+
     val nullTile = Pixmap(TILE_SIZE * 16, TILE_SIZE * 16, Pixmap.Format.RGBA8888)
 
     private fun fileToAtlantes(modname: String, matte: FileHandle, glow: FileHandle?, mode: String?) {
@@ -370,6 +378,7 @@ class CreateTileAtlas {
         }
 
         tags[id] = RenderTag(atlasCursor, connectionType, maskType)
+        tagsByTileNum[atlasCursor.toLong()] = RenderTag(atlasCursor, connectionType, maskType)
 
         printdbg(this, "tileName ${id} ->> tileNumber ${atlasCursor}")
     }

@@ -53,10 +53,10 @@ int _colToInt(vec4 color) {
     return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16) | (int(color.a * 255) << 24);
 }
 
-// 0x0rggbb where int=0xaarrggbb
-// return: [0..1048575]
+// 0x00ggbb where int=0xaarrggbb
+// return: [0..65535]
 int getTileFromColor(vec4 color) {
-    return _colToInt(color) & 0xFFFFF;
+    return _colToInt(color) & 0xFFFF;
 }
 
 // 0x00r00000 where int=0xaarrggbb

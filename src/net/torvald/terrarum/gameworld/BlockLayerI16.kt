@@ -59,7 +59,7 @@ open class BlockLayerI16(val width: Int, val height: Int) : BlockLayer {
         }
     }
 
-    internal fun unsafeGetTile(x: Int, y: Int): Int {
+    override fun unsafeGetTile(x: Int, y: Int): Int {
         val offset = BYTES_PER_BLOCK * (y * width + x)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]

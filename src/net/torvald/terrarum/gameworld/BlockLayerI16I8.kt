@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gameworld
 
-import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.App
 import net.torvald.terrarum.serialise.toUint
 import net.torvald.unsafe.UnsafeHelper
@@ -55,7 +54,16 @@ class BlockLayerI16I8 (val width: Int, val height: Int) : BlockLayer {
         }
     }
 
-    internal fun unsafeGetTile(x: Int, y: Int): Pair<Int, Int> {
+    override fun unsafeGetTile(x: Int, y: Int): Int {
+        val offset = BYTES_PER_BLOCK * (y * width + x)
+        val lsb = ptr[offset]
+        val msb = ptr[offset + 1]
+        val placement = ptr[offset + 2]
+
+        return lsb.toUint() + msb.toUint().shl(8)
+    }
+
+    internal fun unsafeGetTile1(x: Int, y: Int): Pair<Int, Int> {
         val offset = BYTES_PER_BLOCK * (y * width + x)
         val lsb = ptr[offset]
         val msb = ptr[offset + 1]
@@ -92,6 +100,16 @@ class BlockLayerI16I8 (val width: Int, val height: Int) : BlockLayer {
         ptr[offset] = bytes[1]
         ptr[offset + 1] = bytes[0]
         ptr[offset + 2] = bytes[2]
+    }
+
+    internal fun unsafeSetTileKeepPlacement(x: Int, y: Int, tile: Int) {
+        val offset = BYTES_PER_BLOCK * (y * width + x)
+
+        val lsb = tile.and(0xff).toByte()
+        val msb = tile.ushr(8).and(0xff).toByte()
+
+        ptr[offset] = lsb
+        ptr[offset + 1] = msb
     }
 
     /**

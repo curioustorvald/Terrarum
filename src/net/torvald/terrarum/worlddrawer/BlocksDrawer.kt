@@ -14,8 +14,6 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.WorldSimulator
-import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
@@ -85,11 +83,11 @@ internal object BlocksDrawer {
 
     private lateinit var terrainTilesBuffer: Array<IntArray>
     private lateinit var wallTilesBuffer: Array<IntArray>
+    private lateinit var oreTilesBuffer: Array<IntArray>
     //private lateinit var wireTilesBuffer: Array<IntArray>
     private lateinit var fluidTilesBuffer: Array<IntArray>
     private lateinit var occlusionBuffer: Array<IntArray>
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
-
 
     private lateinit var tilesQuad: Mesh
     private val shader = App.loadShaderFromClasspath("shaders/default.vert", "shaders/tiling.frag")
@@ -207,6 +205,7 @@ internal object BlocksDrawer {
             measureDebugTime("Renderer.Tiling") {
                 drawTiles(WALL)
                 drawTiles(TERRAIN) // regular tiles
+                drawTiles(ORES)
                 drawTiles(FLUID)
                 drawTiles(OCCLUSION)
                 //drawTiles(WIRE)
@@ -226,6 +225,7 @@ internal object BlocksDrawer {
         gdxBlendNormalStraightAlpha()
 
         renderUsingBuffer(TERRAIN, projectionMatrix, drawGlow)
+        renderUsingBuffer(ORES, projectionMatrix, drawGlow)
         renderUsingBuffer(FLUID, projectionMatrix, drawGlow)
     }
 
@@ -258,6 +258,43 @@ internal object BlocksDrawer {
     private val occlusionRenderTag = CreateTileAtlas.RenderTag(
         OCCLUSION_TILE_NUM_BASE, CreateTileAtlas.RenderTag.CONNECT_SELF, CreateTileAtlas.RenderTag.MASK_47
     )
+
+    private lateinit var renderOnF3Only: Array<Int>
+    private lateinit var platformTiles: Array<Int>
+    private lateinit var wallStickerTiles: Array<Int>
+    private lateinit var connectMutualTiles: Array<Int>
+    private lateinit var connectSelfTiles: Array<Int>
+
+    internal fun rebuildInternalPrecalculations() {
+        if (App.IS_DEVELOPMENT_BUILD) {
+            printdbg(this, "Current TileName to Number map:")
+            world.tileNameToNumberMap.forEach { id, num ->
+                println("$id -> $num")
+            }
+            println("================================")
+        }
+
+
+        renderOnF3Only = BlockCodex.blockProps.filter { (id, prop) ->
+            prop.isActorBlock && !prop.hasTag("DORENDER") && !id.startsWith("virt:") && id != Block.NULL
+        }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
+
+        platformTiles = BlockCodex.blockProps.filter { (id, prop) ->
+            isPlatform(id) && !id.startsWith("virt:") && id != Block.NULL
+        }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
+
+        wallStickerTiles = BlockCodex.blockProps.filter { (id, prop) ->
+            isWallSticker(id) && !id.startsWith("virt:") && id != Block.NULL
+        }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
+
+        connectMutualTiles = BlockCodex.blockProps.filter { (id, prop) ->
+            isConnectMutual(id) && !id.startsWith("virt:") && id != Block.NULL
+        }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
+
+        connectSelfTiles = BlockCodex.blockProps.filter { (id, prop) ->
+            isConnectSelf(id) && !id.startsWith("virt:") && id != Block.NULL
+        }.map { world.tileNameToNumberMap[it.key] ?: throw NullPointerException("No tilenumber for ${it.key} exists") }.sorted().toTypedArray()
+    }
 
     /**
      * Autotiling; writes to buffer. Actual draw code must be called after this operation.
@@ -293,12 +330,14 @@ internal object BlocksDrawer {
                 val bufferX = x - for_x_start
                 val bufferY = y - for_y_start
 
-                val thisTile: ItemID = when (mode) {
-                    WALL -> world.getTileFromWall(x, y)
-                    TERRAIN -> world.getTileFromTerrain(x, y)
-                    ORES -> world.getTileFromOre(x, y).item
-                    FLUID -> "basegame:-1" // TODO need new wire storing format //world.getFluid(x, y).type.abs()
-                    OCCLUSION -> "placeholder_occlusion"
+                val (wx, wy) = world.coerceXY(x, y)
+
+                val thisTile: Int = when (mode) {
+                    WALL -> world.layerWall.unsafeGetTile(wx, wy)
+                    TERRAIN -> world.layerTerrain.unsafeGetTile(wx, wy)
+                    ORES -> world.layerOres.unsafeGetTile(wx, wy)//.also { println(it) }
+                    FLUID -> 0 // TODO need new wire storing format //world.getFluid(x, y).type.abs()
+                    OCCLUSION -> 0
                     else -> throw IllegalArgumentException()
                 }
 
@@ -307,19 +346,22 @@ internal object BlocksDrawer {
                 val nearbyTilesInfo = if (mode == OCCLUSION) {
                     getNearbyTilesInfoFakeOcc(x, y)
                 }
+                else if (mode == ORES) {
+                    0
+                }
                 /*else if (mode == FLUID) {
                     getNearbyTilesInfoFluids(x, y)
                 }*/
-                else if (isPlatform(thisTile)) {
+                else if (platformTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoPlatform(x, y)
                 }
-                else if (isWallSticker(thisTile)) {
+                else if (wallStickerTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoWallSticker(x, y)
                 }
-                else if (isConnectMutual(thisTile)) {
+                else if (connectMutualTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoConMutual(x, y, mode)
                 }
-                else if (isConnectSelf(thisTile)) {
+                else if (connectSelfTiles.binarySearch(thisTile) >= 0) {
                     getNearbyTilesInfoConSelf(x, y, mode, thisTile)
                 }
                 else {
@@ -332,17 +374,16 @@ internal object BlocksDrawer {
 //                            App.tileMaker.fluidToTileNumber(world.getFluid(x, y))
 //                        else
                             renderTag.tileNumber
-                var tileNumber = if (thisTile == Block.AIR) 0
+                var tileNumber = if (thisTile == 0) 0
                     // special case: actorblocks and F3 key
-                    else if (BlockCodex.hasProp(thisTile) && BlockCodex[thisTile].isActorBlock &&
-                             !BlockCodex[thisTile].hasTag("DORENDER") && !KeyToggler.isOn(Keys.F3))
+                    else if (renderOnF3Only.binarySearch(thisTile) >= 0 && !KeyToggler.isOn(Keys.F3))
                         0
                     // special case: fluids
                     else if (mode == FLUID)
                         tileNumberBase + connectLut47[nearbyTilesInfo]
                     // special case: ores
                     else if (mode == ORES)
-                        tileNumberBase + world.getTileFromOre(x, y).tilePlacement
+                        tileNumberBase + world.layerOres.unsafeGetTile1(wx, wy).second
                     // rest of the cases: terrain and walls
                     else tileNumberBase + when (renderTag.maskType) {
                             CreateTileAtlas.RenderTag.MASK_NA -> 0
@@ -390,6 +431,27 @@ internal object BlocksDrawer {
 
     private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: ItemID?): Int {
         val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) }
+
+        var ret = 0
+        for (i in nearbyTiles.indices) {
+            if (nearbyTiles[i] == mark) {
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+            }
+        }
+
+        return ret
+    }
+
+    private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: Int): Int {
+        val layer = when (mode) {
+            TERRAIN -> world.layerTerrain
+            WALL -> world.layerWall
+            ORES -> world.layerOres
+            FLUID -> world.layerFluids
+            else -> throw IllegalArgumentException()
+        }
+
+        val nearbyTiles = getNearbyTilesPos(x, y).map { layer.unsafeGetTile(x, y) }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
@@ -544,6 +606,7 @@ internal object BlocksDrawer {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
+            ORES -> oreTilesBuffer
             //WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
@@ -567,7 +630,7 @@ internal object BlocksDrawer {
 
 
         val tileAtlas = when (mode) {
-            TERRAIN, WALL, OCCLUSION -> tilesTerrain
+            TERRAIN, ORES, WALL, OCCLUSION -> tilesTerrain
             //WIRE -> tilesWire
             FLUID -> tilesFluid
             else -> throw IllegalArgumentException()
@@ -575,13 +638,14 @@ internal object BlocksDrawer {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
+            ORES -> oreTilesBuffer
             //WIRE -> wireTilesBuffer
             FLUID -> fluidTilesBuffer
             OCCLUSION -> occlusionBuffer
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
-            TERRAIN, /*WIRE,*/ FLUID, OCCLUSION -> Color.WHITE
+            TERRAIN, /*WIRE,*/ ORES, FLUID, OCCLUSION -> Color.WHITE
             WALL -> App.tileMaker.wallOverlayColour
             else -> throw IllegalArgumentException()
         }
@@ -659,6 +723,7 @@ internal object BlocksDrawer {
         if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {
             terrainTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
             wallTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
+            oreTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
             fluidTilesBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
             occlusionBuffer = Array(tilesInVertical) { IntArray(tilesInHorizontal) }
 
