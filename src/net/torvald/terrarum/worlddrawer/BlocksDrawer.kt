@@ -443,14 +443,16 @@ internal object BlocksDrawer {
 
     private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: Int): Int {
         val layer = when (mode) {
-            TERRAIN -> world.layerTerrain
             WALL -> world.layerWall
+            TERRAIN -> world.layerTerrain
             ORES -> world.layerOres
             FLUID -> world.layerFluids
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Unknown mode $mode")
         }
-
-        val nearbyTiles = getNearbyTilesPos(x, y).map { layer.unsafeGetTile(x, y) }
+        val nearbyTiles = getNearbyTilesPos(x, y).map {
+            val (wx, wy) = world.coerceXY(it.x, it.y)
+            layer.unsafeGetTile(wx, wy)
+        }
 
         var ret = 0
         for (i in nearbyTiles.indices) {
