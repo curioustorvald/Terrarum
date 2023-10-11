@@ -12,3 +12,6 @@
 #"11";"item@basegame:138";"GEM,DIAMOND"
 #"12";"item@basegame:139";"GEM,SIO2,AMETHYST"
 #"13";"item@basegame:140";"GEM,SIO2,QUARTZ"
+
+#"256";"macro@BASETILE";"GRASS"
+#"257";"macro@BASETILE";"MOSS"

@@ -4,6 +4,7 @@ import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.ReferencingRanges.PREFIX_VIRTUALTILE
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameitems.isWall
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.util.SortedArrayList
 import org.apache.commons.csv.CSVRecord
@@ -63,7 +64,7 @@ class BlockCodex {
     }
 
     fun fromCSV(module: String, csvString: String) {
-        printdbg(this, "Building wire properties table for module $module")
+        printdbg(this, "Building block properties table for module $module")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csvString,
@@ -144,7 +145,7 @@ class BlockCodex {
         }
 
         try {
-            return if (blockID.startsWith("wall@"))
+            return if (blockID.isWall())
                 blockProps[blockID.substring(5)]!!
             else
                 blockProps[blockID]!!

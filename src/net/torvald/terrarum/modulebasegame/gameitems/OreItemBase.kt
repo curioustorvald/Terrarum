@@ -14,16 +14,24 @@ open class OreItemBase(originalID: ItemID) : GameItem(originalID) {
     override var inventoryCategory = Category.GENERIC
     override val isDynamic = false
     override val materialId = "OORE"
+    override var equipPosition = EquipPosition.HAND_GRIP
 }
 
-class OreTimber(originalID: ItemID) : OreItemBase(originalID) {
-    override var originalName = "ITEM_WOODS"
+/* Wooden Log is a block */
+class OreWood(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_WOOD"
     override val materialId = "WOOD"
     override val itemImage: TextureRegion
         get() = CommonResourcePool.getAsItemSheet("basegame.items").get(0,6)
 }
+class OreStick(originalID: ItemID) : OreItemBase(originalID) {
+    override var originalName = "ITEM_WOOD_STICK"
+    override val materialId = "WOOD"
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,6)
+}
 class OreCopper(originalID: ItemID) : OreItemBase(originalID) {
     override var originalName = "ITEM_ORE_MALACHITE"
     override val itemImage: TextureRegion
-        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(1,6)
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(2,6)
 }

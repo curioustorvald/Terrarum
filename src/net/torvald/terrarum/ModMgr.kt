@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.App.*
 import net.torvald.terrarum.App.setToGameConfig
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.OreCodex
 import net.torvald.terrarum.blockproperties.WireCodex
 import net.torvald.terrarum.gamecontroller.IME
 import net.torvald.terrarum.gameitems.GameItem
@@ -488,6 +489,16 @@ object ModMgr {
         @JvmStatic operator fun invoke(module: String) {
             Terrarum.blockCodex.fromModule(module, "blocks/blocks.csv")
             Terrarum.wireCodex.fromModule(module, "wires/")
+        }
+    }
+
+    object GameOreLoader {
+        init {
+            Terrarum.oreCodex = OreCodex()
+        }
+
+        @JvmStatic operator fun invoke(module: String) {
+            Terrarum.oreCodex.fromModule(module, "ores/ores.csv")
         }
     }
 

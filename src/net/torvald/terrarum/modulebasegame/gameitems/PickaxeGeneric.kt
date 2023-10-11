@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameitems
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZED
 import net.torvald.terrarum.blockproperties.Block
@@ -74,13 +75,18 @@ object PickaxeCore {
 
             // filter passed, do the job
             val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val (oreOnTile, _) = INGAME.world.getTileFromOre(x, y)
 
             (INGAME.world).inflictTerrainDamage(
                     x, y,
                     Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
             )?.let { tileBroken ->
                 if (Math.random() < dropProbability) {
-                    val drop = BlockCodex[tileBroken].drop
+                    val drop = if (oreOnTile != Block.AIR)
+                        OreCodex[oreOnTile].item
+                    else
+                        BlockCodex[tileBroken].drop
+
                     if (drop.isNotBlank()) {
                         INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                     }

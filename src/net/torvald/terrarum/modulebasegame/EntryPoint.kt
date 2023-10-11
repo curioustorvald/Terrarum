@@ -4,6 +4,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.App.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.blockproperties.OreProp
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.itemproperties.CraftingCodex
@@ -39,6 +40,7 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameMaterialLoader.invoke(moduleName)
         ModMgr.GameItemLoader.invoke(moduleName)
         ModMgr.GameBlockLoader.invoke(moduleName)
+        ModMgr.GameOreLoader.invoke(moduleName)
         ModMgr.GameLanguageLoader.invoke(moduleName)
         ModMgr.GameCraftingRecipeLoader.invoke(moduleName)
 
@@ -60,7 +62,7 @@ class EntryPoint : ModuleEntryPoint() {
         printdbg(this, "recording item ID ")
 
         // blocks.csvs are loaded by ModMgr beforehand
-        // block items (blocks and walls are the same thing basically)
+        // register blocks as items
         for (tile in BlockCodex.getAll()) {
             ItemCodex[tile.id] = makeNewItemObj(tile, false)
 
