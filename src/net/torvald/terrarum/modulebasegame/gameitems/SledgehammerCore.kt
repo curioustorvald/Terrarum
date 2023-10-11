@@ -106,7 +106,7 @@ object SledgehammerCore {
                             y * TILE_SIZED + 4 + (4 * (it / 3))
                         )
                         createRandomBlockParticle(wall, pos, 1.0 * (if (Math.random() < 0.5) -1 else 1)).let {
-                            it.despawnUponCollision = false
+                            it.despawnUponCollision = true
                             it.drawColour.set(App.tileMaker.wallOverlayColour)
                             (Terrarum.ingame as TerrarumIngame).addParticle(it)
                         }

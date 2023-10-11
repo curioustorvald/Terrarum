@@ -100,7 +100,7 @@ object PickaxeCore {
                             y * TILE_SIZED + 4 + (4 * (it / 3))
                         )
                         createRandomBlockParticle(tile, pos, 1.0 * (if (Math.random() < 0.5) -1 else 1)).let {
-                            it.despawnUponCollision = false
+                            it.despawnUponCollision = true
                             (Terrarum.ingame as TerrarumIngame).addParticle(it)
                         }
                     }
