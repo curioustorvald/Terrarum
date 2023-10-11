@@ -10,10 +10,14 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameitems.GameItem
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameitems.mouseInInteractableRangeTools
+import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.itemproperties.Calculate
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCore.TOOL_DURABILITY_BASE
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
 /**
@@ -94,6 +98,18 @@ object SledgehammerCore {
                     val drop = BlockCodex[tileBroken].drop
                     if (drop.isNotBlank()) {
                         INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+                    }
+
+                    repeat(9) {
+                        val pos = Vector2(
+                            x * TILE_SIZED + 2 + (4 * (it % 3)),
+                            y * TILE_SIZED + 4 + (4 * (it / 3))
+                        )
+                        createRandomBlockParticle(wall, pos, 1.0 * (if (Math.random() < 0.5) -1 else 1)).let {
+                            it.despawnUponCollision = false
+                            it.drawColour.set(App.tileMaker.wallOverlayColour)
+                            (Terrarum.ingame as TerrarumIngame).addParticle(it)
+                        }
                     }
                 }
             }

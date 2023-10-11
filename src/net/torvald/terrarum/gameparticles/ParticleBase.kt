@@ -14,7 +14,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2017-01-20.
  */
-open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision: Boolean, val noCollision: Boolean = true, maxLifeTime: Second? = null) : Runnable {
+open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision: Boolean, var noCollision: Boolean = true, maxLifeTime: Second? = null) : Runnable {
 
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
@@ -22,7 +22,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     override fun run() = update(App.UPDATE_RATE)
 
     var isNoSubjectToGrav = false
-    var dragCoefficient = 3.0
+    var dragCoefficient = 36.0
 
     val lifetimeMax = maxLifeTime ?: 5f
     var lifetimeCounter = 0f

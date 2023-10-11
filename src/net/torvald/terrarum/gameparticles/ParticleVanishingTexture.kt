@@ -2,12 +2,20 @@ package net.torvald.terrarum.gameparticles
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.App
+import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.drawBodyInGoodPosition
+import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.imagefont.TinyAlphNum
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.dyn4j.geometry.Vector2
 
 /**
+ * The texture must be manually discarded.
+ *
  * @param tex image
  * @param x x-coord of the particle's initial spawn position, bottom-centre
  * @param y y-coord of the particle's initial spawn position, bottom-centre
@@ -28,6 +36,44 @@ open class ParticleVanishingTexture(val tex: TextureRegion, x: Double, y: Double
         super.update(delta)
 
         drawColour.a = (lifetimeMax - lifetimeCounter) / lifetimeMax
+    }
+
+}
+
+// pickaxe sparks must use different create- function
+fun createRandomBlockParticle(block: ItemID, position: Vector2, velocityMult: Double): ParticleBase {
+    val velocity = Vector2(
+        (Math.random() + Math.random()) * velocityMult,
+        0.0
+    ) // triangular distribution with mean of 1.0 * velocityMult
+
+    val w = 3
+    val h = 3
+
+    val renderTag = App.tileMaker.getRenderTag(block)
+    val baseTilenum = renderTag.tileNumber
+    val representativeTilenum = when (renderTag.maskType) {
+        RenderTag.MASK_16 -> 15
+        RenderTag.MASK_47 -> 22
+        else -> 0
+    }
+    val tileNum = baseTilenum + representativeTilenum
+    val atlasX = tileNum % BlocksDrawer.weatherTerrains[1].horizontalCount
+    val atlasY = tileNum / BlocksDrawer.weatherTerrains[1].horizontalCount
+    // take base texture
+    val texBody = BlocksDrawer.weatherTerrains[1].get(atlasX, atlasY)
+    val texGlow = BlocksDrawer.tilesGlow.get(atlasX, atlasY)
+
+    // take random square part
+    val ox = (Math.random() * (TILE_SIZE - w + 1)).toInt()
+    val oy = (Math.random() * (TILE_SIZE - h + 1)).toInt()
+    val texRegionBody = TextureRegion(texBody.texture, texBody.regionX + ox, texBody.regionY + oy, w, h)
+    val texRegionGlow = TextureRegion(texGlow.texture, texGlow.regionX + ox, texGlow.regionY + oy, w, h)
+
+    return ParticleVanishingTexture(texRegionBody, position.x, position.y).also {
+        it.glow = texRegionGlow
+        it.velocity.set(velocity)
+        it.isNoSubjectToGrav = false
     }
 }
 
