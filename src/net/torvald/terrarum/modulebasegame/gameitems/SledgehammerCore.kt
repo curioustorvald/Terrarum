@@ -88,18 +88,26 @@ object SledgehammerCore {
             }
 
             // filter passed, do the job
-            val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val swingDmgToFrameDmg = delta.toDouble() / actionInterval
 
             INGAME.world.inflictWallDamage(
                 x, y,
                 Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
-            )?.let { tileBroken ->
-                if (Math.random() < dropProbability) {
-                    val drop = BlockCodex[tileBroken].drop
-                    if (drop.isNotBlank()) {
-                        INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+            ).let { tileBroken ->
+                // tile busted
+                if (tileBroken != null) {
+                    if (Math.random() < dropProbability) {
+                        val drop = BlockCodex[tileBroken].drop
+                        if (drop.isNotBlank()) {
+                            INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+                        }
+                        PickaxeCore.makeDust(wall, x, y, 9, App.tileMaker.wallOverlayColour)
                     }
-                    PickaxeCore.makeDust(wall, x, y, 9, App.tileMaker.wallOverlayColour)
+                }
+                // tile not busted
+                if (Math.random() < actionInterval) {
+                    PickaxeCore.makeDust(wall, x, y, 1, App.tileMaker.wallOverlayColour)
                 }
             }
 

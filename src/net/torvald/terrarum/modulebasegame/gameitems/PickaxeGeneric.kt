@@ -79,23 +79,31 @@ object PickaxeCore {
             }
 
             // filter passed, do the job
-            val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val actionInterval = actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val swingDmgToFrameDmg = delta.toDouble() / actionInterval
             val (oreOnTile, _) = INGAME.world.getTileFromOre(x, y)
 
             INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
-            )?.let { tileBroken ->
-                if (Math.random() < dropProbability) {
-                    val drop = if (oreOnTile != Block.AIR)
-                        OreCodex[oreOnTile].item
-                    else
-                        BlockCodex[tileBroken].drop
+            ).let { tileBroken ->
+                // tile busted
+                if (tileBroken != null) {
+                    if (Math.random() < dropProbability) {
+                        val drop = if (oreOnTile != Block.AIR)
+                            OreCodex[oreOnTile].item
+                        else
+                            BlockCodex[tileBroken].drop
 
-                    if (drop.isNotBlank()) {
-                        INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+                        if (drop.isNotBlank()) {
+                            INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
+                        }
+                        makeDust(tile, x, y, 9)
                     }
-                    makeDust(tile, x, y, 9)
+                }
+                // tile not busted
+                if (Math.random() < actionInterval) {
+                    makeDust(tile, x, y, 1)
                 }
             }
 
