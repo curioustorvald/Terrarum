@@ -56,13 +56,10 @@ object SledgehammerCore {
             val x = mx + xoff + ox
             val y = my + yoff + oy
 
-            val (wx, wy) = INGAME.world.coerceXY(x, y)
-
             val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
             val wall = INGAME.world.getTileFromWall(x, y)
             val tileTerrain = INGAME.world.getTileFromTerrain(x, y)
-            val tileNum = INGAME.world.layerWall.unsafeGetTile(wx, wy)
 
             val wallNear = listOf(
                 INGAME.world.getTileFromWall(x, (y - 1).coerceAtLeast(0)),
@@ -102,7 +99,7 @@ object SledgehammerCore {
                     if (drop.isNotBlank()) {
                         INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                     }
-                    PickaxeCore.makeDust(tileNum, x, y, 9, App.tileMaker.wallOverlayColour)
+                    PickaxeCore.makeDust(wall, x, y, 9, App.tileMaker.wallOverlayColour)
                 }
             }
 

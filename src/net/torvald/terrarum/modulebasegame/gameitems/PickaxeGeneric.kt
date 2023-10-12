@@ -18,6 +18,7 @@ import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.PickaxeCore.TOOL_DURABILITY_BASE
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.RenderTag
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
@@ -54,13 +55,10 @@ object PickaxeCore {
         for (oy in 0 until mh) for (ox in 0 until mw) {
             val x = mx + xoff + ox
             val y = my + yoff + oy
-            
-            val (wx, wy) = INGAME.world.coerceXY(x, y)
 
             val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
             val tile = INGAME.world.getTileFromTerrain(x, y)
-            val tileNum = INGAME.world.layerTerrain.unsafeGetTile(wx, wy)
 
             item?.using = true
 
@@ -97,7 +95,7 @@ object PickaxeCore {
                     if (drop.isNotBlank()) {
                         INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                     }
-                    makeDust(tileNum, x, y, 9)
+                    makeDust(tile, x, y, 9)
                 }
             }
 
@@ -109,19 +107,28 @@ object PickaxeCore {
     }
 
     private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
-    fun makeDust(tileNum: Int, x: Int, y: Int, density: Int = 9, drawCol: Color = Color.WHITE) {
+    fun makeDust(tile: ItemID, x: Int, y: Int, density: Int = 9, drawCol: Color = Color.WHITE) {
         val pw = 3
         val ph = 3
         val xo = App.GLOBAL_RENDER_TIMER and 1
         val yo = App.GLOBAL_RENDER_TIMER.ushr(1) and 1
+
+        val renderTag = App.tileMaker.getRenderTag(tile)
+        val baseTilenum = renderTag.tileNumber
+        val representativeTilenum = when (renderTag.maskType) {
+            RenderTag.MASK_47 -> 17
+            RenderTag.MASK_PLATFORM -> 7
+            else -> 0
+        }
+        val tileNum = baseTilenum + representativeTilenum // the particle won't match the visible tile anyway because of the seasons stuff
 
         val indices = (0..8).toList().shuffled().subList(0, density)
         for (it in indices) {
             val u = pixelOffs[it % 3]
             val v = pixelOffs[it / 3]
             val pos = Vector2(
-                TILE_SIZED * x + u + xo,
-                TILE_SIZED * y + v + yo - ph,
+                TILE_SIZED * x + u + xo + 0.5,
+                TILE_SIZED * y + v + yo + 2,
             )
             val veloMult = Vector2(
                 1.0 * (if (Math.random() < 0.5) -1 else 1),
