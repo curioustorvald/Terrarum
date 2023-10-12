@@ -650,7 +650,7 @@ open class GameWorld(
         //println("[GameWorld] accumulated damage: ${terrainDamages[addr]}")
 
         // remove tile from the world
-        if (terrainDamages[addr] ?: 0f >= BlockCodex[getTileFromTerrain(x, y)].strength) {
+        if ((terrainDamages[addr] ?: 0f) >= BlockCodex[getTileFromTerrain(x, y)].strength) {
             val tileBroke = getTileFromTerrain(x, y)
             setTileTerrain(x, y, Block.AIR, false)
             terrainDamages.remove(addr)

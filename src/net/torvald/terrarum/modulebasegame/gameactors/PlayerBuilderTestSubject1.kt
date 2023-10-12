@@ -14,7 +14,7 @@ object PlayerBuilderTestSubject1 {
                 ModMgr.getGdxFile("basegame", "sprites/test_sprite_glow.properties").path(),
                 -589141658L // random value thrown
         )
-        InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreaturePlayer.json")
 
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0

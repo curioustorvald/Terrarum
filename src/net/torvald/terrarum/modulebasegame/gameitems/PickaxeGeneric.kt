@@ -242,3 +242,30 @@ class PickaxeSteel(originalID: ItemID) : GameItem(originalID) {
             if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
     override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
 }
+
+/**
+ * Created by minjaesong on 2023-10-12.
+ */
+class PickaxeWood(originalID: ItemID) : GameItem(originalID) {
+    internal constructor() : this("-uninitialised-")
+
+    override var baseToolSize: Double? = BASE_MASS_AND_SIZE
+    override var inventoryCategory = Category.TOOL
+    override val isDynamic = true
+    override val materialId = "WOOD"
+    override var baseMass = material.density.toDouble() / MaterialCodex["IRON"].density * BASE_MASS_AND_SIZE
+    override val itemImage: TextureRegion
+        get() = CommonResourcePool.getAsItemSheet("basegame.items").get(8,4)
+
+    init {
+        equipPosition = GameItem.EquipPosition.HAND_GRIP
+        maxDurability = (TOOL_DURABILITY_BASE * material.enduranceMod).roundToInt()
+        durability = maxDurability.toFloat()
+        tags.add("PICK")
+        originalName = "ITEM_PICK_WOOD"
+    }
+
+    override fun startPrimaryUse(actor: ActorWithBody, delta: Float) =
+        if (PickaxeCore.startPrimaryUse(actor, delta, this, Terrarum.mouseTileX, Terrarum.mouseTileY)) 0L else -1L
+    override fun endPrimaryUse(actor: ActorWithBody, delta: Float) = PickaxeCore.endPrimaryUse(actor, delta, this)
+}

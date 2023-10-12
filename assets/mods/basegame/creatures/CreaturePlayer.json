@@ -5,17 +5,17 @@
   "basemass": 60.0,
 
   "strength": 1000,
-  "strengthmult": [90,95,98,100,102,105,110],
+  "strengthmult": [100,100,100,100,100,100,100],
 
   "accel": 0.67,
 
   "speed": 3.0,
-  "speedmult": [90,95,98,100,102,105,110],
+  "speedmult": [100,100,100,100,100,100,100],
 
   "vertstride": 12,
 
   "jumppower": 13.0,
-  "jumppowermult": [90,95,98,100,102,105,110],
+  "jumppowermult": [100,100,100,100,100,100,100],
 
   "scale": 1.0,
   "scalemult": [100,100,100,100,100,100,100],
@@ -25,7 +25,7 @@
   "reach": 100,
 
   "toolsize": 15,
-
+  
   "intelligent": true,
   "barehandactionminheight": 80,
   "basebarehanddiggingsize": 8

@@ -14,7 +14,7 @@ object PlayerBuilder {
         val world = (Terrarum.ingame!! as TerrarumIngame).world
 
         val p: Actor = IngamePlayer("lol", "lol_glow", world.worldTime.TIME_T)
-        InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreaturePlayer.json")
 
         // attach sprite
 

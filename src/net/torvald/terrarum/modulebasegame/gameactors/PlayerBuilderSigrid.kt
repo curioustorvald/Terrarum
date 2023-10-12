@@ -35,7 +35,7 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.SCALEBUFF] = 1.0 // Constant 1.0 for player, meant to be used by random mobs
         /**
          * fixed value, or 'base value', from creature strength of Dwarf Fortress.
-         * Human race uses 1000. (see CreatureHuman.json)
+         * Human race uses 1000. (see CreaturePlayer.json)
          */
         p.actorValue[AVKey.STRENGTH] = 1414 // this is test character, after all.
         p.actorValue[AVKey.ENCUMBRANCE] = 1000

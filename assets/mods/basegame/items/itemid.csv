@@ -12,7 +12,8 @@ id;classname
 11;net.torvald.terrarum.modulebasegame.gameitems.ItemWallCalendar
 12;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCopper
 13;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerSteel
-
+14;net.torvald.terrarum.modulebasegame.gameitems.PickaxeWood
+15;net.torvald.terrarum.modulebasegame.gameitems.SledgehammerWood
 16;net.torvald.terrarum.modulebasegame.gameitems.ItemWorkbench
 
 128;net.torvald.terrarum.modulebasegame.gameitems.OreCopper
