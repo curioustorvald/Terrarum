@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameitems
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
@@ -53,10 +54,13 @@ object PickaxeCore {
         for (oy in 0 until mh) for (ox in 0 until mw) {
             val x = mx + xoff + ox
             val y = my + yoff + oy
+            
+            val (wx, wy) = INGAME.world.coerceXY(x, y)
 
             val mousePoint = Point2d(x.toDouble(), y.toDouble())
             val actorvalue = actor.actorValue
-            val tile = (INGAME.world).getTileFromTerrain(x, y)
+            val tile = INGAME.world.getTileFromTerrain(x, y)
+            val tileNum = INGAME.world.layerTerrain.unsafeGetTile(wx, wy)
 
             item?.using = true
 
@@ -80,7 +84,7 @@ object PickaxeCore {
             val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
             val (oreOnTile, _) = INGAME.world.getTileFromOre(x, y)
 
-            (INGAME.world).inflictTerrainDamage(
+            INGAME.world.inflictTerrainDamage(
                     x, y,
                     Calculate.pickaxePower(actor, item?.material) * swingDmgToFrameDmg
             )?.let { tileBroken ->
@@ -93,17 +97,7 @@ object PickaxeCore {
                     if (drop.isNotBlank()) {
                         INGAME.queueActorAddition(DroppedItem(drop, (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                     }
-
-                    repeat(9) {
-                        val pos = Vector2(
-                            x * TILE_SIZED + 2 + (4 * (it % 3)),
-                            y * TILE_SIZED + 4 + (4 * (it / 3))
-                        )
-                        createRandomBlockParticle(tile, pos, 1.0 * (if (Math.random() < 0.5) -1 else 1)).let {
-                            it.despawnUponCollision = true
-                            (Terrarum.ingame as TerrarumIngame).addParticle(it)
-                        }
-                    }
+                    makeDust(tileNum, x, y, 9)
                 }
             }
 
@@ -112,6 +106,33 @@ object PickaxeCore {
 
 
         usageStatus
+    }
+
+    private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
+    fun makeDust(tileNum: Int, x: Int, y: Int, density: Int = 9, drawCol: Color = Color.WHITE) {
+        val pw = 3
+        val ph = 3
+        val xo = App.GLOBAL_RENDER_TIMER and 1
+        val yo = App.GLOBAL_RENDER_TIMER.ushr(1) and 1
+
+        val indices = (0..8).toList().shuffled().subList(0, density)
+        for (it in indices) {
+            val u = pixelOffs[it % 3]
+            val v = pixelOffs[it / 3]
+            val pos = Vector2(
+                TILE_SIZED * x + u + xo,
+                TILE_SIZED * y + v + yo - ph,
+            )
+            val veloMult = Vector2(
+                1.0 * (if (Math.random() < 0.5) -1 else 1),
+                (2.0 - (it / 3)) / 2.0 // 1, 0.5, 0
+            )
+            createRandomBlockParticle(tileNum, pos, veloMult, u, v, pw, ph).let {
+                it.despawnUponCollision = true
+                it.drawColour.set(drawCol)
+                (Terrarum.ingame as TerrarumIngame).addParticle(it)
+            }
+        }
     }
 
     fun endPrimaryUse(actor: ActorWithBody, delta: Float, item: GameItem): Boolean {

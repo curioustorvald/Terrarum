@@ -22,7 +22,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
     override fun run() = update(App.UPDATE_RATE)
 
     var isNoSubjectToGrav = false
-    var dragCoefficient = 36.0
+    var dragCoefficient = 40.0
 
     val lifetimeMax = maxLifeTime ?: 5f
     var lifetimeCounter = 0f
@@ -55,8 +55,8 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, var despawnUponCollision
                 )].isSolid) {
 
 
-                if (despawnUponCollision) flagDespawn = true
-                if (!noCollision) velocity.y = 0.0
+                if (despawnUponCollision && lifetimeCounter >= 0.1f) flagDespawn = true
+                if (!noCollision && lifetimeCounter >= 0.1f) velocity.y = 0.0
             }
 
             if (lifetimeCounter >= lifetimeMax) {

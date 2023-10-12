@@ -41,23 +41,12 @@ open class ParticleVanishingTexture(val tex: TextureRegion, x: Double, y: Double
 }
 
 // pickaxe sparks must use different create- function
-fun createRandomBlockParticle(block: ItemID, position: Vector2, velocityMult: Double): ParticleBase {
+fun createRandomBlockParticle(tileNum: Int, position: Vector2, velocityMult: Vector2, tx: Int, ty: Int, tw: Int, th: Int): ParticleBase {
     val velocity = Vector2(
-        (Math.random() + Math.random()) * velocityMult,
-        0.0
+        (Math.random() + Math.random()) * velocityMult.x,
+        -velocityMult.y
     ) // triangular distribution with mean of 1.0 * velocityMult
 
-    val w = 3
-    val h = 3
-
-    val renderTag = App.tileMaker.getRenderTag(block)
-    val baseTilenum = renderTag.tileNumber
-    val representativeTilenum = when (renderTag.maskType) {
-        RenderTag.MASK_16 -> 15
-        RenderTag.MASK_47 -> 22
-        else -> 0
-    }
-    val tileNum = baseTilenum + representativeTilenum
     val atlasX = tileNum % BlocksDrawer.weatherTerrains[1].horizontalCount
     val atlasY = tileNum / BlocksDrawer.weatherTerrains[1].horizontalCount
     // take base texture
@@ -65,10 +54,8 @@ fun createRandomBlockParticle(block: ItemID, position: Vector2, velocityMult: Do
     val texGlow = BlocksDrawer.tilesGlow.get(atlasX, atlasY)
 
     // take random square part
-    val ox = (Math.random() * (TILE_SIZE - w + 1)).toInt()
-    val oy = (Math.random() * (TILE_SIZE - h + 1)).toInt()
-    val texRegionBody = TextureRegion(texBody.texture, texBody.regionX + ox, texBody.regionY + oy, w, h)
-    val texRegionGlow = TextureRegion(texGlow.texture, texGlow.regionX + ox, texGlow.regionY + oy, w, h)
+    val texRegionBody = TextureRegion(texBody.texture, texBody.regionX + tx, texBody.regionY + ty, tw, th)
+    val texRegionGlow = TextureRegion(texGlow.texture, texGlow.regionX + tx, texGlow.regionY + ty, tw, th)
 
     return ParticleVanishingTexture(texRegionBody, position.x, position.y).also {
         it.glow = texRegionGlow

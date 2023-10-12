@@ -1245,6 +1245,10 @@ public class App implements ApplicationListener {
     public static String recycledPlayersDir;
     /** defaultDir + "/Recycled/Worlds" */
     public static String recycledWorldsDir;
+    /** defaultDir + "/Custom/" */
+    public static String customDir;
+    /** defaultDir + "/Custom/Music" */
+    public static String customMusicDir;
 
     private static void getDefaultDirectory() {
         String OS = OSName.toUpperCase();
@@ -1278,6 +1282,8 @@ public class App implements ApplicationListener {
         recycledPlayersDir = defaultDir + "/Recycled/Players";
         recycledWorldsDir = defaultDir + "/Recycled/Worlds";
         importDir = defaultDir + "/Imports";
+        customDir = defaultDir + "/Custom";
+        customMusicDir = customDir + "/Music";
 
         System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
         System.out.println(String.format("os.version = %s", OSVersion));
@@ -1293,7 +1299,9 @@ public class App implements ApplicationListener {
                 new File(worldsDir),
                 new File(recycledPlayersDir),
                 new File(recycledWorldsDir),
-                new File(importDir)
+                new File(importDir),
+                new File(customDir),
+                new File(customMusicDir)
         };
 
         for (File it : dirs) {
