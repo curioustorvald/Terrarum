@@ -58,7 +58,7 @@ open class DroppedItem : ActorWithBody {
 
         isVisible = true
 
-        avBaseMass = (ItemCodex[itemID]?.mass ?: 2.0).coerceAtMost(2.0)
+        avBaseMass = ((ItemCodex[itemID]?.mass) ?: 2.0).coerceAtLeast(2.0)
 
         actorValue[AVKey.SCALE] = ItemCodex[itemID]?.scale ?: 1.0
 
@@ -84,8 +84,17 @@ open class DroppedItem : ActorWithBody {
             externalV.set(spawnVelo)
         }
 
+        actorValue.set(AVKey.FALLDAMPENMULT, 0.1)
+
         printdbg(this, "DroppedItem with itemID '${itemID}'")
     }
+
+
+    override fun reload() {
+        super.reload()
+        actorValue.set(AVKey.FALLDAMPENMULT, 0.1)
+    }
+
 
     override fun drawBody(batch: SpriteBatch) {
         // deserialiser won't call setter of the fields

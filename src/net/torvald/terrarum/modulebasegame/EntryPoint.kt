@@ -95,7 +95,7 @@ class EntryPoint : ModuleEntryPoint() {
     private fun makeNewItemObj(tile: BlockProp, isWall: Boolean) = object : GameItem(
             if (isWall) "wall@"+tile.id else tile.id
     ) {
-        override var baseMass: Double = tile.density / 1000.0
+        override var baseMass: Double = tile.density / 100.0
         override var baseToolSize: Double? = null
         override var inventoryCategory = if (isWall) Category.WALL else Category.BLOCK
         override var isDynamic = false

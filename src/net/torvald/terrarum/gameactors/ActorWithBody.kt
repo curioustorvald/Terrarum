@@ -15,20 +15,20 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
+import net.torvald.terrarum.gameparticles.createRandomBlockParticle
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.TerrarumIngame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
-import kotlin.math.absoluteValue
-import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 
 /**
@@ -564,17 +564,21 @@ open class ActorWithBody : Actor {
                 // Codes that (SHOULD) displaces hitbox directly //
                 ///////////////////////////////////////////////////
 
+                val vecSum = (externalV + (controllerV ?: Vector2(0.0, 0.0)))
                 /**
                  * solveCollision()?
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox()
+                    val (collisionStatus, collisionDamage) = displaceHitbox()
+
+                    // make dusts
+                    if (collisionStatus and (if (gravitation.y > 0.0) COLLIDING_BOTTOM else COLLIDING_TOP) != 0)
+                        makeDust(collisionDamage, vecSum)
                 }
                 else {
                     stairPenaltyCounter = 999
-                    val vecSum = externalV + (controllerV ?: Vector2(0.0, 0.0))
                     hitbox.translate(vecSum)
                 }
 
@@ -599,6 +603,9 @@ open class ActorWithBody : Actor {
                 clampHitbox()
 
                 if (stairPenaltyCounter < 999) stairPenaltyCounter += 1
+
+
+
             }
 
 
@@ -703,7 +710,11 @@ open class ActorWithBody : Actor {
         }
     }
 
-    private fun displaceHitbox() {
+    /**
+     * @return Collision Status, Collision damage in Newtons
+     */
+    private fun displaceHitbox(): Pair<Int, Double> {
+        var collisionDamage = 0.0
         val printdbg1 = false && App.IS_DEVELOPMENT_BUILD
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
@@ -1072,10 +1083,20 @@ open class ActorWithBody : Actor {
                     debug1("resulting hitbox: $newHitbox")
 
 
+                    var feetTileCount = 0
+                    var feetTileStregthSum = 0
+                    forEachFeetTile { it?.let {
+                        feetTileCount += 1
+                        feetTileStregthSum += it.strength
+                    }}
+                    val avrFeetTileStrength = feetTileStregthSum.toDouble() / feetTileCount
+                    val adjustedTileStr = avrFeetTileStrength / 1176
+                    val fallDamageDampenMult = (adjustedTileStr / (adjustedTileStr + 1)).sqr()
                     // slam-into-whatever damage (such dirty; much hack; wow)
                     //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-                    val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+                    collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) * fallDamageDampenMult * GAME_TO_SI_ACC
                     // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
+                    // take material softness(?) into account
                     if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
                     // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
 
@@ -1091,13 +1112,14 @@ open class ActorWithBody : Actor {
 
 
 
-            return
+            return selfCollisionStatus to collisionDamage
 
 
 
             // if collision not detected, just don't care; it's not your job to apply moveDelta
 
         } // end of (world != null)
+        return 0 to collisionDamage
     }
 
     /**
@@ -1915,6 +1937,74 @@ open class ActorWithBody : Actor {
         }
 
         return tileProps.forEach(consumer)
+    }
+
+    fun getFeetTiles(): List<Pair<Pair<Int, Int>, ItemID>> {
+        val y = intTilewiseHitbox.height.toInt() + 1
+        return (0..intTilewiseHitbox.width.toInt()).map { x ->
+            val px = x + intTilewiseHitbox.startX.toInt()
+            val py = y + intTilewiseHitbox.startY.toInt()
+            (px to py) to world!!.getTileFromTerrain(px, py)
+        }
+    }
+
+    private fun makeDust(collisionDamage: Double, vecSum: Vector2) {
+        val particleCount = (collisionDamage / 32.0).pow(0.75)
+
+        if (collisionDamage > 1.0 / 1024.0)  printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+
+        getFeetTiles().forEach { (xy, tile) ->
+            val (x, y) = xy
+            makeDust0(tile, x, y, particleCount, collisionDamage, vecSum)
+        }
+    }
+
+    private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
+    private fun makeDust0(tile: ItemID, x: Int, y: Int, count: Double, fallDamage: Double, vecSum: Vector2) {
+        val pw = 3
+        val ph = 3
+        val xo = App.GLOBAL_RENDER_TIMER and 1
+        val yo = App.GLOBAL_RENDER_TIMER.ushr(1) and 1
+
+        val renderTag = App.tileMaker.getRenderTag(tile)
+        val baseTilenum = renderTag.tileNumber
+        val representativeTilenum = when (renderTag.maskType) {
+            CreateTileAtlas.RenderTag.MASK_47 -> 17
+            CreateTileAtlas.RenderTag.MASK_PLATFORM -> 7
+            else -> 0
+        }
+        val tileNum = baseTilenum + representativeTilenum // the particle won't match the visible tile anyway because of the seasons stuff
+
+        val trueCount = count.toInt() + (Math.random() < (count % 1.0)).toInt()
+
+        for (it in 0 until trueCount) {
+            val ui = (Math.random() * 3).toInt() // 0-2
+            val vi = if (vecSum.y > PHYS_EPSILON_VELO) 0 else if (vecSum.y < -PHYS_EPSILON_VELO) 2 else (Math.random() * 3).toInt()
+            val u = pixelOffs[ui]
+            val v = pixelOffs[vi]
+            val pos = Vector2(
+                TILE_SIZED * x + u + xo + 0.5,
+                TILE_SIZED * y + v + yo + 2,
+            )
+            val veloXvar = (Math.random() + Math.random()) * (if (Math.random() < 0.5) -1 else 1) * 0.5 // avr at 0.5
+            val veloYvar = brownianRand()
+            val veloMult = Vector2(
+                vecSum.x + veloXvar,
+                (count.pow(0.75) + veloYvar) * vecSum.y.sign
+            )
+            createRandomBlockParticle(tileNum, pos, veloMult, u, v, pw, ph).let {
+                it.despawnUponCollision = true
+                it.drawColour.set(Color.WHITE)
+                (Terrarum.ingame as TerrarumIngame).addParticle(it)
+            }
+        }
+    }
+
+    /**
+     * @return random number between 0-1, of which 0 is the most likely and 1 is the least
+     */
+    private fun brownianRand(): Double {
+        return Math.abs(Math.random() + Math.random() - 1)
     }
 
 
