@@ -1388,10 +1388,9 @@ open class ActorWithBody : Actor {
                 (pxStart + sub)..(pxEnd - sub)
             }
             else*/
-                pxStart..pxEnd
+                (pxStart / TILE_SIZED).floorToInt()..(pxEnd / TILE_SIZED).floorToInt()
 
-            for (x in xs) {
-                val tx = (x / TILE_SIZED).floorToInt() // round down toward negative infinity
+            for (tx in xs) {
                 val tile = world!!.getTileFromTerrain(tx, ty)
 
                 if (feet && isFeetTileHeight) {
