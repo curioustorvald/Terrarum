@@ -573,6 +573,21 @@ open class ActorWithBody : Actor {
                 if (!isNoCollideWorld) {
                     val (collisionStatus, collisionDamage) = displaceHitbox()
 
+
+                    if (collisionStatus != 0 && collisionDamage >= 1.0) {
+                        val terrainDamage = collisionDamage / 512.0
+                        getWalledTiles(hitbox, collisionStatus).let {
+                            if (it.isNotEmpty()) {
+//                                printdbg(this, "Dmg to terrain: $terrainDamage, affected: ${it.size}")
+//                                printdbg(this, it)
+                                val dmgPerTile = terrainDamage / it.size
+                                it.forEach { (x, y) ->
+                                    world?.inflictTerrainDamage(x, y, dmgPerTile)
+                                }
+                            }
+                        }
+                    }
+
                     // make dusts
                     if (collisionStatus and (if (gravitation.y > 0.0) COLLIDING_BOTTOM else COLLIDING_TOP) != 0)
                         makeDust(collisionDamage, vecSum)
@@ -1222,6 +1237,68 @@ open class ActorWithBody : Actor {
         }
         else throw IllegalArgumentException("$option")
 
+    }
+
+    private fun getWalledTiles(hitbox: Hitbox, option: Int): List<Point2i> {
+        /*
+        The structure:
+
+             #######  // TOP
+            =+-----+=
+            =|     |=
+            =+-----+=
+             #######  // BOTTOM
+
+        IMPORTANT AF NOTE: things are ASYMMETRIC!
+         */
+
+        if (option.popcnt() == 1) {
+            val (x1, x2, y1, y2) = hitbox.getWallDetection(option)
+
+            val txStart = x1.floorToInt().div(TILE_SIZED).floorToInt() // round down toward negative infinity
+            val txEnd =   x2.floorToInt().div(TILE_SIZED).floorToInt() // round down toward negative infinity
+            val tyStart = y1.floorToInt().div(TILE_SIZED).floorToInt() // round down toward negative infinity
+            val tyEnd =   y2.floorToInt().div(TILE_SIZED).floorToInt() // round down toward negative infinity
+
+            return getWalledTiles0(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM)
+        }
+        else if (option == 0) {
+            return emptyList()
+        }
+        else {
+            return intArrayOf(1, 2, 4, 8).flatMap {
+                getWalledTiles(hitbox, option and it)
+            }
+        }
+    }
+
+    private fun getWalledTiles0(pxStart: Int, pyStart: Int, pxEnd: Int, pyEnd: Int, feet: Boolean): List<Point2i> {
+        val ret = ArrayList<Point2i>()
+        if (world == null) return emptyList()
+        val ys = pyStart..pyEnd
+        val xs = pxStart..pxEnd
+        val feetY = pyEnd // round down toward negative infinity // TODO reverse gravity adaptation?
+
+        for (ty in ys) {
+            val isFeetTileHeight = (ty == feetY)
+
+            for (tx in xs) {
+                val tile = world!!.getTileFromTerrain(tx, ty)
+
+                if (feet && isFeetTileHeight) {
+                    if (shouldICollideWithThisFeet(tile)) {
+                        ret.add(Point2i(tx, ty))
+                    }
+                }
+                else {
+                    if (shouldICollideWithThis(tile)) {
+                        ret.add(Point2i(tx, ty))
+                    }
+                }
+            }
+        }
+//        printdbg(this, "ys=$ys, xs=$xs, ret=$ret")
+        return ret
     }
 
     /**
@@ -1939,19 +2016,19 @@ open class ActorWithBody : Actor {
         return tileProps.forEach(consumer)
     }
 
-    fun getFeetTiles(): List<Pair<Pair<Int, Int>, ItemID>> {
+    fun getFeetTiles(): List<Pair<Point2i, ItemID>> {
         val y = intTilewiseHitbox.height.toInt() + 1
         return (0..intTilewiseHitbox.width.toInt()).map { x ->
             val px = x + intTilewiseHitbox.startX.toInt()
             val py = y + intTilewiseHitbox.startY.toInt()
-            (px to py) to world!!.getTileFromTerrain(px, py)
+            Point2i(px, py) to world!!.getTileFromTerrain(px, py)
         }
     }
 
     private fun makeDust(collisionDamage: Double, vecSum: Vector2) {
         val particleCount = (collisionDamage / 32.0).pow(0.75)
 
-        if (collisionDamage > 1.0 / 1024.0)  printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+//        if (collisionDamage > 1.0 / 1024.0)  printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
 
         getFeetTiles().forEach { (xy, tile) ->
             val (x, y) = xy
