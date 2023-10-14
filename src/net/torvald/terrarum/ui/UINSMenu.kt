@@ -137,7 +137,7 @@ class UINSMenu(
 
             // 2. push the new menu
             if (old != new) {
-                printdbg(this, "tree.children[new].children = ${tree.children[new].children}")
+//                printdbg(this, "tree.children[new].children = ${tree.children[new].children}")
 
                 // push those new menus
                 if (tree.children[new].children.isNotEmpty()) {
@@ -205,7 +205,6 @@ class UINSMenu(
             batch.color = borderCol
             blendNormalStraightAlpha(batch)
             Toolkit.fillArea(batch, it.ui.posX + it.ui.width - 1, it.ui.posY - LINE_HEIGHT, 1, LINE_HEIGHT + it.ui.height)
-            Toolkit.fillArea(batch, it.ui.posX, it.ui.posY + it.ui.height - 1, it.ui.width - 1, 1)
         }
 
     }

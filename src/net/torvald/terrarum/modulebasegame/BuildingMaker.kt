@@ -32,27 +32,26 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val menuYaml = Yaml("""
 - File
- - New flat ter.
- - New rand. ter.
+ - New Flat ter.
+ - New Rand. ter.
  - Export…
- - Export sel…
  - Import…
- - Save terrain…
- - Load terrain…
- -
+ - Save World…
+ - Load World…
  - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
 - Edit
  - Undo
  - Redo
 - Time
+ - Dawn : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeDawn
+ - Sunrise : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeSunrise
  - Morning : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeMorning
  - Noon : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeNoon
  - Dusk : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeDusk
+ - Sunset : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeSunset
  - Night : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeNight
+ - Midnight : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeMidnight
  - Set…
-- Weather
- - Sunny
- - Raining
     """.trimIndent())
 
     private val timeNow = System.currentTimeMillis() / 1000
@@ -216,9 +215,11 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     internal fun addBlockMarker(x: Int, y: Int) {
         try {
             val a = generateNewBlockMarkerVisible(x, y)
-            queueActorAddition(a)
-            actorsRenderOverlay.add(a)
-            selection.add(Point2i(x, y))
+            if (!theGameHasActor(a.referenceID)) {
+                queueActorAddition(a)
+                actorsRenderOverlay.add(a)
+                selection.add(Point2i(x, y))
+            }
         }
         catch (e: Error) { }
     }
@@ -226,11 +227,11 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     internal fun removeBlockMarker(x: Int, y: Int) {
         try {
             val a = getActorByID(blockPosToRefID(x, y))
-            queueActorAddition(a)
+            queueActorRemoval(a)
             actorsRenderOverlay.remove(a)
             selection.remove(Point2i(x, y))
         }
-        catch (e: IllegalArgumentException) {
+        catch (e: Throwable) {
             // no actor to erase, do nothing
         }
     }
@@ -362,6 +363,13 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // actually open
             uiPenMenu.setAsOpen()
         }
+
+
+        actorAdditionQueue.forEach { forceAddActor(it.first, it.second) }
+        actorAdditionQueue.clear()
+        actorRemovalQueue.forEach { forceRemoveActor(it.first, it.second) }
+        actorRemovalQueue.clear()
+
 
         BlockPropUtil.dynamicLumFuncTickClock()
     }
@@ -581,27 +589,59 @@ class YamlCommandExit : YamlInvokable {
     }
 }
 
+class YamlCommandSetTimeDawn : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("6h00"))
+        WeatherMixer.forceSolarElev = -3.0
+    }
+}
+
+class YamlCommandSetTimeSunrise : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("6h00"))
+        WeatherMixer.forceSolarElev = 0.0
+    }
+}
+
 class YamlCommandSetTimeMorning : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("7h00"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("6h00"))
+        WeatherMixer.forceSolarElev = 5.0
     }
 }
 
 class YamlCommandSetTimeNoon : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("12h30"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("12h00"))
+        WeatherMixer.forceSolarElev = 30.0
     }
 }
 
 class YamlCommandSetTimeDusk : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("18h40"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("18h00"))
+        WeatherMixer.forceSolarElev = 3.0
+    }
+}
+
+class YamlCommandSetTimeSunset : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("18h00"))
+        WeatherMixer.forceSolarElev = 0.0
     }
 }
 
 class YamlCommandSetTimeNight : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("0h30"))
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("18h00"))
+        WeatherMixer.forceSolarElev = -8.0
+    }
+}
+
+class YamlCommandSetTimeMidnight : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.worldTime.setTimeOfToday(WorldTime.parseTime("0h00"))
+        WeatherMixer.forceSolarElev = -30.0
     }
 }
 

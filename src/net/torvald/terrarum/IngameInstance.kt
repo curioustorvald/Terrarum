@@ -333,10 +333,10 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     protected open fun forceRemoveActor(actor: Actor, caller: Throwable = StackTraceRecorder()) {
         arrayOf(actorContainerActive, actorContainerInactive).forEach { actorContainer ->
-            val indexToDelete = actorContainer.searchFor(actor.referenceID) { it.referenceID }
+            val indexToDelete = actorContainer.searchForIndex(actor.referenceID) { it.referenceID }
             if (indexToDelete != null) {
                 actor.dispose()
-                actorContainer.remove(indexToDelete)
+                actorContainer.removeAt(indexToDelete)
             }
         }
     }
@@ -348,7 +348,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
             throw ReferencedActorAlreadyExistsException(actor, caller)
         }
         else {
-            actorAdditionQueue.add(actor to StackTraceRecorder())
+            actorContainerActive.add(actor)
         }
     }
 
