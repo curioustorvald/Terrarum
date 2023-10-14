@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 /**
  * Nextstep-themed menu bar with mandatory title line
@@ -102,14 +103,14 @@ class UINSMenu(
 
         val list = UIItemTextButtonList(
             this,
-            UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
+            LINE_HEIGHT,
             stringsFromTree,
             width, LINE_HEIGHT,
             uiWidth, listHeight,
             textAreaWidth = listWidth,
             alignment = UIItemTextButton.Companion.Alignment.LEFT,
             inactiveCol = Color(.94f, .94f, .94f, 1f),
-            itemHitboxSize = LINE_HEIGHT,
+            itemHitboxSize = LINE_HEIGHT - 2,
             backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
         )
 
@@ -129,13 +130,18 @@ class UINSMenu(
             }
 
             // 2. push the new menu
-            if (tree.children[new].children.isNotEmpty()) {
-                addSubMenu(tree.children[new])
-            }
+            if (old != new) {
+                if (tree.children[new].children.isNotEmpty()) {
+                    addSubMenu(tree.children[new])
+                }
 
-            // invoke whatever command there is
-            //printdbg(this, "Selected: ${tree.children[new].data?.second}")
-            tree.children[new].data?.second?.invoke(invocationArgument)
+                // invoke whatever command there is
+                //printdbg(this, "Selected: ${tree.children[new].data?.second}")
+                tree.children[new].data?.second?.invoke(invocationArgument)
+            }
+            else {
+                list.selectedIndex = null // deselect if old == new
+            }
         }
         // END List selection change listener
 
@@ -216,8 +222,10 @@ class UINSMenu(
 
         if (mouseInScreen(screenX, screenY)) {
             if (dragForReal) {
-                handler.setPosition(screenX - dragOriginX, screenY - dragOriginY)
-                //println("drag $screenX, $screenY")
+                handler.setPosition(
+                    (screenX / App.scr.magn - dragOriginX).roundToInt(),
+                    (screenY / App.scr.magn - dragOriginY).roundToInt()
+                )
             }
         }
 

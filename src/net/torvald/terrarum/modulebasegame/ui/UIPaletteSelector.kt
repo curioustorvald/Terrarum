@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BL
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2019-02-03.
@@ -128,8 +129,10 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (mouseInScreen(screenX, screenY)) {
             if (dragForReal) {
-                handler.setPosition(screenX - dragOriginX, screenY - dragOriginY)
-                //println("drag $screenX, $screenY")
+                handler.setPosition(
+                    (screenX / App.scr.magn - dragOriginX).roundToInt(),
+                    (screenY / App.scr.magn - dragOriginY).roundToInt()
+                )
             }
         }
 

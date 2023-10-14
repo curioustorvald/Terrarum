@@ -197,7 +197,8 @@ class UIItemTextButtonList(
             btn.update(delta)
 
 
-            if (!clickLatched && btn.mousePushed && index != selectedIndex) {
+            if (!clickLatched && btn.mousePushed) {
+                clickLatched = true
                 val oldIndex = selectedIndex
 
 //                if (kinematic) {
@@ -214,10 +215,9 @@ class UIItemTextButtonList(
                 selectionChangeListener?.invoke(oldIndex, index)
             }
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
-
         }
 
-        if (!Terrarum.mouseDown) {
+        if (clickLatched && !Terrarum.mouseDown) {
             clickLatched = false
         }
 

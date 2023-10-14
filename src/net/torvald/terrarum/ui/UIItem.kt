@@ -92,6 +92,8 @@ abstract class UIItem(var parentUI: UICanvas, val initialX: Int, val initialY: I
     /** If mouse is hovering over it and mouse is down */
     val mousePushed: Boolean
         get() = mouseUp && Terrarum.mouseDown
+    val mouseJustPushed: Boolean
+        get() = mouseUp && Terrarum.mouseJustDown
     val mouseDown: Boolean
         get() = Terrarum.mouseDown
 

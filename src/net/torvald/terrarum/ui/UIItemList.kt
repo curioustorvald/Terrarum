@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
 
 
 /**
@@ -57,8 +58,18 @@ class UIItemList<Item: UIItem>(
     /** (oldIndex: Int?, newIndex: Int) -> Unit */
     var selectionChangeListener: ((Int?, Int) -> Unit)? = null
 
+    private var clickLatched = false
+
+    override fun show() {
+        clickLatched = true
+    }
+
 
     override fun update(delta: Float) {
+        val posXDelta = posX - oldPosX
+        itemList.forEach { it.posX += posXDelta }
+
+
         if (highlighterMoving) {
             highlighterMoveTimer += delta
 
@@ -83,7 +94,7 @@ class UIItemList<Item: UIItem>(
             item.update(delta)
 
 
-            if (item.mousePushed && index != selectedIndex) {
+            if (!clickLatched && item.mousePushed) {
                 val oldIndex = selectedIndex
 
                 if (kinematic) {
@@ -102,6 +113,12 @@ class UIItemList<Item: UIItem>(
             //item.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
         }
+
+        if (!Terrarum.mouseDown) {
+            clickLatched = false
+        }
+
+        oldPosX = posX
     }
 
     override fun render(batch: SpriteBatch, camera: OrthographicCamera) {

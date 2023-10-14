@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.BlockCodex
-import net.torvald.terrarum.ItemCodex
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendNormalStraightAlpha
+import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
 import net.torvald.terrarum.ui.Toolkit
@@ -23,7 +20,7 @@ import kotlin.math.roundToInt
 class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
     companion object {
-        const val TILES_X = 16
+        const val TILES_X = 8
         const val TILES_Y = 14
 
         const val TILESREGION_SIZE = 24
@@ -64,11 +61,11 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             catch (e: NullPointerException) {
                 null
             }) != null
-        }.forEachIndexed { index, prop ->
+        }.filter { !it.hasTag("INTERNAL") }.forEachIndexed { index, prop ->
             val paletteItem = UIItemImageButton(
                 this, ItemCodex.getItemImage(prop.id)!!,
-                initialX = MENUBAR_SIZE + (index % 16) * TILESREGION_SIZE,
-                initialY = (index / 16) * TILESREGION_SIZE,
+                initialX = MENUBAR_SIZE + (index % TILES_X) * TILESREGION_SIZE,
+                initialY = (index / TILES_X) * TILESREGION_SIZE,
                 highlightable = false,
                 width = TILESREGION_SIZE,
                 height = TILESREGION_SIZE,
@@ -172,7 +169,10 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (mouseOnDragHandle()) {
             if (dragForReal) {
-                handler.setPosition(screenX - dragOriginX, screenY - dragOriginY)
+                handler.setPosition(
+                    (screenX / App.scr.magn - dragOriginX).roundToInt(),
+                    (screenY / App.scr.magn - dragOriginY).roundToInt()
+                )
             }
         }
 

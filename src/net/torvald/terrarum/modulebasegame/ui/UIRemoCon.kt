@@ -91,70 +91,73 @@ open class UIRemoCon(val parent: TitleScreen, val treeRoot: QNDTreeNode<String>)
     private var openUI: UICanvas? = null
 
     override fun updateUI(delta: Float) {
-        if (mouseActionAvailable && Terrarum.mouseDown) {
+        if (mouseActionAvailable) {
             mouseActionAvailable = false
 
             remoConTray.update(delta)
 
-            val selectedItem = remoConTray.selectedItem
-            val selectedIndex = remoConTray.selectedIndex
+            if (Terrarum.mouseDown) {
+                val selectedItem = remoConTray.selectedItem
+                val selectedIndex = remoConTray.selectedIndex
 
-            if (!handler.uiToggleLocked) {
-                selectedItem?.let { if (selectedItem != oldSelectedItem) {
-                    oldSelectedItem?.highlighted = false
+                if (!handler.uiToggleLocked) {
+                    selectedItem?.let {
+                        if (selectedItem != oldSelectedItem) {
+                            oldSelectedItem?.highlighted = false
 
-                    // selection change
-                    if (it.textfun() == Lang["MENU_LABEL_QUIT"]) {
-                        //System.exit(0)
-                        Gdx.app.exit()
+                            // selection change
+                            if (it.textfun() == Lang["MENU_LABEL_QUIT"]) {
+                                //System.exit(0)
+                                Gdx.app.exit()
+                            }
+                            else if (it.textfun() == Lang["MENU_LABEL_RETURN"]) {
+                                val tag = it.tags
+                                if (tag.contains("WRITETOCONFIG")) WriteConfig()
+
+                                if (IS_DEVELOPMENT_BUILD) print("[UIRemoCon] Returning from ${currentRemoConContents.data}")
+
+                                if (currentRemoConContents.parent != null) {
+                                    remoConTray.consume()
+
+                                    currentRemoConContents = currentRemoConContents.parent!!
+                                    currentlySelectedRemoConItem = currentRemoConContents.data
+                                    remoConTray = generateNewRemoCon(currentRemoConContents)
+
+                                    parent.uiFakeBlurOverlay.setAsClose()
+
+                                    if (IS_DEVELOPMENT_BUILD) println(" to ${currentlySelectedRemoConItem}")
+                                }
+                                else {
+                                    throw NullPointerException("No parent node to return")
+                                }
+                            }
+                            else {
+                                // check if target exists
+                                if (IS_DEVELOPMENT_BUILD) {
+                                    //println("current node: ${currentRemoConContents.data}")
+                                    //currentRemoConContents.children.forEach { println("- ${it.data}") }
+                                }
+
+                                if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
+                                    setNewRemoConContents(currentRemoConContents.children[selectedIndex!!])
+                                }
+                                else {
+                                    throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
+                                }
+                            }
+
+
+                            // do something with the actual selection
+                            //printdbg(this, "$currentlySelectedRemoConItem")
+                            openUI(currentlySelectedRemoConItem)
+                        }
                     }
-                    else if (it.textfun() == Lang["MENU_LABEL_RETURN"]) {
-                        val tag = it.tags
-                        if (tag.contains("WRITETOCONFIG")) WriteConfig()
-
-                        if (IS_DEVELOPMENT_BUILD) print("[UIRemoCon] Returning from ${currentRemoConContents.data}")
-
-                        if (currentRemoConContents.parent != null) {
-                            remoConTray.consume()
-
-                            currentRemoConContents = currentRemoConContents.parent!!
-                            currentlySelectedRemoConItem = currentRemoConContents.data
-                            remoConTray = generateNewRemoCon(currentRemoConContents)
-
-                            parent.uiFakeBlurOverlay.setAsClose()
-
-                            if (IS_DEVELOPMENT_BUILD) println(" to ${currentlySelectedRemoConItem}")
-                        }
-                        else {
-                            throw NullPointerException("No parent node to return")
-                        }
-                    }
-                    else {
-                        // check if target exists
-                        if (IS_DEVELOPMENT_BUILD) {
-                            //println("current node: ${currentRemoConContents.data}")
-                            //currentRemoConContents.children.forEach { println("- ${it.data}") }
-                        }
-
-                        if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
-                            setNewRemoConContents(currentRemoConContents.children[selectedIndex!!])
-                        }
-                        else {
-                            throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
-                        }
-                    }
+                }
 
 
-                    // do something with the actual selection
-                    //printdbg(this, "$currentlySelectedRemoConItem")
-                    openUI(currentlySelectedRemoConItem)
-                } }
+                oldSelectedItem = remoConTray.selectedItem
             }
-
-
-            oldSelectedItem = remoConTray.selectedItem
         }
-
 
         openUI?.update(delta)
 
