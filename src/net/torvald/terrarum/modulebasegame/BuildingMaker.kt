@@ -41,18 +41,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
  - Load terrain…
  -
  - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
-- Tool
- - Pencil : net.torvald.terrarum.modulebasegame.YamlCommandToolPencil
- - Eraser : net.torvald.terrarum.modulebasegame.YamlCommandToolPencilErase
- - Wall Hammer : net.torvald.terrarum.modulebasegame.YamlCommandToolPencilEraseWall
- - Eyedropper : net.torvald.terrarum.modulebasegame.YamlCommandToolEyedropper
- - Add Selection : net.torvald.terrarum.modulebasegame.YamlCommandToolMarquee
- - Remove Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeErase
- - Clear Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeClear
- - Move Selected
- -
- - Hide/Show Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolToggleMarqueeOverlay
- -
+- Edit
  - Undo
  - Redo
 - Time
@@ -288,7 +277,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiToolbox.isVisible = true
         uiToolbox.invocationArgument = arrayOf(this)
 
-        uiPaletteSelector.setPosition(App.scr.width - uiPaletteSelector.width, 0)
+        uiPaletteSelector.setPosition(0, App.scr.height - uiPaletteSelector.height)
         uiPaletteSelector.isVisible = true
 
         notifier.setPosition(

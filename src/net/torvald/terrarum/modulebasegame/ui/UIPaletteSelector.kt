@@ -56,7 +56,7 @@ class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
                 0b00_00_00_00_00_00_00_01_11_11_11_01_01,
                 0b00_00_00_00_00_00_00_00_01_11_01_01_00,
                 0b00_00_00_00_00_00_00_00_00_01_01_00_00
-        ).reversed().forEachIndexed { index, bits ->
+        ).forEachIndexed { index, bits ->
             for (shiftmask in 12 downTo 0) {
                 val bit = bits.ushr(shiftmask * 2).and(3)
 

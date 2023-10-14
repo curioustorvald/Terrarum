@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -88,6 +89,13 @@ class UINSMenu(
 
     // FIXME mouseUp doesn't work here
 
+    private fun popToTheList(list: UIItemTextButtonList) {
+        while (listStack.peek().ui != list) {
+            popSubMenu()
+        }
+    }
+
+
     private fun addSubMenu(tree: QNDTreeNode<Pair<String, YamlInvokable?>>) {
         val menuTitle = tree.data?.first ?: title
         val stringsFromTree = Array<String>(tree.children.size) {
@@ -125,12 +133,13 @@ class UINSMenu(
             // 2. push the new menu
 
             // 1. pop as far as possible
-            while (listStack.peek().ui != list) {
-                popSubMenu()
-            }
+            popToTheList(list)
 
             // 2. push the new menu
             if (old != new) {
+                printdbg(this, "tree.children[new].children = ${tree.children[new].children}")
+
+                // push those new menus
                 if (tree.children[new].children.isNotEmpty()) {
                     addSubMenu(tree.children[new])
                 }
@@ -175,12 +184,14 @@ class UINSMenu(
         }
     }
 
+    private val borderCol = Color(1f, 1f, 1f, 0.35f)
+
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
         listStack.forEach {
             // draw title bar
             batch.color = titleBackCol
             BlendMode.resolve(titleBlendMode, batch)
-            Toolkit.fillArea(batch, it.ui.posX.toFloat(), it.ui.posY.toFloat() - LINE_HEIGHT, it.ui.width.toFloat(), LINE_HEIGHT.toFloat())
+            Toolkit.fillArea(batch, it.ui.posX, it.ui.posY - LINE_HEIGHT, it.ui.width, LINE_HEIGHT)
 
             batch.color = titleTextCol
             blendNormalStraightAlpha(batch)
@@ -189,6 +200,12 @@ class UINSMenu(
             // draw the list
             batch.color = Color.WHITE
             it.ui.render(batch, camera)
+
+            // draw border
+            batch.color = borderCol
+            blendNormalStraightAlpha(batch)
+            Toolkit.fillArea(batch, it.ui.posX + it.ui.width - 1, it.ui.posY - LINE_HEIGHT, 1, LINE_HEIGHT + it.ui.height)
+            Toolkit.fillArea(batch, it.ui.posX, it.ui.posY + it.ui.height - 1, it.ui.width - 1, 1)
         }
 
     }
