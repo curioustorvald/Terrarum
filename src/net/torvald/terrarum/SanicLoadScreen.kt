@@ -127,9 +127,9 @@ object SanicLoadScreen : LoadScreenBase() {
                     // draw colour overlay, flipped
                     it.draw(textOverlayTex,
                             (textFbo.width - textWidth) / 2f,
-                            App.fontGame.lineHeight,
+                            0f,
                             textWidth,
-                            -App.fontGame.lineHeight
+                            App.fontGame.lineHeight
                     )
                 }
             }
@@ -155,7 +155,7 @@ object SanicLoadScreen : LoadScreenBase() {
                 // --> original text
                 if (genuineSonic) {
                     it.color = Color.WHITE
-                    it.draw(textTex, textX, glideDispY - 2f)
+                    it.draw(textTex, textX, glideDispY - 2f + textTex.height, textTex.width.toFloat(), -textTex.height.toFloat())
                 }
 
                 // --> ghost

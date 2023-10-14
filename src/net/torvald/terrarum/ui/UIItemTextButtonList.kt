@@ -4,11 +4,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -52,7 +49,10 @@ class UIItemTextButtonList(
 
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
         val itemHitboxSize: Int = lineHeight,
-        tagsCollection: Array<Array<String>> = Array(labelsList.size) { arrayOf("") }
+
+        tagsCollection: Array<Array<String>> = Array(labelsList.size) { arrayOf("") },
+
+        val backgroundCol: Color = Color(0),
 ) : UIItem(parentUI, initialX, initialY) {
 
     companion object {
@@ -237,6 +237,11 @@ class UIItemTextButtonList(
                 Toolkit.fillArea(batch, posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
             }
         }*/
+
+        batch.color = backgroundCol
+        blendNormalStraightAlpha(batch)
+        Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+
 
         buttons.forEach { it.render(batch, camera) }
 

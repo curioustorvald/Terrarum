@@ -101,16 +101,16 @@ class UINSMenu(
         val listHeight = stringsFromTree.size * LINE_HEIGHT
 
         val list = UIItemTextButtonList(
-                this,
-                UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
-                stringsFromTree,
-                width, LINE_HEIGHT,
-                uiWidth, listHeight,
-                textAreaWidth = listWidth,
-                alignment = UIItemTextButton.Companion.Alignment.LEFT,
-                inactiveCol = Color(.94f, .94f, .94f, 1f),
-                itemHitboxSize = LINE_HEIGHT
-
+            this,
+            UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
+            stringsFromTree,
+            width, LINE_HEIGHT,
+            uiWidth, listHeight,
+            textAreaWidth = listWidth,
+            alignment = UIItemTextButton.Companion.Alignment.LEFT,
+            inactiveCol = Color(.94f, .94f, .94f, 1f),
+            itemHitboxSize = LINE_HEIGHT,
+            backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
         )
 
         // List selection change listener

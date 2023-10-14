@@ -43,19 +43,28 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     // TODO scrolling of the palette, as the old method flat out won't work with The Flattening
 
     private val tabs = UIItemTextButtonList(
-            this, 36, arrayOf("Terrain", "Wall", "Wire"),
-            0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
-            defaultSelection = 0
+        this, 36, arrayOf("Terrain", "Wall", "Wire"),
+        0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
+        defaultSelection = 0,
+        backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
     )
     private val closeButton = UIItemTextButtonList(
-            this, 36, arrayOf("Close"),
-            0, this.height - UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
-            width = MENUBAR_SIZE, textAreaWidth = MENUBAR_SIZE
+        this, 36, arrayOf("Close"),
+        0, this.height - UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
+        width = MENUBAR_SIZE, textAreaWidth = MENUBAR_SIZE,
+        backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
     )
 
     init {
 
-        BlockCodex.getAll().forEachIndexed { index, prop ->
+        BlockCodex.getAll().filter {
+            (try {
+                ItemCodex.getItemImage(it.id)
+            }
+            catch (e: NullPointerException) {
+                null
+            }) != null
+        }.forEachIndexed { index, prop ->
             val paletteItem = UIItemImageButton(
                 this, ItemCodex.getItemImage(prop.id)!!,
                 initialX = MENUBAR_SIZE + (index % 16) * TILESREGION_SIZE,
@@ -128,8 +137,14 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        palette.forEach { it.render(batch, camera) }
         blendNormalStraightAlpha(batch)
+
+        // background
+        batch.color = DEFAULT_BACKGROUNDCOL
+        Toolkit.fillArea(batch, 0, 0, width, height)
+
+        palette.forEach { it.render(batch, camera) }
+
 
         // gaps between tabs and close button
         batch.color = DEFAULT_BACKGROUNDCOL

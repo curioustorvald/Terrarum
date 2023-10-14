@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import net.torvald.terrarum.App
 import net.torvald.terrarum.Yaml
 
 
@@ -32,6 +33,10 @@ object UITitleRemoConYaml {
 - MENU_LABEL_QUIT
 """
 
+    val menuBaseDev = """
+- MENU_MODE_BUILDINGMAKER : net.torvald.terrarum.modulebasegame.ui.UIProxyNewBuildingMaker
+""" + menuBase
+
     val menuWithSavefile = """
 - MENU_LABEL_CONTINUE : net.torvald.terrarum.modulebasegame.ui.UIProxyLoadLatestSave
 """
@@ -57,6 +62,6 @@ object UITitleRemoConYaml {
 
     operator fun invoke(hasSave: Boolean) =
 //            Yaml((if (hasSave) menuWithSavefile else menuNewGame) + menuBase).parse()
-            Yaml(menuBase).parse()
+            Yaml(if (App.IS_DEVELOPMENT_BUILD) menuBaseDev else menuBase).parse()
 }
 

@@ -13,7 +13,7 @@ import net.torvald.terrarum.ui.UICanvas
 /**
  * Created by minjaesong on 2018-12-08.
  */
-class UIProxyNewBuildingMaker : UICanvas() {
+class UIProxyNewBuildingMaker(val remoCon: UIRemoCon) : UICanvas() {
 
     override var width: Int = 0
     override var height: Int = 0
