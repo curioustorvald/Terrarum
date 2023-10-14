@@ -4,12 +4,14 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.ui.ControlPanelCommon
 import net.torvald.terrarum.modulebasegame.ui.ControlPanelOptions
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemTextSelector
 import net.torvald.unicode.TIMES
 
 class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
@@ -23,16 +25,44 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
     override var width = App.scr.width - UIRemoCon.remoConWidth - moduleAreaHMargin
     override var height = App.scr.height - moduleAreaHMargin * 2
 
-    init {
-
-    }
+    private val drawX = (Toolkit.drawWidth - width) / 2
+    private val drawY = (App.scr.height - height) / 2
 
     private var currentlySelectedModule = "basegame"
+
+    // List<Pair<proper name, mod key>>
+    val configurableMods = ModMgr.moduleInfo.filter { it.value.configPlan.isNotEmpty() }.map { it.value.properName to it.key }.toList().sortedBy { it.second }
+
+    private val modSelectorWidth = 360
+    private val modSelector = UIItemTextSelector(this, drawX + (width - modSelectorWidth) / 2, drawY,
+        configurableMods.map { { it.first } }, 0, modSelectorWidth, false
+    ).also { item ->
+        item.selectionChangeListener = {
+            currentlySelectedModule = configurableMods[it].second
+
+            defer {
+                uiItems.clear()
+                makeConfig(currentlySelectedModule)
+                addUIitem(item)
+            }
+        }
+    }
+
+    init {
+        printdbg(this, "configurableMods = ${configurableMods.map { it.second }}")
+
+        addUIitem(modSelector)
+    }
 
     override fun show() {
         super.show()
 
         makeConfig(currentlySelectedModule)
+    }
+
+    private var deferred = {}
+    private fun defer(what: () -> Unit) {
+        deferred = what
     }
 
 
@@ -56,11 +86,11 @@ class ModOptionsHost(val remoCon: UIRemoCon) : UICanvas() {
 
     override fun updateUI(delta: Float) {
         uiItems.forEach { it.update(delta) }
+        deferred(); deferred = {}
     }
 
     override fun renderUI(batch: SpriteBatch, camera: OrthographicCamera) {
-        // TODO draw currently editing mod name
-
+        // the actual control panel
         ControlPanelCommon.render("basegame.modcontrolpanel.$currentlySelectedModule", width, batch)
         uiItems.forEach { it.render(batch, camera) }
     }

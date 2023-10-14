@@ -196,7 +196,7 @@ object ModMgr {
                     val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
                     val configPlan = ArrayList<String>()
-                    File("$modDirInternal/$moduleName/configplan.csv").let {
+                    File("$modDir/$moduleName/configplan.csv").let {
                         if (it.exists() && it.isFile) {
                             configPlan.addAll(it.readLines(Common.CHARSET).filter { it.isNotBlank() })
                         }
