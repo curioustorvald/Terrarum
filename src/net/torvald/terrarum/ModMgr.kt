@@ -486,7 +486,7 @@ object ModMgr {
     }
 
     fun getLoadOrderTextForSavegame(): String {
-        return loadOrder.map { "$it ${moduleInfo[it]!!.version}" }.joinToString("\n")
+        return loadOrder.filter { moduleInfo[it] != null }.map { "$it ${moduleInfo[it]!!.version}" }.joinToString("\n")
     }
 
 

@@ -589,7 +589,7 @@ open class ActorWithBody : Actor {
                     }
 
                     // make dusts
-                    if (collisionStatus and (if (gravitation.y > 0.0) COLLIDING_BOTTOM else COLLIDING_TOP) != 0)
+                    if (collisionStatus != 0)
                         makeDust(collisionDamage, vecSum)
                 }
                 else {
@@ -1098,15 +1098,16 @@ open class ActorWithBody : Actor {
                     debug1("resulting hitbox: $newHitbox")
 
 
-                    var feetTileCount = 0
-                    var feetTileStregthSum = 0
-                    forEachFeetTile { it?.let {
-                        feetTileCount += 1
-                        feetTileStregthSum += it.strength
-                    }}
-                    val avrFeetTileStrength = feetTileStregthSum.toDouble() / feetTileCount
-                    val adjustedTileStr = avrFeetTileStrength / 1176
-                    val fallDamageDampenMult = (adjustedTileStr / (adjustedTileStr + 1)).sqr()
+//                    var feetTileCount = 0
+//                    var feetTileStregthSum = 0
+//                    forEachFeetTile { it?.let {
+//                        feetTileCount += 1
+//                        feetTileStregthSum += it.strength
+//                    }}
+//                    val avrFeetTileStrength = feetTileStregthSum.toDouble() / feetTileCount
+//                    val adjustedTileStr = avrFeetTileStrength / 1176
+//                    val fallDamageDampenMult = (adjustedTileStr / (adjustedTileStr + 1)).sqr()
+                    val fallDamageDampenMult = (32.0 / 1176.0).sqr()
                     // slam-into-whatever damage (such dirty; much hack; wow)
                     //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
                     collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) * fallDamageDampenMult * GAME_TO_SI_ACC
@@ -2025,22 +2026,33 @@ open class ActorWithBody : Actor {
     }
 
     private fun makeDust(collisionDamage: Double, vecSum: Vector2) {
-        val particleCount = (collisionDamage / 32.0).pow(0.75)
+        val particleCount = (collisionDamage / 24.0).pow(0.75)
+        val trueParticleCount = particleCount.toInt() + (Math.random() < (particleCount % 1.0)).toInt()
 
-//        if (collisionDamage > 1.0 / 1024.0)  printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+        if (collisionDamage > 1.0 / 1024.0)  printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
 
-        getFeetTiles().forEach { (xy, tile) ->
-            val (x, y) = xy
-            makeDust0(tile, x, y, particleCount, collisionDamage, vecSum)
+        val feetTiles = getFeetTiles()
+        val feetTileIndices = feetTiles.indices.toList().toIntArray()
+
+        for (i in 0 until trueParticleCount) {
+            if (i % feetTiles.size == 0) feetTileIndices.shuffle()
+
+            feetTiles[feetTileIndices[i % feetTiles.size]].second.let {  tile ->
+                val px = hitbox.startX + Math.random() * hitbox.width
+                val py = hitbox.endY
+                makeDust0(tile, px, py, particleCount, collisionDamage, vecSum)
+            }
         }
     }
 
     private val pixelOffs = intArrayOf(2, 7, 12) // hard-coded assuming TILE_SIZE=16
-    private fun makeDust0(tile: ItemID, x: Int, y: Int, count: Double, fallDamage: Double, vecSum: Vector2) {
+
+    /**
+     * @param wx World-X position
+     */
+    private fun makeDust0(tile: ItemID, wx: Double, wy: Double, count: Double, fallDamage: Double, vecSum: Vector2) {
         val pw = 3
         val ph = 3
-        val xo = App.GLOBAL_RENDER_TIMER and 1
-        val yo = App.GLOBAL_RENDER_TIMER.ushr(1) and 1
 
         val renderTag = App.tileMaker.getRenderTag(tile)
         val baseTilenum = renderTag.tileNumber
@@ -2051,28 +2063,23 @@ open class ActorWithBody : Actor {
         }
         val tileNum = baseTilenum + representativeTilenum // the particle won't match the visible tile anyway because of the seasons stuff
 
-        val trueCount = count.toInt() + (Math.random() < (count % 1.0)).toInt()
-
-        for (it in 0 until trueCount) {
-            val ui = (Math.random() * 3).toInt() // 0-2
-            val vi = if (vecSum.y > PHYS_EPSILON_VELO) 0 else if (vecSum.y < -PHYS_EPSILON_VELO) 2 else (Math.random() * 3).toInt()
-            val u = pixelOffs[ui]
-            val v = pixelOffs[vi]
-            val pos = Vector2(
-                TILE_SIZED * x + u + xo + 0.5,
-                TILE_SIZED * y + v + yo + 2,
-            )
-            val veloXvar = (Math.random() + Math.random()) * (if (Math.random() < 0.5) -1 else 1) * 0.5 // avr at 0.5
-            val veloYvar = brownianRand()
-            val veloMult = Vector2(
-                vecSum.x + veloXvar,
-                (count.pow(0.75) + veloYvar) * vecSum.y.sign
-            )
-            createRandomBlockParticle(tileNum, pos, veloMult, u, v, pw, ph).let {
-                it.despawnUponCollision = true
-                it.drawColour.set(Color.WHITE)
-                (Terrarum.ingame as TerrarumIngame).addParticle(it)
-            }
+        val vi = if (vecSum.y > PHYS_EPSILON_VELO) 0 else if (vecSum.y < -PHYS_EPSILON_VELO) 2 else (Math.random() * 3).toInt()
+        val u = (wx.toInt() % TILE_SIZE).coerceIn(0..TILE_SIZE - pw)
+        val v = pixelOffs[vi]
+        val pos = Vector2(
+            wx,
+            wy,
+        )
+        val veloXvar = (Math.random() + Math.random()) * (if (Math.random() < 0.5) -1 else 1) * 0.5 // avr at 0.5
+        val veloYvar = brownianRand()
+        val veloMult = Vector2(
+            vecSum.x + veloXvar,
+            (count.pow(0.5) + veloYvar) * vecSum.y.sign
+        )
+        createRandomBlockParticle(tileNum, pos, veloMult, u, v, pw, ph).let {
+            it.despawnUponCollision = true
+            it.drawColour.set(Color.WHITE)
+            (Terrarum.ingame as TerrarumIngame).addParticle(it)
         }
     }
 
