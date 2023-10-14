@@ -15,6 +15,7 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.forEachSiblings
@@ -67,8 +68,10 @@ object ModMgr {
             val version: String,
             val jar: String,
             val dependencies: Array<String>,
-            val isInternal: Boolean
+            val isInternal: Boolean,
+            val configPlan: List<String>
     ) {
+
         override fun toString() =
                 "\tModule #$order -- $properName | $version | $author\n" +
                 "\t$description | $releaseDate\n" +
@@ -192,7 +195,14 @@ object ModMgr {
                     val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).filter { it.isNotEmpty() }.toTypedArray()
                     val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
 
-                    module = ModuleMetadata(index, isDir, getGdxFile("$modDir/$moduleName/icon.png"), properName, description, descTranslations, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal)
+                    val configPlan = ArrayList<String>()
+                    File("$modDirInternal/$moduleName/configplan.csv").let {
+                        if (it.exists() && it.isFile) {
+                            configPlan.addAll(it.readLines(Common.CHARSET).filter { it.isNotBlank() })
+                        }
+                    }
+
+                    module = ModuleMetadata(index, isDir, getGdxFile("$modDir/$moduleName/icon.png"), properName, description, descTranslations, author, packageName, entryPoint, releaseDate, version, jar, dependency, isInternal, configPlan)
 
                     val versionNumeral = version.split('.')
                     val versionNumber = versionNumeral.toVersionNumber()
