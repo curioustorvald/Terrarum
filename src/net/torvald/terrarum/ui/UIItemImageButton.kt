@@ -54,7 +54,10 @@ open class UIItemImageButton(
     var highlighted = false
     var extraDrawOp: (UIItem, SpriteBatch) -> Unit = { _,_ -> }
 
-    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+    fun render(batch: SpriteBatch, camera: OrthographicCamera, offX: Int, offY: Int) {
+        val posX = this.posX + offX
+        val posY = this.posY + offY
+
         // draw background
         if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode, batch)
@@ -88,6 +91,10 @@ open class UIItemImageButton(
         else if (mouseUp) activeCol
         else inactiveCol
         extraDrawOp(this, batch)
+    }
+
+    override fun render(batch: SpriteBatch, camera: OrthographicCamera) {
+        render(batch, camera, 0, 0)
     }
 
     override fun dispose() {

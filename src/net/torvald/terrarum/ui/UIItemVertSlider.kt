@@ -31,7 +31,7 @@ class UIItemVertSlider(
     private var mouseOnHandle = false
 
     private val handleTravelDist = height - handleHeight
-    private var handlePos = (initialValue / max).times(handleTravelDist).coerceIn(0.0, handleTravelDist.toDouble())
+    private var handlePos = if (max == 0.0) 0.0 else (initialValue / max).times(handleTravelDist).coerceIn(0.0, handleTravelDist.toDouble())
 
     var value: Double = initialValue; private set
     var selectionChangeListener: (Double) -> Unit = {}
