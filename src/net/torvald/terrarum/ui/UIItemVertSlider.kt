@@ -23,7 +23,11 @@ class UIItemVertSlider(
     private val disposeTexture: Boolean = false
 ) : UIItem(parentUI, initialX, initialY) {
 
-    override val width = 16
+    companion object {
+        const val WIDTH = 16
+    }
+
+    override val width = WIDTH
     private var mouseOnHandle = false
 
     private val handleTravelDist = height - handleHeight

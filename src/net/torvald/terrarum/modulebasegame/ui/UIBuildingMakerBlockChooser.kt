@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
-import net.torvald.terrarum.ui.Toolkit
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIItemImageButton
-import net.torvald.terrarum.ui.UIItemTextButtonList
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_BACKGROUNDCOL
 import kotlin.math.roundToInt
 
@@ -21,7 +18,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
     companion object {
         const val TILES_X = 8
-        const val TILES_Y = 14
+        const val TILES_Y = 8
 
         const val TILESREGION_SIZE = 24
         const val MENUBAR_SIZE = 72
@@ -61,7 +58,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             catch (e: NullPointerException) {
                 null
             }) != null
-        }.filter { !it.hasTag("INTERNAL") }.forEachIndexed { index, prop ->
+        }.filter { !it.hasTag("INTERNAL") }.sortedBy { it.id }.forEachIndexed { index, prop ->
             val paletteItem = UIItemImageButton(
                 this, ItemCodex.getItemImage(prop.id)!!,
                 initialX = MENUBAR_SIZE + (index % TILES_X) * TILESREGION_SIZE,
@@ -82,9 +79,22 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         }
     }
 
+    private val scrollOverflowSize = ((palette.size - TILES_X * TILES_Y).toDouble() / TILES_X).ceilToDouble().coerceAtLeast(0.0)
+
+    private val scrollBar = UIItemVertSlider(
+        this, WIDTH - UIItemVertSlider.WIDTH, 0, 0.0, 0.0, scrollOverflowSize, height, SCROLLBAR_SIZE
+    ).also {
+        println("scrollOverflowSize = $scrollOverflowSize")
+
+        addUIitem(it)
+        it.scrolledListener = { scrollX, scrollY ->
+
+        }
+    }
+
+
     override fun updateUI(delta: Float) {
-        parent.tappedOnUI = true
-        if (!mouseOnScroll) palette.forEach { it.update(delta) }
+        if (!scrollBar.mouseUp) palette.forEach { it.update(delta) }
         tabs.update(delta)
         closeButton.update(delta)
         if (closeButton.mousePushed) {
@@ -92,37 +102,8 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             closeGracefully()
         }
 
-        // respond to click
-        if (Terrarum.mouseDown) {
-            // scroll bar
-            if (relativeMouseX in width - SCROLLBAR_SIZE until width && relativeMouseY in 0 until height) {
-                mouseOnScroll = true
-            }
-
-            if (mouseOnScroll) {
-                scrollBarPos = relativeMouseY - (scrollBarHeight / 2).roundToInt()
-                scrollBarPos = scrollBarPos.coerceIn(0, scrollableArea - 1)
-            }
-        }
-        else {
-            mouseOnScroll = false
-        }
-
-        // rebuild if necessary
-        val newPaletteScroll = ((scrollBarPos.toFloat() / scrollableArea) * paletteScrollMax).roundToInt()
-        if (paletteScroll != newPaletteScroll) {
-            paletteScroll = newPaletteScroll
-            rebuildPalette()
-        }
+        uiItems.forEach { it.update(delta) }
     }
-
-    private val scrollbarBackCol = Color(0x000000_70)
-    private var scrollBarPos = 0
-    private var paletteScroll = 0
-    private val paletteScrollMax = 256f - 14f
-    private val scrollBarHeight = (HEIGHT - 16 * 14).toFloat()
-    private val scrollableArea = HEIGHT - scrollBarHeight.roundToInt()
-    private var mouseOnScroll = false
 
     private fun closeGracefully() {
         this.isVisible = false
@@ -140,24 +121,15 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         batch.color = DEFAULT_BACKGROUNDCOL
         Toolkit.fillArea(batch, 0, 0, width, height)
 
-        palette.forEach { it.render(batch, camera) }
-
-
         // gaps between tabs and close button
         batch.color = DEFAULT_BACKGROUNDCOL
         Toolkit.fillArea(batch, 0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
-        // scrollbar back
-        batch.color = DEFAULT_BACKGROUNDCOL
-        Toolkit.fillArea(batch, width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
-        batch.color = scrollbarBackCol
-        Toolkit.fillArea(batch, width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
-        // scrollbar
-        batch.color = CELLCOLOUR_WHITE
-        Toolkit.fillArea(batch, width - SCROLLBAR_SIZE.toFloat(), scrollBarPos.toFloat(), SCROLLBAR_SIZE.toFloat(), scrollBarHeight)
 
         // the actual buttons
         tabs.render(batch, camera)
         closeButton.render(batch, camera)
+
+        uiItems.forEach { it.render(batch, camera) }
     }
 
     private var dragOriginX = 0 // relative mousepos

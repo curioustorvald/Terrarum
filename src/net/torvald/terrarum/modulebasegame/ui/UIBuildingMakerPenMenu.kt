@@ -72,7 +72,10 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
             { parent.currentPenMode = BuildingMaker.PENMODE_MARQUEE_ERASE },
             {
                 parent.uiPalette.isVisible = true
-                parent.uiPalette.setPosition(Gdx.input.x - parent.uiPalette.width / 2, Gdx.input.y - parent.uiPalette.height / 2)
+                parent.uiPalette.setPosition(
+                    ((Gdx.input.x / App.scr.magn) - parent.uiPalette.width / 2).roundToInt(),
+                    ((Gdx.input.y / App.scr.magn) - parent.uiPalette.height / 2).roundToInt()
+                )
                 parent.uiPalette.posX = parent.uiPalette.posX.coerceIn(0, App.scr.width - parent.uiPalette.width)
                 parent.uiPalette.posY = parent.uiPalette.posY.coerceIn(0, App.scr.height - parent.uiPalette.height)
             },
