@@ -96,7 +96,12 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
         addUIitem(it)
         it.selectionChangeListener = { value ->
+            val oldScroll = scroll
             scroll = value.roundToInt()
+
+            palette.forEach {
+                it.posY -= (scroll - oldScroll) * TILESREGION_SIZE
+            }
         }
     }
 
@@ -146,7 +151,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         closeButton.render(batch, camera)
 
         palette.visible.forEach {
-            it.render(batch, camera, 0, -scroll * TILESREGION_SIZE)
+            it.render(batch, camera)
         }
 
         uiItems.forEach { it.render(batch, camera) }
