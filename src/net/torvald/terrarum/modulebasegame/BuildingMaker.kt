@@ -14,12 +14,16 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.TerrarumKeyboardEvent
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
+import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerPenMenu
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
+import net.torvald.terrarum.serialise.Common
+import net.torvald.terrarum.serialise.PointOfInterest
+import net.torvald.terrarum.serialise.POILayer
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -34,7 +38,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 - File
  - New Flat ter.
  - New Rand. ter.
- - Export…
+ - Export… : net.torvald.terrarum.modulebasegame.YamlCommandToolExportTest
  - Import…
  - Save World…
  - Load World…
@@ -696,5 +700,15 @@ class YamlCommandToolMarqueeClear : YamlInvokable {
 class YamlCommandToolToggleMarqueeOverlay : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).showSelection = !(args[0] as BuildingMaker).showSelection
+    }
+}
+
+class YamlCommandToolExportTest : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        val a = PointOfInterest("test", 10, 10)
+        val dat = BlockLayerI16(10, 10)
+        a.layers.add(POILayer("layerr1").also { it.blockLayer.add(BlockLayerI16(10, 10)) })
+        a.layers.add(POILayer("layerr2").also { it.blockLayer.add(BlockLayerI16(10, 10)) })
+        println(Common.jsoner.toJson(a))
     }
 }
