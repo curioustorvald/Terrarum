@@ -36,6 +36,7 @@ class Notification : UICanvas() {
 
     internal var message: List<String> = listOf("")
 
+    private val timeGaugeCol = Color(0x707070ff)
 
     init {
     }
@@ -68,6 +69,16 @@ class Notification : UICanvas() {
 
         Toolkit.drawBaloon(batch, 0f, -textHeight, displayedTextWidth.toFloat(), textHeight, handler.opacity * OPACITY)
 
+        // draw time gauge
+        if (displayTimer != 0f) {
+            batch.color = timeGaugeCol
+            val time = 1f - (displayTimer / visibleTime)
+            val bw = displayedTextWidth * time
+            val bx = (displayedTextWidth - bw) / 2
+            Toolkit.drawStraightLine(batch, bx, 2f, bx + bw, 2f, false)
+        }
+
+        // draw texts
         batch.color = fontCol
         message.forEachIndexed { index, s ->
             val xoff = 6 + (displayedTextWidth - realTextWidth) / 2

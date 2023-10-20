@@ -147,11 +147,14 @@ object Toolkit : Disposable {
     fun fillCircle(batch: SpriteBatch, x: Int, y: Int, w: Int, h: Int) {
         batch.draw(textureWhiteCircle, x.toFloat(), y.toFloat(), w.toFloat(), h.toFloat())
     }
-    fun drawStraightLine(batch: SpriteBatch, x: Int, y: Int, otherEnd: Int, thickness: Int, isVertical: Boolean) {
+    fun drawStraightLine(batch: SpriteBatch, x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
         if (!isVertical)
             fillArea(batch, x, y, otherEnd - x, thickness)
         else
             fillArea(batch, x, y, thickness, otherEnd - y)
+    }
+    fun drawStraightLine(batch: SpriteBatch, x: Int, y: Int, otherEnd: Int, thickness: Int, isVertical: Boolean) {
+        drawStraightLine(batch, x.toFloat(), y.toFloat(), otherEnd.toFloat(), thickness.toFloat(), isVertical)
     }
 
     fun drawBoxBorder(batch: SpriteBatch, x: Float, y: Float, w: Float, h: Float) =
