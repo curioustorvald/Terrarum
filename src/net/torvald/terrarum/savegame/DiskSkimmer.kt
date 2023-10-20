@@ -392,11 +392,18 @@ removefile:
 
     fun setSaveSnapshotVersion(snapshot: Snapshot?) {
         val fa = RandomAccessFile(diskFile, "rwd")
-        fa.seek(51L)
+        fa.seek(52L)
         if (snapshot == null)
             fa.write(byteArrayOf(0, 0))
         else
             fa.write(snapshot.toBytes())
+        fa.close()
+    }
+
+    fun setGameMode(bits: Int) {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        fa.seek(54L)
+        fa.writeByte(bits)
         fa.close()
     }
 
@@ -438,6 +445,12 @@ removefile:
 
         return if (b1 == b2 && b1 == 0.toByte()) null
         else Snapshot(byteArrayOf(b1, b2))
+    }
+
+    fun getGameMode(): Int {
+        val fa = RandomAccessFile(diskFile, "rwd")
+        fa.seek(54L)
+        return fa.read().also { fa.close() }
     }
 
 

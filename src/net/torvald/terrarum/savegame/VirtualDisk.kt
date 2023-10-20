@@ -87,7 +87,12 @@ Version 254 is a customised version of TEVD tailored to be used as a savegame fo
                    w: ISO Week Number (1-53)
                    Aaa: Alphabet (a->000, b->001, ... e->100, f->101, ..., h->111)
                  e.g. 23w40f is encoded as 1_0010111 101000_01
-    Int8[10]    Extra info bytes reserved for future usage
+    Int8        Game Mode (0b ww tttttt)
+                t: 0 - Undecided
+                   1 - Survival (0.4.0+)
+                w: 0 - Singleplayer
+                   2 - Multiplayer
+    Int8[9]    Extra info bytes reserved for future usage
 
     -- END extraInfoBytes --
     UInt8[236]  Rest of the long disk name (268 bytes total)
@@ -183,6 +188,9 @@ class VirtualDisk(
                 Snapshot(extraInfoBytes.sliceArray(4..5))
             }
         }
+    var gamemode: Int
+        set(value) { extraInfoBytes[6] = value.toByte() }
+        get() = extraInfoBytes[6].toUint()
 
     override fun getDiskName(charset: Charset) = diskName.toCanonicalString(charset)
     val root: DiskEntry
