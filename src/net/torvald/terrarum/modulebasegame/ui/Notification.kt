@@ -83,7 +83,7 @@ class Notification : UICanvas() {
         message.forEachIndexed { index, s ->
             val xoff = 6 + (displayedTextWidth - realTextWidth) / 2
             val y = -textHeight + App.fontGame.lineHeight * index
-            App.fontGame.draw(batch, s, LRmargin + xoff, y )
+            App.fontGame.draw(batch, s, LRmargin + xoff, y - 1)
         }
 
 

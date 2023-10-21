@@ -3,11 +3,9 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.App
+import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
-import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.MusicGovernor
-import net.torvald.terrarum.tryDispose
+import net.torvald.unicode.EMDASH
 import java.io.File
 
 data class MusicContainer(
@@ -25,7 +23,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             printdbg(this, "Music: ${it.absolutePath}")
             try {
                 MusicContainer(
-                    it.nameWithoutExtension,
+                    it.nameWithoutExtension.replace('_', ' ').split(" ").map { it.capitalize() }.joinToString(" "),
                     it,
                     Gdx.audio.newMusic(Gdx.files.absolute(it.absolutePath))
                 )
@@ -36,9 +34,21 @@ class TerrarumMusicGovernor : MusicGovernor() {
             }
         } ?: emptyList() // TODO test code
 
-    private var currentMusic: MusicContainer? = null
-
     private var musicBin: ArrayList<Int> = ArrayList(songs.indices.toList().shuffled())
+
+    private var currentMusic: MusicContainer? = null
+    private var currentAmbient: MusicContainer? = null
+
+
+
+    private var warningPrinted = false
+
+    private val musicVolume: Float
+        get() = (App.getConfigDouble("bgmvolume") * App.getConfigDouble("mastervolume")).toFloat()
+    private val ambientVolume: Float
+        get() = (App.getConfigDouble("sfxvolume") * App.getConfigDouble("mastervolume")).toFloat()
+
+
 
 
     private fun stopMusic() {
@@ -52,11 +62,16 @@ class TerrarumMusicGovernor : MusicGovernor() {
         printdbg(this, "Intermission: $intermissionLength seconds")
     }
 
+    private fun startMusic(song: MusicContainer) {
+        song.gdxMusic.volume = musicVolume
+        song.gdxMusic.play()
+        printdbg(this, "Now playing: $song")
 
-    private var warningPrinted = false
+        INGAME.sendNotification("Now Playing $EMDASH ${song.name}")
 
-    private val musicVolume: Float
-        get() = (App.getConfigDouble("musicvolume") * App.getConfigDouble("mastervolume")).toFloat()
+        currentMusic = song
+    }
+
 
     override fun update(ingame: IngameInstance, delta: Float) {
         if (songs.isEmpty()) {
@@ -82,11 +97,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
                         musicBin = ArrayList(songs.indices.toList().shuffled())
                     }
 
-                    song.gdxMusic.volume = musicVolume
-                    song.gdxMusic.play()
-                    printdbg(this, "Now playing: $song")
-
-                    currentMusic = song
+                    startMusic(song)
 
                     // process fadeout request
                     if (fadeoutFired) {

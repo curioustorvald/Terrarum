@@ -167,9 +167,9 @@ object SanicLoadScreen : LoadScreenBase() {
                 val drawHeight = getPulseEffWidthMul() * textTex.height
                 it.draw(textTex,
                         textX - (drawWidth - textTex.width) / 2f,
-                        glideDispY - 2f - (drawHeight - textTex.height) / 2f,
+                        glideDispY - 2f - (drawHeight - textTex.height) / 2f + drawHeight,
                         drawWidth,
-                        drawHeight
+                        -drawHeight
                 )
 
 

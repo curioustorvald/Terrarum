@@ -413,7 +413,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        blockMarkings.dispose()
+//        blockMarkings.dispose()
         uiPenMenu.dispose()
     }
 
