@@ -33,6 +33,8 @@ class UIHandler(//var UI: UICanvas,
         var uiTogglerFunctionDefault: ((UIHandler) -> Unit)? = null
 ): Disposable {
 
+    var alwaysUpdate = false
+
     companion object {
         private val SHADER_PROG_FRAG = """
 #ifdef GL_ES
@@ -224,7 +226,7 @@ void main() {
         //if (closeFired && openCloseCounter > 9) closeFired = false
 
 
-        if (isVisible) {
+        if (isVisible || alwaysUpdate) {
             ui.updateUI(delta)
         }
 
@@ -344,6 +346,8 @@ void main() {
             isVisible = true
 
             openFired = true
+
+            openCloseCounter = 0f
         }
     }
 
@@ -360,6 +364,8 @@ void main() {
             isOpening = false
 
             closeFired = true
+
+            openCloseCounter = 0f
         }
     }
 
