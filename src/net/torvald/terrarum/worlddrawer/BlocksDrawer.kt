@@ -15,6 +15,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -669,7 +670,7 @@ internal object BlocksDrawer {
         }
         val vertexColour = when (mode) {
             TERRAIN, /*WIRE,*/ ORES, FLUID, OCCLUSION -> Color.WHITE
-            WALL -> App.tileMaker.wallOverlayColour
+            WALL -> WALL_OVERLAY_COLOUR
             else -> throw IllegalArgumentException()
         }
 

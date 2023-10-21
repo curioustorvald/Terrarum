@@ -16,6 +16,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIInventoryMinimap.Companion.MINIM
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryMinimap.Companion.MINIMAP_WIDTH
 import net.torvald.terrarum.sqr
 import net.torvald.terrarum.toInt
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import java.util.concurrent.Callable
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.absoluteValue
@@ -150,7 +151,7 @@ object MinimapComposer : Disposable {
                     val tileTerr = world.getTileFromTerrain(x, y)
                     val wallTerr = world.getTileFromWall(x, y)
                     val colTerr = App.tileMaker.terrainTileColourMap.get(tileTerr)!!.toGdxColor()
-                    val colWall = App.tileMaker.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(App.tileMaker.wallOverlayColour)
+                    val colWall = App.tileMaker.terrainTileColourMap.get(wallTerr)!!.toGdxColor().mul(WALL_OVERLAY_COLOUR)
 
                     var outCol = if (y < 0)
                         oobColTop

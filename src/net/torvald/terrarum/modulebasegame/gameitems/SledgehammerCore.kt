@@ -17,6 +17,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.DroppedItem
 import net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCore.BASE_MASS_AND_SIZE
 import net.torvald.terrarum.modulebasegame.gameitems.SledgehammerCore.TOOL_DURABILITY_BASE
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import org.dyn4j.geometry.Vector2
 import kotlin.math.roundToInt
 
@@ -102,12 +103,12 @@ object SledgehammerCore {
                         if (drop.isNotBlank()) {
                             INGAME.queueActorAddition(DroppedItem("wall@$drop", (x + 0.5) * TILE_SIZED, (y + 1.0) * TILE_SIZED))
                         }
-                        PickaxeCore.makeDust(wall, x, y, 9, App.tileMaker.wallOverlayColour)
+                        PickaxeCore.makeDust(wall, x, y, 9, WALL_OVERLAY_COLOUR)
                     }
                 }
                 // tile not busted
                 if (Math.random() < actionInterval) {
-                    PickaxeCore.makeDust(wall, x, y, 1, App.tileMaker.wallOverlayColour)
+                    PickaxeCore.makeDust(wall, x, y, 1, WALL_OVERLAY_COLOUR)
                 }
             }
 

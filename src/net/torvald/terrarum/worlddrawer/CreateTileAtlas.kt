@@ -31,14 +31,16 @@ import kotlin.math.sqrt
  */
 class CreateTileAtlas {
 
+    companion object {
+        val WALL_OVERLAY_COLOUR = Color(.65f, .65f, .65f, 1f)
+    }
+
     var MAX_TEX_SIZE = App.getConfigInt("atlastexsize").coerceIn(1024, App.glInfo.GL_MAX_TEXTURE_SIZE); private set
     var TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE; private set
 
     var SHADER_SIZE_KEYS = floatArrayOf(MAX_TEX_SIZE.toFloat(), MAX_TEX_SIZE.toFloat(), TILES_IN_X.toFloat(), TILES_IN_X.toFloat()); private set
 
     private var TOTAL_TILES = TILES_IN_X * TILES_IN_X
-
-    val wallOverlayColour = Color(.65f, .65f, .65f, 1f)
 
     lateinit var atlasPrevernal: Pixmap
     lateinit var atlasVernal: Pixmap
@@ -250,9 +252,9 @@ class CreateTileAtlas {
         // darken things for the wall
         for (y in 0 until itemWallPixmap.height) {
             for (x in 0 until itemWallPixmap.width) {
-                val c1 = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
+                val c1 = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(WALL_OVERLAY_COLOUR).toRGBA()
                 itemWallPixmap.drawPixel(x, y, c1)
-                val c2 = Color(itemWallPixmapGlow.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
+                val c2 = Color(itemWallPixmapGlow.getPixel(x, y)).mulAndAssign(WALL_OVERLAY_COLOUR).toRGBA()
                 itemWallPixmapGlow.drawPixel(x, y, c2)
             }
         }

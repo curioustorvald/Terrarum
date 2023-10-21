@@ -9,6 +9,7 @@ import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_BACKGROUNDCOL
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.Companion.WALL_OVERLAY_COLOUR
 import kotlin.math.roundToInt
 
 /**
@@ -32,16 +33,30 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     override var height = HEIGHT
     override var openCloseTime = 0f
 
-    val palette = ArrayList<UIItemImageButton>()
+    val paletteTerrain = ArrayList<UIItemImageButton>()
+    val paletteWall = ArrayList<UIItemImageButton>()
+
+    private val palettes = listOf(
+        paletteTerrain, paletteWall
+    )
+
+    var currentPaletteSelection = 0
+    val currentPalette: ArrayList<UIItemImageButton>
+        get() = palettes[currentPaletteSelection]
 
     // TODO scrolling of the palette, as the old method flat out won't work with The Flattening
 
     private val tabs = UIItemTextButtonList(
-        this, 36, arrayOf("Terrain", "Wall", "Wire"), // TODO use inventory icons
+        this, 36, arrayOf("Terrain", "Wall"), // TODO use inventory icons
         0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
         defaultSelection = 0,
         backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
-    )
+    ).also {
+        it.selectionChangeListener = { _, new ->
+            resetScroll()
+            currentPaletteSelection = new
+        }
+    }
     private val closeButton = UIItemTextButtonList(
         this, 36, arrayOf("Close"),
         0, this.height - UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
@@ -50,6 +65,17 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     )
 
     private var scroll = 0
+
+    private fun paletteScroll(delta: Int) {
+        currentPalette.forEach {
+            it.posY -= delta * TILESREGION_SIZE
+        }
+    }
+
+    private fun resetScroll() {
+        scrollBar.scrolledForce(0f, scroll * -1f)
+        scroll = 0
+    }
 
     private val <E> List<E>.visible: List<E>
         get()  = this.subList(
@@ -78,16 +104,30 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
                 activeCol = Color.WHITE,
                 backgroundCol = Color(0)
             )
+            val paletteItem2 = UIItemImageButton(
+                this, ItemCodex.getItemImage(prop.id)!!,
+                initialX = MENUBAR_SIZE + (index % TILES_X) * TILESREGION_SIZE,
+                initialY = (index / TILES_X) * TILESREGION_SIZE,
+                highlightable = false,
+                width = TILESREGION_SIZE,
+                height = TILESREGION_SIZE,
+                highlightCol = Color.WHITE,
+                activeCol = WALL_OVERLAY_COLOUR,
+                inactiveCol = WALL_OVERLAY_COLOUR,
+                backgroundCol = Color(0)
+            )
 
-            paletteItem.clickOnceListener = { _, _ ->
-                parent.setPencilColour(prop.id)
-            }
+            paletteItem.clickOnceListener = { _, _ -> parent.setPencilColour(prop.id) }
+            paletteItem2.clickOnceListener = { _, _ -> parent.setPencilColour("wall@"+prop.id) }
 
-            palette.add(paletteItem)
+            paletteTerrain.add(paletteItem)
+            if (prop.isWallable) paletteWall.add(paletteItem2)
+
         }
     }
 
-    private val scrollOverflowSize = ((palette.size - TILES_X * TILES_Y).toDouble() / TILES_X).ceilToDouble().coerceAtLeast(0.0)
+    private val scrollOverflowSize: Double
+        get() = ((currentPalette.size - TILES_X * TILES_Y).toDouble() / TILES_X).ceilToDouble().coerceAtLeast(0.0)
 
     private val scrollBar = UIItemVertSlider(
         this, WIDTH - UIItemVertSlider.WIDTH, 0, 0.0, 0.0, scrollOverflowSize, height, (height * TILES_Y / (scrollOverflowSize + TILES_Y)).ceilToInt()
@@ -98,16 +138,13 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         it.selectionChangeListener = { value ->
             val oldScroll = scroll
             scroll = value.roundToInt()
-
-            palette.forEach {
-                it.posY -= (scroll - oldScroll) * TILESREGION_SIZE
-            }
+            paletteScroll(scroll - oldScroll)
         }
     }
 
 
     override fun updateUI(delta: Float) {
-        if (!scrollBar.mouseUp) palette.forEach { it.update(delta) }
+        if (!scrollBar.mouseUp) currentPalette.forEach { it.update(delta) }
         tabs.update(delta)
         closeButton.update(delta)
         if (closeButton.mousePushed) {
@@ -115,7 +152,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             closeGracefully()
         }
 
-        palette.visible.forEach {
+        currentPalette.visible.forEach {
             it.update(delta)
         }
 
@@ -150,7 +187,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         tabs.render(batch, camera)
         closeButton.render(batch, camera)
 
-        palette.visible.forEach {
+        currentPalette.visible.forEach {
             it.render(batch, camera)
         }
 
@@ -187,7 +224,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             dragForReal = false
         }
 
-        palette.visible.forEach {
+        currentPalette.visible.forEach {
             it.touchDown(screenX, screenY, pointer, button)
         }
 
