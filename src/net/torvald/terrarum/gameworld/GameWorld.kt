@@ -434,6 +434,13 @@ open class GameWorld(
         setWireGraphOfUnsafe(blockAddr, tile, connection)
     }
 
+    fun setTileOnLayerUnsafe(layer: Int, x: Int, y: Int, tile: Int) {
+        (getLayer(layer) ?: throw IllegalArgumentException("Unknown layer index: $layer")).let {
+            if (it !is BlockLayerI16) throw IllegalArgumentException("Block layers other than BlockLayer16 is not supported yet)")
+            it.unsafeSetTile(x, y, tile)
+        }
+    }
+
     fun removeTileWire(x: Int, y: Int, tile: ItemID, bypassEvent: Boolean) {
         val (x, y) = coerceXY(x, y)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
@@ -790,8 +797,8 @@ open class GameWorld(
     override fun equals(other: Any?) = layerTerrain.ptr == (other as GameWorld).layerTerrain.ptr
 
     companion object {
-        @Transient const val WALL = 1
         @Transient const val TERRAIN = 0
+        @Transient const val WALL = 1
         @Transient const val ORES = 2
 
         @Transient val TILES_SUPPORTED = ReferencingRanges.TILES.last + 1

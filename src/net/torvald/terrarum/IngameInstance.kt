@@ -545,6 +545,8 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
 
     fun onConfigChange() {
     }
+
+    open val musicGovernor: MusicGovernor = MusicGovernor()
 }
 
 inline fun Lock.lock(body: () -> Unit) {

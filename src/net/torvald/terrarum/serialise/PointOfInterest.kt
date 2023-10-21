@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.JsonValue
 import net.torvald.terrarum.TerrarumAppConfiguration
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockLayerI16
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.utils.HashArray
 
 /**
@@ -47,16 +49,31 @@ class PointOfInterest(
     override fun read(json: Json, jsonData: JsonValue) {
         TODO("Not yet implemented")
     }
+
+    /**
+     * Place the specified layers onto the world. The name of the layers are case-insensitive.
+     */
+    fun placeOnWorld(layerNames: List<String>, world: GameWorld, bottomCentreX: Int, bottomCenterY: Int) {
+        val layers = layerNames.map { name ->
+            (layers.linearSearchBy { it.name.equals(name, true) } ?: throw IllegalArgumentException("Layer with name '$name' not found"))
+        }
+        layers.forEach {
+            it.placeOnWorld(world, bottomCentreX, bottomCenterY)
+        }
+    }
 }
 
+/**
+ * @param name name of the layer, case-insensitive.
+ */
 class POILayer(
     name: String
 ) : Json.Serializable {
     constructor() : this("undefined")
 
     @Transient val name = name
-    @Transient val blockLayer = ArrayList<BlockLayerI16>()
-    @Transient private lateinit var dat: Array<ByteArray>
+    @Transient internal lateinit var blockLayer: ArrayList<BlockLayerI16>
+    @Transient internal lateinit var dat: Array<ByteArray>
 
     fun getUniqueTiles(): List<Int> {
         return blockLayer.flatMap { layer ->
@@ -69,6 +86,9 @@ class POILayer(
      *
      * Tilenum: tile number in the block layer, identical to the any other block layers
      * TileSymbol: condensed version of the Tilenum, of which the higheset number is equal to the number of unique tiles used in the layer
+     *
+     * `tilenumToItemID[-1]` should return `Block.NULL`
+     * `itemIDtoTileSym[Block.NULL]` should return -1, so that it would return 0xFF on any length of the word
      */
     fun getReadyForSerialisation(tilenumToItemID: Map<Int, ItemID>, itemIDtoTileSym: Map<ItemID, Long>, byteLength: Int) {
         dat = blockLayer.map { layer ->
@@ -87,10 +107,15 @@ class POILayer(
 
     /**
      * Converts `dat` into `blockLayer` so the Layer can be actually utilised.
+     *
+     * `itemIDtoTileNum[Block.NULL]` should return `-1`
+     * `tileSymbolToItemId[255]` and `tileSymbolToItemId[65535]` should return `Block.NULL`
      */
     fun getReadyToBeUsed(tileSymbolToItemId: HashArray<ItemID>, itemIDtoTileNum: Map<ItemID, Int>, width: Int, height: Int, byteLength: Int) {
-        blockLayer.forEach { it.dispose() }
-        blockLayer.clear()
+        if (::blockLayer.isInitialized) {
+            blockLayer.forEach { it.dispose() }
+        }
+        blockLayer = ArrayList<BlockLayerI16>()
 
         dat.forEachIndexed { layerIndex, layer ->
             val currentBlockLayer = BlockLayerI16(width, height).also {
@@ -106,7 +131,23 @@ class POILayer(
         }
     }
 
+    fun placeOnWorld(world: GameWorld, bottomCentreX: Int, bottomCenterY: Int) {
+        val topLeftX = bottomCentreX - blockLayer[0].width / 2
+        val topLeftY = bottomCenterY - blockLayer[0].height
+
+        blockLayer.forEachIndexed { layerIndex, layer ->
+            for (x in 0 until layer.width) { for (y in 0 until layer.height) {
+                val tile = layer.unsafeGetTile(x, y)
+                if (tile != -1) {
+                    val (wx, wy) = world.coerceXY(x + topLeftX, y + topLeftY)
+                    world.setTileOnLayerUnsafe(layerIndex, wx, wy, tile)
+                }
+            } }
+        }
+    }
+
     override fun write(json: Json) {
+        if (!::dat.isInitialized) throw IllegalStateException("Internal data is not prepared! please run getReadyForSerialisation() before writing!")
         json.setTypeName(null)
         json.writeValue("name", name)
         json.writeValue("dat", dat)

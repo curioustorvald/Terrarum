@@ -2029,18 +2029,20 @@ open class ActorWithBody : Actor {
         val particleCount = (collisionDamage / 24.0).pow(0.75)
         val trueParticleCount = particleCount.toInt() + (Math.random() < (particleCount % 1.0)).toInt()
 
-        if (collisionDamage > 1.0 / 1024.0)  printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
+        if (collisionDamage > 1.0 / 1024.0) {
+//            printdbg(this, "Collision damage: $collisionDamage N, count: $particleCount, velocity: $vecSum, mass: ${this.mass}")
 
-        val feetTiles = getFeetTiles()
-        val feetTileIndices = feetTiles.indices.toList().toIntArray()
+            val feetTiles = getFeetTiles()
+            val feetTileIndices = feetTiles.indices.toList().toIntArray()
 
-        for (i in 0 until trueParticleCount) {
-            if (i % feetTiles.size == 0) feetTileIndices.shuffle()
+            for (i in 0 until trueParticleCount) {
+                if (i % feetTiles.size == 0) feetTileIndices.shuffle()
 
-            feetTiles[feetTileIndices[i % feetTiles.size]].second.let {  tile ->
-                val px = hitbox.startX + Math.random() * hitbox.width
-                val py = hitbox.endY
-                makeDust0(tile, px, py, particleCount, collisionDamage, vecSum)
+                feetTiles[feetTileIndices[i % feetTiles.size]].second.let { tile ->
+                    val px = hitbox.startX + Math.random() * hitbox.width
+                    val py = hitbox.endY
+                    makeDust0(tile, px, py, particleCount, collisionDamage, vecSum)
+                }
             }
         }
     }

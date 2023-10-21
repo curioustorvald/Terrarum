@@ -258,6 +258,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override var gameFullyLoaded = false
         internal set
 
+    override val musicGovernor = TerrarumMusicGovernor()
 
 
     //////////////
@@ -883,12 +884,11 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             oldSelectedWireRenderClass = selectedWireRenderClass
         }
 
+        musicGovernor.update(this, delta)
+
         ////////////////////////
         // ui-related updates //
         ////////////////////////
-        //uiContainer.forEach { it.update(delta) }
-        //debugWindow.update(delta)
-        //notifier.update(delta)
         // open/close fake blur UI according to what's opened
         if (uiInventoryPlayer.isVisible ||
             getUIFixture.get()?.isVisible == true || worldTransitionOngoing) {
@@ -1519,6 +1519,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             }
             catch (e: IllegalArgumentException) {}
         }
+
+        musicGovernor.dispose()
 
         super.dispose()
     }
