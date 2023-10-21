@@ -2,7 +2,9 @@ package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonValue
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
@@ -15,26 +17,49 @@ import net.torvald.terrarum.utils.HashArray
 class PointOfInterest(
     identifier: String,
     width: Int,
-    height: Int
+    height: Int,
+    tileNumberToNameMap0: HashArray<ItemID>
 ) : Json.Serializable {
 
-    constructor() : this("undefined", 0,0)
+    constructor() : this("undefined", 0,0, HashArray())
 
     @Transient val w = width
     @Transient val h = height
     @Transient val layers = ArrayList<POILayer>()
     @Transient val id = identifier
 
+    @Transient val tileNumberToNameMap: HashArray<ItemID> = tileNumberToNameMap0
+
+
     override fun write(json: Json) {
         val tileSymbolToItemId = HashArray<ItemID>() // exported
-        val tilenumToItemID = HashMap<Int, ItemID>() // not exported
 
-        // TODO populate above vars. Block.NULL is always integer -1
+        val uniqueTiles = ArrayList(layers.flatMap { it.getUniqueTiles() }.toSet().toList().sorted())
+        // swap if non-air tile is occupying the index 0
+        if (tileNumberToNameMap[uniqueTiles[0].toLong()] != Block.AIR) {
+            val otherTileIndex = uniqueTiles.linearSearchBy { tileNumberToNameMap[it.toLong()] == Block.AIR }!!
+            val t = uniqueTiles[otherTileIndex]
+            uniqueTiles[otherTileIndex] = uniqueTiles[0]
+            uniqueTiles[0] = t
+        }
+
+        // build tileSymbolToItemId
+        uniqueTiles.forEachIndexed { index, tilenum ->
+            tileSymbolToItemId[index.toLong()] = tileNumberToNameMap[tilenum.toLong()]!!
+        }
+        tileSymbolToItemId[-1] = Block.NULL
 
         val itemIDtoTileSym = tileSymbolToItemId.map { it.value to it.key }.toMap()
 
         val wordSize = if (tileSymbolToItemId.size >= 255) 16 else 8
-        layers.forEach { it.getReadyForSerialisation(tilenumToItemID, itemIDtoTileSym, wordSize / 8) }
+
+
+
+        printdbg(this, "lut=$tileSymbolToItemId")
+
+
+
+        layers.forEach { it.getReadyForSerialisation(tileNumberToNameMap, itemIDtoTileSym, wordSize / 8) }
 
         json.setTypeName(null)
         json.writeValue("genver", TerrarumAppConfiguration.VERSION_RAW)
@@ -75,6 +100,9 @@ class POILayer(
     @Transient internal lateinit var blockLayer: ArrayList<BlockLayerI16>
     @Transient internal lateinit var dat: Array<ByteArray>
 
+    /**
+     * @return list of unique tiles, in the form of TileNums
+     */
     fun getUniqueTiles(): List<Int> {
         return blockLayer.flatMap { layer ->
             (0 until layer.height * layer.width).map { layer.unsafeGetTile(it % layer.width, it / layer.width) }
@@ -90,14 +118,19 @@ class POILayer(
      * `tilenumToItemID[-1]` should return `Block.NULL`
      * `itemIDtoTileSym[Block.NULL]` should return -1, so that it would return 0xFF on any length of the word
      */
-    fun getReadyForSerialisation(tilenumToItemID: Map<Int, ItemID>, itemIDtoTileSym: Map<ItemID, Long>, byteLength: Int) {
+    fun getReadyForSerialisation(tilenumToItemID: HashArray<ItemID>, itemIDtoTileSym: Map<ItemID, Long>, byteLength: Int) {
         dat = blockLayer.map { layer ->
             ByteArray(layer.width * layer.height * byteLength) { i ->
                 if (byteLength == 1) {
-                    itemIDtoTileSym[tilenumToItemID[layer.unsafeGetTile(i % layer.width, i / layer.width)]!!]!!.toByte()
+                    val tilenum = layer.unsafeGetTile(i % layer.width, i / layer.width).toLong()
+                    val itemID = if (tilenum == 255L) Block.NULL else tilenumToItemID[tilenum]!!
+                    val tileSym = itemIDtoTileSym[itemID]!!
+                    tileSym.toByte()
                 }
                 else if (byteLength == 2) {
-                    val tileSym = itemIDtoTileSym[tilenumToItemID[layer.unsafeGetTile((i/2) % layer.width, (i/2) / layer.width)]!!]!!
+                    val tilenum = layer.unsafeGetTile((i/2) % layer.width, (i/2) / layer.width).toLong()
+                    val itemID = if (tilenum == 65535L) Block.NULL else tilenumToItemID[tilenum]!!
+                    val tileSym = itemIDtoTileSym[itemID]!!
                     if (i % 2 == 0) tileSym.and(255).toByte() else tileSym.ushr(8).and(255).toByte()
                 }
                 else throw IllegalArgumentException()

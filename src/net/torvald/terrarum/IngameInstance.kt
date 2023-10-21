@@ -22,6 +22,7 @@ import net.torvald.terrarum.modulebasegame.ui.UITooltip
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.savegame.VirtualDisk
 import net.torvald.terrarum.ui.ConsoleWindow
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.util.CircularArray
 import net.torvald.util.SortedArrayList
 import org.khelekore.prtree.*
@@ -90,7 +91,7 @@ open class IngameInstance(val batch: FlippingSpriteBatch, val isMultiplayer: Boo
     init {
         consoleHandler.setPosition(0, 0)
         notifier.setPosition(
-                (App.scr.width - notifier.width) / 2,
+                (Toolkit.drawWidth - notifier.width) / 2,
                 App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
         )
 

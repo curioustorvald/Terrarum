@@ -82,7 +82,7 @@ class TerrarumMusicGovernor : MusicGovernor() {
             return
         }
 
-        val ingame = ingame as TerrarumIngame
+//        val ingame = ingame as TerrarumIngame
         if (state == 0) state = 2
 
 

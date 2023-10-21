@@ -1477,7 +1477,9 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             // resize UIs
 
             notifier.setPosition(
-                    (drawWidth - notifier.width) / 2, App.scr.height - notifier.height)
+                (Toolkit.drawWidth - notifier.width) / 2,
+                App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
+            )
             uiQuickBar.setPosition((drawWidth - uiQuickBar.width) / 2, App.scr.tvSafeGraphicsHeight)
 
             // inventory

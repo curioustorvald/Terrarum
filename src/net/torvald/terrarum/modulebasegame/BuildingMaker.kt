@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
+import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -16,6 +17,8 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
@@ -24,6 +27,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.serialise.Common
 import net.torvald.terrarum.serialise.PointOfInterest
 import net.torvald.terrarum.serialise.POILayer
+import net.torvald.terrarum.ui.Toolkit
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -61,6 +65,8 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private val timeNow = System.currentTimeMillis() / 1000
 
     val gameWorld = GameWorld(90*12, 90*4, timeNow, timeNow)
+
+    override val musicGovernor = TerrarumMusicGovernor()
 
     init {
         // ghetto world for building
@@ -286,7 +292,9 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiPaletteSelector.isVisible = true
 
         notifier.setPosition(
-                (App.scr.width - notifier.width) / 2, App.scr.height - notifier.height)
+            (Toolkit.drawWidth - notifier.width) / 2,
+            App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
+        )
 
 
         actorNowPlaying?.setPosition(512 * 16.0, 149 * 16.0)
@@ -376,6 +384,9 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
 
         BlockPropUtil.dynamicLumFuncTickClock()
+
+
+        musicGovernor.update(this, delta)
     }
 
     private val particles = CircularArray<ParticleBase>(16, true)
@@ -399,9 +410,13 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     override fun resize(width: Int, height: Int) {
         IngameRenderer.resize(App.scr.width, App.scr.height)
+        val drawWidth = Toolkit.drawWidth
+
         uiToolbox.setPosition(0, 0)
         notifier.setPosition(
-                (App.scr.width - notifier.width) / 2, App.scr.height - notifier.height)
+            (Toolkit.drawWidth - notifier.width) / 2,
+            App.scr.height - notifier.height - App.scr.tvSafeGraphicsHeight
+        )
 
         println("[BuildingMaker] Resize event")
     }
@@ -415,6 +430,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun dispose() {
 //        blockMarkings.dispose()
         uiPenMenu.dispose()
+        musicGovernor.dispose()
     }
 
     override fun inputStrobed(e: TerrarumKeyboardEvent) {
@@ -705,10 +721,57 @@ class YamlCommandToolToggleMarqueeOverlay : YamlInvokable {
 
 class YamlCommandToolExportTest : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        val a = PointOfInterest("test", 10, 10)
-        val dat = BlockLayerI16(10, 10)
-        a.layers.add(POILayer("layerr1").also { it.blockLayer.add(BlockLayerI16(10, 10)) })
-        a.layers.add(POILayer("layerr2").also { it.blockLayer.add(BlockLayerI16(10, 10)) })
-        println(Common.jsoner.toJson(a))
+        val ui = (args[0] as BuildingMaker)
+        if (ui.selection.isEmpty()) return
+
+        val marked = HashSet<Long>()
+        fun isMarked(x: Int, y: Int) = marked.contains(toAddr(x, y))
+
+
+        // get the bounding box
+        var minX = 2147483647
+        var minY = 2147483647
+        var maxX = -1
+        var maxY = -1
+        ui.selection.forEach {
+            if (it.x < minX) minX = it.x
+            if (it.y < minY) minY = it.y
+            if (it.x > maxX) maxX = it.x
+            if (it.y > maxY) maxY = it.y
+
+            marked.add(it.toAddr())
+        }
+
+        var name = "test"
+
+        // prepare POI
+        val poi = PointOfInterest(name, maxX - minX + 1, maxY - minY + 1, ui.world.tileNumberToNameMap)
+        val layer = POILayer(name)
+        val terr = BlockLayerI16(poi.w, poi.h)
+        val wall = BlockLayerI16(poi.w, poi.h)
+        layer.blockLayer = arrayListOf(terr, wall)
+        poi.layers[0] = layer
+
+        for (x in minX..maxX) {
+            for (y in minY..maxY) {
+                if (isMarked(x, y)) {
+                    terr.unsafeSetTile(x - minX, y - minY, ui.world.getTileFromTerrainRaw(x, y))
+                    wall.unsafeSetTile(x - minX, y - minY, ui.world.getTileFromWallRaw(x, y))
+                }
+                else {
+                    terr.unsafeSetTile(x - minX, y - minY, -1)
+                    wall.unsafeSetTile(x - minX, y - minY, -1)
+                }
+            }
+        }
+
+
+        // process POI for export
+        val json = Common.jsoner
+        val jsonStr = json.toJson(poi)
+        printdbg(this, "Json:\n$jsonStr")
     }
 }
+
+private fun Point2i.toAddr() = toAddr(this.x, this.y)
+private fun toAddr(x: Int, y: Int) = (x.toLong().shl(32) or y.toLong().and(0xFFFFFFFFL))
