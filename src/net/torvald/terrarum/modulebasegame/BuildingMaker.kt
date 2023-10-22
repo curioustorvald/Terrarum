@@ -38,16 +38,13 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     private val menuYaml = Yaml("""
 - File
- - New Flat ter.
+ - New Flat ter. : net.torvald.terrarum.modulebasegame.YamlCommandNewFlatTerrain
  - New Rand. ter.
  - Export… : net.torvald.terrarum.modulebasegame.YamlCommandToolExportTest
  - Import…
- - Save World…
- - Load World…
  - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
 - Edit
- - Undo
- - Redo
+ - Clear Selections : net.torvald.terrarum.modulebasegame.YamlCommandClearSelection
 - Time
  - Dawn : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeDawn
  - Sunrise : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeSunrise
@@ -60,40 +57,18 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
  - Set…
     """.trimIndent())
 
-    private val timeNow = System.currentTimeMillis() / 1000
-
-    val gameWorld = GameWorld(90*12, 90*4, timeNow, timeNow)
+    lateinit var gameWorld: GameWorld
 
     override val musicGovernor = TerrarumMusicGovernor()
 
     init {
-        // ghetto world for building
+        gameUpdateGovernor = ConsistentUpdateRate
+        YamlCommandNewFlatTerrain().invoke(arrayOf(this))
+    }
 
-        println("[BuildingMaker] Generating builder world...")
-
-        for (y in 0 until gameWorld.height) {
-            gameWorld.setTileWall(0, y, Block.ILLUMINATOR_RED, true)
-            gameWorld.setTileWall(gameWorld.width - 1, y, Block.ILLUMINATOR_RED, true)
-            gameWorld.setTileTerrain(0, y, Block.ILLUMINATOR_RED_OFF, true)
-            gameWorld.setTileTerrain(gameWorld.width - 1, y, Block.ILLUMINATOR_RED_OFF, true)
-        }
-
-        for (y in 150 until gameWorld.height) {
-            for (x in 1 until gameWorld.width - 1) {
-                // wall layer
-                gameWorld.setTileWall(x, y, Block.DIRT, true)
-
-                // terrain layer
-                gameWorld.setTileTerrain(x, y, if (y == 150) Block.GRASS else Block.DIRT, true)
-            }
-        }
-
-        // set time to summer
-        gameWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
-
-        world = gameWorld
-
-        gameUpdateGovernor = ConsistentUpdateRate.also { it.reset() }
+    internal fun reset() {
+        gameUpdateGovernor.reset()
+        WeatherMixer.forceSolarElev = 5.0
     }
 
 
@@ -269,9 +244,6 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private val essentialOverlays = ArrayList<ActorWithBody>()
 
     init {
-        gameWorld.worldTime.setTimeOfToday(WorldTime.HOUR_SEC * 10)
-        gameWorld.globalLight = Cvec(.8f, .8f, .8f, .8f)
-
         essentialOverlays.add(blockPointingCursor)
 
         uiContainer.add(uiToolbox)
@@ -775,3 +747,52 @@ class YamlCommandToolExportTest : YamlInvokable {
 
 private fun Point2i.toAddr() = toAddr(this.x, this.y)
 private fun toAddr(x: Int, y: Int) = (x.toLong().shl(32) or y.toLong().and(0xFFFFFFFFL))
+
+class YamlCommandClearSelection : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        val ui = (args[0] as BuildingMaker)
+        try {
+            (ui.selection.clone() as ArrayList<Point2i>).forEach { (x, y) ->
+                ui.removeBlockMarker(x, y)
+            }
+        }
+        catch (e: NullPointerException) {}
+    }
+}
+
+class YamlCommandNewFlatTerrain : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        YamlCommandClearSelection().invoke(args)
+        val ui = (args[0] as BuildingMaker)
+
+        println("[BuildingMaker] Generating builder world...")
+
+        val timeNow = System.currentTimeMillis() / 1000
+        ui.gameWorld = GameWorld(90*12, 90*4, timeNow, timeNow)
+
+        for (y in 0 until ui.gameWorld.height) {
+            ui.gameWorld.setTileWall(0, y, Block.ILLUMINATOR_RED, true)
+            ui.gameWorld.setTileWall(ui.gameWorld.width - 1, y, Block.ILLUMINATOR_RED, true)
+            ui.gameWorld.setTileTerrain(0, y, Block.ILLUMINATOR_RED_OFF, true)
+            ui.gameWorld.setTileTerrain(ui.gameWorld.width - 1, y, Block.ILLUMINATOR_RED_OFF, true)
+        }
+
+        for (y in 150 until ui.gameWorld.height) {
+            for (x in 1 until ui.gameWorld.width - 1) {
+                // wall layer
+                ui.gameWorld.setTileWall(x, y, Block.DIRT, true)
+
+                // terrain layer
+                ui.gameWorld.setTileTerrain(x, y, if (y == 150) Block.GRASS else Block.DIRT, true)
+            }
+        }
+        ui.world = ui.gameWorld
+
+
+        // set time to summer morning
+        ui.gameWorld.worldTime.addTime(WorldTime.DAY_LENGTH * 32)
+        ui.gameWorld.worldTime.setTimeOfToday(18062)
+
+        ui.reset()
+    }
+}
