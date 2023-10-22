@@ -17,8 +17,6 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
-import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
@@ -742,6 +740,8 @@ class YamlCommandToolExportTest : YamlInvokable {
             marked.add(it.toAddr())
         }
 
+        printdbg(this, "POI Area: ($minX,$minY)..($maxX,$maxY), WH=(${maxX - minX},${maxY - minY})")
+
         var name = "test"
 
         // prepare POI
@@ -750,7 +750,7 @@ class YamlCommandToolExportTest : YamlInvokable {
         val terr = BlockLayerI16(poi.w, poi.h)
         val wall = BlockLayerI16(poi.w, poi.h)
         layer.blockLayer = arrayListOf(terr, wall)
-        poi.layers[0] = layer
+        poi.layers.add(layer)
 
         for (x in minX..maxX) {
             for (y in minY..maxY) {

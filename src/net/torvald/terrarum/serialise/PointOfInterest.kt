@@ -34,20 +34,16 @@ class PointOfInterest(
     override fun write(json: Json) {
         val tileSymbolToItemId = HashArray<ItemID>() // exported
 
-        val uniqueTiles = ArrayList(layers.flatMap { it.getUniqueTiles() }.toSet().toList().sorted())
-        // swap if non-air tile is occupying the index 0
-        if (tileNumberToNameMap[uniqueTiles[0].toLong()] != Block.AIR) {
-            val otherTileIndex = uniqueTiles.linearSearchBy { tileNumberToNameMap[it.toLong()] == Block.AIR }!!
-            val t = uniqueTiles[otherTileIndex]
-            uniqueTiles[otherTileIndex] = uniqueTiles[0]
-            uniqueTiles[0] = t
-        }
+        val uniqueTiles = ArrayList(layers.flatMap { it.getUniqueTiles() }.toSet().toList().sorted()) // contains TileNumber
+
 
         // build tileSymbolToItemId
         uniqueTiles.forEachIndexed { index, tilenum ->
-            tileSymbolToItemId[index.toLong()] = tileNumberToNameMap[tilenum.toLong()]!!
+            tileSymbolToItemId[index.toLong()] = if (tilenum == 65535) // largest value on BlockLayerI16
+                Block.NULL
+            else
+                tileNumberToNameMap[tilenum.toLong()] ?: throw NullPointerException("No tileNumber->tileName mapping for $tilenum")
         }
-        tileSymbolToItemId[-1] = Block.NULL
 
         val itemIDtoTileSym = tileSymbolToItemId.map { it.value to it.key }.toMap()
 
@@ -55,6 +51,7 @@ class PointOfInterest(
 
 
 
+        printdbg(this, "unique tiles: ${tileSymbolToItemId.size}")
         printdbg(this, "lut=$tileSymbolToItemId")
 
 
@@ -123,7 +120,7 @@ class POILayer(
             ByteArray(layer.width * layer.height * byteLength) { i ->
                 if (byteLength == 1) {
                     val tilenum = layer.unsafeGetTile(i % layer.width, i / layer.width).toLong()
-                    val itemID = if (tilenum == 255L) Block.NULL else tilenumToItemID[tilenum]!!
+                    val itemID = if (tilenum == 65535L) Block.NULL else tilenumToItemID[tilenum] ?: throw NullPointerException("No tileNumber->tileName mapping for $tilenum")
                     val tileSym = itemIDtoTileSym[itemID]!!
                     tileSym.toByte()
                 }

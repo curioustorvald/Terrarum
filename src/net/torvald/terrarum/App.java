@@ -1607,7 +1607,7 @@ public class App implements ApplicationListener {
                 System.out.println(prompt+"null");
             }
             else {
-                String indentation = " ".repeat(out.length() + 15);
+                String indentation = " ".repeat(out.length() + 16);
                 String[] msgLines = message.toString().split("\\n");
                 for (int i = 0; i < msgLines.length; i++) {
                     System.out.println((i == 0 ? prompt : indentation) + msgLines[i]);
@@ -1629,10 +1629,10 @@ public class App implements ApplicationListener {
                 System.out.println(prompt+"null"+csi0);
             }
             else {
-                String indentation = " ".repeat(out.length() + 11);
+                String indentation = " ".repeat(out.length() + 16);
                 String[] msgLines = message.toString().split("\\n");
                 for (int i = 0; i < msgLines.length; i++) {
-                    System.out.println((i == 0 ? prompt : indentation) + msgLines[i] + csi0);
+                    System.out.println((i == 0 ? prompt : indentation) + csiR + msgLines[i] + csi0);
                 }
             }
         }
