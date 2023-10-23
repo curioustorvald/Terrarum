@@ -266,7 +266,15 @@ class ByteArray64(initialSize: Long = BANK_SIZE.toLong()) {
         if (this.size > Integer.MAX_VALUE - 8) // according to OpenJDK; the size itself is VM-dependent
             throw TypeCastException("Impossible cast; too large to fit")
 
-        return ByteArray(this.size.toInt()) { this[it.toLong()] }
+        // TODO make it faster using chunks and memcpy
+//        return ByteArray(this.size.toInt()) { this[it.toLong()] }
+        return ByteArray(this.size.toInt()).also { out ->
+            var c = 0
+            this.forEachUsedBanks { usedCount, bytes ->
+                System.arraycopy(bytes, 0, out, c, usedCount)
+                c += usedCount
+            }
+        }
     }
 
     fun writeToFile(file: File) {

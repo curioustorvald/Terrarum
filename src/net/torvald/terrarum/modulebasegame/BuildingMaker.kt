@@ -17,6 +17,8 @@ import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameparticles.ParticleBase
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerBlockChooser
@@ -717,7 +719,7 @@ class YamlCommandToolExportTest : YamlInvokable {
         var name = "test"
 
         // prepare POI
-        val poi = PointOfInterest(name, maxX - minX + 1, maxY - minY + 1, ui.world.tileNumberToNameMap)
+        val poi = PointOfInterest(name, maxX - minX + 1, maxY - minY + 1, ui.world.tileNumberToNameMap, ui.world.tileNameToNumberMap)
         val layer = POILayer(name)
         val terr = BlockLayerI16(poi.w, poi.h)
         val wall = BlockLayerI16(poi.w, poi.h)
@@ -804,6 +806,31 @@ class YamlCommandToolImportTest : YamlInvokable {
 
         val json = """{"genver":67108864,"id":"test","wlen":8,"w":6,"h":7,"lut":{"0":"basegame:0","1":"basegame:19","2":"basegame:-1"},"layers":[{"name":"test1","dat":["abZy8000000rlLp0S#Gh%Q1%XFDc>fH&5.j6G~zOdGxCG","abZy8000000rlLp0S#Gh38ntBemYv>C=*G~dGxCG"]},{"name":"test2","dat":["abZy8000000rlLp0S#Gh%Q1%XFDc>fH&5.j6G~zOdGxCG","abZy8000000rlLp0S#Gh38ntBemYv>C=*G~dGxCG"]}]}"""
 
-        val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json)
+        val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json).also {
+            it.getReadyToBeUsed(ui.world.tileNameToNumberMap)
+
+            println("==== Test print layer ====")
+            it.layers.forEach { layer ->
+                println("Layer ${layer.name}")
+                println("  Terrain:")
+                for (y in 0 until it.h) {
+                    for (x in 0 until it.w) {
+                        val tnum = layer.blockLayer[TERRAIN].unsafeGetTile(x, y).toLong()
+                        print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:","b")})\t")
+                    }
+                    println()
+                }
+                println("  Wall:")
+                for (y in 0 until it.h) {
+                    for (x in 0 until it.w) {
+                        val tnum = layer.blockLayer[WALL].unsafeGetTile(x, y).toLong()
+                        print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:","b")})\t")
+                    }
+                    println()
+                }
+            }
+        }
+
+        println("Imported POI: $poi")
     }
 }

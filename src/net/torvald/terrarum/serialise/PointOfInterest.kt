@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
 import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.utils.HashArray
+import java.io.StringReader
 
 /**
  * Created by minjaesong on 2023-10-17.
@@ -20,17 +21,22 @@ class PointOfInterest(
     identifier: String,
     width: Int,
     height: Int,
-    tileNumberToNameMap0: HashArray<ItemID>
+    tileNumberToNameMap0: HashArray<ItemID>,
+    tileNameToNumberMap0: HashMap<ItemID, Int>
 ) : Json.Serializable {
 
-    constructor() : this("undefined", 0,0, HashArray())
+    constructor() : this("undefined", 0,0, HashArray(), HashMap())
+
+    constructor(numberToNameMap: HashArray<ItemID>, nameToNumberMap: HashMap<ItemID, Int>) : this("undefined", 0, 0, numberToNameMap, nameToNumberMap)
 
     @Transient var w = width; private set
     @Transient var h = height; private set
     @Transient var layers = ArrayList<POILayer>(); private set
     @Transient var id = identifier; private set
     @Transient var tileNumberToNameMap: HashArray<ItemID> = tileNumberToNameMap0; private set
-
+    @Transient var tileNameToNumberMap: HashMap<ItemID, Int> = tileNameToNumberMap0; private set
+    @Transient lateinit var lutFromJson: HashArray<ItemID>
+    @Transient var wlenFromJson = 0
 
     override fun write(json: Json) {
         val tileSymbolToItemId = HashArray<ItemID>() // exported
@@ -74,22 +80,30 @@ class PointOfInterest(
         this.id = jsonData["id"].asString()
         this.w = jsonData["w"].asInt()
         this.h = jsonData["h"].asInt()
-        this.tileNumberToNameMap = json.readValue(HashArray<ItemID>().javaClass, jsonData["lut"])
-        val wlen = jsonData["wlen"].asInt()
+        this.lutFromJson = json.readValue(HashArray<ItemID>().javaClass, jsonData["lut"])
+        this.wlenFromJson = jsonData["wlen"].asInt()
 
 
         println("read test")
-        println("id: $id, w: $w, h: $h")
-        println("lut: $tileNumberToNameMap")
-        println("==== layers ====")
-        jsonData["layers"].forEachIndexed { index, it ->
+        println("id: $id, w: $w, h: $h, wlen: $wlenFromJson")
+        println("lut: $lutFromJson")
+
+        println("==== layers (bytes) ====")
+
+        // decompress layers
+        jsonData["layers"].forEachIndexed { index, jsonData ->
             print("#${index+1}: ")
-            println(it["name"].asString())
-            println("layerdata:")
-            it["dat"].forEachIndexed { index, value ->
-                print("  L${if (index == TERRAIN) "terr" else if (index == WALL) "wall" else "unk$index"}: ")
-                println(value.asString())
+            POILayer().also {
+                it.w = this.w; it.h = this.h; it.id = this.id
+                it.read(json, jsonData)
+                layers.add(it)
             }
+        }
+    }
+
+    fun getReadyToBeUsed(itemIDtoTileNum: Map<ItemID, Int>) {
+        layers.forEach {
+            it.getReadyToBeUsed(lutFromJson, itemIDtoTileNum, w, h, wlenFromJson / 8)
         }
     }
 
@@ -114,9 +128,13 @@ class POILayer(
 ) : Json.Serializable {
     constructor() : this("undefined")
 
-    @Transient val name = name
+    @Transient var name = name
     @Transient internal lateinit var blockLayer: ArrayList<BlockLayerI16>
     @Transient internal lateinit var dat: Array<ByteArray>
+
+    @Deprecated("Used for debug print", ReplaceWith("name")) @Transient internal var id = ""
+    @Deprecated("Used for debug print") @Transient internal var w = 0
+    @Deprecated("Used for debug print") @Transient internal var h = 0
 
     /**
      * @return list of unique tiles, in the form of TileNums
@@ -157,8 +175,6 @@ class POILayer(
 
     /**
      * Converts `dat` into `blockLayer` so the Layer can be actually utilised.
-     *
-     * `tileSymbolToItemId[255]` and `tileSymbolToItemId[65535]` should return `Block.NULL`
      */
     fun getReadyToBeUsed(tileSymbolToItemId: HashArray<ItemID>, itemIDtoTileNum: Map<ItemID, Int>, width: Int, height: Int, byteLength: Int) {
         if (::blockLayer.isInitialized) {
@@ -168,13 +184,17 @@ class POILayer(
 
         dat.forEachIndexed { layerIndex, layer ->
             val currentBlockLayer = BlockLayerI16(width, height).also {
-                blockLayer[layerIndex] = it
+                blockLayer.add(it)
             }
             for (w in 0 until layer.size / byteLength) {
-                val word = if (byteLength == 1) layer[w].toUint() else if (byteLength == 2) layer.toULittleShort(2*w) else throw IllegalArgumentException()
+                val word = if (byteLength == 1) layer[w].toUint() else if (byteLength == 2) layer.toULittleShort(2*w) else throw IllegalArgumentException("Illegal byteLength $byteLength")
                 val x = w % width
                 val y = w / width
-                val tile = itemIDtoTileNum[tileSymbolToItemId[word.toLong()]!!]!!
+                val itemID = tileSymbolToItemId[word.toLong()]!!
+                val tile = if (itemID == Block.NULL)
+                    -1
+                else
+                    itemIDtoTileNum[itemID]!!
                 currentBlockLayer.unsafeSetTile(x, y, tile)
             }
         }
@@ -187,7 +207,7 @@ class POILayer(
         blockLayer.forEachIndexed { layerIndex, layer ->
             for (x in 0 until layer.width) { for (y in 0 until layer.height) {
                 val tile = layer.unsafeGetTile(x, y)
-                if (tile != -1) {
+                if (tile != -1 && tile != 65535) {
                     val (wx, wy) = world.coerceXY(x + topLeftX, y + topLeftY)
                     world.setTileOnLayerUnsafe(layerIndex, wx, wy, tile)
                 }
@@ -202,8 +222,24 @@ class POILayer(
         json.writeValue("dat", dat)
     }
 
-    override fun read(json: Json?, jsonData: JsonValue?) {
-        TODO("Not yet implemented")
+    override fun read(json: Json, jsonData: JsonValue) {
+        name = jsonData["name"].asString()
+
+        println(name)
+
+
+        dat = jsonData["dat"].mapIndexed { index, value ->
+            val zipdStr = value.asString()
+            val ba = Common.strToBytes(StringReader(zipdStr)).toByteArray()
+            val lname = "L${if (index == TERRAIN) "terr" else if (index == WALL) "wall" else "unk$index"}"
+            if (ba.size != w * h) throw IllegalStateException("Layer size mismatch: expected ${w*h} but got ${ba.size} on POI $id Layer $name $lname")
+
+            print("  $lname: ")
+            print("(${ba.size})")
+            println("[${ba.joinToString()}]")
+
+            ba
+        }.toTypedArray()
     }
 
 }
