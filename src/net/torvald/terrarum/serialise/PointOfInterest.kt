@@ -58,9 +58,9 @@ class PointOfInterest(
 
 
 
-        printdbg(this, "unique tiles: ${tileSymbolToItemId.size}")
-        printdbg(this, "tileSymbolToItemId=$tileSymbolToItemId")
-        printdbg(this, "itemIDtoTileSym=$itemIDtoTileSym")
+//        printdbg(this, "unique tiles: ${tileSymbolToItemId.size}")
+//        printdbg(this, "tileSymbolToItemId=$tileSymbolToItemId")
+//        printdbg(this, "itemIDtoTileSym=$itemIDtoTileSym")
 
 
 

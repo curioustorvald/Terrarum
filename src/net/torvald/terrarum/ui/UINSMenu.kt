@@ -30,12 +30,12 @@ class UINSMenu(
     companion object {
         val DEFAULT_TITLEBACKCOL = Color(0f, 0f, 0f, .77f)
         val DEFAULT_TITLETEXTCOL = Color.WHITE
+        val LINE_HEIGHT = 24
+        val TEXT_OFFSETX = 3f
+        val TEXT_OFFSETY = (LINE_HEIGHT - App.fontGame.lineHeight) / 2f
     }
 
     override var openCloseTime: Second = 0f
-    val LINE_HEIGHT = 24
-    val TEXT_OFFSETX = 3f
-    val TEXT_OFFSETY = (LINE_HEIGHT - App.fontGame.lineHeight) / 2f
     val CHILD_ARROW = "${0x2023.toChar()}"
 
 

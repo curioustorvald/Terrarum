@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.gdx.graphics.Cvec
 import net.torvald.terrarum.*
 import net.torvald.terrarum.App.printdbg
 import net.torvald.terrarum.TerrarumAppConfiguration.TILE_SIZE
@@ -32,6 +31,7 @@ import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.util.CircularArray
+import java.io.File
 
 /**
  * Created by minjaesong on 2018-07-06.
@@ -81,8 +81,12 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     val uiPalette = UIBuildingMakerBlockChooser(this)
     val uiPenMenu = UIBuildingMakerPenMenu(this)
 
+    val uiGetPoiName = UIBuildingMakerGetFilename() // used for both import and export
 
     val uiContainer = UIContainer()
+
+    val keyboardUsedByTextInput: Boolean
+        get() = uiGetPoiName.textInput.isEnabled
 
     private val pensMustShowSelection = arrayOf(
             PENMODE_MARQUEE, PENMODE_MARQUEE_ERASE
@@ -254,6 +258,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         uiContainer.add(notifier)
         uiContainer.add(uiPalette)
         uiContainer.add(uiPenMenu)
+        uiContainer.add(uiGetPoiName)
 
 
 
@@ -314,7 +319,11 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
         WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
-        actorNowPlaying?.update(delta)
+
+        if (!keyboardUsedByTextInput) {
+            actorNowPlaying?.update(delta)
+        }
+
         var overwriteMouseOnUI = false
         uiContainer.forEach {
             it?.update(delta)
@@ -323,7 +332,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             }
         }
 
-        mouseOnUI = (overwriteMouseOnUI || uiPenMenu.isVisible)
+        mouseOnUI = (overwriteMouseOnUI || uiPenMenu.isVisible || uiPalette.isVisible || uiGetPoiName.isVisible)
 
 
         WorldCamera.update(world, actorNowPlaying)
@@ -403,10 +412,37 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     override fun dispose() {
 //        blockMarkings.dispose()
         uiPenMenu.dispose()
+        uiGetPoiName.dispose()
         musicGovernor.dispose()
     }
 
-    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+    fun getPoiNameForExport(w: Int, h: Int, callback: (String) -> Unit) {
+        uiGetPoiName.let {
+            it.title = "Export"
+            it.labelDo = "Export"
+            it.text = listOf("WH: $w\u00D7$h", "Name of the POI:")
+            it.confirmCallback = callback
+            it.setPosition(
+                240,
+                32
+            )
+            it.reset()
+            it.setAsOpen()
+        }
+    }
+
+    fun getPoiNameForImport(callback: (String) -> Unit) {
+        uiGetPoiName.let {
+            it.title = "Import"
+            it.labelDo = "Import"
+            it.text = listOf("Name of the POI:")
+            it.confirmCallback = callback
+            it.setPosition(
+                240,
+                32
+            )
+            it.setAsOpen()
+        }
     }
 
     private fun makePenWork(x: Int, y: Int) {
@@ -486,6 +522,12 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         fos.write(FILE_FOOTER)
         fos.close()
     }*/
+
+    override fun inputStrobed(e: TerrarumKeyboardEvent) {
+        uiContainer.forEach {
+            it?.inputStrobed(e)
+        }
+    }
 }
 
 class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
@@ -676,7 +718,7 @@ class YamlCommandToolMarqueeErase : YamlInvokable {
 class YamlCommandToolMarqueeClear : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).selection.toList().forEach {
-            val (x, y) = (it % 4294967296L).toInt() to (it / 4294967296).toInt()
+            val (x, y) = (it % 4294967296).toInt() to (it / 4294967296).toInt()
             (args[0] as BuildingMaker).removeBlockMarker(x, y)
         }
     }
@@ -703,9 +745,7 @@ class YamlCommandToolExportTest : YamlInvokable {
         var maxX = -1
         var maxY = -1
         ui.selection.forEach {
-            val (x, y) = (it % 4294967296L).toInt() to (it / 4294967296).toInt()
-
-            printdbg(this, "Selection: ($x,$y)")
+            val (x, y) = (it % 4294967296).toInt() to (it / 4294967296).toInt()
 
             if (x < minX) minX = x
             if (y < minY) minY = y
@@ -715,48 +755,60 @@ class YamlCommandToolExportTest : YamlInvokable {
             marked.add(it)
         }
 
-        printdbg(this, "POI Area: ($minX,$minY)..($maxX,$maxY), WH=(${maxX - minX},${maxY - minY})")
+        ui.getPoiNameForExport(maxX - minX + 1, maxY - minY + 1) { name ->
+            // prepare POI
+            val poi = PointOfInterest(
+                name,
+                maxX - minX + 1,
+                maxY - minY + 1,
+                ui.world.tileNumberToNameMap,
+                ui.world.tileNameToNumberMap
+            )
+            val layer = POILayer(name)
+            val terr = BlockLayerI16(poi.w, poi.h)
+            val wall = BlockLayerI16(poi.w, poi.h)
+            layer.blockLayer = arrayListOf(terr, wall)
+            poi.layers.add(layer)
 
-        var name = "test"
-
-        // prepare POI
-        val poi = PointOfInterest(name, maxX - minX + 1, maxY - minY + 1, ui.world.tileNumberToNameMap, ui.world.tileNameToNumberMap)
-        val layer = POILayer(name)
-        val terr = BlockLayerI16(poi.w, poi.h)
-        val wall = BlockLayerI16(poi.w, poi.h)
-        layer.blockLayer = arrayListOf(terr, wall)
-        poi.layers.add(layer)
-
-        for (x in minX..maxX) {
-            for (y in minY..maxY) {
-                if (isMarked(x, y)) {
-                    terr.unsafeSetTile(x - minX, y - minY, ui.world.getTileFromTerrainRaw(x, y))
-                    wall.unsafeSetTile(x - minX, y - minY, ui.world.getTileFromWallRaw(x, y))
-                }
-                else {
-                    terr.unsafeSetTile(x - minX, y - minY, -1)
-                    wall.unsafeSetTile(x - minX, y - minY, -1)
+            for (x in minX..maxX) {
+                for (y in minY..maxY) {
+                    if (isMarked(x, y)) {
+                        terr.unsafeSetTile(x - minX, y - minY, ui.world.getTileFromTerrainRaw(x, y))
+                        wall.unsafeSetTile(x - minX, y - minY, ui.world.getTileFromWallRaw(x, y))
+                    }
+                    else {
+                        terr.unsafeSetTile(x - minX, y - minY, -1)
+                        wall.unsafeSetTile(x - minX, y - minY, -1)
+                    }
                 }
             }
+
+
+            // process POI for export
+            val json = Common.jsoner
+            val jsonStr = json.toJson(poi)
+
+
+            val dir = App.defaultDir + "/Exports/"
+            val dirAsFile = File(dir)
+            if (!dirAsFile.exists()) {
+                dirAsFile.mkdir()
+            }
+
+            File(dirAsFile, "$name.poi").writeText(jsonStr)
         }
-
-
-        // process POI for export
-        val json = Common.jsoner
-        val jsonStr = json.toJson(poi)
-        printdbg(this, "Json:\n$jsonStr")
     }
 }
 
 private fun Point2i.toAddr() = toAddr(this.x, this.y)
-private fun toAddr(x: Int, y: Int) = (x.toLong().shl(32) or y.toLong().and(0xFFFFFFFFL))
+private fun toAddr(x: Int, y: Int) = (y.toLong().shl(32) or x.toLong().and(0xFFFFFFFFL))
 
 class YamlCommandClearSelection : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         val ui = (args[0] as BuildingMaker)
         try {
-            (ui.selection.clone() as ArrayList<Point2i>).forEach { (x, y) ->
-                ui.removeBlockMarker(x, y)
+            (ui.selection.clone() as ArrayList<Long>).forEach { i ->
+                ui.removeBlockMarker((i % 4294967296).toInt(), (i / 4294967296).toInt())
             }
         }
         catch (e: NullPointerException) {}

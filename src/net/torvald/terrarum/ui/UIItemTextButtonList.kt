@@ -240,7 +240,7 @@ class UIItemTextButtonList(
 
         batch.color = backgroundCol
         blendNormalStraightAlpha(batch)
-        Toolkit.fillArea(batch, posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        Toolkit.fillArea(batch, posX, posY, width, height)
 
 
         buttons.forEach { it.render(batch, camera) }
