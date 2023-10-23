@@ -41,7 +41,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
  - New Flat ter. : net.torvald.terrarum.modulebasegame.YamlCommandNewFlatTerrain
  - New Rand. ter.
  - Export… : net.torvald.terrarum.modulebasegame.YamlCommandToolExportTest
- - Import…
+ - Import… : net.torvald.terrarum.modulebasegame.YamlCommandToolImportTest
  - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
 - Edit
  - Clear Selections : net.torvald.terrarum.modulebasegame.YamlCommandClearSelection
@@ -794,5 +794,16 @@ class YamlCommandNewFlatTerrain : YamlInvokable {
         ui.gameWorld.worldTime.setTimeOfToday(18062)
 
         ui.reset()
+    }
+}
+
+class YamlCommandToolImportTest : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        YamlCommandClearSelection().invoke(args)
+        val ui = (args[0] as BuildingMaker)
+
+        val json = """{"genver":67108864,"id":"test","wlen":8,"w":6,"h":7,"lut":{"0":"basegame:0","1":"basegame:19","2":"basegame:-1"},"layers":[{"name":"test1","dat":["abZy8000000rlLp0S#Gh%Q1%XFDc>fH&5.j6G~zOdGxCG","abZy8000000rlLp0S#Gh38ntBemYv>C=*G~dGxCG"]},{"name":"test2","dat":["abZy8000000rlLp0S#Gh%Q1%XFDc>fH&5.j6G~zOdGxCG","abZy8000000rlLp0S#Gh38ntBemYv>C=*G~dGxCG"]}]}"""
+
+        val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json)
     }
 }

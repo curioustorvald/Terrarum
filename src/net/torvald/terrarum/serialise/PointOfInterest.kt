@@ -8,6 +8,8 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameitems.ItemID
 import net.torvald.terrarum.gameworld.BlockLayerI16
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld.Companion.TERRAIN
+import net.torvald.terrarum.gameworld.GameWorld.Companion.WALL
 import net.torvald.terrarum.linearSearchBy
 import net.torvald.terrarum.utils.HashArray
 
@@ -23,12 +25,11 @@ class PointOfInterest(
 
     constructor() : this("undefined", 0,0, HashArray())
 
-    @Transient val w = width
-    @Transient val h = height
-    @Transient val layers = ArrayList<POILayer>()
-    @Transient val id = identifier
-
-    @Transient val tileNumberToNameMap: HashArray<ItemID> = tileNumberToNameMap0
+    @Transient var w = width; private set
+    @Transient var h = height; private set
+    @Transient var layers = ArrayList<POILayer>(); private set
+    @Transient var id = identifier; private set
+    @Transient var tileNumberToNameMap: HashArray<ItemID> = tileNumberToNameMap0; private set
 
 
     override fun write(json: Json) {
@@ -52,7 +53,8 @@ class PointOfInterest(
 
 
         printdbg(this, "unique tiles: ${tileSymbolToItemId.size}")
-        printdbg(this, "lut=$tileSymbolToItemId")
+        printdbg(this, "tileSymbolToItemId=$tileSymbolToItemId")
+        printdbg(this, "itemIDtoTileSym=$itemIDtoTileSym")
 
 
 
@@ -69,7 +71,26 @@ class PointOfInterest(
     }
 
     override fun read(json: Json, jsonData: JsonValue) {
-        TODO("Not yet implemented")
+        this.id = jsonData["id"].asString()
+        this.w = jsonData["w"].asInt()
+        this.h = jsonData["h"].asInt()
+        this.tileNumberToNameMap = json.readValue(HashArray<ItemID>().javaClass, jsonData["lut"])
+        val wlen = jsonData["wlen"].asInt()
+
+
+        println("read test")
+        println("id: $id, w: $w, h: $h")
+        println("lut: $tileNumberToNameMap")
+        println("==== layers ====")
+        jsonData["layers"].forEachIndexed { index, it ->
+            print("#${index+1}: ")
+            println(it["name"].asString())
+            println("layerdata:")
+            it["dat"].forEachIndexed { index, value ->
+                print("  L${if (index == TERRAIN) "terr" else if (index == WALL) "wall" else "unk$index"}: ")
+                println(value.asString())
+            }
+        }
     }
 
     /**
@@ -113,7 +134,6 @@ class POILayer(
      * TileSymbol: condensed version of the Tilenum, of which the higheset number is equal to the number of unique tiles used in the layer
      *
      * `tilenumToItemID[-1]` should return `Block.NULL`
-     * `itemIDtoTileSym[Block.NULL]` should return -1, so that it would return 0xFF on any length of the word
      */
     fun getReadyForSerialisation(tilenumToItemID: HashArray<ItemID>, itemIDtoTileSym: Map<ItemID, Long>, byteLength: Int) {
         dat = blockLayer.map { layer ->
@@ -138,7 +158,6 @@ class POILayer(
     /**
      * Converts `dat` into `blockLayer` so the Layer can be actually utilised.
      *
-     * `itemIDtoTileNum[Block.NULL]` should return `-1`
      * `tileSymbolToItemId[255]` and `tileSymbolToItemId[65535]` should return `Block.NULL`
      */
     fun getReadyToBeUsed(tileSymbolToItemId: HashArray<ItemID>, itemIDtoTileNum: Map<ItemID, Int>, width: Int, height: Int, byteLength: Int) {
