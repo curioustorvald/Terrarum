@@ -97,7 +97,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         }
     var currentPenTarget = PENTARGET_TERRAIN
 
-    val selection = ArrayList<Point2i>()
+    val selection = ArrayList<Long>()
 
     val blockMarkings = CommonResourcePool.getAsTextureRegionPack("blockmarkings_common")
     internal var showSelection = true
@@ -201,9 +201,9 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
         try {
             val a = generateNewBlockMarkerVisible(x, y)
             if (!theGameHasActor(a.referenceID)) {
-                queueActorAddition(a)
+                selection.add(toAddr(x, y))
                 actorsRenderOverlay.add(a)
-                selection.add(Point2i(x, y))
+                queueActorAddition(a)
             }
         }
         catch (e: Error) { }
@@ -211,13 +211,14 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     internal fun removeBlockMarker(x: Int, y: Int) {
         try {
+            selection.remove(toAddr(x, y))
             val a = getActorByID(blockPosToRefID(x, y))
-            queueActorRemoval(a)
             actorsRenderOverlay.remove(a)
-            selection.remove(Point2i(x, y))
+            queueActorRemoval(a)
         }
         catch (e: Throwable) {
             // no actor to erase, do nothing
+//            e.printStackTrace()
         }
     }
 
@@ -439,11 +440,6 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 removeBlockMarker(x, y)
             }
         }
-    }
-
-    private fun getSelectionTotalDimension(): Point2i {
-        selection.sortBy { it.y * world.width + it.x }
-        return selection.last() - selection.first()
     }
 
     /*private fun serialiseSelection(outfile: File) {
@@ -680,7 +676,8 @@ class YamlCommandToolMarqueeErase : YamlInvokable {
 class YamlCommandToolMarqueeClear : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).selection.toList().forEach {
-            (args[0] as BuildingMaker).removeBlockMarker(it.x, it.y)
+            val (x, y) = (it % 4294967296L).toInt() to (it / 4294967296).toInt()
+            (args[0] as BuildingMaker).removeBlockMarker(x, y)
         }
     }
 }
@@ -706,12 +703,16 @@ class YamlCommandToolExportTest : YamlInvokable {
         var maxX = -1
         var maxY = -1
         ui.selection.forEach {
-            if (it.x < minX) minX = it.x
-            if (it.y < minY) minY = it.y
-            if (it.x > maxX) maxX = it.x
-            if (it.y > maxY) maxY = it.y
+            val (x, y) = (it % 4294967296L).toInt() to (it / 4294967296).toInt()
 
-            marked.add(it.toAddr())
+            printdbg(this, "Selection: ($x,$y)")
+
+            if (x < minX) minX = x
+            if (y < minY) minY = y
+            if (x > maxX) maxX = x
+            if (y > maxY) maxY = y
+
+            marked.add(it)
         }
 
         printdbg(this, "POI Area: ($minX,$minY)..($maxX,$maxY), WH=(${maxX - minX},${maxY - minY})")
@@ -804,7 +805,7 @@ class YamlCommandToolImportTest : YamlInvokable {
         YamlCommandClearSelection().invoke(args)
         val ui = (args[0] as BuildingMaker)
 
-        val json = """{"genver":67108864,"id":"test","wlen":8,"w":6,"h":7,"lut":{"0":"basegame:0","1":"basegame:19","2":"basegame:-1"},"layers":[{"name":"test1","dat":["abZy8000000rlLp0S#Gh%Q1%XFDc>fH&5.j6G~zOdGxCG","abZy8000000rlLp0S#Gh38ntBemYv>C=*G~dGxCG"]},{"name":"test2","dat":["abZy8000000rlLp0S#Gh%Q1%XFDc>fH&5.j6G~zOdGxCG","abZy8000000rlLp0S#Gh38ntBemYv>C=*G~dGxCG"]}]}"""
+        val json = """{"genver":67108864,"id":"test","wlen":8,"w":5,"h":5,"lut":{"0":"basegame:0","1":"basegame:50","2":"basegame:-1"},"layers":[{"name":"test","dat":["abZy8000000rlLru|9OOu|r)UvQ#:F5SzVR5HEIzUt9H%0000","abZy8000000rlLru|9OO00j-Xv;?&=0ruM(r|DkH000"]}]}"""
 
         val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json).also {
             it.getReadyToBeUsed(ui.world.tileNameToNumberMap)
