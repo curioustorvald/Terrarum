@@ -50,7 +50,6 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         this, 36, arrayOf("Terrain", "Wall"), // TODO use inventory icons
         0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
         defaultSelection = 0,
-        backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
     ).also {
         it.selectionChangeListener = { _, new ->
             resetScroll()
@@ -61,7 +60,6 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         this, 36, arrayOf("Close"),
         0, this.height - UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
         width = MENUBAR_SIZE, textAreaWidth = MENUBAR_SIZE,
-        backgroundCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL
     )
 
     private var scroll = 0
@@ -175,13 +173,13 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         batch.color = Toolkit.Theme.COL_INACTIVE
         Toolkit.drawBoxBorder(batch, -1, -1, width + 2, height + 2)
 
-        // background
+        // palette background
         batch.color = DEFAULT_BACKGROUNDCOL
-        Toolkit.fillArea(batch, 0, 0, width, height)
+        Toolkit.fillArea(batch, MENUBAR_SIZE, 0, width - MENUBAR_SIZE, height)
 
-        // gaps between tabs and close button
-        batch.color = DEFAULT_BACKGROUNDCOL
-        Toolkit.fillArea(batch, 0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
+        // titlebar (sideways)
+        batch.color = UINSMenu.DEFAULT_TITLEBACKCOL
+        Toolkit.fillArea(batch, 0, 0, MENUBAR_SIZE, height)
 
         // the actual buttons
         tabs.render(batch, camera)
