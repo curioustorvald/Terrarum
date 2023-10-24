@@ -441,6 +441,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 240,
                 32
             )
+            it.reset()
             it.setAsOpen()
         }
     }
@@ -854,36 +855,41 @@ class YamlCommandNewFlatTerrain : YamlInvokable {
 
 class YamlCommandToolImportTest : YamlInvokable {
     override fun invoke(args: Array<Any>) {
-        YamlCommandClearSelection().invoke(args)
         val ui = (args[0] as BuildingMaker)
+        ui.getPoiNameForImport { name ->
+            YamlCommandClearSelection().invoke(args)
 
-        val json = """{"genver":67108864,"id":"test","wlen":8,"w":5,"h":5,"lut":{"0":"basegame:0","1":"basegame:50","2":"basegame:-1"},"layers":[{"name":"test","dat":["abZy8000000rlLru|9OOu|r)UvQ#:F5SzVR5HEIzUt9H%0000","abZy8000000rlLru|9OO00j-Xv;?&=0ruM(r|DkH000"]}]}"""
+            val jsonFile = File(App.defaultDir, "/Exports/$name.poi")
+            if (jsonFile.exists()) {
+                val json = jsonFile.readText()
 
-        val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json).also {
-            it.getReadyToBeUsed(ui.world.tileNameToNumberMap)
+                val poi = Common.jsoner.fromJson(PointOfInterest().javaClass, json).also {
+                    it.getReadyToBeUsed(ui.world.tileNameToNumberMap)
 
-            println("==== Test print layer ====")
-            it.layers.forEach { layer ->
-                println("Layer ${layer.name}")
-                println("  Terrain:")
-                for (y in 0 until it.h) {
-                    for (x in 0 until it.w) {
-                        val tnum = layer.blockLayer[TERRAIN].unsafeGetTile(x, y).toLong()
-                        print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:","b")})\t")
+                    println("==== Test print layer ====")
+                    it.layers.forEach { layer ->
+                        println("Layer ${layer.name}")
+                        println("  Terrain:")
+                        for (y in 0 until it.h) {
+                            for (x in 0 until it.w) {
+                                val tnum = layer.blockLayer[TERRAIN].unsafeGetTile(x, y).toLong()
+                                print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:", "b")})\t")
+                            }
+                            println()
+                        }
+                        println("  Wall:")
+                        for (y in 0 until it.h) {
+                            for (x in 0 until it.w) {
+                                val tnum = layer.blockLayer[WALL].unsafeGetTile(x, y).toLong()
+                                print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:", "b")})\t")
+                            }
+                            println()
+                        }
                     }
-                    println()
                 }
-                println("  Wall:")
-                for (y in 0 until it.h) {
-                    for (x in 0 until it.w) {
-                        val tnum = layer.blockLayer[WALL].unsafeGetTile(x, y).toLong()
-                        print("$tnum(${ui.world.tileNumberToNameMap[tnum]?.replace("basegame:","b")})\t")
-                    }
-                    println()
-                }
+
+                println("Imported POI: $poi")
             }
         }
-
-        println("Imported POI: $poi")
     }
 }
