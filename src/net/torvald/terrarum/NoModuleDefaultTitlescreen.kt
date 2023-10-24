@@ -58,6 +58,8 @@ class NoModuleDefaultTitlescreen(batch: FlippingSpriteBatch) : IngameInstance(ba
     }
 
     override fun render(updateRate: Float) {
+        super.render(updateRate)
+
         gdxClearAndEnableBlend(0f, 0f, 0f, 0f)
 
         if (!init) {

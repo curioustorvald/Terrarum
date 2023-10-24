@@ -12,6 +12,7 @@ import kotlin.math.roundToInt
 class UIBuildingMakerGetFilename : UICanvas() {
 
     var confirmCallback: (String) -> Unit = {}
+    var cancelCallback: () -> Unit = {}
     var title = "Export"
     var text = listOf("")
 
@@ -63,6 +64,7 @@ class UIBuildingMakerGetFilename : UICanvas() {
     ).also {
         it.clickOnceListener = { _, _ ->
             reset()
+            cancelCallback()
             this.setAsClose()
         }
     }

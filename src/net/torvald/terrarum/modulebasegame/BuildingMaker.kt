@@ -298,7 +298,14 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     }
 
 
+    private var mousePrimaryClickLatched = false
+    var mousePrimaryJustDown = false; private set
+
     override fun render(updateRate: Float) {
+        super.render(updateRate)
+
+
+
         Gdx.graphics.setTitle(TerrarumIngame.getCanonicalTitle())
 
 
@@ -316,6 +323,11 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 )
         )
 
+
+
+        if (!Gdx.input.isButtonPressed(App.getConfigInt("config_mouseprimary"))) {
+            mousePrimaryClickLatched = false
+        }
     }
 
     private var mouseOnUI = false
@@ -428,7 +440,13 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             it.title = "Export"
             it.labelDo = "Export"
             it.text = listOf("WH: $w\u00D7$h", "Name of the POI:")
-            it.confirmCallback = callback
+            it.confirmCallback = { s ->
+                callback(s)
+                mousePrimaryClickLatched = true
+            }
+            it.cancelCallback = {
+                mousePrimaryClickLatched = true
+            }
             it.setPosition(
                 240,
                 32
@@ -443,7 +461,13 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             it.title = "Import"
             it.labelDo = "Import"
             it.text = listOf("Name of the POI:")
-            it.confirmCallback = callback
+            it.confirmCallback = { s ->
+                callback(s)
+                mousePrimaryClickLatched = true
+            }
+            it.cancelCallback = {
+                mousePrimaryClickLatched = true
+            }
             it.setPosition(
                 240,
                 32
@@ -456,7 +480,6 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
     private fun makePenWork(x: Int, y: Int) {
         val world = gameWorld
         val palSelection = uiPaletteSelector.fore
-        val mouseJustDown = Terrarum.mouseJustDown
 
         when (currentPenMode) {
             // test paint terrain layer
@@ -485,7 +508,10 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
                 removeBlockMarker(x, y)
             }
             PENMODE_IMPORT -> {
-                if (mouseJustDown) importPoi(x, y)
+                if (!mousePrimaryClickLatched) {
+                    importPoi(x, y)
+                    mousePrimaryClickLatched = true
+                }
             }
         }
     }

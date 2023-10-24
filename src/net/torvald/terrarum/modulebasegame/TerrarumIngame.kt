@@ -732,7 +732,7 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
     internal var autosaveTimer = 0f
 
-    override fun render(`_`: Float) {
+    override fun render(updateRate: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
         // there's still things to load which needs GL context to be present
         if (!gameFullyLoaded) {
@@ -756,6 +756,8 @@ open class TerrarumIngame(batch: FlippingSpriteBatch) : IngameInstance(batch) {
 
             gameFullyLoaded = true
         }
+
+        super.render(updateRate)
 
         ingameController.update()
 
