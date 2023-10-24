@@ -354,7 +354,7 @@ class BuildingMaker(batch: FlippingSpriteBatch) : IngameInstance(batch) {
             }
         }
 
-        mouseOnUI = (overwriteMouseOnUI || uiPenMenu.isVisible || uiPalette.isVisible || uiGetPoiName.isVisible)
+        mouseOnUI = (overwriteMouseOnUI || uiPenMenu.isVisible /*|| uiPalette.isVisible*/ || uiGetPoiName.isVisible)
 
 
         WorldCamera.update(world, actorNowPlaying)
